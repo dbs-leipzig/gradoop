@@ -1,4 +1,4 @@
-package org.biiig.epg.store.impl;
+package org.biiig.epg.store.hbase;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
@@ -21,12 +21,13 @@ public class HBaseGraphStoreFactory {
   private HBaseGraphStoreFactory() {
   }
 
-  public static GraphStore createGraphStore(Configuration config) {
+  public static GraphStore createGraphStore(Configuration config,
+      HBaseVerticesHandler verticesHandler, HBaseGraphsHandler graphsHandler) {
     HTable graphsTable = null;
     HTable verticesTable = null;
 
     try {
-      createTablesIfNotExists(config);
+      createTablesIfNotExists(config, verticesHandler);
 
       graphsTable = new HTable(config, HBaseGraphStore.TABLE_GRAPHS);
       verticesTable = new HTable(config, HBaseGraphStore.TABLE_VERTICES);
@@ -34,7 +35,7 @@ public class HBaseGraphStoreFactory {
       e.printStackTrace();
     }
 
-    return new HBaseGraphStore(graphsTable, verticesTable);
+    return new HBaseGraphStore(graphsTable, verticesTable, verticesHandler, graphsHandler);
   }
 
   public static void deleteGraphStore(Configuration config) {
@@ -45,7 +46,8 @@ public class HBaseGraphStoreFactory {
     }
   }
 
-  private static void createTablesIfNotExists(Configuration config) throws IOException {
+  private static void createTablesIfNotExists(Configuration config,
+      HBaseVerticesHandler verticesHandler) throws IOException {
     HTableDescriptor verticesTableDescriptor =
         new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
@@ -54,7 +56,8 @@ public class HBaseGraphStoreFactory {
     HBaseAdmin admin = new HBaseAdmin(config);
 
     if (!admin.tableExists(verticesTableDescriptor.getName())) {
-      createVerticesTable(admin, verticesTableDescriptor);
+      verticesHandler.createVerticesTable(admin, verticesTableDescriptor);
+      //      createVerticesTable(admin, verticesTableDescriptor);
     }
     if (!admin.tableExists(graphsTableDescriptor.getName())) {
       createGraphsTable(admin, graphsTableDescriptor);
@@ -63,15 +66,15 @@ public class HBaseGraphStoreFactory {
     admin.close();
   }
 
-  private static void createVerticesTable(HBaseAdmin admin, HTableDescriptor tableDescriptor)
-      throws IOException {
-    LOG.info("creating table " + tableDescriptor.getNameAsString());
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_LABELS));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_PROPERTIES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_OUT_EDGES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_IN_EDGES));
-    admin.createTable(tableDescriptor);
-  }
+  //  private static void createVerticesTable(HBaseAdmin admin, HTableDescriptor tableDescriptor)
+  //      throws IOException {
+  //    LOG.info("creating table " + tableDescriptor.getNameAsString());
+  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_LABELS));
+  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_PROPERTIES));
+  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_OUT_EDGES));
+  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_IN_EDGES));
+  //    admin.createTable(tableDescriptor);
+  //  }
 
   private static void createGraphsTable(HBaseAdmin admin, HTableDescriptor tableDescriptor)
       throws IOException {

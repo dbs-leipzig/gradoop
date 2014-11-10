@@ -10,4 +10,6 @@ public interface Vertex extends Identifiable, Attributed, Labeled {
   Map<String, Map<String, Object>> getOutgoingEdges();
 
   Map<String, Map<String, Object>> getIncomingEdges();
+
+  Iterable<Long> getGraphs();
 }

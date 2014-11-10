@@ -13,12 +13,15 @@ public class SimpleVertex extends LabeledPropertyContainer implements Vertex {
 
   private final Map<String, Map<String, Object>> incomingEdges;
 
+  private final Iterable<Long> graphs;
+
   public SimpleVertex(Long id, Iterable<String> labels,
       Map<String, Object> properties, Map<String, Map<String, Object>> outgoingEdges,
-      Map<String, Map<String, Object>> incomingEdges) {
+      Map<String, Map<String, Object>> incomingEdges, Iterable<Long> graphs) {
     super(id, labels, properties);
     this.outgoingEdges = outgoingEdges;
     this.incomingEdges = incomingEdges;
+    this.graphs = graphs;
   }
 
   @Override
@@ -29,6 +32,10 @@ public class SimpleVertex extends LabeledPropertyContainer implements Vertex {
   @Override
   public Map<String, Map<String, Object>> getIncomingEdges() {
     return incomingEdges;
+  }
+
+  @Override public Iterable<Long> getGraphs() {
+    return graphs;
   }
 
   @Override
