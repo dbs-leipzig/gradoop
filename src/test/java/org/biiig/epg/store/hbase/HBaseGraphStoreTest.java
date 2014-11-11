@@ -8,7 +8,7 @@ import org.biiig.epg.model.Vertex;
 import org.biiig.epg.model.impl.SimpleGraph;
 import org.biiig.epg.model.impl.SimpleVertex;
 import org.biiig.epg.store.GraphStore;
-import org.junit.AfterClass;
+import org.biiig.epg.store.exceptions.UnsupportedTypeException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -318,6 +318,26 @@ public class HBaseGraphStoreTest {
     graphStore.close();
   }
 
+  @Test(expected = UnsupportedTypeException.class)
+  public void wrongPropertyTypeTest() {
+    GraphStore graphStore = createEmptyGraphStore();
+
+    final String key = "key1";
+    // list is not supported
+    final List<String> value = Lists.newArrayList();
+
+    Long vertexID = 0L;
+    final Iterable<String> labels = Lists.newArrayList("A");
+    final Map<String, Object> properties = new HashMap<>();
+    properties.put(key, value);
+
+    final Map<String, Map<String, Object>> outEdges = new HashMap<>();
+    final Map<String, Map<String, Object>> inEdges = new HashMap<>();
+    final Iterable<Long> graphs = Lists.newArrayList();
+    Vertex v = new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+    graphStore.writeVertex(v);
+  }
+
   @Test
   public void propertiesTest() {
     GraphStore graphStore = createEmptyGraphStore();
@@ -352,9 +372,9 @@ public class HBaseGraphStoreTest {
     final Iterable<Long> graphs = Lists.newArrayList();
 
     Vertex v = new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+    graphStore.writeVertex(v);
 
     // reopen
-    graphStore.writeVertex(v);
     graphStore.close();
     graphStore = openBasicGraphStore();
 

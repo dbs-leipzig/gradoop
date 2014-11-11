@@ -4,6 +4,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.biiig.epg.model.Attributed;
 import org.biiig.epg.model.Labeled;
+import org.biiig.epg.store.exceptions.UnsupportedTypeException;
 
 import java.util.Map;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 public interface EntityHandler {
   Put writeLabels(Put put, Labeled entity);
 
-  Put writeProperties(Put put, Attributed entity);
+  Put writeProperties(Put put, Attributed entity) throws UnsupportedTypeException;
 
   Iterable<String> readLabels(Result res);
 

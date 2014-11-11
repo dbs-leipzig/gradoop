@@ -1,9 +1,6 @@
 package org.biiig.epg.store.hbase;
 
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.biiig.epg.model.Graph;
@@ -13,6 +10,7 @@ import org.biiig.epg.model.impl.SimpleVertex;
 import org.biiig.epg.store.GraphStore;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.Map;
 
 /**
@@ -83,7 +81,9 @@ public class HBaseGraphStore implements GraphStore {
 
       verticesTable.put(put);
       verticesTable.flushCommits();
-    } catch (Exception e) {
+    } catch (RetriesExhaustedWithDetailsException e) {
+      e.printStackTrace();
+    } catch (InterruptedIOException e) {
       e.printStackTrace();
     }
   }

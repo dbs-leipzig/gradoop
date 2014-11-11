@@ -6,6 +6,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.biiig.epg.model.Attributed;
 import org.biiig.epg.model.Labeled;
+import org.biiig.epg.store.exceptions.UnsupportedTypeException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +69,7 @@ public abstract class BasicHandler implements EntityHandler {
     return keys;
   }
 
-  private byte[] encodeValue(Object value) {
+  private byte[] encodeValue(Object value) throws UnsupportedTypeException {
     Class<?> valueClass = value.getClass();
     byte[] decodedValue;
     if (valueClass.equals(Boolean.class)) {
@@ -84,7 +85,7 @@ public abstract class BasicHandler implements EntityHandler {
     } else if (valueClass.equals(String.class)) {
       decodedValue = Bytes.add(new byte[] { TYPE_STRING }, Bytes.toBytes((String) value));
     } else {
-      throw new IllegalArgumentException(
+      throw new UnsupportedTypeException(
           valueClass + " not supported by graph store " + HBaseGraphStore.class);
     }
     return decodedValue;
