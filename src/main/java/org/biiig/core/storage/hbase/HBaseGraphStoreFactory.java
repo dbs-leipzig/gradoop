@@ -1,4 +1,4 @@
-package org.biiig.epg.store.hbase;
+package org.biiig.core.storage.hbase;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
@@ -7,7 +7,7 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.log4j.Logger;
-import org.biiig.epg.store.GraphStore;
+import org.biiig.core.storage.GraphStore;
 
 import java.io.IOException;
 

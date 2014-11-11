@@ -1,8 +1,8 @@
-package org.biiig.epg.store;
+package org.biiig.core.storage;
 
-import org.biiig.epg.model.Graph;
-import org.biiig.epg.model.Vertex;
-import org.biiig.epg.store.exceptions.UnsupportedTypeException;
+import org.biiig.core.model.Graph;
+import org.biiig.core.model.Vertex;
+import org.biiig.core.storage.exceptions.UnsupportedTypeException;
 
 /**
  * Created by martin on 05.11.14.

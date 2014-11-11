@@ -1,6 +1,6 @@
-package org.biiig.epg.model.impl;
+package org.biiig.core.model.inmemory;
 
-import org.biiig.epg.model.Vertex;
+import org.biiig.core.model.Vertex;
 
 import java.util.Map;
 

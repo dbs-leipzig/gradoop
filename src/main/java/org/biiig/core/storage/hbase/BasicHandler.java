@@ -1,12 +1,12 @@
-package org.biiig.epg.store.hbase;
+package org.biiig.core.storage.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.biiig.epg.model.Attributed;
-import org.biiig.epg.model.Labeled;
-import org.biiig.epg.store.exceptions.UnsupportedTypeException;
+import org.biiig.core.model.Attributed;
+import org.biiig.core.model.Labeled;
+import org.biiig.core.storage.exceptions.UnsupportedTypeException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +86,7 @@ public abstract class BasicHandler implements EntityHandler {
       decodedValue = Bytes.add(new byte[] { TYPE_STRING }, Bytes.toBytes((String) value));
     } else {
       throw new UnsupportedTypeException(
-          valueClass + " not supported by graph store " + HBaseGraphStore.class);
+          valueClass + " not supported by graph storage " + HBaseGraphStore.class);
     }
     return decodedValue;
   }

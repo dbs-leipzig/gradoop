@@ -1,10 +1,10 @@
-package org.biiig.epg.store.hbase;
+package org.biiig.core.storage.hbase;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.biiig.epg.model.Attributed;
-import org.biiig.epg.model.Labeled;
-import org.biiig.epg.store.exceptions.UnsupportedTypeException;
+import org.biiig.core.model.Attributed;
+import org.biiig.core.model.Labeled;
+import org.biiig.core.storage.exceptions.UnsupportedTypeException;
 
 import java.util.Map;
 

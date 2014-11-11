@@ -1,9 +1,9 @@
-package org.biiig.epg.store.hbase;
+package org.biiig.core.storage.hbase;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.biiig.epg.model.Graph;
+import org.biiig.core.model.Graph;
 
 /**
  * Created by s1ck on 11/10/14.

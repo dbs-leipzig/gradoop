@@ -1,8 +1,8 @@
-package org.biiig.epg.model.impl;
+package org.biiig.core.model.inmemory;
 
-import org.biiig.epg.model.Attributed;
-import org.biiig.epg.model.Identifiable;
-import org.biiig.epg.model.Labeled;
+import org.biiig.core.model.Attributed;
+import org.biiig.core.model.Identifiable;
+import org.biiig.core.model.Labeled;
 
 import java.util.Map;
 

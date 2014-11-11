@@ -1,4 +1,4 @@
-package org.biiig.epg.model;
+package org.biiig.core.model;
 
 /**
  * Created by martin on 05.11.14.

@@ -1,14 +1,14 @@
-package org.biiig.epg.store.hbase;
+package org.biiig.core.storage.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
-import org.biiig.epg.model.Graph;
-import org.biiig.epg.model.Vertex;
-import org.biiig.epg.model.impl.SimpleGraph;
-import org.biiig.epg.model.impl.SimpleVertex;
-import org.biiig.epg.store.GraphStore;
-import org.biiig.epg.store.exceptions.UnsupportedTypeException;
+import org.biiig.core.model.Graph;
+import org.biiig.core.model.Vertex;
+import org.biiig.core.model.inmemory.SimpleGraph;
+import org.biiig.core.model.inmemory.SimpleVertex;
+import org.biiig.core.storage.GraphStore;
+import org.biiig.core.storage.exceptions.UnsupportedTypeException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -167,7 +167,7 @@ public class HBaseGraphStoreTest {
   public void simpleTest() {
     GraphStore graphStore = createEmptyGraphStore();
 
-    // store some data
+    // storage some data
     for (Vertex v : createVertices()) {
       graphStore.writeVertex(v);
     }

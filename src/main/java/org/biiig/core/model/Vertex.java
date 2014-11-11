@@ -1,4 +1,4 @@
-package org.biiig.epg.model;
+package org.biiig.core.model;
 
 import java.util.Map;
 

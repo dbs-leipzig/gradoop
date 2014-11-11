@@ -1,13 +1,13 @@
-package org.biiig.epg.store.hbase;
+package org.biiig.core.storage.hbase;
 
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
-import org.biiig.epg.model.Graph;
-import org.biiig.epg.model.Vertex;
-import org.biiig.epg.model.impl.SimpleGraph;
-import org.biiig.epg.model.impl.SimpleVertex;
-import org.biiig.epg.store.GraphStore;
+import org.biiig.core.model.Graph;
+import org.biiig.core.model.Vertex;
+import org.biiig.core.model.inmemory.SimpleGraph;
+import org.biiig.core.model.inmemory.SimpleVertex;
+import org.biiig.core.storage.GraphStore;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
