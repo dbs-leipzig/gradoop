@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Created by s1ck on 11/10/14.
  */
-public interface HBaseEntityHandler {
+public interface EntityHandler {
   Put writeLabels(Put put, Labeled entity);
 
   Put writeProperties(Put put, Attributed entity);

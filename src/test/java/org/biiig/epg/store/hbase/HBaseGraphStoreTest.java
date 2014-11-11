@@ -149,8 +149,8 @@ public class HBaseGraphStoreTest {
   @Test
   public void simpleTest() {
     Configuration config = utility.getConfiguration();
-    HBaseVerticesHandler verticesHandler = new InOutEdgesGraphsVerticesHandler();
-    HBaseGraphsHandler graphsHandler = new BasicGraphsHandler();
+    VertexHandler verticesHandler = new InOutEdgesGraphsVertexHandler();
+    GraphHandler graphsHandler = new BasicGraphHandler();
 
     HBaseGraphStoreFactory.deleteGraphStore(config);
     GraphStore graphStore =

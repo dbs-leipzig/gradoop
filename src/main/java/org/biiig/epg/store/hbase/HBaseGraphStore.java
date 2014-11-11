@@ -35,11 +35,11 @@ public class HBaseGraphStore implements GraphStore {
   private final HTable verticesTable;
   private final HTable graphsTable;
 
-  private final HBaseVerticesHandler verticesHandler;
-  private final HBaseGraphsHandler graphsHandler;
+  private final VertexHandler verticesHandler;
+  private final GraphHandler graphsHandler;
 
   public HBaseGraphStore(HTable graphsTable, HTable verticesTable,
-      HBaseVerticesHandler verticesHandler, HBaseGraphsHandler graphsHandler) {
+      VertexHandler verticesHandler, GraphHandler graphsHandler) {
     this.graphsTable = graphsTable;
     this.verticesTable = verticesTable;
     this.verticesHandler = verticesHandler;

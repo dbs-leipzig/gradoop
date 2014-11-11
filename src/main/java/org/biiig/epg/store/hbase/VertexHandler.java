@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Created by s1ck on 11/8/14.
  */
-public interface HBaseVerticesHandler extends HBaseEntityHandler {
+public interface VertexHandler extends EntityHandler {
   void createVerticesTable(final HBaseAdmin admin, final HTableDescriptor tableDescriptor)
       throws IOException;
 

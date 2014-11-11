@@ -8,7 +8,7 @@ import org.biiig.epg.model.Graph;
 /**
  * Created by s1ck on 11/10/14.
  */
-public class BasicGraphsHandler extends HBaseBasicHandler implements HBaseGraphsHandler {
+public class BasicGraphHandler extends BasicHandler implements GraphHandler {
 
   private static final byte[] CF_VERTICES_BYTES = Bytes.toBytes(HBaseGraphStore.CF_VERTICES);
 

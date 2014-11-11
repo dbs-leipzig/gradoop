@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by s1ck on 11/10/14.
  */
-public abstract class HBaseBasicHandler implements HBaseEntityHandler {
+public abstract class BasicHandler implements EntityHandler {
   protected static final byte[] CF_LABELS_BYTES = Bytes.toBytes(HBaseGraphStore.CF_LABELS);
   protected static final byte[] CF_PROPERTIES_BYTES = Bytes.toBytes(HBaseGraphStore.CF_PROPERTIES);
 

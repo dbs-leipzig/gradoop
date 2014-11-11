@@ -22,7 +22,7 @@ public class HBaseGraphStoreFactory {
   }
 
   public static GraphStore createGraphStore(Configuration config,
-      HBaseVerticesHandler verticesHandler, HBaseGraphsHandler graphsHandler) {
+      VertexHandler verticesHandler, GraphHandler graphsHandler) {
     HTable graphsTable = null;
     HTable verticesTable = null;
 
@@ -47,7 +47,7 @@ public class HBaseGraphStoreFactory {
   }
 
   private static void createTablesIfNotExists(Configuration config,
-      HBaseVerticesHandler verticesHandler) throws IOException {
+      VertexHandler verticesHandler) throws IOException {
     HTableDescriptor verticesTableDescriptor =
         new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =

@@ -7,7 +7,7 @@ import org.biiig.epg.model.Graph;
 /**
  * Created by s1ck on 11/10/14.
  */
-public interface HBaseGraphsHandler extends HBaseEntityHandler {
+public interface GraphHandler extends EntityHandler {
   Put writeVertices(Put put, Graph graph);
 
   Iterable<Long> readVertices(Result res);

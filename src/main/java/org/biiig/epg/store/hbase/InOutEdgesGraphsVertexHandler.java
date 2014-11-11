@@ -16,9 +16,9 @@ import java.util.Map;
 /**
  * Created by s1ck on 11/8/14.
  */
-public class InOutEdgesGraphsVerticesHandler extends HBaseBasicHandler
-    implements HBaseVerticesHandler {
-  private static Logger LOG = Logger.getLogger(InOutEdgesGraphsVerticesHandler.class);
+public class InOutEdgesGraphsVertexHandler extends BasicHandler
+    implements VertexHandler {
+  private static Logger LOG = Logger.getLogger(InOutEdgesGraphsVertexHandler.class);
 
   private static final byte[] CF_OUT_EDGES_BYTES = Bytes.toBytes(HBaseGraphStore.CF_OUT_EDGES);
   private static final byte[] CF_IN_EDGES_BYTES = Bytes.toBytes(HBaseGraphStore.CF_IN_EDGES);
