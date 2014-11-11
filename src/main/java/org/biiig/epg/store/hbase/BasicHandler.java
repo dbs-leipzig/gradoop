@@ -71,15 +71,15 @@ public abstract class BasicHandler implements EntityHandler {
   private byte[] encodeValue(Object value) {
     Class<?> valueClass = value.getClass();
     byte[] decodedValue;
-    if (valueClass.equals(Boolean.TYPE)) {
+    if (valueClass.equals(Boolean.class)) {
       decodedValue = Bytes.add(new byte[] { TYPE_BOOLEAN }, Bytes.toBytes((Boolean) value));
-    } else if (valueClass.equals(Integer.TYPE)) {
+    } else if (valueClass.equals(Integer.class)) {
       decodedValue = Bytes.add(new byte[] { TYPE_INTEGER }, Bytes.toBytes((Integer) value));
-    } else if (valueClass.equals(Long.TYPE)) {
+    } else if (valueClass.equals(Long.class)) {
       decodedValue = Bytes.add(new byte[] { TYPE_LONG }, Bytes.toBytes((Long) value));
-    } else if (valueClass.equals(Float.TYPE)) {
+    } else if (valueClass.equals(Float.class)) {
       decodedValue = Bytes.add(new byte[] { TYPE_FLOAT }, Bytes.toBytes((Float) value));
-    } else if (valueClass.equals(Double.TYPE)) {
+    } else if (valueClass.equals(Double.class)) {
       decodedValue = Bytes.add(new byte[] { TYPE_DOUBLE }, Bytes.toBytes((Double) value));
     } else if (valueClass.equals(String.class)) {
       decodedValue = Bytes.add(new byte[] { TYPE_STRING }, Bytes.toBytes((String) value));

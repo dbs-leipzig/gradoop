@@ -8,7 +8,8 @@ import org.biiig.epg.model.Vertex;
 import org.biiig.epg.model.impl.SimpleGraph;
 import org.biiig.epg.model.impl.SimpleVertex;
 import org.biiig.epg.store.GraphStore;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.*;
@@ -140,21 +141,31 @@ public class HBaseGraphStoreTest {
     return graphs;
   }
 
-  @Before
-  public void setup() throws Exception {
+  private GraphStore createEmptyGraphStore() {
+    Configuration config = utility.getConfiguration();
+    VertexHandler verticesHandler = new InOutEdgesGraphsVertexHandler();
+    GraphHandler graphsHandler = new BasicGraphHandler();
+
+    HBaseGraphStoreFactory.deleteGraphStore(config);
+    return HBaseGraphStoreFactory.createGraphStore(config, verticesHandler, graphsHandler);
+  }
+
+  private GraphStore openBasicGraphStore() {
+    Configuration config = utility.getConfiguration();
+    VertexHandler verticesHandler = new InOutEdgesGraphsVertexHandler();
+    GraphHandler graphsHandler = new BasicGraphHandler();
+    return HBaseGraphStoreFactory.createGraphStore(config, verticesHandler, graphsHandler);
+  }
+
+  @BeforeClass
+  public static void setup() throws Exception {
     utility = new HBaseTestingUtility();
     utility.startMiniCluster();
   }
 
   @Test
   public void simpleTest() {
-    Configuration config = utility.getConfiguration();
-    VertexHandler verticesHandler = new InOutEdgesGraphsVertexHandler();
-    GraphHandler graphsHandler = new BasicGraphHandler();
-
-    HBaseGraphStoreFactory.deleteGraphStore(config);
-    GraphStore graphStore =
-        HBaseGraphStoreFactory.createGraphStore(config, verticesHandler, graphsHandler);
+    GraphStore graphStore = createEmptyGraphStore();
 
     // store some data
     for (Vertex v : createVertices()) {
@@ -167,7 +178,7 @@ public class HBaseGraphStoreTest {
 
     // re-open
     graphStore.close();
-    graphStore = HBaseGraphStoreFactory.createGraphStore(config, verticesHandler, graphsHandler);
+    graphStore = openBasicGraphStore();
 
     // check data
 
@@ -305,5 +316,75 @@ public class HBaseGraphStoreTest {
     assertTrue(graphs.contains(1L));
 
     graphStore.close();
+  }
+
+  @Test
+  public void propertiesTest() {
+    GraphStore graphStore = createEmptyGraphStore();
+
+    final int propertyCount = 6;
+    final String keyBoolean = "key1";
+    final boolean valueBoolean = true;
+    final String keyInteger = "key2";
+    final int valueInteger = 23;
+    final String keyLong = "key3";
+    final long valueLong = 42L;
+    final String keyFloat = "key4";
+    final float valueFloat = 13.37f;
+    final String keyDouble = "key5";
+    final double valueDouble = 3.14d;
+    final String keyString = "key6";
+    final String valueString = "value";
+
+    final Long vertexID = 0L;
+    final Iterable<String> labels = Lists.newArrayList("A");
+
+    final Map<String, Object> properties = new HashMap<>();
+    properties.put(keyBoolean, valueBoolean);
+    properties.put(keyInteger, valueInteger);
+    properties.put(keyLong, valueLong);
+    properties.put(keyFloat, valueFloat);
+    properties.put(keyDouble, valueDouble);
+    properties.put(keyString, valueString);
+
+    final Map<String, Map<String, Object>> outEdges = new HashMap<>();
+    final Map<String, Map<String, Object>> inEdges = new HashMap<>();
+    final Iterable<Long> graphs = Lists.newArrayList();
+
+    Vertex v = new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+
+    // reopen
+    graphStore.writeVertex(v);
+    graphStore.close();
+    graphStore = openBasicGraphStore();
+
+    v = graphStore.readVertex(vertexID);
+
+    List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
+
+    assertEquals(propertyCount, propertyKeys.size());
+
+    for (String propertyKey : propertyKeys) {
+      switch (propertyKey) {
+      case keyBoolean:
+        assertEquals(valueBoolean, v.getProperty(propertyKey));
+        break;
+      case keyInteger:
+        assertEquals(valueInteger, v.getProperty(keyInteger));
+        break;
+      case keyLong:
+        assertEquals(valueLong, v.getProperty(keyLong));
+        break;
+      case keyFloat:
+        assertEquals(valueFloat, v.getProperty(keyFloat));
+        break;
+      case keyDouble:
+        assertEquals(valueDouble, v.getProperty(keyDouble));
+        break;
+      case keyString:
+        assertEquals(valueString, v.getProperty(keyString));
+        break;
+      }
+    }
   }
 }
