@@ -38,7 +38,7 @@ public abstract class BasicHandler implements EntityHandler {
   @Override public Put writeProperties(Put put, Attributed entity) {
     for (String key : entity.getPropertyKeys()) {
       put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key),
-          encodeValue(entity.getProperty(key)));
+          encodeValueToBytes(entity.getProperty(key)));
     }
     return put;
   }
@@ -56,7 +56,8 @@ public abstract class BasicHandler implements EntityHandler {
     for (Map.Entry<byte[], byte[]> propertyColumn : res.getFamilyMap(CF_PROPERTIES_BYTES)
         .entrySet()) {
       properties
-          .put(Bytes.toString(propertyColumn.getKey()), decodeValue(propertyColumn.getValue()));
+          .put(Bytes.toString(propertyColumn.getKey()), decodeValueFromBytes(
+              propertyColumn.getValue()));
     }
     return properties;
   }
@@ -69,7 +70,55 @@ public abstract class BasicHandler implements EntityHandler {
     return keys;
   }
 
-  private byte[] encodeValue(Object value) throws UnsupportedTypeException {
+  protected byte getType(Object o) {
+    Class<?> valueClass = o.getClass();
+    byte type;
+    if (valueClass.equals(Boolean.class)) {
+      type = TYPE_BOOLEAN;
+    } else if (valueClass.equals(Integer.class)) {
+      type = TYPE_INTEGER;
+    } else if (valueClass.equals(Long.class)) {
+      type = TYPE_LONG;
+    } else if (valueClass.equals(Long.class)) {
+      type = TYPE_FLOAT;
+    } else if (valueClass.equals(Double.class)) {
+      type = TYPE_DOUBLE;
+    } else if (valueClass.equals(String.class)) {
+      type = TYPE_STRING;
+    } else {
+      throw new UnsupportedTypeException(valueClass + " not supported");
+    }
+    return type;
+  }
+
+  protected Object decodeValueFromString(byte type, String value) {
+    Object o;
+    switch (type) {
+    case TYPE_BOOLEAN:
+      o = Boolean.parseBoolean(value);
+      break;
+    case TYPE_INTEGER:
+      o = Integer.parseInt(value);
+      break;
+    case TYPE_LONG:
+      o = Long.parseLong(value);
+      break;
+    case TYPE_FLOAT:
+      o = Float.parseFloat(value);
+      break;
+    case TYPE_DOUBLE:
+      o = Double.parseDouble(value);
+      break;
+    case TYPE_STRING:
+      o = value;
+      break;
+    default:
+      throw new UnsupportedTypeException(value.getClass() + " not supported");
+    }
+    return o;
+  }
+
+  protected byte[] encodeValueToBytes(Object value) throws UnsupportedTypeException {
     Class<?> valueClass = value.getClass();
     byte[] decodedValue;
     if (valueClass.equals(Boolean.class)) {
@@ -85,13 +134,12 @@ public abstract class BasicHandler implements EntityHandler {
     } else if (valueClass.equals(String.class)) {
       decodedValue = Bytes.add(new byte[] { TYPE_STRING }, Bytes.toBytes((String) value));
     } else {
-      throw new UnsupportedTypeException(
-          valueClass + " not supported by graph storage " + HBaseGraphStore.class);
+      throw new UnsupportedTypeException(valueClass + " not supported");
     }
     return decodedValue;
   }
 
-  private Object decodeValue(byte[] encValue) {
+  protected Object decodeValueFromBytes(byte[] encValue) {
     Object o = null;
     if (encValue.length > 0) {
       byte type = encValue[0];

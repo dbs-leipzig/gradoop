@@ -57,7 +57,7 @@ public class ExtendedVertexReader implements VertexLineReader {
     String[] valueTokens = token.split(VALUE_TOKEN_SEPARATOR);
     int propertyCount = Integer.parseInt(valueTokens[0]);
     Map<String, Object> properties = Maps.newHashMapWithExpectedSize(propertyCount);
-    for (int i = 1; i < (propertyCount * 3); i += 3) {
+    for (int i = 1; i < valueTokens.length; i += 3) {
       properties.put(valueTokens[i], decodeValue(valueTokens[i + 1], valueTokens[i + 2]));
     }
     return properties;
