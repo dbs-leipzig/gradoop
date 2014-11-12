@@ -19,7 +19,7 @@ public class AdjacencyListReader {
     this.vertexLineReader = vertexLineReader;
   }
 
-  public void readFile(BufferedReader br) throws IOException {
+  public void read(BufferedReader br) throws IOException {
     String line;
     while ((line = br.readLine()) != null) {
       graphStore.writeVertex(vertexLineReader.readLine(line));
