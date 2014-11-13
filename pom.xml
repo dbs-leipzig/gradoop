@@ -16,6 +16,7 @@
 
     <modules>
         <module>gradoop-core</module>
+        <module>gradoop-giraph</module>
     </modules>
 
     <developers>
@@ -40,7 +41,9 @@
         <dep.neo4j.version>2.1.5</dep.neo4j.version>
         <dep.hbase-client.version>0.98.7-hadoop1</dep.hbase-client.version>
         <dep.hbase-testing-util.version>0.98.7-hadoop1</dep.hbase-testing-util.version>
-        <dep.hadoop-core>1.2.1</dep.hadoop-core>
+        <dep.hadoop-core.version>1.2.1</dep.hadoop-core.version>
+        <dep.giraph-core.version>1.1.0-SNAPSHOT</dep.giraph-core.version>
+        <dep.junit.version>4.11</dep.junit.version>
     </properties>
 
     <dependencies>
@@ -48,6 +51,12 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${dep.log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${dep.junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
