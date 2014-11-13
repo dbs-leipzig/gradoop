@@ -5,9 +5,14 @@ import org.biiig.core.io.BasicVertexReader;
 import org.biiig.core.io.ExtendedVertexReader;
 import org.biiig.core.io.VertexLineReader;
 import org.biiig.core.model.Vertex;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,12 +22,28 @@ import static org.junit.Assert.assertTrue;
  */
 public class BIIIGTest {
 
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
   protected static final String KEY_1 = "k1";
   protected static final String KEY_2 = "k2";
   protected static final String KEY_3 = "k3";
   protected static final String VALUE_1 = "v1";
   protected static final String VALUE_2 = "v2";
   protected static final String VALUE_3 = "v3";
+
+  private String getCallingMethod() {
+    return Thread.currentThread().getStackTrace()[1].getMethodName();
+  }
+
+  protected File getTempFile() throws IOException {
+    return getTempFile(null);
+  }
+
+  protected File getTempFile(String fileName) throws IOException {
+    fileName = (fileName != null) ? fileName : getCallingMethod() + "_" + new Random().nextLong();
+    return temporaryFolder.newFile(fileName);
+  }
 
   protected static final String[] BASIC_GRAPH = new String[] {
       "0 1 2",
