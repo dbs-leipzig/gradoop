@@ -5,15 +5,16 @@ import org.biiig.core.model.inmemory.SimpleVertex;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by s1ck on 11/11/14.
  */
 public class BasicVertexReader implements VertexLineReader {
-  private static final String LINE_TOKEN_SEPARATOR = " ";
+  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(" ");
 
   private String[] getTokens(String line) {
-    return line.split(LINE_TOKEN_SEPARATOR);
+    return LINE_TOKEN_SEPARATOR.split(line);
   }
 
   @Override public Vertex readLine(String line) {

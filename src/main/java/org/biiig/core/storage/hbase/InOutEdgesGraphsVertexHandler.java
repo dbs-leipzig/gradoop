@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by s1ck on 11/8/14.
@@ -27,7 +28,7 @@ public class InOutEdgesGraphsVertexHandler extends BasicHandler
   private static final byte[] CF_IN_EDGES_BYTES = Bytes.toBytes(HBaseGraphStore.CF_IN_EDGES);
   private static final byte[] CF_GRAPHS_BYTES = Bytes.toBytes(HBaseGraphStore.CF_GRAPHS);
 
-  private static final String PROPERTY_TOKEN_SEPARATOR = " ";
+  private static final Pattern PROPERTY_TOKEN_SEPARATOR = Pattern.compile(" ");
 
   @Override public void createVerticesTable(HBaseAdmin admin,
       HTableDescriptor tableDescriptor) throws IOException {
@@ -81,7 +82,8 @@ public class InOutEdgesGraphsVertexHandler extends BasicHandler
         );
         propertyStrings.add(propertyString);
       }
-      byte[] properties = Bytes.toBytes(Joiner.on(PROPERTY_TOKEN_SEPARATOR).join(propertyStrings));
+      byte[] properties =
+          Bytes.toBytes(Joiner.on(PROPERTY_TOKEN_SEPARATOR.toString()).join(propertyStrings));
       put.add(columnFamily, Bytes.toBytes(edge.getKey()), properties);
     }
     return put;
@@ -94,7 +96,7 @@ public class InOutEdgesGraphsVertexHandler extends BasicHandler
       Map<String, Object> edgeProperties = new HashMap<>();
       String propertyString = Bytes.toString(edgeColumn.getValue());
       if (propertyString.length() > 0) {
-        String[] tokens = propertyString.split(PROPERTY_TOKEN_SEPARATOR);
+        String[] tokens = PROPERTY_TOKEN_SEPARATOR.split(propertyString);
         for (int i = 0; i < tokens.length; i += 3) {
           String propertyKey = tokens[i];
           byte propertyType = Byte.parseByte(tokens[i + 1]);

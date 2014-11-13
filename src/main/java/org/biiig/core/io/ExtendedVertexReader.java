@@ -10,15 +10,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by s1ck on 11/11/14.
  */
 public class ExtendedVertexReader implements VertexLineReader {
 
-  private static final String LINE_TOKEN_SEPARATOR = "\\|";
-  private static final String VALUE_TOKEN_SEPARATOR = " ";
-  private static final String LIST_TOKEN_SEPARATOR = ",";
+  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile("\\|");
+  private static final Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile(" ");
+  private static final Pattern LIST_TOKEN_SEPARATOR = Pattern.compile(",");
 
   private static final byte TYPE_BOOLEAN = 0x00;
   private static final byte TYPE_INTEGER = 0x01;
@@ -42,7 +43,7 @@ public class ExtendedVertexReader implements VertexLineReader {
   }
 
   private String[] getLineTokens(final String line) {
-    return line.split(LINE_TOKEN_SEPARATOR);
+    return LINE_TOKEN_SEPARATOR.split(line);
   }
 
   private Long readVertexID(String token) {
@@ -50,11 +51,11 @@ public class ExtendedVertexReader implements VertexLineReader {
   }
 
   private Iterable<String> readLabels(String token) {
-    return Arrays.asList(token.split(VALUE_TOKEN_SEPARATOR));
+    return Arrays.asList(VALUE_TOKEN_SEPARATOR.split(token));
   }
 
   private Map<String, Object> readProperties(String token) {
-    String[] valueTokens = token.split(VALUE_TOKEN_SEPARATOR);
+    String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(token);
     int propertyCount = Integer.parseInt(valueTokens[0]);
     Map<String, Object> properties = Maps.newHashMapWithExpectedSize(propertyCount);
     for (int i = 1; i < valueTokens.length; i += 3) {
@@ -65,8 +66,8 @@ public class ExtendedVertexReader implements VertexLineReader {
 
   private Map<String, Map<String, Object>> readEdges(String token) {
     Map<String, Map<String, Object>> edges = new HashMap<>();
-    for (String edgeString : token.split(LIST_TOKEN_SEPARATOR)) {
-      int propStartIdx = edgeString.indexOf(VALUE_TOKEN_SEPARATOR);
+    for (String edgeString : LIST_TOKEN_SEPARATOR.split(token)) {
+      int propStartIdx = edgeString.indexOf(VALUE_TOKEN_SEPARATOR.toString());
       String edgeKey = edgeString.substring(0, propStartIdx);
       Map<String, Object> edgeProperties = readProperties(edgeString.substring(propStartIdx + 1));
       edges.put(edgeKey, edgeProperties);
@@ -75,7 +76,7 @@ public class ExtendedVertexReader implements VertexLineReader {
   }
 
   private Iterable<Long> readGraphs(String lineToken) {
-    String[] valueTokens = lineToken.split(VALUE_TOKEN_SEPARATOR);
+    String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(lineToken);
     int graphCount = Integer.parseInt(valueTokens[0]);
     List<Long> graphs = Lists.newArrayListWithCapacity(graphCount);
     for (int i = 1; i < valueTokens.length; i++) {
