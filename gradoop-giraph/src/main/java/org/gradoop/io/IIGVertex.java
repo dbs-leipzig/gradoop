@@ -25,17 +25,19 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Custom vertex used by {@link org.apache.giraph.examples.biiig
- * .BTGComputation}.
+ * Custom vertex used by {@link org.gradoop.algorithms.BTGComputation}.
  */
 public class IIGVertex implements Writable {
 
   /**
-   * The vertex type which is defined in {@link org.apache.giraph.examples
-   * .biiig.io.IIGVertexType}
+   * The vertex type which is defined in {@link IIGVertexType}
    */
   private IIGVertexType vertexType;
 
@@ -50,15 +52,15 @@ public class IIGVertex implements Writable {
   private List<Long> btgIDs;
 
   /**
-   * Stores the minimum vertex ID per message sender.
-   * This is only used by vertices of type {@link org.apache.giraph.examples
-   * .biiig.io.IIGVertexType} MASTER, so it is only initialized when needed.
+   * Stores the minimum vertex ID per message sender. This is only used by
+   * vertices of type {@link IIGVertexType}
+   * MASTER, so it is only initialized when needed.
    */
   private Map<Long, Long> neighborMinimumBTGIds;
 
   /**
    * Default constructor which is used during deserialization in {@link
-   * org.apache.giraph.examples.biiig.io.formats.IIGTextVertexOutputFormat}
+   * org.gradoop.io.formats.IIGTextVertexOutputFormat}
    */
   @SuppressWarnings("UnusedDeclaration")
   public IIGVertex() {
@@ -73,7 +75,7 @@ public class IIGVertex implements Writable {
    * @param btgIDs      A list of BTGs that vertex belongs to
    */
   public IIGVertex(IIGVertexType vertexType, Double vertexValue,
-      List<Long> btgIDs) {
+                   List<Long> btgIDs) {
     this.vertexType = vertexType;
     this.vertexValue = vertexValue;
     this.btgIDs = btgIDs;
@@ -148,8 +150,8 @@ public class IIGVertex implements Writable {
       initNeighbourMinimBTGIDMap();
     }
     if (!neighborMinimumBTGIds.containsKey(vertexID) ||
-        (neighborMinimumBTGIds.containsKey(
-            vertexID) && neighborMinimumBTGIds.get(vertexID) > btgID)) {
+      (neighborMinimumBTGIds.containsKey(
+        vertexID) && neighborMinimumBTGIds.get(vertexID) > btgID)) {
       neighborMinimumBTGIds.put(vertexID, btgID);
     }
   }
@@ -158,7 +160,7 @@ public class IIGVertex implements Writable {
    * Updates the set of BTG ids this vertex is involved in according to the set
    * of minimum values stored in the mapping between neighbour nodes and BTG
    * ids. This is only necessary for master data nodes like described in {@link
-   * org.apache.giraph.examples.biiig.algorithms.BTGComputation}.
+   * org.gradoop.algorithms.BTGComputation}.
    */
   public void updateBtgIDs() {
     if (this.neighborMinimumBTGIds != null) {
@@ -199,7 +201,7 @@ public class IIGVertex implements Writable {
    */
   @Override
   public void write(DataOutput dataOutput)
-      throws IOException {
+    throws IOException {
     // vertex type
     dataOutput.writeInt(this.vertexType.ordinal());
     // vertex value
@@ -231,7 +233,7 @@ public class IIGVertex implements Writable {
    */
   @Override
   public void readFields(DataInput dataInput)
-      throws IOException {
+    throws IOException {
     // vertex type
     this.vertexType = IIGVertexType.values()[dataInput.readInt()];
     // vertex value
@@ -249,7 +251,7 @@ public class IIGVertex implements Writable {
     }
     for (int i = 0; i < setSize; i++) {
       this.neighborMinimumBTGIds
-          .put(dataInput.readLong(), dataInput.readLong());
+        .put(dataInput.readLong(), dataInput.readLong());
     }
   }
 }

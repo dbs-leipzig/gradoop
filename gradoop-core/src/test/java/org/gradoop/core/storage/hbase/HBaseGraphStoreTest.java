@@ -10,7 +10,11 @@ import org.gradoop.core.storage.GraphStore;
 import org.gradoop.core.storage.exceptions.UnsupportedTypeException;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +33,8 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     vertices.add(0L);
     vertices.add(1L);
 
-    graphs.add(new SimpleGraph(graphID, graphLabels, graphProperties, vertices));
+    graphs
+      .add(new SimpleGraph(graphID, graphLabels, graphProperties, vertices));
 
     // graph 1
     graphID = 1L;
@@ -40,7 +45,8 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     vertices.add(1L);
     vertices.add(2L);
 
-    graphs.add(new SimpleGraph(graphID, graphLabels, graphProperties, vertices));
+    graphs
+      .add(new SimpleGraph(graphID, graphLabels, graphProperties, vertices));
 
     return graphs;
   }
@@ -101,7 +107,8 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     assertEquals("v1", g.getProperty("k1"));
 
     // VERTICES
-    List<Vertex> vertexResult = Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
+    List<Vertex> vertexResult =
+      Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
     for (long l = 0L; l < EXTENDED_GRAPH.length; l++) {
       vertexResult.add(graphStore.readVertex(l));
     }
@@ -125,7 +132,8 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     final Map<String, Map<String, Object>> outEdges = new HashMap<>();
     final Map<String, Map<String, Object>> inEdges = new HashMap<>();
     final Iterable<Long> graphs = Lists.newArrayList();
-    Vertex v = new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+    Vertex v =
+      new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
     graphStore.writeVertex(v);
   }
 
@@ -162,7 +170,8 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     final Map<String, Map<String, Object>> inEdges = new HashMap<>();
     final Iterable<Long> graphs = Lists.newArrayList();
 
-    Vertex v = new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+    Vertex v =
+      new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
     graphStore.writeVertex(v);
 
     // reopen
@@ -177,24 +186,24 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
 
     for (String propertyKey : propertyKeys) {
       switch (propertyKey) {
-      case keyBoolean:
-        assertEquals(valueBoolean, v.getProperty(propertyKey));
-        break;
-      case keyInteger:
-        assertEquals(valueInteger, v.getProperty(keyInteger));
-        break;
-      case keyLong:
-        assertEquals(valueLong, v.getProperty(keyLong));
-        break;
-      case keyFloat:
-        assertEquals(valueFloat, v.getProperty(keyFloat));
-        break;
-      case keyDouble:
-        assertEquals(valueDouble, v.getProperty(keyDouble));
-        break;
-      case keyString:
-        assertEquals(valueString, v.getProperty(keyString));
-        break;
+        case keyBoolean:
+          assertEquals(valueBoolean, v.getProperty(propertyKey));
+          break;
+        case keyInteger:
+          assertEquals(valueInteger, v.getProperty(keyInteger));
+          break;
+        case keyLong:
+          assertEquals(valueLong, v.getProperty(keyLong));
+          break;
+        case keyFloat:
+          assertEquals(valueFloat, v.getProperty(keyFloat));
+          break;
+        case keyDouble:
+          assertEquals(valueDouble, v.getProperty(keyDouble));
+          break;
+        case keyString:
+          assertEquals(valueString, v.getProperty(keyString));
+          break;
       }
     }
   }

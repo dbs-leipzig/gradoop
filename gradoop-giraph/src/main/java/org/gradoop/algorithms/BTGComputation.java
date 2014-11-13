@@ -32,15 +32,17 @@ import java.util.List;
 /**
  * Graph-BSP Implementation of the Business Transaction Graph (BTG) Extraction
  * algorithm described in "BIIIG: Enabling Business Intelligence with Integrated
- * Instance Graphs".
- * The input graph is a so called Integrated Instance Graph (IIG) which contains
- * nodes belonging to two different classes: master data and transactional data.
+ * Instance Graphs". The input graph is a so called Integrated Instance Graph
+ * (IIG) which contains nodes belonging to two different classes: master data
+ * and transactional data.
+ * <p/>
  * A BTG is a sub-graph of the IIG which has only master data nodes as boundary
  * nodes and transactional data nodes as inner nodes. The algorithm finds all
  * BTGs inside a given IIG. In the business domain, a BTG describes a specific
  * case inside a set of business cases involving master data like Employees,
  * Customers and Products and transactional data like SalesOrders, ProductOffers
  * or Purchases.
+ * <p/>
  * The algorithm is based on the idea of finding connected components by
  * communicating the minimum vertex id inside a connected sub-graph and storing
  * it. The minimum id inside a sub-graph is the BTG id. Only transactional data
@@ -52,7 +54,7 @@ import java.util.List;
  * BTG ids the master data node is involved in.
  */
 public class BTGComputation extends
-    BasicComputation<LongWritable, IIGVertex, NullWritable, IIGMessage> {
+  BasicComputation<LongWritable, IIGVertex, NullWritable, IIGMessage> {
 
   /**
    * Returns the current minimum value. This is always the last value in the
@@ -63,10 +65,10 @@ public class BTGComputation extends
    * @return The minimum BTG ID that vertex knows.
    */
   private long getCurrentMinValue(
-      Vertex<LongWritable, IIGVertex, NullWritable> vertex) {
+    Vertex<LongWritable, IIGVertex, NullWritable> vertex) {
     List<Long> btgIDs = vertex.getValue().getBtgIDs();
     return (btgIDs.size() > 0) ? btgIDs.get(
-        btgIDs.size() - 1) : vertex.getId().get();
+      btgIDs.size() - 1) : vertex.getId().get();
   }
 
   /**
@@ -78,7 +80,7 @@ public class BTGComputation extends
    * @return The new (maybe unchanged) minimum value
    */
   private long getNewMinValue(Iterable<IIGMessage> messages,
-      long currentMinValue) {
+                              long currentMinValue) {
     long newMinValue = currentMinValue;
     for (IIGMessage message : messages) {
       if (message.getBtgID() < newMinValue) {
@@ -95,12 +97,12 @@ public class BTGComputation extends
    * @param messages All incoming messages
    */
   private void processMasterVertex(
-      Vertex<LongWritable, IIGVertex, NullWritable> vertex,
-      Iterable<IIGMessage> messages) {
+    Vertex<LongWritable, IIGVertex, NullWritable> vertex,
+    Iterable<IIGMessage> messages) {
     IIGVertex vertexValue = vertex.getValue();
     for (IIGMessage message : messages) {
       vertexValue.updateNeighbourBtgID(message.getSenderID(),
-          message.getBtgID());
+        message.getBtgID());
     }
     vertexValue.updateBtgIDs();
     // in case the vertex has no neighbours
@@ -116,7 +118,7 @@ public class BTGComputation extends
    * @param minValue All incoming messages
    */
   private void processTransactionalVertex(
-      Vertex<LongWritable, IIGVertex, NullWritable> vertex, long minValue) {
+    Vertex<LongWritable, IIGVertex, NullWritable> vertex, long minValue) {
     vertex.getValue().removeLastBtgID();
     vertex.getValue().addBtgID(minValue);
     IIGMessage message = new IIGMessage();
@@ -135,12 +137,12 @@ public class BTGComputation extends
    */
   @Override
   public void compute(Vertex<LongWritable, IIGVertex, NullWritable> vertex,
-      Iterable<IIGMessage> messages)
-      throws IOException {
+                      Iterable<IIGMessage> messages)
+    throws IOException {
     if (vertex.getValue().getVertexType() == IIGVertexType.MASTER) {
       processMasterVertex(vertex, messages);
     } else if (vertex.getValue().getVertexType() ==
-        IIGVertexType.TRANSACTIONAL) {
+      IIGVertexType.TRANSACTIONAL) {
       long currentMinValue = getCurrentMinValue(vertex);
       long newMinValue = getNewMinValue(messages, currentMinValue);
       boolean changed = currentMinValue != newMinValue;

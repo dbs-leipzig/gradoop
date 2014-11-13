@@ -9,7 +9,8 @@ import java.util.Map;
 /**
  * Created by martin on 05.11.14.
  */
-public abstract class LabeledPropertyContainer implements Identifiable, Attributed, Labeled {
+public abstract class LabeledPropertyContainer implements Identifiable,
+  Attributed, Labeled {
 
   protected final Long id;
 
@@ -18,33 +19,38 @@ public abstract class LabeledPropertyContainer implements Identifiable, Attribut
   protected final Map<String, Object> properties;
 
   protected LabeledPropertyContainer(Long id, Iterable<String> labels,
-      Map<String, Object> properties) {
+                                     Map<String, Object> properties) {
     this.id = id;
     this.labels = labels;
     this.properties = properties;
   }
 
-  @Override public Long getID() {
+  @Override
+  public Long getID() {
     return id;
   }
 
-  @Override public Iterable<String> getLabels() {
+  @Override
+  public Iterable<String> getLabels() {
     return labels;
   }
 
-  @Override public Iterable<String> getPropertyKeys() {
+  @Override
+  public Iterable<String> getPropertyKeys() {
     return properties.keySet();
   }
 
-  @Override public Object getProperty(String key) {
+  @Override
+  public Object getProperty(String key) {
     return properties.get(key);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "LabeledPropertyContainer{" +
-        "id=" + id +
-        ", labels=" + labels +
-        ", properties=" + properties +
-        '}';
+      "id=" + id +
+      ", labels=" + labels +
+      ", properties=" + properties +
+      '}';
   }
 }

@@ -40,7 +40,8 @@
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.neo4j.version>2.1.5</dep.neo4j.version>
         <dep.hbase-client.version>0.98.7-hadoop1</dep.hbase-client.version>
-        <dep.hbase-testing-util.version>0.98.7-hadoop1</dep.hbase-testing-util.version>
+        <dep.hbase-testing-util.version>0.98.7-hadoop1
+        </dep.hbase-testing-util.version>
         <dep.hadoop-core.version>1.2.1</dep.hadoop-core.version>
         <dep.giraph-core.version>1.1.0-SNAPSHOT</dep.giraph-core.version>
         <dep.junit.version>4.11</dep.junit.version>
@@ -56,6 +57,48 @@
                     <source>${project.build.targetJdk}</source>
                     <target>${project.build.targetJdk}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.10</version>
+                <configuration>
+                    <configLocation>${top.dir}/checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <enableRulesSummary>false</enableRulesSummary>
+                    <headerLocation>${top.dir}/license-header.txt
+                    </headerLocation>
+                    <failOnViolation>true</failOnViolation>
+                    <includeTestSourceDirectory>false
+                    </includeTestSourceDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.5.2</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                    <findbugsXmlOutput>false</findbugsXmlOutput>
+                    <!--<excludeFilterFile>${top.dir}/findbugs-exclude.xml-->
+                    <!--</excludeFilterFile>-->
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -17,8 +17,10 @@ import java.util.Map;
  * Created by s1ck on 11/10/14.
  */
 public abstract class BasicHandler implements EntityHandler {
-  protected static final byte[] CF_LABELS_BYTES = Bytes.toBytes(HBaseGraphStore.CF_LABELS);
-  protected static final byte[] CF_PROPERTIES_BYTES = Bytes.toBytes(HBaseGraphStore.CF_PROPERTIES);
+  protected static final byte[] CF_LABELS_BYTES =
+    Bytes.toBytes(HBaseGraphStore.CF_LABELS);
+  protected static final byte[] CF_PROPERTIES_BYTES =
+    Bytes.toBytes(HBaseGraphStore.CF_PROPERTIES);
 
   private static final byte TYPE_BOOLEAN = 0x00;
   private static final byte TYPE_INTEGER = 0x01;
@@ -27,44 +29,53 @@ public abstract class BasicHandler implements EntityHandler {
   private static final byte TYPE_DOUBLE = 0x04;
   private static final byte TYPE_STRING = 0x05;
 
-  @Override public Put writeLabels(Put put, Labeled entity) {
+  @Override
+  public Put writeLabels(Put put, Labeled entity) {
     int internalLabelID = 0;
     for (String label : entity.getLabels()) {
-      put.add(CF_LABELS_BYTES, Bytes.toBytes(internalLabelID++), Bytes.toBytes(label));
+      put.add(CF_LABELS_BYTES, Bytes.toBytes(internalLabelID++),
+        Bytes.toBytes(label));
     }
     return put;
   }
 
-  @Override public Put writeProperties(Put put, Attributed entity) {
+  @Override
+  public Put writeProperties(Put put, Attributed entity) {
     for (String key : entity.getPropertyKeys()) {
       put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key),
-          encodeValueToBytes(entity.getProperty(key)));
+        encodeValueToBytes(entity.getProperty(key)));
     }
     return put;
   }
 
-  @Override public Iterable<String> readLabels(Result res) {
+  @Override
+  public Iterable<String> readLabels(Result res) {
     List<String> labels = new ArrayList<>();
-    for (Map.Entry<byte[], byte[]> labelColumn : res.getFamilyMap(CF_LABELS_BYTES).entrySet()) {
+    for (Map.Entry<byte[], byte[]> labelColumn : res
+      .getFamilyMap(CF_LABELS_BYTES).entrySet()) {
       labels.add(Bytes.toString(labelColumn.getValue()));
     }
     return labels;
   }
 
-  @Override public Map<String, Object> readProperties(Result res) {
+  @Override
+  public Map<String, Object> readProperties(Result res) {
     Map<String, Object> properties = new HashMap<>();
-    for (Map.Entry<byte[], byte[]> propertyColumn : res.getFamilyMap(CF_PROPERTIES_BYTES)
-        .entrySet()) {
+    for (Map.Entry<byte[], byte[]> propertyColumn : res
+      .getFamilyMap(CF_PROPERTIES_BYTES)
+      .entrySet()) {
       properties
-          .put(Bytes.toString(propertyColumn.getKey()), decodeValueFromBytes(
-              propertyColumn.getValue()));
+        .put(Bytes.toString(propertyColumn.getKey()), decodeValueFromBytes(
+          propertyColumn.getValue()));
     }
     return properties;
   }
 
-  protected Iterable<Long> getColumnKeysFromFamiliy(Result res, byte[] columnFamily) {
+  protected Iterable<Long> getColumnKeysFromFamiliy(Result res,
+                                                    byte[] columnFamily) {
     List<Long> keys = Lists.newArrayList();
-    for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily).entrySet()) {
+    for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily)
+      .entrySet()) {
       keys.add(Bytes.toLong(column.getKey()));
     }
     return keys;
@@ -94,45 +105,52 @@ public abstract class BasicHandler implements EntityHandler {
   protected Object decodeValueFromString(byte type, String value) {
     Object o;
     switch (type) {
-    case TYPE_BOOLEAN:
-      o = Boolean.parseBoolean(value);
-      break;
-    case TYPE_INTEGER:
-      o = Integer.parseInt(value);
-      break;
-    case TYPE_LONG:
-      o = Long.parseLong(value);
-      break;
-    case TYPE_FLOAT:
-      o = Float.parseFloat(value);
-      break;
-    case TYPE_DOUBLE:
-      o = Double.parseDouble(value);
-      break;
-    case TYPE_STRING:
-      o = value;
-      break;
-    default:
-      throw new UnsupportedTypeException(value.getClass() + " not supported");
+      case TYPE_BOOLEAN:
+        o = Boolean.parseBoolean(value);
+        break;
+      case TYPE_INTEGER:
+        o = Integer.parseInt(value);
+        break;
+      case TYPE_LONG:
+        o = Long.parseLong(value);
+        break;
+      case TYPE_FLOAT:
+        o = Float.parseFloat(value);
+        break;
+      case TYPE_DOUBLE:
+        o = Double.parseDouble(value);
+        break;
+      case TYPE_STRING:
+        o = value;
+        break;
+      default:
+        throw new UnsupportedTypeException(value.getClass() + " not supported");
     }
     return o;
   }
 
-  protected byte[] encodeValueToBytes(Object value) throws UnsupportedTypeException {
+  protected byte[] encodeValueToBytes(Object value)
+    throws UnsupportedTypeException {
     Class<?> valueClass = value.getClass();
     byte[] decodedValue;
     if (valueClass.equals(Boolean.class)) {
-      decodedValue = Bytes.add(new byte[] { TYPE_BOOLEAN }, Bytes.toBytes((Boolean) value));
+      decodedValue =
+        Bytes.add(new byte[]{TYPE_BOOLEAN}, Bytes.toBytes((Boolean) value));
     } else if (valueClass.equals(Integer.class)) {
-      decodedValue = Bytes.add(new byte[] { TYPE_INTEGER }, Bytes.toBytes((Integer) value));
+      decodedValue =
+        Bytes.add(new byte[]{TYPE_INTEGER}, Bytes.toBytes((Integer) value));
     } else if (valueClass.equals(Long.class)) {
-      decodedValue = Bytes.add(new byte[] { TYPE_LONG }, Bytes.toBytes((Long) value));
+      decodedValue =
+        Bytes.add(new byte[]{TYPE_LONG}, Bytes.toBytes((Long) value));
     } else if (valueClass.equals(Float.class)) {
-      decodedValue = Bytes.add(new byte[] { TYPE_FLOAT }, Bytes.toBytes((Float) value));
+      decodedValue =
+        Bytes.add(new byte[]{TYPE_FLOAT}, Bytes.toBytes((Float) value));
     } else if (valueClass.equals(Double.class)) {
-      decodedValue = Bytes.add(new byte[] { TYPE_DOUBLE }, Bytes.toBytes((Double) value));
+      decodedValue =
+        Bytes.add(new byte[]{TYPE_DOUBLE}, Bytes.toBytes((Double) value));
     } else if (valueClass.equals(String.class)) {
-      decodedValue = Bytes.add(new byte[] { TYPE_STRING }, Bytes.toBytes((String) value));
+      decodedValue =
+        Bytes.add(new byte[]{TYPE_STRING}, Bytes.toBytes((String) value));
     } else {
       throw new UnsupportedTypeException(valueClass + " not supported");
     }
@@ -145,24 +163,24 @@ public abstract class BasicHandler implements EntityHandler {
       byte type = encValue[0];
       byte[] value = Bytes.tail(encValue, encValue.length - 1);
       switch (type) {
-      case TYPE_BOOLEAN:
-        o = Bytes.toBoolean(value);
-        break;
-      case TYPE_INTEGER:
-        o = Bytes.toInt(value);
-        break;
-      case TYPE_LONG:
-        o = Bytes.toLong(value);
-        break;
-      case TYPE_FLOAT:
-        o = Bytes.toFloat(value);
-        break;
-      case TYPE_DOUBLE:
-        o = Bytes.toDouble(value);
-        break;
-      case TYPE_STRING:
-        o = Bytes.toString(value);
-        break;
+        case TYPE_BOOLEAN:
+          o = Bytes.toBoolean(value);
+          break;
+        case TYPE_INTEGER:
+          o = Bytes.toInt(value);
+          break;
+        case TYPE_LONG:
+          o = Bytes.toLong(value);
+          break;
+        case TYPE_FLOAT:
+          o = Bytes.toFloat(value);
+          break;
+        case TYPE_DOUBLE:
+          o = Bytes.toDouble(value);
+          break;
+        case TYPE_STRING:
+          o = Bytes.toString(value);
+          break;
       }
     }
     return o;

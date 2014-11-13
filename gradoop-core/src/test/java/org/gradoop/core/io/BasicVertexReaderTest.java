@@ -11,7 +11,8 @@ import java.util.List;
 public class BasicVertexReaderTest extends GradoopTest {
 
   @Test
-  public void readBasicGraphTest() throws IOException {
+  public void readBasicGraphTest()
+    throws IOException {
     VertexLineReader reader = new BasicVertexReader();
     List<Vertex> vertices = Lists.newArrayList();
 

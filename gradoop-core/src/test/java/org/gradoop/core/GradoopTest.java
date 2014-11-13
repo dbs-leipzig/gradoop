@@ -36,25 +36,29 @@ public class GradoopTest {
     return Thread.currentThread().getStackTrace()[1].getMethodName();
   }
 
-  protected File getTempFile() throws IOException {
+  protected File getTempFile()
+    throws IOException {
     return getTempFile(null);
   }
 
-  protected File getTempFile(String fileName) throws IOException {
-    fileName = (fileName != null) ? fileName : getCallingMethod() + "_" + new Random().nextLong();
+  protected File getTempFile(String fileName)
+    throws IOException {
+    fileName = (fileName != null) ? fileName :
+      getCallingMethod() + "_" + new Random().nextLong();
     return temporaryFolder.newFile(fileName);
   }
 
-  protected static final String[] BASIC_GRAPH = new String[] {
-      "0 1 2",
-      "1 0 2",
-      "2 1"
+  protected static final String[] BASIC_GRAPH = new String[]{
+    "0 1 2",
+    "1 0 2",
+    "2 1"
   };
 
-  protected static final String[] EXTENDED_GRAPH = new String[] {
-      "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 1 k1 5 v1|1 0",
-      "1|A B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2,c.2.1 0|a.0.0 1 k1 5 v1|2 0 1",
-      "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.2.1 0|1 1"
+  protected static final String[] EXTENDED_GRAPH = new String[]{
+    "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 1 k1 5 v1|1 0",
+    "1|A B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2," +
+      "c.2.1 0|a.0.0 1 k1 5 v1|2 0 1",
+    "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.2.1 0|1 1"
   };
 
   protected List<Vertex> createBasicGraphVertices() {
@@ -65,7 +69,8 @@ public class GradoopTest {
     return createVertices(EXTENDED_GRAPH, new ExtendedVertexReader());
   }
 
-  private List<Vertex> createVertices(String[] graph, VertexLineReader vertexLineReader) {
+  private List<Vertex> createVertices(String[] graph,
+                                      VertexLineReader vertexLineReader) {
     List<Vertex> vertices = Lists.newArrayListWithCapacity(graph.length);
     for (String line : graph) {
       vertices.add(vertexLineReader.readLine(line));
@@ -188,15 +193,15 @@ public class GradoopTest {
   private void testProperties(Vertex v) {
     for (String propertyKey : v.getPropertyKeys()) {
       switch (propertyKey) {
-      case KEY_1:
-        assertEquals(VALUE_1, v.getProperty(KEY_1));
-        break;
-      case KEY_2:
-        assertEquals(VALUE_2, v.getProperty(KEY_2));
-        break;
-      case KEY_3:
-        assertEquals(VALUE_3, v.getProperty(KEY_3));
-        break;
+        case KEY_1:
+          assertEquals(VALUE_1, v.getProperty(KEY_1));
+          break;
+        case KEY_2:
+          assertEquals(VALUE_2, v.getProperty(KEY_2));
+          break;
+        case KEY_3:
+          assertEquals(VALUE_3, v.getProperty(KEY_3));
+          break;
       }
     }
   }

@@ -14,7 +14,8 @@ import java.util.Map;
 public interface EntityHandler {
   Put writeLabels(Put put, Labeled entity);
 
-  Put writeProperties(Put put, Attributed entity) throws UnsupportedTypeException;
+  Put writeProperties(Put put, Attributed entity)
+    throws UnsupportedTypeException;
 
   Iterable<String> readLabels(Result res);
 

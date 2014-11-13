@@ -14,12 +14,14 @@ public class AdjacencyListReader {
 
   private final VertexLineReader vertexLineReader;
 
-  public AdjacencyListReader(GraphStore graphStore, VertexLineReader vertexLineReader) {
+  public AdjacencyListReader(GraphStore graphStore,
+                             VertexLineReader vertexLineReader) {
     this.graphStore = graphStore;
     this.vertexLineReader = vertexLineReader;
   }
 
-  public void read(BufferedReader br) throws IOException {
+  public void read(BufferedReader br)
+    throws IOException {
     String line;
     while ((line = br.readLine()) != null) {
       graphStore.writeVertex(vertexLineReader.readLine(line));

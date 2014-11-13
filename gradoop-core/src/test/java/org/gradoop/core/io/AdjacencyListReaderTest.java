@@ -6,12 +6,18 @@ import org.gradoop.core.model.Vertex;
 import org.gradoop.core.storage.GraphStore;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 public class AdjacencyListReaderTest extends ClusterBasedTest {
 
-  private BufferedReader createTestReader(String[] graph) throws IOException {
+  private BufferedReader createTestReader(String[] graph)
+    throws IOException {
     File tmpFile = getTempFile();
     BufferedWriter bw = new BufferedWriter(new FileWriter(tmpFile));
 
@@ -26,15 +32,17 @@ public class AdjacencyListReaderTest extends ClusterBasedTest {
   }
 
   @Test
-  public void writeReadExtendedGraphTest() throws IOException {
+  public void writeReadExtendedGraphTest()
+    throws IOException {
     BufferedReader bufferedReader = createTestReader(EXTENDED_GRAPH);
     GraphStore graphStore = createEmptyGraphStore();
     AdjacencyListReader adjacencyListReader =
-        new AdjacencyListReader(graphStore, new ExtendedVertexReader());
+      new AdjacencyListReader(graphStore, new ExtendedVertexReader());
     // store the graph
     adjacencyListReader.read(bufferedReader);
 
-    List<Vertex> vertexResult = Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
+    List<Vertex> vertexResult =
+      Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
     for (long l = 0L; l < EXTENDED_GRAPH.length; l++) {
       vertexResult.add(graphStore.readVertex(l));
     }

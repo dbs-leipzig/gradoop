@@ -16,13 +16,15 @@ import java.io.IOException;
  */
 public class HBaseGraphStoreFactory {
 
-  private static final Logger LOG = Logger.getLogger(HBaseGraphStoreFactory.class);
+  private static final Logger LOG =
+    Logger.getLogger(HBaseGraphStoreFactory.class);
 
   private HBaseGraphStoreFactory() {
   }
 
   public static GraphStore createGraphStore(Configuration config,
-      VertexHandler verticesHandler, GraphHandler graphsHandler) {
+                                            VertexHandler verticesHandler,
+                                            GraphHandler graphsHandler) {
     HTable graphsTable = null;
     HTable verticesTable = null;
 
@@ -35,7 +37,8 @@ public class HBaseGraphStoreFactory {
       e.printStackTrace();
     }
 
-    return new HBaseGraphStore(graphsTable, verticesTable, verticesHandler, graphsHandler);
+    return new HBaseGraphStore(graphsTable, verticesTable, verticesHandler,
+      graphsHandler);
   }
 
   public static void deleteGraphStore(Configuration config) {
@@ -47,11 +50,12 @@ public class HBaseGraphStoreFactory {
   }
 
   private static void createTablesIfNotExists(Configuration config,
-      VertexHandler verticesHandler) throws IOException {
+                                              VertexHandler verticesHandler)
+    throws IOException {
     HTableDescriptor verticesTableDescriptor =
-        new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_VERTICES));
+      new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
-        new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_GRAPHS));
+      new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_GRAPHS));
 
     HBaseAdmin admin = new HBaseAdmin(config);
 
@@ -66,30 +70,39 @@ public class HBaseGraphStoreFactory {
     admin.close();
   }
 
-  //  private static void createVerticesTable(HBaseAdmin admin, HTableDescriptor tableDescriptor)
+  //  private static void createVerticesTable(HBaseAdmin admin,
+  // HTableDescriptor tableDescriptor)
   //      throws IOException {
   //    LOG.info("creating table " + tableDescriptor.getNameAsString());
-  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_LABELS));
-  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_PROPERTIES));
-  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_OUT_EDGES));
-  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_IN_EDGES));
+  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore
+  // .CF_LABELS));
+  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore
+  // .CF_PROPERTIES));
+  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore
+  // .CF_OUT_EDGES));
+  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore
+  // .CF_IN_EDGES));
   //    admin.createTable(tableDescriptor);
   //  }
 
-  private static void createGraphsTable(HBaseAdmin admin, HTableDescriptor tableDescriptor)
-      throws IOException {
+  private static void createGraphsTable(HBaseAdmin admin,
+                                        HTableDescriptor tableDescriptor)
+    throws IOException {
     LOG.info("creating table " + tableDescriptor.getNameAsString());
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_LABELS));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_PROPERTIES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore.CF_VERTICES));
+    tableDescriptor
+      .addFamily(new HColumnDescriptor(HBaseGraphStore.CF_PROPERTIES));
+    tableDescriptor
+      .addFamily(new HColumnDescriptor(HBaseGraphStore.CF_VERTICES));
     admin.createTable(tableDescriptor);
   }
 
-  private static void deleteTablesIfExists(Configuration config) throws IOException {
+  private static void deleteTablesIfExists(Configuration config)
+    throws IOException {
     HTableDescriptor verticesTableDescriptor =
-        new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_VERTICES));
+      new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
-        new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_GRAPHS));
+      new HTableDescriptor(TableName.valueOf(HBaseGraphStore.TABLE_GRAPHS));
 
     HBaseAdmin admin = new HBaseAdmin(config);
 
@@ -104,8 +117,9 @@ public class HBaseGraphStoreFactory {
     admin.close();
   }
 
-  private static void deleteTable(HBaseAdmin admin, HTableDescriptor tableDescriptor)
-      throws IOException {
+  private static void deleteTable(HBaseAdmin admin,
+                                  HTableDescriptor tableDescriptor)
+    throws IOException {
     LOG.info("deleting table: " + tableDescriptor.getNameAsString());
     admin.disableTable(tableDescriptor.getName());
     admin.deleteTable(tableDescriptor.getName());

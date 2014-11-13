@@ -13,8 +13,9 @@ import java.util.Map;
  * Created by s1ck on 11/8/14.
  */
 public interface VertexHandler extends EntityHandler {
-  void createVerticesTable(final HBaseAdmin admin, final HTableDescriptor tableDescriptor)
-      throws IOException;
+  void createVerticesTable(final HBaseAdmin admin,
+                           final HTableDescriptor tableDescriptor)
+    throws IOException;
 
   Put writeOutgoingEdges(Put put, Vertex vertex);
 

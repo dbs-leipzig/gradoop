@@ -25,10 +25,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Custom message format for {@link org.apache.giraph.examples.biiig
- * .BTGComputation}. Master data nodes need to know who the sender of a message
- * is, so this has to be stored inside the message. The btgID is the minimum
- * vertex id inside a BTG.
+ * Custom message format for {@link org.gradoop.algorithms.BTGComputation}.
+ * Master data nodes need to know who the sender of a message is, so this has to
+ * be stored inside the message. The btgID is the minimum vertex id inside a
+ * BTG.
  */
 public class IIGMessage implements Writable {
 
@@ -86,7 +86,7 @@ public class IIGMessage implements Writable {
    */
   @Override
   public void write(DataOutput dataOutput)
-      throws IOException {
+    throws IOException {
     dataOutput.writeLong(this.senderID);
     dataOutput.writeLong(this.btgID);
   }
@@ -99,7 +99,7 @@ public class IIGMessage implements Writable {
    */
   @Override
   public void readFields(DataInput dataInput)
-      throws IOException {
+    throws IOException {
     this.senderID = dataInput.readLong();
     this.btgID = dataInput.readLong();
   }

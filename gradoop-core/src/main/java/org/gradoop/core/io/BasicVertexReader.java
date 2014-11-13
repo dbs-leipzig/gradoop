@@ -17,7 +17,8 @@ public class BasicVertexReader implements VertexLineReader {
     return LINE_TOKEN_SEPARATOR.split(line);
   }
 
-  @Override public Vertex readLine(String line) {
+  @Override
+  public Vertex readLine(String line) {
     String[] tokens = getTokens(line);
     Long vertexID = Long.parseLong(tokens[0]);
 

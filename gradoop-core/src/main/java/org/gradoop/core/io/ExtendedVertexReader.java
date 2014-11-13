@@ -28,7 +28,8 @@ public class ExtendedVertexReader implements VertexLineReader {
   private static final byte TYPE_DOUBLE = 0x04;
   private static final byte TYPE_STRING = 0x05;
 
-  @Override public Vertex readLine(final String line) {
+  @Override
+  public Vertex readLine(final String line) {
     // 0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 1 k1 5 v1|1 0
     String[] lineTokens = getLineTokens(line);
 
@@ -39,7 +40,8 @@ public class ExtendedVertexReader implements VertexLineReader {
     Map<String, Map<String, Object>> inEdges = readEdges(lineTokens[4]);
     Iterable<Long> graphs = readGraphs(lineTokens[5]);
 
-    return new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+    return new SimpleVertex(vertexID, labels, properties, outEdges, inEdges,
+      graphs);
   }
 
   private String[] getLineTokens(final String line) {
@@ -57,9 +59,11 @@ public class ExtendedVertexReader implements VertexLineReader {
   private Map<String, Object> readProperties(String token) {
     String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(token);
     int propertyCount = Integer.parseInt(valueTokens[0]);
-    Map<String, Object> properties = Maps.newHashMapWithExpectedSize(propertyCount);
+    Map<String, Object> properties =
+      Maps.newHashMapWithExpectedSize(propertyCount);
     for (int i = 1; i < valueTokens.length; i += 3) {
-      properties.put(valueTokens[i], decodeValue(valueTokens[i + 1], valueTokens[i + 2]));
+      properties.put(valueTokens[i],
+        decodeValue(valueTokens[i + 1], valueTokens[i + 2]));
     }
     return properties;
   }
@@ -69,7 +73,8 @@ public class ExtendedVertexReader implements VertexLineReader {
     for (String edgeString : LIST_TOKEN_SEPARATOR.split(token)) {
       int propStartIdx = edgeString.indexOf(VALUE_TOKEN_SEPARATOR.toString());
       String edgeKey = edgeString.substring(0, propStartIdx);
-      Map<String, Object> edgeProperties = readProperties(edgeString.substring(propStartIdx + 1));
+      Map<String, Object> edgeProperties =
+        readProperties(edgeString.substring(propStartIdx + 1));
       edges.put(edgeKey, edgeProperties);
     }
     return edges;
@@ -88,26 +93,27 @@ public class ExtendedVertexReader implements VertexLineReader {
   private Object decodeValue(String type, String value) {
     Object o;
     switch (Byte.parseByte(type)) {
-    case TYPE_BOOLEAN:
-      o = Boolean.parseBoolean(value);
-      break;
-    case TYPE_INTEGER:
-      o = Integer.parseInt(value);
-      break;
-    case TYPE_LONG:
-      o = Long.parseLong(value);
-      break;
-    case TYPE_FLOAT:
-      o = Long.parseLong(value);
-      break;
-    case TYPE_DOUBLE:
-      o = Double.parseDouble(value);
-      break;
-    case TYPE_STRING:
-      o = value;
-      break;
-    default:
-      throw new UnsupportedTypeException(type + " not supported by this reader");
+      case TYPE_BOOLEAN:
+        o = Boolean.parseBoolean(value);
+        break;
+      case TYPE_INTEGER:
+        o = Integer.parseInt(value);
+        break;
+      case TYPE_LONG:
+        o = Long.parseLong(value);
+        break;
+      case TYPE_FLOAT:
+        o = Long.parseLong(value);
+        break;
+      case TYPE_DOUBLE:
+        o = Double.parseDouble(value);
+        break;
+      case TYPE_STRING:
+        o = value;
+        break;
+      default:
+        throw new UnsupportedTypeException(
+          type + " not supported by this reader");
     }
     return o;
   }

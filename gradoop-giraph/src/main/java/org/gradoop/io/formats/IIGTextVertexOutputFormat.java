@@ -29,15 +29,14 @@ import org.gradoop.io.IIGVertex;
 import java.io.IOException;
 
 /**
- * Encodes the output of the {@link org.gradoop.algorithms.BTGComputation} in the following format:
- * vertex-id,vertex-class vertex-value[ btg-id]*
- * e.g. the following line
- * 0,0 3.14 23 42
- * decodes vertex-id 0 with vertex-class 0 (0 = transactional, 1 = master) and
- * the value 3.14. The node is connected to two BTGs (23, 42).
+ * Encodes the output of the {@link org.gradoop.algorithms.BTGComputation} in
+ * the following format: vertex-id,vertex-class vertex-value[ btg-id]* e.g. the
+ * following line 0,0 3.14 23 42 decodes vertex-id 0 with vertex-class 0 (0 =
+ * transactional, 1 = master) and the value 3.14. The node is connected to two
+ * BTGs (23, 42).
  */
 public class IIGTextVertexOutputFormat extends
-    TextVertexOutputFormat<LongWritable, IIGVertex, NullWritable> {
+  TextVertexOutputFormat<LongWritable, IIGVertex, NullWritable> {
 
   /**
    * Used for splitting the line into the main tokens (vertex id, vertex value,
@@ -59,13 +58,12 @@ public class IIGTextVertexOutputFormat extends
    */
   @Override
   public TextVertexWriter createVertexWriter(TaskAttemptContext context)
-      throws IOException, InterruptedException {
+    throws IOException, InterruptedException {
     return new BTGTextVertexLineWriter();
   }
 
   /**
-   * Used to convert a {@link IIGVertex} to
-   * a line in the output file.
+   * Used to convert a {@link IIGVertex} to a line in the output file.
    */
   private class BTGTextVertexLineWriter extends TextVertexWriterToEachLine {
 
@@ -78,8 +76,8 @@ public class IIGTextVertexOutputFormat extends
      */
     @Override
     protected Text convertVertexToLine(
-        Vertex<LongWritable, IIGVertex, NullWritable> vertex)
-        throws IOException {
+      Vertex<LongWritable, IIGVertex, NullWritable> vertex)
+      throws IOException {
       StringBuilder sb = new StringBuilder();
       // vertex-id
       sb.append(vertex.getId());

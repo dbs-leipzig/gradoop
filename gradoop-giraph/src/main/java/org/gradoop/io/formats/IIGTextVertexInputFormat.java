@@ -35,16 +35,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * An IIG vertex is decoded in the following format:
- * vertex-id,vertex-class vertex-value[ btg-id]*,[neighbour-vertex-id ]*
- * e.g. the following line
- * 0,0 3.14 4 9,1 2
- * decodes vertex-id 0 with vertex-class 0 (0 = transactional, 1 = master) and
- * value 3.14. The node is connected to two BTGs (4,9) and has edges to two
- * vertices (1,2).
+ * An IIG vertex is decoded in the following format: vertex-id,vertex-class
+ * vertex-value[ btg-id]*,[neighbour-vertex-id ]* e.g. the following line 0,0
+ * 3.14 4 9,1 2 decodes vertex-id 0 with vertex-class 0 (0 = transactional, 1 =
+ * master) and value 3.14. The node is connected to two BTGs (4,9) and has edges
+ * to two vertices (1,2).
  */
 public class IIGTextVertexInputFormat extends
-    TextVertexInputFormat<LongWritable, IIGVertex, NullWritable> {
+  TextVertexInputFormat<LongWritable, IIGVertex, NullWritable> {
 
   /**
    * Used for splitting the line into the main tokens (vertex id, vertex value,
@@ -66,9 +64,9 @@ public class IIGTextVertexInputFormat extends
    */
   @Override
   public TextVertexReader createVertexReader(InputSplit split,
-      TaskAttemptContext context)
-      throws
-      IOException {
+                                             TaskAttemptContext context)
+    throws
+    IOException {
     return new IIGTextVertexReaderFromEachLine();
   }
 
@@ -77,29 +75,29 @@ public class IIGTextVertexInputFormat extends
    * .examples.biiig.io.IIGVertex}.
    */
   private class IIGTextVertexReaderFromEachLine extends
-      TextVertexReaderFromEachLineProcessed<String[]> {
+    TextVertexReaderFromEachLineProcessed<String[]> {
 
     @Override
     protected String[] preprocessLine(Text tokens)
-        throws IOException {
+      throws IOException {
       return LINE_TOKEN_SEPARATOR.split(tokens.toString());
     }
 
     @Override
     protected LongWritable getId(String[] tokens)
-        throws IOException {
+      throws IOException {
       return new LongWritable(Long.parseLong(tokens[0]));
     }
 
     @Override
     protected IIGVertex getValue(String[] tokens)
-        throws IOException {
+      throws IOException {
       String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(tokens[1]);
       IIGVertexType vertexClass = IIGVertexType.values()[Integer.parseInt(
-          valueTokens[0])];
+        valueTokens[0])];
       Double vertexValue = Double.parseDouble(valueTokens[1]);
       List<Long> btgIDs = Lists.newArrayListWithCapacity(
-          valueTokens.length - 1);
+        valueTokens.length - 1);
       for (int n = 2; n < valueTokens.length; n++) {
         btgIDs.add(Long.parseLong(valueTokens[n]));
       }
@@ -108,15 +106,15 @@ public class IIGTextVertexInputFormat extends
 
     @Override
     protected Iterable<Edge<LongWritable, NullWritable>> getEdges(
-        String[] tokens)
-        throws IOException {
+      String[] tokens)
+      throws IOException {
       String[] edgeTokens = (tokens.length == 3) ? VALUE_TOKEN_SEPARATOR.split(
-          tokens[2]) : new String[0];
+        tokens[2]) : new String[0];
       List<Edge<LongWritable, NullWritable>> edges =
-          Lists.newArrayListWithCapacity(edgeTokens.length);
+        Lists.newArrayListWithCapacity(edgeTokens.length);
       for (String edgeToken : edgeTokens) {
         edges.add(EdgeFactory.create(
-            new LongWritable(Long.parseLong(edgeToken))));
+          new LongWritable(Long.parseLong(edgeToken))));
       }
       return edges;
     }

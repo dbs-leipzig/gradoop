@@ -10,7 +10,8 @@ import org.gradoop.core.storage.exceptions.UnsupportedTypeException;
 public interface GraphStore {
   void writeGraph(final Graph graph);
 
-  void writeVertex(final Vertex vertex) throws UnsupportedTypeException;
+  void writeVertex(final Vertex vertex)
+    throws UnsupportedTypeException;
 
   Graph readGraph(final Long graphID);
 

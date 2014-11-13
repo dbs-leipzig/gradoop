@@ -1,6 +1,10 @@
 package org.gradoop.core.storage.hbase;
 
-import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.gradoop.core.model.Graph;
@@ -37,14 +41,16 @@ public class HBaseGraphStore implements GraphStore {
   private final GraphHandler graphsHandler;
 
   public HBaseGraphStore(HTable graphsTable, HTable verticesTable,
-      VertexHandler verticesHandler, GraphHandler graphsHandler) {
+                         VertexHandler verticesHandler,
+                         GraphHandler graphsHandler) {
     this.graphsTable = graphsTable;
     this.verticesTable = verticesTable;
     this.verticesHandler = verticesHandler;
     this.graphsHandler = graphsHandler;
   }
 
-  @Override public void writeGraph(final Graph graph) {
+  @Override
+  public void writeGraph(final Graph graph) {
     LOG.info("writing: " + graph);
     try {
       // graph id
@@ -63,7 +69,8 @@ public class HBaseGraphStore implements GraphStore {
     }
   }
 
-  @Override public void writeVertex(final Vertex vertex) {
+  @Override
+  public void writeVertex(final Vertex vertex) {
     LOG.info("writing: " + vertex);
     try {
       // vertex id
@@ -88,7 +95,8 @@ public class HBaseGraphStore implements GraphStore {
     }
   }
 
-  @Override public Graph readGraph(final Long graphID) {
+  @Override
+  public Graph readGraph(final Long graphID) {
     Graph g = null;
     try {
       byte[] rowKey = Bytes.toBytes(graphID);
@@ -105,7 +113,8 @@ public class HBaseGraphStore implements GraphStore {
     return g;
   }
 
-  @Override public Vertex readVertex(final Long vertexID) {
+  @Override
+  public Vertex readVertex(final Long vertexID) {
     Vertex v = null;
     try {
       byte[] rowKey = Bytes.toBytes(vertexID);
@@ -113,10 +122,13 @@ public class HBaseGraphStore implements GraphStore {
       if (!res.isEmpty()) {
         Iterable<String> labels = verticesHandler.readLabels(res);
         Map<String, Object> properties = verticesHandler.readProperties(res);
-        Map<String, Map<String, Object>> outEdges = verticesHandler.readOutgoingEdges(res);
-        Map<String, Map<String, Object>> inEdges = verticesHandler.readIncomingEdges(res);
+        Map<String, Map<String, Object>> outEdges =
+          verticesHandler.readOutgoingEdges(res);
+        Map<String, Map<String, Object>> inEdges =
+          verticesHandler.readIncomingEdges(res);
         Iterable<Long> graphs = verticesHandler.readGraphs(res);
-        v = new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+        v = new SimpleVertex(vertexID, labels, properties, outEdges, inEdges,
+          graphs);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -124,7 +136,8 @@ public class HBaseGraphStore implements GraphStore {
     return v;
   }
 
-  @Override public void close() {
+  @Override
+  public void close() {
     try {
       graphsTable.close();
       verticesTable.close();

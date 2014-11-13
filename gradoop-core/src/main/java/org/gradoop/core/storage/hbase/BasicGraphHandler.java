@@ -10,16 +10,19 @@ import org.gradoop.core.model.Graph;
  */
 public class BasicGraphHandler extends BasicHandler implements GraphHandler {
 
-  private static final byte[] CF_VERTICES_BYTES = Bytes.toBytes(HBaseGraphStore.CF_VERTICES);
+  private static final byte[] CF_VERTICES_BYTES =
+    Bytes.toBytes(HBaseGraphStore.CF_VERTICES);
 
-  @Override public Put writeVertices(Put put, Graph graph) {
+  @Override
+  public Put writeVertices(Put put, Graph graph) {
     for (Long vertex : graph.getVertices()) {
       put.add(CF_VERTICES_BYTES, Bytes.toBytes(vertex), null);
     }
     return put;
   }
 
-  @Override public Iterable<Long> readVertices(Result res) {
+  @Override
+  public Iterable<Long> readVertices(Result res) {
     return getColumnKeysFromFamiliy(res, CF_VERTICES_BYTES);
   }
 }

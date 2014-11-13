@@ -44,42 +44,42 @@ public class BTGComputationTest extends GiraphTest {
 
   @Test
   public void testConnectedIIG()
-      throws Exception {
+    throws Exception {
     String[] graph = getConnectedIIG();
     validateConnectedIIGResult(computeResults(graph));
   }
 
   @Test
   public void testDisconnectedIIG()
-      throws Exception {
+    throws Exception {
     String[] graph = getDisconnectedIIG();
     validateDisconnectedIIGResult(computeResults(graph));
   }
 
   @Test
   public void testSingleMasterVertex()
-      throws Exception {
+    throws Exception {
     String[] graph = getSingleMasterVertexIIG();
     validateSingleMasterVertexIIGResult(computeResults(graph));
   }
 
   @Test
   public void testSingleTransactionalVertex()
-      throws Exception {
+    throws Exception {
     String[] graph = getSingleTransactionalVertexIIG();
     validateSingleTransactionalVertexIIGResult(computeResults(graph));
   }
 
   @Test
   public void testSingleMasterVertexWithBTG()
-      throws Exception {
+    throws Exception {
     String[] graph = getSingleMasterVertexIIGWithBTG();
     validateSingleMasterVertexIIGResult(computeResults(graph));
   }
 
   @Test
   public void testSingleTransactionalVertexWithBTG()
-      throws Exception {
+    throws Exception {
     String[] graph = getSingleTransactionalVertexIIGWithBTG();
     validateSingleTransactionalVertexIIGResult(computeResults(graph));
   }
@@ -164,21 +164,21 @@ public class BTGComputationTest extends GiraphTest {
   }
 
   private void validateSingleMasterVertexIIGResult(
-      Map<Long, List<Long>> btgIDs) {
+    Map<Long, List<Long>> btgIDs) {
     assertEquals(1, btgIDs.size());
     assertEquals(1, btgIDs.get(0L).size());
     assertTrue(btgIDs.get(0L).contains(0L));
   }
 
   private void validateSingleTransactionalVertexIIGResult(
-      Map<Long, List<Long>> btgIDs) {
+    Map<Long, List<Long>> btgIDs) {
     assertEquals(1, btgIDs.size());
     assertEquals(1, btgIDs.get(0L).size());
     assertTrue(btgIDs.get(0L).contains(0L));
   }
 
   private Map<Long, List<Long>> computeResults(String[] graph)
-      throws Exception {
+    throws Exception {
     GiraphConfiguration conf = getConfiguration();
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
     return parseResults(results);
