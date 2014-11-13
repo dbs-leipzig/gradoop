@@ -4,12 +4,38 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.biiig</groupId>
-    <artifactId>hbase-integration</artifactId>
+    <groupId>de.uni-leipzig.de.dbs</groupId>
+    <artifactId>gradoop</artifactId>
+    <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
 
+    <name>Gradoop Parent</name>
+    <url>http://www.gradoop.org</url>
+    <description>GRADOOP : Graph Analytics on Hadoop</description>
+    <inceptionYear>2014</inceptionYear>
+
+    <modules>
+        <module>gradoop-core</module>
+    </modules>
+
+    <developers>
+        <developer>
+            <id>mjunghanns</id>
+            <name>Martin Junghanns</name>
+            <email>junghanns@informatik.uni-leipzig.de</email>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
+    </developers>
+
     <properties>
+        <top.dir>${project.basedir}</top.dir>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.maven.version>3.0.0</project.maven.version>
         <project.build.targetJdk>1.7</project.build.targetJdk>
+
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.neo4j.version>2.1.5</dep.neo4j.version>
         <dep.hbase-client.version>0.98.7-hadoop1</dep.hbase-client.version>
@@ -19,27 +45,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
-            <version>${dep.hbase-client.version}</version>
-        </dependency>
-        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${dep.log4j.version}</version>
-        </dependency>
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-            <scope>test</scope>
-            <version>${dep.neo4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-testing-util</artifactId>
-            <version>${dep.hbase-testing-util.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

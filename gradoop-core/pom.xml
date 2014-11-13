@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>gradoop</artifactId>
+        <groupId>de.uni-leipzig.de.dbs</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>gradoop-core</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Gradoop Core</name>
+    <description>Gradoop core classes</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>${dep.hbase-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${dep.log4j.version}</version>
+        </dependency>
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <scope>test</scope>
+            <version>${dep.neo4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-testing-util</artifactId>
+            <version>${dep.hbase-testing-util.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
