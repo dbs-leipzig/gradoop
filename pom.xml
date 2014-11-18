@@ -39,11 +39,9 @@
 
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.neo4j.version>2.1.5</dep.neo4j.version>
-        <dep.hbase-client.version>0.98.7-hadoop1</dep.hbase-client.version>
-        <dep.hbase-testing-util.version>0.98.7-hadoop1
-        </dep.hbase-testing-util.version>
-        <dep.hadoop-core.version>1.2.1</dep.hadoop-core.version>
-        <dep.giraph-core.version>1.1.0-SNAPSHOT</dep.giraph-core.version>
+        <dep.hbase.version>0.98.7-hadoop1</dep.hbase.version>
+        <dep.hadoop.version>1.2.1</dep.hadoop.version>
+        <dep.giraph.version>1.1.0-SNAPSHOT</dep.giraph.version>
         <dep.junit.version>4.11</dep.junit.version>
     </properties>
 

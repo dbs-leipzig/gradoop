@@ -40,7 +40,7 @@ public abstract class ClusterBasedTest extends GradoopTest {
   public static void setup()
     throws Exception {
     utility = new HBaseTestingUtility();
-    utility.startMiniCluster();
+    utility.startMiniCluster().waitForActiveAndReadyMaster();
   }
 
   @AfterClass

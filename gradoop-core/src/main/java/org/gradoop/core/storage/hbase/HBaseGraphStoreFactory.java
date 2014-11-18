@@ -61,7 +61,6 @@ public class HBaseGraphStoreFactory {
 
     if (!admin.tableExists(verticesTableDescriptor.getName())) {
       verticesHandler.createVerticesTable(admin, verticesTableDescriptor);
-      //      createVerticesTable(admin, verticesTableDescriptor);
     }
     if (!admin.tableExists(graphsTableDescriptor.getName())) {
       createGraphsTable(admin, graphsTableDescriptor);
@@ -69,21 +68,6 @@ public class HBaseGraphStoreFactory {
 
     admin.close();
   }
-
-  //  private static void createVerticesTable(HBaseAdmin admin,
-  // HTableDescriptor tableDescriptor)
-  //      throws IOException {
-  //    LOG.info("creating table " + tableDescriptor.getNameAsString());
-  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore
-  // .CF_LABELS));
-  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore
-  // .CF_PROPERTIES));
-  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore
-  // .CF_OUT_EDGES));
-  //    tableDescriptor.addFamily(new HColumnDescriptor(HBaseGraphStore
-  // .CF_IN_EDGES));
-  //    admin.createTable(tableDescriptor);
-  //  }
 
   private static void createGraphsTable(HBaseAdmin admin,
                                         HTableDescriptor tableDescriptor)

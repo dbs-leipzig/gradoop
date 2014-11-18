@@ -1,0 +1,155 @@
+package org.gradoop.io.formats;
+
+import org.apache.giraph.io.VertexOutputFormat;
+import org.apache.giraph.io.VertexWriter;
+import org.apache.hadoop.hbase.client.Mutation;
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.OutputCommitter;
+import org.apache.hadoop.mapreduce.RecordWriter;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+
+import java.io.IOException;
+
+/**
+ * Base class for writing Vertex mutations back to specific rows in an HBase
+ * table. This class wraps an instance of TableOutputFormat for easy
+ * configuration with the existing properties.
+ * <p/>
+ * Setting conf.set(TableOutputFormat.OUTPUT_TABLE, "out_table"); will properly
+ * delegate to the TableOutputFormat instance contained in this class. The
+ * Configurable interface prevents specific wrapper methods from having to be
+ * called.
+ * <p/>
+ * Works with {@link HBaseVertexInputFormat}
+ * <p/>
+ * Note: Class is taken from giraph-hbase and adapted to HBase 0.98.7
+ *
+ * @param <I> Vertex index value
+ * @param <V> Vertex value
+ * @param <E> Edge value
+ */
+public abstract class HBaseVertexOutputFormat<
+  I extends WritableComparable,
+  V extends Writable,
+  E extends Writable>
+  extends VertexOutputFormat
+  <I, V, E> {
+
+  /**
+   * delegate output format that writes to HBase
+   */
+  protected static final TableOutputFormat<ImmutableBytesWritable>
+    BASE_FORMAT = new TableOutputFormat<ImmutableBytesWritable>();
+
+  /**
+   * Constructor
+   * <p/>
+   * Simple class which takes an instance of RecordWriter over Writable objects.
+   * Subclasses are expected to implement writeVertex()
+   *
+   * @param <I> Vertex index value
+   * @param <V> Vertex value
+   * @param <E> Edge value
+   */
+  public abstract static class HBaseVertexWriter<
+    I extends WritableComparable,
+    V extends Writable,
+    E extends Writable>
+    extends VertexWriter<I, V, E> {
+
+    /**
+     * Context
+     */
+    private TaskAttemptContext context;
+    /**
+     * Record writer instance
+     * <p/>
+     * Note: changed Writable to Mutation for compatibility reasons.
+     */
+    private RecordWriter<ImmutableBytesWritable, Mutation> recordWriter;
+
+    /**
+     * Sets up base table output format and creates a record writer.
+     *
+     * @param context task attempt context
+     */
+    public HBaseVertexWriter(TaskAttemptContext context)
+      throws IOException, InterruptedException {
+      BASE_FORMAT.setConf(context.getConfiguration());
+      this.recordWriter = BASE_FORMAT.getRecordWriter(context);
+    }
+
+    /**
+     * initialize
+     *
+     * @param context Context used to write the vertices.
+     * @throws IOException
+     */
+    public void initialize(TaskAttemptContext context)
+      throws IOException {
+      this.context = context;
+    }
+
+    /**
+     * close
+     *
+     * @param context the context of the task
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void close(TaskAttemptContext context)
+      throws IOException, InterruptedException {
+      recordWriter.close(context);
+    }
+
+    /**
+     * Get the table record writer;
+     *
+     * @return Record writer to be used for writing.
+     */
+    public RecordWriter<ImmutableBytesWritable,
+      Mutation> getRecordWriter() {
+      return recordWriter;
+    }
+
+    /**
+     * getContext
+     *
+     * @return Context passed to initialize.
+     */
+    public TaskAttemptContext getContext() {
+      return context;
+    }
+  }
+
+  /**
+   * checkOutputSpecs
+   *
+   * @param context information about the job
+   * @throws IOException
+   * @throws InterruptedException
+   */
+  public void checkOutputSpecs(JobContext context)
+    throws IOException, InterruptedException {
+    BASE_FORMAT.checkOutputSpecs(context);
+  }
+
+  /**
+   * getOutputCommitter
+   *
+   * @param context the task context
+   * @return OutputCommitter ouputCommitter
+   * @throws IOException
+   * @throws InterruptedException
+   */
+  public OutputCommitter getOutputCommitter(
+    TaskAttemptContext context)
+    throws IOException, InterruptedException {
+    BASE_FORMAT.setConf(getConf());
+    return BASE_FORMAT.getOutputCommitter(context);
+  }
+}

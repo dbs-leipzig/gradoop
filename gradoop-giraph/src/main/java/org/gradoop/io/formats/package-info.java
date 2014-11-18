@@ -16,6 +16,6 @@
  * limitations under the License.
  */
 /**
- * In- and output formats for the BIIIG Project.
+ * In- and output formats for Giraph <-> HBase
  */
 package org.gradoop.io.formats;

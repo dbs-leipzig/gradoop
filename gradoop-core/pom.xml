@@ -37,6 +37,18 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
             </plugin>
+            <!-- Creates an extra *-tests.jar which can be used as dependency -->
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-jar-plugin</artifactId>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>test-jar</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 
@@ -44,7 +56,7 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
-            <version>${dep.hbase-client.version}</version>
+            <version>${dep.hbase.version}</version>
         </dependency>
         <!-- Testing -->
         <dependency>
@@ -56,7 +68,7 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
-            <version>${dep.hbase-testing-util.version}</version>
+            <version>${dep.hbase.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
