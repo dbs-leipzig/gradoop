@@ -17,6 +17,7 @@
     <modules>
         <module>gradoop-core</module>
         <module>gradoop-giraph</module>
+        <module>gradoop-checkstyle</module>
     </modules>
 
     <developers>
@@ -42,82 +43,101 @@
         <dep.hadoop.version>1.2.1</dep.hadoop.version>
         <dep.giraph.version>1.1.0-SNAPSHOT</dep.giraph.version>
         <dep.junit.version>4.11</dep.junit.version>
+
+        <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
+        <plugin.maven-checkstyle.version>2.13</plugin.maven-checkstyle.version>
+        <plugin.maven-findbugs.version>2.5.2</plugin.maven-findbugs.version>
+        <plugin.maven_assembly.version>2.4</plugin.maven_assembly.version>
+        <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
     </properties>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
-                <configuration>
-                    <source>${project.build.targetJdk}</source>
-                    <target>${project.build.targetJdk}</target>
-                </configuration>
-            </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
-                <!--<version>2.10</version>-->
-                <!--<configuration>-->
-                    <!--<configLocation>${top.dir}/checkstyle.xml</configLocation>-->
-                    <!--<consoleOutput>true</consoleOutput>-->
-                    <!--<enableRulesSummary>false</enableRulesSummary>-->
-                    <!--<headerLocation>${top.dir}/license-header.txt-->
-                    <!--</headerLocation>-->
-                    <!--<failOnViolation>true</failOnViolation>-->
-                    <!--<includeTestSourceDirectory>false-->
-                    <!--</includeTestSourceDirectory>-->
-                <!--</configuration>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>verify</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>check</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.5.2</version>
-                <configuration>
-                    <xmlOutput>true</xmlOutput>
-                    <findbugsXmlOutput>false</findbugsXmlOutput>
-                    <!--<excludeFilterFile>${top.dir}/findbugs-exclude.xml-->
-                    <!--</excludeFilterFile>-->
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <tarLongFileMode>gnu</tarLongFileMode>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>assemble-all</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${plugin.maven-compiler.version}</version>
+                    <configuration>
+                        <source>${project.build.targetJdk}</source>
+                        <target>${project.build.targetJdk}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${plugin.maven-checkstyle.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>de.uni-leipzig.de.dbs</groupId>
+                            <artifactId>gradoop-checkstyle</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <configLocation>gradoop/checkstyle.xml</configLocation>
+                        <headerLocation>gradoop/LICENSE.txt</headerLocation>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>${plugin.maven-findbugs.version}</version>
+                    <configuration>
+                        <xmlOutput>true</xmlOutput>
+                        <findbugsXmlOutput>false</findbugsXmlOutput>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${plugin.maven_assembly.version}</version>
+                    <configuration>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <tarLongFileMode>gnu</tarLongFileMode>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>assemble-all</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${plugin.maven-jar.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <dependencies>
