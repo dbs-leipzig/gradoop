@@ -26,9 +26,9 @@ public class SimpleHBaseVertexInputFormat extends
   public static final String CF_VALUE = "value";
   public static final String CF_EDGES = "edges";
   public static final String Q_VALUE = CF_VALUE;
-  public static final byte[] CF_VALUE_BYTES = Bytes.toBytes(CF_VALUE);
-  public static final byte[] CF_EDGES_BYTES = Bytes.toBytes(CF_EDGES);
-  public static final byte[] Q_VALUE_BYTES = Bytes.toBytes(Q_VALUE);
+  static final byte[] CF_VALUE_BYTES = Bytes.toBytes(CF_VALUE);
+  static final byte[] CF_EDGES_BYTES = Bytes.toBytes(CF_EDGES);
+  static final byte[] Q_VALUE_BYTES = Bytes.toBytes(Q_VALUE);
 
   @Override
   public VertexReader<LongWritable, LongWritable,

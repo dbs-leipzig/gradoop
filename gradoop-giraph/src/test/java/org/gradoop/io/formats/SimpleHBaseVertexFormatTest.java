@@ -1,4 +1,4 @@
-package org.gradoop.io;
+package org.gradoop.io.formats;
 
 import com.google.common.collect.Lists;
 import org.apache.giraph.BspCase;
@@ -11,18 +11,11 @@ import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
-import org.gradoop.io.formats.SimpleHBaseVertexInputFormat;
-import org.gradoop.io.formats.SimpleHBaseVertexOutputFormat;
 import org.junit.Test;
 
 import java.io.IOException;

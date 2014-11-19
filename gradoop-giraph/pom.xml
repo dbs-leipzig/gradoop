@@ -29,10 +29,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -50,7 +50,7 @@
                 </configuration>
             </plugin>
             <plugin>
-            <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
             </plugin>
         </plugins>
@@ -68,33 +68,30 @@
             <version>${dep.giraph.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.giraph</groupId>
-            <artifactId>giraph-hbase</artifactId>
-            <version>${dep.giraph.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
-            <version>${dep.hbase.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-server</artifactId>
-            <version>${dep.hbase.version}</version>
+            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <artifactId>gradoop-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Testing -->
-        <!--<dependency>-->
-        <!--<groupId>de.uni-leipzig.de.dbs</groupId>-->
-        <!--<artifactId>gradoop-core</artifactId>-->
-        <!--<version>${project.version}</version>-->
-        <!--<classifier>tests</classifier>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <artifactId>gradoop-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
             <version>${dep.hbase.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.giraph</groupId>
+            <artifactId>giraph-core</artifactId>
+            <version>${dep.giraph.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

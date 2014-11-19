@@ -17,9 +17,9 @@ import java.util.Map;
  * Created by s1ck on 11/10/14.
  */
 public abstract class BasicHandler implements EntityHandler {
-  protected static final byte[] CF_LABELS_BYTES =
+  static final byte[] CF_LABELS_BYTES =
     Bytes.toBytes(HBaseGraphStore.CF_LABELS);
-  protected static final byte[] CF_PROPERTIES_BYTES =
+  static final byte[] CF_PROPERTIES_BYTES =
     Bytes.toBytes(HBaseGraphStore.CF_PROPERTIES);
 
   private static final byte TYPE_BOOLEAN = 0x00;
@@ -181,6 +181,8 @@ public abstract class BasicHandler implements EntityHandler {
         case TYPE_STRING:
           o = Bytes.toString(value);
           break;
+        default:
+          throw new UnsupportedTypeException("Type code " + type + " not supported");
       }
     }
     return o;
