@@ -4,9 +4,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.gradoop.core.storage.GraphStore;
 import org.gradoop.core.storage.hbase.BasicGraphHandler;
+import org.gradoop.core.storage.hbase.EPGVertexHandler;
 import org.gradoop.core.storage.hbase.GraphHandler;
 import org.gradoop.core.storage.hbase.HBaseGraphStoreFactory;
-import org.gradoop.core.storage.hbase.InOutEdgesGraphsVertexHandler;
 import org.gradoop.core.storage.hbase.VertexHandler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -20,7 +20,7 @@ public abstract class ClusterBasedTest extends GradoopTest {
 
   protected GraphStore createEmptyGraphStore() {
     Configuration config = utility.getConfiguration();
-    VertexHandler verticesHandler = new InOutEdgesGraphsVertexHandler();
+    VertexHandler verticesHandler = new EPGVertexHandler();
     GraphHandler graphsHandler = new BasicGraphHandler();
 
     HBaseGraphStoreFactory.deleteGraphStore(config);
@@ -30,7 +30,7 @@ public abstract class ClusterBasedTest extends GradoopTest {
 
   protected GraphStore openBasicGraphStore() {
     Configuration config = utility.getConfiguration();
-    VertexHandler verticesHandler = new InOutEdgesGraphsVertexHandler();
+    VertexHandler verticesHandler = new EPGVertexHandler();
     GraphHandler graphsHandler = new BasicGraphHandler();
     return HBaseGraphStoreFactory
       .createGraphStore(config, verticesHandler, graphsHandler);

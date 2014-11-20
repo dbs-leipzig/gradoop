@@ -20,10 +20,10 @@ import java.util.regex.Pattern;
 /**
  * Created by s1ck on 11/8/14.
  */
-public class InOutEdgesGraphsVertexHandler extends BasicHandler
+public class EPGVertexHandler extends BasicHandler
   implements VertexHandler {
   private static Logger LOG =
-    Logger.getLogger(InOutEdgesGraphsVertexHandler.class);
+    Logger.getLogger(EPGVertexHandler.class);
 
   private static final byte[] CF_OUT_EDGES_BYTES =
     Bytes.toBytes(HBaseGraphStore.CF_OUT_EDGES);
