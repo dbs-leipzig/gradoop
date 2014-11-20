@@ -1,10 +1,10 @@
 package org.gradoop.core;
 
 import com.google.common.collect.Lists;
-import org.gradoop.core.io.EPGVertexReader;
-import org.gradoop.core.io.SimpleVertexReader;
-import org.gradoop.core.io.VertexLineReader;
-import org.gradoop.core.model.Vertex;
+import org.gradoop.io.reader.EPGVertexReader;
+import org.gradoop.io.reader.SimpleVertexReader;
+import org.gradoop.io.reader.VertexLineReader;
+import org.gradoop.model.Vertex;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 

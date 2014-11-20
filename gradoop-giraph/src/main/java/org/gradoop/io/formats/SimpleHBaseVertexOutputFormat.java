@@ -18,6 +18,7 @@ import java.io.IOException;
  */
 public class SimpleHBaseVertexOutputFormat extends
   HBaseVertexOutputFormat<LongWritable, LongWritable, LongWritable> {
+
   @Override
   public VertexWriter<LongWritable, LongWritable, LongWritable>
   createVertexWriter(

@@ -2,12 +2,12 @@ package org.gradoop.core;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
-import org.gradoop.core.storage.GraphStore;
-import org.gradoop.core.storage.hbase.BasicGraphHandler;
-import org.gradoop.core.storage.hbase.EPGVertexHandler;
-import org.gradoop.core.storage.hbase.GraphHandler;
-import org.gradoop.core.storage.hbase.HBaseGraphStoreFactory;
-import org.gradoop.core.storage.hbase.VertexHandler;
+import org.gradoop.storage.GraphStore;
+import org.gradoop.storage.hbase.BasicGraphHandler;
+import org.gradoop.storage.hbase.EPGVertexHandler;
+import org.gradoop.storage.hbase.GraphHandler;
+import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
+import org.gradoop.storage.hbase.VertexHandler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 

@@ -11,11 +11,17 @@ import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
+import org.gradoop.GConstants;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -52,9 +58,9 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
 
     Configuration conf = utility.getConfiguration();
     conf.set(TableInputFormat.INPUT_TABLE,
-      SimpleHBaseVertexInputFormat.TABLE_NAME);
+      GConstants.TABLE_VERTICES);
     conf.set(TableOutputFormat.OUTPUT_TABLE,
-      SimpleHBaseVertexInputFormat.TABLE_NAME);
+      GConstants.TABLE_VERTICES);
 
     GiraphJob giraphJob = new GiraphJob(conf, BspCase.getCallingMethodName());
     GiraphConfiguration giraphConfiguration = giraphJob.getConfiguration();
@@ -80,7 +86,7 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
     HBaseAdmin admin = new HBaseAdmin(config);
 
     HTableDescriptor verticesTableDescriptor = new HTableDescriptor(TableName
-      .valueOf(SimpleHBaseVertexInputFormat.TABLE_NAME));
+      .valueOf(GConstants.TABLE_VERTICES));
 
     if (admin.tableExists(verticesTableDescriptor.getName())) {
       admin.disableTable(verticesTableDescriptor.getName());
@@ -93,7 +99,7 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
       (SimpleHBaseVertexInputFormat.CF_EDGES));
 
     admin.createTable(verticesTableDescriptor);
-    return new HTable(config, SimpleHBaseVertexInputFormat.TABLE_NAME);
+    return new HTable(config, GConstants.TABLE_VERTICES);
   }
 
   private void createTestData(HTable table)

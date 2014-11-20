@@ -22,9 +22,9 @@ import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.gradoop.io.IIGMessage;
-import org.gradoop.io.IIGVertex;
-import org.gradoop.io.IIGVertexType;
+import org.gradoop.io.formats.IIGMessage;
+import org.gradoop.io.formats.IIGVertex;
+import org.gradoop.io.formats.IIGVertexType;
 
 import java.io.IOException;
 import java.util.List;

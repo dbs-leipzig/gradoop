@@ -22,10 +22,10 @@ import java.util.Map;
 public class SimpleHBaseVertexInputFormat extends
   HBaseVertexInputFormat<LongWritable, LongWritable, LongWritable> {
 
-  public static final String TABLE_NAME = "vertices";
-  public static final String CF_VALUE = "value";
-  public static final String CF_EDGES = "edges";
-  public static final String Q_VALUE = CF_VALUE;
+  static final String CF_VALUE = "value";
+  static final String CF_EDGES = "edges";
+  static final String Q_VALUE = CF_VALUE;
+
   static final byte[] CF_VALUE_BYTES = Bytes.toBytes(CF_VALUE);
   static final byte[] CF_EDGES_BYTES = Bytes.toBytes(CF_EDGES);
   static final byte[] Q_VALUE_BYTES = Bytes.toBytes(Q_VALUE);

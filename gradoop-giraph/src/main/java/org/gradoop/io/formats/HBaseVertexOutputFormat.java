@@ -24,7 +24,7 @@ import java.io.IOException;
  * Configurable interface prevents specific wrapper methods from having to be
  * called.
  * <p/>
- * Works with {@link HBaseVertexInputFormat}
+ * Works with {@link org.gradoop.io.formats.HBaseVertexInputFormat}
  * <p/>
  * Note: Class is taken from giraph-hbase and adapted to HBase 0.98.7
  *
