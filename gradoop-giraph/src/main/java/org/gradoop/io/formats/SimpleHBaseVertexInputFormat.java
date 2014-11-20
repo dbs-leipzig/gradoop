@@ -35,7 +35,7 @@ public class SimpleHBaseVertexInputFormat extends
     LongWritable> createVertexReader(InputSplit split,
                                      TaskAttemptContext context)
     throws IOException {
-    return new EPGHBaseVertexReader(split, context);
+    return new SimpleHBaseVertexReader(split, context);
   }
 
   @Override
@@ -45,11 +45,11 @@ public class SimpleHBaseVertexInputFormat extends
   /**
    * Uses the HBase RecordReader to create vertices from HBase rows.
    */
-  public static class EPGHBaseVertexReader extends
+  public static class SimpleHBaseVertexReader extends
     HBaseVertexReader<LongWritable, LongWritable, LongWritable> {
 
-    public EPGHBaseVertexReader(InputSplit split,
-                                TaskAttemptContext context)
+    public SimpleHBaseVertexReader(InputSplit split,
+                                   TaskAttemptContext context)
       throws IOException {
       super(split, context);
     }

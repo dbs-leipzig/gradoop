@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import org.gradoop.core.ClusterBasedTest;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.SimpleGraph;
-import org.gradoop.model.inmemory.SimpleVertex;
+import org.gradoop.model.inmemory.MemoryGraph;
+import org.gradoop.model.inmemory.MemoryVertex;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     vertices.add(1L);
 
     graphs
-      .add(new SimpleGraph(graphID, graphLabels, graphProperties, vertices));
+      .add(new MemoryGraph(graphID, graphLabels, graphProperties, vertices));
 
     // graph 1
     graphID = 1L;
@@ -46,7 +46,7 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     vertices.add(2L);
 
     graphs
-      .add(new SimpleGraph(graphID, graphLabels, graphProperties, vertices));
+      .add(new MemoryGraph(graphID, graphLabels, graphProperties, vertices));
 
     return graphs;
   }
@@ -133,7 +133,7 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     final Map<String, Map<String, Object>> inEdges = new HashMap<>();
     final Iterable<Long> graphs = Lists.newArrayList();
     Vertex v =
-      new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+      new MemoryVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
     graphStore.writeVertex(v);
   }
 
@@ -171,7 +171,7 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     final Iterable<Long> graphs = Lists.newArrayList();
 
     Vertex v =
-      new SimpleVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+      new MemoryVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
     graphStore.writeVertex(v);
 
     // reopen

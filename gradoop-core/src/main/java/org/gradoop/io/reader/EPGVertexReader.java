@@ -3,7 +3,7 @@ package org.gradoop.io.reader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.SimpleVertex;
+import org.gradoop.model.inmemory.MemoryVertex;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class EPGVertexReader implements VertexLineReader {
     Map<String, Map<String, Object>> inEdges = readEdges(lineTokens[4]);
     Iterable<Long> graphs = readGraphs(lineTokens[5]);
 
-    return new SimpleVertex(vertexID, labels, properties, outEdges, inEdges,
+    return new MemoryVertex(vertexID, labels, properties, outEdges, inEdges,
       graphs);
   }
 

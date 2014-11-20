@@ -7,11 +7,11 @@ import java.util.Map;
 /**
  * Created by martin on 05.11.14.
  */
-public class SimpleGraph extends LabeledPropertyContainer implements Graph {
+public class MemoryGraph extends LabeledPropertyContainer implements Graph {
 
   private final Iterable<Long> vertices;
 
-  public SimpleGraph(Long id, Iterable<String> labels,
+  public MemoryGraph(Long id, Iterable<String> labels,
                      Map<String, Object> properties,
                      Iterable<Long> vertices) {
     super(id, labels, properties);

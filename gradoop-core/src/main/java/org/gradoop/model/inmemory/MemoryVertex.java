@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Created by martin on 05.11.14.
  */
-public class SimpleVertex extends LabeledPropertyContainer implements Vertex {
+public class MemoryVertex extends LabeledPropertyContainer implements Vertex {
 
   private final Map<String, Map<String, Object>> outgoingEdges;
 
@@ -15,7 +15,7 @@ public class SimpleVertex extends LabeledPropertyContainer implements Vertex {
 
   private final Iterable<Long> graphs;
 
-  public SimpleVertex(Long id, Iterable<String> labels,
+  public MemoryVertex(Long id, Iterable<String> labels,
                       Map<String, Object> properties,
                       Map<String, Map<String, Object>> outgoingEdges,
                       Map<String, Map<String, Object>> incomingEdges,

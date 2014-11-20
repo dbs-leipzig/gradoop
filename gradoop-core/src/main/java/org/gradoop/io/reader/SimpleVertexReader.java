@@ -1,7 +1,7 @@
 package org.gradoop.io.reader;
 
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.SimpleVertex;
+import org.gradoop.model.inmemory.MemoryVertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +28,6 @@ public class SimpleVertexReader implements VertexLineReader {
       outEdges.put(tokens[i], new HashMap<String, Object>());
     }
 
-    return new SimpleVertex(vertexID, null, null, outEdges, null, null);
+    return new MemoryVertex(vertexID, null, null, outEdges, null, null);
   }
 }

@@ -9,8 +9,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.SimpleGraph;
-import org.gradoop.model.inmemory.SimpleVertex;
+import org.gradoop.model.inmemory.MemoryGraph;
+import org.gradoop.model.inmemory.MemoryVertex;
 import org.gradoop.storage.GraphStore;
 
 import java.io.IOException;
@@ -95,7 +95,7 @@ public class HBaseGraphStore implements GraphStore {
         Iterable<String> labels = graphsHandler.readLabels(res);
         Map<String, Object> properties = graphsHandler.readProperties(res);
         Iterable<Long> vertices = graphsHandler.readVertices(res);
-        g = new SimpleGraph(graphID, labels, properties, vertices);
+        g = new MemoryGraph(graphID, labels, properties, vertices);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -117,7 +117,7 @@ public class HBaseGraphStore implements GraphStore {
         Map<String, Map<String, Object>> inEdges =
           verticesHandler.readIncomingEdges(res);
         Iterable<Long> graphs = verticesHandler.readGraphs(res);
-        v = new SimpleVertex(vertexID, labels, properties, outEdges, inEdges,
+        v = new MemoryVertex(vertexID, labels, properties, outEdges, inEdges,
           graphs);
       }
     } catch (IOException e) {

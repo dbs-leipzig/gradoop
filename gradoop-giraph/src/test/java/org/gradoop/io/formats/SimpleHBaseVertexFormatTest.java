@@ -7,7 +7,6 @@ import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
@@ -22,6 +21,7 @@ import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.gradoop.GConstants;
+import org.gradoop.GiraphClusterBasedTest;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -33,9 +33,7 @@ import static org.junit.Assert.*;
 /**
  * Created by martin on 17.11.14.
  */
-public class SimpleHBaseVertexFormatTest extends BspCase {
-
-  private static final HBaseTestingUtility utility = new HBaseTestingUtility();
+public class SimpleHBaseVertexFormatTest extends GiraphClusterBasedTest {
 
   private static final long DEFAULT_VERTEX_VALUE = 0L;
   private static final byte[] DEFAULT_VERTEX_VALUE_BYTES =
@@ -51,8 +49,6 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
   @Test
   public void vertexInputOutputTest()
     throws Exception {
-    utility.startMiniCluster(1).waitForActiveAndReadyMaster();
-    utility.startMiniMapReduceCluster();
     HTable testTable = createHBaseTestTable();
     createTestData(testTable);
 
@@ -76,8 +72,6 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
     validateTestData(testTable);
 
     testTable.close();
-    utility.shutdownMiniMapReduceCluster();
-    utility.shutdownMiniCluster();
   }
 
   private HTable createHBaseTestTable()
