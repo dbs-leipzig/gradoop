@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Created by s1ck on 11/11/14.
  */
-public class ExtendedVertexReader implements VertexLineReader {
+public class EPGVertexReader implements VertexLineReader {
 
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile("\\|");
   private static final Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile(" ");

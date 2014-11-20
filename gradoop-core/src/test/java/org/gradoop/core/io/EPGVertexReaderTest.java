@@ -7,11 +7,11 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class ExtendedVertexReaderTest extends GradoopTest {
+public class EPGVertexReaderTest extends GradoopTest {
 
   @Test
   public void readExtendedGraphTest() {
-    VertexLineReader vertexLineReader = new ExtendedVertexReader();
+    VertexLineReader vertexLineReader = new EPGVertexReader();
     List<Vertex> vertices = Lists.newArrayList();
 
     for (String line : EXTENDED_GRAPH) {

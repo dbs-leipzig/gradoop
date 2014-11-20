@@ -1,8 +1,8 @@
 package org.gradoop.core;
 
 import com.google.common.collect.Lists;
-import org.gradoop.core.io.BasicVertexReader;
-import org.gradoop.core.io.ExtendedVertexReader;
+import org.gradoop.core.io.EPGVertexReader;
+import org.gradoop.core.io.SimpleVertexReader;
 import org.gradoop.core.io.VertexLineReader;
 import org.gradoop.core.model.Vertex;
 import org.junit.Rule;
@@ -62,11 +62,11 @@ public class GradoopTest {
   };
 
   protected List<Vertex> createBasicGraphVertices() {
-    return createVertices(BASIC_GRAPH, new BasicVertexReader());
+    return createVertices(BASIC_GRAPH, new SimpleVertexReader());
   }
 
   protected List<Vertex> createExtendedGraphVertices() {
-    return createVertices(EXTENDED_GRAPH, new ExtendedVertexReader());
+    return createVertices(EXTENDED_GRAPH, new EPGVertexReader());
   }
 
   private List<Vertex> createVertices(String[] graph,

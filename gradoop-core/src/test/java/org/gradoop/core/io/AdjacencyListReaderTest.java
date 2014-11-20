@@ -37,7 +37,7 @@ public class AdjacencyListReaderTest extends ClusterBasedTest {
     BufferedReader bufferedReader = createTestReader(EXTENDED_GRAPH);
     GraphStore graphStore = createEmptyGraphStore();
     AdjacencyListReader adjacencyListReader =
-      new AdjacencyListReader(graphStore, new ExtendedVertexReader());
+      new AdjacencyListReader(graphStore, new EPGVertexReader());
     // store the graph
     adjacencyListReader.read(bufferedReader);
 

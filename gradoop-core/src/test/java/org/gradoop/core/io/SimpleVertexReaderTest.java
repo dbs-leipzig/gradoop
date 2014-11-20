@@ -8,12 +8,12 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class BasicVertexReaderTest extends GradoopTest {
+public class SimpleVertexReaderTest extends GradoopTest {
 
   @Test
   public void readBasicGraphTest()
     throws IOException {
-    VertexLineReader reader = new BasicVertexReader();
+    VertexLineReader reader = new SimpleVertexReader();
     List<Vertex> vertices = Lists.newArrayList();
 
     for (String line : BASIC_GRAPH) {
