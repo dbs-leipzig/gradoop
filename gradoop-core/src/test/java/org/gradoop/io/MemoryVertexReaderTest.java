@@ -1,7 +1,7 @@
 package org.gradoop.io;
 
 import com.google.common.collect.Lists;
-import org.gradoop.core.GradoopTest;
+import org.gradoop.GradoopTest;
 import org.gradoop.io.reader.SimpleVertexReader;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Vertex;

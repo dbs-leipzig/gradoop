@@ -1,4 +1,4 @@
-package org.gradoop.core;
+package org.gradoop;
 
 import com.google.common.collect.Lists;
 import org.gradoop.io.reader.EPGVertexReader;
@@ -8,7 +8,11 @@ import org.gradoop.model.Vertex;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -204,5 +208,20 @@ public class GradoopTest {
           break;
       }
     }
+  }
+
+  protected BufferedReader createTestReader(String[] graph)
+    throws IOException {
+    File tmpFile = getTempFile();
+    BufferedWriter bw = new BufferedWriter(new FileWriter(tmpFile));
+
+    for (String line : graph) {
+      bw.write(line);
+      bw.newLine();
+    }
+    bw.flush();
+    bw.close();
+
+    return new BufferedReader(new FileReader(tmpFile));
   }
 }

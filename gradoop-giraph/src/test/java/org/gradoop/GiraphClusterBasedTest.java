@@ -3,7 +3,6 @@ package org.gradoop;
 import org.apache.giraph.BspCase;
 import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
-import org.gradoop.core.ClusterBasedTest;
 import org.junit.BeforeClass;
 
 import java.io.IOException;

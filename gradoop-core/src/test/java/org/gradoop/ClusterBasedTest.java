@@ -1,4 +1,4 @@
-package org.gradoop.core;
+package org.gradoop;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;

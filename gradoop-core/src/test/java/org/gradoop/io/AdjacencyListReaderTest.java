@@ -1,7 +1,7 @@
 package org.gradoop.io;
 
 import com.google.common.collect.Lists;
-import org.gradoop.core.ClusterBasedTest;
+import org.gradoop.ClusterBasedTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Vertex;
@@ -9,29 +9,10 @@ import org.gradoop.storage.GraphStore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
 public class AdjacencyListReaderTest extends ClusterBasedTest {
-
-  private BufferedReader createTestReader(String[] graph)
-    throws IOException {
-    File tmpFile = getTempFile();
-    BufferedWriter bw = new BufferedWriter(new FileWriter(tmpFile));
-
-    for (String line : graph) {
-      bw.write(line);
-      bw.newLine();
-    }
-    bw.flush();
-    bw.close();
-
-    return new BufferedReader(new FileReader(tmpFile));
-  }
 
   @Test
   public void writeReadExtendedGraphTest()

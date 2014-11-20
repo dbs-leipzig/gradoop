@@ -1,7 +1,7 @@
 package org.gradoop.storage.hbase;
 
 import com.google.common.collect.Lists;
-import org.gradoop.core.ClusterBasedTest;
+import org.gradoop.ClusterBasedTest;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryGraph;
