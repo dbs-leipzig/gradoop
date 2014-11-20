@@ -3,6 +3,11 @@
 
 #### Setup development environment
 
+##### Requirements
+
+* Maven 3
+* JDK 7 (Oracle or OpenJDK)
+
 ##### Setup giraph
 
 Unfortunately, Giraph is not available in the official Apache Maven 
