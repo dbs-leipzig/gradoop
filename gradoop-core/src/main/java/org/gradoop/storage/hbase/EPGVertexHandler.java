@@ -9,6 +9,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
+import org.gradoop.model.GraphElement;
 import org.gradoop.model.Vertex;
 
 import java.io.IOException;
@@ -62,7 +63,7 @@ public class EPGVertexHandler extends BasicHandler
   }
 
   @Override
-  public Put writeGraphs(Put put, Vertex vertex) {
+  public Put writeGraphs(Put put, GraphElement vertex) {
     for (Long graphID : vertex.getGraphs()) {
       put.add(CF_GRAPHS_BYTES, Bytes.toBytes(graphID), null);
     }

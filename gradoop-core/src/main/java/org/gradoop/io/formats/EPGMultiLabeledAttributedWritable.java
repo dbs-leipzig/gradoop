@@ -18,8 +18,7 @@ import java.util.Map;
  * Created by martin on 20.11.14.
  */
 public class EPGMultiLabeledAttributedWritable implements MultiLabeled,
-  Attributed,
-  Writable {
+  Attributed, Writable {
 
   private List<String> labels;
 

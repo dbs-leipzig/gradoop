@@ -20,7 +20,8 @@ repositories, so we have to build it on our own.
 * install to local maven repository
 
     `cd giraph`
-    `mvn clean install -DskipTests`
+    
+    `mvn -Phadoop_1 clean install -DskipTests`
     
 ##### Setup gradoop
 
@@ -31,6 +32,7 @@ repositories, so we have to build it on our own.
 * build and run tests
 
     `cd gradoop`
+    
     `mvn clean install`
 
 ##### Code style for IntelliJ IDEA
@@ -40,7 +42,7 @@ repositories, so we have to build it on our own.
     `cp dev-support/gradoop-idea-codestyle.xml ~/<your IDEA folder>/config/codeStyles`
     
 * restart IDEA
-* File -> Settings -> Code Style -> Java -> Scheme -> "Gradoop"
+* `File -> Settings -> Code Style -> Java -> Scheme -> "Gradoop"`
     
 
 

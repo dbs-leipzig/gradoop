@@ -31,6 +31,7 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
   private final static String TEST_LABEL = "test";
   private final static String TEST_KEY = "test_key";
   private final static String TEST_VALUE = "test_value";
+  private final static Long TEST_GRAPH = 2L;
 
   public EPGHBaseVertexFormatTest() {
     super(EPGHBaseVertexFormatTest.class.getName());
@@ -78,23 +79,31 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     // properties
     assertEquals(TEST_VALUE, v.getProperty(TEST_KEY));
 
+    // graphs
+    List<Long> graphs = Lists.newArrayList(v.getGraphs());
+    assertThat(graphs.size(), is(3));
+    assertTrue(graphs.contains(0L));
+    assertTrue(graphs.contains(1L));
+    assertTrue(graphs.contains(2L));
+
     // close everything
     graphStore.close();
     bufferedReader.close();
   }
 
   public static class TestComputation extends
-    BasicComputation<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+    BasicComputation<EPGVertexIdentifier, EPGVertexWritable,
       EPGMultiLabeledAttributedWritable, LongWritable> {
 
     @Override
     public void compute(
-      Vertex<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+      Vertex<EPGVertexIdentifier, EPGVertexWritable,
         EPGMultiLabeledAttributedWritable> vertex,
       Iterable<LongWritable> messages)
       throws IOException {
       vertex.getValue().addLabel(TEST_LABEL);
       vertex.getValue().addProperty(TEST_KEY, TEST_VALUE);
+      vertex.getValue().addToGraph(TEST_GRAPH);
       vertex.voteToHalt();
     }
   }

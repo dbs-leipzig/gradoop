@@ -1,15 +1,9 @@
 package org.gradoop.model;
 
-import java.util.Map;
-
 /**
  * Created by martin on 05.11.14.
  */
-public interface Vertex extends Identifiable, Attributed, MultiLabeled {
+public interface Vertex extends Identifiable, Connected, Attributed,
+  MultiLabeled, GraphElement {
 
-  Map<String, Map<String, Object>> getOutgoingEdges();
-
-  Map<String, Map<String, Object>> getIncomingEdges();
-
-  Iterable<Long> getGraphs();
 }

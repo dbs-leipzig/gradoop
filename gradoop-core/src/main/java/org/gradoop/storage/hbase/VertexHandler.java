@@ -4,6 +4,7 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.gradoop.model.GraphElement;
 import org.gradoop.model.Vertex;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public interface VertexHandler extends EntityHandler {
 
   Put writeIncomingEdges(Put put, Vertex vertex);
 
-  Put writeGraphs(Put put, Vertex vertex);
+  Put writeGraphs(Put put, GraphElement vertex);
 
   Map<String, Map<String, Object>> readOutgoingEdges(Result res);
 

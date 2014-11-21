@@ -79,9 +79,11 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
       Iterable<String> labels = VERTEX_HANDLER.readLabels(row);
       // properties
       Map<String, Object> properties = VERTEX_HANDLER.readProperties(row);
+      // graphs
+      Iterable<Long> graphs = VERTEX_HANDLER.readGraphs(row);
       // create vertex value
-      EPGMultiLabeledAttributedWritable vertexValue = new
-        EPGMultiLabeledAttributedWritable(labels, properties);
+      EPGVertexWritable vertexValue = new
+        EPGVertexWritable(labels, properties, graphs);
 
       // TODO: initialize edges using EDGE_HANDLER
 //      // outgoing edges
