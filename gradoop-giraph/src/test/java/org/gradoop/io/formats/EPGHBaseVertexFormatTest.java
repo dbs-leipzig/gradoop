@@ -1,5 +1,6 @@
 package org.gradoop.io.formats;
 
+import com.google.common.collect.Lists;
 import org.apache.giraph.BspCase;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.graph.BasicComputation;
@@ -18,13 +19,18 @@ import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
  * Created by martin on 20.11.14.
  */
 public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
+  private final static String TEST_LABEL = "test";
+
   public EPGHBaseVertexFormatTest() {
     super(EPGHBaseVertexFormatTest.class.getName());
   }
@@ -58,6 +64,15 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
 
     assertTrue(giraphJob.run(true));
 
+    // test
+    org.gradoop.model.Vertex v = graphStore.readVertex(1L);
+    List<String> labels = Lists.newArrayList(v.getLabels());
+
+    assertThat(labels.size(), is(3));
+    assertThat(labels.contains("A"), is(true));
+    assertThat(labels.contains("B"), is(true));
+    assertThat(labels.contains(TEST_LABEL), is(true));
+
     // close everything
     graphStore.close();
     bufferedReader.close();
@@ -67,13 +82,13 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     BasicComputation<EPGVertexIdentifier, EPGLabeledAttributedWritable,
       EPGLabeledAttributedWritable, LongWritable> {
 
-
     @Override
     public void compute(
       Vertex<EPGVertexIdentifier, EPGLabeledAttributedWritable,
         EPGLabeledAttributedWritable> vertex,
       Iterable<LongWritable> messages)
       throws IOException {
+      vertex.getValue().addLabel(TEST_LABEL);
       vertex.voteToHalt();
     }
   }

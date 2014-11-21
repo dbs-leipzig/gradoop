@@ -5,4 +5,6 @@ package org.gradoop.model;
  */
 public interface Labeled {
   Iterable<String> getLabels();
+
+  void addLabel(String label);
 }

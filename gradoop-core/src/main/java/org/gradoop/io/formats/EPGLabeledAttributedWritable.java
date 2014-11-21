@@ -11,6 +11,7 @@ import org.gradoop.model.Labeled;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,8 @@ public class EPGLabeledAttributedWritable implements Labeled, Attributed,
 
   public EPGLabeledAttributedWritable(Iterable<String> labels, Map<String,
     Object> properties) {
-    this.labels = Lists.newArrayList(labels);
+    this.labels = (labels != null) ? Lists.newArrayList(labels) : new
+      ArrayList<String>();
     this.properties = properties;
   }
 
@@ -48,6 +50,14 @@ public class EPGLabeledAttributedWritable implements Labeled, Attributed,
   @Override
   public Iterable<String> getLabels() {
     return labels;
+  }
+
+  @Override
+  public void addLabel(String label) {
+    if (label == null || "".equals(label)) {
+      throw new IllegalArgumentException("label must not be null or empty");
+    }
+    this.labels.add(label);
   }
 
   @Override
