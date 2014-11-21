@@ -84,13 +84,13 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
   }
 
   public static class TestComputation extends
-    BasicComputation<EPGVertexIdentifier, EPGLabeledAttributedWritable,
-      EPGLabeledAttributedWritable, LongWritable> {
+    BasicComputation<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+      EPGMultiLabeledAttributedWritable, LongWritable> {
 
     @Override
     public void compute(
-      Vertex<EPGVertexIdentifier, EPGLabeledAttributedWritable,
-        EPGLabeledAttributedWritable> vertex,
+      Vertex<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+        EPGMultiLabeledAttributedWritable> vertex,
       Iterable<LongWritable> messages)
       throws IOException {
       vertex.getValue().addLabel(TEST_LABEL);

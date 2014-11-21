@@ -17,22 +17,22 @@ import java.io.IOException;
  * Created by martin on 20.11.14.
  */
 public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
-  EPGVertexIdentifier, EPGLabeledAttributedWritable,
-  EPGLabeledAttributedWritable> {
+  EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+  EPGMultiLabeledAttributedWritable> {
 
   private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
   @Override
-  public VertexWriter<EPGVertexIdentifier, EPGLabeledAttributedWritable,
-    EPGLabeledAttributedWritable> createVertexWriter(
+  public VertexWriter<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+    EPGMultiLabeledAttributedWritable> createVertexWriter(
     TaskAttemptContext context)
     throws IOException, InterruptedException {
     return new EPGHBaseVertexWriter(context);
   }
 
   public static class EPGHBaseVertexWriter extends HBaseVertexWriter<
-    EPGVertexIdentifier, EPGLabeledAttributedWritable,
-    EPGLabeledAttributedWritable> {
+    EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+    EPGMultiLabeledAttributedWritable> {
 
     /**
      * Sets up base table output format and creates a record writer.
@@ -46,8 +46,8 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
 
     @Override
     public void writeVertex(
-      Vertex<EPGVertexIdentifier, EPGLabeledAttributedWritable,
-        EPGLabeledAttributedWritable> vertex)
+      Vertex<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+        EPGMultiLabeledAttributedWritable> vertex)
       throws IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
       byte[] rowKey = Bytes.toBytes(vertex.getId().getID());

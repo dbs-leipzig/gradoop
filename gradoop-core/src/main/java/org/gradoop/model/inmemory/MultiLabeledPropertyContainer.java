@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Identifiable;
-import org.gradoop.model.Labeled;
+import org.gradoop.model.MultiLabeled;
 
 import java.util.List;
 import java.util.Map;
@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * Created by martin on 05.11.14.
  */
-public abstract class LabeledPropertyContainer implements Identifiable,
-  Attributed, Labeled {
+public abstract class MultiLabeledPropertyContainer implements Identifiable,
+  Attributed, MultiLabeled {
 
   protected final Long id;
 
@@ -21,8 +21,8 @@ public abstract class LabeledPropertyContainer implements Identifiable,
 
   protected Map<String, Object> properties;
 
-  protected LabeledPropertyContainer(Long id, Iterable<String> labels,
-                                     Map<String, Object> properties) {
+  protected MultiLabeledPropertyContainer(Long id, Iterable<String> labels,
+                                          Map<String, Object> properties) {
     if (id == null) {
       throw new IllegalArgumentException("id must not be null");
     }

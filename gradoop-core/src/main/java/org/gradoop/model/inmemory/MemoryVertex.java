@@ -7,7 +7,8 @@ import java.util.Map;
 /**
  * Created by martin on 05.11.14.
  */
-public class MemoryVertex extends LabeledPropertyContainer implements Vertex {
+public class MemoryVertex extends MultiLabeledPropertyContainer implements
+  Vertex {
 
   private final Map<String, Map<String, Object>> outgoingEdges;
 

@@ -7,7 +7,8 @@ import java.util.Map;
 /**
  * Created by martin on 05.11.14.
  */
-public class MemoryGraph extends LabeledPropertyContainer implements Graph {
+public class MemoryGraph extends MultiLabeledPropertyContainer implements
+  Graph {
 
   private final Iterable<Long> vertices;
 

@@ -6,7 +6,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.GConstants;
 import org.gradoop.model.Attributed;
-import org.gradoop.model.Labeled;
+import org.gradoop.model.MultiLabeled;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public abstract class BasicHandler implements EntityHandler {
   private static final byte TYPE_STRING = 0x05;
 
   @Override
-  public Put writeLabels(Put put, Labeled entity) {
+  public Put writeLabels(Put put, MultiLabeled entity) {
     int internalLabelID = 0;
     for (String label : entity.getLabels()) {
       put.add(CF_LABELS_BYTES, Bytes.toBytes(internalLabelID++),

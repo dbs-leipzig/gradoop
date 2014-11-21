@@ -1,9 +1,9 @@
 package org.gradoop.model;
 
 /**
- * Created by martin on 05.11.14.
+ * A multi-labeled entity is tagged with zero or more labels.
  */
-public interface Labeled {
+public interface MultiLabeled {
   /**
    * Returns all labels of that entity.
    *

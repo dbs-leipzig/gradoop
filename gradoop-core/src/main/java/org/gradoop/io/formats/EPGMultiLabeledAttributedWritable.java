@@ -6,7 +6,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
 import org.gradoop.model.Attributed;
-import org.gradoop.model.Labeled;
+import org.gradoop.model.MultiLabeled;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -17,19 +17,20 @@ import java.util.Map;
 /**
  * Created by martin on 20.11.14.
  */
-public class EPGLabeledAttributedWritable implements Labeled, Attributed,
+public class EPGMultiLabeledAttributedWritable implements MultiLabeled,
+  Attributed,
   Writable {
 
   private List<String> labels;
 
   private Map<String, Object> properties;
 
-  public EPGLabeledAttributedWritable() {
+  public EPGMultiLabeledAttributedWritable() {
     labels = Lists.newArrayList();
     properties = Maps.newHashMap();
   }
 
-  public EPGLabeledAttributedWritable(Iterable<String> labels, Map<String,
+  public EPGMultiLabeledAttributedWritable(Iterable<String> labels, Map<String,
     Object> properties) {
     this.labels = (labels != null) ? Lists.newArrayList(labels) : null;
     this.properties = properties;

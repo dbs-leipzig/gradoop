@@ -21,14 +21,14 @@ import java.util.Map;
  */
 public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
   EPGVertexIdentifier,
-  EPGLabeledAttributedWritable,
-  EPGLabeledAttributedWritable> {
+  EPGMultiLabeledAttributedWritable,
+  EPGMultiLabeledAttributedWritable> {
 
   private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
   @Override
-  public VertexReader<EPGVertexIdentifier, EPGLabeledAttributedWritable,
-    EPGLabeledAttributedWritable> createVertexReader(
+  public VertexReader<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+    EPGMultiLabeledAttributedWritable> createVertexReader(
     InputSplit split, TaskAttemptContext context)
     throws IOException {
     return new EPGHBaseVertexReader(split, context);
@@ -40,8 +40,8 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
   }
 
   public static class EPGHBaseVertexReader extends
-    HBaseVertexReader<EPGVertexIdentifier, EPGLabeledAttributedWritable,
-      EPGLabeledAttributedWritable> {
+    HBaseVertexReader<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+      EPGMultiLabeledAttributedWritable> {
 
     /**
      * Sets the base TableInputFormat and creates a record reader.
@@ -63,13 +63,13 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
     }
 
     @Override
-    public Vertex<EPGVertexIdentifier, EPGLabeledAttributedWritable,
-      EPGLabeledAttributedWritable> getCurrentVertex()
+    public Vertex<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+      EPGMultiLabeledAttributedWritable> getCurrentVertex()
       throws IOException, InterruptedException {
       Result row = getRecordReader().getCurrentValue();
 
-      Vertex<EPGVertexIdentifier, EPGLabeledAttributedWritable,
-        EPGLabeledAttributedWritable> vertex = getConf().createVertex();
+      Vertex<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable,
+        EPGMultiLabeledAttributedWritable> vertex = getConf().createVertex();
 
       // vertexID
       EPGVertexIdentifier vertexID = new EPGVertexIdentifier(Bytes
@@ -80,8 +80,8 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
       // properties
       Map<String, Object> properties = VERTEX_HANDLER.readProperties(row);
       // create vertex value
-      EPGLabeledAttributedWritable vertexValue = new
-        EPGLabeledAttributedWritable(labels, properties);
+      EPGMultiLabeledAttributedWritable vertexValue = new
+        EPGMultiLabeledAttributedWritable(labels, properties);
 
       // TODO: initialize edges using EDGE_HANDLER
 //      // outgoing edges
@@ -92,7 +92,7 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
 //      Map<String, Map<String, Object>> inEdges = VERTEX_HANDLER
 //        .readIncomingEdges(row);
 
-      List<Edge<EPGVertexIdentifier, EPGLabeledAttributedWritable>> edges =
+      List<Edge<EPGVertexIdentifier, EPGMultiLabeledAttributedWritable>> edges =
         Lists.newArrayList();
 
       vertex.initialize(vertexID, vertexValue, edges);
