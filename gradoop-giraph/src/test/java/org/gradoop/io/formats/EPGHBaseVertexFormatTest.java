@@ -67,8 +67,12 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     BasicComputation<EPGVertexIdentifier, EPGLabeledAttributedWritable,
       EPGLabeledAttributedWritable, LongWritable> {
 
+
     @Override
-    public void compute(Vertex vertex, Iterable messages)
+    public void compute(
+      Vertex<EPGVertexIdentifier, EPGLabeledAttributedWritable,
+        EPGLabeledAttributedWritable> vertex,
+      Iterable<LongWritable> messages)
       throws IOException {
       vertex.voteToHalt();
     }

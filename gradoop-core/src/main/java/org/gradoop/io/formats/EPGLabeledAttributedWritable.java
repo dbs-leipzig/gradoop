@@ -2,6 +2,7 @@ package org.gradoop.io.formats;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
 import org.gradoop.model.Attributed;
@@ -78,6 +79,9 @@ public class EPGLabeledAttributedWritable implements Labeled, Attributed,
 
     // properties
     ObjectWritable ow = new ObjectWritable();
+    Configuration conf = new Configuration();
+    ow.setConf(conf);
+
     final int propertyCount = dataInput.readInt();
     for (int i = 0; i < propertyCount; i++) {
       String key = dataInput.readUTF();
