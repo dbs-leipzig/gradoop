@@ -22,14 +22,15 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by martin on 20.11.14.
  */
 public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
   private final static String TEST_LABEL = "test";
+  private final static String TEST_KEY = "test_key";
+  private final static String TEST_VALUE = "test_value";
 
   public EPGHBaseVertexFormatTest() {
     super(EPGHBaseVertexFormatTest.class.getName());
@@ -68,10 +69,14 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     org.gradoop.model.Vertex v = graphStore.readVertex(1L);
     List<String> labels = Lists.newArrayList(v.getLabels());
 
+    // labels
     assertThat(labels.size(), is(3));
     assertThat(labels.contains("A"), is(true));
     assertThat(labels.contains("B"), is(true));
     assertThat(labels.contains(TEST_LABEL), is(true));
+
+    // properties
+    assertEquals(TEST_VALUE, v.getProperty(TEST_KEY));
 
     // close everything
     graphStore.close();
@@ -89,6 +94,7 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
       Iterable<LongWritable> messages)
       throws IOException {
       vertex.getValue().addLabel(TEST_LABEL);
+      vertex.getValue().addProperty(TEST_KEY, TEST_VALUE);
       vertex.voteToHalt();
     }
   }

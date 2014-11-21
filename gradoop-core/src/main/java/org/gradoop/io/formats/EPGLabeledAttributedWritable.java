@@ -11,7 +11,6 @@ import org.gradoop.model.Labeled;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +20,9 @@ import java.util.Map;
 public class EPGLabeledAttributedWritable implements Labeled, Attributed,
   Writable {
 
-  private final List<String> labels;
+  private List<String> labels;
 
-  private final Map<String, Object> properties;
+  private Map<String, Object> properties;
 
   public EPGLabeledAttributedWritable() {
     labels = Lists.newArrayList();
@@ -32,8 +31,7 @@ public class EPGLabeledAttributedWritable implements Labeled, Attributed,
 
   public EPGLabeledAttributedWritable(Iterable<String> labels, Map<String,
     Object> properties) {
-    this.labels = (labels != null) ? Lists.newArrayList(labels) : new
-      ArrayList<String>();
+    this.labels = (labels != null) ? Lists.newArrayList(labels) : null;
     this.properties = properties;
   }
 
@@ -48,6 +46,20 @@ public class EPGLabeledAttributedWritable implements Labeled, Attributed,
   }
 
   @Override
+  public void addProperty(String key, Object value) {
+    if (key == null || "".equals(key)) {
+      throw new IllegalArgumentException("key must not be null or empty");
+    }
+    if (value == null) {
+      throw new IllegalArgumentException("value must not be null");
+    }
+    if (this.properties == null) {
+      this.properties = Maps.newHashMap();
+    }
+    this.properties.put(key, value);
+  }
+
+  @Override
   public Iterable<String> getLabels() {
     return labels;
   }
@@ -56,6 +68,9 @@ public class EPGLabeledAttributedWritable implements Labeled, Attributed,
   public void addLabel(String label) {
     if (label == null || "".equals(label)) {
       throw new IllegalArgumentException("label must not be null or empty");
+    }
+    if (this.labels == null) {
+      this.labels = Lists.newArrayList();
     }
     this.labels.add(label);
   }

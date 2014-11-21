@@ -1,11 +1,11 @@
 package org.gradoop.model.inmemory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Identifiable;
 import org.gradoop.model.Labeled;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +17,9 @@ public abstract class LabeledPropertyContainer implements Identifiable,
 
   protected final Long id;
 
-  protected final List<String> labels;
+  protected List<String> labels;
 
-  protected final Map<String, Object> properties;
+  protected Map<String, Object> properties;
 
   protected LabeledPropertyContainer(Long id, Iterable<String> labels,
                                      Map<String, Object> properties) {
@@ -28,8 +28,7 @@ public abstract class LabeledPropertyContainer implements Identifiable,
     }
     this.id = id;
 
-    this.labels = (labels != null) ? Lists.newArrayList(labels) : new
-      ArrayList<String>();
+    this.labels = (labels != null) ? Lists.newArrayList(labels) : null;
     this.properties = properties;
   }
 
@@ -48,6 +47,9 @@ public abstract class LabeledPropertyContainer implements Identifiable,
     if (label == null || "".equals(label)) {
       throw new IllegalArgumentException("label must not be null or empty");
     }
+    if (this.labels == null) {
+      this.labels = Lists.newArrayList();
+    }
     this.labels.add(label);
   }
 
@@ -59,6 +61,20 @@ public abstract class LabeledPropertyContainer implements Identifiable,
   @Override
   public Object getProperty(String key) {
     return properties.get(key);
+  }
+
+  @Override
+  public void addProperty(String key, Object value) {
+    if (key == null || "".equals(key)) {
+      throw new IllegalArgumentException("key must not be null or empty");
+    }
+    if (value == null) {
+      throw new IllegalArgumentException("value must not be null");
+    }
+    if (this.properties == null) {
+      this.properties = Maps.newHashMap();
+    }
+    this.properties.put(key, value);
   }
 
   @Override
