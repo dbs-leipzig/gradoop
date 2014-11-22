@@ -103,7 +103,7 @@ public class LabelPropagationComputation extends
                       Iterable<IntWritable> messages)
     throws IOException {
     if (getSuperstep() == 0) {
-      sendMessageToAllEdges(vertex, vertex.getId());
+      sendMessageToAllEdges(vertex, vertex.getValue());
       vertex.voteToHalt();
     } else {
       int currentMinValue = vertex.getValue().get();
