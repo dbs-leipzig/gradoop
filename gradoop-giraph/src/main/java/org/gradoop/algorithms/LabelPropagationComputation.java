@@ -11,16 +11,20 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by gomezk on 03.11.14.
+ * TODO: algorithm description
  */
 public class LabelPropagationComputation extends
   BasicComputation<IntWritable, IntWritable, NullWritable, IntWritable> {
   /**
-   * Returns the current new value. This value si based on all incoming
-   * messages. The method return: 1. The current value if no messages are
-   * received 2. If just one message are received it will return the min of
-   * received message or current vertex value 3. The maxFrequent number in all
-   * received messages
+   * Returns the current new value. This value is based on all incoming
+   * messages. Depending on the number of messages sent to the vertex, the
+   * method returns:
+   * <p/>
+   * 0 messages:   The current value
+   * <p/>
+   * 1 message:    The minimum of the message and the current vertex value
+   * <p/>
+   * >1 messages:  The most frequent of all message values
    *
    * @param vertex   The current vertex
    * @param messages All incoming messages
@@ -29,34 +33,33 @@ public class LabelPropagationComputation extends
   private int getNewValue(Vertex<IntWritable, IntWritable,
     NullWritable> vertex, Iterable<IntWritable> messages) {
     int newValue;
-    //TODO: allMessages besser befuellen.
+    //TODO: create allMessages more efficient
     //List<IntWritable> allMessages = Lists.newArrayList(messages);
     List<Integer> allMessages = new ArrayList<>();
     for (IntWritable message : messages) {
       allMessages.add(message.get());
     }
     if (allMessages.isEmpty()) {
-      //1. if no messages are received
+      // 1. if no messages are received
       newValue = vertex.getValue().get();
     } else if (allMessages.size() == 1) {
-      //2. if just one message are received
+      // 2. if just one message are received
       newValue = Math.min(vertex.getValue().get(), allMessages.get(0));
     } else {
-      //3. if multiple messages are received
-      newValue = getMaxFrequent(vertex, allMessages);
+      // 3. if multiple messages are received
+      newValue = getMostFrequent(vertex, allMessages);
     }
     return newValue;
   }
 
   /**
-   * Returns the maximal frequent number based on all received messages of the
-   * current vertex
+   * Returns the most frequent value based on all received messages.
    *
    * @param vertex      The current vertex
    * @param allMessages All messages the current vertex has received
    * @return the maximal frequent number in all received messages
    */
-  private int getMaxFrequent(Vertex<IntWritable, IntWritable,
+  private int getMostFrequent(Vertex<IntWritable, IntWritable,
     NullWritable> vertex, List<Integer> allMessages) {
     Collections.sort(allMessages);
     int newValue;
@@ -76,7 +79,7 @@ public class LabelPropagationComputation extends
         currentValue = allMessages.get(i);
       }
     }
-    //if the frequent of all received messages are just one
+    // if the frequent of all received messages are just one
     if (maxCounter == 1) {
       // to avoid an oscillating state of the calculation we will just use
       // the smaller value
@@ -92,7 +95,7 @@ public class LabelPropagationComputation extends
    *
    * @param vertex   Vertex
    * @param messages Messages that were sent to this vertex in the previous
-   *                 superstep.  Each message is only guaranteed to have a life
+   *                 superstep.
    * @throws IOException
    */
   @Override
@@ -100,7 +103,7 @@ public class LabelPropagationComputation extends
                       Iterable<IntWritable> messages)
     throws IOException {
     if (getSuperstep() == 0) {
-      sendMessageToAllEdges(vertex, vertex.getValue());
+      sendMessageToAllEdges(vertex, vertex.getId());
       vertex.voteToHalt();
     } else {
       int currentMinValue = vertex.getValue().get();
