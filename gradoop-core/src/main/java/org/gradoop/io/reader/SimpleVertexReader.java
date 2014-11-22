@@ -1,14 +1,18 @@
 package org.gradoop.io.reader;
 
+import com.google.common.collect.Lists;
+import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
+import org.gradoop.model.inmemory.MemoryEdge;
 import org.gradoop.model.inmemory.MemoryVertex;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Created by s1ck on 11/11/14.
+ * Reader for simple adjacency list.
+ * <p/>
+ * vertex-id neighbour1-id neighbour2-id ...
  */
 public class SimpleVertexReader implements VertexLineReader {
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(" ");
@@ -20,14 +24,14 @@ public class SimpleVertexReader implements VertexLineReader {
   @Override
   public Vertex readLine(String line) {
     String[] tokens = getTokens(line);
-    Long vertexID = Long.parseLong(tokens[0]);
+    Long vertexID = Long.valueOf(tokens[0]);
 
-    Map<String, Map<String, Object>> outEdges = new HashMap<>();
-
+    List<Edge> edges = Lists.newArrayListWithCapacity(tokens.length - 1);
     for (int i = 1; i < tokens.length; i++) {
-      outEdges.put(tokens[i], new HashMap<String, Object>());
+      Long otherID = Long.valueOf(tokens[i]);
+      Edge e = new MemoryEdge(otherID, (long) i - 1);
+      edges.add(e);
     }
-
-    return new MemoryVertex(vertexID, null, null, outEdges, null, null);
+    return new MemoryVertex(vertexID, null, null, edges, null, null);
   }
 }

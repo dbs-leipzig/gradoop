@@ -13,4 +13,6 @@ public final class GConstants {
   public static final String CF_OUT_EDGES = "out_edges";
   public static final String CF_IN_EDGES = "in_edges";
   public static final String CF_GRAPHS = "graphs";
+
+  public static final String DEFAULT_EDGE_LABEL = "E_LABEL";
 }

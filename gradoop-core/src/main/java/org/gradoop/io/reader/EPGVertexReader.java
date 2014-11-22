@@ -2,12 +2,13 @@ package org.gradoop.io.reader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
+import org.gradoop.model.inmemory.MemoryEdge;
 import org.gradoop.model.inmemory.MemoryVertex;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -20,6 +21,8 @@ public class EPGVertexReader implements VertexLineReader {
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile("\\|");
   private static final Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile(" ");
   private static final Pattern LIST_TOKEN_SEPARATOR = Pattern.compile(",");
+  private static final Pattern EDGE_KEY_TOKEN_SEPARATOR =
+    Pattern.compile("\\.");
 
   private static final byte TYPE_BOOLEAN = 0x00;
   private static final byte TYPE_INTEGER = 0x01;
@@ -36,8 +39,8 @@ public class EPGVertexReader implements VertexLineReader {
     Long vertexID = readVertexID(lineTokens[0]);
     Iterable<String> labels = readLabels(lineTokens[1]);
     Map<String, Object> properties = readProperties(lineTokens[2]);
-    Map<String, Map<String, Object>> outEdges = readEdges(lineTokens[3]);
-    Map<String, Map<String, Object>> inEdges = readEdges(lineTokens[4]);
+    Iterable<Edge> outEdges = readEdges(lineTokens[3]);
+    Iterable<Edge> inEdges = readEdges(lineTokens[4]);
     Iterable<Long> graphs = readGraphs(lineTokens[5]);
 
     return new MemoryVertex(vertexID, labels, properties, outEdges, inEdges,
@@ -68,14 +71,21 @@ public class EPGVertexReader implements VertexLineReader {
     return properties;
   }
 
-  private Map<String, Map<String, Object>> readEdges(String token) {
-    Map<String, Map<String, Object>> edges = new HashMap<>();
-    for (String edgeString : LIST_TOKEN_SEPARATOR.split(token)) {
+  private Iterable<Edge> readEdges(final String token) {
+    final String[] edgeStrings = LIST_TOKEN_SEPARATOR.split(token);
+    final List<Edge> edges = Lists.newArrayListWithCapacity(edgeStrings.length);
+    for (String edgeString : edgeStrings) {
       int propStartIdx = edgeString.indexOf(VALUE_TOKEN_SEPARATOR.toString());
+      // parse edge key
       String edgeKey = edgeString.substring(0, propStartIdx);
+      String[] edgeKeyTokens = EDGE_KEY_TOKEN_SEPARATOR.split(edgeKey);
+      String edgeLabel = edgeKeyTokens[0];
+      Long otherID = Long.valueOf(edgeKeyTokens[1]);
+      Long edgeIndex = Long.valueOf(edgeKeyTokens[2]);
+      // parse edge properties
       Map<String, Object> edgeProperties =
         readProperties(edgeString.substring(propStartIdx + 1));
-      edges.put(edgeKey, edgeProperties);
+      edges.add(new MemoryEdge(otherID, edgeLabel, edgeIndex, edgeProperties));
     }
     return edges;
   }

@@ -2,6 +2,7 @@ package org.gradoop.storage.hbase;
 
 import com.google.common.collect.Lists;
 import org.gradoop.ClusterBasedTest;
+import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryGraph;
@@ -129,8 +130,8 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     final Map<String, Object> properties = new HashMap<>();
     properties.put(KEY_1, value);
 
-    final Map<String, Map<String, Object>> outEdges = new HashMap<>();
-    final Map<String, Map<String, Object>> inEdges = new HashMap<>();
+    final Iterable<Edge> outEdges = Lists.newArrayListWithCapacity(0);
+    final Iterable<Edge> inEdges = Lists.newArrayListWithCapacity(0);
     final Iterable<Long> graphs = Lists.newArrayList();
     Vertex v =
       new MemoryVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
@@ -166,12 +167,12 @@ public class HBaseGraphStoreTest extends ClusterBasedTest {
     properties.put(keyDouble, valueDouble);
     properties.put(keyString, valueString);
 
-    final Map<String, Map<String, Object>> outEdges = new HashMap<>();
-    final Map<String, Map<String, Object>> inEdges = new HashMap<>();
+    final Iterable<Edge> outEdges = Lists.newArrayListWithCapacity(0);
+    final Iterable<Edge> inEdges = Lists.newArrayListWithCapacity(0);
     final Iterable<Long> graphs = Lists.newArrayList();
 
-    Vertex v =
-      new MemoryVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+    Vertex v = new MemoryVertex(vertexID, labels, properties, outEdges,
+      inEdges, graphs);
     graphStore.writeVertex(v);
 
     // reopen

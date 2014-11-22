@@ -1,6 +1,7 @@
 package org.gradoop.model.inmemory;
 
 import com.google.common.collect.Sets;
+import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 
 import java.util.Map;
@@ -12,16 +13,16 @@ import java.util.Set;
 public class MemoryVertex extends MultiLabeledPropertyContainer implements
   Vertex {
 
-  private final Map<String, Map<String, Object>> outgoingEdges;
+  private final Iterable<Edge> outgoingEdges;
 
-  private final Map<String, Map<String, Object>> incomingEdges;
+  private final Iterable<Edge> incomingEdges;
 
   private Set<Long> graphs;
 
   public MemoryVertex(Long id, Iterable<String> labels,
                       Map<String, Object> properties,
-                      Map<String, Map<String, Object>> outgoingEdges,
-                      Map<String, Map<String, Object>> incomingEdges,
+                      Iterable<Edge> outgoingEdges,
+                      Iterable<Edge> incomingEdges,
                       Iterable<Long> graphs) {
     super(id, labels, properties);
     this.outgoingEdges = outgoingEdges;
@@ -30,12 +31,12 @@ public class MemoryVertex extends MultiLabeledPropertyContainer implements
   }
 
   @Override
-  public Map<String, Map<String, Object>> getOutgoingEdges() {
+  public Iterable<Edge> getOutgoingEdges() {
     return outgoingEdges;
   }
 
   @Override
-  public Map<String, Map<String, Object>> getIncomingEdges() {
+  public Iterable<Edge> getIncomingEdges() {
     return incomingEdges;
   }
 

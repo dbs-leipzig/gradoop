@@ -7,6 +7,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
+import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryGraph;
@@ -30,9 +31,9 @@ public class HBaseGraphStore implements GraphStore {
   private final VertexHandler verticesHandler;
   private final GraphHandler graphsHandler;
 
-  public HBaseGraphStore(HTable graphsTable, HTable verticesTable,
-                         VertexHandler verticesHandler,
-                         GraphHandler graphsHandler) {
+  public HBaseGraphStore(final HTable graphsTable, final HTable verticesTable,
+                         final VertexHandler verticesHandler,
+                         final GraphHandler graphsHandler) {
     this.graphsTable = graphsTable;
     this.verticesTable = verticesTable;
     this.verticesHandler = verticesHandler;
@@ -112,10 +113,8 @@ public class HBaseGraphStore implements GraphStore {
       if (!res.isEmpty()) {
         Iterable<String> labels = verticesHandler.readLabels(res);
         Map<String, Object> properties = verticesHandler.readProperties(res);
-        Map<String, Map<String, Object>> outEdges =
-          verticesHandler.readOutgoingEdges(res);
-        Map<String, Map<String, Object>> inEdges =
-          verticesHandler.readIncomingEdges(res);
+        Iterable<Edge> outEdges = verticesHandler.readOutgoingEdges(res);
+        Iterable<Edge> inEdges = verticesHandler.readIncomingEdges(res);
         Iterable<Long> graphs = verticesHandler.readGraphs(res);
         v = new MemoryVertex(vertexID, labels, properties, outEdges, inEdges,
           graphs);
