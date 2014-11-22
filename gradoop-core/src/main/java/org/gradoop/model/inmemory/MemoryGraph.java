@@ -5,7 +5,7 @@ import org.gradoop.model.Graph;
 import java.util.Map;
 
 /**
- * Created by martin on 05.11.14.
+ * Transient representation of a graph.
  */
 public class MemoryGraph extends MultiLabeledPropertyContainer implements
   Graph {

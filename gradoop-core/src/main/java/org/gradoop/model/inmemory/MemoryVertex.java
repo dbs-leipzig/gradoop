@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by martin on 05.11.14.
+ * Transient representation of a vertex.
  */
 public class MemoryVertex extends MultiLabeledPropertyContainer implements
   Vertex {
