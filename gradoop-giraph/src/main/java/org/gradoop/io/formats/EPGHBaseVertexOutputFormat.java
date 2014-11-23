@@ -1,5 +1,6 @@
 package org.gradoop.io.formats;
 
+import org.apache.giraph.edge.Edge;
 import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.VertexWriter;
 import org.apache.hadoop.hbase.client.Mutation;
@@ -18,20 +19,20 @@ import java.io.IOException;
  */
 public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
   EPGVertexIdentifierWritable, EPGVertexValueWritable,
-  EPGMultiLabeledAttributedWritable> {
+  EPGEdgeValueWritable> {
 
   private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
   @Override
   public VertexWriter<EPGVertexIdentifierWritable, EPGVertexValueWritable,
-    EPGMultiLabeledAttributedWritable> createVertexWriter(
+    EPGEdgeValueWritable> createVertexWriter(
     TaskAttemptContext context)
     throws IOException, InterruptedException {
     return new EPGHBaseVertexWriter(context);
   }
 
   public static class EPGHBaseVertexWriter extends HBaseVertexWriter<
-    EPGVertexIdentifierWritable, EPGVertexValueWritable, EPGMultiLabeledAttributedWritable> {
+    EPGVertexIdentifierWritable, EPGVertexValueWritable, EPGEdgeValueWritable> {
 
     /**
      * Sets up base table output format and creates a record writer.
@@ -46,7 +47,7 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
     @Override
     public void writeVertex(
       Vertex<EPGVertexIdentifierWritable, EPGVertexValueWritable,
-        EPGMultiLabeledAttributedWritable> vertex)
+        EPGEdgeValueWritable> vertex)
       throws IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
       byte[] rowKey = Bytes.toBytes(vertex.getId().getID());
@@ -57,8 +58,12 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
       VERTEX_HANDLER.writeProperties(put, vertex.getValue());
       // graphs
       VERTEX_HANDLER.writeGraphs(put, vertex.getValue());
-
+      // edges
       // TODO: write edges
+//      for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> edge :
+//        vertex.getEdges()) {
+//
+//      }
 
       writer.write(new ImmutableBytesWritable(rowKey), put);
     }
