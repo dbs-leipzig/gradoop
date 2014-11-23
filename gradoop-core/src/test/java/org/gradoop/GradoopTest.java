@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.io.reader.SimpleVertexReader;
 import org.gradoop.io.reader.VertexLineReader;
+import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
+import org.gradoop.model.inmemory.MemoryEdge;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
@@ -118,7 +120,6 @@ public class GradoopTest {
     assertEquals(EXTENDED_GRAPH.length, result.size());
     for (Vertex v : result) {
       List<String> labels = Lists.newArrayList(v.getLabels());
-      List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
       List<Long> graphs = Lists.newArrayList(v.getGraphs());
       List<Edge> outEdges = Lists.newArrayList(v.getOutgoingEdges());
       List<Edge> inEdges = Lists.newArrayList(v.getIncomingEdges());
@@ -129,22 +130,13 @@ public class GradoopTest {
         assertEquals(1, labels.size());
         assertTrue(labels.contains("A"));
         // properties (3 k1 5 v1 k2 5 v2 k3 5 v3)
-        assertEquals(3, propertyKeys.size());
-        testProperties(v);
+        testProperties(v, 3);
         // out edges (a.1.0 1 k1 5 v1)
         assertEquals(1, outEdges.size());
-//        String edgeKey = "a.1.0";
-//        assertTrue(outEdges.containsKey(edgeKey));
-//        assertEquals(1, outEdges.get(edgeKey).size());
-//        assertTrue(outEdges.get(edgeKey).containsKey(KEY_1));
-//        assertEquals(VALUE_1, outEdges.get(edgeKey).get(KEY_1));
-//        // in edges (b.1.0 1 k1 5 v1)
-//        assertEquals(1, inEdges.size());
-//        edgeKey = "b.1.0";
-//        assertTrue(inEdges.containsKey(edgeKey));
-//        assertEquals(1, inEdges.get(edgeKey).size());
-//        assertTrue(inEdges.get(edgeKey).containsKey(KEY_1));
-//        assertEquals(VALUE_1, inEdges.get(edgeKey).get(KEY_1));
+        testEdge(outEdges, 1L, "a", 0L, 1);
+        // in edges (b.1.0 1 k1 5 v1)
+        assertEquals(1, inEdges.size());
+        testEdge(inEdges, 1L, "b", 0L, 1);
         // graphs (1 0)
         assertEquals(1, graphs.size());
         assertTrue(graphs.contains(0L));
@@ -154,26 +146,14 @@ public class GradoopTest {
         assertTrue(labels.contains("A"));
         assertTrue(labels.contains("B"));
         // properties (2 k1 5 v1 k2 5 v2)
-        assertEquals(2, propertyKeys.size());
-        testProperties(v);
+        testProperties(v, 2);
         // out edges (b.0.0 2 k1 5 v1 k2 5 v2,c.2.1 0)
         assertEquals(2, outEdges.size());
-//        String edgeKey = "b.0.0";
-//        assertTrue(outEdges.containsKey(edgeKey));
-//        assertEquals(2, outEdges.get(edgeKey).size());
-//        assertTrue(outEdges.get(edgeKey).containsKey(KEY_1));
-//        assertEquals(VALUE_1, outEdges.get(edgeKey).get(KEY_1));
-//        assertTrue(outEdges.get(edgeKey).containsKey(KEY_2));
-//        assertEquals(VALUE_2, outEdges.get(edgeKey).get(KEY_2));
-//        edgeKey = "c.2.1";
-//        assertEquals(0, outEdges.get(edgeKey).size());
-//        // in edges (a.0.0 1 k1 5 v1)
+        testEdge(outEdges, 0L, "b", 0L, 2);
+        testEdge(outEdges, 2L, "c", 1L, 0);
+        // in edges (a.0.0 1 k1 5 v1)
         assertEquals(1, inEdges.size());
-//        edgeKey = "a.0.0";
-//        assertTrue(inEdges.containsKey(edgeKey));
-//        assertEquals(1, inEdges.get(edgeKey).size());
-//        assertTrue(inEdges.get(edgeKey).containsKey(KEY_1));
-//        assertEquals(VALUE_1, inEdges.get(edgeKey).get(KEY_1));
+        testEdge(inEdges, 0L, "a", 0L, 1);
         // graphs (2 0 1)
         assertEquals(2, graphs.size());
         assertTrue(graphs.contains(0L));
@@ -183,21 +163,14 @@ public class GradoopTest {
         assertEquals(1, labels.size());
         assertTrue(labels.contains("C"));
         // properties (2 k1 5 v1 k2 5 v2)
-        assertEquals(2, propertyKeys.size());
-        testProperties(v);
+        testProperties(v, 2);
         // out edges (d.2.0 0)
         assertEquals(1, outEdges.size());
-//        String edgeKey = "d.2.0";
-//        assertTrue(outEdges.containsKey(edgeKey));
-//        assertEquals(0, outEdges.get(edgeKey).size());
+        testEdge(outEdges, 2L, "d", 0L, 0);
         // in edges (d.2.0 0,c.2.1 0)
         assertEquals(2, inEdges.size());
-//        edgeKey = "d.2.0";
-//        assertTrue(inEdges.containsKey(edgeKey));
-//        assertEquals(0, inEdges.get(edgeKey).size());
-//        edgeKey = "c.2.1";
-//        assertTrue(inEdges.containsKey(edgeKey));
-//        assertEquals(0, inEdges.get(edgeKey).size());
+        testEdge(inEdges, 2L, "d", 0L, 0);
+        testEdge(inEdges, 2L, "c", 1L, 0);
         // graphs (1 1)
         assertEquals(1, graphs.size());
         assertTrue(graphs.contains(1L));
@@ -207,7 +180,18 @@ public class GradoopTest {
     }
   }
 
-  private void testProperties(Vertex v) {
+  private void testEdge(List<Edge> edges, Long expectedOtherID,
+                        String expectedLabel, Long expectedIndex,
+                        int expectedPropertyCount) {
+    Edge tmpEdge = new MemoryEdge(expectedOtherID, expectedLabel,
+      expectedIndex);
+    assertTrue(edges.contains(tmpEdge));
+    int edgeIndex = edges.indexOf(tmpEdge);
+    testProperties(edges.get(edgeIndex), expectedPropertyCount);
+  }
+
+  private void testProperties(Attributed v, int expectedSize) {
+    int count = 0;
     for (String propertyKey : v.getPropertyKeys()) {
       switch (propertyKey) {
         case KEY_1:
@@ -220,7 +204,9 @@ public class GradoopTest {
           assertEquals(VALUE_3, v.getProperty(KEY_3));
           break;
       }
+      count++;
     }
+    assertEquals(expectedSize, count);
   }
 
   protected BufferedReader createTestReader(String[] graph)

@@ -8,17 +8,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Created by martin on 20.11.14.
+ * Stores the globally unique vertex identifier.
  */
-public class EPGVertexIdentifier implements Identifiable,
-  WritableComparable<EPGVertexIdentifier> {
+public class EPGVertexIdentifierWritable implements Identifiable,
+  WritableComparable<EPGVertexIdentifierWritable> {
 
   private Long id;
 
-  public EPGVertexIdentifier() {
+  public EPGVertexIdentifierWritable() {
   }
 
-  public EPGVertexIdentifier(Long id) {
+  public EPGVertexIdentifierWritable(Long id) {
     this.id = id;
   }
 
@@ -40,7 +40,7 @@ public class EPGVertexIdentifier implements Identifiable,
   }
 
   @Override
-  public int compareTo(EPGVertexIdentifier o) {
+  public int compareTo(EPGVertexIdentifierWritable o) {
     if (this == o) {
       return 0;
     }
@@ -56,7 +56,7 @@ public class EPGVertexIdentifier implements Identifiable,
       return false;
     }
 
-    EPGVertexIdentifier that = (EPGVertexIdentifier) o;
+    EPGVertexIdentifierWritable that = (EPGVertexIdentifierWritable) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) {
       return false;

@@ -10,19 +10,20 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by martin on 21.11.14.
+ * Stores the information of an EPG vertex: labels, properties and graphs that
+ * vertex belongs to.
  */
-public class EPGVertexWritable extends EPGMultiLabeledAttributedWritable
+public class EPGVertexValueWritable extends EPGMultiLabeledAttributedWritable
   implements GraphElement {
 
   private Set<Long> graphs;
 
-  public EPGVertexWritable() {
+  public EPGVertexValueWritable() {
   }
 
-  public EPGVertexWritable(Iterable<String> labels,
-                           Map<String, Object> properties,
-                           Iterable<Long> graphs) {
+  public EPGVertexValueWritable(Iterable<String> labels,
+                                Map<String, Object> properties,
+                                Iterable<Long> graphs) {
     super(labels, properties);
     initGraphs(graphs);
   }
