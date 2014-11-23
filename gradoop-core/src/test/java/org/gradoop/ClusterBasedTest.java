@@ -8,7 +8,6 @@ import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.GraphHandler;
 import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.gradoop.storage.hbase.VertexHandler;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
@@ -36,16 +35,17 @@ public abstract class ClusterBasedTest extends GradoopTest {
       .createGraphStore(config, verticesHandler, graphsHandler);
   }
 
+  /**
+   * Starts the mini cluster once for all test cases implementing this class.
+   *
+   * @throws Exception
+   */
   @BeforeClass
   public static void setup()
     throws Exception {
-    utility = new HBaseTestingUtility();
-    utility.startMiniCluster().waitForActiveAndReadyMaster();
-  }
-
-  @AfterClass
-  public static void tearDown()
-    throws Exception {
-    utility.shutdownMiniCluster();
+    if (utility == null) {
+      utility = new HBaseTestingUtility();
+      utility.startMiniCluster().waitForActiveAndReadyMaster();
+    }
   }
 }

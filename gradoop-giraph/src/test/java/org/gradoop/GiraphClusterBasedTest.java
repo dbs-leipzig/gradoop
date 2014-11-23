@@ -27,14 +27,17 @@ public abstract class GiraphClusterBasedTest extends ClusterBasedTest {
   }
 
   /**
-   * Start an additional MapReduce Cluster
+   * Start an additional MapReduce Cluster for all test cases extending this
+   * class.
    *
    * @throws Exception
    */
   @BeforeClass
   public static void setup()
     throws Exception {
-    ClusterBasedTest.setup();
-    utility.startMiniMapReduceCluster();
+    if (utility == null) {
+      ClusterBasedTest.setup();
+      utility.startMiniMapReduceCluster();
+    }
   }
 }
