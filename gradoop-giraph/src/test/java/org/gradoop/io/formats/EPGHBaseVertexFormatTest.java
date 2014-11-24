@@ -10,6 +10,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.GiraphClusterBasedTest;
 import org.gradoop.io.reader.AdjacencyListReader;
@@ -30,6 +31,8 @@ import static org.junit.Assert.*;
  * Created by martin on 20.11.14.
  */
 public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
+  private static Logger LOG = Logger.getLogger(EPGHBaseVertexFormatTest.class);
+
   private final static String TEST_LABEL = "test";
   private final static String TEST_KEY = "test_key";
   private final static String TEST_VALUE = "test_value";
@@ -94,10 +97,12 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     List<Edge> outEdges = Lists.newArrayList(v.getOutgoingEdges());
     assertThat(outEdges.size(), is(2));
     for (Edge e : outEdges) {
-      if (e.getOtherID() == 1L) {
+      if (e.getOtherID() == 0L) {
         assertThat(e.getLabel(), is("b"));
         assertThat(e.getIndex(), is(0L));
         assertNotNull(e.getPropertyKeys());
+        List<String> propertyKeys = Lists.newArrayList(e.getPropertyKeys());
+        assertThat(propertyKeys.size(), is(2));
         for (String k : e.getPropertyKeys()) {
           if (k.equals("k1")) {
             assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
@@ -107,17 +112,27 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
             assertTrue("unexpected property at edge 1L -> 0L", false);
           }
         }
-      } else if (e.getIndex() == 2L) {
+      } else if (e.getOtherID() == TEST_TARGET_VERTEX) {
         assertThat(e.getLabel(), is("c"));
         assertThat(e.getIndex(), is(1L));
         assertNotNull(e.getPropertyKeys());
-        for (String k : e.getPropertyKeys()) {
+        List<String> propertyKeys = Lists.newArrayList(e.getPropertyKeys());
+        for (String k : propertyKeys) {
+          LOG.info("=== propertyKey: " + k);
+        }
+        assertThat(propertyKeys.size(), is(1));
+        for (String k : propertyKeys) {
           if (k.equals(TEST_KEY)) {
             assertThat(e.getProperty(TEST_KEY), Is.<Object>is(TEST_VALUE));
           } else {
-            assertTrue("unexpected property at edge 1L -> 2L", false);
+            assertTrue(String.format("unexpected property at edge %d -> %d " +
+                "(%s => %s)", TEST_SOURCE_VERTEX, TEST_TARGET_VERTEX, k,
+              e.getProperty(k)), false);
           }
         }
+      } else {
+        assertTrue(String.format("unexpected outgoing edge %d -> %d",
+          TEST_SOURCE_VERTEX, e.getOtherID()), false);
       }
     }
 
@@ -130,6 +145,7 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     BasicComputation<EPGVertexIdentifierWritable, EPGVertexValueWritable,
       EPGEdgeValueWritable, LongWritable> {
 
+
     @Override
     public void compute(
       Vertex<EPGVertexIdentifierWritable, EPGVertexValueWritable,
@@ -140,9 +156,15 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
       vertex.getValue().addProperty(TEST_KEY, TEST_VALUE);
       vertex.getValue().addToGraph(TEST_GRAPH);
       if (vertex.getId().getID() == TEST_SOURCE_VERTEX) {
-        EPGEdgeValueWritable edgeValue = vertex.getEdgeValue(new
-          EPGVertexIdentifierWritable(TEST_TARGET_VERTEX));
+        EPGVertexIdentifierWritable vertexIdentifier = new
+          EPGVertexIdentifierWritable(TEST_TARGET_VERTEX);
+        EPGEdgeValueWritable edgeValue = vertex.getEdgeValue(vertexIdentifier);
+        LOG.info("=== in compute");
+        for (String k : edgeValue.getPropertyKeys()) {
+          LOG.info("=== property key (in compute): " + k);
+        }
         edgeValue.addProperty(TEST_KEY, TEST_VALUE);
+        vertex.setEdgeValue(vertexIdentifier, edgeValue);
       }
       vertex.voteToHalt();
     }

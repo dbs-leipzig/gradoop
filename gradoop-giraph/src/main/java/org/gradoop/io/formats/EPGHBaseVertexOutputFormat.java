@@ -62,6 +62,7 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
       // outgoing edges
       for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> edge :
         vertex.getEdges()) {
+        // TODO: something goes wrong here
         VERTEX_HANDLER.writeOutgoingEdges(put, vertex.getAllEdgeValues
           (edge.getTargetVertexId()));
       }
