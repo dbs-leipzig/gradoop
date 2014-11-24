@@ -35,9 +35,10 @@ public class EPGVertexHandler extends BasicHandler
   private static final byte[] CF_GRAPHS_BYTES =
     Bytes.toBytes(GConstants.CF_GRAPHS);
 
-  private static final Pattern PROPERTY_TOKEN_SEPARATOR = Pattern.compile(" ");
+  private static final String PROPERTY_TOKEN_SEPARATOR_STRING = " ";
+  private static final Pattern PROPERTY_TOKEN_SEPARATOR_PATTERN = Pattern.compile(" ");
   private static final String EDGE_KEY_TOKEN_SEPARATOR_STRING = ".";
-  private static final Pattern EDGE_KEY_TOKEN_SEPARATOR =
+  private static final Pattern EDGE_KEY_TOKEN_SEPARATOR_PATTERN =
     Pattern.compile("\\.");
 
   @Override
@@ -127,13 +128,13 @@ public class EPGVertexHandler extends BasicHandler
         Object propertyValue = edge.getProperty(propertyKey);
         String propertyString = String.format("%s%s%d%s%s",
           propertyKey,
-          PROPERTY_TOKEN_SEPARATOR,
+          PROPERTY_TOKEN_SEPARATOR_STRING,
           getType(propertyValue),
-          PROPERTY_TOKEN_SEPARATOR,
+          PROPERTY_TOKEN_SEPARATOR_STRING,
           propertyValue);
         propertyStrings.add(propertyString);
       }
-      result = Joiner.on(PROPERTY_TOKEN_SEPARATOR.toString()).join
+      result = Joiner.on(PROPERTY_TOKEN_SEPARATOR_STRING).join
         (propertyStrings);
     }
     return result;
@@ -148,7 +149,7 @@ public class EPGVertexHandler extends BasicHandler
       Map<String, Object> edgeProperties = new HashMap<>();
       String propertyString = Bytes.toString(edgeColumn.getValue());
       if (propertyString.length() > 0) {
-        String[] tokens = PROPERTY_TOKEN_SEPARATOR.split(propertyString);
+        String[] tokens = PROPERTY_TOKEN_SEPARATOR_PATTERN.split(propertyString);
         for (int i = 0; i < tokens.length; i += 3) {
           String propertyKey = tokens[i];
           byte propertyType = Byte.parseByte(tokens[i + 1]);
@@ -164,7 +165,7 @@ public class EPGVertexHandler extends BasicHandler
 
   private Edge readEdge(final String edgeKey, final Map<String,
     Object> properties) {
-    String[] keyTokens = EDGE_KEY_TOKEN_SEPARATOR.split(edgeKey);
+    String[] keyTokens = EDGE_KEY_TOKEN_SEPARATOR_PATTERN.split(edgeKey);
     String edgeLabel = keyTokens[0];
     Long otherID = Long.valueOf(keyTokens[1]);
     Long edgeIndex = Long.valueOf(keyTokens[2]);
