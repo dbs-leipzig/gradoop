@@ -19,7 +19,6 @@ public class EPGMultiLabeledAttributedWritable extends EPGAttributedWritable
 
   private List<String> labels;
 
-
   public EPGMultiLabeledAttributedWritable() {
     labels = Lists.newArrayList();
   }
@@ -50,22 +49,21 @@ public class EPGMultiLabeledAttributedWritable extends EPGAttributedWritable
   @Override
   public void write(DataOutput dataOutput)
     throws IOException {
-    super.write(dataOutput);
-
     dataOutput.writeInt(labels.size());
     for (String label : labels) {
       dataOutput.writeUTF(label);
     }
+    super.write(dataOutput);
   }
 
   @Override
   public void readFields(DataInput dataInput)
     throws IOException {
-    super.readFields(dataInput);
     // labels
     final int labelCount = dataInput.readInt();
     for (int i = 0; i < labelCount; i++) {
       labels.add(dataInput.readUTF());
     }
+    super.readFields(dataInput);
   }
 }

@@ -71,9 +71,9 @@ public class HBaseGraphStore implements GraphStore {
       // vertex properties
       put = verticesHandler.writeProperties(put, vertex);
       // outgoing edges
-      put = verticesHandler.writeOutgoingEdges(put, vertex);
+      put = verticesHandler.writeOutgoingEdges(put, vertex.getOutgoingEdges());
       // incoming edges
-      put = verticesHandler.writeIncomingEdges(put, vertex);
+      put = verticesHandler.writeIncomingEdges(put, vertex.getIncomingEdges());
       // graphs
       put = verticesHandler.writeGraphs(put, vertex);
 

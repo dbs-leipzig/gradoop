@@ -6,7 +6,8 @@ package org.gradoop.model;
  */
 public interface Attributed {
   /**
-   * Returns all property keys of that entity.
+   * Returns all property keys of that entity or {@code null} it that entity has
+   * no properties.
    *
    * @return property keys
    */

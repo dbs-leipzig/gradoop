@@ -12,20 +12,21 @@ import java.util.Map;
  * Used to manage (de-)serialization of attributed entities that have one
  * label.
  */
-public class EPGSingleLabeledAttributed extends EPGAttributedWritable
+public class EPGSingleLabeledAttributedWritable extends EPGAttributedWritable
   implements SingleLabeled, Writable {
 
   private String label;
 
-  public EPGSingleLabeledAttributed() {
+  public EPGSingleLabeledAttributedWritable() {
   }
 
-  public EPGSingleLabeledAttributed(final String label) {
+  public EPGSingleLabeledAttributedWritable(final String label) {
     this(label, null);
   }
 
-  public EPGSingleLabeledAttributed(final String label, final Map<String,
-    Object> properties) {
+  public EPGSingleLabeledAttributedWritable(final String label,
+                                            final Map<String,
+                                              Object> properties) {
     super(properties);
     this.label = label;
   }
@@ -38,14 +39,14 @@ public class EPGSingleLabeledAttributed extends EPGAttributedWritable
   @Override
   public void write(DataOutput dataOutput)
     throws IOException {
-    super.write(dataOutput);
     dataOutput.writeUTF(label);
+    super.write(dataOutput);
   }
 
   @Override
   public void readFields(DataInput dataInput)
     throws IOException {
-    super.readFields(dataInput);
     label = dataInput.readUTF();
+    super.readFields(dataInput);
   }
 }

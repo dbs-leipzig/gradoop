@@ -89,27 +89,4 @@ public class MemoryEdge extends SingleLabeledPropertyContainer implements Edge {
     result = 31 * result + index.hashCode();
     return result;
   }
-
-  /**
-   * Edges are ordered by otherID, label and index.
-   *
-   * @param o the edge to compare that edge to
-   * @return -1, 0, 1 if that object is smaller, equal or greater than {@code o}
-   */
-  @Override
-  public int compareTo(Edge o) {
-    int result;
-    int otherIDCompare = otherID.compareTo(o.getOtherID());
-    if (otherIDCompare == 0) {
-      int labelCompare = getLabel().compareTo(o.getLabel());
-      if (labelCompare == 0) {
-        result = index.compareTo(o.getIndex());
-      } else {
-        result = labelCompare;
-      }
-    } else {
-      result = otherIDCompare;
-    }
-    return result;
-  }
 }

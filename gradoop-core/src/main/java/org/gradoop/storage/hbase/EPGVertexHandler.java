@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.GraphElement;
-import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryEdge;
 
 import java.io.IOException;
@@ -58,13 +57,15 @@ public class EPGVertexHandler extends BasicHandler
   }
 
   @Override
-  public Put writeOutgoingEdges(final Put put, final Vertex vertex) {
-    return writeEdges(put, CF_OUT_EDGES_BYTES, vertex.getOutgoingEdges());
+  public Put writeOutgoingEdges(final Put put, final Iterable<? extends Edge>
+    edges) {
+    return writeEdges(put, CF_OUT_EDGES_BYTES, edges);
   }
 
   @Override
-  public Put writeIncomingEdges(final Put put, final Vertex vertex) {
-    return writeEdges(put, CF_IN_EDGES_BYTES, vertex.getIncomingEdges());
+  public Put writeIncomingEdges(final Put put,
+                                final Iterable<? extends Edge> edges) {
+    return writeEdges(put, CF_IN_EDGES_BYTES, edges);
   }
 
   @Override
@@ -91,7 +92,7 @@ public class EPGVertexHandler extends BasicHandler
   }
 
   private Put writeEdges(Put put, final byte[] columnFamily,
-                         final Iterable<Edge> edges) {
+                         final Iterable<? extends Edge> edges) {
     for (Edge edge : edges) {
       put = writeEdge(put, columnFamily, edge);
     }
@@ -118,18 +119,24 @@ public class EPGVertexHandler extends BasicHandler
   }
 
   private String createEdgePropertiesString(final Edge edge) {
-    final List<String> propertyStrings = Lists.newArrayList();
-    for (String propertyKey : edge.getPropertyKeys()) {
-      Object propertyValue = edge.getProperty(propertyKey);
-      String propertyString = String.format("%s%s%d%s%s",
-        propertyKey,
-        PROPERTY_TOKEN_SEPARATOR,
-        getType(propertyValue),
-        PROPERTY_TOKEN_SEPARATOR,
-        propertyValue);
-      propertyStrings.add(propertyString);
+    String result = "";
+    Iterable<String> propertyKeys = edge.getPropertyKeys();
+    if (propertyKeys != null) {
+      final List<String> propertyStrings = Lists.newArrayList();
+      for (String propertyKey : propertyKeys) {
+        Object propertyValue = edge.getProperty(propertyKey);
+        String propertyString = String.format("%s%s%d%s%s",
+          propertyKey,
+          PROPERTY_TOKEN_SEPARATOR,
+          getType(propertyValue),
+          PROPERTY_TOKEN_SEPARATOR,
+          propertyValue);
+        propertyStrings.add(propertyString);
+      }
+      result = Joiner.on(PROPERTY_TOKEN_SEPARATOR.toString()).join
+        (propertyStrings);
     }
-    return Joiner.on(PROPERTY_TOKEN_SEPARATOR.toString()).join(propertyStrings);
+    return result;
   }
 
   private Iterable<Edge> readEdges(final Result res,

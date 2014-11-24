@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by martin on 20.11.14.
+ * Used to read a EPG based graph from HBase into Giraph.
  */
 public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
   EPGVertexIdentifierWritable,
@@ -93,15 +93,13 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
       List<Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable>>
         edges = Lists.newArrayList();
       // outgoing edges
-//      for (org.gradoop.model.Edge edge : VERTEX_HANDLER
-//        .readOutgoingEdges(row)) {
-//        EPGVertexIdentifierWritable edgeTarget = new
-//          EPGVertexIdentifierWritable(edge.getOtherID());
-//        // TODO: read edge properties
-//        EPGEdgeValueWritable edgeValue = new EPGEdgeValueWritable(
-//          edge.getLabel());
-//        edges.add(EdgeFactory.create(edgeTarget, edgeValue));
-//      }
+      for (org.gradoop.model.Edge edge : VERTEX_HANDLER
+        .readOutgoingEdges(row)) {
+        EPGVertexIdentifierWritable edgeTarget = new
+          EPGVertexIdentifierWritable(edge.getOtherID());
+        EPGEdgeValueWritable edgeValue = new EPGEdgeValueWritable(edge);
+        edges.add(EdgeFactory.create(edgeTarget, edgeValue));
+      }
       // incoming edges
 //      for (org.gradoop.model.Edge edge : VERTEX_HANDLER
 //        .readIncomingEdges(row)) {

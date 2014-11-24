@@ -14,7 +14,9 @@ import org.gradoop.GConstants;
 import org.gradoop.GiraphClusterBasedTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
+import org.gradoop.model.Edge;
 import org.gradoop.storage.GraphStore;
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -32,6 +34,8 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
   private final static String TEST_KEY = "test_key";
   private final static String TEST_VALUE = "test_value";
   private final static Long TEST_GRAPH = 2L;
+  private final static Long TEST_SOURCE_VERTEX = 1L;
+  private final static Long TEST_TARGET_VERTEX = 2L;
 
   public EPGHBaseVertexFormatTest() {
     super(EPGHBaseVertexFormatTest.class.getName());
@@ -67,7 +71,7 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     assertTrue(giraphJob.run(true));
 
     // test
-    org.gradoop.model.Vertex v = graphStore.readVertex(1L);
+    org.gradoop.model.Vertex v = graphStore.readVertex(TEST_SOURCE_VERTEX);
     List<String> labels = Lists.newArrayList(v.getLabels());
 
     // labels
@@ -85,6 +89,37 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     assertTrue(graphs.contains(0L));
     assertTrue(graphs.contains(1L));
     assertTrue(graphs.contains(2L));
+
+    // edges
+    List<Edge> outEdges = Lists.newArrayList(v.getOutgoingEdges());
+    assertThat(outEdges.size(), is(2));
+    for (Edge e : outEdges) {
+      if (e.getOtherID() == 1L) {
+        assertThat(e.getLabel(), is("b"));
+        assertThat(e.getIndex(), is(0L));
+        assertNotNull(e.getPropertyKeys());
+        for (String k : e.getPropertyKeys()) {
+          if (k.equals("k1")) {
+            assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
+          } else if (k.equals("k2")) {
+            assertThat(e.getProperty("k2"), Is.<Object>is("v2"));
+          } else {
+            assertTrue("unexpected property at edge 1L -> 0L", false);
+          }
+        }
+      } else if (e.getIndex() == 2L) {
+        assertThat(e.getLabel(), is("c"));
+        assertThat(e.getIndex(), is(1L));
+        assertNotNull(e.getPropertyKeys());
+        for (String k : e.getPropertyKeys()) {
+          if (k.equals(TEST_KEY)) {
+            assertThat(e.getProperty(TEST_KEY), Is.<Object>is(TEST_VALUE));
+          } else {
+            assertTrue("unexpected property at edge 1L -> 2L", false);
+          }
+        }
+      }
+    }
 
     // close everything
     graphStore.close();
@@ -104,6 +139,11 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
       vertex.getValue().addLabel(TEST_LABEL);
       vertex.getValue().addProperty(TEST_KEY, TEST_VALUE);
       vertex.getValue().addToGraph(TEST_GRAPH);
+      if (vertex.getId().getID() == TEST_SOURCE_VERTEX) {
+        EPGEdgeValueWritable edgeValue = vertex.getEdgeValue(new
+          EPGVertexIdentifierWritable(TEST_TARGET_VERTEX));
+        edgeValue.addProperty(TEST_KEY, TEST_VALUE);
+      }
       vertex.voteToHalt();
     }
   }

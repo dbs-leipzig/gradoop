@@ -19,9 +19,9 @@ public interface VertexHandler extends EntityHandler {
                            final HTableDescriptor tableDescriptor)
     throws IOException;
 
-  Put writeOutgoingEdges(Put put, Vertex vertex);
+  Put writeOutgoingEdges(Put put, Iterable<? extends Edge> edges);
 
-  Put writeIncomingEdges(Put put, Vertex vertex);
+  Put writeIncomingEdges(Put put, Iterable<? extends Edge> edges);
 
   Put writeGraphs(Put put, GraphElement vertex);
 

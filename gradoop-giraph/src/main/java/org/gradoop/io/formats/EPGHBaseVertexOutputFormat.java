@@ -15,7 +15,8 @@ import org.gradoop.storage.hbase.VertexHandler;
 import java.io.IOException;
 
 /**
- * Created by martin on 20.11.14.
+ * Used to write the result of a graph computation into HBase. The graph is
+ * based on the EPG model.
  */
 public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
   EPGVertexIdentifierWritable, EPGVertexValueWritable,
@@ -58,12 +59,12 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
       VERTEX_HANDLER.writeProperties(put, vertex.getValue());
       // graphs
       VERTEX_HANDLER.writeGraphs(put, vertex.getValue());
-      // edges
-      // TODO: write edges
-//      for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> edge :
-//        vertex.getEdges()) {
-//
-//      }
+      // outgoing edges
+      for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> edge :
+        vertex.getEdges()) {
+        VERTEX_HANDLER.writeOutgoingEdges(put, vertex.getAllEdgeValues
+          (edge.getTargetVertexId()));
+      }
 
       writer.write(new ImmutableBytesWritable(rowKey), put);
     }
