@@ -13,32 +13,55 @@ import java.io.IOException;
 public class EPGVertexIdentifierWritable implements Identifiable,
   WritableComparable<EPGVertexIdentifierWritable> {
 
+  /**
+   * A globally unique identifier for a vertex.
+   */
   private Long id;
 
+  /**
+   * Default constructor is necessary for object deserialization.
+   */
   public EPGVertexIdentifierWritable() {
   }
 
+  /**
+   * Creates a vertex identifier based on the given parameter.
+   *
+   * @param id globally unique long value
+   */
   public EPGVertexIdentifierWritable(Long id) {
     this.id = id;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Long getID() {
     return id;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(DataOutput dataOutput)
     throws IOException {
     dataOutput.writeLong(id);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void readFields(DataInput dataInput)
     throws IOException {
     this.id = dataInput.readLong();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int compareTo(EPGVertexIdentifierWritable o) {
     if (this == o) {
@@ -47,6 +70,9 @@ public class EPGVertexIdentifierWritable implements Identifiable,
     return Long.compare(this.getID(), o.getID());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -65,6 +91,9 @@ public class EPGVertexIdentifierWritable implements Identifiable,
     return true;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int hashCode() {
     return id != null ? id.hashCode() : 0;

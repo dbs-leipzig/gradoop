@@ -16,11 +16,25 @@ import java.util.Set;
 public class EPGVertexValueWritable extends EPGMultiLabeledAttributedWritable
   implements GraphElement {
 
+  /**
+   * The set of graphs that vertex belongs to.
+   */
   private Set<Long> graphs;
 
+  /**
+   * Default constructor is necessary for object deserialization.
+   */
   public EPGVertexValueWritable() {
   }
 
+  /**
+   * Creates a vertex value based on the given parameters.
+   *
+   * @param labels     labels of that vertex (can be {@code null})
+   * @param properties key-value-map (can be {@code null})
+   * @param graphs     graphs that vertex belongs to (can be {@code null} and is
+   *                   stores as a set
+   */
   public EPGVertexValueWritable(Iterable<String> labels,
                                 Map<String, Object> properties,
                                 Iterable<Long> graphs) {

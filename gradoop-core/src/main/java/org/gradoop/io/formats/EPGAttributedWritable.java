@@ -16,26 +16,51 @@ import java.util.Map;
  */
 public class EPGAttributedWritable implements Attributed, Writable {
 
+  /**
+   * Holds a key-value-map of all properties.
+   */
   private Map<String, Object> properties;
 
+  /**
+   * Default size which is used for map initialization.
+   */
+  private static final int DEFAULT_PROPERTIES_SIZE = 10;
+
+  /**
+   * Default constructor is necessary for object deserialization.
+   */
   public EPGAttributedWritable() {
     this(null);
   }
 
-  public EPGAttributedWritable(Map<String, Object> properties) {
+  /**
+   * Create and object with a pre-defined key-value-map (can be {@code null}).
+   *
+   * @param properties key-value-map
+   */
+  public EPGAttributedWritable(final Map<String, Object> properties) {
     this.properties = properties;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Iterable<String> getPropertyKeys() {
     return (properties != null) ? properties.keySet() : null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Object getProperty(String key) {
     return (properties != null) ? properties.get(key) : null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void addProperty(String key, Object value) {
     if (key == null || "".equals(key)) {
@@ -50,18 +75,26 @@ public class EPGAttributedWritable implements Attributed, Writable {
     this.properties.put(key, value);
   }
 
+  /**
+   * Initializes the internal property map.
+   */
   private void initProperties() {
-    initProperties(-1);
+    initProperties(DEFAULT_PROPERTIES_SIZE);
   }
 
+  /**
+   * Initializes the internal property map with the given size. If the size is
+   * {@code -1}, the constant {@code DEFAULT_PROPERTIES_SIZE} will be used.
+   *
+   * @param expectedSize expected size
+   */
   private void initProperties(int expectedSize) {
-    if (expectedSize >= 0) {
-      this.properties = Maps.newHashMapWithExpectedSize(expectedSize);
-    } else {
-      this.properties = Maps.newHashMap();
-    }
+    this.properties = Maps.newHashMapWithExpectedSize(expectedSize);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(DataOutput dataOutput)
     throws IOException {
@@ -78,6 +111,9 @@ public class EPGAttributedWritable implements Attributed, Writable {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void readFields(DataInput dataInput)
     throws IOException {

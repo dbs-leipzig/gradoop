@@ -15,15 +15,27 @@ import java.util.Map;
 public class EPGSingleLabeledAttributedWritable extends EPGAttributedWritable
   implements SingleLabeled, Writable {
 
+  /**
+   * Holds the label of that entity.
+   */
   private String label;
 
   public EPGSingleLabeledAttributedWritable() {
   }
 
+  /**
+   * Default constructor is necessary for object deserialization.
+   */
   public EPGSingleLabeledAttributedWritable(final String label) {
     this(label, null);
   }
 
+  /**
+   * Creates a labeled entity based on the given parameters.
+   *
+   * @param label      entity label (can be {@null})
+   * @param properties key-value-map (can be {@null})
+   */
   public EPGSingleLabeledAttributedWritable(final String label,
                                             final Map<String,
                                               Object> properties) {
@@ -31,11 +43,17 @@ public class EPGSingleLabeledAttributedWritable extends EPGAttributedWritable
     this.label = label;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getLabel() {
     return this.label;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(DataOutput dataOutput)
     throws IOException {
@@ -43,6 +61,9 @@ public class EPGSingleLabeledAttributedWritable extends EPGAttributedWritable
     super.write(dataOutput);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void readFields(DataInput dataInput)
     throws IOException {
