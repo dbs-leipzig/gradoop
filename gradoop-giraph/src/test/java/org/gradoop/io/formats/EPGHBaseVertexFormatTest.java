@@ -145,28 +145,67 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     BasicComputation<EPGVertexIdentifierWritable, EPGVertexValueWritable,
       EPGEdgeValueWritable, LongWritable> {
 
-
     @Override
     public void compute(
       Vertex<EPGVertexIdentifierWritable, EPGVertexValueWritable,
         EPGEdgeValueWritable> vertex,
       Iterable<LongWritable> messages)
       throws IOException {
+      // modify vertex value
       vertex.getValue().addLabel(TEST_LABEL);
       vertex.getValue().addProperty(TEST_KEY, TEST_VALUE);
       vertex.getValue().addToGraph(TEST_GRAPH);
+
+      // modify edge value of edge TEST_SOURCE_VERTEX -> TEST_TARGET_VERTEX
       if (vertex.getId().getID() == TEST_SOURCE_VERTEX) {
         EPGVertexIdentifierWritable vertexIdentifier = new
           EPGVertexIdentifierWritable(TEST_TARGET_VERTEX);
+
         EPGEdgeValueWritable edgeValue = vertex.getEdgeValue(vertexIdentifier);
-        LOG.info("=== in compute");
-        for (String k : edgeValue.getPropertyKeys()) {
-          LOG.info("=== property key (in compute): " + k);
-        }
         edgeValue.addProperty(TEST_KEY, TEST_VALUE);
         vertex.setEdgeValue(vertexIdentifier, edgeValue);
       }
       vertex.voteToHalt();
     }
+
+//    private void printVertexInfo(
+//      Vertex<EPGVertexIdentifierWritable, EPGVertexValueWritable,
+//        EPGEdgeValueWritable> vertex) {
+//      LOG.info("=== vertex" + vertex.getId().getID());
+//      LOG.info("=== labels");
+//      EPGVertexValueWritable value = vertex.getValue();
+//      for (String label : value.getLabels()) {
+//        LOG.info(label);
+//      }
+//      LOG.info("=== properties");
+//      Iterable<String> propertyKeys = value.getPropertyKeys();
+//      if (propertyKeys != null) {
+//        for (String k : propertyKeys) {
+//          LOG.info(String.format("%s => %s", k, value.getProperty(k)));
+//        }
+//      }
+//    }
+//
+//    private void printEdgeInfo(org.apache.giraph.edge
+//                                 .Edge<EPGVertexIdentifierWritable,
+//      EPGEdgeValueWritable> edge) {
+//      LOG.info("=== edge class: " + edge.getClass().getName());
+//      LOG
+//        .info("=== edge target vertex id: " + edge.getTargetVertexId()
+// .getID());
+//      LOG.info("=== edge value");
+//      EPGEdgeValueWritable edgeValue = edge.getValue();
+//      LOG.info("=== otherID: " + edgeValue.getOtherID());
+//      LOG.info("=== label: " + edgeValue.getLabel());
+//      LOG.info("=== index: " + edgeValue.getIndex());
+//      LOG.info("=== properties");
+//      Iterable<String> propertyKeys = edgeValue.getPropertyKeys();
+//      if (propertyKeys != null) {
+//        for (String k : edgeValue.getPropertyKeys()) {
+//          LOG.info(String.format("key %s value %s", k,
+//            edgeValue.getProperty(k)));
+//        }
+//      }
+//    }
   }
 }

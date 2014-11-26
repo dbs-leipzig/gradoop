@@ -10,6 +10,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.log4j.Logger;
 import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
@@ -24,6 +25,9 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
   EPGVertexIdentifierWritable,
   EPGMultiLabeledAttributedWritable,
   EPGEdgeValueWritable> {
+
+  private static final Logger LOG = Logger.getLogger
+    (EPGHBaseVertexInputFormat.class);
 
   private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 

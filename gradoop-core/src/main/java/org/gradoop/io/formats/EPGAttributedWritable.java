@@ -45,9 +45,21 @@ public class EPGAttributedWritable implements Attributed, Writable {
       throw new IllegalArgumentException("value must not be null");
     }
     if (this.properties == null) {
-      this.properties = Maps.newHashMap();
+      initProperties();
     }
     this.properties.put(key, value);
+  }
+
+  private void initProperties() {
+    initProperties(-1);
+  }
+
+  private void initProperties(int expectedSize) {
+    if (expectedSize >= 0) {
+      this.properties = Maps.newHashMapWithExpectedSize(expectedSize);
+    } else {
+      this.properties = Maps.newHashMap();
+    }
   }
 
   @Override
@@ -74,9 +86,8 @@ public class EPGAttributedWritable implements Attributed, Writable {
     ow.setConf(conf);
 
     final int propertyCount = dataInput.readInt();
-
     if (propertyCount > 0) {
-      properties = Maps.newHashMapWithExpectedSize(propertyCount);
+      initProperties(propertyCount);
 
       for (int i = 0; i < propertyCount; i++) {
         String key = dataInput.readUTF();
@@ -84,6 +95,17 @@ public class EPGAttributedWritable implements Attributed, Writable {
         Object value = ow.get();
         properties.put(key, value);
       }
+    } else {
+      /*
+      The properties map has to be initialized even if there are no
+      properties at the element.
+      Not initializing the properties leads to wrong behaviour in giraph
+      where edges with no properties (null) have properties from other edges.
+
+      This is of course a huge memory overhead as there are n + m (possibly
+      empty) HashMaps in a graph with n vertices and m edges.
+       */
+      initProperties();
     }
   }
 }
