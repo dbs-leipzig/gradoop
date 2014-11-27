@@ -32,8 +32,8 @@ public class HBaseGraphStoreFactory {
     try {
       createTablesIfNotExists(config, verticesHandler);
 
-      graphsTable = new HTable(config, GConstants.TABLE_GRAPHS);
-      verticesTable = new HTable(config, GConstants.TABLE_VERTICES);
+      graphsTable = new HTable(config, GConstants.DEFAULT_TABLE_GRAPHS);
+      verticesTable = new HTable(config, GConstants.DEFAULT_TABLE_VERTICES);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -54,9 +54,9 @@ public class HBaseGraphStoreFactory {
                                               VertexHandler verticesHandler)
     throws IOException {
     HTableDescriptor verticesTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(GConstants.TABLE_VERTICES));
+      new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(GConstants.TABLE_GRAPHS));
+      new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_GRAPHS));
 
     HBaseAdmin admin = new HBaseAdmin(config);
 
@@ -85,9 +85,9 @@ public class HBaseGraphStoreFactory {
   private static void deleteTablesIfExists(Configuration config)
     throws IOException {
     HTableDescriptor verticesTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(GConstants.TABLE_VERTICES));
+      new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(GConstants.TABLE_GRAPHS));
+      new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_GRAPHS));
 
     HBaseAdmin admin = new HBaseAdmin(config);
 

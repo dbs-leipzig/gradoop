@@ -54,9 +54,9 @@ public class SimpleHBaseVertexFormatTest extends GiraphClusterBasedTest {
 
     Configuration conf = utility.getConfiguration();
     conf.set(TableInputFormat.INPUT_TABLE,
-      GConstants.TABLE_VERTICES);
+      GConstants.DEFAULT_TABLE_VERTICES);
     conf.set(TableOutputFormat.OUTPUT_TABLE,
-      GConstants.TABLE_VERTICES);
+      GConstants.DEFAULT_TABLE_VERTICES);
 
     GiraphJob giraphJob = new GiraphJob(conf, BspCase.getCallingMethodName());
     GiraphConfiguration giraphConfiguration = giraphJob.getConfiguration();
@@ -80,7 +80,7 @@ public class SimpleHBaseVertexFormatTest extends GiraphClusterBasedTest {
     HBaseAdmin admin = new HBaseAdmin(config);
 
     HTableDescriptor verticesTableDescriptor = new HTableDescriptor(TableName
-      .valueOf(GConstants.TABLE_VERTICES));
+      .valueOf(GConstants.DEFAULT_TABLE_VERTICES));
 
     if (admin.tableExists(verticesTableDescriptor.getName())) {
       admin.disableTable(verticesTableDescriptor.getName());
@@ -93,7 +93,7 @@ public class SimpleHBaseVertexFormatTest extends GiraphClusterBasedTest {
       (SimpleHBaseVertexInputFormat.CF_EDGES));
 
     admin.createTable(verticesTableDescriptor);
-    return new HTable(config, GConstants.TABLE_VERTICES);
+    return new HTable(config, GConstants.DEFAULT_TABLE_VERTICES);
   }
 
   private void createTestData(HTable table)

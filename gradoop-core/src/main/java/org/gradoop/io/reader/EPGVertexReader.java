@@ -2,6 +2,7 @@ package org.gradoop.io.reader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryEdge;
@@ -64,31 +65,6 @@ public class EPGVertexReader implements VertexLineReader {
     Pattern.compile("\\.");
 
   /**
-   * {@code <property-type>} for {@link java.lang.Boolean}
-   */
-  private static final byte TYPE_BOOLEAN = 0x00;
-  /**
-   * {@code <property-type>} for {@link java.lang.Integer}
-   */
-  private static final byte TYPE_INTEGER = 0x01;
-  /**
-   * {@code <property-type>} for {@link java.lang.Long}
-   */
-  private static final byte TYPE_LONG = 0x02;
-  /**
-   * {@code <property-type>} for {@link java.lang.Float}
-   */
-  private static final byte TYPE_FLOAT = 0x03;
-  /**
-   * {@code <property-type>} for {@link java.lang.Double}
-   */
-  private static final byte TYPE_DOUBLE = 0x04;
-  /**
-   * {@code <property-type>} for {@link java.lang.String}
-   */
-  private static final byte TYPE_STRING = 0x05;
-
-  /**
    * {@inheritDoc}
    */
   @Override
@@ -139,8 +115,8 @@ public class EPGVertexReader implements VertexLineReader {
   }
 
   /**
-   * Reads the properties into a map. Uses the property-type to correctly
-   * decode the property-value.
+   * Reads the properties into a map. Uses the property-type to correctly decode
+   * the property-value.
    *
    * @param token string including properties
    * @return key-value-map
@@ -203,29 +179,29 @@ public class EPGVertexReader implements VertexLineReader {
   /**
    * Parses a property-value by using its property-type.
    *
-   * @param type    property-type
-   * @param value   property-value
+   * @param type  property-type
+   * @param value property-value
    * @return parsed value
    */
   private Object decodeValue(String type, String value) {
     Object o;
     switch (Byte.parseByte(type)) {
-      case TYPE_BOOLEAN:
+      case GConstants.TYPE_BOOLEAN:
         o = Boolean.valueOf(value);
         break;
-      case TYPE_INTEGER:
+      case GConstants.TYPE_INTEGER:
         o = Integer.valueOf(value);
         break;
-      case TYPE_LONG:
+      case GConstants.TYPE_LONG:
         o = Long.valueOf(value);
         break;
-      case TYPE_FLOAT:
+      case GConstants.TYPE_FLOAT:
         o = Long.valueOf(value);
         break;
-      case TYPE_DOUBLE:
+      case GConstants.TYPE_DOUBLE:
         o = Double.valueOf(value);
         break;
-      case TYPE_STRING:
+      case GConstants.TYPE_STRING:
         o = value;
         break;
       default:

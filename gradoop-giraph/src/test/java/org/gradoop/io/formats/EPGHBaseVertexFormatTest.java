@@ -57,9 +57,9 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
     // setup in- and output tables
     Configuration conf = utility.getConfiguration();
     conf.set(TableInputFormat.INPUT_TABLE,
-      GConstants.TABLE_VERTICES);
+      GConstants.DEFAULT_TABLE_VERTICES);
     conf.set(TableOutputFormat.OUTPUT_TABLE,
-      GConstants.TABLE_VERTICES);
+      GConstants.DEFAULT_TABLE_VERTICES);
 
     // setup giraph job
     GiraphJob giraphJob = new GiraphJob(conf, BspCase.getCallingMethodName());
@@ -104,15 +104,19 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
         List<String> propertyKeys = Lists.newArrayList(e.getPropertyKeys());
         assertThat(propertyKeys.size(), is(2));
         for (String k : e.getPropertyKeys()) {
-          if (k.equals("k1")) {
-            assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
-          } else if (k.equals("k2")) {
-            assertThat(e.getProperty("k2"), Is.<Object>is("v2"));
-          } else {
-            assertTrue("unexpected property at edge 1L -> 0L", false);
+          switch (k) {
+            case "k1":
+              assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
+              break;
+            case "k2":
+              assertThat(e.getProperty("k2"), Is.<Object>is("v2"));
+              break;
+            default:
+              assertTrue("unexpected property at edge 1L -> 0L", false);
+              break;
           }
         }
-      } else if (e.getOtherID() == TEST_TARGET_VERTEX) {
+      } else if (e.getOtherID().equals(TEST_TARGET_VERTEX)) {
         assertThat(e.getLabel(), is("c"));
         assertThat(e.getIndex(), is(1L));
         assertNotNull(e.getPropertyKeys());
@@ -157,7 +161,7 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
       vertex.getValue().addToGraph(TEST_GRAPH);
 
       // modify edge value of edge TEST_SOURCE_VERTEX -> TEST_TARGET_VERTEX
-      if (vertex.getId().getID() == TEST_SOURCE_VERTEX) {
+      if (vertex.getId().getID().equals(TEST_SOURCE_VERTEX)) {
         EPGVertexIdentifierWritable vertexIdentifier = new
           EPGVertexIdentifierWritable(TEST_TARGET_VERTEX);
 
