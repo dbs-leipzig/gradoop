@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests for {@link org.gradoop.algorithms}
  */
-public class LabelPropagationComputationTest{
+public class LabelPropagationComputationTest {
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile
     (IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
 
