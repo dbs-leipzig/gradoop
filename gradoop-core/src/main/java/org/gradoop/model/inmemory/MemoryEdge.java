@@ -30,23 +30,39 @@ public class MemoryEdge extends SingleLabeledPropertyContainer implements Edge {
     this.index = index;
   }
 
+  /**
+   * Checks if {@code otherID} is valid.
+   *
+   * @param otherID id of entity that edge points to
+   */
   private void checkID(Long otherID) {
     if (otherID == null) {
       throw new IllegalArgumentException("otherID must not be null");
     }
   }
 
+  /**
+   * Checks if {@code index} is valid.
+   *
+   * @param index internal index of edge
+   */
   private void checkIndex(Long index) {
     if (index == null) {
       throw new IllegalArgumentException("index must not be null");
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Long getOtherID() {
     return this.otherID;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Long getIndex() {
     return this.index;
@@ -83,6 +99,9 @@ public class MemoryEdge extends SingleLabeledPropertyContainer implements Edge {
     return true;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int hashCode() {
     int result = otherID.hashCode();

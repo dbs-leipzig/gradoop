@@ -11,20 +11,35 @@ import java.util.Map;
 public abstract class PropertyContainer implements Attributed {
   protected Map<String, Object> properties;
 
+  /**
+   * Creates an object from the given parameters. Can only be called by
+   * inheriting classes.
+   *
+   * @param properties key-value-map (can be {@code null})
+   */
   protected PropertyContainer(Map<String, Object> properties) {
     this.properties = properties;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Iterable<String> getPropertyKeys() {
     return properties.keySet();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Object getProperty(String key) {
     return properties.get(key);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void addProperty(String key, Object value) {
     if (key == null || "".equals(key)) {

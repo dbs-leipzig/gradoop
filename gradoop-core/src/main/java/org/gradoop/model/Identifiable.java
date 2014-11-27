@@ -1,8 +1,13 @@
 package org.gradoop.model;
 
 /**
- * Created by martin on 05.11.14.
+ * Entity is identifiable in a given context.
  */
 public interface Identifiable {
+  /**
+   * Returns the identifier of that entity.
+   *
+   * @return identifier
+   */
   Long getID();
 }

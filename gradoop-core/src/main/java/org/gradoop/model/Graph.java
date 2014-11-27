@@ -16,7 +16,7 @@ public interface Graph extends Identifiable, Attributed, MultiLabeled {
   /**
    * Returns all vertices contained in that graph.
    *
-   * @return
+   * @return vertices
    */
   Iterable<Long> getVertices();
 }

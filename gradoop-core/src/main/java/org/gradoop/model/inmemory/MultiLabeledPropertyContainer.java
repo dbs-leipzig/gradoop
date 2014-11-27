@@ -13,10 +13,24 @@ import java.util.Map;
 public abstract class MultiLabeledPropertyContainer extends PropertyContainer
   implements Identifiable, MultiLabeled {
 
+  /**
+   * Unique identifier.
+   */
   protected final Long id;
 
+  /**
+   * Holds all labels of that entity.
+   */
   protected List<String> labels;
 
+  /**
+   * Creates an object from the given parameters. Can only be called by
+   * inheriting classes.
+   *
+   * @param id         unique id
+   * @param labels     labels (can be {@code null})
+   * @param properties key-value-map (can be {@code null})
+   */
   protected MultiLabeledPropertyContainer(Long id, Iterable<String> labels,
                                           Map<String, Object> properties) {
     super(properties);
@@ -28,16 +42,25 @@ public abstract class MultiLabeledPropertyContainer extends PropertyContainer
 
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Long getID() {
     return id;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Iterable<String> getLabels() {
     return labels;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void addLabel(String label) {
     if (label == null || "".equals(label)) {

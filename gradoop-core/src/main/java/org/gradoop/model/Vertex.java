@@ -1,9 +1,8 @@
 package org.gradoop.model;
 
 /**
- * Created by martin on 05.11.14.
+ * A vertex in the Extended Property Graph Model.
  */
 public interface Vertex extends Identifiable, Connected, Attributed,
   MultiLabeled, GraphElement {
-
 }

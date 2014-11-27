@@ -6,7 +6,10 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Created by martin on 24.11.14.
+ * Used to compare two edge instances. Edges exist of three parts: otherID,
+ * label and index.
+ * <p/>
+ * Edges are ordered using natural ordering of otherID, label and index.
  */
 public class EdgeComparator implements Comparator<Edge>, Serializable {
   /**

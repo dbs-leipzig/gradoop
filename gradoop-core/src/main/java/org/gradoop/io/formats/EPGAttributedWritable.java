@@ -34,7 +34,7 @@ public class EPGAttributedWritable implements Attributed, Writable {
   }
 
   /**
-   * Create and object with a pre-defined key-value-map (can be {@code null}).
+   * Create an object with a pre-defined key-value-map (can be {@code null}).
    *
    * @param properties key-value-map
    */
@@ -84,7 +84,8 @@ public class EPGAttributedWritable implements Attributed, Writable {
 
   /**
    * Initializes the internal property map with the given size. If the size is
-   * {@code -1}, the constant {@code DEFAULT_PROPERTIES_SIZE} will be used.
+   * {@code -1}, the constant {@link org.gradoop.io.formats
+   * .EPGAttributedWritable.DEFAULT_PROPERTY_SIZE} will be used.
    *
    * @param expectedSize expected size
    */

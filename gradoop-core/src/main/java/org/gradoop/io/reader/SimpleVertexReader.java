@@ -15,12 +15,24 @@ import java.util.regex.Pattern;
  * vertex-id neighbour1-id neighbour2-id ...
  */
 public class SimpleVertexReader implements VertexLineReader {
+  /**
+   * Separates a line into tokens.
+   */
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(" ");
 
+  /**
+   * Separates the whole line using {@code LINE_TOKEN_SEPARATOR}.
+   *
+   * @param line single input line
+   * @return token array
+   */
   private String[] getTokens(String line) {
     return LINE_TOKEN_SEPARATOR.split(line);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Vertex readLine(String line) {
     String[] tokens = getTokens(line);

@@ -1,7 +1,7 @@
 package org.gradoop.model;
 
 /**
- * A graph element is part of a graph. An element can belong to more than one
+ * A graph element is part of a graph. An element can be part of more than one
  * graph.
  */
 public interface GraphElement {
