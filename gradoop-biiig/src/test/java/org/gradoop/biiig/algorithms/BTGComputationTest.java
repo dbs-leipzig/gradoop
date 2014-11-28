@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 
-package org.gradoop.algorithms;
+package org.gradoop.biiig.algorithms;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.utils.InternalVertexRunner;
-import org.gradoop.io.formats.IIGTextVertexInputFormat;
-import org.gradoop.io.formats.IIGTextVertexOutputFormat;
+import org.gradoop.algorithms.GiraphTest;
+import org.gradoop.biiig.io.formats.BTGTextVertexInputFormat;
+import org.gradoop.biiig.io.formats.BTGTextVertexOutputFormat;
 import org.junit.Test;
 
 import java.util.List;
@@ -187,8 +188,8 @@ public class BTGComputationTest extends GiraphTest {
   private GiraphConfiguration getConfiguration() {
     GiraphConfiguration conf = new GiraphConfiguration();
     conf.setComputationClass(BTGComputation.class);
-    conf.setVertexInputFormatClass(IIGTextVertexInputFormat.class);
-    conf.setVertexOutputFormatClass(IIGTextVertexOutputFormat.class);
+    conf.setVertexInputFormatClass(BTGTextVertexInputFormat.class);
+    conf.setVertexOutputFormatClass(BTGTextVertexOutputFormat.class);
     return conf;
   }
 

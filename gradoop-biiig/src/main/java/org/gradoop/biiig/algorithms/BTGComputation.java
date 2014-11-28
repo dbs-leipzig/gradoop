@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-package org.gradoop.algorithms;
+package org.gradoop.biiig.algorithms;
 
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.gradoop.io.formats.IIGMessage;
-import org.gradoop.io.formats.IIGVertex;
-import org.gradoop.io.formats.IIGVertexType;
+import org.gradoop.biiig.io.formats.BTGMessage;
+import org.gradoop.biiig.io.formats.BTGVertexType;
+import org.gradoop.biiig.io.formats.BTGVertexValue;
 
 import java.io.IOException;
 import java.util.List;
@@ -54,7 +54,7 @@ import java.util.List;
  * BTG ids the master data node is involved in.
  */
 public class BTGComputation extends
-  BasicComputation<LongWritable, IIGVertex, NullWritable, IIGMessage> {
+  BasicComputation<LongWritable, BTGVertexValue, NullWritable, BTGMessage> {
 
   /**
    * Returns the current minimum value. This is always the last value in the
@@ -65,7 +65,7 @@ public class BTGComputation extends
    * @return The minimum BTG ID that vertex knows.
    */
   private long getCurrentMinValue(
-    Vertex<LongWritable, IIGVertex, NullWritable> vertex) {
+    Vertex<LongWritable, BTGVertexValue, NullWritable> vertex) {
     List<Long> btgIDs = vertex.getValue().getBtgIDs();
     return (btgIDs.size() > 0) ? btgIDs.get(
       btgIDs.size() - 1) : vertex.getId().get();
@@ -79,10 +79,10 @@ public class BTGComputation extends
    * @param currentMinValue The current minimum value
    * @return The new (maybe unchanged) minimum value
    */
-  private long getNewMinValue(Iterable<IIGMessage> messages,
+  private long getNewMinValue(Iterable<BTGMessage> messages,
                               long currentMinValue) {
     long newMinValue = currentMinValue;
-    for (IIGMessage message : messages) {
+    for (BTGMessage message : messages) {
       if (message.getBtgID() < newMinValue) {
         newMinValue = message.getBtgID();
       }
@@ -97,10 +97,10 @@ public class BTGComputation extends
    * @param messages All incoming messages
    */
   private void processMasterVertex(
-    Vertex<LongWritable, IIGVertex, NullWritable> vertex,
-    Iterable<IIGMessage> messages) {
-    IIGVertex vertexValue = vertex.getValue();
-    for (IIGMessage message : messages) {
+    Vertex<LongWritable, BTGVertexValue, NullWritable> vertex,
+    Iterable<BTGMessage> messages) {
+    BTGVertexValue vertexValue = vertex.getValue();
+    for (BTGMessage message : messages) {
       vertexValue.updateNeighbourBtgID(message.getSenderID(),
         message.getBtgID());
     }
@@ -118,10 +118,10 @@ public class BTGComputation extends
    * @param minValue All incoming messages
    */
   private void processTransactionalVertex(
-    Vertex<LongWritable, IIGVertex, NullWritable> vertex, long minValue) {
+    Vertex<LongWritable, BTGVertexValue, NullWritable> vertex, long minValue) {
     vertex.getValue().removeLastBtgID();
     vertex.getValue().addBtgID(minValue);
-    IIGMessage message = new IIGMessage();
+    BTGMessage message = new BTGMessage();
     message.setSenderID(vertex.getId().get());
     message.setBtgID(minValue);
     sendMessageToAllEdges(vertex, message);
@@ -136,13 +136,13 @@ public class BTGComputation extends
    * @throws java.io.IOException
    */
   @Override
-  public void compute(Vertex<LongWritable, IIGVertex, NullWritable> vertex,
-                      Iterable<IIGMessage> messages)
+  public void compute(Vertex<LongWritable, BTGVertexValue, NullWritable> vertex,
+                      Iterable<BTGMessage> messages)
     throws IOException {
-    if (vertex.getValue().getVertexType() == IIGVertexType.MASTER) {
+    if (vertex.getValue().getVertexType() == BTGVertexType.MASTER) {
       processMasterVertex(vertex, messages);
     } else if (vertex.getValue().getVertexType() ==
-      IIGVertexType.TRANSACTIONAL) {
+      BTGVertexType.TRANSACTIONAL) {
       long currentMinValue = getCurrentMinValue(vertex);
       long newMinValue = getNewMinValue(messages, currentMinValue);
       boolean changed = currentMinValue != newMinValue;

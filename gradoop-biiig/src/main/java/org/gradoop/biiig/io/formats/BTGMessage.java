@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.gradoop.io.formats;
+package org.gradoop.biiig.io.formats;
 
 import org.apache.hadoop.io.Writable;
 
@@ -25,12 +25,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Custom message format for {@link org.gradoop.algorithms.BTGComputation}.
+ * Custom message format for {@link org.gradoop.biiig.algorithms.BTGComputation}.
  * Master data nodes need to know who the sender of a message is, so this has to
  * be stored inside the message. The btgID is the minimum vertex id inside a
  * BTG.
  */
-public class IIGMessage implements Writable {
+public class BTGMessage implements Writable {
 
   /**
    * vertex ID of the message sender

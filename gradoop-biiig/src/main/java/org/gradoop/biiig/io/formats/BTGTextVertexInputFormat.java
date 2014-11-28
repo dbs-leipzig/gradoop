@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.gradoop.io.formats;
+package org.gradoop.biiig.io.formats;
 
 import com.google.common.collect.Lists;
 import org.apache.giraph.edge.Edge;
@@ -39,8 +39,8 @@ import java.util.regex.Pattern;
  * master) and value 3.14. The node is connected to two BTGs (4,9) and has edges
  * to two vertices (1,2).
  */
-public class IIGTextVertexInputFormat extends
-  TextVertexInputFormat<LongWritable, IIGVertex, NullWritable> {
+public class BTGTextVertexInputFormat extends
+  TextVertexInputFormat<LongWritable, BTGVertexValue, NullWritable> {
 
   /**
    * Used for splitting the line into the main tokens (vertex id, vertex value,
@@ -88,10 +88,10 @@ public class IIGTextVertexInputFormat extends
     }
 
     @Override
-    protected IIGVertex getValue(String[] tokens)
+    protected BTGVertexValue getValue(String[] tokens)
       throws IOException {
       String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(tokens[1]);
-      IIGVertexType vertexClass = IIGVertexType.values()[Integer.parseInt(
+      BTGVertexType vertexClass = BTGVertexType.values()[Integer.parseInt(
         valueTokens[0])];
       Double vertexValue = Double.parseDouble(valueTokens[1]);
       List<Long> btgIDs = Lists.newArrayListWithCapacity(
@@ -99,7 +99,7 @@ public class IIGTextVertexInputFormat extends
       for (int n = 2; n < valueTokens.length; n++) {
         btgIDs.add(Long.parseLong(valueTokens[n]));
       }
-      return new IIGVertex(vertexClass, vertexValue, btgIDs);
+      return new BTGVertexValue(vertexClass, vertexValue, btgIDs);
     }
 
     @Override

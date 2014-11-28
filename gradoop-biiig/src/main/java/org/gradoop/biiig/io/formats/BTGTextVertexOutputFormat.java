@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.gradoop.io.formats;
+package org.gradoop.biiig.io.formats;
 
 import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.formats.TextVertexOutputFormat;
@@ -28,14 +28,14 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import java.io.IOException;
 
 /**
- * Encodes the output of the {@link org.gradoop.algorithms.BTGComputation} in
+ * Encodes the output of the {@link org.gradoop.biiig.algorithms.BTGComputation} in
  * the following format: vertex-id,vertex-class vertex-value[ btg-id]* e.g. the
  * following line 0,0 3.14 23 42 decodes vertex-id 0 with vertex-class 0 (0 =
  * transactional, 1 = master) and the value 3.14. The node is connected to two
  * BTGs (23, 42).
  */
-public class IIGTextVertexOutputFormat extends
-  TextVertexOutputFormat<LongWritable, IIGVertex, NullWritable> {
+public class BTGTextVertexOutputFormat extends
+  TextVertexOutputFormat<LongWritable, BTGVertexValue, NullWritable> {
 
   /**
    * Used for splitting the line into the main tokens (vertex id, vertex value,
@@ -62,7 +62,7 @@ public class IIGTextVertexOutputFormat extends
   }
 
   /**
-   * Used to convert a {@link IIGVertex} to a line in the output file.
+   * Used to convert a {@link BTGVertexValue} to a line in the output file.
    */
   private class BTGTextVertexLineWriter extends TextVertexWriterToEachLine {
 
@@ -75,7 +75,7 @@ public class IIGTextVertexOutputFormat extends
      */
     @Override
     protected Text convertVertexToLine(
-      Vertex<LongWritable, IIGVertex, NullWritable> vertex)
+      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex)
       throws IOException {
       StringBuilder sb = new StringBuilder();
       // vertex-id

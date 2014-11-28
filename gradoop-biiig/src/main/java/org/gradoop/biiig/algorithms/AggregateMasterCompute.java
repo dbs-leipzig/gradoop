@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.gradoop.algorithms;
+package org.gradoop.biiig.algorithms;
 
 import org.apache.giraph.aggregators.IntSumAggregator;
 import org.apache.giraph.master.DefaultMasterCompute;
@@ -28,8 +28,8 @@ public class AggregateMasterCompute extends DefaultMasterCompute {
 
   /**
    * Creates as many types aggregators as defined in {@link
-   * org.gradoop.algorithms.AggregateComputation} of type defined in {@link
-   * org.gradoop.algorithms.AggregateComputation}
+   * AggregateComputation} of type defined in {@link
+   * AggregateComputation}
    *
    * @throws IllegalAccessException
    * @throws InstantiationException

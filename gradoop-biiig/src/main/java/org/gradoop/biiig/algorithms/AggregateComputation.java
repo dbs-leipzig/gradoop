@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package org.gradoop.algorithms;
+package org.gradoop.biiig.algorithms;
 
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.gradoop.io.formats.IIGVertex;
+import org.gradoop.biiig.io.formats.BTGVertexValue;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ import java.io.IOException;
  * is based on a user-defined function.
  */
 public class AggregateComputation extends BasicComputation<
-  LongWritable, IIGVertex, NullWritable, NullWritable> {
+  LongWritable, BTGVertexValue, NullWritable, NullWritable> {
   /**
    * Prefix for global aggregators for specific BTGs
    */
@@ -58,7 +58,7 @@ public class AggregateComputation extends BasicComputation<
 
   @Override
   public void compute(
-    Vertex<LongWritable, IIGVertex, NullWritable> vertex,
+    Vertex<LongWritable, BTGVertexValue, NullWritable> vertex,
     Iterable<NullWritable> messages)
     throws IOException {
     if (getSuperstep() == 0) {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.gradoop.io.formats;
+package org.gradoop.biiig.io.formats;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -32,14 +32,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Custom vertex used by {@link org.gradoop.algorithms.BTGComputation}.
+ * Custom vertex used by {@link org.gradoop.biiig.algorithms.BTGComputation}.
  */
-public class IIGVertex implements Writable {
+public class BTGVertexValue implements Writable {
 
   /**
-   * The vertex type which is defined in {@link IIGVertexType}
+   * The vertex type which is defined in {@link BTGVertexType}
    */
-  private IIGVertexType vertexType;
+  private BTGVertexType vertexType;
 
   /**
    * The value of that vertex.
@@ -53,17 +53,17 @@ public class IIGVertex implements Writable {
 
   /**
    * Stores the minimum vertex ID per message sender. This is only used by
-   * vertices of type {@link IIGVertexType} MASTER, so it is only initialized
+   * vertices of type {@link BTGVertexType} MASTER, so it is only initialized
    * when needed.
    */
   private Map<Long, Long> neighborMinimumBTGIds;
 
   /**
    * Default constructor which is used during deserialization in {@link
-   * IIGTextVertexOutputFormat}
+   * BTGTextVertexOutputFormat}
    */
   @SuppressWarnings("UnusedDeclaration")
-  public IIGVertex() {
+  public BTGVertexValue() {
     this.btgIDs = new ArrayList<>();
   }
 
@@ -74,8 +74,8 @@ public class IIGVertex implements Writable {
    * @param vertexValue The value stored at that vertex
    * @param btgIDs      A list of BTGs that vertex belongs to
    */
-  public IIGVertex(IIGVertexType vertexType, Double vertexValue,
-                   List<Long> btgIDs) {
+  public BTGVertexValue(BTGVertexType vertexType, Double vertexValue,
+                        List<Long> btgIDs) {
     this.vertexType = vertexType;
     this.vertexValue = vertexValue;
     this.btgIDs = btgIDs;
@@ -86,7 +86,7 @@ public class IIGVertex implements Writable {
    *
    * @return vertex type
    */
-  public IIGVertexType getVertexType() {
+  public BTGVertexType getVertexType() {
     return this.vertexType;
   }
 
@@ -160,7 +160,7 @@ public class IIGVertex implements Writable {
    * Updates the set of BTG ids this vertex is involved in according to the set
    * of minimum values stored in the mapping between neighbour nodes and BTG
    * ids. This is only necessary for master data nodes like described in {@link
-   * org.gradoop.algorithms.BTGComputation}.
+   * org.gradoop.biiig.algorithms.BTGComputation}.
    */
   public void updateBtgIDs() {
     if (this.neighborMinimumBTGIds != null) {
@@ -235,7 +235,7 @@ public class IIGVertex implements Writable {
   public void readFields(DataInput dataInput)
     throws IOException {
     // vertex type
-    this.vertexType = IIGVertexType.values()[dataInput.readInt()];
+    this.vertexType = BTGVertexType.values()[dataInput.readInt()];
     // vertex value
     this.vertexValue = dataInput.readDouble();
     // number of BTGs

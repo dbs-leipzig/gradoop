@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package org.gradoop.io.formats;
+package org.gradoop.biiig.io.formats;
 
 /**
- * Used for {@link org.gradoop.algorithms.BTGComputation}.
+ * Used for {@link org.gradoop.biiig.algorithms.BTGComputation}.
  */
-public enum IIGVertexType {
+public enum BTGVertexType {
   /**
    * Vertices that are created during a business transaction between, like
    * invoices, quotations, deliveries.
