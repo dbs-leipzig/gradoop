@@ -113,8 +113,8 @@ public class KwayPartitioningComputation extends
     if (getSuperstep() == 0) {
       vertex.getValue().setLastVertexValue(vertex.getId());
       Random randomGenerator = new Random();
-//      vertex.getValue().setCurrentVertexValue(new IntWritable(randomGenerator.nextInt
-//        (number_of_partitions)));
+      vertex.getValue().setCurrentVertexValue(new IntWritable(randomGenerator.nextInt
+        (number_of_partitions)));
       sendMessageToAllEdges(vertex, vertex.getValue().getCurrentVertexValue());
       vertex.voteToHalt();
     } else {
