@@ -104,8 +104,8 @@ public class EPGVertexHandler extends BasicHandler
    * {@inheritDoc}
    */
   @Override
-  public Put writeGraphs(final Put put, final GraphElement vertex) {
-    for (Long graphID : vertex.getGraphs()) {
+  public Put writeGraphs(final Put put, final GraphElement graphElement) {
+    for (Long graphID : graphElement.getGraphs()) {
       put.add(CF_GRAPHS_BYTES, Bytes.toBytes(graphID), null);
     }
     return put;

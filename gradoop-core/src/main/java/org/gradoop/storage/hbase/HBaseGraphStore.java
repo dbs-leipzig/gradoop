@@ -4,7 +4,6 @@ import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.gradoop.model.Edge;
@@ -15,31 +14,57 @@ import org.gradoop.model.inmemory.MemoryVertex;
 import org.gradoop.storage.GraphStore;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.util.Map;
 
 /**
- * Created by martin on 05.11.14.
+ * Default HBase graph store that handles reading and writing vertices and
+ * graphs from and to HBase.
  */
 public class HBaseGraphStore implements GraphStore {
 
+  /**
+   * Logger
+   */
   private static final Logger LOG = Logger.getLogger(HBaseGraphStore.class);
 
+  /**
+   * HBase table to use for storing vertices.
+   */
   private final HTable verticesTable;
+  /**
+   * HBase table to use for storing graphs.
+   */
   private final HTable graphsTable;
 
+  /**
+   * Handles the specific storing of vertices.
+   */
   private final VertexHandler verticesHandler;
+  /**
+   * Handles the specific storing of graphs.
+   */
   private final GraphHandler graphsHandler;
 
-  public HBaseGraphStore(final HTable graphsTable, final HTable verticesTable,
-                         final VertexHandler verticesHandler,
-                         final GraphHandler graphsHandler) {
+  /**
+   * Creates a HBaseGraphStore based on the given parameters.
+   *
+   * @param graphsTable     HBase table to store graphs
+   * @param verticesTable   HBase table to store vertices
+   * @param verticesHandler handles reading/writing of vertices
+   * @param graphsHandler   handles reading/writing of graphs
+   */
+  HBaseGraphStore(final HTable graphsTable, final HTable verticesTable,
+                  final VertexHandler verticesHandler,
+                  final GraphHandler graphsHandler) {
     this.graphsTable = graphsTable;
     this.verticesTable = verticesTable;
     this.verticesHandler = verticesHandler;
     this.graphsHandler = graphsHandler;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void writeGraph(final Graph graph) {
     LOG.info("writing: " + graph);
@@ -60,6 +85,9 @@ public class HBaseGraphStore implements GraphStore {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void writeVertex(final Vertex vertex) {
     LOG.info("writing: " + vertex);
@@ -79,13 +107,14 @@ public class HBaseGraphStore implements GraphStore {
 
       verticesTable.put(put);
       verticesTable.flushCommits();
-    } catch (RetriesExhaustedWithDetailsException e) {
-      e.printStackTrace();
-    } catch (InterruptedIOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Graph readGraph(final Long graphID) {
     Graph g = null;
@@ -104,6 +133,9 @@ public class HBaseGraphStore implements GraphStore {
     return g;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Vertex readVertex(final Long vertexID) {
     Vertex v = null;
@@ -125,6 +157,9 @@ public class HBaseGraphStore implements GraphStore {
     return v;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void close() {
     try {

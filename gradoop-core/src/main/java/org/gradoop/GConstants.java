@@ -4,16 +4,43 @@ package org.gradoop;
  * Constants used in Gradoop.
  */
 public final class GConstants {
+  /**
+   * Default HBase table name for vertices.
+   */
   public static final String DEFAULT_TABLE_VERTICES = "vertices";
+  /**
+   * Default HBase table name for graphs.
+   */
   public static final String DEFAULT_TABLE_GRAPHS = "graphs";
 
+  /**
+   * Column family name for labels.
+   */
   public static final String CF_LABELS = "labels";
+  /**
+   * Column family name for properties.
+   */
   public static final String CF_PROPERTIES = "properties";
+  /**
+   * Column family name for vertices.
+   */
   public static final String CF_VERTICES = "vertices";
+  /**
+   * Column family name for outgoing edges.
+   */
   public static final String CF_OUT_EDGES = "out_edges";
+  /**
+   * Column family name for incoming edges.
+   */
   public static final String CF_IN_EDGES = "in_edges";
+  /**
+   * Column family name for graphs.
+   */
   public static final String CF_GRAPHS = "graphs";
 
+  /**
+   * Default label for unlabeled edges.
+   */
   public static final String DEFAULT_EDGE_LABEL = "E_LABEL";
 
   /**
