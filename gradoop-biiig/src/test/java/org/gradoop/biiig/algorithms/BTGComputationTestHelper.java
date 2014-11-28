@@ -16,43 +16,18 @@
  * limitations under the License.
  */
 
-package org.gradoop.algorithms;
-
-import org.apache.hadoop.fs.Path;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Random;
+package org.gradoop.biiig.algorithms;
 
 /**
  * Base class for all BIIIG related unit tests. Contains a few sample graphs
  * which can be used in specific tests.
  */
-public abstract class GiraphTest {
-
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
-
-  private String getCallingMethod() {
-    return Thread.currentThread().getStackTrace()[1].getMethodName();
-  }
-
-  protected Path getTempFile(String fileName)
-    throws IOException {
-    fileName =
-      (fileName != null) ? fileName : getCallingMethod() + "_" + new Random()
-        .nextLong();
-    File tmpFile = testFolder.newFile(fileName);
-    return new Path(tmpFile.getPath());
-  }
-
+public abstract class BTGComputationTestHelper {
   /**
    * @return a small graph with two BTGs that are connected
    */
-  protected String[] getConnectedIIG() {
-    return new String[]{
+  static String[] getConnectedIIG() {
+    return new String[] {
       "0,1 0,1 4 9 10",
       "1,1 1,0 5 6 11 12",
       "2,1 2,8 13",
@@ -75,8 +50,8 @@ public abstract class GiraphTest {
   /**
    * @return a small graph with two BTGs that are disconnected
    */
-  protected String[] getDisconnectedIIG() {
-    return new String[]{
+  static String[] getDisconnectedIIG() {
+    return new String[] {
       "0,1 0,6 7",
       "1,1 1,2 7",
       "2,1 2,1 8 9",
@@ -98,8 +73,8 @@ public abstract class GiraphTest {
    * @return a small graph with two BTGs that are connected, each vertex has
    * correct BTG ids assigned
    */
-  protected String[] getConnectedIIGWithBTGIDs() {
-    return new String[]{
+  static String[] getConnectedIIGWithBTGIDs() {
+    return new String[] {
       "0,1 0 0 1,1 4 9 10",
       "1,1 1 0 1,0 5 6 11 12",
       "2,1 2 0 1,8 13",
@@ -123,8 +98,8 @@ public abstract class GiraphTest {
    * @return a small graph with two BTGs that are disconnected, each vertex has
    * correct BTG ids assigned
    */
-  protected String[] getDisconnectedIIGWithBTGIDs() {
-    return new String[]{
+  static String[] getDisconnectedIIGWithBTGIDs() {
+    return new String[] {
       "0,1 0,6 7",
       "1,1 1,2 7",
       "2,1 2,1 8 9",
@@ -143,37 +118,37 @@ public abstract class GiraphTest {
   }
 
   // a graph containing a single vertex of type Master
-  protected String[] getSingleMasterVertexIIG() {
-    return new String[]{
+  static String[] getSingleMasterVertexIIG() {
+    return new String[] {
       "0,1 0"
     };
   }
 
-  protected String[] getTwoMasterVerticesIIG() {
-    return new String[]{
+  static String[] getTwoMasterVerticesIIG() {
+    return new String[] {
       "0,1 0",
       "1,1 0,0"
     };
   }
 
   // a graph containing a single vertex of type Transactional
-  protected String[] getSingleTransactionalVertexIIG() {
-    return new String[]{
+  static String[] getSingleTransactionalVertexIIG() {
+    return new String[] {
       "0,0 0"
     };
   }
 
   // a graph containing a single vertex of type Master and an associated BTG
-  protected String[] getSingleMasterVertexIIGWithBTG() {
-    return new String[]{
+  static String[] getSingleMasterVertexIIGWithBTG() {
+    return new String[] {
       "0,1 0.0 0"
     };
   }
 
   // a graph containing a single vertex of type Transactional and an
   // associated BTG
-  protected String[] getSingleTransactionalVertexIIGWithBTG() {
-    return new String[]{
+  static String[] getSingleTransactionalVertexIIGWithBTG() {
+    return new String[] {
       "0,0 0.0 0"
     };
   }

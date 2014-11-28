@@ -21,6 +21,7 @@ package org.gradoop.biiig.io.formats;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.hadoop.io.Writable;
+import org.gradoop.model.GraphElement;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -34,7 +35,7 @@ import java.util.Set;
 /**
  * Custom vertex used by {@link org.gradoop.biiig.algorithms.BTGComputation}.
  */
-public class BTGVertexValue implements Writable {
+public class BTGVertexValue implements Writable, GraphElement {
 
   /**
    * The vertex type which is defined in {@link BTGVertexType}
@@ -113,17 +114,24 @@ public class BTGVertexValue implements Writable {
    *
    * @return list of BTGs containing that vertex.
    */
-  public List<Long> getBtgIDs() {
+  @Override
+  public Iterable<Long> getGraphs() {
     return this.btgIDs;
   }
 
   /**
    * Adds a BTG to the list of BTGs. BTGs can occur multiple times.
    *
-   * @param btgID BTG ID to be added
+   * @param graph BTG ID to be added
    */
-  public void addBtgID(long btgID) {
-    this.btgIDs.add(btgID);
+  @Override
+  public void addToGraph(Long graph) {
+    this.btgIDs.add(graph);
+  }
+
+  @Override
+  public int getGraphCount() {
+    return this.btgIDs.size();
   }
 
   /**
@@ -242,7 +250,7 @@ public class BTGVertexValue implements Writable {
     int btgCount = dataInput.readInt();
     // BTG ids
     for (int i = 0; i < btgCount; i++) {
-      this.addBtgID(dataInput.readLong());
+      this.addToGraph(dataInput.readLong());
     }
     // neighbor -> minium BTG id map
     int setSize = dataInput.readInt();

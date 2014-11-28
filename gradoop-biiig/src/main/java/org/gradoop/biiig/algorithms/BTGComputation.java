@@ -18,6 +18,7 @@
 
 package org.gradoop.biiig.algorithms;
 
+import com.google.common.collect.Lists;
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.LongWritable;
@@ -66,7 +67,7 @@ public class BTGComputation extends
    */
   private long getCurrentMinValue(
     Vertex<LongWritable, BTGVertexValue, NullWritable> vertex) {
-    List<Long> btgIDs = vertex.getValue().getBtgIDs();
+    List<Long> btgIDs = Lists.newArrayList(vertex.getValue().getGraphs());
     return (btgIDs.size() > 0) ? btgIDs.get(
       btgIDs.size() - 1) : vertex.getId().get();
   }
@@ -106,8 +107,8 @@ public class BTGComputation extends
     }
     vertexValue.updateBtgIDs();
     // in case the vertex has no neighbours
-    if (vertexValue.getBtgIDs().size() == 0) {
-      vertexValue.addBtgID(vertex.getId().get());
+    if (vertexValue.getGraphCount() == 0) {
+      vertexValue.addToGraph(vertex.getId().get());
     }
   }
 
@@ -120,7 +121,7 @@ public class BTGComputation extends
   private void processTransactionalVertex(
     Vertex<LongWritable, BTGVertexValue, NullWritable> vertex, long minValue) {
     vertex.getValue().removeLastBtgID();
-    vertex.getValue().addBtgID(minValue);
+    vertex.getValue().addToGraph(minValue);
     BTGMessage message = new BTGMessage();
     message.setSenderID(vertex.getId().get());
     message.setBtgID(minValue);

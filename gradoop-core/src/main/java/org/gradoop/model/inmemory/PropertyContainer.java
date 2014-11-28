@@ -26,7 +26,7 @@ public abstract class PropertyContainer implements Attributed {
    */
   @Override
   public Iterable<String> getPropertyKeys() {
-    return properties.keySet();
+    return (properties != null) ? properties.keySet() : null;
   }
 
   /**
@@ -34,7 +34,7 @@ public abstract class PropertyContainer implements Attributed {
    */
   @Override
   public Object getProperty(String key) {
-    return properties.get(key);
+    return (properties != null) ? properties.get(key) : null;
   }
 
   /**

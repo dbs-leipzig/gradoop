@@ -33,10 +33,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * An IIG vertex is decoded in the following format: vertex-id,vertex-class
- * vertex-value[ btg-id]*,[neighbour-vertex-id ]* e.g. the following line 0,0
- * 3.14 4 9,1 2 decodes vertex-id 0 with vertex-class 0 (0 = transactional, 1 =
- * master) and value 3.14. The node is connected to two BTGs (4,9) and has edges
+ * An IIG vertex is decoded in the following format:
+ * <p/>
+ * vertex-id,vertex-class vertex-value[ btg-id]*,[neighbour-vertex-id ]*
+ * <p/>
+ * e.g. the following line
+ * <p/>
+ * 0,0 3.14 4 9,1 2
+ * <p/>
+ * decodes vertex-id 0 with vertex-class 0 (0 = transactional, 1 = master)
+ * and value 3.14. The node is connected to two BTGs (4,9) and has edges
  * to two vertices (1,2).
  */
 public class BTGTextVertexInputFormat extends

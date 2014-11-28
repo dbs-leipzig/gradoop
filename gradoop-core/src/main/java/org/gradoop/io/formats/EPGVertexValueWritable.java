@@ -42,15 +42,29 @@ public class EPGVertexValueWritable extends EPGMultiLabeledAttributedWritable
     initGraphs(graphs);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Iterable<Long> getGraphs() {
     return this.graphs;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void addToGraph(Long graph) {
     initGraphs();
     this.graphs.add(graph);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getGraphCount() {
+    return (graphs != null) ? graphs.size() : 0;
   }
 
   private void initGraphs() {

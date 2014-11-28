@@ -10,7 +10,6 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.log4j.Logger;
 import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
@@ -22,15 +21,17 @@ import java.util.Map;
  * Used to read a EPG based graph from HBase into Giraph.
  */
 public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
-  EPGVertexIdentifierWritable,
-  EPGMultiLabeledAttributedWritable,
+  EPGVertexIdentifierWritable, EPGMultiLabeledAttributedWritable,
   EPGEdgeValueWritable> {
 
-  private static final Logger LOG = Logger.getLogger
-    (EPGHBaseVertexInputFormat.class);
-
+  /**
+   * Vertex handler to read vertices from HBase.
+   */
   private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public VertexReader<EPGVertexIdentifierWritable,
     EPGMultiLabeledAttributedWritable,
@@ -40,6 +41,9 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
     return new EPGHBaseVertexReader(split, context);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void checkInputSpecs(Configuration conf) {
 

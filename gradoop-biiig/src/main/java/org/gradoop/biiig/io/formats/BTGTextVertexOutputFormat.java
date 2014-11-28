@@ -85,7 +85,7 @@ public class BTGTextVertexOutputFormat extends
       sb.append(vertex.getValue().getVertexType().ordinal());
       sb.append(VALUE_TOKEN_SEPARATOR);
       sb.append(vertex.getValue().getVertexValue());
-      for (Long btgID : vertex.getValue().getBtgIDs()) {
+      for (Long btgID : vertex.getValue().getGraphs()) {
         sb.append(VALUE_TOKEN_SEPARATOR);
         sb.append(btgID);
       }

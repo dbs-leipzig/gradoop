@@ -19,4 +19,11 @@ public interface GraphElement {
    * @param graph the graph to be added to
    */
   void addToGraph(Long graph);
+
+  /**
+   * Returns the number of graphs this element belongs to.
+   *
+   * @return number of graphs containing that element
+   */
+  int getGraphCount();
 }

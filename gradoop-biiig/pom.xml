@@ -47,7 +47,7 @@
                         <property>
                             <name>prop.jarLocation</name>
                             <value>
-                                ${top.dir}/gradoop-core/target/gradoop-core-${project.version}-jar-with-dependencies.jar
+                                ${top.dir}/gradoop-core/target/gradoop-giraph-${project.version}-jar-with-dependencies.jar
                             </value>
                         </property>
                     </systemProperties>
@@ -66,15 +66,28 @@
         <!-- Testing -->
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
-            <artifactId>gradoop-core</artifactId>
+            <artifactId>gradoop-giraph</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
-            <artifactId>gradoop-giraph</artifactId>
+            <artifactId>gradoop-core</artifactId>
             <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-testing-util</artifactId>
+            <version>${dep.hbase.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.giraph</groupId>
+            <artifactId>giraph-core</artifactId>
+            <version>${dep.giraph.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

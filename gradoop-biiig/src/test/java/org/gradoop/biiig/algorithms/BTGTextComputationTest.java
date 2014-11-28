@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.utils.InternalVertexRunner;
-import org.gradoop.algorithms.GiraphTest;
 import org.gradoop.biiig.io.formats.BTGTextVertexInputFormat;
 import org.gradoop.biiig.io.formats.BTGTextVertexOutputFormat;
 import org.junit.Test;
@@ -35,9 +34,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for {@link BTGComputation}
+ * Tests for {@link BTGComputation} that reads BTGs from files.
  */
-public class BTGComputationTest extends GiraphTest {
+public class BTGTextComputationTest {
 
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile("[,]");
 
@@ -46,42 +45,43 @@ public class BTGComputationTest extends GiraphTest {
   @Test
   public void testConnectedIIG()
     throws Exception {
-    String[] graph = getConnectedIIG();
+    String[] graph = BTGComputationTestHelper.getConnectedIIG();
     validateConnectedIIGResult(computeResults(graph));
   }
 
   @Test
   public void testDisconnectedIIG()
     throws Exception {
-    String[] graph = getDisconnectedIIG();
+    String[] graph = BTGComputationTestHelper.getDisconnectedIIG();
     validateDisconnectedIIGResult(computeResults(graph));
   }
 
   @Test
   public void testSingleMasterVertex()
     throws Exception {
-    String[] graph = getSingleMasterVertexIIG();
+    String[] graph = BTGComputationTestHelper.getSingleMasterVertexIIG();
     validateSingleMasterVertexIIGResult(computeResults(graph));
   }
 
   @Test
   public void testSingleTransactionalVertex()
     throws Exception {
-    String[] graph = getSingleTransactionalVertexIIG();
+    String[] graph = BTGComputationTestHelper.getSingleTransactionalVertexIIG();
     validateSingleTransactionalVertexIIGResult(computeResults(graph));
   }
 
   @Test
   public void testSingleMasterVertexWithBTG()
     throws Exception {
-    String[] graph = getSingleMasterVertexIIGWithBTG();
+    String[] graph = BTGComputationTestHelper.getSingleMasterVertexIIGWithBTG();
     validateSingleMasterVertexIIGResult(computeResults(graph));
   }
 
   @Test
   public void testSingleTransactionalVertexWithBTG()
     throws Exception {
-    String[] graph = getSingleTransactionalVertexIIGWithBTG();
+    String[] graph =
+      BTGComputationTestHelper.getSingleTransactionalVertexIIGWithBTG();
     validateSingleTransactionalVertexIIGResult(computeResults(graph));
   }
 

@@ -146,8 +146,10 @@ public class EPGVertexHandler extends BasicHandler
    */
   private Put writeEdges(Put put, final byte[] columnFamily,
                          final Iterable<? extends Edge> edges) {
-    for (Edge edge : edges) {
-      put = writeEdge(put, columnFamily, edge);
+    if (edges != null) {
+      for (Edge edge : edges) {
+        put = writeEdge(put, columnFamily, edge);
+      }
     }
     return put;
   }

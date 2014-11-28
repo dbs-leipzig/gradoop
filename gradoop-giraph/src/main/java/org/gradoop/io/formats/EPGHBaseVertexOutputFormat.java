@@ -27,9 +27,6 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
 
   private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
-  private static final Logger LOG = Logger.getLogger
-    (EPGHBaseVertexOutputFormat.class);
-
   @Override
   public VertexWriter<EPGVertexIdentifierWritable, EPGVertexValueWritable,
     EPGEdgeValueWritable> createVertexWriter(
@@ -51,6 +48,9 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
       super(context);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeVertex(
       Vertex<EPGVertexIdentifierWritable, EPGVertexValueWritable,
@@ -60,11 +60,11 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
       byte[] rowKey = Bytes.toBytes(vertex.getId().getID());
       Put put = new Put(rowKey);
       // labels
-      VERTEX_HANDLER.writeLabels(put, vertex.getValue());
+      put = VERTEX_HANDLER.writeLabels(put, vertex.getValue());
       // properties
-      VERTEX_HANDLER.writeProperties(put, vertex.getValue());
+      put = VERTEX_HANDLER.writeProperties(put, vertex.getValue());
       // graphs
-      VERTEX_HANDLER.writeGraphs(put, vertex.getValue());
+      put = VERTEX_HANDLER.writeGraphs(put, vertex.getValue());
       // outgoing edges
       List<org.gradoop.model.Edge> edges = Lists.newArrayListWithCapacity
         (vertex.getNumEdges());

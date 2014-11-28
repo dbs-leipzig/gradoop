@@ -82,6 +82,11 @@ public class MemoryVertex extends MultiLabeledPropertyContainer implements
     this.graphs.add(graph);
   }
 
+  @Override
+  public int getGraphCount() {
+    return this.graphs.size();
+  }
+
   /**
    * {@inheritDoc}
    */

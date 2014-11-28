@@ -62,7 +62,7 @@ public class AggregateComputation extends BasicComputation<
     Iterable<NullWritable> messages)
     throws IOException {
     if (getSuperstep() == 0) {
-      for (long btgID : vertex.getValue().getBtgIDs()) {
+      for (long btgID : vertex.getValue().getGraphs()) {
         String aggregator = BTG_AGGREGATOR_PREFIX + btgID;
         aggregate(aggregator,
           new DoubleWritable(vertex.getValue().getVertexValue()));
