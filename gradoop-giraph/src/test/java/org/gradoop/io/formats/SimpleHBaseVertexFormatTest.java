@@ -31,7 +31,8 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Created by martin on 17.11.14.
+ * Tests read basic graph data from HBase (ids), process them in Giraph and
+ * write the results back to HBase.
  */
 public class SimpleHBaseVertexFormatTest extends GiraphClusterBasedTest {
 

@@ -13,16 +13,31 @@ import org.gradoop.storage.GraphStore;
 import java.io.IOException;
 
 /**
- * Created by martin on 05.11.14.
+ * Creates {@link org.gradoop.storage.GraphStore} instances which can be used to
+ * store an EPG in HBase.
  */
 public class HBaseGraphStoreFactory {
 
+  /**
+   * Logger
+   */
   private static final Logger LOG =
     Logger.getLogger(HBaseGraphStoreFactory.class);
 
+  /**
+   * Private constructor to avoid instantiation.
+   */
   private HBaseGraphStoreFactory() {
   }
 
+  /**
+   * Creates a graph store based on the given parameters.
+   *
+   * @param config          Hadoop configuration
+   * @param verticesHandler vertex storage handler
+   * @param graphsHandler   graph storage handler
+   * @return a graph store instance
+   */
   public static GraphStore createGraphStore(Configuration config,
                                             VertexHandler verticesHandler,
                                             GraphHandler graphsHandler) {
@@ -42,6 +57,11 @@ public class HBaseGraphStoreFactory {
       graphsHandler);
   }
 
+  /**
+   * Deletes the graph store based on the given config.
+   *
+   * @param config Hadoop configuration
+   */
   public static void deleteGraphStore(Configuration config) {
     try {
       deleteTablesIfExists(config);
@@ -50,11 +70,19 @@ public class HBaseGraphStoreFactory {
     }
   }
 
+  /**
+   * Creates the tables used by the graph store.
+   *
+   * @param config          Hadoop configuration
+   * @param verticesHandler vertex storage handler
+   * @throws IOException
+   */
   private static void createTablesIfNotExists(Configuration config,
                                               VertexHandler verticesHandler)
     throws IOException {
     HTableDescriptor verticesTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
+      new HTableDescriptor(
+        TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
       new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_GRAPHS));
 
@@ -70,6 +98,13 @@ public class HBaseGraphStoreFactory {
     admin.close();
   }
 
+  /**
+   * Creates the table used for storing graphs.
+   *
+   * @param admin           HBase admin
+   * @param tableDescriptor descriptor for the graphs table
+   * @throws IOException
+   */
   private static void createGraphsTable(HBaseAdmin admin,
                                         HTableDescriptor tableDescriptor)
     throws IOException {
@@ -82,10 +117,17 @@ public class HBaseGraphStoreFactory {
     admin.createTable(tableDescriptor);
   }
 
+  /**
+   * Deletes the tables defined by the config.
+   *
+   * @param config Hadoop configuration
+   * @throws IOException
+   */
   private static void deleteTablesIfExists(Configuration config)
     throws IOException {
     HTableDescriptor verticesTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
+      new HTableDescriptor(
+        TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
       new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_GRAPHS));
 
@@ -102,6 +144,13 @@ public class HBaseGraphStoreFactory {
     admin.close();
   }
 
+  /**
+   * Deletes a single EPG table.
+   *
+   * @param admin           HBase admin
+   * @param tableDescriptor descriptor for the table to delete
+   * @throws IOException
+   */
   private static void deleteTable(HBaseAdmin admin,
                                   HTableDescriptor tableDescriptor)
     throws IOException {

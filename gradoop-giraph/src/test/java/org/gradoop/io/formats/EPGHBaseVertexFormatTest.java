@@ -28,7 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
- * Created by martin on 20.11.14.
+ * Test class for storing and reading an EPG in the default format.
  */
 public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
   private static Logger LOG = Logger.getLogger(EPGHBaseVertexFormatTest.class);

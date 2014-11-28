@@ -107,7 +107,6 @@ public abstract class BasicHandler implements EntityHandler {
    *
    * @param o object
    * @return type of object
-   * @throws {@link org.gradoop.storage.exceptions.UnsupportedTypeException}
    */
   protected byte getType(final Object o) {
     Class<?> valueClass = o.getClass();
@@ -136,7 +135,6 @@ public abstract class BasicHandler implements EntityHandler {
    * @param type  object type (must be supported by Gradoop)
    * @param value value as string
    * @return decoded object
-   * @throws {@link org.gradoop.storage.exceptions.UnsupportedTypeException}
    */
   protected Object decodeValueFromString(final byte type, final String value) {
     Object o;
@@ -170,7 +168,6 @@ public abstract class BasicHandler implements EntityHandler {
    *
    * @param value value do encode
    * @return encoded value as byte array
-   * @throws {@link org.gradoop.storage.exceptions.UnsupportedTypeException}
    */
   protected byte[] encodeValueToBytes(final Object value)
     throws UnsupportedTypeException {
@@ -185,21 +182,17 @@ public abstract class BasicHandler implements EntityHandler {
         Bytes.add(new byte[]{GConstants.TYPE_INTEGER},
           Bytes.toBytes((Integer) value));
     } else if (valueClass.equals(Long.class)) {
-      decodedValue =
-        Bytes
-          .add(new byte[]{GConstants.TYPE_LONG}, Bytes.toBytes((Long) value));
+      decodedValue = Bytes
+        .add(new byte[]{GConstants.TYPE_LONG}, Bytes.toBytes((Long) value));
     } else if (valueClass.equals(Float.class)) {
-      decodedValue =
-        Bytes
-          .add(new byte[]{GConstants.TYPE_FLOAT}, Bytes.toBytes((Float) value));
+      decodedValue = Bytes
+        .add(new byte[]{GConstants.TYPE_FLOAT}, Bytes.toBytes((Float) value));
     } else if (valueClass.equals(Double.class)) {
-      decodedValue =
-        Bytes.add(new byte[]{GConstants.TYPE_DOUBLE},
-          Bytes.toBytes((Double) value));
+      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_DOUBLE},
+        Bytes.toBytes((Double) value));
     } else if (valueClass.equals(String.class)) {
-      decodedValue =
-        Bytes.add(new byte[]{GConstants.TYPE_STRING},
-          Bytes.toBytes((String) value));
+      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_STRING},
+        Bytes.toBytes((String) value));
     } else {
       throw new UnsupportedTypeException(valueClass + " not supported");
     }
@@ -211,7 +204,6 @@ public abstract class BasicHandler implements EntityHandler {
    *
    * @param encValue encoded value with type information
    * @return decoded value
-   * @throws {@link org.gradoop.storage.exceptions.UnsupportedTypeException}
    */
   protected Object decodeValueFromBytes(final byte[] encValue) {
     Object o = null;
