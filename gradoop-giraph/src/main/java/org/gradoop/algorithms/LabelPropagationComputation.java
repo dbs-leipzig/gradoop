@@ -104,7 +104,6 @@ public class LabelPropagationComputation extends
     throws IOException {
     if (getSuperstep() == 0) {
       sendMessageToAllEdges(vertex, vertex.getId());
-      vertex.voteToHalt();
     } else {
       int currentMinValue = vertex.getValue().get();
       int newValue = getNewValue(vertex, messages);
@@ -112,8 +111,6 @@ public class LabelPropagationComputation extends
       if (changed) {
         vertex.setValue(new IntWritable(newValue));
         sendMessageToAllEdges(vertex, vertex.getValue());
-      } else {
-        vertex.voteToHalt();
       }
     }
     vertex.voteToHalt();

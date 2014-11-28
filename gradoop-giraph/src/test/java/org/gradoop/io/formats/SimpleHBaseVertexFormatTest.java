@@ -7,15 +7,21 @@ import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
+import org.gradoop.GConstants;
+import org.gradoop.GiraphClusterBasedTest;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -25,11 +31,10 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Created by martin on 17.11.14.
+ * Tests read basic graph data from HBase (ids), process them in Giraph and
+ * write the results back to HBase.
  */
-public class SimpleHBaseVertexFormatTest extends BspCase {
-
-  private static final HBaseTestingUtility utility = new HBaseTestingUtility();
+public class SimpleHBaseVertexFormatTest extends GiraphClusterBasedTest {
 
   private static final long DEFAULT_VERTEX_VALUE = 0L;
   private static final byte[] DEFAULT_VERTEX_VALUE_BYTES =
@@ -45,16 +50,14 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
   @Test
   public void vertexInputOutputTest()
     throws Exception {
-    utility.startMiniCluster(1).waitForActiveAndReadyMaster();
-    utility.startMiniMapReduceCluster();
     HTable testTable = createHBaseTestTable();
     createTestData(testTable);
 
     Configuration conf = utility.getConfiguration();
     conf.set(TableInputFormat.INPUT_TABLE,
-      SimpleHBaseVertexInputFormat.TABLE_NAME);
+      GConstants.DEFAULT_TABLE_VERTICES);
     conf.set(TableOutputFormat.OUTPUT_TABLE,
-      SimpleHBaseVertexInputFormat.TABLE_NAME);
+      GConstants.DEFAULT_TABLE_VERTICES);
 
     GiraphJob giraphJob = new GiraphJob(conf, BspCase.getCallingMethodName());
     GiraphConfiguration giraphConfiguration = giraphJob.getConfiguration();
@@ -70,8 +73,6 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
     validateTestData(testTable);
 
     testTable.close();
-    utility.shutdownMiniMapReduceCluster();
-    utility.shutdownMiniCluster();
   }
 
   private HTable createHBaseTestTable()
@@ -80,7 +81,7 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
     HBaseAdmin admin = new HBaseAdmin(config);
 
     HTableDescriptor verticesTableDescriptor = new HTableDescriptor(TableName
-      .valueOf(SimpleHBaseVertexInputFormat.TABLE_NAME));
+      .valueOf(GConstants.DEFAULT_TABLE_VERTICES));
 
     if (admin.tableExists(verticesTableDescriptor.getName())) {
       admin.disableTable(verticesTableDescriptor.getName());
@@ -93,7 +94,7 @@ public class SimpleHBaseVertexFormatTest extends BspCase {
       (SimpleHBaseVertexInputFormat.CF_EDGES));
 
     admin.createTable(verticesTableDescriptor);
-    return new HTable(config, SimpleHBaseVertexInputFormat.TABLE_NAME);
+    return new HTable(config, GConstants.DEFAULT_TABLE_VERTICES);
   }
 
   private void createTestData(HTable table)

@@ -29,6 +29,22 @@
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
+        <developer>
+            <id>apetermann</id>
+            <name>Andre Petermann</name>
+            <email>petermann@informatik.uni-leipzig.de</email>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
+        <developer>
+            <id>kgomez</id>
+            <name>Kevin Gomez</name>
+            <email>k.gomez@freenet.de</email>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
     </developers>
 
     <properties>

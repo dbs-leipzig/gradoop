@@ -23,7 +23,7 @@ import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.gradoop.io.IIGVertex;
+import org.gradoop.io.formats.IIGVertex;
 
 import java.io.IOException;
 
