@@ -4,6 +4,7 @@ import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.gradoop.io.KwayPartitioningVertex;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.Random;
  * TODO: algorithm description
  */
 public class KwayPartitioningComputation extends
-  BasicComputation<IntWritable, IntWritable, NullWritable, IntWritable> {
+  BasicComputation<IntWritable, KwayPartitioningVertex, NullWritable, IntWritable> {
 
   private final int number_of_partitions = 2;
   /**
@@ -33,7 +34,7 @@ public class KwayPartitioningComputation extends
    * @param messages All incoming messages
    * @return the new Value the vertex will become
    */
-  private int getNewValue(Vertex<IntWritable, IntWritable,
+  private int getNewValue(Vertex<IntWritable, KwayPartitioningVertex,
     NullWritable> vertex, Iterable<IntWritable> messages) {
     int newValue;
     //TODO: create allMessages more efficient
@@ -44,10 +45,11 @@ public class KwayPartitioningComputation extends
     }
     if (allMessages.isEmpty()) {
       // 1. if no messages are received
-      newValue = vertex.getValue().get();
+      newValue = vertex.getValue().getCurrentVertexValue().get();
     } else if (allMessages.size() == 1) {
       // 2. if just one message are received
-      newValue = Math.min(vertex.getValue().get(), allMessages.get(0));
+      newValue = Math.min(vertex.getValue().getCurrentVertexValue().get(),
+        allMessages.get(0));
     } else {
       // 3. if multiple messages are received
       newValue = getMostFrequent(vertex, allMessages);
@@ -62,7 +64,7 @@ public class KwayPartitioningComputation extends
    * @param allMessages All messages the current vertex has received
    * @return the maximal frequent number in all received messages
    */
-  private int getMostFrequent(Vertex<IntWritable, IntWritable,
+  private int getMostFrequent(Vertex<IntWritable, KwayPartitioningVertex,
     NullWritable> vertex, List<Integer> allMessages) {
     Collections.sort(allMessages);
     int newValue;
@@ -84,11 +86,14 @@ public class KwayPartitioningComputation extends
     }
     // if the frequent of all received messages are just one
     if (maxCounter == 1) {
-      // to avoid an oscillating state of the calculation we will just use
-      // the bigger value
-      newValue = Math.max(vertex.getValue().get(), allMessages.get(0));
+      newValue = Math.min(allMessages.get(0),
+        vertex.getValue().getCurrentVertexValue().get());
     } else {
-      newValue = maxValue;
+      if(vertex.getValue().getLastVertexValue().get()==maxValue){
+        newValue = vertex.getValue().getCurrentVertexValue().get();
+      }else{
+        newValue=maxValue;
+      }
     }
     return newValue;
   }
@@ -102,22 +107,25 @@ public class KwayPartitioningComputation extends
    * @throws IOException
    */
   @Override
-  public void compute(Vertex<IntWritable, IntWritable, NullWritable> vertex,
+  public void compute(Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
                       Iterable<IntWritable> messages)
     throws IOException {
     if (getSuperstep() == 0) {
+      vertex.getValue().setLastVertexValue(vertex.getId());
       Random randomGenerator = new Random();
-//      vertex.setValue(new IntWritable(randomGenerator.nextInt
+//      vertex.getValue().setCurrentVertexValue(new IntWritable(randomGenerator.nextInt
 //        (number_of_partitions)));
-      sendMessageToAllEdges(vertex, vertex.getValue());
+      sendMessageToAllEdges(vertex, vertex.getValue().getCurrentVertexValue());
       vertex.voteToHalt();
     } else {
-      int currentMinValue = vertex.getValue().get();
+      int currentMinValue = vertex.getValue().getCurrentVertexValue().get();
       int newValue = getNewValue(vertex, messages);
       boolean changed = currentMinValue != newValue;
       if (changed) {
-        vertex.setValue(new IntWritable(newValue));
-        sendMessageToAllEdges(vertex, vertex.getValue());
+        vertex.getValue().setLastVertexValue(vertex.getValue()
+          .getCurrentVertexValue());
+        vertex.getValue().setCurrentVertexValue(new IntWritable(newValue));
+        sendMessageToAllEdges(vertex, vertex.getValue().getCurrentVertexValue());
       } else {
         vertex.voteToHalt();
       }

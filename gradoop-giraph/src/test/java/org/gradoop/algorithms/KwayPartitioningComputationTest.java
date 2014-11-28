@@ -3,8 +3,8 @@ package org.gradoop.algorithms;
 import com.google.common.collect.Maps;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.io.formats.IdWithValueTextOutputFormat;
-import org.apache.giraph.io.formats.IntIntNullTextVertexInputFormat;
 import org.apache.giraph.utils.InternalVertexRunner;
+import org.gradoop.io.formats.KwayPartitioningInputFormat;
 import org.junit.Test;
 
 import java.util.Map;
@@ -27,26 +27,22 @@ public class KwayPartitioningComputationTest {
     validateSmallConnectedGraphResult(computeResults(graph));
   }
 
-//  @Test
-//  public void testCompleteBiPartiteGraph()
-//    throws Exception {
-//    String[] graph = getCompleteBiPartiteGraph();
-//    validateCompleteBiPartiteGraphResult(computeResults(graph));
-//  }
+  @Test
+  public void testCompleteBiPartiteGraph()
+    throws Exception {
+    String[] graph = getCompleteBiPartiteGraph();
+    validateCompleteBiPartiteGraphResult(computeResults(graph));
+  }
 
   /**
    * @return a small graph with two connected partitions
    */
   protected String[] getSmallConnectedGraph() {
     return new String[]{
-      "0 0 1 2 3",
-      "1 0 0 2 3",
-      "2 0 0 1 3 4",
-      "3 0 0 1 2",
-      "4 0 2 5 6 7",
-      "5 0 4 6 7",
-      "6 0 4 5 7",
-      "7 0 4 5 6"
+      "0 0 0 1 2 3",
+      "1 1 1 0 2 3",
+      "2 2 0 0 1 3",
+      "3 3 1 0 1 2"
     };
   }
 
@@ -55,74 +51,31 @@ public class KwayPartitioningComputationTest {
    */
   protected String[] getCompleteBiPartiteGraph() {
     return new String[]{
-      "1 0 5 6 7 8",
-      "2 0 5 6 7 8",
-      "3 0 5 6 7 8",
-      "4 0 5 6 7 8",
-      "5 0 1 2 3 4",
-      "6 0 1 2 3 4",
-      "7 0 1 2 3 4",
-      "8 0 1 2 3 4",
+      "1 1 0 5 6 7 8",
+      "2 2 0 5 6 7 8",
+      "3 3 0 5 6 7 8",
+      "4 4 0 5 6 7 8",
+      "5 5 0 1 2 3 4",
+      "6 6 0 1 2 3 4",
+      "7 7 0 1 2 3 4",
+      "8 8 0 1 2 3 4",
     };
   }
 
   private void validateSmallConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(8, vertexIDwithValue.size());
-    if (0 == vertexIDwithValue.get(0).intValue()) {
-      if(1 == vertexIDwithValue.get(4).intValue()) {
-        assertEquals(0, vertexIDwithValue.get(0).intValue());
-        assertEquals(0, vertexIDwithValue.get(1).intValue());
-        assertEquals(0, vertexIDwithValue.get(2).intValue());
-        assertEquals(0, vertexIDwithValue.get(3).intValue());
-        assertEquals(1, vertexIDwithValue.get(4).intValue());
-        assertEquals(1, vertexIDwithValue.get(5).intValue());
-        assertEquals(1, vertexIDwithValue.get(6).intValue());
-        assertEquals(1, vertexIDwithValue.get(7).intValue());
-      }
-    }
-    if (1 == vertexIDwithValue.get(0).intValue()) {
-      if(0 == vertexIDwithValue.get(4).intValue()) {
-        assertEquals(1, vertexIDwithValue.get(0).intValue());
-        assertEquals(1, vertexIDwithValue.get(1).intValue());
-        assertEquals(1, vertexIDwithValue.get(2).intValue());
-        assertEquals(1, vertexIDwithValue.get(3).intValue());
-        assertEquals(0, vertexIDwithValue.get(4).intValue());
-        assertEquals(0, vertexIDwithValue.get(5).intValue());
-        assertEquals(0, vertexIDwithValue.get(6).intValue());
-        assertEquals(0, vertexIDwithValue.get(7).intValue());
-      }
-    }
-    if (0 == vertexIDwithValue.get(0).intValue()) {
-      if(0 == vertexIDwithValue.get(4).intValue()) {
-        assertEquals(0, vertexIDwithValue.get(0).intValue());
-        assertEquals(0, vertexIDwithValue.get(1).intValue());
-        assertEquals(0, vertexIDwithValue.get(2).intValue());
-        assertEquals(0, vertexIDwithValue.get(3).intValue());
-        assertEquals(0, vertexIDwithValue.get(4).intValue());
-        assertEquals(0, vertexIDwithValue.get(5).intValue());
-        assertEquals(0, vertexIDwithValue.get(6).intValue());
-        assertEquals(0, vertexIDwithValue.get(7).intValue());
-      }
-    }
-    if (1 == vertexIDwithValue.get(0).intValue()) {
-      if(1 == vertexIDwithValue.get(4).intValue()) {
-        assertEquals(1, vertexIDwithValue.get(0).intValue());
-        assertEquals(1, vertexIDwithValue.get(1).intValue());
-        assertEquals(1, vertexIDwithValue.get(2).intValue());
-        assertEquals(1, vertexIDwithValue.get(3).intValue());
-        assertEquals(1, vertexIDwithValue.get(4).intValue());
-        assertEquals(1, vertexIDwithValue.get(5).intValue());
-        assertEquals(1, vertexIDwithValue.get(6).intValue());
-        assertEquals(1, vertexIDwithValue.get(7).intValue());
-      }
-    }
+    assertEquals(4, vertexIDwithValue.size());
+    assertEquals(1, vertexIDwithValue.get(0).intValue());
+    assertEquals(0, vertexIDwithValue.get(1).intValue());
+    assertEquals(1, vertexIDwithValue.get(2).intValue());
+    assertEquals(0, vertexIDwithValue.get(3).intValue());
+
   }
 
   private void validateCompleteBiPartiteGraphResult(Map<Integer,
     Integer> vertexIDwithValue) {
     assertEquals(8, vertexIDwithValue.size());
-    if(0 == vertexIDwithValue.get(1).intValue()) {
+    if (0 == vertexIDwithValue.get(1)) {
       assertEquals(0, vertexIDwithValue.get(1).intValue());
       assertEquals(0, vertexIDwithValue.get(2).intValue());
       assertEquals(0, vertexIDwithValue.get(3).intValue());
@@ -133,7 +86,7 @@ public class KwayPartitioningComputationTest {
       assertEquals(0, vertexIDwithValue.get(8).intValue());
     }
 
-    if(1 == vertexIDwithValue.get(1).intValue()) {
+    if (1 == vertexIDwithValue.get(1)) {
       assertEquals(1, vertexIDwithValue.get(1).intValue());
       assertEquals(1, vertexIDwithValue.get(2).intValue());
       assertEquals(1, vertexIDwithValue.get(3).intValue());
@@ -155,7 +108,7 @@ public class KwayPartitioningComputationTest {
   private GiraphConfiguration getConfiguration() {
     GiraphConfiguration conf = new GiraphConfiguration();
     conf.setComputationClass(KwayPartitioningComputation.class);
-    conf.setVertexInputFormatClass(IntIntNullTextVertexInputFormat.class);
+    conf.setVertexInputFormatClass(KwayPartitioningInputFormat.class);
     conf.setVertexOutputFormatClass(IdWithValueTextOutputFormat.class);
     return conf;
   }
