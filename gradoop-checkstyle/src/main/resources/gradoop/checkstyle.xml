@@ -35,5 +35,5 @@ limitations under the License.
         "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
 <module name="checker">
-    <!--<module name="JavadocPackage"/>-->
+    <module name="JavadocPackage"/>
 </module>
