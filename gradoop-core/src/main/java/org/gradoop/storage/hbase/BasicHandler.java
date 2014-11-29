@@ -49,9 +49,11 @@ public abstract class BasicHandler implements EntityHandler {
    */
   @Override
   public Put writeProperties(final Put put, final Attributed entity) {
-    for (String key : entity.getPropertyKeys()) {
-      put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key),
-        encodeValueToBytes(entity.getProperty(key)));
+    if (entity.getPropertyCount() > 0) {
+      for (String key : entity.getPropertyKeys()) {
+        put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key),
+          encodeValueToBytes(entity.getProperty(key)));
+      }
     }
     return put;
   }

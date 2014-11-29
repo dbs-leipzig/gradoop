@@ -75,6 +75,11 @@ public class EPGAttributedWritable implements Attributed, Writable {
     this.properties.put(key, value);
   }
 
+  @Override
+  public int getPropertyCount() {
+    return (this.properties != null) ? this.properties.size() : 0;
+  }
+
   /**
    * Initializes the internal property map.
    */

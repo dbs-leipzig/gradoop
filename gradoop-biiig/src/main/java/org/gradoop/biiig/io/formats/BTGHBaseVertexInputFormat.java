@@ -93,10 +93,10 @@ public class BTGHBaseVertexInputFormat extends
       Integer firstLabel = Integer.valueOf(vertexLabels.iterator().next());
       BTGVertexType vertexType = BTGVertexType.values()[firstLabel];
 
-      // vertex value is stored using key "val"
-      Double vertexValue = (Double) VERTEX_HANDLER.readProperties(row).get("v");
+      // initial vertex value is the vertex id
+      Double vertexValue = new Double(String.valueOf(vertexID));
 
-      // btgIDs are the graps this vertex belongs to
+      // btgIDs are the graphs this vertex belongs to
       List<Long> btgIDs = Lists.newArrayList(VERTEX_HANDLER.readGraphs(row));
 
       BTGVertexValue btgVertexValue = new BTGVertexValue(vertexType,

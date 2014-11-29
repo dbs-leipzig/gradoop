@@ -30,4 +30,11 @@ public interface Attributed {
    * @param value property value
    */
   void addProperty(String key, Object value);
+
+  /**
+   * Returns the number of properties stored at that entity.
+   *
+   * @return number or properties
+   */
+  int getPropertyCount();
 }

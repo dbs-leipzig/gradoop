@@ -47,7 +47,7 @@
                         <property>
                             <name>prop.jarLocation</name>
                             <value>
-                                ${top.dir}/gradoop-core/target/gradoop-giraph-${project.version}-jar-with-dependencies.jar
+                                ${top.dir}/gradoop-giraph/target/gradoop-giraph-${project.version}-jar-with-dependencies.jar
                             </value>
                         </property>
                     </systemProperties>
