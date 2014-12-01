@@ -35,9 +35,10 @@ public class AdjacencyListReader {
   }
 
   /**
-   * Reads a graph line by line from the given reader.
+   * Reads a vertex line by line from the given reader. If the vertex has
+   * associated graphs, those are also stored.
    *
-   * @param bufferedReader
+   * @param bufferedReader buffered line reader
    * @throws IOException
    */
   public void read(final BufferedReader bufferedReader)
