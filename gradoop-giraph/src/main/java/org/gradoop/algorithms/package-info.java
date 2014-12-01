@@ -1,4 +1,4 @@
 /**
- * Contains all giraph based algorithms used by Gradoop.
+ * Contains all Giraph based algorithms used by Gradoop.
  */
 package org.gradoop.algorithms;

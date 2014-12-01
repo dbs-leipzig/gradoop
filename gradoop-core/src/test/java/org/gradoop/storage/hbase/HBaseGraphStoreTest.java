@@ -1,7 +1,7 @@
 package org.gradoop.storage.hbase;
 
 import com.google.common.collect.Lists;
-import org.gradoop.ClusterBasedTest;
+import org.gradoop.HBaseClusterTest;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class HBaseGraphStoreTest extends ClusterBasedTest {
+public class HBaseGraphStoreTest extends HBaseClusterTest {
 
   private Iterable<Graph> createGraphs() {
     List<Graph> graphs = new ArrayList<>();

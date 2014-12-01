@@ -14,7 +14,7 @@ import org.junit.BeforeClass;
  * Used for test cases that need a HDFS/HBase mini cluster to run. Initializes a
  * test cluster before the first test runs and shuts it down after all tests.
  */
-public abstract class ClusterBasedTest extends GradoopTest {
+public abstract class HBaseClusterTest extends GradoopTest {
 
   protected static HBaseTestingUtility utility;
 

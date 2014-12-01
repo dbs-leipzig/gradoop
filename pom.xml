@@ -19,6 +19,7 @@
         <module>gradoop-giraph</module>
         <module>gradoop-biiig</module>
         <module>gradoop-checkstyle</module>
+        <module>gradoop-mapreduce</module>
     </modules>
 
     <developers>

@@ -3,14 +3,13 @@ package org.gradoop;
 import org.apache.giraph.BspCase;
 import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
-import org.junit.BeforeClass;
 
 import java.io.IOException;
 
 /**
- * Created by martin on 20.11.14.
+ * Tests that need to test Giraph on a mini cluster should extend this.
  */
-public abstract class GiraphClusterBasedTest extends ClusterBasedTest {
+public abstract class GiraphClusterBasedTest extends MapReduceClusterTest {
 
   /**
    * Reference to {@link org.apache.giraph.BspCase} for cluster setup.
@@ -24,20 +23,5 @@ public abstract class GiraphClusterBasedTest extends ClusterBasedTest {
   public final Configuration setupConfiguration(GiraphJob job)
     throws IOException {
     return this.bspCase.setupConfiguration(job);
-  }
-
-  /**
-   * Start an additional MapReduce Cluster for all test cases extending this
-   * class.
-   *
-   * @throws Exception
-   */
-  @BeforeClass
-  public static void setup()
-    throws Exception {
-    if (utility == null) {
-      ClusterBasedTest.setup();
-      utility.startMiniMapReduceCluster();
-    }
   }
 }

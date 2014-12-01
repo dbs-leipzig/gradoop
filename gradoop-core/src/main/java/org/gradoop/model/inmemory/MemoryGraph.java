@@ -18,6 +18,15 @@ public class MemoryGraph extends MultiLabeledPropertyContainer implements
   /**
    * Creates a graph based on the given parameters.
    *
+   * @param id graph identifier
+   */
+  public MemoryGraph(Long id) {
+    this(id, null, null, null);
+  }
+
+  /**
+   * Creates a graph based on the given parameters.
+   *
    * @param id         graph identifier
    * @param labels     labels of that graph (can be {@code null})
    * @param properties key-value-map (can be {@code null})
