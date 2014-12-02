@@ -53,7 +53,7 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
   }
 
   @Test
-  public void simpleTest() {
+  public void writeCloseOpenReadTest() {
     GraphStore graphStore = createEmptyGraphStore();
 
     // storage some data
@@ -69,9 +69,37 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
     graphStore.close();
     graphStore = openBasicGraphStore();
 
-    // validate data
-    // GRAPHS
+    // validate
+    validateGraphs(graphStore);
+    validateVertices(graphStore);
 
+    graphStore.close();
+  }
+
+  @Test
+  public void writeFlushReadTest() {
+    GraphStore graphStore = createEmptyGraphStore();
+    graphStore.setAutoFlush(false);
+
+    // store some data
+    for (Vertex v : createExtendedGraphVertices()) {
+      graphStore.writeVertex(v);
+    }
+    for (Graph g : createGraphs()) {
+      graphStore.writeGraph(g);
+    }
+
+    // flush changes
+    graphStore.flush();
+
+    // validate
+    validateGraphs(graphStore);
+    validateVertices(graphStore);
+
+    graphStore.close();
+  }
+
+  private void validateGraphs(GraphStore graphStore) {
     // g0
     Graph g = graphStore.readGraph(0L);
     assertNotNull(g);
@@ -106,16 +134,15 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
     propertyKeys = Lists.newArrayList(g.getPropertyKeys());
     assertEquals(1, propertyKeys.size());
     assertEquals("v1", g.getProperty("k1"));
+  }
 
-    // VERTICES
+  private void validateVertices(GraphStore graphStore) {
     List<Vertex> vertexResult =
       Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
     for (long l = 0L; l < EXTENDED_GRAPH.length; l++) {
       vertexResult.add(graphStore.readVertex(l));
     }
     validateExtendedGraphVertices(vertexResult);
-
-    graphStore.close();
   }
 
   @Test(expected = UnsupportedTypeException.class)

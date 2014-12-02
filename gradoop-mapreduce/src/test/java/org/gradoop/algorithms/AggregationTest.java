@@ -52,7 +52,21 @@ public class AggregationTest extends HBaseClusterTest {
     // define MapReduce job
     Job job = new Job(conf, AggregationTest.class.getName());
     Scan scan = new Scan();
+    /*
+    If HBase is used as an input source for a MapReduce job, for example,
+    make sure the input Scan instance to the MapReduce job has setCaching()
+    set to something greater than 1. Using the default value means the map
+    task will make callbacks to the region server for every record processed.
+    Setting this value to 500, for example, will transfer 500 rows at at
+    time to the client to be processed.
+     */
     scan.setCaching(500);
+    /*
+    Scan instances can be set to use the block cache in the region server via
+     the setCacheBlocks() method. For scans used with MapReduce jobs,
+     this should be false. For frequently accessed rows,
+     it is advisable to use the block cache.
+     */
     scan.setCacheBlocks(false);
     // map
     TableMapReduceUtil.initTableMapperJob(

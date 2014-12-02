@@ -43,7 +43,18 @@ public interface GraphStore {
   Vertex readVertex(final Long vertexID);
 
   /**
-   * Closes the graph store.
+   * Setting this value to true, forces the store implementation to flush the
+   * write buffers after every write.
+   */
+  void setAutoFlush(boolean autoFlush);
+
+  /**
+   * Flushes all buffered writes to the store.
+   */
+  void flush();
+
+  /**
+   * Closes the graph store and flushes all writes.
    */
   void close();
 }

@@ -31,30 +31,30 @@ public class HBaseGraphStoreFactory {
   }
 
   /**
-   * Creates a graph store based on the given parameters.
+   * Creates a graph store based on the given parameters. If something goes
+   * wrong, {@code null} is returned.
    *
    * @param config          Hadoop configuration
    * @param verticesHandler vertex storage handler
    * @param graphsHandler   graph storage handler
-   * @return a graph store instance
+   * @return a graph store instance or {@code null in the case of errors}
    */
   public static GraphStore createGraphStore(Configuration config,
                                             VertexHandler verticesHandler,
                                             GraphHandler graphsHandler) {
-    HTable graphsTable = null;
-    HTable verticesTable = null;
-
     try {
       createTablesIfNotExists(config, verticesHandler);
 
-      graphsTable = new HTable(config, GConstants.DEFAULT_TABLE_GRAPHS);
-      verticesTable = new HTable(config, GConstants.DEFAULT_TABLE_VERTICES);
+      HTable graphsTable = new HTable(config, GConstants.DEFAULT_TABLE_GRAPHS);
+      HTable verticesTable = new HTable(config,
+        GConstants.DEFAULT_TABLE_VERTICES);
+
+      return new HBaseGraphStore(graphsTable, verticesTable, verticesHandler,
+        graphsHandler);
     } catch (IOException e) {
       e.printStackTrace();
+      return null;
     }
-
-    return new HBaseGraphStore(graphsTable, verticesTable, verticesHandler,
-      graphsHandler);
   }
 
   /**

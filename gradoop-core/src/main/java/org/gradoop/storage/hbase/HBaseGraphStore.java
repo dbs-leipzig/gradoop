@@ -45,8 +45,13 @@ public class HBaseGraphStore implements GraphStore {
    */
   private final GraphHandler graphsHandler;
 
+  private static final boolean DEFAULT_AUTO_FLUSH = true;
+
+  private static final boolean DEFAULT_CLEAR_BUFFER_ON_FAIL = true;
+
   /**
-   * Creates a HBaseGraphStore based on the given parameters.
+   * Creates a HBaseGraphStore based on the given parameters. All parameters
+   * are mandatory and must not be {@code null}.
    *
    * @param graphsTable     HBase table to store graphs
    * @param verticesTable   HBase table to store vertices
@@ -56,10 +61,27 @@ public class HBaseGraphStore implements GraphStore {
   HBaseGraphStore(final HTable graphsTable, final HTable verticesTable,
                   final VertexHandler verticesHandler,
                   final GraphHandler graphsHandler) {
+    if (graphsTable == null) {
+      throw new IllegalArgumentException("graphsTable must not be null");
+    }
+    if (verticesTable == null) {
+      throw new IllegalArgumentException("verticesTable must not be null");
+    }
+    if (verticesHandler == null) {
+      throw new IllegalArgumentException("verticesHandler must not be null");
+    }
+    if (graphsHandler == null) {
+      throw new IllegalArgumentException("graphsHandler must not be null");
+    }
     this.graphsTable = graphsTable;
     this.verticesTable = verticesTable;
     this.verticesHandler = verticesHandler;
     this.graphsHandler = graphsHandler;
+
+    this.verticesTable.setAutoFlush(DEFAULT_AUTO_FLUSH,
+      DEFAULT_CLEAR_BUFFER_ON_FAIL);
+    this.graphsTable.setAutoFlush(DEFAULT_AUTO_FLUSH,
+      DEFAULT_CLEAR_BUFFER_ON_FAIL);
   }
 
   /**
@@ -79,7 +101,6 @@ public class HBaseGraphStore implements GraphStore {
       put = graphsHandler.writeVertices(put, graph);
 
       graphsTable.put(put);
-      graphsTable.flushCommits();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -106,7 +127,6 @@ public class HBaseGraphStore implements GraphStore {
       put = verticesHandler.writeGraphs(put, vertex);
 
       verticesTable.put(put);
-      verticesTable.flushCommits();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -155,6 +175,28 @@ public class HBaseGraphStore implements GraphStore {
       e.printStackTrace();
     }
     return v;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setAutoFlush(boolean autoFlush) {
+    this.verticesTable.setAutoFlush(autoFlush, true);
+    this.graphsTable.setAutoFlush(autoFlush, true);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void flush() {
+    try {
+      this.verticesTable.flushCommits();
+      this.graphsTable.flushCommits();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
