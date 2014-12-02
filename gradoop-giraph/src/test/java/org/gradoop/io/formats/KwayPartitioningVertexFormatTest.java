@@ -19,10 +19,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by gomezk on 28.11.14.
  */
-public class KwayPartitioningInputFormatTest {
+public class KwayPartitioningVertexFormatTest {
 
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile
-    (IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
+    (" ");
 
   @Test
   public void testSmallConnectedGraph()
@@ -36,27 +36,27 @@ public class KwayPartitioningInputFormatTest {
    */
   protected String[] getSmallConnectedGraph() {
     return new String[]{
-      "0 7 0 1 2 3",
-      "1 6 1 0 2 3",
-      "2 5 2 0 1 3 4",
-      "3 4 3 0 1 2",
-      "4 3 4 2 5 6 7",
-      "5 2 5 4 6 7",
-      "6 1 6 4 5 7",
-      "7 0 7 4 5 6"
+      "0 7 0 1",
+      "1 6 0 0",
+      "2 5 0 3",
+      "3 4 0 2",
+      "4 3 0 5",
+      "5 2 0 4",
+      "6 1 0 7",
+      "7 0 0 6"
     };
   }
 
   private void validateSmallConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(3, vertexIDwithValue.get(0).intValue());
-    assertEquals(3, vertexIDwithValue.get(1).intValue());
-    assertEquals(4, vertexIDwithValue.get(2).intValue());
-    assertEquals(3, vertexIDwithValue.get(3).intValue());
-    assertEquals(7, vertexIDwithValue.get(4).intValue());
-    assertEquals(7, vertexIDwithValue.get(5).intValue());
-    assertEquals(7, vertexIDwithValue.get(6).intValue());
-    assertEquals(7, vertexIDwithValue.get(7).intValue());
+    assertEquals(7, vertexIDwithValue.get(0).intValue());
+    assertEquals(7, vertexIDwithValue.get(1).intValue());
+    assertEquals(5, vertexIDwithValue.get(2).intValue());
+    assertEquals(5, vertexIDwithValue.get(3).intValue());
+    assertEquals(3, vertexIDwithValue.get(4).intValue());
+    assertEquals(3, vertexIDwithValue.get(5).intValue());
+    assertEquals(1, vertexIDwithValue.get(6).intValue());
+    assertEquals(1, vertexIDwithValue.get(7).intValue());
 
   }
 
@@ -71,7 +71,7 @@ public class KwayPartitioningInputFormatTest {
     GiraphConfiguration conf = new GiraphConfiguration();
     conf.setComputationClass(GetLastValueComputation.class);
     conf.setVertexInputFormatClass(KwayPartitioningInputFormat.class);
-    conf.setVertexOutputFormatClass(IdWithValueTextOutputFormat.class);
+    conf.setVertexOutputFormatClass(KwayPartitioningOutputFormat.class);
     return conf;
   }
 
@@ -100,17 +100,19 @@ public class KwayPartitioningInputFormatTest {
       Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
       Iterable<IntWritable> messages) {
       if (getSuperstep() == 0) {
-        vertex.getValue().setLastVertexValue(vertex.getId());
         sendMessageToAllEdges(vertex, vertex.getValue().getLastVertexValue());
-      } else {
-        int maxValue = vertex.getValue().getCurrentVertexValue().get();
-        for (IntWritable message : messages) {
-          int messageValue = message.get();
-          if (messageValue > maxValue) {
-            maxValue = messageValue;
+        vertex.voteToHalt();
+      }else{
+        int currentValue = vertex.getValue().getCurrentVertexValue().get();
+
+        for(IntWritable lastValue: messages){
+          if(currentValue<lastValue.get()){
+            vertex.getValue().setCurrentVertexValue(lastValue);
+            sendMessageToAllEdges(vertex,vertex.getValue().getCurrentVertexValue
+              ());
+            vertex.voteToHalt();
           }
         }
-        vertex.getValue().setCurrentVertexValue(new IntWritable(maxValue));
       }
       vertex.voteToHalt();
     }

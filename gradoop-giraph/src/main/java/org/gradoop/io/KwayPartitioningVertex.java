@@ -8,54 +8,80 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Created by gomezk on 28.11.14.
+ * Custom vertex used by {@link org.gradoop.algorithms
+ * .KwayPartitioningComputation}.
  */
 public class KwayPartitioningVertex implements Writable {
 
+  /**
+   * The vertex value which the vertex had in the previous superstep
+   */
   private int lastValue;
+
+  /**
+   * The actual vertex value
+   */
   private int currentValue;
 
-
-  public KwayPartitioningVertex(){}
-
+  /**
+   * Method to set the currentValue of the vertex
+   *
+   * @param currentVertexValue the currentValue
+   */
   public void setCurrentVertexValue(IntWritable currentVertexValue) {
     this.currentValue = currentVertexValue.get();
   }
 
+  /**
+   * Method to set the lastValue of the vertex
+   *
+   * @param lastVertexValue the lastValue
+   */
   public void setLastVertexValue(IntWritable lastVertexValue) {
     this.lastValue = lastVertexValue.get();
   }
 
+  /**
+   * Get the lastValue    // vertex lastvalue
+   *
+   * @return lastValue
+   */
   public IntWritable getLastVertexValue() {
     return new IntWritable(this.lastValue);
   }
 
+  /**
+   * Get the currentValue
+   *
+   * @return currentValue
+   */
   public IntWritable getCurrentVertexValue() {
     return new IntWritable(this.currentValue);
   }
 
-  @Override
-  public String toString(){
-    return Integer.toString(currentValue);
-  }
-
-
+  /**
+   * Serializes the content of the vertex object.
+   *
+   * @param dataOutput data to be serialized
+   * @throws IOException
+   */
   @Override
   public void write(DataOutput dataOutput)
     throws IOException {
-    // vertex lastvalue
     dataOutput.writeInt(this.lastValue);
-    // vertex currentvalue
     dataOutput.writeInt(this.currentValue);
   }
 
-
+  /**
+   * Deserializes the content of the vertex object.
+   *
+   * @param dataInput data to be deserialized
+   * @throws IOException
+   */
   @Override
   public void readFields(DataInput dataInput)
     throws IOException {
-    // vertex lastvalue
     this.lastValue = dataInput.readInt();
-    // vertex currentvalue
     this.currentValue = dataInput.readInt();
   }
 }

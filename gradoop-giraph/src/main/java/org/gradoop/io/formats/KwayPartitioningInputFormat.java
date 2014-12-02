@@ -16,7 +16,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Created by gomezk on 28.11.14.
+ * An KwayPartitioning vertex is decoded in the following format: vertex-id
+ * vertex-last_value vertex-current_value [neighbour-vertex-id ]* e.g. the
+ * following line: 5 3 4 4 6 7 decodes vertex-id 5 last_value 3 and actual_value
+ * 4. The node is connected to three other nodes (4 6 7)
  */
 public class KwayPartitioningInputFormat extends
   TextVertexInputFormat<IntWritable, KwayPartitioningVertex, NullWritable> {
@@ -24,8 +27,14 @@ public class KwayPartitioningInputFormat extends
   /**
    * Separator of the vertex and neighbors
    */
-  private static final Pattern SEPARATOR = Pattern.compile("[\t ]");
+  private static final Pattern SEPARATOR = Pattern.compile(" ");
 
+  /**
+   * @param split   the split to be read
+   * @param context the information about the task
+   * @return the text vertex reader to be used
+   * @throws IOException
+   */
   @Override
   public TextVertexReader createVertexReader(InputSplit split,
                                              TaskAttemptContext context)
@@ -40,14 +49,21 @@ public class KwayPartitioningInputFormat extends
      */
     private int id;
     /**
-     * Cached vertex last value for the current line
+     * Cached vertex last_value for the current line
      */
     private int lastvalue;
     /**
-     * Cached vertex current value for the current line
+     * Cached vertex current_value for the current line
      */
     private int currentvalue;
 
+    /**
+     * Reads every single line and returns the tokens as array
+     *
+     * @param line line of input
+     * @return line tokens as array
+     * @throws IOException
+     */
     @Override
     protected String[] preprocessLine(Text line)
       throws IOException {
@@ -58,12 +74,26 @@ public class KwayPartitioningInputFormat extends
       return tokens;
     }
 
+    /**
+     * Returns the vertex ID
+     *
+     * @param tokens line tokens
+     * @return the vertex ID as Writable
+     * @throws IOException
+     */
     @Override
     protected IntWritable getId(String[] tokens)
       throws IOException {
       return new IntWritable(id);
     }
 
+    /**
+     * Returns the new KwayPartitioning vertex
+     *
+     * @param tokens line tokens
+     * @return vertex with set params
+     * @throws IOException
+     */
     @Override
     protected KwayPartitioningVertex getValue(String[] tokens)
       throws IOException {
@@ -73,7 +103,13 @@ public class KwayPartitioningInputFormat extends
       return vertex;
     }
 
-
+    /**
+     * Returns all edges of the vertex
+     *
+     * @param tokens line tokens
+     * @return edges of the vertex
+     * @throws IOException
+     */
     @Override
     protected Iterable<Edge<IntWritable, NullWritable>> getEdges(
       String[] tokens)

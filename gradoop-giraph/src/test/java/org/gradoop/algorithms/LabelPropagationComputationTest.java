@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests for {@link org.gradoop.algorithms}
+ * Tests for {@link org.gradoop.algorithms.LabelPropagationComputation}
  */
 public class LabelPropagationComputationTest {
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile
