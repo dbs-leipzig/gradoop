@@ -13,13 +13,15 @@
 Unfortunately, Giraph is not available in the official Apache Maven 
 repositories, so we have to build it on our own.
 
-* check out Giraph from dbs-leipzig/giraph
+* check out Giraph from apache/giraph and switch to tag release-1.1.0
 
-    `git clone -b trunk https://github.com/dbs-leipzig/giraph.git`
+    `https://github.com/apache/giraph.git`
+    
+    `cd giraph`
+    
+    `git checkout tags/release-1.1.0`
     
 * install to local maven repository
-
-    `cd giraph`
     
     `mvn -Phadoop_1 clean install -DskipTests`
     
@@ -27,7 +29,7 @@ repositories, so we have to build it on our own.
 
 * check out gradoop
 
-    `git clone -b master https://github.com/s1ck/gradoop.git`
+    `git clone https://github.com/s1ck/gradoop.git`
     
 * build and run tests
 
