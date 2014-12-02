@@ -8,12 +8,12 @@
 * Maven 3
 * JDK 7 (Oracle or OpenJDK)
 
-##### Setup giraph
+##### Setup Giraph
 
 Unfortunately, Giraph is not available in the official Apache Maven 
 repositories, so we have to build it on our own.
 
-* check out Giraph from apache/giraph and switch to tag release-1.1.0
+* check out Giraph from apache/giraph and switch to release 1.1.0
 
     `https://github.com/apache/giraph.git`
     
@@ -25,9 +25,9 @@ repositories, so we have to build it on our own.
     
     `mvn -Phadoop_1 clean install -DskipTests`
     
-##### Setup gradoop
+##### Setup Gradoop
 
-* check out gradoop
+* check out Gradoop
 
     `git clone https://github.com/s1ck/gradoop.git`
     

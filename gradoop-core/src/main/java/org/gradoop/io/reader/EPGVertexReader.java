@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 /**
  * An example for a {@link org.gradoop.io.reader.VertexLineReader} that reads a
  * vertex input line given in the following format:
- *
+ * <p/>
  * {@code <vertex-id>|[<label-list>]|<properties>|[<out-edges>]|[<in-edges>]|
  * [<graph-list>]}
  * <p/>
@@ -134,8 +134,8 @@ public class EPGVertexReader implements VertexLineReader {
   }
 
   /**
-   * Reads edges from a given string by splitting with {@code
-   * LIST_TOKEN_SEPARATOR}.
+   * Reads edges from a given string by splitting with
+   * {@code LIST_TOKEN_SEPARATOR}.
    *
    * @param token string including edges
    * @return edge list

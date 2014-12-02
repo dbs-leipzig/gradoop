@@ -14,6 +14,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.GConstants;
 import org.gradoop.HBaseClusterTest;
+import org.gradoop.MapReduceClusterTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  * Simple test for reading EPG from HBase, process it via MapReduce
  * (Aggregate) and write the results back to HBase.
  */
-public class AggregationTest extends HBaseClusterTest {
+public class AggregationTest extends MapReduceClusterTest {
 
   private static final String VCOUNT_PROPERTY_KEY = "vcount";
 
@@ -90,6 +91,8 @@ public class AggregationTest extends HBaseClusterTest {
     // validate
     validateGraphs(graphStore);
 
+    // cleanup
+    bufferedReader.close();
     graphStore.close();
   }
 
