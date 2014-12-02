@@ -1,5 +1,6 @@
 package org.gradoop.algorithms;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
@@ -9,87 +10,166 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.gradoop.GConstants;
 import org.gradoop.io.formats.PairWritable;
 import org.gradoop.model.Graph;
+import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryGraph;
-import org.gradoop.storage.hbase.EPGGraphHandler;
-import org.gradoop.storage.hbase.EPGVertexHandler;
+import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.hbase.GraphHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
- * Created by martin on 02.12.14.
+ * Very static and POC MapReduce algorithm for the selection of graphs based
+ * on a vertex predicate and the projection of defined attributes for
+ * aggregation in a reduce step.
  */
 public class SelectAndAggregate {
-
-  private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
-  private static final GraphHandler GRAPH_HANDLER = new EPGGraphHandler();
-
+  /**
+   * True
+   */
   private static final BooleanWritable TRUE = new BooleanWritable(true);
+  /**
+   * False
+   */
   private static final BooleanWritable FALSE = new BooleanWritable(false);
+  /**
+   * Configuration key for the predicate class used in the selection step.
+   */
+  public static final String VERTEX_PREDICATE_CLASS = SelectAndAggregate
+    .class.getName() + ".predicate";
 
-  public static final String PREDICATE_PROPERTY_KEY = "type";
-  public static final Integer PREDICATE_PROPERTY_VALUE = 1;
-
+  /**
+   * Aggregate specific property.
+   */
   public static final String PROJECTION_PROPERTY_KEY1 = "pos";
+  /**
+   * Aggregate specific property.
+   */
   public static final String PROJECTION_PROPERTY_KEY2 = "neg";
-
+  /**
+   * Aggregate specific property.
+   */
   public static final String AGGREGATION_RESULT_PROPERTY_KEY = "agg_sum";
 
-//  private interface VertexPredicate {
-//    boolean evaluate(Vertex v);
-//  }
-//
-//  private static VertexPredicate PREDICATE = new VertexPredicate() {
-//    @Override
-//    public boolean evaluate(Vertex v) {
-//      boolean result = false;
-//      if (v.getPropertyCount() > 0) {
-//        Object o = v.getProperty(PREDICATE_PROPERTY_KEY);
-//        result = (o != null && o.equals(PREDICATE_PROPERTY_VALUE));
-//      }
-//      return result;
-//    }
-//  };
+  /**
+   * In the map phase, graphs are selected based on a given vertex attribute.
+   */
+  public static class SelectMapper extends TableMapper<LongWritable,
+    PairWritable> {
 
-  public class SelectMapper extends TableMapper<LongWritable, PairWritable> {
+    /**
+     * Reads/writes vertices from/to HBase.
+     */
+    private VertexHandler vertexHandler;
+    /**
+     * Used to evaluate the vertex.
+     */
+    private VertexPredicate vertexPredicate;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setup(Context context)
+      throws IOException, InterruptedException {
+      Configuration conf = context.getConfiguration();
+
+      Class<? extends VertexHandler> handlerClass = conf.getClass(
+        GConstants.VERTEX_HANDLER_CLASS,
+        GConstants.DEFAULT_VERTEX_HANDLER,
+        VertexHandler.class
+      );
+
+      Class<? extends VertexPredicate> predicateClass = conf.getClass(
+        SelectAndAggregate.VERTEX_PREDICATE_CLASS,
+        null,
+        VertexPredicate.class
+      );
+
+      try {
+        this.vertexHandler = handlerClass.getConstructor().newInstance();
+        this.vertexPredicate = predicateClass.getConstructor().newInstance();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void map(ImmutableBytesWritable key, Result value,
                        Context context)
       throws IOException, InterruptedException {
-      Map<String, Object> vertexProps = VERTEX_HANDLER.readProperties(value);
+      Vertex v = vertexHandler.readVertex(value);
 
       int calcValue = 0;
-      if (vertexProps.containsKey(PROJECTION_PROPERTY_KEY1)) {
-        calcValue += (int) vertexProps.get(PROJECTION_PROPERTY_KEY1);
+      if (v.getPropertyCount() > 0) {
+        Object o = v.getProperty(PROJECTION_PROPERTY_KEY1);
+        if (o != null) {
+          calcValue += (int) o;
+        }
+        o = v.getProperty(PROJECTION_PROPERTY_KEY2);
+        if (o != null) {
+          calcValue -= (int) o;
+        }
       }
-      if (vertexProps.containsKey(PROJECTION_PROPERTY_KEY2)) {
-        calcValue -= (int) vertexProps.get(PROJECTION_PROPERTY_KEY2);
-      }
-      if (calcValue != 0) {
-        IntWritable calcValueWritable = new IntWritable(calcValue);
 
-        boolean predicate = vertexProps.containsKey(PREDICATE_PROPERTY_KEY)
-          && PREDICATE_PROPERTY_VALUE
-          .equals(vertexProps.get(PREDICATE_PROPERTY_KEY));
-        for (Long graph : VERTEX_HANDLER.readGraphs(value)) {
-          if (predicate) {
-            context.write(new LongWritable(graph), new PairWritable(TRUE,
-              calcValueWritable));
-          } else {
-            context.write(new LongWritable(graph), new PairWritable(FALSE,
-              calcValueWritable));
-          }
+      IntWritable calcValueWritable = new IntWritable(calcValue);
+
+      boolean predicate = vertexPredicate.evaluate(v);
+
+      for (Long graph : vertexHandler.readGraphs(value)) {
+        if (predicate) {
+          context.write(new LongWritable(graph), new PairWritable(TRUE,
+            calcValueWritable));
+        } else {
+          context.write(new LongWritable(graph), new PairWritable(FALSE,
+            calcValueWritable));
         }
       }
     }
   }
 
-  public class AggregateReducer extends TableReducer<LongWritable,
+  /**
+   * Checks all vertices of a graph for the predicate result and aggregates the
+   * values.
+   */
+  public static class AggregateReducer extends TableReducer<LongWritable,
     PairWritable, ImmutableBytesWritable> {
+    /**
+     * Reads/writes graph from/to HBase.
+     */
+    private GraphHandler graphHandler;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setup(Context context)
+      throws IOException, InterruptedException {
+      Configuration conf = context.getConfiguration();
+
+      Class<? extends GraphHandler> handlerClass = conf.getClass(
+        GConstants.GRAPH_HANDLER_CLASS,
+        GConstants.DEFAULT_GRAPH_HANDLER,
+        GraphHandler.class
+      );
+
+      try {
+        this.graphHandler = handlerClass
+          .getConstructor().newInstance();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void reduce(LongWritable key, Iterable<PairWritable> values,
                           Context context)
@@ -99,7 +179,7 @@ public class SelectAndAggregate {
       // calculate aggregate and check if the graph matches the predicate
       for (PairWritable pair : values) {
         sum = sum + pair.getValue().get();
-        if (pair.getPredicateResult().get() == true) {
+        if (pair.getPredicateResult().get()) {
           predicate = true;
         }
       }
@@ -108,10 +188,9 @@ public class SelectAndAggregate {
         Graph g = new MemoryGraph(key.get());
         g.addProperty(AGGREGATION_RESULT_PROPERTY_KEY, sum);
         Put put = new Put(Bytes.toBytes(key.get()));
-        put = GRAPH_HANDLER.writeVertices(put, g);
+        put = graphHandler.writeProperties(put, g);
         context.write(null, put);
       }
     }
   }
-
 }

@@ -141,20 +141,24 @@ public class EPGVertexReader implements VertexLineReader {
    * @return edge list
    */
   private Iterable<Edge> readEdges(final String token) {
-    final String[] edgeStrings = LIST_TOKEN_SEPARATOR.split(token);
-    final List<Edge> edges = Lists.newArrayListWithCapacity(edgeStrings.length);
-    for (String edgeString : edgeStrings) {
-      int propStartIdx = edgeString.indexOf(VALUE_TOKEN_SEPARATOR.toString());
-      // parse edge key
-      String edgeKey = edgeString.substring(0, propStartIdx);
-      String[] edgeKeyTokens = EDGE_KEY_TOKEN_SEPARATOR.split(edgeKey);
-      String edgeLabel = edgeKeyTokens[0];
-      Long otherID = Long.valueOf(edgeKeyTokens[1]);
-      Long edgeIndex = Long.valueOf(edgeKeyTokens[2]);
-      // parse edge properties
-      Map<String, Object> edgeProperties =
-        readProperties(edgeString.substring(propStartIdx + 1));
-      edges.add(new MemoryEdge(otherID, edgeLabel, edgeIndex, edgeProperties));
+    List<Edge> edges = null;
+    if (!"".equals(token)) {
+      final String[] edgeStrings = LIST_TOKEN_SEPARATOR.split(token);
+      edges = Lists.newArrayListWithCapacity(edgeStrings.length);
+      for (String edgeString : edgeStrings) {
+        int propStartIdx = edgeString.indexOf(VALUE_TOKEN_SEPARATOR.toString());
+        // parse edge key
+        String edgeKey = edgeString.substring(0, propStartIdx);
+        String[] edgeKeyTokens = EDGE_KEY_TOKEN_SEPARATOR.split(edgeKey);
+        String edgeLabel = edgeKeyTokens[0];
+        Long otherID = Long.valueOf(edgeKeyTokens[1]);
+        Long edgeIndex = Long.valueOf(edgeKeyTokens[2]);
+        // parse edge properties
+        Map<String, Object> edgeProperties =
+          readProperties(edgeString.substring(propStartIdx + 1));
+        edges
+          .add(new MemoryEdge(otherID, edgeLabel, edgeIndex, edgeProperties));
+      }
     }
     return edges;
   }

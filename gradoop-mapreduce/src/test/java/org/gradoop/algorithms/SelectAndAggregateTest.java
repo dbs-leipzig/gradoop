@@ -11,7 +11,13 @@ import org.gradoop.io.formats.PairWritable;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
+import org.gradoop.model.Vertex;
+import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.GraphStore;
+import org.gradoop.storage.hbase.EPGGraphHandler;
+import org.gradoop.storage.hbase.EPGVertexHandler;
+import org.gradoop.storage.hbase.GraphHandler;
+import org.gradoop.storage.hbase.VertexHandler;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -27,12 +33,15 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
   private static final String[] TEST_GRAPH = new String[] {
     "1|A|1 pos 1 1000 type 1 0|||1 1",
     "2|A|1 pos 1 1000 type 1 0|||2 1 2",
-    "3|A|1 pos 1 500 type 1 1|||2 1 2",
-    "4|A|2 neg 1 1000 type 1 1|||2 1 2",
-    "5|A|1 neg 1 100 type 1 1|||2 1 2"
+    "3|A|1 pos 1 500 type 1 1|||1 1",
+    "4|A|2 neg 1 1000 type 1 1|||1 2",
+    "5|A|1 neg 1 100 type 1 1|||1 2"
   };
 
   private static final String AGG_SUM_KEY = "agg_sum";
+
+  private static final String PREDICATE_KEY = "type";
+  private static final Integer PREDICATE_VALUE = 1;
 
   @Test
   public void selectAndAggregateTest()
@@ -45,7 +54,16 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
       (graphStore, new EPGVertexReader());
     adjacencyListReader.read(br);
 
-    // define MapReduce job
+    // setup MapReduce job
+    // handler for HBase access
+    conf.setClass(GConstants.VERTEX_HANDLER_CLASS, EPGVertexHandler.class,
+      VertexHandler.class);
+    conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
+      GraphHandler.class);
+    // vertex predicate for select step
+    conf.setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS, TestPredicate.class,
+      VertexPredicate.class);
+
     Job job = new Job(conf, SelectAndAggregateTest.class.getName());
     Scan scan = new Scan();
     scan.setCaching(500);
@@ -80,12 +98,28 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
   }
 
   private void validateGraphs(GraphStore graphStore) {
-    validateGraph(graphStore.readGraph(1L), 1000);
-    validateGraph(graphStore.readGraph(2L), 1400);
+    validateGraph(graphStore.readGraph(1L), 2500);
+    validateGraph(graphStore.readGraph(2L), -100);
   }
 
   private void validateGraph(Graph g, int expectedValue) {
     assertEquals(1, g.getPropertyCount());
     assertEquals(expectedValue, g.getProperty(AGG_SUM_KEY));
+  }
+
+  /**
+   * Returns true if the vertex has the given key-value-pair.
+   */
+  public static class TestPredicate implements VertexPredicate {
+
+    @Override
+    public boolean evaluate(Vertex vertex) {
+      boolean result = false;
+      if (vertex.getPropertyCount() > 0) {
+        Object o = vertex.getProperty(PREDICATE_KEY);
+        result = (o != null && o.equals(PREDICATE_VALUE));
+      }
+      return result;
+    }
   }
 }

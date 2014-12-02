@@ -49,6 +49,12 @@ public class PairWritable implements Writable {
   @Override
   public void readFields(DataInput dataInput)
     throws IOException {
+    if (this.predicateResult == null) {
+      this.predicateResult = new BooleanWritable();
+    }
+    if (this.value == null) {
+      this.value = new IntWritable();
+    }
     this.predicateResult.readFields(dataInput);
     this.value.readFields(dataInput);
   }
