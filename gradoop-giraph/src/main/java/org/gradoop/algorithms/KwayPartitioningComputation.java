@@ -50,7 +50,11 @@ public class KwayPartitioningComputation extends
       newValue = vertex.getValue().getCurrentVertexValue().get();
     } else if (allMessages.size() == 1) {
       // 2. if just one message are received
-      newValue = vertex.getValue().getCurrentVertexValue().get();
+      if(allMessages.get(0) == vertex.getValue().getLastVertexValue().get()){
+        newValue = vertex.getValue().getCurrentVertexValue().get();
+      }else{
+        newValue = allMessages.get(0);
+      }
     } else {
       // 3. if multiple messages are received
       newValue = getMostFrequent(vertex, allMessages);
@@ -87,12 +91,7 @@ public class KwayPartitioningComputation extends
     }
     // if the frequent of all received messages are one
     if (maxCounter == 1) {
-      //Todo: Workaround
-      if (allMessages.get(0) == vertex.getValue().getLastVertexValue().get()) {
-        newValue = vertex.getValue().getCurrentVertexValue().get();
-      } else {
-        newValue = maxValue;
-      }
+      newValue = allMessages.get(new Random().nextInt(allMessages.size()));
     } else {
       if (maxValue == vertex.getValue().getLastVertexValue().get()) {
         newValue = vertex.getValue().getCurrentVertexValue().get();

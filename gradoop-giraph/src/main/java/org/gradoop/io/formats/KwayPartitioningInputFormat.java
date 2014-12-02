@@ -27,7 +27,7 @@ public class KwayPartitioningInputFormat extends
   /**
    * Separator of the vertex and neighbors
    */
-  private static final Pattern SEPARATOR = Pattern.compile(" ");
+  private static final Pattern SEPARATOR = Pattern.compile("[\t ]");
 
   /**
    * @param split   the split to be read

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link org.gradoop.algorithms.KwayPartitioningComputation}
@@ -26,85 +27,77 @@ public class KwayPartitioningComputationTest {
     validateSmallConnectedGraphResult(computeResults(graph));
   }
 
-//  @Test
-//  public void testCompleteBiPartiteGraph()
-//    throws Exception {
-//    String[] graph = getCompleteBiPartiteGraph();
-//    validateCompleteBiPartiteGraphResult(computeResults(graph));
-//  }
-
   /**
    * @return a small graph with two connected partitions
    */
   protected String[] getSmallConnectedGraph() {
     return new String[]{
-      "0 0 0 1 2 3",
-      "1 0 0 0 2 3",
-      "2 0 1 0 1 3 4",
-      "3 0 0 0 1 2",
-      "4 0 1 2 5 6 7",
-      "5 0 1 4 6 7",
-      "6 0 0 4 5 7",
-      "7 0 1 4 5 6"
+      "0 0 1 1 2",
+      "1 0 1 0 2",
+      "2 0 0 0 1 3",
+      "3 0 1 2 4 5",
+      "4 0 0 3 5",
+      "5 0 0 3 4"
     };
   }
 
-  /**
-   * @return a small complete bipartite graph
-   */
-  protected String[] getCompleteBiPartiteGraph() {
-    return new String[]{
-      "1 1 0 5 6 7 8",
-      "2 2 0 5 6 7 8",
-      "3 3 0 5 6 7 8",
-      "4 4 0 5 6 7 8",
-      "5 5 0 1 2 3 4",
-      "6 6 0 1 2 3 4",
-      "7 7 0 1 2 3 4",
-      "8 8 0 1 2 3 4",
-    };
-  }
 
   private void validateSmallConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(8, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0).intValue());
-    assertEquals(0, vertexIDwithValue.get(1).intValue());
-    assertEquals(0, vertexIDwithValue.get(2).intValue());
-    assertEquals(0, vertexIDwithValue.get(3).intValue());
-    assertEquals(1, vertexIDwithValue.get(4).intValue());
-    assertEquals(1, vertexIDwithValue.get(5).intValue());
-    assertEquals(1, vertexIDwithValue.get(6).intValue());
-    assertEquals(1, vertexIDwithValue.get(7).intValue());
+    assertEquals(6, vertexIDwithValue.size());
+    if (0 == vertexIDwithValue.get(2)) {
+      if (1 == vertexIDwithValue.get(3)) {
+        assertEquals(0, vertexIDwithValue.get(0).intValue());
+        assertEquals(0, vertexIDwithValue.get(1).intValue());
+        assertEquals(0, vertexIDwithValue.get(2).intValue());
+        assertEquals(1, vertexIDwithValue.get(3).intValue());
+        assertEquals(1, vertexIDwithValue.get(4).intValue());
+        assertEquals(1, vertexIDwithValue.get(5).intValue());
+
+      }
+    }
+
+    if (1 == vertexIDwithValue.get(2)) {
+      if (0 == vertexIDwithValue.get(3)) {
+        assertEquals(1, vertexIDwithValue.get(0).intValue());
+        assertEquals(1, vertexIDwithValue.get(1).intValue());
+        assertEquals(1, vertexIDwithValue.get(2).intValue());
+        assertEquals(0, vertexIDwithValue.get(3).intValue());
+        assertEquals(0, vertexIDwithValue.get(4).intValue());
+        assertEquals(0, vertexIDwithValue.get(5).intValue());
+
+      }
+    }
+
+    if (1 == vertexIDwithValue.get(2)) {
+      if (1 == vertexIDwithValue.get(3)) {
+        assertEquals(1, vertexIDwithValue.get(0).intValue());
+        assertEquals(1, vertexIDwithValue.get(1).intValue());
+        assertEquals(1, vertexIDwithValue.get(2).intValue());
+        assertEquals(1, vertexIDwithValue.get(3).intValue());
+        assertEquals(1, vertexIDwithValue.get(4).intValue());
+        assertEquals(1, vertexIDwithValue.get(5).intValue());
+
+      }
+    }
+
+    if (0 == vertexIDwithValue.get(2)) {
+      if (0 == vertexIDwithValue.get(3)) {
+        assertEquals(0, vertexIDwithValue.get(0).intValue());
+        assertEquals(0, vertexIDwithValue.get(1).intValue());
+        assertEquals(0, vertexIDwithValue.get(2).intValue());
+        assertEquals(0, vertexIDwithValue.get(3).intValue());
+        assertEquals(0, vertexIDwithValue.get(4).intValue());
+        assertEquals(0, vertexIDwithValue.get(5).intValue());
+
+      }
+    } else {
+      assertTrue("Wrong Case", false);
+    }
 
 
   }
 
-  private void validateCompleteBiPartiteGraphResult(Map<Integer,
-    Integer> vertexIDwithValue) {
-    assertEquals(8, vertexIDwithValue.size());
-    if (0 == vertexIDwithValue.get(1)) {
-      assertEquals(0, vertexIDwithValue.get(1).intValue());
-      assertEquals(0, vertexIDwithValue.get(2).intValue());
-      assertEquals(0, vertexIDwithValue.get(3).intValue());
-      assertEquals(0, vertexIDwithValue.get(4).intValue());
-      assertEquals(0, vertexIDwithValue.get(5).intValue());
-      assertEquals(0, vertexIDwithValue.get(6).intValue());
-      assertEquals(0, vertexIDwithValue.get(7).intValue());
-      assertEquals(0, vertexIDwithValue.get(8).intValue());
-    }
-
-    if (1 == vertexIDwithValue.get(1)) {
-      assertEquals(1, vertexIDwithValue.get(1).intValue());
-      assertEquals(1, vertexIDwithValue.get(2).intValue());
-      assertEquals(1, vertexIDwithValue.get(3).intValue());
-      assertEquals(1, vertexIDwithValue.get(4).intValue());
-      assertEquals(1, vertexIDwithValue.get(5).intValue());
-      assertEquals(1, vertexIDwithValue.get(6).intValue());
-      assertEquals(1, vertexIDwithValue.get(7).intValue());
-      assertEquals(1, vertexIDwithValue.get(8).intValue());
-    }
-  }
 
   private Map<Integer, Integer> computeResults(String[] graph)
     throws Exception {
