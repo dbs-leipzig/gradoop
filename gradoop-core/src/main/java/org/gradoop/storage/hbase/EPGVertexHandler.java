@@ -12,7 +12,9 @@ import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.GraphElement;
+import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryEdge;
+import org.gradoop.model.inmemory.MemoryVertex;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -115,6 +117,19 @@ public class EPGVertexHandler extends BasicHandler
    * {@inheritDoc}
    */
   @Override
+  public Put writeVertex(final Put put, final Vertex vertex) {
+    writeLabels(put, vertex);
+    writeProperties(put, vertex);
+    writeOutgoingEdges(put, vertex.getOutgoingEdges());
+    writeIncomingEdges(put, vertex.getIncomingEdges());
+    writeGraphs(put, vertex);
+    return put;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Iterable<Edge> readOutgoingEdges(final Result res) {
     return readEdges(res, CF_OUT_EDGES_BYTES);
   }
@@ -133,6 +148,19 @@ public class EPGVertexHandler extends BasicHandler
   @Override
   public Iterable<Long> readGraphs(final Result res) {
     return getColumnKeysFromFamiliy(res, CF_GRAPHS_BYTES);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Vertex readVertex(final Result res) {
+    return new MemoryVertex(
+      Bytes.toLong(res.getRow()),
+      readLabels(res),
+      readProperties(res),
+      readOutgoingEdges(res),
+      readIncomingEdges(res), readGraphs(res));
   }
 
   /**

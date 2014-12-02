@@ -6,15 +6,11 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
-import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryGraph;
-import org.gradoop.model.inmemory.MemoryVertex;
 import org.gradoop.storage.GraphStore;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Default HBase graph store that handles reading and writing vertices and
@@ -93,13 +89,9 @@ public class HBaseGraphStore implements GraphStore {
     try {
       // graph id
       Put put = new Put(Bytes.toBytes(graph.getID()));
-      // graph labels
-      put = graphsHandler.writeLabels(put, graph);
-      // graph properties
-      put = graphsHandler.writeProperties(put, graph);
-      // graph vertices
-      put = graphsHandler.writeVertices(put, graph);
-
+      // write graph to Put
+      put = graphsHandler.writeGraph(put, graph);
+      // write to table
       graphsTable.put(put);
     } catch (Exception e) {
       e.printStackTrace();
@@ -115,17 +107,9 @@ public class HBaseGraphStore implements GraphStore {
     try {
       // vertex id
       Put put = new Put(Bytes.toBytes(vertex.getID()));
-      // vertex labels
-      put = verticesHandler.writeLabels(put, vertex);
-      // vertex properties
-      put = verticesHandler.writeProperties(put, vertex);
-      // outgoing edges
-      put = verticesHandler.writeOutgoingEdges(put, vertex.getOutgoingEdges());
-      // incoming edges
-      put = verticesHandler.writeIncomingEdges(put, vertex.getIncomingEdges());
-      // graphs
-      put = verticesHandler.writeGraphs(put, vertex);
-
+      // write vertex to Put
+      put = verticesHandler.writeVertex(put, vertex);
+      // write to table
       verticesTable.put(put);
     } catch (IOException e) {
       e.printStackTrace();
@@ -142,10 +126,7 @@ public class HBaseGraphStore implements GraphStore {
       byte[] rowKey = Bytes.toBytes(graphID);
       Result res = graphsTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
-        Iterable<String> labels = graphsHandler.readLabels(res);
-        Map<String, Object> properties = graphsHandler.readProperties(res);
-        Iterable<Long> vertices = graphsHandler.readVertices(res);
-        g = new MemoryGraph(graphID, labels, properties, vertices);
+        g = graphsHandler.readGraph(res);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -163,13 +144,7 @@ public class HBaseGraphStore implements GraphStore {
       byte[] rowKey = Bytes.toBytes(vertexID);
       Result res = verticesTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
-        Iterable<String> labels = verticesHandler.readLabels(res);
-        Map<String, Object> properties = verticesHandler.readProperties(res);
-        Iterable<Edge> outEdges = verticesHandler.readOutgoingEdges(res);
-        Iterable<Edge> inEdges = verticesHandler.readIncomingEdges(res);
-        Iterable<Long> graphs = verticesHandler.readGraphs(res);
-        v = new MemoryVertex(vertexID, labels, properties, outEdges, inEdges,
-          graphs);
+        v = verticesHandler.readVertex(res);
       }
     } catch (IOException e) {
       e.printStackTrace();

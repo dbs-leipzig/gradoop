@@ -5,6 +5,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.GConstants;
 import org.gradoop.model.Graph;
+import org.gradoop.model.inmemory.MemoryGraph;
 
 /**
  * Handles storing graphs in a HBase table.
@@ -32,7 +33,30 @@ public class EPGGraphHandler extends BasicHandler implements GraphHandler {
    * {@inheritDoc}
    */
   @Override
+  public Put writeGraph(final Put put, final Graph graph) {
+    writeLabels(put, graph);
+    writeProperties(put, graph);
+    writeVertices(put, graph);
+    return put;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Iterable<Long> readVertices(Result res) {
     return getColumnKeysFromFamiliy(res, CF_VERTICES_BYTES);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Graph readGraph(Result res) {
+    return new MemoryGraph(
+      Bytes.toLong(res.getRow()),
+      readLabels(res),
+      readProperties(res),
+      readVertices(res));
   }
 }

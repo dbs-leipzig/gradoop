@@ -6,6 +6,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.Edge;
 import org.gradoop.model.GraphElement;
+import org.gradoop.model.Vertex;
 
 import java.io.IOException;
 
@@ -60,6 +61,16 @@ public interface VertexHandler extends EntityHandler {
   Put writeGraphs(final Put put, final GraphElement graphElement);
 
   /**
+   * Writes the complete vertex information to the given
+   * {@link org.apache.hadoop.hbase.client.Put} and returns it.
+   *
+   * @param put    {@link org.apache.hadoop.hbase.client.Put} to add vertex to
+   * @param vertex vertex to be written
+   * @return put with vertex information
+   */
+  Put writeVertex(final Put put, final Vertex vertex);
+
+  /**
    * Reads the outgoing edges from the given
    * {@link org.apache.hadoop.hbase.client.Result}.
    *
@@ -85,4 +96,13 @@ public interface VertexHandler extends EntityHandler {
    * @return graphs contained in the given result
    */
   Iterable<Long> readGraphs(final Result res);
+
+  /**
+   * Reads the complete vertex from the given
+   * {@link org.apache.hadoop.hbase.client.Result}.
+   *
+   * @param res HBase row
+   * @return vertex contained in the given result.
+   */
+  Vertex readVertex(final Result res);
 }

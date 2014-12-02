@@ -20,10 +20,28 @@ public interface GraphHandler extends EntityHandler {
   Put writeVertices(final Put put, final Graph graph);
 
   /**
+   * Adds all graph information to the given
+   * {@link org.apache.hadoop.hbase.client.Put} and returns it.
+   *
+   * @param put   put to add graph to
+   * @param graph graph whose information shall be added
+   * @return put with graph information
+   */
+  Put writeGraph(final Put put, final Graph graph);
+
+  /**
    * Reads the vertex identifiers of a given graph from the given result.
    *
    * @param res HBase row
    * @return vertex identifiers stored in the given result
    */
   Iterable<Long> readVertices(final Result res);
+
+  /**
+   * Reads the complete graph from the given result.
+   *
+   * @param res HBase row
+   * @return graph entity
+   */
+  Graph readGraph(final Result res);
 }
