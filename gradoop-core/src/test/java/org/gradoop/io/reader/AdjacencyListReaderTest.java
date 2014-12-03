@@ -1,9 +1,7 @@
-package org.gradoop.io;
+package org.gradoop.io.reader;
 
 import com.google.common.collect.Lists;
 import org.gradoop.HBaseClusterTest;
-import org.gradoop.io.reader.AdjacencyListReader;
-import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 import org.junit.Test;

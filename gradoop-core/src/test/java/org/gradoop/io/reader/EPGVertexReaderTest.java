@@ -1,9 +1,7 @@
-package org.gradoop.io;
+package org.gradoop.io.reader;
 
 import com.google.common.collect.Lists;
 import org.gradoop.GradoopTest;
-import org.gradoop.io.reader.EPGVertexReader;
-import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Vertex;
 import org.junit.Test;
 

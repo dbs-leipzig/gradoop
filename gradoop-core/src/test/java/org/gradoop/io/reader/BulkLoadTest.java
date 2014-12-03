@@ -24,7 +24,7 @@ import org.junit.Test;
 import java.io.BufferedReader;
 
 /**
- * Created by martin on 03.12.14.
+ * Testing the Bulk Import.
  */
 public class BulkLoadTest extends MapReduceClusterTest {
 
