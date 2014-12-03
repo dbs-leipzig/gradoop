@@ -32,8 +32,8 @@ public class EPGMultiLabeledAttributedWritable extends EPGAttributedWritable
   /**
    * Creates a multi labeled entity based on the given values.
    *
-   * @param labels     initial list of labels (can be {@null})
-   * @param properties key-value-map (can be {@null})
+   * @param labels     initial list of labels (can be {@code null})
+   * @param properties key-value-map (can be {@code null})
    */
   public EPGMultiLabeledAttributedWritable(Iterable<String> labels, Map<String,
     Object> properties) {
@@ -61,6 +61,14 @@ public class EPGMultiLabeledAttributedWritable extends EPGAttributedWritable
       this.labels = Lists.newArrayList();
     }
     this.labels.add(label);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getLabelCount() {
+    return (this.labels != null) ? this.labels.size() : 0;
   }
 
   /**

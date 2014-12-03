@@ -8,7 +8,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.gradoop.GConstants;
-import org.gradoop.GiraphClusterBasedTest;
+import org.gradoop.GiraphClusterTest;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexOutputFormat;
 import org.gradoop.io.reader.AdjacencyListReader;
@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * Tests for {@link BTGComputation} that reads BTGs from HBase.
  */
-public class BTGHBaseComputationTest extends GiraphClusterBasedTest {
+public class BTGHBaseComputationTest extends GiraphClusterTest {
   public BTGHBaseComputationTest() {
     super(BTGHBaseComputationTest.class.getName());
   }

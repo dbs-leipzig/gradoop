@@ -12,7 +12,7 @@ import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
-import org.gradoop.GiraphClusterBasedTest;
+import org.gradoop.GiraphClusterTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Edge;
@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * Test class for storing and reading an EPG in the default format.
  */
-public class EPGHBaseVertexFormatTest extends GiraphClusterBasedTest {
+public class EPGHBaseVertexFormatTest extends GiraphClusterTest {
   private static Logger LOG = Logger.getLogger(EPGHBaseVertexFormatTest.class);
 
   private final static String TEST_LABEL = "test";

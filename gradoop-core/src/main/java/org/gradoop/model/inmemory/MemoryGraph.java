@@ -20,7 +20,7 @@ public class MemoryGraph extends MultiLabeledPropertyContainer implements
    *
    * @param id graph identifier
    */
-  public MemoryGraph(Long id) {
+  public MemoryGraph(final Long id) {
     this(id, null, null, null);
   }
 
@@ -32,9 +32,9 @@ public class MemoryGraph extends MultiLabeledPropertyContainer implements
    * @param properties key-value-map (can be {@code null})
    * @param vertices   vertices contained in that graph (can be {@code null})
    */
-  public MemoryGraph(Long id, Iterable<String> labels,
-                     Map<String, Object> properties,
-                     Iterable<Long> vertices) {
+  public MemoryGraph(final Long id, final Iterable<String> labels,
+                     final Map<String, Object> properties,
+                     final Iterable<Long> vertices) {
     super(id, labels, properties);
     this.vertices = vertices;
   }

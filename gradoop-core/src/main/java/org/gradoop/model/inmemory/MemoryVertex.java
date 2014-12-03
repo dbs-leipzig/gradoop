@@ -29,7 +29,16 @@ public class MemoryVertex extends MultiLabeledPropertyContainer implements
   private Set<Long> graphs;
 
   /**
-   * Creates a vertex from the given parameters.
+   * Creates a vertex based on the given parameters.
+   *
+   * @param id vertex id
+   */
+  public MemoryVertex(final Long id) {
+    this(id, null, null, null, null, null);
+  }
+
+  /**
+   * Creates a vertex based on the given parameters.
    *
    * @param id            vertex id
    * @param labels        labels (can be {@code null})

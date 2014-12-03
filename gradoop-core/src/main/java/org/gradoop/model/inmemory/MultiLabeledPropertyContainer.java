@@ -71,4 +71,12 @@ public abstract class MultiLabeledPropertyContainer extends PropertyContainer
     }
     this.labels.add(label);
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getLabelCount() {
+    return (this.labels != null) ? this.labels.size() : 0;
+  }
 }

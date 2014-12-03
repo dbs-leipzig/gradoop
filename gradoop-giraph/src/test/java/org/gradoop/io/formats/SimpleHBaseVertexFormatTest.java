@@ -21,7 +21,7 @@ import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.gradoop.GConstants;
-import org.gradoop.GiraphClusterBasedTest;
+import org.gradoop.GiraphClusterTest;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  * Tests read basic graph data from HBase (ids), process them in Giraph and
  * write the results back to HBase.
  */
-public class SimpleHBaseVertexFormatTest extends GiraphClusterBasedTest {
+public class SimpleHBaseVertexFormatTest extends GiraphClusterTest {
 
   private static final long DEFAULT_VERTEX_VALUE = 0L;
   private static final byte[] DEFAULT_VERTEX_VALUE_BYTES =

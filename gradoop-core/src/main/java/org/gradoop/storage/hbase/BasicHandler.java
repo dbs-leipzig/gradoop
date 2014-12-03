@@ -37,9 +37,11 @@ public abstract class BasicHandler implements EntityHandler {
   @Override
   public Put writeLabels(final Put put, final MultiLabeled entity) {
     int internalLabelID = 0;
-    for (String label : entity.getLabels()) {
-      put.add(CF_LABELS_BYTES, Bytes.toBytes(internalLabelID++),
-        Bytes.toBytes(label));
+    if (entity.getLabelCount() > 0) {
+      for (String label : entity.getLabels()) {
+        put.add(CF_LABELS_BYTES, Bytes.toBytes(internalLabelID++),
+          Bytes.toBytes(label));
+      }
     }
     return put;
   }
@@ -177,23 +179,23 @@ public abstract class BasicHandler implements EntityHandler {
     byte[] decodedValue;
     if (valueClass.equals(Boolean.class)) {
       decodedValue =
-        Bytes.add(new byte[]{GConstants.TYPE_BOOLEAN},
+        Bytes.add(new byte[] {GConstants.TYPE_BOOLEAN},
           Bytes.toBytes((Boolean) value));
     } else if (valueClass.equals(Integer.class)) {
       decodedValue =
-        Bytes.add(new byte[]{GConstants.TYPE_INTEGER},
+        Bytes.add(new byte[] {GConstants.TYPE_INTEGER},
           Bytes.toBytes((Integer) value));
     } else if (valueClass.equals(Long.class)) {
       decodedValue = Bytes
-        .add(new byte[]{GConstants.TYPE_LONG}, Bytes.toBytes((Long) value));
+        .add(new byte[] {GConstants.TYPE_LONG}, Bytes.toBytes((Long) value));
     } else if (valueClass.equals(Float.class)) {
       decodedValue = Bytes
-        .add(new byte[]{GConstants.TYPE_FLOAT}, Bytes.toBytes((Float) value));
+        .add(new byte[] {GConstants.TYPE_FLOAT}, Bytes.toBytes((Float) value));
     } else if (valueClass.equals(Double.class)) {
-      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_DOUBLE},
+      decodedValue = Bytes.add(new byte[] {GConstants.TYPE_DOUBLE},
         Bytes.toBytes((Double) value));
     } else if (valueClass.equals(String.class)) {
-      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_STRING},
+      decodedValue = Bytes.add(new byte[] {GConstants.TYPE_STRING},
         Bytes.toBytes((String) value));
     } else {
       throw new UnsupportedTypeException(valueClass + " not supported");

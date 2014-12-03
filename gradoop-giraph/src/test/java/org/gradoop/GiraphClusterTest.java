@@ -9,14 +9,14 @@ import java.io.IOException;
 /**
  * Tests that need to test Giraph on a mini cluster should extend this.
  */
-public abstract class GiraphClusterBasedTest extends MapReduceClusterTest {
+public abstract class GiraphClusterTest extends MapReduceClusterTest {
 
   /**
    * Reference to {@link org.apache.giraph.BspCase} for cluster setup.
    */
   private final BspCase bspCase;
 
-  public GiraphClusterBasedTest(String testName) {
+  public GiraphClusterTest(String testName) {
     this.bspCase = new BspCase(testName);
   }
 

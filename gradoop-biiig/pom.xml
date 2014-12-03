@@ -17,6 +17,8 @@
 
     <properties>
         <top.dir>${project.basedir}/..</top.dir>
+
+        <dep.json.version>20141113</dep.json.version>
     </properties>
 
     <build>
@@ -62,6 +64,18 @@
             <artifactId>gradoop-giraph</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <artifactId>gradoop-mapreduce</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${dep.json.version}</version>
+        </dependency>
+
 
         <!-- Testing -->
         <dependency>
