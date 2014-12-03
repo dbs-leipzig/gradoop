@@ -7,6 +7,7 @@ import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapper;
 import org.apache.hadoop.hbase.mapreduce.TableReducer;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Pair;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -47,11 +48,20 @@ public class SelectAndAggregate {
    */
   public static final String VERTEX_AGGREGATE_CLASS = SelectAndAggregate
     .class.getName() + ".aggregate";
-
   /**
-   * Aggregate specific property.
+   * Class to be used to calculate the final result for a single graph in the
+   * reduce phase.
    */
-  public static final String AGGREGATION_RESULT_PROPERTY_KEY = "agg_sum";
+  public static final String PAIR_AGGREGATE_CLASS = SelectAndAggregate
+    .class.getName() + ".aggregate.class";
+  /**
+   * Graph property key to store the aggregation result at.
+   */
+  public static final String AGGREGATE_RESULT_PROPERTY_KEY =
+    SelectAndAggregate.class.getName() + ".aggregate_result_property_key";
+
+  private static final String DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY =
+    "agg_result";
 
   /**
    * In the map phase, graphs are selected based on a given vertex attribute.
@@ -145,6 +155,16 @@ public class SelectAndAggregate {
     private GraphHandler graphHandler;
 
     /**
+     * Used to aggregate the values coming from the map phase.
+     */
+    private PairAggregator pairAggregator;
+
+    /**
+     * Graph property key where the aggregated value will be stored.
+     */
+    private String aggregateResultPropertyKey;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -152,15 +172,25 @@ public class SelectAndAggregate {
       throws IOException, InterruptedException {
       Configuration conf = context.getConfiguration();
 
+      this.aggregateResultPropertyKey = conf.get(
+        SelectAndAggregate.AGGREGATE_RESULT_PROPERTY_KEY,
+        SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
+
       Class<? extends GraphHandler> handlerClass = conf.getClass(
         GConstants.GRAPH_HANDLER_CLASS,
         GConstants.DEFAULT_GRAPH_HANDLER,
         GraphHandler.class
       );
 
+      Class<? extends PairAggregator> aggregatorClass = conf.getClass(
+        SelectAndAggregate.PAIR_AGGREGATE_CLASS,
+        null,
+        PairAggregator.class
+      );
+
       try {
-        this.graphHandler = handlerClass
-          .getConstructor().newInstance();
+        this.graphHandler = handlerClass.getConstructor().newInstance();
+        this.pairAggregator = aggregatorClass.getConstructor().newInstance();
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -173,19 +203,12 @@ public class SelectAndAggregate {
     protected void reduce(LongWritable key, Iterable<PairWritable> values,
                           Context context)
       throws IOException, InterruptedException {
-      int sum = 0;
-      boolean predicate = false;
-      // calculate aggregate and check if the graph matches the predicate
-      for (PairWritable pair : values) {
-        sum = sum + pair.getValue().get();
-        if (pair.getPredicateResult().get()) {
-          predicate = true;
-        }
-      }
-
-      if (predicate) {
+      // compute the result for the graph
+      Pair<Boolean, Integer> result = this.pairAggregator.aggregate(values);
+      // if selection predicate evaluates to true, store the aggregate value
+      if (result.getFirst()) {
         Graph g = new MemoryGraph(key.get());
-        g.addProperty(AGGREGATION_RESULT_PROPERTY_KEY, sum);
+        g.addProperty(aggregateResultPropertyKey, result.getSecond());
         Put put = new Put(Bytes.toBytes(key.get()));
         put = graphHandler.writeProperties(put, g);
         context.write(null, put);

@@ -3,6 +3,7 @@ package org.gradoop.algorithms;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
+import org.apache.hadoop.hbase.util.Pair;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.GConstants;
@@ -47,10 +48,17 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
    * Aggregate specific property.
    */
   public static final String PROJECTION_PROPERTY_KEY2 = "neg";
-
-  private static final String AGG_SUM_KEY = "agg_sum";
-
+  /**
+   * Graph property key where the result will be stored.
+   */
+  private static final String AGG_RESULT_KEY = "agg_sum";
+  /**
+   * Property key a vertex has to have to fulfil the predicate.
+   */
   private static final String PREDICATE_KEY = "type";
+  /**
+   * Property value a vertex has to have to fulfil the predicate.
+   */
   private static final Integer PREDICATE_VALUE = 1;
 
   @Test
@@ -64,18 +72,26 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
       (graphStore, new EPGVertexReader());
     adjacencyListReader.read(br);
 
-    // setup MapReduce job
-    // handler for HBase access
+    /*
+    Setup MapReduce Job SelectAndAggreagte
+     */
+
+    // Mapper settings
     conf.setClass(GConstants.VERTEX_HANDLER_CLASS, EPGVertexHandler.class,
       VertexHandler.class);
-    conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
-      GraphHandler.class);
+    conf.setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS,
+      TestPredicate.class,
+      VertexPredicate.class);
     conf.setClass(SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
       TestVertexAggregate.class, VertexIntegerAggregate.class);
+    // Reducer settings
+    conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
+      GraphHandler.class);
+    conf.set(SelectAndAggregate.AGGREGATE_RESULT_PROPERTY_KEY, AGG_RESULT_KEY);
+    conf.setClass(SelectAndAggregate.PAIR_AGGREGATE_CLASS,
+      TestPairAggregator.class, PairAggregator.class);
     // vertex predicate for select step
-    conf
-      .setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS, TestPredicate.class,
-        VertexPredicate.class);
+
 
     Job job = new Job(conf, SelectAndAggregateTest.class.getName());
     Scan scan = new Scan();
@@ -117,7 +133,7 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
 
   private void validateGraph(Graph g, int expectedValue) {
     assertEquals(1, g.getPropertyCount());
-    assertEquals(expectedValue, g.getProperty(AGG_SUM_KEY));
+    assertEquals(expectedValue, g.getProperty(AGG_RESULT_KEY));
   }
 
   /**
@@ -156,6 +172,25 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
         }
       }
       return calcValue;
+    }
+  }
+
+  /**
+   * Domain specific aggregation of the vertex values.
+   */
+  public static class TestPairAggregator implements PairAggregator {
+
+    @Override
+    public Pair<Boolean, Integer> aggregate(Iterable<PairWritable> values) {
+      int sum = 0;
+      boolean predicate = false;
+      for (PairWritable value : values) {
+        sum = sum + value.getValue().get();
+        if (value.getPredicateResult().get()) {
+          predicate = true;
+        }
+      }
+      return new Pair<>(predicate, sum);
     }
   }
 }
