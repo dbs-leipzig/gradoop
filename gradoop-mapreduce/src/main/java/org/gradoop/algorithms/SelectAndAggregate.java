@@ -15,6 +15,7 @@ import org.gradoop.io.formats.PairWritable;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryGraph;
+import org.gradoop.model.operators.VertexIntegerAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.hbase.GraphHandler;
 import org.gradoop.storage.hbase.VertexHandler;
@@ -40,15 +41,13 @@ public class SelectAndAggregate {
    */
   public static final String VERTEX_PREDICATE_CLASS = SelectAndAggregate
     .class.getName() + ".predicate";
+  /**
+   * Configuration key for the vertex aggregate class used in the selection
+   * step.
+   */
+  public static final String VERTEX_AGGREGATE_CLASS = SelectAndAggregate
+    .class.getName() + ".aggregate";
 
-  /**
-   * Aggregate specific property.
-   */
-  public static final String PROJECTION_PROPERTY_KEY1 = "pos";
-  /**
-   * Aggregate specific property.
-   */
-  public static final String PROJECTION_PROPERTY_KEY2 = "neg";
   /**
    * Aggregate specific property.
    */
@@ -68,6 +67,10 @@ public class SelectAndAggregate {
      * Used to evaluate the vertex.
      */
     private VertexPredicate vertexPredicate;
+    /**
+     * Used to calculate a vertex aggregate.
+     */
+    private VertexIntegerAggregate vertexIntegerAggregate;
 
     /**
      * {@inheritDoc}
@@ -89,9 +92,17 @@ public class SelectAndAggregate {
         VertexPredicate.class
       );
 
+      Class<? extends VertexIntegerAggregate> aggregateClass = conf.getClass(
+        SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
+        null,
+        VertexIntegerAggregate.class
+      );
+
       try {
         this.vertexHandler = handlerClass.getConstructor().newInstance();
         this.vertexPredicate = predicateClass.getConstructor().newInstance();
+        this.vertexIntegerAggregate =
+          aggregateClass.getConstructor().newInstance();
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -106,29 +117,17 @@ public class SelectAndAggregate {
       throws IOException, InterruptedException {
       Vertex v = vertexHandler.readVertex(value);
 
-      int calcValue = 0;
-      if (v.getPropertyCount() > 0) {
-        Object o = v.getProperty(PROJECTION_PROPERTY_KEY1);
-        if (o != null) {
-          calcValue += (int) o;
-        }
-        o = v.getProperty(PROJECTION_PROPERTY_KEY2);
-        if (o != null) {
-          calcValue -= (int) o;
-        }
-      }
-
-      IntWritable calcValueWritable = new IntWritable(calcValue);
-
       boolean predicate = vertexPredicate.evaluate(v);
+      IntWritable aggregate = new IntWritable(vertexIntegerAggregate
+        .aggregate(v));
 
       for (Long graph : vertexHandler.readGraphs(value)) {
         if (predicate) {
           context.write(new LongWritable(graph), new PairWritable(TRUE,
-            calcValueWritable));
+            aggregate));
         } else {
           context.write(new LongWritable(graph), new PairWritable(FALSE,
-            calcValueWritable));
+            aggregate));
         }
       }
     }

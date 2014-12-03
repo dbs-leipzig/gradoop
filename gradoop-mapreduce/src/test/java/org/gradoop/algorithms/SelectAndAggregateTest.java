@@ -12,6 +12,7 @@ import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
+import org.gradoop.model.operators.VertexIntegerAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGGraphHandler;
@@ -38,6 +39,15 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
     "5|A|1 neg 1 100 type 1 1|||1 2"
   };
 
+  /**
+   * Aggregate specific property.
+   */
+  public static final String PROJECTION_PROPERTY_KEY1 = "pos";
+  /**
+   * Aggregate specific property.
+   */
+  public static final String PROJECTION_PROPERTY_KEY2 = "neg";
+
   private static final String AGG_SUM_KEY = "agg_sum";
 
   private static final String PREDICATE_KEY = "type";
@@ -60,9 +70,12 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
       VertexHandler.class);
     conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
       GraphHandler.class);
+    conf.setClass(SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
+      TestVertexAggregate.class, VertexIntegerAggregate.class);
     // vertex predicate for select step
-    conf.setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS, TestPredicate.class,
-      VertexPredicate.class);
+    conf
+      .setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS, TestPredicate.class,
+        VertexPredicate.class);
 
     Job job = new Job(conf, SelectAndAggregateTest.class.getName());
     Scan scan = new Scan();
@@ -120,6 +133,29 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
         result = (o != null && o.equals(PREDICATE_VALUE));
       }
       return result;
+    }
+  }
+
+  /**
+   * Domain specific vertex aggregation. Sums up positive and negative
+   * property values stored at a vertex.
+   */
+  public static class TestVertexAggregate implements VertexIntegerAggregate {
+
+    @Override
+    public Integer aggregate(Vertex vertex) {
+      int calcValue = 0;
+      if (vertex.getPropertyCount() > 0) {
+        Object o = vertex.getProperty(PROJECTION_PROPERTY_KEY1);
+        if (o != null) {
+          calcValue += (int) o;
+        }
+        o = vertex.getProperty(PROJECTION_PROPERTY_KEY2);
+        if (o != null) {
+          calcValue -= (int) o;
+        }
+      }
+      return calcValue;
     }
   }
 }
