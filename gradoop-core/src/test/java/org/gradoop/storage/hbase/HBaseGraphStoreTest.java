@@ -67,7 +67,7 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
 
     // re-open
     graphStore.close();
-    graphStore = openBasicGraphStore();
+    graphStore = openGraphStore();
 
     // validate
     validateGraphs(graphStore);
@@ -204,7 +204,7 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
 
     // reopen
     graphStore.close();
-    graphStore = openBasicGraphStore();
+    graphStore = openGraphStore();
 
     v = graphStore.readVertex(vertexID);
 

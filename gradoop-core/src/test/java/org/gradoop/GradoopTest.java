@@ -8,6 +8,7 @@ import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryEdge;
+import org.gradoop.storage.GraphStore;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
@@ -54,13 +55,13 @@ public class GradoopTest {
     return temporaryFolder.newFile(fileName);
   }
 
-  protected static final String[] BASIC_GRAPH = new String[]{
+  protected static final String[] BASIC_GRAPH = new String[] {
     "0 1 2",
     "1 0 2",
     "2 1"
   };
 
-  protected static final String[] EXTENDED_GRAPH = new String[]{
+  protected static final String[] EXTENDED_GRAPH = new String[] {
     "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 1 k1 5 v1|1 0",
     "1|A B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2," +
       "c.2.1 0|a.0.0 1 k1 5 v1|2 0 1",
@@ -114,6 +115,16 @@ public class GradoopTest {
         assertTrue("edge list contains wrong edges", false);
       }
     }
+  }
+
+  protected void validateExtendedGraphVertices(GraphStore graphStore) {
+    List<Vertex> vertices = Lists.newArrayListWithCapacity(EXTENDED_GRAPH
+      .length);
+    for (long id = 0; id < EXTENDED_GRAPH.length; id++) {
+      Vertex v = graphStore.readVertex(id);
+      vertices.add(graphStore.readVertex(id));
+    }
+    validateExtendedGraphVertices(vertices);
   }
 
   protected void validateExtendedGraphVertices(List<Vertex> result) {

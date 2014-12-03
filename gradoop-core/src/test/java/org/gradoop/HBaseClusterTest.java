@@ -28,7 +28,7 @@ public abstract class HBaseClusterTest extends GradoopTest {
       .createGraphStore(config, verticesHandler, graphsHandler);
   }
 
-  protected GraphStore openBasicGraphStore() {
+  protected GraphStore openGraphStore() {
     Configuration config = utility.getConfiguration();
     VertexHandler verticesHandler = new EPGVertexHandler();
     GraphHandler graphsHandler = new EPGGraphHandler();
