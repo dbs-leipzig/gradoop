@@ -10,11 +10,11 @@ import org.gradoop.io.formats.PairWritable;
 public interface PairAggregator {
   /**
    * First element states if the graph fulfills the predicate defined for that
-   * job, second element is the aggregated {@link Integer} value for that graph.
+   * job, second element is the aggregated {@link Double} value for that graph.
    *
    * @param values result of map phase in
    *               {@link org.gradoop.algorithms.SelectAndAggregate}
    * @return predicate result and aggregated graph value
    */
-  Pair<Boolean, Integer> aggregate(Iterable<PairWritable> values);
+  Pair<Boolean, Double> aggregate(Iterable<PairWritable> values);
 }

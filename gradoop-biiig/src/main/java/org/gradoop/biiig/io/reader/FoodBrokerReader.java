@@ -3,6 +3,7 @@ package org.gradoop.biiig.io.reader;
 import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.biiig.BIIIGConstants;
 import org.gradoop.biiig.io.formats.BTGVertexType;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Attributed;
@@ -49,11 +50,6 @@ public class FoodBrokerReader implements VertexLineReader {
    * Key for data Json object.
    */
   private static final String DATA = "data";
-
-  /**
-   * Prefix gets attached to the meta property keys.
-   */
-  private static final String META_PREFIX = "__";
   /**
    * Just for internal use.
    */
@@ -115,14 +111,15 @@ public class FoodBrokerReader implements VertexLineReader {
 
     // outgoing edge on source vertex
     Edge edgeOut = new MemoryEdge(targetID, edgeType, RANDOM.nextLong());
-    addProperties(edgeOut, edge.getJSONObject(META), META_PREFIX);
+    addProperties(edgeOut, edge.getJSONObject(META),
+      BIIIGConstants.META_PREFIX);
     addProperties(edgeOut, edge.getJSONObject(DATA));
     vList.add(new MemoryVertex(sourceID, null, null,
       Lists.newArrayList(edgeOut), null, null));
 
     // incoming edge on target vertex
     Edge edgeIn = new MemoryEdge(sourceID, edgeType, RANDOM.nextLong());
-    addProperties(edgeIn, edge.getJSONObject(META), META_PREFIX);
+    addProperties(edgeIn, edge.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(edgeIn, edge.getJSONObject(DATA));
     vList.add(new MemoryVertex(targetID, null, null, null,
       Lists.newArrayList(edgeIn), null));
@@ -141,7 +138,7 @@ public class FoodBrokerReader implements VertexLineReader {
     throws JSONException {
     Long vertexID = vertex.getLong(VERTEX_ID);
     Vertex v = new MemoryVertex(vertexID);
-    addProperties(v, vertex.getJSONObject(META), META_PREFIX);
+    addProperties(v, vertex.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(v, vertex.getJSONObject(DATA));
     v.addLabel(String.valueOf(getKind(vertex)));
     return Lists.newArrayList(v);

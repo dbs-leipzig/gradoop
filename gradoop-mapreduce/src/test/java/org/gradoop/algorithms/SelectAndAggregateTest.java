@@ -13,7 +13,7 @@ import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.operators.VertexIntegerAggregate;
+import org.gradoop.model.operators.VertexDoubleAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGGraphHandler;
@@ -33,11 +33,11 @@ import static org.junit.Assert.assertEquals;
 public class SelectAndAggregateTest extends MapReduceClusterTest {
 
   private static final String[] TEST_GRAPH = new String[] {
-    "1|A|1 pos 1 1000 type 1 0|||1 1",
-    "2|A|1 pos 1 1000 type 1 0|||2 1 2",
-    "3|A|1 pos 1 500 type 1 1|||1 1",
-    "4|A|2 neg 1 1000 type 1 1|||1 2",
-    "5|A|1 neg 1 100 type 1 1|||1 2"
+    "1|A|1 pos 4 1000 type 1 0|||1 1",
+    "2|A|1 pos 4 1000 type 1 0|||2 1 2",
+    "3|A|1 pos 4 500 type 1 1|||1 1",
+    "4|A|2 neg 4 1000 type 1 1|||1 2",
+    "5|A|1 neg 4 100 type 1 1|||1 2"
   };
 
   /**
@@ -83,7 +83,7 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
       TestPredicate.class,
       VertexPredicate.class);
     conf.setClass(SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
-      TestVertexAggregate.class, VertexIntegerAggregate.class);
+      TestVertexAggregate.class, VertexDoubleAggregate.class);
     // Reducer settings
     conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
       GraphHandler.class);
@@ -127,11 +127,11 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
   }
 
   private void validateGraphs(GraphStore graphStore) {
-    validateGraph(graphStore.readGraph(1L), 2500);
-    validateGraph(graphStore.readGraph(2L), -100);
+    validateGraph(graphStore.readGraph(1L), 2500.0);
+    validateGraph(graphStore.readGraph(2L), -100.0);
   }
 
-  private void validateGraph(Graph g, int expectedValue) {
+  private void validateGraph(Graph g, double expectedValue) {
     assertEquals(1, g.getPropertyCount());
     assertEquals(expectedValue, g.getProperty(AGG_RESULT_KEY));
   }
@@ -156,19 +156,19 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
    * Domain specific vertex aggregation. Sums up positive and negative
    * property values stored at a vertex.
    */
-  public static class TestVertexAggregate implements VertexIntegerAggregate {
+  public static class TestVertexAggregate implements VertexDoubleAggregate {
 
     @Override
-    public Integer aggregate(Vertex vertex) {
-      int calcValue = 0;
+    public Double aggregate(Vertex vertex) {
+      double calcValue = 0;
       if (vertex.getPropertyCount() > 0) {
         Object o = vertex.getProperty(PROJECTION_PROPERTY_KEY1);
         if (o != null) {
-          calcValue += (int) o;
+          calcValue += (double) o;
         }
         o = vertex.getProperty(PROJECTION_PROPERTY_KEY2);
         if (o != null) {
-          calcValue -= (int) o;
+          calcValue -= (double) o;
         }
       }
       return calcValue;
@@ -181,8 +181,8 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
   public static class TestPairAggregator implements PairAggregator {
 
     @Override
-    public Pair<Boolean, Integer> aggregate(Iterable<PairWritable> values) {
-      int sum = 0;
+    public Pair<Boolean, Double> aggregate(Iterable<PairWritable> values) {
+      double sum = 0f;
       boolean predicate = false;
       for (PairWritable value : values) {
         sum = sum + value.getValue().get();

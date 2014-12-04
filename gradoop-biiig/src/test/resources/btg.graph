@@ -2,13 +2,13 @@
 {"id":1,"data":{"num":"EMP1","name":"Bob Heisenberg","gender":"male"},"meta":{"system":"ERP","class":"Employee","kind":"MasterData"}}
 {"id":2,"data":{"num":"EMP2","name":"Carol Einstein","gender":"female"},"meta":{"system":"ERP","class":"Employee","kind":"MasterData"}}
 {"id":3,"data":{"num":"EMP3","name":"Eve Oppenheimer","gender":"female"},"meta":{"system":"ERP","class":"Employee","kind":"MasterData"}}
-{"id":4,"data":{"num":"SIN4","text":"Refund Ticket 72219","date":"2014-12-16","revenue":-193.34},"meta":{"system":"ERP","class":"SalesInvoice","kind":"TransData"}}
+{"id":4,"data":{"num":"SIN4","text":"Refund Ticket 72219","date":"2014-12-16","revenue":-193.34},"meta":{"system":"ERP","class":"SalesOrder","kind":"TransData"}}
 {"id":5,"data":{"num":"POR5","date":"2014-12-04"},"meta":{"system":"ERP","class":"PurchOrder","kind":"TransData"}}
 {"id":6,"data":{"num":"PIN6","text":"Refund Ticket 73719","expense":-75.89,"date":"2014-12-25"},"meta":{"system":"ERP","class":"PurchInvoice","kind":"TransData"}}
 {"id":7,"data":{"num":"SIN7","text":"Refund Ticket 72598","date":"2014-12-25","revenue":-29.8},"meta":{"system":"ERP","class":"SalesInvoice","kind":"TransData"}}
 {"id":8,"data":{"num":"POR8","date":"2014-12-24"},"meta":{"system":"ERP","class":"PurchOrder","kind":"TransData"}}
 {"id":9,"data":{"num":"SQN9","date":"2014-12-08"},"meta":{"system":"ERP","class":"SalesQuotation","kind":"TransData"}}
-{"id":10,"data":{"num":"PIN10","text":"SampleText","expense":814,"date":"2014-12-24"},"meta":{"system":"ERP","class":"PurchInvoice","kind":"TransData"}}
+{"id":10,"data":{"num":"PIN10","text":"SampleText","expense":814.00,"date":"2014-12-24"},"meta":{"system":"ERP","class":"PurchInvoice","kind":"TransData"}}
 {"id":11,"data":{"num":"SIN11","text":"Refund Ticket 73151","date":"2014-12-24","revenue":-567.08},"meta":{"system":"ERP","class":"SalesInvoice","kind":"TransData"}}
 {"id":12,"data":{"num":"SQN12","date":"2014-12-10"},"meta":{"system":"ERP","class":"SalesQuotation","kind":"TransData"}}
 {"id":13,"data":{"num":"SIN13","text":"SampleText","date":"2014-12-06","revenue":2556.46},"meta":{"system":"ERP","class":"SalesInvoice","kind":"TransData"}}

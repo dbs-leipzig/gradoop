@@ -9,14 +9,14 @@ import org.apache.hadoop.hbase.mapreduce.TableReducer;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
 import org.apache.hadoop.io.BooleanWritable;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.gradoop.GConstants;
 import org.gradoop.io.formats.PairWritable;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryGraph;
-import org.gradoop.model.operators.VertexIntegerAggregate;
+import org.gradoop.model.operators.VertexDoubleAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.hbase.GraphHandler;
 import org.gradoop.storage.hbase.VertexHandler;
@@ -60,7 +60,7 @@ public class SelectAndAggregate {
   public static final String AGGREGATE_RESULT_PROPERTY_KEY =
     SelectAndAggregate.class.getName() + ".aggregate_result_property_key";
 
-  private static final String DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY =
+  public static final String DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY =
     "agg_result";
 
   /**
@@ -80,7 +80,7 @@ public class SelectAndAggregate {
     /**
      * Used to calculate a vertex aggregate.
      */
-    private VertexIntegerAggregate vertexIntegerAggregate;
+    private VertexDoubleAggregate vertexDoubleAggregate;
 
     /**
      * {@inheritDoc}
@@ -102,16 +102,16 @@ public class SelectAndAggregate {
         VertexPredicate.class
       );
 
-      Class<? extends VertexIntegerAggregate> aggregateClass = conf.getClass(
+      Class<? extends VertexDoubleAggregate> aggregateClass = conf.getClass(
         SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
         null,
-        VertexIntegerAggregate.class
+        VertexDoubleAggregate.class
       );
 
       try {
         this.vertexHandler = handlerClass.getConstructor().newInstance();
         this.vertexPredicate = predicateClass.getConstructor().newInstance();
-        this.vertexIntegerAggregate =
+        this.vertexDoubleAggregate =
           aggregateClass.getConstructor().newInstance();
       } catch (Exception e) {
         e.printStackTrace();
@@ -128,7 +128,7 @@ public class SelectAndAggregate {
       Vertex v = vertexHandler.readVertex(value);
 
       boolean predicate = vertexPredicate.evaluate(v);
-      IntWritable aggregate = new IntWritable(vertexIntegerAggregate
+      DoubleWritable aggregate = new DoubleWritable(vertexDoubleAggregate
         .aggregate(v));
 
       for (Long graph : vertexHandler.readGraphs(value)) {
@@ -204,7 +204,7 @@ public class SelectAndAggregate {
                           Context context)
       throws IOException, InterruptedException {
       // compute the result for the graph
-      Pair<Boolean, Integer> result = this.pairAggregator.aggregate(values);
+      Pair<Boolean, Double> result = this.pairAggregator.aggregate(values);
       // if selection predicate evaluates to true, store the aggregate value
       if (result.getFirst()) {
         Graph g = new MemoryGraph(key.get());

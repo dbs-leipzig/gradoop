@@ -1,7 +1,7 @@
 package org.gradoop.io.formats;
 
 import org.apache.hadoop.io.BooleanWritable;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
@@ -21,12 +21,12 @@ public class PairWritable implements Writable {
   /**
    * Attribute value for aggregation.
    */
-  private IntWritable value;
+  private DoubleWritable value;
 
   public PairWritable() {
   }
 
-  public PairWritable(BooleanWritable predicateResult, IntWritable value) {
+  public PairWritable(BooleanWritable predicateResult, DoubleWritable value) {
     this.predicateResult = predicateResult;
     this.value = value;
   }
@@ -35,7 +35,7 @@ public class PairWritable implements Writable {
     return predicateResult;
   }
 
-  public IntWritable getValue() {
+  public DoubleWritable getValue() {
     return value;
   }
 
@@ -53,7 +53,7 @@ public class PairWritable implements Writable {
       this.predicateResult = new BooleanWritable();
     }
     if (this.value == null) {
-      this.value = new IntWritable();
+      this.value = new DoubleWritable();
     }
     this.predicateResult.readFields(dataInput);
     this.value.readFields(dataInput);

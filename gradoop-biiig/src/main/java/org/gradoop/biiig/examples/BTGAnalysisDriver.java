@@ -2,17 +2,22 @@ package org.gradoop.biiig.examples;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.giraph.conf.GiraphConfiguration;
+import org.apache.giraph.conf.GiraphConstants;
 import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.HFileOutputFormat2;
 import org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
+import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.hbase.util.Pair;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -21,14 +26,22 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
+import org.gradoop.algorithms.PairAggregator;
+import org.gradoop.algorithms.SelectAndAggregate;
+import org.gradoop.biiig.BIIIGConstants;
 import org.gradoop.biiig.algorithms.BTGComputation;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexOutputFormat;
 import org.gradoop.biiig.io.reader.FoodBrokerReader;
+import org.gradoop.io.formats.PairWritable;
 import org.gradoop.io.reader.BulkLoadEPG;
 import org.gradoop.io.reader.VertexLineReader;
+import org.gradoop.model.Vertex;
+import org.gradoop.model.operators.VertexDoubleAggregate;
+import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;
+import org.gradoop.storage.hbase.GraphHandler;
 import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.gradoop.storage.hbase.VertexHandler;
 
@@ -44,6 +57,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * args[0] - bulk load input graph file
    * args[1] - bulk load output folder
    * args[2] - worker count
+   * args[3] - scan cache for HBase
    *
    * @param args driver arguments
    * @return Exit code (0 - ok)
@@ -52,10 +66,11 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   @Override
   public int run(String[] args)
     throws Exception {
-    if (args.length != 3) {
+    if (args.length != 4) {
       System.err.printf("Usage: %s [generic options] <graph-input-file> " +
-        "<bulk-load-output-dir> <giraph-worker-count>%n", getClass()
-        .getSimpleName());
+          "<bulk-load-output-dir> <giraph-worker-count> <scan-cache-size>%n",
+        getClass()
+          .getSimpleName());
       ToolRunner.printGenericCommandUsage(System.err);
     }
 
@@ -70,18 +85,26 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     );
 
     /*
-    Step 1: Bulk Load of the graph into HBase
+    Step 1: Bulk Load of the graph into HBase using MapReduce
      */
     if (!runBulkLoad(conf, args[0], args[1])) {
       return -1;
     }
 
     /*
-    Step 2: BTG Computation
+    Step 2: BTG Computation using Giraph
      */
     if (!runBTGComputation(conf, Integer.parseInt(args[2]))) {
       return -1;
     }
+
+    /*
+    Step 3: Select And Aggregate using MapReduce
+     */
+    if (!runSelectAndAggregate(conf, Integer.parseInt(args[3]))) {
+      return -1;
+    }
+
     return 0;
   }
 
@@ -172,9 +195,133 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     giraphConf.setComputationClass(BTGComputation.class);
     giraphConf.setVertexInputFormatClass(BTGHBaseVertexInputFormat.class);
     giraphConf.setVertexOutputFormatClass(BTGHBaseVertexOutputFormat.class);
-    giraphConf.setWorkerConfiguration(workerCount, workerCount, 100f);
-
+    if (isRunningDistributed()) {
+      giraphConf.setWorkerConfiguration(workerCount, workerCount, 100f);
+    } else {
+      giraphConf.setWorkerConfiguration(1, 1, 100.0F);
+      GiraphConstants.SPLIT_MASTER_WORKER.set(giraphConf, false);
+      GiraphConstants.LOCAL_TEST_MODE.set(giraphConf, true);
+    }
 
     return job.run(true);
+  }
+
+  private boolean runSelectAndAggregate(Configuration conf, int scanCache)
+    throws IOException, ClassNotFoundException, InterruptedException {
+    /*
+     mapper settings
+      */
+    // vertex handler
+    conf.setClass(GConstants.VERTEX_HANDLER_CLASS,
+      EPGVertexHandler.class,
+      VertexHandler.class
+    );
+
+    // vertex predicate
+    conf.setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS,
+      SalesOrderPredicate.class,
+      VertexPredicate.class
+    );
+
+    // vertex aggregate
+    conf.setClass(SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
+      ProfitVertexAggregate.class,
+      VertexDoubleAggregate.class);
+
+    /*
+    reducer settings
+     */
+    // graph handler
+    conf.setClass(GConstants.GRAPH_HANDLER_CLASS,
+      EPGGraphHandler.class,
+      GraphHandler.class
+    );
+    // pair aggregate class
+    conf.setClass(SelectAndAggregate.PAIR_AGGREGATE_CLASS,
+      SumAgregator.class,
+      PairAggregator.class);
+
+    Job job = new Job(conf, SelectAndAggregate.class.getName());
+    Scan scan = new Scan();
+    scan.setCaching(scanCache);
+    scan.setCacheBlocks(false);
+
+    // map
+    TableMapReduceUtil.initTableMapperJob(
+      GConstants.DEFAULT_TABLE_VERTICES,
+      scan,
+      SelectAndAggregate.SelectMapper.class,
+      LongWritable.class,
+      PairWritable.class,
+      job
+    );
+
+    // reduce
+    TableMapReduceUtil.initTableReducerJob(
+      GConstants.DEFAULT_TABLE_GRAPHS,
+      SelectAndAggregate.AggregateReducer.class,
+      job
+    );
+
+    // run
+    return job.waitForCompletion(true);
+  }
+
+  public static class SalesOrderPredicate implements VertexPredicate {
+
+    private static final String KEY = BIIIGConstants.META_PREFIX + "class";
+    private static final String VALUE = "SalesOrder";
+
+    @Override
+    public boolean evaluate(Vertex vertex) {
+      boolean result = false;
+      if (vertex.getPropertyCount() > 0) {
+        Object o = vertex.getProperty(KEY);
+        result = (o != null && o.equals(VALUE));
+      }
+      return result;
+    }
+  }
+
+  public static class ProfitVertexAggregate implements VertexDoubleAggregate {
+    private static final String EXPENSE_KEY = "expense";
+    private static final String REVENUE_KEY = "revenue";
+
+
+    @Override
+    public Double aggregate(Vertex vertex) {
+      double calcValue = 0f;
+      if (vertex.getPropertyCount() > 0) {
+        Object o = vertex.getProperty(REVENUE_KEY);
+        if (o != null) {
+          calcValue += (double) o;
+        }
+        o = vertex.getProperty(EXPENSE_KEY);
+        if (o != null) {
+          calcValue -= (double) o;
+        }
+      }
+      return calcValue;
+    }
+  }
+
+  public static class SumAgregator implements PairAggregator {
+
+    @Override
+    public Pair<Boolean, Double> aggregate(Iterable<PairWritable> values) {
+      double sum = 0;
+      boolean predicate = false;
+      for (PairWritable value : values) {
+        sum = sum + value.getValue().get();
+        if (value.getPredicateResult().get()) {
+          predicate = true;
+        }
+      }
+      return new Pair<>(predicate, sum);
+    }
+  }
+
+  private boolean isRunningDistributed() {
+    return System.getProperty("prop.mapred.job.tracker") != null;
   }
 }

@@ -5,6 +5,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.gradoop.MapReduceClusterTest;
+import org.gradoop.algorithms.SelectAndAggregate;
+import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 import org.junit.Test;
@@ -29,6 +31,7 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
     String graphFile = "btg.graph";
     String outputDir = "/output";
     String workerCount = Integer.toString(1);
+    String cacheSize = Integer.toBinaryString(500);
 
     prepareInput(graphFile);
 
@@ -39,7 +42,8 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
     int exitCode = btgAnalysisDriver.run(new String[] {
       graphFile,
       outputDir,
-      workerCount
+      workerCount,
+      cacheSize
     });
 
     // tests
@@ -47,6 +51,8 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
     GraphStore graphStore = openGraphStore();
     // BTG results
     validateBTGComputation(graphStore);
+    // Select and Aggregate results
+    validateSelectAndAggregate(graphStore);
     graphStore.close();
   }
 
@@ -76,6 +82,21 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
       assertTrue(graphIDs.contains(expectedBTG));
     }
 
+  }
+
+  private void validateSelectAndAggregate(GraphStore graphStore) {
+    // there should only be one graph in the result
+    Graph g1 = graphStore.readGraph(4L);
+    assertNotNull(g1);
+    Graph g2 = graphStore.readGraph(9L);
+    assertNull(g2);
+
+    // g1 has the aggregated value stored
+    assertEquals(1, g1.getPropertyCount());
+    Object prop =
+      g1.getProperty(SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
+    assertNotNull(prop);
+    assertEquals(-147.25, prop);
   }
 
   private void prepareInput(String inputFile)
