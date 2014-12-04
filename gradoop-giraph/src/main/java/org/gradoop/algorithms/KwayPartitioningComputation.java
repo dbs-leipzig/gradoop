@@ -19,12 +19,14 @@ public class KwayPartitioningComputation extends
   BasicComputation<IntWritable, KwayPartitioningVertex, NullWritable,
     IntWritable> {
 
-  private final static int number_of_partitions = 10;
+  private final static int number_of_partitions = 2;
+
+  private final static String computation_case = "max";
 
   /**
    * Returns the current new value. This value is based on all incoming
    * messages. Depending on the number of messages sent to the vertex, the
-   * method returns:
+   * method returns:static
    * <p/>
    * 0 messages:   The current value
    * <p/>
@@ -49,12 +51,8 @@ public class KwayPartitioningComputation extends
       // 1. if no messages are received
       newValue = vertex.getValue().getCurrentVertexValue().get();
     } else if (allMessages.size() == 1) {
+      newValue = getSwitchValue(allMessages.get(0),vertex);
       // 2. if just one message are received
-      if(allMessages.get(0) == vertex.getValue().getLastVertexValue().get()){
-        newValue = vertex.getValue().getCurrentVertexValue().get();
-      }else{
-        newValue = allMessages.get(0);
-      }
     } else {
       // 3. if multiple messages are received
       newValue = getMostFrequent(vertex, allMessages);
@@ -91,15 +89,43 @@ public class KwayPartitioningComputation extends
     }
     // if the frequent of all received messages are one
     if (maxCounter == 1) {
-      newValue = allMessages.get(new Random().nextInt(allMessages.size()));
+      newValue = getSwitchValue(allMessages.get(allMessages.size() -1 ),
+        vertex);
     } else {
-      if (maxValue == vertex.getValue().getLastVertexValue().get()) {
-        newValue = vertex.getValue().getCurrentVertexValue().get();
-      } else {
-        newValue = maxValue;
-      }
+      newValue = getSwitchValue(maxValue, vertex);
     }
     return newValue;
+  }
+
+
+  public int getSwitchValue(int value1,
+                            Vertex<IntWritable, KwayPartitioningVertex,
+                              NullWritable> vertex) {
+    int value;
+
+    if (value1 == vertex.getValue().getLastVertexValue().get()) {
+      value = vertex.getValue().getCurrentVertexValue().get();
+    } else {
+      switch (computation_case) {
+        case "min":
+          value = Math.min(value1, vertex.getValue().getCurrentVertexValue().get());
+          break;
+        case "max":
+          value = Math.max(value1, vertex.getValue().getCurrentVertexValue().get());
+          break;
+        case "rdm":
+          if (1 == new Random().nextInt(2)) {
+            value = value1;
+          } else {
+            value = vertex.getValue().getCurrentVertexValue().get();
+          }
+          break;
+
+        default:
+          value = Math.min(value1, vertex.getValue().getCurrentVertexValue().get());
+      }
+    }
+    return value;
   }
 
   /**
@@ -116,11 +142,11 @@ public class KwayPartitioningComputation extends
     Iterable<IntWritable> messages)
     throws IOException {
     if (getSuperstep() == 0) {
-      vertex.getValue().setLastVertexValue(new IntWritable(Integer.MAX_VALUE));
       Random randomGenerator = new Random();
       vertex.getValue().setCurrentVertexValue(new IntWritable
-        (randomGenerator.nextInt
-        (number_of_partitions)));
+        (randomGenerator.nextInt(number_of_partitions)));
+      vertex.getValue()
+        .setLastVertexValue(vertex.getValue().getCurrentVertexValue());
       sendMessageToAllEdges(vertex, vertex.getValue().getCurrentVertexValue());
       vertex.voteToHalt();
     } else {
