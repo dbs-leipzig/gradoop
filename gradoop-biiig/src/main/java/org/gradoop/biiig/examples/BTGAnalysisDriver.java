@@ -1,5 +1,8 @@
 package org.gradoop.biiig.examples;
 
+import org.apache.commons.cli.ParseException;
+import org.apache.giraph.conf.GiraphConfiguration;
+import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -8,6 +11,8 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.HFileOutputFormat2;
 import org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles;
+import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -16,6 +21,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
+import org.gradoop.biiig.algorithms.BTGComputation;
+import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
+import org.gradoop.biiig.io.formats.BTGHBaseVertexOutputFormat;
 import org.gradoop.biiig.io.reader.FoodBrokerReader;
 import org.gradoop.io.reader.BulkLoadEPG;
 import org.gradoop.io.reader.VertexLineReader;
@@ -35,6 +43,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   /**
    * args[0] - bulk load input graph file
    * args[1] - bulk load output folder
+   * args[2] - worker count
    *
    * @param args driver arguments
    * @return Exit code (0 - ok)
@@ -43,9 +52,10 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   @Override
   public int run(String[] args)
     throws Exception {
-    if (args.length != 2) {
+    if (args.length != 3) {
       System.err.printf("Usage: %s [generic options] <graph-input-file> " +
-        "<bulk-load-output-dir>%n", getClass().getSimpleName());
+        "<bulk-load-output-dir> <giraph-worker-count>%n", getClass()
+        .getSimpleName());
       ToolRunner.printGenericCommandUsage(System.err);
     }
 
@@ -69,7 +79,9 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     /*
     Step 2: BTG Computation
      */
-
+    if (!runBTGComputation(conf, Integer.parseInt(args[2]))) {
+      return -1;
+    }
     return 0;
   }
 
@@ -131,5 +143,38 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     loader.doBulkLoad(outputDir, hTable);
 
     return true;
+  }
+
+  /**
+   * Runs the BTG computation on the input graph using Giraph.
+   *
+   * @param conf        Cluster configuration
+   * @param workerCount Number of workers Giraph shall use.
+   * @return true, if the job completed successfully, false otherwise
+   * @throws IOException
+   * @throws ClassNotFoundException
+   * @throws InterruptedException
+   * @throws ParseException
+   */
+  private boolean runBTGComputation(Configuration conf, int workerCount)
+    throws IOException, ClassNotFoundException, InterruptedException,
+    ParseException {
+    // set HBase table to read graph from
+    conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+    // set HBase table to write computation results to
+    conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+
+    // setup Giraph job
+    GiraphJob job = new GiraphJob(conf, BTGComputation.class.getName());
+    GiraphConfiguration giraphConf = job.getConfiguration();
+
+
+    giraphConf.setComputationClass(BTGComputation.class);
+    giraphConf.setVertexInputFormatClass(BTGHBaseVertexInputFormat.class);
+    giraphConf.setVertexOutputFormatClass(BTGHBaseVertexOutputFormat.class);
+    giraphConf.setWorkerConfiguration(workerCount, workerCount, 100f);
+
+
+    return job.run(true);
   }
 }

@@ -1,17 +1,20 @@
 package org.gradoop.biiig.examples;
 
+import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.gradoop.MapReduceClusterTest;
+import org.gradoop.model.Vertex;
+import org.gradoop.storage.GraphStore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * Tests the pipeline described in
@@ -25,15 +28,54 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
     Configuration conf = utility.getConfiguration();
     String graphFile = "btg.graph";
     String outputDir = "/output";
+    String workerCount = Integer.toString(1);
 
     prepareInput(graphFile);
 
     BTGAnalysisDriver btgAnalysisDriver = new BTGAnalysisDriver();
     btgAnalysisDriver.setConf(conf);
 
-    int exitCode = btgAnalysisDriver.run(new String[] {graphFile, outputDir});
+    // run the pipeline
+    int exitCode = btgAnalysisDriver.run(new String[] {
+      graphFile,
+      outputDir,
+      workerCount
+    });
 
+    // tests
     assertThat(exitCode, is(0));
+    GraphStore graphStore = openGraphStore();
+    // BTG results
+    validateBTGComputation(graphStore);
+    graphStore.close();
+  }
+
+  private void validateBTGComputation(GraphStore graphStore) {
+    validateBTGs(graphStore.readVertex(0L), 4L, 9L);
+    validateBTGs(graphStore.readVertex(1L), 4L, 9L);
+    validateBTGs(graphStore.readVertex(2L), 4L, 9L);
+    validateBTGs(graphStore.readVertex(3L), 4L, 9L);
+    validateBTGs(graphStore.readVertex(4L), 4L);
+    validateBTGs(graphStore.readVertex(5L), 4L);
+    validateBTGs(graphStore.readVertex(6L), 4L);
+    validateBTGs(graphStore.readVertex(7L), 4L);
+    validateBTGs(graphStore.readVertex(8L), 4L);
+    validateBTGs(graphStore.readVertex(9L), 9L);
+    validateBTGs(graphStore.readVertex(10L), 9L);
+    validateBTGs(graphStore.readVertex(11L), 9L);
+    validateBTGs(graphStore.readVertex(12L), 9L);
+    validateBTGs(graphStore.readVertex(13L), 9L);
+    validateBTGs(graphStore.readVertex(14L), 9L);
+    validateBTGs(graphStore.readVertex(15L), 9L);
+  }
+
+  private void validateBTGs(Vertex vertex, long... expectedBTGs) {
+    assertEquals(expectedBTGs.length, vertex.getGraphCount());
+    List<Long> graphIDs = Lists.newArrayList(vertex.getGraphs());
+    for (long expectedBTG : expectedBTGs) {
+      assertTrue(graphIDs.contains(expectedBTG));
+    }
+
   }
 
   private void prepareInput(String inputFile)
