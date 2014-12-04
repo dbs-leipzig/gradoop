@@ -17,7 +17,7 @@ public class MemoryVertexReaderTest extends GradoopTest {
     List<Vertex> vertices = Lists.newArrayList();
 
     for (String line : BASIC_GRAPH) {
-      vertices.add(reader.readLine(line));
+      vertices.add(reader.readVertex(line));
     }
 
     validateBasicGraphVertices(vertices);

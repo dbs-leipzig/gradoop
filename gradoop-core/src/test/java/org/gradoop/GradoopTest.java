@@ -25,9 +25,10 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
- * Created by martin on 12.11.14.
+ * Default Test class for gradoop. Contains a few graphs and some helper
+ * methods.
  */
-public class GradoopTest {
+public abstract class GradoopTest {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -80,7 +81,7 @@ public class GradoopTest {
                                       VertexLineReader vertexLineReader) {
     List<Vertex> vertices = Lists.newArrayListWithCapacity(graph.length);
     for (String line : graph) {
-      vertices.add(vertexLineReader.readLine(line));
+      vertices.add(vertexLineReader.readVertex(line));
     }
     return vertices;
   }
@@ -121,7 +122,6 @@ public class GradoopTest {
     List<Vertex> vertices = Lists.newArrayListWithCapacity(EXTENDED_GRAPH
       .length);
     for (long id = 0; id < EXTENDED_GRAPH.length; id++) {
-      Vertex v = graphStore.readVertex(id);
       vertices.add(graphStore.readVertex(id));
     }
     validateExtendedGraphVertices(vertices);

@@ -15,7 +15,7 @@ public class EPGVertexReaderTest extends GradoopTest {
     List<Vertex> vertices = Lists.newArrayList();
 
     for (String line : EXTENDED_GRAPH) {
-      vertices.add(vertexLineReader.readLine(line));
+      vertices.add(vertexLineReader.readVertex(line));
     }
 
     validateExtendedGraphVertices(vertices);

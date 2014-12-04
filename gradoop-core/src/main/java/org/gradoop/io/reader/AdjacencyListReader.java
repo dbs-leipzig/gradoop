@@ -1,5 +1,6 @@
 package org.gradoop.io.reader;
 
+import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 
 import java.io.BufferedReader;
@@ -44,8 +45,15 @@ public class AdjacencyListReader {
   public void read(final BufferedReader bufferedReader)
     throws IOException {
     String line;
+    boolean readerHasListSupport = vertexLineReader.supportsVertexLists();
     while ((line = bufferedReader.readLine()) != null) {
-      graphStore.writeVertex(vertexLineReader.readLine(line));
+      if (readerHasListSupport) {
+        for (Vertex v : vertexLineReader.readVertexList(line)) {
+          graphStore.writeVertex(v);
+        }
+      } else {
+        graphStore.writeVertex(vertexLineReader.readVertex(line));
+      }
     }
   }
 }

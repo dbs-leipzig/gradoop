@@ -2,7 +2,7 @@ package org.gradoop.biiig.io.reader;
 
 import com.google.common.collect.Lists;
 import org.gradoop.HBaseClusterTest;
-import org.gradoop.io.reader.VertexListLineReader;
+import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
@@ -73,7 +73,7 @@ public class FoodBrokerReaderTest extends HBaseClusterTest {
     FoodBrokerReader reader = new FoodBrokerReader();
     List<Vertex> vertices = Lists.newArrayList();
     for (String line : FOODBROKER_SAMPLE) {
-      vertices.addAll(reader.readLine(line));
+      vertices.addAll(reader.readVertexList(line));
     }
     // reader creates a vertex for each line in the input: 1 vertex for each
     // vertex line and 2 vertices for each edge line (outgoing + incoming)
@@ -85,9 +85,9 @@ public class FoodBrokerReaderTest extends HBaseClusterTest {
   public void loadJsonToHBaseTest()
     throws IOException {
     GraphStore graphStore = createEmptyGraphStore();
-    VertexListLineReader foodbrokerReader = new FoodBrokerReader();
+    VertexLineReader foodbrokerReader = new FoodBrokerReader();
     for (String line : FOODBROKER_SAMPLE) {
-      for (Vertex v : foodbrokerReader.readLine(line)) {
+      for (Vertex v : foodbrokerReader.readVertexList(line)) {
         graphStore.writeVertex(v);
       }
     }

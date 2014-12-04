@@ -12,7 +12,7 @@ import org.gradoop.GiraphClusterTest;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexOutputFormat;
 import org.gradoop.io.reader.AdjacencyListReader;
-import org.gradoop.io.reader.VertexLineReader;
+import org.gradoop.io.reader.SingleVertexReader;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.inmemory.MemoryEdge;
@@ -157,12 +157,15 @@ public class BTGHBaseComputationTest extends GiraphClusterTest {
    * Reads vertices from the sample graphs in
    * {@link org.gradoop.biiig.algorithms.BTGComputationTestHelper}
    */
-  private static class BTGLineReader implements VertexLineReader {
+  private static class BTGLineReader extends SingleVertexReader {
     final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(",");
     final Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile(" ");
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Vertex readLine(String line) {
+    public Vertex readVertex(String line) {
       String[] lineTokens = LINE_TOKEN_SEPARATOR.split(line);
       Long vertexID = Long.valueOf(lineTokens[0]);
       String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(lineTokens[1]);

@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * <p/>
  * vertex-id neighbour1-id neighbour2-id ...
  */
-public class SimpleVertexReader implements VertexLineReader {
+public class SimpleVertexReader extends SingleVertexReader {
   /**
    * Separates a line into tokens.
    */
@@ -34,7 +34,7 @@ public class SimpleVertexReader implements VertexLineReader {
    * {@inheritDoc}
    */
   @Override
-  public Vertex readLine(String line) {
+  public Vertex readVertex(String line) {
     String[] tokens = getTokens(line);
     Long vertexID = Long.valueOf(tokens[0]);
 

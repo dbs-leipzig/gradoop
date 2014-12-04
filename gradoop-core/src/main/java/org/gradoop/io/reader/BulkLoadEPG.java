@@ -76,7 +76,19 @@ public class BulkLoadEPG extends Mapper<LongWritable, Text,
   protected void map(LongWritable key, Text value,
                      Context context)
     throws IOException, InterruptedException {
-    Vertex vertex = vertexLineReader.readLine(value.toString());
+    boolean readerHasListSupport = vertexLineReader.supportsVertexLists();
+    if (readerHasListSupport) {
+      for (Vertex v : vertexLineReader.readVertexList(value.toString())) {
+        addVertexToContext(context, v);
+      }
+    } else {
+      addVertexToContext(context,
+        vertexLineReader.readVertex(value.toString()));
+    }
+  }
+
+  private void addVertexToContext(Context context, Vertex vertex)
+    throws IOException, InterruptedException {
     byte[] vertexID = Bytes.toBytes(vertex.getID());
     ImmutableBytesWritable outKey = new ImmutableBytesWritable(vertexID);
     Put put = new Put(vertexID);

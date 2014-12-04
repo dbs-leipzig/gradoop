@@ -3,7 +3,7 @@ package org.gradoop.biiig.io.reader;
 import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.io.reader.VertexListLineReader;
+import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * Reads Json input from Foodbroker, a data generator for business process data.
  */
-public class FoodBrokerReader implements VertexListLineReader {
+public class FoodBrokerReader implements VertexLineReader {
   /**
    * Key for vertex id.
    */
@@ -66,7 +66,15 @@ public class FoodBrokerReader implements VertexListLineReader {
    * {@inheritDoc}
    */
   @Override
-  public List<Vertex> readLine(String line) {
+  public Vertex readVertex(String line) {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<Vertex> readVertexList(String line) {
     List<Vertex> vList = null;
     try {
       JSONObject jsonObject = new JSONObject(line);
@@ -79,6 +87,14 @@ public class FoodBrokerReader implements VertexListLineReader {
       e.printStackTrace();
     }
     return vList;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean supportsVertexLists() {
+    return true;
   }
 
   /**

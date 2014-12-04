@@ -68,7 +68,7 @@ public class EPGVertexReader implements VertexLineReader {
    * {@inheritDoc}
    */
   @Override
-  public Vertex readLine(final String line) {
+  public Vertex readVertex(final String line) {
     // 0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 1 k1 5 v1|1 0
     String[] lineTokens = getLineTokens(line);
 
@@ -81,6 +81,22 @@ public class EPGVertexReader implements VertexLineReader {
 
     return new MemoryVertex(vertexID, labels, properties, outEdges, inEdges,
       graphs);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<Vertex> readVertexList(String line) {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean supportsVertexLists() {
+    return false;
   }
 
   /**
