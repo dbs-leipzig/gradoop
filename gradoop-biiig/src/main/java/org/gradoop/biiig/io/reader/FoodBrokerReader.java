@@ -3,6 +3,7 @@ package org.gradoop.biiig.io.reader;
 import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.biiig.io.formats.BTGVertexType;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
@@ -79,9 +80,9 @@ public class FoodBrokerReader implements VertexLineReader {
     try {
       JSONObject jsonObject = new JSONObject(line);
       if (jsonObject.has(EDGE_SOURCE)) {
-        vList = createFromEdge(jsonObject);
+        vList = createFromEdgeLine(jsonObject);
       } else {
-        vList = createFromVertex(jsonObject);
+        vList = createFromVertexLine(jsonObject);
       }
     } catch (JSONException e) {
       e.printStackTrace();
@@ -104,7 +105,7 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return Vertex with id and single outgoing edge
    * @throws JSONException
    */
-  private List<Vertex> createFromEdge(JSONObject edge)
+  private List<Vertex> createFromEdgeLine(JSONObject edge)
     throws JSONException {
     List<Vertex> vList = Lists.newArrayListWithCapacity(2);
     Long sourceID = edge.getLong(EDGE_SOURCE);
@@ -136,13 +137,13 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return vertex with id, labels, properties
    * @throws JSONException
    */
-  private List<Vertex> createFromVertex(JSONObject vertex)
+  private List<Vertex> createFromVertexLine(JSONObject vertex)
     throws JSONException {
     Long vertexID = vertex.getLong(VERTEX_ID);
     Vertex v = new MemoryVertex(vertexID);
     addProperties(v, vertex.getJSONObject(META), META_PREFIX);
     addProperties(v, vertex.getJSONObject(DATA));
-    v.addLabel(getKind(vertex));
+    v.addLabel(String.valueOf(getKind(vertex)));
     return Lists.newArrayList(v);
   }
 
@@ -166,9 +167,11 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return vertex type
    * @throws JSONException
    */
-  private String getKind(JSONObject object)
+  private int getKind(JSONObject object)
     throws JSONException {
-    return object.getJSONObject(META).getString(KIND_PROPERTY);
+    String kindValue = object.getJSONObject(META).getString(KIND_PROPERTY);
+    return (kindValue.equals(BTGVertexType.MASTER.toString())) ?
+      BTGVertexType.MASTER.ordinal() : BTGVertexType.TRANSACTIONAL.ordinal();
   }
 
   /**

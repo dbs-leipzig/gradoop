@@ -23,13 +23,23 @@ package org.gradoop.biiig.io.formats;
  */
 public enum BTGVertexType {
   /**
-   * Vertices that are created during a business transaction between, like
+   * Vertices that are created during a business transaction, like
    * invoices, quotations, deliveries.
    */
-  TRANSACTIONAL,
+  TRANSACTIONAL {
+    @Override
+    public String toString() {
+      return "TransData";
+    }
+  },
   /**
    * Vertices that take part in a business transaction, like users, products,
    * vendors.
    */
-  MASTER
+  MASTER {
+    @Override
+    public String toString() {
+      return "MasterData";
+    }
+  }
 }
