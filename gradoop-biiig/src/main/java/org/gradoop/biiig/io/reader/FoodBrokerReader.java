@@ -3,7 +3,7 @@ package org.gradoop.biiig.io.reader;
 import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.io.reader.VertexLineReader;
+import org.gradoop.io.reader.VertexListLineReader;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
@@ -11,12 +11,13 @@ import org.gradoop.model.inmemory.MemoryEdge;
 import org.gradoop.model.inmemory.MemoryVertex;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 /**
  * Reads Json input from Foodbroker, a data generator for business process data.
  */
-public class FoodBrokerReader implements VertexLineReader {
+public class FoodBrokerReader implements VertexListLineReader {
   /**
    * Key for vertex id.
    */
@@ -65,19 +66,19 @@ public class FoodBrokerReader implements VertexLineReader {
    * {@inheritDoc}
    */
   @Override
-  public Vertex readLine(String line) {
-    Vertex v = null;
+  public List<Vertex> readLine(String line) {
+    List<Vertex> vList = null;
     try {
       JSONObject jsonObject = new JSONObject(line);
       if (jsonObject.has(EDGE_SOURCE)) {
-        v = createFromEdge(jsonObject);
+        vList = createFromEdge(jsonObject);
       } else {
-        v = createFromVertex(jsonObject);
+        vList = createFromVertex(jsonObject);
       }
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    return v;
+    return vList;
   }
 
   /**
@@ -87,17 +88,29 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return Vertex with id and single outgoing edge
    * @throws JSONException
    */
-  private Vertex createFromEdge(JSONObject edge)
+  private List<Vertex> createFromEdge(JSONObject edge)
     throws JSONException {
+    List<Vertex> vList = Lists.newArrayListWithCapacity(2);
     Long sourceID = edge.getLong(EDGE_SOURCE);
     Long targetID = edge.getLong(EDGE_TARGET);
 
-    Edge e = new MemoryEdge(targetID, getType(edge), RANDOM.nextLong());
-    addProperties(e, edge.getJSONObject(META), META_PREFIX);
-    addProperties(e, edge.getJSONObject(DATA));
+    String edgeType = getType(edge);
 
-    return new MemoryVertex(sourceID, null, null, Lists.newArrayList(e),
-      null, null);
+    // outgoing edge on source vertex
+    Edge edgeOut = new MemoryEdge(targetID, edgeType, RANDOM.nextLong());
+    addProperties(edgeOut, edge.getJSONObject(META), META_PREFIX);
+    addProperties(edgeOut, edge.getJSONObject(DATA));
+    vList.add(new MemoryVertex(sourceID, null, null,
+      Lists.newArrayList(edgeOut), null, null));
+
+    // incoming edge on target vertex
+    Edge edgeIn = new MemoryEdge(sourceID, edgeType, RANDOM.nextLong());
+    addProperties(edgeIn, edge.getJSONObject(META), META_PREFIX);
+    addProperties(edgeIn, edge.getJSONObject(DATA));
+    vList.add(new MemoryVertex(targetID, null, null, null,
+      Lists.newArrayList(edgeIn), null));
+
+    return vList;
   }
 
   /**
@@ -107,14 +120,14 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return vertex with id, labels, properties
    * @throws JSONException
    */
-  private Vertex createFromVertex(JSONObject vertex)
+  private List<Vertex> createFromVertex(JSONObject vertex)
     throws JSONException {
     Long vertexID = vertex.getLong(VERTEX_ID);
     Vertex v = new MemoryVertex(vertexID);
     addProperties(v, vertex.getJSONObject(META), META_PREFIX);
     addProperties(v, vertex.getJSONObject(DATA));
     v.addLabel(getKind(vertex));
-    return v;
+    return Lists.newArrayList(v);
   }
 
   /**

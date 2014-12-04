@@ -2,7 +2,7 @@ package org.gradoop.biiig.io.reader;
 
 import com.google.common.collect.Lists;
 import org.gradoop.HBaseClusterTest;
-import org.gradoop.io.reader.AdjacencyListReader;
+import org.gradoop.io.reader.VertexListLineReader;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
@@ -17,6 +17,9 @@ import static org.junit.Assert.assertEquals;
  * Tests for {@link org.gradoop.biiig.io.reader.FoodBrokerReader}.
  */
 public class FoodBrokerReaderTest extends HBaseClusterTest {
+
+  private static final int FOODBROKER_SAMPLE_VCOUNT = 6;
+  private static final int FOODBROKER_SAMPLE_ECOUNT = 5;
 
   private static final String[] FOODBROKER_SAMPLE = new String[] {
     // nodes
@@ -50,7 +53,7 @@ public class FoodBrokerReaderTest extends HBaseClusterTest {
     "{\"start\":1,\"data\":{},\"meta\":{\"type\":\"sentBy\"},\"end\":2}",
 
     "{\"start\":1,\"data\":{},\"meta\":{\"type\":\"sentTo\"},\"end\":3}",
-    
+
     "{\"start\":2,\"data\":{\"salesPrice\":8.44,\"purchPrice\":8.04," +
       "\"quantity\":25},\"meta\":{\"system\":\"ERP\"," +
       "\"type\":\"SalesQuotationLine\"},\"end\":41}",
@@ -70,37 +73,44 @@ public class FoodBrokerReaderTest extends HBaseClusterTest {
     FoodBrokerReader reader = new FoodBrokerReader();
     List<Vertex> vertices = Lists.newArrayList();
     for (String line : FOODBROKER_SAMPLE) {
-      vertices.add(reader.readLine(line));
+      vertices.addAll(reader.readLine(line));
     }
-    assertEquals(FOODBROKER_SAMPLE.length, vertices.size());
+    // reader creates a vertex for each line in the input: 1 vertex for each
+    // vertex line and 2 vertices for each edge line (outgoing + incoming)
+    assertEquals(FOODBROKER_SAMPLE_VCOUNT + 2 * FOODBROKER_SAMPLE_ECOUNT,
+      vertices.size());
   }
 
   @Test
   public void loadJsonToHBaseTest()
     throws IOException {
     GraphStore graphStore = createEmptyGraphStore();
-    AdjacencyListReader adjacencyListReader = new AdjacencyListReader
-      (graphStore, new FoodBrokerReader());
-    adjacencyListReader.read(createTestReader(FOODBROKER_SAMPLE));
+    VertexListLineReader foodbrokerReader = new FoodBrokerReader();
+    for (String line : FOODBROKER_SAMPLE) {
+      for (Vertex v : foodbrokerReader.readLine(line)) {
+        graphStore.writeVertex(v);
+      }
+    }
     validateFoodbrokerGraph(graphStore);
     graphStore.close();
   }
 
   private void validateFoodbrokerGraph(GraphStore graphStore) {
-    validateVertex(graphStore.readVertex(1L), 7, 1, 2);
-    validateVertex(graphStore.readVertex(2L), 7, 1, 1);
-    validateVertex(graphStore.readVertex(3L), 7, 1, 0);
-    validateVertex(graphStore.readVertex(41L), 8, 1, 2);
-    validateVertex(graphStore.readVertex(42L), 8, 1, 0);
-    validateVertex(graphStore.readVertex(43L), 8, 1, 0);
+    validateVertex(graphStore.readVertex(1L), 7, 1, 2, 0);
+    validateVertex(graphStore.readVertex(2L), 7, 1, 1, 1);
+    validateVertex(graphStore.readVertex(3L), 7, 1, 0, 1);
+    validateVertex(graphStore.readVertex(41L), 8, 1, 2, 1);
+    validateVertex(graphStore.readVertex(42L), 8, 1, 0, 2);
+    validateVertex(graphStore.readVertex(43L), 8, 1, 0, 0);
   }
 
   private void validateVertex(Vertex vertex, int expectedPropertyCount, int
-    expectedLabelCount, int expectedOutEdgesCount) {
+    expectedLabelCount, int expectedOutEdgesCount, int expectedInEdgesCount) {
     assertEquals(expectedPropertyCount, vertex.getPropertyCount());
     assertEquals(expectedLabelCount, vertex.getLabelCount());
     List<Edge> outgoingEdges = Lists.newArrayList(vertex.getOutgoingEdges());
     assertEquals(expectedOutEdgesCount, outgoingEdges.size());
-
+    List<Edge> incomingEdges = Lists.newArrayList(vertex.getIncomingEdges());
+    assertEquals(expectedInEdgesCount, incomingEdges.size());
   }
 }

@@ -10,7 +10,7 @@ public interface VertexLineReader {
   /**
    * Parses a given line and creates a vertex instance for further processing.
    *
-   * @param line  decoded vertex
+   * @param line  string encoded vertex
    * @return vertex instance
    */
   Vertex readLine(String line);
