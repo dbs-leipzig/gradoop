@@ -53,6 +53,8 @@ import java.io.IOException;
 public class BTGAnalysisDriver extends Configured implements Tool {
   private static Logger LOG = Logger.getLogger(BTGAnalysisDriver.class);
 
+  private static final String JOB_PREFIX = "BTG Analysis: ";
+
   /**
    * args[0] - bulk load input graph file
    * args[1] - bulk load output folder
@@ -77,8 +79,9 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     Configuration conf = getConf();
 
     /*
-    Step 0: Create HBase tables
+    Step 0: Delete (if exists) and create HBase tables
      */
+    HBaseGraphStoreFactory.deleteGraphStore(conf);
     HBaseGraphStoreFactory.createGraphStore(conf,
       new EPGVertexHandler(),
       new EPGGraphHandler()
@@ -132,7 +135,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       EPGVertexHandler.class,
       VertexHandler.class);
 
-    Job job = new Job(conf, BulkLoadEPG.class.getName());
+    Job job = new Job(conf, JOB_PREFIX + BulkLoadEPG.class.getName());
     // mapper that runs the HFile conversion
     job.setMapperClass(BulkLoadEPG.class);
     // input format for Mapper (File)
@@ -188,17 +191,18 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
 
     // setup Giraph job
-    GiraphJob job = new GiraphJob(conf, BTGComputation.class.getName());
+    GiraphJob job = new GiraphJob(conf, JOB_PREFIX + BTGComputation.class
+      .getName());
     GiraphConfiguration giraphConf = job.getConfiguration();
 
 
     giraphConf.setComputationClass(BTGComputation.class);
     giraphConf.setVertexInputFormatClass(BTGHBaseVertexInputFormat.class);
     giraphConf.setVertexOutputFormatClass(BTGHBaseVertexOutputFormat.class);
-    if (isRunningDistributed()) {
-      giraphConf.setWorkerConfiguration(workerCount, workerCount, 100f);
-    } else {
-      giraphConf.setWorkerConfiguration(1, 1, 100.0F);
+    giraphConf.setWorkerConfiguration(workerCount, workerCount, 100f);
+
+    // assuming local environment
+    if (workerCount == 1) {
       GiraphConstants.SPLIT_MASTER_WORKER.set(giraphConf, false);
       GiraphConstants.LOCAL_TEST_MODE.set(giraphConf, true);
     }
@@ -241,7 +245,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       SumAgregator.class,
       PairAggregator.class);
 
-    Job job = new Job(conf, SelectAndAggregate.class.getName());
+    Job job = new Job(conf, JOB_PREFIX + SelectAndAggregate.class.getName());
     Scan scan = new Scan();
     scan.setCaching(scanCache);
     scan.setCacheBlocks(false);
@@ -294,11 +298,19 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       if (vertex.getPropertyCount() > 0) {
         Object o = vertex.getProperty(REVENUE_KEY);
         if (o != null) {
-          calcValue += (double) o;
+          if (o instanceof Integer) {
+            calcValue += ((Integer) o).doubleValue();
+          } else {
+            calcValue += (double) o;
+          }
         }
         o = vertex.getProperty(EXPENSE_KEY);
         if (o != null) {
-          calcValue -= (double) o;
+          if (o instanceof Integer) {
+            calcValue -= ((Integer) o).doubleValue();
+          } else {
+            calcValue -= (double) o;
+          }
         }
       }
       return calcValue;
@@ -323,5 +335,10 @@ public class BTGAnalysisDriver extends Configured implements Tool {
 
   private boolean isRunningDistributed() {
     return System.getProperty("prop.mapred.job.tracker") != null;
+  }
+
+  public static void main(String[] args)
+    throws Exception {
+    System.exit(ToolRunner.run(new BTGAnalysisDriver(), args));
   }
 }
