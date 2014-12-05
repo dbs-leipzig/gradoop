@@ -45,9 +45,9 @@ public class KwayPartitioningComputationTest {
 
   private void validateSmallConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(6, vertexIDwithValue.size());
-    if (0 == vertexIDwithValue.get(2)) {
+    if (0 == vertexIDwithValue.get(0)) {
       if (1 == vertexIDwithValue.get(3)) {
+        assertEquals(6, vertexIDwithValue.size());
         assertEquals(0, vertexIDwithValue.get(0).intValue());
         assertEquals(0, vertexIDwithValue.get(1).intValue());
         assertEquals(0, vertexIDwithValue.get(2).intValue());
@@ -58,8 +58,9 @@ public class KwayPartitioningComputationTest {
       }
     }
 
-    if (1 == vertexIDwithValue.get(2)) {
+    if (1 == vertexIDwithValue.get(0)) {
       if (0 == vertexIDwithValue.get(3)) {
+        assertEquals(6, vertexIDwithValue.size());
         assertEquals(1, vertexIDwithValue.get(0).intValue());
         assertEquals(1, vertexIDwithValue.get(1).intValue());
         assertEquals(1, vertexIDwithValue.get(2).intValue());
@@ -70,8 +71,9 @@ public class KwayPartitioningComputationTest {
       }
     }
 
-    if (1 == vertexIDwithValue.get(2)) {
+    if (1 == vertexIDwithValue.get(0)) {
       if (1 == vertexIDwithValue.get(3)) {
+        assertEquals(6, vertexIDwithValue.size());
         assertEquals(1, vertexIDwithValue.get(0).intValue());
         assertEquals(1, vertexIDwithValue.get(1).intValue());
         assertEquals(1, vertexIDwithValue.get(2).intValue());
@@ -82,8 +84,9 @@ public class KwayPartitioningComputationTest {
       }
     }
 
-    if (0 == vertexIDwithValue.get(2)) {
+    if (0 == vertexIDwithValue.get(0)) {
       if (0 == vertexIDwithValue.get(3)) {
+        assertEquals(6, vertexIDwithValue.size());
         assertEquals(0, vertexIDwithValue.get(0).intValue());
         assertEquals(0, vertexIDwithValue.get(1).intValue());
         assertEquals(0, vertexIDwithValue.get(2).intValue());
@@ -92,10 +95,7 @@ public class KwayPartitioningComputationTest {
         assertEquals(0, vertexIDwithValue.get(5).intValue());
 
       }
-    } else {
-      assertTrue("Something else", false);
     }
-
 
   }
 

@@ -21,7 +21,7 @@ public class KwayPartitioningComputation extends
 
   private final static int number_of_partitions = 2;
 
-  private final static String computation_case = "max";
+  private final static String computation_case = "rdm";
 
   /**
    * Returns the current new value. This value is based on all incoming
@@ -51,7 +51,7 @@ public class KwayPartitioningComputation extends
       // 1. if no messages are received
       newValue = vertex.getValue().getCurrentVertexValue().get();
     } else if (allMessages.size() == 1) {
-      newValue = getSwitchValue(allMessages.get(0),vertex);
+      newValue = getSwitchValue(allMessages.get(0), vertex);
       // 2. if just one message are received
     } else {
       // 3. if multiple messages are received
@@ -89,42 +89,61 @@ public class KwayPartitioningComputation extends
     }
     // if the frequent of all received messages are one
     if (maxCounter == 1) {
-      newValue = getSwitchValue(allMessages.get(allMessages.size() -1 ),
-        vertex);
+      switch (computation_case) {
+        case "min":
+          newValue = getSwitchValue(allMessages.get(0), vertex);
+          break;
+        case "max":
+          newValue = getSwitchValue(allMessages.get(allMessages.size() - 1),
+            vertex);
+          break;
+        case "rdm":
+          newValue = getSwitchValue(allMessages.get(new Random().nextInt
+            (allMessages.size() - 1)), vertex);
+        default:
+          newValue = getSwitchValue(allMessages.get(0), vertex);
+      }
     } else {
       newValue = getSwitchValue(maxValue, vertex);
     }
     return newValue;
   }
 
-
+  /**
+   * Decides how the computation should work in different cases.
+   * @param value1 int value to compare with
+   * @param vertex The current vertex
+   * @return new vertex value
+   */
   public int getSwitchValue(int value1,
                             Vertex<IntWritable, KwayPartitioningVertex,
                               NullWritable> vertex) {
     int value;
 
-    if (value1 == vertex.getValue().getLastVertexValue().get()) {
-      value = vertex.getValue().getCurrentVertexValue().get();
-    } else {
-      switch (computation_case) {
-        case "min":
-          value = Math.min(value1, vertex.getValue().getCurrentVertexValue().get());
-          break;
-        case "max":
-          value = Math.max(value1, vertex.getValue().getCurrentVertexValue().get());
-          break;
-        case "rdm":
-          if (1 == new Random().nextInt(2)) {
-            value = value1;
-          } else {
-            value = vertex.getValue().getCurrentVertexValue().get();
-          }
-          break;
+    switch (computation_case) {
+      case "min":
+        value =
+          Math.min(value1, vertex.getValue().getLastVertexValue().get());
+        break;
+      case "max":
+        value =
+          Math.max(value1, vertex.getValue().getCurrentVertexValue().get());
+        break;
+      case "rdm":
+        if (value1 == vertex.getValue().getLastVertexValue().get()) {
+          value = vertex.getValue().getLastVertexValue().get();
+        } else {
 
-        default:
-          value = Math.min(value1, vertex.getValue().getCurrentVertexValue().get());
-      }
+          value = Math.min(value1, vertex.getValue().getLastVertexValue().get
+            ());
+
+          break;
+        }
+      default:
+        value =
+          Math.min(value1, vertex.getValue().getCurrentVertexValue().get());
     }
+    //}
     return value;
   }
 
