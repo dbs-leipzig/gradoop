@@ -53,6 +53,18 @@
                     </systemProperties>
                 </configuration>
             </plugin>
+            <!-- Creates an extra *-tests.jar which can be used as dependency -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

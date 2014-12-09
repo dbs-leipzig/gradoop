@@ -22,10 +22,10 @@ import java.util.Map;
 public class SimpleHBaseVertexInputFormat extends
   HBaseVertexInputFormat<LongWritable, LongWritable, LongWritable> {
 
-  public static final String TABLE_NAME = "vertices";
-  public static final String CF_VALUE = "value";
-  public static final String CF_EDGES = "edges";
-  public static final String Q_VALUE = CF_VALUE;
+  static final String CF_VALUE = "value";
+  static final String CF_EDGES = "edges";
+  static final String Q_VALUE = CF_VALUE;
+
   static final byte[] CF_VALUE_BYTES = Bytes.toBytes(CF_VALUE);
   static final byte[] CF_EDGES_BYTES = Bytes.toBytes(CF_EDGES);
   static final byte[] Q_VALUE_BYTES = Bytes.toBytes(Q_VALUE);
@@ -35,7 +35,7 @@ public class SimpleHBaseVertexInputFormat extends
     LongWritable> createVertexReader(InputSplit split,
                                      TaskAttemptContext context)
     throws IOException {
-    return new EPGHBaseVertexReader(split, context);
+    return new SimpleHBaseVertexReader(split, context);
   }
 
   @Override
@@ -45,11 +45,11 @@ public class SimpleHBaseVertexInputFormat extends
   /**
    * Uses the HBase RecordReader to create vertices from HBase rows.
    */
-  public static class EPGHBaseVertexReader extends
+  public static class SimpleHBaseVertexReader extends
     HBaseVertexReader<LongWritable, LongWritable, LongWritable> {
 
-    public EPGHBaseVertexReader(InputSplit split,
-                                TaskAttemptContext context)
+    public SimpleHBaseVertexReader(InputSplit split,
+                                   TaskAttemptContext context)
       throws IOException {
       super(split, context);
     }

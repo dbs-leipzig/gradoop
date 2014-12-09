@@ -18,18 +18,19 @@ import java.io.IOException;
  */
 public class SimpleHBaseVertexOutputFormat extends
   HBaseVertexOutputFormat<LongWritable, LongWritable, LongWritable> {
+
   @Override
   public VertexWriter<LongWritable, LongWritable, LongWritable>
   createVertexWriter(
     TaskAttemptContext context)
     throws IOException, InterruptedException {
-    return new EPGHBaseVertexWriter(context);
+    return new SimpleHBaseVertexWriter(context);
   }
 
-  public static class EPGHBaseVertexWriter extends
+  public static class SimpleHBaseVertexWriter extends
     HBaseVertexWriter<LongWritable, LongWritable, LongWritable> {
 
-    public EPGHBaseVertexWriter(TaskAttemptContext context)
+    public SimpleHBaseVertexWriter(TaskAttemptContext context)
       throws IOException, InterruptedException {
       super(context);
     }

@@ -17,7 +17,9 @@
     <modules>
         <module>gradoop-core</module>
         <module>gradoop-giraph</module>
+        <module>gradoop-biiig</module>
         <module>gradoop-checkstyle</module>
+        <module>gradoop-mapreduce</module>
     </modules>
 
     <developers>
@@ -25,6 +27,22 @@
             <id>mjunghanns</id>
             <name>Martin Junghanns</name>
             <email>junghanns@informatik.uni-leipzig.de</email>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
+        <developer>
+            <id>apetermann</id>
+            <name>Andre Petermann</name>
+            <email>petermann@informatik.uni-leipzig.de</email>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
+        <developer>
+            <id>kgomez</id>
+            <name>Kevin Gomez</name>
+            <email>k.gomez@freenet.de</email>
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
@@ -41,7 +59,7 @@
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.hbase.version>0.98.7-hadoop1</dep.hbase.version>
         <dep.hadoop.version>1.2.1</dep.hadoop.version>
-        <dep.giraph.version>1.1.0-SNAPSHOT</dep.giraph.version>
+        <dep.giraph.version>1.1.0</dep.giraph.version>
         <dep.junit.version>4.11</dep.junit.version>
 
         <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>

@@ -1,0 +1,37 @@
+{"id":0,"data":{"num":"EMP0","name":"Alice Schroedinger","gender":"female"},"meta":{"system":"ERP","class":"Employee","kind":"MasterData"}}
+{"id":1,"data":{"num":"EMP1","name":"Bob Heisenberg","gender":"male"},"meta":{"system":"ERP","class":"Employee","kind":"MasterData"}}
+{"id":2,"data":{"num":"EMP2","name":"Carol Einstein","gender":"female"},"meta":{"system":"ERP","class":"Employee","kind":"MasterData"}}
+{"id":3,"data":{"num":"EMP3","name":"Eve Oppenheimer","gender":"female"},"meta":{"system":"ERP","class":"Employee","kind":"MasterData"}}
+{"id":4,"data":{"num":"SIN4","text":"Refund Ticket 72219","date":"2014-12-16","revenue":-193.34},"meta":{"system":"ERP","class":"SalesOrder","kind":"TransData"}}
+{"id":5,"data":{"num":"POR5","date":"2014-12-04"},"meta":{"system":"ERP","class":"PurchOrder","kind":"TransData"}}
+{"id":6,"data":{"num":"PIN6","text":"Refund Ticket 73719","expense":-75.89,"date":"2014-12-25"},"meta":{"system":"ERP","class":"PurchInvoice","kind":"TransData"}}
+{"id":7,"data":{"num":"SIN7","text":"Refund Ticket 72598","date":"2014-12-25","revenue":-29.8},"meta":{"system":"ERP","class":"SalesInvoice","kind":"TransData"}}
+{"id":8,"data":{"num":"POR8","date":"2014-12-24"},"meta":{"system":"ERP","class":"PurchOrder","kind":"TransData"}}
+{"id":9,"data":{"num":"SQN9","date":"2014-12-08"},"meta":{"system":"ERP","class":"SalesQuotation","kind":"TransData"}}
+{"id":10,"data":{"num":"PIN10","text":"SampleText","expense":814,"date":"2014-12-24"},"meta":{"system":"ERP","class":"PurchInvoice","kind":"TransData"}}
+{"id":11,"data":{"num":"SIN11","text":"Refund Ticket 73151","date":"2014-12-24","revenue":-567.08},"meta":{"system":"ERP","class":"SalesInvoice","kind":"TransData"}}
+{"id":12,"data":{"num":"SQN12","date":"2014-12-10"},"meta":{"system":"ERP","class":"SalesQuotation","kind":"TransData"}}
+{"id":13,"data":{"num":"SIN13","text":"SampleText","date":"2014-12-06","revenue":2556.46},"meta":{"system":"ERP","class":"SalesInvoice","kind":"TransData"}}
+{"id":14,"data":{"num":"POR14","date":"2014-12-17"},"meta":{"system":"ERP","class":"PurchOrder","kind":"TransData"}}
+{"id":15,"data":{"num":"PIN15","text":"Refund Ticket 71032","expense":-138.46,"date":"2014-12-18"},"meta":{"system":"ERP","class":"PurchInvoice","kind":"TransData"}}
+{"start":1,"data":{},"meta":{"type":"worksFor"},"end":0}
+{"start":4,"data":{},"meta":{"type":"worksFor"},"end":0}
+{"start":5,"data":{},"meta":{"type":"worksFor"},"end":1}
+{"start":5,"data":{},"meta":{"type":"worksFor"},"end":4}
+{"start":6,"data":{},"meta":{"type":"worksFor"},"end":1}
+{"start":6,"data":{},"meta":{"type":"worksFor"},"end":5}
+{"start":7,"data":{},"meta":{"type":"worksFor"},"end":3}
+{"start":7,"data":{},"meta":{"type":"worksFor"},"end":6}
+{"start":8,"data":{},"meta":{"type":"worksFor"},"end":2}
+{"start":8,"data":{},"meta":{"type":"worksFor"},"end":6}
+{"start":9,"data":{},"meta":{"type":"worksFor"},"end":0}
+{"start":10,"data":{},"meta":{"type":"worksFor"},"end":9}
+{"start":11,"data":{},"meta":{"type":"worksFor"},"end":10}
+{"start":12,"data":{},"meta":{"type":"worksFor"},"end":1}
+{"start":12,"data":{},"meta":{"type":"worksFor"},"end":10}
+{"start":13,"data":{},"meta":{"type":"worksFor"},"end":2}
+{"start":13,"data":{},"meta":{"type":"worksFor"},"end":11}
+{"start":14,"data":{},"meta":{"type":"worksFor"},"end":3}
+{"start":14,"data":{},"meta":{"type":"worksFor"},"end":11}
+{"start":15,"data":{},"meta":{"type":"worksFor"},"end":3}
+{"start":15,"data":{},"meta":{"type":"worksFor"},"end":12}
