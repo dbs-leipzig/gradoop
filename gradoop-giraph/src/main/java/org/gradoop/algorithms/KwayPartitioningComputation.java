@@ -100,6 +100,7 @@ public class KwayPartitioningComputation extends
         case "rdm":
           newValue = getSwitchValue(allMessages.get(new Random().nextInt
             (allMessages.size() - 1)), vertex);
+          break;
         default:
           newValue = getSwitchValue(allMessages.get(0), vertex);
       }
@@ -111,6 +112,7 @@ public class KwayPartitioningComputation extends
 
   /**
    * Decides how the computation should work in different cases.
+   *
    * @param value1 int value to compare with
    * @param vertex The current vertex
    * @return new vertex value
@@ -137,8 +139,9 @@ public class KwayPartitioningComputation extends
           value = Math.min(value1, vertex.getValue().getLastVertexValue().get
             ());
 
-          break;
+
         }
+        break;
       default:
         value =
           Math.min(value1, vertex.getValue().getCurrentVertexValue().get());
