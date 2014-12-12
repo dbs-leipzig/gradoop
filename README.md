@@ -8,26 +8,9 @@
 * Maven 3
 * JDK 7 (Oracle or OpenJDK)
 
-##### Setup Giraph
-
-Unfortunately, Giraph is not available in the official Apache Maven 
-repositories, so we have to build it on our own.
-
-* check out Giraph from apache/giraph and switch to release 1.1.0
-
-    `https://github.com/apache/giraph.git`
-    
-    `cd giraph`
-    
-    `git checkout tags/release-1.1.0`
-    
-* install to local maven repository
-    
-    `mvn -Phadoop_1 clean install -DskipTests`
-    
 ##### Setup Gradoop
 
-* check out Gradoop
+* clone Gradoop to your local file system
 
     `git clone https://github.com/s1ck/gradoop.git`
     
@@ -45,6 +28,20 @@ repositories, so we have to build it on our own.
     
 * restart IDEA
 * `File -> Settings -> Code Style -> Java -> Scheme -> "Gradoop"`
+
+##### Troubleshooting
+
+* Exception while running test org.apache.giraph.io.hbase
+.TestHBaseRootMarkerVertextFormat (incorrect permissions, see
+http://stackoverflow.com/questions/17625938/hbase-minidfscluster-java-fails
+-in-certain-environments for details)
+
+    `umask 022`
+
+* Ubuntu + Giraph hostname problems. To avoid hostname issues comment the
+following line in /etc/hosts
+
+    `127.0.1.1   <your-host-name>`
     
 
 
