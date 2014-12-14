@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class KwayPartitioningComputationTest {
 
-  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(" ");
+  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile("\t");
 
   @Test
   public void testSmallConnectedGraph()

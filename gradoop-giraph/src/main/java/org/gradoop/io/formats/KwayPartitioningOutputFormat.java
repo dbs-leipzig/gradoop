@@ -20,7 +20,7 @@ public class KwayPartitioningOutputFormat extends
   /**
    * Used for splitting the line into the main tokens (vertex id, vertex value
    */
-  private static final String VALUE_TOKEN_SEPARATOR = " ";
+  private static final String VALUE_TOKEN_SEPARATOR = "\t";
 
   /**
    * @param context the information about the task
