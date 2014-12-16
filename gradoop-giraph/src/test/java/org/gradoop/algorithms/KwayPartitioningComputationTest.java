@@ -24,7 +24,7 @@ public class KwayPartitioningComputationTest {
   public void testSmallConnectedGraph()
     throws Exception {
     String[] graph = getSmallConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph));
+    validateSmallConnectedGraphResult(computeResults(graph, 2, "rdm"));
   }
 
   /**
@@ -71,6 +71,7 @@ public class KwayPartitioningComputationTest {
       }
     }
 
+
     if (1 == vertexIDwithValue.get(0)) {
       if (1 == vertexIDwithValue.get(3)) {
         assertEquals(6, vertexIDwithValue.size());
@@ -100,9 +101,14 @@ public class KwayPartitioningComputationTest {
   }
 
 
-  private Map<Integer, Integer> computeResults(String[] graph)
+  private Map<Integer, Integer> computeResults(String[] graph,
+                                               int partitionCount,
+                                               String computation_case)
     throws Exception {
     GiraphConfiguration conf = getConfiguration();
+    conf.set(KwayPartitioningComputation.NUMBER_OF_PARTITIONS,
+      Integer.toString(partitionCount));
+    conf.set(KwayPartitioningComputation.COMPUTATION_CASE, computation_case);
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
     return parseResults(results);
   }
@@ -110,6 +116,7 @@ public class KwayPartitioningComputationTest {
   private GiraphConfiguration getConfiguration() {
     GiraphConfiguration conf = new GiraphConfiguration();
     conf.setComputationClass(KwayPartitioningComputation.class);
+    conf.setMasterComputeClass(KwayPartitioningMasterComputation.class);
     conf.setVertexInputFormatClass(KwayPartitioningInputFormat.class);
     conf.setVertexOutputFormatClass(KwayPartitioningOutputFormat.class);
     return conf;
