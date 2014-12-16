@@ -76,6 +76,12 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     Configuration conf = getConf();
     CommandLine cmd = ConfigurationUtils.parseArgs(args);
 
+    if (cmd == null) {
+      return 0;
+    }
+
+    boolean verbose = cmd.hasOption(ConfigurationUtils.OPTION_VERBOSE);
+
     /*
     Step 0: Delete (if exists) and create HBase tables
      */
@@ -94,7 +100,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       .OPTION_GRAPH_INPUT_PATH);
     String outputPath = cmd.getOptionValue(ConfigurationUtils
       .OPTION_GRAPH_OUTPUT_PATH);
-    if (!runBulkLoad(conf, inputPath, outputPath)) {
+    if (!runBulkLoad(conf, inputPath, outputPath, verbose)) {
       return -1;
     }
 
@@ -103,7 +109,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
      */
     int workers = Integer.parseInt(cmd.getOptionValue(ConfigurationUtils
       .OPTION_WORKERS));
-    if (!runBTGComputation(conf, workers)) {
+    if (!runBTGComputation(conf, workers, verbose)) {
       return -1;
     }
 
@@ -114,7 +120,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       .OPTION_HBASE_SCAN_CACHE, "500"));
     int reducers = Integer.parseInt(cmd.getOptionValue(ConfigurationUtils
       .OPTION_REDUCERS, "1"));
-    if (!runSelectAndAggregate(conf, scanCache, reducers)) {
+    if (!runSelectAndAggregate(conf, scanCache, reducers, verbose)) {
       return -1;
     }
 
@@ -131,7 +137,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @throws IOException
    */
   private boolean runBulkLoad(Configuration conf, String graphFile, String
-    outDir)
+    outDir, boolean verbose)
     throws Exception {
     Path inputFile = new Path(graphFile);
     Path outputDir = new Path(outDir);
@@ -165,11 +171,9 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     // auto configure partitioner and reducer corresponding to the number of
     // regions
     HFileOutputFormat2.configureIncrementalLoad(job, hTable);
-    boolean successful;
 
     // run job
-    successful = job.waitForCompletion(true);
-    if (!successful) {
+    if (!job.waitForCompletion(verbose)) {
       LOG.error("Error during bulk import ... stopping pipeline");
       return false;
     }
@@ -192,7 +196,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @throws InterruptedException
    * @throws ParseException
    */
-  private boolean runBTGComputation(Configuration conf, int workerCount)
+  private boolean runBTGComputation(Configuration conf, int workerCount,
+                                    boolean verbose)
     throws IOException, ClassNotFoundException, InterruptedException,
     ParseException {
     // set HBase table to read graph from
@@ -216,11 +221,11 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       GiraphConstants.LOCAL_TEST_MODE.set(giraphConf, true);
     }
 
-    return job.run(true);
+    return job.run(verbose);
   }
 
   private boolean runSelectAndAggregate(Configuration conf, int scanCache,
-                                        int reducers)
+                                        int reducers, boolean verbose)
     throws IOException, ClassNotFoundException, InterruptedException {
     /*
      mapper settings
@@ -279,7 +284,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     job.setNumReduceTasks(reducers);
 
     // run
-    return job.waitForCompletion(true);
+    return job.waitForCompletion(verbose);
   }
 
   public static class SalesOrderPredicate implements VertexPredicate {

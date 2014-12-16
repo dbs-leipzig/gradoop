@@ -42,6 +42,37 @@ http://stackoverflow.com/questions/17625938/hbase-minidfscluster-java-fails
 following line in /etc/hosts
 
     `127.0.1.1   <your-host-name>`
+
+#### Gradoop modules
+
+##### gradoop-core
+
+The main contents of that module are the Extended Property Graph data
+model, the corresponding graph repository and its reference implementation for
+Apache HBase.
+
+Furthermore, the module contains the HBase Bulk Loader based on MapReduce and
+ file reader for user defined file/graph formats.
+
+##### gradoop-giraph
+
+Contains graph algorithms and EPG-operators implemented with Apache Giraph. It
+also contains various formats to read and write the graph from and to the
+graph repository.
+
+##### gradoop-mapreduce
+
+Contains EPG-operators implemented with Apache MapReduce and I/O formats used
+ by these operator implementations.
+
+##### gradoop-biiig
+
+Contains BIIIG-specific data readers and example analytical pipelines for
+business related graph data.
+
+##### gradoop-checkstyle
+
+Used to maintain the codestyle for the whole project.
     
 
 
