@@ -1,5 +1,6 @@
 package org.gradoop.biiig.examples;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.conf.GiraphConstants;
@@ -33,6 +34,7 @@ import org.gradoop.biiig.algorithms.BTGComputation;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexOutputFormat;
 import org.gradoop.biiig.io.reader.FoodBrokerReader;
+import org.gradoop.biiig.utils.ConfigurationUtils;
 import org.gradoop.io.formats.PairWritable;
 import org.gradoop.io.reader.BulkLoadEPG;
 import org.gradoop.io.reader.VertexLineReader;
@@ -53,13 +55,15 @@ import java.io.IOException;
 public class BTGAnalysisDriver extends Configured implements Tool {
   private static Logger LOG = Logger.getLogger(BTGAnalysisDriver.class);
 
+  static {
+    Configuration.addDefaultResource("giraph-site.xml");
+    Configuration.addDefaultResource("hbase-site.xml");
+  }
+
   private static final String JOB_PREFIX = "BTG Analysis: ";
 
   /**
-   * args[0] - bulk load input graph file
-   * args[1] - bulk load output folder
-   * args[2] - worker count
-   * args[3] - scan cache for HBase
+   * Starting point for BTG analysis pipeline.
    *
    * @param args driver arguments
    * @return Exit code (0 - ok)
@@ -68,20 +72,22 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   @Override
   public int run(String[] args)
     throws Exception {
-    if (args.length != 4) {
-      System.err.printf("Usage: %s [generic options] <graph-input-file> " +
-          "<bulk-load-output-dir> <giraph-worker-count> <scan-cache-size>%n",
-        getClass()
-          .getSimpleName());
-      ToolRunner.printGenericCommandUsage(System.err);
-    }
 
     Configuration conf = getConf();
+    CommandLine cmd = ConfigurationUtils.parseArgs(args);
+
+    if (cmd == null) {
+      return 0;
+    }
+
+    boolean verbose = cmd.hasOption(ConfigurationUtils.OPTION_VERBOSE);
 
     /*
     Step 0: Delete (if exists) and create HBase tables
      */
-    HBaseGraphStoreFactory.deleteGraphStore(conf);
+    if (cmd.hasOption(ConfigurationUtils.OPTION_DROP_TABLES)) {
+      HBaseGraphStoreFactory.deleteGraphStore(conf);
+    }
     HBaseGraphStoreFactory.createGraphStore(conf,
       new EPGVertexHandler(),
       new EPGGraphHandler()
@@ -90,21 +96,31 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     /*
     Step 1: Bulk Load of the graph into HBase using MapReduce
      */
-    if (!runBulkLoad(conf, args[0], args[1])) {
+    String inputPath = cmd.getOptionValue(ConfigurationUtils
+      .OPTION_GRAPH_INPUT_PATH);
+    String outputPath = cmd.getOptionValue(ConfigurationUtils
+      .OPTION_GRAPH_OUTPUT_PATH);
+    if (!runBulkLoad(conf, inputPath, outputPath, verbose)) {
       return -1;
     }
 
     /*
     Step 2: BTG Computation using Giraph
      */
-    if (!runBTGComputation(conf, Integer.parseInt(args[2]))) {
+    int workers = Integer.parseInt(cmd.getOptionValue(ConfigurationUtils
+      .OPTION_WORKERS));
+    if (!runBTGComputation(conf, workers, verbose)) {
       return -1;
     }
 
     /*
     Step 3: Select And Aggregate using MapReduce
      */
-    if (!runSelectAndAggregate(conf, Integer.parseInt(args[3]))) {
+    int scanCache = Integer.parseInt(cmd.getOptionValue(ConfigurationUtils
+      .OPTION_HBASE_SCAN_CACHE, "500"));
+    int reducers = Integer.parseInt(cmd.getOptionValue(ConfigurationUtils
+      .OPTION_REDUCERS, "1"));
+    if (!runSelectAndAggregate(conf, scanCache, reducers, verbose)) {
       return -1;
     }
 
@@ -121,7 +137,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @throws IOException
    */
   private boolean runBulkLoad(Configuration conf, String graphFile, String
-    outDir)
+    outDir, boolean verbose)
     throws Exception {
     Path inputFile = new Path(graphFile);
     Path outputDir = new Path(outDir);
@@ -155,11 +171,9 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     // auto configure partitioner and reducer corresponding to the number of
     // regions
     HFileOutputFormat2.configureIncrementalLoad(job, hTable);
-    boolean successful;
 
     // run job
-    successful = job.waitForCompletion(true);
-    if (!successful) {
+    if (!job.waitForCompletion(verbose)) {
       LOG.error("Error during bulk import ... stopping pipeline");
       return false;
     }
@@ -182,7 +196,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @throws InterruptedException
    * @throws ParseException
    */
-  private boolean runBTGComputation(Configuration conf, int workerCount)
+  private boolean runBTGComputation(Configuration conf, int workerCount,
+                                    boolean verbose)
     throws IOException, ClassNotFoundException, InterruptedException,
     ParseException {
     // set HBase table to read graph from
@@ -195,7 +210,6 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       .getName());
     GiraphConfiguration giraphConf = job.getConfiguration();
 
-
     giraphConf.setComputationClass(BTGComputation.class);
     giraphConf.setVertexInputFormatClass(BTGHBaseVertexInputFormat.class);
     giraphConf.setVertexOutputFormatClass(BTGHBaseVertexOutputFormat.class);
@@ -207,10 +221,11 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       GiraphConstants.LOCAL_TEST_MODE.set(giraphConf, true);
     }
 
-    return job.run(true);
+    return job.run(verbose);
   }
 
-  private boolean runSelectAndAggregate(Configuration conf, int scanCache)
+  private boolean runSelectAndAggregate(Configuration conf, int scanCache,
+                                        int reducers, boolean verbose)
     throws IOException, ClassNotFoundException, InterruptedException {
     /*
      mapper settings
@@ -266,9 +281,10 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       SelectAndAggregate.AggregateReducer.class,
       job
     );
+    job.setNumReduceTasks(reducers);
 
     // run
-    return job.waitForCompletion(true);
+    return job.waitForCompletion(verbose);
   }
 
   public static class SalesOrderPredicate implements VertexPredicate {
@@ -331,10 +347,6 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       }
       return new Pair<>(predicate, sum);
     }
-  }
-
-  private boolean isRunningDistributed() {
-    return System.getProperty("prop.mapred.job.tracker") != null;
   }
 
   public static void main(String[] args)

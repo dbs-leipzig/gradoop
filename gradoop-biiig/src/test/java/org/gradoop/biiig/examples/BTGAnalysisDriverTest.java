@@ -6,6 +6,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.gradoop.MapReduceClusterTest;
 import org.gradoop.algorithms.SelectAndAggregate;
+import org.gradoop.biiig.utils.ConfigurationUtils;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
@@ -28,10 +29,17 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
   public void driverTest()
     throws Exception {
     Configuration conf = utility.getConfiguration();
+
     String graphFile = "btg.graph";
-    String outputDir = "/output";
-    String workerCount = Integer.toString(1);
-    String cacheSize = Integer.toBinaryString(500);
+
+    String[] args = new String[] {
+      "-" + ConfigurationUtils.OPTION_WORKERS, "1",
+      "-" + ConfigurationUtils.OPTION_REDUCERS, "1",
+      "-" + ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500",
+      "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
+      "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH, "/output",
+      "-" + ConfigurationUtils.OPTION_DROP_TABLES
+    };
 
     prepareInput(graphFile);
 
@@ -39,12 +47,7 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
     btgAnalysisDriver.setConf(conf);
 
     // run the pipeline
-    int exitCode = btgAnalysisDriver.run(new String[] {
-      graphFile,
-      outputDir,
-      workerCount,
-      cacheSize
-    });
+    int exitCode = btgAnalysisDriver.run(args);
 
     // tests
     assertThat(exitCode, is(0));

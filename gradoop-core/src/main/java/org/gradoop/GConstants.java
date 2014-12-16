@@ -21,27 +21,27 @@ public final class GConstants {
   /**
    * Column family name for labels.
    */
-  public static final String CF_LABELS = "labels";
+  public static final String CF_LABELS = "l";
   /**
    * Column family name for properties.
    */
-  public static final String CF_PROPERTIES = "properties";
+  public static final String CF_PROPERTIES = "p";
   /**
    * Column family name for vertices.
    */
-  public static final String CF_VERTICES = "vertices";
+  public static final String CF_VERTICES = "v";
   /**
    * Column family name for outgoing edges.
    */
-  public static final String CF_OUT_EDGES = "out_edges";
+  public static final String CF_OUT_EDGES = "oe";
   /**
    * Column family name for incoming edges.
    */
-  public static final String CF_IN_EDGES = "in_edges";
+  public static final String CF_IN_EDGES = "ie";
   /**
    * Column family name for graphs.
    */
-  public static final String CF_GRAPHS = "graphs";
+  public static final String CF_GRAPHS = "g";
 
   /**
    * Default label for unlabeled edges.
