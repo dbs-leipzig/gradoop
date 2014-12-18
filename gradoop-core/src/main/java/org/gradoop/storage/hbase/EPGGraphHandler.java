@@ -11,12 +11,33 @@ import org.gradoop.model.inmemory.MemoryGraph;
  * Handles storing graphs in a HBase table.
  */
 public class EPGGraphHandler extends BasicHandler implements GraphHandler {
-
   /**
    * Byte array representation of the vertices column family.
    */
   private static final byte[] CF_VERTICES_BYTES =
     Bytes.toBytes(GConstants.CF_VERTICES);
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public byte[] getRowKey(final Long graphID) {
+    if (graphID == null) {
+      throw new IllegalArgumentException("graphID must not be null");
+    }
+    return Bytes.toBytes(graphID.toString());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Long getGraphID(byte[] rowKey) {
+    if (rowKey == null) {
+      throw new IllegalArgumentException("rowKey must not be null");
+    }
+    return Long.valueOf(Bytes.toString(rowKey));
+  }
 
   /**
    * {@inheritDoc}
@@ -54,7 +75,7 @@ public class EPGGraphHandler extends BasicHandler implements GraphHandler {
   @Override
   public Graph readGraph(Result res) {
     return new MemoryGraph(
-      Bytes.toLong(res.getRow()),
+      Long.valueOf(Bytes.toString(res.getRow())),
       readLabels(res),
       readProperties(res),
       readVertices(res));

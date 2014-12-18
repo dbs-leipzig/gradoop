@@ -4,7 +4,6 @@ import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
@@ -17,7 +16,6 @@ import java.io.IOException;
  * graphs from and to HBase.
  */
 public class HBaseGraphStore implements GraphStore {
-
   /**
    * Logger
    */
@@ -35,11 +33,11 @@ public class HBaseGraphStore implements GraphStore {
   /**
    * Handles the specific storing of vertices.
    */
-  private final VertexHandler verticesHandler;
+  private final VertexHandler vertexHandler;
   /**
    * Handles the specific storing of graphs.
    */
-  private final GraphHandler graphsHandler;
+  private final GraphHandler graphHandler;
 
   private static final boolean DEFAULT_AUTO_FLUSH = true;
 
@@ -49,30 +47,30 @@ public class HBaseGraphStore implements GraphStore {
    * Creates a HBaseGraphStore based on the given parameters. All parameters
    * are mandatory and must not be {@code null}.
    *
-   * @param graphsTable     HBase table to store graphs
-   * @param verticesTable   HBase table to store vertices
-   * @param verticesHandler handles reading/writing of vertices
-   * @param graphsHandler   handles reading/writing of graphs
+   * @param graphsTable   HBase table to store graphs
+   * @param verticesTable HBase table to store vertices
+   * @param vertexHandler handles reading/writing of vertices
+   * @param graphHandler  handles reading/writing of graphs
    */
   HBaseGraphStore(final HTable graphsTable, final HTable verticesTable,
-                  final VertexHandler verticesHandler,
-                  final GraphHandler graphsHandler) {
+                  final VertexHandler vertexHandler,
+                  final GraphHandler graphHandler) {
     if (graphsTable == null) {
       throw new IllegalArgumentException("graphsTable must not be null");
     }
     if (verticesTable == null) {
       throw new IllegalArgumentException("verticesTable must not be null");
     }
-    if (verticesHandler == null) {
-      throw new IllegalArgumentException("verticesHandler must not be null");
+    if (vertexHandler == null) {
+      throw new IllegalArgumentException("vertexHandler must not be null");
     }
-    if (graphsHandler == null) {
-      throw new IllegalArgumentException("graphsHandler must not be null");
+    if (graphHandler == null) {
+      throw new IllegalArgumentException("graphHandler must not be null");
     }
     this.graphsTable = graphsTable;
     this.verticesTable = verticesTable;
-    this.verticesHandler = verticesHandler;
-    this.graphsHandler = graphsHandler;
+    this.vertexHandler = vertexHandler;
+    this.graphHandler = graphHandler;
 
     this.verticesTable.setAutoFlush(DEFAULT_AUTO_FLUSH,
       DEFAULT_CLEAR_BUFFER_ON_FAIL);
@@ -88,9 +86,9 @@ public class HBaseGraphStore implements GraphStore {
     LOG.info("writing: " + graph);
     try {
       // graph id
-      Put put = new Put(Bytes.toBytes(graph.getID()));
+      Put put = new Put(graphHandler.getRowKey(graph.getID()));
       // write graph to Put
-      put = graphsHandler.writeGraph(put, graph);
+      put = graphHandler.writeGraph(put, graph);
       // write to table
       graphsTable.put(put);
     } catch (Exception e) {
@@ -106,9 +104,9 @@ public class HBaseGraphStore implements GraphStore {
     LOG.info("writing: " + vertex);
     try {
       // vertex id
-      Put put = new Put(Bytes.toBytes(vertex.getID()));
+      Put put = new Put(vertexHandler.getRowKey(vertex.getID()));
       // write vertex to Put
-      put = verticesHandler.writeVertex(put, vertex);
+      put = vertexHandler.writeVertex(put, vertex);
       // write to table
       verticesTable.put(put);
     } catch (IOException e) {
@@ -123,10 +121,10 @@ public class HBaseGraphStore implements GraphStore {
   public Graph readGraph(final Long graphID) {
     Graph g = null;
     try {
-      byte[] rowKey = Bytes.toBytes(graphID);
+      byte[] rowKey = graphHandler.getRowKey(graphID);
       Result res = graphsTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
-        g = graphsHandler.readGraph(res);
+        g = graphHandler.readGraph(res);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -141,10 +139,10 @@ public class HBaseGraphStore implements GraphStore {
   public Vertex readVertex(final Long vertexID) {
     Vertex v = null;
     try {
-      byte[] rowKey = Bytes.toBytes(vertexID);
+      byte[] rowKey = vertexHandler.getRowKey(vertexID);
       Result res = verticesTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
-        v = verticesHandler.readVertex(res);
+        v = vertexHandler.readVertex(res);
       }
     } catch (IOException e) {
       e.printStackTrace();

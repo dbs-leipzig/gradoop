@@ -7,7 +7,6 @@ import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.VertexReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -86,7 +85,8 @@ public class BTGHBaseVertexInputFormat extends
         .createVertex();
 
       // vertexID
-      LongWritable vertexID = new LongWritable(Bytes.toLong(row.getRow()));
+      LongWritable vertexID = new LongWritable(VERTEX_HANDLER.getVertexID(row
+        .getRow()));
 
       // vertex type is stored the first label of the vertex
       Iterable<String> vertexLabels = VERTEX_HANDLER.readLabels(row);

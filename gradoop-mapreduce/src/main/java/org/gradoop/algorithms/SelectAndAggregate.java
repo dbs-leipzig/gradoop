@@ -6,7 +6,6 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapper;
 import org.apache.hadoop.hbase.mapreduce.TableReducer;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.DoubleWritable;
@@ -207,9 +206,10 @@ public class SelectAndAggregate {
       Pair<Boolean, Double> result = this.pairAggregator.aggregate(values);
       // if selection predicate evaluates to true, store the aggregate value
       if (result.getFirst()) {
-        Graph g = new MemoryGraph(key.get());
+        long graphID = key.get();
+        Graph g = new MemoryGraph(graphID);
         g.addProperty(aggregateResultPropertyKey, result.getSecond());
-        Put put = new Put(Bytes.toBytes(key.get()));
+        Put put = new Put(graphHandler.getRowKey(graphID));
         put = graphHandler.writeProperties(put, g);
         context.write(null, put);
       }

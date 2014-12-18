@@ -7,7 +7,6 @@ import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.VertexReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.gradoop.storage.hbase.EPGVertexHandler;
@@ -85,8 +84,8 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
 
       // vertexID
       EPGVertexIdentifierWritable vertexID =
-        new EPGVertexIdentifierWritable(Bytes
-          .toLong(row.getRow()));
+        new EPGVertexIdentifierWritable(
+          VERTEX_HANDLER.getVertexID(row.getRow()));
 
       // labels
       Iterable<String> labels = VERTEX_HANDLER.readLabels(row);
