@@ -9,6 +9,24 @@ import org.gradoop.model.Graph;
  * HBase.
  */
 public interface GraphHandler extends EntityHandler {
+
+  /**
+   * Creates a globally unique row key based on the given vertexID. The
+   * created row key is used to persist the vertex in the graph store.
+   *
+   * @param graphID graphID to create row key from (must not be {@code null}).
+   * @return persistent graph identifier
+   */
+  byte[] getRowKey(final Long graphID);
+
+  /**
+   * Creates a graph identifier from a given row key.
+   *
+   * @param rowKey row key from the graph store (must not be {@code null})
+   * @return transient graph identifier
+   */
+  Long getGraphID(final byte[] rowKey);
+
   /**
    * Adds all vertices of the given graph to the given
    * {@link org.apache.hadoop.hbase.client.Put} and returns it.

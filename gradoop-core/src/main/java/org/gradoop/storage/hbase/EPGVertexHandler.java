@@ -88,6 +88,28 @@ public class EPGVertexHandler extends BasicHandler
    * {@inheritDoc}
    */
   @Override
+  public byte[] getRowKey(final Long vertexID) {
+    if (vertexID == null) {
+      throw new IllegalArgumentException("vertexID must not be null");
+    }
+    return Bytes.toBytes(vertexID.toString());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Long getVertexID(final byte[] rowKey) {
+    if (rowKey == null) {
+      throw new IllegalArgumentException("rowKey must not be null");
+    }
+    return Long.valueOf(Bytes.toString(rowKey));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Put writeOutgoingEdges(final Put put, final Iterable<? extends Edge>
     edges) {
     return writeEdges(put, CF_OUT_EDGES_BYTES, edges);
@@ -156,7 +178,7 @@ public class EPGVertexHandler extends BasicHandler
   @Override
   public Vertex readVertex(final Result res) {
     return new MemoryVertex(
-      Bytes.toLong(res.getRow()),
+      Long.valueOf(Bytes.toString(res.getRow())),
       readLabels(res),
       readProperties(res),
       readOutgoingEdges(res),

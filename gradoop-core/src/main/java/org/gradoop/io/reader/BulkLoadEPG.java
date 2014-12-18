@@ -89,7 +89,7 @@ public class BulkLoadEPG extends Mapper<LongWritable, Text,
 
   private void addVertexToContext(Context context, Vertex vertex)
     throws IOException, InterruptedException {
-    byte[] vertexID = Bytes.toBytes(vertex.getID());
+    byte[] vertexID = Bytes.toBytes(vertex.getID().toString());
     ImmutableBytesWritable outKey = new ImmutableBytesWritable(vertexID);
     Put put = new Put(vertexID);
     put = vertexHandler.writeVertex(put, vertex);

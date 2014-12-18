@@ -28,6 +28,23 @@ public interface VertexHandler extends EntityHandler {
     throws IOException;
 
   /**
+   * Creates a globally unique row key based on the given vertexID. The
+   * created row key is used to persist the vertex in the graph store.
+   *
+   * @param vertexID vertexID to create row key from (must not be {@code null}).
+   * @return persistent vertex identifier
+   */
+  byte[] getRowKey(final Long vertexID);
+
+  /**
+   * Creates a vertex identifier from a given row key.
+   *
+   * @param rowKey row key from the graph store (must not be {@code null})
+   * @return transient vertex identifier
+   */
+  Long getVertexID(final byte[] rowKey);
+
+  /**
    * Adds the given outgoing edges to the given
    * {@link org.apache.hadoop.hbase.client.Put}
    * and returns it.

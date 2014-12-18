@@ -7,10 +7,8 @@ import org.apache.giraph.io.VertexWriter;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.log4j.Logger;
 import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
@@ -57,7 +55,8 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
         EPGEdgeValueWritable> vertex)
       throws IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
-      byte[] rowKey = Bytes.toBytes(vertex.getId().getID());
+      // vertex identifier
+      byte[] rowKey = VERTEX_HANDLER.getRowKey(vertex.getId().getID());
       Put put = new Put(rowKey);
       // labels
       put = VERTEX_HANDLER.writeLabels(put, vertex.getValue());

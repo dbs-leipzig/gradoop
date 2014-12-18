@@ -8,12 +8,10 @@ import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableMapper;
 import org.apache.hadoop.hbase.mapreduce.TableReducer;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.GConstants;
-import org.gradoop.HBaseClusterTest;
 import org.gradoop.MapReduceClusterTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
@@ -158,7 +156,7 @@ public class AggregationTest extends MapReduceClusterTest {
       Graph g = new MemoryGraph(key.get());
       g.addProperty(VCOUNT_PROPERTY_KEY, count);
 
-      Put put = new Put(Bytes.toBytes(key.get()));
+      Put put = new Put(GRAPH_HANDLER.getRowKey(key.get()));
       put = GRAPH_HANDLER.writeProperties(put, g);
 
       context.write(null, put);
