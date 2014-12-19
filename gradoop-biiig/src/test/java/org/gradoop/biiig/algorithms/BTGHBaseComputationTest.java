@@ -139,6 +139,14 @@ public class BTGHBaseComputationTest extends GiraphClusterTest {
     // setup in- and output tables
     Configuration conf = utility.getConfiguration();
     conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+    // just scan necessary CFs
+    String columnFamiliesToScan = String.format("%s %s %s %s",
+      GConstants.CF_LABELS,
+      GConstants.CF_OUT_EDGES,
+      GConstants.CF_IN_EDGES,
+      GConstants.CF_GRAPHS);
+    conf.set(TableInputFormat.SCAN_COLUMNS, columnFamiliesToScan);
+
     conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
 
     // setup giraph job
