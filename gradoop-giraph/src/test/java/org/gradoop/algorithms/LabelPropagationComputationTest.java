@@ -1,230 +1,120 @@
 package org.gradoop.algorithms;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.giraph.BspCase;
 import org.apache.giraph.conf.GiraphConfiguration;
-import org.apache.giraph.io.formats.IdWithValueTextOutputFormat;
-import org.apache.giraph.io.formats.IntIntNullTextVertexInputFormat;
-import org.apache.giraph.utils.InternalVertexRunner;
+import org.apache.giraph.job.GiraphJob;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.gradoop.GConstants;
+import org.gradoop.GiraphClusterTest;
+import org.gradoop.io.formats.EPGIdWithValueVertexOutputFormat;
+import org.gradoop.io.formats.EPGLongLongNullVertexInputFormat;
+import org.gradoop.io.reader.AdjacencyListReader;
+import org.gradoop.io.reader.SingleVertexReader;
+import org.gradoop.model.Edge;
+import org.gradoop.model.Vertex;
+import org.gradoop.model.inmemory.MemoryEdge;
+import org.gradoop.model.inmemory.MemoryVertex;
+import org.gradoop.storage.GraphStore;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Tests for {@link org.gradoop.algorithms.LabelPropagationComputation}
  */
-public class LabelPropagationComputationTest {
-  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile
-    (IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
+public class LabelPropagationComputationTest extends GiraphClusterTest {
+  public LabelPropagationComputationTest() {
+    super(LabelPropagationComputationTest.class.getName());
+  }
 
   @Test
   public void testConnectedGraph()
-    throws Exception {
-    String[] graph = getConnectedGraph();
-    validateConnectedGraphResult(computeResults(graph));
+    throws IOException, InterruptedException, ClassNotFoundException {
+    // prepare data
+    BufferedReader inputReader = createTestReader
+      (PartitioningComputationTestHelper.getSimpleGraph());
+    GraphStore graphStore = createEmptyGraphStore();
+    AdjacencyListReader adjacencyListReader = new AdjacencyListReader
+      (graphStore, new PartitioningLineReader());
+    adjacencyListReader.read(inputReader);
+    // run giraph
+    compute();
+    // test results
+    validateConnectedGraph(graphStore);
+    // clean up
+    graphStore.close();
   }
 
-  @Test
-  public void testLoopGraph()
-    throws Exception {
-    String[] graph = getLoopGraph();
-    validateLoopGraphResult(computeResults(graph));
+  private void validateConnectedGraph(GraphStore store) {
+    validateVertex(store, 0L, 0L);
+    validateVertex(store, 1L, 0L);
+    validateVertex(store, 2L, 0L);
+    validateVertex(store, 3L, 0L);
+    validateVertex(store, 4L, 4L);
+    validateVertex(store, 5L, 4L);
+    validateVertex(store, 6L, 4L);
+    validateVertex(store, 7L, 4L);
   }
 
-
-  @Test
-  public void testDisconnectedGraph()
-    throws Exception {
-    String[] graph = getDisconnectedGraph();
-    validateDisconnectedGraphResult(computeResults(graph));
+  private void validateVertex(final GraphStore store, final long vertexID,
+                              final long expectedValue) {
+    Vertex v = store.readVertex(vertexID);
+    assertNotNull(v);
+    assertEquals(1, v.getPropertyCount());
+    assertEquals(expectedValue,
+      v.getProperty(EPGLongLongNullVertexInputFormat.VALUE_PROPERTY_KEY));
   }
 
-  @Test
-  public void testBiPartitGraph()
-    throws Exception {
-    String[] graph = getBiPartiteGraph();
-    validateBipartitGraphResult(computeResults(graph));
+  private void compute()
+    throws IOException, ClassNotFoundException, InterruptedException {
+    // setup in- and output tables
+    Configuration conf = utility.getConfiguration();
+    conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+    conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+    // setup giraph job
+    GiraphJob job = new GiraphJob(conf, BspCase.getCallingMethodName());
+    GiraphConfiguration giraphConf = job.getConfiguration();
+    setupConfiguration(job);
+    giraphConf.setComputationClass(LabelPropagationComputation.class);
+    giraphConf.setVertexInputFormatClass(EPGLongLongNullVertexInputFormat.class);
+    giraphConf
+      .setVertexOutputFormatClass(EPGIdWithValueVertexOutputFormat.class);
+    assertTrue(job.run(true));
   }
 
-  @Test
-  public void testCompleteBiPartiteGraph()
-    throws Exception {
-    String[] graph = getCompleteBiPartiteGraph();
-    validateCompleteBipartiteGraphResult(computeResults(graph));
-  }
+  private static class PartitioningLineReader extends SingleVertexReader {
+    final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(" ");
 
-
-  /**
-   * @return a small graph with two connected partitions
-   */
-  protected String[] getConnectedGraph() {
-    return new String[]{
-      "0 0 1 2 3",
-      "1 1 0 2 3",
-      "2 2 0 1 3 4",
-      "3 3 0 1 2",
-      "4 4 2 5 6 7",
-      "5 5 4 6 7 8",
-      "6 6 4 5 7",
-      "7 7 4 5 6",
-      "8 8 5 9 10 11",
-      "9 9 8 10 11",
-      "10 10 8 9 11",
-      "11 11 8 9 10"
-    };
-  }
-
-
-  /**
-   * @return a small graph with two connected partitions
-   */
-  protected String[] getLoopGraph() {
-    return new String[]{
-      "0 0 0 0 0 0 0 0",
-      "0 0 0"
-    };
-  }
-
-
-  /**
-   * @return a small graph with two disconnected partitions
-   */
-  protected String[] getDisconnectedGraph() {
-    return new String[]{
-      "0 0 1 2 3",
-      "1 1 0 2 3",
-      "2 2 0 1 3",
-      "3 3 0 1 2",
-      "4 4 5 6 7",
-      "5 5 4 6 7",
-      "6 6 4 5 7",
-      "7 7 4 5 6"
-    };
-  }
-
-  /**
-   * @return a small bipartite graph
-   */
-  protected String[] getBiPartiteGraph() {
-    return new String[]{
-      "0 0 4",
-      "1 1 5",
-      "2 2 6",
-      "3 3 7",
-      "4 4 0",
-      "5 5 1",
-      "6 6 2",
-      "7 7 3"
-    };
-  }
-
-  /**
-   * @return a small complete bipartite graph
-   */
-  protected String[] getCompleteBiPartiteGraph() {
-    return new String[]{
-      "1 1 5 6 7 8",
-      "2 2 5 6 7 8",
-      "3 3 5 6 7 8",
-      "4 4 5 6 7 8",
-      "5 5 1 2 3 4",
-      "6 6 1 2 3 4",
-      "7 7 1 2 3 4",
-      "8 8 1 2 3 4",
-    };
-  }
-
-  private void validateConnectedGraphResult(
-    Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(12, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0).intValue());
-    assertEquals(0, vertexIDwithValue.get(1).intValue());
-    assertEquals(0, vertexIDwithValue.get(2).intValue());
-    assertEquals(0, vertexIDwithValue.get(3).intValue());
-    assertEquals(4, vertexIDwithValue.get(4).intValue());
-    assertEquals(4, vertexIDwithValue.get(5).intValue());
-    assertEquals(4, vertexIDwithValue.get(6).intValue());
-    assertEquals(4, vertexIDwithValue.get(7).intValue());
-    assertEquals(8, vertexIDwithValue.get(8).intValue());
-    assertEquals(8, vertexIDwithValue.get(9).intValue());
-    assertEquals(8, vertexIDwithValue.get(10).intValue());
-    assertEquals(8, vertexIDwithValue.get(11).intValue());
-  }
-
-  private void validateLoopGraphResult(
-    Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(1, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0).intValue());
-  }
-
-  private void validateDisconnectedGraphResult(
-    Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(8, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0).intValue());
-    assertEquals(0, vertexIDwithValue.get(1).intValue());
-    assertEquals(0, vertexIDwithValue.get(2).intValue());
-    assertEquals(0, vertexIDwithValue.get(3).intValue());
-    assertEquals(4, vertexIDwithValue.get(4).intValue());
-    assertEquals(4, vertexIDwithValue.get(5).intValue());
-    assertEquals(4, vertexIDwithValue.get(6).intValue());
-    assertEquals(4, vertexIDwithValue.get(7).intValue());
-  }
-
-  private void validateBipartitGraphResult(
-    Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(8, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0).intValue());
-    assertEquals(0, vertexIDwithValue.get(4).intValue());
-    assertEquals(1, vertexIDwithValue.get(1).intValue());
-    assertEquals(1, vertexIDwithValue.get(5).intValue());
-    assertEquals(2, vertexIDwithValue.get(2).intValue());
-    assertEquals(2, vertexIDwithValue.get(6).intValue());
-    assertEquals(3, vertexIDwithValue.get(3).intValue());
-    assertEquals(3, vertexIDwithValue.get(7).intValue());
-  }
-
-  private void validateCompleteBipartiteGraphResult(Map<Integer,
-    Integer> vertexIDwithValue) {
-    assertEquals(8, vertexIDwithValue.size());
-    assertEquals(1, vertexIDwithValue.get(1).intValue());
-    assertEquals(1, vertexIDwithValue.get(2).intValue());
-    assertEquals(1, vertexIDwithValue.get(3).intValue());
-    assertEquals(1, vertexIDwithValue.get(4).intValue());
-    assertEquals(1, vertexIDwithValue.get(5).intValue());
-    assertEquals(1, vertexIDwithValue.get(6).intValue());
-    assertEquals(1, vertexIDwithValue.get(7).intValue());
-    assertEquals(1, vertexIDwithValue.get(8).intValue());
-  }
-
-  private Map<Integer, Integer> computeResults(String[] graph)
-    throws Exception {
-    GiraphConfiguration conf = getConfiguration();
-    Iterable<String> results = InternalVertexRunner.run(conf, graph);
-    return parseResults(results);
-  }
-
-  private GiraphConfiguration getConfiguration() {
-    GiraphConfiguration conf = new GiraphConfiguration();
-    conf.setComputationClass(LabelPropagationComputation.class);
-    conf.setVertexInputFormatClass(IntIntNullTextVertexInputFormat.class);
-    conf.setVertexOutputFormatClass(IdWithValueTextOutputFormat.class);
-    return conf;
-  }
-
-  private Map<Integer, Integer> parseResults(Iterable<String> results) {
-    Map<Integer, Integer> parsedResults = Maps.newHashMap();
-    String[] lineTokens;
-    int value;
-    int vertexID;
-    for (String line : results) {
-      lineTokens = LINE_TOKEN_SEPARATOR.split(line);
-      vertexID = Integer.parseInt(lineTokens[0]);
-      value = Integer.parseInt(lineTokens[1]);
-      parsedResults.put(vertexID, value);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Vertex readVertex(String line) {
+      final String[] lineTokens = LINE_TOKEN_SEPARATOR.split(line);
+      // read vertex id
+      long vertexID = Long.valueOf(lineTokens[0]);
+      // read vertex value
+      Map<String, Object> properties = Maps.newHashMapWithExpectedSize(1);
+      properties.put(EPGLongLongNullVertexInputFormat.VALUE_PROPERTY_KEY,
+        Integer.valueOf(lineTokens[1]));
+      List<Edge> edges =
+        Lists.newArrayListWithCapacity(lineTokens.length - 2);
+      for (int n = 2; n < lineTokens.length; n++) {
+        long otherID = Long.valueOf(lineTokens[n]);
+        edges.add(new MemoryEdge(otherID, (long) (n)));
+      }
+      return new MemoryVertex(vertexID, null, properties, edges, null, null);
     }
-    return parsedResults;
   }
 }
 

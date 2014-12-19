@@ -58,6 +58,19 @@ public class KwayPartitioningComputationTest {
       }
     }
 
+    if (0 == vertexIDwithValue.get(0)) {
+      if (1 == vertexIDwithValue.get(3)) {
+        assertEquals(6, vertexIDwithValue.size());
+        assertEquals(0, vertexIDwithValue.get(0).intValue());
+        assertEquals(1, vertexIDwithValue.get(1).intValue());
+        assertEquals(0, vertexIDwithValue.get(2).intValue());
+        assertEquals(1, vertexIDwithValue.get(3).intValue());
+        assertEquals(0, vertexIDwithValue.get(4).intValue());
+        assertEquals(1, vertexIDwithValue.get(5).intValue());
+
+      }
+    }
+
     if (1 == vertexIDwithValue.get(0)) {
       if (0 == vertexIDwithValue.get(3)) {
         assertEquals(6, vertexIDwithValue.size());
@@ -66,6 +79,19 @@ public class KwayPartitioningComputationTest {
         assertEquals(1, vertexIDwithValue.get(2).intValue());
         assertEquals(0, vertexIDwithValue.get(3).intValue());
         assertEquals(0, vertexIDwithValue.get(4).intValue());
+        assertEquals(0, vertexIDwithValue.get(5).intValue());
+
+      }
+    }
+
+    if (1 == vertexIDwithValue.get(0)) {
+      if (0 == vertexIDwithValue.get(3)) {
+        assertEquals(6, vertexIDwithValue.size());
+        assertEquals(1, vertexIDwithValue.get(0).intValue());
+        assertEquals(0, vertexIDwithValue.get(1).intValue());
+        assertEquals(1, vertexIDwithValue.get(2).intValue());
+        assertEquals(0, vertexIDwithValue.get(3).intValue());
+        assertEquals(1, vertexIDwithValue.get(4).intValue());
         assertEquals(0, vertexIDwithValue.get(5).intValue());
 
       }
