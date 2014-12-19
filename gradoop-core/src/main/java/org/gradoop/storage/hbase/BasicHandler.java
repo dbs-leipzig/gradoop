@@ -50,11 +50,20 @@ public abstract class BasicHandler implements EntityHandler {
    * {@inheritDoc}
    */
   @Override
+  public Put writeProperty(final Put put, final String key,
+                           final Object value) {
+    put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key), encodeValueToBytes(value));
+    return put;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Put writeProperties(final Put put, final Attributed entity) {
     if (entity.getPropertyCount() > 0) {
       for (String key : entity.getPropertyKeys()) {
-        put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key),
-          encodeValueToBytes(entity.getProperty(key)));
+        writeProperty(put, key, entity.getProperty(key));
       }
     }
     return put;

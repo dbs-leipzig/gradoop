@@ -23,6 +23,16 @@ public interface EntityHandler {
   Put writeLabels(final Put put, final MultiLabeled entity);
 
   /**
+   * Adds the given key-value-pair to the put and returns it.
+   *
+   * @param put   put to write property to
+   * @param key   property key
+   * @param value property value
+   * @return
+   */
+  Put writeProperty(final Put put, final String key, final Object value);
+
+  /**
    * Adds all properties to the given HBase put and returns it.
    *
    * @param put    put to write properties to
