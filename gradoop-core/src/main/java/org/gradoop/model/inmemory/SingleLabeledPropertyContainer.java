@@ -19,15 +19,12 @@ public abstract class SingleLabeledPropertyContainer extends PropertyContainer
    * Creates an object from the given parameters. Can only be called by
    * inheriting classes.
    *
-   * @param label      label (must not be {@code null} or empty)
-   * @param properties key-value-map (can be {@code null})
+   * @param label      label
+   * @param properties key-value-map
    */
   protected SingleLabeledPropertyContainer(String label, Map<String,
     Object> properties) {
     super(properties);
-    if (label == null || "".equals(label)) {
-      throw new IllegalArgumentException("label must not be null or empty");
-    }
     this.label = label;
   }
 

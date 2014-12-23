@@ -13,7 +13,7 @@ import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.GraphElement;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryEdge;
+import org.gradoop.model.inmemory.EdgeFactory;
 import org.gradoop.model.inmemory.MemoryVertex;
 
 import java.io.IOException;
@@ -304,7 +304,7 @@ public class EPGVertexHandler extends BasicHandler
   /**
    * Creates an edge object based on the given key and properties. The given
    * edge key is separated into tokens and used to create a new {@link
-   * org.gradoop.model.inmemory.MemoryEdge} instance.
+   * org.gradoop.model.inmemory.DefaultEdge} instance.
    *
    * @param edgeKey    string representation of edge key
    * @param properties key-value-map
@@ -316,6 +316,7 @@ public class EPGVertexHandler extends BasicHandler
     String edgeLabel = keyTokens[0];
     Long otherID = Long.valueOf(keyTokens[1]);
     Long edgeIndex = Long.valueOf(keyTokens[2]);
-    return new MemoryEdge(otherID, edgeLabel, edgeIndex, properties);
+    return EdgeFactory.createDefaultEdge(otherID, edgeLabel, edgeIndex,
+      properties);
   }
 }

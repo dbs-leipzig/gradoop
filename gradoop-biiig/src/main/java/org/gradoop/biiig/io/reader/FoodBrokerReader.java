@@ -9,7 +9,7 @@ import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryEdge;
+import org.gradoop.model.inmemory.EdgeFactory;
 import org.gradoop.model.inmemory.MemoryVertex;
 
 import java.util.Iterator;
@@ -110,7 +110,8 @@ public class FoodBrokerReader implements VertexLineReader {
     String edgeType = getType(edge);
 
     // outgoing edge on source vertex
-    Edge edgeOut = new MemoryEdge(targetID, edgeType, RANDOM.nextLong());
+    Edge edgeOut = EdgeFactory.createDefaultEdge(targetID, edgeType, RANDOM
+      .nextLong());
     addProperties(edgeOut, edge.getJSONObject(META),
       BIIIGConstants.META_PREFIX);
     addProperties(edgeOut, edge.getJSONObject(DATA));
@@ -118,7 +119,8 @@ public class FoodBrokerReader implements VertexLineReader {
       Lists.newArrayList(edgeOut), null, null));
 
     // incoming edge on target vertex
-    Edge edgeIn = new MemoryEdge(sourceID, edgeType, RANDOM.nextLong());
+    Edge edgeIn = EdgeFactory.createDefaultEdge(sourceID, edgeType, RANDOM
+      .nextLong());
     addProperties(edgeIn, edge.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(edgeIn, edge.getJSONObject(DATA));
     vList.add(new MemoryVertex(targetID, null, null, null,

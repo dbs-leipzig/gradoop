@@ -7,7 +7,7 @@ import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryEdge;
+import org.gradoop.model.inmemory.EdgeFactory;
 import org.gradoop.storage.GraphStore;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -194,8 +194,8 @@ public abstract class GradoopTest {
   private void testEdge(List<Edge> edges, Long expectedOtherID,
                         String expectedLabel, Long expectedIndex,
                         int expectedPropertyCount) {
-    Edge tmpEdge = new MemoryEdge(expectedOtherID, expectedLabel,
-      expectedIndex);
+    Edge tmpEdge = EdgeFactory.createDefaultEdge(expectedOtherID,
+      expectedLabel, expectedIndex);
     assertTrue(edges.contains(tmpEdge));
     int edgeIndex = edges.indexOf(tmpEdge);
     testProperties(edges.get(edgeIndex), expectedPropertyCount);

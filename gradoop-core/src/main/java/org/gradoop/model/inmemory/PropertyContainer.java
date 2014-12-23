@@ -15,7 +15,7 @@ public abstract class PropertyContainer implements Attributed {
    * Creates an object from the given parameters. Can only be called by
    * inheriting classes.
    *
-   * @param properties key-value-map (can be {@code null})
+   * @param properties key-value-map
    */
   protected PropertyContainer(Map<String, Object> properties) {
     this.properties = properties;

@@ -15,7 +15,7 @@ import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.SingleVertexReader;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryEdge;
+import org.gradoop.model.inmemory.EdgeFactory;
 import org.gradoop.model.inmemory.MemoryVertex;
 import org.gradoop.storage.GraphStore;
 import org.junit.Test;
@@ -184,7 +184,7 @@ public class BTGHBaseComputationTest extends GiraphClusterTest {
       List<Edge> edges = Lists.newArrayListWithCapacity(stringEdges.length);
       for (String edge : stringEdges) {
         Long otherID = Long.valueOf(edge);
-        edges.add(new MemoryEdge(otherID, 0L));
+        edges.add(EdgeFactory.createDefaultEdge(otherID, 0L));
       }
       return new MemoryVertex(vertexID, Lists.newArrayList(vertexType),
         null, edges, null, null);

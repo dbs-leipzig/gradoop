@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryEdge;
+import org.gradoop.model.inmemory.EdgeFactory;
 import org.gradoop.model.inmemory.MemoryVertex;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
@@ -173,7 +173,8 @@ public class EPGVertexReader implements VertexLineReader {
         Map<String, Object> edgeProperties =
           readProperties(edgeString.substring(propStartIdx + 1));
         edges
-          .add(new MemoryEdge(otherID, edgeLabel, edgeIndex, edgeProperties));
+          .add(EdgeFactory.createDefaultEdge(otherID, edgeLabel, edgeIndex,
+            edgeProperties));
       }
     }
     return edges;
