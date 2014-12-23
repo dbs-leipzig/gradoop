@@ -1,5 +1,6 @@
 package org.gradoop.model.impl;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
@@ -63,6 +64,30 @@ public class DefaultVertex extends MultiLabeledPropertyContainer implements
   @Override
   public Iterable<Edge> getIncomingEdges() {
     return incomingEdges;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getOutgoingDegree() {
+    return (outgoingEdges != null) ? Iterables.size(outgoingEdges) : 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getIncomingDegree() {
+    return (incomingEdges != null) ? Iterables.size(incomingEdges) : 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getDegree() {
+    return getOutgoingDegree() + getIncomingDegree();
   }
 
   /**

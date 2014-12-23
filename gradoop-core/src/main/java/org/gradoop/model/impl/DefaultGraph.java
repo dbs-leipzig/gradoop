@@ -1,9 +1,9 @@
 package org.gradoop.model.impl;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.gradoop.model.Graph;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,7 +15,7 @@ public class DefaultGraph extends MultiLabeledPropertyContainer implements
   /**
    * Holds vertex identifiers contained in that graph.
    */
-  private final List<Long> vertices;
+  private final Iterable<Long> vertices;
 
   /**
    * Creates a graph based on the given parameters.
@@ -45,7 +45,7 @@ public class DefaultGraph extends MultiLabeledPropertyContainer implements
    */
   @Override
   public int getVertexCount() {
-    return (vertices != null) ? vertices.size() : 0;
+    return (vertices != null) ? Iterables.size(vertices) : 0;
   }
 
   /**

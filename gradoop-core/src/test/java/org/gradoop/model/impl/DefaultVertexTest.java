@@ -19,6 +19,11 @@ public class DefaultVertexTest {
     Long vertexID = 0L;
     Vertex v = VertexFactory.createDefaultVertexWithID(vertexID);
     assertThat(v.getID(), is(vertexID));
+    assertThat(v.getLabelCount(), is(0));
+    assertThat(v.getGraphCount(), is(0));
+    assertThat(v.getOutgoingDegree(), is(0));
+    assertThat(v.getIncomingDegree(), is(0));
+    assertThat(v.getDegree(), is(0));
   }
 
   @Test
@@ -36,10 +41,10 @@ public class DefaultVertexTest {
       outgoingEdges);
 
     assertThat(v.getID(), is(vertexID));
-    List<Edge> e = Lists.newArrayList(v.getOutgoingEdges());
-    assertThat(e.size(), is(2));
-    assertTrue(e.contains(e1));
-    assertTrue(e.contains(e2));
+    assertThat(v.getOutgoingDegree(), is(2));
+    assertThat(v.getDegree(), is(2));
+    assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e1));
+    assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e2));
   }
 
   @Test
@@ -64,14 +69,16 @@ public class DefaultVertexTest {
     Vertex v = VertexFactory.createDefaultVertexWithEdges(vertexID,
       outgoingEdges, incomingEdges);
     assertThat(v.getID(), is(vertexID));
-    List<Edge> e = Lists.newArrayList(v.getOutgoingEdges());
-    assertThat(e.size(), is(2));
-    assertTrue(e.contains(e1));
-    assertTrue(e.contains(e2));
-    e = Lists.newArrayList(v.getIncomingEdges());
-    assertThat(e.size(), is(2));
-    assertTrue(e.contains(e3));
-    assertTrue(e.contains(e4));
+
+    assertThat(v.getOutgoingDegree(), is(2));
+    assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e1));
+    assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e2));
+
+    assertThat(v.getIncomingDegree(), is(2));
+    assertTrue(Lists.newArrayList(v.getIncomingEdges()).contains(e3));
+    assertTrue(Lists.newArrayList(v.getIncomingEdges()).contains(e4));
+
+    assertThat(v.getDegree(), is(4));
   }
 
   @Test
@@ -98,10 +105,10 @@ public class DefaultVertexTest {
     assertTrue(Lists.newArrayList(v.getLabels()).contains(label1));
     assertTrue(Lists.newArrayList(v.getLabels()).contains(label2));
 
-    List<Edge> e = Lists.newArrayList(v.getOutgoingEdges());
-    assertThat(e.size(), is(2));
-    assertTrue(e.contains(e1));
-    assertTrue(e.contains(e2));
+    assertThat(v.getOutgoingDegree(), is(2));
+    assertThat(v.getDegree(), is(2));
+    assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e1));
+    assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e2));
   }
 
   @Test
