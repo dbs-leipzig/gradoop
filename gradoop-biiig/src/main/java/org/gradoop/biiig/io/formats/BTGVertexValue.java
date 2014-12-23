@@ -76,7 +76,7 @@ public class BTGVertexValue implements Writable, GraphElement {
    * @param btgIDs      A list of BTGs that vertex belongs to
    */
   public BTGVertexValue(BTGVertexType vertexType, Double vertexValue,
-                        List<Long> btgIDs) {
+    List<Long> btgIDs) {
     this.vertexType = vertexType;
     this.vertexValue = vertexValue;
     this.btgIDs = btgIDs;
@@ -158,8 +158,8 @@ public class BTGVertexValue implements Writable, GraphElement {
       initNeighbourMinimBTGIDMap();
     }
     if (!neighborMinimumBTGIds.containsKey(vertexID) ||
-      (neighborMinimumBTGIds.containsKey(
-        vertexID) && neighborMinimumBTGIds.get(vertexID) > btgID)) {
+      (neighborMinimumBTGIds.containsKey(vertexID) &&
+        neighborMinimumBTGIds.get(vertexID) > btgID)) {
       neighborMinimumBTGIds.put(vertexID, btgID);
     }
   }
@@ -208,8 +208,7 @@ public class BTGVertexValue implements Writable, GraphElement {
    * @throws java.io.IOException
    */
   @Override
-  public void write(DataOutput dataOutput)
-    throws IOException {
+  public void write(DataOutput dataOutput) throws IOException {
     // vertex type
     dataOutput.writeInt(this.vertexType.ordinal());
     // vertex value
@@ -240,8 +239,7 @@ public class BTGVertexValue implements Writable, GraphElement {
    * @throws java.io.IOException
    */
   @Override
-  public void readFields(DataInput dataInput)
-    throws IOException {
+  public void readFields(DataInput dataInput) throws IOException {
     // vertex type
     this.vertexType = BTGVertexType.values()[dataInput.readInt()];
     // vertex value

@@ -74,10 +74,8 @@ public class EPGGraphHandler extends BasicHandler implements GraphHandler {
    */
   @Override
   public Graph readGraph(Result res) {
-    return GraphFactory.createDefaultGraph(
-      Long.valueOf(Bytes.toString(res.getRow())),
-      readLabels(res),
-      readProperties(res),
-      readVertices(res));
+    return GraphFactory
+      .createDefaultGraph(Long.valueOf(Bytes.toString(res.getRow())),
+        readLabels(res), readProperties(res), readVertices(res));
   }
 }

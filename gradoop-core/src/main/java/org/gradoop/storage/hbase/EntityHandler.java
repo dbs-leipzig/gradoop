@@ -4,7 +4,6 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.MultiLabeled;
-import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public interface EntityHandler {
    * @param put   put to write property to
    * @param key   property key
    * @param value property value
-   * @return
+   * @return put with property
    */
   Put writeProperty(final Put put, final String key, final Object value);
 
@@ -38,7 +37,6 @@ public interface EntityHandler {
    * @param put    put to write properties to
    * @param entity entity to use properties from
    * @return put with properties
-   * @throws UnsupportedTypeException
    */
   Put writeProperties(final Put put, final Attributed entity);
 

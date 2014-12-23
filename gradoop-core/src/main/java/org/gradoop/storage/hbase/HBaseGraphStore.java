@@ -4,12 +4,14 @@ import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.log4j.Logger;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 
 /**
  * Default HBase graph store that handles reading and writing vertices and
@@ -20,6 +22,15 @@ public class HBaseGraphStore implements GraphStore {
    * Logger
    */
   private static final Logger LOG = Logger.getLogger(HBaseGraphStore.class);
+
+  /**
+   * Default value for clearing buffer on fail.
+   */
+  private static final boolean DEFAULT_CLEAR_BUFFER_ON_FAIL = true;
+  /**
+   * Default value for enabling auto flush in HBase.
+   */
+  private static final boolean DEFAULT_ENABLE_AUTO_FLUSH = true;
 
   /**
    * HBase table to use for storing vertices.
@@ -39,10 +50,6 @@ public class HBaseGraphStore implements GraphStore {
    */
   private final GraphHandler graphHandler;
 
-  private static final boolean DEFAULT_AUTO_FLUSH = true;
-
-  private static final boolean DEFAULT_CLEAR_BUFFER_ON_FAIL = true;
-
   /**
    * Creates a HBaseGraphStore based on the given parameters. All parameters
    * are mandatory and must not be {@code null}.
@@ -53,8 +60,7 @@ public class HBaseGraphStore implements GraphStore {
    * @param graphHandler  handles reading/writing of graphs
    */
   HBaseGraphStore(final HTable graphsTable, final HTable verticesTable,
-                  final VertexHandler vertexHandler,
-                  final GraphHandler graphHandler) {
+    final VertexHandler vertexHandler, final GraphHandler graphHandler) {
     if (graphsTable == null) {
       throw new IllegalArgumentException("graphsTable must not be null");
     }
@@ -72,10 +78,10 @@ public class HBaseGraphStore implements GraphStore {
     this.vertexHandler = vertexHandler;
     this.graphHandler = graphHandler;
 
-    this.verticesTable.setAutoFlush(DEFAULT_AUTO_FLUSH,
-      DEFAULT_CLEAR_BUFFER_ON_FAIL);
-    this.graphsTable.setAutoFlush(DEFAULT_AUTO_FLUSH,
-      DEFAULT_CLEAR_BUFFER_ON_FAIL);
+    this.verticesTable
+      .setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
+    this.graphsTable
+      .setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
   }
 
   /**
@@ -91,7 +97,7 @@ public class HBaseGraphStore implements GraphStore {
       put = graphHandler.writeGraph(put, graph);
       // write to table
       graphsTable.put(put);
-    } catch (Exception e) {
+    } catch (RetriesExhaustedWithDetailsException | InterruptedIOException e) {
       e.printStackTrace();
     }
   }

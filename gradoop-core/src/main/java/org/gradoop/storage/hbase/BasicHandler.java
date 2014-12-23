@@ -22,8 +22,7 @@ public abstract class BasicHandler implements EntityHandler {
   /**
    * Byte array representation of the labels column family.
    */
-  static final byte[] CF_LABELS_BYTES =
-    Bytes.toBytes(GConstants.CF_LABELS);
+  static final byte[] CF_LABELS_BYTES = Bytes.toBytes(GConstants.CF_LABELS);
 
   /**
    * Byte representation of the properties column family.
@@ -51,7 +50,7 @@ public abstract class BasicHandler implements EntityHandler {
    */
   @Override
   public Put writeProperty(final Put put, final String key,
-                           final Object value) {
+    final Object value) {
     put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key), encodeValueToBytes(value));
     return put;
   }
@@ -89,11 +88,9 @@ public abstract class BasicHandler implements EntityHandler {
   public Map<String, Object> readProperties(final Result res) {
     Map<String, Object> properties = new HashMap<>();
     for (Map.Entry<byte[], byte[]> propertyColumn : res
-      .getFamilyMap(CF_PROPERTIES_BYTES)
-      .entrySet()) {
-      properties
-        .put(Bytes.toString(propertyColumn.getKey()), decodeValueFromBytes(
-          propertyColumn.getValue()));
+      .getFamilyMap(CF_PROPERTIES_BYTES).entrySet()) {
+      properties.put(Bytes.toString(propertyColumn.getKey()),
+        decodeValueFromBytes(propertyColumn.getValue()));
     }
     return properties;
   }
@@ -106,7 +103,7 @@ public abstract class BasicHandler implements EntityHandler {
    * @return all keys inside column family.
    */
   protected Iterable<Long> getColumnKeysFromFamiliy(final Result res,
-                                                    final byte[] columnFamily) {
+    final byte[] columnFamily) {
     List<Long> keys = Lists.newArrayList();
     for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily)
       .entrySet()) {
@@ -152,26 +149,26 @@ public abstract class BasicHandler implements EntityHandler {
   protected Object decodeValueFromString(final byte type, final String value) {
     Object o;
     switch (type) {
-      case GConstants.TYPE_BOOLEAN:
-        o = Boolean.parseBoolean(value);
-        break;
-      case GConstants.TYPE_INTEGER:
-        o = Integer.parseInt(value);
-        break;
-      case GConstants.TYPE_LONG:
-        o = Long.parseLong(value);
-        break;
-      case GConstants.TYPE_FLOAT:
-        o = Float.parseFloat(value);
-        break;
-      case GConstants.TYPE_DOUBLE:
-        o = Double.parseDouble(value);
-        break;
-      case GConstants.TYPE_STRING:
-        o = value;
-        break;
-      default:
-        throw new UnsupportedTypeException(value.getClass() + " not supported");
+    case GConstants.TYPE_BOOLEAN:
+      o = Boolean.parseBoolean(value);
+      break;
+    case GConstants.TYPE_INTEGER:
+      o = Integer.parseInt(value);
+      break;
+    case GConstants.TYPE_LONG:
+      o = Long.parseLong(value);
+      break;
+    case GConstants.TYPE_FLOAT:
+      o = Float.parseFloat(value);
+      break;
+    case GConstants.TYPE_DOUBLE:
+      o = Double.parseDouble(value);
+      break;
+    case GConstants.TYPE_STRING:
+      o = value;
+      break;
+    default:
+      throw new UnsupportedTypeException(value.getClass() + " not supported");
     }
     return o;
   }
@@ -182,30 +179,28 @@ public abstract class BasicHandler implements EntityHandler {
    * @param value value do encode
    * @return encoded value as byte array
    */
-  protected byte[] encodeValueToBytes(final Object value)
-    throws UnsupportedTypeException {
+  protected byte[] encodeValueToBytes(final Object value) throws
+    UnsupportedTypeException {
     Class<?> valueClass = value.getClass();
     byte[] decodedValue;
     if (valueClass.equals(Boolean.class)) {
-      decodedValue =
-        Bytes.add(new byte[] {GConstants.TYPE_BOOLEAN},
-          Bytes.toBytes((Boolean) value));
+      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_BOOLEAN},
+        Bytes.toBytes((Boolean) value));
     } else if (valueClass.equals(Integer.class)) {
-      decodedValue =
-        Bytes.add(new byte[] {GConstants.TYPE_INTEGER},
-          Bytes.toBytes((Integer) value));
+      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_INTEGER},
+        Bytes.toBytes((Integer) value));
     } else if (valueClass.equals(Long.class)) {
       decodedValue = Bytes
-        .add(new byte[] {GConstants.TYPE_LONG}, Bytes.toBytes((Long) value));
+        .add(new byte[]{GConstants.TYPE_LONG}, Bytes.toBytes((Long) value));
     } else if (valueClass.equals(Float.class)) {
       decodedValue = Bytes
-        .add(new byte[] {GConstants.TYPE_FLOAT}, Bytes.toBytes((Float) value));
+        .add(new byte[]{GConstants.TYPE_FLOAT}, Bytes.toBytes((Float) value));
     } else if (valueClass.equals(Double.class)) {
-      decodedValue = Bytes.add(new byte[] {GConstants.TYPE_DOUBLE},
-        Bytes.toBytes((Double) value));
+      decodedValue = Bytes
+        .add(new byte[]{GConstants.TYPE_DOUBLE}, Bytes.toBytes((Double) value));
     } else if (valueClass.equals(String.class)) {
-      decodedValue = Bytes.add(new byte[] {GConstants.TYPE_STRING},
-        Bytes.toBytes((String) value));
+      decodedValue = Bytes
+        .add(new byte[]{GConstants.TYPE_STRING}, Bytes.toBytes((String) value));
     } else {
       throw new UnsupportedTypeException(valueClass + " not supported");
     }
@@ -224,27 +219,27 @@ public abstract class BasicHandler implements EntityHandler {
       byte type = encValue[0];
       byte[] value = Bytes.tail(encValue, encValue.length - 1);
       switch (type) {
-        case GConstants.TYPE_BOOLEAN:
-          o = Bytes.toBoolean(value);
-          break;
-        case GConstants.TYPE_INTEGER:
-          o = Bytes.toInt(value);
-          break;
-        case GConstants.TYPE_LONG:
-          o = Bytes.toLong(value);
-          break;
-        case GConstants.TYPE_FLOAT:
-          o = Bytes.toFloat(value);
-          break;
-        case GConstants.TYPE_DOUBLE:
-          o = Bytes.toDouble(value);
-          break;
-        case GConstants.TYPE_STRING:
-          o = Bytes.toString(value);
-          break;
-        default:
-          throw new UnsupportedTypeException(
-            "Type code " + type + " not supported");
+      case GConstants.TYPE_BOOLEAN:
+        o = Bytes.toBoolean(value);
+        break;
+      case GConstants.TYPE_INTEGER:
+        o = Bytes.toInt(value);
+        break;
+      case GConstants.TYPE_LONG:
+        o = Bytes.toLong(value);
+        break;
+      case GConstants.TYPE_FLOAT:
+        o = Bytes.toFloat(value);
+        break;
+      case GConstants.TYPE_DOUBLE:
+        o = Bytes.toDouble(value);
+        break;
+      case GConstants.TYPE_STRING:
+        o = Bytes.toString(value);
+        break;
+      default:
+        throw new UnsupportedTypeException(
+          "Type code " + type + " not supported");
       }
     }
     return o;

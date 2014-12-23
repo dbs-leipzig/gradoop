@@ -17,14 +17,14 @@ import java.util.Map;
 public class EPGAttributedWritable implements Attributed, Writable {
 
   /**
-   * Holds a key-value-map of all properties.
-   */
-  private Map<String, Object> properties;
-
-  /**
    * Default size which is used for map initialization.
    */
   private static final int DEFAULT_PROPERTIES_SIZE = 10;
+
+  /**
+   * Holds a key-value-map of all properties.
+   */
+  private Map<String, Object> properties;
 
   /**
    * Default constructor is necessary for object deserialization.
@@ -102,8 +102,7 @@ public class EPGAttributedWritable implements Attributed, Writable {
    * {@inheritDoc}
    */
   @Override
-  public void write(DataOutput dataOutput)
-    throws IOException {
+  public void write(DataOutput dataOutput) throws IOException {
     if (properties != null) {
       dataOutput.writeInt(properties.size());
       ObjectWritable ow = new ObjectWritable();
@@ -121,8 +120,7 @@ public class EPGAttributedWritable implements Attributed, Writable {
    * {@inheritDoc}
    */
   @Override
-  public void readFields(DataInput dataInput)
-    throws IOException {
+  public void readFields(DataInput dataInput) throws IOException {
     ObjectWritable ow = new ObjectWritable();
     Configuration conf = new Configuration();
     ow.setConf(conf);

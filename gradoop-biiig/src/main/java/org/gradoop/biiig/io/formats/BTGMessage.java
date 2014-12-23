@@ -25,7 +25,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Custom message format for {@link org.gradoop.biiig.algorithms.BTGComputation}.
+ * Custom message format for {@link org.gradoop.biiig.algorithms
+ * .BTGComputation}.
  * Master data nodes need to know who the sender of a message is, so this has to
  * be stored inside the message. The btgID is the minimum vertex id inside a
  * BTG.
@@ -85,8 +86,7 @@ public class BTGMessage implements Writable {
    * @throws java.io.IOException
    */
   @Override
-  public void write(DataOutput dataOutput)
-    throws IOException {
+  public void write(DataOutput dataOutput) throws IOException {
     dataOutput.writeLong(this.senderID);
     dataOutput.writeLong(this.btgID);
   }
@@ -98,8 +98,7 @@ public class BTGMessage implements Writable {
    * @throws java.io.IOException
    */
   @Override
-  public void readFields(DataInput dataInput)
-    throws IOException {
+  public void readFields(DataInput dataInput) throws IOException {
     this.senderID = dataInput.readLong();
     this.btgID = dataInput.readLong();
   }

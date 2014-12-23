@@ -32,8 +32,7 @@ public class BTGHBaseVertexOutputFormat extends
   @Override
   public VertexWriter<LongWritable, BTGVertexValue, NullWritable>
   createVertexWriter(
-    TaskAttemptContext context)
-    throws IOException, InterruptedException {
+    TaskAttemptContext context) throws IOException, InterruptedException {
     return new BTGHBaseVertexWriter(context);
   }
 
@@ -48,8 +47,8 @@ public class BTGHBaseVertexOutputFormat extends
      *
      * @param context task attempt context
      */
-    public BTGHBaseVertexWriter(TaskAttemptContext context)
-      throws IOException, InterruptedException {
+    public BTGHBaseVertexWriter(TaskAttemptContext context) throws IOException,
+      InterruptedException {
       super(context);
     }
 
@@ -58,8 +57,8 @@ public class BTGHBaseVertexOutputFormat extends
      */
     @Override
     public void writeVertex(
-      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex)
-      throws IOException, InterruptedException {
+      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex) throws
+      IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
       byte[] rowKey = VERTEX_HANDLER.getRowKey(vertex.getId().get());
       Put put = new Put(rowKey);

@@ -32,18 +32,15 @@ import java.io.IOException;
  * @param <V> Vertex value
  * @param <E> Edge value
  */
-public abstract class HBaseVertexOutputFormat<
-  I extends WritableComparable,
-  V extends Writable,
-  E extends Writable>
-  extends VertexOutputFormat
-  <I, V, E> {
+public abstract class HBaseVertexOutputFormat<I extends WritableComparable, V
+  extends Writable, E extends Writable> extends
+  VertexOutputFormat<I, V, E> {
 
   /**
    * delegate output format that writes to HBase
    */
-  protected static final TableOutputFormat<ImmutableBytesWritable>
-    BASE_FORMAT = new TableOutputFormat<ImmutableBytesWritable>();
+  protected static final TableOutputFormat<ImmutableBytesWritable> BASE_FORMAT =
+    new TableOutputFormat<>();
 
   /**
    * Constructor
@@ -55,11 +52,9 @@ public abstract class HBaseVertexOutputFormat<
    * @param <V> Vertex value
    * @param <E> Edge value
    */
-  public abstract static class HBaseVertexWriter<
-    I extends WritableComparable,
-    V extends Writable,
-    E extends Writable>
-    extends VertexWriter<I, V, E> {
+  public abstract static class HBaseVertexWriter<I extends
+    WritableComparable, V extends Writable, E extends Writable> extends
+    VertexWriter<I, V, E> {
 
     /**
      * Context
@@ -77,8 +72,8 @@ public abstract class HBaseVertexOutputFormat<
      *
      * @param context task attempt context
      */
-    public HBaseVertexWriter(TaskAttemptContext context)
-      throws IOException, InterruptedException {
+    public HBaseVertexWriter(TaskAttemptContext context) throws IOException,
+      InterruptedException {
       BASE_FORMAT.setConf(context.getConfiguration());
       this.recordWriter = BASE_FORMAT.getRecordWriter(context);
     }
@@ -89,8 +84,7 @@ public abstract class HBaseVertexOutputFormat<
      * @param context Context used to write the vertices.
      * @throws IOException
      */
-    public void initialize(TaskAttemptContext context)
-      throws IOException {
+    public void initialize(TaskAttemptContext context) throws IOException {
       this.context = context;
     }
 
@@ -101,8 +95,8 @@ public abstract class HBaseVertexOutputFormat<
      * @throws IOException
      * @throws InterruptedException
      */
-    public void close(TaskAttemptContext context)
-      throws IOException, InterruptedException {
+    public void close(TaskAttemptContext context) throws IOException,
+      InterruptedException {
       recordWriter.close(context);
     }
 
@@ -111,8 +105,7 @@ public abstract class HBaseVertexOutputFormat<
      *
      * @return Record writer to be used for writing.
      */
-    public RecordWriter<ImmutableBytesWritable,
-      Mutation> getRecordWriter() {
+    public RecordWriter<ImmutableBytesWritable, Mutation> getRecordWriter() {
       return recordWriter;
     }
 
@@ -133,8 +126,8 @@ public abstract class HBaseVertexOutputFormat<
    * @throws IOException
    * @throws InterruptedException
    */
-  public void checkOutputSpecs(JobContext context)
-    throws IOException, InterruptedException {
+  public void checkOutputSpecs(JobContext context) throws IOException,
+    InterruptedException {
     BASE_FORMAT.checkOutputSpecs(context);
   }
 
@@ -146,9 +139,8 @@ public abstract class HBaseVertexOutputFormat<
    * @throws IOException
    * @throws InterruptedException
    */
-  public OutputCommitter getOutputCommitter(
-    TaskAttemptContext context)
-    throws IOException, InterruptedException {
+  public OutputCommitter getOutputCommitter(TaskAttemptContext context) throws
+    IOException, InterruptedException {
     BASE_FORMAT.setConf(getConf());
     return BASE_FORMAT.getOutputCommitter(context);
   }

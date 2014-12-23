@@ -68,8 +68,8 @@ public class BTGComputation extends
   private long getCurrentMinValue(
     Vertex<LongWritable, BTGVertexValue, NullWritable> vertex) {
     List<Long> btgIDs = Lists.newArrayList(vertex.getValue().getGraphs());
-    return (btgIDs.size() > 0) ? btgIDs.get(
-      btgIDs.size() - 1) : vertex.getId().get();
+    return (btgIDs.size() > 0) ? btgIDs.get(btgIDs.size() - 1) :
+      vertex.getId().get();
   }
 
   /**
@@ -81,7 +81,7 @@ public class BTGComputation extends
    * @return The new (maybe unchanged) minimum value
    */
   private long getNewMinValue(Iterable<BTGMessage> messages,
-                              long currentMinValue) {
+    long currentMinValue) {
     long newMinValue = currentMinValue;
     for (BTGMessage message : messages) {
       if (message.getBtgID() < newMinValue) {
@@ -102,8 +102,8 @@ public class BTGComputation extends
     Iterable<BTGMessage> messages) {
     BTGVertexValue vertexValue = vertex.getValue();
     for (BTGMessage message : messages) {
-      vertexValue.updateNeighbourBtgID(message.getSenderID(),
-        message.getBtgID());
+      vertexValue
+        .updateNeighbourBtgID(message.getSenderID(), message.getBtgID());
     }
     vertexValue.updateBtgIDs();
     // in case the vertex has no neighbours
@@ -138,8 +138,7 @@ public class BTGComputation extends
    */
   @Override
   public void compute(Vertex<LongWritable, BTGVertexValue, NullWritable> vertex,
-                      Iterable<BTGMessage> messages)
-    throws IOException {
+    Iterable<BTGMessage> messages) throws IOException {
     if (vertex.getValue().getVertexType() == BTGVertexType.MASTER) {
       processMasterVertex(vertex, messages);
     } else if (vertex.getValue().getVertexType() ==

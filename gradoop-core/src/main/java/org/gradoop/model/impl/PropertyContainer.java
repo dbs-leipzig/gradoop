@@ -9,7 +9,10 @@ import java.util.Map;
  * Abstract entity that holds properties.
  */
 public abstract class PropertyContainer implements Attributed {
-  protected Map<String, Object> properties;
+  /**
+   * Internal property storage
+   */
+  private Map<String, Object> properties;
 
   /**
    * Creates an object from the given parameters. Can only be called by

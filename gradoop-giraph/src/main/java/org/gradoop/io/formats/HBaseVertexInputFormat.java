@@ -11,7 +11,6 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,23 +34,14 @@ import java.util.List;
  * @param <V> Vertex value
  * @param <E> Edge value
  */
-public abstract class HBaseVertexInputFormat<
-  I extends WritableComparable,
-  V extends Writable,
-  E extends Writable>
-  extends VertexInputFormat<I, V, E> {
-
+public abstract class HBaseVertexInputFormat<I extends WritableComparable, V
+  extends Writable, E extends Writable> extends
+  VertexInputFormat<I, V, E> {
 
   /**
    * delegate HBase table input format
    */
-  protected static final TableInputFormat BASE_FORMAT =
-    new TableInputFormat();
-  /**
-   * logger
-   */
-  private static final Logger LOG =
-    Logger.getLogger(HBaseVertexInputFormat.class);
+  protected static final TableInputFormat BASE_FORMAT = new TableInputFormat();
 
   /**
    * Takes an instance of RecordReader that supports HBase row-key, result
@@ -63,11 +53,9 @@ public abstract class HBaseVertexInputFormat<
    * @param <V> Vertex value
    * @param <E> Edge value
    */
-  public abstract static class HBaseVertexReader<
-    I extends WritableComparable,
-    V extends Writable,
-    E extends Writable>
-    extends VertexReader<I, V, E> {
+  public abstract static class HBaseVertexReader<I extends
+    WritableComparable, V extends Writable, E extends Writable> extends
+    VertexReader<I, V, E> {
 
     /**
      * Reader instance
@@ -85,8 +73,8 @@ public abstract class HBaseVertexInputFormat<
      * @param context Context
      * @throws java.io.IOException
      */
-    public HBaseVertexReader(InputSplit split, TaskAttemptContext context)
-      throws IOException {
+    public HBaseVertexReader(InputSplit split,
+      TaskAttemptContext context) throws IOException {
       BASE_FORMAT.setConf(context.getConfiguration());
       this.reader = BASE_FORMAT.createRecordReader(split, context);
     }
@@ -100,8 +88,7 @@ public abstract class HBaseVertexInputFormat<
      * @throws InterruptedException
      */
     public void initialize(InputSplit inputSplit,
-                           TaskAttemptContext context)
-      throws IOException, InterruptedException {
+      TaskAttemptContext context) throws IOException, InterruptedException {
       reader.initialize(inputSplit, context);
       this.context = context;
     }
@@ -111,8 +98,7 @@ public abstract class HBaseVertexInputFormat<
      *
      * @throws IOException
      */
-    public void close()
-      throws IOException {
+    public void close() throws IOException {
       reader.close();
     }
 
@@ -123,9 +109,7 @@ public abstract class HBaseVertexInputFormat<
      * @throws IOException
      * @throws InterruptedException
      */
-    public float getProgress()
-      throws
-      IOException, InterruptedException {
+    public float getProgress() throws IOException, InterruptedException {
       return reader.getProgress();
     }
 
@@ -134,8 +118,7 @@ public abstract class HBaseVertexInputFormat<
      *
      * @return Record reader to be used for reading.
      */
-    protected RecordReader<ImmutableBytesWritable,
-      Result> getRecordReader() {
+    protected RecordReader<ImmutableBytesWritable, Result> getRecordReader() {
       return reader;
     }
 
@@ -151,9 +134,8 @@ public abstract class HBaseVertexInputFormat<
   }
 
   @Override
-  public List<InputSplit> getSplits(
-    JobContext context, int minSplitCountHint)
-    throws IOException, InterruptedException {
+  public List<InputSplit> getSplits(JobContext context,
+    int minSplitCountHint) throws IOException, InterruptedException {
     BASE_FORMAT.setConf(getConf());
     return BASE_FORMAT.getSplits(context);
   }

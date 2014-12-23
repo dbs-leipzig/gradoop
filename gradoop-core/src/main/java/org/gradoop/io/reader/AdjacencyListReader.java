@@ -30,7 +30,7 @@ public class AdjacencyListReader {
    * @param vertexLineReader used to read and process a single input line
    */
   public AdjacencyListReader(final GraphStore graphStore,
-                             final VertexLineReader vertexLineReader) {
+    final VertexLineReader vertexLineReader) {
     this.graphStore = graphStore;
     this.vertexLineReader = vertexLineReader;
   }
@@ -42,8 +42,7 @@ public class AdjacencyListReader {
    * @param bufferedReader buffered line reader
    * @throws IOException
    */
-  public void read(final BufferedReader bufferedReader)
-    throws IOException {
+  public void read(final BufferedReader bufferedReader) throws IOException {
     String line;
     boolean readerHasListSupport = vertexLineReader.supportsVertexLists();
     while ((line = bufferedReader.readLine()) != null) {

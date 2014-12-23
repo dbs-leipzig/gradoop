@@ -35,8 +35,7 @@ public class BTGHBaseVertexInputFormat extends
   @Override
   public VertexReader<LongWritable, BTGVertexValue, NullWritable>
   createVertexReader(
-    InputSplit split, TaskAttemptContext context)
-    throws IOException {
+    InputSplit split, TaskAttemptContext context) throws IOException {
     return new BTGHBaseVertexReader(split, context);
   }
 
@@ -48,6 +47,9 @@ public class BTGHBaseVertexInputFormat extends
 
   }
 
+  /**
+   * Reads a single giraph vertex for BTG computation from a HBase row result.
+   */
   public static class BTGHBaseVertexReader extends
     HBaseVertexReader<LongWritable, BTGVertexValue, NullWritable> {
 
@@ -59,8 +61,7 @@ public class BTGHBaseVertexInputFormat extends
      * @throws java.io.IOException
      */
     public BTGHBaseVertexReader(InputSplit split,
-                                TaskAttemptContext context)
-      throws IOException {
+      TaskAttemptContext context) throws IOException {
       super(split, context);
     }
 
@@ -68,8 +69,7 @@ public class BTGHBaseVertexInputFormat extends
      * {@inheritDoc}
      */
     @Override
-    public boolean nextVertex()
-      throws IOException, InterruptedException {
+    public boolean nextVertex() throws IOException, InterruptedException {
       return getRecordReader().nextKeyValue();
     }
 
@@ -77,16 +77,17 @@ public class BTGHBaseVertexInputFormat extends
      * {@inheritDoc}
      */
     @Override
-    public Vertex<LongWritable, BTGVertexValue, NullWritable> getCurrentVertex()
-      throws IOException, InterruptedException {
+    public Vertex<LongWritable, BTGVertexValue, NullWritable>
+    getCurrentVertex() throws
+      IOException, InterruptedException {
       Result row = getRecordReader().getCurrentValue();
 
-      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex = getConf()
-        .createVertex();
+      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex =
+        getConf().createVertex();
 
       // vertexID
-      LongWritable vertexID = new LongWritable(VERTEX_HANDLER.getVertexID(row
-        .getRow()));
+      LongWritable vertexID =
+        new LongWritable(VERTEX_HANDLER.getVertexID(row.getRow()));
 
       // vertex type is stored the first label of the vertex
       Iterable<String> vertexLabels = VERTEX_HANDLER.readLabels(row);
@@ -99,8 +100,8 @@ public class BTGHBaseVertexInputFormat extends
       // btgIDs are the graphs this vertex belongs to
       List<Long> btgIDs = Lists.newArrayList(VERTEX_HANDLER.readGraphs(row));
 
-      BTGVertexValue btgVertexValue = new BTGVertexValue(vertexType,
-        vertexValue, btgIDs);
+      BTGVertexValue btgVertexValue =
+        new BTGVertexValue(vertexType, vertexValue, btgIDs);
 
       // read outgoing edges
       List<Edge<LongWritable, NullWritable>> edges = Lists.newArrayList();

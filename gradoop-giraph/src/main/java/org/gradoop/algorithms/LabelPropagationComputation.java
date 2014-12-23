@@ -30,8 +30,8 @@ public class LabelPropagationComputation extends
    * @param messages All incoming messages
    * @return the new Value the vertex will become
    */
-  private int getNewValue(Vertex<IntWritable, IntWritable,
-    NullWritable> vertex, Iterable<IntWritable> messages) {
+  private int getNewValue(Vertex<IntWritable, IntWritable, NullWritable> vertex,
+    Iterable<IntWritable> messages) {
     int newValue;
     //TODO: create allMessages more efficient
     //List<IntWritable> allMessages = Lists.newArrayList(messages);
@@ -59,8 +59,9 @@ public class LabelPropagationComputation extends
    * @param allMessages All messages the current vertex has received
    * @return the maximal frequent number in all received messages
    */
-  private int getMostFrequent(Vertex<IntWritable, IntWritable,
-    NullWritable> vertex, List<Integer> allMessages) {
+  private int getMostFrequent(
+    Vertex<IntWritable, IntWritable, NullWritable> vertex,
+    List<Integer> allMessages) {
     Collections.sort(allMessages);
     int newValue;
     int currentCounter = 1;
@@ -100,8 +101,7 @@ public class LabelPropagationComputation extends
    */
   @Override
   public void compute(Vertex<IntWritable, IntWritable, NullWritable> vertex,
-                      Iterable<IntWritable> messages)
-    throws IOException {
+    Iterable<IntWritable> messages) throws IOException {
     if (getSuperstep() == 0) {
       sendMessageToAllEdges(vertex, vertex.getId());
     } else {

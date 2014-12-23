@@ -29,7 +29,7 @@ public class DefaultEdge extends SingleLabeledPropertyContainer implements
    * @param properties edge properties
    */
   DefaultEdge(final Long otherID, final String label, final Long index,
-              final Map<String, Object> properties) {
+    final Map<String, Object> properties) {
     super(label, properties);
     this.otherID = otherID;
     this.index = index;
@@ -70,7 +70,7 @@ public class DefaultEdge extends SingleLabeledPropertyContainer implements
     DefaultEdge that = (DefaultEdge) o;
 
     return index.equals(that.index) && otherID.equals(that.otherID) &&
-      getLabel().equals((that.getLabel()));
+      getLabel().equals(that.getLabel());
   }
 
   /**

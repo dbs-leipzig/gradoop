@@ -19,9 +19,9 @@ import java.util.Map;
 /**
  * Used to read a EPG based graph from HBase into Giraph.
  */
-public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
-  EPGVertexIdentifierWritable, EPGMultiLabeledAttributedWritable,
-  EPGEdgeValueWritable> {
+public class EPGHBaseVertexInputFormat extends
+  HBaseVertexInputFormat<EPGVertexIdentifierWritable,
+    EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable> {
 
   /**
    * Vertex handler to read vertices from HBase.
@@ -33,10 +33,8 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
    */
   @Override
   public VertexReader<EPGVertexIdentifierWritable,
-    EPGMultiLabeledAttributedWritable,
-    EPGEdgeValueWritable> createVertexReader(
-    InputSplit split, TaskAttemptContext context)
-    throws IOException {
+    EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable> createVertexReader(
+    InputSplit split, TaskAttemptContext context) throws IOException {
     return new EPGHBaseVertexReader(split, context);
   }
 
@@ -48,10 +46,12 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
 
   }
 
+  /**
+   * Reads an EPG vertex from a given HBase row result.
+   */
   public static class EPGHBaseVertexReader extends
     HBaseVertexReader<EPGVertexIdentifierWritable,
-      EPGMultiLabeledAttributedWritable,
-      EPGEdgeValueWritable> {
+      EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable> {
 
     /**
      * Sets the base TableInputFormat and creates a record reader.
@@ -61,31 +61,35 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
      * @throws java.io.IOException
      */
     public EPGHBaseVertexReader(InputSplit split,
-                                TaskAttemptContext context)
-      throws IOException {
+      TaskAttemptContext context) throws IOException {
       super(split, context);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean nextVertex()
-      throws IOException, InterruptedException {
+    public boolean nextVertex() throws IOException, InterruptedException {
       return getRecordReader().nextKeyValue();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Vertex<EPGVertexIdentifierWritable,
-      EPGMultiLabeledAttributedWritable,
-      EPGEdgeValueWritable> getCurrentVertex()
-      throws IOException, InterruptedException {
+      EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable>
+    getCurrentVertex() throws
+      IOException, InterruptedException {
       Result row = getRecordReader().getCurrentValue();
 
       Vertex<EPGVertexIdentifierWritable, EPGMultiLabeledAttributedWritable,
-        EPGEdgeValueWritable> vertex = getConf().createVertex();
+        EPGEdgeValueWritable>
+        vertex = getConf().createVertex();
 
       // vertexID
-      EPGVertexIdentifierWritable vertexID =
-        new EPGVertexIdentifierWritable(
-          VERTEX_HANDLER.getVertexID(row.getRow()));
+      EPGVertexIdentifierWritable vertexID = new EPGVertexIdentifierWritable(
+        VERTEX_HANDLER.getVertexID(row.getRow()));
 
       // labels
       Iterable<String> labels = VERTEX_HANDLER.readLabels(row);
@@ -94,16 +98,16 @@ public class EPGHBaseVertexInputFormat extends HBaseVertexInputFormat<
       // graphs
       Iterable<Long> graphs = VERTEX_HANDLER.readGraphs(row);
       // create vertex value
-      EPGVertexValueWritable vertexValue = new
-        EPGVertexValueWritable(labels, properties, graphs);
+      EPGVertexValueWritable vertexValue =
+        new EPGVertexValueWritable(labels, properties, graphs);
 
-      List<Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable>>
-        edges = Lists.newArrayList();
+      List<Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable>> edges =
+        Lists.newArrayList();
       // outgoing edges
       for (org.gradoop.model.Edge edge : VERTEX_HANDLER
         .readOutgoingEdges(row)) {
-        EPGVertexIdentifierWritable edgeTarget = new
-          EPGVertexIdentifierWritable(edge.getOtherID());
+        EPGVertexIdentifierWritable edgeTarget =
+          new EPGVertexIdentifierWritable(edge.getOtherID());
         EPGEdgeValueWritable edgeValue = new EPGEdgeValueWritable(edge);
         edges.add(EdgeFactory.create(edgeTarget, edgeValue));
       }

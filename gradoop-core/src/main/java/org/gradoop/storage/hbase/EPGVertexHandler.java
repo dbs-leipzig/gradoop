@@ -25,10 +25,11 @@ import java.util.regex.Pattern;
 /**
  * Used to read and write an EPG vertex from/to a HBase table.
  */
-public class EPGVertexHandler extends BasicHandler
-  implements VertexHandler {
-  private static Logger LOG =
-    Logger.getLogger(EPGVertexHandler.class);
+public class EPGVertexHandler extends BasicHandler implements VertexHandler {
+  /**
+   * Logger
+   */
+  private static Logger LOG = Logger.getLogger(EPGVertexHandler.class);
 
   /**
    * Byte array representation of the outgoing edges column family.
@@ -70,16 +71,12 @@ public class EPGVertexHandler extends BasicHandler
    */
   @Override
   public void createVerticesTable(final HBaseAdmin admin,
-                                  final HTableDescriptor tableDescriptor)
-    throws IOException {
+    final HTableDescriptor tableDescriptor) throws IOException {
     LOG.info("creating table " + tableDescriptor.getNameAsString());
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_LABELS));
-    tableDescriptor
-      .addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
-    tableDescriptor
-      .addFamily(new HColumnDescriptor(GConstants.CF_OUT_EDGES));
-    tableDescriptor
-      .addFamily(new HColumnDescriptor(GConstants.CF_IN_EDGES));
+    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
+    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_OUT_EDGES));
+    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_IN_EDGES));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_GRAPHS));
     admin.createTable(tableDescriptor);
   }
@@ -110,8 +107,8 @@ public class EPGVertexHandler extends BasicHandler
    * {@inheritDoc}
    */
   @Override
-  public Put writeOutgoingEdges(final Put put, final Iterable<? extends Edge>
-    edges) {
+  public Put writeOutgoingEdges(final Put put,
+    final Iterable<? extends Edge> edges) {
     return writeEdges(put, CF_OUT_EDGES_BYTES, edges);
   }
 
@@ -120,7 +117,7 @@ public class EPGVertexHandler extends BasicHandler
    */
   @Override
   public Put writeIncomingEdges(final Put put,
-                                final Iterable<? extends Edge> edges) {
+    final Iterable<? extends Edge> edges) {
     return writeEdges(put, CF_IN_EDGES_BYTES, edges);
   }
 
@@ -177,25 +174,24 @@ public class EPGVertexHandler extends BasicHandler
    */
   @Override
   public Vertex readVertex(final Result res) {
-    return VertexFactory.createDefaultVertex(
-      Long.valueOf(Bytes.toString(res.getRow())),
-      readLabels(res),
-      readProperties(res),
-      readOutgoingEdges(res),
-      readIncomingEdges(res), readGraphs(res));
+    return VertexFactory
+      .createDefaultVertex(Long.valueOf(Bytes.toString(res.getRow())),
+        readLabels(res), readProperties(res), readOutgoingEdges(res),
+        readIncomingEdges(res), readGraphs(res));
   }
 
   /**
    * Adds edges to the the given HBase put.
    *
-   * @param put          {@link org.apache.hadoop.hbase.client.Put} to write the
+   * @param put          {@link org.apache.hadoop.hbase.client.Put} to
+   *                     write the
    *                     edges to
    * @param columnFamily CF where the edges shall be stored
    * @param edges        edges to store
    * @return the updated put
    */
   private Put writeEdges(Put put, final byte[] columnFamily,
-                         final Iterable<? extends Edge> edges) {
+    final Iterable<? extends Edge> edges) {
     if (edges != null) {
       for (Edge edge : edges) {
         put = writeEdge(put, columnFamily, edge);
@@ -207,14 +203,15 @@ public class EPGVertexHandler extends BasicHandler
   /**
    * Writes a single edge to a given put.
    *
-   * @param put          {@link org.apache.hadoop.hbase.client.Put} to write the
+   * @param put          {@link org.apache.hadoop.hbase.client.Put} to
+   *                     write the
    *                     edge to
    * @param columnFamily CF where the edges shall be stored
    * @param edge         edge to store
    * @return the updated put
    */
   private Put writeEdge(final Put put, final byte[] columnFamily,
-                        final Edge edge) {
+    final Edge edge) {
     String edgeKey = createEdgeIdentifier(edge);
     byte[] edgeKeyBytes = Bytes.toBytes(edgeKey);
     String properties = createEdgePropertiesString(edge);
@@ -233,12 +230,9 @@ public class EPGVertexHandler extends BasicHandler
    * @return string representation of the edge identifier
    */
   private String createEdgeIdentifier(final Edge edge) {
-    return String.format("%s%s%d%s%d",
-      edge.getLabel(),
-      EDGE_KEY_TOKEN_SEPARATOR_STRING,
-      edge.getOtherID(),
-      EDGE_KEY_TOKEN_SEPARATOR_STRING,
-      edge.getIndex());
+    return String
+      .format("%s%s%d%s%d", edge.getLabel(), EDGE_KEY_TOKEN_SEPARATOR_STRING,
+        edge.getOtherID(), EDGE_KEY_TOKEN_SEPARATOR_STRING, edge.getIndex());
   }
 
   /**
@@ -255,16 +249,13 @@ public class EPGVertexHandler extends BasicHandler
       final List<String> propertyStrings = Lists.newArrayList();
       for (String propertyKey : propertyKeys) {
         Object propertyValue = edge.getProperty(propertyKey);
-        String propertyString = String.format("%s%s%d%s%s",
-          propertyKey,
-          PROPERTY_TOKEN_SEPARATOR_STRING,
-          getType(propertyValue),
-          PROPERTY_TOKEN_SEPARATOR_STRING,
-          propertyValue);
+        String propertyString = String
+          .format("%s%s%d%s%s", propertyKey, PROPERTY_TOKEN_SEPARATOR_STRING,
+            getType(propertyValue), PROPERTY_TOKEN_SEPARATOR_STRING,
+            propertyValue);
         propertyStrings.add(propertyString);
       }
-      result = Joiner.on(PROPERTY_TOKEN_SEPARATOR_STRING).join
-        (propertyStrings);
+      result = Joiner.on(PROPERTY_TOKEN_SEPARATOR_STRING).join(propertyStrings);
     }
     return result;
   }
@@ -278,7 +269,7 @@ public class EPGVertexHandler extends BasicHandler
    * @return edges
    */
   private Iterable<Edge> readEdges(final Result res,
-                                   final byte[] columnFamily) {
+    final byte[] columnFamily) {
     final List<Edge> edges = Lists.newArrayList();
     for (Map.Entry<byte[], byte[]> edgeColumn : res.getFamilyMap(columnFamily)
       .entrySet()) {
@@ -310,13 +301,13 @@ public class EPGVertexHandler extends BasicHandler
    * @param properties key-value-map
    * @return Edge object
    */
-  private Edge readEdge(final String edgeKey, final Map<String,
-    Object> properties) {
+  private Edge readEdge(final String edgeKey,
+    final Map<String, Object> properties) {
     String[] keyTokens = EDGE_KEY_TOKEN_SEPARATOR_PATTERN.split(edgeKey);
     String edgeLabel = keyTokens[0];
     Long otherID = Long.valueOf(keyTokens[1]);
     Long edgeIndex = Long.valueOf(keyTokens[2]);
-    return EdgeFactory.createDefaultEdge(otherID, edgeLabel, edgeIndex,
-      properties);
+    return EdgeFactory
+      .createDefaultEdge(otherID, edgeLabel, edgeIndex, properties);
   }
 }

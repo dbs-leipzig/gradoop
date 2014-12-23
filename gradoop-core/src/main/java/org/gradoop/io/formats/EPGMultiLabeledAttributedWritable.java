@@ -14,8 +14,8 @@ import java.util.Map;
  * Used to manage (de-)serialization of attributed entities that can have
  * multiple labels.
  */
-public class EPGMultiLabeledAttributedWritable extends EPGAttributedWritable
-  implements MultiLabeled, Writable {
+public class EPGMultiLabeledAttributedWritable extends
+  EPGAttributedWritable implements MultiLabeled, Writable {
 
   /**
    * Holds all labels of that entity.
@@ -35,8 +35,8 @@ public class EPGMultiLabeledAttributedWritable extends EPGAttributedWritable
    * @param labels     initial list of labels (can be {@code null})
    * @param properties key-value-map (can be {@code null})
    */
-  public EPGMultiLabeledAttributedWritable(Iterable<String> labels, Map<String,
-    Object> properties) {
+  public EPGMultiLabeledAttributedWritable(Iterable<String> labels,
+    Map<String, Object> properties) {
     super(properties);
     this.labels = (labels != null) ? Lists.newArrayList(labels) : null;
   }
@@ -75,8 +75,7 @@ public class EPGMultiLabeledAttributedWritable extends EPGAttributedWritable
    * {@inheritDoc}
    */
   @Override
-  public void write(DataOutput dataOutput)
-    throws IOException {
+  public void write(DataOutput dataOutput) throws IOException {
     dataOutput.writeInt(labels.size());
     for (String label : labels) {
       dataOutput.writeUTF(label);
@@ -88,8 +87,7 @@ public class EPGMultiLabeledAttributedWritable extends EPGAttributedWritable
    * {@inheritDoc}
    */
   @Override
-  public void readFields(DataInput dataInput)
-    throws IOException {
+  public void readFields(DataInput dataInput) throws IOException {
     // labels
     final int labelCount = dataInput.readInt();
     for (int i = 0; i < labelCount; i++) {

@@ -19,30 +19,39 @@ import java.util.List;
  * Used to write the result of a graph computation into HBase. The graph is
  * based on the EPG model.
  */
-public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
-  EPGVertexIdentifierWritable, EPGVertexValueWritable,
-  EPGEdgeValueWritable> {
+public class EPGHBaseVertexOutputFormat extends
+  HBaseVertexOutputFormat<EPGVertexIdentifierWritable,
+    EPGVertexValueWritable, EPGEdgeValueWritable> {
 
+  /**
+   * Vertex handler to write vertices to HBase.
+   */
   private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public VertexWriter<EPGVertexIdentifierWritable, EPGVertexValueWritable,
     EPGEdgeValueWritable> createVertexWriter(
-    TaskAttemptContext context)
-    throws IOException, InterruptedException {
+    TaskAttemptContext context) throws IOException, InterruptedException {
     return new EPGHBaseVertexWriter(context);
   }
 
-  public static class EPGHBaseVertexWriter extends HBaseVertexWriter<
-    EPGVertexIdentifierWritable, EPGVertexValueWritable, EPGEdgeValueWritable> {
+  /**
+   * Writes a single giraph vertex back to HBase.
+   */
+  public static class EPGHBaseVertexWriter extends
+    HBaseVertexWriter<EPGVertexIdentifierWritable, EPGVertexValueWritable,
+      EPGEdgeValueWritable> {
 
     /**
      * Sets up base table output format and creates a record writer.
      *
      * @param context task attempt context
      */
-    public EPGHBaseVertexWriter(TaskAttemptContext context)
-      throws IOException, InterruptedException {
+    public EPGHBaseVertexWriter(TaskAttemptContext context) throws IOException,
+      InterruptedException {
       super(context);
     }
 
@@ -52,8 +61,8 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
     @Override
     public void writeVertex(
       Vertex<EPGVertexIdentifierWritable, EPGVertexValueWritable,
-        EPGEdgeValueWritable> vertex)
-      throws IOException, InterruptedException {
+        EPGEdgeValueWritable> vertex) throws
+      IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
       // vertex identifier
       byte[] rowKey = VERTEX_HANDLER.getRowKey(vertex.getId().getID());
@@ -65,10 +74,10 @@ public class EPGHBaseVertexOutputFormat extends HBaseVertexOutputFormat<
       // graphs
       put = VERTEX_HANDLER.writeGraphs(put, vertex.getValue());
       // outgoing edges
-      List<org.gradoop.model.Edge> edges = Lists.newArrayListWithCapacity
-        (vertex.getNumEdges());
-      for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> edge :
-        vertex.getEdges()) {
+      List<org.gradoop.model.Edge> edges =
+        Lists.newArrayListWithCapacity(vertex.getNumEdges());
+      for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> edge : vertex
+        .getEdges()) {
         edges.add(edge.getValue());
       }
       VERTEX_HANDLER.writeOutgoingEdges(put, edges);

@@ -37,8 +37,7 @@ public class EdgeFactory {
    * @return edge connected to otherID with label and index
    */
   public static Edge createDefaultEdgeWithLabel(final Long otherID,
-                                                final String label,
-                                                final Long index) {
+    final String label, final Long index) {
     return createDefaultEdge(otherID, label, index, null);
   }
 
@@ -52,8 +51,7 @@ public class EdgeFactory {
    * @return edge connected to otherID with label, properties and index
    */
   public static Edge createDefaultEdge(final Long otherID, final String label,
-                                       final Long index,
-                                       final Map<String, Object> properties) {
+    final Long index, final Map<String, Object> properties) {
     checkID(otherID);
     checkIndex(index);
     checkLabel(label);
@@ -82,6 +80,11 @@ public class EdgeFactory {
     }
   }
 
+  /**
+   * Checks if {@code label} is valid (not null or empty).
+   *
+   * @param label edge label
+   */
   private static void checkLabel(String label) {
     if (label == null || "".equals(label)) {
       throw new IllegalArgumentException("label must not be null or empty");

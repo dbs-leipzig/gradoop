@@ -31,8 +31,8 @@ import java.io.IOException;
  * Used for aggregate calculation of each BTG inside the graph. The aggregation
  * is based on a user-defined function.
  */
-public class AggregateComputation extends BasicComputation<
-  LongWritable, BTGVertexValue, NullWritable, NullWritable> {
+public class AggregateComputation extends
+  BasicComputation<LongWritable, BTGVertexValue, NullWritable, NullWritable> {
   /**
    * Prefix for global aggregators for specific BTGs
    */
@@ -57,10 +57,8 @@ public class AggregateComputation extends BasicComputation<
   public static final Long DEFAULT_BTG_CNT = 10L;
 
   @Override
-  public void compute(
-    Vertex<LongWritable, BTGVertexValue, NullWritable> vertex,
-    Iterable<NullWritable> messages)
-    throws IOException {
+  public void compute(Vertex<LongWritable, BTGVertexValue, NullWritable> vertex,
+    Iterable<NullWritable> messages) throws IOException {
     if (getSuperstep() == 0) {
       for (long btgID : vertex.getValue().getGraphs()) {
         String aggregator = BTG_AGGREGATOR_PREFIX + btgID;

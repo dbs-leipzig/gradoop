@@ -45,6 +45,8 @@ public interface GraphStore {
   /**
    * Setting this value to true, forces the store implementation to flush the
    * write buffers after every write.
+   *
+   * @param autoFlush true to enable auto flush, false to disable
    */
   void setAutoFlush(boolean autoFlush);
 

@@ -23,9 +23,18 @@ public class PairWritable implements Writable {
    */
   private DoubleWritable value;
 
+  /**
+   * Default constructor needed for deserialization.
+   */
   public PairWritable() {
   }
 
+  /**
+   * Creates a PairWritable based on the given parameters.
+   *
+   * @param predicateResult predicate result
+   * @param value           value for aggregation
+   */
   public PairWritable(BooleanWritable predicateResult, DoubleWritable value) {
     this.predicateResult = predicateResult;
     this.value = value;
@@ -39,16 +48,20 @@ public class PairWritable implements Writable {
     return value;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void write(DataOutput dataOutput)
-    throws IOException {
+  public void write(DataOutput dataOutput) throws IOException {
     predicateResult.write(dataOutput);
     value.write(dataOutput);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void readFields(DataInput dataInput)
-    throws IOException {
+  public void readFields(DataInput dataInput) throws IOException {
     if (this.predicateResult == null) {
       this.predicateResult = new BooleanWritable();
     }
