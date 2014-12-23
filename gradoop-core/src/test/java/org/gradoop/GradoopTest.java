@@ -7,7 +7,7 @@ import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.EdgeFactory;
+import org.gradoop.model.impl.EdgeFactory;
 import org.gradoop.storage.GraphStore;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;

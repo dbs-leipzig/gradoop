@@ -13,8 +13,8 @@ import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.GraphElement;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.EdgeFactory;
-import org.gradoop.model.inmemory.MemoryVertex;
+import org.gradoop.model.impl.EdgeFactory;
+import org.gradoop.model.impl.VertexFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -177,7 +177,7 @@ public class EPGVertexHandler extends BasicHandler
    */
   @Override
   public Vertex readVertex(final Result res) {
-    return new MemoryVertex(
+    return VertexFactory.createDefaultVertex(
       Long.valueOf(Bytes.toString(res.getRow())),
       readLabels(res),
       readProperties(res),
@@ -304,7 +304,7 @@ public class EPGVertexHandler extends BasicHandler
   /**
    * Creates an edge object based on the given key and properties. The given
    * edge key is separated into tokens and used to create a new {@link
-   * org.gradoop.model.inmemory.DefaultEdge} instance.
+   * org.gradoop.model.impl.DefaultEdge} instance.
    *
    * @param edgeKey    string representation of edge key
    * @param properties key-value-map

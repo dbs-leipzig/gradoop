@@ -9,8 +9,8 @@ import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.EdgeFactory;
-import org.gradoop.model.inmemory.MemoryVertex;
+import org.gradoop.model.impl.EdgeFactory;
+import org.gradoop.model.impl.VertexFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -115,17 +115,16 @@ public class FoodBrokerReader implements VertexLineReader {
     addProperties(edgeOut, edge.getJSONObject(META),
       BIIIGConstants.META_PREFIX);
     addProperties(edgeOut, edge.getJSONObject(DATA));
-    vList.add(new MemoryVertex(sourceID, null, null,
-      Lists.newArrayList(edgeOut), null, null));
+    vList.add(VertexFactory.createDefaultVertexWithEdges(sourceID,
+      Lists.newArrayList(edgeOut), null));
 
     // incoming edge on target vertex
     Edge edgeIn = EdgeFactory.createDefaultEdge(sourceID, edgeType, RANDOM
       .nextLong());
     addProperties(edgeIn, edge.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(edgeIn, edge.getJSONObject(DATA));
-    vList.add(new MemoryVertex(targetID, null, null, null,
-      Lists.newArrayList(edgeIn), null));
-
+    vList.add(VertexFactory.createDefaultVertexWithEdges(targetID, null, Lists
+      .newArrayList(edgeIn)));
     return vList;
   }
 
@@ -139,7 +138,7 @@ public class FoodBrokerReader implements VertexLineReader {
   private List<Vertex> createFromVertexLine(JSONObject vertex)
     throws JSONException {
     Long vertexID = vertex.getLong(VERTEX_ID);
-    Vertex v = new MemoryVertex(vertexID);
+    Vertex v = VertexFactory.createDefaultVertexWithID(vertexID);
     addProperties(v, vertex.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(v, vertex.getJSONObject(DATA));
     v.addLabel(String.valueOf(getKind(vertex)));

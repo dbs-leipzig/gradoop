@@ -5,8 +5,8 @@ import com.google.common.collect.Maps;
 import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.EdgeFactory;
-import org.gradoop.model.inmemory.MemoryVertex;
+import org.gradoop.model.impl.EdgeFactory;
+import org.gradoop.model.impl.VertexFactory;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
 import java.util.Arrays;
@@ -79,8 +79,8 @@ public class EPGVertexReader implements VertexLineReader {
     Iterable<Edge> inEdges = readEdges(lineTokens[4]);
     Iterable<Long> graphs = readGraphs(lineTokens[5]);
 
-    return new MemoryVertex(vertexID, labels, properties, outEdges, inEdges,
-      graphs);
+    return VertexFactory.createDefaultVertex(vertexID, labels, properties,
+      outEdges, inEdges, graphs);
   }
 
   /**

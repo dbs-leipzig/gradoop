@@ -1,4 +1,4 @@
-package org.gradoop.model.inmemory;
+package org.gradoop.model.impl;
 
 import com.google.common.collect.Maps;
 import org.gradoop.GConstants;
@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 public class DefaultEdgeTest {
 
   @Test
-  public void createOtherIDIndexTest() {
+  public void createWithOtherIDIndexTest() {
     Long otherID = 0L;
     Long index = 0L;
     Edge e = EdgeFactory.createDefaultEdge(otherID, index);
@@ -24,7 +24,7 @@ public class DefaultEdgeTest {
   }
 
   @Test
-  public void createOtherIDLabelIndexTest() {
+  public void createWithOtherIDLabelIndexTest() {
     Long otherID = 0L;
     String label = "label";
     Long index = 0L;
@@ -35,7 +35,7 @@ public class DefaultEdgeTest {
   }
 
   @Test
-  public void createOtherIDLabelIndexPropertiesTest() {
+  public void createWithOtherIDLabelIndexPropertiesTest() {
     Long otherID = 0L;
     String label = "label";
     Long index = 0L;
@@ -51,19 +51,19 @@ public class DefaultEdgeTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createMissingOtherIDTest() {
+  public void createWithMissingOtherIDTest() {
     Long index = 0L;
     EdgeFactory.createDefaultEdge(null, index);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createMissingIndexTest() {
+  public void createWithMissingIndexTest() {
     Long otherID = 0L;
     EdgeFactory.createDefaultEdge(otherID, null);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createMissingLabelTest() {
+  public void createWithMissingLabelTest() {
     Long otherID = 0L;
     Long index = 0L;
     EdgeFactory.createDefaultEdge(otherID, null, index);

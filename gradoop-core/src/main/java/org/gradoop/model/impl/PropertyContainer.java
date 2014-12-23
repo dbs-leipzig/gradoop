@@ -1,4 +1,4 @@
-package org.gradoop.model.inmemory;
+package org.gradoop.model.impl;
 
 import com.google.common.collect.Maps;
 import org.gradoop.model.Attributed;

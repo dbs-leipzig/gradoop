@@ -1,4 +1,4 @@
-package org.gradoop.model.inmemory;
+package org.gradoop.model.impl;
 
 import org.gradoop.model.Edge;
 
@@ -9,8 +9,15 @@ import java.util.Map;
  */
 public class DefaultEdge extends SingleLabeledPropertyContainer implements
   Edge {
+  /**
+   * Identifier of the vertex this edge is connected to. This can be either
+   * the start or end vertex of this edge.
+   */
   private final Long otherID;
 
+  /**
+   * Vertex centric edge index to allow parallel edges.
+   */
   private final Long index;
 
   /**
@@ -74,5 +81,17 @@ public class DefaultEdge extends SingleLabeledPropertyContainer implements
     int result = otherID.hashCode();
     result = 31 * result + index.hashCode();
     return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return "DefaultEdge{" +
+      "otherID=" + otherID +
+      ", label=" + getLabel() +
+      ", index=" + index +
+      '}';
   }
 }

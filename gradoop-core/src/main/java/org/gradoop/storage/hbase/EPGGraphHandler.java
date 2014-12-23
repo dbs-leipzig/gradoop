@@ -5,7 +5,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.GConstants;
 import org.gradoop.model.Graph;
-import org.gradoop.model.inmemory.MemoryGraph;
+import org.gradoop.model.impl.MemoryGraph;
 
 /**
  * Handles storing graphs in a HBase table.

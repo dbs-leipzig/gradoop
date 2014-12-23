@@ -16,7 +16,7 @@ import org.gradoop.MapReduceClusterTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
-import org.gradoop.model.inmemory.MemoryGraph;
+import org.gradoop.model.impl.MemoryGraph;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;

@@ -1,4 +1,4 @@
-### Gradoop : Graph Analytics Framework on Apache Hadoop
+### Gradoop : Graph Analytics on Apache Hadoop
 ***
 
 #### Setup development environment

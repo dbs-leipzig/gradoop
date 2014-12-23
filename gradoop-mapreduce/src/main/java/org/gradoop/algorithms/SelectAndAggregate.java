@@ -14,7 +14,7 @@ import org.gradoop.GConstants;
 import org.gradoop.io.formats.PairWritable;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryGraph;
+import org.gradoop.model.impl.MemoryGraph;
 import org.gradoop.model.operators.VertexDoubleAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.hbase.GraphHandler;

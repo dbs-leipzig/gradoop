@@ -1,4 +1,4 @@
-package org.gradoop.model.inmemory;
+package org.gradoop.model.impl;
 
 import com.google.common.collect.Sets;
 import org.gradoop.model.Edge;
@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Transient representation of a vertex.
  */
-public class MemoryVertex extends MultiLabeledPropertyContainer implements
+public class DefaultVertex extends MultiLabeledPropertyContainer implements
   Vertex {
 
   /**
@@ -31,15 +31,6 @@ public class MemoryVertex extends MultiLabeledPropertyContainer implements
   /**
    * Creates a vertex based on the given parameters.
    *
-   * @param id vertex id
-   */
-  public MemoryVertex(final Long id) {
-    this(id, null, null, null, null, null);
-  }
-
-  /**
-   * Creates a vertex based on the given parameters.
-   *
    * @param id            vertex id
    * @param labels        labels (can be {@code null})
    * @param properties    key-value-map  (can be {@code null})
@@ -47,11 +38,11 @@ public class MemoryVertex extends MultiLabeledPropertyContainer implements
    * @param incomingEdges incoming edges (can be {@code null})
    * @param graphs        graphs that contain that vertex (can be {@code null})
    */
-  public MemoryVertex(Long id, Iterable<String> labels,
-                      Map<String, Object> properties,
-                      Iterable<Edge> outgoingEdges,
-                      Iterable<Edge> incomingEdges,
-                      Iterable<Long> graphs) {
+  DefaultVertex(final Long id, final Iterable<String> labels,
+                       final Map<String, Object> properties,
+                       final Iterable<Edge> outgoingEdges,
+                       final Iterable<Edge> incomingEdges,
+                       final Iterable<Long> graphs) {
     super(id, labels, properties);
     this.outgoingEdges = outgoingEdges;
     this.incomingEdges = incomingEdges;
