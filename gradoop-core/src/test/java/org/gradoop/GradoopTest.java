@@ -25,8 +25,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
- * Default Test class for gradoop. Contains a few graphs and some helper
- * methods.
+ * Root class for gradoop tests. Contains sample graphs, corresponding
+ * validation methods and helper methods.
  */
 public abstract class GradoopTest {
 
@@ -63,7 +63,7 @@ public abstract class GradoopTest {
   };
 
   protected static final String[] EXTENDED_GRAPH = new String[] {
-    "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 1 k1 5 v1|1 0",
+    "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 2 k1 5 v1 k2 5 v2|1 0",
     "1|A B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2," +
       "c.2.1 0|a.0.0 1 k1 5 v1|2 0 1",
     "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.2.1 0|1 1"
@@ -147,7 +147,7 @@ public abstract class GradoopTest {
         testEdge(outEdges, 1L, "a", 0L, 1);
         // in edges (b.1.0 1 k1 5 v1)
         assertEquals(1, inEdges.size());
-        testEdge(inEdges, 1L, "b", 0L, 1);
+        testEdge(inEdges, 1L, "b", 0L, 2);
         // graphs (1 0)
         assertEquals(1, graphs.size());
         assertTrue(graphs.contains(0L));
@@ -220,6 +220,15 @@ public abstract class GradoopTest {
     assertEquals(expectedSize, count);
   }
 
+  /**
+   * Takes a given graph represented by a string array, writes it to a
+   * temporary file and returns a buffered reader which can be used for
+   * testing readers.
+   *
+   * @param graph string array representing lines in a file
+   * @return reader on the input graph
+   * @throws IOException
+   */
   protected BufferedReader createTestReader(String[] graph)
     throws IOException {
     File tmpFile = getTempFile();
