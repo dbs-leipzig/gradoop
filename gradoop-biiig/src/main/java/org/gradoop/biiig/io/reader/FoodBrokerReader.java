@@ -110,8 +110,9 @@ public class FoodBrokerReader implements VertexLineReader {
     String edgeType = getType(edge);
 
     // outgoing edge on source vertex
-    Edge edgeOut = EdgeFactory.createDefaultEdge(targetID, edgeType, RANDOM
-      .nextLong());
+    Edge edgeOut = EdgeFactory.createDefaultEdgeWithLabel(targetID, edgeType,
+      RANDOM
+        .nextLong());
     addProperties(edgeOut, edge.getJSONObject(META),
       BIIIGConstants.META_PREFIX);
     addProperties(edgeOut, edge.getJSONObject(DATA));
@@ -119,8 +120,9 @@ public class FoodBrokerReader implements VertexLineReader {
       Lists.newArrayList(edgeOut), null));
 
     // incoming edge on target vertex
-    Edge edgeIn = EdgeFactory.createDefaultEdge(sourceID, edgeType, RANDOM
-      .nextLong());
+    Edge edgeIn = EdgeFactory.createDefaultEdgeWithLabel(sourceID, edgeType,
+      RANDOM
+        .nextLong());
     addProperties(edgeIn, edge.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(edgeIn, edge.getJSONObject(DATA));
     vList.add(VertexFactory.createDefaultVertexWithEdges(targetID, null, Lists

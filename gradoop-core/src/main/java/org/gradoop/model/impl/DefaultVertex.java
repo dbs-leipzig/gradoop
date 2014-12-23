@@ -39,10 +39,10 @@ public class DefaultVertex extends MultiLabeledPropertyContainer implements
    * @param graphs        graphs that contain that vertex (can be {@code null})
    */
   DefaultVertex(final Long id, final Iterable<String> labels,
-                       final Map<String, Object> properties,
-                       final Iterable<Edge> outgoingEdges,
-                       final Iterable<Edge> incomingEdges,
-                       final Iterable<Long> graphs) {
+                final Map<String, Object> properties,
+                final Iterable<Edge> outgoingEdges,
+                final Iterable<Edge> incomingEdges,
+                final Iterable<Long> graphs) {
     super(id, labels, properties);
     this.outgoingEdges = outgoingEdges;
     this.incomingEdges = incomingEdges;
@@ -93,9 +93,12 @@ public class DefaultVertex extends MultiLabeledPropertyContainer implements
   @Override
   public String toString() {
     return "SimpleVertex{" +
-      "outgoingEdges=" + outgoingEdges +
+      "id=" + getID() +
+      ", labels=" + getLabels() +
+      ", outgoingEdges=" + outgoingEdges +
       ", incomingEdges=" + incomingEdges +
-      "} " + super.toString();
+      ", graphs=" + getGraphs() +
+      "}";
   }
 
   /**

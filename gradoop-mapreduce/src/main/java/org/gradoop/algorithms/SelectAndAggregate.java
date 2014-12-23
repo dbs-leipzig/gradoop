@@ -14,7 +14,7 @@ import org.gradoop.GConstants;
 import org.gradoop.io.formats.PairWritable;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.impl.MemoryGraph;
+import org.gradoop.model.impl.GraphFactory;
 import org.gradoop.model.operators.VertexDoubleAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.hbase.GraphHandler;
@@ -207,7 +207,7 @@ public class SelectAndAggregate {
       // if selection predicate evaluates to true, store the aggregate value
       if (result.getFirst()) {
         long graphID = key.get();
-        Graph g = new MemoryGraph(graphID);
+        Graph g = GraphFactory.createDefaultGraphWithID(graphID);
         g.addProperty(aggregateResultPropertyKey, result.getSecond());
         Put put = new Put(graphHandler.getRowKey(graphID));
         put = graphHandler.writeProperties(put, g);

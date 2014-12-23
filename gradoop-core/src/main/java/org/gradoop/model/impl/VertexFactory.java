@@ -11,7 +11,7 @@ import java.util.Map;
 public class VertexFactory {
 
   /**
-   * Avoid initialization.
+   * Avoid instantiation.
    */
   private VertexFactory() {
   }

@@ -194,7 +194,7 @@ public abstract class GradoopTest {
   private void testEdge(List<Edge> edges, Long expectedOtherID,
                         String expectedLabel, Long expectedIndex,
                         int expectedPropertyCount) {
-    Edge tmpEdge = EdgeFactory.createDefaultEdge(expectedOtherID,
+    Edge tmpEdge = EdgeFactory.createDefaultEdgeWithLabel(expectedOtherID,
       expectedLabel, expectedIndex);
     assertTrue(edges.contains(tmpEdge));
     int edgeIndex = edges.indexOf(tmpEdge);

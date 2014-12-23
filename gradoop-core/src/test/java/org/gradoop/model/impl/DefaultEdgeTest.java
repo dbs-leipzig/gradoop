@@ -28,7 +28,7 @@ public class DefaultEdgeTest {
     Long otherID = 0L;
     String label = "label";
     Long index = 0L;
-    Edge e = EdgeFactory.createDefaultEdge(otherID, label, index);
+    Edge e = EdgeFactory.createDefaultEdgeWithLabel(otherID, label, index);
     assertThat(e.getOtherID(), is(otherID));
     assertThat(e.getLabel(), is(label));
     assertThat(e.getIndex(), is(index));
@@ -66,15 +66,15 @@ public class DefaultEdgeTest {
   public void createWithMissingLabelTest() {
     Long otherID = 0L;
     Long index = 0L;
-    EdgeFactory.createDefaultEdge(otherID, null, index);
+    EdgeFactory.createDefaultEdgeWithLabel(otherID, null, index);
   }
 
 
   @Test
   public void testEquals() {
-    Edge e1 = EdgeFactory.createDefaultEdge(0L, "a", 0L);
-    Edge e2 = EdgeFactory.createDefaultEdge(0L, "a", 0L);
-    Edge e3 = EdgeFactory.createDefaultEdge(1L, "a", 0L);
+    Edge e1 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 0L);
+    Edge e2 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 0L);
+    Edge e3 = EdgeFactory.createDefaultEdgeWithLabel(1L, "a", 0L);
     assertEquals(e1, e2);
     assertNotEquals(e1, e3);
     assertNotEquals(e2, e3);
@@ -82,11 +82,11 @@ public class DefaultEdgeTest {
 
   @Test
   public void testCompareTo() {
-    Edge e1 = EdgeFactory.createDefaultEdge(0L, "a", 0L);
-    Edge e2 = EdgeFactory.createDefaultEdge(0L, "a", 0L);
-    Edge e3 = EdgeFactory.createDefaultEdge(0L, "a", 1L);
-    Edge e4 = EdgeFactory.createDefaultEdge(0L, "b", 1L);
-    Edge e5 = EdgeFactory.createDefaultEdge(1L, "b", 1L);
+    Edge e1 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 0L);
+    Edge e2 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 0L);
+    Edge e3 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 1L);
+    Edge e4 = EdgeFactory.createDefaultEdgeWithLabel(0L, "b", 1L);
+    Edge e5 = EdgeFactory.createDefaultEdgeWithLabel(1L, "b", 1L);
     EdgeComparator edgeComparator = new EdgeComparator();
     assertTrue(edgeComparator.compare(e1, e1) == 0);
     assertTrue(edgeComparator.compare(e1, e2) == 0);

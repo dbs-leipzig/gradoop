@@ -5,7 +5,7 @@ import org.gradoop.HBaseClusterTest;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.impl.MemoryGraph;
+import org.gradoop.model.impl.GraphFactory;
 import org.gradoop.model.impl.VertexFactory;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
@@ -35,7 +35,8 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
     vertices.add(1L);
 
     graphs
-      .add(new MemoryGraph(graphID, graphLabels, graphProperties, vertices));
+      .add(GraphFactory.createDefaultGraph(graphID, graphLabels,
+        graphProperties, vertices));
 
     // graph 1
     graphID = 1L;
@@ -46,8 +47,8 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
     vertices.add(1L);
     vertices.add(2L);
 
-    graphs
-      .add(new MemoryGraph(graphID, graphLabels, graphProperties, vertices));
+    graphs.add(GraphFactory.createDefaultGraph(graphID, graphLabels,
+      graphProperties, vertices));
 
     return graphs;
   }

@@ -5,7 +5,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.GConstants;
 import org.gradoop.model.Graph;
-import org.gradoop.model.impl.MemoryGraph;
+import org.gradoop.model.impl.GraphFactory;
 
 /**
  * Handles storing graphs in a HBase table.
@@ -74,7 +74,7 @@ public class EPGGraphHandler extends BasicHandler implements GraphHandler {
    */
   @Override
   public Graph readGraph(Result res) {
-    return new MemoryGraph(
+    return GraphFactory.createDefaultGraph(
       Long.valueOf(Bytes.toString(res.getRow())),
       readLabels(res),
       readProperties(res),

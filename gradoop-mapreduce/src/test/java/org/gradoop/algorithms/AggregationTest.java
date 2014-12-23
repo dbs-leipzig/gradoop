@@ -16,7 +16,7 @@ import org.gradoop.MapReduceClusterTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
-import org.gradoop.model.impl.MemoryGraph;
+import org.gradoop.model.impl.GraphFactory;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;
@@ -153,7 +153,7 @@ public class AggregationTest extends MapReduceClusterTest {
         count++;
       }
 
-      Graph g = new MemoryGraph(key.get());
+      Graph g = GraphFactory.createDefaultGraphWithID(key.get());
       g.addProperty(VCOUNT_PROPERTY_KEY, count);
 
       Put put = new Put(GRAPH_HANDLER.getRowKey(key.get()));

@@ -19,4 +19,11 @@ public interface Graph extends Identifiable, Attributed, MultiLabeled {
    * @return vertices
    */
   Iterable<Long> getVertices();
+
+  /**
+   * Returns the number of vertices belonging to that graph.
+   *
+   * @return vertex count
+   */
+  int getVertexCount();
 }

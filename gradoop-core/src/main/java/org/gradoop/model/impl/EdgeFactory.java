@@ -24,7 +24,8 @@ public class EdgeFactory {
    * @return edge connected to otherID with index
    */
   public static Edge createDefaultEdge(final Long otherID, final Long index) {
-    return createDefaultEdge(otherID, GConstants.DEFAULT_EDGE_LABEL, index);
+    return createDefaultEdgeWithLabel(otherID, GConstants.DEFAULT_EDGE_LABEL,
+      index);
   }
 
   /**
@@ -35,8 +36,9 @@ public class EdgeFactory {
    * @param index   vertex centric edge index for parallel edges
    * @return edge connected to otherID with label and index
    */
-  public static Edge createDefaultEdge(final Long otherID, final String label,
-                                       final Long index) {
+  public static Edge createDefaultEdgeWithLabel(final Long otherID,
+                                                final String label,
+                                                final Long index) {
     return createDefaultEdge(otherID, label, index, null);
   }
 
