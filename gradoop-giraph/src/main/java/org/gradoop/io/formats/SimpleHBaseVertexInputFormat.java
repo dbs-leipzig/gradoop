@@ -5,7 +5,6 @@ import org.apache.giraph.edge.Edge;
 import org.apache.giraph.edge.EdgeFactory;
 import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.VertexReader;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
@@ -61,13 +60,6 @@ public class SimpleHBaseVertexInputFormat extends
   createVertexReader(
     InputSplit split, TaskAttemptContext context) throws IOException {
     return new SimpleHBaseVertexReader(split, context);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void checkInputSpecs(Configuration conf) {
   }
 
   /**

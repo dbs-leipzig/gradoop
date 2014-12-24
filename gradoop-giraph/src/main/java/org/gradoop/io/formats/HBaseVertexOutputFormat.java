@@ -11,8 +11,11 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.gradoop.GConstants;
+import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Base class for writing Vertex mutations back to specific rows in an HBase
@@ -68,6 +71,11 @@ public abstract class HBaseVertexOutputFormat<I extends WritableComparable, V
     private RecordWriter<ImmutableBytesWritable, Mutation> recordWriter;
 
     /**
+     * Vertex handler to write vertices to HBase.
+     */
+    private VertexHandler vertexHandler;
+
+    /**
      * Sets up base table output format and creates a record writer.
      *
      * @param context task attempt context
@@ -79,13 +87,23 @@ public abstract class HBaseVertexOutputFormat<I extends WritableComparable, V
     }
 
     /**
-     * initialize
+     * Initialize context and Vertex handler.
      *
      * @param context Context used to write the vertices.
      * @throws IOException
      */
     public void initialize(TaskAttemptContext context) throws IOException {
       this.context = context;
+
+      Class<? extends VertexHandler> handlerClass = getConf()
+        .getClass(GConstants.VERTEX_HANDLER_CLASS,
+          GConstants.DEFAULT_VERTEX_HANDLER, VertexHandler.class);
+      try {
+        this.vertexHandler = handlerClass.getConstructor().newInstance();
+      } catch (NoSuchMethodException | InstantiationException |
+        IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
+      }
     }
 
     /**
@@ -116,6 +134,15 @@ public abstract class HBaseVertexOutputFormat<I extends WritableComparable, V
      */
     public TaskAttemptContext getContext() {
       return context;
+    }
+
+    /**
+     * Returns the vertex handler.
+     *
+     * @return Vertex handler to be used for writing vertices.
+     */
+    protected VertexHandler getVertexHandler() {
+      return vertexHandler;
     }
   }
 

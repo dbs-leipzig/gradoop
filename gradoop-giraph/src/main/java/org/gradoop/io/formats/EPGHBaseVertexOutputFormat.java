@@ -9,7 +9,6 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
@@ -22,11 +21,6 @@ import java.util.List;
 public class EPGHBaseVertexOutputFormat extends
   HBaseVertexOutputFormat<EPGVertexIdentifierWritable,
     EPGVertexValueWritable, EPGEdgeValueWritable> {
-
-  /**
-   * Vertex handler to write vertices to HBase.
-   */
-  private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
   /**
    * {@inheritDoc}
@@ -64,15 +58,16 @@ public class EPGHBaseVertexOutputFormat extends
         EPGEdgeValueWritable> vertex) throws
       IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
+      VertexHandler vertexHandler = getVertexHandler();
       // vertex identifier
-      byte[] rowKey = VERTEX_HANDLER.getRowKey(vertex.getId().getID());
+      byte[] rowKey = vertexHandler.getRowKey(vertex.getId().getID());
       Put put = new Put(rowKey);
       // labels
-      put = VERTEX_HANDLER.writeLabels(put, vertex.getValue());
+      put = vertexHandler.writeLabels(put, vertex.getValue());
       // properties
-      put = VERTEX_HANDLER.writeProperties(put, vertex.getValue());
+      put = vertexHandler.writeProperties(put, vertex.getValue());
       // graphs
-      put = VERTEX_HANDLER.writeGraphs(put, vertex.getValue());
+      put = vertexHandler.writeGraphs(put, vertex.getValue());
       // outgoing edges
       List<org.gradoop.model.Edge> edges =
         Lists.newArrayListWithCapacity(vertex.getNumEdges());
@@ -80,8 +75,7 @@ public class EPGHBaseVertexOutputFormat extends
         .getEdges()) {
         edges.add(edge.getValue());
       }
-      VERTEX_HANDLER.writeOutgoingEdges(put, edges);
-
+      vertexHandler.writeOutgoingEdges(put, edges);
       writer.write(new ImmutableBytesWritable(rowKey), put);
     }
   }

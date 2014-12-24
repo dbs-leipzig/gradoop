@@ -10,7 +10,6 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.gradoop.io.formats.HBaseVertexOutputFormat;
-import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
@@ -20,11 +19,6 @@ import java.io.IOException;
  */
 public class BTGHBaseVertexOutputFormat extends
   HBaseVertexOutputFormat<LongWritable, BTGVertexValue, NullWritable> {
-
-  /**
-   * Vertex handler to write vertices to HBase.
-   */
-  private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
   /**
    * {@inheritDoc}
@@ -60,10 +54,11 @@ public class BTGHBaseVertexOutputFormat extends
       Vertex<LongWritable, BTGVertexValue, NullWritable> vertex) throws
       IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
-      byte[] rowKey = VERTEX_HANDLER.getRowKey(vertex.getId().get());
+      VertexHandler vertexHandler = getVertexHandler();
+      byte[] rowKey = vertexHandler.getRowKey(vertex.getId().get());
       Put put = new Put(rowKey);
       // just need to write the graphs
-      put = VERTEX_HANDLER.writeGraphs(put, vertex.getValue());
+      put = vertexHandler.writeGraphs(put, vertex.getValue());
 
       writer.write(new ImmutableBytesWritable(rowKey), put);
     }

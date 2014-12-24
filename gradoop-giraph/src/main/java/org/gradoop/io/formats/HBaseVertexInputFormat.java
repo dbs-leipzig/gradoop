@@ -2,6 +2,7 @@ package org.gradoop.io.formats;
 
 import org.apache.giraph.io.VertexInputFormat;
 import org.apache.giraph.io.VertexReader;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
@@ -11,8 +12,11 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.gradoop.GConstants;
+import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -44,6 +48,13 @@ public abstract class HBaseVertexInputFormat<I extends WritableComparable, V
   protected static final TableInputFormat BASE_FORMAT = new TableInputFormat();
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void checkInputSpecs(Configuration conf) {
+  }
+
+  /**
    * Takes an instance of RecordReader that supports HBase row-key, result
    * records.  Subclasses can focus on vertex instantiation details without
    * worrying about connection semantics. Subclasses are expected to implement
@@ -61,6 +72,12 @@ public abstract class HBaseVertexInputFormat<I extends WritableComparable, V
      * Reader instance
      */
     private final RecordReader<ImmutableBytesWritable, Result> reader;
+
+    /**
+     * Vertex handler to read vertices from HBase.
+     */
+    private VertexHandler vertexHandler;
+
     /**
      * Context passed to initialize
      */
@@ -80,7 +97,7 @@ public abstract class HBaseVertexInputFormat<I extends WritableComparable, V
     }
 
     /**
-     * initialize
+     * Initialize the HBase Reader and the Vertex handler.
      *
      * @param inputSplit Input split to be used for reading vertices.
      * @param context    Context from the task.
@@ -91,6 +108,16 @@ public abstract class HBaseVertexInputFormat<I extends WritableComparable, V
       TaskAttemptContext context) throws IOException, InterruptedException {
       reader.initialize(inputSplit, context);
       this.context = context;
+
+      Class<? extends VertexHandler> handlerClass = getConf()
+        .getClass(GConstants.VERTEX_HANDLER_CLASS,
+          GConstants.DEFAULT_VERTEX_HANDLER, VertexHandler.class);
+      try {
+        this.vertexHandler = handlerClass.getConstructor().newInstance();
+      } catch (NoSuchMethodException | InstantiationException |
+        IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
+      }
     }
 
     /**
@@ -129,6 +156,15 @@ public abstract class HBaseVertexInputFormat<I extends WritableComparable, V
      */
     protected TaskAttemptContext getContext() {
       return context;
+    }
+
+    /**
+     * Returns the vertex handler.
+     *
+     * @return Vertex handler to be used for reading vertices.
+     */
+    protected VertexHandler getVertexHandler() {
+      return vertexHandler;
     }
 
   }
