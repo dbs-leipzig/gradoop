@@ -74,6 +74,24 @@ public class VertexFactory {
   }
 
   /**
+   * Create a vertex with properties and outgoing edges.
+   *
+   * @param vertexID      vertex identifier
+   * @param properties    vertex properties
+   * @param outgoingEdges edges starting at that vertex
+   * @return vertex with identifier, properties and outgoing edges
+   */
+  public static Vertex createDefaultVertexWithProperties(final Long vertexID,
+                                                         final Map<String,
+                                                           Object> properties,
+                                                         final Iterable<Edge>
+                                                           outgoingEdges) {
+    return createDefaultVertex(vertexID, null, properties, outgoingEdges, null,
+      null);
+  }
+
+
+  /**
    * Creates a vertex based on the given properties.
    *
    * @param id            vertex identifier
