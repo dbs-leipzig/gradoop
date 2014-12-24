@@ -5,14 +5,12 @@ import org.apache.giraph.edge.Edge;
 import org.apache.giraph.edge.EdgeFactory;
 import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.VertexReader;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.gradoop.io.formats.HBaseVertexInputFormat;
-import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
@@ -25,29 +23,18 @@ public class BTGHBaseVertexInputFormat extends
   HBaseVertexInputFormat<LongWritable, BTGVertexValue, NullWritable> {
 
   /**
-   * Vertex handler to read vertices from HBase.
-   */
-  private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
-
-  /**
    * {@inheritDoc}
    */
   @Override
   public VertexReader<LongWritable, BTGVertexValue, NullWritable>
   createVertexReader(
-    InputSplit split, TaskAttemptContext context)
-    throws IOException {
+    InputSplit split, TaskAttemptContext context) throws IOException {
     return new BTGHBaseVertexReader(split, context);
   }
 
   /**
-   * {@inheritDoc}
+   * Reads a single giraph vertex for BTG computation from a HBase row result.
    */
-  @Override
-  public void checkInputSpecs(Configuration conf) {
-
-  }
-
   public static class BTGHBaseVertexReader extends
     HBaseVertexReader<LongWritable, BTGVertexValue, NullWritable> {
 
@@ -59,8 +46,7 @@ public class BTGHBaseVertexInputFormat extends
      * @throws java.io.IOException
      */
     public BTGHBaseVertexReader(InputSplit split,
-                                TaskAttemptContext context)
-      throws IOException {
+      TaskAttemptContext context) throws IOException {
       super(split, context);
     }
 
@@ -68,8 +54,7 @@ public class BTGHBaseVertexInputFormat extends
      * {@inheritDoc}
      */
     @Override
-    public boolean nextVertex()
-      throws IOException, InterruptedException {
+    public boolean nextVertex() throws IOException, InterruptedException {
       return getRecordReader().nextKeyValue();
     }
 
@@ -77,19 +62,21 @@ public class BTGHBaseVertexInputFormat extends
      * {@inheritDoc}
      */
     @Override
-    public Vertex<LongWritable, BTGVertexValue, NullWritable> getCurrentVertex()
-      throws IOException, InterruptedException {
+    public Vertex<LongWritable, BTGVertexValue, NullWritable>
+    getCurrentVertex() throws
+      IOException, InterruptedException {
       Result row = getRecordReader().getCurrentValue();
+      VertexHandler vertexHandler = getVertexHandler();
 
-      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex = getConf()
-        .createVertex();
+      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex =
+        getConf().createVertex();
 
       // vertexID
-      LongWritable vertexID = new LongWritable(VERTEX_HANDLER.getVertexID(row
-        .getRow()));
+      LongWritable vertexID =
+        new LongWritable(vertexHandler.getVertexID(row.getRow()));
 
       // vertex type is stored the first label of the vertex
-      Iterable<String> vertexLabels = VERTEX_HANDLER.readLabels(row);
+      Iterable<String> vertexLabels = vertexHandler.readLabels(row);
       Integer firstLabel = Integer.valueOf(vertexLabels.iterator().next());
       BTGVertexType vertexType = BTGVertexType.values()[firstLabel];
 
@@ -97,18 +84,18 @@ public class BTGHBaseVertexInputFormat extends
       Double vertexValue = new Double(String.valueOf(vertexID));
 
       // btgIDs are the graphs this vertex belongs to
-      List<Long> btgIDs = Lists.newArrayList(VERTEX_HANDLER.readGraphs(row));
+      List<Long> btgIDs = Lists.newArrayList(vertexHandler.readGraphs(row));
 
-      BTGVertexValue btgVertexValue = new BTGVertexValue(vertexType,
-        vertexValue, btgIDs);
+      BTGVertexValue btgVertexValue =
+        new BTGVertexValue(vertexType, vertexValue, btgIDs);
 
       // read outgoing edges
       List<Edge<LongWritable, NullWritable>> edges = Lists.newArrayList();
-      for (org.gradoop.model.Edge e : VERTEX_HANDLER.readOutgoingEdges(row)) {
+      for (org.gradoop.model.Edge e : vertexHandler.readOutgoingEdges(row)) {
         edges.add(EdgeFactory.create(new LongWritable(e.getOtherID())));
       }
       // read incoming edges
-      for (org.gradoop.model.Edge e : VERTEX_HANDLER.readIncomingEdges(row)) {
+      for (org.gradoop.model.Edge e : vertexHandler.readIncomingEdges(row)) {
         edges.add(EdgeFactory.create(new LongWritable(e.getOtherID())));
       }
 

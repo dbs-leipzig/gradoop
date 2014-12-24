@@ -11,8 +11,11 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.gradoop.GConstants;
+import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Base class for writing Vertex mutations back to specific rows in an HBase
@@ -32,18 +35,15 @@ import java.io.IOException;
  * @param <V> Vertex value
  * @param <E> Edge value
  */
-public abstract class HBaseVertexOutputFormat<
-  I extends WritableComparable,
-  V extends Writable,
-  E extends Writable>
-  extends VertexOutputFormat
-  <I, V, E> {
+public abstract class HBaseVertexOutputFormat<I extends WritableComparable, V
+  extends Writable, E extends Writable> extends
+  VertexOutputFormat<I, V, E> {
 
   /**
    * delegate output format that writes to HBase
    */
-  protected static final TableOutputFormat<ImmutableBytesWritable>
-    BASE_FORMAT = new TableOutputFormat<ImmutableBytesWritable>();
+  protected static final TableOutputFormat<ImmutableBytesWritable> BASE_FORMAT =
+    new TableOutputFormat<>();
 
   /**
    * Constructor
@@ -55,11 +55,9 @@ public abstract class HBaseVertexOutputFormat<
    * @param <V> Vertex value
    * @param <E> Edge value
    */
-  public abstract static class HBaseVertexWriter<
-    I extends WritableComparable,
-    V extends Writable,
-    E extends Writable>
-    extends VertexWriter<I, V, E> {
+  public abstract static class HBaseVertexWriter<I extends
+    WritableComparable, V extends Writable, E extends Writable> extends
+    VertexWriter<I, V, E> {
 
     /**
      * Context
@@ -73,25 +71,39 @@ public abstract class HBaseVertexOutputFormat<
     private RecordWriter<ImmutableBytesWritable, Mutation> recordWriter;
 
     /**
+     * Vertex handler to write vertices to HBase.
+     */
+    private VertexHandler vertexHandler;
+
+    /**
      * Sets up base table output format and creates a record writer.
      *
      * @param context task attempt context
      */
-    public HBaseVertexWriter(TaskAttemptContext context)
-      throws IOException, InterruptedException {
+    public HBaseVertexWriter(TaskAttemptContext context) throws IOException,
+      InterruptedException {
       BASE_FORMAT.setConf(context.getConfiguration());
       this.recordWriter = BASE_FORMAT.getRecordWriter(context);
     }
 
     /**
-     * initialize
+     * Initialize context and Vertex handler.
      *
      * @param context Context used to write the vertices.
      * @throws IOException
      */
-    public void initialize(TaskAttemptContext context)
-      throws IOException {
+    public void initialize(TaskAttemptContext context) throws IOException {
       this.context = context;
+
+      Class<? extends VertexHandler> handlerClass = getConf()
+        .getClass(GConstants.VERTEX_HANDLER_CLASS,
+          GConstants.DEFAULT_VERTEX_HANDLER, VertexHandler.class);
+      try {
+        this.vertexHandler = handlerClass.getConstructor().newInstance();
+      } catch (NoSuchMethodException | InstantiationException |
+        IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
+      }
     }
 
     /**
@@ -101,8 +113,8 @@ public abstract class HBaseVertexOutputFormat<
      * @throws IOException
      * @throws InterruptedException
      */
-    public void close(TaskAttemptContext context)
-      throws IOException, InterruptedException {
+    public void close(TaskAttemptContext context) throws IOException,
+      InterruptedException {
       recordWriter.close(context);
     }
 
@@ -111,8 +123,7 @@ public abstract class HBaseVertexOutputFormat<
      *
      * @return Record writer to be used for writing.
      */
-    public RecordWriter<ImmutableBytesWritable,
-      Mutation> getRecordWriter() {
+    public RecordWriter<ImmutableBytesWritable, Mutation> getRecordWriter() {
       return recordWriter;
     }
 
@@ -124,6 +135,15 @@ public abstract class HBaseVertexOutputFormat<
     public TaskAttemptContext getContext() {
       return context;
     }
+
+    /**
+     * Returns the vertex handler.
+     *
+     * @return Vertex handler to be used for writing vertices.
+     */
+    protected VertexHandler getVertexHandler() {
+      return vertexHandler;
+    }
   }
 
   /**
@@ -133,8 +153,8 @@ public abstract class HBaseVertexOutputFormat<
    * @throws IOException
    * @throws InterruptedException
    */
-  public void checkOutputSpecs(JobContext context)
-    throws IOException, InterruptedException {
+  public void checkOutputSpecs(JobContext context) throws IOException,
+    InterruptedException {
     BASE_FORMAT.checkOutputSpecs(context);
   }
 
@@ -146,9 +166,8 @@ public abstract class HBaseVertexOutputFormat<
    * @throws IOException
    * @throws InterruptedException
    */
-  public OutputCommitter getOutputCommitter(
-    TaskAttemptContext context)
-    throws IOException, InterruptedException {
+  public OutputCommitter getOutputCommitter(TaskAttemptContext context) throws
+    IOException, InterruptedException {
     BASE_FORMAT.setConf(getConf());
     return BASE_FORMAT.getOutputCommitter(context);
   }

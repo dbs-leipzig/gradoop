@@ -53,14 +53,21 @@ import java.io.IOException;
  * Runs the BIIIG Foodbroker/BTG Example
  */
 public class BTGAnalysisDriver extends Configured implements Tool {
+  /**
+   * Logger
+   */
   private static Logger LOG = Logger.getLogger(BTGAnalysisDriver.class);
+
+  /**
+   * Job names start with that prefix.
+   */
+  private static final String JOB_PREFIX = "BTG Analysis: ";
 
   static {
     Configuration.addDefaultResource("giraph-site.xml");
     Configuration.addDefaultResource("hbase-site.xml");
   }
 
-  private static final String JOB_PREFIX = "BTG Analysis: ";
 
   /**
    * Starting point for BTG analysis pipeline.
@@ -70,8 +77,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @throws Exception
    */
   @Override
-  public int run(String[] args)
-    throws Exception {
+  public int run(String[] args) throws Exception {
 
     Configuration conf = getConf();
     CommandLine cmd = ConfigurationUtils.parseArgs(args);
@@ -88,18 +94,16 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     if (cmd.hasOption(ConfigurationUtils.OPTION_DROP_TABLES)) {
       HBaseGraphStoreFactory.deleteGraphStore(conf);
     }
-    HBaseGraphStoreFactory.createGraphStore(conf,
-      new EPGVertexHandler(),
-      new EPGGraphHandler()
-    );
+    HBaseGraphStoreFactory
+      .createGraphStore(conf, new EPGVertexHandler(), new EPGGraphHandler());
 
     /*
     Step 1: Bulk Load of the graph into HBase using MapReduce
      */
-    String inputPath = cmd.getOptionValue(ConfigurationUtils
-      .OPTION_GRAPH_INPUT_PATH);
-    String outputPath = cmd.getOptionValue(ConfigurationUtils
-      .OPTION_GRAPH_OUTPUT_PATH);
+    String inputPath =
+      cmd.getOptionValue(ConfigurationUtils.OPTION_GRAPH_INPUT_PATH);
+    String outputPath =
+      cmd.getOptionValue(ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH);
     if (!runBulkLoad(conf, inputPath, outputPath, verbose)) {
       return -1;
     }
@@ -107,8 +111,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     /*
     Step 2: BTG Computation using Giraph
      */
-    int workers = Integer.parseInt(cmd.getOptionValue(ConfigurationUtils
-      .OPTION_WORKERS));
+    int workers =
+      Integer.parseInt(cmd.getOptionValue(ConfigurationUtils.OPTION_WORKERS));
     if (!runBTGComputation(conf, workers, verbose)) {
       return -1;
     }
@@ -116,10 +120,10 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     /*
     Step 3: Select And Aggregate using MapReduce
      */
-    int scanCache = Integer.parseInt(cmd.getOptionValue(ConfigurationUtils
-      .OPTION_HBASE_SCAN_CACHE, "500"));
-    int reducers = Integer.parseInt(cmd.getOptionValue(ConfigurationUtils
-      .OPTION_REDUCERS, "1"));
+    int scanCache = Integer.parseInt(
+      cmd.getOptionValue(ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500"));
+    int reducers = Integer
+      .parseInt(cmd.getOptionValue(ConfigurationUtils.OPTION_REDUCERS, "1"));
     if (!runSelectAndAggregate(conf, scanCache, reducers, verbose)) {
       return -1;
     }
@@ -134,21 +138,20 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @param conf      Cluster config
    * @param graphFile input file in HDFS
    * @param outDir    HFile output dir in HDFS
+   * @param verbose   print output during job
+   * @return true, if the job completed successfully, false otherwise
    * @throws IOException
    */
-  private boolean runBulkLoad(Configuration conf, String graphFile, String
-    outDir, boolean verbose)
-    throws Exception {
+  private boolean runBulkLoad(Configuration conf, String graphFile,
+    String outDir, boolean verbose) throws Exception {
     Path inputFile = new Path(graphFile);
     Path outputDir = new Path(outDir);
 
     // set line reader to read lines in input splits
-    conf.setClass(BulkLoadEPG.VERTEX_LINE_READER,
-      FoodBrokerReader.class,
+    conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, FoodBrokerReader.class,
       VertexLineReader.class);
     // set vertex handler that creates the Puts
-    conf.setClass(BulkLoadEPG.VERTEX_HANDLER,
-      EPGVertexHandler.class,
+    conf.setClass(BulkLoadEPG.VERTEX_HANDLER, EPGVertexHandler.class,
       VertexHandler.class);
 
     Job job = new Job(conf, JOB_PREFIX + BulkLoadEPG.class.getName());
@@ -189,7 +192,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * Runs the BTG computation on the input graph using Giraph.
    *
    * @param conf        Cluster configuration
-   * @param workerCount Number of workers Giraph shall use.
+   * @param workerCount Number of workers Giraph shall use
+   * @param verbose     print output during job
    * @return true, if the job completed successfully, false otherwise
    * @throws IOException
    * @throws ClassNotFoundException
@@ -197,24 +201,21 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @throws ParseException
    */
   private boolean runBTGComputation(Configuration conf, int workerCount,
-                                    boolean verbose)
-    throws IOException, ClassNotFoundException, InterruptedException,
-    ParseException {
+    boolean verbose) throws IOException, ClassNotFoundException,
+    InterruptedException, ParseException {
     // set HBase table to read graph from
     conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
     // just scan necessary CFs (no properties needed)
-    String columnFamiliesToScan = String.format("%s %s %s %s",
-      GConstants.CF_LABELS,
-      GConstants.CF_OUT_EDGES,
-      GConstants.CF_IN_EDGES,
-      GConstants.CF_GRAPHS);
+    String columnFamiliesToScan = String
+      .format("%s %s %s %s", GConstants.CF_LABELS, GConstants.CF_OUT_EDGES,
+        GConstants.CF_IN_EDGES, GConstants.CF_GRAPHS);
     conf.set(TableInputFormat.SCAN_COLUMNS, columnFamiliesToScan);
     // set HBase table to write computation results to
     conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
 
     // setup Giraph job
-    GiraphJob job = new GiraphJob(conf, JOB_PREFIX + BTGComputation.class
-      .getName());
+    GiraphJob job =
+      new GiraphJob(conf, JOB_PREFIX + BTGComputation.class.getName());
     GiraphConfiguration giraphConf = job.getConfiguration();
 
     giraphConf.setComputationClass(BTGComputation.class);
@@ -231,40 +232,44 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     return job.run(verbose);
   }
 
+  /**
+   * Runs Selection and Aggregation using a single MapReduce Job.
+   *
+   * @param conf      Cluster configuration
+   * @param scanCache hbase client scan cache
+   * @param reducers  number of reducers to use for the job
+   * @param verbose   print output during job
+   * @return true, if the job completed successfully, false otherwise
+   * @throws IOException
+   * @throws ClassNotFoundException
+   * @throws InterruptedException
+   */
   private boolean runSelectAndAggregate(Configuration conf, int scanCache,
-                                        int reducers, boolean verbose)
-    throws IOException, ClassNotFoundException, InterruptedException {
+    int reducers, boolean verbose) throws IOException, ClassNotFoundException,
+    InterruptedException {
     /*
      mapper settings
       */
     // vertex handler
-    conf.setClass(GConstants.VERTEX_HANDLER_CLASS,
-      EPGVertexHandler.class,
-      VertexHandler.class
-    );
+    conf.setClass(GConstants.VERTEX_HANDLER_CLASS, EPGVertexHandler.class,
+      VertexHandler.class);
 
     // vertex predicate
     conf.setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS,
-      SalesOrderPredicate.class,
-      VertexPredicate.class
-    );
+      SalesOrderPredicate.class, VertexPredicate.class);
 
     // vertex aggregate
     conf.setClass(SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
-      ProfitVertexAggregate.class,
-      VertexDoubleAggregate.class);
+      ProfitVertexAggregate.class, VertexDoubleAggregate.class);
 
     /*
     reducer settings
      */
     // graph handler
-    conf.setClass(GConstants.GRAPH_HANDLER_CLASS,
-      EPGGraphHandler.class,
-      GraphHandler.class
-    );
+    conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
+      GraphHandler.class);
     // pair aggregate class
-    conf.setClass(SelectAndAggregate.PAIR_AGGREGATE_CLASS,
-      SumAgregator.class,
+    conf.setClass(SelectAndAggregate.PAIR_AGGREGATE_CLASS, SumAgregator.class,
       PairAggregator.class);
 
     Job job = new Job(conf, JOB_PREFIX + SelectAndAggregate.class.getName());
@@ -273,30 +278,31 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     scan.setCacheBlocks(false);
 
     // map
-    TableMapReduceUtil.initTableMapperJob(
-      GConstants.DEFAULT_TABLE_VERTICES,
-      scan,
-      SelectAndAggregate.SelectMapper.class,
-      LongWritable.class,
-      PairWritable.class,
-      job
-    );
+    TableMapReduceUtil
+      .initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES, scan,
+        SelectAndAggregate.SelectMapper.class, LongWritable.class,
+        PairWritable.class, job);
 
     // reduce
-    TableMapReduceUtil.initTableReducerJob(
-      GConstants.DEFAULT_TABLE_GRAPHS,
-      SelectAndAggregate.AggregateReducer.class,
-      job
-    );
+    TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
+      SelectAndAggregate.AggregateReducer.class, job);
     job.setNumReduceTasks(reducers);
 
     // run
     return job.waitForCompletion(verbose);
   }
 
+  /**
+   * Predicate to select graphs containing a vertex of type SalesOrder.
+   */
   public static class SalesOrderPredicate implements VertexPredicate {
-
+    /**
+     * Property key a vertex needs to have.
+     */
     private static final String KEY = BIIIGConstants.META_PREFIX + "class";
+    /**
+     * Property value a vertex needs to have to fulfil predicate.
+     */
     private static final String VALUE = "SalesOrder";
 
     @Override
@@ -304,16 +310,24 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       boolean result = false;
       if (vertex.getPropertyCount() > 0) {
         Object o = vertex.getProperty(KEY);
-        result = (o != null && o.equals(VALUE));
+        result = o != null && o.equals(VALUE);
       }
       return result;
     }
   }
 
+  /**
+   * Aggregate function to calculate the profit for a single graph.
+   */
   public static class ProfitVertexAggregate implements VertexDoubleAggregate {
+    /**
+     * Profit contains expenses.
+     */
     private static final String EXPENSE_KEY = "expense";
+    /**
+     * Profit contains revenues.
+     */
     private static final String REVENUE_KEY = "revenue";
-
 
     @Override
     public Double aggregate(Vertex vertex) {
@@ -340,6 +354,9 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     }
   }
 
+  /**
+   * Calculates the sum from a given set of values.
+   */
   public static class SumAgregator implements PairAggregator {
 
     @Override
@@ -356,8 +373,13 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     }
   }
 
-  public static void main(String[] args)
-    throws Exception {
+  /**
+   * Runs the job.
+   *
+   * @param args command line arguments
+   * @throws Exception
+   */
+  public static void main(String[] args) throws Exception {
     System.exit(ToolRunner.run(new BTGAnalysisDriver(), args));
   }
 }

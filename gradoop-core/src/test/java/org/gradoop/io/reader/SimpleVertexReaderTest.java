@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class MemoryVertexReaderTest extends GradoopTest {
+public class SimpleVertexReaderTest extends GradoopTest {
 
   @Test
   public void readBasicGraphTest()

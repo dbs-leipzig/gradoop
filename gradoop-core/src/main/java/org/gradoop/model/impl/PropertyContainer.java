@@ -1,4 +1,4 @@
-package org.gradoop.model.inmemory;
+package org.gradoop.model.impl;
 
 import com.google.common.collect.Maps;
 import org.gradoop.model.Attributed;
@@ -9,13 +9,16 @@ import java.util.Map;
  * Abstract entity that holds properties.
  */
 public abstract class PropertyContainer implements Attributed {
-  protected Map<String, Object> properties;
+  /**
+   * Internal property storage
+   */
+  private Map<String, Object> properties;
 
   /**
    * Creates an object from the given parameters. Can only be called by
    * inheriting classes.
    *
-   * @param properties key-value-map (can be {@code null})
+   * @param properties key-value-map
    */
   protected PropertyContainer(Map<String, Object> properties) {
     this.properties = properties;

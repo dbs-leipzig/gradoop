@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 /**
  * Tests that need a MapReduce cluster should extend this.
  */
-public class MapReduceClusterTest extends HBaseClusterTest {
+public abstract class MapReduceClusterTest extends HBaseClusterTest {
   /**
    * Start an additional MapReduce Cluster for all test cases extending this
    * class.

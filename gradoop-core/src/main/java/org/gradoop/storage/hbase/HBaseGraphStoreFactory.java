@@ -40,14 +40,13 @@ public class HBaseGraphStoreFactory {
    * @return a graph store instance or {@code null in the case of errors}
    */
   public static GraphStore createGraphStore(Configuration config,
-                                            VertexHandler verticesHandler,
-                                            GraphHandler graphsHandler) {
+    VertexHandler verticesHandler, GraphHandler graphsHandler) {
     try {
       createTablesIfNotExists(config, verticesHandler);
 
       HTable graphsTable = new HTable(config, GConstants.DEFAULT_TABLE_GRAPHS);
-      HTable verticesTable = new HTable(config,
-        GConstants.DEFAULT_TABLE_VERTICES);
+      HTable verticesTable =
+        new HTable(config, GConstants.DEFAULT_TABLE_VERTICES);
 
       return new HBaseGraphStore(graphsTable, verticesTable, verticesHandler,
         graphsHandler);
@@ -78,11 +77,9 @@ public class HBaseGraphStoreFactory {
    * @throws IOException
    */
   private static void createTablesIfNotExists(Configuration config,
-                                              VertexHandler verticesHandler)
-    throws IOException {
-    HTableDescriptor verticesTableDescriptor =
-      new HTableDescriptor(
-        TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
+    VertexHandler verticesHandler) throws IOException {
+    HTableDescriptor verticesTableDescriptor = new HTableDescriptor(
+      TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
       new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_GRAPHS));
 
@@ -106,14 +103,11 @@ public class HBaseGraphStoreFactory {
    * @throws IOException
    */
   private static void createGraphsTable(HBaseAdmin admin,
-                                        HTableDescriptor tableDescriptor)
-    throws IOException {
+    HTableDescriptor tableDescriptor) throws IOException {
     LOG.info("creating table " + tableDescriptor.getNameAsString());
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_LABELS));
-    tableDescriptor
-      .addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
-    tableDescriptor
-      .addFamily(new HColumnDescriptor(GConstants.CF_VERTICES));
+    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
+    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_VERTICES));
     admin.createTable(tableDescriptor);
   }
 
@@ -123,11 +117,10 @@ public class HBaseGraphStoreFactory {
    * @param config Hadoop configuration
    * @throws IOException
    */
-  private static void deleteTablesIfExists(Configuration config)
-    throws IOException {
-    HTableDescriptor verticesTableDescriptor =
-      new HTableDescriptor(
-        TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
+  private static void deleteTablesIfExists(Configuration config) throws
+    IOException {
+    HTableDescriptor verticesTableDescriptor = new HTableDescriptor(
+      TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
       new HTableDescriptor(TableName.valueOf(GConstants.DEFAULT_TABLE_GRAPHS));
 
@@ -152,8 +145,7 @@ public class HBaseGraphStoreFactory {
    * @throws IOException
    */
   private static void deleteTable(HBaseAdmin admin,
-                                  HTableDescriptor tableDescriptor)
-    throws IOException {
+    HTableDescriptor tableDescriptor) throws IOException {
     LOG.info("deleting table: " + tableDescriptor.getNameAsString());
     admin.disableTable(tableDescriptor.getName());
     admin.deleteTable(tableDescriptor.getName());

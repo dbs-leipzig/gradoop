@@ -9,8 +9,8 @@ import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryEdge;
-import org.gradoop.model.inmemory.MemoryVertex;
+import org.gradoop.model.impl.EdgeFactory;
+import org.gradoop.model.impl.VertexFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -101,8 +101,8 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return Vertex with id and single outgoing edge
    * @throws JSONException
    */
-  private List<Vertex> createFromEdgeLine(JSONObject edge)
-    throws JSONException {
+  private List<Vertex> createFromEdgeLine(JSONObject edge) throws
+    JSONException {
     List<Vertex> vList = Lists.newArrayListWithCapacity(2);
     Long sourceID = edge.getLong(EDGE_SOURCE);
     Long targetID = edge.getLong(EDGE_TARGET);
@@ -110,20 +110,22 @@ public class FoodBrokerReader implements VertexLineReader {
     String edgeType = getType(edge);
 
     // outgoing edge on source vertex
-    Edge edgeOut = new MemoryEdge(targetID, edgeType, RANDOM.nextLong());
+    Edge edgeOut = EdgeFactory
+      .createDefaultEdgeWithLabel(targetID, edgeType, RANDOM.nextLong());
     addProperties(edgeOut, edge.getJSONObject(META),
       BIIIGConstants.META_PREFIX);
     addProperties(edgeOut, edge.getJSONObject(DATA));
-    vList.add(new MemoryVertex(sourceID, null, null,
-      Lists.newArrayList(edgeOut), null, null));
+    vList.add(VertexFactory
+      .createDefaultVertexWithEdges(sourceID, Lists.newArrayList(edgeOut),
+        null));
 
     // incoming edge on target vertex
-    Edge edgeIn = new MemoryEdge(sourceID, edgeType, RANDOM.nextLong());
+    Edge edgeIn = EdgeFactory
+      .createDefaultEdgeWithLabel(sourceID, edgeType, RANDOM.nextLong());
     addProperties(edgeIn, edge.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(edgeIn, edge.getJSONObject(DATA));
-    vList.add(new MemoryVertex(targetID, null, null, null,
-      Lists.newArrayList(edgeIn), null));
-
+    vList.add(VertexFactory.createDefaultVertexWithEdges(targetID, null,
+      Lists.newArrayList(edgeIn)));
     return vList;
   }
 
@@ -134,10 +136,10 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return vertex with id, labels, properties
    * @throws JSONException
    */
-  private List<Vertex> createFromVertexLine(JSONObject vertex)
-    throws JSONException {
+  private List<Vertex> createFromVertexLine(JSONObject vertex) throws
+    JSONException {
     Long vertexID = vertex.getLong(VERTEX_ID);
-    Vertex v = new MemoryVertex(vertexID);
+    Vertex v = VertexFactory.createDefaultVertexWithID(vertexID);
     addProperties(v, vertex.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(v, vertex.getJSONObject(DATA));
     v.addLabel(String.valueOf(getKind(vertex)));
@@ -151,8 +153,7 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return edge type (label)
    * @throws JSONException
    */
-  private String getType(JSONObject object)
-    throws JSONException {
+  private String getType(JSONObject object) throws JSONException {
     return object.getJSONObject(META).getString(TYPE_PROPERTY);
   }
 
@@ -164,8 +165,7 @@ public class FoodBrokerReader implements VertexLineReader {
    * @return vertex type
    * @throws JSONException
    */
-  private int getKind(JSONObject object)
-    throws JSONException {
+  private int getKind(JSONObject object) throws JSONException {
     String kindValue = object.getJSONObject(META).getString(KIND_PROPERTY);
     return (kindValue.equals(BTGVertexType.MASTER.toString())) ?
       BTGVertexType.MASTER.ordinal() : BTGVertexType.TRANSACTIONAL.ordinal();
@@ -179,8 +179,7 @@ public class FoodBrokerReader implements VertexLineReader {
    * @throws JSONException
    */
   private void addProperties(final Attributed attributed,
-                             final JSONObject object)
-    throws JSONException {
+    final JSONObject object) throws JSONException {
     addProperties(attributed, object, "");
   }
 
@@ -193,15 +192,13 @@ public class FoodBrokerReader implements VertexLineReader {
    * @throws JSONException
    */
   private void addProperties(final Attributed attributed,
-                             final JSONObject object,
-                             final String prefix)
-    throws JSONException {
+    final JSONObject object, final String prefix) throws JSONException {
     boolean addPrefix = !EMPTY_PREFIX.equals(prefix);
     Iterator<?> keys = object.keys();
     while (keys.hasNext()) {
       String key = keys.next().toString();
       Object o = object.get(key);
-      key = (addPrefix) ? prefix + key : key;
+      key = addPrefix ? prefix + key : key;
       attributed.addProperty(key, o);
     }
   }

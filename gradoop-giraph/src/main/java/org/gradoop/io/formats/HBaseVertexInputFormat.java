@@ -2,6 +2,7 @@ package org.gradoop.io.formats;
 
 import org.apache.giraph.io.VertexInputFormat;
 import org.apache.giraph.io.VertexReader;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
@@ -11,9 +12,11 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.log4j.Logger;
+import org.gradoop.GConstants;
+import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -35,23 +38,21 @@ import java.util.List;
  * @param <V> Vertex value
  * @param <E> Edge value
  */
-public abstract class HBaseVertexInputFormat<
-  I extends WritableComparable,
-  V extends Writable,
-  E extends Writable>
-  extends VertexInputFormat<I, V, E> {
-
+public abstract class HBaseVertexInputFormat<I extends WritableComparable, V
+  extends Writable, E extends Writable> extends
+  VertexInputFormat<I, V, E> {
 
   /**
    * delegate HBase table input format
    */
-  protected static final TableInputFormat BASE_FORMAT =
-    new TableInputFormat();
+  protected static final TableInputFormat BASE_FORMAT = new TableInputFormat();
+
   /**
-   * logger
+   * {@inheritDoc}
    */
-  private static final Logger LOG =
-    Logger.getLogger(HBaseVertexInputFormat.class);
+  @Override
+  public void checkInputSpecs(Configuration conf) {
+  }
 
   /**
    * Takes an instance of RecordReader that supports HBase row-key, result
@@ -63,16 +64,20 @@ public abstract class HBaseVertexInputFormat<
    * @param <V> Vertex value
    * @param <E> Edge value
    */
-  public abstract static class HBaseVertexReader<
-    I extends WritableComparable,
-    V extends Writable,
-    E extends Writable>
-    extends VertexReader<I, V, E> {
+  public abstract static class HBaseVertexReader<I extends
+    WritableComparable, V extends Writable, E extends Writable> extends
+    VertexReader<I, V, E> {
 
     /**
      * Reader instance
      */
     private final RecordReader<ImmutableBytesWritable, Result> reader;
+
+    /**
+     * Vertex handler to read vertices from HBase.
+     */
+    private VertexHandler vertexHandler;
+
     /**
      * Context passed to initialize
      */
@@ -85,14 +90,14 @@ public abstract class HBaseVertexInputFormat<
      * @param context Context
      * @throws java.io.IOException
      */
-    public HBaseVertexReader(InputSplit split, TaskAttemptContext context)
-      throws IOException {
+    public HBaseVertexReader(InputSplit split,
+      TaskAttemptContext context) throws IOException {
       BASE_FORMAT.setConf(context.getConfiguration());
       this.reader = BASE_FORMAT.createRecordReader(split, context);
     }
 
     /**
-     * initialize
+     * Initialize the HBase Reader and the Vertex handler.
      *
      * @param inputSplit Input split to be used for reading vertices.
      * @param context    Context from the task.
@@ -100,10 +105,19 @@ public abstract class HBaseVertexInputFormat<
      * @throws InterruptedException
      */
     public void initialize(InputSplit inputSplit,
-                           TaskAttemptContext context)
-      throws IOException, InterruptedException {
+      TaskAttemptContext context) throws IOException, InterruptedException {
       reader.initialize(inputSplit, context);
       this.context = context;
+
+      Class<? extends VertexHandler> handlerClass = getConf()
+        .getClass(GConstants.VERTEX_HANDLER_CLASS,
+          GConstants.DEFAULT_VERTEX_HANDLER, VertexHandler.class);
+      try {
+        this.vertexHandler = handlerClass.getConstructor().newInstance();
+      } catch (NoSuchMethodException | InstantiationException |
+        IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
+      }
     }
 
     /**
@@ -111,8 +125,7 @@ public abstract class HBaseVertexInputFormat<
      *
      * @throws IOException
      */
-    public void close()
-      throws IOException {
+    public void close() throws IOException {
       reader.close();
     }
 
@@ -123,9 +136,7 @@ public abstract class HBaseVertexInputFormat<
      * @throws IOException
      * @throws InterruptedException
      */
-    public float getProgress()
-      throws
-      IOException, InterruptedException {
+    public float getProgress() throws IOException, InterruptedException {
       return reader.getProgress();
     }
 
@@ -134,8 +145,7 @@ public abstract class HBaseVertexInputFormat<
      *
      * @return Record reader to be used for reading.
      */
-    protected RecordReader<ImmutableBytesWritable,
-      Result> getRecordReader() {
+    protected RecordReader<ImmutableBytesWritable, Result> getRecordReader() {
       return reader;
     }
 
@@ -148,12 +158,20 @@ public abstract class HBaseVertexInputFormat<
       return context;
     }
 
+    /**
+     * Returns the vertex handler.
+     *
+     * @return Vertex handler to be used for reading vertices.
+     */
+    protected VertexHandler getVertexHandler() {
+      return vertexHandler;
+    }
+
   }
 
   @Override
-  public List<InputSplit> getSplits(
-    JobContext context, int minSplitCountHint)
-    throws IOException, InterruptedException {
+  public List<InputSplit> getSplits(JobContext context,
+    int minSplitCountHint) throws IOException, InterruptedException {
     BASE_FORMAT.setConf(getConf());
     return BASE_FORMAT.getSplits(context);
   }

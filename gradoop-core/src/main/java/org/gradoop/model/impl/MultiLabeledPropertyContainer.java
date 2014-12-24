@@ -1,4 +1,4 @@
-package org.gradoop.model.inmemory;
+package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
 import org.gradoop.model.Identifiable;
@@ -27,16 +27,13 @@ public abstract class MultiLabeledPropertyContainer extends PropertyContainer
    * Creates an object from the given parameters. Can only be called by
    * inheriting classes.
    *
-   * @param id         unique id
-   * @param labels     labels (can be {@code null})
-   * @param properties key-value-map (can be {@code null})
+   * @param id         unique identifier
+   * @param labels     labels
+   * @param properties key-value-map
    */
   protected MultiLabeledPropertyContainer(Long id, Iterable<String> labels,
                                           Map<String, Object> properties) {
     super(properties);
-    if (id == null) {
-      throw new IllegalArgumentException("id must not be null");
-    }
     this.id = id;
     this.labels = (labels != null) ? Lists.newArrayList(labels) : null;
 

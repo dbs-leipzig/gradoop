@@ -67,6 +67,7 @@
         <plugin.maven-findbugs.version>2.5.2</plugin.maven-findbugs.version>
         <plugin.maven_assembly.version>2.4</plugin.maven_assembly.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
+        <plugin.maven-surefire.version>2.6</plugin.maven-surefire.version>
     </properties>
 
     <build>
@@ -153,6 +154,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${plugin.maven-surefire.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

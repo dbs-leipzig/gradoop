@@ -8,7 +8,7 @@ public class UnsupportedTypeException extends RuntimeException {
   /**
    * Creates a new exception object using the given message.
    *
-   * @param message
+   * @param message exception message
    */
   public UnsupportedTypeException(String message) {
     super(message);

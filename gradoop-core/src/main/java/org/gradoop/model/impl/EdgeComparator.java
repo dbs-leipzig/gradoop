@@ -1,4 +1,4 @@
-package org.gradoop.model.inmemory;
+package org.gradoop.model.impl;
 
 import org.gradoop.model.Edge;
 

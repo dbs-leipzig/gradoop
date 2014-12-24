@@ -24,8 +24,7 @@ public interface VertexHandler extends EntityHandler {
    * @throws IOException
    */
   void createVerticesTable(final HBaseAdmin admin,
-                           final HTableDescriptor tableDescriptor)
-    throws IOException;
+    final HTableDescriptor tableDescriptor) throws IOException;
 
   /**
    * Creates a globally unique row key based on the given vertexID. The

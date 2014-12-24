@@ -3,8 +3,8 @@ package org.gradoop.io.reader;
 import com.google.common.collect.Lists;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryEdge;
-import org.gradoop.model.inmemory.MemoryVertex;
+import org.gradoop.model.impl.EdgeFactory;
+import org.gradoop.model.impl.VertexFactory;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -41,9 +41,9 @@ public class SimpleVertexReader extends SingleVertexReader {
     List<Edge> edges = Lists.newArrayListWithCapacity(tokens.length - 1);
     for (int i = 1; i < tokens.length; i++) {
       Long otherID = Long.valueOf(tokens[i]);
-      Edge e = new MemoryEdge(otherID, (long) i - 1);
+      Edge e = EdgeFactory.createDefaultEdge(otherID, (long) i - 1);
       edges.add(e);
     }
-    return new MemoryVertex(vertexID, null, null, edges, null, null);
+    return VertexFactory.createDefaultVertexWithOutgoingEdges(vertexID, edges);
   }
 }

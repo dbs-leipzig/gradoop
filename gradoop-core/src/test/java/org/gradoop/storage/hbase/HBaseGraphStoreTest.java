@@ -5,8 +5,8 @@ import org.gradoop.HBaseClusterTest;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryGraph;
-import org.gradoop.model.inmemory.MemoryVertex;
+import org.gradoop.model.impl.GraphFactory;
+import org.gradoop.model.impl.VertexFactory;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.junit.Test;
@@ -35,7 +35,8 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
     vertices.add(1L);
 
     graphs
-      .add(new MemoryGraph(graphID, graphLabels, graphProperties, vertices));
+      .add(GraphFactory.createDefaultGraph(graphID, graphLabels,
+        graphProperties, vertices));
 
     // graph 1
     graphID = 1L;
@@ -46,8 +47,8 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
     vertices.add(1L);
     vertices.add(2L);
 
-    graphs
-      .add(new MemoryGraph(graphID, graphLabels, graphProperties, vertices));
+    graphs.add(GraphFactory.createDefaultGraph(graphID, graphLabels,
+      graphProperties, vertices));
 
     return graphs;
   }
@@ -160,8 +161,8 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
     final Iterable<Edge> outEdges = Lists.newArrayListWithCapacity(0);
     final Iterable<Edge> inEdges = Lists.newArrayListWithCapacity(0);
     final Iterable<Long> graphs = Lists.newArrayList();
-    Vertex v =
-      new MemoryVertex(vertexID, labels, properties, outEdges, inEdges, graphs);
+    Vertex v = VertexFactory.createDefaultVertex(vertexID, labels, properties,
+      outEdges, inEdges, graphs);
     graphStore.writeVertex(v);
   }
 
@@ -198,8 +199,8 @@ public class HBaseGraphStoreTest extends HBaseClusterTest {
     final Iterable<Edge> inEdges = Lists.newArrayListWithCapacity(0);
     final Iterable<Long> graphs = Lists.newArrayList();
 
-    Vertex v = new MemoryVertex(vertexID, labels, properties, outEdges,
-      inEdges, graphs);
+    Vertex v = VertexFactory.createDefaultVertex(vertexID, labels, properties,
+      outEdges, inEdges, graphs);
     graphStore.writeVertex(v);
 
     // reopen

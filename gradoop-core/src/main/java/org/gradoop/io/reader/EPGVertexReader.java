@@ -5,8 +5,8 @@ import com.google.common.collect.Maps;
 import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.inmemory.MemoryEdge;
-import org.gradoop.model.inmemory.MemoryVertex;
+import org.gradoop.model.impl.EdgeFactory;
+import org.gradoop.model.impl.VertexFactory;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
 import java.util.Arrays;
@@ -79,8 +79,9 @@ public class EPGVertexReader implements VertexLineReader {
     Iterable<Edge> inEdges = readEdges(lineTokens[4]);
     Iterable<Long> graphs = readGraphs(lineTokens[5]);
 
-    return new MemoryVertex(vertexID, labels, properties, outEdges, inEdges,
-      graphs);
+    return VertexFactory
+      .createDefaultVertex(vertexID, labels, properties, outEdges, inEdges,
+        graphs);
   }
 
   /**
@@ -172,8 +173,8 @@ public class EPGVertexReader implements VertexLineReader {
         // parse edge properties
         Map<String, Object> edgeProperties =
           readProperties(edgeString.substring(propStartIdx + 1));
-        edges
-          .add(new MemoryEdge(otherID, edgeLabel, edgeIndex, edgeProperties));
+        edges.add(EdgeFactory
+          .createDefaultEdge(otherID, edgeLabel, edgeIndex, edgeProperties));
       }
     }
     return edges;
@@ -206,27 +207,27 @@ public class EPGVertexReader implements VertexLineReader {
   private Object decodeValue(String type, String value) {
     Object o;
     switch (Byte.parseByte(type)) {
-      case GConstants.TYPE_BOOLEAN:
-        o = Boolean.valueOf(value);
-        break;
-      case GConstants.TYPE_INTEGER:
-        o = Integer.valueOf(value);
-        break;
-      case GConstants.TYPE_LONG:
-        o = Long.valueOf(value);
-        break;
-      case GConstants.TYPE_FLOAT:
-        o = Long.valueOf(value);
-        break;
-      case GConstants.TYPE_DOUBLE:
-        o = Double.valueOf(value);
-        break;
-      case GConstants.TYPE_STRING:
-        o = value;
-        break;
-      default:
-        throw new UnsupportedTypeException(
-          type + " not supported by this reader");
+    case GConstants.TYPE_BOOLEAN:
+      o = Boolean.valueOf(value);
+      break;
+    case GConstants.TYPE_INTEGER:
+      o = Integer.valueOf(value);
+      break;
+    case GConstants.TYPE_LONG:
+      o = Long.valueOf(value);
+      break;
+    case GConstants.TYPE_FLOAT:
+      o = Long.valueOf(value);
+      break;
+    case GConstants.TYPE_DOUBLE:
+      o = Double.valueOf(value);
+      break;
+    case GConstants.TYPE_STRING:
+      o = value;
+      break;
+    default:
+      throw new UnsupportedTypeException(
+        type + " not supported by this reader");
     }
     return o;
   }

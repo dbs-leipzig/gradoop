@@ -10,8 +10,8 @@ import java.util.Map;
 /**
  * Used to manage (de-)serialization of edge values.
  */
-public class EPGEdgeValueWritable extends EPGSingleLabeledAttributedWritable
-  implements Edge {
+public class EPGEdgeValueWritable extends
+  EPGSingleLabeledAttributedWritable implements Edge {
 
   /**
    * The vertex id of the "other" vertex the vertex storing that edge is
@@ -49,11 +49,11 @@ public class EPGEdgeValueWritable extends EPGSingleLabeledAttributedWritable
    * Creates an edge value based on the given parameters.
    *
    * @param otherID the vertex this edge connects to
-   * @param label   edge label, must not be {@null} or empty
+   * @param label   edge label (must not be {@code null} or empty)
    * @param index   internal index of that edge
    */
   public EPGEdgeValueWritable(final Long otherID, final String label,
-                              final Long index) {
+    final Long index) {
     this(otherID, label, index, null);
   }
 
@@ -61,13 +61,12 @@ public class EPGEdgeValueWritable extends EPGSingleLabeledAttributedWritable
    * Creates an edge value based on the given parameters.
    *
    * @param otherID    the vertex this edge connects to
-   * @param label      edge label, must not be {@null} or empty
+   * @param label      edge label (must not be {@code null} or empty)
    * @param index      internal index of that edge
    * @param properties key-value-map (can be {@code null})
    */
   public EPGEdgeValueWritable(final Long otherID, final String label,
-                              final Long index, Map<String,
-    Object> properties) {
+    final Long index, Map<String, Object> properties) {
     super(label, properties);
     this.otherID = otherID;
     this.index = index;
@@ -93,8 +92,7 @@ public class EPGEdgeValueWritable extends EPGSingleLabeledAttributedWritable
    * {@inheritDoc}
    */
   @Override
-  public void write(DataOutput dataOutput)
-    throws IOException {
+  public void write(DataOutput dataOutput) throws IOException {
     dataOutput.writeLong(this.otherID);
     dataOutput.writeLong(this.index);
     super.write(dataOutput);
@@ -104,8 +102,7 @@ public class EPGEdgeValueWritable extends EPGSingleLabeledAttributedWritable
    * {@inheritDoc}
    */
   @Override
-  public void readFields(DataInput dataInput)
-    throws IOException {
+  public void readFields(DataInput dataInput) throws IOException {
     this.otherID = dataInput.readLong();
     this.index = dataInput.readLong();
     super.readFields(dataInput);

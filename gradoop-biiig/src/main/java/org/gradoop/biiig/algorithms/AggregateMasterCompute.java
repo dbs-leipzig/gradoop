@@ -35,13 +35,13 @@ public class AggregateMasterCompute extends DefaultMasterCompute {
    * @throws InstantiationException
    */
   @Override
-  public void initialize()
-    throws IllegalAccessException, InstantiationException {
+  public void initialize() throws IllegalAccessException,
+    InstantiationException {
     long btgCount = getConf().getLong(AggregateComputation.BTG_AGGREGATOR_CNT,
       AggregateComputation.DEFAULT_BTG_CNT);
-    Class aggregatorClass = getConf().getClass(
-      AggregateComputation.BTG_AGGREGATOR_CLASS,
-      IntSumAggregator.class);
+    Class aggregatorClass = getConf()
+      .getClass(AggregateComputation.BTG_AGGREGATOR_CLASS,
+        IntSumAggregator.class);
     for (int i = 0; i < btgCount; i++) {
       registerAggregator(AggregateComputation.BTG_AGGREGATOR_PREFIX + i,
         aggregatorClass);

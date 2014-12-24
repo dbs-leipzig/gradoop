@@ -28,7 +28,8 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import java.io.IOException;
 
 /**
- * Encodes the output of the {@link org.gradoop.biiig.algorithms.BTGComputation} in
+ * Encodes the output of the {@link org.gradoop.biiig.algorithms
+ * .BTGComputation} in
  * the following format: vertex-id,vertex-class vertex-value[ btg-id]* e.g. the
  * following line 0,0 3.14 23 42 decodes vertex-id 0 with vertex-class 0 (0 =
  * transactional, 1 = master) and the value 3.14. The node is connected to two
@@ -56,8 +57,8 @@ public class BTGTextVertexOutputFormat extends
    * @throws InterruptedException
    */
   @Override
-  public TextVertexWriter createVertexWriter(TaskAttemptContext context)
-    throws IOException, InterruptedException {
+  public TextVertexWriter createVertexWriter(TaskAttemptContext context) throws
+    IOException, InterruptedException {
     return new BTGTextVertexLineWriter();
   }
 
@@ -75,8 +76,8 @@ public class BTGTextVertexOutputFormat extends
      */
     @Override
     protected Text convertVertexToLine(
-      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex)
-      throws IOException {
+      Vertex<LongWritable, BTGVertexValue, NullWritable> vertex) throws
+      IOException {
       StringBuilder sb = new StringBuilder();
       // vertex-id
       sb.append(vertex.getId());

@@ -45,8 +45,7 @@ public class EPGVertexIdentifierWritable implements Identifiable,
    * {@inheritDoc}
    */
   @Override
-  public void write(DataOutput dataOutput)
-    throws IOException {
+  public void write(DataOutput dataOutput) throws IOException {
     dataOutput.writeLong(id);
   }
 
@@ -54,8 +53,7 @@ public class EPGVertexIdentifierWritable implements Identifiable,
    * {@inheritDoc}
    */
   @Override
-  public void readFields(DataInput dataInput)
-    throws IOException {
+  public void readFields(DataInput dataInput) throws IOException {
     this.id = dataInput.readLong();
   }
 
@@ -87,7 +85,6 @@ public class EPGVertexIdentifierWritable implements Identifiable,
     if (id != null ? !id.equals(that.id) : that.id != null) {
       return false;
     }
-
     return true;
   }
 

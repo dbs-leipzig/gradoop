@@ -16,7 +16,7 @@ import org.gradoop.MapReduceClusterTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
-import org.gradoop.model.inmemory.MemoryGraph;
+import org.gradoop.model.impl.GraphFactory;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;
@@ -135,7 +135,7 @@ public class SelectionTest extends MapReduceClusterTest {
         }
       }
       if (predicate) {
-        Graph g = new MemoryGraph(key.get());
+        Graph g = GraphFactory.createDefaultGraphWithID(key.get());
         g.addProperty(PREDICATE_PROPERTY_KEY, true);
         Put put = new Put(GRAPH_HANDLER.getRowKey(key.get()));
         put = GRAPH_HANDLER.writeProperties(put, g);

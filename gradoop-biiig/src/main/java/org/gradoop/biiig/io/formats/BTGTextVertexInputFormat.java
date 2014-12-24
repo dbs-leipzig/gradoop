@@ -68,9 +68,7 @@ public class BTGTextVertexInputFormat extends
    */
   @Override
   public TextVertexReader createVertexReader(InputSplit split,
-                                             TaskAttemptContext context)
-    throws
-    IOException {
+    TaskAttemptContext context) throws IOException {
     return new IIGTextVertexReaderFromEachLine();
   }
 
@@ -82,26 +80,23 @@ public class BTGTextVertexInputFormat extends
     TextVertexReaderFromEachLineProcessed<String[]> {
 
     @Override
-    protected String[] preprocessLine(Text tokens)
-      throws IOException {
+    protected String[] preprocessLine(Text tokens) throws IOException {
       return LINE_TOKEN_SEPARATOR.split(tokens.toString());
     }
 
     @Override
-    protected LongWritable getId(String[] tokens)
-      throws IOException {
+    protected LongWritable getId(String[] tokens) throws IOException {
       return new LongWritable(Long.parseLong(tokens[0]));
     }
 
     @Override
-    protected BTGVertexValue getValue(String[] tokens)
-      throws IOException {
+    protected BTGVertexValue getValue(String[] tokens) throws IOException {
       String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(tokens[1]);
-      BTGVertexType vertexClass = BTGVertexType.values()[Integer.parseInt(
-        valueTokens[0])];
+      BTGVertexType vertexClass =
+        BTGVertexType.values()[Integer.parseInt(valueTokens[0])];
       Double vertexValue = Double.parseDouble(valueTokens[1]);
-      List<Long> btgIDs = Lists.newArrayListWithCapacity(
-        valueTokens.length - 1);
+      List<Long> btgIDs =
+        Lists.newArrayListWithCapacity(valueTokens.length - 1);
       for (int n = 2; n < valueTokens.length; n++) {
         btgIDs.add(Long.parseLong(valueTokens[n]));
       }
@@ -110,15 +105,15 @@ public class BTGTextVertexInputFormat extends
 
     @Override
     protected Iterable<Edge<LongWritable, NullWritable>> getEdges(
-      String[] tokens)
-      throws IOException {
-      String[] edgeTokens = (tokens.length == 3) ? VALUE_TOKEN_SEPARATOR.split(
-        tokens[2]) : new String[0];
+      String[] tokens) throws IOException {
+      String[] edgeTokens =
+        (tokens.length == 3) ? VALUE_TOKEN_SEPARATOR.split(tokens[2]) :
+          new String[0];
       List<Edge<LongWritable, NullWritable>> edges =
         Lists.newArrayListWithCapacity(edgeTokens.length);
       for (String edgeToken : edgeTokens) {
-        edges.add(EdgeFactory.create(
-          new LongWritable(Long.parseLong(edgeToken))));
+        edges
+          .add(EdgeFactory.create(new LongWritable(Long.parseLong(edgeToken))));
       }
       return edges;
     }
