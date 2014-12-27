@@ -18,7 +18,9 @@ import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Pair;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -35,11 +37,11 @@ import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexOutputFormat;
 import org.gradoop.biiig.io.reader.FoodBrokerReader;
 import org.gradoop.biiig.utils.ConfigurationUtils;
-import org.gradoop.io.formats.PairWritable;
+import org.gradoop.io.formats.GenericPairWritable;
 import org.gradoop.io.reader.BulkLoadEPG;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.operators.VertexDoubleAggregate;
+import org.gradoop.model.operators.VertexAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;
@@ -260,7 +262,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
 
     // vertex aggregate
     conf.setClass(SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
-      ProfitVertexAggregate.class, VertexDoubleAggregate.class);
+      ProfitVertexAggregate.class, VertexAggregate.class);
 
     /*
     reducer settings
@@ -281,7 +283,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     TableMapReduceUtil
       .initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES, scan,
         SelectAndAggregate.SelectMapper.class, LongWritable.class,
-        PairWritable.class, job);
+        GenericPairWritable.class, job);
 
     // reduce
     TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
@@ -319,7 +321,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   /**
    * Aggregate function to calculate the profit for a single graph.
    */
-  public static class ProfitVertexAggregate implements VertexDoubleAggregate {
+  public static class ProfitVertexAggregate implements VertexAggregate {
     /**
      * Profit contains expenses.
      */
@@ -330,7 +332,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     private static final String REVENUE_KEY = "revenue";
 
     @Override
-    public Double aggregate(Vertex vertex) {
+    public Writable aggregate(Vertex vertex) {
       double calcValue = 0f;
       if (vertex.getPropertyCount() > 0) {
         Object o = vertex.getProperty(REVENUE_KEY);
@@ -350,7 +352,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
           }
         }
       }
-      return calcValue;
+      return new DoubleWritable(calcValue);
     }
   }
 
@@ -360,11 +362,12 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   public static class SumAgregator implements PairAggregator {
 
     @Override
-    public Pair<Boolean, Double> aggregate(Iterable<PairWritable> values) {
+    public Pair<Boolean, ? extends Number> aggregate(
+      Iterable<GenericPairWritable> values) {
       double sum = 0;
       boolean predicate = false;
-      for (PairWritable value : values) {
-        sum = sum + value.getValue().get();
+      for (GenericPairWritable value : values) {
+        sum = sum + ((DoubleWritable) value.getValue().get()).get();
         if (value.getPredicateResult().get()) {
           predicate = true;
         }

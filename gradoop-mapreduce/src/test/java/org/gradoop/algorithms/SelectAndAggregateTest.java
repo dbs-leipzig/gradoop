@@ -4,16 +4,18 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.util.Pair;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.GConstants;
 import org.gradoop.MapReduceClusterTest;
-import org.gradoop.io.formats.PairWritable;
+import org.gradoop.io.formats.GenericPairWritable;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
-import org.gradoop.model.operators.VertexDoubleAggregate;
+import org.gradoop.model.operators.VertexAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGGraphHandler;
@@ -32,13 +34,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class SelectAndAggregateTest extends MapReduceClusterTest {
 
-  private static final String[] TEST_GRAPH = new String[] {
-    "1|A|1 pos 4 1000 type 1 0|||1 1",
-    "2|A|1 pos 4 1000 type 1 0|||2 1 2",
-    "3|A|1 pos 4 500 type 1 1|||1 1",
-    "4|A|2 neg 4 1000 type 1 1|||1 2",
-    "5|A|1 neg 4 100 type 1 1|||1 2"
-  };
+  private static final String[] TEST_GRAPH =
+    new String[]{"1|A|1 pos 4 1000 type 1 0|||1 1",
+                 "2|A|1 pos 4 1000 type 1 0|||2 1 2",
+                 "3|A|1 pos 4 500 type 1 1|||1 1",
+                 "4|A|2 neg 4 1000 type 1 1|||1 2",
+                 "5|A|1 neg 4 100 type 1 1|||1 2"};
 
   /**
    * Aggregate specific property.
@@ -62,14 +63,14 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
   private static final Integer PREDICATE_VALUE = 1;
 
   @Test
-  public void selectAndAggregateTest()
-    throws IOException, ClassNotFoundException, InterruptedException {
+  public void selectAndAggregateTest() throws IOException,
+    ClassNotFoundException, InterruptedException {
     // setup
     Configuration conf = utility.getConfiguration();
     GraphStore graphStore = createEmptyGraphStore();
     BufferedReader br = createTestReader(TEST_GRAPH);
-    AdjacencyListReader adjacencyListReader = new AdjacencyListReader
-      (graphStore, new EPGVertexReader());
+    AdjacencyListReader adjacencyListReader =
+      new AdjacencyListReader(graphStore, new EPGVertexReader());
     adjacencyListReader.read(br);
 
     /*
@@ -79,11 +80,11 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
     // Mapper settings
     conf.setClass(GConstants.VERTEX_HANDLER_CLASS, EPGVertexHandler.class,
       VertexHandler.class);
-    conf.setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS,
-      TestPredicate.class,
-      VertexPredicate.class);
+    conf
+      .setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS, TestPredicate.class,
+        VertexPredicate.class);
     conf.setClass(SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
-      TestVertexAggregate.class, VertexDoubleAggregate.class);
+      TestVertexAggregate.class, VertexAggregate.class);
     // Reducer settings
     conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
       GraphHandler.class);
@@ -99,21 +100,14 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
     scan.setCacheBlocks(false);
 
     // map
-    TableMapReduceUtil.initTableMapperJob(
-      GConstants.DEFAULT_TABLE_VERTICES,
-      scan,
-      SelectAndAggregate.SelectMapper.class,
-      LongWritable.class,
-      PairWritable.class,
-      job
-    );
+    TableMapReduceUtil
+      .initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES, scan,
+        SelectAndAggregate.SelectMapper.class, LongWritable.class,
+        GenericPairWritable.class, job);
 
     // reduce
-    TableMapReduceUtil.initTableReducerJob(
-      GConstants.DEFAULT_TABLE_GRAPHS,
-      SelectAndAggregate.AggregateReducer.class,
-      job
-    );
+    TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
+      SelectAndAggregate.AggregateReducer.class, job);
     job.setNumReduceTasks(1);
     // run MR job
     job.waitForCompletion(true);
@@ -156,10 +150,10 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
    * Domain specific vertex aggregation. Sums up positive and negative
    * property values stored at a vertex.
    */
-  public static class TestVertexAggregate implements VertexDoubleAggregate {
+  public static class TestVertexAggregate implements VertexAggregate {
 
     @Override
-    public Double aggregate(Vertex vertex) {
+    public Writable aggregate(Vertex vertex) {
       double calcValue = 0;
       if (vertex.getPropertyCount() > 0) {
         Object o = vertex.getProperty(PROJECTION_PROPERTY_KEY1);
@@ -171,7 +165,7 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
           calcValue -= (double) o;
         }
       }
-      return calcValue;
+      return new DoubleWritable(calcValue);
     }
   }
 
@@ -181,11 +175,14 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
   public static class TestPairAggregator implements PairAggregator {
 
     @Override
-    public Pair<Boolean, Double> aggregate(Iterable<PairWritable> values) {
+    public Pair<Boolean, ? extends Number> aggregate(
+      Iterable<GenericPairWritable> values) {
       double sum = 0f;
       boolean predicate = false;
-      for (PairWritable value : values) {
-        sum = sum + value.getValue().get();
+      for (GenericPairWritable value : values) {
+
+        sum = sum + ((DoubleWritable) value.getValue().get()).get();
+
         if (value.getPredicateResult().get()) {
           predicate = true;
         }

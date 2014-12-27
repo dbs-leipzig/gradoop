@@ -1,7 +1,6 @@
 package org.gradoop.io.formats;
 
 import org.apache.hadoop.io.BooleanWritable;
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
@@ -9,9 +8,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * This is just for testing purpose of Select/Aggregate.
+ * Used to transfer a predicate result and a value from the mapper to the
+ * reducer.
  */
-public class PairWritable implements Writable {
+public class GenericPairWritable implements Writable {
 
   /**
    * Result of predicate.
@@ -21,21 +21,22 @@ public class PairWritable implements Writable {
   /**
    * Attribute value for aggregation.
    */
-  private DoubleWritable value;
+  private ValueWritable value;
 
   /**
    * Default constructor needed for deserialization.
    */
-  public PairWritable() {
+  public GenericPairWritable() {
   }
 
   /**
-   * Creates a PairWritable based on the given parameters.
+   * Creates a GenericPairWritable based on the given parameters.
    *
    * @param predicateResult predicate result
-   * @param value           value for aggregation
+   * @param value           value
    */
-  public PairWritable(BooleanWritable predicateResult, DoubleWritable value) {
+  public GenericPairWritable(BooleanWritable predicateResult,
+    ValueWritable value) {
     this.predicateResult = predicateResult;
     this.value = value;
   }
@@ -44,7 +45,7 @@ public class PairWritable implements Writable {
     return predicateResult;
   }
 
-  public DoubleWritable getValue() {
+  public ValueWritable getValue() {
     return value;
   }
 
@@ -66,7 +67,7 @@ public class PairWritable implements Writable {
       this.predicateResult = new BooleanWritable();
     }
     if (this.value == null) {
-      this.value = new DoubleWritable();
+      this.value = new ValueWritable();
     }
     this.predicateResult.readFields(dataInput);
     this.value.readFields(dataInput);
