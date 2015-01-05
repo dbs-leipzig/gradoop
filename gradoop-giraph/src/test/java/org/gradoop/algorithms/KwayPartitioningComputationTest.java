@@ -23,29 +23,15 @@ public class KwayPartitioningComputationTest {
   @Test
   public void testSmallConnectedGraph()
     throws Exception {
-    String[] graph = getSmallConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph, 2, "rdm"));
+    String[] graph =
+      PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
+    validateSmallConnectedGraphResult(computeResults(graph, 2, "max"));
   }
-
-  /**
-   * @return a small graph with two connected partitions
-   */
-  protected String[] getSmallConnectedGraph() {
-    return new String[]{
-      "0 0 0 1 2",
-      "1 0 0 0 2",
-      "2 0 0 0 1 3",
-      "3 0 0 2 4 5",
-      "4 0 0 3 5",
-      "5 0 0 3 4"
-    };
-  }
-
 
 
   private void validateSmallConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
-    if (0 == vertexIDwithValue.get(0)) {
+    if (0 == vertexIDwithValue.get(2)) {
       if (1 == vertexIDwithValue.get(3)) {
         assertEquals(6, vertexIDwithValue.size());
         assertEquals(0, vertexIDwithValue.get(0).intValue());
@@ -58,20 +44,7 @@ public class KwayPartitioningComputationTest {
       }
     }
 
-    if (0 == vertexIDwithValue.get(0)) {
-      if (1 == vertexIDwithValue.get(3)) {
-        assertEquals(6, vertexIDwithValue.size());
-        assertEquals(0, vertexIDwithValue.get(0).intValue());
-        assertEquals(1, vertexIDwithValue.get(1).intValue());
-        assertEquals(0, vertexIDwithValue.get(2).intValue());
-        assertEquals(1, vertexIDwithValue.get(3).intValue());
-        assertEquals(0, vertexIDwithValue.get(4).intValue());
-        assertEquals(1, vertexIDwithValue.get(5).intValue());
-
-      }
-    }
-
-    if (1 == vertexIDwithValue.get(0)) {
+    if (1 == vertexIDwithValue.get(2)) {
       if (0 == vertexIDwithValue.get(3)) {
         assertEquals(6, vertexIDwithValue.size());
         assertEquals(1, vertexIDwithValue.get(0).intValue());
@@ -84,21 +57,8 @@ public class KwayPartitioningComputationTest {
       }
     }
 
-    if (1 == vertexIDwithValue.get(0)) {
-      if (0 == vertexIDwithValue.get(3)) {
-        assertEquals(6, vertexIDwithValue.size());
-        assertEquals(1, vertexIDwithValue.get(0).intValue());
-        assertEquals(0, vertexIDwithValue.get(1).intValue());
-        assertEquals(1, vertexIDwithValue.get(2).intValue());
-        assertEquals(0, vertexIDwithValue.get(3).intValue());
-        assertEquals(1, vertexIDwithValue.get(4).intValue());
-        assertEquals(0, vertexIDwithValue.get(5).intValue());
 
-      }
-    }
-
-
-    if (1 == vertexIDwithValue.get(0)) {
+    if (1 == vertexIDwithValue.get(2)) {
       if (1 == vertexIDwithValue.get(3)) {
         assertEquals(6, vertexIDwithValue.size());
         assertEquals(1, vertexIDwithValue.get(0).intValue());
@@ -111,7 +71,7 @@ public class KwayPartitioningComputationTest {
       }
     }
 
-    if (0 == vertexIDwithValue.get(0)) {
+    if (0 == vertexIDwithValue.get(2)) {
       if (0 == vertexIDwithValue.get(3)) {
         assertEquals(6, vertexIDwithValue.size());
         assertEquals(0, vertexIDwithValue.get(0).intValue());

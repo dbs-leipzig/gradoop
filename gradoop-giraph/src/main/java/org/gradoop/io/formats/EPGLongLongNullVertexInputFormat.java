@@ -1,6 +1,7 @@
 package org.gradoop.io.formats;
 
 import com.google.common.collect.Lists;
+
 import org.apache.giraph.edge.Edge;
 import org.apache.giraph.edge.EdgeFactory;
 import org.apache.giraph.graph.Vertex;
@@ -15,27 +16,23 @@ import org.apache.log4j.Logger;
 import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
+import javax.sound.midi.MidiDevice;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by gomezk on 18.12.14.
+ * Used to read a EPG based graph from HBase into Giraph.
  */
 public class EPGLongLongNullVertexInputFormat extends
   HBaseVertexInputFormat<LongWritable, LongWritable, NullWritable> {
 
-  private static Logger LOG = Logger.getLogger
-    (EPGLongLongNullVertexInputFormat.class);
 
   /**
    * Property key to identify the corresponding vertex value.
    */
   public static final String VALUE_PROPERTY_KEY = "v";
-  /**
-   * Vertex handler to read vertices from HBase.
-   */
-  private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
+
 
   /**
    * {@inheritDoc}
@@ -45,27 +42,21 @@ public class EPGLongLongNullVertexInputFormat extends
     NullWritable> createVertexReader(
     InputSplit inputSplit, TaskAttemptContext taskAttemptContext)
     throws IOException {
-    return new EPGLongIntNullVertexReader(inputSplit, taskAttemptContext);
+    return new EPGLongLongNullVertexReader(inputSplit, taskAttemptContext);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void checkInputSpecs(Configuration entries) {
-  }
 
-  public static class EPGLongIntNullVertexReader extends
+  public static class EPGLongLongNullVertexReader extends
     HBaseVertexReader<LongWritable, LongWritable, NullWritable> {
+
     /**
      * Sets the base TableInputFormat and creates a record reader.
      *
      * @param split   InputSplit
      * @param context Context
-     * @throws java.io.IOException
      */
-    public EPGLongIntNullVertexReader(InputSplit split,
-                                      TaskAttemptContext context)
+    public EPGLongLongNullVertexReader(InputSplit split,
+                                       TaskAttemptContext context)
       throws IOException {
       super(split, context);
     }
@@ -86,31 +77,21 @@ public class EPGLongLongNullVertexInputFormat extends
     public Vertex<LongWritable, LongWritable, NullWritable> getCurrentVertex()
       throws IOException, InterruptedException {
       Result row = getRecordReader().getCurrentValue();
+      VertexHandler vertexHandler = getVertexHandler();
 
-      LOG.info("=== reading vertex");
-
-      LongWritable vertexID = new LongWritable(VERTEX_HANDLER.getVertexID(
+      LongWritable vertexID = new LongWritable(vertexHandler.getVertexID(
         row.getRow()));
 
-      LOG.info("=== vertex id: " + vertexID);
 
-      Map<String, Object> props = VERTEX_HANDLER.readProperties(row);
-
-      LOG.info("=== properties");
-      for (Map.Entry<String, Object> e : props.entrySet()) {
-        LOG.info(e.getKey() + " => " + e.getValue());
-      }
+      Map<String, Object> props = vertexHandler.readProperties(row);
 
       LongWritable vertexValue = new LongWritable((long) props.get
         (VALUE_PROPERTY_KEY));
 
-      LOG.info("=== vertex value: " + vertexValue);
 
       // read outgoing edges
-      LOG.info("=== outgoing edges");
       List<Edge<LongWritable, NullWritable>> edges = Lists.newArrayList();
-      for (org.gradoop.model.Edge e : VERTEX_HANDLER.readOutgoingEdges(row)) {
-        LOG.info("=== otherID: " + e.getOtherID());
+      for (org.gradoop.model.Edge e : vertexHandler.readOutgoingEdges(row)) {
         edges.add(EdgeFactory.create(new LongWritable(e.getOtherID())));
       }
 
@@ -119,7 +100,6 @@ public class EPGLongLongNullVertexInputFormat extends
 
       vertex.initialize(vertexID, vertexValue, edges);
 
-      LOG.info("=== EO reading vertex");
       return vertex;
     }
   }

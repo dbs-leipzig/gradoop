@@ -14,20 +14,21 @@ import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
- * Created by gomezk on 18.12.14.
+ * Used to write the result of a graph computation into HBase. The graph is
+ * based on the EPG model.
  */
 public class EPGIdWithValueVertexOutputFormat extends
-  HBaseVertexOutputFormat<LongWritable, IntWritable, NullWritable> {
+  HBaseVertexOutputFormat<LongWritable, LongWritable, NullWritable> {
 
-  private static final VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexWriter<LongWritable, IntWritable, NullWritable>
+  public VertexWriter<LongWritable, LongWritable, NullWritable>
   createVertexWriter(
     TaskAttemptContext taskAttemptContext)
     throws IOException, InterruptedException {
@@ -35,7 +36,7 @@ public class EPGIdWithValueVertexOutputFormat extends
   }
 
   public static class EPGIdWithValueVertexWriter extends
-    HBaseVertexWriter<LongWritable, IntWritable, NullWritable> {
+    HBaseVertexWriter<LongWritable, LongWritable, NullWritable> {
 
     /**
      * Sets up base table output format and creates a record writer.
@@ -52,13 +53,15 @@ public class EPGIdWithValueVertexOutputFormat extends
      */
     @Override
     public void writeVertex(
-      Vertex<LongWritable, IntWritable, NullWritable> vertex)
+      Vertex<LongWritable, LongWritable, NullWritable> vertex)
       throws IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
-      byte[] rowKey = VERTEX_HANDLER.getRowKey(vertex.getId().get());
+      VertexHandler vertexHandler = getVertexHandler();
+      byte[] rowKey = vertexHandler.getRowKey(vertex.getId().get());
       Put put = new Put(rowKey);
-      VERTEX_HANDLER.writeProperty(put, EPGLongLongNullVertexInputFormat
+      vertexHandler.writeProperty(put, EPGLongLongNullVertexInputFormat
         .VALUE_PROPERTY_KEY, vertex.getValue().get());
+
       writer.write(new ImmutableBytesWritable(rowKey), put);
     }
   }

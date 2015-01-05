@@ -3,6 +3,7 @@ package org.gradoop.algorithms;
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.util.List;
  * TODO: algorithm description
  */
 public class LabelPropagationComputation extends
-  BasicComputation<IntWritable, IntWritable, NullWritable, IntWritable> {
+  BasicComputation<LongWritable, LongWritable, NullWritable, LongWritable> {
   /**
    * Returns the current new value. This value is based on all incoming
    * messages. Depending on the number of messages sent to the vertex, the
@@ -30,13 +31,14 @@ public class LabelPropagationComputation extends
    * @param messages All incoming messages
    * @return the new Value the vertex will become
    */
-  private int getNewValue(Vertex<IntWritable, IntWritable, NullWritable> vertex,
-    Iterable<IntWritable> messages) {
-    int newValue;
+  private long getNewValue(Vertex<LongWritable, LongWritable, NullWritable>
+                           vertex,
+    Iterable<LongWritable> messages) {
+    long newValue;
     //TODO: create allMessages more efficient
-    //List<IntWritable> allMessages = Lists.newArrayList(messages);
-    List<Integer> allMessages = new ArrayList<>();
-    for (IntWritable message : messages) {
+    //List<LongWritable> allMessages = Lists.newArrayList(messages);
+    List<Long> allMessages = new ArrayList<>();
+    for (LongWritable message : messages) {
       allMessages.add(message.get());
     }
     if (allMessages.isEmpty()) {
@@ -59,15 +61,15 @@ public class LabelPropagationComputation extends
    * @param allMessages All messages the current vertex has received
    * @return the maximal frequent number in all received messages
    */
-  private int getMostFrequent(
-    Vertex<IntWritable, IntWritable, NullWritable> vertex,
-    List<Integer> allMessages) {
+  private long getMostFrequent(
+    Vertex<LongWritable, LongWritable, NullWritable> vertex,
+    List<Long> allMessages) {
     Collections.sort(allMessages);
-    int newValue;
+    long newValue;
     int currentCounter = 1;
-    int currentValue = allMessages.get(0);
+    long currentValue = allMessages.get(0);
     int maxCounter = 1;
-    int maxValue = 1;
+    long maxValue = 1;
     for (int i = 1; i < allMessages.size(); i++) {
       if (currentValue == allMessages.get(i)) {
         currentCounter++;
@@ -100,16 +102,16 @@ public class LabelPropagationComputation extends
    * @throws IOException
    */
   @Override
-  public void compute(Vertex<IntWritable, IntWritable, NullWritable> vertex,
-    Iterable<IntWritable> messages) throws IOException {
+  public void compute(Vertex<LongWritable, LongWritable, NullWritable> vertex,
+    Iterable<LongWritable> messages) throws IOException {
     if (getSuperstep() == 0) {
       sendMessageToAllEdges(vertex, vertex.getId());
     } else {
-      int currentMinValue = vertex.getValue().get();
-      int newValue = getNewValue(vertex, messages);
+      long currentMinValue = vertex.getValue().get();
+      long newValue = getNewValue(vertex, messages);
       boolean changed = currentMinValue != newValue;
       if (changed) {
-        vertex.setValue(new IntWritable(newValue));
+        vertex.setValue(new LongWritable(newValue));
         sendMessageToAllEdges(vertex, vertex.getValue());
       }
     }
