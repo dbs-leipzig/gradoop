@@ -16,16 +16,19 @@ public class KwayPartitioningMasterComputation extends DefaultMasterCompute {
    * @throws InstantiationException
    */
   @Override
-  public void initialize()
-    throws IllegalAccessException, InstantiationException {
-    int partitionCount = Integer.valueOf(getConf().get
-      (KwayPartitioningComputation.NUMBER_OF_PARTITIONS,
+  public void initialize() throws IllegalAccessException,
+    InstantiationException {
+    int partitionCount = Integer.valueOf(getConf()
+      .get(KwayPartitioningComputation.NUMBER_OF_PARTITIONS,
         KwayPartitioningComputation.DEFAULT_PARTITIONS));
-    Class aggregatorClass = getConf().getClass(
-      KwayPartitioningComputation.KWAY_AGGREGATOR_CLASS,
-      IntSumAggregator.class);
+    Class aggregatorClass = getConf()
+      .getClass(KwayPartitioningComputation.KWAY_AGGREGATOR_CLASS,
+        IntSumAggregator.class);
     for (int i = 0; i < partitionCount; i++) {
-      registerAggregator(KwayPartitioningComputation.KWAY_AGGREGATOR_PREFIX + i,
+      registerAggregator(KwayPartitioningComputation
+        .KWAY_DEMAND_AGGREGATOR_PREFIX + i, aggregatorClass);
+      registerAggregator(
+        KwayPartitioningComputation.KWAY_CAPACITY_AGGREGATOR_PREFIX + i,
         aggregatorClass);
     }
   }

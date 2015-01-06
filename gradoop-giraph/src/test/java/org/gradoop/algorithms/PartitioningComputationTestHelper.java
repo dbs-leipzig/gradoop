@@ -90,12 +90,14 @@ public abstract class PartitioningComputationTestHelper {
    */
   static String[] getKwaySmallConnectedGraph() {
     return new String[] {
-      "0 0 0 1 2",
-      "1 0 0 0 2",
-      "2 0 0 0 1 3",
-      "3 0 0 2 4 5",
-      "4 0 0 3 5",
-      "5 0 0 3 4"
+      "0 0 0 1 2 3",
+      "1 0 0 0 2 3",
+      "2 0 0 0 1 3 4",
+      "3 0 0 0 1 2",
+      "4 0 0 2 5 6 7",
+      "5 0 0 4 6 7",
+      "6 0 0 4 5 7",
+      "7 0 0 4 5 6"
     };
   }
 

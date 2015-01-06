@@ -9,7 +9,9 @@ import org.gradoop.io.KwayPartitioningVertex;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang.math.RandomUtils.nextInt;
 
@@ -19,50 +21,55 @@ import static org.apache.commons.lang.math.RandomUtils.nextInt;
 public class KwayPartitioningComputation extends
   BasicComputation<IntWritable, KwayPartitioningVertex, NullWritable,
     IntWritable> {
-  public final static String NUMBER_OF_PARTITIONS = "partitioning.num" +
-    ".partitions";
+
+
+  public final static String NUMBER_OF_PARTITIONS =
+    "partitioning.num" + ".partitions";
   public static String COMPUTATION_CASE = "partitioning.case";
   public static String DEFAULT_PARTITIONS = "2";
   public static final String KWAY_AGGREGATOR_CLASS =
     KwayPartitioningComputation.class.getName() + ".aggregator.class";
-  public static final String KWAY_AGGREGATOR_PREFIX =
-    KwayPartitioningComputation.class.getName() + ".kway.aggregator.";
+  public static final String KWAY_CAPACITY_AGGREGATOR_PREFIX =
+    KwayPartitioningComputation.class.getName() + ".capacity.aggregator.";
+  public static final String KWAY_DEMAND_AGGREGATOR_PREFIX =
+    KwayPartitioningComputation.class.getName() + ".demand.aggregator.";
 
-  /**
-   * Returns the current new value. This value is based on all incoming
-   * messages. Depending on the number of messages sent to the vertex, the
-   * method returns:static
-   * <p/>
-   * 0 messages:   The current value
-   * <p/>
-   * 1 message:    The minimum of the message and the current vertex value
-   * <p/>
-   * >1 messages:  The most frequent of all message values
-   *
-   * @param vertex   The current vertex
-   * @param messages All incoming messages
-   * @return the new Value the vertex will become
-   */
-  private int getNewValue(Vertex<IntWritable, KwayPartitioningVertex,
-    NullWritable> vertex, Iterable<IntWritable> messages, String computation_case) {
-    int newValue;
-    //TODO: create allMessages more efficient
-    //List<IntWritable> allMessages = Lists.newArrayList(messages);
-    List<Integer> allMessages = new ArrayList<>();
+
+  private int getHighestWeight(Iterable<IntWritable> messages) {
+
+    int desiredPartition=0;
+
+    Map<Integer, Integer> countNeighbours = new HashMap<>();
+    Map<Integer, Float> partitionWeight = new HashMap<>();
+
     for (IntWritable message : messages) {
-      allMessages.add(message.get());
+      if(!countNeighbours.containsKey(message.get())){
+        countNeighbours.put(message.get(),1);
+      }else{
+        countNeighbours.put(message.get(),countNeighbours.get(message.get())+1);
+      }
     }
-    if (allMessages.isEmpty()) {
-      // 1. if no messages are received
-      newValue = vertex.getValue().getCurrentVertexValue().get();
-    } else if (allMessages.size() == 1) {
-      newValue = getSwitchValue(allMessages.get(0), vertex, computation_case);
-      // 2. if just one message are received
-    } else {
-      // 3. if multiple messages are received
-      newValue = getMostFrequent(vertex, allMessages, computation_case);
+
+    int partitionCount = Integer.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
+
+    for(int i=0; i<partitionCount;i++){
+      String aggregator = KWAY_CAPACITY_AGGREGATOR_PREFIX + i;
+      int load = getAggregatedValue(aggregator);
+      int totalNeighbours = countNeighbours.size();
+      int numNeighboursInI = countNeighbours.get(i);
+      float weight = (1/load) * numNeighboursInI / totalNeighbours;
+      partitionWeight.put(i,weight);
     }
-    return newValue;
+
+    for(Map.Entry<Integer,Float> entry : partitionWeight.entrySet()){
+
+    }
+
+
+
+
+
+    return desiredPartition;
   }
 
   /**
@@ -72,8 +79,9 @@ public class KwayPartitioningComputation extends
    * @param allMessages All messages the current vertex has received
    * @return the maximal frequent number in all received messages
    */
-  private int getMostFrequent(Vertex<IntWritable, KwayPartitioningVertex,
-    NullWritable> vertex, List<Integer> allMessages, String computation_case) {
+  private int getMostFrequent(
+    Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
+    List<Integer> allMessages, String computation_case) {
     Collections.sort(allMessages);
     int newValue;
     int currentCounter = 1;
@@ -95,20 +103,22 @@ public class KwayPartitioningComputation extends
     // if the frequent of all received messages are one
     if (maxCounter == 1) {
       switch (computation_case) {
-        case "min":
-          newValue = getSwitchValue(allMessages.get(0), vertex, computation_case);
-          break;
-        case "max":
-          newValue = getSwitchValue(allMessages.get(allMessages.size() - 1),
+      case "min":
+        newValue = getSwitchValue(allMessages.get(0), vertex, computation_case);
+        break;
+      case "max":
+        newValue =
+          getSwitchValue(allMessages.get(allMessages.size() - 1), vertex,
+            computation_case);
+        break;
+      case "rdm":
+        newValue =
+          getSwitchValue(allMessages.get(nextInt(allMessages.size() - 1)),
             vertex, computation_case);
-          break;
-        case "rdm":
-          newValue = getSwitchValue(allMessages.get(nextInt
-            (allMessages.size() - 1)), vertex, computation_case);
-          break;
-        default:
-          newValue = getSwitchValue(allMessages.get(0), vertex, computation_case);
-          break;
+        break;
+      default:
+        newValue = getSwitchValue(allMessages.get(0), vertex, computation_case);
+        break;
       }
     } else {
       newValue = getSwitchValue(maxValue, vertex, computation_case);
@@ -124,48 +134,65 @@ public class KwayPartitioningComputation extends
    * @return new vertex value
    */
   private int getSwitchValue(int value1,
-                             Vertex<IntWritable, KwayPartitioningVertex,
-                               NullWritable> vertex, String computation_case) {
+    Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
+    String computation_case) {
     int value;
     switch (computation_case) {
-      case "min":
-        value =
-          Math.min(value1, vertex.getValue().getLastVertexValue().get());
-        break;
-      case "max":
-        value =
-          Math.max(value1, vertex.getValue().getCurrentVertexValue().get());
-        break;
-      case "rdm":
-        if (value1 == vertex.getValue().getLastVertexValue().get()) {
-          value = vertex.getValue().getCurrentVertexValue().get();
-        } else {
-          value = value1;
-        }
-        break;
-      default:
-        value =
-          Math.min(value1, vertex.getValue().getCurrentVertexValue().get());
+    case "min":
+      value = Math.min(value1, vertex.getValue().getLastVertexValue().get());
+      break;
+    case "max":
+      value = Math.max(value1, vertex.getValue().getCurrentVertexValue().get());
+      break;
+    case "rdm":
+      if (value1 == vertex.getValue().getLastVertexValue().get()) {
+        value = vertex.getValue().getCurrentVertexValue().get();
+      } else {
+        value = value1;
+      }
+      break;
+    default:
+      value = Math.min(value1, vertex.getValue().getCurrentVertexValue().get());
     }
     //}
     return value;
   }
 
-  private void setVertexStartValue(Vertex<IntWritable, KwayPartitioningVertex,
-    NullWritable> vertex) {
+  private void setVertexStartValue(
+    Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex) {
     int partitionCount = Integer.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
-    vertex.getValue().setCurrentVertexValue(new IntWritable
-      (nextInt(partitionCount)));
+    int startValue = vertex.getId().get() % partitionCount;
+    vertex.getValue().setCurrentVertexValue(new IntWritable(startValue));
     vertex.getValue()
-      .setLastVertexValue(
-        vertex.getValue().getCurrentVertexValue());
+      .setLastVertexValue(vertex.getValue().getCurrentVertexValue());
   }
 
-  private void notifyAggregator(Vertex<IntWritable, KwayPartitioningVertex,
-    NullWritable> vertex) {
-    String aggregator = KWAY_AGGREGATOR_PREFIX + vertex.getValue()
-      .getCurrentVertexValue().get();
-    aggregate(aggregator, new IntWritable(1));
+  private void notifyAggregator(
+    Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex, int x) {
+    String aggregator = KWAY_CAPACITY_AGGREGATOR_PREFIX +
+      vertex.getValue().getCurrentVertexValue().get();
+    aggregate(aggregator, new IntWritable(x));
+  }
+
+  private boolean checkAggregatorSpace(int newValue, int sum) {
+    String aggregator = KWAY_AGGREGATOR_PREFIX + newValue;
+    IntWritable aggregatedSum = getAggregatedValue(aggregator);
+    int partitionCount = Integer.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
+
+    return ((aggregatedSum.get() + 1) < sum / partitionCount);
+  }
+
+  private int getNodeCountAndReset() {
+    int partitionCount = Integer.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
+    int sum = 0;
+    IntWritable aggregatedValue;
+    for (int i = 0; i < partitionCount; i++) {
+      aggregatedValue = getAggregatedValue(KWAY_AGGREGATOR_PREFIX + i);
+      sum += aggregatedValue.get();
+      int x = aggregatedValue.get();
+      aggregate(KWAY_AGGREGATOR_PREFIX + i, new IntWritable(-x));
+    }
+    return sum;
   }
 
   /**
@@ -179,31 +206,46 @@ public class KwayPartitioningComputation extends
   @Override
   public void compute(
     Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
-    Iterable<IntWritable> messages)
-    throws IOException {
+    Iterable<IntWritable> messages) throws IOException {
 
-    String computation_case = String.valueOf(getConf().get
-      (COMPUTATION_CASE));
+    String computation_case = String.valueOf(getConf().get(COMPUTATION_CASE));
+    int nodecount = 0;
 
     if (getSuperstep() == 0) {
       setVertexStartValue(vertex);
+      notifyAggregator(vertex, 1);
       sendMessageToAllEdges(vertex, vertex.getValue().getCurrentVertexValue());
       vertex.voteToHalt();
     } else {
+      if((getSuperstep()%2) == 0){
+
+
+      }else{
+        int desiredPartition = getHighestWeight(messages);
+
+
+      }
       int currentMinValue = vertex.getValue().getCurrentVertexValue().get();
       int newValue = getNewValue(vertex, messages, computation_case);
       boolean changed = currentMinValue != newValue;
       if (changed) {
-        vertex.getValue().setLastVertexValue(new IntWritable(currentMinValue));
-        vertex.getValue().setCurrentVertexValue(new IntWritable(newValue));
-        sendMessageToAllEdges(vertex,
-          vertex.getValue().getCurrentVertexValue());
+        if (checkAggregatorSpace(newValue, nodecount)) {
+          vertex.getValue()
+            .setLastVertexValue(new IntWritable(currentMinValue));
+          notifyAggregator(vertex, -1);
+
+          vertex.getValue().setCurrentVertexValue(new IntWritable(newValue));
+          notifyAggregator(vertex, 1);
+          sendMessageToAllEdges(vertex,
+            vertex.getValue().getCurrentVertexValue());
+        } else {
+          notifyAggregator(vertex, +1);
+          vertex.voteToHalt();
+        }
       } else {
         vertex.voteToHalt();
-        notifyAggregator(vertex);
       }
     }
     vertex.voteToHalt();
-    notifyAggregator(vertex);
   }
 }
