@@ -29,9 +29,12 @@ public class KwayPartitioningComputation extends
   private int getHighestWeight(Vertex<IntWritable, KwayPartitioningVertex,
     NullWritable> vertex,
     Iterable<IntWritable> messages) {
+
     int desiredPartition = 0;
+
     Map<Integer, Integer> countNeighbours = new HashMap<>();
-    Map<Integer, Float> partitionWeight = new HashMap<>();
+    Map<Integer, Double> partitionWeight = new HashMap<>();
+
     for (IntWritable message : messages) {
       if (!countNeighbours.containsKey(message.get())) {
         countNeighbours.put(message.get(), 1);
@@ -46,13 +49,13 @@ public class KwayPartitioningComputation extends
       String aggregator = KWAY_CAPACITY_AGGREGATOR_PREFIX + i;
       int load = getAggregatedValue(aggregator);
       int numNeighboursInI = countNeighbours.get(i);
-      float weight = (1 / load) * numNeighboursInI / totalNeighbours;
+      double weight = (1 / load) * numNeighboursInI / totalNeighbours;
       partitionWeight.put(i, weight);
     }
-    float highestWeight = 0;
-    float secondHighestWeight = 0;
+    double highestWeight = 0;
+    double secondHighestWeight = 0;
     int secondKey = 0;
-    for (Map.Entry<Integer, Float> entry : partitionWeight.entrySet()) {
+    for (Map.Entry<Integer, Double> entry : partitionWeight.entrySet()) {
       if (highestWeight < entry.getValue()) {
         secondHighestWeight = highestWeight;
         secondKey = desiredPartition;

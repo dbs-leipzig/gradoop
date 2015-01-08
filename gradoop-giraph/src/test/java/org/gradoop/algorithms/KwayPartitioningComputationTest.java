@@ -5,6 +5,7 @@ import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.io.formats.IdWithValueTextOutputFormat;
 import org.apache.giraph.io.formats.IntIntNullTextVertexInputFormat;
 import org.apache.giraph.utils.InternalVertexRunner;
+import org.gradoop.io.KwayPartitioningVertex;
 import org.gradoop.io.formats.KwayPartitioningInputFormat;
 import org.gradoop.io.formats.KwayPartitioningOutputFormat;
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class KwayPartitioningComputationTest {
   public void testSmallConnectedGraph() throws Exception {
     String[] graph =
       PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph, 2));
+    validateSmallConnectedGraphResult(computeResults(graph, 3));
   }
 
 
@@ -78,8 +79,8 @@ public class KwayPartitioningComputationTest {
     GiraphConfiguration conf = new GiraphConfiguration();
     conf.setComputationClass(KwayPartitioningComputation.class);
     conf.setMasterComputeClass(KwayPartitioningMasterComputation.class);
-    conf.setVertexInputFormatClass(IntIntNullTextVertexInputFormat.class);
-    conf.setVertexOutputFormatClass(IdWithValueTextOutputFormat.class);
+    conf.setVertexInputFormatClass(KwayPartitioningInputFormat.class);
+    conf.setVertexOutputFormatClass(KwayPartitioningOutputFormat.class);
     return conf;
   }
 
