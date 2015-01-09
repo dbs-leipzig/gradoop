@@ -4,10 +4,10 @@ import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.log4j.Logger;
 import org.gradoop.io.KwayPartitioningVertex;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * TODO: algorithm description
@@ -15,6 +15,10 @@ import java.util.Map;
 public class KwayPartitioningComputation extends
   BasicComputation<IntWritable, KwayPartitioningVertex, NullWritable,
     IntWritable> {
+
+  private static final Logger LOG = Logger.getLogger
+    (KwayPartitioningComputation.class);
+
   public final static String NUMBER_OF_PARTITIONS =
     "partitioning.num" + ".partitions";
   public final static String NUMBER_OF_ITERATIONS = "iterations";
@@ -37,14 +41,29 @@ public class KwayPartitioningComputation extends
 
     int currentPartition = vertex.getValue().getCurrentVertexValue().get();
     int desiredPartition = currentPartition;
+
+
+    LOG.info("=== vertex id: " + vertex.getId());
+    LOG.info("=== current Partition: " + currentPartition);
+
     // got messages?
     if (messages.iterator().hasNext()) {
 
       // partition -> neighbours in partition
       int[] countNeighbours = getCountNeighbours(messages);
+      LOG.info("=== count neighbours:");
+      for (int i = 0; i < countNeighbours.length; i++) {
+        LOG.info(String.format("%d => %d", i, countNeighbours[i]));
+      }
+
       // partition -> desire to migrate
       double[] partitionWeights =
         getPartitionWeight(countNeighbours, vertex.getNumEdges());
+      LOG.info("=== partition weights:");
+      for (int i = 0; i < partitionWeights.length; i++) {
+        LOG.info(String.format("%d => %f.2", i, partitionWeights[i]));
+      }
+
 
       double firstMax = Integer.MIN_VALUE;
       double secondMax = Integer.MIN_VALUE;
@@ -52,12 +71,19 @@ public class KwayPartitioningComputation extends
       int secondK = -1;
       for (int i = 0; i < k; i++) {
         if (partitionWeights[i] >= firstMax) {
-          secondMax = firstMax;
-          firstMax = countNeighbours[i];
-          secondK = firstK;
+          firstMax = partitionWeights[i];
           firstK = i;
+        } else if (partitionWeights[i] > secondMax) {
+          secondMax = partitionWeights[i];
+          secondK = i;
         }
+
       }
+
+      LOG.info("=== firstMax: " + firstMax);
+      LOG.info("=== secondMax: " + secondMax);
+      LOG.info("=== firstK: " + firstK);
+      LOG.info("=== secondK: " + secondK);
 
       if (firstMax == secondMax) {
         if (currentPartition != firstK && currentPartition != secondK) {
@@ -67,6 +93,7 @@ public class KwayPartitioningComputation extends
         desiredPartition = firstK;
       }
     }
+    LOG.info("=== switching to: " + desiredPartition);
     return desiredPartition;
   }
 
@@ -104,7 +131,7 @@ public class KwayPartitioningComputation extends
     String demand_aggregator = KWAY_DEMAND_AGGREGATOR_PREFIX + desiredPartition;
     double partitionCount = Double.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
     double total_cpacity = getTotalNumVertices() / partitionCount +
-      (getTotalNumVertices() / partitionCount * 2);
+      (getTotalNumVertices() / partitionCount * 0.5);
     IntWritable load_capacity = getAggregatedValue(capacity_aggregator);
     double load = load_capacity.get();
     double availability = total_cpacity - load;
@@ -128,8 +155,7 @@ public class KwayPartitioningComputation extends
 
   private void setVertexStartValue(
     Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex) {
-    int partitionCount = Integer.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
-    int startValue = vertex.getId().get() % partitionCount;
+    int startValue = vertex.getId().get() % k;
     vertex.getValue().setCurrentVertexValue(new IntWritable(startValue));
   }
 
@@ -148,7 +174,9 @@ public class KwayPartitioningComputation extends
   @Override
   public void compute(
     Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
-    Iterable<IntWritable> messages) throws IOException {
+    Iterable<IntWritable> messages)
+    throws IOException {
+    LOG.info("=== superstep: " + getSuperstep());
     k = Integer.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
     if (getSuperstep() == 0) {
       setVertexStartValue(vertex);
@@ -156,17 +184,25 @@ public class KwayPartitioningComputation extends
         vertex.getValue().getCurrentVertexValue().get();
       notifyCapacityAggregator(aggregator, 1);
       sendMessageToAllEdges(vertex, vertex.getValue().getCurrentVertexValue());
-      vertex.voteToHalt();
     } else {
+      // even superstep: migrate phase
       if ((getSuperstep() % 2) == 0) {
         int desiredPartition = vertex.getValue().getLastVertexValue().get();
-        boolean migrate = doMigrate(desiredPartition);
-        if (migrate) {
-          migrateVertex(vertex, desiredPartition);
-          sendMessageToAllEdges(vertex,
-            vertex.getValue().getCurrentVertexValue());
+        int currentPartition = vertex.getValue().getCurrentVertexValue().get();
+        LOG.info("=== vertex id: " + vertex.getId());
+        LOG.info("=== currentPartition: " + currentPartition);
+        LOG.info("=== desiredPartition: " + desiredPartition);
+        if (desiredPartition != currentPartition) {
+          boolean migrate = doMigrate(desiredPartition);
+          LOG.info("=== doMigrate: " + migrate);
+          if (migrate) {
+            migrateVertex(vertex, desiredPartition);
+            sendMessageToAllEdges(vertex,
+              vertex.getValue().getCurrentVertexValue());
+          }
         }
-      } else if ((getSuperstep() % 2) == 1) {
+        vertex.voteToHalt();
+      } else { // odd supersteps: demand phase
         int desiredPartition = getDesiredPartition(vertex, messages);
         vertex.getValue().setLastVertexValue(new IntWritable(desiredPartition));
         int currentValue = vertex.getValue().getCurrentVertexValue().get();
@@ -176,6 +212,5 @@ public class KwayPartitioningComputation extends
         }
       }
     }
-    vertex.voteToHalt();
   }
 }
