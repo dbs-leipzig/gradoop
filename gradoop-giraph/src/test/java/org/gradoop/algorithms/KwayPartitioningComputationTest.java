@@ -27,8 +27,8 @@ public class KwayPartitioningComputationTest {
   @Test
   public void testSmallConnectedGraph() throws Exception {
     String[] graph =
-      PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph, 3));
+      PartitioningComputationTestHelper.getLPConnectedGraph();
+    validateSmallConnectedGraphResult(computeResults(graph, 2));
   }
 
 

@@ -4,6 +4,7 @@ import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.log4j.Logger;
 import org.gradoop.io.KwayPartitioningVertex;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class KwayPartitioningComputation extends
   BasicComputation<IntWritable, KwayPartitioningVertex, NullWritable,
     IntWritable> {
+  Logger log = Logger.getLogger(KwayPartitioningComputation.class);
   public final static String NUMBER_OF_PARTITIONS =
     "partitioning.num" + ".partitions";
   public static String DEFAULT_PARTITIONS = "2";
@@ -26,15 +28,42 @@ public class KwayPartitioningComputation extends
   public static final String KWAY_DEMAND_AGGREGATOR_PREFIX =
     KwayPartitioningComputation.class.getName() + ".demand.aggregator.";
 
-  private int getHighestWeight(Vertex<IntWritable, KwayPartitioningVertex,
-    NullWritable> vertex,
+  private int getDesiredPartition(
+    Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
     Iterable<IntWritable> messages) {
-
     int desiredPartition = 0;
+    Map<Integer, Integer> countNeighbours = getCountNeighbours(messages);
+    if (countNeighbours.size() != 0) {
+      Map<Integer, Double> partitionWeight =
+        getPartitionWeight(countNeighbours);
+      double highestWeight = 0;
+//      double secondHighestWeight = 0;
+//      int secondKey = 0;
+      for (Map.Entry<Integer, Double> entry : partitionWeight.entrySet()) {
+        if (Double.compare(highestWeight, entry.getValue()) < 0) {
+//          secondHighestWeight = highestWeight;
+//          secondKey = desiredPartition;
+          desiredPartition = entry.getKey();
+          highestWeight = entry.getValue();
+        }
+      }
+//      if (secondHighestWeight == highestWeight) {
+//        if (
+//          vertex.getValue().getCurrentVertexValue().get() ==
+// desiredPartition ||
+//            vertex.getValue().getCurrentVertexValue().get() == secondKey) {
+//          desiredPartition = vertex.getValue().getCurrentVertexValue().get();
+//        }
+//      }
+    } else {
+      return vertex.getValue().getCurrentVertexValue().get();
+    }
+    return desiredPartition;
+  }
 
+  private Map<Integer, Integer> getCountNeighbours(
+    Iterable<IntWritable> messages) {
     Map<Integer, Integer> countNeighbours = new HashMap<>();
-    Map<Integer, Double> partitionWeight = new HashMap<>();
-
     for (IntWritable message : messages) {
       if (!countNeighbours.containsKey(message.get())) {
         countNeighbours.put(message.get(), 1);
@@ -43,33 +72,23 @@ public class KwayPartitioningComputation extends
           .put(message.get(), countNeighbours.get(message.get()) + 1);
       }
     }
-    int partitionCount = Integer.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
-    int totalNeighbours = countNeighbours.size();
+    return countNeighbours;
+  }
+
+  private Map<Integer, Double> getPartitionWeight(
+    Map<Integer, Integer> countNeighbours) {
+    Map<Integer, Double> partitionWeight = new HashMap<>();
+    double partitionCount = Double.valueOf(getConf().get(NUMBER_OF_PARTITIONS));
+    double totalNeighbours = countNeighbours.size();
     for (int i = 0; i < partitionCount; i++) {
       String aggregator = KWAY_CAPACITY_AGGREGATOR_PREFIX + i;
-      int load = getAggregatedValue(aggregator);
-      int numNeighboursInI = countNeighbours.get(i);
-      double weight = (1 / load) * numNeighboursInI / totalNeighbours;
+      IntWritable aggregator_load = getAggregatedValue(aggregator);
+      double load = aggregator_load.get();
+      double numNeighboursInI = countNeighbours.get(i);
+      double weight = numNeighboursInI / (load * totalNeighbours);
       partitionWeight.put(i, weight);
     }
-    double highestWeight = 0;
-    double secondHighestWeight = 0;
-    int secondKey = 0;
-    for (Map.Entry<Integer, Double> entry : partitionWeight.entrySet()) {
-      if (highestWeight < entry.getValue()) {
-        secondHighestWeight = highestWeight;
-        secondKey = desiredPartition;
-        desiredPartition = entry.getKey();
-        highestWeight = entry.getValue();
-      }
-    }
-    if (secondHighestWeight == highestWeight) {
-      if (vertex.getValue().getCurrentVertexValue().get() == desiredPartition
-        || vertex.getValue().getCurrentVertexValue().get() == secondKey) {
-        desiredPartition = vertex.getValue().getCurrentVertexValue().get();
-      }
-    }
-    return desiredPartition;
+    return partitionWeight;
   }
 
   private void notifyDemandAggregator(int desiredPartition) {
@@ -92,10 +111,11 @@ public class KwayPartitioningComputation extends
     return randomRange < treshhold;
   }
 
-  private void migrateVertex(Vertex<IntWritable, KwayPartitioningVertex,
-    NullWritable> vertex, int desiredPartition) {
-    String oldPartition = KWAY_CAPACITY_AGGREGATOR_PREFIX + vertex.getValue()
-      .getCurrentVertexValue().get();
+  private void migrateVertex(
+    Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
+    int desiredPartition) {
+    String oldPartition = KWAY_CAPACITY_AGGREGATOR_PREFIX +
+      vertex.getValue().getCurrentVertexValue().get();
     String newPartition = KWAY_CAPACITY_AGGREGATOR_PREFIX + desiredPartition;
     notifyCapacityAggregator(oldPartition, -1);
     vertex.getValue().setCurrentVertexValue(new IntWritable(desiredPartition));
@@ -127,17 +147,15 @@ public class KwayPartitioningComputation extends
     Iterable<IntWritable> messages) throws IOException {
     if (getSuperstep() == 0) {
       setVertexStartValue(vertex);
-      String aggregator = KWAY_CAPACITY_AGGREGATOR_PREFIX + vertex.getValue()
-        .getCurrentVertexValue().get();
+      String aggregator = KWAY_CAPACITY_AGGREGATOR_PREFIX +
+        vertex.getValue().getCurrentVertexValue().get();
       notifyCapacityAggregator(aggregator, 1);
       sendMessageToAllEdges(vertex, vertex.getValue().getCurrentVertexValue());
       vertex.voteToHalt();
     } else {
-
       if ((getSuperstep() % 2) == 0) {
         int desiredPartition = vertex.getValue().getLastVertexValue().get();
-        boolean migrate =
-          calculateThreshold(desiredPartition);
+        boolean migrate = calculateThreshold(desiredPartition);
         if (migrate) {
           migrateVertex(vertex, desiredPartition);
           sendMessageToAllEdges(vertex,
@@ -145,16 +163,13 @@ public class KwayPartitioningComputation extends
         } else {
           vertex.voteToHalt();
         }
-
-
       } else if ((getSuperstep() % 2) == 1) {
-        int desiredPartition = getHighestWeight(vertex, messages);
+        int desiredPartition = getDesiredPartition(vertex, messages);
         vertex.getValue().setLastVertexValue(new IntWritable(desiredPartition));
         int currentValue = vertex.getValue().getCurrentVertexValue().get();
         boolean changed = currentValue != desiredPartition;
         if (changed) {
           notifyDemandAggregator(desiredPartition);
-        } else {
           vertex.voteToHalt();
         }
       }
