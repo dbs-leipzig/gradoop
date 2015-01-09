@@ -21,57 +21,63 @@ import static org.junit.Assert.assertTrue;
  */
 public class KwayPartitioningComputationTest {
 
-  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile
-    (IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
+  private static final Pattern LINE_TOKEN_SEPARATOR =
+    Pattern.compile(IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
 
   @Test
   public void testSmallConnectedGraph() throws Exception {
     String[] graph =
-      PartitioningComputationTestHelper.getLPConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph, 2));
+      PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
+    validateSmallConnectedGraphResult(computeResults(graph, 2, 100));
   }
+
+//  @Test
+//  public void testBiPartiteGraph() throws Exception {
+//    String[] graph = PartitioningComputationTestHelper.getKwayBiPartiteGraph();
+//    validateBiPartiteGraphResult(computeResults(graph, 2));
+//  }
 
 
   private void validateSmallConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
 
+    assertEquals(8, vertexIDwithValue.size());
+    assertEquals(0, vertexIDwithValue.get(0).intValue());
+    assertEquals(1, vertexIDwithValue.get(1).intValue());
+    assertEquals(0, vertexIDwithValue.get(2).intValue());
+    assertEquals(1, vertexIDwithValue.get(3).intValue());
+    assertEquals(0, vertexIDwithValue.get(4).intValue());
+    assertEquals(1, vertexIDwithValue.get(5).intValue());
+    assertEquals(0, vertexIDwithValue.get(6).intValue());
+    assertEquals(1, vertexIDwithValue.get(7).intValue());
 
-//    if (0 == vertexIDwithValue.get(0)) {
-//      if (1 == vertexIDwithValue.get(4)) {
-        assertEquals(8, vertexIDwithValue.size());
-        assertEquals(0, vertexIDwithValue.get(0).intValue());
-        assertEquals(0, vertexIDwithValue.get(1).intValue());
-        assertEquals(0, vertexIDwithValue.get(2).intValue());
-        assertEquals(0, vertexIDwithValue.get(3).intValue());
-        assertEquals(1, vertexIDwithValue.get(4).intValue());
-        assertEquals(1, vertexIDwithValue.get(5).intValue());
-        assertEquals(1, vertexIDwithValue.get(6).intValue());
-        assertEquals(1, vertexIDwithValue.get(7).intValue());
-//      }
-//    }
+  }
 
-//    if(1 == vertexIDwithValue.get(0)){
-//      if(0 == vertexIDwithValue.get(4)){
-//        assertEquals(8, vertexIDwithValue.size());
-//        assertEquals(1, vertexIDwithValue.get(0).intValue());
-//        assertEquals(1, vertexIDwithValue.get(1).intValue());
-//        assertEquals(1, vertexIDwithValue.get(2).intValue());
-//        assertEquals(1, vertexIDwithValue.get(4).intValue());
-//        assertEquals(0, vertexIDwithValue.get(5).intValue());
-//        assertEquals(0, vertexIDwithValue.get(6).intValue());
-//        assertEquals(0, vertexIDwithValue.get(7).intValue());
-//        assertEquals(0, vertexIDwithValue.get(8).intValue());
-//      }
-//    }
+  private void validateBiPartiteGraphResult(Map<Integer, Integer>
+    vertexIDwithValue){
+    assertEquals(10, vertexIDwithValue.size());
+    assertEquals(0, vertexIDwithValue.get(0).intValue());
+    assertEquals(1, vertexIDwithValue.get(1).intValue());
+    assertEquals(0, vertexIDwithValue.get(2).intValue());
+    assertEquals(1, vertexIDwithValue.get(3).intValue());
+    assertEquals(0, vertexIDwithValue.get(4).intValue());
+    assertEquals(1, vertexIDwithValue.get(5).intValue());
+    assertEquals(0, vertexIDwithValue.get(6).intValue());
+    assertEquals(1, vertexIDwithValue.get(7).intValue());
+    assertEquals(0, vertexIDwithValue.get(8).intValue());
+    assertEquals(1, vertexIDwithValue.get(9).intValue());
   }
 
 
   private Map<Integer, Integer> computeResults(String[] graph,
-    int partitionCount) throws Exception {
+    int partitionCount, int max_iteration) throws Exception {
     GiraphConfiguration conf = getConfiguration();
     conf.set(KwayPartitioningComputation.NUMBER_OF_PARTITIONS,
       Integer.toString(partitionCount));
+    conf.set(KwayPartitioningComputation.NUMBER_OF_ITERATIONS, Integer
+      .toString(max_iteration));
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
+
     return parseResults(results);
   }
 
@@ -92,6 +98,7 @@ public class KwayPartitioningComputationTest {
     for (String line : results) {
       lineTokens = LINE_TOKEN_SEPARATOR.split(line);
       vertexID = Integer.parseInt(lineTokens[0]);
+      System.out.println(line);
       value = Integer.parseInt(lineTokens[1]);
       parsedResults.put(vertexID, value);
     }

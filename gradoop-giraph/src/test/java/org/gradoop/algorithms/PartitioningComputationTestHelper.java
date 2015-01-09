@@ -101,6 +101,24 @@ public abstract class PartitioningComputationTestHelper {
     };
   }
 
+  /**
+   * @return a small bipartite graph
+   */
+  static String[] getKwayBiPartiteGraph() {
+    return new String[] {
+      "0 0 0 5 6 7 8 9",
+      "1 0 0 5 6 7 8 9",
+      "2 0 0 5 6 7 8 9",
+      "3 0 0 5 6 7 8 9",
+      "4 0 0 5 6 7 8 9",
+      "5 0 0 0 1 2 3 4",
+      "6 0 0 0 1 2 3 4",
+      "7 0 0 0 1 2 3 4",
+      "8 0 0 0 1 2 3 4",
+      "9 0 0 0 1 2 3 4"
+    };
+  }
+
 
 
   static String[] getBiPartiteGraph() {

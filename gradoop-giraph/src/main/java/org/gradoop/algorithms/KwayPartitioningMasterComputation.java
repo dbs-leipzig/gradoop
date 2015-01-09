@@ -32,4 +32,11 @@ public class KwayPartitioningMasterComputation extends DefaultMasterCompute {
         aggregatorClass);
     }
   }
+
+  @Override
+  public void compute(){
+    int iterations =  Integer.valueOf(getConf().get
+      (KwayPartitioningComputation.NUMBER_OF_ITERATIONS));
+    if(getSuperstep() == iterations) haltComputation();
+  }
 }
