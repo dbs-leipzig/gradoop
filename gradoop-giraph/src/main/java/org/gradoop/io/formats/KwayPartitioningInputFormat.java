@@ -37,11 +37,13 @@ public class KwayPartitioningInputFormat extends
    */
   @Override
   public TextVertexReader createVertexReader(InputSplit split,
-                                             TaskAttemptContext context)
-    throws IOException {
+    TaskAttemptContext context) throws IOException {
     return new TwoValueVertexReader();
   }
 
+  /**
+   * Reads a vertex with two values from an input line.
+   */
   public class TwoValueVertexReader extends
     TextVertexReaderFromEachLineProcessed<String[]> {
     /**
@@ -51,11 +53,11 @@ public class KwayPartitioningInputFormat extends
     /**
      * Cached vertex last_value for the current line
      */
-    private int lastvalue;
+    private int lastValue;
     /**
      * Cached vertex current_value for the current line
      */
-    private int currentvalue;
+    private int currentValue;
 
     /**
      * Reads every single line and returns the tokens as array
@@ -65,12 +67,11 @@ public class KwayPartitioningInputFormat extends
      * @throws IOException
      */
     @Override
-    protected String[] preprocessLine(Text line)
-      throws IOException {
+    protected String[] preprocessLine(Text line) throws IOException {
       String[] tokens = SEPARATOR.split(line.toString());
       id = Integer.parseInt(tokens[0]);
-      lastvalue = Integer.parseInt(tokens[1]);
-      currentvalue = Integer.parseInt(tokens[2]);
+      lastValue = Integer.parseInt(tokens[1]);
+      currentValue = Integer.parseInt(tokens[2]);
       return tokens;
     }
 
@@ -82,8 +83,7 @@ public class KwayPartitioningInputFormat extends
      * @throws IOException
      */
     @Override
-    protected IntWritable getId(String[] tokens)
-      throws IOException {
+    protected IntWritable getId(String[] tokens) throws IOException {
       return new IntWritable(id);
     }
 
@@ -95,11 +95,11 @@ public class KwayPartitioningInputFormat extends
      * @throws IOException
      */
     @Override
-    protected KwayPartitioningVertex getValue(String[] tokens)
-      throws IOException {
+    protected KwayPartitioningVertex getValue(String[] tokens) throws
+      IOException {
       KwayPartitioningVertex vertex = new KwayPartitioningVertex();
-      vertex.setCurrentVertexValue(new IntWritable(currentvalue));
-      vertex.setLastVertexValue(new IntWritable(lastvalue));
+      vertex.setCurrentVertexValue(new IntWritable(currentValue));
+      vertex.setLastVertexValue(new IntWritable(lastValue));
       return vertex;
     }
 
@@ -112,16 +112,14 @@ public class KwayPartitioningInputFormat extends
      */
     @Override
     protected Iterable<Edge<IntWritable, NullWritable>> getEdges(
-      String[] tokens)
-      throws IOException {
+      String[] tokens) throws IOException {
       List<Edge<IntWritable, NullWritable>> edges =
         Lists.newArrayListWithCapacity(tokens.length - 3);
       for (int n = 3; n < tokens.length; n++) {
-        edges.add(EdgeFactory.create(
-          new IntWritable(Integer.parseInt(tokens[n]))));
+        edges.add(
+          EdgeFactory.create(new IntWritable(Integer.parseInt(tokens[n]))));
       }
       return edges;
     }
   }
-
 }

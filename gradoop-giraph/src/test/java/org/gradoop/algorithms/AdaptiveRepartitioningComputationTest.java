@@ -3,9 +3,7 @@ package org.gradoop.algorithms;
 import com.google.common.collect.Maps;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.io.formats.IdWithValueTextOutputFormat;
-import org.apache.giraph.io.formats.IntIntNullTextVertexInputFormat;
 import org.apache.giraph.utils.InternalVertexRunner;
-import org.gradoop.io.KwayPartitioningVertex;
 import org.gradoop.io.formats.KwayPartitioningInputFormat;
 import org.gradoop.io.formats.KwayPartitioningOutputFormat;
 import org.junit.Test;
@@ -14,12 +12,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for {@link org.gradoop.algorithms.KwayPartitioningComputation}
+ * Tests for {@link AdaptiveRepartitioningComputation}
  */
-public class KwayPartitioningComputationTest {
+public class AdaptiveRepartitioningComputationTest {
 
   private static final Pattern LINE_TOKEN_SEPARATOR =
     Pattern.compile(IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
@@ -28,12 +25,13 @@ public class KwayPartitioningComputationTest {
   public void testSmallConnectedGraph() throws Exception {
     String[] graph =
       PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph, 2, 100));
+    validateSmallConnectedGraphResult(computeResults(graph, 2, 100, 0.5f));
   }
 
 //  @Test
 //  public void testBiPartiteGraph() throws Exception {
-//    String[] graph = PartitioningComputationTestHelper.getKwayBiPartiteGraph();
+//    String[] graph = PartitioningComputationTestHelper
+// .getKwayBiPartiteGraph();
 //    validateBiPartiteGraphResult(computeResults(graph, 2));
 //  }
 
@@ -53,8 +51,8 @@ public class KwayPartitioningComputationTest {
 
   }
 
-  private void validateBiPartiteGraphResult(Map<Integer, Integer>
-    vertexIDwithValue){
+  private void validateBiPartiteGraphResult(
+    Map<Integer, Integer> vertexIDwithValue) {
     assertEquals(10, vertexIDwithValue.size());
     assertEquals(0, vertexIDwithValue.get(0).intValue());
     assertEquals(1, vertexIDwithValue.get(1).intValue());
@@ -70,12 +68,15 @@ public class KwayPartitioningComputationTest {
 
 
   private Map<Integer, Integer> computeResults(String[] graph,
-    int partitionCount, int max_iteration) throws Exception {
+    int partitionCount, int maxIterations, float capacityTreshold) throws
+    Exception {
     GiraphConfiguration conf = getConfiguration();
-    conf.set(KwayPartitioningComputation.NUMBER_OF_PARTITIONS,
-      Integer.toString(partitionCount));
-    conf.set(KwayPartitioningComputation.NUMBER_OF_ITERATIONS, Integer
-      .toString(max_iteration));
+    conf.setInt(AdaptiveRepartitioningComputation.NUMBER_OF_PARTITIONS,
+      partitionCount);
+    conf.setInt(AdaptiveRepartitioningComputation.NUMBER_OF_ITERATIONS,
+      maxIterations);
+    conf.setFloat(AdaptiveRepartitioningComputation.CAPACITY_THRESHOLD,
+      capacityTreshold);
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
 
     return parseResults(results);
@@ -83,8 +84,8 @@ public class KwayPartitioningComputationTest {
 
   private GiraphConfiguration getConfiguration() {
     GiraphConfiguration conf = new GiraphConfiguration();
-    conf.setComputationClass(KwayPartitioningComputation.class);
-    conf.setMasterComputeClass(KwayPartitioningMasterComputation.class);
+    conf.setComputationClass(AdaptiveRepartitioningComputation.class);
+    conf.setMasterComputeClass(AdaptiveRepartitioningMasterComputation.class);
     conf.setVertexInputFormatClass(KwayPartitioningInputFormat.class);
     conf.setVertexOutputFormatClass(KwayPartitioningOutputFormat.class);
     return conf;

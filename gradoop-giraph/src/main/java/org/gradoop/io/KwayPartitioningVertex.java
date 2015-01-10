@@ -66,8 +66,7 @@ public class KwayPartitioningVertex implements Writable {
    * @throws IOException
    */
   @Override
-  public void write(DataOutput dataOutput)
-    throws IOException {
+  public void write(DataOutput dataOutput) throws IOException {
     dataOutput.writeInt(this.lastValue);
     dataOutput.writeInt(this.currentValue);
   }
@@ -79,8 +78,7 @@ public class KwayPartitioningVertex implements Writable {
    * @throws IOException
    */
   @Override
-  public void readFields(DataInput dataInput)
-    throws IOException {
+  public void readFields(DataInput dataInput) throws IOException {
     this.lastValue = dataInput.readInt();
     this.currentValue = dataInput.readInt();
   }

@@ -11,7 +11,8 @@ import org.gradoop.io.KwayPartitioningVertex;
 import java.io.IOException;
 
 /**
- * Encodes the output of the {@link org.gradoop.algorithms.KwayPartitioningComputation} in
+ * Encodes the output of the {@link org.gradoop.algorithms
+ * .AdaptiveRepartitioningComputation} in
  * the following format: vertex-id vertex-value
  */
 public class KwayPartitioningOutputFormat extends
@@ -29,13 +30,14 @@ public class KwayPartitioningOutputFormat extends
    * @throws InterruptedException
    */
   @Override
-  public TextVertexWriter createVertexWriter(TaskAttemptContext context)
-    throws IOException, InterruptedException {
+  public TextVertexWriter createVertexWriter(TaskAttemptContext context) throws
+    IOException, InterruptedException {
     return new KwayTextVertexLineWriter();
   }
 
   /**
-   *  Used to convert a {@link org.gradoop.io.KwayPartitioningVertex} to a line in the output file.
+   * Used to convert a {@link org.gradoop.io.KwayPartitioningVertex} to a
+   * line in the output file.
    */
   private class KwayTextVertexLineWriter extends TextVertexWriterToEachLine {
 
@@ -48,14 +50,10 @@ public class KwayPartitioningOutputFormat extends
      */
     @Override
     protected Text convertVertexToLine(
-      Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex)
-      throws IOException {
-      StringBuilder sb = new StringBuilder();
-      // vertex-id
-      sb.append(vertex.getId());
-      sb.append(VALUE_TOKEN_SEPARATOR);
-      sb.append(vertex.getValue().getCurrentVertexValue());
-      return new Text(sb.toString());
+      Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex) throws
+      IOException {
+      return new Text(String.valueOf(vertex.getId()) + VALUE_TOKEN_SEPARATOR +
+        vertex.getValue().getCurrentVertexValue());
     }
   }
 }
