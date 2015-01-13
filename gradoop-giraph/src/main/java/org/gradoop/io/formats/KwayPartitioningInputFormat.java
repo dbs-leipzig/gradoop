@@ -16,13 +16,37 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * An KwayPartitioning vertex is decoded in the following format: vertex-id
- * vertex-last_value vertex-current_value [neighbour-vertex-id ]* e.g. the
- * following line: 5 3 4 4 6 7 decodes vertex-id 5 last_value 3 and actual_value
- * 4. The node is connected to three other nodes (4 6 7)
+ * A KwayPartitioning vertex is decoded in the following format:
+ * <p/>
+ * {@code <vertex-id> <vertex-last-value> <vertex-current-value>
+ * [<neighbour-id>]*}
+ * <p/>
+ * e.g. the following line:
+ * <p/>
+ * 5 3 4 4 6 7
+ * <p/>
+ * decodes vertex-id 5, last value 3 and actual value 4. The node is connected
+ * to three other nodes (4 6 7)
+ * <p/>
+ * If the config parameter "partitioning.input.partioned' is set to false
+ * (default) this format also except a simple adjacency list in the following
+ * format:
+ * <p/>
+ * {@code <vertex-id> [<neighbour-id>]*}
  */
 public class KwayPartitioningInputFormat extends
   TextVertexInputFormat<IntWritable, KwayPartitioningVertex, NullWritable> {
+
+  /**
+   * Used to tell the input format if the input graph is already partitioned.
+   */
+  public static final String PARTITIONED_INPUT =
+    "partitioning.input." + ".partitioned";
+
+  /**
+   * Default value for PARTITIONED_INPUT.
+   */
+  public static final boolean DEFAULT_PARTITIONED_INPUT = false;
 
   /**
    * Separator of the vertex and neighbors
@@ -47,17 +71,64 @@ public class KwayPartitioningInputFormat extends
   public class TwoValueVertexReader extends
     TextVertexReaderFromEachLineProcessed<String[]> {
     /**
+     * Edge offset for partitioned graph inputs.
+     */
+    private static final int PARTITIONED_EDGE_OFFSET = 3;
+
+    /**
+     * Edge offset for unpartitioned graph inputs.
+     */
+    private static final int UNPARTITIONED_EDGE_OFFSET = 1;
+
+    /**
+     * If the graph is partitioned, the input contains values for current and
+     * last vertex values. In that case, the offset for edges has to be
+     * adapted.
+     */
+    private int edgeOffset;
+
+    /**
+     * If true, the reader assumes that a single line contains just
+     * <p/>
+     * {@code <vertex-id> [<neighbour-id>]*}
+     * <p/>
+     * If false, the reader assumes that a single line contains
+     * <p/>
+     * {@code <vertex-id> <vertex-last-value> <vertex-current-value>
+     * [<neighbour-id>]*}
+     */
+    private boolean isPartitioned;
+
+    /**
      * Cached vertex id for the current line
      */
     private int id;
     /**
      * Cached vertex last_value for the current line
      */
-    private int lastValue;
+    private int lastValue = 0;
     /**
      * Cached vertex current_value for the current line
      */
-    private int currentValue;
+    private int currentValue = 0;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initialize(InputSplit inputSplit,
+      TaskAttemptContext context) throws IOException, InterruptedException {
+      super.initialize(inputSplit, context);
+      this.isPartitioned =
+        getConf().getBoolean(PARTITIONED_INPUT, DEFAULT_PARTITIONED_INPUT);
+      // if the input graph is partitioned (contains two vertex values), the
+      // the edges start at offset 3
+      if (this.isPartitioned) {
+        edgeOffset = PARTITIONED_EDGE_OFFSET;
+      } else {
+        edgeOffset = UNPARTITIONED_EDGE_OFFSET;
+      }
+    }
 
     /**
      * Reads every single line and returns the tokens as array
@@ -70,8 +141,10 @@ public class KwayPartitioningInputFormat extends
     protected String[] preprocessLine(Text line) throws IOException {
       String[] tokens = SEPARATOR.split(line.toString());
       id = Integer.parseInt(tokens[0]);
-      lastValue = Integer.parseInt(tokens[1]);
-      currentValue = Integer.parseInt(tokens[2]);
+      if (this.isPartitioned) {
+        lastValue = Integer.parseInt(tokens[1]);
+        currentValue = Integer.parseInt(tokens[2]);
+      }
       return tokens;
     }
 
@@ -114,8 +187,8 @@ public class KwayPartitioningInputFormat extends
     protected Iterable<Edge<IntWritable, NullWritable>> getEdges(
       String[] tokens) throws IOException {
       List<Edge<IntWritable, NullWritable>> edges =
-        Lists.newArrayListWithCapacity(tokens.length - 3);
-      for (int n = 3; n < tokens.length; n++) {
+        Lists.newArrayListWithCapacity(tokens.length - this.edgeOffset);
+      for (int n = this.edgeOffset; n < tokens.length; n++) {
         edges.add(
           EdgeFactory.create(new IntWritable(Integer.parseInt(tokens[n]))));
       }
