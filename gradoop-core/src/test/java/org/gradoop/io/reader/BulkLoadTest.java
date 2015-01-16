@@ -38,7 +38,7 @@ public class BulkLoadTest extends MapReduceClusterTest {
     // need to create test file and output dir
     FileSystem fs = utility.getTestFileSystem();
     Path graphFile = new Path("graph.txt");
-    Path outputDir = new Path("/output");
+    Path outputDir = new Path("/output/hfiles");
     FSDataOutputStream bw = fs.create(graphFile);
     BufferedReader br = createTestReader(EXTENDED_GRAPH);
     IOUtils.copy(br, bw);

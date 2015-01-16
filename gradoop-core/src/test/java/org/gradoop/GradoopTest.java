@@ -44,30 +44,24 @@ public abstract class GradoopTest {
     return Thread.currentThread().getStackTrace()[1].getMethodName();
   }
 
-  protected File getTempFile()
-    throws IOException {
+  protected File getTempFile() throws IOException {
     return getTempFile(null);
   }
 
-  protected File getTempFile(String fileName)
-    throws IOException {
+  protected File getTempFile(String fileName) throws IOException {
     fileName = (fileName != null) ? fileName :
       getCallingMethod() + "_" + new Random().nextLong();
     return temporaryFolder.newFile(fileName);
   }
 
-  protected static final String[] BASIC_GRAPH = new String[] {
-    "0 1 2",
-    "1 0 2",
-    "2 1"
-  };
+  protected static final String[] BASIC_GRAPH =
+    new String[]{"0 1 2", "1 0 2", "2 1"};
 
-  protected static final String[] EXTENDED_GRAPH = new String[] {
+  protected static final String[] EXTENDED_GRAPH = new String[]{
     "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 2 k1 5 v1 k2 5 v2|1 0",
     "1|A B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2," +
       "c.2.1 0|a.0.0 1 k1 5 v1|2 0 1",
-    "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.2.1 0|1 1"
-  };
+    "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.2.1 0|1 1"};
 
   protected List<Vertex> createBasicGraphVertices() {
     return createVertices(BASIC_GRAPH, new SimpleVertexReader());
@@ -78,12 +72,23 @@ public abstract class GradoopTest {
   }
 
   private List<Vertex> createVertices(String[] graph,
-                                      VertexLineReader vertexLineReader) {
+    VertexLineReader vertexLineReader) {
     List<Vertex> vertices = Lists.newArrayListWithCapacity(graph.length);
     for (String line : graph) {
       vertices.add(vertexLineReader.readVertex(line));
     }
     return vertices;
+  }
+
+  /**
+   * Validates if a given graph decoded as adjacency list matches the basic
+   * graph.
+   *
+   * @param textGraph graph under test
+   */
+  protected void validateBasicGraphVertices(String[] textGraph) {
+    List<Vertex> vertices = createVertices(textGraph, new SimpleVertexReader());
+    validateBasicGraphVertices(vertices);
   }
 
   protected void validateBasicGraphVertices(List<Vertex> vertices) {
@@ -101,7 +106,7 @@ public abstract class GradoopTest {
   }
 
   private void validateBasicGraphEdges(Iterable<Edge> edges, int expectedCount,
-                                       long... otherIDs) {
+    long... otherIDs) {
     List<Edge> edgeList = Lists.newArrayList(edges);
     assertThat(edgeList.size(), is(expectedCount));
     for (int i = 0; i < otherIDs.length; i++) {
@@ -119,8 +124,8 @@ public abstract class GradoopTest {
   }
 
   protected void validateExtendedGraphVertices(GraphStore graphStore) {
-    List<Vertex> vertices = Lists.newArrayListWithCapacity(EXTENDED_GRAPH
-      .length);
+    List<Vertex> vertices =
+      Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
     for (long id = 0; id < EXTENDED_GRAPH.length; id++) {
       vertices.add(graphStore.readVertex(id));
     }
@@ -192,10 +197,10 @@ public abstract class GradoopTest {
   }
 
   private void testEdge(List<Edge> edges, Long expectedOtherID,
-                        String expectedLabel, Long expectedIndex,
-                        int expectedPropertyCount) {
-    Edge tmpEdge = EdgeFactory.createDefaultEdgeWithLabel(expectedOtherID,
-      expectedLabel, expectedIndex);
+    String expectedLabel, Long expectedIndex, int expectedPropertyCount) {
+    Edge tmpEdge = EdgeFactory
+      .createDefaultEdgeWithLabel(expectedOtherID, expectedLabel,
+        expectedIndex);
     assertTrue(edges.contains(tmpEdge));
     int edgeIndex = edges.indexOf(tmpEdge);
     testProperties(edges.get(edgeIndex), expectedPropertyCount);
@@ -205,15 +210,15 @@ public abstract class GradoopTest {
     int count = 0;
     for (String propertyKey : v.getPropertyKeys()) {
       switch (propertyKey) {
-        case KEY_1:
-          assertEquals(VALUE_1, v.getProperty(KEY_1));
-          break;
-        case KEY_2:
-          assertEquals(VALUE_2, v.getProperty(KEY_2));
-          break;
-        case KEY_3:
-          assertEquals(VALUE_3, v.getProperty(KEY_3));
-          break;
+      case KEY_1:
+        assertEquals(VALUE_1, v.getProperty(KEY_1));
+        break;
+      case KEY_2:
+        assertEquals(VALUE_2, v.getProperty(KEY_2));
+        break;
+      case KEY_3:
+        assertEquals(VALUE_3, v.getProperty(KEY_3));
+        break;
       }
       count++;
     }
@@ -229,8 +234,7 @@ public abstract class GradoopTest {
    * @return reader on the input graph
    * @throws IOException
    */
-  protected BufferedReader createTestReader(String[] graph)
-    throws IOException {
+  protected BufferedReader createTestReader(String[] graph) throws IOException {
     File tmpFile = getTempFile();
     BufferedWriter bw = new BufferedWriter(new FileWriter(tmpFile));
 
