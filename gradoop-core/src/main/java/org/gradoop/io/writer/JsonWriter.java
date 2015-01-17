@@ -3,30 +3,51 @@ package org.gradoop.io.writer;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.model.Attributed;
 import org.gradoop.model.Edge;
+import org.gradoop.model.GraphElement;
 import org.gradoop.model.Vertex;
 
 /**
- * Converts a vertex into a json representation.
+ * Converts a vertex into a Json representation.
  */
 public class JsonWriter implements VertexLineWriter {
-
+  /**
+   * Key for the vertex id.
+   */
   public static final String VERTEX_ID = "id";
-
+  /**
+   * Key for vertex labels.
+   */
   public static final String LABELS = "labels";
-
+  /**
+   * Key for vertex and edge properties.
+   */
   public static final String PROPERTIES = "properties";
-
+  /**
+   * Key for outgoing edges.
+   */
   public static final String OUT_EDGES = "out-edges";
-
+  /**
+   * Key for incoming edges.
+   */
   public static final String IN_EDGES = "in-edges";
-
+  /**
+   * Key for graphs.
+   */
   public static final String GRAPHS = "graphs";
-
+  /**
+   * Key for otherid of an edge.
+   */
   public static final String EDGE_OTHER_ID = "otherid";
-
+  /**
+   * Key for edge label.
+   */
   public static final String EDGE_LABEL = "label";
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String writeVertex(Vertex vertex) {
     JSONObject json = new JSONObject();
@@ -43,6 +64,14 @@ public class JsonWriter implements VertexLineWriter {
     return json.toString();
   }
 
+  /**
+   * Adds vertex labels to the given json object.
+   *
+   * @param json json object to write to
+   * @param v    vertex
+   * @return updated json object
+   * @throws JSONException
+   */
   private JSONObject writeLabels(final JSONObject json, final Vertex v) throws
     JSONException {
     JSONArray labelArray = new JSONArray();
@@ -53,16 +82,33 @@ public class JsonWriter implements VertexLineWriter {
     return json;
   }
 
+  /**
+   * Write properties to the given json object.
+   *
+   * @param json       json object to write to
+   * @param attributed entity with attributes (graphs, vertex, edge)
+   * @return updated json object
+   * @throws JSONException
+   */
   private JSONObject writeProperties(final JSONObject json,
-    final Vertex v) throws JSONException {
+    final Attributed attributed) throws JSONException {
     JSONObject properties = new JSONObject();
-    for (String propertyKey : v.getPropertyKeys()) {
-      properties.put(propertyKey, v.getProperty(propertyKey));
+    for (String propertyKey : attributed.getPropertyKeys()) {
+      properties.put(propertyKey, attributed.getProperty(propertyKey));
     }
     json.put(PROPERTIES, properties);
     return json;
   }
 
+  /**
+   * Write either outgoing or incoming edges of to the given json object.
+   *
+   * @param json  json object to write edges to
+   * @param key   used to differ incoming and outgoing edges
+   * @param edges edges to write
+   * @return updated json object
+   * @throws JSONException
+   */
   private JSONObject writeEdges(final JSONObject json, final String key,
     final Iterable<Edge> edges) throws JSONException {
     JSONArray edgeArray = new JSONArray();
@@ -70,16 +116,25 @@ public class JsonWriter implements VertexLineWriter {
       JSONObject jsonEdge = new JSONObject();
       jsonEdge.put(EDGE_OTHER_ID, e.getOtherID());
       jsonEdge.put(EDGE_LABEL, e.getLabel());
+      jsonEdge = writeProperties(jsonEdge, e);
       edgeArray.put(jsonEdge);
     }
     json.put(key, edgeArray);
     return json;
   }
 
-  private JSONObject writeGraphs(final JSONObject json, final Vertex v) throws
-    JSONException {
+  /**
+   * Write graphs to the given json object.
+   *
+   * @param json         json object to write graphs to
+   * @param graphElement entity that is part of graphs
+   * @return updated json object
+   * @throws JSONException
+   */
+  private JSONObject writeGraphs(final JSONObject json,
+    final GraphElement graphElement) throws JSONException {
     JSONArray graphArray = new JSONArray();
-    for (Long graph : v.getGraphs()) {
+    for (Long graph : graphElement.getGraphs()) {
       graphArray.put(graph);
     }
     json.put(GRAPHS, graphArray);

@@ -61,6 +61,8 @@
         <dep.hadoop.version>1.2.1</dep.hadoop.version>
         <dep.giraph.version>1.1.0</dep.giraph.version>
         <dep.junit.version>4.11</dep.junit.version>
+        <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
+
 
         <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.13</plugin.maven-checkstyle.version>

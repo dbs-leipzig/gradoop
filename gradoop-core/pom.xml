@@ -65,5 +65,11 @@
             <version>${dep.hbase.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <version>${dep.jsonassert.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

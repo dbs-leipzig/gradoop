@@ -25,7 +25,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
- * Root class for gradoop tests. Contains sample graphs, corresponding
+ * Root class for Gradoop tests. Contains sample graphs, corresponding
  * validation methods and helper methods.
  */
 public abstract class GradoopTest {
@@ -55,13 +55,29 @@ public abstract class GradoopTest {
   }
 
   protected static final String[] BASIC_GRAPH =
-    new String[]{"0 1 2", "1 0 2", "2 1"};
+    new String[]{"0 1 2", "1 0 2", "2 1" };
 
   protected static final String[] EXTENDED_GRAPH = new String[]{
     "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 2 k1 5 v1 k2 5 v2|1 0",
     "1|A B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2," +
       "c.2.1 0|a.0.0 1 k1 5 v1|2 0 1",
-    "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.2.1 0|1 1"};
+    "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.1.1 0|1 1" };
+
+  protected static final String[] EXTENDED_GRAPH_JSON = new String[]{
+    "{\"id\":0,\"labels\":[\"A\"],\"properties\":{\"k1\":\"v1\", " +
+      "\"k2\":\"v2\", \"k3\":\"v3\"},\"out-edges\":[{\"otherid\":1," +
+      "\"label\":\"a\",\"properties\":{\"k1\": \"v1\"}}], " +
+      "\"in-edges\":[{\"otherid\":1,\"label\":\"b\"," +
+      "\"properties\":{\"k1\":\"v1\",\"k2\":\"v2\"}}],\"graphs\":[0]}",
+    "{\"id\":1,\"labels\":[\"A\",\"B\"],\"properties\":{\"k1\":\"v1\"," +
+      "\"k2\":\"v2\"},\"out-edges\":[{\"otherid\":0,\"label\":\"b\"," +
+      "\"properties\":{\"k1\":\"v1\",\"k2\":\"v2\"}},{\"otherid\":2," +
+      "\"label\":\"c\"}],\"in-edges\":[{\"otherid\":0,\"label\":\"a\"," +
+      "\"properties\":{\"k1\":\"v1\"}}],\"graphs\":[0, 1]}",
+    "{\"id\":2,\"labels\":[\"C\"],\"properties\":{\"k1\":\"v1\"," +
+      "\"k2\":\"v2\"},\"out-edges\":[{\"otherid\":2,\"label\":\"d\"}]," +
+      "\"in-edges\":[{\"otherid\":	2,\"label\":\"d\"},{\"otherid\":1," +
+      "\"label\":\"c\"}],\"graphs\":[1]}" };
 
   protected List<Vertex> createBasicGraphVertices() {
     return createVertices(BASIC_GRAPH, new SimpleVertexReader());
@@ -186,7 +202,7 @@ public abstract class GradoopTest {
         // in edges (d.2.0 0,c.2.1 0)
         assertEquals(2, inEdges.size());
         testEdge(inEdges, 2L, "d", 0L, 0);
-        testEdge(inEdges, 2L, "c", 1L, 0);
+        testEdge(inEdges, 1L, "c", 1L, 0);
         // graphs (1 1)
         assertEquals(1, graphs.size());
         assertTrue(graphs.contains(1L));
@@ -208,21 +224,25 @@ public abstract class GradoopTest {
 
   private void testProperties(Attributed v, int expectedSize) {
     int count = 0;
-    for (String propertyKey : v.getPropertyKeys()) {
-      switch (propertyKey) {
-      case KEY_1:
-        assertEquals(VALUE_1, v.getProperty(KEY_1));
-        break;
-      case KEY_2:
-        assertEquals(VALUE_2, v.getProperty(KEY_2));
-        break;
-      case KEY_3:
-        assertEquals(VALUE_3, v.getProperty(KEY_3));
-        break;
+    if (expectedSize == 0) {
+      assertNull(v.getPropertyKeys());
+    } else {
+      for (String propertyKey : v.getPropertyKeys()) {
+        switch (propertyKey) {
+        case KEY_1:
+          assertEquals(VALUE_1, v.getProperty(KEY_1));
+          break;
+        case KEY_2:
+          assertEquals(VALUE_2, v.getProperty(KEY_2));
+          break;
+        case KEY_3:
+          assertEquals(VALUE_3, v.getProperty(KEY_3));
+          break;
+        }
+        count++;
       }
-      count++;
+      assertEquals(expectedSize, count);
     }
-    assertEquals(expectedSize, count);
   }
 
   /**
