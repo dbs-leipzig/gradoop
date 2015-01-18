@@ -19,6 +19,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.io.reader.BulkLoadEPG;
@@ -151,6 +152,16 @@ public class BulkLoadDriver extends Configured implements Tool {
     loader.doBulkLoad(outputDir, htable);
 
     return true;
+  }
+
+  /**
+   * Runs the job from console.
+   *
+   * @param args command line arguments
+   * @throws Exception
+   */
+  public static void main(String[] args) throws Exception {
+    System.exit(ToolRunner.run(new BulkLoadDriver(), args));
   }
 
   /**
