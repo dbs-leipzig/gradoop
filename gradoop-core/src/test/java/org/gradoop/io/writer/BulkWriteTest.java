@@ -16,9 +16,7 @@ import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * Testing for Bulk Export.
@@ -26,8 +24,8 @@ import java.io.InputStreamReader;
 public class BulkWriteTest extends MapReduceClusterTest {
 
   @Test
-  public void bulkWriteSimpleGraphTest() throws IOException, ClassNotFoundException,
-    InterruptedException {
+  public void bulkWriteSimpleGraphTest() throws IOException,
+    ClassNotFoundException, InterruptedException {
     Configuration conf = utility.getConfiguration();
     // create store and store some test data
     GraphStore store = createEmptyGraphStore();
@@ -65,15 +63,7 @@ public class BulkWriteTest extends MapReduceClusterTest {
 
     // read map output
     Path outputFile = new Path(outputDir, "part-m-00000");
-    BufferedReader br = new BufferedReader(
-      new InputStreamReader(utility.getTestFileSystem().open(outputFile)));
-    String line;
-    int i = 0;
-    String[] fileContent = new String[BASIC_GRAPH.length];
-    while ((line = br.readLine()) != null) {
-      fileContent[i] = line;
-      i++;
-    }
+    String[] fileContent = readGraphFromFile(outputFile, BASIC_GRAPH.length);
 
     // validate text output with input graph
     validateBasicGraphVertices(fileContent);

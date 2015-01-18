@@ -36,16 +36,19 @@ public class BulkLoadDriver extends Configured implements Tool {
   /**
    * Class logger.
    */
-  private static Logger LOG = Logger.getLogger(BulkLoadDriver.class);
+  private static final Logger LOG = Logger.getLogger(BulkLoadDriver.class);
   /**
    * Job name for map reduce job.
    */
-  private static String JOB_NAME = "Bulk Load Driver";
+  private static final String JOB_NAME = "Bulk Load Driver";
 
   static {
     Configuration.addDefaultResource("hbase-site.xml");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int run(String[] args) throws Exception {
     Configuration conf = getConf();
@@ -58,7 +61,8 @@ public class BulkLoadDriver extends Configured implements Tool {
     boolean dropTables = cmd.hasOption(ConfUtils.OPTION_DROP_TABLES);
     String inputPath = cmd.getOptionValue(ConfUtils.OPTION_GRAPH_INPUT_PATH);
     String outputPath = cmd.getOptionValue(ConfUtils.OPTION_GRAPH_OUTPUT_PATH);
-    String readerClassName = cmd.getOptionValue(ConfUtils.VERTEX_LINE_READER);
+    String readerClassName =
+      cmd.getOptionValue(ConfUtils.OPTION_VERTEX_LINE_READER);
 
     Class<? extends VertexLineReader> readerClass =
       getLineReaderClass(readerClassName);
@@ -75,7 +79,8 @@ public class BulkLoadDriver extends Configured implements Tool {
    * Returns the class for the given class name parameter.
    *
    * @param readerClassName full qualified class name of the reader
-   * @return reader instance
+   * @return reader class instance
+   * @throws java.lang.ClassNotFoundException
    */
   private Class<? extends VertexLineReader> getLineReaderClass(
     final String readerClassName) throws ClassNotFoundException {
@@ -179,7 +184,7 @@ public class BulkLoadDriver extends Configured implements Tool {
     /**
      * Command lne option for setting the vertex reader class.
      */
-    public static final String VERTEX_LINE_READER = "vlr";
+    public static final String OPTION_VERTEX_LINE_READER = "vlr";
     /**
      * Command line option to drop hbase tables if they exist.
      */
@@ -202,7 +207,7 @@ public class BulkLoadDriver extends Configured implements Tool {
       OPTIONS.addOption(OPTION_HELP, "help", false, "Display help.");
       OPTIONS.addOption(OPTION_VERBOSE, "verbose", false,
         "Print console output during job execution.");
-      OPTIONS.addOption(VERTEX_LINE_READER, "vertex-line-reader", true,
+      OPTIONS.addOption(OPTION_VERTEX_LINE_READER, "vertex-line-reader", true,
         "VertexLineReader implementation which is used to read a single line " +
           "in the input.");
       OPTIONS.addOption(OPTION_DROP_TABLES, "drop-tables", false,
@@ -253,7 +258,7 @@ public class BulkLoadDriver extends Configured implements Tool {
      */
     private static boolean performSanityCheck(final CommandLine cmd) {
       boolean sane = true;
-      if (!cmd.hasOption(VERTEX_LINE_READER)) {
+      if (!cmd.hasOption(OPTION_VERTEX_LINE_READER)) {
         LOG.error("Choose the vertex line reader (-vlr)");
         sane = false;
       }
@@ -262,7 +267,7 @@ public class BulkLoadDriver extends Configured implements Tool {
         sane = false;
       }
       if (!cmd.hasOption(OPTION_GRAPH_OUTPUT_PATH)) {
-        LOG.error("Choose the graph output path " + "(-gop)");
+        LOG.error("Choose the graph output path (-gop)");
         sane = false;
       }
       return sane;

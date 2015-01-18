@@ -12,7 +12,9 @@ import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.gradoop.storage.hbase.VertexHandler;
 import org.junit.BeforeClass;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 import static org.junit.Assert.assertNotNull;
@@ -72,5 +74,27 @@ public abstract class HBaseClusterTest extends GradoopTest {
       utility = new HBaseTestingUtility();
       utility.startMiniCluster().waitForActiveAndReadyMaster();
     }
+  }
+
+  /**
+   * Reads a graph file in HDFS line by line into an array and returns it.
+   *
+   * @param graphFileName file in HDFS
+   * @param lineCount     number of lines
+   * @return array with line contents
+   * @throws IOException
+   */
+  protected String[] readGraphFromFile(final Path graphFileName,
+    final int lineCount) throws IOException {
+    BufferedReader br = new BufferedReader(
+      new InputStreamReader(utility.getTestFileSystem().open(graphFileName)));
+    String line;
+    int i = 0;
+    String[] fileContent = new String[lineCount];
+    while ((line = br.readLine()) != null) {
+      fileContent[i] = line;
+      i++;
+    }
+    return fileContent;
   }
 }

@@ -20,7 +20,7 @@ public class BulkLoadDriverTest extends MapReduceClusterTest {
     String graphFile = "json-sample.graph";
 
     String[] args = new String[] {
-      "-" + BulkLoadDriver.ConfUtils.VERTEX_LINE_READER,
+      "-" + BulkLoadDriver.ConfUtils.OPTION_VERTEX_LINE_READER,
       JsonReader.class.getCanonicalName(),
       "-" + BulkLoadDriver.ConfUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
       "-" + BulkLoadDriver.ConfUtils.OPTION_GRAPH_OUTPUT_PATH,
