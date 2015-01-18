@@ -75,10 +75,12 @@ public class JsonWriter implements VertexLineWriter {
   private JSONObject writeLabels(final JSONObject json, final Vertex v) throws
     JSONException {
     JSONArray labelArray = new JSONArray();
-    for (String label : v.getLabels()) {
-      labelArray.put(label);
+    if (v.getLabelCount() > 0) {
+      for (String label : v.getLabels()) {
+        labelArray.put(label);
+      }
+      json.put(LABELS, labelArray);
     }
-    json.put(LABELS, labelArray);
     return json;
   }
 
@@ -93,10 +95,12 @@ public class JsonWriter implements VertexLineWriter {
   private JSONObject writeProperties(final JSONObject json,
     final Attributed attributed) throws JSONException {
     JSONObject properties = new JSONObject();
-    for (String propertyKey : attributed.getPropertyKeys()) {
-      properties.put(propertyKey, attributed.getProperty(propertyKey));
+    if (attributed.getPropertyCount() > 0) {
+      for (String propertyKey : attributed.getPropertyKeys()) {
+        properties.put(propertyKey, attributed.getProperty(propertyKey));
+      }
+      json.put(PROPERTIES, properties);
     }
-    json.put(PROPERTIES, properties);
     return json;
   }
 
@@ -134,10 +138,12 @@ public class JsonWriter implements VertexLineWriter {
   private JSONObject writeGraphs(final JSONObject json,
     final GraphElement graphElement) throws JSONException {
     JSONArray graphArray = new JSONArray();
-    for (Long graph : graphElement.getGraphs()) {
-      graphArray.put(graph);
+    if (graphElement.getGraphCount() > 0) {
+      for (Long graph : graphElement.getGraphs()) {
+        graphArray.put(graph);
+      }
+      json.put(GRAPHS, graphArray);
     }
-    json.put(GRAPHS, graphArray);
     return json;
   }
 }

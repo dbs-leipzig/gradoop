@@ -274,9 +274,10 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
     for (Map.Entry<byte[], byte[]> edgeColumn : res.getFamilyMap(columnFamily)
       .entrySet()) {
       String edgeKey = Bytes.toString(edgeColumn.getKey());
-      Map<String, Object> edgeProperties = new HashMap<>();
+      Map<String, Object> edgeProperties = null;
       String propertyString = Bytes.toString(edgeColumn.getValue());
       if (propertyString.length() > 0) {
+        edgeProperties = new HashMap<>();
         String[] tokens =
           PROPERTY_TOKEN_SEPARATOR_PATTERN.split(propertyString);
         for (int i = 0; i < tokens.length; i += 3) {

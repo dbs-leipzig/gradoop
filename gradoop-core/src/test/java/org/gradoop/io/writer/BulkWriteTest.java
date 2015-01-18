@@ -26,7 +26,7 @@ import java.io.InputStreamReader;
 public class BulkWriteTest extends MapReduceClusterTest {
 
   @Test
-  public void bulkWriteTest() throws IOException, ClassNotFoundException,
+  public void bulkWriteSimpleGraphTest() throws IOException, ClassNotFoundException,
     InterruptedException {
     Configuration conf = utility.getConfiguration();
     // create store and store some test data
@@ -57,7 +57,7 @@ public class BulkWriteTest extends MapReduceClusterTest {
     job.setNumReduceTasks(0);
 
     // set output path
-    Path outputDir = new Path("/output/export");
+    Path outputDir = new Path("/output/export/simple-graph");
     FileOutputFormat.setOutputPath(job, outputDir);
 
     // run
