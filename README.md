@@ -46,7 +46,7 @@ for further details on how to implement a pipeline.
 
 To run the pipeline on your hadoop installation, please follow these steps.
 
-*   Copy the generated `gradoop-biiig/target/gradoop-biiig-&lt;version&gt;-jar-with-dependencies.jar`
+*   Copy the generated `gradoop-biiig/target/gradoop-biiig-<version>-jar-with-dependencies.jar`
     to your Hadoop environment.
 
 *   For a list of options for that example pipeline call
@@ -69,7 +69,7 @@ To run the pipeline on your hadoop installation, please follow these steps.
 
 *   The bulk load supports user defined formats. You need to implement
     `org.gradoop.io.reader.VertexLineReader`, please have a look at
-    `org gradoop.io.reader.JsonReader` for an example.
+    `org.gradoop.io.reader.JsonReader` for an example.
 
 ##### Exporting data from Gradoop
 
@@ -80,7 +80,7 @@ To run the pipeline on your hadoop installation, please follow these steps.
 
 *   The bulk write supports user defined formats. You need to implement
     `org.gradoop.io.writer.VertexLineWriter`, please have a look at
-    `org gradoop.io.writer.JsonWriter` for an example.
+    `org.gradoop.io.writer.JsonWriter` for an example.
 
 #### Gradoop modules
 
