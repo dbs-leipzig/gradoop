@@ -7,7 +7,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.gradoop.io.KwayPartitioningVertex;
+import org.gradoop.io.PartitioningVertex;
 
 import java.io.IOException;
 
@@ -19,13 +19,14 @@ import java.io.IOException;
  * {@code <vertex-id> <vertex-last-value> <vertex-current-value>
  * [<neighbour-id>]*}
  */
-public class KwayPartitioningOutputFormat extends
-  TextVertexOutputFormat<IntWritable, KwayPartitioningVertex, NullWritable> {
-
+public class AdaptiveRepartitioningOutputFormat extends
+  TextVertexOutputFormat<IntWritable, PartitioningVertex, NullWritable> {
   /**
    * Used for splitting the line into the main tokens (vertex id, vertex value
    */
   private static final String VALUE_TOKEN_SEPARATOR = "\t";
+  private static final String LIST_BLOCK_OPEN = "[";
+  private static final String LIST_BLOCK_CLOSE = "]";
 
   /**
    * @param context the information about the task
@@ -36,15 +37,15 @@ public class KwayPartitioningOutputFormat extends
   @Override
   public TextVertexWriter createVertexWriter(TaskAttemptContext context) throws
     IOException, InterruptedException {
-    return new KwayTextVertexLineWriter();
+    return new AdaptiveRepartitioningTextVertexLineWriter();
   }
 
   /**
-   * Used to convert a {@link org.gradoop.io.KwayPartitioningVertex} to a
+   * Used to convert a {@link org.gradoop.io.PartitioningVertex} to a
    * line in the output file.
    */
-  private class KwayTextVertexLineWriter extends TextVertexWriterToEachLine {
-
+  private class AdaptiveRepartitioningTextVertexLineWriter extends
+    TextVertexWriterToEachLine {
     /**
      * Writes a line for the given vertex.
      *
@@ -54,13 +55,19 @@ public class KwayPartitioningOutputFormat extends
      */
     @Override
     protected Text convertVertexToLine(
-      Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex) throws
+      Vertex<IntWritable, PartitioningVertex, NullWritable> vertex) throws
       IOException {
       StringBuilder sb = new StringBuilder(vertex.getId().toString());
       sb.append(VALUE_TOKEN_SEPARATOR);
-      sb.append(vertex.getValue().getLastVertexValue());
+      sb.append(vertex.getValue().getCurrentPartition());
       sb.append(VALUE_TOKEN_SEPARATOR);
-      sb.append(vertex.getValue().getCurrentVertexValue());
+      if (vertex.getValue().getPartitionHistoryCount() != 0) {
+        sb.append(vertex.getValue().getPartitionHistory().toString());
+      } else {
+        sb.append(LIST_BLOCK_OPEN);
+        sb.append(LIST_BLOCK_CLOSE);
+        sb.append(VALUE_TOKEN_SEPARATOR);
+      }
       for (Edge<IntWritable, NullWritable> e : vertex.getEdges()) {
         sb.append(VALUE_TOKEN_SEPARATOR).append(e.getTargetVertexId());
       }

@@ -9,7 +9,7 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.gradoop.io.KwayPartitioningVertex;
+import org.gradoop.io.PartitioningVertex;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,8 +34,8 @@ import java.util.regex.Pattern;
  * <p/>
  * {@code <vertex-id> [<neighbour-id>]*}
  */
-public class KwayPartitioningInputFormat extends
-  TextVertexInputFormat<IntWritable, KwayPartitioningVertex, NullWritable> {
+public class AdaptiveRepartitioningInputFormat extends
+  TextVertexInputFormat<IntWritable, PartitioningVertex, NullWritable> {
 
   /**
    * Used to tell the input format if the input graph is already partitioned.
@@ -46,7 +46,7 @@ public class KwayPartitioningInputFormat extends
   /**
    * Default value for PARTITIONED_INPUT.
    */
-  public static final boolean DEFAULT_PARTITIONED_INPUT = false;
+  public static final boolean DEFAULT_PARTITIONED_INPUT = true;
 
   /**
    * Separator of the vertex and neighbors
@@ -73,7 +73,7 @@ public class KwayPartitioningInputFormat extends
     /**
      * Edge offset for partitioned graph inputs.
      */
-    private static final int PARTITIONED_EDGE_OFFSET = 3;
+    private static final int PARTITIONED_EDGE_OFFSET = 2;
 
     /**
      * Edge offset for unpartitioned graph inputs.
@@ -94,8 +94,7 @@ public class KwayPartitioningInputFormat extends
      * <p/>
      * If false, the reader assumes that a single line contains
      * <p/>
-     * {@code <vertex-id> <vertex-last-value> <vertex-current-value>
-     * [<neighbour-id>]*}
+     * {@code <vertex-id> <vertex-current-partition> [<neighbour-id>]*}
      */
     private boolean isPartitioned;
 
@@ -103,14 +102,19 @@ public class KwayPartitioningInputFormat extends
      * Cached vertex id for the current line
      */
     private int id;
+
+
     /**
-     * Cached vertex last_value for the current line
+     * Cached vertex current Partition
      */
-    private int lastValue = 0;
+    private int currentPartition = 0;
+
     /**
-     * Cached vertex current_value for the current line
+     * Cached vertex desired Partition
      */
-    private int currentValue = 0;
+    private int desiredPartition = 0;
+
+
 
     /**
      * {@inheritDoc}
@@ -122,7 +126,7 @@ public class KwayPartitioningInputFormat extends
       this.isPartitioned =
         getConf().getBoolean(PARTITIONED_INPUT, DEFAULT_PARTITIONED_INPUT);
       // if the input graph is partitioned (contains two vertex values), the
-      // the edges start at offset 3
+      // the edges start at offset 2
       if (this.isPartitioned) {
         edgeOffset = PARTITIONED_EDGE_OFFSET;
       } else {
@@ -142,8 +146,7 @@ public class KwayPartitioningInputFormat extends
       String[] tokens = SEPARATOR.split(line.toString());
       id = Integer.parseInt(tokens[0]);
       if (this.isPartitioned) {
-        lastValue = Integer.parseInt(tokens[1]);
-        currentValue = Integer.parseInt(tokens[2]);
+        currentPartition = Integer.parseInt(tokens[1]);
       }
       return tokens;
     }
@@ -168,11 +171,11 @@ public class KwayPartitioningInputFormat extends
      * @throws IOException
      */
     @Override
-    protected KwayPartitioningVertex getValue(String[] tokens) throws
+    protected PartitioningVertex getValue(String[] tokens) throws
       IOException {
-      KwayPartitioningVertex vertex = new KwayPartitioningVertex();
-      vertex.setCurrentVertexValue(new IntWritable(currentValue));
-      vertex.setLastVertexValue(new IntWritable(lastValue));
+      PartitioningVertex vertex = new PartitioningVertex();
+      vertex.setCurrentPartition(new IntWritable(currentPartition));
+      vertex.setDesiredPartition(new IntWritable(desiredPartition));
       return vertex;
     }
 

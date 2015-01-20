@@ -1,11 +1,16 @@
 package org.gradoop.algorithms;
 
+import org.apache.giraph.comm.WorkerClientRequestProcessor;
 import org.apache.giraph.graph.BasicComputation;
+import org.apache.giraph.graph.GraphState;
+import org.apache.giraph.graph.GraphTaskManager;
 import org.apache.giraph.graph.Vertex;
+import org.apache.giraph.worker.WorkerContext;
+import org.apache.giraph.worker.WorkerGlobalCommUsage;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.log4j.Logger;
-import org.gradoop.io.KwayPartitioningVertex;
+import org.gradoop.io.PartitioningVertex;
 
 import java.io.IOException;
 
@@ -17,7 +22,7 @@ import java.io.IOException;
  * TODO: algorithm description
  */
 public class AdaptiveRepartitioningComputation extends
-  BasicComputation<IntWritable, KwayPartitioningVertex, NullWritable,
+  BasicComputation<IntWritable, PartitioningVertex, NullWritable,
     IntWritable> {
   /**
    * Number of partitions to create.
@@ -27,7 +32,7 @@ public class AdaptiveRepartitioningComputation extends
   /**
    * Default number of partitions if no value is given.
    */
-  public static final int DEFAULT_NUMBER_OF_PARTITIONS = 2;
+  public static final int DEFAULT_NUMBER_OF_PARTITIONS = 4;
   /**
    * Number of iterations after which the calculation is stopped.
    */
@@ -37,6 +42,15 @@ public class AdaptiveRepartitioningComputation extends
    */
   public static final int DEFAULT_NUMBER_OF_ITERATIONS = 50;
   /**
+   * Number of migrations the Vertex can do
+   */
+  public static final String NUMBER_OF_STABILIZATION_ROUNDS =
+    "partitioning.stabilization";
+  /**
+   * Default number of migrations if no value is given
+   */
+  public static final int DEFAULT_NUMBER_OF_STABILIZATION_ROUNDS = 30;
+  /**
    * Threshold to calculate total partition capacity.
    */
   public static final String CAPACITY_THRESHOLD =
@@ -45,44 +59,41 @@ public class AdaptiveRepartitioningComputation extends
    * Default capacityThreshold if no value is given.
    */
   public static final float DEFAULT_CAPACITY_THRESHOLD = .2f;
-
   /**
    * Prefix for capacity aggregator which is used by master and worker compute.
    */
   static final String CAPACITY_AGGREGATOR_PREFIX =
     AdaptiveRepartitioningComputation.class.getName() + ".capacity.aggregator.";
-
   /**
    * Prefix for demand aggregator which is used by master and worker compute.
    */
   static final String DEMAND_AGGREGATOR_PREFIX =
     AdaptiveRepartitioningComputation.class.getName() + ".demand.aggregator.";
-
   /**
    * Needed for aggregators.
    */
   private static final IntWritable POSITIVE_ONE = new IntWritable(1);
-
   /**
    * Needed for aggregators.
    */
   private static final IntWritable NEGATIVE_ONE = new IntWritable(-1);
-
   /**
    * Class logger.
    */
   private static final Logger LOG =
     Logger.getLogger(AdaptiveRepartitioningComputation.class);
-
   /**
    * Total number of available partitions.
    */
   private int k;
-
   /**
    * Capacity capacityThreshold
    */
   private float capacityThreshold;
+  /**
+   * Total number of possible migrations
+   */
+  private int stabilizationRoundMax;
 
   /**
    * Returns the desired partition of the given vertex based on the
@@ -93,24 +104,20 @@ public class AdaptiveRepartitioningComputation extends
    * @return desired partition
    */
   private int getDesiredPartition(
-    final Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
+    final Vertex<IntWritable, PartitioningVertex, NullWritable>
+      vertex,
     final Iterable<IntWritable> messages) {
-
-    int currentPartition = vertex.getValue().getCurrentVertexValue().get();
+    int currentPartition = vertex.getValue().getCurrentPartition().get();
     int desiredPartition = currentPartition;
-
     LOG.info("currentPartition: " + currentPartition);
-
     // got messages?
     if (messages.iterator().hasNext()) {
-
       // partition -> neighbours in partition
       int[] countNeighbours = getPartitionFrequencies(messages);
       LOG.info("count neighbours:");
       for (int i = 0; i < countNeighbours.length; i++) {
         LOG.info(String.format("%d => %d", i, countNeighbours[i]));
       }
-
       // partition -> desire to migrate
       double[] partitionWeights =
         getPartitionWeights(countNeighbours, vertex.getNumEdges());
@@ -118,7 +125,6 @@ public class AdaptiveRepartitioningComputation extends
       for (int i = 0; i < partitionWeights.length; i++) {
         LOG.info(String.format("%d => %f.2", i, partitionWeights[i]));
       }
-
       double firstMax = Integer.MIN_VALUE;
       double secondMax = Integer.MIN_VALUE;
       int firstK = -1;
@@ -134,12 +140,10 @@ public class AdaptiveRepartitioningComputation extends
           secondK = i;
         }
       }
-
       LOG.info("firstMax: " + firstMax);
       LOG.info("secondMax: " + secondMax);
       LOG.info("firstK: " + firstK);
       LOG.info("secondK: " + secondK);
-
       if (firstMax == secondMax) {
         if (currentPartition != firstK && currentPartition != secondK) {
           desiredPartition = firstK;
@@ -162,7 +166,6 @@ public class AdaptiveRepartitioningComputation extends
    */
   private int[] getPartitionFrequencies(final Iterable<IntWritable> messages) {
     int[] result = new int[k];
-
     for (IntWritable message : messages) {
       result[message.get()]++;
     }
@@ -257,13 +260,23 @@ public class AdaptiveRepartitioningComputation extends
    * @param desiredPartition partition to move vertex to
    */
   private void migrateVertex(
-    final Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
+    final Vertex<IntWritable, PartitioningVertex, NullWritable>
+      vertex,
     int desiredPartition) {
+    vertex.getValue()
+      .addToPartitionHistory(vertex.getValue().getCurrentPartition().get());
+    LOG.info("maximum stabilization rounds" + stabilizationRoundMax);
+    LOG.info("history count" + vertex.getValue().getPartitionHistoryCount());
+    LOG.info("Partition History");
+
+    for(Integer partition : vertex.getValue().getPartitionHistory()){
+      LOG.info(partition);
+    }
     String oldPartition = CAPACITY_AGGREGATOR_PREFIX +
-      vertex.getValue().getCurrentVertexValue().get();
+      vertex.getValue().getCurrentPartition().get();
     String newPartition = CAPACITY_AGGREGATOR_PREFIX + desiredPartition;
     notifyAggregator(oldPartition, NEGATIVE_ONE);
-    vertex.getValue().setCurrentVertexValue(new IntWritable(desiredPartition));
+    vertex.getValue().setCurrentPartition(new IntWritable(desiredPartition));
     notifyAggregator(newPartition, POSITIVE_ONE);
   }
 
@@ -274,9 +287,10 @@ public class AdaptiveRepartitioningComputation extends
    * @param vertex vertex
    */
   private void setVertexStartValue(
-    final Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex) {
+    final Vertex<IntWritable, PartitioningVertex, NullWritable>
+      vertex) {
     int startValue = vertex.getId().get() % k;
-    vertex.getValue().setCurrentVertexValue(new IntWritable(startValue));
+    vertex.getValue().setCurrentPartition(new IntWritable(startValue));
   }
 
   /**
@@ -290,6 +304,26 @@ public class AdaptiveRepartitioningComputation extends
     aggregate(aggregator, v);
   }
 
+  @Override
+  public void initialize(GraphState graphState,
+    WorkerClientRequestProcessor<IntWritable, PartitioningVertex, NullWritable> workerClientRequestProcessor,
+    GraphTaskManager<IntWritable, PartitioningVertex, NullWritable>
+      graphTaskManager,
+    WorkerGlobalCommUsage workerGlobalCommUsage, WorkerContext workerContext) {
+    super.initialize(graphState, workerClientRequestProcessor, graphTaskManager,
+      workerGlobalCommUsage, workerContext);
+
+    k = getConf().getInt(NUMBER_OF_PARTITIONS, DEFAULT_NUMBER_OF_PARTITIONS);
+    stabilizationRoundMax = getConf().getInt(NUMBER_OF_STABILIZATION_ROUNDS,
+      DEFAULT_NUMBER_OF_STABILIZATION_ROUNDS);
+    capacityThreshold =
+      getConf().getFloat(CAPACITY_THRESHOLD, DEFAULT_CAPACITY_THRESHOLD);
+
+    LOG.info("=== Initialized Computation");
+    LOG.info(String.format("k: %d, stabilizationRounds: %d, capacityTreshold:" +
+      " %.2f", k, stabilizationRoundMax, capacityThreshold));
+  }
+
   /**
    * The actual ADP computation.
    *
@@ -300,26 +334,23 @@ public class AdaptiveRepartitioningComputation extends
    */
   @Override
   public void compute(
-    Vertex<IntWritable, KwayPartitioningVertex, NullWritable> vertex,
+    Vertex<IntWritable, PartitioningVertex, NullWritable> vertex,
     Iterable<IntWritable> messages) throws IOException {
-    k = getConf().getInt(NUMBER_OF_PARTITIONS, DEFAULT_NUMBER_OF_ITERATIONS);
-    capacityThreshold =
-      getConf().getFloat(CAPACITY_THRESHOLD, DEFAULT_CAPACITY_THRESHOLD);
     LOG.info(String.format("=== ss: %d vertex-id: %d k: %d", getSuperstep(),
       vertex.getId().get(), k));
     if (getSuperstep() == 0) {
       LOG.info("== INIT PHASE");
       setVertexStartValue(vertex);
       String aggregator = CAPACITY_AGGREGATOR_PREFIX +
-        vertex.getValue().getCurrentVertexValue().get();
+        vertex.getValue().getCurrentPartition().get();
       notifyAggregator(aggregator, POSITIVE_ONE);
-      sendMessageToAllEdges(vertex, vertex.getValue().getCurrentVertexValue());
+      sendMessageToAllEdges(vertex, vertex.getValue().getCurrentPartition());
     } else {
       // even superstep: migrate phase
       if ((getSuperstep() % 2) == 0) {
         LOG.info("MIGRATION PHASE");
-        int desiredPartition = vertex.getValue().getLastVertexValue().get();
-        int currentPartition = vertex.getValue().getCurrentVertexValue().get();
+        int desiredPartition = vertex.getValue().getDesiredPartition().get();
+        int currentPartition = vertex.getValue().getCurrentPartition().get();
         LOG.info("currentPartition: " + currentPartition);
         LOG.info("desiredPartition: " + desiredPartition);
         if (desiredPartition != currentPartition) {
@@ -328,19 +359,25 @@ public class AdaptiveRepartitioningComputation extends
           if (migrate) {
             migrateVertex(vertex, desiredPartition);
             sendMessageToAllEdges(vertex,
-              vertex.getValue().getCurrentVertexValue());
+              vertex.getValue().getCurrentPartition());
           }
         }
         vertex.voteToHalt();
       } else { // odd supersteps: demand phase
-        LOG.info("DEMAND PHASE");
-        int desiredPartition = getDesiredPartition(vertex, messages);
-        vertex.getValue().setLastVertexValue(new IntWritable(desiredPartition));
-        int currentValue = vertex.getValue().getCurrentVertexValue().get();
-        boolean changed = currentValue != desiredPartition;
-        if (changed) {
-          notifyAggregator(DEMAND_AGGREGATOR_PREFIX + desiredPartition,
-            POSITIVE_ONE);
+        if (vertex.getValue().getPartitionHistoryCount() >=
+          stabilizationRoundMax) {
+          vertex.voteToHalt();
+        } else {
+          LOG.info("DEMAND PHASE");
+          int desiredPartition = getDesiredPartition(vertex, messages);
+          vertex.getValue()
+            .setDesiredPartition(new IntWritable(desiredPartition));
+          int currentValue = vertex.getValue().getCurrentPartition().get();
+          boolean changed = currentValue != desiredPartition;
+          if (changed) {
+            notifyAggregator(DEMAND_AGGREGATOR_PREFIX + desiredPartition,
+              POSITIVE_ONE);
+          }
         }
       }
     }

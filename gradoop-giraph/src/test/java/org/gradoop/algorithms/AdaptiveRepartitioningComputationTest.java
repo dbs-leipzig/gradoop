@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.io.formats.IdWithValueTextOutputFormat;
 import org.apache.giraph.utils.InternalVertexRunner;
-import org.gradoop.io.formats.KwayPartitioningInputFormat;
-import org.gradoop.io.formats.KwayPartitioningOutputFormat;
+import org.gradoop.io.formats.AdaptiveRepartitioningInputFormat;
+import org.gradoop.io.formats.AdaptiveRepartitioningOutputFormat;
 import org.junit.Test;
 
 import java.util.Map;
@@ -25,7 +25,7 @@ public class AdaptiveRepartitioningComputationTest {
   public void testSmallConnectedGraph() throws Exception {
     String[] graph =
       PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph, 2, 100, 0.5f));
+    validateSmallConnectedGraphResult(computeResults(graph, 2, 120, 0.5f, 1));
   }
 
 //  @Test
@@ -68,7 +68,9 @@ public class AdaptiveRepartitioningComputationTest {
 
 
   private Map<Integer, Integer> computeResults(String[] graph,
-    int partitionCount, int maxIterations, float capacityTreshold) throws
+    int partitionCount, int maxIterations, float capacityTreshold, int
+    maxStabilization)
+    throws
     Exception {
     GiraphConfiguration conf = getConfiguration();
     conf.setInt(AdaptiveRepartitioningComputation.NUMBER_OF_PARTITIONS,
@@ -77,6 +79,9 @@ public class AdaptiveRepartitioningComputationTest {
       maxIterations);
     conf.setFloat(AdaptiveRepartitioningComputation.CAPACITY_THRESHOLD,
       capacityTreshold);
+    conf.setInt(AdaptiveRepartitioningComputation
+      .NUMBER_OF_STABILIZATION_ROUNDS, maxStabilization);
+    conf.setBoolean(AdaptiveRepartitioningInputFormat.PARTITIONED_INPUT, true);
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
 
     return parseResults(results);
@@ -86,8 +91,8 @@ public class AdaptiveRepartitioningComputationTest {
     GiraphConfiguration conf = new GiraphConfiguration();
     conf.setComputationClass(AdaptiveRepartitioningComputation.class);
     conf.setMasterComputeClass(AdaptiveRepartitioningMasterComputation.class);
-    conf.setVertexInputFormatClass(KwayPartitioningInputFormat.class);
-    conf.setVertexOutputFormatClass(KwayPartitioningOutputFormat.class);
+    conf.setVertexInputFormatClass(AdaptiveRepartitioningInputFormat.class);
+    conf.setVertexOutputFormatClass(AdaptiveRepartitioningOutputFormat.class);
     return conf;
   }
 
@@ -99,7 +104,6 @@ public class AdaptiveRepartitioningComputationTest {
     for (String line : results) {
       lineTokens = LINE_TOKEN_SEPARATOR.split(line);
       vertexID = Integer.parseInt(lineTokens[0]);
-      System.out.println(line);
       value = Integer.parseInt(lineTokens[1]);
       parsedResults.put(vertexID, value);
     }
