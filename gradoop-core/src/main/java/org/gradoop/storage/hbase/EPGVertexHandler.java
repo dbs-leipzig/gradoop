@@ -70,7 +70,7 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
    * {@inheritDoc}
    */
   @Override
-  public void createVerticesTable(final HBaseAdmin admin,
+  public void createTable(final HBaseAdmin admin,
     final HTableDescriptor tableDescriptor) throws IOException {
     LOG.info("creating table " + tableDescriptor.getNameAsString());
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_LABELS));

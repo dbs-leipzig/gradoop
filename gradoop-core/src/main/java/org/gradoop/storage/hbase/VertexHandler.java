@@ -1,30 +1,16 @@
 package org.gradoop.storage.hbase;
 
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.Edge;
 import org.gradoop.model.GraphElement;
 import org.gradoop.model.Vertex;
 
-import java.io.IOException;
-
 /**
  * VertexHandler is responsible for reading and writing EPG vertices from and to
  * HBase.
  */
 public interface VertexHandler extends EntityHandler {
-  /**
-   * Creates vertices table based on the given table descriptor.
-   *
-   * @param admin           HBase admin
-   * @param tableDescriptor description of the vertices table used by that
-   *                        handler
-   * @throws IOException
-   */
-  void createVerticesTable(final HBaseAdmin admin,
-    final HTableDescriptor tableDescriptor) throws IOException;
 
   /**
    * Creates a globally unique row key based on the given vertexID. The
