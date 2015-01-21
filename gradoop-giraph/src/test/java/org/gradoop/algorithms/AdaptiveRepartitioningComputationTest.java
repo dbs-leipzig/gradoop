@@ -1,6 +1,7 @@
 package org.gradoop.algorithms;
 
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.io.formats.IdWithValueTextOutputFormat;
 import org.apache.giraph.utils.InternalVertexRunner;
@@ -25,7 +26,7 @@ public class AdaptiveRepartitioningComputationTest {
   public void testSmallConnectedGraph() throws Exception {
     String[] graph =
       PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph, 2, 120, 0.5f, 1));
+    validateSmallConnectedGraphResult(computeResults(graph, 2, 120, 0.5f, 5));
   }
 
 //  @Test
@@ -83,6 +84,8 @@ public class AdaptiveRepartitioningComputationTest {
       .NUMBER_OF_STABILIZATION_ROUNDS, maxStabilization);
     conf.setBoolean(AdaptiveRepartitioningInputFormat.PARTITIONED_INPUT, true);
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
+
+    System.out.println(StringUtils.join(results, "\n"));
 
     return parseResults(results);
   }

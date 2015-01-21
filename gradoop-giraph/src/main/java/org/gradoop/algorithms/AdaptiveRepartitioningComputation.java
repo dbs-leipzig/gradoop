@@ -1,5 +1,6 @@
 package org.gradoop.algorithms;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.giraph.comm.WorkerClientRequestProcessor;
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.GraphState;
@@ -22,8 +23,7 @@ import java.io.IOException;
  * TODO: algorithm description
  */
 public class AdaptiveRepartitioningComputation extends
-  BasicComputation<IntWritable, PartitioningVertex, NullWritable,
-    IntWritable> {
+  BasicComputation<IntWritable, PartitioningVertex, NullWritable, IntWritable> {
   /**
    * Number of partitions to create.
    */
@@ -104,8 +104,7 @@ public class AdaptiveRepartitioningComputation extends
    * @return desired partition
    */
   private int getDesiredPartition(
-    final Vertex<IntWritable, PartitioningVertex, NullWritable>
-      vertex,
+    final Vertex<IntWritable, PartitioningVertex, NullWritable> vertex,
     final Iterable<IntWritable> messages) {
     int currentPartition = vertex.getValue().getCurrentPartition().get();
     int desiredPartition = currentPartition;
@@ -260,24 +259,23 @@ public class AdaptiveRepartitioningComputation extends
    * @param desiredPartition partition to move vertex to
    */
   private void migrateVertex(
-    final Vertex<IntWritable, PartitioningVertex, NullWritable>
-      vertex,
+    final Vertex<IntWritable, PartitioningVertex, NullWritable> vertex,
     int desiredPartition) {
+    // add current partition to partition history
     vertex.getValue()
       .addToPartitionHistory(vertex.getValue().getCurrentPartition().get());
-    LOG.info("maximum stabilization rounds" + stabilizationRoundMax);
-    LOG.info("history count" + vertex.getValue().getPartitionHistoryCount());
-    LOG.info("Partition History");
+    LOG.info("Partition History: " +
+      StringUtils.join(vertex.getValue().getPartitionHistory(), " "));
 
-    for(Integer partition : vertex.getValue().getPartitionHistory()){
-      LOG.info(partition);
-    }
+    // decrease capacity in old partition
     String oldPartition = CAPACITY_AGGREGATOR_PREFIX +
       vertex.getValue().getCurrentPartition().get();
-    String newPartition = CAPACITY_AGGREGATOR_PREFIX + desiredPartition;
     notifyAggregator(oldPartition, NEGATIVE_ONE);
-    vertex.getValue().setCurrentPartition(new IntWritable(desiredPartition));
+    // increase capacity in new partition
+    String newPartition = CAPACITY_AGGREGATOR_PREFIX + desiredPartition;
     notifyAggregator(newPartition, POSITIVE_ONE);
+
+    vertex.getValue().setCurrentPartition(new IntWritable(desiredPartition));
   }
 
   /**
@@ -287,8 +285,7 @@ public class AdaptiveRepartitioningComputation extends
    * @param vertex vertex
    */
   private void setVertexStartValue(
-    final Vertex<IntWritable, PartitioningVertex, NullWritable>
-      vertex) {
+    final Vertex<IntWritable, PartitioningVertex, NullWritable> vertex) {
     int startValue = vertex.getId().get() % k;
     vertex.getValue().setCurrentPartition(new IntWritable(startValue));
   }
@@ -306,7 +303,8 @@ public class AdaptiveRepartitioningComputation extends
 
   @Override
   public void initialize(GraphState graphState,
-    WorkerClientRequestProcessor<IntWritable, PartitioningVertex, NullWritable> workerClientRequestProcessor,
+    WorkerClientRequestProcessor<IntWritable, PartitioningVertex,
+      NullWritable> workerClientRequestProcessor,
     GraphTaskManager<IntWritable, PartitioningVertex, NullWritable>
       graphTaskManager,
     WorkerGlobalCommUsage workerGlobalCommUsage, WorkerContext workerContext) {
@@ -320,8 +318,9 @@ public class AdaptiveRepartitioningComputation extends
       getConf().getFloat(CAPACITY_THRESHOLD, DEFAULT_CAPACITY_THRESHOLD);
 
     LOG.info("=== Initialized Computation");
-    LOG.info(String.format("k: %d, stabilizationRounds: %d, capacityTreshold:" +
-      " %.2f", k, stabilizationRoundMax, capacityThreshold));
+    LOG.info(String
+      .format("k: %d, stabilizationRounds: %d, capacityTreshold:" + " %.2f", k,
+        stabilizationRoundMax, capacityThreshold));
   }
 
   /**
