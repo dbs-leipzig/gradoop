@@ -56,15 +56,6 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
    */
   private static final Pattern PROPERTY_TOKEN_SEPARATOR_PATTERN =
     Pattern.compile(" ");
-  /**
-   * Separates an edge key into tokens.
-   */
-  private static final String EDGE_KEY_TOKEN_SEPARATOR_STRING = ".";
-  /**
-   * Separates an edge key into tokens.
-   */
-  private static final Pattern EDGE_KEY_TOKEN_SEPARATOR_PATTERN =
-    Pattern.compile("\\.");
 
   /**
    * {@inheritDoc}
@@ -212,27 +203,29 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
    */
   private Put writeEdge(final Put put, final byte[] columnFamily,
     final Edge edge) {
-    String edgeKey = createEdgeIdentifier(edge);
-    byte[] edgeKeyBytes = Bytes.toBytes(edgeKey);
+    byte[] edgeKey = createEdgeIdentifier(edge);
     String properties = createEdgePropertiesString(edge);
     byte[] propertiesBytes = Bytes.toBytes(properties);
-    put.add(columnFamily, edgeKeyBytes, propertiesBytes);
+    put.add(columnFamily, edgeKey, propertiesBytes);
     return put;
   }
 
   /**
-   * Creates a vertex centric edge identifier from the given edge. Edge keys
-   * have the following format:
+   * Serializes an edge to an edge identifier in the following format:
    * <p/>
-   * <edge-identifier> ::= <label>.<otherID>.<index>
+   * <edge-identifier> ::= <otherID><index><label>
    *
    * @param edge edge to create identifier for
    * @return string representation of the edge identifier
    */
-  private String createEdgeIdentifier(final Edge edge) {
-    return String
-      .format("%s%s%d%s%d", edge.getLabel(), EDGE_KEY_TOKEN_SEPARATOR_STRING,
-        edge.getOtherID(), EDGE_KEY_TOKEN_SEPARATOR_STRING, edge.getIndex());
+  private byte[] createEdgeIdentifier(final Edge edge) {
+    byte[] labelBytes = Bytes.toBytes(edge.getLabel());
+    byte[] edgeKey = new byte[2 * Bytes.SIZEOF_LONG + labelBytes.length];
+    Bytes.putLong(edgeKey, 0, edge.getOtherID());
+    Bytes.putLong(edgeKey, Bytes.SIZEOF_LONG, edge.getIndex());
+    Bytes.putBytes(edgeKey, Bytes.SIZEOF_LONG * 2, labelBytes, 0,
+      labelBytes.length);
+    return edgeKey;
   }
 
   /**
@@ -273,7 +266,7 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
     final List<Edge> edges = Lists.newArrayList();
     for (Map.Entry<byte[], byte[]> edgeColumn : res.getFamilyMap(columnFamily)
       .entrySet()) {
-      String edgeKey = Bytes.toString(edgeColumn.getKey());
+      byte[] edgeKey = edgeColumn.getKey();
       Map<String, Object> edgeProperties = null;
       String propertyString = Bytes.toString(edgeColumn.getValue());
       if (propertyString.length() > 0) {
@@ -295,19 +288,19 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
 
   /**
    * Creates an edge object based on the given key and properties. The given
-   * edge key is separated into tokens and used to create a new {@link
+   * edge key is deserialized and used to create a new {@link
    * org.gradoop.model.impl.DefaultEdge} instance.
    *
    * @param edgeKey    string representation of edge key
    * @param properties key-value-map
    * @return Edge object
    */
-  private Edge readEdge(final String edgeKey,
+  private Edge readEdge(final byte[] edgeKey,
     final Map<String, Object> properties) {
-    String[] keyTokens = EDGE_KEY_TOKEN_SEPARATOR_PATTERN.split(edgeKey);
-    String edgeLabel = keyTokens[0];
-    Long otherID = Long.valueOf(keyTokens[1]);
-    Long edgeIndex = Long.valueOf(keyTokens[2]);
+    Long otherID = Bytes.toLong(edgeKey);
+    Long edgeIndex = Bytes.toLong(edgeKey, Bytes.SIZEOF_LONG);
+    String edgeLabel = Bytes.toString(edgeKey, 2 * Bytes.SIZEOF_LONG,
+      edgeKey.length - (2 * Bytes.SIZEOF_LONG));
     return EdgeFactory
       .createDefaultEdge(otherID, edgeLabel, edgeIndex, properties);
   }
