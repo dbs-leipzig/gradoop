@@ -126,7 +126,7 @@ public class BulkLoadDriver extends Configured implements Tool {
       VertexHandler.class);
 
     // create job
-    Job job = new Job(conf, JOB_NAME);
+    Job job = Job.getInstance(conf, JOB_NAME);
     // mapper the runs the HFile conversion
     job.setMapperClass(BulkLoadEPG.class);
     // input format for mapper (File)

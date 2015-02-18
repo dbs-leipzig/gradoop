@@ -55,7 +55,7 @@ public class BulkLoadTest extends MapReduceClusterTest {
       EPGVertexHandler.class,
       VertexHandler.class);
 
-    Job job = new Job(conf, BulkLoadTest.class.getName());
+    Job job = Job.getInstance(conf, BulkLoadTest.class.getName());
     job.setMapperClass(BulkLoadEPG.class);
     job.setMapOutputKeyClass(ImmutableBytesWritable.class);
     job.setMapOutputValueClass(Put.class);

@@ -104,7 +104,7 @@ public class BulkWriteDriver extends Configured implements Tool {
       VertexLineWriter.class);
     conf.setClass(BulkWriteEPG.VERTEX_HANDLER, EPGVertexHandler.class,
       VertexHandler.class);
-    Job job = new Job(conf, JOB_NAME);
+    Job job = Job.getInstance(conf, JOB_NAME);
     // setup scan to read from htable
     Scan scan = new Scan();
     if (hbaseScanCache > 0) {

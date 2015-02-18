@@ -42,7 +42,7 @@ public class BulkWriteTest extends MapReduceClusterTest {
     conf.setClass(BulkWriteEPG.VERTEX_HANDLER, EPGVertexHandler.class,
       VertexHandler.class);
 
-    Job job = new Job(conf, BulkWriteTest.class.getName());
+    Job job = Job.getInstance(conf, BulkWriteTest.class.getName());
     Scan scan = new Scan();
     scan.setCaching(500);
     scan.setCacheBlocks(false);

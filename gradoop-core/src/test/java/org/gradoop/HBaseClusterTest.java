@@ -10,6 +10,7 @@ import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.GraphHandler;
 import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.gradoop.storage.hbase.VertexHandler;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.BufferedReader;
@@ -74,6 +75,17 @@ public abstract class HBaseClusterTest extends GradoopTest {
       utility = new HBaseTestingUtility();
       utility.startMiniCluster().waitForActiveAndReadyMaster();
     }
+  }
+
+  /**
+   * Shuts down the mini cluster after each test class.
+   *
+   * @throws Exception
+   */
+  @AfterClass
+  public static void tearDown() throws Exception {
+    utility.shutdownMiniCluster();
+    utility = null;
   }
 
   /**
