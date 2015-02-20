@@ -7,7 +7,7 @@
     <parent>
         <artifactId>gradoop</artifactId>
         <groupId>de.uni-leipzig.de.dbs</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2</version>
     </parent>
     <artifactId>gradoop-mapreduce</artifactId>
     <packaging>jar</packaging>
@@ -68,29 +68,23 @@
         </plugins>
     </build>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>${dep.hadoop.version}</version>
-        </dependency>
+        <!-- Runtime -->
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Testing -->
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-core</artifactId>
-            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
-            <version>${dep.hbase.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -7,7 +7,7 @@
     <parent>
         <artifactId>gradoop</artifactId>
         <groupId>de.uni-leipzig.de.dbs</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2</version>
     </parent>
     <artifactId>gradoop-core</artifactId>
     <packaging>jar</packaging>
@@ -53,22 +53,29 @@
     </build>
 
     <dependencies>
+        <!-- Hadoop -->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.hadoop</groupId>-->
+            <!--<artifactId>hadoop-client</artifactId>-->
+        <!--</dependency>-->
+
+        <!-- HBase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-server</artifactId>
-            <version>${dep.hbase.version}</version>
         </dependency>
+
         <!-- Testing -->
+
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
-            <version>${dep.hbase.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
-            <version>${dep.jsonassert.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

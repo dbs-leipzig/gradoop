@@ -8,6 +8,7 @@ import org.gradoop.biiig.utils.ConfigurationUtils;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -20,6 +21,21 @@ import static org.junit.Assert.*;
  * {@link org.gradoop.biiig.examples.BTGAnalysisDriver}.
  */
 public class BTGAnalysisDriverTest extends MapReduceClusterTest {
+
+  /**
+   * Driver test requires a restart of the mini cluster.
+   * TODO: find out why
+   *
+   * @throws Exception
+   */
+  @Before
+  public void before() throws Exception {
+    if (utility != null) {
+      utility.shutdownMiniCluster();
+      utility.startMiniCluster().waitForActiveAndReadyMaster();
+      utility.startMiniMapReduceCluster();
+    }
+  }
 
   @Test
   public void driverTest() throws Exception {

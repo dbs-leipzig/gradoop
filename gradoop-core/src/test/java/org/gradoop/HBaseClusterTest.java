@@ -78,17 +78,6 @@ public abstract class HBaseClusterTest extends GradoopTest {
   }
 
   /**
-   * Shuts down the mini cluster after each test class.
-   *
-   * @throws Exception
-   */
-  @AfterClass
-  public static void tearDown() throws Exception {
-    utility.shutdownMiniCluster();
-    utility = null;
-  }
-
-  /**
    * Reads a graph file in HDFS line by line into an array and returns it.
    *
    * @param graphFileName file in HDFS

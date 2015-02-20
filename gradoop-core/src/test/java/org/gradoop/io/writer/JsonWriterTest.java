@@ -1,8 +1,8 @@
 package org.gradoop.io.writer;
 
-import org.codehaus.jettison.json.JSONException;
 import org.gradoop.GradoopTest;
 import org.gradoop.model.Vertex;
+import org.json.JSONException;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -12,7 +12,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 public class JsonWriterTest extends GradoopTest {
 
   @Test
-  public void writerTest() throws JSONException, org.json.JSONException {
+  public void writerTest() throws JSONException {
     VertexLineWriter writer = new JsonWriter();
     int i = 0;
     for (Vertex v : createExtendedGraphVertices()) {
