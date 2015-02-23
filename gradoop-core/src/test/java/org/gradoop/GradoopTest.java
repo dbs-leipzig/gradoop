@@ -55,7 +55,7 @@ public abstract class GradoopTest {
   }
 
   protected static final String[] BASIC_GRAPH =
-    new String[]{"0 1 2", "1 0 2", "2 1" };
+    new String[]{"0 1 2", "1 0 2", "2 1", "3"};
 
   protected static final String[] EXTENDED_GRAPH = new String[]{
     "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 2 k1 5 v1 k2 5 v2|1 0",
@@ -108,22 +108,27 @@ public abstract class GradoopTest {
   }
 
   protected void validateBasicGraphVertices(List<Vertex> vertices) {
-    assertEquals(3, vertices.size());
+    assertEquals(4, vertices.size());
     for (Vertex v : vertices) {
       Long i = v.getID();
+      List<Edge> edgeList = Lists.newArrayList();
+      if (v.getOutgoingDegree() > 0) {
+        edgeList = Lists.newArrayList(v.getOutgoingEdges());
+      }
       if (i.equals(0L)) {
-        validateBasicGraphEdges(v.getOutgoingEdges(), 2, 1, 2);
+        validateBasicGraphEdges(edgeList, 2, 1, 2);
       } else if (i.equals(1L)) {
-        validateBasicGraphEdges(v.getOutgoingEdges(), 2, 0, 2);
+        validateBasicGraphEdges(edgeList, 2, 0, 2);
       } else if (i.equals(2L)) {
-        validateBasicGraphEdges(v.getOutgoingEdges(), 1, 1);
+        validateBasicGraphEdges(edgeList, 1, 1);
+      } else if (i.equals(3L)) {
+        validateBasicGraphEdges(edgeList, 0);
       }
     }
   }
 
-  private void validateBasicGraphEdges(Iterable<Edge> edges, int expectedCount,
+  private void validateBasicGraphEdges(List<Edge> edgeList, int expectedCount,
     long... otherIDs) {
-    List<Edge> edgeList = Lists.newArrayList(edges);
     assertThat(edgeList.size(), is(expectedCount));
     for (int i = 0; i < otherIDs.length; i++) {
       boolean match = false;
