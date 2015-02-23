@@ -127,6 +127,7 @@ public class BulkLoadDriver extends Configured implements Tool {
 
     // create job
     Job job = Job.getInstance(conf, JOB_NAME);
+    job.setJarByClass(BulkLoadDriver.class);
     // mapper the runs the HFile conversion
     job.setMapperClass(BulkLoadEPG.class);
     // input format for mapper (File)
