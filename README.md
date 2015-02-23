@@ -13,9 +13,8 @@
 If you want to run Gradoop on a cluster, you need the following components
 installed.
 
-*   Hadoop 1.2.1
-*   HBase 0.98.7
-*   Giraph 1.1.0 (also packaged with Gradoop)
+*   Hadoop 2.5.1
+*   HBase 0.98.10.1-hadoop2
 
 ##### Setup Gradoop
 
@@ -55,7 +54,7 @@ To run the pipeline on your hadoop installation, please follow these steps.
 
 *   The following call runs the pipeline on a given input graph (foodbroker) using 11 giraph workers, 11 reducers and a hbase scan cache of 500 rows.
 
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-biiig-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver -gip /user/hduser/input/foodbroker_10.graph -gop /user/hduser/output/hdfiles -w 11 -r 11 -sc 500
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-biiig-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver -libjars $HBASE_LIBS -gip /user/hduser/input/foodbroker_10.graph -gop /user/hduser/output/hdfiles -w 11 -r 11 -sc 500
 
 *   See [Foodbroker Repository](https://github.com/dbs-leipzig/foodbroker) if you want to generate your
     own graphs or implement a custom FileReader to load your own graph format.
