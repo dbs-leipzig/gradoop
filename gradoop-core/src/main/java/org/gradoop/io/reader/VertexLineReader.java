@@ -5,8 +5,9 @@ import org.gradoop.model.Vertex;
 import java.util.List;
 
 /**
- * Used to read a vertex from an input string. Used in
- * {@link org.gradoop.io.reader.AdjacencyListReader}.
+ * Used to read a vertex from an input string. Used e.g. in
+ * {@link org.gradoop.io.reader.AdjacencyListReader} and
+ * {@link org.gradoop.io.reader.BulkLoadEPG}.
  */
 public interface VertexLineReader {
   /**
@@ -15,7 +16,7 @@ public interface VertexLineReader {
    * @param line string encoded vertex
    * @return vertex instance
    */
-  Vertex readVertex(String line);
+  Vertex readVertex(final String line);
 
   /**
    * Parses a given line and creates one or multiple vertex instances for
@@ -27,7 +28,7 @@ public interface VertexLineReader {
    * @param line string encoded vertices
    * @return vertex list or {@code null} if lists are not supported
    */
-  List<Vertex> readVertexList(String line);
+  List<Vertex> readVertexList(final String line);
 
   /**
    * True, if the reader supports reading multiple vertices from a single

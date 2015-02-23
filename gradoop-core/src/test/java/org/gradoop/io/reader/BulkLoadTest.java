@@ -38,7 +38,7 @@ public class BulkLoadTest extends MapReduceClusterTest {
     // need to create test file and output dir
     FileSystem fs = utility.getTestFileSystem();
     Path graphFile = new Path("graph.txt");
-    Path outputDir = new Path("/output");
+    Path outputDir = new Path("/output/hfiles");
     FSDataOutputStream bw = fs.create(graphFile);
     BufferedReader br = createTestReader(EXTENDED_GRAPH);
     IOUtils.copy(br, bw);
@@ -55,7 +55,7 @@ public class BulkLoadTest extends MapReduceClusterTest {
       EPGVertexHandler.class,
       VertexHandler.class);
 
-    Job job = new Job(conf, BulkLoadTest.class.getName());
+    Job job = Job.getInstance(conf, BulkLoadTest.class.getName());
     job.setMapperClass(BulkLoadEPG.class);
     job.setMapOutputKeyClass(ImmutableBytesWritable.class);
     job.setMapOutputValueClass(Put.class);

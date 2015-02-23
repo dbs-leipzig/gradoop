@@ -2,18 +2,15 @@ package org.gradoop.biiig.examples;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.gradoop.MapReduceClusterTest;
 import org.gradoop.algorithms.SelectAndAggregate;
 import org.gradoop.biiig.utils.ConfigurationUtils;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -25,9 +22,23 @@ import static org.junit.Assert.*;
  */
 public class BTGAnalysisDriverTest extends MapReduceClusterTest {
 
+  /**
+   * Driver test requires a restart of the mini cluster.
+   * TODO: find out why
+   *
+   * @throws Exception
+   */
+  @Before
+  public void before() throws Exception {
+    if (utility != null) {
+      utility.shutdownMiniCluster();
+      utility.startMiniCluster().waitForActiveAndReadyMaster();
+      utility.startMiniMapReduceCluster();
+    }
+  }
+
   @Test
-  public void driverTest()
-    throws Exception {
+  public void driverTest() throws Exception {
     Configuration conf = utility.getConfiguration();
 
     String graphFile = "btg.graph";
@@ -37,11 +48,11 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
       "-" + ConfigurationUtils.OPTION_REDUCERS, "1",
       "-" + ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500",
       "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
-      "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH, "/output",
+      "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH, "/output/import/biiig",
       "-" + ConfigurationUtils.OPTION_DROP_TABLES
     };
 
-    prepareInput(graphFile);
+    copyFromLocal(graphFile);
 
     BTGAnalysisDriver btgAnalysisDriver = new BTGAnalysisDriver();
     btgAnalysisDriver.setConf(conf);
@@ -100,18 +111,5 @@ public class BTGAnalysisDriverTest extends MapReduceClusterTest {
       g1.getProperty(SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
     assertNotNull(prop);
     assertEquals(-147.25, prop);
-  }
-
-  private void prepareInput(String inputFile)
-    throws IOException {
-    URL tmpUrl = Thread.currentThread().getContextClassLoader().getResource
-      (inputFile);
-    assertNotNull(tmpUrl);
-    String graphFileResource = tmpUrl.getPath();
-    // copy input graph to DFS
-    FileSystem fs = utility.getTestFileSystem();
-    Path graphFileLocalPath = new Path(graphFileResource);
-    Path graphFileDFSPath = new Path(inputFile);
-    fs.copyFromLocalFile(graphFileLocalPath, graphFileDFSPath);
   }
 }

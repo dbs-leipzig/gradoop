@@ -1,7 +1,6 @@
 package org.gradoop.storage.hbase;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
@@ -39,10 +38,10 @@ public class HBaseGraphStoreFactory {
    * @param graphsHandler   graph storage handler
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static GraphStore createGraphStore(Configuration config,
-    VertexHandler verticesHandler, GraphHandler graphsHandler) {
+  public static GraphStore createGraphStore(final Configuration config,
+    final VertexHandler verticesHandler, final GraphHandler graphsHandler) {
     try {
-      createTablesIfNotExists(config, verticesHandler);
+      createTablesIfNotExists(config, verticesHandler, graphsHandler);
 
       HTable graphsTable = new HTable(config, GConstants.DEFAULT_TABLE_GRAPHS);
       HTable verticesTable =
@@ -61,7 +60,7 @@ public class HBaseGraphStoreFactory {
    *
    * @param config Hadoop configuration
    */
-  public static void deleteGraphStore(Configuration config) {
+  public static void deleteGraphStore(final Configuration config) {
     try {
       deleteTablesIfExists(config);
     } catch (IOException e) {
@@ -74,10 +73,12 @@ public class HBaseGraphStoreFactory {
    *
    * @param config          Hadoop configuration
    * @param verticesHandler vertex storage handler
+   * @param graphHandler    graph storage handler
    * @throws IOException
    */
-  private static void createTablesIfNotExists(Configuration config,
-    VertexHandler verticesHandler) throws IOException {
+  private static void createTablesIfNotExists(final Configuration config,
+    final VertexHandler verticesHandler, final GraphHandler graphHandler) throws
+    IOException {
     HTableDescriptor verticesTableDescriptor = new HTableDescriptor(
       TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
     HTableDescriptor graphsTableDescriptor =
@@ -86,29 +87,13 @@ public class HBaseGraphStoreFactory {
     HBaseAdmin admin = new HBaseAdmin(config);
 
     if (!admin.tableExists(verticesTableDescriptor.getName())) {
-      verticesHandler.createVerticesTable(admin, verticesTableDescriptor);
+      verticesHandler.createTable(admin, verticesTableDescriptor);
     }
     if (!admin.tableExists(graphsTableDescriptor.getName())) {
-      createGraphsTable(admin, graphsTableDescriptor);
+      graphHandler.createTable(admin, graphsTableDescriptor);
     }
 
     admin.close();
-  }
-
-  /**
-   * Creates the table used for storing graphs.
-   *
-   * @param admin           HBase admin
-   * @param tableDescriptor descriptor for the graphs table
-   * @throws IOException
-   */
-  private static void createGraphsTable(HBaseAdmin admin,
-    HTableDescriptor tableDescriptor) throws IOException {
-    LOG.info("creating table " + tableDescriptor.getNameAsString());
-    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_LABELS));
-    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
-    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_VERTICES));
-    admin.createTable(tableDescriptor);
   }
 
   /**
@@ -117,7 +102,7 @@ public class HBaseGraphStoreFactory {
    * @param config Hadoop configuration
    * @throws IOException
    */
-  private static void deleteTablesIfExists(Configuration config) throws
+  private static void deleteTablesIfExists(final Configuration config) throws
     IOException {
     HTableDescriptor verticesTableDescriptor = new HTableDescriptor(
       TableName.valueOf(GConstants.DEFAULT_TABLE_VERTICES));
@@ -144,8 +129,8 @@ public class HBaseGraphStoreFactory {
    * @param tableDescriptor descriptor for the table to delete
    * @throws IOException
    */
-  private static void deleteTable(HBaseAdmin admin,
-    HTableDescriptor tableDescriptor) throws IOException {
+  private static void deleteTable(final HBaseAdmin admin,
+    final HTableDescriptor tableDescriptor) throws IOException {
     LOG.info("deleting table: " + tableDescriptor.getNameAsString());
     admin.disableTable(tableDescriptor.getName());
     admin.deleteTable(tableDescriptor.getName());

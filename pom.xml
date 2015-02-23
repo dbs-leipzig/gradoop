@@ -7,7 +7,7 @@
     <groupId>de.uni-leipzig.de.dbs</groupId>
     <artifactId>gradoop</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -56,11 +56,14 @@
         <project.maven.version>3.0.0</project.maven.version>
         <project.build.targetJdk>1.7</project.build.targetJdk>
 
-        <dep.log4j.version>1.2.17</dep.log4j.version>
-        <dep.hbase.version>0.98.7-hadoop1</dep.hbase.version>
-        <dep.hadoop.version>1.2.1</dep.hadoop.version>
-        <dep.giraph.version>1.1.0</dep.giraph.version>
+
+        <dep.giraph.version>1.1.0-hadoop2</dep.giraph.version>
+        <dep.hadoop.version>2.5.1</dep.hadoop.version>
+        <dep.hbase.version>0.98.10.1-hadoop2</dep.hbase.version>
         <dep.junit.version>4.11</dep.junit.version>
+        <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
+        <dep.log4j.version>1.2.17</dep.log4j.version>
+
 
         <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.13</plugin.maven-checkstyle.version>
@@ -164,17 +167,107 @@
         </pluginManagement>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${dep.log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${dep.junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <!-- compile dependencies -->
+            <!-- Gradoop -->
+            <dependency>
+                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <artifactId>gradoop-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <artifactId>gradoop-giraph</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <artifactId>gradoop-mapreduce</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Giraph -->
+            <dependency>
+                <groupId>org.apache.giraph</groupId>
+                <artifactId>giraph-core</artifactId>
+                <version>${dep.giraph.version}</version>
+            </dependency>
+
+            <!-- HBase -->
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-server</artifactId>
+                <version>${dep.hbase.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Others -->
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${dep.log4j.version}</version>
+            </dependency>
+
+            <!-- test dependencies -->
+            <!-- Gradoop -->
+            <dependency>
+                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <artifactId>gradoop-core</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <artifactId>gradoop-giraph</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Giraph -->
+            <dependency>
+                <groupId>org.apache.giraph</groupId>
+                <artifactId>giraph-core</artifactId>
+                <version>${dep.giraph.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Hadoop -->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-test</artifactId>
+                <version>${dep.hadoop.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- HBase -->
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-testing-util</artifactId>
+                <version>${dep.hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Others -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${dep.junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.skyscreamer</groupId>
+                <artifactId>jsonassert</artifactId>
+                <version>${dep.jsonassert.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

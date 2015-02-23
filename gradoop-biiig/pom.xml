@@ -7,7 +7,7 @@
     <parent>
         <artifactId>gradoop</artifactId>
         <groupId>de.uni-leipzig.de.dbs</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2</version>
     </parent>
     <artifactId>gradoop-biiig</artifactId>
     <packaging>jar</packaging>
@@ -57,43 +57,42 @@
     </build>
 
     <dependencies>
+        <!-- Compile -->
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-giraph</artifactId>
-            <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-mapreduce</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Testing -->
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
-            <artifactId>gradoop-giraph</artifactId>
-            <version>${project.version}</version>
+            <artifactId>gradoop-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
-            <artifactId>gradoop-core</artifactId>
-            <version>${project.version}</version>
+            <artifactId>gradoop-giraph</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-testing-util</artifactId>
-            <version>${dep.hbase.version}</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.giraph</groupId>
             <artifactId>giraph-core</artifactId>
-            <version>${dep.giraph.version}</version>
             <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-testing-util</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

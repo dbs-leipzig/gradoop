@@ -25,7 +25,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
- * Root class for gradoop tests. Contains sample graphs, corresponding
+ * Root class for Gradoop tests. Contains sample graphs, corresponding
  * validation methods and helper methods.
  */
 public abstract class GradoopTest {
@@ -44,30 +44,40 @@ public abstract class GradoopTest {
     return Thread.currentThread().getStackTrace()[1].getMethodName();
   }
 
-  protected File getTempFile()
-    throws IOException {
+  protected File getTempFile() throws IOException {
     return getTempFile(null);
   }
 
-  protected File getTempFile(String fileName)
-    throws IOException {
+  protected File getTempFile(String fileName) throws IOException {
     fileName = (fileName != null) ? fileName :
       getCallingMethod() + "_" + new Random().nextLong();
     return temporaryFolder.newFile(fileName);
   }
 
-  protected static final String[] BASIC_GRAPH = new String[] {
-    "0 1 2",
-    "1 0 2",
-    "2 1"
-  };
+  protected static final String[] BASIC_GRAPH =
+    new String[]{"0 1 2", "1 0 2", "2 1" };
 
-  protected static final String[] EXTENDED_GRAPH = new String[] {
+  protected static final String[] EXTENDED_GRAPH = new String[]{
     "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 2 k1 5 v1 k2 5 v2|1 0",
     "1|A B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2," +
       "c.2.1 0|a.0.0 1 k1 5 v1|2 0 1",
-    "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.2.1 0|1 1"
-  };
+    "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.1.1 0|1 1" };
+
+  protected static final String[] EXTENDED_GRAPH_JSON = new String[]{
+    "{\"id\":0,\"labels\":[\"A\"],\"properties\":{\"k1\":\"v1\", " +
+      "\"k2\":\"v2\", \"k3\":\"v3\"},\"out-edges\":[{\"otherid\":1," +
+      "\"label\":\"a\",\"properties\":{\"k1\": \"v1\"}}], " +
+      "\"in-edges\":[{\"otherid\":1,\"label\":\"b\"," +
+      "\"properties\":{\"k1\":\"v1\",\"k2\":\"v2\"}}],\"graphs\":[0]}",
+    "{\"id\":1,\"labels\":[\"A\",\"B\"],\"properties\":{\"k1\":\"v1\"," +
+      "\"k2\":\"v2\"},\"out-edges\":[{\"otherid\":0,\"label\":\"b\"," +
+      "\"properties\":{\"k1\":\"v1\",\"k2\":\"v2\"}},{\"otherid\":2," +
+      "\"label\":\"c\"}],\"in-edges\":[{\"otherid\":0,\"label\":\"a\"," +
+      "\"properties\":{\"k1\":\"v1\"}}],\"graphs\":[0, 1]}",
+    "{\"id\":2,\"labels\":[\"C\"],\"properties\":{\"k1\":\"v1\"," +
+      "\"k2\":\"v2\"},\"out-edges\":[{\"otherid\":2,\"label\":\"d\"}]," +
+      "\"in-edges\":[{\"otherid\":	2,\"label\":\"d\"},{\"otherid\":1," +
+      "\"label\":\"c\"}],\"graphs\":[1]}" };
 
   protected List<Vertex> createBasicGraphVertices() {
     return createVertices(BASIC_GRAPH, new SimpleVertexReader());
@@ -78,12 +88,23 @@ public abstract class GradoopTest {
   }
 
   private List<Vertex> createVertices(String[] graph,
-                                      VertexLineReader vertexLineReader) {
+    VertexLineReader vertexLineReader) {
     List<Vertex> vertices = Lists.newArrayListWithCapacity(graph.length);
     for (String line : graph) {
       vertices.add(vertexLineReader.readVertex(line));
     }
     return vertices;
+  }
+
+  /**
+   * Validates if a given graph decoded as adjacency list matches the basic
+   * graph.
+   *
+   * @param textGraph graph under test
+   */
+  protected void validateBasicGraphVertices(String[] textGraph) {
+    List<Vertex> vertices = createVertices(textGraph, new SimpleVertexReader());
+    validateBasicGraphVertices(vertices);
   }
 
   protected void validateBasicGraphVertices(List<Vertex> vertices) {
@@ -101,7 +122,7 @@ public abstract class GradoopTest {
   }
 
   private void validateBasicGraphEdges(Iterable<Edge> edges, int expectedCount,
-                                       long... otherIDs) {
+    long... otherIDs) {
     List<Edge> edgeList = Lists.newArrayList(edges);
     assertThat(edgeList.size(), is(expectedCount));
     for (int i = 0; i < otherIDs.length; i++) {
@@ -119,8 +140,8 @@ public abstract class GradoopTest {
   }
 
   protected void validateExtendedGraphVertices(GraphStore graphStore) {
-    List<Vertex> vertices = Lists.newArrayListWithCapacity(EXTENDED_GRAPH
-      .length);
+    List<Vertex> vertices =
+      Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
     for (long id = 0; id < EXTENDED_GRAPH.length; id++) {
       vertices.add(graphStore.readVertex(id));
     }
@@ -181,7 +202,7 @@ public abstract class GradoopTest {
         // in edges (d.2.0 0,c.2.1 0)
         assertEquals(2, inEdges.size());
         testEdge(inEdges, 2L, "d", 0L, 0);
-        testEdge(inEdges, 2L, "c", 1L, 0);
+        testEdge(inEdges, 1L, "c", 1L, 0);
         // graphs (1 1)
         assertEquals(1, graphs.size());
         assertTrue(graphs.contains(1L));
@@ -192,10 +213,10 @@ public abstract class GradoopTest {
   }
 
   private void testEdge(List<Edge> edges, Long expectedOtherID,
-                        String expectedLabel, Long expectedIndex,
-                        int expectedPropertyCount) {
-    Edge tmpEdge = EdgeFactory.createDefaultEdgeWithLabel(expectedOtherID,
-      expectedLabel, expectedIndex);
+    String expectedLabel, Long expectedIndex, int expectedPropertyCount) {
+    Edge tmpEdge = EdgeFactory
+      .createDefaultEdgeWithLabel(expectedOtherID, expectedLabel,
+        expectedIndex);
     assertTrue(edges.contains(tmpEdge));
     int edgeIndex = edges.indexOf(tmpEdge);
     testProperties(edges.get(edgeIndex), expectedPropertyCount);
@@ -203,8 +224,11 @@ public abstract class GradoopTest {
 
   private void testProperties(Attributed v, int expectedSize) {
     int count = 0;
-    for (String propertyKey : v.getPropertyKeys()) {
-      switch (propertyKey) {
+    if (expectedSize == 0) {
+      assertNull(v.getPropertyKeys());
+    } else {
+      for (String propertyKey : v.getPropertyKeys()) {
+        switch (propertyKey) {
         case KEY_1:
           assertEquals(VALUE_1, v.getProperty(KEY_1));
           break;
@@ -214,10 +238,11 @@ public abstract class GradoopTest {
         case KEY_3:
           assertEquals(VALUE_3, v.getProperty(KEY_3));
           break;
+        }
+        count++;
       }
-      count++;
+      assertEquals(expectedSize, count);
     }
-    assertEquals(expectedSize, count);
   }
 
   /**
@@ -229,8 +254,7 @@ public abstract class GradoopTest {
    * @return reader on the input graph
    * @throws IOException
    */
-  protected BufferedReader createTestReader(String[] graph)
-    throws IOException {
+  protected BufferedReader createTestReader(String[] graph) throws IOException {
     File tmpFile = getTempFile();
     BufferedWriter bw = new BufferedWriter(new FileWriter(tmpFile));
 

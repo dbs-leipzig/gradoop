@@ -141,11 +141,13 @@ public class EPGVertexReader implements VertexLineReader {
   private Map<String, Object> readProperties(final String token) {
     String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(token);
     int propertyCount = Integer.parseInt(valueTokens[0]);
-    Map<String, Object> properties =
-      Maps.newHashMapWithExpectedSize(propertyCount);
-    for (int i = 1; i < valueTokens.length; i += 3) {
-      properties.put(valueTokens[i],
-        decodeValue(valueTokens[i + 1], valueTokens[i + 2]));
+    Map<String, Object> properties = null;
+    if (propertyCount > 0) {
+      properties = Maps.newHashMapWithExpectedSize(propertyCount);
+      for (int i = 1; i < valueTokens.length; i += 3) {
+        properties.put(valueTokens[i],
+          decodeValue(valueTokens[i + 1], valueTokens[i + 2]));
+      }
     }
     return properties;
   }

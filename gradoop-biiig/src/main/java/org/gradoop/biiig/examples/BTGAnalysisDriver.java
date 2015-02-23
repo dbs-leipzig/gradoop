@@ -156,7 +156,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     conf.setClass(BulkLoadEPG.VERTEX_HANDLER, EPGVertexHandler.class,
       VertexHandler.class);
 
-    Job job = new Job(conf, JOB_PREFIX + BulkLoadEPG.class.getName());
+    Job job = Job.getInstance(conf, JOB_PREFIX + BulkLoadEPG.class.getName());
+    job.setJarByClass(BulkLoadEPG.class);
     // mapper that runs the HFile conversion
     job.setMapperClass(BulkLoadEPG.class);
     // input format for Mapper (File)
@@ -274,7 +275,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     conf.setClass(SelectAndAggregate.PAIR_AGGREGATE_CLASS, SumAgregator.class,
       PairAggregator.class);
 
-    Job job = new Job(conf, JOB_PREFIX + SelectAndAggregate.class.getName());
+    Job job =
+      Job.getInstance(conf, JOB_PREFIX + SelectAndAggregate.class.getName());
     Scan scan = new Scan();
     scan.setCaching(scanCache);
     scan.setCacheBlocks(false);
@@ -383,6 +385,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    System.exit(ToolRunner.run(new BTGAnalysisDriver(), args));
+    Configuration conf = new Configuration();
+    System.exit(ToolRunner.run(conf, new BTGAnalysisDriver(), args));
   }
 }

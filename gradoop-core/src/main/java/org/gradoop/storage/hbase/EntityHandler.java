@@ -1,10 +1,13 @@
 package org.gradoop.storage.hbase;
 
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.MultiLabeled;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -55,4 +58,15 @@ public interface EntityHandler {
    * @return all properties contained in the row
    */
   Map<String, Object> readProperties(final Result res);
+
+  /**
+   * Creates table based on the given table descriptor.
+   *
+   * @param admin           HBase admin
+   * @param tableDescriptor description of the table used by that specific
+   *                        handler
+   * @throws java.io.IOException
+   */
+  void createTable(final HBaseAdmin admin,
+    final HTableDescriptor tableDescriptor) throws IOException;
 }
