@@ -11,7 +11,17 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * TODO: algorithm description
+ * Implementation of the Label Propagation Algorithm:
+ * The input graph as adjacency list contains the information about the
+ * vertex (id), value (label) and its edges to neighbors.
+ *
+ * In super step 0 each vertex will propagate its value within his neighbors
+ *
+ * In the remaining super steps each vertex will adopt the value of the
+ * majority of their neighbors or the smallest one if there are just one
+ * neighbor. If a vertex adopt a new value it'll propagate the new one again.
+ *
+ * The computation will terminate if no new values are assigned.
  */
 public class LabelPropagationComputation extends
   BasicComputation<LongWritable, LongWritable, NullWritable, LongWritable> {

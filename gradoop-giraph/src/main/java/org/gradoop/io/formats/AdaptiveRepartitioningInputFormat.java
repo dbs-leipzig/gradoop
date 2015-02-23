@@ -16,17 +16,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * A KwayPartitioning vertex is decoded in the following format:
+ * A AdaptiveRepartitioning vertex is decoded in the following format:
  * <p/>
- * {@code <vertex-id> <vertex-last-value> <vertex-current-value>
- * [<neighbour-id>]*}
+ * {@code <vertex-id> <vertex-partition> [<neighbour-id>]*}
  * <p/>
  * e.g. the following line:
  * <p/>
- * 5 3 4 4 6 7
+ * 5 3 4 6 7
  * <p/>
- * decodes vertex-id 5, last value 3 and actual value 4. The node is connected
- * to three other nodes (4 6 7)
+ * decodes vertex-id 5, the actual partition 3. The node is
+ * connected to three other nodes (4 6 7)
  * <p/>
  * If the config parameter "partitioning.input.partioned' is set to false
  * (default) this format also except a simple adjacency list in the following
@@ -46,7 +45,7 @@ public class AdaptiveRepartitioningInputFormat extends
   /**
    * Default value for PARTITIONED_INPUT.
    */
-  public static final boolean DEFAULT_PARTITIONED_INPUT = true;
+  public static final boolean DEFAULT_PARTITIONED_INPUT = false;
 
   /**
    * Separator of the vertex and neighbors
@@ -76,7 +75,7 @@ public class AdaptiveRepartitioningInputFormat extends
     private static final int PARTITIONED_EDGE_OFFSET = 2;
 
     /**
-     * Edge offset for unpartitioned graph inputs.
+     * Edge offset for un-partitioned graph inputs.
      */
     private static final int UNPARTITIONED_EDGE_OFFSET = 1;
 
@@ -88,13 +87,13 @@ public class AdaptiveRepartitioningInputFormat extends
     private int edgeOffset;
 
     /**
-     * If true, the reader assumes that a single line contains just
-     * <p/>
-     * {@code <vertex-id> [<neighbour-id>]*}
-     * <p/>
-     * If false, the reader assumes that a single line contains
+     * If true, the reader assumes that a single line contains
      * <p/>
      * {@code <vertex-id> <vertex-current-partition> [<neighbour-id>]*}
+     * <p/>
+     * If false, the reader assumes that a single line contains just
+     * <p/>
+     * {@code <vertex-id> [<neighbour-id>]*}
      */
     private boolean isPartitioned;
 

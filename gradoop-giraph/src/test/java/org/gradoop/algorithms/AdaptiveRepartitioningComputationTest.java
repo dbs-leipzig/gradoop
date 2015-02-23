@@ -1,9 +1,7 @@
 package org.gradoop.algorithms;
 
 import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.giraph.conf.GiraphConfiguration;
-import org.apache.giraph.io.formats.IdWithValueTextOutputFormat;
 import org.apache.giraph.utils.InternalVertexRunner;
 import org.gradoop.io.formats.AdaptiveRepartitioningInputFormat;
 import org.gradoop.io.formats.AdaptiveRepartitioningOutputFormat;
@@ -12,67 +10,41 @@ import org.junit.Test;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link AdaptiveRepartitioningComputation}
  */
 public class AdaptiveRepartitioningComputationTest {
-
-  private static final Pattern LINE_TOKEN_SEPARATOR =
-    Pattern.compile(IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
+  private final int numPartitions = 2;
+  private final float capacityThreshold = 0.5f;
+  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(" ");
+  private int countVerticesPartitionZero = 0;
 
   @Test
   public void testSmallConnectedGraph() throws Exception {
+    final int numIterations = 120;
+    final int stabilizationRounds = 5;
     String[] graph =
       PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
-    validateSmallConnectedGraphResult(computeResults(graph, 2, 120, 0.5f, 5));
+    validateSmallConnectedGraphResult(
+      computeResults(graph, numPartitions, numIterations, capacityThreshold,
+        stabilizationRounds));
   }
-
-//  @Test
-//  public void testBiPartiteGraph() throws Exception {
-//    String[] graph = PartitioningComputationTestHelper
-// .getKwayBiPartiteGraph();
-//    validateBiPartiteGraphResult(computeResults(graph, 2));
-//  }
-
 
   private void validateSmallConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
-
-    assertEquals(8, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0).intValue());
-    assertEquals(1, vertexIDwithValue.get(1).intValue());
-    assertEquals(0, vertexIDwithValue.get(2).intValue());
-    assertEquals(1, vertexIDwithValue.get(3).intValue());
-    assertEquals(0, vertexIDwithValue.get(4).intValue());
-    assertEquals(1, vertexIDwithValue.get(5).intValue());
-    assertEquals(0, vertexIDwithValue.get(6).intValue());
-    assertEquals(1, vertexIDwithValue.get(7).intValue());
-
+    double countedOccupation = (float) countVerticesPartitionZero /
+      vertexIDwithValue.size();
+    double estimatedOccupation = ((vertexIDwithValue.size() / numPartitions) +
+      ((vertexIDwithValue.size() / numPartitions) * capacityThreshold)) /
+      vertexIDwithValue.size();
+    assertTrue(Double.compare(countedOccupation, estimatedOccupation) <= 0);
   }
-
-  private void validateBiPartiteGraphResult(
-    Map<Integer, Integer> vertexIDwithValue) {
-    assertEquals(10, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0).intValue());
-    assertEquals(1, vertexIDwithValue.get(1).intValue());
-    assertEquals(0, vertexIDwithValue.get(2).intValue());
-    assertEquals(1, vertexIDwithValue.get(3).intValue());
-    assertEquals(0, vertexIDwithValue.get(4).intValue());
-    assertEquals(1, vertexIDwithValue.get(5).intValue());
-    assertEquals(0, vertexIDwithValue.get(6).intValue());
-    assertEquals(1, vertexIDwithValue.get(7).intValue());
-    assertEquals(0, vertexIDwithValue.get(8).intValue());
-    assertEquals(1, vertexIDwithValue.get(9).intValue());
-  }
-
 
   private Map<Integer, Integer> computeResults(String[] graph,
-    int partitionCount, int maxIterations, float capacityTreshold, int
-    maxStabilization)
-    throws
-    Exception {
+    int partitionCount, int maxIterations, float capacityTreshold,
+    int maxStabilization) throws Exception {
     GiraphConfiguration conf = getConfiguration();
     conf.setInt(AdaptiveRepartitioningComputation.NUMBER_OF_PARTITIONS,
       partitionCount);
@@ -80,13 +52,11 @@ public class AdaptiveRepartitioningComputationTest {
       maxIterations);
     conf.setFloat(AdaptiveRepartitioningComputation.CAPACITY_THRESHOLD,
       capacityTreshold);
-    conf.setInt(AdaptiveRepartitioningComputation
-      .NUMBER_OF_STABILIZATION_ROUNDS, maxStabilization);
+    conf
+      .setInt(AdaptiveRepartitioningComputation.NUMBER_OF_STABILIZATION_ROUNDS,
+        maxStabilization);
     conf.setBoolean(AdaptiveRepartitioningInputFormat.PARTITIONED_INPUT, true);
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
-
-    System.out.println(StringUtils.join(results, "\n"));
-
     return parseResults(results);
   }
 
@@ -108,6 +78,9 @@ public class AdaptiveRepartitioningComputationTest {
       lineTokens = LINE_TOKEN_SEPARATOR.split(line);
       vertexID = Integer.parseInt(lineTokens[0]);
       value = Integer.parseInt(lineTokens[1]);
+      if (value == 0) {
+        countVerticesPartitionZero++;
+      }
       parsedResults.put(vertexID, value);
     }
     return parsedResults;

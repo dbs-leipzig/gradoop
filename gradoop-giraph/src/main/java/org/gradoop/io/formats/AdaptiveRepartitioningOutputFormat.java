@@ -37,6 +37,20 @@ public class AdaptiveRepartitioningOutputFormat extends
    * Used to separate partition ids in partition history block.
    */
   private static final String PARTITION_HISTORY_SEPARATOR = ",";
+  /**
+   * Used to tell the output format if the partition history should be
+   * printed or not
+   */
+  public static final String PARTITIONING_OUTPUT = "partitioning.output" +
+    ".partitionhistory";
+  /**
+   * Used to decide if Partition History should be printed or not.
+   */
+  private boolean historyOutput;
+  /**
+   * Default value for PARTITIONING_OUTPUT.
+   */
+  public static final boolean DEFAULT_PARTITIONING_OUTPUT = false;
 
   /**
    * @param context the information about the task
@@ -47,6 +61,8 @@ public class AdaptiveRepartitioningOutputFormat extends
   @Override
   public TextVertexWriter createVertexWriter(TaskAttemptContext context) throws
     IOException, InterruptedException {
+    this.historyOutput =
+      getConf().getBoolean(PARTITIONING_OUTPUT, DEFAULT_PARTITIONING_OUTPUT);
     return new AdaptiveRepartitioningTextVertexLineWriter();
   }
 
@@ -56,7 +72,6 @@ public class AdaptiveRepartitioningOutputFormat extends
    */
   private class AdaptiveRepartitioningTextVertexLineWriter extends
     TextVertexWriterToEachLine {
-
     /**
      * {@inheritDoc}
      */
@@ -71,15 +86,19 @@ public class AdaptiveRepartitioningOutputFormat extends
       sb.append(vertex.getValue().getCurrentPartition());
       sb.append(VALUE_TOKEN_SEPARATOR);
       // vertex partition history
-      sb.append(LIST_BLOCK_OPEN);
-      if (vertex.getValue().getPartitionHistoryCount() > 0) {
-        sb.append(StringUtils.join(vertex.getValue().getPartitionHistory(),
-          PARTITION_HISTORY_SEPARATOR));
+      if(historyOutput){
+        sb.append(LIST_BLOCK_OPEN);
+        if (vertex.getValue().getPartitionHistoryCount() > 0) {
+          sb.append(StringUtils.join(vertex.getValue().getPartitionHistory(),
+            PARTITION_HISTORY_SEPARATOR));
+        }
+        sb.append(LIST_BLOCK_CLOSE);
+        sb.append(VALUE_TOKEN_SEPARATOR);
       }
-      sb.append(LIST_BLOCK_CLOSE);
       // edges
       for (Edge<IntWritable, NullWritable> e : vertex.getEdges()) {
-        sb.append(VALUE_TOKEN_SEPARATOR).append(e.getTargetVertexId());
+        sb.append(e.getTargetVertexId());
+        sb.append(VALUE_TOKEN_SEPARATOR);
       }
       return new Text(sb.toString());
     }

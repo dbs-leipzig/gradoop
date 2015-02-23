@@ -1,6 +1,5 @@
 package org.gradoop.algorithms;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.giraph.comm.WorkerClientRequestProcessor;
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.GraphState;
@@ -12,6 +11,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.log4j.Logger;
 import org.gradoop.io.PartitioningVertex;
+import org.gradoop.io.formats.AdaptiveRepartitioningInputFormat;
 
 import java.io.IOException;
 
@@ -20,7 +20,35 @@ import java.io.IOException;
  * <p/>
  * http://www.few.vu.nl/~cma330/papers/ICDCS14.pdf
  * <p/>
- * TODO: algorithm description
+ * The Implementation of the Adaptive Repartitioning algorithm:
+ * The initialization (super step 0) of the algorithm is based on the given
+ * input graph.
+ * If the input graph is a un-partitioned graph the algorithm will first
+ * initialize each vertex to a partition (modulo-hash-partitioning). If the
+ * given graph is already partitioned we skip the hash partitioning part.
+ * After that each vertex will notify his partition capacity aggregator that
+ * he is currently a member of the partition and will start to propagate his
+ * partition id.
+ * <p/>
+ * The main computation is divided in two phases:
+ * <p/>
+ * Phase 1 Demand Phase (odd numbered super step):
+ * <p/>
+ * Each vertex will based on the information about their neighbors calculate
+ * its desired partition. If the desired partition and the actual partition
+ * are not equal the vertex will notify the demand aggregator of the desired
+ * partition that the vertex want to migrate in.
+ * <p/>
+ * Phase 2 Migration Phase (even numbered super step):
+ * <p/>
+ * Based on the information of the first phase the algorithm will calculate
+ * which vertex are allowed to migrate in its desired partition. If a vertex
+ * migrate to another partition the vertex will notify the new and old
+ * partition aggregator.
+ * <p/>
+ * The computation will terminate if it reach the maximum number of
+ * iterations or every vertex has reached his maximum number of stabilization
+ * rounds.
  */
 public class AdaptiveRepartitioningComputation extends
   BasicComputation<IntWritable, PartitioningVertex, NullWritable, IntWritable> {
@@ -78,11 +106,6 @@ public class AdaptiveRepartitioningComputation extends
    */
   private static final IntWritable NEGATIVE_ONE = new IntWritable(-1);
   /**
-   * Class logger.
-   */
-  private static final Logger LOG =
-    Logger.getLogger(AdaptiveRepartitioningComputation.class);
-  /**
    * Total number of available partitions.
    */
   private int k;
@@ -94,6 +117,10 @@ public class AdaptiveRepartitioningComputation extends
    * Total number of possible migrations
    */
   private int stabilizationRoundMax;
+  /**
+   * Used to decide if the given input is already partitioned or not
+   */
+  private boolean isPartitioned;
 
   /**
    * Returns the desired partition of the given vertex based on the
@@ -108,22 +135,13 @@ public class AdaptiveRepartitioningComputation extends
     final Iterable<IntWritable> messages) {
     int currentPartition = vertex.getValue().getCurrentPartition().get();
     int desiredPartition = currentPartition;
-    LOG.info("currentPartition: " + currentPartition);
     // got messages?
     if (messages.iterator().hasNext()) {
       // partition -> neighbours in partition
       int[] countNeighbours = getPartitionFrequencies(messages);
-      LOG.info("count neighbours:");
-      for (int i = 0; i < countNeighbours.length; i++) {
-        LOG.info(String.format("%d => %d", i, countNeighbours[i]));
-      }
       // partition -> desire to migrate
       double[] partitionWeights =
         getPartitionWeights(countNeighbours, vertex.getNumEdges());
-      LOG.info("partition weights:");
-      for (int i = 0; i < partitionWeights.length; i++) {
-        LOG.info(String.format("%d => %f.2", i, partitionWeights[i]));
-      }
       double firstMax = Integer.MIN_VALUE;
       double secondMax = Integer.MIN_VALUE;
       int firstK = -1;
@@ -139,10 +157,6 @@ public class AdaptiveRepartitioningComputation extends
           secondK = i;
         }
       }
-      LOG.info("firstMax: " + firstMax);
-      LOG.info("secondMax: " + secondMax);
-      LOG.info("firstK: " + firstK);
-      LOG.info("secondK: " + secondK);
       if (firstMax == secondMax) {
         if (currentPartition != firstK && currentPartition != secondK) {
           desiredPartition = firstK;
@@ -151,7 +165,6 @@ public class AdaptiveRepartitioningComputation extends
         desiredPartition = firstK;
       }
     }
-    LOG.info("desiredPartition: " + desiredPartition);
     return desiredPartition;
   }
 
@@ -200,19 +213,12 @@ public class AdaptiveRepartitioningComputation extends
    * @return true if the vertex is allowed to migrate, false otherwise
    */
   private boolean doMigrate(int desiredPartition) {
-    LOG.info("calculating migration probability");
     long totalCapacity = getTotalCapacity();
-    LOG.info("totalCapacity: " + totalCapacity);
     int load = getPartitionLoad(desiredPartition);
-    LOG.info("load: " + load);
     long availability = totalCapacity - load;
-    LOG.info("availability: " + availability);
     double demand = getPartitionDemand(desiredPartition);
-    LOG.info("demand: " + demand);
     double threshold = availability / demand;
-    LOG.info("capacityThreshold: " + threshold);
     double randomRange = Math.random();
-    LOG.info("randomRange: " + randomRange);
     return Double.compare(randomRange, threshold) < 0;
   }
 
@@ -264,9 +270,6 @@ public class AdaptiveRepartitioningComputation extends
     // add current partition to partition history
     vertex.getValue()
       .addToPartitionHistory(vertex.getValue().getCurrentPartition().get());
-    LOG.info("Partition History: " +
-      StringUtils.join(vertex.getValue().getPartitionHistory(), " "));
-
     // decrease capacity in old partition
     String oldPartition = CAPACITY_AGGREGATOR_PREFIX +
       vertex.getValue().getCurrentPartition().get();
@@ -274,7 +277,6 @@ public class AdaptiveRepartitioningComputation extends
     // increase capacity in new partition
     String newPartition = CAPACITY_AGGREGATOR_PREFIX + desiredPartition;
     notifyAggregator(newPartition, POSITIVE_ONE);
-
     vertex.getValue().setCurrentPartition(new IntWritable(desiredPartition));
   }
 
@@ -297,7 +299,6 @@ public class AdaptiveRepartitioningComputation extends
    * @param v          value to send
    */
   private void notifyAggregator(final String aggregator, final IntWritable v) {
-    LOG.info(String.format("sending %d to %s", v.get(), aggregator));
     aggregate(aggregator, v);
   }
 
@@ -310,17 +311,16 @@ public class AdaptiveRepartitioningComputation extends
     WorkerGlobalCommUsage workerGlobalCommUsage, WorkerContext workerContext) {
     super.initialize(graphState, workerClientRequestProcessor, graphTaskManager,
       workerGlobalCommUsage, workerContext);
-
-    k = getConf().getInt(NUMBER_OF_PARTITIONS, DEFAULT_NUMBER_OF_PARTITIONS);
-    stabilizationRoundMax = getConf().getInt(NUMBER_OF_STABILIZATION_ROUNDS,
-      DEFAULT_NUMBER_OF_STABILIZATION_ROUNDS);
-    capacityThreshold =
+    this.k =
+      getConf().getInt(NUMBER_OF_PARTITIONS, DEFAULT_NUMBER_OF_PARTITIONS);
+    this.stabilizationRoundMax = getConf()
+      .getInt(NUMBER_OF_STABILIZATION_ROUNDS,
+        DEFAULT_NUMBER_OF_STABILIZATION_ROUNDS);
+    this.capacityThreshold =
       getConf().getFloat(CAPACITY_THRESHOLD, DEFAULT_CAPACITY_THRESHOLD);
-
-    LOG.info("=== Initialized Computation");
-    LOG.info(String
-      .format("k: %d, stabilizationRounds: %d, capacityTreshold:" + " %.2f", k,
-        stabilizationRoundMax, capacityThreshold));
+    this.isPartitioned = getConf()
+      .getBoolean(AdaptiveRepartitioningInputFormat.PARTITIONED_INPUT,
+        AdaptiveRepartitioningInputFormat.DEFAULT_PARTITIONED_INPUT);
   }
 
   /**
@@ -335,11 +335,10 @@ public class AdaptiveRepartitioningComputation extends
   public void compute(
     Vertex<IntWritable, PartitioningVertex, NullWritable> vertex,
     Iterable<IntWritable> messages) throws IOException {
-    LOG.info(String.format("=== ss: %d vertex-id: %d k: %d", getSuperstep(),
-      vertex.getId().get(), k));
     if (getSuperstep() == 0) {
-      LOG.info("== INIT PHASE");
-      setVertexStartValue(vertex);
+      if (isPartitioned) {
+        setVertexStartValue(vertex);
+      }
       String aggregator = CAPACITY_AGGREGATOR_PREFIX +
         vertex.getValue().getCurrentPartition().get();
       notifyAggregator(aggregator, POSITIVE_ONE);
@@ -347,14 +346,10 @@ public class AdaptiveRepartitioningComputation extends
     } else {
       // even superstep: migrate phase
       if ((getSuperstep() % 2) == 0) {
-        LOG.info("MIGRATION PHASE");
         int desiredPartition = vertex.getValue().getDesiredPartition().get();
         int currentPartition = vertex.getValue().getCurrentPartition().get();
-        LOG.info("currentPartition: " + currentPartition);
-        LOG.info("desiredPartition: " + desiredPartition);
         if (desiredPartition != currentPartition) {
           boolean migrate = doMigrate(desiredPartition);
-          LOG.info("doMigrate: " + migrate);
           if (migrate) {
             migrateVertex(vertex, desiredPartition);
             sendMessageToAllEdges(vertex,
@@ -367,7 +362,6 @@ public class AdaptiveRepartitioningComputation extends
           stabilizationRoundMax) {
           vertex.voteToHalt();
         } else {
-          LOG.info("DEMAND PHASE");
           int desiredPartition = getDesiredPartition(vertex, messages);
           vertex.getValue()
             .setDesiredPartition(new IntWritable(desiredPartition));
