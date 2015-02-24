@@ -18,7 +18,20 @@ public interface GraphElement {
    *
    * @param graph the graph to be added to
    */
-  void addToGraph(Long graph);
+  void addGraph(Long graph);
+
+  /**
+   * Adds graphs to existing graph set. If an element is already element
+   * of the given graph, nothing happens.
+   *
+   * @param graphs the graphs to be added
+   */
+  void addGraphs(Iterable<Long> graphs);
+
+  /**
+   * Resets all graph elements.
+   */
+  void resetGraphs();
 
   /**
    * Returns the number of graphs this element belongs to.

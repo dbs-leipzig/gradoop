@@ -112,6 +112,37 @@ public class DefaultVertexTest {
   }
 
   @Test
+  public void addAndResetGraphsTest() {
+    Long vertexID0 = 0L;
+    Long vertexID1 = 1L;
+    Long vertexID2 = 2L;
+    List<Long> tmpGraphs = Lists.newArrayListWithCapacity(2);
+    tmpGraphs.add(vertexID0);
+    tmpGraphs.add(vertexID1);
+
+    //tests
+    Vertex v0 = VertexFactory.createDefaultVertexWithID(vertexID0);
+    v0.addGraphs(tmpGraphs);
+    assertEquals(2, v0.getGraphCount());
+    //add already contained element
+    v0.addGraph(vertexID0);
+    assertEquals(2, v0.getGraphCount());
+    //add new element
+    v0.addGraph(vertexID2);
+    assertEquals(3, v0.getGraphCount());
+    //reset
+    v0.resetGraphs();
+    assertEquals(0, v0.getGraphCount());
+
+    //defaultVertex, optionally
+    Vertex v1 = VertexFactory.createDefaultVertex(vertexID1, null, null,
+      null, null, tmpGraphs);
+    assertEquals(2, v1.getGraphCount());
+    v1.resetGraphs();
+    assertEquals(0, v1.getGraphCount());
+  }
+
+  @Test
   public void createDefaultVertexTest() {
     Long vertexID = 0L;
     Long otherID1 = 1L;

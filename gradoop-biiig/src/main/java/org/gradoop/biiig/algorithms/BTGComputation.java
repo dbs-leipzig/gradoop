@@ -108,7 +108,7 @@ public class BTGComputation extends
     vertexValue.updateBtgIDs();
     // in case the vertex has no neighbours
     if (vertexValue.getGraphCount() == 0) {
-      vertexValue.addToGraph(vertex.getId().get());
+      vertexValue.addGraph(vertex.getId().get());
     }
   }
 
@@ -121,7 +121,7 @@ public class BTGComputation extends
   private void processTransactionalVertex(
     Vertex<LongWritable, BTGVertexValue, NullWritable> vertex, long minValue) {
     vertex.getValue().removeLastBtgID();
-    vertex.getValue().addToGraph(minValue);
+    vertex.getValue().addGraph(minValue);
     BTGMessage message = new BTGMessage();
     message.setSenderID(vertex.getId().get());
     message.setBtgID(minValue);

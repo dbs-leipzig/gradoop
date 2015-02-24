@@ -102,11 +102,37 @@ public class DefaultVertex extends MultiLabeledPropertyContainer implements
    * {@inheritDoc}
    */
   @Override
-  public void addToGraph(Long graph) {
-    initGraphs();
+  public void addGraph(Long graph) {
+    if (this.graphs.isEmpty()) {
+      initGraphs();
+    }
     this.graphs.add(graph);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void addGraphs(Iterable<Long> graphs) {
+    if (this.graphs.isEmpty()) {
+      initGraphs();
+    }
+    for (Long g : graphs) {
+      this.graphs.add(g);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void resetGraphs() {
+    initGraphs();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int getGraphCount() {
     return this.graphs.size();

@@ -125,8 +125,26 @@ public class BTGVertexValue implements Writable, GraphElement {
    * @param graph BTG ID to be added
    */
   @Override
-  public void addToGraph(Long graph) {
+  public void addGraph(Long graph) {
+    if (this.btgIDs.isEmpty()) {
+      resetGraphs();
+    }
     this.btgIDs.add(graph);
+  }
+
+  @Override
+  public void resetGraphs() {
+    this.btgIDs = Lists.newArrayList();
+  }
+
+  @Override
+  public void addGraphs(Iterable<Long> graphs) {
+    if (this.btgIDs.isEmpty()) {
+      resetGraphs();
+    }
+    for (Long btg : graphs) {
+      this.btgIDs.add(btg);
+    }
   }
 
   @Override
@@ -248,7 +266,7 @@ public class BTGVertexValue implements Writable, GraphElement {
     int btgCount = dataInput.readInt();
     // BTG ids
     for (int i = 0; i < btgCount; i++) {
-      this.addToGraph(dataInput.readLong());
+      this.addGraph(dataInput.readLong());
     }
     // neighbor -> minium BTG id map
     int setSize = dataInput.readInt();
