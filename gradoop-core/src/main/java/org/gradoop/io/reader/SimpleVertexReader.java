@@ -38,12 +38,17 @@ public class SimpleVertexReader extends SingleVertexReader {
     String[] tokens = getTokens(line);
     Long vertexID = Long.valueOf(tokens[0]);
 
-    List<Edge> edges = Lists.newArrayListWithCapacity(tokens.length - 1);
-    for (int i = 1; i < tokens.length; i++) {
-      Long otherID = Long.valueOf(tokens[i]);
-      Edge e = EdgeFactory.createDefaultEdge(otherID, (long) i - 1);
-      edges.add(e);
+    if (tokens.length > 1) {
+      List<Edge> edges = Lists.newArrayListWithCapacity(tokens.length - 1);
+      for (int i = 1; i < tokens.length; i++) {
+        Long otherID = Long.valueOf(tokens[i]);
+        Edge e = EdgeFactory.createDefaultEdge(otherID, (long) i - 1);
+        edges.add(e);
+      }
+      return
+        VertexFactory.createDefaultVertexWithOutgoingEdges(vertexID, edges);
+    } else {
+      return VertexFactory.createDefaultVertexWithID(vertexID);
     }
-    return VertexFactory.createDefaultVertexWithOutgoingEdges(vertexID, edges);
   }
 }
