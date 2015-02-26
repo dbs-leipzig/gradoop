@@ -105,15 +105,15 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterTest {
         assertThat(propertyKeys.size(), is(2));
         for (String k : e.getPropertyKeys()) {
           switch (k) {
-            case "k1":
-              assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
-              break;
-            case "k2":
-              assertThat(e.getProperty("k2"), Is.<Object>is("v2"));
-              break;
-            default:
-              assertTrue("unexpected property at edge 1L -> 0L", false);
-              break;
+          case "k1":
+            assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
+            break;
+          case "k2":
+            assertThat(e.getProperty("k2"), Is.<Object>is("v2"));
+            break;
+          default:
+            assertTrue("unexpected property at edge 1L -> 0L", false);
+            break;
           }
         }
       } else if (e.getOtherID().equals(TEST_TARGET_VERTEX)) {
