@@ -10,7 +10,6 @@ import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.GraphHandler;
 import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.gradoop.storage.hbase.VertexHandler;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.BufferedReader;
@@ -24,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
  * Used for test cases that need a HDFS/HBase mini cluster to run. Initializes a
  * test cluster before the first test runs and shuts it down after all tests.
  */
-public abstract class HBaseClusterTest extends GradoopTest {
+public abstract class GradoopClusterTest extends GradoopTest {
 
   protected static HBaseTestingUtility utility;
 
@@ -74,6 +73,7 @@ public abstract class HBaseClusterTest extends GradoopTest {
     if (utility == null) {
       utility = new HBaseTestingUtility();
       utility.startMiniCluster().waitForActiveAndReadyMaster();
+      utility.startMiniMapReduceCluster();
     }
   }
 

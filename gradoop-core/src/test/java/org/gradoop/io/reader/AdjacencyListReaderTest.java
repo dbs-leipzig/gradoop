@@ -1,7 +1,7 @@
 package org.gradoop.io.reader;
 
 import com.google.common.collect.Lists;
-import org.gradoop.HBaseClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 
-public class AdjacencyListReaderTest extends HBaseClusterTest {
+public class AdjacencyListReaderTest extends GradoopClusterTest {
 
   @Test
   public void writeReadExtendedGraphTest()
