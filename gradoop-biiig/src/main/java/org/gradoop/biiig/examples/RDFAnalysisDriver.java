@@ -18,7 +18,7 @@ import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Pair;
-import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Job;
@@ -29,16 +29,15 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
+import org.gradoop.algorithms.ConnectedComponentsComputation;
 import org.gradoop.algorithms.PairAggregator;
 import org.gradoop.algorithms.SelectAndAggregate;
-import org.gradoop.biiig.BIIIGConstants;
-import org.gradoop.biiig.algorithms.BTGComputation;
-import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
-import org.gradoop.biiig.io.formats.BTGHBaseVertexOutputFormat;
-import org.gradoop.biiig.io.reader.FoodBrokerReader;
 import org.gradoop.biiig.utils.ConfigurationUtils;
+import org.gradoop.io.formats.EPGHBaseVertexInputFormat;
 import org.gradoop.io.formats.GenericPairWritable;
+import org.gradoop.io.formats.SubgraphExtractionVertexOutputFormat;
 import org.gradoop.io.reader.BulkLoadEPG;
+import org.gradoop.io.reader.RDFReader;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.operators.VertexAggregate;
@@ -52,24 +51,23 @@ import org.gradoop.storage.hbase.VertexHandler;
 import java.io.IOException;
 
 /**
- * Runs the BIIIG Foodbroker/BTG Example
+ * RDF Analysis Driver
  */
-public class BTGAnalysisDriver extends Configured implements Tool {
+public class RDFAnalysisDriver extends Configured implements Tool {
   /**
    * Logger
    */
-  private static Logger LOG = Logger.getLogger(BTGAnalysisDriver.class);
+  private static Logger LOG = Logger.getLogger(RDFAnalysisDriver.class);
 
   /**
    * Job names start with that prefix.
    */
-  private static final String JOB_PREFIX = "BTG Analysis: ";
+  private static final String JOB_PREFIX = "RDF Analysis: ";
 
   static {
     Configuration.addDefaultResource("giraph-site.xml");
     Configuration.addDefaultResource("hbase-site.xml");
   }
-
 
   /**
    * Starting point for BTG analysis pipeline.
@@ -111,11 +109,11 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     }
 
     /*
-    Step 2: BTG Computation using Giraph
+    Step 2: CC Computation using Giraph
      */
     int workers =
       Integer.parseInt(cmd.getOptionValue(ConfigurationUtils.OPTION_WORKERS));
-    if (!runBTGComputation(conf, workers, verbose)) {
+    if (!runRDFComputation(conf, workers, verbose)) {
       return -1;
     }
 
@@ -142,7 +140,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @param outDir    HFile output dir in HDFS
    * @param verbose   print output during job
    * @return true, if the job completed successfully, false otherwise
-   * @throws IOException
+   * @throws java.io.IOException
    */
   private boolean runBulkLoad(Configuration conf, String graphFile,
     String outDir, boolean verbose) throws Exception {
@@ -150,7 +148,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     Path outputDir = new Path(outDir);
 
     // set line reader to read lines in input splits
-    conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, FoodBrokerReader.class,
+    conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, RDFReader.class,
       VertexLineReader.class);
     // set vertex handler that creates the Puts
     conf.setClass(BulkLoadEPG.VERTEX_HANDLER, EPGVertexHandler.class,
@@ -192,18 +190,18 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   }
 
   /**
-   * Runs the BTG computation on the input graph using Giraph.
+   * Runs the computation on the input graph using Giraph.
    *
    * @param conf        Cluster configuration
    * @param workerCount Number of workers Giraph shall use
    * @param verbose     print output during job
    * @return true, if the job completed successfully, false otherwise
-   * @throws IOException
+   * @throws java.io.IOException
    * @throws ClassNotFoundException
    * @throws InterruptedException
-   * @throws ParseException
+   * @throws org.apache.commons.cli.ParseException
    */
-  private boolean runBTGComputation(Configuration conf, int workerCount,
+  private boolean runRDFComputation(Configuration conf, int workerCount,
     boolean verbose) throws IOException, ClassNotFoundException,
     InterruptedException, ParseException {
     // set HBase table to read graph from
@@ -217,13 +215,15 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
 
     // setup Giraph job
-    GiraphJob job =
-      new GiraphJob(conf, JOB_PREFIX + BTGComputation.class.getName());
+    GiraphJob job = new GiraphJob(conf,
+        JOB_PREFIX + ConnectedComponentsComputation.class.getName());
     GiraphConfiguration giraphConf = job.getConfiguration();
 
-    giraphConf.setComputationClass(BTGComputation.class);
-    giraphConf.setVertexInputFormatClass(BTGHBaseVertexInputFormat.class);
-    giraphConf.setVertexOutputFormatClass(BTGHBaseVertexOutputFormat.class);
+    giraphConf.setComputationClass(ConnectedComponentsComputation.class);
+    giraphConf.setVertexInputFormatClass(EPGHBaseVertexInputFormat.class);
+    giraphConf.setBoolean(EPGHBaseVertexInputFormat.READ_INCOMING_EDGES, true);
+    giraphConf.setVertexOutputFormatClass(
+      SubgraphExtractionVertexOutputFormat.class);
     giraphConf.setWorkerConfiguration(workerCount, workerCount, 100f);
 
     // assuming local environment
@@ -239,7 +239,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * Runs Selection and Aggregation using a single MapReduce Job.
    *
    * @param conf      Cluster configuration
-   * @param scanCache hbase client scan cache
+   * @param scanCache HBase client scan cache
    * @param reducers  number of reducers to use for the job
    * @param verbose   print output during job
    * @return true, if the job completed successfully, false otherwise
@@ -252,28 +252,23 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     InterruptedException {
     /*
      mapper settings
-      */
-    // vertex handler
+     */
     conf.setClass(GConstants.VERTEX_HANDLER_CLASS, EPGVertexHandler.class,
       VertexHandler.class);
-
     // vertex predicate
     conf.setClass(SelectAndAggregate.VERTEX_PREDICATE_CLASS,
-      SalesOrderPredicate.class, VertexPredicate.class);
-
+      SameAsPredicate.class, VertexPredicate.class);
     // vertex aggregate
     conf.setClass(SelectAndAggregate.VERTEX_AGGREGATE_CLASS,
-      ProfitVertexAggregate.class, VertexAggregate.class);
+      ComponentAggregate.class, VertexAggregate.class);
 
     /*
     reducer settings
      */
-    // graph handler
     conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
       GraphHandler.class);
-    // pair aggregate class
-    conf.setClass(SelectAndAggregate.PAIR_AGGREGATE_CLASS, SumAggregator.class,
-      PairAggregator.class);
+    conf.setClass(SelectAndAggregate.PAIR_AGGREGATE_CLASS,
+      ComponentCountAggregator.class, PairAggregator.class);
 
     Job job =
       Job.getInstance(conf, JOB_PREFIX + SelectAndAggregate.class.getName());
@@ -282,10 +277,9 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     scan.setCacheBlocks(false);
 
     // map
-    TableMapReduceUtil
-      .initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES, scan,
-        SelectAndAggregate.SelectMapper.class, LongWritable.class,
-        GenericPairWritable.class, job);
+    TableMapReduceUtil.initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES,
+      scan, SelectAndAggregate.SelectMapper.class, LongWritable.class,
+      GenericPairWritable.class, job);
 
     // reduce
     TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
@@ -297,84 +291,45 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   }
 
   /**
-   * Predicate to select graphs containing a vertex of type SalesOrder.
+   * Predicate to select graphs containing a vertex with an edge having the
+   * label owl:sameAs .
    */
-  public static class SalesOrderPredicate implements VertexPredicate {
-    /**
-     * Property key a vertex needs to have.
+  public static class SameAsPredicate implements VertexPredicate {
+    /*
+     * TODO replace dummy.
+     * vertex needs out/in edges with owl:sameAs label
      */
-    private static final String KEY = BIIIGConstants.META_PREFIX + "class";
-    /**
-     * Property value a vertex needs to have to fulfil predicate.
-     */
-    private static final String VALUE = "SalesOrder";
 
     @Override
     public boolean evaluate(Vertex vertex) {
-      boolean result = false;
-      if (vertex.getPropertyCount() > 0) {
-        Object o = vertex.getProperty(KEY);
-        result = o != null && o.equals(VALUE);
-      }
-      return result;
+      return true;
     }
   }
 
   /**
-   * Aggregate function to calculate the profit for a single graph.
+   * Aggregate function, not (yet) needed.
    */
-  public static class ProfitVertexAggregate implements VertexAggregate {
-    /**
-     * Profit contains expenses.
-     */
-    private static final String EXPENSE_KEY = "expense";
-    /**
-     * Profit contains revenues.
-     */
-    private static final String REVENUE_KEY = "revenue";
+  public static class ComponentAggregate implements VertexAggregate {
 
     @Override
     public Writable aggregate(Vertex vertex) {
-      double calcValue = 0f;
-      if (vertex.getPropertyCount() > 0) {
-        Object o = vertex.getProperty(REVENUE_KEY);
-        if (o != null) {
-          if (o instanceof Integer) {
-            calcValue += ((Integer) o).doubleValue();
-          } else {
-            calcValue += (double) o;
-          }
-        }
-        o = vertex.getProperty(EXPENSE_KEY);
-        if (o != null) {
-          if (o instanceof Integer) {
-            calcValue -= ((Integer) o).doubleValue();
-          } else {
-            calcValue -= (double) o;
-          }
-        }
-      }
-      return new DoubleWritable(calcValue);
+      return new IntWritable(1);
     }
   }
 
   /**
    * Calculates the sum from a given set of values.
    */
-  public static class SumAggregator implements PairAggregator {
+  public static class ComponentCountAggregator implements PairAggregator {
 
     @Override
     public Pair<Boolean, ? extends Number> aggregate(
       Iterable<GenericPairWritable> values) {
-      double sum = 0;
-      boolean predicate = false;
+      int count = 0;
       for (GenericPairWritable value : values) {
-        sum = sum + ((DoubleWritable) value.getValue().get()).get();
-        if (value.getPredicateResult().get()) {
-          predicate = true;
-        }
+        count += ((IntWritable) value.getValue().get()).get();
       }
-      return new Pair<>(predicate, sum);
+      return new Pair<>(true, count);
     }
   }
 
@@ -385,7 +340,6 @@ public class BTGAnalysisDriver extends Configured implements Tool {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    Configuration conf = new Configuration();
-    System.exit(ToolRunner.run(conf, new BTGAnalysisDriver(), args));
+    System.exit(ToolRunner.run(new RDFAnalysisDriver(), args));
   }
 }

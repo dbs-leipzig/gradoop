@@ -1,7 +1,7 @@
 package org.gradoop.io.reader;
 
 import com.google.common.collect.Lists;
-import org.gradoop.HBaseClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests for {@link org.gradoop.io.reader.RDFReader}.
  */
-public class RDFReaderTest extends HBaseClusterTest {
+public class RDFReaderTest extends GradoopClusterTest {
 
   private static final Long lgdID = 7821830309733859244L;
   private static final Long geoID = 7282190339445886145L;
