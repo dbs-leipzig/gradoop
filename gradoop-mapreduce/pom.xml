@@ -68,13 +68,15 @@
         </plugins>
     </build>
     <dependencies>
-        <!-- Runtime -->
+        <!-- Compile -->
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-core</artifactId>
         </dependency>
 
         <!-- Testing -->
+
+        <!-- Gradoop -->
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-core</artifactId>
@@ -82,9 +84,52 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- HBase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
+            <version>${dep.hbase.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <version>${dep.hbase.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Hadoop -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${dep.hadoop.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${dep.hadoop.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${dep.hadoop.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Others -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${dep.junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
