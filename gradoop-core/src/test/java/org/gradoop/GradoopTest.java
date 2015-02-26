@@ -55,7 +55,7 @@ public abstract class GradoopTest {
   }
 
   protected static final String[] BASIC_GRAPH =
-    new String[]{"0 1 2", "1 0 2", "2 1", "3"};
+    new String[]{"0 1 2", "1 0 2", "2 1"};
 
   protected static final String[] EXTENDED_GRAPH = new String[]{
     "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 2 k1 5 v1 k2 5 v2|1 0",
@@ -108,7 +108,7 @@ public abstract class GradoopTest {
   }
 
   protected void validateBasicGraphVertices(List<Vertex> vertices) {
-    assertEquals(4, vertices.size());
+    assertEquals(3, vertices.size());
     for (Vertex v : vertices) {
       Long i = v.getID();
       List<Edge> edgeList = Lists.newArrayList();
@@ -121,8 +121,8 @@ public abstract class GradoopTest {
         validateBasicGraphEdges(edgeList, 2, 0, 2);
       } else if (i.equals(2L)) {
         validateBasicGraphEdges(edgeList, 1, 1);
-      } else if (i.equals(3L)) {
-        validateBasicGraphEdges(edgeList, 0);
+//      } else if (i.equals(3L)) {
+//        validateBasicGraphEdges(edgeList, 0);
       }
     }
   }
