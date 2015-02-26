@@ -58,7 +58,6 @@
 
 
         <dep.giraph.version>1.1.0-hadoop2</dep.giraph.version>
-        <dep.hadoop.version>2.5.1</dep.hadoop.version>
         <dep.hbase.version>0.98.10.1-hadoop2</dep.hbase.version>
         <dep.junit.version>4.11</dep.junit.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>

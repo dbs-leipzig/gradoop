@@ -20,8 +20,8 @@ import java.net.URL;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Used for test cases that need a HDFS/HBase mini cluster to run. Initializes a
- * test cluster before the first test runs and shuts it down after all tests.
+ * Used for test cases that need a HDFS/HBase/MR mini cluster to run.
+ * Initializes a test cluster before the first test runs.
  */
 public abstract class GradoopClusterTest extends GradoopTest {
 

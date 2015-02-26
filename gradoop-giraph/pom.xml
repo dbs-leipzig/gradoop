@@ -103,7 +103,6 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
-            <version>${dep.hbase.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -111,7 +110,6 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-server</artifactId>
-            <version>${dep.hbase.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -120,7 +118,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${dep.junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
