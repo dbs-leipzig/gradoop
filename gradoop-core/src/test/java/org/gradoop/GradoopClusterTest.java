@@ -34,7 +34,7 @@ public abstract class GradoopClusterTest extends GradoopTest {
 
     HBaseGraphStoreFactory.deleteGraphStore(config);
     return HBaseGraphStoreFactory
-      .createGraphStore(config, verticesHandler, graphsHandler);
+      .createOrOpenGraphStore(config, verticesHandler, graphsHandler);
   }
 
   protected GraphStore openGraphStore() {
@@ -42,7 +42,7 @@ public abstract class GradoopClusterTest extends GradoopTest {
     VertexHandler verticesHandler = new EPGVertexHandler();
     GraphHandler graphsHandler = new EPGGraphHandler();
     return HBaseGraphStoreFactory
-      .createGraphStore(config, verticesHandler, graphsHandler);
+      .createOrOpenGraphStore(config, verticesHandler, graphsHandler);
   }
 
   /**

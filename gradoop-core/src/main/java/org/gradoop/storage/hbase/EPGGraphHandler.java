@@ -14,7 +14,7 @@ import org.gradoop.model.impl.GraphFactory;
 import java.io.IOException;
 
 /**
- * Handles storing graphs in a HBase table.
+ * Used to read/write an EPG graph from/to a HBase table.
  */
 public class EPGGraphHandler extends BasicHandler implements GraphHandler {
   /**

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * Used to read and write an EPG vertex from/to a HBase table.
+ * Used to read/write an EPG vertex from/to a HBase table.
  */
 public class EPGVertexHandler extends BasicHandler implements VertexHandler {
   /**
