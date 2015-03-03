@@ -1,10 +1,10 @@
-package org.gradoop.biiig.examples;
+package org.gradoop.rdf.examples;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.algorithms.SelectAndAggregate;
-import org.gradoop.biiig.utils.ConfigurationUtils;
+import org.gradoop.utils.ConfigurationUtils;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
@@ -16,7 +16,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
- * Tests the pipeline described in {@link RDFAnalysisDriver}.
+ * Tests the pipeline described in {@link org.gradoop.rdf.examples.RDFAnalysisDriver}.
  */
 public class RDFAnalysisDriverTest extends GradoopClusterTest {
   private static final Long A_DBP = -4820974574369803382L;

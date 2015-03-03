@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.algorithms.SelectAndAggregate;
-import org.gradoop.biiig.utils.ConfigurationUtils;
+import org.gradoop.utils.ConfigurationUtils;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;

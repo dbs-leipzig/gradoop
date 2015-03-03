@@ -1,4 +1,4 @@
-package org.gradoop.biiig.utils;
+package org.gradoop.utils;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;

@@ -9,11 +9,11 @@
         <groupId>de.uni-leipzig.de.dbs</groupId>
         <version>0.0.2</version>
     </parent>
-    <artifactId>gradoop-biiig</artifactId>
+    <artifactId>gradoop-examples</artifactId>
     <packaging>jar</packaging>
 
-    <name>Gradoop BIIIG</name>
-    <description>Contains everything related to the BIIIG Project</description>
+    <name>Gradoop Examples</name>
+    <description>Contains possible use cases for Gradoop.</description>
 
     <properties>
         <top.dir>${project.basedir}/..</top.dir>
