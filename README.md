@@ -28,7 +28,9 @@ installed.
     
     > mvn clean install
 
-##### Running BIIIG example pipelines
+##### Running example pipelines
+
+###### BIIIG
 
 The BIIIG example pipeline is used to analyze business data represented as a graph.
 It consists of multiple steps:
@@ -45,19 +47,32 @@ for further details on how to implement a pipeline.
 
 To run the pipeline on your hadoop installation, please follow these steps.
 
-*   Copy the generated `gradoop-biiig/target/gradoop-biiig-<version>-jar-with-dependencies.jar`
+*   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar
+-with-dependencies.jar`
     to your Hadoop environment.
 
 *   For a list of options for that example pipeline call
 
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-biiig-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver --help
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;
+    -jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver --help
 
 *   The following call runs the pipeline on a given input graph (foodbroker) using 11 giraph workers, 11 reducers and a hbase scan cache of 500 rows.
 
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-biiig-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver -libjars $HBASE_LIBS -gip /user/hduser/input/foodbroker_10.graph -gop /user/hduser/output/hdfiles -w 11 -r 11 -sc 500
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt; 
+    -jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver -libjars $HBASE_LIBS -gip /user/hduser/input/foodbroker_10.graph -gop /user/hduser/output/hdfiles -w 11 -r 11 -sc 500
 
 *   See [Foodbroker Repository](https://github.com/dbs-leipzig/foodbroker) if you want to generate your
     own graphs or implement a custom FileReader to load your own graph format.
+    
+###### RDF
+
+The RDF example pipeline analyzes a given NTriple using following steps:
+
+1. Bulk Load RDF NTriple file into Gradoop
+2. Compute Connected Components using Giraph
+3. For each component the contained vertices are counted using MapReduce.
+4. Resulting graphs are written back to Gradoop
+
 
 ##### Importing data into Gradoop
 
@@ -103,10 +118,12 @@ graph repository.
 Contains EPG-operators implemented with Apache MapReduce and I/O formats used
 by these operator implementations.
 
-##### gradoop-biiig
+##### gradoop-examples
 
-Contains BIIIG-specific data readers and example analytical pipelines for
-business related graph data.
+Contains example pipelines showing use cases for Gradoop. 
+
+*   BIIIG pipeline for business related graph data using specific data readers
+*   RDF pipeline for semantic web analysis
 
 ##### gradoop-checkstyle
 
