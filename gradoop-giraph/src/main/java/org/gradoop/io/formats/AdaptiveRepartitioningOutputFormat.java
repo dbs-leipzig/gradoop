@@ -25,12 +25,12 @@ public class AdaptiveRepartitioningOutputFormat extends
    * Used to tell the output format if the partition history should be
    * printed or not
    */
-  public static final String PARTITIONING_OUTPUT =
+  public static final String PARTITION_HISTORY_OUTPUT =
     "partitioning.output" + ".partitionhistory";
   /**
-   * Default value for PARTITIONING_OUTPUT.
+   * Default value for PARTITION_HISTORY_OUTPUT.
    */
-  public static final boolean DEFAULT_PARTITIONING_OUTPUT = false;
+  public static final boolean DEFAULT_PARTITION_HISTORY_OUTPUT = false;
   /**
    * Used for splitting the line into the main tokens (vertex id, vertex value
    */
@@ -52,7 +52,6 @@ public class AdaptiveRepartitioningOutputFormat extends
    */
   private boolean historyOutput;
 
-
   /**
    * @param context the information about the task
    * @return the text vertex writer to be used
@@ -62,8 +61,8 @@ public class AdaptiveRepartitioningOutputFormat extends
   @Override
   public TextVertexWriter createVertexWriter(TaskAttemptContext context) throws
     IOException, InterruptedException {
-    this.historyOutput =
-      getConf().getBoolean(PARTITIONING_OUTPUT, DEFAULT_PARTITIONING_OUTPUT);
+    this.historyOutput = getConf()
+      .getBoolean(PARTITION_HISTORY_OUTPUT, DEFAULT_PARTITION_HISTORY_OUTPUT);
     return new AdaptiveRepartitioningTextVertexLineWriter();
   }
 
