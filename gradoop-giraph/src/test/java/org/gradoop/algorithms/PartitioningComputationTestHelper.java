@@ -10,7 +10,7 @@ public abstract class PartitioningComputationTestHelper {
   /**
    * @return a small graph with two connected partitions
    */
-  static String[] getConnectedGraph() {
+  static String[] getHBaseLPConnectedGraph() {
     return new String[] {
       "0 0 1 2 3",
       "1 1 0 2 3",
@@ -88,7 +88,7 @@ public abstract class PartitioningComputationTestHelper {
   /**
    * @return a small graph with two connected partitions
    */
-  static String[] getKwaySmallConnectedGraph() {
+  static String[] getAdaptivePartitioningConnectedGraph() {
     return new String[] {
       "0 1 2 3",
       "1 0 2 3",

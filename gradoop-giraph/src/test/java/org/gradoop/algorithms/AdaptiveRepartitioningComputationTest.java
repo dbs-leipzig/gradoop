@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class AdaptiveRepartitioningComputationTest {
   private final int numPartitions = 2;
-  private final float capacityThreshold = 0.5f;
+  private final float capacityThreshold = 0.25f;
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(" ");
   private int countVerticesPartitionZero = 0;
 
@@ -25,26 +25,27 @@ public class AdaptiveRepartitioningComputationTest {
   public void testSmallConnectedGraph() throws Exception {
     final int numIterations = 120;
     final int stabilizationRounds = 5;
+    final long seed = 13374242;
     String[] graph =
-      PartitioningComputationTestHelper.getKwaySmallConnectedGraph();
+      PartitioningComputationTestHelper.getAdaptivePartitioningConnectedGraph();
     validateSmallConnectedGraphResult(
       computeResults(graph, numPartitions, numIterations, capacityThreshold,
-        stabilizationRounds));
+        stabilizationRounds, seed));
   }
 
   private void validateSmallConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
-    double countedOccupation = (float) countVerticesPartitionZero /
-      vertexIDwithValue.size();
-    double estimatedOccupation = ((vertexIDwithValue.size() / numPartitions) +
-      ((vertexIDwithValue.size() / numPartitions) * capacityThreshold)) /
-      vertexIDwithValue.size();
+    int n = vertexIDwithValue.size();
+    int optimalPartitionSize = n / numPartitions;
+    double countedOccupation = (float) countVerticesPartitionZero / n;
+    double estimatedOccupation =
+      (optimalPartitionSize + (optimalPartitionSize * capacityThreshold)) / n;
     assertTrue(Double.compare(countedOccupation, estimatedOccupation) <= 0);
   }
 
   private Map<Integer, Integer> computeResults(String[] graph,
     int partitionCount, int maxIterations, float capacityTreshold,
-    int maxStabilization) throws Exception {
+    int maxStabilization, long seed) throws Exception {
     GiraphConfiguration conf = getConfiguration();
     conf.setInt(AdaptiveRepartitioningComputation.NUMBER_OF_PARTITIONS,
       partitionCount);
@@ -55,6 +56,7 @@ public class AdaptiveRepartitioningComputationTest {
     conf
       .setInt(AdaptiveRepartitioningComputation.NUMBER_OF_STABILIZATION_ROUNDS,
         maxStabilization);
+    conf.setLong(AdaptiveRepartitioningComputation.SEED, seed);
     conf.setBoolean(AdaptiveRepartitioningInputFormat.PARTITIONED_INPUT, true);
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
     return parseResults(results);

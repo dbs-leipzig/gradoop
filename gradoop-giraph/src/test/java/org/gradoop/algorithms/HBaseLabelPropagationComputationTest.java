@@ -42,7 +42,7 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
     throws IOException, InterruptedException, ClassNotFoundException {
     // prepare data
     BufferedReader inputReader = createTestReader
-      (PartitioningComputationTestHelper.getConnectedGraph());
+      (PartitioningComputationTestHelper.getHBaseLPConnectedGraph());
     GraphStore graphStore = createEmptyGraphStore();
     AdjacencyListReader adjacencyListReader = new AdjacencyListReader
       (graphStore, new PartitioningLineReader());

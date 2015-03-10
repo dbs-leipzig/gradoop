@@ -13,6 +13,7 @@ import org.gradoop.io.PartitioningVertex;
 import org.gradoop.io.formats.AdaptiveRepartitioningInputFormat;
 
 import java.io.IOException;
+import java.util.Random;
 
 /**
  * Adaptive Repartitioning (ADP) algorithm as described in:
@@ -87,6 +88,14 @@ public class AdaptiveRepartitioningComputation extends
    */
   public static final float DEFAULT_CAPACITY_THRESHOLD = .2f;
   /**
+   * Seed Number for random generator
+   */
+  public static final String SEED = "partitioning.seed";
+  /**
+   * Default seed
+   */
+  public static final long DEFAULT_SEED = 0;
+  /**
    * Prefix for capacity aggregator which is used by master and worker compute.
    */
   static final String CAPACITY_AGGREGATOR_PREFIX =
@@ -120,6 +129,14 @@ public class AdaptiveRepartitioningComputation extends
    * Used to decide if the given input is already partitioned or not
    */
   private boolean isPartitioned;
+  /**
+   * Seed number for random generator
+   */
+  private long seed;
+  /**
+   * Instance of Random Class
+   */
+  private Random random;
 
   /**
    * Returns the desired partition of the given vertex based on the
@@ -217,7 +234,7 @@ public class AdaptiveRepartitioningComputation extends
     long availability = totalCapacity - load;
     double demand = getPartitionDemand(desiredPartition);
     double threshold = availability / demand;
-    double randomRange = Math.random();
+    double randomRange = random.nextDouble();
     return Double.compare(randomRange, threshold) < 0;
   }
 
@@ -320,6 +337,12 @@ public class AdaptiveRepartitioningComputation extends
     this.isPartitioned = getConf()
       .getBoolean(AdaptiveRepartitioningInputFormat.PARTITIONED_INPUT,
         AdaptiveRepartitioningInputFormat.DEFAULT_PARTITIONED_INPUT);
+    this.seed = getConf().getLong(SEED, DEFAULT_SEED);
+    if (seed != 0) {
+      random = new Random(seed);
+    } else {
+      random = new Random();
+    }
   }
 
   /**
