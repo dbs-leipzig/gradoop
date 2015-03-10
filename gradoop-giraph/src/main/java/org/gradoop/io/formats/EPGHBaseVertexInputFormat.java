@@ -22,6 +22,19 @@ public class EPGHBaseVertexInputFormat extends
     EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable> {
 
   /**
+   * Configuration key used to specify if edges are seen directed (false) or
+   * undirected (true) (i.e., for giraph computations)
+   */
+  public static final String READ_INCOMING_EDGES =
+    "gradoop.io.epgvertexinputformat.readincomingedges";
+
+  /**
+   * Default value false, only needed in computation like connected
+   * components in giraph
+   */
+  private static final boolean READ_INCOMING_EDGES_DEFAULT_VALUE = false;
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -37,6 +50,12 @@ public class EPGHBaseVertexInputFormat extends
   public static class EPGHBaseVertexReader extends
     HBaseVertexReader<EPGVertexIdentifierWritable,
       EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable> {
+
+    /**
+     * If true, read incoming edges to simulate undirected edges (i.e., for
+     * giraph computations)
+     */
+    private boolean readIncomingEdges;
 
     /**
      * Sets the base TableInputFormat and creates a record reader.
@@ -56,6 +75,18 @@ public class EPGHBaseVertexInputFormat extends
     @Override
     public boolean nextVertex() throws IOException, InterruptedException {
       return getRecordReader().nextKeyValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initialize(InputSplit inputSplit,
+      TaskAttemptContext context) throws IOException, InterruptedException {
+      super.initialize(inputSplit, context);
+
+      readIncomingEdges = getConf().getBoolean(READ_INCOMING_EDGES,
+        READ_INCOMING_EDGES_DEFAULT_VALUE);
     }
 
     /**
@@ -97,14 +128,15 @@ public class EPGHBaseVertexInputFormat extends
         edges.add(EdgeFactory.create(edgeTarget, edgeValue));
       }
       // incoming edges
-//      for (org.gradoop.model.Edge edge : VERTEX_HANDLER
-//        .readIncomingEdges(row)) {
-//        EPGVertexIdentifierWritable edgeTarget = new
-//          EPGVertexIdentifierWritable(edge.getOtherID());
-//        EPGEdgeValueWritable edgeValue = new EPGEdgeValueWritable(
-//          edge.getLabel());
-//        edges.add(EdgeFactory.create(edgeTarget, edgeValue));
-//      }
+      if (readIncomingEdges) {
+        for (org.gradoop.model.Edge edge :
+          vertexHandler.readIncomingEdges(row)) {
+          EPGVertexIdentifierWritable edgeTarget =
+            new EPGVertexIdentifierWritable(edge.getOtherID());
+          EPGEdgeValueWritable edgeValue = new EPGEdgeValueWritable(edge);
+          edges.add(EdgeFactory.create(edgeTarget, edgeValue));
+        }
+      }
 
       vertex.initialize(vertexID, vertexValue, edges);
 

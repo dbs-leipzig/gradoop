@@ -105,15 +105,15 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterTest {
         assertThat(propertyKeys.size(), is(2));
         for (String k : e.getPropertyKeys()) {
           switch (k) {
-            case "k1":
-              assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
-              break;
-            case "k2":
-              assertThat(e.getProperty("k2"), Is.<Object>is("v2"));
-              break;
-            default:
-              assertTrue("unexpected property at edge 1L -> 0L", false);
-              break;
+          case "k1":
+            assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
+            break;
+          case "k2":
+            assertThat(e.getProperty("k2"), Is.<Object>is("v2"));
+            break;
+          default:
+            assertTrue("unexpected property at edge 1L -> 0L", false);
+            break;
           }
         }
       } else if (e.getOtherID().equals(TEST_TARGET_VERTEX)) {
@@ -152,13 +152,12 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterTest {
     @Override
     public void compute(
       Vertex<EPGVertexIdentifierWritable, EPGVertexValueWritable,
-        EPGEdgeValueWritable> vertex,
-      Iterable<LongWritable> messages)
+        EPGEdgeValueWritable> vertex, Iterable<LongWritable> messages)
       throws IOException {
       // modify vertex value
       vertex.getValue().addLabel(TEST_LABEL);
       vertex.getValue().addProperty(TEST_KEY, TEST_VALUE);
-      vertex.getValue().addToGraph(TEST_GRAPH);
+      vertex.getValue().addGraph(TEST_GRAPH);
 
       // modify edge value of edge TEST_SOURCE_VERTEX -> TEST_TARGET_VERTEX
       if (vertex.getId().getID().equals(TEST_SOURCE_VERTEX)) {

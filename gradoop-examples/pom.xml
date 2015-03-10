@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>gradoop</artifactId>
+        <groupId>de.uni-leipzig.de.dbs</groupId>
+        <version>0.0.2</version>
+    </parent>
+    <artifactId>gradoop-examples</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Gradoop Examples</name>
+    <description>Contains possible use cases for Gradoop.</description>
+
+    <properties>
+        <top.dir>${project.basedir}/..</top.dir>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <systemProperties>
+                        <!-- Needed for unit testing with mapreduce cluster -->
+                        <property>
+                            <name>prop.jarLocation</name>
+                            <value>
+                                ${top.dir}/gradoop-giraph/target/gradoop-giraph-${project.version}-jar-with-dependencies.jar
+                            </value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Compile -->
+
+        <dependency>
+            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <artifactId>gradoop-giraph</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <artifactId>gradoop-mapreduce</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+
+        <!-- Gradoop -->
+        <dependency>
+            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <artifactId>gradoop-core</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <artifactId>gradoop-giraph</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Giraph -->
+        <dependency>
+            <groupId>org.apache.giraph</groupId>
+            <artifactId>giraph-core</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- HBase -->
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-testing-util</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Others -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
