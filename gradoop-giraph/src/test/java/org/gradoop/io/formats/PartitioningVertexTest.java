@@ -16,10 +16,10 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by gomezk on 28.11.14.
+ * Test Class for PartitioningVertex
  */
 public class PartitioningVertexTest {
-  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile("\t");
+  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile(" ");
 
   @Test
   public void testSmallConnectedGraph() throws Exception {

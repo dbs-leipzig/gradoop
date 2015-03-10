@@ -7,7 +7,6 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,6 +76,7 @@ public class PartitioningVertex implements Writable {
 
   /**
    * Method to add a partition to partition history
+   * @param partition the vertex had
    */
   public void addToPartitionHistory(int partition) {
     initList();
@@ -91,7 +91,9 @@ public class PartitioningVertex implements Writable {
     return (partitionHistory != null) ? partitionHistory.size() : 0;
   }
 
-
+  /**
+   * Initialize the PartitionHistoryList
+   */
   private void initList() {
     if (partitionHistory == null) {
       this.partitionHistory = Lists.newArrayList();

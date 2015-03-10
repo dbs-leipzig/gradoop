@@ -22,6 +22,16 @@ import java.io.IOException;
 public class AdaptiveRepartitioningOutputFormat extends
   TextVertexOutputFormat<IntWritable, PartitioningVertex, NullWritable> {
   /**
+   * Used to tell the output format if the partition history should be
+   * printed or not
+   */
+  public static final String PARTITIONING_OUTPUT =
+    "partitioning.output" + ".partitionhistory";
+  /**
+   * Default value for PARTITIONING_OUTPUT.
+   */
+  public static final boolean DEFAULT_PARTITIONING_OUTPUT = false;
+  /**
    * Used for splitting the line into the main tokens (vertex id, vertex value
    */
   private static final String VALUE_TOKEN_SEPARATOR = " ";
@@ -38,19 +48,10 @@ public class AdaptiveRepartitioningOutputFormat extends
    */
   private static final String PARTITION_HISTORY_SEPARATOR = ",";
   /**
-   * Used to tell the output format if the partition history should be
-   * printed or not
-   */
-  public static final String PARTITIONING_OUTPUT = "partitioning.output" +
-    ".partitionhistory";
-  /**
    * Used to decide if Partition History should be printed or not.
    */
   private boolean historyOutput;
-  /**
-   * Default value for PARTITIONING_OUTPUT.
-   */
-  public static final boolean DEFAULT_PARTITIONING_OUTPUT = false;
+
 
   /**
    * @param context the information about the task
@@ -86,7 +87,7 @@ public class AdaptiveRepartitioningOutputFormat extends
       sb.append(vertex.getValue().getCurrentPartition());
       sb.append(VALUE_TOKEN_SEPARATOR);
       // vertex partition history
-      if(historyOutput){
+      if (historyOutput) {
         sb.append(LIST_BLOCK_OPEN);
         if (vertex.getValue().getPartitionHistoryCount() > 0) {
           sb.append(StringUtils.join(vertex.getValue().getPartitionHistory(),

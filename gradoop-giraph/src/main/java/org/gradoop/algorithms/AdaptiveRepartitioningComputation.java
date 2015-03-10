@@ -9,7 +9,6 @@ import org.apache.giraph.worker.WorkerContext;
 import org.apache.giraph.worker.WorkerGlobalCommUsage;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.log4j.Logger;
 import org.gradoop.io.PartitioningVertex;
 import org.gradoop.io.formats.AdaptiveRepartitioningInputFormat;
 
