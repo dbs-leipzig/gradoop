@@ -9,7 +9,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.gradoop.GConstants;
-import org.gradoop.MapReduceClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGVertexHandler;
@@ -21,7 +21,7 @@ import java.io.IOException;
 /**
  * Testing for Bulk Export.
  */
-public class BulkWriteTest extends MapReduceClusterTest {
+public class BulkWriteTest extends GradoopClusterTest {
 
   @Test
   public void bulkWriteSimpleGraphTest() throws IOException,

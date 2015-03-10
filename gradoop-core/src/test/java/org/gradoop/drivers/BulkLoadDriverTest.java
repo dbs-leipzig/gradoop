@@ -1,7 +1,7 @@
 package org.gradoop.drivers;
 
 import org.apache.hadoop.conf.Configuration;
-import org.gradoop.MapReduceClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.io.reader.JsonReader;
 import org.junit.Test;
 
@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests for {@link org.gradoop.drivers.BulkLoadDriver}.
  */
-public class BulkLoadDriverTest extends MapReduceClusterTest {
+public class BulkLoadDriverTest extends GradoopClusterTest {
 
   @Test
   public void testBulkLoadDriver() throws Exception {

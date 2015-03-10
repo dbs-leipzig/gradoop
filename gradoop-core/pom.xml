@@ -53,12 +53,6 @@
     </build>
 
     <dependencies>
-        <!-- Hadoop -->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.hadoop</groupId>-->
-            <!--<artifactId>hadoop-client</artifactId>-->
-        <!--</dependency>-->
-
         <!-- HBase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
@@ -67,9 +61,26 @@
 
         <!-- Testing -->
 
+        <!-- HBase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Others -->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
 

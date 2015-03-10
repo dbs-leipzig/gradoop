@@ -58,6 +58,7 @@
 
     <dependencies>
         <!-- Compile -->
+
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-giraph</artifactId>
@@ -69,6 +70,8 @@
         </dependency>
 
         <!-- Testing -->
+
+        <!-- Gradoop -->
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-core</artifactId>
@@ -83,6 +86,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Giraph -->
         <dependency>
             <groupId>org.apache.giraph</groupId>
             <artifactId>giraph-core</artifactId>
@@ -90,9 +94,25 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- HBase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Others -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

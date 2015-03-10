@@ -98,7 +98,8 @@ public class BulkLoadDriver extends Configured implements Tool {
       HBaseGraphStoreFactory.deleteGraphStore(conf);
     }
     HBaseGraphStoreFactory
-      .createGraphStore(conf, new EPGVertexHandler(), new EPGGraphHandler());
+      .createOrOpenGraphStore(conf, new EPGVertexHandler(),
+        new EPGGraphHandler());
   }
 
   /**

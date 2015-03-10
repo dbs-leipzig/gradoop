@@ -12,7 +12,7 @@ import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.GConstants;
-import org.gradoop.MapReduceClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 /**
  * Select graphs based on a given vertex property.
  */
-public class SelectionTest extends MapReduceClusterTest {
+public class SelectionTest extends GradoopClusterTest {
   /**
    * Select graphs that contain vertices that own the following property.
    */
@@ -53,7 +53,7 @@ public class SelectionTest extends MapReduceClusterTest {
     adjacencyListReader.read(bufferedReader);
 
     // define MapReduce job
-    Job job = new Job(conf, SelectionTest.class.getName());
+    Job job = Job.getInstance(conf, SelectionTest.class.getName());
     Scan scan = new Scan();
     scan.setCaching(500);
     scan.setCacheBlocks(false);

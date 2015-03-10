@@ -12,7 +12,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.GConstants;
-import org.gradoop.MapReduceClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
 import org.gradoop.model.Graph;
@@ -33,13 +33,13 @@ import static org.junit.Assert.assertEquals;
  * Simple test for reading EPG from HBase, process it via MapReduce
  * (Aggregate) and write the results back to HBase.
  */
-public class AggregationTest extends MapReduceClusterTest {
+public class AggregationTest extends GradoopClusterTest {
 
   private static final String VCOUNT_PROPERTY_KEY = "vcount";
 
   @Test
-  public void aggregateTest()
-    throws IOException, ClassNotFoundException, InterruptedException {
+  public void aggregateTest() throws IOException, ClassNotFoundException,
+    InterruptedException {
     Configuration conf = utility.getConfiguration();
     GraphStore graphStore = createEmptyGraphStore();
     BufferedReader bufferedReader = createTestReader(EXTENDED_GRAPH);
@@ -49,7 +49,7 @@ public class AggregationTest extends MapReduceClusterTest {
     adjacencyListReader.read(bufferedReader);
 
     // define MapReduce job
-    Job job = new Job(conf, AggregationTest.class.getName());
+    Job job = Job.getInstance(conf, AggregationTest.class.getName());
     Scan scan = new Scan();
     /*
     If HBase is used as an input source for a MapReduce job, for example,
@@ -68,20 +68,12 @@ public class AggregationTest extends MapReduceClusterTest {
      */
     scan.setCacheBlocks(false);
     // map
-    TableMapReduceUtil.initTableMapperJob(
-      GConstants.DEFAULT_TABLE_VERTICES,
-      scan,
-      AggregateTableMapper.class,
-      LongWritable.class,
-      IntWritable.class,
-      job
-    );
+    TableMapReduceUtil
+      .initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES, scan,
+        AggregateTableMapper.class, LongWritable.class, IntWritable.class, job);
     // reduce
-    TableMapReduceUtil.initTableReducerJob(
-      GConstants.DEFAULT_TABLE_GRAPHS,
-      AggregateTableReducer.class,
-      job
-    );
+    TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
+      AggregateTableReducer.class, job);
     job.setNumReduceTasks(1);
     // run MR job
     job.waitForCompletion(true);
@@ -100,13 +92,13 @@ public class AggregationTest extends MapReduceClusterTest {
   }
 
   private void validateGraph(Graph g, int expectedPropertyCount,
-                             int expectedVertexCount) {
+    int expectedVertexCount) {
     assertEquals(expectedPropertyCount, g.getPropertyCount());
     assertEquals(expectedVertexCount, g.getProperty(VCOUNT_PROPERTY_KEY));
   }
 
-  public static class AggregateTableMapper extends TableMapper<LongWritable,
-    IntWritable> {
+  public static class AggregateTableMapper extends
+    TableMapper<LongWritable, IntWritable> {
 
     private static VertexHandler VERTEX_HANDLER = new EPGVertexHandler();
     private static IntWritable ONE = new IntWritable(1);
@@ -122,8 +114,7 @@ public class AggregationTest extends MapReduceClusterTest {
      */
     @Override
     protected void map(ImmutableBytesWritable key, Result value,
-                       Context context)
-      throws IOException, InterruptedException {
+      Context context) throws IOException, InterruptedException {
       for (Long graph : VERTEX_HANDLER.readGraphs(value)) {
         context.write(new LongWritable(graph), ONE);
       }
@@ -146,8 +137,7 @@ public class AggregationTest extends MapReduceClusterTest {
      */
     @Override
     protected void reduce(LongWritable key, Iterable<IntWritable> values,
-                          Context context)
-      throws IOException, InterruptedException {
+      Context context) throws IOException, InterruptedException {
       int count = 0;
       for (IntWritable ignored : values) {
         count++;

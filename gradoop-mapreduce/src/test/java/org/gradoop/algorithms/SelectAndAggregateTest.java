@@ -9,7 +9,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.GConstants;
-import org.gradoop.MapReduceClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.io.formats.GenericPairWritable;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.EPGVertexReader;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Simple test for a select and aggregate map reduce job.
  */
-public class SelectAndAggregateTest extends MapReduceClusterTest {
+public class SelectAndAggregateTest extends GradoopClusterTest {
 
   private static final String[] TEST_GRAPH =
     new String[]{"1|A|1 pos 4 1000 type 1 0|||1 1",
@@ -94,7 +94,7 @@ public class SelectAndAggregateTest extends MapReduceClusterTest {
     // vertex predicate for select step
 
 
-    Job job = new Job(conf, SelectAndAggregateTest.class.getName());
+    Job job = Job.getInstance(conf, SelectAndAggregateTest.class.getName());
     Scan scan = new Scan();
     scan.setCaching(500);
     scan.setCacheBlocks(false);

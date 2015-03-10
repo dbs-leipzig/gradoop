@@ -10,6 +10,9 @@ import java.util.List;
 
 public class SimpleVertexReaderTest extends GradoopTest {
 
+  protected static final String[] MY_BASIC_GRAPH =
+    new String[]{"0 1 2", "1 0 2", "2 1", "3"};
+
   @Test
   public void readBasicGraphTest()
     throws IOException {

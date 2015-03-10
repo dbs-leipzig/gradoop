@@ -97,7 +97,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       HBaseGraphStoreFactory.deleteGraphStore(conf);
     }
     HBaseGraphStoreFactory
-      .createGraphStore(conf, new EPGVertexHandler(), new EPGGraphHandler());
+      .createOrOpenGraphStore(conf, new EPGVertexHandler(),
+        new EPGGraphHandler());
 
     /*
     Step 1: Bulk Load of the graph into HBase using MapReduce

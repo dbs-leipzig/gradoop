@@ -1,7 +1,7 @@
 package org.gradoop.biiig.io.reader;
 
 import com.google.common.collect.Lists;
-import org.gradoop.HBaseClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests for {@link org.gradoop.biiig.io.reader.FoodBrokerReader}.
  */
-public class FoodBrokerReaderTest extends HBaseClusterTest {
+public class FoodBrokerReaderTest extends GradoopClusterTest {
 
   private static final int FOODBROKER_SAMPLE_VCOUNT = 6;
   private static final int FOODBROKER_SAMPLE_ECOUNT = 5;

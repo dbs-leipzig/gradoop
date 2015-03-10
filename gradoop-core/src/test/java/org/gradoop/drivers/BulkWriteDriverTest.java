@@ -1,7 +1,7 @@
 package org.gradoop.drivers;
 
 import org.apache.hadoop.fs.Path;
-import org.gradoop.MapReduceClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.io.writer.SimpleVertexWriter;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests for {@link org.gradoop.drivers.BulkWriteDriver}.
  */
-public class BulkWriteDriverTest extends MapReduceClusterTest {
+public class BulkWriteDriverTest extends GradoopClusterTest {
 
   @Test
   public void testBulkWriteDriver() throws Exception {

@@ -15,7 +15,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.gradoop.GConstants;
-import org.gradoop.MapReduceClusterTest;
+import org.gradoop.GradoopClusterTest;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.VertexHandler;
@@ -26,7 +26,7 @@ import java.io.BufferedReader;
 /**
  * Testing the Bulk Import.
  */
-public class BulkLoadTest extends MapReduceClusterTest {
+public class BulkLoadTest extends GradoopClusterTest {
 
   @Test
   public void bulkLoadTest()
