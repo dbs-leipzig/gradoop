@@ -22,14 +22,14 @@ public class LabelPropagationComputationTest {
   @Test
   public void testConnectedGraph()
     throws Exception {
-    String[] graph = PartitioningComputationTestHelper.getLPConnectedGraph();
+    String[] graph = GiraphTestHelper.getConnectedGraphWithVertexValues();
     validateConnectedGraphResult(computeResults(graph));
   }
 
   @Test
   public void testLoopGraph()
     throws Exception {
-    String[] graph = PartitioningComputationTestHelper.getLPLoopGraph();
+    String[] graph = GiraphTestHelper.getLoopGraphWithVertexValues();
     validateLoopGraphResult(computeResults(graph));
   }
 
@@ -37,21 +37,21 @@ public class LabelPropagationComputationTest {
   @Test
   public void testDisconnectedGraph()
     throws Exception {
-    String[] graph = PartitioningComputationTestHelper.getLPDisconnectedGraph();
+    String[] graph = GiraphTestHelper.getDisconnectedGraphWithVertexValues();
     validateDisconnectedGraphResult(computeResults(graph));
   }
 
   @Test
-  public void testBiPartitGraph()
+  public void testBipartiteGraph()
     throws Exception {
-    String[] graph = PartitioningComputationTestHelper.getLPBiPartiteGraph();
-    validateBipartitGraphResult(computeResults(graph));
+    String[] graph = GiraphTestHelper.getBipartiteGraphWithVertexValues();
+    validateBipartiteGraphResult(computeResults(graph));
   }
 
   @Test
-  public void testCompleteBiPartiteGraph()
+  public void testCompleteBipartiteGraph()
     throws Exception {
-    String[] graph = PartitioningComputationTestHelper.getBiPartiteGraph();
+    String[] graph = GiraphTestHelper.getCompleteBipartiteGraphWithVertexValue();
     validateCompleteBipartiteGraphResult(computeResults(graph));
   }
 
@@ -92,7 +92,7 @@ public class LabelPropagationComputationTest {
     assertEquals(4, vertexIDwithValue.get(7).intValue());
   }
 
-  private void validateBipartitGraphResult(
+  private void validateBipartiteGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
     assertEquals(8, vertexIDwithValue.size());
     assertEquals(0, vertexIDwithValue.get(0).intValue());

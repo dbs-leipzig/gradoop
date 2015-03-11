@@ -38,14 +38,14 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
   }
 
   @Test
-  public void testConnectedGraph()
-    throws IOException, InterruptedException, ClassNotFoundException {
+  public void testConnectedGraph() throws IOException, InterruptedException,
+    ClassNotFoundException {
     // prepare data
-    BufferedReader inputReader = createTestReader
-      (PartitioningComputationTestHelper.getHBaseLPConnectedGraph());
+    BufferedReader inputReader = createTestReader(
+      GiraphTestHelper.getConnectedGraphWithVertexValues());
     GraphStore graphStore = createEmptyGraphStore();
-    AdjacencyListReader adjacencyListReader = new AdjacencyListReader
-      (graphStore, new PartitioningLineReader());
+    AdjacencyListReader adjacencyListReader =
+      new AdjacencyListReader(graphStore, new PartitioningLineReader());
     adjacencyListReader.read(inputReader);
     // run giraph
     compute();
@@ -67,24 +67,25 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
   }
 
   @Test
-  public void testBiPartiteGraph()
-    throws IOException, InterruptedException, ClassNotFoundException {
+  public void testBipartiteGraph() throws IOException, InterruptedException,
+    ClassNotFoundException {
     // prepare data
-    BufferedReader inputReader = createTestReader
-      (PartitioningComputationTestHelper.getBiPartiteGraph());
+    BufferedReader inputReader = createTestReader(
+      GiraphTestHelper
+        .getCompleteBipartiteGraphWithVertexValue());
     GraphStore graphStore = createEmptyGraphStore();
-    AdjacencyListReader adjacencyListReader = new AdjacencyListReader
-      (graphStore, new PartitioningLineReader());
+    AdjacencyListReader adjacencyListReader =
+      new AdjacencyListReader(graphStore, new PartitioningLineReader());
     adjacencyListReader.read(inputReader);
     // run giraph
     compute();
     // test results
-    validateBiPartiteGraph(graphStore);
+    validateBipartiteGraph(graphStore);
     // clean up
     graphStore.close();
   }
 
-  private void validateBiPartiteGraph(GraphStore store) {
+  private void validateBipartiteGraph(GraphStore store) {
     validateVertex(store, 0, 0);
     validateVertex(store, 1, 0);
     validateVertex(store, 2, 0);
@@ -97,7 +98,7 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
 
 
   private void validateVertex(final GraphStore store, final long vertexID,
-                              final long expectedValue) {
+    final long expectedValue) {
     Vertex v = store.readVertex(vertexID);
     assertNotNull(v);
     assertEquals(1, v.getPropertyCount());
@@ -105,8 +106,8 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
       v.getProperty(EPGLongLongNullVertexInputFormat.VALUE_PROPERTY_KEY));
   }
 
-  private void compute()
-    throws IOException, ClassNotFoundException, InterruptedException {
+  private void compute() throws IOException, ClassNotFoundException,
+    InterruptedException {
     // setup in- and output tables
     Configuration conf = utility.getConfiguration();
     conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
@@ -138,14 +139,13 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
       Map<String, Object> properties = Maps.newHashMapWithExpectedSize(1);
       properties.put(EPGLongLongNullVertexInputFormat.VALUE_PROPERTY_KEY,
         Long.valueOf(lineTokens[1]));
-      List<Edge> edges =
-        Lists.newArrayListWithCapacity(lineTokens.length - 2);
+      List<Edge> edges = Lists.newArrayListWithCapacity(lineTokens.length - 2);
       for (int n = 2; n < lineTokens.length; n++) {
         long otherID = Long.valueOf(lineTokens[n]);
         edges.add(EdgeFactory.createDefaultEdge(otherID, (long) n - 2));
       }
-      return VertexFactory.createDefaultVertexWithProperties(vertexID,
-        properties, edges);
+      return VertexFactory
+        .createDefaultVertexWithProperties(vertexID, properties, edges);
     }
   }
 }

@@ -27,13 +27,13 @@ public class AdaptiveRepartitioningComputationTest {
     final int stabilizationRounds = 5;
     final long seed = 13374242;
     String[] graph =
-      PartitioningComputationTestHelper.getAdaptivePartitioningConnectedGraph();
-    validateSmallConnectedGraphResult(
+      GiraphTestHelper.getConnectedGraphWithVertexValues();
+    validateConnectedGraphResult(
       computeResults(graph, numPartitions, numIterations, capacityThreshold,
         stabilizationRounds, seed));
   }
 
-  private void validateSmallConnectedGraphResult(
+  private void validateConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
     int n = vertexIDwithValue.size();
     int optimalPartitionSize = n / numPartitions;
