@@ -35,13 +35,11 @@ public class ConnectedComponentsComputation extends
       // for each edge, check, if target vertex id is smaller than current id
       for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> e :
         vertex.getEdges()) {
-        long candidate = e.getTargetVertexId().getID(); // 0->1 ...
+        long candidate = e.getTargetVertexId().getID();
         if (candidate < current) {
           current = candidate;
         }
       }
-      // TODO reset + add is not every time needed, only if id differs,
-      // TODO what about messages?
       vertex.getValue().resetGraphs();
       vertex.getValue().addGraph(current);
       for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> edge :
@@ -57,7 +55,6 @@ public class ConnectedComponentsComputation extends
     // next supersteps: take component from vertex.getValue().getGraphs()
     boolean changed = false;
     long current = vertex.getValue().getGraphs().iterator().next();
-    // did we get a smaller id ?
     for (LongWritable message : messages) {
       long candidate = message.get();
       if (candidate < current) {
