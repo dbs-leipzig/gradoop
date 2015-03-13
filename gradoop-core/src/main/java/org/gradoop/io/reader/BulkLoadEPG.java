@@ -58,6 +58,9 @@ public class BulkLoadEPG extends
 
     try {
       this.vertexLineReader = readerClass.getConstructor().newInstance();
+      if (this.vertexLineReader instanceof ConfigurableVertexLineReader){
+        ((ConfigurableVertexLineReader) this.vertexLineReader).setConf(conf);
+      }
       this.vertexHandler = handlerClass.getConstructor().newInstance();
     } catch (NoSuchMethodException | InstantiationException |
       InvocationTargetException | IllegalAccessException e) {
