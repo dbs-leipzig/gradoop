@@ -1,9 +1,10 @@
 package csv.io.reader;
 
 import com.google.common.collect.Lists;
+import org.apache.hadoop.conf.Configuration;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.csv.io.reader.CSVReader;
-import org.gradoop.io.reader.VertexLineReader;
+import org.gradoop.io.reader.ConfigurableVertexLineReader;
 import org.gradoop.model.Vertex;
 import org.junit.Test;
 
@@ -18,12 +19,17 @@ import java.util.List;
 public class CSVReaderTest extends GradoopClusterTest {
 
   private static final String NODE_META = "node_meta.csv";
-  private static final String NODE_TEXT = "node.csv";
+  private static final String NODE_TEXT = "person";
+
+
 
 
 
   @Test
   public void checkSimpleCSVInputTest() {
+
+
+
     for (Vertex v : createVerticesFromCSV()) {
       if(v.getID() == 0){
       }
@@ -32,7 +38,14 @@ public class CSVReaderTest extends GradoopClusterTest {
   }
 
   private List<Vertex> createVerticesFromCSV(){
-    VertexLineReader reader = new CSVReader(NODE_META);
+    ConfigurableVertexLineReader reader = new CSVReader();
+
+    Configuration conf = new Configuration();
+    conf.set("Meta", NODE_META);
+    conf.set("Label", "Person");
+
+    reader.setConf(conf);
+
     List<Vertex> vertices = Lists.newArrayList();
 
     try {

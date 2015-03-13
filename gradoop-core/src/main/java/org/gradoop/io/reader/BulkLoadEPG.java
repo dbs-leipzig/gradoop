@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class BulkLoadEPG extends
   Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
-
   /**
    * Configuration key for the vertex line reader.
    */
@@ -49,16 +48,13 @@ public class BulkLoadEPG extends
   protected void setup(Context context) throws IOException,
     InterruptedException {
     Configuration conf = context.getConfiguration();
-
     Class<? extends VertexLineReader> readerClass =
       conf.getClass(VERTEX_LINE_READER, null, VertexLineReader.class);
-
     Class<? extends VertexHandler> handlerClass =
       conf.getClass(VERTEX_HANDLER, null, VertexHandler.class);
-
     try {
       this.vertexLineReader = readerClass.getConstructor().newInstance();
-      if (this.vertexLineReader instanceof ConfigurableVertexLineReader){
+      if (this.vertexLineReader instanceof ConfigurableVertexLineReader) {
         ((ConfigurableVertexLineReader) this.vertexLineReader).setConf(conf);
       }
       this.vertexHandler = handlerClass.getConstructor().newInstance();
