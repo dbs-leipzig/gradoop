@@ -70,7 +70,7 @@ public class RDFAnalysisDriver extends Configured implements Tool {
   }
 
   /**
-   * Starting point for BTG analysis pipeline.
+   * Starting point for RDF analysis pipeline.
    *
    * @param args driver arguments
    * @return Exit code (0 - ok)
@@ -98,7 +98,7 @@ public class RDFAnalysisDriver extends Configured implements Tool {
       new EPGGraphHandler());
 
     /*
-    Step 1: Bulk Load of the graph into HBase using MapReduce
+    Stepx 1: Bulk Load of the graph into HBase using MapReduce
      */
     String inputPath =
       cmd.getOptionValue(ConfigurationUtils.OPTION_GRAPH_INPUT_PATH);

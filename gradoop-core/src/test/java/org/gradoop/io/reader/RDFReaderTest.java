@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
  * Tests for {@link org.gradoop.io.reader.RDFReader}.
  */
 public class RDFReaderTest extends GradoopClusterTest {
-
   private static final Long lgdID = 7821830309733859244L;
   private static final Long geoID = 7282190339445886145L;
   private static final Long dbpID = 7459480252541644492L;
@@ -69,9 +68,8 @@ public class RDFReaderTest extends GradoopClusterTest {
     assertEquals(label, vertex.getLabel());
   }
 
-  @Test
-  public void checkSimpleRDFNTripleInputTest() {
-    for (Vertex v : createVerticesFromRDF()) {
+  public void validateDetails(GraphStore graphStore) {
+    for (Vertex v : graphStore.readVertices()) {
       long id = v.getID();
       if (id == lgdID) {
         checkLabel(v, lgd);
@@ -124,7 +122,9 @@ public class RDFReaderTest extends GradoopClusterTest {
         graphStore.writeVertex(v);
       }
     }
+
     validateRDFGraph(graphStore);
+    validateDetails(graphStore);
     graphStore.close();
   }
 

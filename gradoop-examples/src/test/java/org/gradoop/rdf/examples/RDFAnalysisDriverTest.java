@@ -10,12 +10,15 @@ import org.gradoop.drivers.BulkWriteDriver;
 import org.gradoop.io.reader.JsonReader;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.io.writer.JsonWriter;
+import org.gradoop.io.writer.Neo4jWriter;
 import org.gradoop.utils.ConfigurationUtils;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +36,7 @@ public class RDFAnalysisDriverTest extends GradoopClusterTest {
    * Class logger.
    */
   private static final Logger LOG = Logger.getLogger(RDFAnalysisDriverTest.class);
+
   private static final Long A_DBP = -4820974574369803382L;
   private static final Long A_FAC = -3558936620827054041L;
 //  private static final Long A_GEO = -3728619970397603446L;
@@ -50,6 +54,9 @@ public class RDFAnalysisDriverTest extends GradoopClusterTest {
 //  private static final Long G_GEO = 8152360427669492775L;
   private static final Long G_NYT = -552704442989841987L;
 //  private static final Long G_LGD = -3957714962320320763L;
+
+  private static final String DB_PATH = "target/neo4j-db";
+
 
   @Test
   public void driverTest() throws Exception {
@@ -77,9 +84,34 @@ public class RDFAnalysisDriverTest extends GradoopClusterTest {
     GraphStore graphStore = openGraphStore();
     // RDF results
     validateComponentForSampleVertex(graphStore);
-    validateSelectAndAggregate(graphStore);
+
+    writeNeo4jOutput(graphStore);
+
+//    HashSet<Long> componentIDs = getUniqueComponentIDs();
+//    validateSelectAndAggregate(graphStore, componentIDs);
 
     graphStore.close();
+  }
+
+  private void writeNeo4jOutput(GraphStore graphStore) throws Exception {
+    Neo4jWriter writer = new Neo4jWriter(DB_PATH);
+    GraphDatabaseService db = writer.getGraphDbService();
+
+
+    try (Transaction tx = db.beginTx()) {
+      for (Vertex vertex : graphStore.readVertices()) {
+        writer.writeVertex(vertex);
+      }
+
+//      for (Vertex vertex : graphStore.readVertices()) {
+//        writer.writeEdges(vertex);
+//      }
+      tx.success();
+    }
+
+    writer.shutdown();
+
+    //assertTrue(false);
   }
 
   private HashSet<Long> getUniqueComponentIDs() throws Exception {
@@ -151,19 +183,8 @@ public class RDFAnalysisDriverTest extends GradoopClusterTest {
 //    validateRDF(graphStore.readVertex(G_GEO), gRef);
   }
 
-  private void validateSelectAndAggregate(GraphStore graphStore) throws
-    Exception {
-//    Graph afghanistan = graphStore.readGraph(getComponent(graphStore, A_DBP));
-//    Graph germany = graphStore.readGraph(getComponent(graphStore, D_DBP));
-//    Graph ghana = graphStore.readGraph(getComponent(graphStore, G_DBP));
-//
-//    List<Graph> graphs = Lists.newArrayListWithCapacity(3);
-//    graphs.add(afghanistan);
-//    graphs.add(germany);
-//    graphs.add(ghana);
-
-
-    HashSet<Long> componentIDs = getUniqueComponentIDs();
+  private void validateSelectAndAggregate(GraphStore graphStore,
+    HashSet<Long> componentIDs) throws Exception {
     List<Graph> graphs = Lists.newArrayListWithCapacity(componentIDs.size());
 
     for (Long id: componentIDs) {

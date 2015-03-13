@@ -117,12 +117,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-tdb</artifactId>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
         </dependency>
     </dependencies>
 </project>
