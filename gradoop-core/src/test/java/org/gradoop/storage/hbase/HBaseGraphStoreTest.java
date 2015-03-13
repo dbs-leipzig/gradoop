@@ -70,8 +70,22 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
 
     // validate
     validateGraphs(graphStore);
-    validateVertices(graphStore);
+    validateSingleVertices(graphStore);
+    validateAllVertices(graphStore);
+    validateEdges(graphStore);
+    graphStore.close();
+  }
 
+  @Test
+  public void writeFlushReadEdgesTest() {
+    GraphStore graphStore = createEmptyGraphStore();
+    graphStore.setAutoFlush(false);
+    for (Vertex v : createExtendedGraphVertices()) {
+      graphStore.writeVertex(v);
+    }
+    graphStore.flush();
+
+    validateEdges(graphStore);
     graphStore.close();
   }
 
@@ -93,8 +107,7 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
 
     // validate
     validateGraphs(graphStore);
-    validateVertices(graphStore);
-
+    validateSingleVertices(graphStore);
     graphStore.close();
   }
 
@@ -130,13 +143,23 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     assertEquals("v1", g.getProperty("k1"));
   }
 
-  private void validateVertices(GraphStore graphStore) {
+  private void validateSingleVertices(GraphStore graphStore) {
     List<Vertex> vertexResult =
       Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
     for (long l = 0L; l < EXTENDED_GRAPH.length; l++) {
       vertexResult.add(graphStore.readVertex(l));
     }
     validateExtendedGraphVertices(vertexResult);
+  }
+
+  private void validateAllVertices(GraphStore graphStore) {
+    List<Vertex> vertexResult = Lists.newArrayList(graphStore.readVertices());
+    validateExtendedGraphVertices(vertexResult);
+  }
+
+  private void validateEdges(GraphStore graphStore) {
+    List<Edge> edgeResult = Lists.newArrayList(graphStore.readEdges());
+    validateExtendedGraphEdges(edgeResult);
   }
 
   @Test(expected = UnsupportedTypeException.class)

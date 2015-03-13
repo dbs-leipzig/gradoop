@@ -1,17 +1,22 @@
 package org.gradoop.storage.hbase;
 
+import com.google.common.collect.Lists;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.log4j.Logger;
+import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.util.List;
 
 /**
  * Default HBase graph store that handles reading and writing vertices and
@@ -170,6 +175,46 @@ public class HBaseGraphStore implements GraphStore {
       e.printStackTrace();
     }
     return v;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Iterable<Vertex> readVertices() {
+    List<Vertex> vList = Lists.newArrayList();
+    try {
+      ResultScanner scanner = verticesTable.getScanner(new Scan());
+      for (Result res : scanner) {
+        if (!res.isEmpty()) {
+          vList.add(vertexHandler.readVertex(res));
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return vList;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Iterable<Edge> readEdges() {
+    List<Edge> eList = Lists.newArrayList();
+    try {
+      ResultScanner scanner = verticesTable.getScanner(new Scan());
+      for (Result res : scanner) {
+        if (!res.isEmpty()) {
+          for (Edge edge : vertexHandler.readOutgoingEdges(res)) {
+            eList.add(edge);
+          }
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return eList;
   }
 
   /**

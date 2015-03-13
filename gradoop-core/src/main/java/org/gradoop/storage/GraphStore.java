@@ -1,5 +1,6 @@
 package org.gradoop.storage;
 
+import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.hbase.GraphHandler;
@@ -55,6 +56,20 @@ public interface GraphStore {
    * {@code vertexID}
    */
   Vertex readVertex(final Long vertexID);
+
+  /**
+   * Reads all vertices from the graph store. If graph store is empty, {@code
+   * null} is returned.
+   * @return all vertices or {@code null} if graph store is empty
+   */
+  Iterable<Vertex> readVertices();
+
+  /**
+   * Reads all edges from the graph store. If no edges exist, {@code null} is
+   * returned
+   * @return all edges or {@code null} if vertices have no edges
+   */
+  Iterable<Edge> readEdges();
 
   /**
    * Setting this value to true, forces the store implementation to flush the
