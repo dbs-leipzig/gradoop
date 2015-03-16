@@ -36,26 +36,23 @@ public class CSVReader implements ConfigurableVertexLineReader {
   }
 
   private void initializeAndReadFirstLine(String line) {
-    Log.info("###INITIALIZE");
+//    Log.info("###INITIALIZE");
     vList = Lists.newArrayList();
     labels = Lists.newArrayList();
-    Log.info("###ReadFirstLine");
-    this.properties = getTokens(line);
-    for (int i = 0; i < properties.length; i++) {
-      Log.info(properties[i]);
-    }
+//    Log.info("###ReadFirstLine");
+    properties = getTokens(line);
+//    for (int i = 0; i < properties.length; i++) {
+//      Log.info(properties[i]);
+//    }
     String metaData = conf.get(META_DATA);
     labels.add(conf.get(LABEL));
-//    this.types =
-//      new String[]{"long", "string", "string", "string", "string", "string",
-//                   "string", "string",};
 
 
     try {
       BufferedReader in = new BufferedReader(new FileReader(metaData));
       String datLine;
       while ((datLine = in.readLine()) != null) {
-        this.types = getTokens(datLine);
+        types = getTokens(datLine);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -66,30 +63,30 @@ public class CSVReader implements ConfigurableVertexLineReader {
   }
 
   private void checkType() {
-    Log.info("###checkType");
+//    Log.info("###checkType");
     if (conf.get(TYPE).equals("node")) {
       this.node = true;
     }
-    Log.info(node);
+//    Log.info(node);
   }
 
   private Vertex readRemainingLines(String line) {
-    Log.info("###ReadRemainingLines");
+//    Log.info("###ReadRemainingLines");
     String[] tokens = getTokens(line);
     long id = Long.parseLong(tokens[0]);
-    Log.info(id);
-    Log.info(labels.get(0));
+//    Log.info(id);
+//    Log.info(labels.get(0));
     Vertex vex = VertexFactory.createDefaultVertexWithLabels(id, labels, null);
     if (node) {
       for (int i = 1; i < properties.length; i++) {
         switch (types[i]) {
         case "long":
           vex.addProperty(properties[i], Long.parseLong(tokens[i]));
-          Log.info(tokens[i]);
+//          Log.info(tokens[i]);
           break;
         case "string":
           vex.addProperty(properties[i], tokens[i]);
-          Log.info(tokens[i]);
+//          Log.info(tokens[i]);
           break;
         default:
           vex.addProperty(properties[i], tokens[i]);
