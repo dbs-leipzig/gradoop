@@ -152,6 +152,7 @@ public class CSVReader implements ConfigurableVertexLineReader {
     }
   }
 
+
   /**
    * {@inheritDoc}
    */

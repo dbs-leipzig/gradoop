@@ -29,7 +29,9 @@ public class BulkWriteDriverTest extends GradoopClusterTest {
       "-" + BulkWriteDriver.ConfUtils.OPTION_VERTEX_LINE_WRITER,
       SimpleVertexWriter.class.getName(),
       "-" + BulkWriteDriver.ConfUtils.OPTION_HBASE_SCAN_CACHE, "10",
-      "-" + BulkWriteDriver.ConfUtils.OPTION_GRAPH_OUTPUT_PATH, outputDirName
+      "-" + BulkWriteDriver.ConfUtils.OPTION_GRAPH_OUTPUT_PATH, outputDirName,
+      "-" + BulkWriteDriver.ConfUtils.OPTION_CUSTOM_ARGUMENT,
+      "csv-reader.label=knows, csv-reader.meta_data=person_knows_person.meta"
     };
 
     BulkWriteDriver bulkWriteDriver = new BulkWriteDriver();

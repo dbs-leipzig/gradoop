@@ -1,5 +1,7 @@
 package org.gradoop.drivers;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -60,6 +62,23 @@ public class BulkWriteDriver extends Configured implements Tool {
       cmd.getOptionValue(ConfUtils.OPTION_VERTEX_LINE_WRITER);
     int hbaseScanCache = Integer
       .parseInt(cmd.getOptionValue(ConfUtils.OPTION_HBASE_SCAN_CACHE, "0"));
+    if (cmd.hasOption(ConfUtils.OPTION_CUSTOM_ARGUMENT)) {
+      for (String caOptionValue : cmd.getOptionValues("ca")) {
+        for (String paramValue : Splitter.on(',').split(caOptionValue)) {
+          String[] parts =
+            Iterables.toArray(Splitter.on('=').split(paramValue), String.class);
+          if (parts.length != 2) {
+            throw new IllegalArgumentException("Unable to parse custom " +
+              " argument: " + paramValue);
+          }
+          //if (LOG.isInfoEnabled()) {
+          LOG.info("###Setting custom argument [" + parts[0] + "] to [" +
+            parts[1] + "] in GiraphConfiguration");
+          //}
+          conf.set(parts[0], parts[1]);
+        }
+      }
+    }
 
     Class<? extends VertexLineWriter> writerClass =
       getLineWriterClass(writerClassName);
@@ -160,6 +179,10 @@ public class BulkWriteDriver extends Configured implements Tool {
      */
     public static final String OPTION_GRAPH_OUTPUT_PATH = "gop";
     /**
+     * Command line option to set a custom argument.
+     */
+    public static final String OPTION_CUSTOM_ARGUMENT = "ca";
+    /**
      * Holds options accepted by {@link org.gradoop.drivers.BulkWriteDriver}.
      */
     private static Options OPTIONS;
@@ -176,6 +199,13 @@ public class BulkWriteDriver extends Configured implements Tool {
           " single line in the output.");
       OPTIONS.addOption(OPTION_GRAPH_OUTPUT_PATH, "graph-output-path", true,
         "Path where the output is stored.");
+      OPTIONS.addOption(OPTION_CUSTOM_ARGUMENT, "customArguments", true,
+        "provide custom" +
+          " arguments for the job configuration in the form:" +
+          " -ca <param1>=<value1>,<param2>=<value2> -ca <param3>=<value3> etc" +
+          "." +
+          " It can appear multiple times, and the last one has effect" +
+          " for the same param.");
     }
 
     /**

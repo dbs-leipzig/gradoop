@@ -3,7 +3,6 @@ package csv.io.reader;
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
-import org.gradoop.GradoopClusterTest;
 import org.gradoop.csv.io.reader.CSVReader;
 import org.gradoop.io.reader.ConfigurableVertexLineReader;
 import org.gradoop.model.Edge;
@@ -18,37 +17,44 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests for {@link org.gradoop.csv.io.reader.CSVReader}.
  */
-public class CSVReaderTest{
+public class CSVReaderTest {
+  Logger LOG = Logger.getLogger(CSVReaderTest.class);
+  // paths to meta data
   private final String NODE_META =
     getClass().getResource("/node_meta.csv").getPath();
   private final String EDGE_META =
     getClass().getResource("/edge_meta.csv").getPath();
-  private static final String label_node = "Person";
-  private static final String firstNameProperty = "firstName";
-  private static final String lastNameProperty = "lastName";
-  private static final String genderProperty = "gender";
-  private static final String birthdayProperty = "birthday";
+  // node test values, properties and labels
+  private static final String LABEL_NODE = "Person";
+  private static final String FIRSTNAMEPROPERTY = "firstName";
+  private static final String LASTNAMEPROPERTY = "lastName";
+  private static final String GENDERPROPERTY = "gender";
+  private static final String BIRTHDAYPROPERTY = "birthday";
   private static final long person0 = 0;
-  private static final String firstNameValue0 = "Arun";
-  private static final String lastNameValue0 = "Reddy";
-  private static final String genderValue0 = "female";
-  private static final String birthdayValue0 = "1987-05-27";
+  private static final String FIRSTNAMEVALUE0 = "Arun";
+  private static final String LASTNAMEVALUE0 = "Reddy";
+  private static final String GENDERVALUE0 = "female";
+  private static final String BIRTHDAYVALUE0 = "1987-05-27";
   private static final long person1 = 1;
-  private static final String firstNameValue1 = "Yang";
-  private static final String lastNameValue1 = "Li";
-  private static final String genderValue1 = "male";
-  private static final String birthdayValue1 = "1984-07-09";
-  private static final String edgeLabel = "workedAt";
+  private static final String FIRSTNAMEVALUE1 = "Yang";
+  private static final String LASTNAMEVALUE1 = "Li";
+  private static final String GENDERVALUE1 = "male";
+  private static final String BIRTHDAYVALUE1 = "1984-07-09";
+  // edge test label and id's
+  private static final String EDGELABEL = "workedAt";
   private static final long person2 = 2;
   private static final long person3 = 3;
   private static final long person4 = 4;
   private static final long person5 = 5;
+  // Test files
   private static final String[] PERSON_CSV =
     new String[]{"id|firstName|lastName|gender|birthday|",
                  "0|Arun|Reddy|female|1987-05-27|",
                  "1|Yang|Li|male|1984-07-09|"};
   private static final String[] KNOWS_CSV =
-    new String[]{"Person.id|Organisation.id|since|", "2|3|2015|", "4|5|2012|"};
+    new String[]{"Person.id|Organisation.id|since|office|department|",
+                 "2|3|2015|P414|visual-studios|",
+                 "4|5|2012|P416|databases|"};
 
   @Test
   public void checkNodeCSVInputTest() {
@@ -57,37 +63,37 @@ public class CSVReaderTest{
     for (Vertex v : vlist) {
       long id = v.getID();
       if (id == person0) {
-        checkLabel(v, label_node);
+        checkLabel(v, LABEL_NODE);
         for (String propertyKey : v.getPropertyKeys()) {
-          if (propertyKey.equals(firstNameProperty)) {
+          if (propertyKey.equals(FIRSTNAMEPROPERTY)) {
             String value = (String) v.getProperty(propertyKey);
-            assertEquals(value, firstNameValue0);
-          } else if (propertyKey.equals(lastNameProperty)) {
-            String value = (String) v.getProperty(lastNameProperty);
-            assertEquals(value, lastNameValue0);
-          } else if (propertyKey.equals(genderProperty)) {
-            String value = (String) v.getProperty(genderProperty);
-            assertEquals(value, genderValue0);
-          } else if (propertyKey.equals(birthdayProperty)) {
-            String value = (String) v.getProperty(birthdayProperty);
-            assertEquals(value, birthdayValue0);
+            assertEquals(value, FIRSTNAMEVALUE0);
+          } else if (propertyKey.equals(LASTNAMEPROPERTY)) {
+            String value = (String) v.getProperty(LASTNAMEPROPERTY);
+            assertEquals(value, LASTNAMEVALUE0);
+          } else if (propertyKey.equals(GENDERPROPERTY)) {
+            String value = (String) v.getProperty(GENDERPROPERTY);
+            assertEquals(value, GENDERVALUE0);
+          } else if (propertyKey.equals(BIRTHDAYPROPERTY)) {
+            String value = (String) v.getProperty(BIRTHDAYPROPERTY);
+            assertEquals(value, BIRTHDAYVALUE0);
           }
         }
       } else if (id == person1) {
-        checkLabel(v, label_node);
+        checkLabel(v, LABEL_NODE);
         for (String propertyKey : v.getPropertyKeys()) {
-          if (propertyKey.equals(firstNameProperty)) {
+          if (propertyKey.equals(FIRSTNAMEPROPERTY)) {
             String value = (String) v.getProperty(propertyKey);
-            assertEquals(value, firstNameValue1);
-          } else if (propertyKey.equals(lastNameProperty)) {
-            String value = (String) v.getProperty(lastNameProperty);
-            assertEquals(value, lastNameValue1);
-          } else if (propertyKey.equals(genderProperty)) {
-            String value = (String) v.getProperty(genderProperty);
-            assertEquals(value, genderValue1);
-          } else if (propertyKey.equals(birthdayProperty)) {
-            String value = (String) v.getProperty(birthdayProperty);
-            assertEquals(value, birthdayValue1);
+            assertEquals(value, FIRSTNAMEVALUE1);
+          } else if (propertyKey.equals(LASTNAMEPROPERTY)) {
+            String value = (String) v.getProperty(LASTNAMEPROPERTY);
+            assertEquals(value, LASTNAMEVALUE1);
+          } else if (propertyKey.equals(GENDERPROPERTY)) {
+            String value = (String) v.getProperty(GENDERPROPERTY);
+            assertEquals(value, GENDERVALUE1);
+          } else if (propertyKey.equals(BIRTHDAYPROPERTY)) {
+            String value = (String) v.getProperty(BIRTHDAYPROPERTY);
+            assertEquals(value, BIRTHDAYVALUE1);
           }
         }
       }
@@ -128,13 +134,13 @@ public class CSVReaderTest{
 
   protected void checkOutgoingEdge(List<Edge> edges) {
     for (Edge edge : edges) {
-      assertEquals(edge.getLabel(), edgeLabel);
+      assertEquals(edge.getLabel(), EDGELABEL);
     }
   }
 
   protected void checkIncomingEdge(List<Edge> edges) {
     for (Edge edge : edges) {
-      assertEquals(edge.getLabel(), edgeLabel);
+      assertEquals(edge.getLabel(), EDGELABEL);
     }
   }
 
