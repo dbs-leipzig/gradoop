@@ -18,10 +18,6 @@ import org.apache.log4j.Logger;
  */
 public abstract class BulkDriver extends Configured implements Tool {
   /**
-   * Class Logger
-   */
-  private static Logger LOG = Logger.getLogger(BulkDriver.class);
-  /**
    * Command line option for displaying help.
    */
   public static final String OPTION_HELP = "h";
@@ -41,14 +37,77 @@ public abstract class BulkDriver extends Configured implements Tool {
    * Command line option to set a custom argument.
    */
   public static final String OPTION_CUSTOM_ARGUMENT = "ca";
-  public boolean verbose;
-  public String inputPath;
-  public String outputPath;
-  public Configuration conf;
+  /**
+   * Class Logger
+   */
+  private static Logger LOG = Logger.getLogger(BulkDriver.class);
+  /**
+   * Verbose var for bulkload and buldwrite driver
+   */
+  private boolean verbose;
+  /**
+   * graph input path
+   */
+  private String inputPath;
+  /**
+   * graph output path
+   */
+  private String outputPath;
+  /**
+   * Giraph configuration
+   */
+  private Configuration conf;
 
-  public void parseArgs(String[] args) throws ParseException {
+  /**
+   * Get Method for verbose var
+   *
+   * @return verbose
+   */
+  public boolean getVerbose() {
+    return this.verbose;
+  }
+
+  /**
+   * Get Method for input path
+   *
+   * @return inputPath
+   */
+  public String getInputPath() {
+    return this.inputPath;
+  }
+
+  /**
+   * Get Method for output path
+   *
+   * @return outputpath
+   */
+  public String getOutputPath() {
+    return this.outputPath;
+  }
+
+  /**
+   * Get Method for giraph Configuration
+   *
+   * @return conf
+   */
+  public Configuration getGiraphConf() {
+    return this.conf;
+  }
+
+  /**
+   * Method to parse the given arguments
+   *
+   * @param args arguments of the command line
+   * @return int check number
+   * @throws ParseException
+   */
+  public int parseArgs(String[] args) throws ParseException {
     conf = getConf();
     CommandLine cmd = ConfUtils.parseArgs(args);
+    if (cmd.hasOption(OPTION_HELP)) {
+      printHelp();
+      return 0;
+    }
     verbose = cmd.hasOption(OPTION_VERBOSE);
     inputPath = cmd.getOptionValue(OPTION_GRAPH_INPUT_PATH);
     outputPath = cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH);
@@ -61,14 +120,24 @@ public abstract class BulkDriver extends Configured implements Tool {
             throw new IllegalArgumentException("Unable to parse custom " +
               " argument: " + paramValue);
           }
-          //if (LOG.isInfoEnabled()) {
+          parts[1] = parts[1].replaceAll("\"", "");
+          if (LOG.isInfoEnabled()) {
             LOG.info("###Setting custom argument [" + parts[0] + "] to [" +
               parts[1] + "] in GiraphConfiguration");
-          //}
+          }
           conf.set(parts[0], parts[1]);
         }
       }
     }
+    return 1;
+  }
+
+  /**
+   * Prints a help menu for the defined options.
+   */
+  private static void printHelp() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp(ConfUtils.class.getName(), ConfUtils.OPTIONS, true);
   }
 
   /**
@@ -78,7 +147,7 @@ public abstract class BulkDriver extends Configured implements Tool {
     /**
      * Maintains accepted options for {@link org.gradoop.drivers.BulkLoadDriver}
      */
-    protected static Options OPTIONS;
+    protected static final Options OPTIONS;
 
     static {
       OPTIONS = new Options();
@@ -112,34 +181,7 @@ public abstract class BulkDriver extends Configured implements Tool {
       }
       CommandLineParser parser = new BasicParser();
       CommandLine cmd = parser.parse(OPTIONS, args, true);
-      if (cmd.hasOption(OPTION_HELP)) {
-        printHelp();
-        return null;
-      }
-      boolean sane = performSanityCheck(cmd);
-
-      return sane ? cmd : null;
-    }
-
-    private static boolean performSanityCheck(final CommandLine cmd){
-      boolean sane = true;
-      if (!cmd.hasOption(OPTION_GRAPH_OUTPUT_PATH)) {
-        LOG.error("Choose the graph output path (-gop)");
-        sane = false;
-      }
-      if (!cmd.hasOption(OPTION_GRAPH_INPUT_PATH)) {
-        LOG.error("Choose the graph input path. (-gip)");
-        sane = false;
-      }
-      return sane;
-    }
-
-    /**
-     * Prints a help menu for the defined options.
-     */
-    private static void printHelp() {
-      HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp(ConfUtils.class.getName(), OPTIONS, true);
+      return cmd;
     }
   }
 }

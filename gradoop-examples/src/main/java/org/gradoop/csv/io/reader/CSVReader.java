@@ -2,6 +2,7 @@ package org.gradoop.csv.io.reader;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.log4j.Logger;
 import org.gradoop.io.reader.ConfigurableVertexLineReader;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
@@ -49,6 +50,10 @@ public class CSVReader implements ConfigurableVertexLineReader {
    * Node type if csv input contains nodes
    */
   private static final String NODE_TYPE = "node";
+  /**
+   * Class Logger
+   */
+  private static final Logger LOG = Logger.getLogger(CSVReader.class);
   /**
    * Configuration
    */
@@ -99,7 +104,8 @@ public class CSVReader implements ConfigurableVertexLineReader {
     // Get properties (e.g. FirstName, LastName...)
     properties = getTokens(line);
     // Get MetaData (e.g. long, string, string...)
-    readTypes(conf.get(META_DATA));
+    types = getTokens(conf.get(META_DATA));
+    //readTypes(conf.get(META_DATA));
     // Set Labels
     labels.add(conf.get(LABEL));
     // getCSVType
@@ -115,13 +121,15 @@ public class CSVReader implements ConfigurableVertexLineReader {
    * @param metaData configuration parameter
    */
   private void readTypes(String metaData) {
+    LOG.info("###readTypes");
+    LOG.info("###metaPath" + metaData);
     try {
       BufferedReader in = new BufferedReader(
         new InputStreamReader(new FileInputStream(metaData),
           Charset.forName("UTF-8")));
       String line;
       while ((line = in.readLine()) != null) {
-        types = getTokens(line);
+        types = getTokens(metaData);
       }
       in.close();
     } catch (IOException e) {
@@ -151,7 +159,6 @@ public class CSVReader implements ConfigurableVertexLineReader {
       return Lists.newArrayListWithExpectedSize(size);
     }
   }
-
 
   /**
    * {@inheritDoc}

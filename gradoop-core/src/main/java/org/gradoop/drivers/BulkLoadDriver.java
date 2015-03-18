@@ -41,25 +41,33 @@ public class BulkLoadDriver extends BulkDriver implements Tool {
   }
 
   /**
+   * Constructor
+   */
+  public BulkLoadDriver() {
+    new LoadConfUtils();
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public int run(String[] args) throws Exception {
-    LOG.info("####parseArgs");
-    LoadConfUtils.setOptions();
-    parseArgs(args);
-    LOG.info("####inputPath: " + inputPath);
-    LOG.info("####outputPath: " + outputPath);
-
-
+    int check = parseArgs(args);
+    if (check == 0) {
+      return 0;
+    }
     CommandLine cmd = LoadConfUtils.parseArgs(args);
     if (cmd == null) {
       return 0;
     }
     boolean sane = performSanityCheck(cmd);
-    if (sane) {
+    if (!sane) {
       return -1;
     }
+    Configuration conf = getGiraphConf();
+    String inputPath = getInputPath();
+    String outputPath = getOutputPath();
+    boolean verbose = getVerbose();
     boolean dropTables = cmd.hasOption(LoadConfUtils.OPTION_DROP_TABLES);
     String readerClassName =
       cmd.getOptionValue(LoadConfUtils.OPTION_VERTEX_LINE_READER);
@@ -81,8 +89,6 @@ public class BulkLoadDriver extends BulkDriver implements Tool {
    */
   private Class<? extends VertexLineReader> getLineReaderClass(
     final String readerClassName) throws ClassNotFoundException {
-    LOG.info("###getLineReader: " + Class.forName(readerClassName).asSubclass
-      (VertexLineReader.class));
     return Class.forName(readerClassName).asSubclass(VertexLineReader.class);
   }
 
@@ -110,6 +116,14 @@ public class BulkLoadDriver extends BulkDriver implements Tool {
     boolean sane = true;
     if (!cmd.hasOption(LoadConfUtils.OPTION_VERTEX_LINE_READER)) {
       LOG.error("Choose the vertex line reader (-vlr)");
+      sane = false;
+    }
+    if (!cmd.hasOption(OPTION_GRAPH_OUTPUT_PATH)) {
+      LOG.error("Choose the graph output path (-gop)");
+      sane = false;
+    }
+    if (!cmd.hasOption(OPTION_GRAPH_INPUT_PATH)) {
+      LOG.error("Choose the graph input path. (-gip)");
       sane = false;
     }
     return sane;
@@ -178,6 +192,9 @@ public class BulkLoadDriver extends BulkDriver implements Tool {
     System.exit(ToolRunner.run(new BulkLoadDriver(), args));
   }
 
+  /**
+   * Configuration params for {@link org.gradoop.drivers.BulkLoadDriver}.
+   */
   public static class LoadConfUtils extends ConfUtils {
     /**
      * Command lne option for setting the vertex reader class.
@@ -194,18 +211,6 @@ public class BulkLoadDriver extends BulkDriver implements Tool {
       OPTIONS.addOption(OPTION_VERTEX_LINE_READER, "vertex-line-reader", true,
         "VertexLineReader implementation which is used to read a single line " +
           "in the input.");
-      LOG.info("###options added drop table and vertex line reader");
     }
-
-    public static void setOptions(){
-      OPTIONS.addOption(OPTION_DROP_TABLES, "drop-tables", false,
-        "Drop HBase EPG tables if they exist.");
-      OPTIONS.addOption(OPTION_VERTEX_LINE_READER, "vertex-line-reader", true,
-        "VertexLineReader implementation which is used to read a single line " +
-          "in the input.");
-      LOG.info("###options added drop table and vertex line reader");
-    }
-
-
   }
 }
