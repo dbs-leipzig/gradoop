@@ -19,11 +19,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class CSVReaderTest {
   Logger LOG = Logger.getLogger(CSVReaderTest.class);
-  // paths to meta data
-  private final String NODE_META =
-    getClass().getResource("/node_meta.csv").getPath();
-  private final String EDGE_META =
-    getClass().getResource("/edge_meta.csv").getPath();
+  // Meta Strings
+  private final String NODE_META = "long|string|string|string|string|";
+  private final String EDGE_META = "long|long|long|string|string|";
   // node test values, properties and labels
   private static final String LABEL_NODE = "Person";
   private static final String FIRSTNAMEPROPERTY = "firstName";
@@ -53,8 +51,7 @@ public class CSVReaderTest {
                  "1|Yang|Li|male|1984-07-09|"};
   private static final String[] KNOWS_CSV =
     new String[]{"Person.id|Organisation.id|since|office|department|",
-                 "2|3|2015|P414|visual-studios|",
-                 "4|5|2012|P416|databases|"};
+                 "2|3|2015|P414|visual-studios|", "4|5|2012|P416|databases|"};
 
   @Test
   public void checkNodeCSVInputTest() {
@@ -135,12 +132,14 @@ public class CSVReaderTest {
   protected void checkOutgoingEdge(List<Edge> edges) {
     for (Edge edge : edges) {
       assertEquals(edge.getLabel(), EDGELABEL);
+      LOG.info(edge.getPropertyKeys());
     }
   }
 
   protected void checkIncomingEdge(List<Edge> edges) {
     for (Edge edge : edges) {
       assertEquals(edge.getLabel(), EDGELABEL);
+      LOG.info(edge.getPropertyKeys());
     }
   }
 

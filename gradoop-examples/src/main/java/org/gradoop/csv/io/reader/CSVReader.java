@@ -2,18 +2,12 @@ package org.gradoop.csv.io.reader;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.log4j.Logger;
 import org.gradoop.io.reader.ConfigurableVertexLineReader;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.impl.EdgeFactory;
 import org.gradoop.model.impl.VertexFactory;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -50,10 +44,6 @@ public class CSVReader implements ConfigurableVertexLineReader {
    * Node type if csv input contains nodes
    */
   private static final String NODE_TYPE = "node";
-  /**
-   * Class Logger
-   */
-  private static final Logger LOG = Logger.getLogger(CSVReader.class);
   /**
    * Configuration
    */
@@ -113,28 +103,6 @@ public class CSVReader implements ConfigurableVertexLineReader {
     random = new Random();
     // initialStep is over
     initialStep = false;
-  }
-
-  /**
-   * Load Metadata Types e.g. long|string|string|...
-   *
-   * @param metaData configuration parameter
-   */
-  private void readTypes(String metaData) {
-    LOG.info("###readTypes");
-    LOG.info("###metaPath" + metaData);
-    try {
-      BufferedReader in = new BufferedReader(
-        new InputStreamReader(new FileInputStream(metaData),
-          Charset.forName("UTF-8")));
-      String line;
-      while ((line = in.readLine()) != null) {
-        types = getTokens(metaData);
-      }
-      in.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 
   /**
@@ -212,18 +180,18 @@ public class CSVReader implements ConfigurableVertexLineReader {
    * @param line     line of csv input
    */
   private void readEdges(List<Vertex> vertices, String line) {
-    List<String> label0 = Lists.newArrayListWithExpectedSize(1);
-    List<String> label1 = Lists.newArrayListWithExpectedSize(1);
+    List<String> nodeLabel0 = Lists.newArrayListWithExpectedSize(1);
+    List<String> nodeLabel1 = Lists.newArrayListWithExpectedSize(1);
     String[] tokens = getTokens(line);
     long id0 = Long.parseLong(tokens[0]);
     long id1 = Long.parseLong(tokens[1]);
-    String label = conf.get(LABEL);
-    label0.add(properties[0].replace(".id", ""));
-    label1.add(properties[1].replace(".id", ""));
+    String edgeLabel = conf.get(LABEL);
+    nodeLabel0.add(properties[0].replace(".id", ""));
+    nodeLabel1.add(properties[1].replace(".id", ""));
     Edge outgoing =
-      EdgeFactory.createDefaultEdgeWithLabel(id1, label, random.nextLong());
+      EdgeFactory.createDefaultEdgeWithLabel(id1, edgeLabel, random.nextLong());
     Edge incoming =
-      EdgeFactory.createDefaultEdgeWithLabel(id0, label, random.nextLong());
+      EdgeFactory.createDefaultEdgeWithLabel(id0, edgeLabel, random.nextLong());
     for (int i = 2; i < properties.length; i++) {
       switch (types[i]) {
       case "long":
@@ -249,9 +217,9 @@ public class CSVReader implements ConfigurableVertexLineReader {
     List<Edge> incomingEdgeList = Lists.newArrayListWithCapacity(1);
     incomingEdgeList.add(incoming);
     Vertex vex0 = VertexFactory
-      .createDefaultVertex(id0, label0, null, outgoingEdgeList, null, null);
+      .createDefaultVertex(id0, nodeLabel0, null, outgoingEdgeList, null, null);
     Vertex vex1 = VertexFactory
-      .createDefaultVertex(id1, label1, null, null, incomingEdgeList, null);
+      .createDefaultVertex(id1, nodeLabel1, null, null, incomingEdgeList, null);
     vertices.add(vex0);
     vertices.add(vex1);
   }
