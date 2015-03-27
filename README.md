@@ -59,7 +59,7 @@ To run the pipeline on your hadoop installation, please follow these steps.
 *   The following call runs the pipeline on a given input graph (foodbroker) using 11 giraph workers, 11 reducers and a hbase scan cache of 500 rows.
 
     > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt; 
-    -jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver -libjars $HBASE_LIBS -gip /user/hduser/input/foodbroker_10.graph -gop /user/hduser/output/hdfiles -w 11 -r 11 -sc 500
+    -jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver -libjars $HBASE_JARS -gip /user/hduser/input/foodbroker_10.graph -gop /user/hduser/output/hdfiles -w 11 -r 11 -sc 500
 
 *   See [Foodbroker Repository](https://github.com/dbs-leipzig/foodbroker) if you want to generate your
     own graphs or implement a custom FileReader to load your own graph format.
