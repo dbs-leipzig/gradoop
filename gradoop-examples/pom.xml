@@ -120,5 +120,9 @@
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
     </dependencies>
 </project>

@@ -1,62 +1,30 @@
 package org.gradoop.rdf.examples;
 
-import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.algorithms.SelectAndAggregate;
-import org.gradoop.drivers.BulkWriteDriver;
-import org.gradoop.io.reader.JsonReader;
-import org.gradoop.io.reader.VertexLineReader;
-import org.gradoop.io.writer.JsonWriter;
-import org.gradoop.io.writer.Neo4jWriter;
 import org.gradoop.utils.ConfigurationUtils;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
- * Tests the pipeline described in {@link org.gradoop.rdf.examples.RDFAnalysisDriver}.
+ * Tests the pipeline described in
+ * {@link org.gradoop.rdf.examples.RDFAnalysisDriver}.
  */
 public class RDFAnalysisDriverTest extends GradoopClusterTest {
-  /**
-   * Class logger.
-   */
-  private static final Logger LOG = Logger.getLogger(RDFAnalysisDriverTest.class);
+  private static final long MAX_GRAPHS1 = -9022373811030210963L;
+  private static final long MAX_GRAPHS2 = -7402558968462893373L;
+  private static final long MAX_GRAPHS3 = -8374894514776459130L;
 
-  private static final Long A_DBP = -4820974574369803382L;
-  private static final Long A_FAC = -3558936620827054041L;
-//  private static final Long A_GEO = -3728619970397603446L;
-  private static final Long A_NYT = -2056322834497809177L;
-//  private static final Long A_LGD = 85441770852151607L;
-
-  private static final Long D_DBP =  8473659083696230591L;
-  private static final Long D_FAC = -9198211274455686300L;
-//  private static final Long D_GEO =  7366010066576370289L;
-  private static final Long D_NYT =  3410771805009961568L;
-//  private static final Long D_LGD =  1506527894713967875L;
-
-  private static final Long G_DBP = -1005574797037940634L;
-  private static final Long G_FAC = 8710406901643533074L;
-//  private static final Long G_GEO = 8152360427669492775L;
-  private static final Long G_NYT = -552704442989841987L;
-//  private static final Long G_LGD = -3957714962320320763L;
-
-  private static final String DB_PATH = "target/neo4j-db";
-
+  private static final int VERTICES_COUNT_12 = 12;
+  private static final int VERTICES_COUNT_11 = 11;
 
   @Test
   public void driverTest() throws Exception {
@@ -82,167 +50,46 @@ public class RDFAnalysisDriverTest extends GradoopClusterTest {
     // tests
     assertThat(exitCode, is(0));
     GraphStore graphStore = openGraphStore();
-    // RDF results
-    validateComponentForSampleVertex(graphStore);
-
-    writeNeo4jOutput(graphStore);
-
-//    HashSet<Long> componentIDs = getUniqueComponentIDs();
-//    validateSelectAndAggregate(graphStore, componentIDs);
+    HashSet<Graph> graphs = getGraphs(graphStore);
+    validateSelectAndAggregate(graphs);
 
     graphStore.close();
   }
 
-  private void writeNeo4jOutput(GraphStore graphStore) throws Exception {
-    Neo4jWriter writer = new Neo4jWriter(DB_PATH);
-    GraphDatabaseService db = writer.getGraphDbService();
+  private HashSet<Graph> getGraphs(GraphStore graphStore) throws Exception {
+    Iterable<Vertex> vertices = graphStore.readVertices();
+    HashSet<Graph> graphs = new HashSet<>();
 
-
-    try (Transaction tx = db.beginTx()) {
-      for (Vertex vertex : graphStore.readVertices()) {
-        writer.writeVertex(vertex);
-      }
-
-//      for (Vertex vertex : graphStore.readVertices()) {
-//        writer.writeEdges(vertex);
-//      }
-      tx.success();
+    for (Vertex vertex : vertices) {
+      Long graphId = vertex.getGraphs().iterator().next();
+      Graph graph = graphStore.readGraph(getComponent(graphStore, graphId));
+      graphs.add(graph);
     }
 
-    writer.shutdown();
-
-    //assertTrue(false);
+    return graphs;
   }
 
-  private HashSet<Long> getUniqueComponentIDs() throws Exception {
-    String outputDirName = "/output/export/rdf";
-
-    String[] outArgs = new String[] {
-      "-" + BulkWriteDriver.ConfUtils.OPTION_VERTEX_LINE_WRITER,
-      JsonWriter.class.getName(),
-      "-" + BulkWriteDriver.ConfUtils.OPTION_HBASE_SCAN_CACHE, "10",
-      "-" + BulkWriteDriver.ConfUtils.OPTION_GRAPH_OUTPUT_PATH, outputDirName
-    };
-
-    BulkWriteDriver bulkWriteDriver = new BulkWriteDriver();
-    bulkWriteDriver.setConf(utility.getConfiguration());
-
-    // run the bulk write
-    int outExitCode = bulkWriteDriver.run(outArgs);
-
-    // testing
-    assertThat(outExitCode, CoreMatchers.is(0));
-
-    // read map output
-    int count = 18584;
-    Path outputFile = new Path(outputDirName, "part-m-00000");
-    String[] fileContent = readGraphFromFile(outputFile, count);
-
-    HashSet<Long> uniqueComponents = new HashSet<>();
-    VertexLineReader reader = new JsonReader();
-    for (String line : fileContent) {
-      if (!line.isEmpty()) {
-        Vertex vertex = reader.readVertex(line);
-        Long graphID = vertex.getGraphs().iterator().next();
-        if (graphID == -9022373811030210963L) {
-          LOG.info("======== max value vertex: " + vertex.toString());
-        }
-        if (graphID == -7402558968462893373L) {
-          LOG.info("======== -7402558968462893373 vertex: " + vertex.toString());
-        }
-        if (graphID == -8374894514776459130L) {
-          LOG.info("======== -8374894514776459130 vertex: " + vertex.toString());
-        }
-        uniqueComponents.add(graphID);
-      }
-    }
-    return uniqueComponents;
-  }
-
-  private void validateComponentForSampleVertex(GraphStore graphStore) {
-    Long aRef = getComponent(graphStore, A_DBP);
-    Long dRef = getComponent(graphStore, D_DBP);
-    Long gRef = getComponent(graphStore, G_DBP);
-
-    validateRDF(graphStore.readVertex(A_DBP), aRef);
-    validateRDF(graphStore.readVertex(A_FAC), aRef);
-    validateRDF(graphStore.readVertex(A_NYT), aRef);
-//    validateRDF(graphStore.readVertex(A_LGD), aRef);
-//    validateRDF(graphStore.readVertex(A_GEO), aRef);
-
-    validateRDF(graphStore.readVertex(D_DBP), dRef);
-    validateRDF(graphStore.readVertex(D_FAC), dRef);
-    validateRDF(graphStore.readVertex(D_NYT), dRef);
-//    validateRDF(graphStore.readVertex(D_LGD), dRef);
-//    validateRDF(graphStore.readVertex(D_GEO), dRef);
-
-    validateRDF(graphStore.readVertex(G_DBP), gRef);
-    validateRDF(graphStore.readVertex(G_FAC), gRef);
-    validateRDF(graphStore.readVertex(G_NYT), gRef);
-//    validateRDF(graphStore.readVertex(G_LGD), gRef);
-//    validateRDF(graphStore.readVertex(G_GEO), gRef);
-  }
-
-  private void validateSelectAndAggregate(GraphStore graphStore,
-    HashSet<Long> componentIDs) throws Exception {
-    List<Graph> graphs = Lists.newArrayListWithCapacity(componentIDs.size());
-
-    for (Long id: componentIDs) {
-      graphs.add(graphStore.readGraph(getComponent(graphStore, id)));
-    }
-
-    int min = Integer.MAX_VALUE;
-    int max = 0;
-    Graph minGraph = null;
-    Graph maxGraph = null;
-
-    HashMap<Graph, Integer> graphIntegerMap = new HashMap<>();
+  private void validateSelectAndAggregate(HashSet<Graph> graphs) throws
+    Exception {
+    assertEquals(18584, graphs.size());
 
     for (Graph g : graphs) {
       assertNotNull(g);
       assertEquals(1, g.getPropertyCount());
-      Object count =
+      int count = (int)
         g.getProperty(SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
-      if ((int) count > 8) {
-        graphIntegerMap.put(g, (int) count);
-      }
-      if ((int) count < min) {
-        min = (int) count;
-        minGraph = g;
-      }
-      if ((int) count > max) {
-        max = (int) count;
-        maxGraph = g;
-      }
-//      LOG.info("===== graph ID: " + g.getID().toString());
-//      LOG.info("===== - count value: " + count);
       assertNotNull(count);
-      // each graph has 5 vertices which are connected
-      //assertEquals(5, count);
-    }
 
-    for (Map.Entry<Graph, Integer> entry : graphIntegerMap.entrySet()) {
-      LOG.info("===== graphIntMap: key: " + entry.getKey() + " value: " +
-        entry.getValue());
+      if (g.getID() == MAX_GRAPHS1) {
+        assertEquals(VERTICES_COUNT_12, count);
+      }
+      if (g.getID() == MAX_GRAPHS2) {
+        assertEquals(VERTICES_COUNT_11, count);
+      }
+      if (g.getID() == MAX_GRAPHS3) {
+        assertEquals(VERTICES_COUNT_11, count);
+      }
     }
-
-    LOG.info("===== number of components with graphs >= 9: " + graphIntegerMap
-      .size());
-    LOG.info("===== number of components: " + componentIDs.size());
-    if (maxGraph != null) {
-      LOG.info("===== max count " + max + " found for component: "
-        + maxGraph.getID().toString());
-    }
-    if (minGraph != null) {
-      LOG.info("===== min count " + min + " found for component: "
-        + minGraph.getID().toString());
-    }
-  }
-
-  private void validateRDF(Vertex vertex, long reference) {
-    assertEquals(vertex.getGraphCount(), 1);
-
-    assertThat(vertex.getGraphs().iterator().next(), is(reference));
   }
 
   private Long getComponent(GraphStore graphStore, Long vID) {

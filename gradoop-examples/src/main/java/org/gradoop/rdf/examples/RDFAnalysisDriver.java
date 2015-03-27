@@ -98,7 +98,7 @@ public class RDFAnalysisDriver extends Configured implements Tool {
       new EPGGraphHandler());
 
     /*
-    Stepx 1: Bulk Load of the graph into HBase using MapReduce
+    Step 1: Bulk Load of the graph into HBase using MapReduce
      */
     String inputPath =
       cmd.getOptionValue(ConfigurationUtils.OPTION_GRAPH_INPUT_PATH);
@@ -121,9 +121,9 @@ public class RDFAnalysisDriver extends Configured implements Tool {
     Step 3: Select And Aggregate using MapReduce
      */
     int scanCache = Integer.parseInt(
-      cmd.getOptionValue(ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500"));
+      cmd.getOptionValue(ConfigurationUtils.OPTION_HBASE_SCAN_CACHE));
     int reducers = Integer
-      .parseInt(cmd.getOptionValue(ConfigurationUtils.OPTION_REDUCERS, "1"));
+      .parseInt(cmd.getOptionValue(ConfigurationUtils.OPTION_REDUCERS));
     if (!runSelectAndAggregate(conf, scanCache, reducers, verbose)) {
       return -1;
     }
