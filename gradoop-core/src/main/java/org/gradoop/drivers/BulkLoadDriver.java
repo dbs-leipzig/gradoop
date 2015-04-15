@@ -12,7 +12,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
@@ -26,7 +25,7 @@ import org.gradoop.storage.hbase.VertexHandler;
 /**
  * Driver program for running a bulk load.
  */
-public class BulkLoadDriver extends BulkDriver implements Tool {
+public class BulkLoadDriver extends BulkDriver {
   /**
    * Class logger.
    */

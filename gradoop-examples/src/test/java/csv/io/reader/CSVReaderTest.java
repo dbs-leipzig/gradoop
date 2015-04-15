@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for {@link org.gradoop.csv.io.reader.CSVReader}.
+ * Tests for {@link CSVReader}.
  */
 public class CSVReaderTest {
   Logger LOG = Logger.getLogger(CSVReaderTest.class);
