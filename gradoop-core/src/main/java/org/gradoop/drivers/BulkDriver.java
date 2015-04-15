@@ -90,7 +90,7 @@ public abstract class BulkDriver extends Configured implements Tool {
    *
    * @return conf
    */
-  public Configuration getGiraphConf() {
+  public Configuration getHadoopConf() {
     return this.conf;
   }
 

@@ -61,7 +61,7 @@ public class BulkWriteDriver extends BulkDriver implements Tool {
     if (!sane) {
       return -1;
     }
-    Configuration conf = getGiraphConf();
+    Configuration conf = getHadoopConf();
     String outputPath = getOutputPath();
     boolean verbose = getVerbose();
     String writerClassName =

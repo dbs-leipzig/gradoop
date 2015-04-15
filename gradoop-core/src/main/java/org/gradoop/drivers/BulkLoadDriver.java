@@ -64,7 +64,7 @@ public class BulkLoadDriver extends BulkDriver implements Tool {
     if (!sane) {
       return -1;
     }
-    Configuration conf = getGiraphConf();
+    Configuration conf = getHadoopConf();
     String inputPath = getInputPath();
     String outputPath = getOutputPath();
     boolean verbose = getVerbose();
