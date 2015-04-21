@@ -14,7 +14,7 @@ If you want to run Gradoop on a cluster, you need the following components
 installed.
 
 *   Hadoop 2.5.1
-*   HBase 0.98.10.1-hadoop2
+*   HBase 0.98.11-hadoop2
 
 ##### Setup Gradoop
 
