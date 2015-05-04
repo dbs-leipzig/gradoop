@@ -2,16 +2,16 @@ package org.gradoop.rdf.examples;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
+import org.gradoop.GConstants;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.drivers.BulkLoadDriver;
 import org.gradoop.io.reader.RDFReader;
-import org.gradoop.io.writer.Neo4jLineWriter;
 import org.gradoop.utils.ConfigurationUtils;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
+import java.util.Iterator;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -26,8 +26,10 @@ public class RDFInstanceEnrichmentDriverTest extends GradoopClusterTest {
   private static final String[] LABELS = new String[]{"rdfs:label",
                                                       "skos:prefLabel",
                                                       "gn:name",
-                                                      "empty_property"};
+                                                      "empty_property",
+                                                      "no_property"};
   private static final String DB_PATH = "output/neo4j-db";
+  private static final String VERTICES_PREFIX = "enrich";
 
 
   @Test
@@ -36,17 +38,25 @@ public class RDFInstanceEnrichmentDriverTest extends GradoopClusterTest {
     String graphFile = "countries.graph";
 
     createTestData(conf, graphFile);
-    enrichData(conf, graphFile);
-    testData();
+    enrichData(conf);
+    testData(conf);
   }
 
-  private void testData() throws FileNotFoundException {
+  private void testData(Configuration conf) throws Exception {
     GraphStore graphStore = openGraphStore();
-    Neo4jLineWriter writer = new Neo4jLineWriter(DB_PATH);
-    writer.produceOutput(graphStore);
-    writer.shutdown();
+    String[] args =
+      new String[]{"-" + Neo4jOutputDriver.ConfUtils.OPTION_NEO4J_OUTPUT_PATH,
+                   DB_PATH};
 
-    for (Vertex vertex : graphStore.readVertices()) {
+    Neo4jOutputDriver driver = new Neo4jOutputDriver();
+    driver.setConf(conf);
+    int testExitCode = driver.run(args);
+    assertThat(testExitCode, is(0));
+
+    String tableName = VERTICES_PREFIX + GConstants.DEFAULT_TABLE_VERTICES;
+    Iterator<Vertex> vertices = graphStore.getVertices(tableName);
+    while (vertices.hasNext()) {
+      Vertex vertex = vertices.next();
       for (String s : vertex.getPropertyKeys()) {
         boolean isProperty = false;
 
@@ -64,32 +74,26 @@ public class RDFInstanceEnrichmentDriverTest extends GradoopClusterTest {
     graphStore.close();
   }
 
-  private void enrichData(Configuration conf, String graphFile) throws
-    Exception {
-    String[] argsEnrich = new String[] {
-      "-" + ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500",
-      "-" + ConfigurationUtils.OPTION_WORKERS, "1",
-      "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
-      "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH,
-      "/output/import/rdf-enrich",
-      "-" + ConfigurationUtils.OPTION_DROP_TABLES
-    };
+  private void enrichData(Configuration conf) throws Exception {
+    String[] args = new String[]{"-" + ConfigurationUtils.OPTION_TABLE_PREFIX,
+                   VERTICES_PREFIX};
 
     RDFInstanceEnrichmentDriver enrichDrv = new RDFInstanceEnrichmentDriver();
     enrichDrv.setConf(conf);
-    int enrichExitCode = enrichDrv.run(argsEnrich);
+    int enrichExitCode = enrichDrv.run(args);
     assertThat(enrichExitCode, is(0));
   }
 
   private void createTestData(Configuration conf, String graphFile) throws
     Exception {
     String[] argsBulk = new String[] {
-      "-" + BulkLoadDriver.ConfUtils.OPTION_VERTEX_LINE_READER,
+      "-" + BulkLoadDriver.LoadConfUtils.OPTION_VERTEX_LINE_READER,
       RDFReader.class.getCanonicalName(),
       "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
       "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH,
       "/output/import/rdf-enrich",
-      "-" + ConfigurationUtils.OPTION_DROP_TABLES
+      "-" + ConfigurationUtils.OPTION_DROP_TABLES,
+      "-" + ConfigurationUtils.OPTION_TABLE_PREFIX, VERTICES_PREFIX
     };
 
     copyFromLocal(graphFile);

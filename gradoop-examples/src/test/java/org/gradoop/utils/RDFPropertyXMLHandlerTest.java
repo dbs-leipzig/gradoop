@@ -48,27 +48,35 @@ public class RDFPropertyXMLHandlerTest {
 
   public void checkForLabel(RDFPropertyXMLHandler parser, String url) throws
     ParserConfigurationException, SAXException, IOException {
-    HashSet<String[]> labelProperties = parser.getLabelsForURI(url);
+    LOG.info("checkForLabel: " + url);
 
-    if (labelProperties.isEmpty()) {
-      if (!url.equals(FAIL)) {
-        LOG.error("URL " + url + " not reachable, try again later.");
-      }
-      assertEquals(url, FAIL);
-    }
+    try {
+      HashSet<String[]> labelProperties = parser.getLabelsForURI(url);
 
-    for (String[] propertyAndValue : labelProperties) {
-      boolean isProperty = false;
-      for (String label : LABELS) {
-        if (propertyAndValue[0].contains(label)) {
-          assertTrue(true);
-          isProperty = true;
-          break;
+      if (labelProperties.isEmpty()) {
+        if (!url.equals(FAIL)) {
+          LOG.error("URL " + url + " not reachable, try again later.");
+        } else {
+          assertEquals(url, FAIL);
         }
       }
-      if (!isProperty) {
-        assertTrue(false);
+
+      for (String[] propertyAndValue : labelProperties) {
+        boolean isProperty = false;
+        for (String label : LABELS) {
+          if (propertyAndValue[0].contains(label)) {
+            assertTrue(true);
+            isProperty = true;
+            break;
+          }
+        }
+        if (!isProperty) {
+          assertTrue(false);
+        }
       }
+    } catch (SAXException e) {
+      LOG.error("Error on URL " + url + " , try again later:"
+        + e.toString());
     }
   }
 }

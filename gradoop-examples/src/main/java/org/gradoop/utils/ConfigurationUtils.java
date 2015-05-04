@@ -44,14 +44,26 @@ public class ConfigurationUtils {
    */
   public static final String OPTION_GRAPH_OUTPUT_PATH = "gop";
   /**
+   * Create custom vertices table for different use cases.
+   */
+  public static final String OPTION_TABLE_PREFIX = "tp";
+  /**
+   * Command line option to skip the import of data.
+   */
+  public static final String OPTION_SKIP_IMPORT = "si";
+  /**
+   * Command line option to skip the enrichment process of data.
+   */
+  public static final String OPTION_SKIP_ENRICHMENT = "se";
+  /**
    * Command line option to set the table name for the secondary index.
    */
   public static final String OPTION_SORT_TABLE_NAME = "stn";
 
   /**
-   * Maintains accepted options for gradoop-biiig
+   * Maintains accepted options for gradoop-examples
    */
-  private static Options OPTIONS;
+  protected static final Options OPTIONS;
 
   static {
     OPTIONS = new Options();
@@ -68,6 +80,9 @@ public class ConfigurationUtils {
       "Graph Input Path");
     OPTIONS.addOption(OPTION_GRAPH_OUTPUT_PATH, "graphOutputPath", true,
       "HFiles output path (used by Bulk Load)");
+    OPTIONS.addOption(OPTION_TABLE_PREFIX, "table-prefix",
+      true, "Custom prefix for HBase table to distinguish different use " +
+        "cases.");
     OPTIONS.addOption(OPTION_SORT_TABLE_NAME, "sortTableName", true, "HTable " +
       "used to store secondary index.");
   }
@@ -99,7 +114,7 @@ public class ConfigurationUtils {
   /**
    * Prints a help menu for the defined options.
    */
-  private static void printHelp() {
+  protected static void printHelp() {
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp(ConfigurationUtils.class.getName(), OPTIONS, true);
   }
@@ -113,7 +128,8 @@ public class ConfigurationUtils {
     if (!cmd.hasOption(OPTION_WORKERS)) {
       throw new IllegalArgumentException("Chose the number of workers (-w)");
     }
-    if (!cmd.hasOption(OPTION_GRAPH_INPUT_PATH)) {
+    if (!cmd.hasOption(OPTION_GRAPH_INPUT_PATH) &&
+      !cmd.hasOption(OPTION_SKIP_IMPORT)) {
       throw new IllegalArgumentException("Chose the graph input path (-gip");
     }
     if (!cmd.hasOption(OPTION_GRAPH_OUTPUT_PATH)) {

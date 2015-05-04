@@ -4,7 +4,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.drivers.BulkLoadDriver;
 import org.gradoop.io.reader.RDFReader;
-import org.gradoop.storage.GraphStore;
 import org.gradoop.utils.ConfigurationUtils;
 import org.junit.Test;
 
@@ -18,18 +17,19 @@ public class Neo4jOutputDriverTest extends GradoopClusterTest {
 
   @Test
   public void driverTest() throws Exception {
-    createTestData();
-    writeNeo4jOutput();
+    Configuration conf = utility.getConfiguration();
 
-    // read output again!?
+    createTestData(conf);
+    writeNeo4jOutput(conf);
+
+    // TODO test result
   }
 
-  private void createTestData() throws Exception {
-    Configuration conf = utility.getConfiguration();
-    String graphFile = "61_merged_files.graph";
+  private void createTestData(Configuration conf) throws Exception {
+    String graphFile = "countries.graph";
 
     String[] args = new String[] {
-      "-" + BulkLoadDriver.ConfUtils.OPTION_VERTEX_LINE_READER,
+      "-" + BulkLoadDriver.LoadConfUtils.OPTION_VERTEX_LINE_READER,
       RDFReader.class.getCanonicalName(),
       "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
       "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH,
@@ -43,30 +43,17 @@ public class Neo4jOutputDriverTest extends GradoopClusterTest {
     bulkLoadDriver.setConf(conf);
     int bulkExitCode = bulkLoadDriver.run(args);
     assertThat(bulkExitCode, is(0));
-
-    String[] argsEnrich = new String[] {
-      "-" + ConfigurationUtils.OPTION_WORKERS, "1",
-      "-" + ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500",
-      "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
-      "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH,
-      "/output/import/neo4j-mapreduce",
-      "-" + ConfigurationUtils.OPTION_DROP_TABLES
-    };
-
-    RDFInstanceEnrichmentDriver enrichDrv = new RDFInstanceEnrichmentDriver();
-    enrichDrv.setConf(conf);
-    int enrichExitCode = enrichDrv.run(argsEnrich);
-    assertThat(enrichExitCode, is(0));
   }
 
-  private void writeNeo4jOutput() throws Exception {
-    GraphStore graphStore = openGraphStore();
-
+  private void writeNeo4jOutput(Configuration conf) throws Exception {
     String[] args = new String[]{
       "-" + Neo4jOutputDriver.ConfUtils.OPTION_NEO4J_OUTPUT_PATH, ""};
 
-    Neo4jOutputDriver driver = new Neo4jOutputDriver(args);
-    driver.setGraphStore(graphStore);
-    driver.writeOutput();
+    Neo4jOutputDriver driver = new Neo4jOutputDriver();
+    driver.setConf(conf);
+    int neoExitCode = driver.run(args);
+    assertThat(neoExitCode, is(0));
+
+    // todo read output and validate:q
   }
 }

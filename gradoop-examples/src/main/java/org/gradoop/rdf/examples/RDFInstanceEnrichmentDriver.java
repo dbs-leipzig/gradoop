@@ -1,33 +1,49 @@
 package org.gradoop.rdf.examples;
 
+import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
-import org.gradoop.rdf.algorithms.RDFInstanceEnrichment;
+import org.gradoop.model.Vertex;
+import org.gradoop.storage.GraphStore;
 import org.gradoop.utils.ConfigurationUtils;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
-import org.gradoop.storage.hbase.VertexHandler;
+import org.gradoop.utils.RDFPropertyXMLHandler;
+import org.xml.sax.SAXException;
 
-import java.io.IOException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * RDF Instance Enrichment Driver
  */
 public class RDFInstanceEnrichmentDriver extends Configured implements Tool {
   /**
-   * Job names start with that prefix.
+   * Logger
    */
-  private static final String JOB_PREFIX = "RDF Instance Enrichment: ";
+  private static Logger LOG = Logger.getLogger(RDFInstanceEnrichmentDriver
+    .class);
+  /**
+   * Some vertices will get no property at all, need dummy property
+   */
+  private static final String EMPTY_PROPERTY = "empty_property";
+  /**
+   * Some vertices will get no property at all, need dummy property
+   */
+  private static final String NO_PROPERTY = "no_property";
+  /**
+   * Dummy value
+   */
+  private static final String EMPTY_PROPERTY_VALUE = "";
 
   static {
     Configuration.addDefaultResource("hbase-site.xml");
@@ -44,63 +60,61 @@ public class RDFInstanceEnrichmentDriver extends Configured implements Tool {
   public int run(String[] args) throws Exception {
 
     Configuration conf = getConf();
-    CommandLine cmd = ConfigurationUtils.parseArgs(args);
+    CommandLine cmd = LoadConfUtils.parseArgs(args);
 
-    boolean verbose = cmd.hasOption(ConfigurationUtils.OPTION_VERBOSE);
-
-    /*
-    Step 0: Open HBase tables
-     */
-    HBaseGraphStoreFactory.createOrOpenGraphStore(conf, new EPGVertexHandler(),
-      new EPGGraphHandler());
-
-    /*
-    Step 1: Enrichment of properties for instances (MapReduce)
-     */
-    int sc = Integer.parseInt(
-      cmd.getOptionValue(ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500"));
-    if (!runEnrich(conf, sc, verbose)) {
-      return -1;
+    if (cmd == null) {
+      return 0;
     }
+
+    String tablePrefix = cmd.getOptionValue(ConfigurationUtils
+      .OPTION_TABLE_PREFIX, "");
+    String tableName = tablePrefix + GConstants.DEFAULT_TABLE_VERTICES;
+
+    // Open HBase tables
+    GraphStore graphStore = HBaseGraphStoreFactory.createOrOpenGraphStore(conf,
+      new EPGVertexHandler(), new EPGGraphHandler(), tablePrefix);
+
+    LOG.info("=== graphStore opened with tableName" + tableName);
+    enrich(graphStore, tableName);
 
     return 0;
   }
 
   /**
-   * Runs Enrichment of instances using a MapReduce Job.
-   *
-   * @param conf      Cluster configuration
-   * @param scanCache HBase client scan cache
-   * @param verbose   print output during job  @return true, if the job
-   *                  completed successfully, false otherwise
-   * @throws IOException
-   * @throws ClassNotFoundException
-   * @throws InterruptedException
-   * @return success state
+   * Enrich graph store with additional information from URLs
+   * @param graphStore graph store to be handled
+   * @param tableName HBase table name
+   * @throws Exception
    */
-  private boolean runEnrich(Configuration conf, int scanCache,
-    boolean verbose) throws IOException, ClassNotFoundException,
-    InterruptedException {
-    conf.setClass(GConstants.VERTEX_HANDLER_CLASS, EPGVertexHandler.class,
-      VertexHandler.class);
+  public void enrich(GraphStore graphStore, String tableName) throws Exception {
+    RDFPropertyXMLHandler handler = new RDFPropertyXMLHandler();
+    Iterator<Vertex> vertices = graphStore.getVertices(tableName);
+    while (vertices.hasNext()) {
+      Vertex vertex = vertices.next();
+//    for (Vertex vertex : graphStore.getVertices(tableName)) {
+      try {
+        String url = vertex.getLabels().iterator().next();
+        HashSet<String[]> properties = handler.getLabelsForURI(url);
+        if (!properties.isEmpty()) {
+          for (String[] property : properties) {
+            String key = property[0];
+            String value = property[1];
+            if (!value.isEmpty() || !value.equals("")) {
+              vertex.addProperty(key, value);
+            }
+          }
+        } else {
+          vertex.addProperty(NO_PROPERTY, EMPTY_PROPERTY_VALUE);
+        }
+      } catch (ParserConfigurationException | SAXException e) {
+        e.printStackTrace();
+        // too much queries -> parser exception, add dummy property
+        vertex.addProperty(EMPTY_PROPERTY, EMPTY_PROPERTY_VALUE);
+      }
 
-    Job job =
-      Job.getInstance(conf, JOB_PREFIX + RDFInstanceEnrichment.class.getName());
-    Scan scan = new Scan();
-    scan.setCaching(scanCache);
-    scan.setCacheBlocks(false);
-
-    // map
-    TableMapReduceUtil.initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES,
-      scan, RDFInstanceEnrichment.EnrichMapper.class, ImmutableBytesWritable
-        .class, Put.class, job);
-    // no reduce
-    TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_VERTICES,
-      null, job);
-    job.setNumReduceTasks(0);
-
-    // run
-    return job.waitForCompletion(verbose);
+      graphStore.writeVertex(vertex);
+    }
+    graphStore.close();
   }
 
   /**
@@ -110,6 +124,34 @@ public class RDFInstanceEnrichmentDriver extends Configured implements Tool {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    System.exit(ToolRunner.run(new RDFInstanceEnrichmentDriver(), args));
+    Configuration conf = new Configuration();
+    System.exit(ToolRunner.run(conf, new RDFInstanceEnrichmentDriver(), args));
+  }
+
+  /**
+   * Configuration params for
+   * {@link org.gradoop.rdf.examples.RDFInstanceEnrichmentDriver}.
+   */
+  public static class LoadConfUtils extends ConfigurationUtils {
+    /**
+     * Parses the given arguments.
+     *
+     * @param args command line arguments
+     * @return parsed command line
+     * @throws org.apache.commons.cli.ParseException
+     */
+    public static CommandLine parseArgs(final String[] args) throws
+      ParseException {
+
+      CommandLineParser parser = new BasicParser();
+      CommandLine cmd = parser.parse(OPTIONS, args);
+
+      if (cmd.hasOption(OPTION_HELP)) {
+        printHelp();
+        return null;
+      }
+
+      return cmd;
+    }
   }
 }

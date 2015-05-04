@@ -5,6 +5,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapper;
+import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.utils.RDFPropertyXMLHandler;
 import org.gradoop.model.Vertex;
@@ -17,9 +18,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 
 /**
- * RDF Instance Enrichment for vertices which are already loaded to HBase.
+ * RDF Instance Enrichment Map Reduce algorithm for vertices which are already
+ * loaded to HBase.
  */
 public class RDFInstanceEnrichment {
+  /**
+   * Logger
+   */
+  private static Logger LOG = Logger.getLogger(RDFInstanceEnrichment
+    .class);
   /**
    * Some vertices will get no property at all, need dummy property
    */
@@ -45,6 +52,7 @@ public class RDFInstanceEnrichment {
     @Override
     protected void setup(Context context) throws IOException,
       InterruptedException {
+      LOG.info("=== start setup");
       Configuration conf = context.getConfiguration();
 
       Class<? extends VertexHandler> handlerClass = conf
@@ -56,6 +64,7 @@ public class RDFInstanceEnrichment {
         InstantiationException | IllegalAccessException e) {
         e.printStackTrace();
       }
+      LOG.info("=== end setup");
     }
 
     /**
@@ -64,6 +73,7 @@ public class RDFInstanceEnrichment {
     @Override
     protected void map(ImmutableBytesWritable key, Result value,
       Context context) throws IOException, InterruptedException {
+      LOG.info("=== map");
 
       Vertex v = vertexHandler.readVertex(value);
       Put put = new Put(vertexHandler.getRowKey(v.getID()));
@@ -71,8 +81,7 @@ public class RDFInstanceEnrichment {
 
       RDFPropertyXMLHandler handler = new RDFPropertyXMLHandler();
       try {
-        HashSet<String[]> properties =
-          handler.getLabelsForURI(url);
+        HashSet<String[]> properties = handler.getLabelsForURI(url);
         if (!properties.isEmpty()) {
           for (String[] property : properties) {
             String k = property[0];

@@ -1,10 +1,9 @@
 package org.gradoop.io.writer;
 
-import com.google.common.collect.Iterables;
+import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
-import org.gradoop.storage.GraphStore;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -14,6 +13,7 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.File;
@@ -23,6 +23,10 @@ import java.io.FileNotFoundException;
  * Export from Gradoop to Neo4j instance.
  */
 public class Neo4jLineWriter implements VertexLineWriter {
+  /**
+   * Class logger.
+   */
+  private static final Logger LOG = Logger.getLogger(Neo4jLineWriter.class);
   /**
    * Regex for splitting graph values.
    */
@@ -46,7 +50,7 @@ public class Neo4jLineWriter implements VertexLineWriter {
    */
   public Neo4jLineWriter(String dbPath) throws FileNotFoundException {
     if (dbPath.isEmpty()) {
-      dbPath = "target/neo4j-db";
+      dbPath = "output/neo4j-db";
     }
     initDb(dbPath);
   }
@@ -69,15 +73,16 @@ public class Neo4jLineWriter implements VertexLineWriter {
    * @param vertex edges are extracted from vertices
    */
   public void writeEdges(Vertex vertex) {
-
-    Node processedNode = gradoopIdIndex.get(
-      GConstants.GRADOOP_VERTEX_ID_PROPERTY, vertex.getID()).getSingle();
-    //for (Node itNode : globOps.getAllNodes()) {
-    //long nodeId = (long) itNode.getProperty(GRADOOP_VERTEX_ID_PROPERTY);
-    //if (vertex.getID() == nodeId) {
-    writeNodeEdges(processedNode, vertex.getOutgoingEdges());
-    //}
-    //}
+    Node node = gradoopIdIndex.get(GConstants.GRADOOP_VERTEX_ID_PROPERTY,
+      vertex.getID()).getSingle();
+    if (vertex.getOutgoingDegree() > 0) {
+      for (Edge edge : vertex.getOutgoingEdges()) {
+        LOG.info("edge.getOtherID() " + edge.getOtherID());
+        LOG.info("node.getLabel() " + gradoopIdIndex.get(GConstants
+            .GRADOOP_VERTEX_ID_PROPERTY, edge.getOtherID()).getSingle());
+      }
+      writeNodeRelationships(node, vertex.getOutgoingEdges());
+    }
   }
 
   /**
@@ -101,21 +106,20 @@ public class Neo4jLineWriter implements VertexLineWriter {
    * @param outEdges outEdges
    * @return updated Neo4j node
    */
-  private Node writeNodeEdges(Node node, Iterable<Edge> outEdges) {
+  private Node writeNodeRelationships(Node node, Iterable<Edge> outEdges) {
     for (Edge edge : outEdges) {
-      for (Node targetNode : globOps.getAllNodes()) {
-        if (targetNode.getProperty(GConstants.GRADOOP_VERTEX_ID_PROPERTY)
-          .equals(edge.getOtherID())) {
-          RelationshipType relType =
-            DynamicRelationshipType.withName(edge.getLabel());
-          Relationship relationship = node.createRelationshipTo(targetNode,
-            relType);
-          if (edge.getPropertyCount() > 0) {
-            Iterable<String> edgeProps = edge.getPropertyKeys();
-            for (String key : edgeProps) {
-              relationship.setProperty(key, edge.getProperty(key));
-            }
-          }
+      Node target = gradoopIdIndex.get(GConstants.GRADOOP_VERTEX_ID_PROPERTY,
+        edge.getOtherID()).getSingle();
+      LOG.info("node: " + node.getLabels().iterator().next());
+      LOG.info("target: " + target.toString());
+      LOG.info("target: " + target.getLabels().iterator().next());
+      RelationshipType relType =
+        DynamicRelationshipType.withName(edge.getLabel());
+      Relationship relationship = node.createRelationshipTo(target, relType);
+      if (edge.getPropertyCount() > 0) {
+        Iterable<String> edgeProps = edge.getPropertyKeys();
+        for (String key : edgeProps) {
+          relationship.setProperty(key, edge.getProperty(key));
         }
       }
     }
@@ -162,8 +166,17 @@ public class Neo4jLineWriter implements VertexLineWriter {
    * Get node count for current graph db.
    * @return node count
    */
-  protected int getNodeCount() {
-    return (getNodes() != null) ? Iterables.size(getNodes()) : 0;
+  public int getNodeCount() {
+    int result;
+    try (Transaction tx = graphDb.beginTx()) {
+      if (getNodes() != null) {
+        result = IteratorUtil.count(getNodes());
+      } else {
+        result = 0;
+      }
+      tx.success();
+    }
+    return result;
   }
 
   /**
@@ -243,26 +256,6 @@ public class Neo4jLineWriter implements VertexLineWriter {
         // recover from error or throw an exception
         throw new FileNotFoundException("Failed to delete file " + file);
       }
-    }
-  }
-
-  /**
-   * Create all vertices and edges in the Neo4j database for given graph store.
-   * @param graphStore graph store containing vertices and edges
-   */
-  public void produceOutput(GraphStore graphStore) {
-    try (Transaction tx = graphDb.beginTx()) {
-      for (Vertex v : graphStore.readVertices()) {
-        writeVertex(v);
-      }
-      tx.success();
-    }
-
-    try (Transaction tx = graphDb.beginTx()) {
-      for (Vertex v : graphStore.readVertices()) {
-        writeEdges(v);
-      }
-      tx.success();
     }
   }
 }

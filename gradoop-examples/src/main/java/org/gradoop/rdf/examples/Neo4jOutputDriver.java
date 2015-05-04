@@ -1,72 +1,221 @@
 package org.gradoop.rdf.examples;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
+import org.gradoop.GConstants;
+import org.gradoop.algorithms.SelectAndAggregate;
 import org.gradoop.io.writer.Neo4jLineWriter;
+import org.gradoop.model.Graph;
+
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
+import org.gradoop.storage.hbase.EPGGraphHandler;
+import org.gradoop.storage.hbase.EPGVertexHandler;
+import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Read vertices and edges from Gradoop and write them to Neo4j embedded db.
  */
-public class Neo4jOutputDriver extends Configured {
+public class Neo4jOutputDriver extends Configured implements Tool {
   /**
    * Class logger.
    */
   private static final Logger LOG = Logger.getLogger(Neo4jOutputDriver.class);
 
-  /**
-   * Output path for Neo4j embedded db.
-   */
-  private String outputPath;
-
-  /**
-   * GraphStore
-   */
-  private GraphStore graphStore;
-
-  /**
-   * Neo4jOutputDriver constructor setting up configuration values.
-   * @param args cmd line parameters
-   * @throws Exception
-   */
-  public Neo4jOutputDriver(String[] args) throws Exception {
+  @Override
+  public int run(String[] args) throws Exception {
+    Configuration conf = getConf();
     CommandLine cmd = ConfUtils.parseArgs(args);
-    this.outputPath = cmd.getOptionValue(ConfUtils.OPTION_NEO4J_OUTPUT_PATH);
+    if (cmd == null) {
+      return 0;
+    }
+
+    String tablePrefix = cmd.getOptionValue(ConfUtils.OPTION_TABLE_PREFIX, "");
+    String outDir = cmd.getOptionValue(ConfUtils.OPTION_NEO4J_OUTPUT_PATH, "");
+
+    // Open HBase tables
+    GraphStore graphStore = HBaseGraphStoreFactory.createOrOpenGraphStore(conf,
+      new EPGVertexHandler(), new EPGGraphHandler(), tablePrefix);
+
+    writeOutput(graphStore, outDir, tablePrefix);
+    graphStore.close();
+
+    return 0;
   }
 
   /**
    * Write output to the defined Neo4j instance.
    * @throws Exception
+   * @param graphStore gs
+   * @param outputDir out directory
+   * @param tablePrefix table prefix
    */
-  public void writeOutput() throws Exception {
-    Neo4jLineWriter writer = new Neo4jLineWriter(outputPath);
+  public void writeOutput(GraphStore graphStore, String outputDir, String
+    tablePrefix) throws
+    Exception {
+    Neo4jLineWriter writer = new Neo4jLineWriter(outputDir);
     GraphDatabaseService db = writer.getGraphDbService();
+    String verticesTable = tablePrefix + GConstants.DEFAULT_TABLE_VERTICES;
+    String graphsTable = tablePrefix + GConstants.DEFAULT_TABLE_GRAPHS;
 
-    try (Transaction tx = db.beginTx()) {
-      for (Vertex vertex : graphStore.readVertices()) {
-        writer.writeVertex(vertex);
+    long rowCount = 1598547L;
+    long rowGraphCount = 753813L;
+    LOG.info("vertices rows (unique vertices): " + rowCount);
+    LOG.info("graphs rows (unique components): " + rowGraphCount);
+
+    Iterator<Graph> itGraphsTableElements = graphStore.getGraphs(graphsTable);
+    HashMap<Long, Integer> graphs = restrictGraphs(itGraphsTableElements);
+
+    ArrayList allComponentsList = Lists.newArrayList(graphs.keySet());
+    LOG.info("allComponentsList.size() " + allComponentsList.size());
+
+    LOG.info("Creating Neo4j nodes...");
+    Iterator<Vertex> vertices = graphStore.getVertices(verticesTable);
+    writeVerticesToDb(writer, db, allComponentsList, vertices);
+
+    LOG.info("Creating Neo4j relationships...");
+    Iterator<Vertex> relVertices = graphStore.getVertices(verticesTable);
+    writeRelationships(writer, db, allComponentsList, relVertices);
+
+    writer.shutdown();
+  }
+
+  /**
+   * Write all relationships to the Neo4j embedded database instance.
+   * @param writer Neo4j line writer to use
+   * @param db graph database service
+   * @param checkList list containing all components to be handled
+   * @param vertices iterator vertices (containing relationships)
+   */
+  private void writeRelationships(Neo4jLineWriter writer,
+    GraphDatabaseService db, ArrayList checkList,
+    Iterator<Vertex> vertices) {
+    int arrayCount = 0;
+    int count = 0;
+    int delay = 0;
+    int windowSize = 500;
+    ArrayList<Vertex> vertexList = new ArrayList<>(windowSize);
+    while (vertices.hasNext()) {
+      Vertex vertex = vertices.next();
+
+      if (checkList.contains(vertex.getGraphs().iterator().next())) {
+        vertexList.add(vertex);
+        LOG.info("vertex.getId() " + vertex.getID());
+        ++arrayCount;
+        if (arrayCount == windowSize) {
+          try (Transaction tx = db.beginTx()) {
+            for (Vertex v : vertexList) {
+              writer.writeEdges(v);
+            }
+            tx.success();
+          }
+          arrayCount = 0;
+          vertexList = new ArrayList<>(windowSize);
+        }
+
+        ++count;
+        if (delay * windowSize < count) {
+          ++delay;
+          LOG.info("Relationships added to List Neo4j: " + count);
+        }
       }
-      tx.success();
     }
-
     try (Transaction tx = db.beginTx()) {
-      for (Vertex vertex : graphStore.readVertices()) {
+      for (Vertex vertex : vertexList) {
         writer.writeEdges(vertex);
       }
       tx.success();
     }
+    LOG.info("Relationships created in Neo4j: " + count);
+  }
 
-    writer.shutdown();
-    graphStore.close();
+  /**
+   * Write all vertices to the Neo4j embedded database instance.
+   * @param writer Neo4j line writer to use
+   * @param db graph database service
+   * @param checkList list containing all components to be handled
+   * @param vertices iterator vertices
+   */
+  private void writeVerticesToDb(Neo4jLineWriter writer,
+    GraphDatabaseService db, ArrayList checkList, Iterator<Vertex> vertices) {
+    int count = 0;
+    int delay = 0;
+    int windowSize = 1000;
+    int arrayCount = 0;
+    ArrayList<Vertex> vl = new ArrayList<>(windowSize);
+    while (vertices.hasNext()) {
+      Vertex v = vertices.next();
+      if (checkList.contains(v.getGraphs().iterator().next())) {
+        vl.add(v);
+        ++arrayCount;
+        if (arrayCount == windowSize) {
+          writeListToDb(writer, db, vl);
+          arrayCount = 0;
+          vl = new ArrayList<>(windowSize);
+        }
+        ++count;
+        if (delay * windowSize < count) {
+          ++delay;
+          LOG.info("Nodes created in Neo4j: " + count);
+        }
+      }
+    }
+    writeListToDb(writer, db, vl);
+    LOG.info("Nodes created in Neo4j: " + count);
+  }
+
+  /**
+   * Transaction of an array list containing vertices.
+   * @param writer Neo4j line writer
+   * @param db graph database service
+   * @param vl vertex list
+   */
+  private void writeListToDb(Neo4jLineWriter writer, GraphDatabaseService db,
+    ArrayList<Vertex> vl) {
+    try (Transaction tx = db.beginTx()) {
+      for (Vertex vertex : vl) {
+        writer.writeVertex(vertex);
+      }
+      tx.success();
+    }
+  }
+
+  /**
+   * Restrict the set of graphs to graphs containing at least 3 elements.
+   * @param graphs iterator element over all graphs
+   * @throws Exception
+   * @return hash map containing <componentId, size> entries
+   */
+  private HashMap<Long, Integer> restrictGraphs(Iterator<Graph> graphs)
+      throws Exception {
+    int biggerTwo = 45485;
+    HashMap<Long, Integer> graphMap = new HashMap<>(biggerTwo);
+    while (graphs.hasNext()) {
+      Graph graph = graphs.next();
+      int count = (int) graph.getProperty(
+        SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
+      if (count > 5) {
+        graphMap.put(graph.getID(), count);
+      }
+    }
+
+    return graphMap;
   }
 
   /**
@@ -76,12 +225,8 @@ public class Neo4jOutputDriver extends Configured {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    Neo4jOutputDriver driver = new Neo4jOutputDriver(args);
-    driver.writeOutput();
-  }
-
-  public void setGraphStore(GraphStore graphStore) {
-    this.graphStore = graphStore;
+    Configuration conf = new Configuration();
+    System.exit(ToolRunner.run(conf, new Neo4jOutputDriver(), args));
   }
 
   /**
@@ -99,9 +244,14 @@ public class Neo4jOutputDriver extends Configured {
     /**
      * Command line option to set the path to write the graph to.
      */
-    public static final String OPTION_NEO4J_OUTPUT_PATH = "out";
+    public static final String OPTION_NEO4J_OUTPUT_PATH = "o";
     /**
-     * Holds options accepted by {@link org.gradoop.drivers.BulkWriteDriver}.
+     * Create custom vertices table for different use cases.
+     */
+    public static final String OPTION_TABLE_PREFIX = "tp";
+    /**
+     * Holds options accepted by
+     * {@link org.gradoop.rdf.examples.Neo4jOutputDriver}.
      */
     private static Options OPTIONS;
 
@@ -112,6 +262,9 @@ public class Neo4jOutputDriver extends Configured {
         "Print console output during job execution.");
       OPTIONS.addOption(OPTION_NEO4J_OUTPUT_PATH, "neo4j-output-path", true,
         "Path where the output will be stored.");
+      OPTIONS.addOption(OPTION_TABLE_PREFIX, "table-prefix",
+        true, "Custom prefix for HBase table to distinguish different use " +
+          "cases.");
     }
 
     /**
@@ -143,7 +296,8 @@ public class Neo4jOutputDriver extends Configured {
      */
     private static void printHelp() {
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp(ConfUtils.class.getName(), OPTIONS, true);
+      formatter.printHelp(ConfUtils.class.getSuperclass().getName(), OPTIONS,
+        true);
     }
 
     /**

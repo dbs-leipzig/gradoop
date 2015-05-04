@@ -16,7 +16,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
- * Simple pipeline test for {@link org.gradoop.rdf.examples.RDFAnalysisDriver}.
+ * Simple pipeline test for
+ * {@link org.gradoop.rdf.examples.SimpleRDFAnalysisDriverTest}.
  */
 public class SimpleRDFAnalysisDriverTest extends GradoopClusterTest {
   private static final Long A_DBP = -4820974574369803382L;
@@ -41,6 +42,7 @@ public class SimpleRDFAnalysisDriverTest extends GradoopClusterTest {
   public void driverTest() throws Exception {
     Configuration conf = utility.getConfiguration();
     String graphFile = "countries.graph";
+    String tablePrefix = "rdfSimpleAnalysis";
 
     String[] args = new String[] {
       "-" + ConfigurationUtils.OPTION_WORKERS, "1",
@@ -49,7 +51,8 @@ public class SimpleRDFAnalysisDriverTest extends GradoopClusterTest {
       "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
       "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH,
       "/output/import/simplerdf",
-      "-" + ConfigurationUtils.OPTION_DROP_TABLES
+      "-" + ConfigurationUtils.OPTION_TABLE_PREFIX, tablePrefix,
+      "-" + ConfigurationUtils.OPTION_DROP_TABLES,
     };
 
     copyFromLocal(graphFile);
@@ -61,11 +64,9 @@ public class SimpleRDFAnalysisDriverTest extends GradoopClusterTest {
 
     // tests
     assertThat(exitCode, is(0));
-    GraphStore graphStore = openGraphStore();
-    // RDF results
+    GraphStore graphStore = openGraphStore(tablePrefix);
     validateComponents(graphStore);
     validateSelectAndAggregate(graphStore);
-
     graphStore.close();
   }
 
