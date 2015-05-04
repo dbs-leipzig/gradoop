@@ -110,6 +110,17 @@ public final class GConstants {
     EPGVertexHandler.class;
 
   /**
+   * Row counter path within Map Reduce Row Counter job.
+   */
+  public static final String ROW_COUNTER_MAPRED_JOB =
+    "org.apache.hadoop.hbase.mapreduce.RowCounter$RowCounterMapper$Counters";
+
+  /**
+   * Row counter property within Map Reduce Row Counter job.
+   */
+  public static final String ROW_COUNTER_PROPERTY = "ROWS";
+
+  /**
    * Configuration key to define a custom graph handler.
    */
   public static final String GRAPH_HANDLER_CLASS = "gradoop.io.graphhandler";
