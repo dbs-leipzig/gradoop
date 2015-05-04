@@ -47,6 +47,24 @@ public class HBaseGraphStoreFactory {
    * Creates a graph store or opens an existing one based on the given
    * parameters. If something goes wrong, {@code null} is returned.
    *
+   * @param config        cluster configuration
+   * @param vertexHandler vertex storage handler
+   * @param graphHandler  graph storage handler
+   * @param prefix        prefix for HBase table name
+   * @return a graph store instance or {@code null in the case of errors}
+   */
+  public static GraphStore createOrOpenGraphStore(final Configuration config,
+    final VertexHandler vertexHandler, final GraphHandler graphHandler, final
+    String prefix) {
+    return createOrOpenGraphStore(config, vertexHandler, graphHandler,
+      prefix + GConstants.DEFAULT_TABLE_VERTICES,
+      prefix + GConstants.DEFAULT_TABLE_GRAPHS);
+  }
+
+  /**
+   * Creates a graph store or opens an existing one based on the given
+   * parameters. If something goes wrong, {@code null} is returned.
+   *
    * @param config          cluster configuration
    * @param vertexHandler   vertex storage handler
    * @param graphHandler    graph graph storage handler

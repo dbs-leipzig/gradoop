@@ -95,7 +95,7 @@ public abstract class BasicHandler implements EntityHandler {
    * @param columnFamily column family to get keys from
    * @return all keys inside column family.
    */
-  protected Iterable<Long> getColumnKeysFromFamiliy(final Result res,
+  protected Iterable<Long> getColumnKeysFromFamily(final Result res,
     final byte[] columnFamily) {
     List<Long> keys = Lists.newArrayList();
     for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily)

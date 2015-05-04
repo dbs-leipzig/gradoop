@@ -157,7 +157,7 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
    */
   @Override
   public Iterable<Long> readGraphs(final Result res) {
-    return getColumnKeysFromFamiliy(res, CF_GRAPHS_BYTES);
+    return getColumnKeysFromFamily(res, CF_GRAPHS_BYTES);
   }
 
   /**

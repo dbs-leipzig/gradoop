@@ -12,6 +12,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
+import org.gradoop.GConstants;
 
 /**
  * BulkDriver SuperClass for all Driver
@@ -34,6 +35,10 @@ public abstract class BulkDriver extends Configured implements Tool {
    */
   public static final String OPTION_GRAPH_OUTPUT_PATH = "gop";
   /**
+   * Create custom vertices table for different use cases.
+   */
+  public static final String OPTION_TABLE_PREFIX = "tp";
+  /**
    * Command line option to set a custom argument.
    */
   public static final String OPTION_CUSTOM_ARGUMENT = "ca";
@@ -49,6 +54,14 @@ public abstract class BulkDriver extends Configured implements Tool {
    * graph input path
    */
   private String inputPath;
+  /**
+   * vertices table name
+   */
+  private String verticesTableName;
+  /**
+   * graphs table name
+   */
+  private String graphsTableName;
   /**
    * graph output path
    */
@@ -86,6 +99,24 @@ public abstract class BulkDriver extends Configured implements Tool {
   }
 
   /**
+   * Get vertices table name
+   *
+   * @return outputpath
+   */
+  public String getVerticesTableName() {
+    return this.verticesTableName;
+  }
+
+  /**
+   * Get vertices table name
+   *
+   * @return outputpath
+   */
+  public String getGraphsTableName() {
+    return this.graphsTableName;
+  }
+
+  /**
    * Get Method for giraph Configuration
    *
    * @return conf
@@ -112,6 +143,15 @@ public abstract class BulkDriver extends Configured implements Tool {
     verbose = cmd.hasOption(OPTION_VERBOSE);
     inputPath = cmd.getOptionValue(OPTION_GRAPH_INPUT_PATH);
     outputPath = cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH);
+    String tablePrefix =
+      cmd.getOptionValue(OPTION_TABLE_PREFIX, "");
+    if (tablePrefix.isEmpty()) {
+      verticesTableName = GConstants.DEFAULT_TABLE_VERTICES;
+      graphsTableName = GConstants.DEFAULT_TABLE_GRAPHS;
+    } else {
+      verticesTableName = tablePrefix + GConstants.DEFAULT_TABLE_VERTICES;
+      graphsTableName = tablePrefix + GConstants.DEFAULT_TABLE_GRAPHS;
+    }
     if (cmd.hasOption(OPTION_CUSTOM_ARGUMENT)) {
       for (String caOptionValue : cmd.getOptionValues(OPTION_CUSTOM_ARGUMENT)) {
         for (String paramValue : Splitter.on(',').split(caOptionValue)) {
@@ -159,6 +199,9 @@ public abstract class BulkDriver extends Configured implements Tool {
         "Path to the input graph file.");
       OPTIONS.addOption(OPTION_GRAPH_OUTPUT_PATH, "graph-output-path", true,
         "Path to store HFiles in HDFS (used by Bulk Load)");
+      OPTIONS.addOption(OPTION_TABLE_PREFIX, "table-vertices-prefix",
+        true, "Custom prefix for vertices table to distinguish different use " +
+          "cases.");
       OPTIONS.addOption(OPTION_CUSTOM_ARGUMENT, "customArguments", true,
         "provide custom" +
           " arguments for the job configuration in the form:" +
