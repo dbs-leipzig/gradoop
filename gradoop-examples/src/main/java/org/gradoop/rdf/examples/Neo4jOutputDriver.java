@@ -67,23 +67,14 @@ public class Neo4jOutputDriver extends Configured implements Tool {
    * @param tablePrefix table prefix
    */
   public void writeOutput(GraphStore graphStore, String outputDir, String
-    tablePrefix) throws
-    Exception {
+    tablePrefix) throws Exception {
     Neo4jLineWriter writer = new Neo4jLineWriter(outputDir);
     GraphDatabaseService db = writer.getGraphDbService();
     String verticesTable = tablePrefix + GConstants.DEFAULT_TABLE_VERTICES;
     String graphsTable = tablePrefix + GConstants.DEFAULT_TABLE_GRAPHS;
 
-    long rowCount = 1598547L;
-    long rowGraphCount = 753813L;
-    LOG.info("vertices rows (unique vertices): " + rowCount);
-    LOG.info("graphs rows (unique components): " + rowGraphCount);
-
-    Iterator<Graph> itGraphsTableElements = graphStore.getGraphs(graphsTable);
-    HashMap<Long, Integer> graphs = restrictGraphs(itGraphsTableElements);
-
-    ArrayList allComponentsList = Lists.newArrayList(graphs.keySet());
-    LOG.info("allComponentsList.size() " + allComponentsList.size());
+    ArrayList<Long> allComponentsList = getAllComponents(graphStore,
+      graphsTable);
 
     LOG.info("Creating Neo4j nodes...");
     Iterator<Vertex> vertices = graphStore.getVertices(verticesTable);
@@ -97,6 +88,21 @@ public class Neo4jOutputDriver extends Configured implements Tool {
   }
 
   /**
+   * Get all graph ids in a graphs table.
+   * @param graphStore HBase graph store
+   * @param graphsTable graphs table name
+   * @return list with all graph ids
+   * @throws Exception
+   */
+  private ArrayList<Long> getAllComponents(GraphStore graphStore,
+    String graphsTable) throws Exception {
+    Iterator<Graph> itGraphsTableElements = graphStore.getGraphs(graphsTable);
+    HashMap<Long, Integer> graphs = restrictGraphs(itGraphsTableElements);
+
+    return Lists.newArrayList(graphs.keySet());
+  }
+
+  /**
    * Write all relationships to the Neo4j embedded database instance.
    * @param writer Neo4j line writer to use
    * @param db graph database service
@@ -104,7 +110,7 @@ public class Neo4jOutputDriver extends Configured implements Tool {
    * @param vertices iterator vertices (containing relationships)
    */
   private void writeRelationships(Neo4jLineWriter writer,
-    GraphDatabaseService db, ArrayList checkList,
+    GraphDatabaseService db, ArrayList<Long> checkList,
     Iterator<Vertex> vertices) {
     int arrayCount = 0;
     int count = 0;
@@ -113,10 +119,10 @@ public class Neo4jOutputDriver extends Configured implements Tool {
     ArrayList<Vertex> vertexList = new ArrayList<>(windowSize);
     while (vertices.hasNext()) {
       Vertex vertex = vertices.next();
+      long vertexGraphComponent = vertex.getGraphs().iterator().next();
 
-      if (checkList.contains(vertex.getGraphs().iterator().next())) {
+      if (checkList.contains(vertexGraphComponent)) {
         vertexList.add(vertex);
-        LOG.info("vertex.getId() " + vertex.getID());
         ++arrayCount;
         if (arrayCount == windowSize) {
           try (Transaction tx = db.beginTx()) {
@@ -159,6 +165,7 @@ public class Neo4jOutputDriver extends Configured implements Tool {
     int windowSize = 1000;
     int arrayCount = 0;
     ArrayList<Vertex> vl = new ArrayList<>(windowSize);
+
     while (vertices.hasNext()) {
       Vertex v = vertices.next();
       if (checkList.contains(v.getGraphs().iterator().next())) {
@@ -197,20 +204,20 @@ public class Neo4jOutputDriver extends Configured implements Tool {
   }
 
   /**
-   * Restrict the set of graphs to graphs containing at least 3 elements.
+   * Restrict the set of graphs to graphs containing at least 5 elements.
    * @param graphs iterator element over all graphs
    * @throws Exception
    * @return hash map containing <componentId, size> entries
    */
   private HashMap<Long, Integer> restrictGraphs(Iterator<Graph> graphs)
       throws Exception {
-    int biggerTwo = 45485;
-    HashMap<Long, Integer> graphMap = new HashMap<>(biggerTwo);
+    int restrictSize = 5;
+    HashMap<Long, Integer> graphMap = new HashMap<>();
     while (graphs.hasNext()) {
       Graph graph = graphs.next();
       int count = (int) graph.getProperty(
         SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
-      if (count > 5) {
+      if (count > restrictSize) {
         graphMap.put(graph.getID(), count);
       }
     }

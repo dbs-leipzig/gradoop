@@ -225,6 +225,27 @@ public class HBaseGraphStore implements GraphStore {
    * {@inheritDoc}
    */
   @Override
+  public Iterator<Vertex> getVertices(String tableName, int cacheSize) throws
+    InterruptedException, IOException, ClassNotFoundException {
+    VertexIterator vertexIterator = null;
+
+    try {
+      Scan scan = new Scan();
+      scan.setCaching(cacheSize);
+      scan.setMaxVersions(1);
+
+      ResultScanner scanner = verticesTable.getScanner(scan);
+      vertexIterator = new VertexIterator(scanner);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return vertexIterator;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public long getRowCount(String tableName) throws IOException,
     ClassNotFoundException, InterruptedException {
     Job rcJob = RowCounter

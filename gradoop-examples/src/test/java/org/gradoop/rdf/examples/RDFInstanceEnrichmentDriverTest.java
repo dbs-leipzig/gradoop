@@ -23,43 +23,32 @@ import static org.junit.Assert.*;
 public class RDFInstanceEnrichmentDriverTest extends GradoopClusterTest {
   private static final Logger LOG =
     Logger.getLogger(RDFInstanceEnrichmentDriverTest.class);
+
   private static final String[] LABELS = new String[]{"rdfs:label",
                                                       "skos:prefLabel",
                                                       "gn:name",
                                                       "empty_property",
                                                       "no_property"};
-  private static final String DB_PATH = "output/neo4j-db";
   private static final String VERTICES_PREFIX = "enrich";
-
+  private static final String GRAPH_FILE = "countries.graph";
 
   @Test
   public void driverTest() throws Exception {
     Configuration conf = utility.getConfiguration();
-    String graphFile = "countries.graph";
 
-    createTestData(conf, graphFile);
+    createTestData(conf);
     enrichData(conf);
-    testData(conf);
+    testData();
   }
 
-  private void testData(Configuration conf) throws Exception {
+  private void testData() throws Exception {
     GraphStore graphStore = openGraphStore();
-    String[] args =
-      new String[]{"-" + Neo4jOutputDriver.ConfUtils.OPTION_NEO4J_OUTPUT_PATH,
-                   DB_PATH};
-
-    Neo4jOutputDriver driver = new Neo4jOutputDriver();
-    driver.setConf(conf);
-    int testExitCode = driver.run(args);
-    assertThat(testExitCode, is(0));
-
     String tableName = VERTICES_PREFIX + GConstants.DEFAULT_TABLE_VERTICES;
     Iterator<Vertex> vertices = graphStore.getVertices(tableName);
     while (vertices.hasNext()) {
       Vertex vertex = vertices.next();
       for (String s : vertex.getPropertyKeys()) {
         boolean isProperty = false;
-
         for (String label : LABELS) {
           if (s.contains(label)) {
             isProperty = true;
@@ -77,30 +66,30 @@ public class RDFInstanceEnrichmentDriverTest extends GradoopClusterTest {
   private void enrichData(Configuration conf) throws Exception {
     String[] args = new String[]{"-" + ConfigurationUtils.OPTION_TABLE_PREFIX,
                    VERTICES_PREFIX};
-
     RDFInstanceEnrichmentDriver enrichDrv = new RDFInstanceEnrichmentDriver();
     enrichDrv.setConf(conf);
+
     int enrichExitCode = enrichDrv.run(args);
+
     assertThat(enrichExitCode, is(0));
   }
 
-  private void createTestData(Configuration conf, String graphFile) throws
-    Exception {
+  private void createTestData(Configuration conf) throws Exception {
     String[] argsBulk = new String[] {
       "-" + BulkLoadDriver.LoadConfUtils.OPTION_VERTEX_LINE_READER,
       RDFReader.class.getCanonicalName(),
-      "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
+      "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, GRAPH_FILE,
       "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH,
       "/output/import/rdf-enrich",
       "-" + ConfigurationUtils.OPTION_DROP_TABLES,
       "-" + ConfigurationUtils.OPTION_TABLE_PREFIX, VERTICES_PREFIX
     };
-
-    copyFromLocal(graphFile);
-
+    copyFromLocal(GRAPH_FILE);
     BulkLoadDriver bulkLoadDriver = new BulkLoadDriver();
     bulkLoadDriver.setConf(conf);
+
     int bulkExitCode = bulkLoadDriver.run(argsBulk);
+
     assertThat(bulkExitCode, is(0));
   }
 }

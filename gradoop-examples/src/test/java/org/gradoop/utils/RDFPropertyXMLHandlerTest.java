@@ -1,11 +1,13 @@
 package org.gradoop.utils;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.HashSet;
 
 import static org.junit.Assert.*;
@@ -24,6 +26,7 @@ public class RDFPropertyXMLHandlerTest {
   public static final String URI_GEO = "http://sws.geonames.org/2879139/";
   public static final String URI_LGD =
     "http://linkedgeodata.org/triplify/node240111242";
+  // resource exists, but has no label at all
   private static final String FAIL =
     "http://dbpedia.org/resource/Parker_Drilling_Company";
 
@@ -74,7 +77,8 @@ public class RDFPropertyXMLHandlerTest {
           assertTrue(false);
         }
       }
-    } catch (SAXException e) {
+    } catch (SAXException | ConnectTimeoutException | SocketTimeoutException
+      e) {
       LOG.error("Error on URL " + url + " , try again later:"
         + e.toString());
     }

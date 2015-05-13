@@ -70,6 +70,16 @@ public interface GraphStore {
     IOException, ClassNotFoundException;
 
   /**
+   * Reads all vertices from the graph store. If graph store is empty, {@code
+   * null} is returned.
+   * @param tableName HBase table name
+   * @param cacheSize cache size for HBase scan
+   * @return all vertices or {@code null} if graph store is empty
+   */
+  Iterator<Vertex> getVertices(String tableName, int cacheSize) throws
+    InterruptedException, IOException, ClassNotFoundException;
+
+  /**
    * Reads all edges from the graph store. If no edges exist, {@code null} is
    * returned
    * @return all edges or {@code null} if vertices have no edges
