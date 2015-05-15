@@ -102,6 +102,7 @@ public abstract class BulkDriver extends Configured implements Tool {
    * @throws ParseException
    */
   public int parseArgs(String[] args) throws ParseException {
+    LOG.info("inner parseArgs");
     conf = getConf();
     CommandLine cmd = ConfUtils.parseArgs(args);
     if (cmd.hasOption(OPTION_HELP)) {
@@ -123,7 +124,7 @@ public abstract class BulkDriver extends Configured implements Tool {
           parts[1] = parts[1].replaceAll("\"", "");
           if (LOG.isInfoEnabled()) {
             LOG.info("###Setting custom argument [" + parts[0] + "] to [" +
-              parts[1] + "] in GiraphConfiguration");
+              parts[1] + "] in HadoopConfiguration");
           }
           conf.set(parts[0], parts[1]);
         }
@@ -180,7 +181,7 @@ public abstract class BulkDriver extends Configured implements Tool {
         LOG.error("No arguments were provided (try -h)");
       }
       CommandLineParser parser = new BasicParser();
-      CommandLine cmd = parser.parse(OPTIONS, args, true);
+      CommandLine cmd = parser.parse(OPTIONS, args, false);
       return cmd;
     }
   }

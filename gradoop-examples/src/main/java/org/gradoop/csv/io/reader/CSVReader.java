@@ -83,6 +83,7 @@ public class CSVReader implements ConfigurableVertexLineReader {
     return LINE_TOKEN_SEPARATOR.split(line);
   }
 
+
   /**
    * Initial step: initializations and reading the headline
    *
