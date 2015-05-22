@@ -31,7 +31,6 @@ import org.gradoop.drivers.BulkDriver;
 import org.gradoop.io.formats.EPGLabelPropagationInputFormat;
 import org.gradoop.io.formats.EPGLabelPropagationOutputFormat;
 import org.gradoop.io.formats.SummarizeWritable;
-import org.gradoop.io.formats.TextLabelPropagationOutputFormat;
 import org.gradoop.io.reader.BulkLoadEPG;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.sna.io.reader.CSVReader;
