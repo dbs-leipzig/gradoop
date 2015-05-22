@@ -31,7 +31,7 @@ public class BulkWriteDriverTest extends GradoopClusterTest {
       "-" + BulkWriteDriver.LoadConfUtils.OPTION_HBASE_SCAN_CACHE, "10",
       "-" + BulkWriteDriver.OPTION_GRAPH_OUTPUT_PATH, outputDirName,
       "-" + BulkWriteDriver.OPTION_CUSTOM_ARGUMENT,
-      "csv-reader.label=knows, csv-reader.meta_data=person_knows_person.meta"
+      "sna-reader.label=knows, sna-reader.meta_data=person_knows_person.meta"
     };
 
     BulkWriteDriver bulkWriteDriver = new BulkWriteDriver();

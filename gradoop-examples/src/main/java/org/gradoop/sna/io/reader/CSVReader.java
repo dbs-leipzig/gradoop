@@ -1,4 +1,4 @@
-package org.gradoop.csv.io.reader;
+package org.gradoop.sna.io.reader;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
@@ -13,35 +13,35 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 /**
- * Reads csv input data
+ * Reads sna input data
  */
 public class CSVReader implements ConfigurableVertexLineReader {
   /**
-   * The path to the meta_data of a csv file
+   * The path to the meta_data of a sna file
    */
-  public static final String META_DATA = "csv-reader.meta_data";
+  public static final String META_DATA = "sna-reader.meta_data";
   /**
-   * The type of a csv input (nodes or edges)
+   * The type of a sna input (nodes or edges)
    */
-  public static final String TYPE = "csv-reader.type";
+  public static final String TYPE = "sna-reader.type";
   /**
-   * The label (relationship) of a csv input
+   * The label (relationship) of a sna input
    */
-  public static final String LABEL = "csv-reader.label";
+  public static final String LABEL = "sna-reader.label";
   /**
    * The expected amount of nodes that will be created
    */
-  public static final String EXPECTED_SIZE = "csv-reader.expected_size";
+  public static final String EXPECTED_SIZE = "sna-reader.expected_size";
   /**
    * Default value of the expected size
    */
   public static final int DEFAULT_EXPECTED_SIZE = 0;
   /**
-   * Token Separator of a csv line
+   * Token Separator of a sna line
    */
   private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile("\\|");
   /**
-   * Node type if csv input contains nodes
+   * Node type if sna input contains nodes
    */
   private static final String NODE_TYPE = "node";
   /**
@@ -53,7 +53,7 @@ public class CSVReader implements ConfigurableVertexLineReader {
    */
   private boolean initialStep = true;
   /**
-   * Contains the information about the csv type (if node its true)
+   * Contains the information about the sna type (if node its true)
    */
   private boolean isNodeCSV = false;
   /**
@@ -61,11 +61,11 @@ public class CSVReader implements ConfigurableVertexLineReader {
    */
   private List<String> labels;
   /**
-   * types of a csv file (e.g. long|string|string|integer)
+   * types of a sna file (e.g. long|string|string|integer)
    */
   private String[] types;
   /**
-   * properties of a csv input (headline)
+   * properties of a sna input (headline)
    */
   private String[] properties;
   /**
@@ -76,7 +76,7 @@ public class CSVReader implements ConfigurableVertexLineReader {
   /**
    * Splits a line into tokens
    *
-   * @param line line of csv input
+   * @param line line of sna input
    * @return tokens as array
    */
   private String[] getTokens(String line) {
@@ -87,7 +87,7 @@ public class CSVReader implements ConfigurableVertexLineReader {
   /**
    * Initial step: initializations and reading the headline
    *
-   * @param line line of csv input
+   * @param line line of sna input
    */
   private void initialStep(String line) {
     // Initialize Lists
@@ -178,7 +178,7 @@ public class CSVReader implements ConfigurableVertexLineReader {
    * Creates vertices and edges
    *
    * @param vertices vertex list
-   * @param line     line of csv input
+   * @param line     line of sna input
    */
   private void readEdges(List<Vertex> vertices, String line) {
     List<String> nodeLabel0 = Lists.newArrayListWithExpectedSize(1);

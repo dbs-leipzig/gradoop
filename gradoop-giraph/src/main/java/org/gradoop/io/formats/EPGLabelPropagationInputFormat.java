@@ -21,7 +21,6 @@ import java.util.List;
 public class EPGLabelPropagationInputFormat extends
   HBaseVertexInputFormat<LongWritable, LongWritable, NullWritable> {
 
-
   /**
    * {@inheritDoc}
    */
@@ -38,6 +37,16 @@ public class EPGLabelPropagationInputFormat extends
    */
   public static class EPGLongLongNullVertexReader extends
     HBaseVertexReader<LongWritable, LongWritable, NullWritable> {
+    /**
+     * Specific node label
+     */
+
+    private static final String NODELABEL = "node.label";
+
+    /**
+     * Specific edge labels
+     */
+    private static final String EDGELABLE = "edge.label";
 
     /**
      * Sets the base TableInputFormat and creates a record reader.
@@ -67,31 +76,21 @@ public class EPGLabelPropagationInputFormat extends
       IOException, InterruptedException {
       Result row = getRecordReader().getCurrentValue();
       VertexHandler vertexHandler = getVertexHandler();
-
-
       LongWritable vertexID =
         new LongWritable(vertexHandler.getVertexID(row.getRow()));
-
-
       List<Edge<LongWritable, NullWritable>> edges = Lists.newArrayList();
-
-
       // read outgoing edges
       for (org.gradoop.model.Edge e : vertexHandler.readOutgoingEdges(row)) {
         edges.add(EdgeFactory.create(new LongWritable(e.getOtherID())));
       }
-
+      // read incoming edges
       for (org.gradoop.model.Edge e : vertexHandler.readIncomingEdges(row)) {
         edges.add(EdgeFactory.create(new LongWritable(e.getOtherID())));
       }
-
       Vertex<LongWritable, LongWritable, NullWritable> vertex =
         getConf().createVertex();
-
       vertex.initialize(vertexID, vertexID, edges);
       return vertex;
-
-
     }
   }
 }

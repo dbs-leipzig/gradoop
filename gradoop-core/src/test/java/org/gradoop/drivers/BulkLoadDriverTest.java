@@ -21,7 +21,7 @@ public class BulkLoadDriverTest extends GradoopClusterTest {
                    "-" + BulkLoadDriver.OPTION_GRAPH_OUTPUT_PATH,
                    "/output/import/extended-graph",
                    "-" + BulkLoadDriver.OPTION_CUSTOM_ARGUMENT,
-                   "csv-reader.label=knows, csv-reader" +
+                   "sna-reader.label=knows, sna-reader" +
                      ".meta_data=person_knows_person.meta",
                    "-" + BulkLoadDriver.LoadConfUtils.OPTION_VERTEX_LINE_READER,
                    JsonReader.class.getCanonicalName(),

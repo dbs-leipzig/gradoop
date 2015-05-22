@@ -1,69 +1,68 @@
 package org.gradoop.io.formats;
 
-import org.apache.giraph.edge.Edge;
 import org.apache.giraph.graph.Vertex;
-import org.apache.giraph.io.formats.TextVertexOutputFormat;
+import org.apache.giraph.io.VertexWriter;
+import org.apache.hadoop.hbase.client.Mutation;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.gradoop.model.impl.VertexFactory;
+import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
 
 /**
- * Encodes the output of the {@link org.gradoop.algorithms
- * .AdaptiveRepartitioningComputation} in
- * the following format:
- * <p/>
- * {@code <vertex-id> <partition-id> \[<partition-id>*\] [<neighbour-id>]*}
+ * Used to write resulting vertices of BTG Computation to HBase.
  */
 public class EPGLabelPropagationOutputFormat extends
-  TextVertexOutputFormat<LongWritable, LongWritable, NullWritable> {
+  HBaseVertexOutputFormat<LongWritable, LongWritable, NullWritable> {
 
   /**
-   * Value Token Separator
-   */
-  private static final String VALUE_TOKEN_SEPARATOR = " ";
-
-
-  /**
-   * @param context the information about the task
-   * @return the text vertex writer to be used
-   * @throws IOException
-   * @throws InterruptedException
+   * {@inheritDoc}
    */
   @Override
-  public TextVertexWriter createVertexWriter(TaskAttemptContext context) throws
-    IOException, InterruptedException {
-
-    return new LabelPropagationTextVertexLineWriter();
+  public VertexWriter<LongWritable, LongWritable, NullWritable>
+  createVertexWriter(
+    TaskAttemptContext context) throws IOException, InterruptedException {
+    return new BTGHBaseVertexWriter(context);
   }
 
   /**
-   * Used to convert a {@link org.gradoop.io.PartitioningVertex} to a
-   * line in the output file.
+   * Writes a single Giraph vertex back to HBase.
    */
-  private class LabelPropagationTextVertexLineWriter extends
-    TextVertexWriterToEachLine {
+  public static class BTGHBaseVertexWriter extends
+    HBaseVertexWriter<LongWritable, LongWritable, NullWritable> {
+
+    /**
+     * Sets up HBase table output format and creates a record writer.
+     *
+     * @param context task attempt context
+     */
+    public BTGHBaseVertexWriter(TaskAttemptContext context) throws IOException,
+      InterruptedException {
+      super(context);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Text convertVertexToLine(
+    public void writeVertex(
       Vertex<LongWritable, LongWritable, NullWritable> vertex) throws
-      IOException {
-      // vertex id
-      StringBuilder sb = new StringBuilder(vertex.getId().toString());
-      sb.append(VALUE_TOKEN_SEPARATOR);
-      // vertex value
-      sb.append(vertex.getValue());
-      sb.append(VALUE_TOKEN_SEPARATOR);
-      // edges
-      for (Edge<LongWritable, NullWritable> e : vertex.getEdges()) {
-        sb.append(e.getTargetVertexId());
-        sb.append(VALUE_TOKEN_SEPARATOR);
-      }
-      return new Text(sb.toString());
+      IOException, InterruptedException {
+      RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
+      VertexHandler vertexHandler = getVertexHandler();
+      byte[] rowKey = vertexHandler.getRowKey(vertex.getId().get());
+      Put put = new Put(rowKey);
+      // just need to write the Values
+      org.gradoop.model.Vertex v =
+        VertexFactory.createDefaultVertexWithID(vertex.getId().get());
+      v.addGraph(vertex.getValue().get());
+      put = vertexHandler.writeGraphs(put, v);
+      writer.write(new ImmutableBytesWritable(rowKey), put);
     }
   }
 }

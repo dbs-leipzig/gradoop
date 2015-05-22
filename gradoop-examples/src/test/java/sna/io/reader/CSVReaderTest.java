@@ -1,9 +1,9 @@
-package csv.io.reader;
+package sna.io.reader;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
-import org.gradoop.csv.io.reader.CSVReader;
+import org.gradoop.sna.io.reader.CSVReader;
 import org.gradoop.io.reader.ConfigurableVertexLineReader;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
@@ -45,13 +45,14 @@ public class CSVReaderTest {
   private static final long person4 = 4;
   private static final long person5 = 5;
   // Test files
-  private static final String[] PERSON_CSV =
-    new String[]{"id|firstName|lastName|gender|birthday|",
-                 "0|Arun|Reddy|female|1987-05-27|",
-                 "1|Yang|Li|male|1984-07-09|"};
-  private static final String[] KNOWS_CSV =
-    new String[]{"Person.id|Organisation.id|since|office|department|",
-                 "2|3|2015|P414|visual-studios|", "4|5|2012|P416|databases|"};
+  private static final String[] PERSON_CSV = new String[] {
+    "id|firstName|lastName|gender|birthday|", "0|Arun|Reddy|female|1987-05-27|",
+    "1|Yang|Li|male|1984-07-09|"
+  };
+  private static final String[] KNOWS_CSV = new String[] {
+    "Person.id|Organisation.id|since|office|department|",
+    "2|3|2015|P414|visual-studios|", "4|5|2012|P416|databases|"
+  };
 
   @Test
   public void checkNodeCSVInputTest() {
