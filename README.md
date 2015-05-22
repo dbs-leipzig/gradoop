@@ -14,7 +14,7 @@ If you want to run Gradoop on a cluster, you need the following components
 installed.
 
 *   Hadoop 2.5.1
-*   HBase 0.98.10.1-hadoop2
+*   HBase 0.98.11-hadoop2
 
 ##### Setup Gradoop
 
@@ -135,7 +135,7 @@ Used to maintain the codestyle for the whole project.
 
 *   copy codestyle from dev-support to your local IDEA config folder
 
-    > cp dev-support/gradoop-idea-codestyle.xml ~/<your IDEA folder>/config/codeStyles
+    > cp dev-support/gradoop-idea-codestyle.xml ~/.IntelliJIdea14/config/codeStyles
 
 *   restart IDEA
 
@@ -154,6 +154,10 @@ http://stackoverflow.com/questions/17625938/hbase-minidfscluster-java-fails
 following line in /etc/hosts
 
     `127.0.1.1   <your-host-name>`
+    
+* And add your hostname to the localhost entry
+
+    `127.0.0.1  localhost <your-host-name>`
 
 
 
