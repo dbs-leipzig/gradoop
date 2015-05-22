@@ -204,7 +204,6 @@ public class Summarize {
         sb.append(entryMap.getValue());
         sb.append(" ");
       }
-      LOG.info("###LogOutput: " + communityKey + sb.toString());
       return sb.toString();
     }
   }

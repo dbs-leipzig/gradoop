@@ -43,23 +43,34 @@ import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Runs the SNB Analysis Example
  */
 public class SNAAnalysisDriver extends BulkDriver {
-
+  /**
+   * Class Logger
+   */
   private static final Logger LOG = Logger.getLogger(SNAAnalysisDriver.class);
-
+  /**
+   * Job Prefix
+   */
   private static final String JOB_PREFIX = "SNB Analysis: ";
 
+  /**
+   * static block
+   */
   static {
     Configuration.addDefaultResource("giraph-site.xml");
     Configuration.addDefaultResource("hbase-site.xml");
   }
 
+  /**
+   * Constructor
+   */
   public SNAAnalysisDriver() {
     new LoadConfUtils();
   }
@@ -99,11 +110,11 @@ public class SNAAnalysisDriver extends BulkDriver {
     // Create or Open GraphStore
     HBaseGraphStoreFactory.createOrOpenGraphStore(conf, new EPGVertexHandler(),
       new EPGGraphHandler());
-    
      /*
     Step 1: Bulk Load of the graph into HBase using MapReduce
      */
     if (cmd.hasOption(LoadConfUtils.OPTION_BULKLOAD)) {
+      String separator = System.getProperty("file.separator");
       String metaDataPath =
         cmd.getOptionValue(LoadConfUtils.OPTION_METADATA_PATH);
       String type;
@@ -114,36 +125,47 @@ public class SNAAnalysisDriver extends BulkDriver {
       for (File file : csvFiles) {
         String fname = file.getName();
         if (fname.contains("_meta")) {
-          BufferedReader br =
-            new BufferedReader(new FileReader(metaDataPath + "/" + fname));
-          String line;
-          type = "";
-          label = "";
-          metaData = "";
-          int lineNr = 1;
-          while ((line = br.readLine()) != null) {
-            if (lineNr == 1) {
-              type = line;
-              lineNr++;
-            } else if (lineNr == 2) {
-              label = line;
-              lineNr++;
-            } else {
-              metaData = line;
+          BufferedReader br = null;
+          try {
+            br = new BufferedReader(new InputStreamReader(
+              new FileInputStream(metaDataPath + separator + fname), "UTF8"));
+            String line;
+            type = "";
+            label = "";
+            metaData = "";
+            int lineNr = 1;
+            while ((line = br.readLine()) != null) {
+              if (lineNr == 1) {
+                type = line;
+                lineNr++;
+              } else if (lineNr == 2) {
+                label = line;
+                lineNr++;
+              } else {
+                metaData = line;
+              }
             }
-          }
-          conf.set(CSVReader.TYPE, type);
-          conf.set(CSVReader.LABEL, label);
-          conf.set(CSVReader.META_DATA, metaData);
-          String hdfsInputPath = cmd.getOptionValue(OPTION_GRAPH_INPUT_PATH);
-          String hdfsFileName = fname.replace("_meta", "");
-          String hdfsinputFilePath = hdfsInputPath + hdfsFileName;
-          String outputPathHDFS =
-            cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH) + "/" +
-              hdfsinputFilePath;
-          LOG.info("Run Bulkload: " + hdfsFileName);
-          if (!runBulkLoad(conf, hdfsinputFilePath, outputPathHDFS, verbose)) {
-            return -1;
+            conf.set(CSVReader.TYPE, type);
+            conf.set(CSVReader.LABEL, label);
+            conf.set(CSVReader.META_DATA, metaData);
+            String hdfsInputPath = cmd.getOptionValue(OPTION_GRAPH_INPUT_PATH);
+            String hdfsFileName = fname.replace("_meta", "");
+            String hdfsinputFilePath = hdfsInputPath + hdfsFileName;
+            String outputPathHDFS =
+              cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH) +
+                separator +
+                hdfsinputFilePath;
+            LOG.info("Run Bulkload: " + hdfsFileName);
+            if (!runBulkLoad(conf, hdfsinputFilePath, outputPathHDFS,
+              verbose)) {
+              return -1;
+            }
+          } catch (IOException e) {
+            System.err.println("IOExcepton: " + e.getMessage());
+          } finally {
+            if (br != null) {
+              br.close();
+            }
           }
         }
       }
@@ -184,9 +206,10 @@ public class SNAAnalysisDriver extends BulkDriver {
    * Runs the HFile conversion from the given file to the output dir. Also
    * loads the Hfiles to region servers.
    *
-   * @param conf    Cluster config
-   * @param outDir  HFile output dir in HDFS
-   * @param verbose print output during job
+   * @param conf      Cluster config
+   * @param graphFile graph file in hdfs
+   * @param outDir    HFile output dir in HDFS
+   * @param verbose   print output during job
    * @return true, if the job completed successfully, false otherwise
    * @throws Exception
    */
@@ -229,6 +252,18 @@ public class SNAAnalysisDriver extends BulkDriver {
     return true;
   }
 
+  /**
+   * runs Label Propagation Computation
+   *
+   * @param conf        hadoop conf
+   * @param workerCount worker for giraph computation
+   * @param verbose     verbose
+   * @return true, if the job completed successfully, false otherwise
+   * @throws IOException
+   * @throws ClassNotFoundException
+   * @throws InterruptedException
+   * @throws ParseException
+   */
   private boolean runLabelPropagationComputation(Configuration conf,
     int workerCount, boolean verbose) throws IOException,
     ClassNotFoundException, InterruptedException, ParseException {
@@ -263,6 +298,19 @@ public class SNAAnalysisDriver extends BulkDriver {
     return job.run(verbose);
   }
 
+  /**
+   * runs Summarize MapReduce job
+   *
+   * @param conf      hadoop conf
+   * @param scanCache scan cache size
+   * @param reducers  reducer class
+   * @param verbose   verbose
+   * @param path      output path
+   * @return true, if the job completed successfully, false otherwise
+   * @throws IOException
+   * @throws ClassNotFoundException
+   * @throws InterruptedException
+   */
   private boolean runSummarize(Configuration conf, int scanCache, int reducers,
     boolean verbose, String path) throws IOException, ClassNotFoundException,
     InterruptedException {
@@ -314,23 +362,42 @@ public class SNAAnalysisDriver extends BulkDriver {
      * Command line option to drop hbase tables if they exist.
      */
     public static final String OPTION_DROP_TABLES = "dt";
-
+    /**
+     * Command line option for setting giraph worker
+     */
     public static final String OPTION_WORKERS = "w";
-
+    /**
+     * Command line option for starting a new bulk load
+     */
     public static final String OPTION_BULKLOAD = "bl";
-
+    /**
+     * Command line option for starting the label propagation computation
+     */
     public static final String OPTION_LABLEPROPAGATION = "lp";
-
+    /**
+     * Command line option for setting the meta data path
+     */
     public static final String OPTION_METADATA_PATH = "mdp";
-
+    /**
+     * Command line option for setting giraph output path (unused atm)
+     * Todo: using mapred.output.path
+     */
     public static final String OPTION_GIRAPH_OUTPUT_PATH = "gop";
-
+    /**
+     * Command line option for starting summarize mapreduce job
+     */
     public static final String OPTION_SUMMARIZE = "sum";
-
+    /**
+     * Command line option for setting the reducer count
+     */
     public static final String OPTION_REDUCERS = "rs";
-
+    /**
+     * Command line option for setting hbase scan cache
+     */
     public static final String OPTION_SCAN_CACHE = "sc";
-
+    /**
+     * Command line option for setting summarize output path
+     */
     public static final String OPTION_SUMMARIZE_OUTPUT_PATH = "sop";
 
     static {
