@@ -8,7 +8,6 @@ import org.apache.hadoop.hbase.mapreduce.TableMapper;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.io.formats.SummarizeWritable;
 import org.gradoop.model.Edge;
@@ -29,20 +28,14 @@ import java.util.Map;
  * Summarize Operation
  */
 public class Summarize {
-
   /**
-   * Class Logger
+   * Output: [graph-id, [vertex-id, (target1, target2, ...)]]
    */
-  private static Logger LOG = Logger.getLogger(Summarize.class);
-
-  /**
-   * Select Mapper
-   */
-  public static class SelectMapper extends
+  public static class SummarizeMapper extends
     TableMapper<LongWritable, SummarizeWritable> {
 
     /**
-     * Reads/writes vertices from/to HBase.
+     * Converts vertices from/to HBase rows.
      */
     private VertexHandler vertexHandler;
 
@@ -70,22 +63,20 @@ public class Summarize {
     @Override
     protected void map(ImmutableBytesWritable key, Result value,
       Context context) throws IOException, InterruptedException {
-      LOG.info("###MAP:");
       Vertex v = vertexHandler.readVertex(value);
       for (Long graph : vertexHandler.readGraphs(value)) {
         List<Edge> edges = Lists.newArrayList(v.getOutgoingEdges());
         context.write(new LongWritable(graph),
           new SummarizeWritable(v.getID(), edges));
-        LOG.info("Create SummarizeWritable: " + v.getID());
       }
     }
   }
 
   /**
-   * Checks all vertices of a graph for the predicate result and aggregates the
-   * values.
+   * Input: graph-id, [[vertex-id, (target1, target2, ...)], ...]]
+   * Output: graph-id [(graph-id, edge-count), ...]
    */
-  public static class TextReducer extends
+  public static class SummarizeReducer extends
     Reducer<LongWritable, SummarizeWritable, Text, Text> {
 
     /**

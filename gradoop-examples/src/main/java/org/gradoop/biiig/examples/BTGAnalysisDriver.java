@@ -8,6 +8,10 @@ import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Scan;
@@ -17,6 +21,7 @@ import org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -31,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.algorithms.PairAggregator;
 import org.gradoop.algorithms.SelectAndAggregate;
+import org.gradoop.algorithms.Sort;
 import org.gradoop.biiig.BIIIGConstants;
 import org.gradoop.biiig.algorithms.BTGComputation;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
@@ -96,9 +102,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     if (cmd.hasOption(ConfigurationUtils.OPTION_DROP_TABLES)) {
       HBaseGraphStoreFactory.deleteGraphStore(conf);
     }
-    HBaseGraphStoreFactory
-      .createOrOpenGraphStore(conf, new EPGVertexHandler(),
-        new EPGGraphHandler());
+    HBaseGraphStoreFactory.createOrOpenGraphStore(conf, new EPGVertexHandler(),
+      new EPGGraphHandler());
 
     /*
     Step 1: Bulk Load of the graph into HBase using MapReduce
@@ -128,6 +133,13 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     int reducers = Integer
       .parseInt(cmd.getOptionValue(ConfigurationUtils.OPTION_REDUCERS, "1"));
     if (!runSelectAndAggregate(conf, scanCache, reducers, verbose)) {
+      return -1;
+    }
+
+    /*
+    Step 4: Sort graphs by profit
+     */
+    if (!runSort(conf, scanCache, verbose)) {
       return -1;
     }
 
@@ -295,6 +307,76 @@ public class BTGAnalysisDriver extends Configured implements Tool {
 
     // run
     return job.waitForCompletion(verbose);
+  }
+
+  /**
+   * Sorts an HBase table by a given column value.
+   *
+   * @param conf      Cluster configuration
+   * @param scanCache hbase client scan cache
+   * @param verbose   print output during job
+   * @return true, if the job completed successfully, false otherwise
+   * @throws IOException
+   * @throws ClassNotFoundException
+   * @throws InterruptedException
+   */
+  private boolean runSort(Configuration conf, int scanCache,
+    boolean verbose) throws IOException, ClassNotFoundException,
+    InterruptedException {
+
+    String sortKey = SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY;
+    String outputTable = "graphs_sorted";
+
+    createTable(conf, outputTable);
+
+    /*
+     mapper settings
+      */
+    // graph handler
+    conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
+      GraphHandler.class);
+
+    Job job = Job.getInstance(conf, JOB_PREFIX + Sort.class.getName());
+    Scan scan = new Scan();
+    scan.addColumn(Bytes.toBytes(GConstants.CF_PROPERTIES),
+      Bytes.toBytes(sortKey));
+    scan.setCaching(scanCache);
+    scan.setCacheBlocks(false);
+
+    // map
+    TableMapReduceUtil.initTableMapperJob(GConstants.DEFAULT_TABLE_GRAPHS, scan,
+      Sort.SortMapper.class, ImmutableBytesWritable.class, Put.class, job);
+
+    job.setOutputFormatClass(TableOutputFormat.class);
+    job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, outputTable);
+
+    // no reducer necessary
+    job.setNumReduceTasks(0);
+
+    // run
+    return job.waitForCompletion(verbose);
+  }
+
+  /**
+   * Creates a hbase table with the given name.
+   *
+   * @param conf        Cluster Cluster configuration
+   * @param outputTable table name
+   * @throws IOException
+   */
+  private void createTable(Configuration conf, String outputTable) throws
+    IOException {
+    HTableDescriptor outputTableDescriptor =
+      new HTableDescriptor(TableName.valueOf(outputTable));
+
+    HBaseAdmin admin = new HBaseAdmin(conf);
+
+    if (!admin.tableExists(outputTableDescriptor.getName())) {
+      outputTableDescriptor.addFamily(new HColumnDescriptor("v"));
+      admin.createTable(outputTableDescriptor);
+    }
+
+    admin.close();
   }
 
   /**

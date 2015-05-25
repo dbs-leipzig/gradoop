@@ -334,12 +334,10 @@ public class SNAAnalysisDriver extends BulkDriver {
     // map
     TableMapReduceUtil
       .initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES, scan,
-        Summarize.SelectMapper.class, LongWritable.class,
+        Summarize.SummarizeMapper.class, LongWritable.class,
         SummarizeWritable.class, job);
     // reduce
-//    TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
-//      Summarize.TextReducer.class, job);
-    job.setReducerClass(Summarize.TextReducer.class);
+    job.setReducerClass(Summarize.SummarizeReducer.class);
     job.setNumReduceTasks(reducers);
     job.setOutputFormatClass(TextOutputFormat.class);
     conf.set(TextOutputFormat.SEPERATOR, " ");
