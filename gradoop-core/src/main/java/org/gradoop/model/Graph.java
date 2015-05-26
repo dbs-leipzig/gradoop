@@ -14,6 +14,13 @@ package org.gradoop.model;
  */
 public interface Graph extends Identifiable, Attributed, MultiLabeled {
   /**
+   * Adds the given vertex identifier to the graph.
+   *
+   * @param vertexID vertex identifier
+   */
+  void addVertex(Long vertexID);
+
+  /**
    * Returns all vertices contained in that graph.
    *
    * @return vertices

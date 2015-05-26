@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.gradoop.model.Graph;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,7 +16,7 @@ public class DefaultGraph extends MultiLabeledPropertyContainer implements
   /**
    * Holds vertex identifiers contained in that graph.
    */
-  private final Iterable<Long> vertices;
+  private List<Long> vertices;
 
   /**
    * Creates a graph based on the given parameters.
@@ -30,6 +31,18 @@ public class DefaultGraph extends MultiLabeledPropertyContainer implements
                final Iterable<Long> vertices) {
     super(id, labels, properties);
     this.vertices = (vertices != null) ? Lists.newArrayList(vertices) : null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void addVertex(Long vertexID) {
+    if (vertices != null) {
+      vertices.add(vertexID);
+    } else {
+      vertices = Lists.newArrayList(vertexID);
+    }
   }
 
   /**
