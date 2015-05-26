@@ -6,7 +6,10 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapper;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.log4j.Logger;
+import org.apache.hadoop.hbase.util.Order;
+import org.apache.hadoop.hbase.util.OrderedBytes;
+import org.apache.hadoop.hbase.util.PositionedByteRange;
+import org.apache.hadoop.hbase.util.SimplePositionedByteRange;
 import org.gradoop.GConstants;
 import org.gradoop.model.Graph;
 import org.gradoop.storage.hbase.GraphHandler;
@@ -17,13 +20,32 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Gradoop sort operator. Sorts HBase rows by column value by creating a
  * secondary index table.
+ * <p>
+ * Note: Only supports sorting on double values at the moment.
  */
 public class Sort {
 
   /**
-   * Class logger.
+   * Configuration key to assign a property key which shall be used for sorting.
    */
-  private static Logger LOG = Logger.getLogger(Sort.class);
+  public static final String SORT_PROPERTY_KEY =
+    Sort.class.getName() + ".propertykey";
+
+  /**
+   * Configuration key to set the sort order.
+   */
+  public static final String SORT_ASCENDING =
+    Sort.class.getName() + ".ascending";
+
+  /**
+   * Column family to store value in.
+   */
+  public static final String COLUMN_FAMILY_NAME = "v";
+
+  /**
+   * Column to store value in.
+   */
+  public static final String COLUMN_NAME = "c";
 
   /**
    * Sorts the input table by the given column. Creates a new table with the
@@ -33,25 +55,24 @@ public class Sort {
     TableMapper<ImmutableBytesWritable, Put> {
 
     /**
-     * Ascending or descending
-     */
-    private static boolean ASCENDING = true;
-
-    /**
      * Byte array for column family identifier
      */
-    private static byte[] CF_NAME = Bytes.toBytes("v");
+    private static byte[] CF_IDENTIFIER = Bytes.toBytes(COLUMN_FAMILY_NAME);
 
     /**
      * Byte array for column identifier
      */
-    private static byte[] COLUMN_NAME = Bytes.toBytes("k");
+    private static byte[] COL_IDENTIFIER = Bytes.toBytes(COLUMN_NAME);
+
+    /**
+     * Ascending (true) or descending (false)
+     */
+    private boolean ascending;
 
     /**
      * Property to sort
      */
-    private static String PROPERTY_KEY =
-      SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY;
+    private String propertyKey;
 
     /**
      * Reads/writes graphs from/to HBase rows.
@@ -69,6 +90,9 @@ public class Sort {
       Class<? extends GraphHandler> handlerClass = conf
         .getClass(GConstants.GRAPH_HANDLER_CLASS,
           GConstants.DEFAULT_GRAPH_HANDLER, GraphHandler.class);
+
+      propertyKey = conf.get(Sort.SORT_PROPERTY_KEY);
+      ascending = conf.getBoolean(Sort.SORT_ASCENDING, true);
 
       try {
         this.graphHandler = handlerClass.getConstructor().newInstance();
@@ -91,21 +115,33 @@ public class Sort {
     protected void map(ImmutableBytesWritable key, Result value,
       Context context) throws IOException, InterruptedException {
       Graph graph = graphHandler.readGraph(value);
-      LOG.info("=== processing graph " + graph.getID() + " with property " +
-        "count: " + graph.getPropertyCount());
       if (graph.getPropertyCount() > 0) {
-        Double v = (Double) graph.getProperty(PROPERTY_KEY);
-        LOG.info("=== value to sort: " + v.toString());
-        if (!ASCENDING) {
-          v = Double.MAX_VALUE - v;
-        }
+        Double v = (Double) graph.getProperty(propertyKey);
 
-        byte[] rowKeyBytes = Bytes.toBytes(v);
+        byte[] rowKeyBytes = ascending ? encodeDouble(v, Order.ASCENDING) :
+          encodeDouble(v, Order.DESCENDING);
+
         Put put = new Put(rowKeyBytes);
-        put.add(CF_NAME, COLUMN_NAME, Bytes.toBytes(graph.getID()));
+        put.add(CF_IDENTIFIER, COL_IDENTIFIER, Bytes.toBytes(graph.getID()));
 
         context.write(new ImmutableBytesWritable(rowKeyBytes), put);
       }
+    }
+
+    /**
+     * Encodes the given double value to a sortable byte array representation.
+     *
+     * @param d     double value
+     * @param order sorting order
+     * @return byte array representing the double value
+     */
+    private byte[] encodeDouble(Double d, Order order) {
+      byte[] a = new byte[Bytes.SIZEOF_DOUBLE];
+
+      PositionedByteRange buf = new SimplePositionedByteRange(a);
+      OrderedBytes.encodeNumeric(buf, d, order);
+
+      return buf.getBytes();
     }
   }
 }

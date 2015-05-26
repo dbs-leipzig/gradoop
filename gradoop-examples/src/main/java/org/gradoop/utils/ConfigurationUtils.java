@@ -43,6 +43,10 @@ public class ConfigurationUtils {
    * Command line option to set the path to store HFiles from Bulk Load.
    */
   public static final String OPTION_GRAPH_OUTPUT_PATH = "gop";
+  /**
+   * Command line option to set the table name for the secondary index.
+   */
+  public static final String OPTION_SORT_TABLE_NAME = "stn";
 
   /**
    * Maintains accepted options for gradoop-biiig
@@ -64,6 +68,8 @@ public class ConfigurationUtils {
       "Graph Input Path");
     OPTIONS.addOption(OPTION_GRAPH_OUTPUT_PATH, "graphOutputPath", true,
       "HFiles output path (used by Bulk Load)");
+    OPTIONS.addOption(OPTION_SORT_TABLE_NAME, "sortTableName", true, "HTable " +
+      "used to store secondary index.");
   }
 
   /**
@@ -112,6 +118,9 @@ public class ConfigurationUtils {
     }
     if (!cmd.hasOption(OPTION_GRAPH_OUTPUT_PATH)) {
       throw new IllegalArgumentException("Chose the graph output path (-gop");
+    }
+    if (!cmd.hasOption(OPTION_SORT_TABLE_NAME)) {
+      throw new IllegalArgumentException("Chose the sort table name (-stn");
     }
   }
 }

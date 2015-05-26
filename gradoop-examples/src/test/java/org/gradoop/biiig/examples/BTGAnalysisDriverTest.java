@@ -7,9 +7,13 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.OrderedBytes;
+import org.apache.hadoop.hbase.util.PositionedByteRange;
+import org.apache.hadoop.hbase.util.SimplePositionedByteRange;
 import org.apache.log4j.Logger;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.algorithms.SelectAndAggregate;
+import org.gradoop.algorithms.Sort;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
@@ -33,19 +37,22 @@ public class BTGAnalysisDriverTest extends GradoopClusterTest {
     Configuration conf = utility.getConfiguration();
 
     String graphFile = "btg2.graph";
+    String sortTable = "graphs_sorted";
 
-    String[] args = new String[]{"-" + ConfigurationUtils.OPTION_WORKERS, "1",
-                                 "-" + ConfigurationUtils.OPTION_REDUCERS, "1",
-                                 "-" +
-                                   ConfigurationUtils.OPTION_HBASE_SCAN_CACHE,
-                                 "500", "-" +
-                                   ConfigurationUtils.OPTION_GRAPH_INPUT_PATH,
-                                 graphFile, "-" +
-                                   ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH,
-                                 "/output/import/biiig",
-                                 "-" + ConfigurationUtils.OPTION_DROP_TABLES};
+    String[] args = new String[] {
+      "-" + ConfigurationUtils.OPTION_WORKERS, "1",
+      "-" + ConfigurationUtils.OPTION_REDUCERS, "1",
+      "-" + ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500",
+      "-" + ConfigurationUtils.OPTION_GRAPH_INPUT_PATH, graphFile,
+      "-" + ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH, "/output/import/biiig",
+      "-" + ConfigurationUtils.OPTION_DROP_TABLES,
+      "-" + ConfigurationUtils.OPTION_SORT_TABLE_NAME, sortTable
+    };
 
     copyFromLocal(graphFile);
+
+    // create table for sort output
+    createTable(sortTable);
 
     BTGAnalysisDriver btgAnalysisDriver = new BTGAnalysisDriver();
     btgAnalysisDriver.setConf(conf);
@@ -140,8 +147,8 @@ public class BTGAnalysisDriverTest extends GradoopClusterTest {
   private void validateSort(Configuration config) throws IOException {
     HTable table = new HTable(config, "graphs_sorted");
 
-    byte[] cf = Bytes.toBytes("v");
-    byte[] col = Bytes.toBytes("k");
+    byte[] cf = Bytes.toBytes(Sort.COLUMN_FAMILY_NAME);
+    byte[] col = Bytes.toBytes(Sort.COLUMN_NAME);
 
     Scan scan = new Scan();
     scan.addColumn(cf, col);
@@ -155,11 +162,18 @@ public class BTGAnalysisDriverTest extends GradoopClusterTest {
     while ((res = sc.next()) != null) {
       if (rowCount == 0) {
         assertEquals(16L, Bytes.toLong(res.getValue(cf, col)));
+        assertEquals(Double.valueOf(163.91), decodeDouble(res.getRow()));
       } else if (rowCount == 1) {
         assertEquals(4L, Bytes.toLong(res.getValue(cf, col)));
+        assertEquals(Double.valueOf(-147.25), decodeDouble(res.getRow()));
       }
       rowCount++;
     }
     sc.close();
+  }
+
+  private Double decodeDouble(byte[] value) {
+    PositionedByteRange buf = new SimplePositionedByteRange(value);
+    return OrderedBytes.decodeNumericAsDouble(buf);
   }
 }

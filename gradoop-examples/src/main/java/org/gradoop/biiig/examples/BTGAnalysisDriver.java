@@ -1,5 +1,6 @@
 package org.gradoop.biiig.examples;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.giraph.conf.GiraphConfiguration;
@@ -8,12 +9,10 @@ import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.HColumnDescriptor;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.HFileOutputFormat2;
@@ -42,20 +41,23 @@ import org.gradoop.biiig.algorithms.BTGComputation;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexInputFormat;
 import org.gradoop.biiig.io.formats.BTGHBaseVertexOutputFormat;
 import org.gradoop.biiig.io.reader.FoodBrokerReader;
-import org.gradoop.utils.ConfigurationUtils;
 import org.gradoop.io.formats.GenericPairWritable;
 import org.gradoop.io.reader.BulkLoadEPG;
 import org.gradoop.io.reader.VertexLineReader;
+import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.operators.VertexAggregate;
 import org.gradoop.model.operators.VertexPredicate;
+import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.GraphHandler;
 import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.gradoop.storage.hbase.VertexHandler;
+import org.gradoop.utils.ConfigurationUtils;
 
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Runs the BIIIG Foodbroker/BTG Example
@@ -76,6 +78,10 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     Configuration.addDefaultResource("hbase-site.xml");
   }
 
+  /**
+   * Used to read and write graph elements from HBase.
+   */
+  private GraphStore graphStore;
 
   /**
    * Starting point for BTG analysis pipeline.
@@ -102,8 +108,10 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     if (cmd.hasOption(ConfigurationUtils.OPTION_DROP_TABLES)) {
       HBaseGraphStoreFactory.deleteGraphStore(conf);
     }
-    HBaseGraphStoreFactory.createOrOpenGraphStore(conf, new EPGVertexHandler(),
-      new EPGGraphHandler());
+
+    graphStore = HBaseGraphStoreFactory
+      .createOrOpenGraphStore(conf, new EPGVertexHandler(),
+        new EPGGraphHandler());
 
     /*
     Step 1: Bulk Load of the graph into HBase using MapReduce
@@ -139,7 +147,16 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     /*
     Step 4: Sort graphs by profit
      */
-    if (!runSort(conf, scanCache, verbose)) {
+    String sortTableName =
+      cmd.getOptionValue(ConfigurationUtils.OPTION_SORT_TABLE_NAME);
+    if (!runSort(conf, sortTableName, scanCache, verbose)) {
+      return -1;
+    }
+
+    /*
+    Step 5: Compute overlapping nodes of top 100 graphs
+     */
+    if (!runOverlap(conf, sortTableName, 100)) {
       return -1;
     }
 
@@ -312,22 +329,20 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   /**
    * Sorts an HBase table by a given column value.
    *
-   * @param conf      Cluster configuration
-   * @param scanCache hbase client scan cache
-   * @param verbose   print output during job
+   * @param conf          Cluster configuration
+   * @param sortTableName table to use for sort output
+   * @param scanCache     hbase client scan cache
+   * @param verbose       print output during job
    * @return true, if the job completed successfully, false otherwise
    * @throws IOException
    * @throws ClassNotFoundException
    * @throws InterruptedException
    */
-  private boolean runSort(Configuration conf, int scanCache,
-    boolean verbose) throws IOException, ClassNotFoundException,
+  private boolean runSort(Configuration conf, String sortTableName,
+    int scanCache, boolean verbose) throws IOException, ClassNotFoundException,
     InterruptedException {
 
     String sortKey = SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY;
-    String outputTable = "graphs_sorted";
-
-    createTable(conf, outputTable);
 
     /*
      mapper settings
@@ -335,6 +350,8 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     // graph handler
     conf.setClass(GConstants.GRAPH_HANDLER_CLASS, EPGGraphHandler.class,
       GraphHandler.class);
+    conf.set(Sort.SORT_PROPERTY_KEY, sortKey);
+    conf.setBoolean(Sort.SORT_ASCENDING, false);
 
     Job job = Job.getInstance(conf, JOB_PREFIX + Sort.class.getName());
     Scan scan = new Scan();
@@ -348,7 +365,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
       Sort.SortMapper.class, ImmutableBytesWritable.class, Put.class, job);
 
     job.setOutputFormatClass(TableOutputFormat.class);
-    job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, outputTable);
+    job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, sortTableName);
 
     // no reducer necessary
     job.setNumReduceTasks(0);
@@ -358,26 +375,55 @@ public class BTGAnalysisDriver extends Configured implements Tool {
   }
 
   /**
-   * Creates a hbase table with the given name.
+   * Computes the overlapping vertices of the top x graphs.
    *
-   * @param conf        Cluster Cluster configuration
-   * @param outputTable table name
+   * @param conf      Cluster configuration
+   * @param sortTable table to use for sort output
+   * @param top       number of rows from sort table
+   * @return true, iff there was no error
    * @throws IOException
    */
-  private void createTable(Configuration conf, String outputTable) throws
-    IOException {
-    HTableDescriptor outputTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(outputTable));
+  private boolean runOverlap(Configuration conf, String sortTable,
+    int top) throws IOException {
+    HTable table = new HTable(conf, sortTable);
 
-    HBaseAdmin admin = new HBaseAdmin(conf);
+    byte[] cf = Bytes.toBytes(Sort.COLUMN_FAMILY_NAME);
+    byte[] col = Bytes.toBytes(Sort.COLUMN_NAME);
 
-    if (!admin.tableExists(outputTableDescriptor.getName())) {
-      outputTableDescriptor.addFamily(new HColumnDescriptor("v"));
-      admin.createTable(outputTableDescriptor);
+    Scan scan = new Scan();
+    scan.setMaxResultSize(top);
+
+    Set<Long> overlap = Sets.newHashSet();
+
+
+    ResultScanner scanner = table.getScanner(scan);
+    Result res;
+
+    int line = 0;
+    while ((res = scanner.next()) != null) {
+      Long graphID = Bytes.toLong(res.getValue(cf, col));
+      Graph graph = graphStore.readGraph(graphID);
+      if (graph != null && graph.getVertexCount() > 0) {
+        Set<Long> vertices = Sets.newHashSet(graph.getVertices());
+        if (line == 0) {
+          overlap.addAll(vertices);
+        } else {
+          overlap.retainAll(vertices);
+        }
+        line++;
+      }
     }
 
-    admin.close();
+    scanner.close();
+
+    LOG.info("=== Overlapping vertices");
+    for (Long vertexID : overlap) {
+      LOG.info(vertexID);
+    }
+
+    return true;
   }
+
 
   /**
    * Predicate to select graphs containing a vertex of type SalesOrder.
