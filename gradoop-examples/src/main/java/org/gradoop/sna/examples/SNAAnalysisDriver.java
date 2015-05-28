@@ -96,6 +96,16 @@ public class SNAAnalysisDriver extends BulkDriver {
     }
     boolean verbose = cmd.hasOption(OPTION_VERBOSE);
     Configuration conf = getHadoopConf();
+    String hbaseTableName;
+    if (cmd.hasOption(LoadConfUtils.OPTION_TABLENAME)) {
+      hbaseTableName = cmd.getOptionValue(LoadConfUtils.OPTION_TABLENAME);
+    } else {
+      hbaseTableName = GConstants.DEFAULT_TABLE_VERTICES;
+    }
+    if (cmd.hasOption(LoadConfUtils.OPTION_TEXT_OUTPUT_PATH)) {
+      conf.set(FileOutputFormat.OUTDIR,
+        cmd.getOptionValue(LoadConfUtils.OPTION_TEXT_OUTPUT_PATH));
+    }
 
     /*
     Step 0: Drop Tables if needed
@@ -156,7 +166,7 @@ public class SNAAnalysisDriver extends BulkDriver {
                 hdfsinputFilePath;
             LOG.info("Run Bulkload: " + hdfsFileName);
             if (!runBulkLoad(conf, hdfsinputFilePath, outputPathHDFS,
-              verbose)) {
+              hbaseTableName, verbose)) {
               return -1;
             }
           } catch (IOException e) {
@@ -177,8 +187,8 @@ public class SNAAnalysisDriver extends BulkDriver {
       int workers =
         Integer.parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_WORKERS));
       LOG.info("Run Label-Propagation");
-      if (!runLabelPropagationComputation(conf, workers, verbose)) {
-        LOG.info("####LP Failure");
+      if (!runLabelPropagationComputation(conf, workers, hbaseTableName,
+        verbose)) {
         return -1;
       }
     }
@@ -193,8 +203,8 @@ public class SNAAnalysisDriver extends BulkDriver {
         .parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_REDUCERS, "1"));
       int scanCache = Integer
         .parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_SCAN_CACHE, "500"));
-      if (!runSummarize(conf, scanCache, reduce, verbose, path)) {
-        LOG.info("####MP Failure");
+      if (!runSummarize(conf, scanCache, reduce, hbaseTableName, verbose,
+        path)) {
         return -1;
       }
     }
@@ -205,15 +215,16 @@ public class SNAAnalysisDriver extends BulkDriver {
    * Runs the HFile conversion from the given file to the output dir. Also
    * loads the Hfiles to region servers.
    *
-   * @param conf      Cluster config
-   * @param graphFile graph file in hdfs
-   * @param outDir    HFile output dir in HDFS
-   * @param verbose   print output during job
+   * @param conf           Cluster config
+   * @param graphFile      graph file in hdfs
+   * @param outDir         HFile output dir in HDFS
+   * @param hbaseTableName hbase table name
+   * @param verbose        print output during job
    * @return true, if the job completed successfully, false otherwise
    * @throws Exception
    */
   private boolean runBulkLoad(Configuration conf, String graphFile,
-    String outDir, boolean verbose) throws Exception {
+    String outDir, String hbaseTableName, boolean verbose) throws Exception {
     Path inputFile = new Path(graphFile);
     Path outputDir = new Path(outDir);
     // set line reader to read lines in input splits
@@ -236,7 +247,7 @@ public class SNAAnalysisDriver extends BulkDriver {
     FileInputFormat.addInputPath(job, inputFile);
     // set output directory
     FileOutputFormat.setOutputPath(job, outputDir);
-    HTable hTable = new HTable(conf, GConstants.DEFAULT_TABLE_VERTICES);
+    HTable hTable = new HTable(conf, hbaseTableName);
     // auto configure partitioner and reducer corresponding to the number of
     // regions
     HFileOutputFormat2.configureIncrementalLoad(job, hTable);
@@ -254,9 +265,10 @@ public class SNAAnalysisDriver extends BulkDriver {
   /**
    * runs Label Propagation Computation
    *
-   * @param conf        hadoop conf
-   * @param workerCount worker for giraph computation
-   * @param verbose     verbose
+   * @param conf           hadoop conf
+   * @param workerCount    worker for giraph computation
+   * @param hbaseTableName hbase table name
+   * @param verbose        verbose
    * @return true, if the job completed successfully, false otherwise
    * @throws IOException
    * @throws ClassNotFoundException
@@ -264,21 +276,17 @@ public class SNAAnalysisDriver extends BulkDriver {
    * @throws ParseException
    */
   private boolean runLabelPropagationComputation(Configuration conf,
-    int workerCount, boolean verbose) throws IOException,
+    int workerCount, String hbaseTableName, boolean verbose) throws IOException,
     ClassNotFoundException, InterruptedException, ParseException {
     // set HBase table to read graph from
-    conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+    conf.set(TableInputFormat.INPUT_TABLE, hbaseTableName);
     // just scan necessary CFs (no properties needed)
     String columnFamiliesToScan = String
       .format("%s %s %s %s", GConstants.CF_LABELS, GConstants.CF_OUT_EDGES,
         GConstants.CF_IN_EDGES, GConstants.CF_GRAPHS);
     conf.set(TableInputFormat.SCAN_COLUMNS, columnFamiliesToScan);
     // set HBase table to write computation results to
-    conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
-    /**
-     * Configuration for giraph output to fs
-     */
-    conf.set("mapreduce.output.fileoutputformat.outputdir", "output/lp");
+    conf.set(TableOutputFormat.OUTPUT_TABLE, hbaseTableName);
     // setup Giraph job
     GiraphJob job = new GiraphJob(conf,
       JOB_PREFIX + LabelPropagationComputation.class.getName());
@@ -300,19 +308,20 @@ public class SNAAnalysisDriver extends BulkDriver {
   /**
    * runs Summarize MapReduce job
    *
-   * @param conf      hadoop conf
-   * @param scanCache scan cache size
-   * @param reducers  reducer class
-   * @param verbose   verbose
-   * @param path      output path
+   * @param conf           hadoop conf
+   * @param scanCache      scan cache size
+   * @param reducers       reducer class
+   * @param hbaseTableName hbase table name
+   * @param verbose        verbose
+   * @param path           output path
    * @return true, if the job completed successfully, false otherwise
    * @throws IOException
    * @throws ClassNotFoundException
    * @throws InterruptedException
    */
   private boolean runSummarize(Configuration conf, int scanCache, int reducers,
-    boolean verbose, String path) throws IOException, ClassNotFoundException,
-    InterruptedException {
+    String hbaseTableName, boolean verbose, String path) throws IOException,
+    ClassNotFoundException, InterruptedException {
     Path outputPath = new Path(path);
 
     /*
@@ -333,12 +342,9 @@ public class SNAAnalysisDriver extends BulkDriver {
     scan.setCacheBlocks(false);
     // map
     TableMapReduceUtil
-      .initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES, scan,
-        Summarize.SelectMapper.class, LongWritable.class,
-        SummarizeWritable.class, job);
+      .initTableMapperJob(hbaseTableName, scan, Summarize.SelectMapper.class,
+        LongWritable.class, SummarizeWritable.class, job);
     // reduce
-//    TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
-//      Summarize.TextReducer.class, job);
     job.setReducerClass(Summarize.TextReducer.class);
     job.setNumReduceTasks(reducers);
     job.setOutputFormatClass(TextOutputFormat.class);
@@ -398,6 +404,14 @@ public class SNAAnalysisDriver extends BulkDriver {
      * Command line option for setting summarize output path
      */
     public static final String OPTION_SUMMARIZE_OUTPUT_PATH = "sop";
+    /**
+     * Command line option for setting hbase tablename
+     */
+    public static final String OPTION_TABLENAME = "t";
+    /**
+     * Path for text output. Used only with giraph textoutput formats
+     */
+    public static final String OPTION_TEXT_OUTPUT_PATH = "top";
 
     static {
       OPTIONS.addOption(OPTION_DROP_TABLES, "drop-tables", false,
@@ -425,6 +439,10 @@ public class SNAAnalysisDriver extends BulkDriver {
       OPTIONS
         .addOption(OPTION_SUMMARIZE_OUTPUT_PATH, "summarizeoutputpath", true,
           "Summarize outout Path");
+      OPTIONS.addOption(OPTION_TABLENAME, "hbasetablename", true,
+        "HBase " + "custom Tablename");
+      OPTIONS.addOption(OPTION_TEXT_OUTPUT_PATH, "textoutputpath", true,
+        "Used for giraph textoutput format only!");
     }
   }
 
