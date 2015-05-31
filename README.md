@@ -35,11 +35,14 @@ installed.
 The BIIIG example pipeline is used to analyze business data represented as a graph.
 It consists of multiple steps:
 
-1.  Bulk Load a data set into Gradoop
-2.  Identify subgraphs using Giraph
+1.  Bulk Load a [FoodBroker](https://github.com/dbs-leipzig/foodbroker) data set into Gradoop
+2.  Identify business transaction subgraphs using Giraph
 3.  Select a (sub)set of subgraphs based on an UDF using MapReduce
 4.  Aggregate these graphs based on an UDF using MapReduce
 5.  Store the aggregated result as a graph property
+6.  Sort these subgraphs by a property value using MapReduce
+7.  Select the TOP 100 Subgraphs based on their aggregated property
+8.  Compute the overlapping vertices of these subgraphs
 
 The pipeline itself is currently represented by a Hadoop Driver
 (org.gradoop.biiig.examples.BTGAnalysisDriver). Please have a look at the driver
@@ -63,6 +66,20 @@ To run the pipeline on your hadoop installation, please follow these steps.
 
 *   See [Foodbroker Repository](https://github.com/dbs-leipzig/foodbroker) if you want to generate your
     own graphs or implement a custom FileReader to load your own graph format.
+
+###### SNA
+
+The SNA example pipeline is used to analyze a social network represented as a graph.
+It consists of multiple steps:
+
+1.  Bulk Load a [LDBC-SNB](https://github.com/ldbc/ldbc_snb_datagen) data set into Gradoop
+2.  Identify communities using Label Propagation in Giraph
+3.  Summarize Communities as single vertices with count value
+4.  Aggregate edges inside a community and between communities to single edges with count value
+
+The pipeline itself is currently represented by a Hadoop Driver
+(org.gradoop.biiig.examples.SNAAnalysisDriver). Please have a look at the driver
+for further details on how to implement a pipeline.
     
 ###### RDF
 
