@@ -16,45 +16,39 @@ import static org.junit.Assert.assertEquals;
  * Tests for {@link org.gradoop.algorithms}
  */
 public class LabelPropagationComputationTest {
-  private static final Pattern LINE_TOKEN_SEPARATOR = Pattern.compile
-    (IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
+  private static final Pattern LINE_TOKEN_SEPARATOR =
+    Pattern.compile(IdWithValueTextOutputFormat.LINE_TOKENIZE_VALUE_DEFAULT);
 
   @Test
-  public void testConnectedGraph()
-    throws Exception {
+  public void testConnectedGraph() throws Exception {
     String[] graph = GiraphTestHelper.getConnectedGraphWithVertexValues();
     validateConnectedGraphResult(computeResults(graph));
   }
 
   @Test
-  public void testLoopGraph()
-    throws Exception {
+  public void testLoopGraph() throws Exception {
     String[] graph = GiraphTestHelper.getLoopGraphWithVertexValues();
     validateLoopGraphResult(computeResults(graph));
   }
 
-
   @Test
-  public void testDisconnectedGraph()
-    throws Exception {
+  public void testDisconnectedGraph() throws Exception {
     String[] graph = GiraphTestHelper.getDisconnectedGraphWithVertexValues();
     validateDisconnectedGraphResult(computeResults(graph));
   }
 
   @Test
-  public void testBipartiteGraph()
-    throws Exception {
+  public void testBipartiteGraph() throws Exception {
     String[] graph = GiraphTestHelper.getBipartiteGraphWithVertexValues();
     validateBipartiteGraphResult(computeResults(graph));
   }
 
   @Test
-  public void testCompleteBipartiteGraph()
-    throws Exception {
-    String[] graph = GiraphTestHelper.getCompleteBipartiteGraphWithVertexValue();
+  public void testCompleteBipartiteGraph() throws Exception {
+    String[] graph =
+      GiraphTestHelper.getCompleteBipartiteGraphWithVertexValue();
     validateCompleteBipartiteGraphResult(computeResults(graph));
   }
-
 
   private void validateConnectedGraphResult(
     Map<Integer, Integer> vertexIDwithValue) {
@@ -105,8 +99,8 @@ public class LabelPropagationComputationTest {
     assertEquals(3, vertexIDwithValue.get(7).intValue());
   }
 
-  private void validateCompleteBipartiteGraphResult(Map<Integer,
-    Integer> vertexIDwithValue) {
+  private void validateCompleteBipartiteGraphResult(
+    Map<Integer, Integer> vertexIDwithValue) {
     assertEquals(8, vertexIDwithValue.size());
     assertEquals(0, vertexIDwithValue.get(0).intValue());
     assertEquals(0, vertexIDwithValue.get(1).intValue());
@@ -118,8 +112,8 @@ public class LabelPropagationComputationTest {
     assertEquals(0, vertexIDwithValue.get(7).intValue());
   }
 
-  private Map<Integer, Integer> computeResults(String[] graph)
-    throws Exception {
+  private Map<Integer, Integer> computeResults(String[] graph) throws
+    Exception {
     GiraphConfiguration conf = getConfiguration();
     Iterable<String> results = InternalVertexRunner.run(conf, graph);
     return parseResults(results);
@@ -128,6 +122,7 @@ public class LabelPropagationComputationTest {
   private GiraphConfiguration getConfiguration() {
     GiraphConfiguration conf = new GiraphConfiguration();
     conf.setComputationClass(LabelPropagationComputation.class);
+    conf.setMasterComputeClass(LabelPropagationMasterComputation.class);
     conf.setVertexInputFormatClass(LongLongNullTextInputFormat.class);
     conf.setVertexOutputFormatClass(IdWithValueTextOutputFormat.class);
     return conf;

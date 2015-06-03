@@ -1,7 +1,12 @@
 package org.gradoop.algorithms;
 
+import org.apache.giraph.comm.WorkerClientRequestProcessor;
 import org.apache.giraph.graph.BasicComputation;
+import org.apache.giraph.graph.GraphState;
+import org.apache.giraph.graph.GraphTaskManager;
 import org.apache.giraph.graph.Vertex;
+import org.apache.giraph.worker.WorkerContext;
+import org.apache.giraph.worker.WorkerGlobalCommUsage;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 
@@ -14,17 +19,27 @@ import java.util.List;
  * Implementation of the Label Propagation Algorithm:
  * The input graph as adjacency list contains the information about the
  * vertex (id), value (label) and its edges to neighbors.
- *
+ * <p/>
  * In super step 0 each vertex will propagate its value within his neighbors
- *
+ * <p/>
  * In the remaining super steps each vertex will adopt the value of the
  * majority of their neighbors or the smallest one if there are just one
  * neighbor. If a vertex adopt a new value it'll propagate the new one again.
- *
+ * <p/>
  * The computation will terminate if no new values are assigned.
  */
 public class LabelPropagationComputation extends
   BasicComputation<LongWritable, LongWritable, NullWritable, LongWritable> {
+  /**
+   * Number of migrations the Vertex can do
+   */
+  public static final String NUMBER_OF_ITERATIONS =
+    "labelpropagation.numberofiterations";
+  /**
+   * Default number of migrations if no value is given
+   */
+  public static final int DEFAULT_NUMBER_OF_ITERATIONS = 10;
+
   /**
    * Returns the current new value. This value is based on all incoming
    * messages. Depending on the number of messages sent to the vertex, the
@@ -40,8 +55,8 @@ public class LabelPropagationComputation extends
    * @param messages All incoming messages
    * @return the new Value the vertex will become
    */
-  private long getNewValue(Vertex<LongWritable, LongWritable, NullWritable>
-                           vertex,
+  private long getNewValue(
+    Vertex<LongWritable, LongWritable, NullWritable> vertex,
     Iterable<LongWritable> messages) {
     long newValue;
     //TODO: create allMessages more efficient
@@ -100,6 +115,16 @@ public class LabelPropagationComputation extends
       newValue = maxValue;
     }
     return newValue;
+  }
+
+  @Override
+  public void initialize(GraphState graphState,
+    WorkerClientRequestProcessor<LongWritable, LongWritable, NullWritable>
+      workerClientRequestProcessor,
+    GraphTaskManager<LongWritable, LongWritable, NullWritable> graphTaskManager,
+    WorkerGlobalCommUsage workerGlobalCommUsage, WorkerContext workerContext) {
+    super.initialize(graphState, workerClientRequestProcessor, graphTaskManager,
+      workerGlobalCommUsage, workerContext);
   }
 
   /**

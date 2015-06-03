@@ -37,16 +37,6 @@ public class EPGLabelPropagationInputFormat extends
    */
   public static class EPGLongLongNullVertexReader extends
     HBaseVertexReader<LongWritable, LongWritable, NullWritable> {
-    /**
-     * Specific node label
-     */
-
-    private static final String NODELABEL = "node.label";
-
-    /**
-     * Specific edge labels
-     */
-    private static final String EDGELABLE = "edge.label";
 
     /**
      * Sets the base TableInputFormat and creates a record reader.

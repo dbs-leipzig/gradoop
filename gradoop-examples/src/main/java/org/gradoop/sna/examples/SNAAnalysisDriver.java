@@ -26,12 +26,15 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.gradoop.GConstants;
 import org.gradoop.algorithms.LabelPropagationComputation;
+import org.gradoop.algorithms.LabelPropagationMasterComputation;
 import org.gradoop.algorithms.Summarize;
 import org.gradoop.drivers.BulkDriver;
 import org.gradoop.io.formats.EPGLabelPropagationInputFormat;
 import org.gradoop.io.formats.EPGLabelPropagationOutputFormat;
 import org.gradoop.io.formats.SummarizeWritable;
+import org.gradoop.io.formats.TextLabelPropagationOutputFormat;
 import org.gradoop.io.reader.BulkLoadEPG;
+import org.gradoop.io.reader.JsonReader;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.sna.io.reader.CSVReader;
 import org.gradoop.storage.hbase.EPGGraphHandler;
@@ -58,6 +61,22 @@ public class SNAAnalysisDriver extends BulkDriver {
    * Job Prefix
    */
   private static final String JOB_PREFIX = "SNB Analysis: ";
+  /**
+   * Job Sufix
+   */
+  private static final String JOB_SEPARATOR = " ";
+  /**
+   * Configuration strings
+   */
+  private static final String BULKLOAD = "bulkload";
+  /**
+   * CSV Bulkload string
+   */
+  private static final String CSV_BULKLOAD = "csv";
+  /**
+   * JSON Bulkload string
+   */
+  private static final String JSON_BULKLOAD = "json";
 
   /**
    * static block
@@ -97,6 +116,21 @@ public class SNAAnalysisDriver extends BulkDriver {
     boolean verbose = cmd.hasOption(OPTION_VERBOSE);
     Configuration conf = getHadoopConf();
 
+    boolean textOutput = false;
+    if (cmd.hasOption(LoadConfUtils.OPTION_TEXT_OUTPUT_PATH)) {
+      conf.set(FileOutputFormat.OUTDIR,
+        cmd.getOptionValue(LoadConfUtils.OPTION_TEXT_OUTPUT_PATH));
+      textOutput = true;
+    }
+    boolean jsonBulkload;
+    if (cmd.hasOption(LoadConfUtils.OPTION_JSON_BULKLOAD)) {
+      conf.set(BULKLOAD, JSON_BULKLOAD);
+      jsonBulkload = true;
+    } else {
+      conf.set(BULKLOAD, CSV_BULKLOAD);
+      jsonBulkload = false;
+    }
+
     /*
     Step 0: Drop Tables if needed
      */
@@ -113,59 +147,73 @@ public class SNAAnalysisDriver extends BulkDriver {
     Step 1: Bulk Load of the graph into HBase using MapReduce
      */
     if (cmd.hasOption(LoadConfUtils.OPTION_BULKLOAD)) {
-      String separator = System.getProperty("file.separator");
-      String metaDataPath =
-        cmd.getOptionValue(LoadConfUtils.OPTION_METADATA_PATH);
-      String type;
-      String label;
-      String metaData;
-      File[] csvFiles = new File(metaDataPath).listFiles();
-      assert csvFiles != null;
-      for (File file : csvFiles) {
-        String fname = file.getName();
-        if (fname.contains("_meta")) {
-          BufferedReader br = null;
-          try {
-            br = new BufferedReader(new InputStreamReader(
-              new FileInputStream(metaDataPath + separator + fname), "UTF8"));
-            String line;
-            type = "";
-            label = "";
-            metaData = "";
-            int lineNr = 1;
-            while ((line = br.readLine()) != null) {
-              if (lineNr == 1) {
-                type = line;
-                lineNr++;
-              } else if (lineNr == 2) {
-                label = line;
-                lineNr++;
-              } else {
-                metaData = line;
+      if (!jsonBulkload) {
+        String separator = System.getProperty("file.separator");
+        String metaDataPath =
+          cmd.getOptionValue(LoadConfUtils.OPTION_METADATA_PATH);
+        String type;
+        String label;
+        String metaData;
+        String properties;
+        File[] csvFiles = new File(metaDataPath).listFiles();
+        assert csvFiles != null;
+        for (File file : csvFiles) {
+          String fname = file.getName();
+          if (fname.contains("_meta")) {
+            BufferedReader br = null;
+            try {
+              br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(metaDataPath + separator + fname), "UTF8"));
+              String line;
+              type = "";
+              label = "";
+              metaData = "";
+              properties = "";
+              int lineNr = 1;
+              while ((line = br.readLine()) != null) {
+                if (lineNr == 1) {
+                  type = line;
+                  lineNr++;
+                } else if (lineNr == 2) {
+                  label = line;
+                  lineNr++;
+                } else if (lineNr == 3) {
+                  metaData = line;
+                  lineNr++;
+                } else {
+                  properties = line;
+                }
+              }
+              conf.set(CSVReader.TYPE, type);
+              conf.set(CSVReader.LABEL, label);
+              conf.set(CSVReader.META_DATA, metaData);
+              conf.set(CSVReader.PROPERTIES, properties);
+              String hdfsInputPath =
+                cmd.getOptionValue(OPTION_GRAPH_INPUT_PATH);
+              String hdfsFileName = fname.replace("_meta", "");
+              String hdfsinputFilePath = hdfsInputPath + hdfsFileName;
+              String outputPathHDFS =
+                cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH) +
+                  separator +
+                  hdfsinputFilePath;
+              if (!runBulkLoad(conf, hdfsinputFilePath, outputPathHDFS, verbose,
+                hdfsFileName)) {
+                return -1;
+              }
+            } catch (IOException e) {
+              System.err.println("IOExcepton: " + e.getMessage());
+            } finally {
+              if (br != null) {
+                br.close();
               }
             }
-            conf.set(CSVReader.TYPE, type);
-            conf.set(CSVReader.LABEL, label);
-            conf.set(CSVReader.META_DATA, metaData);
-            String hdfsInputPath = cmd.getOptionValue(OPTION_GRAPH_INPUT_PATH);
-            String hdfsFileName = fname.replace("_meta", "");
-            String hdfsinputFilePath = hdfsInputPath + hdfsFileName;
-            String outputPathHDFS =
-              cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH) +
-                separator +
-                hdfsinputFilePath;
-            LOG.info("Run Bulkload: " + hdfsFileName);
-            if (!runBulkLoad(conf, hdfsinputFilePath, outputPathHDFS,
-              verbose)) {
-              return -1;
-            }
-          } catch (IOException e) {
-            System.err.println("IOExcepton: " + e.getMessage());
-          } finally {
-            if (br != null) {
-              br.close();
-            }
           }
+        }
+      } else {
+        String inputPath = cmd.getOptionValue(OPTION_GRAPH_INPUT_PATH);
+        String outputPath = cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH);
+        if (!runBulkLoad(conf, inputPath, outputPath, verbose, "json_input")) {
+          return -1;
         }
       }
     }
@@ -176,9 +224,7 @@ public class SNAAnalysisDriver extends BulkDriver {
     if (cmd.hasOption(LoadConfUtils.OPTION_LABLEPROPAGATION)) {
       int workers =
         Integer.parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_WORKERS));
-      LOG.info("Run Label-Propagation");
-      if (!runLabelPropagationComputation(conf, workers, verbose)) {
-        LOG.info("####LP Failure");
+      if (!runLabelPropagationComputation(conf, workers, textOutput, verbose)) {
         return -1;
       }
     }
@@ -187,14 +233,12 @@ public class SNAAnalysisDriver extends BulkDriver {
     Step 3: Summarization
      */
     if (cmd.hasOption(LoadConfUtils.OPTION_SUMMARIZE)) {
-      String path =
-        cmd.getOptionValue(LoadConfUtils.OPTION_SUMMARIZE_OUTPUT_PATH);
+      String path = cmd.getOptionValue(LoadConfUtils.OPTION_SUMMARIZE);
       int reduce = Integer
         .parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_REDUCERS, "1"));
       int scanCache = Integer
         .parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_SCAN_CACHE, "500"));
       if (!runSummarize(conf, scanCache, reduce, verbose, path)) {
-        LOG.info("####MP Failure");
         return -1;
       }
     }
@@ -205,24 +249,31 @@ public class SNAAnalysisDriver extends BulkDriver {
    * Runs the HFile conversion from the given file to the output dir. Also
    * loads the Hfiles to region servers.
    *
-   * @param conf      Cluster config
-   * @param graphFile graph file in hdfs
-   * @param outDir    HFile output dir in HDFS
-   * @param verbose   print output during job
+   * @param conf         Cluster config
+   * @param graphFile    graph file in hdfs
+   * @param outDir       HFile output dir in HDFS
+   * @param verbose      print output during job
+   * @param hdfsFileName name of the hdfsfile
    * @return true, if the job completed successfully, false otherwise
    * @throws Exception
    */
   private boolean runBulkLoad(Configuration conf, String graphFile,
-    String outDir, boolean verbose) throws Exception {
+    String outDir, boolean verbose, String hdfsFileName) throws Exception {
     Path inputFile = new Path(graphFile);
     Path outputDir = new Path(outDir);
     // set line reader to read lines in input splits
-    conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, CSVReader.class,
-      VertexLineReader.class);
+    if (conf.get(BULKLOAD).equals(CSV_BULKLOAD)) {
+      conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, CSVReader.class,
+        VertexLineReader.class);
+    } else {
+      conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, JsonReader.class,
+        VertexLineReader.class);
+    }
     // set vertex handler that creates the Puts
     conf.setClass(BulkLoadEPG.VERTEX_HANDLER, EPGVertexHandler.class,
       VertexHandler.class);
-    Job job = Job.getInstance(conf, JOB_PREFIX + BulkLoadEPG.class.getName());
+    Job job = Job.getInstance(conf,
+      JOB_PREFIX + BulkLoadEPG.class.getName() + JOB_SEPARATOR + hdfsFileName);
     job.setJarByClass(BulkLoadEPG.class);
     // mapper that runs the HFile conversion
     job.setMapperClass(BulkLoadEPG.class);
@@ -256,6 +307,7 @@ public class SNAAnalysisDriver extends BulkDriver {
    *
    * @param conf        hadoop conf
    * @param workerCount worker for giraph computation
+   * @param textOutput  specify text output
    * @param verbose     verbose
    * @return true, if the job completed successfully, false otherwise
    * @throws IOException
@@ -264,7 +316,7 @@ public class SNAAnalysisDriver extends BulkDriver {
    * @throws ParseException
    */
   private boolean runLabelPropagationComputation(Configuration conf,
-    int workerCount, boolean verbose) throws IOException,
+    int workerCount, boolean textOutput, boolean verbose) throws IOException,
     ClassNotFoundException, InterruptedException, ParseException {
     // set HBase table to read graph from
     conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
@@ -275,19 +327,21 @@ public class SNAAnalysisDriver extends BulkDriver {
     conf.set(TableInputFormat.SCAN_COLUMNS, columnFamiliesToScan);
     // set HBase table to write computation results to
     conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
-    /**
-     * Configuration for giraph output to fs
-     */
-    conf.set("mapreduce.output.fileoutputformat.outputdir", "output/lp");
     // setup Giraph job
     GiraphJob job = new GiraphJob(conf,
       JOB_PREFIX + LabelPropagationComputation.class.getName());
     GiraphConfiguration giraphConf = job.getConfiguration();
     giraphConf.setComputationClass(LabelPropagationComputation.class);
+    giraphConf.setMasterComputeClass(LabelPropagationMasterComputation.class);
     giraphConf.setVertexInputFormatClass(EPGLabelPropagationInputFormat.class);
     //giraph output or hbaseoutput
-    giraphConf
-      .setVertexOutputFormatClass(EPGLabelPropagationOutputFormat.class);
+    if (textOutput) {
+      giraphConf
+        .setVertexOutputFormatClass(TextLabelPropagationOutputFormat.class);
+    } else {
+      giraphConf
+        .setVertexOutputFormatClass(EPGLabelPropagationOutputFormat.class);
+    }
     giraphConf.setWorkerConfiguration(workerCount, workerCount, 100f);
     // assuming local environment
     if (workerCount == 1) {
@@ -314,7 +368,6 @@ public class SNAAnalysisDriver extends BulkDriver {
     boolean verbose, String path) throws IOException, ClassNotFoundException,
     InterruptedException {
     Path outputPath = new Path(path);
-
     /*
      mapper settings
       */
@@ -337,8 +390,6 @@ public class SNAAnalysisDriver extends BulkDriver {
         Summarize.SelectMapper.class, LongWritable.class,
         SummarizeWritable.class, job);
     // reduce
-//    TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
-//      Summarize.TextReducer.class, job);
     job.setReducerClass(Summarize.TextReducer.class);
     job.setNumReduceTasks(reducers);
     job.setOutputFormatClass(TextOutputFormat.class);
@@ -378,14 +429,13 @@ public class SNAAnalysisDriver extends BulkDriver {
      */
     public static final String OPTION_METADATA_PATH = "mdp";
     /**
-     * Command line option for setting giraph output path (unused atm)
-     * Todo: using mapred.output.path
+     * Command line option for setting giraph output path
      */
     public static final String OPTION_GIRAPH_OUTPUT_PATH = "gop";
     /**
      * Command line option for starting summarize mapreduce job
      */
-    public static final String OPTION_SUMMARIZE = "sum";
+    public static final String OPTION_SUMMARIZE = "su";
     /**
      * Command line option for setting the reducer count
      */
@@ -395,13 +445,26 @@ public class SNAAnalysisDriver extends BulkDriver {
      */
     public static final String OPTION_SCAN_CACHE = "sc";
     /**
-     * Command line option for setting summarize output path
+     * Command line option for setting hbase tablename
      */
-    public static final String OPTION_SUMMARIZE_OUTPUT_PATH = "sop";
+    public static final String OPTION_TABLENAME = "t";
+    /**
+     * Path for text output. Used only with giraph textoutput formats
+     */
+    public static final String OPTION_TEXT_OUTPUT_PATH = "lpto";
+    /**
+     * CSV Option for CSV input
+     */
+    public static final String OPTION_CSV_BULKLOAD = "csv";
+    /**
+     * JSON Option for JSON input
+     */
+    public static final String OPTION_JSON_BULKLOAD = "json";
 
     static {
       OPTIONS.addOption(OPTION_DROP_TABLES, "drop-tables", false,
         "Drop HBase EPG tables if they exist.");
+      //Todo: use vlr
       OPTIONS.addOption(OPTION_VERTEX_LINE_READER, "vertex-line-reader", true,
         "VertexLineReader implerementation which is used to read a single " +
           "line " +
@@ -416,15 +479,20 @@ public class SNAAnalysisDriver extends BulkDriver {
         "Path to " + "CSV MetaData");
       OPTIONS.addOption(OPTION_GIRAPH_OUTPUT_PATH, "giraphoutputpath", true,
         "Path to Giraph - Output");
-      OPTIONS.addOption(OPTION_SUMMARIZE, "summarize", false,
+      OPTIONS.addOption(OPTION_SUMMARIZE, "summarize", true,
         "Add the " + "summarize option to the anlysis pipeline");
       OPTIONS.addOption(OPTION_REDUCERS, "reducers", true,
         "Number of " + "Reducers");
       OPTIONS.addOption(OPTION_SCAN_CACHE, "scancache", true,
         "Mapreduce " + "scan-cahce");
-      OPTIONS
-        .addOption(OPTION_SUMMARIZE_OUTPUT_PATH, "summarizeoutputpath", true,
-          "Summarize outout Path");
+      OPTIONS.addOption(OPTION_TABLENAME, "hbasetablename", true,
+        "HBase " + "custom Tablename");
+      OPTIONS.addOption(OPTION_TEXT_OUTPUT_PATH, "textoutputpath", true,
+        "Used for giraph textoutput format only!");
+      OPTIONS.addOption(OPTION_CSV_BULKLOAD, "csvbulkload", false,
+        "Use .CSV " + "data for bulkimport");
+      OPTIONS.addOption(OPTION_JSON_BULKLOAD, "jsonbulkload", false,
+        "Use " + ".json data for bulkimport");
     }
   }
 

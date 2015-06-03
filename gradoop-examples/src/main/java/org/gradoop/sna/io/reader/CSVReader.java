@@ -29,6 +29,10 @@ public class CSVReader implements ConfigurableVertexLineReader {
    */
   public static final String LABEL = "sna-reader.label";
   /**
+   * CSV Properties
+   */
+  public static final String PROPERTIES = "sna-reader.properties";
+  /**
    * The expected amount of nodes that will be created
    */
   public static final String EXPECTED_SIZE = "sna-reader.expected_size";
@@ -83,17 +87,14 @@ public class CSVReader implements ConfigurableVertexLineReader {
     return LINE_TOKEN_SEPARATOR.split(line);
   }
 
-
   /**
    * Initial step: initializations and reading the headline
-   *
-   * @param line line of sna input
    */
-  private void initialStep(String line) {
+  private void initialStep() {
     // Initialize Lists
     labels = Lists.newArrayList();
     // Get properties (e.g. FirstName, LastName...)
-    properties = getTokens(line);
+    properties = getTokens(conf.get(PROPERTIES));
     // Get MetaData (e.g. long, string, string...)
     types = getTokens(conf.get(META_DATA));
     //readTypes(conf.get(META_DATA));
@@ -102,8 +103,6 @@ public class CSVReader implements ConfigurableVertexLineReader {
     // getCSVType
     isNodeCSV = isNodeCSV();
     random = new Random();
-    // initialStep is over
-    initialStep = false;
   }
 
   /**
@@ -163,7 +162,8 @@ public class CSVReader implements ConfigurableVertexLineReader {
   public List<Vertex> readVertexList(String line) {
     List<Vertex> vList = setVList();
     if (initialStep) {
-      initialStep(line);
+      initialStep();
+      initialStep = false;
     } else {
       if (isNodeCSV) {
         vList.add(readVertex(line));
@@ -193,24 +193,26 @@ public class CSVReader implements ConfigurableVertexLineReader {
       EdgeFactory.createDefaultEdgeWithLabel(id1, edgeLabel, random.nextLong());
     Edge incoming =
       EdgeFactory.createDefaultEdgeWithLabel(id0, edgeLabel, random.nextLong());
-    for (int i = 2; i < properties.length; i++) {
-      switch (types[i]) {
-      case "long":
-        outgoing.addProperty(properties[i], Long.parseLong(tokens[i]));
-        incoming.addProperty(properties[i], Long.parseLong(tokens[i]));
-        break;
-      case "string":
-        outgoing.addProperty(properties[i], tokens[i]);
-        incoming.addProperty(properties[i], tokens[i]);
-        break;
-      case "integer":
-        outgoing.addProperty(properties[i], Integer.parseInt(tokens[i]));
-        incoming.addProperty(properties[i], Integer.parseInt(tokens[i]));
-        break;
-      default:
-        outgoing.addProperty(properties[i], tokens[i]);
-        incoming.addProperty(properties[i], tokens[i]);
-        break;
+    if (properties.length > 2) {
+      for (int i = 2; i < properties.length; i++) {
+        switch (types[i]) {
+        case "long":
+          outgoing.addProperty(properties[i], Long.parseLong(tokens[i]));
+          incoming.addProperty(properties[i], Long.parseLong(tokens[i]));
+          break;
+        case "string":
+          outgoing.addProperty(properties[i], tokens[i]);
+          incoming.addProperty(properties[i], tokens[i]);
+          break;
+        case "integer":
+          outgoing.addProperty(properties[i], Integer.parseInt(tokens[i]));
+          incoming.addProperty(properties[i], Integer.parseInt(tokens[i]));
+          break;
+        default:
+          outgoing.addProperty(properties[i], tokens[i]);
+          incoming.addProperty(properties[i], tokens[i]);
+          break;
+        }
       }
     }
     List<Edge> outgoingEdgeList = Lists.newArrayListWithExpectedSize(1);
