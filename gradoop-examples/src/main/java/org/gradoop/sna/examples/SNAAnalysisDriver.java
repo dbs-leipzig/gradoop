@@ -207,6 +207,27 @@ public class SNAAnalysisDriver extends BulkDriver {
                 br.close();
               }
             }
+            conf.set(CSVReader.TYPE, type);
+            conf.set(CSVReader.LABEL, label);
+            conf.set(CSVReader.META_DATA, metaData);
+            String hdfsInputPath = cmd.getOptionValue(OPTION_GRAPH_INPUT_PATH);
+            String hdfsFileName = fname.replace("_meta", "");
+            String hdfsinputFilePath = hdfsInputPath + hdfsFileName;
+            String outputPathHDFS =
+              cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH) +
+                separator +
+                hdfsinputFilePath;
+            LOG.info("Run Bulkload: " + hdfsFileName);
+            if (!runBulkLoad(conf, hdfsinputFilePath, outputPathHDFS,
+              verbose)) {
+              return -1;
+            }
+          } catch (IOException e) {
+            System.err.println("IOExcepton: " + e.getMessage());
+          } finally {
+            if (br != null) {
+              br.close();
+            }
           }
         }
       } else {
