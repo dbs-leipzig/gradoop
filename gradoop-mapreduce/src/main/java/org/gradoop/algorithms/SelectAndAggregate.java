@@ -1,5 +1,6 @@
 package org.gradoop.algorithms;
 
+import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
@@ -22,6 +23,7 @@ import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * Very static and POC MapReduce algorithm for the selection of graphs based
@@ -123,7 +125,7 @@ public class SelectAndAggregate {
     protected void map(ImmutableBytesWritable key, Result value,
       Context context) throws IOException, InterruptedException {
       Vertex v = vertexHandler.readVertex(value);
-
+      LongWritable vertexID = new LongWritable(v.getID());
       boolean predicate = vertexPredicate.evaluate(v);
       ValueWritable aggregate = new ValueWritable();
       aggregate.set(vertexDoubleAggregate.aggregate(v));
@@ -131,10 +133,10 @@ public class SelectAndAggregate {
       for (Long graph : vertexHandler.readGraphs(value)) {
         if (predicate) {
           context.write(new LongWritable(graph),
-            new GenericPairWritable(TRUE, aggregate));
+            new GenericPairWritable(TRUE, vertexID, aggregate));
         } else {
           context.write(new LongWritable(graph),
-            new GenericPairWritable(FALSE, aggregate));
+            new GenericPairWritable(FALSE, vertexID, aggregate));
         }
       }
     }
@@ -197,16 +199,40 @@ public class SelectAndAggregate {
     protected void reduce(LongWritable key,
       Iterable<GenericPairWritable> values, Context context) throws IOException,
       InterruptedException {
+
+      long graphID = key.get();
+      Graph g = GraphFactory.createDefaultGraphWithID(graphID);
+
+      // need to cache the pairs, because can only iterate once
+      // TODO: workaround for BTGAnalysisDriver. not generic
+      List<GenericPairWritable> pairs = Lists.newArrayList();
+      // store vertices contained in that graph
+      for (GenericPairWritable value : values) {
+        g.addVertex(value.getVertexID().get());
+        pairs.add(new GenericPairWritable(
+          new BooleanWritable(value.getPredicateResult().get()),
+          new LongWritable(value.getVertexID().get()),
+          new ValueWritable(value.getValue().get())));
+      }
       // compute the result for the graph
       Pair<Boolean, ? extends Number> result =
-        this.pairAggregator.aggregate(values);
-      // if selection predicate evaluates to true, store the aggregate value
-      if (result.getFirst()) {
-        long graphID = key.get();
-        Graph g = GraphFactory.createDefaultGraphWithID(graphID);
-        g.addProperty(aggregateResultPropertyKey, result.getSecond());
+        this.pairAggregator.aggregate(pairs);
+
+      // graph fulfils predicate or has vertices
+      if (result.getFirst() || g.getVertexCount() > 0) {
         Put put = new Put(graphHandler.getRowKey(graphID));
-        put = graphHandler.writeProperties(put, g);
+
+        // write vertices to put
+        if (g.getVertexCount() > 0) {
+          put = graphHandler.writeVertices(put, g);
+        }
+
+        // if selection predicate evaluates to true, store the aggregate value
+        if (result.getFirst()) {
+          g.addProperty(aggregateResultPropertyKey, result.getSecond());
+          put = graphHandler.writeProperties(put, g);
+        }
+
         context.write(null, put);
       }
     }

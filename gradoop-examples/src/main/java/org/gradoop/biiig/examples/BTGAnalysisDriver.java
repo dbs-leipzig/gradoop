@@ -3,6 +3,7 @@ package org.gradoop.biiig.examples;
 import com.google.common.collect.Sets;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.conf.GiraphConstants;
 import org.apache.giraph.job.GiraphJob;
@@ -156,9 +157,13 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     /*
     Step 5: Compute overlapping nodes of top 100 graphs
      */
+    StopWatch sw = new StopWatch();
+    sw.start();
     if (!runOverlap(conf, sortTableName, 100)) {
       return -1;
     }
+    sw.stop();
+    LOG.info(String.format("Overlap took: %d seconds", sw.getTime() / 1000));
 
     return 0;
   }
@@ -245,6 +250,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     conf.set(TableInputFormat.SCAN_COLUMNS, columnFamiliesToScan);
     // set HBase table to write computation results to
     conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+
 
     // setup Giraph job
     GiraphJob job =
@@ -363,6 +369,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     // map
     TableMapReduceUtil.initTableMapperJob(GConstants.DEFAULT_TABLE_GRAPHS, scan,
       Sort.SortMapper.class, ImmutableBytesWritable.class, Put.class, job);
+    job.setJarByClass(Sort.class);
 
     job.setOutputFormatClass(TableOutputFormat.class);
     job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, sortTableName);
@@ -391,16 +398,15 @@ public class BTGAnalysisDriver extends Configured implements Tool {
     byte[] col = Bytes.toBytes(Sort.COLUMN_NAME);
 
     Scan scan = new Scan();
-    scan.setMaxResultSize(top);
+    scan.setCaching(top);
 
     Set<Long> overlap = Sets.newHashSet();
 
-
     ResultScanner scanner = table.getScanner(scan);
-    Result res;
+    Result res = scanner.next();
 
     int line = 0;
-    while ((res = scanner.next()) != null) {
+    while (line < top && res != null) {
       Long graphID = Bytes.toLong(res.getValue(cf, col));
       Graph graph = graphStore.readGraph(graphID);
       if (graph != null && graph.getVertexCount() > 0) {
@@ -411,6 +417,7 @@ public class BTGAnalysisDriver extends Configured implements Tool {
           overlap.retainAll(vertices);
         }
         line++;
+        res = scanner.next();
       }
     }
 

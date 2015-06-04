@@ -83,9 +83,9 @@ public class BTGHBaseVertexOutputFormat extends
       byte[] rowKey = vertexHandler.getRowKey(vertex.getId().get());
       Put put = new Put(rowKey);
       // update graphs
-      for (Long graphID : vertex.getValue().getGraphs()) {
-        updateGraph(graphID, vertex.getId().get());
-      }
+//      for (Long graphID : vertex.getValue().getGraphs()) {
+//        updateGraph(graphID, vertex.getId().get());
+//      }
       // update vertex
       put = vertexHandler.writeGraphs(put, vertex.getValue());
       writer.write(new ImmutableBytesWritable(rowKey), put);

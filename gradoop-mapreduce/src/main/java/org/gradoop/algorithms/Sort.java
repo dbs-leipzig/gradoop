@@ -20,8 +20,9 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Gradoop sort operator. Sorts HBase rows by column value by creating a
  * secondary index table.
- * <p>
- * Note: Only supports sorting on double values at the moment.
+ * <p/>
+ * Note: As this is for a prototypical use case, only sorting
+ * double values is supported at the moment.
  */
 public class Sort {
 
@@ -136,7 +137,7 @@ public class Sort {
      * @return byte array representing the double value
      */
     private byte[] encodeDouble(Double d, Order order) {
-      byte[] a = new byte[Bytes.SIZEOF_DOUBLE];
+      byte[] a = new byte[Bytes.SIZEOF_DOUBLE + 3];
 
       PositionedByteRange buf = new SimplePositionedByteRange(a);
       OrderedBytes.encodeNumeric(buf, d, order);

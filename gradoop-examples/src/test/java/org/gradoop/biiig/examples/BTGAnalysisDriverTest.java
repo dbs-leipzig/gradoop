@@ -113,7 +113,6 @@ public class BTGAnalysisDriverTest extends GradoopClusterTest {
     for (long expectedBTG : expectedBTGs) {
       assertTrue(graphIDs.contains(expectedBTG));
     }
-
   }
 
   private void validateSelectAndAggregate(GraphStore graphStore) {

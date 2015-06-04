@@ -119,8 +119,5 @@ public class ConfigurationUtils {
     if (!cmd.hasOption(OPTION_GRAPH_OUTPUT_PATH)) {
       throw new IllegalArgumentException("Chose the graph output path (-gop");
     }
-    if (!cmd.hasOption(OPTION_SORT_TABLE_NAME)) {
-      throw new IllegalArgumentException("Chose the sort table name (-stn");
-    }
   }
 }
