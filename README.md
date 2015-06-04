@@ -117,8 +117,8 @@ The RDF example pipeline analyzes a given NTriple using following steps:
 
 ##### gradoop-core
 
-The main contents of that module are the Extended Property Graph data
-model, the corresponding graph repository and its reference implementation for
+The main contents of that module are the Extended Property Graph Data
+Model, the corresponding graph repository and its reference implementation for
 Apache HBase.
 
 Furthermore, the module contains the Bulk Load / Write drivers based on
@@ -140,6 +140,7 @@ by these operator implementations.
 Contains example pipelines showing use cases for Gradoop. 
 
 *   BIIIG pipeline for business related graph data using specific data readers
+*   SNA pipeline for social network analysis
 *   RDF pipeline for semantic web analysis
 
 ##### gradoop-checkstyle
