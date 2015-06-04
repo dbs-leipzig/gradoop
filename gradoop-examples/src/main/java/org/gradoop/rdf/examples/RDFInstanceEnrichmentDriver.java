@@ -99,20 +99,32 @@ public class RDFInstanceEnrichmentDriver extends Configured implements Tool {
   public void enrich(GraphStore graphStore, String tableName) throws Exception {
     RDFPropertyXMLHandler handler = new RDFPropertyXMLHandler();
     Iterator<Vertex> vertices = graphStore.getVertices(tableName, 30);
+    int error = 0;
+    int complete = 0;
+    int exist = 0;
     while (vertices.hasNext()) {
       Vertex vertex = vertices.next();
       try {
         if (!containsLabels(vertex)) {
           vertex = getProperties(handler, vertex);
+        } else {
+          ++exist;
+          LOG.info("Existing count: " + exist);
+          continue;
         }
       } catch (ParserConfigurationException | SAXException |
         ConnectTimeoutException | HttpHostConnectException |
         SocketTimeoutException e) {
-        e.printStackTrace();
+        //e.printStackTrace();
+        LOG.info(e.toString());
         // too much queries -> parser exception, add dummy property
         vertex.addProperty(EMPTY_PROPERTY, EMPTY_PROPERTY_VALUE);
+        ++error;
+        LOG.info("Error count: " + error);
       }
       graphStore.writeVertex(vertex);
+      ++complete;
+      LOG.info("Completed count: " + complete);
     }
     graphStore.close();
   }
@@ -157,19 +169,20 @@ public class RDFInstanceEnrichmentDriver extends Configured implements Tool {
   }
 
   /**
-   * Checks, if vertex already contains specific label properties
+   * Checks, if vertex already contains specific label property keys
    * @param vertex vertex
    * @return true, if a label is contained, false otherwise
    */
   private boolean containsLabels(Vertex vertex) {
     if (vertex.getPropertyCount() != 0) {
+      LOG.info("propCount = " + vertex.getPropertyCount());
       for (String label : LABELS) {
         for (String s : vertex.getPropertyKeys()) {
-          if (vertex.getProperty(s).toString().contains(label)) {
+          LOG.info("string: " + vertex.getProperty(s));
+          if (s.contains(label)) {
             return true;
           }
         }
-
       }
     }
     return false;

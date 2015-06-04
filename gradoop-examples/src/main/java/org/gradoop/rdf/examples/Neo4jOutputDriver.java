@@ -48,12 +48,14 @@ public class Neo4jOutputDriver extends Configured implements Tool {
 
     String tablePrefix = cmd.getOptionValue(ConfUtils.OPTION_TABLE_PREFIX, "");
     String outDir = cmd.getOptionValue(ConfUtils.OPTION_NEO4J_OUTPUT_PATH, "");
+    int restrictSize = Integer.parseInt(
+      cmd.getOptionValue(ConfUtils.OPTION_RESTRICT_SIZE, "2"));
 
     // Open HBase tables
     GraphStore graphStore = HBaseGraphStoreFactory.createOrOpenGraphStore(conf,
       new EPGVertexHandler(), new EPGGraphHandler(), tablePrefix);
 
-    writeOutput(graphStore, outDir, tablePrefix);
+    writeOutput(graphStore, outDir, tablePrefix, restrictSize);
     graphStore.close();
 
     return 0;
@@ -64,25 +66,26 @@ public class Neo4jOutputDriver extends Configured implements Tool {
    * @throws Exception
    * @param graphStore gs
    * @param outputDir out directory
-   * @param tablePrefix table prefix
+   * @param tablePrefix HBase table prefix
+   * @param restrictSize  minimum count of vertices in graphs to receive
    */
-  public void writeOutput(GraphStore graphStore, String outputDir, String
-    tablePrefix) throws Exception {
+  public void writeOutput(GraphStore graphStore, String outputDir,
+    String tablePrefix, int restrictSize) throws Exception {
     Neo4jLineWriter writer = new Neo4jLineWriter(outputDir);
     GraphDatabaseService db = writer.getGraphDbService();
     String verticesTable = tablePrefix + GConstants.DEFAULT_TABLE_VERTICES;
     String graphsTable = tablePrefix + GConstants.DEFAULT_TABLE_GRAPHS;
 
     ArrayList<Long> allComponentsList = getAllComponents(graphStore,
-      graphsTable);
+      graphsTable, restrictSize);
 
     LOG.info("Creating Neo4j nodes...");
     Iterator<Vertex> vertices = graphStore.getVertices(verticesTable);
-    writeVerticesToDb(writer, db, allComponentsList, vertices);
+    writeVerticesToNeo(writer, db, allComponentsList, vertices);
 
     LOG.info("Creating Neo4j relationships...");
     Iterator<Vertex> relVertices = graphStore.getVertices(verticesTable);
-    writeRelationships(writer, db, allComponentsList, relVertices);
+    writeRelationshipsToNeo(writer, db, allComponentsList, relVertices);
 
     writer.shutdown();
   }
@@ -91,13 +94,15 @@ public class Neo4jOutputDriver extends Configured implements Tool {
    * Get all graph ids in a graphs table.
    * @param graphStore HBase graph store
    * @param graphsTable graphs table name
+   * @param restrictSize minimum count of vertices in graphs to receive
    * @return list with all graph ids
    * @throws Exception
    */
   private ArrayList<Long> getAllComponents(GraphStore graphStore,
-    String graphsTable) throws Exception {
+    String graphsTable, int restrictSize) throws Exception {
     Iterator<Graph> itGraphsTableElements = graphStore.getGraphs(graphsTable);
-    HashMap<Long, Integer> graphs = restrictGraphs(itGraphsTableElements);
+    HashMap<Long, Integer> graphs = restrictGraphs(itGraphsTableElements,
+      restrictSize);
 
     return Lists.newArrayList(graphs.keySet());
   }
@@ -109,7 +114,7 @@ public class Neo4jOutputDriver extends Configured implements Tool {
    * @param checkList list containing all components to be handled
    * @param vertices iterator vertices (containing relationships)
    */
-  private void writeRelationships(Neo4jLineWriter writer,
+  private void writeRelationshipsToNeo(Neo4jLineWriter writer,
     GraphDatabaseService db, ArrayList<Long> checkList,
     Iterator<Vertex> vertices) {
     int arrayCount = 0;
@@ -158,7 +163,7 @@ public class Neo4jOutputDriver extends Configured implements Tool {
    * @param checkList list containing all components to be handled
    * @param vertices iterator vertices
    */
-  private void writeVerticesToDb(Neo4jLineWriter writer,
+  private void writeVerticesToNeo(Neo4jLineWriter writer,
     GraphDatabaseService db, ArrayList checkList, Iterator<Vertex> vertices) {
     int count = 0;
     int delay = 0;
@@ -204,14 +209,15 @@ public class Neo4jOutputDriver extends Configured implements Tool {
   }
 
   /**
-   * Restrict the set of graphs to graphs containing at least 5 elements.
+   * Restrict the set of graphs to graphs containing a minimum of elements.
    * @param graphs iterator element over all graphs
+   * @param restrictSize minimum count of vertices in graphs to receive
    * @throws Exception
    * @return hash map containing <componentId, size> entries
    */
-  private HashMap<Long, Integer> restrictGraphs(Iterator<Graph> graphs)
+  private HashMap<Long, Integer> restrictGraphs(Iterator<Graph> graphs,
+    int restrictSize)
       throws Exception {
-    int restrictSize = 5;
     HashMap<Long, Integer> graphMap = new HashMap<>();
     while (graphs.hasNext()) {
       Graph graph = graphs.next();
@@ -257,6 +263,10 @@ public class Neo4jOutputDriver extends Configured implements Tool {
      */
     public static final String OPTION_TABLE_PREFIX = "tp";
     /**
+     * Restrict result set size to graphs with a minimum count of vertices.
+     */
+    public static final String OPTION_RESTRICT_SIZE = "rs";
+    /**
      * Holds options accepted by
      * {@link org.gradoop.rdf.examples.Neo4jOutputDriver}.
      */
@@ -271,7 +281,9 @@ public class Neo4jOutputDriver extends Configured implements Tool {
         "Path where the output will be stored.");
       OPTIONS.addOption(OPTION_TABLE_PREFIX, "table-prefix",
         true, "Custom prefix for HBase table to distinguish different use " +
-          "cases.");
+          "cases. (empty by default)");
+      OPTIONS.addOption(OPTION_RESTRICT_SIZE, "restrict-size", true,
+        "Restrict size of graphs to a minimum of vertices. (default: 2)");
     }
 
     /**
