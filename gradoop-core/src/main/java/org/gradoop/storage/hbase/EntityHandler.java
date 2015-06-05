@@ -5,24 +5,24 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.Attributed;
-import org.gradoop.model.MultiLabeled;
+import org.gradoop.model.Labeled;
 
 import java.io.IOException;
 import java.util.Map;
 
 /**
- * Handles writing and reading labels and properties of an epg entity, normally
+ * Handles writing and reading label and properties of an EPGM entity, normally
  * vertices and graphs.
  */
 public interface EntityHandler {
   /**
-   * Adds all labels to the given HBase put and returns it.
+   * Adds the labels to the given HBase put and returns it.
    *
-   * @param put    put to write labels to
-   * @param entity entity to use the labels from
-   * @return put with labels
+   * @param put    put to write label to
+   * @param entity entity to use the label from
+   * @return put with label
    */
-  Put writeLabels(final Put put, final MultiLabeled entity);
+  Put writeLabel(final Put put, final Labeled entity);
 
   /**
    * Adds the given key-value-pair to the put and returns it.
@@ -44,12 +44,12 @@ public interface EntityHandler {
   Put writeProperties(final Put put, final Attributed entity);
 
   /**
-   * Reads all labels from the given HBase row result.
+   * Reads the label from the given HBase row result.
    *
    * @param res HBase row result
-   * @return all labels contained in the row
+   * @return label contained in the row
    */
-  Iterable<String> readLabels(final Result res);
+  String readLabel(final Result res);
 
   /**
    * Reads all properties from the given HBase row result.

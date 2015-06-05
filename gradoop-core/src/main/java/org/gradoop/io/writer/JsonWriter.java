@@ -17,9 +17,9 @@ public class JsonWriter implements VertexLineWriter {
    */
   public static final String VERTEX_ID = "id";
   /**
-   * Key for vertex labels.
+   * Key for vertex label.
    */
-  public static final String LABELS = "labels";
+  public static final String LABEL = "label";
   /**
    * Key for vertex and edge properties.
    */
@@ -53,7 +53,7 @@ public class JsonWriter implements VertexLineWriter {
     JSONObject json = new JSONObject();
     try {
       json.put(VERTEX_ID, vertex.getID());
-      json = writeLabels(json, vertex);
+      json.put(LABEL, vertex.getLabel());
       json = writeProperties(json, vertex);
       json = writeEdges(json, OUT_EDGES, vertex.getOutgoingEdges());
       json = writeEdges(json, IN_EDGES, vertex.getIncomingEdges());
@@ -62,26 +62,6 @@ public class JsonWriter implements VertexLineWriter {
       e.printStackTrace();
     }
     return json.toString();
-  }
-
-  /**
-   * Adds vertex labels to the given json object.
-   *
-   * @param json json object to write to
-   * @param v    vertex
-   * @return updated json object
-   * @throws JSONException
-   */
-  private JSONObject writeLabels(final JSONObject json, final Vertex v) throws
-    JSONException {
-    JSONArray labelArray = new JSONArray();
-    if (v.getLabelCount() > 0) {
-      for (String label : v.getLabels()) {
-        labelArray.put(label);
-      }
-      json.put(LABELS, labelArray);
-    }
-    return json;
   }
 
   /**

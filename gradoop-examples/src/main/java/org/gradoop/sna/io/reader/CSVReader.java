@@ -57,15 +57,15 @@ public class CSVReader implements ConfigurableVertexLineReader {
    */
   private boolean isNodeCSV = false;
   /**
-   * String List for vertex creation
+   * Label for vertex creation
    */
-  private List<String> labels;
+  private String label;
   /**
-   * types of a sna file (e.g. long|string|string|integer)
+   * Types of a sna file (e.g. long|string|string|integer)
    */
   private String[] types;
   /**
-   * properties of a sna input (headline)
+   * Properties of a sna input (headline)
    */
   private String[] properties;
   /**
@@ -90,15 +90,13 @@ public class CSVReader implements ConfigurableVertexLineReader {
    * @param line line of sna input
    */
   private void initialStep(String line) {
-    // Initialize Lists
-    labels = Lists.newArrayList();
     // Get properties (e.g. FirstName, LastName...)
     properties = getTokens(line);
     // Get MetaData (e.g. long, string, string...)
     types = getTokens(conf.get(META_DATA));
     //readTypes(conf.get(META_DATA));
-    // Set Labels
-    labels.add(conf.get(LABEL));
+    // set label
+    label = conf.get(LABEL);
     // getCSVType
     isNodeCSV = isNodeCSV();
     random = new Random();
@@ -136,7 +134,7 @@ public class CSVReader implements ConfigurableVertexLineReader {
   public Vertex readVertex(String line) {
     String[] tokens = getTokens(line);
     long id = Long.parseLong(tokens[0]);
-    Vertex vex = VertexFactory.createDefaultVertexWithLabels(id, labels, null);
+    Vertex vex = VertexFactory.createDefaultVertexWithLabel(id, label, null);
     for (int i = 1; i < properties.length; i++) {
       switch (types[i]) {
       case "long":
@@ -181,14 +179,12 @@ public class CSVReader implements ConfigurableVertexLineReader {
    * @param line     line of sna input
    */
   private void readEdges(List<Vertex> vertices, String line) {
-    List<String> nodeLabel0 = Lists.newArrayListWithExpectedSize(1);
-    List<String> nodeLabel1 = Lists.newArrayListWithExpectedSize(1);
     String[] tokens = getTokens(line);
     long id0 = Long.parseLong(tokens[0]);
     long id1 = Long.parseLong(tokens[1]);
     String edgeLabel = conf.get(LABEL);
-    nodeLabel0.add(properties[0].replace(".id", ""));
-    nodeLabel1.add(properties[1].replace(".id", ""));
+    String nodeLabel0 = properties[0].replace(".id", "");
+    String nodeLabel1 = properties[1].replace(".id", "");
     Edge outgoing =
       EdgeFactory.createDefaultEdgeWithLabel(id1, edgeLabel, random.nextLong());
     Edge incoming =

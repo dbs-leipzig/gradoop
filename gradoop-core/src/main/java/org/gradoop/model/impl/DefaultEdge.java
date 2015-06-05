@@ -7,18 +7,13 @@ import java.util.Map;
 /**
  * Transient representation of an edge.
  */
-public class DefaultEdge extends SingleLabeledPropertyContainer implements
+public class DefaultEdge extends LabeledPropertyContainer implements
   Edge {
   /**
    * Identifier of the vertex this edge is connected to. This can be either
    * the start or end vertex of this edge.
    */
   private final Long otherID;
-
-  /**
-   * Vertex centric edge index to allow parallel edges.
-   */
-  private final Long index;
 
   /**
    * Creates an edge instance based on the given parameters.
@@ -30,9 +25,8 @@ public class DefaultEdge extends SingleLabeledPropertyContainer implements
    */
   DefaultEdge(final Long otherID, final String label, final Long index,
     final Map<String, Object> properties) {
-    super(label, properties);
+    super(index, label, properties);
     this.otherID = otherID;
-    this.index = index;
   }
 
   /**
@@ -48,7 +42,7 @@ public class DefaultEdge extends SingleLabeledPropertyContainer implements
    */
   @Override
   public Long getIndex() {
-    return this.index;
+    return this.id;
   }
 
   /**
@@ -69,7 +63,7 @@ public class DefaultEdge extends SingleLabeledPropertyContainer implements
 
     DefaultEdge that = (DefaultEdge) o;
 
-    return index.equals(that.index) && otherID.equals(that.otherID) &&
+    return id.equals(that.id) && otherID.equals(that.otherID) &&
       getLabel().equals(that.getLabel());
   }
 
@@ -79,7 +73,7 @@ public class DefaultEdge extends SingleLabeledPropertyContainer implements
   @Override
   public int hashCode() {
     int result = otherID.hashCode();
-    result = 31 * result + index.hashCode();
+    result = 31 * result + id.hashCode();
     return result;
   }
 
@@ -91,7 +85,7 @@ public class DefaultEdge extends SingleLabeledPropertyContainer implements
     return "DefaultEdge{" +
       "otherID=" + otherID +
       ", label=" + getLabel() +
-      ", index=" + index +
+      ", index=" + id +
       '}';
   }
 }

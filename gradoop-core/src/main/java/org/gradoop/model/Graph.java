@@ -12,7 +12,7 @@ package org.gradoop.model;
  * are attached to different graphs. If multiple graphs overlap, an edge can be
  * inter- and intra-edge at the same time.
  */
-public interface Graph extends Identifiable, Attributed, MultiLabeled {
+public interface Graph extends Identifiable, Attributed, Labeled {
   /**
    * Adds the given vertex identifier to the graph.
    *

@@ -142,7 +142,7 @@ public class FoodBrokerReader implements VertexLineReader {
     Vertex v = VertexFactory.createDefaultVertexWithID(vertexID);
     addProperties(v, vertex.getJSONObject(META), BIIIGConstants.META_PREFIX);
     addProperties(v, vertex.getJSONObject(DATA));
-    v.addLabel(String.valueOf(getKind(vertex)));
+    v.setLabel(String.valueOf(getKind(vertex)));
     return Lists.newArrayList(v);
   }
 

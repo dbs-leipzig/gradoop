@@ -1,7 +1,7 @@
 package org.gradoop.io.formats;
 
 import org.apache.hadoop.io.Writable;
-import org.gradoop.model.SingleLabeled;
+import org.gradoop.model.Labeled;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -12,8 +12,8 @@ import java.util.Map;
  * Used to manage (de-)serialization of attributed entities that have one
  * label.
  */
-public class EPGSingleLabeledAttributedWritable extends
-  EPGAttributedWritable implements SingleLabeled, Writable {
+public class EPGLabeledAttributedWritable extends
+  EPGAttributedWritable implements Labeled, Writable {
 
   /**
    * Holds the label of that entity.
@@ -23,7 +23,7 @@ public class EPGSingleLabeledAttributedWritable extends
   /**
    * Default constructor is necessary for object deserialization.
    */
-  public EPGSingleLabeledAttributedWritable() {
+  public EPGLabeledAttributedWritable() {
   }
 
   /**
@@ -31,7 +31,7 @@ public class EPGSingleLabeledAttributedWritable extends
    *
    * @param label entity label
    */
-  public EPGSingleLabeledAttributedWritable(final String label) {
+  public EPGLabeledAttributedWritable(final String label) {
     this(label, null);
   }
 
@@ -41,7 +41,7 @@ public class EPGSingleLabeledAttributedWritable extends
    * @param label      entity label (can be {@code null})
    * @param properties key-value-map (can be {@code null})
    */
-  public EPGSingleLabeledAttributedWritable(final String label,
+  public EPGLabeledAttributedWritable(final String label,
     final Map<String, Object> properties) {
     super(properties);
     this.label = label;
@@ -53,6 +53,14 @@ public class EPGSingleLabeledAttributedWritable extends
   @Override
   public String getLabel() {
     return this.label;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   /**

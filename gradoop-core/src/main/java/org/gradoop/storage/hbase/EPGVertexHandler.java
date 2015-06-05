@@ -64,7 +64,7 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
   public void createTable(final HBaseAdmin admin,
     final HTableDescriptor tableDescriptor) throws IOException {
     LOG.info("creating table " + tableDescriptor.getNameAsString());
-    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_LABELS));
+    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_OUT_EDGES));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_IN_EDGES));
@@ -128,7 +128,7 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
    */
   @Override
   public Put writeVertex(final Put put, final Vertex vertex) {
-    writeLabels(put, vertex);
+    writeLabel(put, vertex);
     writeProperties(put, vertex);
     writeOutgoingEdges(put, vertex.getOutgoingEdges());
     writeIncomingEdges(put, vertex.getIncomingEdges());
@@ -167,7 +167,7 @@ public class EPGVertexHandler extends BasicHandler implements VertexHandler {
   public Vertex readVertex(final Result res) {
     return VertexFactory
       .createDefaultVertex(Long.valueOf(Bytes.toString(res.getRow())),
-        readLabels(res), readProperties(res), readOutgoingEdges(res),
+        readLabel(res), readProperties(res), readOutgoingEdges(res),
         readIncomingEdges(res), readGraphs(res));
   }
 

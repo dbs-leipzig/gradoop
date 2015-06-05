@@ -59,22 +59,22 @@ public abstract class GradoopTest {
 
   protected static final String[] EXTENDED_GRAPH = new String[]{
     "0|A|3 k1 5 v1 k2 5 v2 k3 5 v3|a.1.0 1 k1 5 v1|b.1.0 2 k1 5 v1 k2 5 v2|1 0",
-    "1|A B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2," +
+    "1|B|2 k1 5 v1 k2 5 v2|b.0.0 2 k1 5 v1 k2 5 v2," +
       "c.2.1 0|a.0.0 1 k1 5 v1|2 0 1",
     "2|C|2 k1 5 v1 k2 5 v2|d.2.0 0|d.2.0 0,c.1.1 0|1 1" };
 
   protected static final String[] EXTENDED_GRAPH_JSON = new String[]{
-    "{\"id\":0,\"labels\":[\"A\"],\"properties\":{\"k1\":\"v1\", " +
+    "{\"id\":0,\"label\":\"A\",\"properties\":{\"k1\":\"v1\", " +
       "\"k2\":\"v2\", \"k3\":\"v3\"},\"out-edges\":[{\"otherid\":1," +
       "\"label\":\"a\",\"properties\":{\"k1\": \"v1\"}}], " +
       "\"in-edges\":[{\"otherid\":1,\"label\":\"b\"," +
       "\"properties\":{\"k1\":\"v1\",\"k2\":\"v2\"}}],\"graphs\":[0]}",
-    "{\"id\":1,\"labels\":[\"A\",\"B\"],\"properties\":{\"k1\":\"v1\"," +
+    "{\"id\":1,\"label\":\"B\",\"properties\":{\"k1\":\"v1\"," +
       "\"k2\":\"v2\"},\"out-edges\":[{\"otherid\":0,\"label\":\"b\"," +
       "\"properties\":{\"k1\":\"v1\",\"k2\":\"v2\"}},{\"otherid\":2," +
       "\"label\":\"c\"}],\"in-edges\":[{\"otherid\":0,\"label\":\"a\"," +
       "\"properties\":{\"k1\":\"v1\"}}],\"graphs\":[0, 1]}",
-    "{\"id\":2,\"labels\":[\"C\"],\"properties\":{\"k1\":\"v1\"," +
+    "{\"id\":2,\"label\":\"C\",\"properties\":{\"k1\":\"v1\"," +
       "\"k2\":\"v2\"},\"out-edges\":[{\"otherid\":2,\"label\":\"d\"}]," +
       "\"in-edges\":[{\"otherid\":	2,\"label\":\"d\"},{\"otherid\":1," +
       "\"label\":\"c\"}],\"graphs\":[1]}" };
@@ -156,16 +156,16 @@ public abstract class GradoopTest {
   protected void validateExtendedGraphVertices(List<Vertex> result) {
     assertEquals(EXTENDED_GRAPH.length, result.size());
     for (Vertex v : result) {
-      List<String> labels = Lists.newArrayList(v.getLabels());
+      System.out.println(v);
+      String label = v.getLabel();
       List<Long> graphs = Lists.newArrayList(v.getGraphs());
       List<Edge> outEdges = Lists.newArrayList(v.getOutgoingEdges());
       List<Edge> inEdges = Lists.newArrayList(v.getIncomingEdges());
 
       Long i = v.getID();
       if (i.equals(0L)) {
-        // labels (A)
-        assertEquals(1, labels.size());
-        assertTrue(labels.contains("A"));
+        // label (A)
+        assertEquals("A", label);
         // properties (3 k1 5 v1 k2 5 v2 k3 5 v3)
         testProperties(v, 3);
         // out edges (a.1.0 1 k1 5 v1)
@@ -178,10 +178,8 @@ public abstract class GradoopTest {
         assertEquals(1, graphs.size());
         assertTrue(graphs.contains(0L));
       } else if (i.equals(1L)) {
-        // labels (A,B)
-        assertEquals(2, labels.size());
-        assertTrue(labels.contains("A"));
-        assertTrue(labels.contains("B"));
+        // labels (B)
+        assertEquals("B", label);
         // properties (2 k1 5 v1 k2 5 v2)
         testProperties(v, 2);
         // out edges (b.0.0 2 k1 5 v1 k2 5 v2,c.2.1 0)
@@ -197,8 +195,7 @@ public abstract class GradoopTest {
         assertTrue(graphs.contains(1L));
       } else if (i.equals(2L)) {
         // labels (C)
-        assertEquals(1, labels.size());
-        assertTrue(labels.contains("C"));
+        assertEquals("C", label);
         // properties (2 k1 5 v1 k2 5 v2)
         testProperties(v, 2);
         // out edges (d.2.0 0)

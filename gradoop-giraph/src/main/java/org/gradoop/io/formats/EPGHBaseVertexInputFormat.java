@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class EPGHBaseVertexInputFormat extends
   HBaseVertexInputFormat<EPGVertexIdentifierWritable,
-    EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable> {
+    EPGLabeledAttributedWritable, EPGEdgeValueWritable> {
 
   /**
    * Configuration key used to specify if edges are seen directed (false) or
@@ -39,7 +39,7 @@ public class EPGHBaseVertexInputFormat extends
    */
   @Override
   public VertexReader<EPGVertexIdentifierWritable,
-    EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable> createVertexReader(
+    EPGLabeledAttributedWritable, EPGEdgeValueWritable> createVertexReader(
     InputSplit split, TaskAttemptContext context) throws IOException {
     return new EPGHBaseVertexReader(split, context);
   }
@@ -49,7 +49,7 @@ public class EPGHBaseVertexInputFormat extends
    */
   public static class EPGHBaseVertexReader extends
     HBaseVertexReader<EPGVertexIdentifierWritable,
-      EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable> {
+      EPGLabeledAttributedWritable, EPGEdgeValueWritable> {
 
     /**
      * If true, read incoming edges to simulate undirected edges (i.e., for
@@ -85,22 +85,21 @@ public class EPGHBaseVertexInputFormat extends
       TaskAttemptContext context) throws IOException, InterruptedException {
       super.initialize(inputSplit, context);
 
-      readIncomingEdges = getConf().getBoolean(READ_INCOMING_EDGES,
-        READ_INCOMING_EDGES_DEFAULT_VALUE);
+      readIncomingEdges = getConf()
+        .getBoolean(READ_INCOMING_EDGES, READ_INCOMING_EDGES_DEFAULT_VALUE);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Vertex<EPGVertexIdentifierWritable,
-      EPGMultiLabeledAttributedWritable, EPGEdgeValueWritable>
-    getCurrentVertex() throws
+    public Vertex<EPGVertexIdentifierWritable, EPGLabeledAttributedWritable,
+      EPGEdgeValueWritable> getCurrentVertex() throws
       IOException, InterruptedException {
       Result row = getRecordReader().getCurrentValue();
       VertexHandler vertexHandler = getVertexHandler();
 
-      Vertex<EPGVertexIdentifierWritable, EPGMultiLabeledAttributedWritable,
+      Vertex<EPGVertexIdentifierWritable, EPGLabeledAttributedWritable,
         EPGEdgeValueWritable>
         vertex = getConf().createVertex();
 
@@ -108,15 +107,15 @@ public class EPGHBaseVertexInputFormat extends
       EPGVertexIdentifierWritable vertexID = new EPGVertexIdentifierWritable(
         vertexHandler.getVertexID(row.getRow()));
 
-      // labels
-      Iterable<String> labels = vertexHandler.readLabels(row);
+      // label
+      String label = vertexHandler.readLabel(row);
       // properties
       Map<String, Object> properties = vertexHandler.readProperties(row);
       // graphs
       Iterable<Long> graphs = vertexHandler.readGraphs(row);
       // create vertex value
       EPGVertexValueWritable vertexValue =
-        new EPGVertexValueWritable(labels, properties, graphs);
+        new EPGVertexValueWritable(label, properties, graphs);
 
       List<Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable>> edges =
         Lists.newArrayList();
@@ -129,8 +128,8 @@ public class EPGHBaseVertexInputFormat extends
       }
       // incoming edges
       if (readIncomingEdges) {
-        for (org.gradoop.model.Edge edge :
-          vertexHandler.readIncomingEdges(row)) {
+        for (org.gradoop.model.Edge edge : vertexHandler
+          .readIncomingEdges(row)) {
           EPGVertexIdentifierWritable edgeTarget =
             new EPGVertexIdentifierWritable(edge.getOtherID());
           EPGEdgeValueWritable edgeValue = new EPGEdgeValueWritable(edge);

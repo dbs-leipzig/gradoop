@@ -21,7 +21,7 @@ public class FoodBrokerReaderTest extends GradoopClusterTest {
   private static final int FOODBROKER_SAMPLE_VCOUNT = 6;
   private static final int FOODBROKER_SAMPLE_ECOUNT = 5;
 
-  private static final String[] FOODBROKER_SAMPLE = new String[] {
+  private static final String[] FOODBROKER_SAMPLE = new String[]{
     // nodes
     "{\"id\":1,\"data\":{\"num\":\"EMP0000001\",\"name\":\"Trace Armstrong\"," +
       "\"gender\":\"male\"},\"meta\":{\"system\":\"ERP\"," +
@@ -64,12 +64,10 @@ public class FoodBrokerReaderTest extends GradoopClusterTest {
 
     "{\"start\":41,\"data\":{\"salesPrice\":6.74,\"purchPrice\":6.54," +
       "\"quantity\":85},\"meta\":{\"system\":\"ERP\"," +
-      "\"type\":\"SalesQuotationLine\"},\"end\":42}"
-  };
+      "\"type\":\"SalesQuotationLine\"},\"end\":42}"};
 
   @Test
-  public void readFromJsonTest()
-    throws IOException {
+  public void readFromJsonTest() throws IOException {
     FoodBrokerReader reader = new FoodBrokerReader();
     List<Vertex> vertices = Lists.newArrayList();
     for (String line : FOODBROKER_SAMPLE) {
@@ -82,8 +80,7 @@ public class FoodBrokerReaderTest extends GradoopClusterTest {
   }
 
   @Test
-  public void loadJsonToHBaseTest()
-    throws IOException {
+  public void loadJsonToHBaseTest() throws IOException {
     GraphStore graphStore = createEmptyGraphStore();
     VertexLineReader foodbrokerReader = new FoodBrokerReader();
     for (String line : FOODBROKER_SAMPLE) {
@@ -96,18 +93,17 @@ public class FoodBrokerReaderTest extends GradoopClusterTest {
   }
 
   private void validateFoodbrokerGraph(GraphStore graphStore) {
-    validateVertex(graphStore.readVertex(1L), 7, 1, 2, 0);
-    validateVertex(graphStore.readVertex(2L), 7, 1, 1, 1);
-    validateVertex(graphStore.readVertex(3L), 7, 1, 0, 1);
-    validateVertex(graphStore.readVertex(41L), 8, 1, 2, 1);
-    validateVertex(graphStore.readVertex(42L), 8, 1, 0, 2);
-    validateVertex(graphStore.readVertex(43L), 8, 1, 0, 0);
+    validateVertex(graphStore.readVertex(1L), 7, 2, 0);
+    validateVertex(graphStore.readVertex(2L), 7, 1, 1);
+    validateVertex(graphStore.readVertex(3L), 7, 0, 1);
+    validateVertex(graphStore.readVertex(41L), 8, 2, 1);
+    validateVertex(graphStore.readVertex(42L), 8, 0, 2);
+    validateVertex(graphStore.readVertex(43L), 8, 0, 0);
   }
 
-  private void validateVertex(Vertex vertex, int expectedPropertyCount, int
-    expectedLabelCount, int expectedOutEdgesCount, int expectedInEdgesCount) {
+  private void validateVertex(Vertex vertex, int expectedPropertyCount,
+    int expectedOutEdgesCount, int expectedInEdgesCount) {
     assertEquals(expectedPropertyCount, vertex.getPropertyCount());
-    assertEquals(expectedLabelCount, vertex.getLabelCount());
     List<Edge> outgoingEdges = Lists.newArrayList(vertex.getOutgoingEdges());
     assertEquals(expectedOutEdgesCount, outgoingEdges.size());
     List<Edge> incomingEdges = Lists.newArrayList(vertex.getIncomingEdges());

@@ -141,9 +141,7 @@ public class CSVReaderTest {
   }
 
   protected void checkLabel(Vertex vertex, String label) {
-    for (String s : vertex.getLabels()) {
-      assertEquals(s, label);
-    }
+    assertEquals(label, vertex.getLabel());
   }
 
   protected void checkOutgoingEdge(List<Edge> edges) {

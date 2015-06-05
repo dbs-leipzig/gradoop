@@ -138,8 +138,8 @@ public class RDFReader implements VertexLineReader {
       HASH_FUNCTION.newHasher().putString(o, Charsets.UTF_8).hash().asLong();
 
     if (o.startsWith("\"")) { // create only one vertex with property
-      Vertex vertex = VertexFactory
-        .createDefaultVertexWithLabels(sourceID, Lists.newArrayList(s), null);
+      Vertex vertex =
+        VertexFactory.createDefaultVertexWithLabel(sourceID, s, null);
 
       switch (getDatatype(o)) {
       case "integer":
@@ -163,8 +163,7 @@ public class RDFReader implements VertexLineReader {
       Edge edgeOut =
         EdgeFactory.createDefaultEdgeWithLabel(targetID, p, edgeOutIndex);
       Vertex sourceVertex = VertexFactory
-        .createDefaultVertexWithLabels(sourceID, Lists.newArrayList(s),
-          Lists.newArrayList(edgeOut));
+        .createDefaultVertexWithLabel(sourceID, s, Lists.newArrayList(edgeOut));
       vList.add(sourceVertex);
 
       //incoming edge on target vertex
@@ -176,7 +175,7 @@ public class RDFReader implements VertexLineReader {
       Vertex targetVertex = VertexFactory
         .createDefaultVertexWithEdges(targetID, null,
           Lists.newArrayList(edgeIn));
-      targetVertex.addLabel(o);
+      targetVertex.setLabel(o);
       vList.add(targetVertex);
     }
     return vList;

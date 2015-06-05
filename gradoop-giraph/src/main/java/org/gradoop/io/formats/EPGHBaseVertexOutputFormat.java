@@ -63,7 +63,7 @@ public class EPGHBaseVertexOutputFormat extends
       byte[] rowKey = vertexHandler.getRowKey(vertex.getId().getID());
       Put put = new Put(rowKey);
       // labels
-      put = vertexHandler.writeLabels(put, vertex.getValue());
+      put = vertexHandler.writeLabel(put, vertex.getValue());
       // properties
       put = vertexHandler.writeProperties(put, vertex.getValue());
       // graphs

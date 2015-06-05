@@ -270,7 +270,7 @@ public class SNAAnalysisDriver extends BulkDriver {
     conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
     // just scan necessary CFs (no properties needed)
     String columnFamiliesToScan = String
-      .format("%s %s %s %s", GConstants.CF_LABELS, GConstants.CF_OUT_EDGES,
+      .format("%s %s %s %s", GConstants.CF_META, GConstants.CF_OUT_EDGES,
         GConstants.CF_IN_EDGES, GConstants.CF_GRAPHS);
     conf.set(TableInputFormat.SCAN_COLUMNS, columnFamiliesToScan);
     // set HBase table to write computation results to

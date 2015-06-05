@@ -9,8 +9,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DefaultGraphTest {
   @Test
@@ -23,21 +22,18 @@ public class DefaultGraphTest {
   @Test
   public void createDefaultGraphTest() {
     Long graphID = 0L;
-    String label1 = "A";
-    String label2 = "B";
+    String label = "A";
     Long vertex1 = 0L;
     Long vertex2 = 1L;
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
     props.put("k2", "v2");
 
-    Graph g = GraphFactory.createDefaultGraph(graphID, Lists.newArrayList
-      (label1, label2), props, Lists.newArrayList(vertex1, vertex2));
+    Graph g = GraphFactory.createDefaultGraph(graphID, label, props,
+      Lists.newArrayList(vertex1, vertex2));
 
     assertThat(g.getID(), is(graphID));
-    assertThat(g.getLabelCount(), is(2));
-    assertTrue(Lists.newArrayList(g.getLabels()).contains(label1));
-    assertTrue(Lists.newArrayList(g.getLabels()).contains(label2));
+    assertEquals(label, g.getLabel());
     assertThat(g.getPropertyCount(), is(2));
     assertThat(g.getProperty("k1"), Is.<Object>is("v1"));
     assertThat(g.getProperty("k2"), Is.<Object>is("v2"));

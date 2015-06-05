@@ -36,14 +36,14 @@ public class BTGHBaseComputationTest extends GiraphClusterTest {
   }
 
   @Test
-  public void testConnectedIIG()
-    throws IOException, InterruptedException, ClassNotFoundException {
+  public void testConnectedIIG() throws IOException, InterruptedException,
+    ClassNotFoundException {
     // prepare data
-    BufferedReader inputReader = createTestReader(BTGComputationTestHelper
-      .getConnectedIIG());
+    BufferedReader inputReader =
+      createTestReader(BTGComputationTestHelper.getConnectedIIG());
     GraphStore graphStore = createEmptyGraphStore();
-    AdjacencyListReader adjacencyListReader = new AdjacencyListReader
-      (graphStore, new BTGLineReader());
+    AdjacencyListReader adjacencyListReader =
+      new AdjacencyListReader(graphStore, new BTGLineReader());
     adjacencyListReader.read(inputReader);
 
     // run giraph
@@ -77,14 +77,14 @@ public class BTGHBaseComputationTest extends GiraphClusterTest {
   }
 
   @Test
-  public void testDisconnectedIIG()
-    throws IOException, InterruptedException, ClassNotFoundException {
+  public void testDisconnectedIIG() throws IOException, InterruptedException,
+    ClassNotFoundException {
     // prepare data
-    BufferedReader inputReader = createTestReader(BTGComputationTestHelper
-      .getDisconnectedIIG());
+    BufferedReader inputReader =
+      createTestReader(BTGComputationTestHelper.getDisconnectedIIG());
     GraphStore graphStore = createEmptyGraphStore();
-    AdjacencyListReader adjacencyListReader = new AdjacencyListReader
-      (graphStore, new BTGLineReader());
+    AdjacencyListReader adjacencyListReader =
+      new AdjacencyListReader(graphStore, new BTGLineReader());
     adjacencyListReader.read(inputReader);
 
     // run giraph
@@ -117,7 +117,7 @@ public class BTGHBaseComputationTest extends GiraphClusterTest {
   }
 
   private void validateVertex(final GraphStore store, final Long vertexID,
-                              final Long... expectedBTGIds) {
+    final Long... expectedBTGIds) {
     Vertex v = store.readVertex(vertexID);
     assertNotNull(v);
     assertEquals(expectedBTGIds.length, v.getGraphCount());
@@ -134,17 +134,15 @@ public class BTGHBaseComputationTest extends GiraphClusterTest {
    * @throws ClassNotFoundException
    * @throws InterruptedException
    */
-  private void compute()
-    throws IOException, ClassNotFoundException, InterruptedException {
+  private void compute() throws IOException, ClassNotFoundException,
+    InterruptedException {
     // setup in- and output tables
     Configuration conf = utility.getConfiguration();
     conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
     // just scan necessary CFs
-    String columnFamiliesToScan = String.format("%s %s %s %s",
-      GConstants.CF_LABELS,
-      GConstants.CF_OUT_EDGES,
-      GConstants.CF_IN_EDGES,
-      GConstants.CF_GRAPHS);
+    String columnFamiliesToScan = String
+      .format("%s %s %s %s", GConstants.CF_META, GConstants.CF_OUT_EDGES,
+        GConstants.CF_IN_EDGES, GConstants.CF_GRAPHS);
     conf.set(TableInputFormat.SCAN_COLUMNS, columnFamiliesToScan);
 
     conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
@@ -186,8 +184,8 @@ public class BTGHBaseComputationTest extends GiraphClusterTest {
         Long otherID = Long.valueOf(edge);
         edges.add(EdgeFactory.createDefaultEdge(otherID, 0L));
       }
-      return VertexFactory.createDefaultVertexWithLabels(vertexID,
-        Lists.newArrayList(vertexType), edges);
+      return VertexFactory
+        .createDefaultVertexWithLabel(vertexID, vertexType, edges);
     }
   }
 }

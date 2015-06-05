@@ -1,5 +1,6 @@
 package org.gradoop.model.impl;
 
+import org.gradoop.GConstants;
 import org.gradoop.model.Graph;
 
 import java.util.Map;
@@ -29,17 +30,21 @@ public class GraphFactory {
    * Creates a graph using the given parameters.
    *
    * @param id         graph identifier
-   * @param labels     graph labels
+   * @param label      graph label
    * @param properties graph properties
    * @param vertices   vertices contained in the graph
    * @return graph
    */
-  public static Graph createDefaultGraph(final Long id,
-                                         final Iterable<String> labels,
-                                         final Map<String, Object> properties,
-                                         final Iterable<Long> vertices) {
+  public static Graph createDefaultGraph(final Long id, final String label,
+    final Map<String, Object> properties, final Iterable<Long> vertices) {
     checkGraphID(id);
-    return new DefaultGraph(id, labels, properties, vertices);
+    if (label == null || "".equals(label)) {
+      return new DefaultGraph(id, GConstants.DEFAULT_GRAPH_LABEL, properties,
+        vertices);
+    } else {
+      return new DefaultGraph(id, label, properties, vertices);
+    }
+
   }
 
   /**
