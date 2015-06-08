@@ -19,7 +19,7 @@ public abstract class LabeledPropertyContainer extends
   /**
    * Label of that entity.
    */
-  private String label;
+  protected String label;
 
   /**
    * Creates an object from the given parameters. Can only be called by
@@ -33,7 +33,6 @@ public abstract class LabeledPropertyContainer extends
     Map<String, Object> properties) {
     super(properties);
     this.id = id;
-    validateLabel(label);
     this.label = label;
   }
 
@@ -50,7 +49,7 @@ public abstract class LabeledPropertyContainer extends
    */
   @Override
   public String getLabel() {
-    return this.label;
+    return label;
   }
 
   /**
@@ -58,18 +57,6 @@ public abstract class LabeledPropertyContainer extends
    */
   @Override
   public void setLabel(String label) {
-    validateLabel(label);
     this.label = label;
-  }
-
-  /**
-   * Checks if the given label is not null or empty.
-   *
-   * @param label label to check
-   */
-  private void validateLabel(String label) {
-    if (label == null || "".equals(label)) {
-      throw new IllegalArgumentException("label must not be null or empty");
-    }
   }
 }

@@ -39,8 +39,8 @@ public abstract class BasicHandler implements EntityHandler {
    */
   @Override
   public Put writeLabel(final Put put, final Labeled entity) {
-    return put
-      .add(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
+    return (entity.getLabel() == null) ? put :
+      put.add(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
   }
 
   /**

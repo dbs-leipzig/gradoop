@@ -1,6 +1,5 @@
 package org.gradoop.model.impl;
 
-import org.gradoop.GConstants;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
 
@@ -24,8 +23,7 @@ public class VertexFactory {
    * @return vertex with identifier
    */
   public static Vertex createDefaultVertexWithID(final Long vertexID) {
-    return createDefaultVertex(vertexID, GConstants.DEFAULT_VERTEX_LABEL, null,
-      null, null, null);
+    return createDefaultVertex(vertexID, null, null, null, null, null);
   }
 
   /**
@@ -50,7 +48,7 @@ public class VertexFactory {
    */
   public static Vertex createDefaultVertexWithEdges(final Long vertexID,
     final Iterable<Edge> outgoingEdges, final Iterable<Edge> incomingEdges) {
-    return createDefaultVertex(vertexID, GConstants.DEFAULT_VERTEX_LABEL, null,
+    return createDefaultVertex(vertexID, null, null,
       outgoingEdges, incomingEdges, null);
   }
 
@@ -78,7 +76,7 @@ public class VertexFactory {
    */
   public static Vertex createDefaultVertexWithProperties(final Long vertexID,
     final Map<String, Object> properties, final Iterable<Edge> outgoingEdges) {
-    return createDefaultVertex(vertexID, GConstants.DEFAULT_VERTEX_LABEL,
+    return createDefaultVertex(vertexID, null,
       properties, outgoingEdges, null, null);
   }
 
@@ -98,13 +96,8 @@ public class VertexFactory {
     final Iterable<Edge> incomingEdges, final Iterable<Long> graphs) {
     checkVertexID(id);
 
-    if (label == null || "".equals(label)) {
-      return new DefaultVertex(id, GConstants.DEFAULT_VERTEX_LABEL, properties,
-        outgoingEdges, incomingEdges, graphs);
-    } else {
-      return new DefaultVertex(id, label, properties, outgoingEdges,
-        incomingEdges, graphs);
-    }
+    return new DefaultVertex(id, label, properties, outgoingEdges,
+      incomingEdges, graphs);
   }
 
   /**

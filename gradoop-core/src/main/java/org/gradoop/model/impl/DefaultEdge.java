@@ -7,8 +7,7 @@ import java.util.Map;
 /**
  * Transient representation of an edge.
  */
-public class DefaultEdge extends LabeledPropertyContainer implements
-  Edge {
+public class DefaultEdge extends LabeledPropertyContainer implements Edge {
   /**
    * Identifier of the vertex this edge is connected to. This can be either
    * the start or end vertex of this edge.
