@@ -80,16 +80,71 @@ It consists of multiple steps:
 The pipeline itself is currently represented by a Hadoop Driver
 (org.gradoop.biiig.examples.SNAAnalysisDriver). Please have a look at the driver
 for further details on how to implement a pipeline.
+
+To run the pipeline on your hadoop installation, please follow these steps.
+
+*   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar
+-with-dependencies.jar`
+    to your Hadoop environment.
+
+*   For a list of options for that example pipeline call
+
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;
+    -jar-with-dependencies.jar org.gradoop.biiig.examples.SNAAnalysisDriver --help
+
+*   The following call runs the complete pipeline on a given input graph folder (LDBC-SNB) using 11 giraph workers and a hbase scan cache of 500 rows.
+
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt; 
+    -jar-with-dependencies.jar org.gradoop.biiig.examples.SNAAnalysisDriver -libjars $HBASE_JARS --bulkload -csvbulkload --meta-data-path datasets/snb/example/ --vertex-line-reader CSVReader -gip /user/hduser/input/ -gop /user/hduser/output/snaexample11 -lp -w 11 -sum -sop /user/hduser/output/summarize -v
+
+*   See [LDBC-SNB](https://github.com/ldbc/ldbc_snb_datagen) if you want to generate your
+    own graphs or implement a custom FileReader to load your own graph format.
     
 ###### RDF
 
 The RDF example pipeline analyzes a given NTriple using following steps:
 
-1. Bulk Load RDF NTriple file into Gradoop
+1. Bulk Load RDF NTriple file into Gradoop (optional: enrich RDF data based 
+on LOD facts)
 2. Compute Connected Components using Giraph
 3. For each component the contained vertices are counted using MapReduce.
-4. Resulting graphs are written back to Gradoop
+4. Resulting graphs are written back to Gradoop (and optionally written to a 
+Neo4j database)
 
+The pipeline itself is currently represented by a Hadoop Driver
+(org.gradoop.biiig.examples.RDFAnalysisDriver). Please have a look at the driver
+for further details on how to implement a pipeline.
+
+To run the pipeline on your hadoop installation, please follow these steps.
+
+*   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar-with-dependencies.jar`
+    to your Hadoop environment.
+
+*   For a list of options for that example pipeline call
+
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.biiig.examples.RDFAnalysisDriver
+    --help
+
+*   Bulk load RDF data and delete old data, data is loaded to custom HBase 
+table with prefix 'rdf'
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.drivers.BulkLoadDriver
+    -libjars $HBASE_JARS -gip /user/hduser/input/dataset.nt -gop 
+    /user/hduser/output/rdf/dataset -vlr org.gradoop.io.reader.RDFReader
+     -dt -tp rdf
+
+*   RDF Instance Enrichment (optional) - on all vertices in a given HBase table
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar
+    org.gradoop.rdf.examples.RDFInstanceEnrichmentDriver -libjars $HBASE_JARS
+     -tp rdf
+    
+*   Analysis (ConnectedComponents + Aggregate) on a given HBase table
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.rdf.examples.RDFAnalysisDriver
+    -libjars $HBASE_JARS -si -tp rdf -w 6 -r 6 -gop 
+    /user/hduser/output/rdf/dataset_analysis
+    
+*   Create a Neo4j database which can be used for further analysis
+    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.rdf.examples.Neo4jOutputDriver
+    -o outputFolder -tp rdf
 
 ##### Importing data into Gradoop
 
@@ -117,8 +172,8 @@ The RDF example pipeline analyzes a given NTriple using following steps:
 
 ##### gradoop-core
 
-The main contents of that module are the Extended Property Graph data
-model, the corresponding graph repository and its reference implementation for
+The main contents of that module are the Extended Property Graph Data
+Model, the corresponding graph repository and its reference implementation for
 Apache HBase.
 
 Furthermore, the module contains the Bulk Load / Write drivers based on
@@ -140,6 +195,7 @@ by these operator implementations.
 Contains example pipelines showing use cases for Gradoop. 
 
 *   BIIIG pipeline for business related graph data using specific data readers
+*   SNA pipeline for social network analysis
 *   RDF pipeline for semantic web analysis
 
 ##### gradoop-checkstyle
