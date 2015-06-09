@@ -140,9 +140,9 @@ public class RDFInstanceEnrichmentDriver extends Configured implements Tool {
    */
   private Vertex getProperties(RDFPropertyXMLHandler handler, Vertex vertex)
       throws IOException, ParserConfigurationException, SAXException {
-    String url = vertex.getLabels().iterator().next();
-
+    String url = vertex.getLabel();
     HashSet<String[]> properties = handler.getLabelsForURI(url);
+
     return enrichVertexWithProperties(vertex, properties);
   }
 

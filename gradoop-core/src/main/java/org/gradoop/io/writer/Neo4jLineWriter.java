@@ -147,9 +147,7 @@ public class Neo4jLineWriter implements VertexLineWriter {
    * @return updated Neo4j node
    */
   private Node writeLabels(Node node, Vertex vertex) {
-    for (String l : vertex.getLabels()) {
-      node.addLabel(DynamicLabel.label(l));
-    }
+    node.addLabel(DynamicLabel.label(vertex.getLabel()));
 
     return node;
   }

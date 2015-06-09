@@ -55,8 +55,8 @@ public class RDFInstanceEnrichmentDriverTest extends GradoopClusterTest {
             break;
           }
         }
-        LOG.info("===vertex: " + vertex.getLabels().iterator().next() +
-          " key: " + s + " value: " + vertex.getProperty(s));
+        LOG.info("===vertex: " + vertex.getLabel() + " key: " + s + " value: "
+          + vertex.getProperty(s));
         assertTrue(isProperty);
       }
     }

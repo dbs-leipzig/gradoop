@@ -18,7 +18,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-
 /**
  * Test Neo4jWriter, no Hadoop/HDFS
  */
@@ -74,8 +73,7 @@ public class Neo4JVertexLineWriterTest extends GradoopTest {
         assertEquals(1, graphs.size());
         assertTrue(graphs.contains(0L));
       } else if (gradoopId.equals(1L)) {
-        assertEquals(2, labels.size());
-        assertTrue(labels.contains("A"));
+        assertEquals(1, labels.size());
         assertTrue(labels.contains("B"));
         // properties (2 k1 5 v1 k2 5 v2)
         testProperties(node, 2);
@@ -131,7 +129,6 @@ public class Neo4JVertexLineWriterTest extends GradoopTest {
           outgoing = true;
         }
         String label = rel.getType().name();
-        //TODO edge properties
         testEdge(nodeId, otherId, label, outgoing);
       }
     }
@@ -143,8 +140,6 @@ public class Neo4JVertexLineWriterTest extends GradoopTest {
       if (outgoing) {
         assertEquals(1L, (long) otherId);
         assertEquals("a", label);
-        // TODO property test not working
-        //testProperties(rel, 1);
       } else {
         assertEquals(1L, (long) otherId);
         assertEquals("b", label);

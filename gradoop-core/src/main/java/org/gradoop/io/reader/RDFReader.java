@@ -89,8 +89,8 @@ public class RDFReader implements VertexLineReader {
     Edge edgeIn =
       EdgeFactory.createDefaultEdgeWithLabel(sourceID, p, edgeInIndex);
 
-    return VertexFactory.createDefaultVertex(targetID,
-      o, null, null, Lists.newArrayList(edgeIn), null);
+    return VertexFactory.createDefaultVertex(targetID, o, null, null, Lists
+      .newArrayList(edgeIn), null);
   }
 
   /**
