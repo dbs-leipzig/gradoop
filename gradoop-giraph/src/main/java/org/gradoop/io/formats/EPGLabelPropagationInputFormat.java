@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class EPGLabelPropagationInputFormat extends
   HBaseVertexInputFormat<LongWritable, LongWritable, NullWritable> {
-
   /**
    * {@inheritDoc}
    */
@@ -29,23 +28,22 @@ public class EPGLabelPropagationInputFormat extends
   createVertexReader(
     InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws
     IOException {
-    return new EPGLongLongNullVertexReader(inputSplit, taskAttemptContext);
+    return new LPVertexReader(inputSplit, taskAttemptContext);
   }
 
   /**
    * Reads a single vertex from HBase.
    */
-  public static class EPGLongLongNullVertexReader extends
+  public static class LPVertexReader extends
     HBaseVertexReader<LongWritable, LongWritable, NullWritable> {
-
     /**
      * Sets the base TableInputFormat and creates a record reader.
      *
      * @param split   InputSplit
      * @param context Context
      */
-    public EPGLongLongNullVertexReader(InputSplit split,
-      TaskAttemptContext context) throws IOException {
+    public LPVertexReader(InputSplit split, TaskAttemptContext context) throws
+      IOException {
       super(split, context);
     }
 

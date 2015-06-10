@@ -27,13 +27,13 @@ public class EPGLabelPropagationOutputFormat extends
   public VertexWriter<LongWritable, LongWritable, NullWritable>
   createVertexWriter(
     TaskAttemptContext context) throws IOException, InterruptedException {
-    return new BTGHBaseVertexWriter(context);
+    return new LPHBaseVertexWriter(context);
   }
 
   /**
    * Writes a single Giraph vertex back to HBase.
    */
-  public static class BTGHBaseVertexWriter extends
+  public static class LPHBaseVertexWriter extends
     HBaseVertexWriter<LongWritable, LongWritable, NullWritable> {
 
     /**
@@ -41,7 +41,7 @@ public class EPGLabelPropagationOutputFormat extends
      *
      * @param context task attempt context
      */
-    public BTGHBaseVertexWriter(TaskAttemptContext context) throws IOException,
+    public LPHBaseVertexWriter(TaskAttemptContext context) throws IOException,
       InterruptedException {
       super(context);
     }
