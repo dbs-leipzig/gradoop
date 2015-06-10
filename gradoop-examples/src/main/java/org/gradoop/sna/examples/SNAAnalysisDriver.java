@@ -151,9 +151,7 @@ public class SNAAnalysisDriver extends BulkDriver {
     Step 1: Bulk Load of the graph into HBase using MapReduce
      */
     if (cmd.hasOption(LoadConfUtils.OPTION_BULKLOAD)) {
-      LOG.info("###bulkload");
       if (!cmd.hasOption(LoadConfUtils.OPTION_JSON_BULKLOAD)) {
-        LOG.info("###csv bulkload");
         String separator = System.getProperty("file.separator");
         String metaDataPath =
           cmd.getOptionValue(LoadConfUtils.OPTION_METADATA_PATH);
@@ -202,7 +200,6 @@ public class SNAAnalysisDriver extends BulkDriver {
                 cmd.getOptionValue(OPTION_GRAPH_OUTPUT_PATH) +
                   separator +
                   hdfsinputFilePath;
-              LOG.info("run bulkload");
               if (!runBulkLoad(conf, hdfsinputFilePath, outputPathHDFS,
                 hbaseTableName, verbose, hdfsFileName)) {
                 return -1;
@@ -232,7 +229,6 @@ public class SNAAnalysisDriver extends BulkDriver {
     if (cmd.hasOption(LoadConfUtils.OPTION_LABLEPROPAGATION)) {
       int workers =
         Integer.parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_WORKERS));
-      LOG.info("###Run Label-Propagation");
       if (!runLabelPropagationComputation(conf, workers, hbaseTableName, tex,
         verbose)) {
         return -1;
@@ -278,11 +274,9 @@ public class SNAAnalysisDriver extends BulkDriver {
     if (conf.get(BULKLOAD).equals(CSV_BULKLOAD)) {
       conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, CSVReader.class,
         VertexLineReader.class);
-      LOG.info("###csvBulkload");
     } else {
       conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, JsonReader.class,
         VertexLineReader.class);
-      LOG.info("###jsonBulkload");
     }
     // set vertex handler that creates the Puts
     conf.setClass(BulkLoadEPG.VERTEX_HANDLER, EPGVertexHandler.class,
@@ -354,11 +348,9 @@ public class SNAAnalysisDriver extends BulkDriver {
     if (tex) {
       giraphConf
         .setVertexOutputFormatClass(TextLabelPropagationOutputFormat.class);
-      LOG.info("###TEXTOutput");
     } else {
       giraphConf
         .setVertexOutputFormatClass(EPGLabelPropagationOutputFormat.class);
-      LOG.info("###EPGOutput");
     }
     giraphConf.setWorkerConfiguration(workerCount, workerCount, 100f);
     // assuming local environment
@@ -454,7 +446,7 @@ public class SNAAnalysisDriver extends BulkDriver {
     /**
      * Command line option for starting summarize mapreduce job
      */
-    public static final String OPTION_SUMMARIZE = "sum";
+    public static final String OPTION_SUMMARIZE = "su";
     /**
      * Command line option for setting the reducer count
      */
@@ -491,7 +483,7 @@ public class SNAAnalysisDriver extends BulkDriver {
         "Starts LabelPropagation");
       OPTIONS.addOption(OPTION_METADATA_PATH, "meta-data-path", true,
         "Path to " + "CSV MetaData");
-      OPTIONS.addOption(OPTION_GIRAPH_OUTPUT_PATH, "giraphoutputpath", true,
+      OPTIONS.addOption(OPTION_GIRAPH_OUTPUT_PATH, "giraph-output-path", true,
         "Path to Giraph - Output");
       OPTIONS.addOption(OPTION_SUMMARIZE, "summarize", true,
         "Add the " + "summarize option to the anlysis pipeline");
@@ -499,12 +491,12 @@ public class SNAAnalysisDriver extends BulkDriver {
         "Number of " + "Reducers");
       OPTIONS.addOption(OPTION_SCAN_CACHE, "scancache", true,
         "Mapreduce " + "scan-cahce");
-      OPTIONS.addOption(OPTION_TABLENAME, "hbasetablename", true,
+      OPTIONS.addOption(OPTION_TABLENAME, "hbase-table-name", true,
         "HBase " + "custom Tablename");
       OPTIONS.addOption(OPTION_TEXTOUTPUT, "textoutput", true,
         "Text output " + "true or false");
       OPTIONS.addOption(OPTION_JSON_BULKLOAD, "json-bulkload", false,
-        "Use .json file for bulkimport");
+        "Use .json file for bulkload");
     }
   }
 
