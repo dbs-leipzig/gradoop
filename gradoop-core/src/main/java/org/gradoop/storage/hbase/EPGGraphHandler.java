@@ -66,7 +66,7 @@ public class EPGGraphHandler extends BasicHandler implements GraphHandler {
    */
   @Override
   public Put writeGraph(final Put put, final Graph graph) {
-    writeLabels(put, graph);
+    writeLabel(put, graph);
     writeProperties(put, graph);
     writeVertices(put, graph);
     return put;
@@ -87,7 +87,7 @@ public class EPGGraphHandler extends BasicHandler implements GraphHandler {
   public Graph readGraph(final Result res) {
     return GraphFactory
       .createDefaultGraph(Long.valueOf(Bytes.toString(res.getRow())),
-        readLabels(res), readProperties(res), readVertices(res));
+        readLabel(res), readProperties(res), readVertices(res));
   }
 
   /**
@@ -97,7 +97,7 @@ public class EPGGraphHandler extends BasicHandler implements GraphHandler {
   public void createTable(final HBaseAdmin admin,
     final HTableDescriptor tableDescriptor) throws IOException {
     LOG.info("creating table " + tableDescriptor.getNameAsString());
-    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_LABELS));
+    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_VERTICES));
     admin.createTable(tableDescriptor);

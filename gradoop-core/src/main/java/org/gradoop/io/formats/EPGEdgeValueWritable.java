@@ -11,7 +11,7 @@ import java.util.Map;
  * Used to manage (de-)serialization of edge values.
  */
 public class EPGEdgeValueWritable extends
-  EPGSingleLabeledAttributedWritable implements Edge {
+  EPGLabeledAttributedWritable implements Edge {
 
   /**
    * The vertex id of the "other" vertex the vertex storing that edge is

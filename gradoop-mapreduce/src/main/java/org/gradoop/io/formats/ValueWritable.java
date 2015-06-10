@@ -27,6 +27,22 @@ public class ValueWritable extends GenericWritable {
   }
 
   /**
+   * Default constructor
+   */
+  public ValueWritable() {
+  }
+
+  /**
+   * Creates new Value writable from the given value.
+   *
+   * @param value writable value
+   */
+  public ValueWritable(Writable value) {
+    this.set(value);
+  }
+
+
+  /**
    * {@inheritDoc}
    */
   @Override

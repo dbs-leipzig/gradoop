@@ -2,12 +2,26 @@ package org.gradoop.storage;
 
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
+import org.gradoop.storage.hbase.GraphHandler;
+import org.gradoop.storage.hbase.VertexHandler;
 
 /**
  * A graph store is responsible for writing and reading graphs including
  * vertices and edges.
  */
 public interface GraphStore {
+  /**
+   * Returns the vertex handler used by this store.
+   *
+   * @return vertex handler
+   */
+  VertexHandler getVertexHandler();
+  /**
+   * Returns the graph handler used by this store.
+   *
+   * @return graph handler
+   */
+  GraphHandler getGraphHandler();
   /**
    * Writes the given graph into the graph store.
    *

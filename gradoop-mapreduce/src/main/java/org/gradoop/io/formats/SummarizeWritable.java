@@ -34,14 +34,14 @@ public class SummarizeWritable implements Writable {
    * Creates a SummarizeWritable based on the given Params
    *
    * @param vertexID vertexID
-   * @param edges    all edges
+   * @param edges    all outgoing edges
    */
   public SummarizeWritable(Long vertexID, List<Edge> edges) {
     this.vertexIdentifier = vertexID;
     this.targets = Lists.newArrayListWithExpectedSize(edges.size());
     if (edges.size() != 0) {
-      for (int i = 0; i < edges.size(); i++) {
-        targets.add(edges.get(i).getOtherID());
+      for (Edge edge : edges) {
+        targets.add(edge.getOtherID());
       }
     }
   }

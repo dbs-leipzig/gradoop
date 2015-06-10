@@ -10,6 +10,13 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.gradoop.io.formats.HBaseVertexOutputFormat;
+import org.gradoop.model.Graph;
+import org.gradoop.model.impl.GraphFactory;
+import org.gradoop.storage.GraphStore;
+import org.gradoop.storage.hbase.EPGGraphHandler;
+import org.gradoop.storage.hbase.EPGVertexHandler;
+import org.gradoop.storage.hbase.GraphHandler;
+import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
@@ -37,6 +44,11 @@ public class BTGHBaseVertexOutputFormat extends
     HBaseVertexWriter<LongWritable, BTGVertexValue, NullWritable> {
 
     /**
+     * Used to access persistent graph database.
+     */
+    private GraphStore graphStore;
+
+    /**
      * Sets up base table output format and creates a record writer.
      *
      * @param context task attempt context
@@ -50,6 +62,19 @@ public class BTGHBaseVertexOutputFormat extends
      * {@inheritDoc}
      */
     @Override
+    public void initialize(TaskAttemptContext context) throws IOException {
+      super.initialize(context);
+      VertexHandler vertexHandler = new EPGVertexHandler();
+      GraphHandler graphHandler = new EPGGraphHandler();
+      graphStore = HBaseGraphStoreFactory
+        .createOrOpenGraphStore(context.getConfiguration(), vertexHandler,
+          graphHandler);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void writeVertex(
       Vertex<LongWritable, BTGVertexValue, NullWritable> vertex) throws
       IOException, InterruptedException {
@@ -57,10 +82,25 @@ public class BTGHBaseVertexOutputFormat extends
       VertexHandler vertexHandler = getVertexHandler();
       byte[] rowKey = vertexHandler.getRowKey(vertex.getId().get());
       Put put = new Put(rowKey);
-      // just need to write the graphs
+      // update graphs
+//      for (Long graphID : vertex.getValue().getGraphs()) {
+//        updateGraph(graphID, vertex.getId().get());
+//      }
+      // update vertex
       put = vertexHandler.writeGraphs(put, vertex.getValue());
-
       writer.write(new ImmutableBytesWritable(rowKey), put);
+    }
+
+    /**
+     * Adds the given vertex to the given graph.
+     *
+     * @param graphID  graph identifier
+     * @param vertexID vertex identifier
+     */
+    private void updateGraph(Long graphID, Long vertexID) {
+      Graph g = GraphFactory.createDefaultGraphWithID(graphID);
+      g.addVertex(vertexID);
+      graphStore.writeGraph(g);
     }
   }
 }

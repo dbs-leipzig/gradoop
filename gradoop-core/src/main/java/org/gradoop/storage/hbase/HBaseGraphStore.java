@@ -88,6 +88,22 @@ public class HBaseGraphStore implements GraphStore {
    * {@inheritDoc}
    */
   @Override
+  public VertexHandler getVertexHandler() {
+    return this.vertexHandler;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphHandler getGraphHandler() {
+    return this.graphHandler;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void writeGraph(final Graph graph) {
     LOG.info("writing: " + graph);
     try {

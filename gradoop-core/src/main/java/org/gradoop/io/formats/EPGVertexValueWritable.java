@@ -14,7 +14,7 @@ import java.util.Set;
  * vertex belongs to.
  */
 public class EPGVertexValueWritable extends
-  EPGMultiLabeledAttributedWritable implements GraphElement {
+  EPGLabeledAttributedWritable implements GraphElement {
 
   /**
    * The set of graphs that vertex belongs to.
@@ -30,14 +30,14 @@ public class EPGVertexValueWritable extends
   /**
    * Creates a vertex value based on the given parameters.
    *
-   * @param labels     labels of that vertex (can be {@code null})
+   * @param label      label of that vertex (can not be {@code null})
    * @param properties key-value-map (can be {@code null})
    * @param graphs     graphs that vertex belongs to (can be {@code null} and is
    *                   stores as a set
    */
-  public EPGVertexValueWritable(Iterable<String> labels,
-    Map<String, Object> properties, Iterable<Long> graphs) {
-    super(labels, properties);
+  public EPGVertexValueWritable(String label, Map<String, Object> properties,
+    Iterable<Long> graphs) {
+    super(label, properties);
     initGraphs(graphs);
   }
 

@@ -9,7 +9,6 @@ import org.gradoop.model.impl.EdgeFactory;
 import org.gradoop.model.impl.VertexFactory;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -73,14 +72,14 @@ public class EPGVertexReader implements VertexLineReader {
     String[] lineTokens = getLineTokens(line);
 
     Long vertexID = readVertexID(lineTokens[0]);
-    Iterable<String> labels = readLabels(lineTokens[1]);
+    String label = readLabel(lineTokens[1]);
     Map<String, Object> properties = readProperties(lineTokens[2]);
     Iterable<Edge> outEdges = readEdges(lineTokens[3]);
     Iterable<Edge> inEdges = readEdges(lineTokens[4]);
     Iterable<Long> graphs = readGraphs(lineTokens[5]);
 
     return VertexFactory
-      .createDefaultVertex(vertexID, labels, properties, outEdges, inEdges,
+      .createDefaultVertex(vertexID, label, properties, outEdges, inEdges,
         graphs);
   }
 
@@ -127,8 +126,8 @@ public class EPGVertexReader implements VertexLineReader {
    * @param token string including labels
    * @return label list
    */
-  private Iterable<String> readLabels(final String token) {
-    return Arrays.asList(VALUE_TOKEN_SEPARATOR.split(token));
+  private String readLabel(final String token) {
+    return token;
   }
 
   /**

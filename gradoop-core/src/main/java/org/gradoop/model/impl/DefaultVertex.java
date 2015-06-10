@@ -11,8 +11,7 @@ import java.util.Set;
 /**
  * Transient representation of a vertex.
  */
-public class DefaultVertex extends MultiLabeledPropertyContainer implements
-  Vertex {
+public class DefaultVertex extends LabeledPropertyContainer implements Vertex {
 
   /**
    * Hold all outgoing edges of that vertex.
@@ -33,18 +32,16 @@ public class DefaultVertex extends MultiLabeledPropertyContainer implements
    * Creates a vertex based on the given parameters.
    *
    * @param id            vertex id
-   * @param labels        labels (can be {@code null})
+   * @param label         label (can not be {@code null})
    * @param properties    key-value-map  (can be {@code null})
    * @param outgoingEdges outgoing edges (can be {@code null})
    * @param incomingEdges incoming edges (can be {@code null})
    * @param graphs        graphs that contain that vertex (can be {@code null})
    */
-  DefaultVertex(final Long id, final Iterable<String> labels,
-                final Map<String, Object> properties,
-                final Iterable<Edge> outgoingEdges,
-                final Iterable<Edge> incomingEdges,
-                final Iterable<Long> graphs) {
-    super(id, labels, properties);
+  DefaultVertex(final Long id, final String label,
+    final Map<String, Object> properties, final Iterable<Edge> outgoingEdges,
+    final Iterable<Edge> incomingEdges, final Iterable<Long> graphs) {
+    super(id, label, properties);
     this.outgoingEdges = outgoingEdges;
     this.incomingEdges = incomingEdges;
     initGraphs(graphs);
@@ -145,7 +142,7 @@ public class DefaultVertex extends MultiLabeledPropertyContainer implements
   public String toString() {
     return "SimpleVertex{" +
       "id=" + getID() +
-      ", labels=" + getLabels() +
+      ", label=" + getLabel() +
       ", outgoingEdges=" + outgoingEdges +
       ", incomingEdges=" + incomingEdges +
       ", graphs=" + getGraphs() +

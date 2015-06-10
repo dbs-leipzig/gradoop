@@ -34,8 +34,7 @@ public class VertexFactory {
    * @return vertex with identifier and outgoing edges
    */
   public static Vertex createDefaultVertexWithOutgoingEdges(final Long vertexID,
-                                                            final Iterable<Edge>
-                                                              outgoingEdges) {
+    final Iterable<Edge> outgoingEdges) {
     return createDefaultVertexWithEdges(vertexID, outgoingEdges, null);
   }
 
@@ -48,28 +47,22 @@ public class VertexFactory {
    * @return vertex with identifier, outgoing and incoming edges
    */
   public static Vertex createDefaultVertexWithEdges(final Long vertexID,
-                                                    final Iterable<Edge>
-                                                      outgoingEdges,
-                                                    final Iterable<Edge>
-                                                      incomingEdges) {
-    return createDefaultVertex(vertexID, null, null, outgoingEdges,
-      incomingEdges, null);
+    final Iterable<Edge> outgoingEdges, final Iterable<Edge> incomingEdges) {
+    return createDefaultVertex(vertexID, null, null,
+      outgoingEdges, incomingEdges, null);
   }
 
   /**
    * Creates a vertex with labels and outgoing edges.
    *
    * @param vertexID      vertex identifier
-   * @param labels        vertex labels
+   * @param label         vertex labels
    * @param outgoingEdges edges starting at that vertex
    * @return vertex with identifier, labels and outgoing edges
    */
-  public static Vertex createDefaultVertexWithLabels(final Long vertexID,
-                                                     final Iterable<String>
-                                                       labels,
-                                                     final Iterable<Edge>
-                                                       outgoingEdges) {
-    return createDefaultVertex(vertexID, labels, null, outgoingEdges, null,
+  public static Vertex createDefaultVertexWithLabel(final Long vertexID,
+    final String label, final Iterable<Edge> outgoingEdges) {
+    return createDefaultVertex(vertexID, label, null, outgoingEdges, null,
       null);
   }
 
@@ -82,34 +75,28 @@ public class VertexFactory {
    * @return vertex with identifier, properties and outgoing edges
    */
   public static Vertex createDefaultVertexWithProperties(final Long vertexID,
-                                                         final Map<String,
-                                                           Object> properties,
-                                                         final Iterable<Edge>
-                                                           outgoingEdges) {
-    return createDefaultVertex(vertexID, null, properties, outgoingEdges, null,
-      null);
+    final Map<String, Object> properties, final Iterable<Edge> outgoingEdges) {
+    return createDefaultVertex(vertexID, null,
+      properties, outgoingEdges, null, null);
   }
-
 
   /**
    * Creates a vertex based on the given properties.
    *
    * @param id            vertex identifier
-   * @param labels        vertex labels
+   * @param label         vertex labels
    * @param properties    vertex properties
    * @param outgoingEdges edges starting at that vertex
    * @param incomingEdges edges ending in that vertex
    * @param graphs        graphs that vertex belongs to
    * @return vertex
    */
-  public static Vertex createDefaultVertex(final Long id,
-                                           final Iterable<String> labels,
-                                           final Map<String, Object> properties,
-                                           final Iterable<Edge> outgoingEdges,
-                                           final Iterable<Edge> incomingEdges,
-                                           final Iterable<Long> graphs) {
+  public static Vertex createDefaultVertex(final Long id, final String label,
+    final Map<String, Object> properties, final Iterable<Edge> outgoingEdges,
+    final Iterable<Edge> incomingEdges, final Iterable<Long> graphs) {
     checkVertexID(id);
-    return new DefaultVertex(id, labels, properties, outgoingEdges,
+
+    return new DefaultVertex(id, label, properties, outgoingEdges,
       incomingEdges, graphs);
   }
 

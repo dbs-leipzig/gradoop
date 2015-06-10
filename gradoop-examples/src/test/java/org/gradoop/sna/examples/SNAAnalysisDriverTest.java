@@ -1,11 +1,9 @@
-package sna.examples;
+package org.gradoop.sna.examples;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.log4j.Logger;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.model.Vertex;
-import org.gradoop.sna.examples.SNAAnalysisDriver;
 import org.gradoop.storage.GraphStore;
 import org.junit.Test;
 
@@ -32,7 +30,7 @@ public class SNAAnalysisDriverTest extends GradoopClusterTest {
       "-" + SNAAnalysisDriver.LoadConfUtils.OPTION_BULKLOAD,
       "-" + SNAAnalysisDriver.LoadConfUtils.OPTION_VERTEX_LINE_READER,
       "CSVReader", "-" + SNAAnalysisDriver.OPTION_GRAPH_INPUT_PATH, "",
-      "-" + SNAAnalysisDriver.OPTION_GRAPH_OUTPUT_PATH, "/output/sna",
+      "-" + SNAAnalysisDriver.OPTION_GRAPH_OUTPUT_PATH, "/output/org.gradoop.sna",
       "-" + SNAAnalysisDriver.LoadConfUtils.OPTION_METADATA_PATH,
       resourceUrl.getPath().replace("person_meta.csv", ""),
       "-" + SNAAnalysisDriver.OPTION_VERBOSE,

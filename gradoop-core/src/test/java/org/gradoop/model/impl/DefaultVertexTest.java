@@ -19,7 +19,6 @@ public class DefaultVertexTest {
     Long vertexID = 0L;
     Vertex v = VertexFactory.createDefaultVertexWithID(vertexID);
     assertThat(v.getID(), is(vertexID));
-    assertThat(v.getLabelCount(), is(0));
     assertThat(v.getGraphCount(), is(0));
     assertThat(v.getOutgoingDegree(), is(0));
     assertThat(v.getIncomingDegree(), is(0));
@@ -87,24 +86,19 @@ public class DefaultVertexTest {
     Long otherID1 = 1L;
     Long otherID2 = 2L;
 
-    String label1 = "A";
-    String label2 = "B";
-    List<String> labels = Lists.newArrayList(label1, label2);
+    String label = "A";
+
     List<Edge> outgoingEdges = Lists.newArrayListWithCapacity(2);
     Edge e1 = EdgeFactory.createDefaultEdge(otherID1, otherID1);
     outgoingEdges.add(e1);
     Edge e2 = EdgeFactory.createDefaultEdge(otherID2, otherID2);
     outgoingEdges.add(e2);
 
-    Vertex v = VertexFactory.createDefaultVertexWithLabels(vertexID, labels,
+    Vertex v = VertexFactory.createDefaultVertexWithLabel(vertexID, label,
       outgoingEdges);
 
     assertThat(v.getID(), is(vertexID));
-
-    assertThat(v.getLabelCount(), is(2));
-    assertTrue(Lists.newArrayList(v.getLabels()).contains(label1));
-    assertTrue(Lists.newArrayList(v.getLabels()).contains(label2));
-
+    assertEquals(label, v.getLabel());
     assertThat(v.getOutgoingDegree(), is(2));
     assertThat(v.getDegree(), is(2));
     assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e1));
@@ -150,9 +144,7 @@ public class DefaultVertexTest {
     Long otherID3 = 3L;
     Long otherID4 = 4L;
 
-    String label1 = "A";
-    String label2 = "B";
-    List<String> labels = Lists.newArrayList(label1, label2);
+    String label = "A";
 
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
@@ -172,13 +164,10 @@ public class DefaultVertexTest {
 
     List<Long> graphs = Lists.newArrayList(0L, 1L);
 
-    Vertex v = VertexFactory.createDefaultVertex(vertexID, labels, props,
+    Vertex v = VertexFactory.createDefaultVertex(vertexID, label, props,
       outgoingEdges, incomingEdges, graphs);
 
-    assertThat(v.getLabelCount(), is(2));
-    assertTrue(Lists.newArrayList(v.getLabels()).contains(label1));
-    assertTrue(Lists.newArrayList(v.getLabels()).contains(label2));
-
+    assertEquals(label, v.getLabel());
     assertThat(v.getPropertyCount(), is(2));
     assertEquals("v1", v.getProperty("k1"));
     assertEquals("v2", v.getProperty("k2"));

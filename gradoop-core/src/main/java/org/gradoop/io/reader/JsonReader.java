@@ -30,10 +30,10 @@ public class JsonReader extends SingleVertexReader {
       JSONObject json = new JSONObject(line);
       // vertex id
       Long vertexID = readVertexID(json);
-      // vertex labels
-      Iterable<String> labels = null;
-      if (json.has(JsonWriter.LABELS)) {
-        labels = readLabels(json.getJSONArray(JsonWriter.LABELS));
+      // vertex label
+      String label = null;
+      if (json.has(JsonWriter.LABEL)) {
+        label = readLabel(json);
       }
       // vertex properties
       Map<String, Object> properties = null;
@@ -56,7 +56,7 @@ public class JsonReader extends SingleVertexReader {
         graphs = readGraphs(json.getJSONArray(JsonWriter.GRAPHS));
       }
       v = VertexFactory
-        .createDefaultVertex(vertexID, labels, properties, outgoingEdges,
+        .createDefaultVertex(vertexID, label, properties, outgoingEdges,
           incomingEdges, graphs);
     } catch (JSONException e) {
       e.printStackTrace();
@@ -76,19 +76,15 @@ public class JsonReader extends SingleVertexReader {
   }
 
   /**
-   * Reads the vertex labels from the json object.
+   * Reads the vertex label from the json object.
    *
-   * @param labelArray json object
-   * @return vertex labels
+   * @param json json object
+   * @return vertex label
    * @throws JSONException
    */
-  private Iterable<String> readLabels(final JSONArray labelArray) throws
+  private String readLabel(final JSONObject json) throws
     JSONException {
-    List<String> result = Lists.newArrayListWithCapacity(labelArray.length());
-    for (int i = 0; i < labelArray.length(); i++) {
-      result.add(labelArray.getString(i));
-    }
-    return result;
+    return json.getString(JsonWriter.LABEL);
   }
 
   /**

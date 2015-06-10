@@ -76,9 +76,8 @@ public class BTGHBaseVertexInputFormat extends
         new LongWritable(vertexHandler.getVertexID(row.getRow()));
 
       // vertex type is stored the first label of the vertex
-      Iterable<String> vertexLabels = vertexHandler.readLabels(row);
-      Integer firstLabel = Integer.valueOf(vertexLabels.iterator().next());
-      BTGVertexType vertexType = BTGVertexType.values()[firstLabel];
+      Integer vertexLabel = Integer.valueOf(vertexHandler.readLabel(row));
+      BTGVertexType vertexType = BTGVertexType.values()[vertexLabel];
 
       // initial vertex value is the vertex id
       Double vertexValue = new Double(String.valueOf(vertexID));

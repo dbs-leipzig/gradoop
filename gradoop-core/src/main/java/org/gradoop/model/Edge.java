@@ -9,7 +9,7 @@ package org.gradoop.model;
  * An edge has exactly one label and an internal index to handle multiple edges
  * between two vertex instances with the same label.
  */
-public interface Edge extends SingleLabeled, Attributed {
+public interface Edge extends Labeled, Attributed {
   /**
    * Returns the id of the other vertex this edge belongs to. In case of an
    * outgoing edge, this is the target vertex. In case of an incoming edge this

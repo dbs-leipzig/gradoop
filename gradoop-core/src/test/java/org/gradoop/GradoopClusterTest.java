@@ -4,6 +4,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;
@@ -61,6 +65,26 @@ public abstract class GradoopClusterTest extends GradoopTest {
     Path graphFileLocalPath = new Path(graphFileResource);
     Path graphFileDFSPath = new Path(inputFile);
     fs.copyFromLocalFile(graphFileLocalPath, graphFileDFSPath);
+  }
+
+  /**
+   * Creates a HBase table with the given name.
+   *
+   * @param outputTable table name
+   * @throws IOException
+   */
+  protected void createTable(String outputTable) throws IOException {
+    HTableDescriptor outputTableDescriptor =
+      new HTableDescriptor(TableName.valueOf(outputTable));
+
+    HBaseAdmin admin = new HBaseAdmin(utility.getConfiguration());
+
+    if (!admin.tableExists(outputTableDescriptor.getName())) {
+      outputTableDescriptor.addFamily(new HColumnDescriptor("v"));
+      admin.createTable(outputTableDescriptor);
+    }
+
+    admin.close();
   }
 
   /**

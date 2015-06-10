@@ -22,39 +22,36 @@ public class RDFReaderTest extends GradoopClusterTest {
   private static final Long geoID = 7282190339445886145L;
   private static final Long dbpID = 7459480252541644492L;
   private static final Long hedbpID = -7523405104137954346L;
-  private static final String lgd
-    = "http://linkedgeodata.org/triplify/node240111242";
-  private static final String geo
-    = "http://sws.geonames.org/2879139/";
-  private static final String dbp
-    = "http://dbpedia.org/resource/Leipzig";
+  private static final String lgd =
+    "http://linkedgeodata.org/triplify/node240111242";
+  private static final String geo = "http://sws.geonames.org/2879139/";
+  private static final String dbp = "http://dbpedia.org/resource/Leipzig";
   private static final String hedbp = "http://he.dbpedia.org/resource/" +
     "\u05DC\u05D9\u05D9\u05E4\u05E6\u05D9\u05D2";
   private static final String eLabel = "http://www.w3.org/2002/07/owl#sameAs";
   private static final String post = "http://dbpedia.org/ontology/postalCode";
-  private static final String pop
-    = "http://dbpedia.org/ontology/populationTotal";
+  private static final String pop =
+    "http://dbpedia.org/ontology/populationTotal";
   private static final String postVal = "04001-04357";
   private static final int popVal = 539348;
 
-  private static final String[] RDF_NTRIPLES = new String[] {
-    "<http://linkedgeodata.org/triplify/node240111242> " +
-      "<http://www.w3.org/2002/07/owl#sameAs> " +
-      "<http://sws.geonames.org/2879139/> .",
-    "<http://dbpedia.org/resource/Leipzig> " +
-      "<http://www.w3.org/2002/07/owl#sameAs> " +
-      "<http://sws.geonames.org/2879139/> .",
-    "<http://dbpedia.org/resource/Leipzig> " +
-      "<http://dbpedia.org/ontology/postalCode> " +
-      "\"04001-04357\" .",
-    "<http://dbpedia.org/resource/Leipzig> " +
-      "<http://dbpedia.org/ontology/populationTotal> " +
-      "\"539348\"^^<http://www.w3.org/2001/XMLSchema#integer> .",
-    "<http://dbpedia.org/resource/Leipzig> " +
-      "<http://www.w3.org/2002/07/owl#sameAs>	" +
-      "<http://he.dbpedia.org/resource/" + "" +
-      "\u05DC\u05D9\u05D9\u05E4\u05E6\u05D9\u05D2> ."
-  };
+  private static final String[] RDF_NTRIPLES =
+    new String[]{"<http://linkedgeodata.org/triplify/node240111242> " +
+                   "<http://www.w3.org/2002/07/owl#sameAs> " +
+                   "<http://sws.geonames.org/2879139/> .",
+                 "<http://dbpedia.org/resource/Leipzig> " +
+                   "<http://www.w3.org/2002/07/owl#sameAs> " +
+                   "<http://sws.geonames.org/2879139/> .",
+                 "<http://dbpedia.org/resource/Leipzig> " +
+                   "<http://dbpedia.org/ontology/postalCode> " +
+                   "\"04001-04357\" .",
+                 "<http://dbpedia.org/resource/Leipzig> " +
+                   "<http://dbpedia.org/ontology/populationTotal> " +
+                   "\"539348\"^^<http://www.w3.org/2001/XMLSchema#integer> .",
+                 "<http://dbpedia.org/resource/Leipzig> " +
+                   "<http://www.w3.org/2002/07/owl#sameAs>	" +
+                   "<http://he.dbpedia.org/resource/" + "" +
+                   "\u05DC\u05D9\u05D9\u05E4\u05E6\u05D9\u05D2> ."};
 
   protected List<Vertex> createVerticesFromRDF() {
     VertexLineReader reader = new RDFReader();
@@ -69,9 +66,7 @@ public class RDFReaderTest extends GradoopClusterTest {
   }
 
   protected void checkLabel(Vertex vertex, String label) {
-    for (String s : vertex.getLabels()) {
-      assertEquals(s, label);
-    }
+    assertEquals(label, vertex.getLabel());
   }
 
   @Test
@@ -87,8 +82,8 @@ public class RDFReaderTest extends GradoopClusterTest {
       } else if (id == geoID) {
         checkLabel(v, geo);
         for (Edge e : v.getIncomingEdges()) {
-          assertTrue((long) e.getOtherID() == lgdID
-            || (long) e.getOtherID() == dbpID);
+          assertTrue(
+            (long) e.getOtherID() == lgdID || (long) e.getOtherID() == dbpID);
           assertEquals(e.getLabel(), eLabel);
         }
       } else if (id == dbpID) {
@@ -103,8 +98,8 @@ public class RDFReaderTest extends GradoopClusterTest {
           }
         } else {
           for (Edge e : v.getOutgoingEdges()) {
-            assertTrue((long) e.getOtherID() == geoID
-              || (long) e.getOtherID() == hedbpID);
+            assertTrue((long) e.getOtherID() == geoID ||
+              (long) e.getOtherID() == hedbpID);
             assertEquals(e.getLabel(), eLabel);
           }
         }
@@ -121,8 +116,7 @@ public class RDFReaderTest extends GradoopClusterTest {
   }
 
   @Test
-  public void loadRDFToHBaseTest()
-    throws IOException {
+  public void loadRDFToHBaseTest() throws IOException {
     GraphStore graphStore = createEmptyGraphStore();
     VertexLineReader rdfReader = new RDFReader();
     for (String line : RDF_NTRIPLES) {
@@ -135,16 +129,15 @@ public class RDFReaderTest extends GradoopClusterTest {
   }
 
   private void validateRDFGraph(GraphStore graphStore) {
-    validateVertex(graphStore.readVertex(lgdID), 0, 1, 1, 0);
-    validateVertex(graphStore.readVertex(geoID), 0, 1, 0, 2);
-    validateVertex(graphStore.readVertex(dbpID), 2, 1, 2, 0);
-    validateVertex(graphStore.readVertex(hedbpID), 0, 1, 0, 1);
+    validateVertex(graphStore.readVertex(lgdID), 0, 1, 0);
+    validateVertex(graphStore.readVertex(geoID), 0, 0, 2);
+    validateVertex(graphStore.readVertex(dbpID), 2, 2, 0);
+    validateVertex(graphStore.readVertex(hedbpID), 0, 0, 1);
   }
 
-  private void validateVertex(Vertex vertex, int expectedPropertyCount, int
-    expectedLabelCount, int expectedOutEdgesCount, int expectedInEdgesCount) {
+  private void validateVertex(Vertex vertex, int expectedPropertyCount,
+    int expectedOutEdgesCount, int expectedInEdgesCount) {
     assertEquals(expectedPropertyCount, vertex.getPropertyCount());
-    assertEquals(expectedLabelCount, vertex.getLabelCount());
     List<Edge> outgoingEdges = Lists.newArrayList(vertex.getOutgoingEdges());
     assertEquals(expectedOutEdgesCount, outgoingEdges.size());
     List<Edge> incomingEdges = Lists.newArrayList(vertex.getIncomingEdges());

@@ -12,7 +12,6 @@ import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,7 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
 
     // graph 0
     Long graphID = 0L;
-    List<String> graphLabels = Arrays.asList("A");
+    String graphLabel = "A";
     Map<String, Object> graphProperties = new HashMap<>();
     graphProperties.put("k1", "v1");
     graphProperties.put("k2", "v2");
@@ -34,21 +33,20 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     vertices.add(0L);
     vertices.add(1L);
 
-    graphs
-      .add(GraphFactory.createDefaultGraph(graphID, graphLabels,
-        graphProperties, vertices));
+    graphs.add(GraphFactory
+      .createDefaultGraph(graphID, graphLabel, graphProperties, vertices));
 
     // graph 1
     graphID = 1L;
-    graphLabels = Arrays.asList("A", "B");
+    graphLabel = "A";
     graphProperties = new HashMap<>();
     graphProperties.put("k1", "v1");
     vertices = new ArrayList<>();
     vertices.add(1L);
     vertices.add(2L);
 
-    graphs.add(GraphFactory.createDefaultGraph(graphID, graphLabels,
-      graphProperties, vertices));
+    graphs.add(GraphFactory
+      .createDefaultGraph(graphID, graphLabel, graphProperties, vertices));
 
     return graphs;
   }
@@ -104,9 +102,7 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     // g0
     Graph g = graphStore.readGraph(0L);
     assertNotNull(g);
-    List<String> labels = Lists.newArrayList(g.getLabels());
-    assertEquals(1, labels.size());
-    assertTrue(labels.contains("A"));
+    assertEquals("A", g.getLabel());
     List<Long> vertices = Lists.newArrayList(g.getVertices());
     assertEquals(2, vertices.size());
     assertTrue(vertices.contains(0L));
@@ -124,10 +120,7 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     // g1
     g = graphStore.readGraph(1L);
     assertNotNull(g);
-    labels = Lists.newArrayList(g.getLabels());
-    assertEquals(2, labels.size());
-    assertTrue(labels.contains("A"));
-    assertTrue(labels.contains("B"));
+    assertEquals("A", g.getLabel());
     vertices = Lists.newArrayList(g.getVertices());
     assertEquals(2, vertices.size());
     assertTrue(vertices.contains(1L));
@@ -154,15 +147,16 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     final List<String> value = Lists.newArrayList();
 
     Long vertexID = 0L;
-    final Iterable<String> labels = Lists.newArrayList("A");
+    final String label = "A";
     final Map<String, Object> properties = new HashMap<>();
     properties.put(KEY_1, value);
 
     final Iterable<Edge> outEdges = Lists.newArrayListWithCapacity(0);
     final Iterable<Edge> inEdges = Lists.newArrayListWithCapacity(0);
     final Iterable<Long> graphs = Lists.newArrayList();
-    Vertex v = VertexFactory.createDefaultVertex(vertexID, labels, properties,
-      outEdges, inEdges, graphs);
+    Vertex v = VertexFactory
+      .createDefaultVertex(vertexID, label, properties, outEdges, inEdges,
+        graphs);
     graphStore.writeVertex(v);
   }
 
@@ -185,7 +179,7 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     final String valueString = "value";
 
     final Long vertexID = 0L;
-    final Iterable<String> labels = Lists.newArrayList("A");
+    final String label = "A";
 
     final Map<String, Object> properties = new HashMap<>();
     properties.put(keyBoolean, valueBoolean);
@@ -199,8 +193,9 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     final Iterable<Edge> inEdges = Lists.newArrayListWithCapacity(0);
     final Iterable<Long> graphs = Lists.newArrayList();
 
-    Vertex v = VertexFactory.createDefaultVertex(vertexID, labels, properties,
-      outEdges, inEdges, graphs);
+    Vertex v = VertexFactory
+      .createDefaultVertex(vertexID, label, properties, outEdges, inEdges,
+        graphs);
     graphStore.writeVertex(v);
 
     // reopen
@@ -215,24 +210,24 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
 
     for (String propertyKey : propertyKeys) {
       switch (propertyKey) {
-        case keyBoolean:
-          assertEquals(valueBoolean, v.getProperty(propertyKey));
-          break;
-        case keyInteger:
-          assertEquals(valueInteger, v.getProperty(keyInteger));
-          break;
-        case keyLong:
-          assertEquals(valueLong, v.getProperty(keyLong));
-          break;
-        case keyFloat:
-          assertEquals(valueFloat, v.getProperty(keyFloat));
-          break;
-        case keyDouble:
-          assertEquals(valueDouble, v.getProperty(keyDouble));
-          break;
-        case keyString:
-          assertEquals(valueString, v.getProperty(keyString));
-          break;
+      case keyBoolean:
+        assertEquals(valueBoolean, v.getProperty(propertyKey));
+        break;
+      case keyInteger:
+        assertEquals(valueInteger, v.getProperty(keyInteger));
+        break;
+      case keyLong:
+        assertEquals(valueLong, v.getProperty(keyLong));
+        break;
+      case keyFloat:
+        assertEquals(valueFloat, v.getProperty(keyFloat));
+        break;
+      case keyDouble:
+        assertEquals(valueDouble, v.getProperty(keyDouble));
+        break;
+      case keyString:
+        assertEquals(valueString, v.getProperty(keyString));
+        break;
       }
     }
   }

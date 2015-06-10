@@ -19,9 +19,30 @@ public final class GConstants {
   public static final String DEFAULT_TABLE_GRAPHS = "graphs";
 
   /**
-   * Column family name for labels.
+   * Default label for unlabeled vertices.
    */
-  public static final String CF_LABELS = "l";
+  public static final String DEFAULT_VERTEX_LABEL = "__V_LABEL";
+  /**
+   * Default label for unlabeled graphs.
+   */
+  public static final String DEFAULT_GRAPH_LABEL = "__G_LABEL";
+  /**
+   * Default label for unlabeled edges.
+   */
+  public static final String DEFAULT_EDGE_LABEL = "__E_LABEL";
+
+  /**
+   * Column family name for label.
+   */
+  public static final String CF_META = "m";
+  /**
+   * Column name for label.
+   */
+  public static final String COL_LABEL = "t";
+  /**
+   * Column name for graphs.
+   */
+  public static final String COL_GRAPHS = "g";
   /**
    * Column family name for properties.
    */
@@ -42,11 +63,6 @@ public final class GConstants {
    * Column family name for graphs.
    */
   public static final String CF_GRAPHS = "g";
-
-  /**
-   * Default label for unlabeled edges.
-   */
-  public static final String DEFAULT_EDGE_LABEL = "E_LABEL";
 
   /**
    * {@code <property-type>} for {@link java.lang.Boolean}

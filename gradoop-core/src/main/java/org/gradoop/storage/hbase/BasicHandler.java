@@ -6,23 +6,27 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.GConstants;
 import org.gradoop.model.Attributed;
-import org.gradoop.model.MultiLabeled;
+import org.gradoop.model.Labeled;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Handler is used to write labels and properties into HBase tables. This is
+ * Handler is used to write label and properties into HBase tables. This is
  * used by graphs and vertices.
  */
 public abstract class BasicHandler implements EntityHandler {
   /**
-   * Byte array representation of the labels column family.
+   * Byte representation of the meta column family.
    */
-  static final byte[] CF_LABELS_BYTES = Bytes.toBytes(GConstants.CF_LABELS);
+  static final byte[] CF_META_BYTES = Bytes.toBytes(GConstants.CF_META);
+
+  /**
+   * Byte representation of the label column identifier.
+   */
+  static final byte[] COL_LABEL_BYTES = Bytes.toBytes(GConstants.COL_LABEL);
 
   /**
    * Byte representation of the properties column family.
@@ -34,15 +38,9 @@ public abstract class BasicHandler implements EntityHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeLabels(final Put put, final MultiLabeled entity) {
-    int internalLabelID = 0;
-    if (entity.getLabelCount() > 0) {
-      for (String label : entity.getLabels()) {
-        put.add(CF_LABELS_BYTES, Bytes.toBytes(internalLabelID++),
-          Bytes.toBytes(label));
-      }
-    }
-    return put;
+  public Put writeLabel(final Put put, final Labeled entity) {
+    return (entity.getLabel() == null) ? put :
+      put.add(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
   }
 
   /**
@@ -72,13 +70,8 @@ public abstract class BasicHandler implements EntityHandler {
    * {@inheritDoc}
    */
   @Override
-  public Iterable<String> readLabels(final Result res) {
-    List<String> labels = new ArrayList<>();
-    for (Map.Entry<byte[], byte[]> labelColumn : res
-      .getFamilyMap(CF_LABELS_BYTES).entrySet()) {
-      labels.add(Bytes.toString(labelColumn.getValue()));
-    }
-    return labels;
+  public String readLabel(final Result res) {
+    return Bytes.toString(res.getValue(CF_META_BYTES, COL_LABEL_BYTES));
   }
 
   /**
