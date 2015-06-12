@@ -1,19 +1,12 @@
 package org.gradoop.rdf.examples;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.conf.GiraphConstants;
 import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapreduce.HFileOutputFormat2;
-import org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
@@ -22,9 +15,6 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
@@ -32,23 +22,23 @@ import org.gradoop.GConstants;
 import org.gradoop.algorithms.ConnectedComponentsComputation;
 import org.gradoop.algorithms.PairAggregator;
 import org.gradoop.algorithms.SelectAndAggregate;
+import org.gradoop.drivers.BulkLoadDriver;
 import org.gradoop.utils.ConfigurationUtils;
 import org.gradoop.io.formats.EPGHBaseVertexInputFormat;
 import org.gradoop.io.formats.GenericPairWritable;
 import org.gradoop.io.formats.SubgraphExtractionVertexOutputFormat;
-import org.gradoop.io.reader.BulkLoadEPG;
 import org.gradoop.io.reader.RDFReader;
-import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.model.Vertex;
 import org.gradoop.model.operators.VertexAggregate;
 import org.gradoop.model.operators.VertexPredicate;
 import org.gradoop.storage.hbase.EPGGraphHandler;
 import org.gradoop.storage.hbase.EPGVertexHandler;
 import org.gradoop.storage.hbase.GraphHandler;
-import org.gradoop.storage.hbase.HBaseGraphStoreFactory;
 import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * RDF Analysis Driver
@@ -70,7 +60,14 @@ public class RDFAnalysisDriver extends Configured implements Tool {
   }
 
   /**
-   * Starting point for BTG analysis pipeline.
+   * Constructor
+   */
+  public RDFAnalysisDriver() {
+    new ConfUtils();
+  }
+
+  /**
+   * Starting point for RDF analysis pipeline.
    *
    * @param args driver arguments
    * @return Exit code (0 - ok)
@@ -78,42 +75,31 @@ public class RDFAnalysisDriver extends Configured implements Tool {
    */
   @Override
   public int run(String[] args) throws Exception {
-
     Configuration conf = getConf();
-    CommandLine cmd = ConfigurationUtils.parseArgs(args);
-
+    CommandLine cmd = ConfUtils.parseArgs(args);
     if (cmd == null) {
       return 0;
     }
 
-    boolean verbose = cmd.hasOption(ConfigurationUtils.OPTION_VERBOSE);
+    String tablePrefix = cmd.getOptionValue(ConfigurationUtils
+      .OPTION_TABLE_PREFIX, "");
+    String tableVerticesName = tablePrefix + GConstants.DEFAULT_TABLE_VERTICES;
+    boolean verbose = cmd.hasOption(ConfUtils.OPTION_VERBOSE);
 
-    /*
-    Step 0: Delete (if exists) and create HBase tables
-     */
-    if (cmd.hasOption(ConfigurationUtils.OPTION_DROP_TABLES)) {
-      HBaseGraphStoreFactory.deleteGraphStore(conf);
-    }
-    HBaseGraphStoreFactory.createOrOpenGraphStore(conf, new EPGVertexHandler(),
-      new EPGGraphHandler());
-
-    /*
-    Step 1: Bulk Load of the graph into HBase using MapReduce
-     */
-    String inputPath =
-      cmd.getOptionValue(ConfigurationUtils.OPTION_GRAPH_INPUT_PATH);
-    String outputPath =
-      cmd.getOptionValue(ConfigurationUtils.OPTION_GRAPH_OUTPUT_PATH);
-    if (!runBulkLoad(conf, inputPath, outputPath, verbose)) {
-      return -1;
+    // Bulk load data
+    if (!cmd.hasOption(ConfUtils.OPTION_SKIP_IMPORT)) {
+      String[] options = prepareOptions(cmd);
+      if (!prepareGraphStoreAndBulkLoad(conf, options)) {
+        return -1;
+      }
     }
 
     /*
     Step 2: CC Computation using Giraph
      */
     int workers =
-      Integer.parseInt(cmd.getOptionValue(ConfigurationUtils.OPTION_WORKERS));
-    if (!runRDFComputation(conf, workers, verbose)) {
+      Integer.parseInt(cmd.getOptionValue(ConfUtils.OPTION_WORKERS));
+    if (!runRDFComputation(conf, workers, tableVerticesName, verbose)) {
       return -1;
     }
 
@@ -121,10 +107,11 @@ public class RDFAnalysisDriver extends Configured implements Tool {
     Step 3: Select And Aggregate using MapReduce
      */
     int scanCache = Integer.parseInt(
-      cmd.getOptionValue(ConfigurationUtils.OPTION_HBASE_SCAN_CACHE, "500"));
-    int reducers = Integer
-      .parseInt(cmd.getOptionValue(ConfigurationUtils.OPTION_REDUCERS, "1"));
-    if (!runSelectAndAggregate(conf, scanCache, reducers, verbose)) {
+      cmd.getOptionValue(ConfUtils.OPTION_HBASE_SCAN_CACHE, "500"));
+    int reducers = Integer.parseInt(
+      cmd.getOptionValue(ConfUtils.OPTION_REDUCERS));
+    if (!runSelectAndAggregate(conf, scanCache, reducers, tableVerticesName,
+      tablePrefix + GConstants.DEFAULT_TABLE_GRAPHS, verbose)) {
       return -1;
     }
 
@@ -132,60 +119,48 @@ public class RDFAnalysisDriver extends Configured implements Tool {
   }
 
   /**
-   * Runs the HFile conversion from the given file to the output dir. Also
-   * loads the HFiles to region servers.
+   * Create custom options for the bulk load process.
+   * @param cmd command line options
+   * @return string array containing options
+   */
+  private String[] prepareOptions(CommandLine cmd) {
+    List<String> argsList = new ArrayList<>();
+    argsList.add("-" + BulkLoadDriver.LoadConfUtils.OPTION_VERTEX_LINE_READER);
+    argsList.add(RDFReader.class.getCanonicalName());
+    argsList.add("-" + ConfUtils.OPTION_GRAPH_INPUT_PATH);
+    argsList.add(cmd.getOptionValue(ConfUtils.OPTION_GRAPH_INPUT_PATH));
+    argsList.add("-" + ConfUtils.OPTION_GRAPH_OUTPUT_PATH);
+    argsList.add(cmd.getOptionValue(ConfUtils.OPTION_GRAPH_OUTPUT_PATH));
+    if (cmd.hasOption(ConfUtils.OPTION_DROP_TABLES)) {
+      argsList.add("-" + ConfUtils.OPTION_DROP_TABLES);
+    }
+    if (cmd.hasOption(ConfUtils.OPTION_VERBOSE)) {
+      argsList.add("-" + ConfUtils.OPTION_VERBOSE);
+    }
+    argsList.add("-" + ConfUtils.OPTION_TABLE_PREFIX);
+    argsList.add(cmd.getOptionValue(ConfUtils.OPTION_TABLE_PREFIX));
+
+    return argsList.toArray(new String[argsList.size()]);
+  }
+
+  /**
+   * Imports the data set to the given vertices table.
    *
-   * @param conf      Cluster config
-   * @param graphFile input file in HDFS
-   * @param outDir    HFile output dir in HDFS
-   * @param verbose   print output during job
+   * @param conf       Cluster config
+   * @param argOptions options needed for the bulk load
    * @return true, if the job completed successfully, false otherwise
    * @throws java.io.IOException
    */
-  private boolean runBulkLoad(Configuration conf, String graphFile,
-    String outDir, boolean verbose) throws Exception {
-    Path inputFile = new Path(graphFile);
-    Path outputDir = new Path(outDir);
+  private boolean prepareGraphStoreAndBulkLoad(Configuration conf,
+    String[] argOptions) throws Exception {
+    BulkLoadDriver bulkLoadDriver = new BulkLoadDriver();
+    bulkLoadDriver.setConf(conf);
+    int bulkExitCode = bulkLoadDriver.run(argOptions);
 
-    // set line reader to read lines in input splits
-    conf.setClass(BulkLoadEPG.VERTEX_LINE_READER, RDFReader.class,
-      VertexLineReader.class);
-    // set vertex handler that creates the Puts
-    conf.setClass(BulkLoadEPG.VERTEX_HANDLER, EPGVertexHandler.class,
-      VertexHandler.class);
-
-    Job job = Job.getInstance(conf, JOB_PREFIX + BulkLoadEPG.class.getName());
-    job.setJarByClass(BulkLoadEPG.class);
-    // mapper that runs the HFile conversion
-    job.setMapperClass(BulkLoadEPG.class);
-    // input format for Mapper (File)
-    job.setInputFormatClass(TextInputFormat.class);
-    // output Key class of Mapper
-    job.setMapOutputKeyClass(ImmutableBytesWritable.class);
-    // output Value class of Mapper
-    job.setMapOutputValueClass(Put.class);
-
-    // set input file
-    FileInputFormat.addInputPath(job, inputFile);
-    // set output directory
-    FileOutputFormat.setOutputPath(job, outputDir);
-
-    HTable hTable = new HTable(conf, GConstants.DEFAULT_TABLE_VERTICES);
-
-    // auto configure partitioner and reducer corresponding to the number of
-    // regions
-    HFileOutputFormat2.configureIncrementalLoad(job, hTable);
-
-    // run job
-    if (!job.waitForCompletion(verbose)) {
+    if (bulkExitCode != 0) {
       LOG.error("Error during bulk import ... stopping pipeline");
       return false;
     }
-
-    // load created HFiles to the region servers
-    LoadIncrementalHFiles loader = new LoadIncrementalHFiles(conf);
-    loader.doBulkLoad(outputDir, hTable);
-
     return true;
   }
 
@@ -194,25 +169,25 @@ public class RDFAnalysisDriver extends Configured implements Tool {
    *
    * @param conf        Cluster configuration
    * @param workerCount Number of workers Giraph shall use
+   * @param verticesTableName specify (custom) table vertices
    * @param verbose     print output during job
    * @return true, if the job completed successfully, false otherwise
    * @throws java.io.IOException
    * @throws ClassNotFoundException
    * @throws InterruptedException
-   * @throws org.apache.commons.cli.ParseException
    */
   private boolean runRDFComputation(Configuration conf, int workerCount,
-    boolean verbose) throws IOException, ClassNotFoundException,
-    InterruptedException, ParseException {
+    String verticesTableName, boolean verbose) throws
+    IOException, ClassNotFoundException, InterruptedException {
     // set HBase table to read graph from
-    conf.set(TableInputFormat.INPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+    conf.set(TableInputFormat.INPUT_TABLE, verticesTableName);
     // just scan necessary CFs (no properties needed)
     String columnFamiliesToScan = String
       .format("%s %s %s %s", GConstants.CF_META, GConstants.CF_OUT_EDGES,
         GConstants.CF_IN_EDGES, GConstants.CF_GRAPHS);
     conf.set(TableInputFormat.SCAN_COLUMNS, columnFamiliesToScan);
     // set HBase table to write computation results to
-    conf.set(TableOutputFormat.OUTPUT_TABLE, GConstants.DEFAULT_TABLE_VERTICES);
+    conf.set(TableOutputFormat.OUTPUT_TABLE, verticesTableName);
 
     // setup Giraph job
     GiraphJob job = new GiraphJob(conf,
@@ -241,6 +216,8 @@ public class RDFAnalysisDriver extends Configured implements Tool {
    * @param conf      Cluster configuration
    * @param scanCache HBase client scan cache
    * @param reducers  number of reducers to use for the job
+   * @param verticesTableName specify (custom) table vertices
+   * @param graphsTableName specify (custom) table graphs
    * @param verbose   print output during job
    * @return true, if the job completed successfully, false otherwise
    * @throws IOException
@@ -248,8 +225,8 @@ public class RDFAnalysisDriver extends Configured implements Tool {
    * @throws InterruptedException
    */
   private boolean runSelectAndAggregate(Configuration conf, int scanCache,
-    int reducers, boolean verbose) throws IOException, ClassNotFoundException,
-    InterruptedException {
+    int reducers, String verticesTableName, String graphsTableName, boolean
+    verbose) throws IOException, ClassNotFoundException, InterruptedException {
     /*
      mapper settings
      */
@@ -277,12 +254,12 @@ public class RDFAnalysisDriver extends Configured implements Tool {
     scan.setCacheBlocks(false);
 
     // map
-    TableMapReduceUtil.initTableMapperJob(GConstants.DEFAULT_TABLE_VERTICES,
+    TableMapReduceUtil.initTableMapperJob(verticesTableName,
       scan, SelectAndAggregate.SelectMapper.class, LongWritable.class,
       GenericPairWritable.class, job);
 
     // reduce
-    TableMapReduceUtil.initTableReducerJob(GConstants.DEFAULT_TABLE_GRAPHS,
+    TableMapReduceUtil.initTableReducerJob(graphsTableName,
       SelectAndAggregate.AggregateReducer.class, job);
     job.setNumReduceTasks(reducers);
 
@@ -341,5 +318,27 @@ public class RDFAnalysisDriver extends Configured implements Tool {
    */
   public static void main(String[] args) throws Exception {
     System.exit(ToolRunner.run(new RDFAnalysisDriver(), args));
+  }
+
+  /**
+   * Configuration params for
+   * {@link org.gradoop.rdf.examples.RDFAnalysisDriver}.
+   */
+  public static class ConfUtils extends ConfigurationUtils {
+    /**
+     * Command line option to skip the import of data.
+     */
+    public static final String OPTION_SKIP_IMPORT = "si";
+    /**
+     * Command line option to skip the enrichment process of data.
+     */
+    public static final String OPTION_SKIP_ENRICHMENT = "se";
+
+    static {
+      OPTIONS.addOption(OPTION_SKIP_IMPORT, "skipImport", false,
+        "Skip import of data.");
+      OPTIONS.addOption(OPTION_SKIP_ENRICHMENT, "skipEnrichment", false,
+        "Skip enrichment of data.");
+    }
   }
 }

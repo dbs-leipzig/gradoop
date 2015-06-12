@@ -1,6 +1,7 @@
 package org.gradoop.storage.hbase;
 
 import com.google.common.collect.Lists;
+import org.gradoop.GConstants;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
@@ -11,6 +12,7 @@ import org.gradoop.storage.GraphStore;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +54,8 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
   }
 
   @Test
-  public void writeCloseOpenReadTest() {
+  public void writeCloseOpenReadTest() throws InterruptedException, IOException,
+    ClassNotFoundException {
     GraphStore graphStore = createEmptyGraphStore();
 
     // storage some data
@@ -70,8 +73,22 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
 
     // validate
     validateGraphs(graphStore);
-    validateVertices(graphStore);
+    validateSingleVertices(graphStore);
+    validateAllVertices(graphStore);
+    validateEdges(graphStore);
+    graphStore.close();
+  }
 
+  @Test
+  public void writeFlushReadEdgesTest() {
+    GraphStore graphStore = createEmptyGraphStore();
+    graphStore.setAutoFlush(false);
+    for (Vertex v : createExtendedGraphVertices()) {
+      graphStore.writeVertex(v);
+    }
+    graphStore.flush();
+
+    validateEdges(graphStore);
     graphStore.close();
   }
 
@@ -93,8 +110,7 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
 
     // validate
     validateGraphs(graphStore);
-    validateVertices(graphStore);
-
+    validateSingleVertices(graphStore);
     graphStore.close();
   }
 
@@ -130,13 +146,25 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     assertEquals("v1", g.getProperty("k1"));
   }
 
-  private void validateVertices(GraphStore graphStore) {
+  private void validateSingleVertices(GraphStore graphStore) {
     List<Vertex> vertexResult =
       Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
     for (long l = 0L; l < EXTENDED_GRAPH.length; l++) {
       vertexResult.add(graphStore.readVertex(l));
     }
     validateExtendedGraphVertices(vertexResult);
+  }
+
+  private void validateAllVertices(GraphStore graphStore) throws
+    InterruptedException, IOException, ClassNotFoundException {
+    List<Vertex> vertexResult = Lists.newArrayList(graphStore.getVertices(
+      GConstants.DEFAULT_TABLE_VERTICES));
+    validateExtendedGraphVertices(vertexResult);
+  }
+
+  private void validateEdges(GraphStore graphStore) {
+    List<Edge> edgeResult = Lists.newArrayList(graphStore.getEdges());
+    validateExtendedGraphEdges(edgeResult);
   }
 
   @Test(expected = UnsupportedTypeException.class)

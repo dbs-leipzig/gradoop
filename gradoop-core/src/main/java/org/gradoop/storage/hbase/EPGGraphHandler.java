@@ -77,7 +77,7 @@ public class EPGGraphHandler extends BasicHandler implements GraphHandler {
    */
   @Override
   public Iterable<Long> readVertices(final Result res) {
-    return getColumnKeysFromFamiliy(res, CF_VERTICES_BYTES);
+    return getColumnKeysFromFamily(res, CF_VERTICES_BYTES);
   }
 
   /**
