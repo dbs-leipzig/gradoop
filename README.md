@@ -10,7 +10,7 @@
 
 ##### Cluster requirements
 
-If you want to run Gradoop on a cluster, you need the following components
+If you want to execute Gradoop on a cluster, you need the following components
 installed.
 
 *   Hadoop 2.5.1
@@ -22,7 +22,7 @@ installed.
 
     > git clone https://github.com/s1ck/gradoop.git
     
-* Build and run tests
+* Build and execute tests
 
     > cd gradoop
     
@@ -48,7 +48,7 @@ The pipeline itself is currently represented by a Hadoop Driver
 (org.gradoop.biiig.examples.BTGAnalysisDriver). Please have a look at the driver
 for further details on how to implement a pipeline.
 
-To run the pipeline on your hadoop installation, please follow these steps.
+To execute the pipeline on your hadoop installation, please follow these steps.
 
 *   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar
 -with-dependencies.jar`
@@ -81,7 +81,7 @@ The pipeline itself is currently represented by a Hadoop Driver
 (org.gradoop.biiig.examples.SNAAnalysisDriver). Please have a look at the driver
 for further details on how to implement a pipeline.
 
-To run the pipeline on your hadoop installation, please follow these steps.
+To execute the pipeline on your hadoop installation, please follow these steps.
 
 *   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar
 -with-dependencies.jar`
@@ -115,7 +115,7 @@ The pipeline itself is currently represented by a Hadoop Driver
 (org.gradoop.biiig.examples.RDFAnalysisDriver). Please have a look at the driver
 for further details on how to implement a pipeline.
 
-To run the pipeline on your hadoop installation, please follow these steps.
+To execute the pipeline on your hadoop installation, please follow these steps.
 
 *   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar-with-dependencies.jar`
     to your Hadoop environment.
