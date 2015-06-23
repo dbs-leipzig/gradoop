@@ -1,10 +1,20 @@
 package org.gradoop.model;
 
+import java.util.Map;
+
 /**
  * Used to describe entities that store a set of properties, where each property
  * is defined by a property key and a property value.
  */
 public interface Attributed {
+
+  /**
+   * Returns all properties of that entity.
+   *
+   * @return properties
+   */
+  Map<String, Object> getProperties();
+
   /**
    * Returns all property keys of that entity or {@code null} it that entity has
    * no properties.
@@ -29,7 +39,7 @@ public interface Attributed {
    * @param key   property key
    * @param value property value
    */
-  void addProperty(String key, Object value);
+  void setProperty(String key, Object value);
 
   /**
    * Returns the number of properties stored at that entity.

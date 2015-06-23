@@ -199,7 +199,7 @@ public class FoodBrokerReader implements VertexLineReader {
       String key = keys.next().toString();
       Object o = object.get(key);
       key = addPrefix ? prefix + key : key;
-      attributed.addProperty(key, o);
+      attributed.setProperty(key, o);
     }
   }
 }

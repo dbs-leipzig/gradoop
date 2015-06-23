@@ -15,11 +15,13 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model;
+package org.gradoop.model.operators;
 
-public interface EPCollection {
+import org.gradoop.model.EPEdgeData;
+import org.gradoop.model.helper.Predicate;
+import org.gradoop.model.impl.EPEdgeCollection;
 
-  <T> Iterable<T> values(Class<T> propertyType, String propertyKey);
+public interface EPEdgeCollectionOperators extends EPCollectionOperators {
 
-  long size();
+  EPEdgeCollection select(Predicate<EPEdgeData> predicateFunction);
 }

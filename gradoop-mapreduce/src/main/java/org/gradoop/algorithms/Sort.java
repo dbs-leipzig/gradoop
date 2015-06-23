@@ -123,7 +123,7 @@ public class Sort {
           encodeDouble(v, Order.DESCENDING);
 
         Put put = new Put(rowKeyBytes);
-        put.add(CF_IDENTIFIER, COL_IDENTIFIER, Bytes.toBytes(graph.getID()));
+        put.add(CF_IDENTIFIER, COL_IDENTIFIER, Bytes.toBytes(graph.getId()));
 
         context.write(new ImmutableBytesWritable(rowKeyBytes), put);
       }

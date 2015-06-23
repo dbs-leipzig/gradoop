@@ -141,7 +141,7 @@ public class DefaultVertex extends LabeledPropertyContainer implements Vertex {
   @Override
   public String toString() {
     return "SimpleVertex{" +
-      "id=" + getID() +
+      "id=" + getId() +
       ", label=" + getLabel() +
       ", outgoingEdges=" + outgoingEdges +
       ", incomingEdges=" + incomingEdges +

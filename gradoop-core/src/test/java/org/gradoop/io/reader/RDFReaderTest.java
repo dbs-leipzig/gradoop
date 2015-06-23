@@ -72,7 +72,7 @@ public class RDFReaderTest extends GradoopClusterTest {
   @Test
   public void checkSimpleRDFNTripleInputTest() {
     for (Vertex v : createVerticesFromRDF()) {
-      long id = v.getID();
+      long id = v.getId();
       if (id == lgdID) {
         checkLabel(v, lgd);
         for (Edge e : v.getOutgoingEdges()) {

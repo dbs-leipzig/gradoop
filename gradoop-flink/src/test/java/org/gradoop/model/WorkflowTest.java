@@ -18,7 +18,7 @@
 package org.gradoop.model;
 
 import com.google.common.collect.Lists;
-import javafx.util.Pair;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.helper.Aggregate;
 import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.BinaryFunction;
@@ -26,17 +26,16 @@ import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.SystemProperties;
 import org.gradoop.model.helper.UnaryFunction;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.EPGraphCollection;
+import org.gradoop.model.operators.EPGraphCollectionOperators;
+import org.gradoop.model.store.EPGraphStore;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Set;
 
-@RunWith(MockitoJUnitRunner.class)
 public class WorkflowTest {
 
-  @Test
   public void summarizedCommunities() {
     EPGraphStore db = Mockito.mock(EPGraphStore.class);
 
@@ -44,7 +43,7 @@ public class WorkflowTest {
     EPGraph dbGraph = db.getDatabaseGraph();
 
     // extract friendships
-    EPGraphCollection friendships =
+    EPGraphCollectionOperators friendships =
       dbGraph.match("(a)-(c)->(b)", new Predicate<EPPatternGraph>() {
         @Override
         public boolean filter(EPPatternGraph graph) {
@@ -70,28 +69,26 @@ public class WorkflowTest {
     // summarize communities
     knowsGraph
       .summarize(Lists.newArrayList(SystemProperties.TYPE.name(), "city"),
-        new Aggregate<Pair<Vertex, Set<Vertex>>, Vertex>() {
+        new Aggregate<Tuple2<EPVertexData, Set<EPVertexData>>, EPVertexData>() {
           @Override
-          public Vertex aggregate(Pair<Vertex, Set<Vertex>> entity) {
-            Vertex summarizedVertex = entity.getKey();
-            summarizedVertex.addProperty("count", entity.getValue().size());
+          public EPVertexData aggregate(
+            Tuple2<EPVertexData, Set<EPVertexData>> entity) {
+            EPVertexData summarizedVertex = entity.f0;
+            summarizedVertex.setProperty("count", entity.f1.size());
             return summarizedVertex;
           }
         }, Lists.newArrayList(SystemProperties.TYPE.name()),
-        new Aggregate<Pair<Edge, Set<Edge>>, Edge>() {
+        new Aggregate<Tuple2<EPEdgeData, Set<EPEdgeData>>, EPEdgeData>() {
           @Override
-          public Edge aggregate(Pair<Edge, Set<Edge>> entity) {
-            Edge summarizedEdge = entity.getKey();
-            summarizedEdge.addProperty("count", entity.getValue().size());
+          public EPEdgeData aggregate(
+            Tuple2<EPEdgeData, Set<EPEdgeData>> entity) {
+            EPEdgeData summarizedEdge = entity.f0;
+            summarizedEdge.setProperty("count", entity.f1.size());
             return summarizedEdge;
           }
         });
-
-    // store the resulting summarized graph
-    db.writeGraph(knowsGraph);
   }
 
-  @Test
   public void topRevenueBusinessProcess() {
     EPGraphStore db = Mockito.mock(EPGraphStore.class);
 
@@ -99,16 +96,16 @@ public class WorkflowTest {
     EPGraph dbGraph = db.getDatabaseGraph();
 
     // extract business process instances
-    EPGraphCollection btgs =
+    EPGraphCollectionOperators btgs =
       dbGraph.callForCollection(Algorithm.BUSINESS_TRANSACTION_GRAPHS);
 
     // define predicate function (graph contains invoice)
     final Predicate<EPGraph> predicate = new Predicate<EPGraph>() {
       @Override
-      public boolean filter(EPGraph graph) {
-        return graph.getVertices().select(new Predicate<Vertex>() {
+      public boolean filter(EPGraph graph) throws Exception {
+        return graph.getVertices().select(new Predicate<EPVertexData>() {
           @Override
-          public boolean filter(Vertex entity) {
+          public boolean filter(EPVertexData entity) {
             return entity.getLabel().equals("SalesInvoice");
           }
         }).size() > 0;
@@ -130,7 +127,7 @@ public class WorkflowTest {
       };
 
     // apply predicate and aggregate function
-    EPGraphCollection invBtgs =
+    EPGraphCollectionOperators invBtgs =
       btgs.select(predicate).apply(new UnaryFunction<EPGraph, EPGraph>() {
         @Override
         public EPGraph execute(EPGraph entity) {
@@ -139,10 +136,10 @@ public class WorkflowTest {
       });
 
     // sort graphs by revenue and return top 100
-    EPGraphCollection topBTGs =
+    EPGraphCollectionOperators topBTGs =
       invBtgs.sortBy("revenue", Order.DESCENDING).top(100);
 
-    // compute overlap to find master data objects (e.g. Employee)
+    // compute overlap to find master store objects (e.g. Employee)
     EPGraph topOverlap = topBTGs.reduce(new BinaryFunction<EPGraph, EPGraph>() {
       @Override
       public EPGraph execute(EPGraph first, EPGraph second) {
@@ -151,12 +148,11 @@ public class WorkflowTest {
     });
   }
 
-  @Test
   public void clusterCharacteristicPatterns() {
     EPGraphStore db = Mockito.mock(EPGraphStore.class);
 
     // generate base collection
-    EPGraphCollection btgs = db.getDatabaseGraph()
+    EPGraphCollectionOperators btgs = db.getDatabaseGraph()
       .callForCollection(Algorithm.BUSINESS_TRANSACTION_GRAPHS);
 
     // define aggregate function (profit per graph)
@@ -187,30 +183,31 @@ public class WorkflowTest {
     });
 
     // vertex function for projection
-    final UnaryFunction<Vertex, Vertex> vertexFunc =
-      new UnaryFunction<Vertex, Vertex>() {
+    final UnaryFunction<EPVertexData, EPVertexData> vertexFunc =
+      new UnaryFunction<EPVertexData, EPVertexData>() {
         @Override
-        public Vertex execute(Vertex entity) {
-          Vertex newVertex = Mockito.mock(Vertex.class);
+        public EPVertexData execute(EPVertexData entity) {
+          EPVertexData newVertex = Mockito.mock(EPVertexData.class);
           if ((Boolean) entity.getProperty("IsMasterData")) {
             newVertex.setLabel(entity.getProperty("sourceID").toString());
           } else {
             newVertex.setLabel(entity.getLabel());
           }
-          newVertex.addProperty("result", entity.getProperty("result"));
+          newVertex.setProperty("result", entity.getProperty("result"));
           return newVertex;
         }
       };
 
     // edge function for projection
-    final UnaryFunction<Edge, Edge> edgeFunc = new UnaryFunction<Edge, Edge>() {
-      @Override
-      public Edge execute(Edge entity) {
-        Edge newEdge = Mockito.mock(Edge.class);
-        newEdge.setLabel(entity.getLabel());
-        return newEdge;
-      }
-    };
+    final UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc =
+      new UnaryFunction<EPEdgeData, EPEdgeData>() {
+        @Override
+        public EPEdgeData execute(EPEdgeData entity) {
+          EPEdgeData newEdge = Mockito.mock(EPEdgeData.class);
+          newEdge.setLabel(entity.getLabel());
+          return newEdge;
+        }
+      };
 
     // apply projection on all btgs
     btgs = btgs.apply(new UnaryFunction<EPGraph, EPGraph>() {

@@ -16,7 +16,7 @@ public class DefaultGraphTest {
   public void createWithIDTest() {
     Long graphID = 0L;
     Graph g = GraphFactory.createDefaultGraphWithID(graphID);
-    assertThat(g.getID(), is(graphID));
+    assertThat(g.getId(), is(graphID));
   }
 
   @Test
@@ -32,7 +32,7 @@ public class DefaultGraphTest {
     Graph g = GraphFactory.createDefaultGraph(graphID, label, props,
       Lists.newArrayList(vertex1, vertex2));
 
-    assertThat(g.getID(), is(graphID));
+    assertThat(g.getId(), is(graphID));
     assertEquals(label, g.getLabel());
     assertThat(g.getPropertyCount(), is(2));
     assertThat(g.getProperty("k1"), Is.<Object>is("v1"));

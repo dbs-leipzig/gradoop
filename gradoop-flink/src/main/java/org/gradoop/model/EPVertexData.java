@@ -15,9 +15,13 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.helper;
+package org.gradoop.model;
 
-public interface Predicate<T> {
+import java.util.Set;
 
-  boolean filter(T entity) throws Exception;
+public interface EPVertexData extends Identifiable, Attributed, Labeled {
+
+  Set<Long> getGraphs();
+
+  void setGraphs(Set<Long> graphs);
 }

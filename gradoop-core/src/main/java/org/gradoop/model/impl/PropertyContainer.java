@@ -28,6 +28,14 @@ public abstract class PropertyContainer implements Attributed {
    * {@inheritDoc}
    */
   @Override
+  public Map<String, Object> getProperties() {
+    return properties;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Iterable<String> getPropertyKeys() {
     return (properties != null) ? properties.keySet() : null;
   }
@@ -44,7 +52,7 @@ public abstract class PropertyContainer implements Attributed {
    * {@inheritDoc}
    */
   @Override
-  public void addProperty(String key, Object value) {
+  public void setProperty(String key, Object value) {
     if (key == null || "".equals(key)) {
       throw new IllegalArgumentException("key must not be null or empty");
     }

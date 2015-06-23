@@ -15,9 +15,11 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.helper;
+package org.gradoop.model.operators;
 
-public interface Predicate<T> {
+public interface EPCollectionOperators {
 
-  boolean filter(T entity) throws Exception;
+  <T> Iterable<T> values(Class<T> propertyType, String propertyKey);
+
+  long size() throws Exception;
 }

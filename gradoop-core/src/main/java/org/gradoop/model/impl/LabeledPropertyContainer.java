@@ -40,8 +40,15 @@ public abstract class LabeledPropertyContainer extends
    * {@inheritDoc}
    */
   @Override
-  public Long getID() {
+  public Long getId() {
     return id;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setId(Long id) {
   }
 
   /**

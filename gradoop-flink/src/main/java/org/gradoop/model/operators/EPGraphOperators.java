@@ -15,47 +15,60 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model;
+package org.gradoop.model.operators;
 
-import javafx.util.Pair;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.EPEdgeData;
+import org.gradoop.model.EPPatternGraph;
+import org.gradoop.model.EPVertexData;
 import org.gradoop.model.helper.Aggregate;
 import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.EPEdgeCollection;
+import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.EPVertexCollection;
 
 import java.util.List;
 import java.util.Set;
 
-public interface EPGraph extends Identifiable, Attributed, Labeled {
+/**
+ * Describes all operators that can be applied on a single graph inside the
+ * EPGM.
+ */
+public interface EPGraphOperators {
+
+  EPVertexCollection getVertices();
+
+  EPEdgeCollection getEdges();
+
+  EPEdgeCollection getOutgoingEdges(final Long vertexID);
+
+  EPEdgeCollection getIncomingEdges(final Long vertexID);
 
   /*
-  CRUD operators
+  unary operators take one graph as input and return a single graph or a
+  graph collection
    */
 
-  EPVertexSet getVertices();
-
-  EPEdgeSet getEdges();
-
-  /*
-  unary operators
-   */
-
-  EPGraphCollection match(String graphPattern,
+  EPGraphCollectionOperators match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc);
 
-  EPGraph project(UnaryFunction<Vertex, Vertex> vertexFunction,
-    UnaryFunction<Edge, Edge> edgeFunction);
+  EPGraph project(UnaryFunction<EPVertexData, EPVertexData> vertexFunction,
+    UnaryFunction<EPEdgeData, EPEdgeData> edgeFunction);
 
   <O extends Number> EPGraph aggregate(String propertyKey,
     Aggregate<EPGraph, O> aggregateFunc);
 
   EPGraph summarize(List<String> vertexGroupingKeys,
-    Aggregate<Pair<Vertex, Set<Vertex>>, Vertex> vertexAggregateFunc,
+    Aggregate<Tuple2<EPVertexData, Set<EPVertexData>>, EPVertexData>
+      vertexAggregateFunc,
     List<String> edgeGroupingKeys,
-    Aggregate<Pair<Edge, Set<Edge>>, Edge> edgeAggregateFunc);
+    Aggregate<Tuple2<EPEdgeData, Set<EPEdgeData>>, EPEdgeData>
+      edgeAggregateFunc);
 
   /*
-  binary operators
+  binary operators take two graphs as input and return a single graph
    */
 
   EPGraph combine(EPGraph otherGraph);
@@ -70,9 +83,6 @@ public interface EPGraph extends Identifiable, Attributed, Labeled {
 
   EPGraph callForGraph(Algorithm algorithm, String... params);
 
-  EPGraphCollection callForCollection(Algorithm algorithm, String... params);
-
-  long getVertexCount();
-
-  long getEdgeCount();
+  EPGraphCollectionOperators callForCollection(Algorithm algorithm,
+    String... params);
 }

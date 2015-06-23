@@ -9,5 +9,12 @@ public interface Identifiable {
    *
    * @return identifier
    */
-  Long getID();
+  Long getId();
+
+  /**
+   * Sets the identifier of that entity.
+   *
+   * @param id identifier
+   */
+  void setId(Long id);
 }

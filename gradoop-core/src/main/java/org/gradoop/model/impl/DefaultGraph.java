@@ -65,7 +65,7 @@ public class DefaultGraph extends LabeledPropertyContainer implements Graph {
   @Override
   public String toString() {
     return "DefaultGraph{" +
-      "id=" + getID() +
+      "id=" + getId() +
       ", label=" + getLabel() +
       ", vertices=" + vertices +
       '}';
