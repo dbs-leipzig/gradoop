@@ -60,7 +60,7 @@ public class EPGHBaseVertexOutputFormat extends
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
       VertexHandler vertexHandler = getVertexHandler();
       // vertex identifier
-      byte[] rowKey = vertexHandler.getRowKey(vertex.getId().getID());
+      byte[] rowKey = vertexHandler.getRowKey(vertex.getId().getId());
       Put put = new Put(rowKey);
       // labels
       put = vertexHandler.writeLabel(put, vertex.getValue());

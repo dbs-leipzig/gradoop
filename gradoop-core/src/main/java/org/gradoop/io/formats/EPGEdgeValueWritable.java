@@ -40,7 +40,7 @@ public class EPGEdgeValueWritable extends
     this(edge.getOtherID(), edge.getLabel(), edge.getIndex());
     if (edge.getPropertyKeys() != null) {
       for (String propertyKey : edge.getPropertyKeys()) {
-        this.addProperty(propertyKey, edge.getProperty(propertyKey));
+        this.setProperty(propertyKey, edge.getProperty(propertyKey));
       }
     }
   }

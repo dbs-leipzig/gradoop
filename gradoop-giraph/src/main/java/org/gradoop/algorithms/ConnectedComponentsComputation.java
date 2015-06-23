@@ -31,11 +31,11 @@ public class ConnectedComponentsComputation extends
 
     //first superstep: take vertexID
     if (getSuperstep() == 0) {
-      long current = vertex.getId().getID();
+      long current = vertex.getId().getId();
       // for each edge, check, if target vertex id is smaller than current id
       for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> e :
         vertex.getEdges()) {
-        long candidate = e.getTargetVertexId().getID();
+        long candidate = e.getTargetVertexId().getId();
         if (candidate < current) {
           current = candidate;
         }
@@ -45,7 +45,7 @@ public class ConnectedComponentsComputation extends
       for (Edge<EPGVertexIdentifierWritable, EPGEdgeValueWritable> edge :
         vertex.getEdges()) {
         EPGVertexIdentifierWritable neighbor = edge.getTargetVertexId();
-        if (neighbor.getID() > current) {
+        if (neighbor.getId() > current) {
           sendMessage(neighbor, new LongWritable(current));
         }
       }

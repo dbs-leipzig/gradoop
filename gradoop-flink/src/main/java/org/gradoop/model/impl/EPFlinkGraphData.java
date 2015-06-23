@@ -15,18 +15,22 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model;
+package org.gradoop.model.impl;
 
-public interface EPGraphStore {
+import org.gradoop.model.EPGraphData;
 
-  EPGraph getDatabaseGraph();
+import java.util.Map;
 
-  EPGraphCollection getCollection();
+/**
+ * POJO for graph data.
+ */
+public class EPFlinkGraphData extends EPFlinkEntity implements EPGraphData {
 
-  EPGraph readGraph(Long graphID);
+  public EPFlinkGraphData() {
+  }
 
-  EPGraph writeGraph(EPGraph graph);
-
-
-
+  public EPFlinkGraphData(Long graphID, String label,
+    Map<String, Object> properties) {
+    super(graphID, label, properties);
+  }
 }

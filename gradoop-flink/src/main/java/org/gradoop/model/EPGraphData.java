@@ -15,9 +15,10 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.helper;
+package org.gradoop.model;
 
-public interface Predicate<T> {
-
-  boolean filter(T entity) throws Exception;
+/**
+ * Stores all information regarding a graph in the EPGM.
+ */
+public interface EPGraphData extends Identifiable, Attributed, Labeled {
 }

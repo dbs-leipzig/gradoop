@@ -15,9 +15,14 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.helper;
+package org.gradoop.model;
 
-public interface Predicate<T> {
+public interface EPEdgeData extends Identifiable, Labeled, Attributed {
+  Long getSourceVertex();
 
-  boolean filter(T entity) throws Exception;
+  void setSourceVertex(Long sourceVertexId);
+
+  Long getTargetVertex();
+
+  void setTargetVertex(Long targetVertexId);
 }

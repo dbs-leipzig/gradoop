@@ -46,6 +46,14 @@ public class EPGAttributedWritable implements Attributed, Writable {
    * {@inheritDoc}
    */
   @Override
+  public Map<String, Object> getProperties() {
+    return this.properties;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Iterable<String> getPropertyKeys() {
     return (properties != null) ? properties.keySet() : null;
   }
@@ -62,7 +70,7 @@ public class EPGAttributedWritable implements Attributed, Writable {
    * {@inheritDoc}
    */
   @Override
-  public void addProperty(String key, Object value) {
+  public void setProperty(String key, Object value) {
     if (key == null || "".equals(key)) {
       throw new IllegalArgumentException("key must not be null or empty");
     }

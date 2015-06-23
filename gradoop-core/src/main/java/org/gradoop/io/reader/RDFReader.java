@@ -143,15 +143,15 @@ public class RDFReader implements VertexLineReader {
 
       switch (getDatatype(o)) {
       case "integer":
-        vertex.addProperty(p, Integer.parseInt(getLiteralValue(o)));
+        vertex.setProperty(p, Integer.parseInt(getLiteralValue(o)));
         break;
       case "double":
       case "float":
       case "decimal":
-        vertex.addProperty(p, Double.parseDouble(getLiteralValue(o)));
+        vertex.setProperty(p, Double.parseDouble(getLiteralValue(o)));
         break;
       default:
-        vertex.addProperty(p, getLiteralValue(o));
+        vertex.setProperty(p, getLiteralValue(o));
         break;
       }
       vList.add(vertex);

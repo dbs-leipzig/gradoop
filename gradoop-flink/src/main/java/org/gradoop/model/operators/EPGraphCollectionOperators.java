@@ -14,18 +14,20 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model;
+package org.gradoop.model.operators;
 
 import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.BinaryFunction;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.EPGraphCollection;
 
 /**
  * Created by martin on 18.06.15.
  */
-public interface EPGraphCollection {
+public interface EPGraphCollectionOperators extends EPCollectionOperators {
 
   /*
   collection operators
@@ -49,9 +51,9 @@ public interface EPGraphCollection {
   auxiliary operators
    */
 
-  EPGraphCollection apply(UnaryFunction unaryFunction);
+  EPGraphCollection apply(UnaryFunction<EPGraph, EPGraph> unaryFunction);
 
-  EPGraph reduce(BinaryFunction binaryGraphOperator);
+  EPGraph reduce(BinaryFunction<EPGraph, EPGraph> binaryGraphOperator);
 
   EPGraph callForGraph(Algorithm algorithm, String... params);
 

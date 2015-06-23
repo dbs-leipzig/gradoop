@@ -18,7 +18,7 @@ public class DefaultVertexTest {
   public void createWithIDTest() {
     Long vertexID = 0L;
     Vertex v = VertexFactory.createDefaultVertexWithID(vertexID);
-    assertThat(v.getID(), is(vertexID));
+    assertThat(v.getId(), is(vertexID));
     assertThat(v.getGraphCount(), is(0));
     assertThat(v.getOutgoingDegree(), is(0));
     assertThat(v.getIncomingDegree(), is(0));
@@ -39,7 +39,7 @@ public class DefaultVertexTest {
     Vertex v = VertexFactory.createDefaultVertexWithOutgoingEdges(vertexID,
       outgoingEdges);
 
-    assertThat(v.getID(), is(vertexID));
+    assertThat(v.getId(), is(vertexID));
     assertThat(v.getOutgoingDegree(), is(2));
     assertThat(v.getDegree(), is(2));
     assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e1));
@@ -67,7 +67,7 @@ public class DefaultVertexTest {
 
     Vertex v = VertexFactory.createDefaultVertexWithEdges(vertexID,
       outgoingEdges, incomingEdges);
-    assertThat(v.getID(), is(vertexID));
+    assertThat(v.getId(), is(vertexID));
 
     assertThat(v.getOutgoingDegree(), is(2));
     assertTrue(Lists.newArrayList(v.getOutgoingEdges()).contains(e1));
@@ -97,7 +97,7 @@ public class DefaultVertexTest {
     Vertex v = VertexFactory.createDefaultVertexWithLabel(vertexID, label,
       outgoingEdges);
 
-    assertThat(v.getID(), is(vertexID));
+    assertThat(v.getId(), is(vertexID));
     assertEquals(label, v.getLabel());
     assertThat(v.getOutgoingDegree(), is(2));
     assertThat(v.getDegree(), is(2));
@@ -172,7 +172,7 @@ public class DefaultVertexTest {
     assertEquals("v1", v.getProperty("k1"));
     assertEquals("v2", v.getProperty("k2"));
 
-    assertThat(v.getID(), is(vertexID));
+    assertThat(v.getId(), is(vertexID));
     List<Edge> e = Lists.newArrayList(v.getOutgoingEdges());
     assertThat(e.size(), is(2));
     assertTrue(e.contains(e1));

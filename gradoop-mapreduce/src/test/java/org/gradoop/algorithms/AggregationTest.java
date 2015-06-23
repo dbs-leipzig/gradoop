@@ -144,7 +144,7 @@ public class AggregationTest extends GradoopClusterTest {
       }
 
       Graph g = GraphFactory.createDefaultGraphWithID(key.get());
-      g.addProperty(VCOUNT_PROPERTY_KEY, count);
+      g.setProperty(VCOUNT_PROPERTY_KEY, count);
 
       Put put = new Put(GRAPH_HANDLER.getRowKey(key.get()));
       put = GRAPH_HANDLER.writeProperties(put, g);

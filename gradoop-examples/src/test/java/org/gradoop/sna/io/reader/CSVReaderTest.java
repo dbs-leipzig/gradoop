@@ -57,7 +57,7 @@ public class CSVReaderTest {
     List<Vertex> vlist = createVerticesFromCSV();
     assertTrue(vlist.size() == 2);
     for (Vertex v : vlist) {
-      long id = v.getID();
+      long id = v.getId();
       if (id == person0) {
         checkLabel(v, LABEL_NODE);
         for (String propertyKey : v.getPropertyKeys()) {
@@ -118,7 +118,7 @@ public class CSVReaderTest {
   public void checkEdgeCSVInputTest() {
     List<Vertex> vlist = createEdgesFromCSV();
     for (Vertex v : vlist) {
-      long id = v.getID();
+      long id = v.getId();
       assertEquals(vlist.size(), 4);
       if (id == person2) {
         assertEquals(v.getOutgoingDegree(), 1);

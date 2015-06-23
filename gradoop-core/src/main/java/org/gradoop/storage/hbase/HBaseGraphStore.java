@@ -108,7 +108,7 @@ public class HBaseGraphStore implements GraphStore {
     LOG.info("writing: " + graph);
     try {
       // graph id
-      Put put = new Put(graphHandler.getRowKey(graph.getID()));
+      Put put = new Put(graphHandler.getRowKey(graph.getId()));
       // write graph to Put
       put = graphHandler.writeGraph(put, graph);
       // write to table
@@ -126,7 +126,7 @@ public class HBaseGraphStore implements GraphStore {
     LOG.info("writing: " + vertex);
     try {
       // vertex id
-      Put put = new Put(vertexHandler.getRowKey(vertex.getID()));
+      Put put = new Put(vertexHandler.getRowKey(vertex.getId()));
       // write vertex to Put
       put = vertexHandler.writeVertex(put, vertex);
       // write to table

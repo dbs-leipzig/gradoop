@@ -91,7 +91,7 @@ public class BulkLoadEPG extends
    */
   private void addVertexToContext(Context context, Vertex vertex) throws
     IOException, InterruptedException {
-    byte[] vertexID = vertexHandler.getRowKey(vertex.getID());
+    byte[] vertexID = vertexHandler.getRowKey(vertex.getId());
     ImmutableBytesWritable outKey = new ImmutableBytesWritable(vertexID);
     Put put = new Put(vertexID);
     put = vertexHandler.writeVertex(put, vertex);

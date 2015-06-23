@@ -110,7 +110,7 @@ public abstract class GradoopTest {
   protected void validateBasicGraphVertices(List<Vertex> vertices) {
     assertEquals(3, vertices.size());
     for (Vertex v : vertices) {
-      Long i = v.getID();
+      Long i = v.getId();
       List<Edge> edgeList = Lists.newArrayList();
       if (v.getOutgoingDegree() > 0) {
         edgeList = Lists.newArrayList(v.getOutgoingEdges());
@@ -162,7 +162,7 @@ public abstract class GradoopTest {
       List<Edge> outEdges = Lists.newArrayList(v.getOutgoingEdges());
       List<Edge> inEdges = Lists.newArrayList(v.getIncomingEdges());
 
-      Long i = v.getID();
+      Long i = v.getId();
       if (i.equals(0L)) {
         // label (A)
         assertEquals("A", label);

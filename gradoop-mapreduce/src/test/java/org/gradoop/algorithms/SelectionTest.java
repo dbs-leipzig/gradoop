@@ -136,7 +136,7 @@ public class SelectionTest extends GradoopClusterTest {
       }
       if (predicate) {
         Graph g = GraphFactory.createDefaultGraphWithID(key.get());
-        g.addProperty(PREDICATE_PROPERTY_KEY, true);
+        g.setProperty(PREDICATE_PROPERTY_KEY, true);
         Put put = new Put(GRAPH_HANDLER.getRowKey(key.get()));
         put = GRAPH_HANDLER.writeProperties(put, g);
         context.write(null, put);

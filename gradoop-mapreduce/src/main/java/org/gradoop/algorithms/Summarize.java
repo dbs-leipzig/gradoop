@@ -67,7 +67,7 @@ public class Summarize {
       for (Long graph : vertexHandler.readGraphs(value)) {
         List<Edge> edges = Lists.newArrayList(v.getOutgoingEdges());
         context.write(new LongWritable(graph),
-          new SummarizeWritable(v.getID(), edges));
+          new SummarizeWritable(v.getId(), edges));
       }
     }
   }

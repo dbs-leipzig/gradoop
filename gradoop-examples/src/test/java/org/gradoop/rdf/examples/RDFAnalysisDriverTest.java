@@ -105,7 +105,7 @@ public class RDFAnalysisDriverTest extends GradoopClusterTest {
       assertEquals(1, g.getPropertyCount());
       Object count =
         g.getProperty(SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
-//      LOG.info("============= g: " + g.getID().toString());
+//      LOG.info("============= g: " + g.getId().toString());
 //      LOG.info("============= count value: " + count);
       assertNotNull(count);
       // each graph has 5 vertices which are connected

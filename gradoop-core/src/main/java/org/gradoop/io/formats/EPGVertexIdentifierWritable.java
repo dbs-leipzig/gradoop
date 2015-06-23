@@ -37,8 +37,16 @@ public class EPGVertexIdentifierWritable implements Identifiable,
    * {@inheritDoc}
    */
   @Override
-  public Long getID() {
+  public Long getId() {
     return id;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setId(Long id) {
+    this.id = id;
   }
 
   /**
@@ -65,7 +73,7 @@ public class EPGVertexIdentifierWritable implements Identifiable,
     if (this == o) {
       return 0;
     }
-    return Long.compare(this.getID(), o.getID());
+    return Long.compare(this.getId(), o.getId());
   }
 
   /**

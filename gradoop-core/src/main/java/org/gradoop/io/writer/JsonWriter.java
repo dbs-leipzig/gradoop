@@ -52,7 +52,7 @@ public class JsonWriter implements VertexLineWriter {
   public String writeVertex(Vertex vertex) {
     JSONObject json = new JSONObject();
     try {
-      json.put(VERTEX_ID, vertex.getID());
+      json.put(VERTEX_ID, vertex.getId());
       json.put(LABEL, vertex.getLabel());
       json = writeProperties(json, vertex);
       json = writeEdges(json, OUT_EDGES, vertex.getOutgoingEdges());

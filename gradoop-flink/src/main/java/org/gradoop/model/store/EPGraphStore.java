@@ -15,9 +15,16 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.helper;
+package org.gradoop.model.store;
 
-public interface Predicate<T> {
+import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.operators.EPGraphCollectionOperators;
 
-  boolean filter(T entity) throws Exception;
+public interface EPGraphStore {
+
+  EPGraph getDatabaseGraph();
+
+  EPGraphCollectionOperators getCollection();
+
+  EPGraph getGraph(Long graphID);
 }

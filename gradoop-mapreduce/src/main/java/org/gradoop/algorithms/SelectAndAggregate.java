@@ -125,7 +125,7 @@ public class SelectAndAggregate {
     protected void map(ImmutableBytesWritable key, Result value,
       Context context) throws IOException, InterruptedException {
       Vertex v = vertexHandler.readVertex(value);
-      LongWritable vertexID = new LongWritable(v.getID());
+      LongWritable vertexID = new LongWritable(v.getId());
       boolean predicate = vertexPredicate.evaluate(v);
       ValueWritable aggregate = new ValueWritable();
       aggregate.set(vertexDoubleAggregate.aggregate(v));
@@ -229,7 +229,7 @@ public class SelectAndAggregate {
 
         // if selection predicate evaluates to true, store the aggregate value
         if (result.getFirst()) {
-          g.addProperty(aggregateResultPropertyKey, result.getSecond());
+          g.setProperty(aggregateResultPropertyKey, result.getSecond());
           put = graphHandler.writeProperties(put, g);
         }
 

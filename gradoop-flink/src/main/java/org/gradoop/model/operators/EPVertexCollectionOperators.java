@@ -15,11 +15,13 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model;
+package org.gradoop.model.operators;
 
+import org.gradoop.model.EPVertexData;
 import org.gradoop.model.helper.Predicate;
+import org.gradoop.model.impl.EPVertexCollection;
 
-public interface EPEdgeSet extends EPCollection {
+public interface EPVertexCollectionOperators extends EPCollectionOperators {
 
-  EPEdgeSet select(Predicate<Edge> predicateFunction);
+  EPVertexCollection select(Predicate<EPVertexData> predicateFunction);
 }

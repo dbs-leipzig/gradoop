@@ -152,16 +152,16 @@ public class EPGHBaseVertexFormatTest extends GiraphClusterTest {
       Iterable<LongWritable> messages) throws IOException {
       // modify vertex value
       vertex.getValue().setLabel(TEST_LABEL);
-      vertex.getValue().addProperty(TEST_KEY, TEST_VALUE);
+      vertex.getValue().setProperty(TEST_KEY, TEST_VALUE);
       vertex.getValue().addGraph(TEST_GRAPH);
 
       // modify edge value of edge TEST_SOURCE_VERTEX -> TEST_TARGET_VERTEX
-      if (vertex.getId().getID().equals(TEST_SOURCE_VERTEX)) {
+      if (vertex.getId().getId().equals(TEST_SOURCE_VERTEX)) {
         EPGVertexIdentifierWritable vertexIdentifier =
           new EPGVertexIdentifierWritable(TEST_TARGET_VERTEX);
 
         EPGEdgeValueWritable edgeValue = vertex.getEdgeValue(vertexIdentifier);
-        edgeValue.addProperty(TEST_KEY, TEST_VALUE);
+        edgeValue.setProperty(TEST_KEY, TEST_VALUE);
         vertex.setEdgeValue(vertexIdentifier, edgeValue);
       }
       vertex.voteToHalt();

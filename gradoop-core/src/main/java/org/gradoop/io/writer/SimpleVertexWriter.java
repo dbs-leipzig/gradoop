@@ -25,7 +25,7 @@ public class SimpleVertexWriter implements VertexLineWriter {
   @Override
   public String writeVertex(final Vertex vertex) {
     sb.setLength(0);
-    sb.append(vertex.getID().toString());
+    sb.append(vertex.getId().toString());
     for (Edge e : vertex.getOutgoingEdges()) {
       sb.append(LINE_TOKEN_SEPARATOR);
       sb.append(e.getOtherID());
