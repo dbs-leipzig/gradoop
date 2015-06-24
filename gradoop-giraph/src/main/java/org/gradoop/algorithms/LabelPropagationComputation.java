@@ -26,6 +26,7 @@ import org.apache.giraph.worker.WorkerContext;
 import org.apache.giraph.worker.WorkerGlobalCommUsage;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.gradoop.io.LabelPropagationValue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,7 +47,8 @@ import java.util.List;
  * The computation will terminate if no new values are assigned.
  */
 public class LabelPropagationComputation extends
-  BasicComputation<LongWritable, LongWritable, NullWritable, LongWritable> {
+  BasicComputation<LongWritable, LabelPropagationValue, NullWritable,
+    LongWritable> {
   /**
    * Number of migrations the Vertex can do
    */
@@ -55,7 +57,20 @@ public class LabelPropagationComputation extends
   /**
    * Default number of migrations if no value is given
    */
-  public static final int DEFAULT_NUMBER_OF_ITERATIONS = 10;
+  public static final int DEFAULT_NUMBER_OF_ITERATIONS = 50;
+  /**
+   * Number of maximal community swaps
+   */
+  public static final String MAX_STABILISATION_ROUNDS =
+    "labelpropagation" + ".maxstabilizationrounds";
+  /**
+   * default number of maximal stabilization rounds
+   */
+  public static final long DEFAULT_NUMBER_OF_MAX_STABILIZATION_ROUNDS = 20;
+  /**
+   * stabilizationMax
+   */
+  private long stabilizationMax;
 
   /**
    * Returns the current new value. This value is based on all incoming
@@ -72,10 +87,10 @@ public class LabelPropagationComputation extends
    * @param messages All incoming messages
    * @return the new Value the vertex will become
    */
-  private long getNewValue(
-    Vertex<LongWritable, LongWritable, NullWritable> vertex,
+  private long getNewCommunity(
+    Vertex<LongWritable, LabelPropagationValue, NullWritable> vertex,
     Iterable<LongWritable> messages) {
-    long newValue;
+    long newCommunity;
     //TODO: create allMessages more efficient
     //List<LongWritable> allMessages = Lists.newArrayList(messages);
     List<Long> allMessages = new ArrayList<>();
@@ -84,15 +99,16 @@ public class LabelPropagationComputation extends
     }
     if (allMessages.isEmpty()) {
       // 1. if no messages are received
-      newValue = vertex.getValue().get();
+      newCommunity = vertex.getValue().getCurrentCommunity().get();
     } else if (allMessages.size() == 1) {
       // 2. if just one message are received
-      newValue = Math.min(vertex.getValue().get(), allMessages.get(0));
+      newCommunity = Math
+        .min(vertex.getValue().getCurrentCommunity().get(), allMessages.get(0));
     } else {
       // 3. if multiple messages are received
-      newValue = getMostFrequent(vertex, allMessages);
+      newCommunity = getMostFrequent(vertex, allMessages);
     }
-    return newValue;
+    return newCommunity;
   }
 
   /**
@@ -103,7 +119,7 @@ public class LabelPropagationComputation extends
    * @return the maximal frequent number in all received messages
    */
   private long getMostFrequent(
-    Vertex<LongWritable, LongWritable, NullWritable> vertex,
+    Vertex<LongWritable, LabelPropagationValue, NullWritable> vertex,
     List<Long> allMessages) {
     Collections.sort(allMessages);
     long newValue;
@@ -127,7 +143,8 @@ public class LabelPropagationComputation extends
     if (maxCounter == 1) {
       // to avoid an oscillating state of the calculation we will just use
       // the smaller value
-      newValue = Math.min(vertex.getValue().get(), allMessages.get(0));
+      newValue = Math
+        .min(vertex.getValue().getCurrentCommunity().get(), allMessages.get(0));
     } else {
       newValue = maxValue;
     }
@@ -136,12 +153,15 @@ public class LabelPropagationComputation extends
 
   @Override
   public void initialize(GraphState graphState,
-    WorkerClientRequestProcessor<LongWritable, LongWritable, NullWritable>
-      workerClientRequestProcessor,
-    GraphTaskManager<LongWritable, LongWritable, NullWritable> graphTaskManager,
+    WorkerClientRequestProcessor<LongWritable, LabelPropagationValue,
+      NullWritable> workerClientRequestProcessor,
+    GraphTaskManager<LongWritable, LabelPropagationValue, NullWritable>
+      graphTaskManager,
     WorkerGlobalCommUsage workerGlobalCommUsage, WorkerContext workerContext) {
     super.initialize(graphState, workerClientRequestProcessor, graphTaskManager,
       workerGlobalCommUsage, workerContext);
+    this.stabilizationMax = getConf().getLong(MAX_STABILISATION_ROUNDS,
+      DEFAULT_NUMBER_OF_MAX_STABILIZATION_ROUNDS);
   }
 
   /**
@@ -153,17 +173,27 @@ public class LabelPropagationComputation extends
    * @throws IOException
    */
   @Override
-  public void compute(Vertex<LongWritable, LongWritable, NullWritable> vertex,
+  public void compute(
+    Vertex<LongWritable, LabelPropagationValue, NullWritable> vertex,
     Iterable<LongWritable> messages) throws IOException {
     if (getSuperstep() == 0) {
-      sendMessageToAllEdges(vertex, vertex.getId());
+      sendMessageToAllEdges(vertex, vertex.getValue().getCurrentCommunity());
     } else {
-      long currentMinValue = vertex.getValue().get();
-      long newValue = getNewValue(vertex, messages);
-      boolean changed = currentMinValue != newValue;
-      if (changed) {
-        vertex.setValue(new LongWritable(newValue));
-        sendMessageToAllEdges(vertex, vertex.getValue());
+      long currentCommunity = vertex.getValue().getCurrentCommunity().get();
+      long lastCommunity = vertex.getValue().getLastCommunity().get();
+      long newCommunity = getNewCommunity(vertex, messages);
+      long stabilizationRound = vertex.getValue().getStabilizationRounds();
+      boolean changed = currentCommunity != newCommunity;
+      boolean check = lastCommunity == newCommunity;
+      if (check) { //Counts the amount of community swaps between 2 communities
+        stabilizationRound++;
+        vertex.getValue().setStabilizationRounds(stabilizationRound);
+      }
+      boolean maximalChanges = stabilizationRound <= stabilizationMax;
+      if (changed && maximalChanges) {
+        vertex.getValue().setLastCommunity(new LongWritable(currentCommunity));
+        vertex.getValue().setCurrentCommunity(new LongWritable(newCommunity));
+        sendMessageToAllEdges(vertex, vertex.getValue().getCurrentCommunity());
       }
     }
     vertex.voteToHalt();

@@ -8,9 +8,13 @@ import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.io.LongWritable;
 import org.gradoop.GConstants;
 import org.gradoop.GiraphClusterTest;
+import org.gradoop.io.LabelPropagationValue;
 import org.gradoop.io.formats.EPGIdWithValueVertexOutputFormat;
+import org.gradoop.io.formats.EPGLabelPropagationInputFormat;
+import org.gradoop.io.formats.EPGLabelPropagationOutputFormat;
 import org.gradoop.io.formats.EPGLongLongNullVertexInputFormat;
 import org.gradoop.io.reader.AdjacencyListReader;
 import org.gradoop.io.reader.SingleVertexReader;
@@ -41,8 +45,8 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
   public void testConnectedGraph() throws IOException, InterruptedException,
     ClassNotFoundException {
     // prepare data
-    BufferedReader inputReader = createTestReader(
-      GiraphTestHelper.getConnectedGraphWithVertexValues());
+    BufferedReader inputReader =
+      createTestReader(GiraphTestHelper.getConnectedGraphWithVertexValues());
     GraphStore graphStore = createEmptyGraphStore();
     AdjacencyListReader adjacencyListReader =
       new AdjacencyListReader(graphStore, new PartitioningLineReader());
@@ -71,8 +75,7 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
     ClassNotFoundException {
     // prepare data
     BufferedReader inputReader = createTestReader(
-      GiraphTestHelper
-        .getCompleteBipartiteGraphWithVertexValue());
+      GiraphTestHelper.getCompleteBipartiteGraphWithVertexValue());
     GraphStore graphStore = createEmptyGraphStore();
     AdjacencyListReader adjacencyListReader =
       new AdjacencyListReader(graphStore, new PartitioningLineReader());
@@ -96,14 +99,14 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
     validateVertex(store, 7, 0);
   }
 
-
   private void validateVertex(final GraphStore store, final long vertexID,
     final long expectedValue) {
     Vertex v = store.readVertex(vertexID);
     assertNotNull(v);
-    assertEquals(1, v.getPropertyCount());
-    assertEquals(expectedValue,
-      v.getProperty(EPGLongLongNullVertexInputFormat.VALUE_PROPERTY_KEY));
+    assertTrue(1 == v.getGraphCount());
+    for (Long community: v.getGraphs()){
+      assertTrue(expectedValue == community);
+    }
   }
 
   private void compute() throws IOException, ClassNotFoundException,
@@ -117,10 +120,10 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
     GiraphConfiguration giraphConf = job.getConfiguration();
     setupConfiguration(job);
     giraphConf.setComputationClass(LabelPropagationComputation.class);
+    giraphConf.setVertexInputFormatClass(EPGLabelPropagationInputFormat.class);
     giraphConf
-      .setVertexInputFormatClass(EPGLongLongNullVertexInputFormat.class);
-    giraphConf
-      .setVertexOutputFormatClass(EPGIdWithValueVertexOutputFormat.class);
+      .setVertexOutputFormatClass(EPGLabelPropagationOutputFormat.class);
+    giraphConf.setMasterComputeClass(LabelPropagationMasterComputation.class);
     assertTrue(job.run(true));
   }
 
@@ -135,17 +138,14 @@ public class HBaseLabelPropagationComputationTest extends GiraphClusterTest {
       final String[] lineTokens = LINE_TOKEN_SEPARATOR.split(line);
       // read vertex id
       long vertexID = Long.valueOf(lineTokens[0]);
-      // read vertex value
-      Map<String, Object> properties = Maps.newHashMapWithExpectedSize(1);
-      properties.put(EPGLongLongNullVertexInputFormat.VALUE_PROPERTY_KEY,
-        Long.valueOf(lineTokens[1]));
+      String lpvalue = lineTokens[0];
       List<Edge> edges = Lists.newArrayListWithCapacity(lineTokens.length - 2);
       for (int n = 2; n < lineTokens.length; n++) {
         long otherID = Long.valueOf(lineTokens[n]);
         edges.add(EdgeFactory.createDefaultEdge(otherID, (long) n - 2));
       }
       return VertexFactory
-        .createDefaultVertexWithProperties(vertexID, properties, edges);
+        .createDefaultVertexWithLabel(vertexID, lpvalue, edges);
     }
   }
 }

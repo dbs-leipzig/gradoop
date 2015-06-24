@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.io.formats;
 
 import com.google.common.collect.Lists;
@@ -27,6 +26,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.gradoop.io.LabelPropagationValue;
 import org.gradoop.storage.hbase.VertexHandler;
 
 import java.io.IOException;
@@ -36,12 +36,12 @@ import java.util.List;
  * Used to read a EPG based graph from HBase into Giraph.
  */
 public class EPGLabelPropagationInputFormat extends
-  HBaseVertexInputFormat<LongWritable, LongWritable, NullWritable> {
+  HBaseVertexInputFormat<LongWritable, LabelPropagationValue, NullWritable> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexReader<LongWritable, LongWritable, NullWritable>
+  public VertexReader<LongWritable, LabelPropagationValue, NullWritable>
   createVertexReader(
     InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws
     IOException {
@@ -52,7 +52,7 @@ public class EPGLabelPropagationInputFormat extends
    * Reads a single vertex from HBase.
    */
   public static class LPVertexReader extends
-    HBaseVertexReader<LongWritable, LongWritable, NullWritable> {
+    HBaseVertexReader<LongWritable, LabelPropagationValue, NullWritable> {
     /**
      * Sets the base TableInputFormat and creates a record reader.
      *
@@ -76,13 +76,17 @@ public class EPGLabelPropagationInputFormat extends
      * {@inheritDoc}
      */
     @Override
-    public Vertex<LongWritable, LongWritable, NullWritable> getCurrentVertex
-    () throws
+    public Vertex<LongWritable, LabelPropagationValue, NullWritable>
+    getCurrentVertex() throws
       IOException, InterruptedException {
       Result row = getRecordReader().getCurrentValue();
       VertexHandler vertexHandler = getVertexHandler();
+      Vertex<LongWritable, LabelPropagationValue, NullWritable> vertex =
+        getConf().createVertex();
       LongWritable vertexID =
         new LongWritable(vertexHandler.getVertexID(row.getRow()));
+      LabelPropagationValue lpVertexValue =
+        new LabelPropagationValue(vertexID, vertexID, 0);
       List<Edge<LongWritable, NullWritable>> edges = Lists.newArrayList();
       // read outgoing edges
       for (org.gradoop.model.Edge e : vertexHandler.readOutgoingEdges(row)) {
@@ -92,9 +96,7 @@ public class EPGLabelPropagationInputFormat extends
       for (org.gradoop.model.Edge e : vertexHandler.readIncomingEdges(row)) {
         edges.add(EdgeFactory.create(new LongWritable(e.getOtherID())));
       }
-      Vertex<LongWritable, LongWritable, NullWritable> vertex =
-        getConf().createVertex();
-      vertex.initialize(vertexID, vertexID, edges);
+      vertex.initialize(vertexID, lpVertexValue, edges);
       return vertex;
     }
   }

@@ -26,6 +26,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.gradoop.io.LabelPropagationValue;
 import org.gradoop.model.impl.VertexFactory;
 import org.gradoop.storage.hbase.VertexHandler;
 
@@ -35,13 +36,12 @@ import java.io.IOException;
  * Used to write resulting vertices of BTG Computation to HBase.
  */
 public class EPGLabelPropagationOutputFormat extends
-  HBaseVertexOutputFormat<LongWritable, LongWritable, NullWritable> {
-
+  HBaseVertexOutputFormat<LongWritable, LabelPropagationValue, NullWritable> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexWriter<LongWritable, LongWritable, NullWritable>
+  public VertexWriter<LongWritable, LabelPropagationValue, NullWritable>
   createVertexWriter(
     TaskAttemptContext context) throws IOException, InterruptedException {
     return new LPHBaseVertexWriter(context);
@@ -51,8 +51,7 @@ public class EPGLabelPropagationOutputFormat extends
    * Writes a single Giraph vertex back to HBase.
    */
   public static class LPHBaseVertexWriter extends
-    HBaseVertexWriter<LongWritable, LongWritable, NullWritable> {
-
+    HBaseVertexWriter<LongWritable, LabelPropagationValue, NullWritable> {
     /**
      * Sets up HBase table output format and creates a record writer.
      *
@@ -68,7 +67,7 @@ public class EPGLabelPropagationOutputFormat extends
      */
     @Override
     public void writeVertex(
-      Vertex<LongWritable, LongWritable, NullWritable> vertex) throws
+      Vertex<LongWritable, LabelPropagationValue, NullWritable> vertex) throws
       IOException, InterruptedException {
       RecordWriter<ImmutableBytesWritable, Mutation> writer = getRecordWriter();
       VertexHandler vertexHandler = getVertexHandler();
@@ -77,7 +76,7 @@ public class EPGLabelPropagationOutputFormat extends
       // just need to write the Values
       org.gradoop.model.Vertex v =
         VertexFactory.createDefaultVertexWithID(vertex.getId().get());
-      v.addGraph(vertex.getValue().get());
+      v.addGraph(vertex.getValue().getCurrentCommunity().get());
       put = vertexHandler.writeGraphs(put, v);
       writer.write(new ImmutableBytesWritable(rowKey), put);
     }

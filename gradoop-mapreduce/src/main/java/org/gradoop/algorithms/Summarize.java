@@ -196,7 +196,7 @@ public class Summarize {
      *
      * @param communityKey   Community Identifier
      * @param communitySize  Size of the Community
-     * @param communityCount counts edges to the community
+     * @param communityCount counts edges to the commintValueunity
      * @return string
      */
     private String writeCommunities(Long communityKey, int communitySize,

@@ -95,7 +95,7 @@ To run the pipeline on your hadoop installation, please follow these steps.
 *   The following call runs the complete pipeline on a given input graph folder (LDBC-SNB) using 11 giraph workers and a hbase scan cache of 500 rows.
 
     > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt; 
-    -jar-with-dependencies.jar org.gradoop.biiig.examples.SNAAnalysisDriver -libjars $HBASE_JARS --bulkload -csvbulkload --meta-data-path datasets/snb/example/ --vertex-line-reader CSVReader -gip /user/hduser/input/ -gop /user/hduser/output/snaexample11 -lp -w 11 -sum -sop /user/hduser/output/summarize -v
+    -jar-with-dependencies.jar org.gradoop.biiig.examples.SNAAnalysisDriver -libjars $HBASE_JARS --bulkload --meta-data-path datasets/snb/example/ --vertex-line-reader CSVReader -gip /user/hduser/input/ -gop /user/hduser/output/snaexample11 -lp -w 11 -sum /user/hduser/output/summarize -v
 
 *   See [LDBC-SNB](https://github.com/ldbc/ldbc_snb_datagen) if you want to generate your
     own graphs or implement a custom FileReader to load your own graph format.
