@@ -1,6 +1,7 @@
 package org.gradoop.io.reader;
 
 import com.google.common.collect.Lists;
+import org.gradoop.GConstants;
 import org.gradoop.GradoopClusterTest;
 import org.gradoop.model.Edge;
 import org.gradoop.model.Vertex;
@@ -8,6 +9,7 @@ import org.gradoop.storage.GraphStore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -17,7 +19,6 @@ import static org.junit.Assert.assertTrue;
  * Tests for {@link org.gradoop.io.reader.RDFReader}.
  */
 public class RDFReaderTest extends GradoopClusterTest {
-
   private static final Long lgdID = 7821830309733859244L;
   private static final Long geoID = 7282190339445886145L;
   private static final Long dbpID = 7459480252541644492L;
@@ -69,9 +70,12 @@ public class RDFReaderTest extends GradoopClusterTest {
     assertEquals(label, vertex.getLabel());
   }
 
-  @Test
-  public void checkSimpleRDFNTripleInputTest() {
-    for (Vertex v : createVerticesFromRDF()) {
+  public void validateDetails(GraphStore graphStore) throws
+    InterruptedException, IOException, ClassNotFoundException {
+    Iterator<Vertex> vertices = graphStore.getVertices(GConstants
+      .DEFAULT_TABLE_VERTICES);
+    while (vertices.hasNext()) {
+      Vertex v = vertices.next();
       long id = v.getID();
       if (id == lgdID) {
         checkLabel(v, lgd);
@@ -82,8 +86,8 @@ public class RDFReaderTest extends GradoopClusterTest {
       } else if (id == geoID) {
         checkLabel(v, geo);
         for (Edge e : v.getIncomingEdges()) {
-          assertTrue(
-            (long) e.getOtherID() == lgdID || (long) e.getOtherID() == dbpID);
+          assertTrue((long) e.getOtherID() == lgdID
+            || (long) e.getOtherID() == dbpID);
           assertEquals(e.getLabel(), eLabel);
         }
       } else if (id == dbpID) {
@@ -98,8 +102,8 @@ public class RDFReaderTest extends GradoopClusterTest {
           }
         } else {
           for (Edge e : v.getOutgoingEdges()) {
-            assertTrue((long) e.getOtherID() == geoID ||
-              (long) e.getOtherID() == hedbpID);
+            assertTrue((long) e.getOtherID() == geoID
+              || (long) e.getOtherID() == hedbpID);
             assertEquals(e.getLabel(), eLabel);
           }
         }
@@ -116,7 +120,8 @@ public class RDFReaderTest extends GradoopClusterTest {
   }
 
   @Test
-  public void loadRDFToHBaseTest() throws IOException {
+  public void loadRDFToHBaseTest() throws IOException, ClassNotFoundException,
+    InterruptedException {
     GraphStore graphStore = createEmptyGraphStore();
     VertexLineReader rdfReader = new RDFReader();
     for (String line : RDF_NTRIPLES) {
@@ -124,7 +129,9 @@ public class RDFReaderTest extends GradoopClusterTest {
         graphStore.writeVertex(v);
       }
     }
+
     validateRDFGraph(graphStore);
+    validateDetails(graphStore);
     graphStore.close();
   }
 

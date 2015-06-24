@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop;
 
 import org.gradoop.storage.hbase.EPGGraphHandler;
@@ -88,6 +105,14 @@ public final class GConstants {
    * {@code <property-type>} for {@link java.lang.String}
    */
   public static final byte TYPE_STRING = 0x05;
+  /**
+   * Key for the vertex id.
+   */
+  public static final String GRADOOP_VERTEX_ID_PROPERTY = "gradoop_vertex_id";
+  /**
+   * Key for graphs.
+   */
+  public static final String GRAPHS = "gradoop_graphs";
 
   /**
    * Configuration key to define a custom vertex handler.
@@ -100,6 +125,17 @@ public final class GConstants {
    */
   public static final Class<? extends VertexHandler> DEFAULT_VERTEX_HANDLER =
     EPGVertexHandler.class;
+
+  /**
+   * Row counter path within Map Reduce Row Counter job.
+   */
+  public static final String ROW_COUNTER_MAPRED_JOB =
+    "org.apache.hadoop.hbase.mapreduce.RowCounter$RowCounterMapper$Counters";
+
+  /**
+   * Row counter property within Map Reduce Row Counter job.
+   */
+  public static final String ROW_COUNTER_PROPERTY = "ROWS";
 
   /**
    * Configuration key to define a custom graph handler.

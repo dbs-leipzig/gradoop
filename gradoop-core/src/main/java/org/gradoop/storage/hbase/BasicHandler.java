@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.storage.hbase;
 
 import com.google.common.collect.Lists;
@@ -95,7 +112,7 @@ public abstract class BasicHandler implements EntityHandler {
    * @param columnFamily column family to get keys from
    * @return all keys inside column family.
    */
-  protected Iterable<Long> getColumnKeysFromFamiliy(final Result res,
+  protected Iterable<Long> getColumnKeysFromFamily(final Result res,
     final byte[] columnFamily) {
     List<Long> keys = Lists.newArrayList();
     for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily)
