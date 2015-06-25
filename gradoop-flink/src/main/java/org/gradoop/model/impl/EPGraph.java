@@ -18,6 +18,8 @@
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -25,6 +27,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.apache.flink.util.Collector;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPGraphData;
 import org.gradoop.model.EPPatternGraph;
@@ -36,6 +39,7 @@ import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.operators.EPGraphOperators;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +47,9 @@ import java.util.Set;
 /**
  * Represents a single graph inside the EPGM. Holds information about the
  * graph (label, properties) and offers unary, binary and auxiliary operators.
+ *
+ * @author Martin Junghanns
+ * @author Niklas Teichmann
  */
 public class EPGraph implements EPGraphData, EPGraphOperators {
 
@@ -143,23 +150,44 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPGraph combine(EPGraph otherGraph) {
+    final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
+
+    // build distinct union of vertex sets and update graph ids at vertices
     // cannot use Gelly union here because of missing argument for KeySelector
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
       this.graph.getVertices().union(otherGraph.graph.getVertices())
-        .distinct(new VertexKeySelector());
+        .distinct(new VertexKeySelector())
+        .map(new VertexToGraphUpdater(newGraphID));
 
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
       this.graph.getEdges().union(otherGraph.graph.getEdges())
         .distinct(new EdgeKeySelector());
 
     return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
-      new EPFlinkGraphData(FlinkConstants.COMBINE_GRAPH_ID,
-        FlinkConstants.DEFAULT_GRAPH_LABEL), env);
+      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
+      env);
   }
 
   @Override
   public EPGraph overlap(EPGraph otherGraph) {
-    return null;
+    final Long newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
+
+    // union vertex sets, group by vertex id, filter vertices where
+    // the group contains two vertices and update them with the new graph id
+    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
+      this.graph.getVertices().union(otherGraph.graph.getVertices())
+        .groupBy(new VertexKeySelector())
+        .reduceGroup(new VertexDuplicationCheck(2L))
+        .map(new VertexToGraphUpdater(newGraphID));
+
+    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
+      this.graph.getEdges().union(otherGraph.graph.getEdges())
+        .groupBy(new EdgeKeySelector())
+        .reduceGroup(new EdgeDuplicationCheck(2L));
+
+    return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
+      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
+      env);
   }
 
   @Override
@@ -247,4 +275,86 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
       return longEPFlinkEdgeDataEdge.f2.getId();
     }
   }
+
+  /**
+   * Used to check if the number of grouped, duplicate vertices is equal to a
+   * given amount. If yes, reducer returns the vertex.
+   */
+  private static class VertexDuplicationCheck implements
+    GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
+      EPFlinkVertexData>> {
+
+    private long amount;
+
+    public VertexDuplicationCheck(long amount) {
+      this.amount = amount;
+    }
+
+    @Override
+    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
+      Collector<Vertex<Long, EPFlinkVertexData>> collector) throws Exception {
+      Iterator<Vertex<Long, EPFlinkVertexData>> iterator = iterable.iterator();
+      long count = 0L;
+      Vertex<Long, EPFlinkVertexData> v = null;
+      while (iterator.hasNext()) {
+        v = iterator.next();
+        count++;
+      }
+      if (count == amount) {
+        collector.collect(v);
+      }
+    }
+  }
+
+  /**
+   * Used to check if the number of grouped, duplicate edges is equal to a
+   * given amount. If yes, reducer returns the vertex.
+   */
+  private static class EdgeDuplicationCheck implements
+    GroupReduceFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long,
+      EPFlinkEdgeData>> {
+
+    private long amount;
+
+    public EdgeDuplicationCheck(long amount) {
+      this.amount = amount;
+    }
+
+    @Override
+    public void reduce(Iterable<Edge<Long, EPFlinkEdgeData>> iterable,
+      Collector<Edge<Long, EPFlinkEdgeData>> collector) throws Exception {
+      Iterator<Edge<Long, EPFlinkEdgeData>> iterator = iterable.iterator();
+      long count = 0L;
+      Edge<Long, EPFlinkEdgeData> e = null;
+      while (iterator.hasNext()) {
+        e = iterator.next();
+        count++;
+      }
+      if (count == amount) {
+        collector.collect(e);
+      }
+    }
+  }
+
+  /**
+   * Adds a given graph ID to the vertex and returns it.
+   */
+  private static class VertexToGraphUpdater implements
+    MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
+      EPFlinkVertexData>> {
+
+    private final long newGraphID;
+
+    public VertexToGraphUpdater(final long newGraphID) {
+      this.newGraphID = newGraphID;
+    }
+
+    @Override
+    public Vertex<Long, EPFlinkVertexData> map(
+      Vertex<Long, EPFlinkVertexData> v) throws Exception {
+      v.getValue().addGraph(newGraphID);
+      return v;
+    }
+  }
+
 }

@@ -21,4 +21,6 @@ public class FlinkConstants {
   public static final String DEFAULT_GRAPH_LABEL = "__GRAPH__";
 
   public static final Long COMBINE_GRAPH_ID = -1L;
+
+  public static final Long OVERLAP_GRAPH_ID = -2L;
 }

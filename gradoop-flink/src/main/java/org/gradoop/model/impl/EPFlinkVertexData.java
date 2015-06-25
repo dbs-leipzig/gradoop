@@ -60,10 +60,16 @@ public class EPFlinkVertexData extends EPFlinkEntity implements EPVertexData {
   }
 
   @Override
+  public void addGraph(Long graph) {
+    this.graphs.add(graph);
+  }
+
+  @Override
   public String toString() {
     return "EPFlinkVertexData{" +
       "super=" + super.toString() +
       ", graphs=" + graphs +
       '}';
   }
+
 }

@@ -61,21 +61,17 @@ public class EPVertexCollection implements
   public Collection<EPVertexData> collect() throws Exception {
     return vertices
       .map(new MapFunction<Vertex<Long, EPFlinkVertexData>, EPVertexData>() {
-
         @Override
-        public EPFlinkVertexData map(
-          Vertex<Long, EPFlinkVertexData> longEPFlinkVertexDataVertex) throws
+        public EPFlinkVertexData map(Vertex<Long, EPFlinkVertexData> v) throws
           Exception {
-          return longEPFlinkVertexDataVertex.getValue();
+          return v.getValue();
         }
       }).collect();
   }
 
-
   @Override
   public long size() throws Exception {
     return vertices.count();
-
   }
 
   @Override

@@ -27,6 +27,7 @@ import org.gradoop.model.store.EPGraphStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 public class FlinkGraphStore implements EPGraphStore {
 

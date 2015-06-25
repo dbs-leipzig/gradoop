@@ -18,11 +18,14 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.Identifiable;
 import org.gradoop.model.Labeled;
 
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class EPFlinkEntity implements Identifiable, Attributed,
   Labeled, Comparable<EPFlinkEntity> {
@@ -107,5 +110,22 @@ public abstract class EPFlinkEntity implements Identifiable, Attributed,
       ", label='" + label + '\'' +
       ", properties=" + properties +
       '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof EPFlinkEntity)) {
+      return false;
+    }
+    EPFlinkEntity that = (EPFlinkEntity) o;
+    return Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 }
