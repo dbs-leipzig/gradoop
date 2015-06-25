@@ -17,13 +17,11 @@
 
 package org.gradoop.model.operators;
 
+import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.impl.EPEdgeCollection;
-import org.gradoop.model.impl.EPFlinkEdgeData;
 
-import java.util.Collection;
+public interface EPEdgeCollectionOperators<T> extends EPCollectionOperators<T> {
 
-public interface EPEdgeCollectionOperators extends EPCollectionOperators {
-
-  EPEdgeCollection select(Predicate<EPFlinkEdgeData> predicateFunction);
+  EPEdgeCollection filter(final Predicate<EPEdgeData> predicateFunction);
 }

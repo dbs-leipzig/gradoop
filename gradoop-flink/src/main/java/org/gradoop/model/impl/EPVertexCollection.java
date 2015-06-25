@@ -17,13 +17,18 @@
 
 package org.gradoop.model.impl;
 
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EPVertexData;
-import org.gradoop.model.operators.EPVertexCollectionOperators;
 import org.gradoop.model.helper.Predicate;
+import org.gradoop.model.operators.EPVertexCollectionOperators;
 
-public class EPVertexCollection implements EPVertexCollectionOperators {
+import java.util.Collection;
+
+public class EPVertexCollection implements
+  EPVertexCollectionOperators<EPVertexData> {
 
   private DataSet<Vertex<Long, EPFlinkVertexData>> vertices;
 
@@ -32,14 +37,40 @@ public class EPVertexCollection implements EPVertexCollectionOperators {
   }
 
   @Override
-  public EPVertexCollection select(Predicate<EPVertexData> predicateFunction) {
+  public EPVertexCollection filter(
+    final Predicate<EPVertexData> predicateFunction) {
+    return new EPVertexCollection(
+      vertices.filter(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
+        @Override
+        public boolean filter(
+          Vertex<Long, EPFlinkVertexData> longEPFlinkVertexDataVertex) throws
+          Exception {
+          return predicateFunction
+            .filter(longEPFlinkVertexDataVertex.getValue());
+        }
+      }));
+  }
+
+
+  @Override
+  public <V> Iterable<V> values(Class<V> propertyType, String propertyKey) {
     return null;
   }
 
   @Override
-  public <T> Iterable<T> values(Class<T> propertyType, String propertyKey) {
-    return null;
+  public Collection<EPVertexData> collect() throws Exception {
+    return vertices
+      .map(new MapFunction<Vertex<Long, EPFlinkVertexData>, EPVertexData>() {
+
+        @Override
+        public EPFlinkVertexData map(
+          Vertex<Long, EPFlinkVertexData> longEPFlinkVertexDataVertex) throws
+          Exception {
+          return longEPFlinkVertexDataVertex.getValue();
+        }
+      }).collect();
   }
+
 
   @Override
   public long size() throws Exception {

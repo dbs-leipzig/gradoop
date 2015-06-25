@@ -17,11 +17,16 @@
 
 package org.gradoop.model.impl;
 
+import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
+import org.gradoop.model.EPVertexData;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
+import java.util.Collection;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class EPGraphTest extends EPFlinkTest {
 
@@ -75,15 +80,19 @@ public class EPGraphTest extends EPFlinkTest {
   public void testCombine() throws Exception {
     EPGraphStore graphStore = createSocialGraph();
 
-    EPGraph graphCommunity = graphStore.getGraph(2L);
     EPGraph databaseCommunity = graphStore.getGraph(0L);
+    EPGraph graphCommunity = graphStore.getGraph(2L);
 
     EPGraph newGraph = graphCommunity.combine(databaseCommunity);
 
     assertEquals("wrong number of vertices", 5L, newGraph.getVertexCount());
     assertEquals("wrong number of edges", 8L, newGraph.getEdgeCount());
 
+    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
 
+    assertEquals("wrong number of vertex values", 5, vertexData.size());
+    assertEquals("wrong number of edge values", 8, edgeData.size());
   }
 
   public void testOverlap() throws Exception {

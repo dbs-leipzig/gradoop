@@ -18,15 +18,18 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
+import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.operators.EPEdgeCollectionOperators;
 
 import java.util.Collection;
 import java.util.List;
 
-public class EPEdgeCollection implements EPEdgeCollectionOperators {
+public class EPEdgeCollection implements EPEdgeCollectionOperators<EPEdgeData> {
 
   private DataSet<Edge<Long, EPFlinkEdgeData>> edges;
 
@@ -50,15 +53,30 @@ public class EPEdgeCollection implements EPEdgeCollectionOperators {
   }
 
   @Override
-  public EPEdgeCollection select(Predicate<EPFlinkEdgeData> predicateFunction) {
-    return null;
+  public EPEdgeCollection filter(
+    final Predicate<EPEdgeData> predicateFunction) {
+    return new EPEdgeCollection(
+      edges.filter(new FilterFunction<Edge<Long, EPFlinkEdgeData>>() {
+        @Override
+        public boolean filter(
+          Edge<Long, EPFlinkEdgeData> longEPFlinkEdgeDataEdge) throws
+          Exception {
+          return predicateFunction.filter(longEPFlinkEdgeDataEdge.getValue());
+        }
+      }));
   }
 
-  public Collection<EPFlinkEdgeData> collect() throws Exception {
-    List<EPFlinkEdgeData> result = Lists.newArrayList();
-    for (Edge<Long, EPFlinkEdgeData> gellyEdge : edges.collect()) {
-      result.add(gellyEdge.f2);
-    }
-    return result;
+  @Override
+  public Collection<EPEdgeData> collect() throws Exception {
+    List<EPEdgeData> result = Lists.newArrayList();
+    return edges
+      .map(new MapFunction<Edge<Long, EPFlinkEdgeData>, EPEdgeData>() {
+        @Override
+        public EPEdgeData map(
+          Edge<Long, EPFlinkEdgeData> longEPFlinkEdgeDataEdge) throws
+          Exception {
+          return longEPFlinkEdgeDataEdge.getValue();
+        }
+      }).collect();
   }
 }

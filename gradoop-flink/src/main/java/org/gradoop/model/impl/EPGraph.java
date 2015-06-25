@@ -18,7 +18,6 @@
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -35,7 +34,6 @@ import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
-import org.gradoop.model.operators.EPGraphCollectionOperators;
 import org.gradoop.model.operators.EPGraphOperators;
 
 import java.util.List;
@@ -115,7 +113,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
-  public EPGraphCollectionOperators match(String graphPattern,
+  public EPGraphCollection match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc) {
     return null;
   }
@@ -175,7 +173,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
-  public EPGraphCollectionOperators callForCollection(Algorithm algorithm,
+  public EPGraphCollection callForCollection(Algorithm algorithm,
     String... params) {
     return null;
   }

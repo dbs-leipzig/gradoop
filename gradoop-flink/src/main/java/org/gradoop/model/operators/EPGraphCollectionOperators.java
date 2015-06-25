@@ -16,6 +16,7 @@
  */
 package org.gradoop.model.operators;
 
+import org.gradoop.model.EPGraphData;
 import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.BinaryFunction;
 import org.gradoop.model.helper.Order;
@@ -27,15 +28,34 @@ import org.gradoop.model.impl.EPGraphCollection;
 /**
  * Created by martin on 18.06.15.
  */
-public interface EPGraphCollectionOperators extends EPCollectionOperators {
+public interface EPGraphCollectionOperators<T> extends
+  EPCollectionOperators<T> {
 
+  /**
+   * Get graph from collection by identifier.
+   *
+   * @param graphID
+   * @return
+   * @throws Exception
+   */
   EPGraph getGraph(final Long graphID) throws Exception;
+
+  /**
+   * Filter containing graphs based on their properties.
+   *
+   * @param predicateFunction
+   * @return
+   * @throws Exception
+   */
+  EPGraphCollection filter(Predicate<EPGraphData> predicateFunction) throws
+    Exception;
 
   /*
   collection operators
    */
 
-  EPGraphCollection select(Predicate<EPGraph> predicateFunction);
+  EPGraphCollection select(Predicate<EPGraph> predicateFunction) throws
+    Exception;
 
   EPGraphCollection union(EPGraphCollection otherCollection);
 

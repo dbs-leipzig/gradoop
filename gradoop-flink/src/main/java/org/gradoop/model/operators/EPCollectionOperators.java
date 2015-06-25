@@ -17,14 +17,15 @@
 
 package org.gradoop.model.operators;
 
-public interface EPCollectionOperators {
+import java.util.Collection;
+
+public interface EPCollectionOperators<T> {
 
   <V> Iterable<V> values(Class<V> propertyType, String propertyKey);
+
+  Collection<T> collect() throws Exception;
 
   long size() throws Exception;
 
   void print() throws Exception;
-
-
-
 }

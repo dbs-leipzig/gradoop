@@ -28,7 +28,6 @@ import org.gradoop.model.helper.SystemProperties;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
-import org.gradoop.model.operators.EPGraphCollectionOperators;
 import org.gradoop.model.store.EPGraphStore;
 import org.mockito.Mockito;
 
@@ -43,7 +42,7 @@ public class WorkflowTest {
     EPGraph dbGraph = db.getDatabaseGraph();
 
     // extract friendships
-    EPGraphCollectionOperators friendships =
+    EPGraphCollection friendships =
       dbGraph.match("(a)-(c)->(b)", new Predicate<EPPatternGraph>() {
         @Override
         public boolean filter(EPPatternGraph graph) {
@@ -89,21 +88,21 @@ public class WorkflowTest {
         });
   }
 
-  public void topRevenueBusinessProcess() {
+  public void topRevenueBusinessProcess() throws Exception {
     EPGraphStore db = Mockito.mock(EPGraphStore.class);
 
     // read full graph from database
     EPGraph dbGraph = db.getDatabaseGraph();
 
     // extract business process instances
-    EPGraphCollectionOperators btgs =
+    EPGraphCollection btgs =
       dbGraph.callForCollection(Algorithm.BUSINESS_TRANSACTION_GRAPHS);
 
     // define predicate function (graph contains invoice)
     final Predicate<EPGraph> predicate = new Predicate<EPGraph>() {
       @Override
       public boolean filter(EPGraph graph) throws Exception {
-        return graph.getVertices().select(new Predicate<EPVertexData>() {
+        return graph.getVertices().filter(new Predicate<EPVertexData>() {
           @Override
           public boolean filter(EPVertexData entity) {
             return entity.getLabel().equals("SalesInvoice");
@@ -127,7 +126,7 @@ public class WorkflowTest {
       };
 
     // apply predicate and aggregate function
-    EPGraphCollectionOperators invBtgs =
+    EPGraphCollection invBtgs =
       btgs.select(predicate).apply(new UnaryFunction<EPGraph, EPGraph>() {
         @Override
         public EPGraph execute(EPGraph entity) {
@@ -136,7 +135,7 @@ public class WorkflowTest {
       });
 
     // sort graphs by revenue and return top 100
-    EPGraphCollectionOperators topBTGs =
+    EPGraphCollection topBTGs =
       invBtgs.sortBy("revenue", Order.DESCENDING).top(100);
 
     // compute overlap to find master store objects (e.g. Employee)
@@ -148,11 +147,11 @@ public class WorkflowTest {
     });
   }
 
-  public void clusterCharacteristicPatterns() {
+  public void clusterCharacteristicPatterns() throws Exception {
     EPGraphStore db = Mockito.mock(EPGraphStore.class);
 
     // generate base collection
-    EPGraphCollectionOperators btgs = db.getDatabaseGraph()
+    EPGraphCollection btgs = db.getDatabaseGraph()
       .callForCollection(Algorithm.BUSINESS_TRANSACTION_GRAPHS);
 
     // define aggregate function (profit per graph)
@@ -218,9 +217,9 @@ public class WorkflowTest {
     });
 
     // select profit and loss clusters
-    EPGraphCollection profitBtgs = btgs.select(new Predicate<EPGraph>() {
+    EPGraphCollection profitBtgs = btgs.filter(new Predicate<EPGraphData>() {
       @Override
-      public boolean filter(EPGraph entity) {
+      public boolean filter(EPGraphData entity) {
         return (Double) entity.getProperty("result") >= 0;
       }
     });

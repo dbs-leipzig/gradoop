@@ -27,6 +27,7 @@ import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EPEdgeCollection;
 import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.EPVertexCollection;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public interface EPGraphOperators {
   graph collection
    */
 
-  EPGraphCollectionOperators match(String graphPattern,
+  EPGraphCollection match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc);
 
   EPGraph project(UnaryFunction<EPVertexData, EPVertexData> vertexFunction,
@@ -87,6 +88,5 @@ public interface EPGraphOperators {
 
   EPGraph callForGraph(Algorithm algorithm, String... params);
 
-  EPGraphCollectionOperators callForCollection(Algorithm algorithm,
-    String... params);
+  EPGraphCollection callForCollection(Algorithm algorithm, String... params);
 }
