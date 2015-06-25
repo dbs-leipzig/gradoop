@@ -29,6 +29,10 @@ public class EPFlinkGraphData extends EPFlinkEntity implements EPGraphData {
   public EPFlinkGraphData() {
   }
 
+  public EPFlinkGraphData(Long graphID, String label) {
+    this(graphID, label, null);
+  }
+
   public EPFlinkGraphData(Long graphID, String label,
     Map<String, Object> properties) {
     super(graphID, label, properties);

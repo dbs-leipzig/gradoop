@@ -17,11 +17,14 @@
 
 package org.gradoop.model.impl;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
-import org.gradoop.model.EPEdgeData;
-import org.gradoop.model.operators.EPEdgeCollectionOperators;
 import org.gradoop.model.helper.Predicate;
+import org.gradoop.model.operators.EPEdgeCollectionOperators;
+
+import java.util.Collection;
+import java.util.List;
 
 public class EPEdgeCollection implements EPEdgeCollectionOperators {
 
@@ -32,17 +35,30 @@ public class EPEdgeCollection implements EPEdgeCollectionOperators {
   }
 
   @Override
-  public EPEdgeCollection select(Predicate<EPEdgeData> predicateFunction) {
-    return null;
-  }
-
-  @Override
   public <T> Iterable<T> values(Class<T> propertyType, String propertyKey) {
     return null;
   }
 
   @Override
   public long size() throws Exception {
-      return edges.count();
+    return edges.count();
+  }
+
+  @Override
+  public void print() throws Exception {
+    edges.print();
+  }
+
+  @Override
+  public EPEdgeCollection select(Predicate<EPFlinkEdgeData> predicateFunction) {
+    return null;
+  }
+
+  public Collection<EPFlinkEdgeData> collect() throws Exception {
+    List<EPFlinkEdgeData> result = Lists.newArrayList();
+    for (Edge<Long, EPFlinkEdgeData> gellyEdge : edges.collect()) {
+      result.add(gellyEdge.f2);
+    }
+    return result;
   }
 }

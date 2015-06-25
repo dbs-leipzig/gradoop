@@ -23,10 +23,9 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.EPEdgeData;
-import org.gradoop.model.EPVertexData;
 import org.gradoop.model.store.EPGraphStore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class FlinkGraphStore implements EPGraphStore {
@@ -42,26 +41,40 @@ public class FlinkGraphStore implements EPGraphStore {
   private final ExecutionEnvironment env;
 
   private FlinkGraphStore(DataSet<Vertex<Long, EPFlinkVertexData>> vertices,
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges, ExecutionEnvironment env) {
+    DataSet<Edge<Long, EPFlinkEdgeData>> edges,
+    DataSet<Subgraph<Long, EPFlinkGraphData>> graphData,
+    ExecutionEnvironment env) {
     this.database =
-      new EPGraphCollection(Graph.fromDataSet(vertices, edges, env), null, env);
+      new EPGraphCollection(Graph.fromDataSet(vertices, edges, env), graphData,
+        env);
     this.env = env;
   }
 
-  public static EPGraphStore fromCollection(Collection<EPFlinkVertexData> vertices,
-    Collection<EPFlinkEdgeData> edges, ExecutionEnvironment env) {
-    DataSet<EPFlinkVertexData> epgmVertexSet = env.fromCollection(vertices);
-    DataSet<EPFlinkEdgeData> epgmEdgeSet = env.fromCollection(edges);
+  public static EPGraphStore fromCollection(
+    Collection<EPFlinkVertexData> vertexData,
+    Collection<EPFlinkEdgeData> edgeData, ExecutionEnvironment env) {
+    return fromCollection(vertexData, edgeData,
+      new ArrayList<EPFlinkGraphData>(), env);
+  }
 
+  public static EPGraphStore fromCollection(
+    Collection<EPFlinkVertexData> vertexData,
+    Collection<EPFlinkEdgeData> edgeData,
+    Collection<EPFlinkGraphData> graphData, ExecutionEnvironment env) {
+    DataSet<EPFlinkVertexData> epgmVertexSet = env.fromCollection(vertexData);
+    DataSet<EPFlinkEdgeData> epgmEdgeSet = env.fromCollection(edgeData);
+    DataSet<EPFlinkGraphData> epgmGraphSet = env.fromCollection(graphData);
 
     DataSet<Vertex<Long, EPFlinkVertexData>> vertexDataSet = null;
     DataSet<Edge<Long, EPFlinkEdgeData>> edgeDataSet = null;
+    DataSet<Subgraph<Long, EPFlinkGraphData>> graphDataSet = null;
 
     if (epgmVertexSet != null) {
       vertexDataSet = epgmVertexSet.map(new VerticesConverter());
       edgeDataSet = epgmEdgeSet.map(new EdgesConverter());
+      graphDataSet = epgmGraphSet.map(new GraphsConverter());
     }
-    return new FlinkGraphStore(vertexDataSet, edgeDataSet, env);
+    return new FlinkGraphStore(vertexDataSet, edgeDataSet, graphDataSet, env);
   }
 
   @Override
@@ -75,8 +88,8 @@ public class FlinkGraphStore implements EPGraphStore {
   }
 
   @Override
-  public EPGraph getGraph(Long graphID) {
-    return null;
+  public EPGraph getGraph(Long graphID) throws Exception {
+    return database.getGraph(graphID);
   }
 
   /**
@@ -88,10 +101,7 @@ public class FlinkGraphStore implements EPGraphStore {
     @Override
     public Vertex<Long, EPFlinkVertexData> map(EPFlinkVertexData value) throws
       Exception {
-      Vertex<Long, EPFlinkVertexData> vertex = new Vertex<>();
-      vertex.setId(value.getId());
-      vertex.setValue(value);
-      return vertex;
+      return new Vertex<>(value.getId(), value);
     }
   }
 
@@ -105,11 +115,22 @@ public class FlinkGraphStore implements EPGraphStore {
     @Override
     public Edge<Long, EPFlinkEdgeData> map(EPFlinkEdgeData value) throws
       Exception {
-      Edge<Long, EPFlinkEdgeData> e = new Edge<>();
-      e.setSource(value.getSourceVertex());
-      e.setTarget(value.getTargetVertex());
-      e.setValue(value);
-      return e;
+      return new Edge<>(value.getSourceVertex(), value.getTargetVertex(),
+        value);
+    }
+  }
+
+  /**
+   * Takes an EPGM vertex and produces a collection of flink edges based on
+   * its outgoing edges.
+   */
+  public static class GraphsConverter implements
+    MapFunction<EPFlinkGraphData, Subgraph<Long, EPFlinkGraphData>> {
+
+    @Override
+    public Subgraph<Long, EPFlinkGraphData> map(EPFlinkGraphData value) throws
+      Exception {
+      return new Subgraph<>(value.getId(), value);
     }
   }
 }

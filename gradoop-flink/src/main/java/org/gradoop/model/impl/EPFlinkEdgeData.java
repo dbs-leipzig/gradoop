@@ -33,8 +33,13 @@ public class EPFlinkEdgeData extends EPFlinkEntity implements EPEdgeData {
   public EPFlinkEdgeData() {
   }
 
-  public EPFlinkEdgeData(Long id, String label, Map<String, Object> properties,
-    Long sourceVertex, Long targetVertex) {
+  public EPFlinkEdgeData(Long id, String label, Long sourceVertex,
+    Long targetVertex) {
+    this(id, label, sourceVertex, targetVertex, null);
+  }
+
+  public EPFlinkEdgeData(Long id, String label, Long sourceVertex,
+    Long targetVertex, Map<String, Object> properties) {
     super(id, label, properties);
     this.sourceVertex = sourceVertex;
     this.targetVertex = targetVertex;
@@ -58,5 +63,14 @@ public class EPFlinkEdgeData extends EPFlinkEntity implements EPEdgeData {
   @Override
   public void setTargetVertex(Long targetVertexId) {
     this.targetVertex = targetVertexId;
+  }
+
+  @Override
+  public String toString() {
+    return "EPFlinkEdgeData{" +
+      "super=" + super.toString() +
+      ", sourceVertex=" + sourceVertex +
+      ", targetVertex=" + targetVertex +
+      '}';
   }
 }

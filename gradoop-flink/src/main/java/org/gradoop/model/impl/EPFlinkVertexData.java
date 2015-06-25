@@ -35,10 +35,18 @@ public class EPFlinkVertexData extends EPFlinkEntity implements EPVertexData {
   }
 
   public EPFlinkVertexData(Long id, String label,
+    Map<String, Object> properties) {
+    this(id, label, properties, null);
+  }
+
+  public EPFlinkVertexData(Long id, String label,
     Map<String, Object> properties, Set<Long> graphs) {
     super(id, label, properties);
-    this.graphs = graphs;
-
+    if (graphs != null) {
+      this.graphs = graphs;
+    } else {
+      this.graphs = Sets.newHashSet();
+    }
   }
 
   @Override
@@ -49,5 +57,13 @@ public class EPFlinkVertexData extends EPFlinkEntity implements EPVertexData {
   @Override
   public void setGraphs(Set<Long> graphs) {
     this.graphs = graphs;
+  }
+
+  @Override
+  public String toString() {
+    return "EPFlinkVertexData{" +
+      "super=" + super.toString() +
+      ", graphs=" + graphs +
+      '}';
   }
 }

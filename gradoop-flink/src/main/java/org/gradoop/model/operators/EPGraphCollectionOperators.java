@@ -29,6 +29,8 @@ import org.gradoop.model.impl.EPGraphCollection;
  */
 public interface EPGraphCollectionOperators extends EPCollectionOperators {
 
+  EPGraph getGraph(final Long graphID) throws Exception;
+
   /*
   collection operators
    */

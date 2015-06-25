@@ -46,4 +46,9 @@ public class EPVertexCollection implements EPVertexCollectionOperators {
     return vertices.count();
 
   }
+
+  @Override
+  public void print() throws Exception {
+    vertices.print();
+  }
 }

@@ -15,16 +15,10 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.operators;
+package org.gradoop.model.helper;
 
-public interface EPCollectionOperators {
+public class FlinkConstants {
+  public static final String DEFAULT_GRAPH_LABEL = "__GRAPH__";
 
-  <V> Iterable<V> values(Class<V> propertyType, String propertyKey);
-
-  long size() throws Exception;
-
-  void print() throws Exception;
-
-
-
+  public static final Long COMBINE_GRAPH_ID = -1L;
 }

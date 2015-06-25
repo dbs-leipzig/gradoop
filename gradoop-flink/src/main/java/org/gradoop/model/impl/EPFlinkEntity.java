@@ -25,7 +25,7 @@ import org.gradoop.model.Labeled;
 import java.util.Map;
 
 public abstract class EPFlinkEntity implements Identifiable, Attributed,
-  Labeled {
+  Labeled, Comparable<EPFlinkEntity> {
 
   private Long id;
 
@@ -37,16 +37,14 @@ public abstract class EPFlinkEntity implements Identifiable, Attributed,
     this.properties = Maps.newHashMap();
   }
 
-  public EPFlinkEntity(EPFlinkEntity otherEntity) {
-    this.id = otherEntity.getId();
-    this.label = otherEntity.getLabel();
-    this.properties = otherEntity.getProperties();
-  }
-
   public EPFlinkEntity(Long id, String label, Map<String, Object> properties) {
     this.id = id;
     this.label = label;
-    this.properties = properties;
+    if (properties != null) {
+      this.properties = properties;
+    } else {
+      this.properties = Maps.newHashMap();
+    }
   }
 
   @Override
@@ -95,5 +93,19 @@ public abstract class EPFlinkEntity implements Identifiable, Attributed,
   @Override
   public int getPropertyCount() {
     return properties.size();
+  }
+
+  @Override
+  public int compareTo(EPFlinkEntity o) {
+    return Long.compare(this.getId(), o.getId());
+  }
+
+  @Override
+  public String toString() {
+    return "EPFlinkEntity{" +
+      "id=" + id +
+      ", label='" + label + '\'' +
+      ", properties=" + properties +
+      '}';
   }
 }

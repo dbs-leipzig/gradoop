@@ -46,6 +46,10 @@ public interface EPGraphOperators {
 
   EPEdgeCollection getIncomingEdges(final Long vertexID);
 
+  long getVertexCount() throws Exception;
+
+  long getEdgeCount() throws Exception;
+
   /*
   unary operators take one graph as input and return a single graph or a
   graph collection

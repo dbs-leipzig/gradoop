@@ -18,13 +18,14 @@
 package org.gradoop.model.store;
 
 import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.operators.EPGraphCollectionOperators;
 
 public interface EPGraphStore {
 
   EPGraph getDatabaseGraph();
 
-  EPGraphCollectionOperators getCollection();
+  EPGraphCollection getCollection();
 
-  EPGraph getGraph(Long graphID);
+  EPGraph getGraph(Long graphID) throws Exception;
 }

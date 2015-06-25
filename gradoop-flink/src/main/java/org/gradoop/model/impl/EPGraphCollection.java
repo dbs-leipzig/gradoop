@@ -17,15 +17,19 @@
 
 package org.gradoop.model.impl;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
-import org.gradoop.model.operators.EPGraphCollectionOperators;
+import org.apache.flink.graph.Vertex;
 import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.BinaryFunction;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.operators.EPGraphCollectionOperators;
+
+import java.util.Collection;
 
 public class EPGraphCollection implements EPGraphCollectionOperators {
 
@@ -35,11 +39,37 @@ public class EPGraphCollection implements EPGraphCollectionOperators {
 
   private DataSet<Subgraph<Long, EPFlinkGraphData>> subgraphs;
 
-  public EPGraphCollection(Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    DataSet<Subgraph<Long, EPFlinkGraphData>> subgraphs, ExecutionEnvironment env) {
+  public EPGraphCollection(
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
+    DataSet<Subgraph<Long, EPFlinkGraphData>> subgraphs,
+    ExecutionEnvironment env) {
     this.graph = graph;
     this.subgraphs = subgraphs;
     this.env = env;
+  }
+
+  @Override
+  public EPGraph getGraph(final Long graphID) throws Exception {
+    // filter vertices and edges based on given graph id
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> subGraph = this.graph
+      .filterOnVertices(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
+        @Override
+        public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
+          Exception {
+          return vertex.getValue().getGraphs().contains(graphID);
+        }
+      });
+    // get graph data based on graph id
+    EPFlinkGraphData graphData =
+      subgraphs.filter(new FilterFunction<Subgraph<Long, EPFlinkGraphData>>() {
+        @Override
+        public boolean filter(Subgraph<Long, EPFlinkGraphData> graph) throws
+          Exception {
+          return graph.getId().equals(graphID);
+        }
+      }).collect().get(0).getValue();
+
+    return EPGraph.fromGraph(subGraph, graphData, env);
   }
 
   @Override
@@ -99,7 +129,7 @@ public class EPGraphCollection implements EPGraphCollectionOperators {
   }
 
   @Override
-  public <T> Iterable<T> values(Class<T> propertyType, String propertyKey) {
+  public <V> Iterable<V> values(Class<V> propertyType, String propertyKey) {
     return null;
   }
 
@@ -108,7 +138,12 @@ public class EPGraphCollection implements EPGraphCollectionOperators {
     return subgraphs.count();
   }
 
+  @Override
+  public void print() throws Exception {
+    subgraphs.print();
+  }
+
   EPGraph getGraph() {
-    return new EPGraph(this.graph, null, env);
+    return EPGraph.fromGraph(this.graph, null, env);
   }
 }

@@ -18,17 +18,21 @@
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
+import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPGraphData;
 import org.gradoop.model.EPPatternGraph;
 import org.gradoop.model.EPVertexData;
 import org.gradoop.model.helper.Aggregate;
 import org.gradoop.model.helper.Algorithm;
+import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.operators.EPGraphCollectionOperators;
@@ -50,11 +54,17 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   private EPFlinkGraphData graphData;
 
-  public EPGraph(Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
+  private EPGraph(Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
     EPFlinkGraphData graphData, ExecutionEnvironment env) {
     this.graph = graph;
     this.graphData = graphData;
     this.env = env;
+  }
+
+  public static EPGraph fromGraph(
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
+    EPFlinkGraphData graphData, ExecutionEnvironment env) {
+    return new EPGraph(graph, graphData, env);
   }
 
   @Override
@@ -86,12 +96,22 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   public EPEdgeCollection getIncomingEdges(final Long vertexID) {
     return new EPEdgeCollection(this.graph.getEdges()
       .filter(new FilterFunction<Edge<Long, EPFlinkEdgeData>>() {
-          @Override
-          public boolean filter(Edge<Long, EPFlinkEdgeData> edgeTuple) throws
-            Exception {
-            return edgeTuple.getValue().getTargetVertex().equals(vertexID);
-          }
-        }));
+        @Override
+        public boolean filter(Edge<Long, EPFlinkEdgeData> edgeTuple) throws
+          Exception {
+          return edgeTuple.getValue().getTargetVertex().equals(vertexID);
+        }
+      }));
+  }
+
+  @Override
+  public long getVertexCount() throws Exception {
+    return this.graph.numberOfVertices();
+  }
+
+  @Override
+  public long getEdgeCount() throws Exception {
+    return this.graph.numberOfEdges();
   }
 
   @Override
@@ -125,8 +145,18 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPGraph combine(EPGraph otherGraph) {
+    // cannot use Gelly union here because of missing argument for KeySelector
+    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
+      this.graph.getVertices().union(otherGraph.graph.getVertices())
+        .distinct(new VertexKeySelector());
 
-    return null;
+    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
+      this.graph.getEdges().union(otherGraph.graph.getEdges())
+        .distinct(new EdgeKeySelector());
+
+    return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
+      new EPFlinkGraphData(FlinkConstants.COMBINE_GRAPH_ID,
+        FlinkConstants.DEFAULT_GRAPH_LABEL), env);
   }
 
   @Override
@@ -193,5 +223,30 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   @Override
   public void setLabel(String label) {
     graphData.setLabel(label);
+  }
+
+  /**
+   * Used for distinction of vertices based on their unique id.
+   */
+  private static class VertexKeySelector implements
+    KeySelector<Vertex<Long, EPFlinkVertexData>, Long> {
+    @Override
+    public Long getKey(
+      Vertex<Long, EPFlinkVertexData> longEPFlinkVertexDataVertex) throws
+      Exception {
+      return longEPFlinkVertexDataVertex.f0;
+    }
+  }
+
+  /**
+   * Used for distinction of edges based on their unique id.
+   */
+  private static class EdgeKeySelector implements
+    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    @Override
+    public Long getKey(
+      Edge<Long, EPFlinkEdgeData> longEPFlinkEdgeDataEdge) throws Exception {
+      return longEPFlinkEdgeDataEdge.f2.getId();
+    }
   }
 }
