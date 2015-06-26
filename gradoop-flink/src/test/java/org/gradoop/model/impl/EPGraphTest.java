@@ -79,7 +79,7 @@ public class EPGraphTest extends EPFlinkTest {
   }
 
   @Test
-  public void testCombine() throws Exception {
+  public void testCombineWithOverlappingGraphs() throws Exception {
     EPGraphStore graphStore = createSocialGraph();
 
     EPGraph databaseCommunity = graphStore.getGraph(0L);
@@ -125,7 +125,96 @@ public class EPGraphTest extends EPFlinkTest {
   }
 
   @Test
-  public void testOverlap() throws Exception {
+  public void testCombineWithNonOverlappingGraphs() throws Exception {
+    EPGraphStore graphStore = createSocialGraph();
+
+    EPGraph databaseCommunity = graphStore.getGraph(0L);
+    EPGraph graphCommunity = graphStore.getGraph(1L);
+
+    EPGraph newGraph = graphCommunity.combine(databaseCommunity);
+
+    assertEquals("wrong number of vertices", 6L, newGraph.getVertexCount());
+    assertEquals("wrong number of edges", 8L, newGraph.getEdgeCount());
+
+    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
+
+    assertEquals("wrong number of vertex values", 6, vertexData.size());
+    assertEquals("wrong number of edge values", 8, edgeData.size());
+
+    // check if vertices are assigned to the new and the old graphs
+    Long newGraphID = newGraph.getId();
+
+    for (EPVertexData v : vertexData) {
+      Set<Long> gIDs = v.getGraphs();
+      assertTrue("vertex was not in new graph", gIDs.contains(newGraphID));
+      if (v.equals(alice)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(bob)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(eve)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      } else if (v.equals(carol)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(dave)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(frank)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      }
+    }
+
+    Set<Long> expectedIds = Sets.newHashSet(0L, 1L, 6L, 21L, 4L, 5L, 22L, 23L);
+
+    for (EPEdgeData e : edgeData) {
+      Long edgeID = e.getId();
+      assertTrue("edge " + edgeID + "was not expected",
+        expectedIds.contains(edgeID));
+    }
+  }
+
+  @Test
+  public void testCombineWithSameGraphs() throws Exception {
+    EPGraphStore graphStore = createSocialGraph();
+
+    EPGraph databaseCommunity = graphStore.getGraph(0L);
+
+    EPGraph newGraph = databaseCommunity.combine(databaseCommunity);
+
+    assertEquals("wrong number of vertices", 3L, newGraph.getVertexCount());
+    assertEquals("wrong number of edges", 4L, newGraph.getEdgeCount());
+
+    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
+
+    assertEquals("wrong number of vertex values", 3, vertexData.size());
+    assertEquals("wrong number of edge values", 4, edgeData.size());
+
+    // check if vertices are assigned to the new and the old graphs
+    Long newGraphID = newGraph.getId();
+
+    for (EPVertexData v : vertexData) {
+      Set<Long> gIDs = v.getGraphs();
+      assertTrue("vertex was not in new graph", gIDs.contains(newGraphID));
+      if (v.equals(alice)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(bob)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(eve)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      }
+    }
+
+    Set<Long> expectedIds = Sets.newHashSet(0L, 1L, 6L, 21L);
+
+    for (EPEdgeData e : edgeData) {
+      Long edgeID = e.getId();
+      assertTrue("edge " + edgeID + "was not expected",
+        expectedIds.contains(edgeID));
+    }
+  }
+
+  @Test
+  public void testOverlapWithOverlappingGraphs() throws Exception {
     EPGraphStore graphStore = createSocialGraph();
 
     EPGraph databaseCommunity = graphStore.getGraph(0L);
@@ -164,8 +253,157 @@ public class EPGraphTest extends EPFlinkTest {
     }
   }
 
-  public void testExclude() throws Exception {
+  @Test
+  public void testOverlapWithNonOverlappingGraphs() throws Exception {
+    EPGraphStore graphStore = createSocialGraph();
 
+    EPGraph databaseCommunity = graphStore.getGraph(0L);
+    EPGraph graphCommunity = graphStore.getGraph(1L);
+
+    EPGraph newGraph = graphCommunity.overlap(databaseCommunity);
+
+    assertEquals("wrong number of vertices", 0L, newGraph.getVertexCount());
+    assertEquals("wrong number of edges", 0L, newGraph.getEdgeCount());
+
+    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
+
+    assertEquals("wrong number of vertex values", 0, vertexData.size());
+    assertEquals("wrong number of edge values", 0, edgeData.size());
+  }
+
+  @Test
+  public void testOverlapWithSameGraphs() throws Exception {
+    EPGraphStore graphStore = createSocialGraph();
+
+    EPGraph databaseCommunity = graphStore.getGraph(0L);
+
+    EPGraph newGraph = databaseCommunity.overlap(databaseCommunity);
+
+    assertEquals("wrong number of vertices", 3, newGraph.getVertexCount());
+    assertEquals("wrong number of edges", 4L, newGraph.getEdgeCount());
+
+    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
+
+    assertEquals("wrong number of vertex values", 3, vertexData.size());
+    assertEquals("wrong number of edge values", 4, edgeData.size());
+
+    // check if vertices are assigned to the new and the old graphs
+    Long newGraphID = newGraph.getId();
+
+    for (EPVertexData v : vertexData) {
+      Set<Long> gIDs = v.getGraphs();
+      assertTrue("vertex was not in new graph", gIDs.contains(newGraphID));
+      if (v.equals(alice)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(bob)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(eve)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      }
+    }
+
+    Set<Long> expectedIds = Sets.newHashSet(0L, 1L, 6L, 21L);
+
+    for (EPEdgeData e : edgeData) {
+      Long edgeID = e.getId();
+      assertTrue("edge " + edgeID + "was not expected",
+        expectedIds.contains(edgeID));
+    }
+  }
+
+  @Test
+  public void testExcludeWithOverlappingGraphs() throws Exception {
+    EPGraphStore graphStore = createSocialGraph();
+
+    EPGraph databaseCommunity = graphStore.getGraph(0L);
+    EPGraph graphCommunity = graphStore.getGraph(2L);
+
+    EPGraph newGraph = databaseCommunity.exclude(graphCommunity);
+
+    assertEquals("wrong number of vertices", 1L, newGraph.getVertexCount());
+    newGraph.getEdges().print();
+    assertEquals("wrong number of edges", 0L, newGraph.getEdgeCount());
+
+    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
+
+    assertEquals("wrong number of vertex values", 1, vertexData.size());
+    assertEquals("wrong number of edge values", 0, edgeData.size());
+
+    // check if vertices are assigned to the new and the old graphs
+    Long newGraphID = newGraph.getId();
+
+    for (EPVertexData v : vertexData) {
+      Set<Long> gIDs = v.getGraphs();
+      assertTrue("vertex was not in new graph", gIDs.contains(newGraphID));
+      if (v.equals(eve)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      }
+    }
+  }
+
+  @Test
+  public void testExcludeWithNonOverlappingGraphs() throws Exception {
+    EPGraphStore graphStore = createSocialGraph();
+
+    EPGraph databaseCommunity = graphStore.getGraph(0L);
+    EPGraph hadoopCommunity = graphStore.getGraph(1L);
+
+    EPGraph newGraph = databaseCommunity.exclude(hadoopCommunity);
+
+    newGraph.getVertices().print();
+    assertEquals("wrong number of vertices", 3L, newGraph.getVertexCount());
+    assertEquals("wrong number of edges", 4L, newGraph.getEdgeCount());
+
+    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
+
+    assertEquals("wrong number of vertex values", 3, vertexData.size());
+    assertEquals("wrong number of edge values", 4, edgeData.size());
+
+    // check if vertices are assigned to the new and the old graphs
+    Long newGraphID = newGraph.getId();
+
+    for (EPVertexData v : vertexData) {
+      Set<Long> gIDs = v.getGraphs();
+      assertTrue("vertex was not in new graph", gIDs.contains(newGraphID));
+      if (v.equals(alice)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(bob)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (v.equals(eve)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      }
+    }
+
+    Set<Long> expectedIds = Sets.newHashSet(0L, 1L, 6L, 21L);
+
+    for (EPEdgeData e : edgeData) {
+      Long edgeID = e.getId();
+      assertTrue("edge " + edgeID + "was not expected",
+        expectedIds.contains(edgeID));
+    }
+  }
+
+  @Test
+  public void testExcludeWithSameGraphs() throws Exception {
+    EPGraphStore graphStore = createSocialGraph();
+
+    EPGraph databaseCommunity = graphStore.getGraph(0L);
+
+    EPGraph newGraph = databaseCommunity.exclude(databaseCommunity);
+
+    assertEquals("wrong number of vertices", 0L, newGraph.getVertexCount());
+    newGraph.getEdges().print();
+    assertEquals("wrong number of edges", 0L, newGraph.getEdgeCount());
+
+    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
+
+    assertEquals("wrong number of vertex values", 0, vertexData.size());
+    assertEquals("wrong number of edge values", 0, edgeData.size());
   }
 
   public void testCallForGraph() throws Exception {

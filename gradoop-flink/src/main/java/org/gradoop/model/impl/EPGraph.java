@@ -19,6 +19,7 @@ package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -177,13 +178,12 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
       this.graph.getVertices().union(otherGraph.graph.getVertices())
         .groupBy(new VertexKeySelector())
-        .reduceGroup(new VertexDuplicationCheck(2L))
+        .reduceGroup(new VertexGroupReducer(2L))
         .map(new VertexToGraphUpdater(newGraphID));
 
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
       this.graph.getEdges().union(otherGraph.graph.getEdges())
-        .groupBy(new EdgeKeySelector())
-        .reduceGroup(new EdgeDuplicationCheck(2L));
+        .groupBy(new EdgeKeySelector()).reduceGroup(new EdgeGroupReducer(2L));
 
     return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
       new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
@@ -192,7 +192,43 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPGraph exclude(EPGraph otherGraph) {
-    return null;
+    final Long newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
+
+    // union vertex sets, group by vertex id, filter vertices where the group
+    // contains exactly one vertex which belongs to the graph, the operator is
+    // called on
+    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
+      this.graph.getVertices().union(otherGraph.graph.getVertices())
+        .groupBy(new VertexKeySelector()).reduceGroup(
+        new VertexGroupReducer(1L, this.getId(), otherGraph.getId()))
+        .map(new VertexToGraphUpdater(newGraphID));
+
+    JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
+      EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>
+      joinFunc =
+      new JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
+        EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>() {
+        @Override
+        public Edge<Long, EPFlinkEdgeData> join(
+          Edge<Long, EPFlinkEdgeData> leftTuple,
+          Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
+          return leftTuple;
+        }
+      };
+
+    // In exclude(), we are only interested in edges that connect vertices
+    // that are in the exclusion of the vertex sets. Thus, we join the edges
+    // from the left graph with the new vertex set using source and target ids.
+    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
+      this.graph.getEdges().join(newVertexSet)
+        .where(new EdgeSourceVertexKeySelector())
+        .equalTo(new VertexKeySelector()).with(joinFunc).join(newVertexSet)
+        .where(new EdgeTargetVertexKeySelector())
+        .equalTo(new VertexKeySelector()).with(joinFunc);
+
+    return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
+      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
+      env);
   }
 
   @Override
@@ -277,17 +313,63 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   /**
-   * Used to check if the number of grouped, duplicate vertices is equal to a
-   * given amount. If yes, reducer returns the vertex.
+   * Used to select the source vertex id of an edge.
    */
-  private static class VertexDuplicationCheck implements
+  private static class EdgeSourceVertexKeySelector implements
+    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    @Override
+    public Long getKey(Edge<Long, EPFlinkEdgeData> e) throws Exception {
+      return e.getSource();
+    }
+  }
+
+  /**
+   * Used to select the target vertex id of an edge.
+   */
+  private static class EdgeTargetVertexKeySelector implements
+    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    @Override
+    public Long getKey(Edge<Long, EPFlinkEdgeData> e) throws Exception {
+      return e.getTarget();
+    }
+  }
+
+  /**
+   * Uses for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
+   * <p/>
+   * Checks if the number of grouped, duplicate vertices is equal to a
+   * given amount. If yes, reducer returns the vertex. Furthermore, if a graph
+   * id is given, the method also checks if the vertex belongs only to that
+   * graph and returns it in that case.
+   */
+  private static class VertexGroupReducer implements
     GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
       EPFlinkVertexData>> {
 
+    /**
+     * number of times a vertex must occur inside a group
+     */
     private long amount;
 
-    public VertexDuplicationCheck(long amount) {
+    /**
+     * graph, a vertex must be part of
+     */
+    private Long includedGraphID;
+
+    /**
+     * graph, a vertex must not be part of
+     */
+    private Long precludedGraphID;
+
+    public VertexGroupReducer(long amount) {
+      this(amount, null, null);
+    }
+
+    public VertexGroupReducer(long amount, Long includedGraphID,
+      Long precludedGraphID) {
       this.amount = amount;
+      this.includedGraphID = includedGraphID;
+      this.precludedGraphID = precludedGraphID;
     }
 
     @Override
@@ -301,7 +383,14 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
         count++;
       }
       if (count == amount) {
-        collector.collect(v);
+        if (includedGraphID != null && precludedGraphID != null) {
+          if (v.getValue().getGraphs().contains(includedGraphID) &&
+            !v.getValue().getGraphs().contains(precludedGraphID)) {
+            collector.collect(v);
+          }
+        } else {
+          collector.collect(v);
+        }
       }
     }
   }
@@ -310,13 +399,13 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Used to check if the number of grouped, duplicate edges is equal to a
    * given amount. If yes, reducer returns the vertex.
    */
-  private static class EdgeDuplicationCheck implements
+  private static class EdgeGroupReducer implements
     GroupReduceFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long,
       EPFlinkEdgeData>> {
 
     private long amount;
 
-    public EdgeDuplicationCheck(long amount) {
+    public EdgeGroupReducer(long amount) {
       this.amount = amount;
     }
 
