@@ -17,57 +17,24 @@
 
 package org.gradoop.model;
 
-import com.google.common.collect.Lists;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkVertexData;
 import org.gradoop.model.impl.EPGraph;
-import org.gradoop.model.impl.FlinkGraphStore;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FlinkGraphStoreTest {
+public class FlinkGraphStoreTest extends EPFlinkTest {
 
   @Test
   public void testGetDatabaseGraph() throws Exception {
-    EPFlinkVertexData alice = new EPFlinkVertexData();
-    alice.setId(0L);
-    alice.setLabel("Person");
-    alice.setProperty("name", "Alice");
-
-    EPFlinkVertexData bob = new EPFlinkVertexData();
-    bob.setId(1L);
-    bob.setLabel("Person");
-    bob.setProperty("name", "Bob");
-
-    EPFlinkEdgeData aliceKnowsBob = new EPFlinkEdgeData();
-    aliceKnowsBob.setSourceVertex(alice.getId());
-    aliceKnowsBob.setTargetVertex(bob.getId());
-    aliceKnowsBob.setLabel("knows");
-
-
-    List<EPFlinkVertexData> vertexCollection = Lists.newArrayList(alice, bob);
-    List<EPFlinkEdgeData> edgeCollection = Lists.newArrayList(aliceKnowsBob);
-
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
-    EPGraphStore graphStore =
-      FlinkGraphStore.fromCollection(vertexCollection, edgeCollection, env);
+    EPGraphStore graphStore = createSocialGraph();
 
     EPGraph dbGraph = graphStore.getDatabaseGraph();
 
     assertNotNull("database graph was null", dbGraph);
-    assertEquals("vertex set has the wrong size", 2,
+    assertEquals("vertex set has the wrong size", 11,
       dbGraph.getVertices().size());
-    assertEquals("edge set has the wrong size", 1, dbGraph.getEdges().size());
-    assertEquals("wrong number of outgoing edges at alice", 1,
-      dbGraph.getOutgoingEdges(0L).size());
-    assertEquals("wrong number of incoming edges at bob", 1,
-      dbGraph.getIncomingEdges(1L).size());
+    assertEquals("edge set has the wrong size", 24, dbGraph.getEdges().size());
   }
 }
