@@ -335,12 +335,15 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   /**
-   * Uses for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
+   * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
    * <p/>
    * Checks if the number of grouped, duplicate vertices is equal to a
-   * given amount. If yes, reducer returns the vertex. Furthermore, if a graph
-   * id is given, the method also checks if the vertex belongs only to that
-   * graph and returns it in that case.
+   * given amount. If yes, reducer returns the vertex.
+   * <p/>
+   * Furthermore, to realize exclusion, if two graphs are given, the method
+   * checks if the vertex is contained in the first (include graph) but not
+   * in the other graph (preclude graph). If this is the case, the vertex
+   * gets returned.
    */
   private static class VertexGroupReducer implements
     GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
@@ -396,6 +399,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   /**
+   * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
+   * <p/>
    * Used to check if the number of grouped, duplicate edges is equal to a
    * given amount. If yes, reducer returns the vertex.
    */
