@@ -38,6 +38,12 @@ public abstract class EPFlinkEntity implements Identifiable, Attributed,
     this.properties = Maps.newHashMap();
   }
 
+  public EPFlinkEntity(EPFlinkEntity otherEntity) {
+    this.id = otherEntity.getId();
+    this.label = otherEntity.getLabel();
+    this.properties = Maps.newHashMap(otherEntity.getProperties());
+  }
+
   public EPFlinkEntity(Long id, String label, Map<String, Object> properties) {
     this.id = id;
     this.label = label;

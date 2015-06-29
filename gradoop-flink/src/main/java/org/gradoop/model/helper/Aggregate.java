@@ -19,5 +19,5 @@ package org.gradoop.model.helper;
 
 public interface Aggregate<I, O> {
 
-  O aggregate(I entity);
+  O aggregate(I entity) throws Exception;
 }

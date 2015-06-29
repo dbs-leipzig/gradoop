@@ -129,7 +129,7 @@ public class WorkflowTest {
     EPGraphCollection invBtgs =
       btgs.select(predicate).apply(new UnaryFunction<EPGraph, EPGraph>() {
         @Override
-        public EPGraph execute(EPGraph entity) {
+        public EPGraph execute(EPGraph entity) throws Exception {
           return entity.aggregate("revenue", aggregateFunc);
         }
       });
@@ -176,7 +176,7 @@ public class WorkflowTest {
     // apply aggregate function on btgs
     btgs = btgs.apply(new UnaryFunction<EPGraph, EPGraph>() {
       @Override
-      public EPGraph execute(EPGraph entity) {
+      public EPGraph execute(EPGraph entity) throws Exception {
         return entity.aggregate("profit", aggFunc);
       }
     });

@@ -34,6 +34,11 @@ public class EPFlinkVertexData extends EPFlinkEntity implements EPVertexData {
     this.graphs = Sets.newHashSet();
   }
 
+  public EPFlinkVertexData(EPFlinkVertexData otherVertexData) {
+    super(otherVertexData);
+    this.graphs = Sets.newHashSet(otherVertexData.graphs);
+  }
+
   public EPFlinkVertexData(Long id, String label,
     Map<String, Object> properties) {
     this(id, label, properties, null);

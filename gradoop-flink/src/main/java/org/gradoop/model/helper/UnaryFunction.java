@@ -19,5 +19,5 @@ package org.gradoop.model.helper;
 
 public interface UnaryFunction<I, O> {
 
-  O execute(I entity);
+  O execute(I entity) throws Exception;
 }

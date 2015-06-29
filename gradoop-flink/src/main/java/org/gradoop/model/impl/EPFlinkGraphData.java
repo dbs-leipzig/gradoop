@@ -19,6 +19,7 @@ package org.gradoop.model.impl;
 
 import org.gradoop.model.EPGraphData;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -27,6 +28,10 @@ import java.util.Map;
 public class EPFlinkGraphData extends EPFlinkEntity implements EPGraphData {
 
   public EPFlinkGraphData() {
+  }
+
+  public EPFlinkGraphData(EPFlinkGraphData otherGraphData) {
+    super(otherGraphData);
   }
 
   public EPFlinkGraphData(Long graphID, String label) {

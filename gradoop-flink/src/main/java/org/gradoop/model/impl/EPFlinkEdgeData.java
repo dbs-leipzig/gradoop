@@ -33,6 +33,12 @@ public class EPFlinkEdgeData extends EPFlinkEntity implements EPEdgeData {
   public EPFlinkEdgeData() {
   }
 
+  public EPFlinkEdgeData(EPFlinkEdgeData otherEdgeData) {
+    super(otherEdgeData);
+    this.sourceVertex = otherEdgeData.sourceVertex;
+    this.targetVertex = otherEdgeData.targetVertex;
+  }
+
   public EPFlinkEdgeData(Long id, String label, Long sourceVertex,
     Long targetVertex) {
     this(id, label, sourceVertex, targetVertex, null);

@@ -17,6 +17,8 @@
 
 package org.gradoop.model.impl;
 
+import com.esotericsoftware.kryo.Kryo;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -40,6 +42,7 @@ import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.operators.EPGraphOperators;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -135,8 +138,12 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public <O extends Number> EPGraph aggregate(String propertyKey,
-    Aggregate<EPGraph, O> aggregateFunc) {
-    return null;
+    Aggregate<EPGraph, O> aggregateFunc) throws Exception {
+    O result = aggregateFunc.aggregate(this);
+    // copy graph data before updating properties
+    EPFlinkGraphData newGraphData = new EPFlinkGraphData(this.graphData);
+    newGraphData.setProperty(propertyKey, result);
+    return EPGraph.fromGraph(this.graph, newGraphData, env);
   }
 
   @Override
@@ -336,10 +343,10 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   /**
    * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
-   * <p/>
+   * <p>
    * Checks if the number of grouped, duplicate vertices is equal to a
    * given amount. If yes, reducer returns the vertex.
-   * <p/>
+   * <p>
    * Furthermore, to realize exclusion, if two graphs are given, the method
    * checks if the vertex is contained in the first (include graph) but not
    * in the other graph (preclude graph). If this is the case, the vertex
@@ -400,7 +407,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   /**
    * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
-   * <p/>
+   * <p>
    * Used to check if the number of grouped, duplicate edges is equal to a
    * given amount. If yes, reducer returns the vertex.
    */

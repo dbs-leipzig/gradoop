@@ -63,7 +63,7 @@ public interface EPGraphOperators {
     UnaryFunction<EPEdgeData, EPEdgeData> edgeFunction);
 
   <O extends Number> EPGraph aggregate(String propertyKey,
-    Aggregate<EPGraph, O> aggregateFunc);
+    Aggregate<EPGraph, O> aggregateFunc) throws Exception;
 
   EPGraph summarize(List<String> vertexGroupingKeys,
     Aggregate<Tuple2<EPVertexData, Set<EPVertexData>>, EPVertexData>

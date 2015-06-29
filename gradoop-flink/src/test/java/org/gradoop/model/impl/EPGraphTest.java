@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.EPVertexData;
+import org.gradoop.model.helper.Aggregate;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
@@ -70,8 +71,32 @@ public class EPGraphTest extends EPFlinkTest {
 
   }
 
+  @Test
   public void testAggregate() throws Exception {
+    EPGraphStore graphStore = createSocialGraph();
 
+    EPGraph databaseCommunity = graphStore.getGraph(0L);
+
+    String vCountPropertyKey = "vCount";
+
+    Aggregate<EPGraph, Long> aggregateFunc = new Aggregate<EPGraph, Long>() {
+      @Override
+      public Long aggregate(EPGraph entity) throws Exception {
+        return entity.getVertices().size();
+      }
+    };
+
+    EPGraph newGraph =
+      databaseCommunity.aggregate(vCountPropertyKey, aggregateFunc);
+
+    assertEquals("wrong property count", 3, newGraph.getPropertyCount());
+
+    assertEquals("wrong property value", 3L,
+      newGraph.getProperty(vCountPropertyKey));
+
+    // original graph needs to be unchanged
+    assertEquals("wrong property count", 2,
+      databaseCommunity.getPropertyCount());
   }
 
   public void testSummarize() throws Exception {
