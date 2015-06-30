@@ -17,8 +17,6 @@
 
 package org.gradoop.model.impl;
 
-import com.esotericsoftware.kryo.Kryo;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -26,7 +24,6 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
@@ -42,11 +39,9 @@ import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.operators.EPGraphOperators;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Represents a single graph inside the EPGM. Holds information about the
@@ -147,12 +142,11 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
-  public EPGraph summarize(List<String> vertexGroupingKeys,
-    Aggregate<Tuple2<EPVertexData, Set<EPVertexData>>, EPVertexData>
-      vertexAggregateFunc,
+  public <O1 extends Number, O2 extends Number> EPGraph summarize(
+    List<String> vertexGroupingKeys,
+    Aggregate<EPVertexCollection, O1> vertexAggregateFunc,
     List<String> edgeGroupingKeys,
-    Aggregate<Tuple2<EPEdgeData, Set<EPEdgeData>>, EPEdgeData>
-      edgeAggregateFunc) {
+    Aggregate<EPEdgeCollection, O2> edgeAggregateFunc) {
     return null;
   }
 
@@ -343,10 +337,10 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   /**
    * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
-   * <p>
+   * <p/>
    * Checks if the number of grouped, duplicate vertices is equal to a
    * given amount. If yes, reducer returns the vertex.
-   * <p>
+   * <p/>
    * Furthermore, to realize exclusion, if two graphs are given, the method
    * checks if the vertex is contained in the first (include graph) but not
    * in the other graph (preclude graph). If this is the case, the vertex
@@ -407,7 +401,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   /**
    * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
-   * <p>
+   * <p/>
    * Used to check if the number of grouped, duplicate edges is equal to a
    * given amount. If yes, reducer returns the vertex.
    */

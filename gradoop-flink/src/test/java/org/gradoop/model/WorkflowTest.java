@@ -18,7 +18,6 @@
 package org.gradoop.model;
 
 import com.google.common.collect.Lists;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.helper.Aggregate;
 import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.BinaryFunction;
@@ -26,12 +25,12 @@ import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.SystemProperties;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.EPEdgeCollection;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
+import org.gradoop.model.impl.EPVertexCollection;
 import org.gradoop.model.store.EPGraphStore;
 import org.mockito.Mockito;
-
-import java.util.Set;
 
 public class WorkflowTest {
 
@@ -68,22 +67,16 @@ public class WorkflowTest {
     // summarize communities
     knowsGraph
       .summarize(Lists.newArrayList(SystemProperties.TYPE.name(), "city"),
-        new Aggregate<Tuple2<EPVertexData, Set<EPVertexData>>, EPVertexData>() {
+        new Aggregate<EPVertexCollection, Long>() {
           @Override
-          public EPVertexData aggregate(
-            Tuple2<EPVertexData, Set<EPVertexData>> entity) {
-            EPVertexData summarizedVertex = entity.f0;
-            summarizedVertex.setProperty("count", entity.f1.size());
-            return summarizedVertex;
+          public Long aggregate(EPVertexCollection entities) throws Exception {
+            return entities.size();
           }
         }, Lists.newArrayList(SystemProperties.TYPE.name()),
-        new Aggregate<Tuple2<EPEdgeData, Set<EPEdgeData>>, EPEdgeData>() {
+        new Aggregate<EPEdgeCollection, Long>() {
           @Override
-          public EPEdgeData aggregate(
-            Tuple2<EPEdgeData, Set<EPEdgeData>> entity) {
-            EPEdgeData summarizedEdge = entity.f0;
-            summarizedEdge.setProperty("count", entity.f1.size());
-            return summarizedEdge;
+          public Long aggregate(EPEdgeCollection entities) throws Exception {
+            return entities.size();
           }
         });
   }

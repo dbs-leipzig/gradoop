@@ -25,4 +25,6 @@ public class FlinkConstants {
   public static final Long OVERLAP_GRAPH_ID = -2L;
 
   public static final Long EXCLUDE_GRAPH_ID = -3L;
+
+  public static final Long SUMMARIZE_GRAPH_ID = -4L;
 }

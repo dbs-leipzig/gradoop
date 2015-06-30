@@ -17,7 +17,6 @@
 
 package org.gradoop.model.operators;
 
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPPatternGraph;
 import org.gradoop.model.EPVertexData;
@@ -31,7 +30,6 @@ import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.EPVertexCollection;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Describes all operators that can be applied on a single graph inside the
@@ -65,12 +63,11 @@ public interface EPGraphOperators {
   <O extends Number> EPGraph aggregate(String propertyKey,
     Aggregate<EPGraph, O> aggregateFunc) throws Exception;
 
-  EPGraph summarize(List<String> vertexGroupingKeys,
-    Aggregate<Tuple2<EPVertexData, Set<EPVertexData>>, EPVertexData>
-      vertexAggregateFunc,
+  <O1 extends Number, O2 extends Number> EPGraph summarize(
+    List<String> vertexGroupingKeys,
+    Aggregate<EPVertexCollection, O1> vertexAggregateFunc,
     List<String> edgeGroupingKeys,
-    Aggregate<Tuple2<EPEdgeData, Set<EPEdgeData>>, EPEdgeData>
-      edgeAggregateFunc);
+    Aggregate<EPEdgeCollection, O2> edgeAggregateFunc);
 
   /*
   binary operators take two graphs as input and return a single graph
