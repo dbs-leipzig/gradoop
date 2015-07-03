@@ -40,6 +40,10 @@ public interface EPGraphCollectionOperators<T> extends
    */
   EPGraph getGraph(final Long graphID) throws Exception;
 
+  EPGraphCollection getGraphs(final Long... identifiers) throws Exception;
+
+  Long getGraphCount() throws Exception;
+
   /**
    * Filter containing graphs based on their properties.
    *
@@ -59,7 +63,8 @@ public interface EPGraphCollectionOperators<T> extends
 
   EPGraphCollection union(EPGraphCollection otherCollection);
 
-  EPGraphCollection intersect(EPGraphCollection otherCollection);
+  EPGraphCollection intersect(EPGraphCollection otherCollection) throws
+    Exception;
 
   EPGraphCollection difference(EPGraphCollection otherCollection);
 
