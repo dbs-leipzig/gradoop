@@ -107,16 +107,17 @@ public class EPGraphCollectionTest extends EPFlinkTest {
   public void testIntersect() throws Exception {
     EPGraphStore graphStore = createSocialGraph();
     EPGraphCollection graphColl = graphStore.getCollection();
-    EPGraphCollection collection1 = graphColl.getGraphs(0l, 2l);
-    EPGraphCollection collection2 = graphColl.getGraphs(1l, 2l);
+    EPGraphCollection collection1 = graphColl.getGraphs(0l, 1l, 2l);
+    EPGraphCollection collection2 = graphColl.getGraphs(0l, 1l);
 
-    EPGraphCollection unionCollection = collection1.intersect(collection2);
+    EPGraphCollection unionCollection =
+      collection1.alternateIntersect(collection2);
 
     assertNotNull("graph collection is null", unionCollection);
-    assertEquals("wrong number of graphs", 1, unionCollection.size());
-    assertEquals("wrong number of vertices", 4,
+    assertEquals("wrong number of graphs", 2, unionCollection.size());
+    assertEquals("wrong number of vertices", 6,
       unionCollection.getGraph().getVertexCount());
-    assertEquals("wrong number of edges", 6,
+    assertEquals("wrong number of edges", 10,
       unionCollection.getGraph().getEdgeCount());
   }
 
@@ -124,16 +125,17 @@ public class EPGraphCollectionTest extends EPFlinkTest {
   public void testDifference() throws Exception {
     EPGraphStore graphStore = createSocialGraph();
     EPGraphCollection graphColl = graphStore.getCollection();
-    EPGraphCollection collection1 = graphColl.getGraphs(0l, 1l);
-    EPGraphCollection collection2 = graphColl.getGraphs(0l, 2l);
+    EPGraphCollection collection1 = graphColl.getGraphs(0l, 1l, 2l);
+    EPGraphCollection collection2 = graphColl.getGraphs(0l);
 
-    EPGraphCollection unionCollection = collection1.difference(collection2);
+    EPGraphCollection unionCollection =
+      collection1.alternateDifference(collection2);
 
     assertNotNull("graph collection is null", unionCollection);
-    assertEquals("wrong number of graphs", 1, unionCollection.size());
-    assertEquals("wrong number of vertices", 3,
+    assertEquals("wrong number of graphs", 2, unionCollection.size());
+    assertEquals("wrong number of vertices", 5,
       unionCollection.getGraph().getVertexCount());
-    assertEquals("wrong number of edges", 4,
+    assertEquals("wrong number of edges", 8,
       unionCollection.getGraph().getEdgeCount());
   }
 
