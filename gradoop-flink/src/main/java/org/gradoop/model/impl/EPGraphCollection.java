@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EPGraphData;
@@ -53,15 +54,12 @@ public class EPGraphCollection implements
 
   @Override
   public EPGraph getGraph(final Long graphID) throws Exception {
+
     // filter vertices and edges based on given graph id
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> subGraph = this.graph
-      .filterOnVertices(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
-        @Override
-        public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
-          Exception {
-          return vertex.getValue().getGraphs().contains(graphID);
-        }
-      });
+      .subgraph(new VertexGraphContainmentFilter(graphID),
+        new EdgeGraphContainmentFilter(graphID));
+
     // get graph data based on graph id
     EPFlinkGraphData graphData =
       subgraphs.filter(new FilterFunction<Subgraph<Long, EPFlinkGraphData>>() {
@@ -192,14 +190,13 @@ public class EPGraphCollection implements
   public Collection<EPGraphData> collect() throws Exception {
     return this.subgraphs
       .map(new MapFunction<Subgraph<Long, EPFlinkGraphData>, EPGraphData>() {
-          @Override
-          public EPFlinkGraphData map(
-            Subgraph<Long, EPFlinkGraphData> longEPFlinkGraphDataSubgraph)
-            throws
-            Exception {
-            return longEPFlinkGraphDataSubgraph.getValue();
-          }
-        }).collect();
+        @Override
+        public EPFlinkGraphData map(
+          Subgraph<Long, EPFlinkGraphData> longEPFlinkGraphDataSubgraph) throws
+          Exception {
+          return longEPFlinkGraphDataSubgraph.getValue();
+        }
+      }).collect();
   }
 
   @Override
@@ -214,5 +211,35 @@ public class EPGraphCollection implements
 
   EPGraph getGraph() {
     return EPGraph.fromGraph(this.graph, null, env);
+  }
+
+  private static class VertexGraphContainmentFilter implements
+    FilterFunction<Vertex<Long, EPFlinkVertexData>> {
+
+    private long graphID;
+
+    public VertexGraphContainmentFilter(long graphID) {
+      this.graphID = graphID;
+    }
+
+    @Override
+    public boolean filter(Vertex<Long, EPFlinkVertexData> v) throws Exception {
+      return v.f1.getGraphs().contains(graphID);
+    }
+  }
+
+  private static class EdgeGraphContainmentFilter implements
+    FilterFunction<Edge<Long, EPFlinkEdgeData>> {
+
+    private long graphID;
+
+    public EdgeGraphContainmentFilter(long graphID) {
+      this.graphID = graphID;
+    }
+
+    @Override
+    public boolean filter(Edge<Long, EPFlinkEdgeData> e) throws Exception {
+      return e.f2.getGraphs().contains(graphID);
+    }
   }
 }
