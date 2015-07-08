@@ -44,7 +44,9 @@ public class EPGraphOverlapTests extends EPFlinkTest {
     "0, 2, 2, 2", // overlapping
     "2, 0, 2, 2", // overlapping switched
     "0, 1, 0, 0", // non-overlapping
-    "1, 0, 0, 0" // non-overlapping switched
+    "1, 0, 0, 0", // non-overlapping switched
+    "3, 1, 2, 1", // overlapping vertex and not edge set
+    "1, 3, 2, 1" // overlapping vertex and not edge set switched
   })
   public void testOverlap(long firstGraph, long secondGraph,
     long expectedVertexCount, long expectedEdgeCount) throws Exception {
