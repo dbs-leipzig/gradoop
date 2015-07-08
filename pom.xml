@@ -62,6 +62,7 @@
         <dep.giraph.version>1.1.0-hadoop2</dep.giraph.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
         <dep.junit.version>4.11</dep.junit.version>
+        <dep.junitparams.version>1.0.4</dep.junitparams.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>1.10.19</dep.mockito.version>
@@ -282,6 +283,13 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${dep.junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>pl.pragmatists</groupId>
+                <artifactId>JUnitParams</artifactId>
+                <version>${dep.junitparams.version}</version>
                 <scope>test</scope>
             </dependency>
 
