@@ -17,24 +17,12 @@
 
 package org.gradoop.model;
 
-import org.gradoop.model.impl.EPGraph;
-import org.gradoop.model.store.EPGraphStore;
-import org.junit.Test;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+public interface EPGraphElement {
+  Set<Long> getGraphs();
 
-public class FlinkGraphStoreTest extends EPFlinkTest {
+  void setGraphs(Set<Long> graphs);
 
-  @Test
-  public void testGetDatabaseGraph() throws Exception {
-    EPGraphStore graphStore = createSocialGraph();
-
-    EPGraph dbGraph = graphStore.getDatabaseGraph();
-
-    assertNotNull("database graph was null", dbGraph);
-    assertEquals("vertex set has the wrong size", 11,
-      dbGraph.getVertices().size());
-    assertEquals("edge set has the wrong size", 24, dbGraph.getEdges().size());
-  }
+  void addGraph(Long graph);
 }

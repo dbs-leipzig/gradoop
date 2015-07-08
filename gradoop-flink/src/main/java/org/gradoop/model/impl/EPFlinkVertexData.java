@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Sets;
 import org.gradoop.model.EPVertexData;
 
 import java.util.Map;
@@ -26,17 +25,14 @@ import java.util.Set;
 /**
  * POJO for vertex data.
  */
-public class EPFlinkVertexData extends EPFlinkEntity implements EPVertexData {
-
-  private Set<Long> graphs;
+public class EPFlinkVertexData extends EPFlinkGraphElementEntity implements
+  EPVertexData {
 
   public EPFlinkVertexData() {
-    this.graphs = Sets.newHashSet();
   }
 
   public EPFlinkVertexData(EPFlinkVertexData otherVertexData) {
     super(otherVertexData);
-    this.graphs = Sets.newHashSet(otherVertexData.graphs);
   }
 
   public EPFlinkVertexData(Long id, String label,
@@ -46,35 +42,12 @@ public class EPFlinkVertexData extends EPFlinkEntity implements EPVertexData {
 
   public EPFlinkVertexData(Long id, String label,
     Map<String, Object> properties, Set<Long> graphs) {
-    super(id, label, properties);
-    if (graphs != null) {
-      this.graphs = graphs;
-    } else {
-      this.graphs = Sets.newHashSet();
-    }
-  }
-
-  @Override
-  public Set<Long> getGraphs() {
-    return graphs;
-  }
-
-  @Override
-  public void setGraphs(Set<Long> graphs) {
-    this.graphs = graphs;
-  }
-
-  @Override
-  public void addGraph(Long graph) {
-    this.graphs.add(graph);
+    super(id, label, properties, graphs);
   }
 
   @Override
   public String toString() {
     return "EPFlinkVertexData{" +
-      "super=" + super.toString() +
-      ", graphs=" + graphs +
-      '}';
+      "super=" + super.toString() + '}';
   }
-
 }

@@ -20,11 +20,13 @@ package org.gradoop.model.impl;
 import org.gradoop.model.EPEdgeData;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * POJO for edge data.
  */
-public class EPFlinkEdgeData extends EPFlinkEntity implements EPEdgeData {
+public class EPFlinkEdgeData extends EPFlinkGraphElementEntity implements
+  EPEdgeData {
 
   private Long sourceVertex;
 
@@ -41,12 +43,26 @@ public class EPFlinkEdgeData extends EPFlinkEntity implements EPEdgeData {
 
   public EPFlinkEdgeData(Long id, String label, Long sourceVertex,
     Long targetVertex) {
-    this(id, label, sourceVertex, targetVertex, null);
+    this(id, label, sourceVertex, targetVertex, null, null);
   }
 
   public EPFlinkEdgeData(Long id, String label, Long sourceVertex,
     Long targetVertex, Map<String, Object> properties) {
-    super(id, label, properties);
+    super(id, label, properties, null);
+    this.sourceVertex = sourceVertex;
+    this.targetVertex = targetVertex;
+  }
+
+  public EPFlinkEdgeData(Long id, String label, Long sourceVertex,
+    Long targetVertex, Set<Long> graphs) {
+    super(id, label, null, graphs);
+    this.sourceVertex = sourceVertex;
+    this.targetVertex = targetVertex;
+  }
+
+  public EPFlinkEdgeData(Long id, String label, Long sourceVertex,
+    Long targetVertex, Map<String, Object> properties, Set<Long> graphs) {
+    super(id, label, properties, graphs);
     this.sourceVertex = sourceVertex;
     this.targetVertex = targetVertex;
   }

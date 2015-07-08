@@ -90,14 +90,14 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
     carol = new EPFlinkVertexData(2L, LABEL_PERSON, properties,
-      Sets.newHashSet(1L, 2L));
+      Sets.newHashSet(1L, 2L, 3L));
     // Person:Dave (3L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Dave");
     properties.put(PROPERTY_KEY_GENDER, "m");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
     dave = new EPFlinkVertexData(3L, LABEL_PERSON, properties,
-      Sets.newHashSet(1L, 2L));
+      Sets.newHashSet(1L, 2L, 3L));
     // Person:Eve (4L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Eve");
@@ -135,7 +135,8 @@ public abstract class EPFlinkTest {
     // Forum:Graph Processing (10L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_TITLE, "Graph Processing");
-    forumGPS = new EPFlinkVertexData(10L, LABEL_FORUM, properties);
+    forumGPS =
+      new EPFlinkVertexData(10L, LABEL_FORUM, properties, Sets.newHashSet(3L));
 
     List<EPFlinkVertexData> vertices = Lists
       .newArrayList(alice, bob, carol, dave, eve, frank, tagDatabases,
@@ -147,53 +148,53 @@ public abstract class EPFlinkTest {
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2014);
     edges.add(new EPFlinkEdgeData(0L, LABEL_KNOWS, alice.getId(), bob.getId(),
-      properties));
+      properties, Sets.newHashSet(0L, 2L)));
     // Person:Bob-[knows]->Person:Alice (1L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2014);
     edges.add(new EPFlinkEdgeData(1L, LABEL_KNOWS, bob.getId(), alice.getId(),
-      properties));
+      properties, Sets.newHashSet(0L, 2L)));
     // Person:Bob-[knows]->Person:Carol (2L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2013);
     edges.add(new EPFlinkEdgeData(2L, LABEL_KNOWS, bob.getId(), carol.getId(),
-      properties));
+      properties, Sets.newHashSet(2L)));
     // Person:Carol-[knows]->Person:Bob (3L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2013);
     edges.add(new EPFlinkEdgeData(3L, LABEL_KNOWS, carol.getId(), bob.getId(),
-      properties));
+      properties, Sets.newHashSet(2L)));
     // Person:Carol-[knows]->Person:Dave (4L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2014);
     edges.add(new EPFlinkEdgeData(4L, LABEL_KNOWS, carol.getId(), dave.getId(),
-      properties));
+      properties, Sets.newHashSet(1L, 2L, 3L)));
     // Person:Dave-[knows]->Person:Carol (5L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2014);
     edges.add(new EPFlinkEdgeData(5L, LABEL_KNOWS, dave.getId(), carol.getId(),
-      properties));
+      properties, Sets.newHashSet(1L, 2L)));
     // Person:Eve-[knows]->Person:Alice (6L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2013);
     edges.add(new EPFlinkEdgeData(6L, LABEL_KNOWS, eve.getId(), alice.getId(),
-      properties));
+      properties, Sets.newHashSet(0L)));
     // Person:Eve-[knows]->Person:Bob (21L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2015);
     edges.add(new EPFlinkEdgeData(21L, LABEL_KNOWS, eve.getId(), bob.getId(),
-      properties));
+      properties, Sets.newHashSet(0L)));
     // Person:Frank-[knows]->Person:Carol (22L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2015);
     edges.add(
       new EPFlinkEdgeData(22L, LABEL_KNOWS, frank.getId(), carol.getId(),
-        properties));
+        properties, Sets.newHashSet(1L)));
     // Person:Frank-[knows]->Person:Dave (23L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2015);
     edges.add(new EPFlinkEdgeData(23L, LABEL_KNOWS, frank.getId(), dave.getId(),
-      properties));
+      properties, Sets.newHashSet(1L)));
     // Person:Eve-[hasInterest]->Tag:Databases (7L)
     edges.add(new EPFlinkEdgeData(7L, LABEL_HAS_INTEREST, eve.getId(),
       tagDatabases.getId()));
@@ -223,7 +224,7 @@ public abstract class EPFlinkTest {
       alice.getId()));
     // Forum:Graph Processing-[hasModerator]->Person:Dave (16L)
     edges.add(new EPFlinkEdgeData(16L, LABEL_HAS_MODERATOR, forumGPS.getId(),
-      dave.getId()));
+      dave.getId(), Sets.newHashSet(3L)));
     // Forum:Graph Databases-[hasMember]->Person:Alice (17L)
     edges.add(new EPFlinkEdgeData(17L, LABEL_HAS_MEMBER, forumGDBS.getId(),
       alice.getId()));
@@ -232,10 +233,11 @@ public abstract class EPFlinkTest {
       bob.getId()));
     // Forum:Graph Processing-[hasMember]->Person:Carol (19L)
     edges.add(new EPFlinkEdgeData(19L, LABEL_HAS_MEMBER, forumGPS.getId(),
-      carol.getId()));
+      carol.getId(), Sets.newHashSet(3L)));
     // Forum:Graph Processing-[hasMember]->Person:Dave (20L)
-    edges.add(new EPFlinkEdgeData(20L, LABEL_HAS_MEMBER, forumGPS.getId(),
-      dave.getId()));
+    edges.add(
+      new EPFlinkEdgeData(20L, LABEL_HAS_MEMBER, forumGPS.getId(), dave.getId(),
+        Sets.newHashSet(3L)));
 
     // graphs
     List<EPFlinkGraphData> graphs = Lists.newArrayList();
@@ -254,6 +256,9 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_INTEREST, "Graphs");
     properties.put(PROPERTY_KEY_VERTEX_COUNT, 4);
     graphs.add(new EPFlinkGraphData(2L, LABEL_COMMUNITY, properties));
+
+    // Forum {} (3L)
+    graphs.add(new EPFlinkGraphData(3L, LABEL_FORUM));
 
     return FlinkGraphStore.fromCollection(vertices, edges, graphs, env);
   }

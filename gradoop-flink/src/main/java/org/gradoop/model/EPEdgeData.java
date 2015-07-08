@@ -17,7 +17,8 @@
 
 package org.gradoop.model;
 
-public interface EPEdgeData extends Identifiable, Labeled, Attributed {
+public interface EPEdgeData extends Identifiable, Labeled, Attributed,
+  EPGraphElement {
   Long getSourceVertex();
 
   void setSourceVertex(Long sourceVertexId);

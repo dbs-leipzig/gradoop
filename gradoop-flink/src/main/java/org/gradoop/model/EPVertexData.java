@@ -17,13 +17,7 @@
 
 package org.gradoop.model;
 
-import java.util.Set;
+public interface EPVertexData extends Identifiable, Attributed, Labeled,
+  EPGraphElement {
 
-public interface EPVertexData extends Identifiable, Attributed, Labeled {
-
-  Set<Long> getGraphs();
-
-  void setGraphs(Set<Long> graphs);
-
-  void addGraph(Long graph);
 }
