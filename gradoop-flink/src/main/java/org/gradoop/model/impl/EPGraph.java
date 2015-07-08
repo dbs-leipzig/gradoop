@@ -227,7 +227,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
         .where(new EdgeSourceVertexKeySelector())
         .equalTo(new VertexKeySelector()).with(joinFunc).join(newVertexSet)
         .where(new EdgeTargetVertexKeySelector())
-        .equalTo(new VertexKeySelector()).with(joinFunc);
+        .equalTo(new VertexKeySelector()).with(joinFunc)
+        .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
       new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),

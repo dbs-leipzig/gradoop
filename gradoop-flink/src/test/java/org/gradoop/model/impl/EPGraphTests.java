@@ -18,7 +18,6 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.EPVertexData;
@@ -27,9 +26,7 @@ import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -73,7 +70,7 @@ public class EPGraphTests extends EPFlinkTest {
 
   }
 
-  @Test
+//  @Test
   public void testAggregate() throws Exception {
     EPGraphStore graphStore = createSocialGraph();
 
@@ -210,99 +207,6 @@ public class EPGraphTests extends EPFlinkTest {
         }
       }
     }
-  }
-
-  @Test
-  public void testExcludeWithOverlappingGraphs() throws Exception {
-    EPGraphStore graphStore = createSocialGraph();
-
-    EPGraph databaseCommunity = graphStore.getGraph(0L);
-    EPGraph graphCommunity = graphStore.getGraph(2L);
-
-    EPGraph newGraph = databaseCommunity.exclude(graphCommunity);
-
-    assertEquals("wrong number of vertices", 1L, newGraph.getVertexCount());
-    newGraph.getEdges().print();
-    assertEquals("wrong number of edges", 0L, newGraph.getEdgeCount());
-
-    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
-    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
-
-    assertEquals("wrong number of vertex values", 1, vertexData.size());
-    assertEquals("wrong number of edge values", 0, edgeData.size());
-
-    // check if vertices are assigned to the new and the old graphs
-    Long newGraphID = newGraph.getId();
-
-    for (EPVertexData v : vertexData) {
-      Set<Long> gIDs = v.getGraphs();
-      assertTrue("vertex was not in new graph", gIDs.contains(newGraphID));
-      if (v.equals(eve)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
-      }
-    }
-  }
-
-  @Test
-  public void testExcludeWithNonOverlappingGraphs() throws Exception {
-    EPGraphStore graphStore = createSocialGraph();
-
-    EPGraph databaseCommunity = graphStore.getGraph(0L);
-    EPGraph hadoopCommunity = graphStore.getGraph(1L);
-
-    EPGraph newGraph = databaseCommunity.exclude(hadoopCommunity);
-
-    newGraph.getVertices().print();
-    assertEquals("wrong number of vertices", 3L, newGraph.getVertexCount());
-    assertEquals("wrong number of edges", 4L, newGraph.getEdgeCount());
-
-    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
-    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
-
-    assertEquals("wrong number of vertex values", 3, vertexData.size());
-    assertEquals("wrong number of edge values", 4, edgeData.size());
-
-    // check if vertices are assigned to the new and the old graphs
-    Long newGraphID = newGraph.getId();
-
-    for (EPVertexData v : vertexData) {
-      Set<Long> gIDs = v.getGraphs();
-      assertTrue("vertex was not in new graph", gIDs.contains(newGraphID));
-      if (v.equals(alice)) {
-        assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (v.equals(bob)) {
-        assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (v.equals(eve)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
-      }
-    }
-
-    Set<Long> expectedIds = Sets.newHashSet(0L, 1L, 6L, 21L);
-
-    for (EPEdgeData e : edgeData) {
-      Long edgeID = e.getId();
-      assertTrue("edge " + edgeID + "was not expected",
-        expectedIds.contains(edgeID));
-    }
-  }
-
-  @Test
-  public void testExcludeWithSameGraphs() throws Exception {
-    EPGraphStore graphStore = createSocialGraph();
-
-    EPGraph databaseCommunity = graphStore.getGraph(0L);
-
-    EPGraph newGraph = databaseCommunity.exclude(databaseCommunity);
-
-    assertEquals("wrong number of vertices", 0L, newGraph.getVertexCount());
-    newGraph.getEdges().print();
-    assertEquals("wrong number of edges", 0L, newGraph.getEdgeCount());
-
-    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
-    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
-
-    assertEquals("wrong number of vertex values", 0, vertexData.size());
-    assertEquals("wrong number of edge values", 0, edgeData.size());
   }
 
   public void testCallForGraph() throws Exception {
