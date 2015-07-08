@@ -163,7 +163,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
       this.graph.getEdges().union(otherGraph.graph.getEdges())
-        .distinct(new EdgeKeySelector());
+        .distinct(new EdgeKeySelector())
+        .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
       new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
@@ -449,6 +450,26 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
       Vertex<Long, EPFlinkVertexData> v) throws Exception {
       v.getValue().addGraph(newGraphID);
       return v;
+    }
+  }
+
+  /**
+   * Adds a given graph ID to the edge and returns it.
+   */
+  private static class EdgeToGraphUpdater implements
+    MapFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long, EPFlinkEdgeData>> {
+
+    private final long newGraphID;
+
+    public EdgeToGraphUpdater(final long newGraphID) {
+      this.newGraphID = newGraphID;
+    }
+
+    @Override
+    public Edge<Long, EPFlinkEdgeData> map(Edge<Long, EPFlinkEdgeData> e) throws
+      Exception {
+      e.getValue().addGraph(newGraphID);
+      return e;
     }
   }
 
