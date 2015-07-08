@@ -185,7 +185,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
       this.graph.getEdges().union(otherGraph.graph.getEdges())
-        .groupBy(new EdgeKeySelector()).reduceGroup(new EdgeGroupReducer(2L));
+        .groupBy(new EdgeKeySelector()).reduceGroup(new EdgeGroupReducer(2L))
+        .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
       new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
