@@ -18,22 +18,8 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.model.EPFlinkTest;
-import org.gradoop.model.store.EPGraphStore;
-import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-public class EPGraphCollectionTest extends EPFlinkTest {
-
-  @Test
-  public void testGetGraph() throws Exception {
-    EPGraphStore graphStore = createSocialGraph();
-    EPGraphCollection graphColl = graphStore.getCollection();
-
-    EPGraph graphCommunity = graphColl.getGraph(2L);
-    assertNotNull("graph was null", graphCommunity);
-    assertEquals("wrong label", LABEL_COMMUNITY, graphCommunity.getLabel());
-  }
+public class EPGraphCollectionTests extends EPFlinkTest {
 
   public void testSelect() throws Exception {
 

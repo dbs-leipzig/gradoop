@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Sets;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.gradoop.model.EPEdgeData;

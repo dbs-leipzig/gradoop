@@ -17,44 +17,29 @@
 
 package org.gradoop.model.impl;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(Parameterized.class)
-public class FlinkGraphStoreGetGraphTests extends EPFlinkTest {
+@RunWith(JUnitParamsRunner.class)
+public class FlinkGraphStoreTests extends EPFlinkTest {
 
   private EPGraphStore graphStore;
 
-  public FlinkGraphStoreGetGraphTests() {
+  public FlinkGraphStoreTests() {
     graphStore = createSocialGraph();
   }
 
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return Arrays.asList(
-      new Object[][]{{0L, 3L, 4L}, {1L, 3L, 4L}, {2L, 4L, 6L}, {3L, 3L, 4L}});
-  }
-
-  @Parameterized.Parameter
-  public long graphID;
-
-  @Parameterized.Parameter(value = 1)
-  public long expectedVertexCount;
-
-  @Parameterized.Parameter(value = 2)
-  public long expectedEdgeCount;
-
   @Test
-  public void testGetGraph() throws Exception {
+  @Parameters({"0, 3, 4", "1, 3, 4", "2, 4, 6", "3, 3, 4"})
+  public void testGetGraph(long graphID, long expectedVertexCount,
+    long expectedEdgeCount) throws Exception {
     EPGraph g = graphStore.getGraph(graphID);
 
     assertNotNull("graph was null", g);

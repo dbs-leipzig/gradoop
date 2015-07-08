@@ -33,7 +33,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class EPGraphTest extends EPFlinkTest {
+public class EPGraphTests extends EPFlinkTest {
 
   @Test
   public void testGetVertices() throws Exception {
