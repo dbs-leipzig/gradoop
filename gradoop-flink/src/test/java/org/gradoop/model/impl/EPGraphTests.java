@@ -24,7 +24,6 @@ import org.gradoop.model.EPVertexData;
 import org.gradoop.model.helper.Aggregate;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.store.EPGraphStore;
-import org.junit.Test;
 
 import java.util.List;
 
