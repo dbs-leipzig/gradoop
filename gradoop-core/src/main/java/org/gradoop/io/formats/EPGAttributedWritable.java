@@ -70,6 +70,14 @@ public class EPGAttributedWritable implements Attributed, Writable {
    * {@inheritDoc}
    */
   @Override
+  public <T> T getProperty(String key, Class<T> type) {
+    return type.cast(getProperty(key));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void setProperty(String key, Object value) {
     if (key == null || "".equals(key)) {
       throw new IllegalArgumentException("key must not be null or empty");

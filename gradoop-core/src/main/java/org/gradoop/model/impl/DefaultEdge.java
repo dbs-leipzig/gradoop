@@ -87,4 +87,12 @@ public class DefaultEdge extends LabeledPropertyContainer implements Edge {
       ", index=" + id +
       '}';
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> T getProperty(String key, Class<T> type) {
+    return type.cast(getProperty(key));
+  }
 }

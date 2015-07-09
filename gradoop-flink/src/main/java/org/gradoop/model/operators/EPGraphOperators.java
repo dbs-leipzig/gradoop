@@ -64,10 +64,16 @@ public interface EPGraphOperators {
     Aggregate<EPGraph, O> aggregateFunc) throws Exception;
 
   <O1 extends Number, O2 extends Number> EPGraph summarize(
+    String vertexGroupingKey,
+    Aggregate<Iterable<EPVertexData>, O1> vertexAggregateFunc,
+    String edgeGroupingKey,
+    Aggregate<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws Exception;
+
+  <O1 extends Number, O2 extends Number> EPGraph summarize(
     List<String> vertexGroupingKeys,
-    Aggregate<EPVertexCollection, O1> vertexAggregateFunc,
+    Aggregate<Iterable<EPVertexData>, O1> vertexAggregateFunc,
     List<String> edgeGroupingKeys,
-    Aggregate<EPEdgeCollection, O2> edgeAggregateFunc);
+    Aggregate<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws Exception;
 
   /*
   binary operators take two graphs as input and return a single graph

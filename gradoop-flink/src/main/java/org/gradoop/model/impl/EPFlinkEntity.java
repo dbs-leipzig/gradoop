@@ -93,6 +93,11 @@ public abstract class EPFlinkEntity implements Identifiable, Attributed,
   }
 
   @Override
+  public <T> T getProperty(String key, Class<T> type) {
+    return type.cast(properties.get(key));
+  }
+
+  @Override
   public void setProperty(String key, Object value) {
     properties.put(key, value);
   }

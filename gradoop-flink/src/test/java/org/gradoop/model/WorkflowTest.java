@@ -25,16 +25,14 @@ import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.SystemProperties;
 import org.gradoop.model.helper.UnaryFunction;
-import org.gradoop.model.impl.EPEdgeCollection;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
-import org.gradoop.model.impl.EPVertexCollection;
 import org.gradoop.model.store.EPGraphStore;
 import org.mockito.Mockito;
 
 public class WorkflowTest {
 
-  public void summarizedCommunities() {
+  public void summarizedCommunities() throws Exception {
     EPGraphStore db = Mockito.mock(EPGraphStore.class);
 
     // read full graph from database
@@ -67,16 +65,26 @@ public class WorkflowTest {
     // summarize communities
     knowsGraph
       .summarize(Lists.newArrayList(SystemProperties.TYPE.name(), "city"),
-        new Aggregate<EPVertexCollection, Long>() {
+        new Aggregate<Iterable<EPVertexData>, Long>() {
           @Override
-          public Long aggregate(EPVertexCollection entities) throws Exception {
-            return entities.size();
+          public Long aggregate(Iterable<EPVertexData> entities) throws
+            Exception {
+            long count = 0L;
+            for (EPVertexData e : entities) {
+              count++;
+            }
+            return count;
           }
         }, Lists.newArrayList(SystemProperties.TYPE.name()),
-        new Aggregate<EPEdgeCollection, Long>() {
+        new Aggregate<Iterable<EPEdgeData>, Long>() {
           @Override
-          public Long aggregate(EPEdgeCollection entities) throws Exception {
-            return entities.size();
+          public Long aggregate(Iterable<EPEdgeData> entities) throws
+            Exception {
+            long count = 0L;
+            for (EPEdgeData e : entities) {
+              count++;
+            }
+            return count;
           }
         });
   }
