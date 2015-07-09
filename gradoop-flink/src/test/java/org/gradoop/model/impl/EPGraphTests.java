@@ -71,34 +71,6 @@ public class EPGraphTests extends EPFlinkTest {
   }
 
 //  @Test
-  public void testAggregate() throws Exception {
-    EPGraphStore graphStore = createSocialGraph();
-
-    EPGraph databaseCommunity = graphStore.getGraph(0L);
-
-    String vCountPropertyKey = "vCount";
-
-    Aggregate<EPGraph, Long> aggregateFunc = new Aggregate<EPGraph, Long>() {
-      @Override
-      public Long aggregate(EPGraph entity) throws Exception {
-        return entity.getVertices().size();
-      }
-    };
-
-    EPGraph newGraph =
-      databaseCommunity.aggregate(vCountPropertyKey, aggregateFunc);
-
-    assertEquals("wrong property count", 3, newGraph.getPropertyCount());
-
-    assertEquals("wrong property value", 3L,
-      newGraph.getProperty(vCountPropertyKey));
-
-    // original graph needs to be unchanged
-    assertEquals("wrong property count", 2,
-      databaseCommunity.getPropertyCount());
-  }
-
-  @Test
   public void testSummarizeWithVertexGroupingKeys() throws Exception {
     EPGraphStore graphStore = createSocialGraph();
 
