@@ -32,36 +32,6 @@ import static org.junit.Assert.*;
 
 public class EPGraphTests extends EPFlinkTest {
 
-  @Test
-  public void testGetVertices() throws Exception {
-    EPGraphStore graphStore = createSocialGraph();
-
-    EPGraph dbGraph = graphStore.getDatabaseGraph();
-
-    assertEquals("wrong number of vertices", 11, dbGraph.getVertices().size());
-  }
-
-  @Test
-  public void testGetEdges() throws Exception {
-    EPGraphStore graphStore = createSocialGraph();
-
-    EPGraph dbGraph = graphStore.getDatabaseGraph();
-
-    assertEquals("wrong number of edges", 24, dbGraph.getEdges().size());
-
-    assertEquals("wrong number of outgoing edges", 2,
-      dbGraph.getOutgoingEdges(alice.getId()).size());
-
-    assertEquals("wrong number of outgoing edges", 0,
-      dbGraph.getOutgoingEdges(tagDatabases.getId()).size());
-
-    assertEquals("wrong number of incoming edges", 3,
-      dbGraph.getIncomingEdges(tagDatabases.getId()).size());
-
-    assertEquals("wrong number of incoming edges", 0,
-      dbGraph.getIncomingEdges(frank.getId()).size());
-  }
-
   public void testMatch() throws Exception {
 
   }
