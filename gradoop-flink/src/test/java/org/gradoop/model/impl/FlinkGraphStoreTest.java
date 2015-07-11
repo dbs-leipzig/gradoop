@@ -37,19 +37,6 @@ public class FlinkGraphStoreTest extends EPFlinkTest {
   }
 
   @Test
-  @Parameters({"0, 3, 4", "1, 3, 4", "2, 4, 6", "3, 3, 4"})
-  public void testGetGraph(long graphID, long expectedVertexCount,
-    long expectedEdgeCount) throws Exception {
-    EPGraph g = graphStore.getGraph(graphID);
-
-    assertNotNull("graph was null", g);
-    assertEquals("vertex set has the wrong size", expectedVertexCount,
-      g.getVertices().size());
-    assertEquals("edge set has the wrong size", expectedEdgeCount,
-      g.getEdges().size());
-  }
-
-  @Test
   public void testGetDatabaseGraph() throws Exception {
     EPGraph dbGraph = graphStore.getDatabaseGraph();
 

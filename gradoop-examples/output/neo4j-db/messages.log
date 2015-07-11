@@ -1,0 +1,509 @@
+2015-07-11 09:18:59.801+0000 INFO  [org.neo4j]: No locking implementation specified, defaulting to 'community'
+2015-07-11 09:18:59.870+0000 INFO  [org.neo4j]: --- INITIALIZED diagnostics START ---
+2015-07-11 09:18:59.872+0000 INFO  [org.neo4j]: Neo4j Kernel properties:
+    neostore.propertystore.db.mapped_memory=625M
+    neostore.relationshipgroupstore.db.mapped_memory=0M
+    neostore.nodestore.db.mapped_memory=172M
+    neostore.relationshipstore.db.mapped_memory=739M
+    neostore.propertystore.db.strings.mapped_memory=547M
+    store_dir=output/neo4j-db
+    neostore.propertystore.db.arrays.mapped_memory=638M
+    ephemeral=false
+2015-07-11 09:18:59.873+0000 INFO  [org.neo4j]: Diagnostics providers:
+    org.neo4j.kernel.configuration.Config
+    org.neo4j.kernel.info.DiagnosticsManager
+    SYSTEM_MEMORY
+    JAVA_MEMORY
+    OPERATING_SYSTEM
+    JAVA_VIRTUAL_MACHINE
+    CLASSPATH
+    LIBRARY_PATH
+    SYSTEM_PROPERTIES
+    LINUX_SCHEDULERS
+    NETWORK
+2015-07-11 09:18:59.874+0000 INFO  [org.neo4j]: System memory information:
+    Total Physical memory: 7.68 GB
+    Free Physical memory: 717.48 MB
+    Committed virtual memory: 3.99 GB
+    Total swap space: 7.88 GB
+    Free swap space: 7.88 GB
+2015-07-11 09:18:59.875+0000 INFO  [org.neo4j]: JVM memory information:
+    Free  memory: 90.69 MB
+    Total memory: 340.00 MB
+    Max   memory: 910.50 MB
+    Garbage Collector: PS Scavenge: [PS Eden Space, PS Survivor Space]
+    Garbage Collector: PS MarkSweep: [PS Eden Space, PS Survivor Space, PS Old Gen, PS Perm Gen]
+    Memory Pool: Code Cache (Non-heap memory): committed=6.56 MB, used=6.31 MB, max=48.00 MB, threshold=0.00 B
+    Memory Pool: PS Eden Space (Heap memory): committed=189.50 MB, used=121.30 MB, max=271.50 MB, threshold=?
+    Memory Pool: PS Survivor Space (Heap memory): committed=30.00 MB, used=29.62 MB, max=30.00 MB, threshold=?
+    Memory Pool: PS Old Gen (Heap memory): committed=120.50 MB, used=98.39 MB, max=682.50 MB, threshold=0.00 B
+    Memory Pool: PS Perm Gen (Non-heap memory): committed=135.00 MB, used=78.20 MB, max=256.00 MB, threshold=0.00 B
+2015-07-11 09:18:59.876+0000 INFO  [org.neo4j]: Operating system information:
+    Operating System: Linux; version: 3.19.0-22-generic; arch: amd64; cpus: 4
+    Max number of file descriptors: 65536
+    Number of open file descriptors: 576
+    Process id: 10479@s1ck-T520
+    Byte order: LITTLE_ENDIAN
+    Local timezone: Europe/Berlin
+2015-07-11 09:18:59.877+0000 INFO  [org.neo4j]: JVM information:
+    VM Name: Java HotSpot(TM) 64-Bit Server VM
+    VM Vendor: Oracle Corporation
+    VM Version: 24.80-b11
+    JIT compiler: HotSpot 64-Bit Tiered Compilers
+    VM Arguments: [-Xmx1024m, -XX:MaxPermSize=256m]
+2015-07-11 09:18:59.877+0000 INFO  [org.neo4j]: Java classpath:
+     [loader.1] file:/usr/lib/jvm/java-7-oracle/jre/lib/ext/sunjce_provider.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/jersey/jersey-client/1.9/jersey-client-1.9.jar
+     [bootstrap] /usr/lib/jvm/java-7-oracle/jre/classes
+     [classpath] /home/s1ck/.m2/repository/org/apache/bval/bval-core/0.5/bval-core-0.5.jar
+     [classpath] /home/s1ck/.m2/repository/javax/inject/javax.inject/1/javax.inject-1.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/zookeeper/zookeeper/3.4.5/zookeeper-3.4.5.jar
+     [classpath] /home/s1ck/.m2/repository/org/glassfish/gmbal/gmbal-api-only/3.0.0-b023/gmbal-api-only-3.0.0-b023.jar
+     [classpath] /home/s1ck/Devel/gradoop/gradoop-mapreduce/target/gradoop-mapreduce-0.0.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-http-server/2.1.2/grizzly-http-server-2.1.2.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/jersey/jersey-json/1.9/jersey-json-1.9.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-lucene-index/2.1.7/neo4j-lucene-index-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-hadoop2-compat/0.98.11-hadoop2/hbase-hadoop2-compat-0.98.11-hadoop2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-graph-matching/2.1.7/neo4j-graph-matching-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/commons-digester/commons-digester/1.8/commons-digester-1.8.jar
+     [classpath] /home/s1ck/.m2/repository/tomcat/jasper-runtime/5.5.23/jasper-runtime-5.5.23.jar
+     [classpath] /home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-http-servlet/2.1.2/grizzly-http-servlet-2.1.2.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.9/jersey-test-framework-core-1.9.jar
+     [classpath] /home/s1ck/.m2/repository/io/airlift/slice/0.5/slice-0.5.jar
+     [classpath] /home/s1ck/.m2/repository/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-framework/2.1.2/grizzly-framework-2.1.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-common/2.2.0/hadoop-yarn-common-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-udc/2.1.7/neo4j-udc-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/commons-daemon/commons-daemon/1.0.13/commons-daemon-1.0.13.jar
+     [bootstrap] /usr/lib/jvm/java-7-oracle/jre/lib/jce.jar
+     [classpath] /home/s1ck/.m2/repository/org/glassfish/javax.servlet/3.1/javax.servlet-3.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar
+     [classpath] /home/s1ck/.m2/repository/org/mortbay/jetty/jsp-2.1/6.1.14/jsp-2.1-6.1.14.jar
+     [classpath] /home/s1ck/.m2/repository/commons-cli/commons-cli/1.2/commons-cli-1.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-resourcemanager/2.2.0/hadoop-yarn-server-resourcemanager-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-hdfs/2.2.0/hadoop-hdfs-2.2.0-tests.jar
+     [classpath] /home/s1ck/Devel/gradoop/gradoop-giraph/target/gradoop-giraph-0.0.2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/json/json/20090211/json-20090211.jar
+     [bootstrap] /usr/lib/jvm/java-7-oracle/jre/lib/jfr.jar
+     [classpath] /home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-rcm/2.1.2/grizzly-rcm-2.1.2.jar
+     [classpath] /home/s1ck/.m2/repository/asm/asm/3.1/asm-3.1.jar
+     [classpath] /home/s1ck/Devel/gradoop/gradoop-giraph/target/gradoop-giraph-0.0.2.jar
+     [classpath] /home/s1ck/.m2/repository/io/airlift/units/0.91/units-0.91.jar
+     [classpath] /home/s1ck/.m2/repository/commons-net/commons-net/3.1/commons-net-3.1.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-cypher/2.1.7/neo4j-cypher-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/org/jamon/jamon-runtime/2.3.1/jamon-runtime-2.3.1.jar
+     [classpath] /home/s1ck/Devel/gradoop/gradoop-examples/target/classes
+     [classpath] /home/s1ck/.m2/repository/com/google/inject/guice/3.0/guice-3.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-cypher-compiler-2.1/2.1.7/neo4j-cypher-compiler-2.1-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-graph-algo/2.1.7/neo4j-graph-algo-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/giraph/giraph-core/1.1.0-hadoop2/giraph-core-1.1.0-hadoop2.jar
+     [classpath] /home/s1ck/.m2/repository/com/facebook/nifty/nifty-client/0.13.1/nifty-client-0.13.1.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/jersey/jersey-core/1.9/jersey-core-1.9.jar
+     [classpath] /home/s1ck/.m2/repository/com/facebook/swift/swift-service/0.13.1/swift-service-0.13.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-nodemanager/2.2.0/hadoop-yarn-server-nodemanager-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/bval/bval-jsr303/0.5/bval-jsr303-0.5.jar
+     [classpath] /home/s1ck/.m2/repository/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-core/2.2.0/hadoop-mapreduce-client-core-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+     [classpath] /home/s1ck/.m2/repository/it/unimi/dsi/fastutil/6.5.4/fastutil-6.5.4.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-client/0.98.11-hadoop2/hbase-client-0.98.11-hadoop2.jar
+     [loader.1] file:/usr/lib/jvm/java-7-oracle/jre/lib/ext/localedata.jar
+     [classpath] /home/s1ck/.m2/repository/com/facebook/swift/swift-codec/0.13.1/swift-codec-0.13.1.jar
+     [classpath] /home/s1ck/.m2/repository/net/iharder/base64/2.3.8/base64-2.3.8.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-jobclient/2.2.0/hadoop-mapreduce-client-jobclient-2.2.0-tests.jar
+     [classpath] /home/s1ck/Devel/gradoop/gradoop-core/target/gradoop-core-0.0.2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/lucene/lucene-core/3.6.2/lucene-core-3.6.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-common/2.2.0/hadoop-yarn-server-common-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/com/google/guava/guava/14.0.1/guava-14.0.1.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.9/jersey-test-framework-grizzly2-1.9.jar
+     [loader.1] file:/usr/lib/jvm/java-7-oracle/jre/lib/ext/dnsns.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-jmx/2.1.7/neo4j-jmx-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/org/parboiled/parboiled-core/1.1.6/parboiled-core-1.1.6.jar
+     [classpath] /home/s1ck/.m2/repository/org/codehaus/jackson/jackson-jaxrs/1.8.8/jackson-jaxrs-1.8.8.jar
+     [classpath] /home/s1ck/.m2/repository/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.1/high-scale-lib-1.1.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-server/0.98.11-hadoop2/hbase-server-0.98.11-hadoop2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-annotations/0.98.11-hadoop2/hbase-annotations-0.98.11-hadoop2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-hs/2.2.0/hadoop-mapreduce-client-hs-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-common/2.2.0/hadoop-mapreduce-client-common-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/jersey/jersey-server/1.9/jersey-server-1.9.jar
+     [classpath] /home/s1ck/.m2/repository/commons-configuration/commons-configuration/1.6/commons-configuration-1.6.jar
+     [classpath] /home/s1ck/.m2/repository/commons-beanutils/commons-beanutils-core/1.8.0/commons-beanutils-core-1.8.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/parboiled/parboiled-scala_2.10/1.1.6/parboiled-scala_2.10-1.1.6.jar
+     [classpath] /home/s1ck/.m2/repository/com/facebook/nifty/nifty-core/0.13.1/nifty-core-0.13.1.jar
+     [loader.1] file:/usr/lib/jvm/java-7-oracle/jre/lib/ext/zipfs.jar
+     [classpath] /home/s1ck/.m2/repository/javax/validation/validation-api/1.1.0.Final/validation-api-1.1.0.Final.jar
+     [classpath] /home/s1ck/.m2/repository/org/jodah/typetools/0.2.1/typetools-0.2.1.jar
+     [classpath] /home/s1ck/.m2/repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar
+     [bootstrap] /usr/lib/jvm/java-7-oracle/jre/lib/rt.jar
+     [loader.1] file:/usr/lib/jvm/java-7-oracle/jre/lib/ext/sunec.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-shuffle/2.2.0/hadoop-mapreduce-client-shuffle-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-cypher-compiler-2.0/2.0.3/neo4j-cypher-compiler-2.0-2.0.3.jar
+     [classpath] /home/s1ck/.m2/repository/commons-el/commons-el/1.0/commons-el-1.0.jar
+     [classpath] /home/s1ck/.m2/repository/javax/servlet/javax.servlet-api/3.0.1/javax.servlet-api-3.0.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-annotations/2.2.0/hadoop-annotations-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-annotations/0.98.11-hadoop2/hbase-annotations-0.98.11-hadoop2.jar
+     [classpath] /home/s1ck/.m2/repository/com/thoughtworks/paranamer/paranamer/2.5.2/paranamer-2.5.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.2/jackson-core-asl-1.9.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-client/2.2.0/hadoop-client-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/httpcomponents/httpcore/4.1.4/httpcore-4.1.4.jar
+     [classpath] /home/s1ck/.m2/repository/com/google/protobuf/protobuf-java/2.5.0/protobuf-java-2.5.0.jar
+     [classpath] /home/s1ck/.m2/repository/io/airlift/configuration/0.91/configuration-0.91.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-common/0.98.11-hadoop2/hbase-common-0.98.11-hadoop2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-hdfs/2.2.0/hadoop-hdfs-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/jersey/contribs/jersey-guice/1.9/jersey-guice-1.9.jar
+     [classpath] /home/s1ck/.m2/repository/org/slf4j/slf4j-log4j12/1.6.4/slf4j-log4j12-1.6.4.jar
+     [classpath] /home/s1ck/.m2/repository/org/weakref/jmxutils/1.16/jmxutils-1.16.jar
+     [classpath] /home/s1ck/.m2/repository/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-cypher-compiler-1.9/2.0.3/neo4j-cypher-compiler-1.9-2.0.3.jar
+     [classpath] /home/s1ck/.m2/repository/tomcat/jasper-compiler/5.5.23/jasper-compiler-5.5.23.jar
+     [classpath] /home/s1ck/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-tests/2.2.0/hadoop-yarn-server-tests-2.2.0-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-client/2.2.0/hadoop-yarn-client-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-jobclient/2.2.0/hadoop-mapreduce-client-jobclient-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-http/2.1.2/grizzly-http-2.1.2.jar
+     [classpath] /home/s1ck/.m2/repository/io/netty/netty-all/4.0.14.Final/netty-all-4.0.14.Final.jar
+     [classpath] /home/s1ck/.m2/repository/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/jruby/jcodings/jcodings/1.0.8/jcodings-1.0.8.jar
+     [classpath] /home/s1ck/.m2/repository/io/netty/netty/3.6.6.Final/netty-3.6.6.Final.jar
+     [classpath] /home/s1ck/.m2/repository/org/glassfish/external/management-api/3.0.0-b012/management-api-3.0.0-b012.jar
+     [classpath] /home/s1ck/.m2/repository/org/tukaani/xz/1.0/xz-1.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-hadoop-compat/0.98.11-hadoop2/hbase-hadoop-compat-0.98.11-hadoop2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/junit/junit/4.11/junit-4.11.jar
+     [classpath] /home/s1ck/.m2/repository/jline/jline/0.9.94/jline-0.9.94.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/commons/commons-math/2.1/commons-math-2.1.jar
+     [classpath] /usr/lib/jvm/java-7-oracle/lib/tools.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-auth/2.2.0/hadoop-auth-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j/2.1.7/neo4j-2.1.7.jar
+     [bootstrap] /usr/lib/jvm/java-7-oracle/jre/lib/sunrsasign.jar
+     [classpath] /home/s1ck/.m2/repository/xmlenc/xmlenc/0.52/xmlenc-0.52.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-cypher-commons/2.1.7/neo4j-cypher-commons-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-web-proxy/2.2.0/hadoop-yarn-server-web-proxy-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-api/2.2.0/hadoop-yarn-api-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/httpcomponents/httpclient/4.1.3/httpclient-4.1.3.jar
+     [classpath] /home/s1ck/.m2/repository/com/github/stephenc/findbugs/findbugs-annotations/1.3.9-1/findbugs-annotations-1.3.9-1.jar
+     [classpath] /home/s1ck/.m2/repository/com/facebook/thirdparty/yourkit-api/yjp-controller-api-redist/11.0.10/yjp-controller-api-redist-11.0.10.jar
+     [classpath] /home/s1ck/.m2/repository/commons-codec/commons-codec/1.4/commons-codec-1.4.jar
+     [classpath] /home/s1ck/.m2/repository/io/airlift/stats/0.91/stats-0.91.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-common/2.2.0/hadoop-common-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/mortbay/jetty/jsp-api-2.1/6.1.14/jsp-api-2.1-6.1.14.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-testing-util/0.98.11-hadoop2/hbase-testing-util-0.98.11-hadoop2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.1.4/jackson-annotations-2.1.4.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/giraph/giraph-core/1.1.0-hadoop2/giraph-core-1.1.0-hadoop2-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-primitive-collections/2.1.7/neo4j-primitive-collections-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/javax/xml/bind/jaxb-api/2.2.2/jaxb-api-2.2.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-prefix-tree/0.98.11-hadoop2/hbase-prefix-tree-0.98.11-hadoop2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/geronimo/specs/geronimo-jta_1.1_spec/1.1.1/geronimo-jta_1.1_spec-1.1.1.jar
+     [classpath] /home/s1ck/.m2/repository/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-protocol/0.98.11-hadoop2/hbase-protocol-0.98.11-hadoop2.jar
+     [classpath] /home/s1ck/.m2/repository/commons-io/commons-io/2.1/commons-io-2.1.jar
+     [classpath] /home/s1ck/Devel/gradoop/gradoop-core/target/gradoop-core-0.0.2.jar
+     [classpath] /home/s1ck/.m2/repository/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar
+     [classpath] /home/s1ck/.m2/repository/org/jruby/joni/joni/2.1.2/joni-2.1.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-hadoop-compat/0.98.11-hadoop2/hbase-hadoop-compat-0.98.11-hadoop2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/avro/avro/1.7.4/avro-1.7.4.jar
+     [classpath] /home/s1ck/.m2/repository/org/openjdk/jol/jol-core/0.1/jol-core-0.1.jar
+     [classpath] /home/s1ck/.m2/repository/com/facebook/swift/swift-annotations/0.13.1/swift-annotations-0.13.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/xerial/snappy/snappy-java/1.0.4.1/snappy-java-1.0.4.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/mortbay/jetty/jetty-sslengine/6.1.26/jetty-sslengine-6.1.26.jar
+     [bootstrap] /usr/lib/jvm/java-7-oracle/jre/lib/jsse.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-hadoop2-compat/0.98.11-hadoop2/hbase-hadoop2-compat-0.98.11-hadoop2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-server/0.98.11-hadoop2/hbase-server-0.98.11-hadoop2.jar
+     [loader.1] file:/usr/lib/jvm/java-7-oracle/jre/lib/ext/sunpkcs11.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hbase/hbase-common/0.98.11-hadoop2/hbase-common-0.98.11-hadoop2.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-app/2.2.0/hadoop-mapreduce-client-app-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/commons/commons-compress/1.4.1/commons-compress-1.4.1.jar
+     [classpath] /home/s1ck/.m2/repository/com/google/code/findbugs/annotations/2.0.2/annotations-2.0.2.jar
+     [classpath] /home/s1ck/.m2/repository/net/sf/opencsv/opencsv/2.3/opencsv-2.3.jar
+     [classpath] /home/s1ck/.m2/repository/org/codehaus/jackson/jackson-xc/1.8.3/jackson-xc-1.8.3.jar
+     [classpath] /home/s1ck/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.2/jackson-mapper-asl-1.9.2.jar
+     [classpath] /home/s1ck/.m2/repository/cglib/cglib-nodep/2.2.2/cglib-nodep-2.2.2.jar
+     [classpath] /home/s1ck/.m2/repository/org/mortbay/jetty/servlet-api-2.5/6.1.14/servlet-api-2.5-6.1.14.jar
+     [classpath] /home/s1ck/.m2/repository/net/java/dev/jets3t/jets3t/0.6.1/jets3t-0.6.1.jar
+     [bootstrap] /usr/lib/jvm/java-7-oracle/jre/lib/resources.jar
+     [classpath] /home/s1ck/.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-minicluster/2.2.0/hadoop-minicluster-2.2.0.jar
+     [classpath] /home/s1ck/.m2/repository/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.3.1/concurrentlinkedhashmap-lru-1.3.1.jar
+     [classpath] /home/s1ck/.m2/repository/org/cloudera/htrace/htrace-core/2.04/htrace-core-2.04.jar
+     [classpath] /home/s1ck/.m2/repository/org/apache/hadoop/hadoop-common/2.2.0/hadoop-common-2.2.0-tests.jar
+     [classpath] /home/s1ck/.m2/repository/org/neo4j/neo4j-kernel/2.1.7/neo4j-kernel-2.1.7.jar
+     [classpath] /home/s1ck/.m2/repository/com/sun/jersey/jersey-grizzly2/1.9/jersey-grizzly2-1.9.jar
+     [classpath] /home/s1ck/.m2/repository/org/python/jython/2.5.3/jython-2.5.3.jar
+     [loader.0] file:/tmp/surefirebooter6101351986492175227.jar
+     [bootstrap] /usr/lib/jvm/java-7-oracle/jre/lib/charsets.jar
+     [classpath] /home/s1ck/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar
+     [classpath] /home/s1ck/.m2/repository/log4j/log4j/1.2.17/log4j-1.2.17.jar
+     [classpath] /home/s1ck/Devel/gradoop/gradoop-examples/target/test-classes
+2015-07-11 09:18:59.880+0000 INFO  [org.neo4j]: Library path:
+    /usr/java/packages/lib/amd64
+    /usr/lib64
+    /lib64
+    /lib
+    /usr/lib
+2015-07-11 09:18:59.881+0000 INFO  [org.neo4j]: System.properties:
+    sun.boot.library.path = /usr/lib/jvm/java-7-oracle/jre/lib/amd64
+    path.separator = :
+    file.encoding.pkg = sun.io
+    user.country = US
+    sun.java.launcher = SUN_STANDARD
+    sun.os.patch.level = unknown
+    test.cache.data = /home/s1ck/Devel/gradoop/gradoop-examples/target/test-data/539da48a-cfca-4ac0-8a87-6b681bee26b4/cache_data
+    user.dir = /home/s1ck/Devel/gradoop/gradoop-examples
+    basedir = /home/s1ck/Devel/gradoop/gradoop-examples
+    zookeeper.snapCount = 50000
+    surefire.real.class.path = /tmp/surefirebooter6101351986492175227.jar
+    hadoop.tmp.dir = /home/s1ck/Devel/gradoop/gradoop-examples/target/test-data/539da48a-cfca-4ac0-8a87-6b681bee26b4/hadoop_tmp
+    sun.jnu.encoding = UTF-8
+    sun.nio.ch.bugLevel = 
+    surefire.test.class.path = /home/s1ck/Devel/gradoop/gradoop-examples/target/test-classes:/home/s1ck/Devel/gradoop/gradoop-examples/target/classes:/home/s1ck/Devel/gradoop/gradoop-giraph/target/gradoop-giraph-0.0.2.jar:/home/s1ck/Devel/gradoop/gradoop-core/target/gradoop-core-0.0.2.jar:/home/s1ck/.m2/repository/org/apache/giraph/giraph-core/1.1.0-hadoop2/giraph-core-1.1.0-hadoop2.jar:/home/s1ck/Devel/gradoop/gradoop-mapreduce/target/gradoop-mapreduce-0.0.2.jar:/home/s1ck/Devel/gradoop/gradoop-core/target/gradoop-core-0.0.2-tests.jar:/home/s1ck/Devel/gradoop/gradoop-giraph/target/gradoop-giraph-0.0.2-tests.jar:/home/s1ck/.m2/repository/org/apache/giraph/giraph-core/1.1.0-hadoop2/giraph-core-1.1.0-hadoop2-tests.jar:/home/s1ck/.m2/repository/com/facebook/nifty/nifty-client/0.13.1/nifty-client-0.13.1.jar:/home/s1ck/.m2/repository/com/facebook/nifty/nifty-core/0.13.1/nifty-core-0.13.1.jar:/home/s1ck/.m2/repository/javax/inject/javax.inject/1/javax.inject-1.jar:/home/s1ck/.m2/repository/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0.jar:/home/s1ck/.m2/repository/com/google/inject/guice/3.0/guice-3.0.jar:/home/s1ck/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar:/home/s1ck/.m2/repository/io/airlift/units/0.91/units-0.91.jar:/home/s1ck/.m2/repository/javax/validation/validation-api/1.1.0.Final/validation-api-1.1.0.Final.jar:/home/s1ck/.m2/repository/com/facebook/swift/swift-annotations/0.13.1/swift-annotations-0.13.1.jar:/home/s1ck/.m2/repository/com/facebook/swift/swift-codec/0.13.1/swift-codec-0.13.1.jar:/home/s1ck/.m2/repository/com/thoughtworks/paranamer/paranamer/2.5.2/paranamer-2.5.2.jar:/home/s1ck/.m2/repository/com/facebook/swift/swift-service/0.13.1/swift-service-0.13.1.jar:/home/s1ck/.m2/repository/io/airlift/configuration/0.91/configuration-0.91.jar:/home/s1ck/.m2/repository/org/apache/bval/bval-jsr303/0.5/bval-jsr303-0.5.jar:/home/s1ck/.m2/repository/org/apache/bval/bval-core/0.5/bval-core-0.5.jar:/home/s1ck/.m2/repository/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar:/home/s1ck/.m2/repository/cglib/cglib-nodep/2.2.2/cglib-nodep-2.2.2.jar:/home/s1ck/.m2/repository/io/airlift/stats/0.91/stats-0.91.jar:/home/s1ck/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.1.4/jackson-annotations-2.1.4.jar:/home/s1ck/.m2/repository/io/airlift/slice/0.5/slice-0.5.jar:/home/s1ck/.m2/repository/org/openjdk/jol/jol-core/0.1/jol-core-0.1.jar:/home/s1ck/.m2/repository/org/weakref/jmxutils/1.16/jmxutils-1.16.jar:/home/s1ck/.m2/repository/com/facebook/thirdparty/yourkit-api/yjp-controller-api-redist/11.0.10/yjp-controller-api-redist-11.0.10.jar:/home/s1ck/.m2/repository/com/google/code/findbugs/annotations/2.0.2/annotations-2.0.2.jar:/home/s1ck/.m2/repository/com/google/guava/guava/14.0.1/guava-14.0.1.jar:/home/s1ck/.m2/repository/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar:/home/s1ck/.m2/repository/commons-cli/commons-cli/1.2/commons-cli-1.2.jar:/home/s1ck/.m2/repository/commons-io/commons-io/2.1/commons-io-2.1.jar:/home/s1ck/.m2/repository/log4j/log4j/1.2.17/log4j-1.2.17.jar:/home/s1ck/.m2/repository/io/netty/netty-all/4.0.14.Final/netty-all-4.0.14.Final.jar:/home/s1ck/.m2/repository/net/iharder/base64/2.3.8/base64-2.3.8.jar:/home/s1ck/.m2/repository/it/unimi/dsi/fastutil/6.5.4/fastutil-6.5.4.jar:/home/s1ck/.m2/repository/org/apache/zookeeper/zookeeper/3.4.5/zookeeper-3.4.5.jar:/home/s1ck/.m2/repository/jline/jline/0.9.94/jline-0.9.94.jar:/home/s1ck/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.2/jackson-core-asl-1.9.2.jar:/home/s1ck/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.2/jackson-mapper-asl-1.9.2.jar:/home/s1ck/.m2/repository/org/jodah/typetools/0.2.1/typetools-0.2.1.jar:/home/s1ck/.m2/repository/org/json/json/20090211/json-20090211.jar:/home/s1ck/.m2/repository/org/python/jython/2.5.3/jython-2.5.3.jar:/home/s1ck/.m2/repository/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-testing-util/0.98.11-hadoop2/hbase-testing-util-0.98.11-hadoop2-tests.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-common/0.98.11-hadoop2/hbase-common-0.98.11-hadoop2.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-annotations/0.98.11-hadoop2/hbase-annotations-0.98.11-hadoop2.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-common/0.98.11-hadoop2/hbase-common-0.98.11-hadoop2-tests.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-annotations/0.98.11-hadoop2/hbase-annotations-0.98.11-hadoop2-tests.jar:/usr/lib/jvm/java-7-oracle/jre/../lib/tools.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-protocol/0.98.11-hadoop2/hbase-protocol-0.98.11-hadoop2.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-client/0.98.11-hadoop2/hbase-client-0.98.11-hadoop2.jar:/home/s1ck/.m2/repository/org/jruby/jcodings/jcodings/1.0.8/jcodings-1.0.8.jar:/home/s1ck/.m2/repository/org/jruby/joni/joni/2.1.2/joni-2.1.2.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-server/0.98.11-hadoop2/hbase-server-0.98.11-hadoop2.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-hadoop-compat/0.98.11-hadoop2/hbase-hadoop-compat-0.98.11-hadoop2.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-hadoop-compat/0.98.11-hadoop2/hbase-hadoop-compat-0.98.11-hadoop2-tests.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-hadoop2-compat/0.98.11-hadoop2/hbase-hadoop2-compat-0.98.11-hadoop2.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-hadoop2-compat/0.98.11-hadoop2/hbase-hadoop2-compat-0.98.11-hadoop2-tests.jar:/home/s1ck/.m2/repository/org/slf4j/slf4j-log4j12/1.6.4/slf4j-log4j12-1.6.4.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-common/2.2.0/hadoop-common-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-annotations/2.2.0/hadoop-annotations-2.2.0.jar:/home/s1ck/.m2/repository/xmlenc/xmlenc/0.52/xmlenc-0.52.jar:/home/s1ck/.m2/repository/commons-net/commons-net/3.1/commons-net-3.1.jar:/home/s1ck/.m2/repository/com/sun/jersey/jersey-core/1.9/jersey-core-1.9.jar:/home/s1ck/.m2/repository/com/sun/jersey/jersey-json/1.9/jersey-json-1.9.jar:/home/s1ck/.m2/repository/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar:/home/s1ck/.m2/repository/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1.jar:/home/s1ck/.m2/repository/javax/xml/bind/jaxb-api/2.2.2/jaxb-api-2.2.2.jar:/home/s1ck/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar:/home/s1ck/.m2/repository/org/codehaus/jackson/jackson-xc/1.8.3/jackson-xc-1.8.3.jar:/home/s1ck/.m2/repository/com/sun/jersey/jersey-server/1.9/jersey-server-1.9.jar:/home/s1ck/.m2/repository/asm/asm/3.1/asm-3.1.jar:/home/s1ck/.m2/repository/commons-el/commons-el/1.0/commons-el-1.0.jar:/home/s1ck/.m2/repository/net/java/dev/jets3t/jets3t/0.6.1/jets3t-0.6.1.jar:/home/s1ck/.m2/repository/commons-configuration/commons-configuration/1.6/commons-configuration-1.6.jar:/home/s1ck/.m2/repository/commons-digester/commons-digester/1.8/commons-digester-1.8.jar:/home/s1ck/.m2/repository/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar:/home/s1ck/.m2/repository/commons-beanutils/commons-beanutils-core/1.8.0/commons-beanutils-core-1.8.0.jar:/home/s1ck/.m2/repository/org/apache/avro/avro/1.7.4/avro-1.7.4.jar:/home/s1ck/.m2/repository/org/xerial/snappy/snappy-java/1.0.4.1/snappy-java-1.0.4.1.jar:/home/s1ck/.m2/repository/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar:/home/s1ck/.m2/repository/org/apache/commons/commons-compress/1.4.1/commons-compress-1.4.1.jar:/home/s1ck/.m2/repository/org/tukaani/xz/1.0/xz-1.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-auth/2.2.0/hadoop-auth-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-client/2.2.0/hadoop-client-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-app/2.2.0/hadoop-mapreduce-client-app-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-api/2.2.0/hadoop-yarn-api-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-core/2.2.0/hadoop-mapreduce-client-core-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-common/2.2.0/hadoop-yarn-common-2.2.0.jar:/home/s1ck/.m2/repository/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.9/jersey-test-framework-grizzly2-1.9.jar:/home/s1ck/.m2/repository/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.9/jersey-test-framework-core-1.9.jar:/home/s1ck/.m2/repository/javax/servlet/javax.servlet-api/3.0.1/javax.servlet-api-3.0.1.jar:/home/s1ck/.m2/repository/com/sun/jersey/jersey-client/1.9/jersey-client-1.9.jar:/home/s1ck/.m2/repository/com/sun/jersey/jersey-grizzly2/1.9/jersey-grizzly2-1.9.jar:/home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-http/2.1.2/grizzly-http-2.1.2.jar:/home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-framework/2.1.2/grizzly-framework-2.1.2.jar:/home/s1ck/.m2/repository/org/glassfish/gmbal/gmbal-api-only/3.0.0-b023/gmbal-api-only-3.0.0-b023.jar:/home/s1ck/.m2/repository/org/glassfish/external/management-api/3.0.0-b012/management-api-3.0.0-b012.jar:/home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-http-server/2.1.2/grizzly-http-server-2.1.2.jar:/home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-rcm/2.1.2/grizzly-rcm-2.1.2.jar:/home/s1ck/.m2/repository/org/glassfish/grizzly/grizzly-http-servlet/2.1.2/grizzly-http-servlet-2.1.2.jar:/home/s1ck/.m2/repository/org/glassfish/javax.servlet/3.1/javax.servlet-3.1.jar:/home/s1ck/.m2/repository/com/sun/jersey/contribs/jersey-guice/1.9/jersey-guice-1.9.jar:/home/s1ck/.m2/repository/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-jobclient/2.2.0/hadoop-mapreduce-client-jobclient-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-common/2.2.0/hadoop-mapreduce-client-common-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-client/2.2.0/hadoop-yarn-client-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-common/2.2.0/hadoop-yarn-server-common-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-shuffle/2.2.0/hadoop-mapreduce-client-shuffle-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-nodemanager/2.2.0/hadoop-yarn-server-nodemanager-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-hdfs/2.2.0/hadoop-hdfs-2.2.0.jar:/home/s1ck/.m2/repository/commons-daemon/commons-daemon/1.0.13/commons-daemon-1.0.13.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-hdfs/2.2.0/hadoop-hdfs-2.2.0-tests.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-minicluster/2.2.0/hadoop-minicluster-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-common/2.2.0/hadoop-common-2.2.0-tests.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-tests/2.2.0/hadoop-yarn-server-tests-2.2.0-tests.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-resourcemanager/2.2.0/hadoop-yarn-server-resourcemanager-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-yarn-server-web-proxy/2.2.0/hadoop-yarn-server-web-proxy-2.2.0.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-jobclient/2.2.0/hadoop-mapreduce-client-jobclient-2.2.0-tests.jar:/home/s1ck/.m2/repository/org/apache/hadoop/hadoop-mapreduce-client-hs/2.2.0/hadoop-mapreduce-client-hs-2.2.0.jar:/home/s1ck/.m2/repository/com/github/stephenc/findbugs/findbugs-annotations/1.3.9-1/findbugs-annotations-1.3.9-1.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-server/0.98.11-hadoop2/hbase-server-0.98.11-hadoop2-tests.jar:/home/s1ck/.m2/repository/org/apache/hbase/hbase-prefix-tree/0.98.11-hadoop2/hbase-prefix-tree-0.98.11-hadoop2.jar:/home/s1ck/.m2/repository/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar:/home/s1ck/.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar:/home/s1ck/.m2/repository/com/google/protobuf/protobuf-java/2.5.0/protobuf-java-2.5.0.jar:/home/s1ck/.m2/repository/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.1/high-scale-lib-1.1.1.jar:/home/s1ck/.m2/repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar:/home/s1ck/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/home/s1ck/.m2/repository/org/apache/commons/commons-math/2.1/commons-math-2.1.jar:/home/s1ck/.m2/repository/io/netty/netty/3.6.6.Final/netty-3.6.6.Final.jar:/home/s1ck/.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26.jar:/home/s1ck/.m2/repository/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26.jar:/home/s1ck/.m2/repository/org/mortbay/jetty/jetty-sslengine/6.1.26/jetty-sslengine-6.1.26.jar:/home/s1ck/.m2/repository/org/mortbay/jetty/jsp-2.1/6.1.14/jsp-2.1-6.1.14.jar:/home/s1ck/.m2/repository/org/mortbay/jetty/jsp-api-2.1/6.1.14/jsp-api-2.1-6.1.14.jar:/home/s1ck/.m2/repository/org/mortbay/jetty/servlet-api-2.5/6.1.14/servlet-api-2.5-6.1.14.jar:/home/s1ck/.m2/repository/org/codehaus/jackson/jackson-jaxrs/1.8.8/jackson-jaxrs-1.8.8.jar:/home/s1ck/.m2/repository/tomcat/jasper-compiler/5.5.23/jasper-compiler-5.5.23.jar:/home/s1ck/.m2/repository/tomcat/jasper-runtime/5.5.23/jasper-runtime-5.5.23.jar:/home/s1ck/.m2/repository/org/jamon/jamon-runtime/2.3.1/jamon-runtime-2.3.1.jar:/home/s1ck/.m2/repository/org/cloudera/htrace/htrace-core/2.04/htrace-core-2.04.jar:/home/s1ck/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/s1ck/.m2/repository/junit/junit/4.11/junit-4.11.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j/2.1.7/neo4j-2.1.7.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-kernel/2.1.7/neo4j-kernel-2.1.7.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-primitive-collections/2.1.7/neo4j-primitive-collections-2.1.7.jar:/home/s1ck/.m2/repository/org/apache/geronimo/specs/geronimo-jta_1.1_spec/1.1.1/geronimo-jta_1.1_spec-1.1.1.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-lucene-index/2.1.7/neo4j-lucene-index-2.1.7.jar:/home/s1ck/.m2/repository/org/apache/lucene/lucene-core/3.6.2/lucene-core-3.6.2.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-graph-algo/2.1.7/neo4j-graph-algo-2.1.7.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-udc/2.1.7/neo4j-udc-2.1.7.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-graph-matching/2.1.7/neo4j-graph-matching-2.1.7.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-cypher/2.1.7/neo4j-cypher-2.1.7.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-cypher-commons/2.1.7/neo4j-cypher-commons-2.1.7.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-cypher-compiler-1.9/2.0.3/neo4j-cypher-compiler-1.9-2.0.3.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-cypher-compiler-2.0/2.0.3/neo4j-cypher-compiler-2.0-2.0.3.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-cypher-compiler-2.1/2.1.7/neo4j-cypher-compiler-2.1-2.1.7.jar:/home/s1ck/.m2/repository/org/parboiled/parboiled-scala_2.10/1.1.6/parboiled-scala_2.10-1.1.6.jar:/home/s1ck/.m2/repository/org/parboiled/parboiled-core/1.1.6/parboiled-core-1.1.6.jar:/home/s1ck/.m2/repository/net/sf/opencsv/opencsv/2.3/opencsv-2.3.jar:/home/s1ck/.m2/repository/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.3.1/concurrentlinkedhashmap-lru-1.3.1.jar:/home/s1ck/.m2/repository/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar:/home/s1ck/.m2/repository/org/neo4j/neo4j-jmx/2.1.7/neo4j-jmx-2.1.7.jar:/home/s1ck/.m2/repository/org/apache/httpcomponents/httpclient/4.1.3/httpclient-4.1.3.jar:/home/s1ck/.m2/repository/org/apache/httpcomponents/httpcore/4.1.4/httpcore-4.1.4.jar:/home/s1ck/.m2/repository/commons-codec/commons-codec/1.4/commons-codec-1.4.jar:
+    test.build.data = /home/s1ck/Devel/gradoop/gradoop-examples/target/test-data/539da48a-cfca-4ac0-8a87-6b681bee26b4/dfscluster_a7f82e05-7c1f-43e2-b8df-c136a1dd14d2
+    prop.jarLocation = /home/s1ck/Devel/gradoop/gradoop-examples/../gradoop-giraph/target/gradoop-giraph-0.0.2-jar-with-dependencies.jar
+    sun.management.compiler = HotSpot 64-Bit Tiered Compilers
+    user.home = /home/s1ck
+    user.timezone = Europe/Berlin
+    mapred.local.dir = /home/s1ck/Devel/gradoop/gradoop-examples/target/test-data/539da48a-cfca-4ac0-8a87-6b681bee26b4/mapred_local
+    mapred.temp.dir = /home/s1ck/Devel/gradoop/gradoop-examples/target/test-data/539da48a-cfca-4ac0-8a87-6b681bee26b4/mapred_temp
+    file.encoding = UTF-8
+    user.name = s1ck
+    sun.java.command = /tmp/surefirebooter6101351986492175227.jar /tmp/surefire6289609613881365960tmp /tmp/surefire8794437645894430780tmp
+    sun.arch.data.model = 64
+    user.language = en
+    awt.toolkit = sun.awt.X11.XToolkit
+    hadoop.log.dir = /home/s1ck/Devel/gradoop/gradoop-examples/target/test-data/539da48a-cfca-4ac0-8a87-6b681bee26b4/hadoop_logs
+    zookeeper.preAllocSize = 100
+    localRepository = /home/s1ck/.m2/repository
+    file.separator = /
+    sun.io.unicode.encoding = UnicodeLittle
+    sun.cpu.endian = little
+    test.build.dir = /home/s1ck/Devel/gradoop/gradoop-examples/target/test-data/539da48a-cfca-4ac0-8a87-6b681bee26b4
+    hadoop.policy.file = hbase-policy.xml
+    sun.cpu.isalist = 
+2015-07-11 09:18:59.881+0000 INFO  [org.neo4j]: Linux scheduler information:
+    noop [deadline] cfq 
+    noop [deadline] cfq 
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+    none
+2015-07-11 09:18:59.883+0000 INFO  [org.neo4j]: Network information:
+    Interface wlan0:
+        address: fe80:0:0:0:224:d7ff:fede:dcb0%3
+        address: 2a00:c1a0:80c0:c000:224:d7ff:fede:dcb0%3
+        address: 192.168.0.21
+    Interface lo:
+        address: 0:0:0:0:0:0:0:1%1
+        address: 127.0.0.1
+2015-07-11 09:18:59.883+0000 INFO  [org.neo4j]: --- INITIALIZED diagnostics END ---
+2015-07-11 09:18:59.935+0000 INFO  [org.neo4j]: Creating new db @ output/neo4j-db/neostore
+2015-07-11 09:19:00.081+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshiptypestore.db.names] brickCount=0 brickSize=0b mappedMem=0b (storeSize=38b)
+2015-07-11 09:19:00.083+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshiptypestore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.087+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshiptypestore.db.names hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.096+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshiptypestore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.131+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.labeltokenstore.db.names] brickCount=0 brickSize=0b mappedMem=0b (storeSize=38b)
+2015-07-11 09:19:00.133+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.labeltokenstore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.140+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.labeltokenstore.db.names hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.148+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.labeltokenstore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.181+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshiptypestore.db.names] brickCount=0 brickSize=0b mappedMem=0b (storeSize=38b)
+2015-07-11 09:19:00.181+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshiptypestore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.182+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.labeltokenstore.db.names] brickCount=0 brickSize=0b mappedMem=0b (storeSize=38b)
+2015-07-11 09:19:00.182+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.labeltokenstore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.183+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db.strings] brickCount=0 brickSize=573568b mappedMem=573571072b (storeSize=128b)
+2015-07-11 09:19:00.183+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db.index.keys] brickCount=0 brickSize=0b mappedMem=0b (storeSize=38b)
+2015-07-11 09:19:00.184+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db.index] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.185+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db.arrays] brickCount=0 brickSize=668928b mappedMem=668991488b (storeSize=128b)
+2015-07-11 09:19:00.191+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db] brickCount=0 brickSize=6553563b mappedMem=655360000b (storeSize=0b)
+2015-07-11 09:19:00.196+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshipstore.db] brickCount=0 brickSize=7748974b mappedMem=774897664b (storeSize=0b)
+2015-07-11 09:19:00.197+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.nodestore.db.labels] brickCount=0 brickSize=0b mappedMem=0b (storeSize=68b)
+2015-07-11 09:19:00.201+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.nodestore.db] brickCount=0 brickSize=1803540b mappedMem=180355072b (storeSize=0b)
+2015-07-11 09:19:00.202+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.schemastore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=64b)
+2015-07-11 09:19:00.205+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshipgroupstore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=25b)
+2015-07-11 09:19:00.206+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.218+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshiptypestore.db.names hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.225+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshiptypestore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.233+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.labeltokenstore.db.names hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.240+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.labeltokenstore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.248+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db.strings hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.259+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db.index.keys hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.270+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db.index hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.278+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db.arrays hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.285+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.293+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshipstore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.304+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.nodestore.db.labels hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.312+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.nodestore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.319+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.schemastore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.326+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshipgroupstore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:00.337+0000 INFO  [org.neo4j]: output/neo4j-db/neostore hit=0 miss=10 switches=0 ooe=0
+2015-07-11 09:19:00.360+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshiptypestore.db.names] brickCount=0 brickSize=0b mappedMem=0b (storeSize=38b)
+2015-07-11 09:19:00.360+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshiptypestore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.361+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.labeltokenstore.db.names] brickCount=0 brickSize=0b mappedMem=0b (storeSize=38b)
+2015-07-11 09:19:00.361+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.labeltokenstore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.361+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db.strings] brickCount=0 brickSize=573568b mappedMem=573571072b (storeSize=128b)
+2015-07-11 09:19:00.362+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db.index.keys] brickCount=0 brickSize=0b mappedMem=0b (storeSize=38b)
+2015-07-11 09:19:00.362+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db.index] brickCount=0 brickSize=0b mappedMem=0b (storeSize=0b)
+2015-07-11 09:19:00.363+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db.arrays] brickCount=0 brickSize=668928b mappedMem=668991488b (storeSize=128b)
+2015-07-11 09:19:00.363+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.propertystore.db] brickCount=0 brickSize=6553563b mappedMem=655360000b (storeSize=0b)
+2015-07-11 09:19:00.364+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshipstore.db] brickCount=0 brickSize=7748974b mappedMem=774897664b (storeSize=0b)
+2015-07-11 09:19:00.364+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.nodestore.db.labels] brickCount=0 brickSize=0b mappedMem=0b (storeSize=68b)
+2015-07-11 09:19:00.365+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.nodestore.db] brickCount=0 brickSize=1803540b mappedMem=180355072b (storeSize=0b)
+2015-07-11 09:19:00.365+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.schemastore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=64b)
+2015-07-11 09:19:00.366+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore.relationshipgroupstore.db] brickCount=0 brickSize=0b mappedMem=0b (storeSize=25b)
+2015-07-11 09:19:00.366+0000 INFO  [org.neo4j]: [output/neo4j-db/neostore] brickCount=0 brickSize=0b mappedMem=0b (storeSize=81b)
+2015-07-11 09:19:00.484+0000 INFO  [org.neo4j]: No lucene scan store index found, this might just be first use. Preparing to rebuild.
+2015-07-11 09:19:00.513+0000 INFO  [org.neo4j]: No lucene scan store index found, this might just be first use. Preparing to rebuild.
+2015-07-11 09:19:00.592+0000 INFO  [org.neo4j]: Opened logical log [output/neo4j-db/nioneo_logical.log.1] version=0, lastTxId=1 (clean)
+2015-07-11 09:19:00.598+0000 INFO  [org.neo4j]: Rebuilding lucene scan store, this may take a while
+2015-07-11 09:19:00.599+0000 INFO  [org.neo4j]: Lucene scan store rebuilt (roughly -1 nodes)
+2015-07-11 09:19:00.601+0000 INFO  [org.neo4j]: TM new log: tm_tx_log.1
+2015-07-11 09:19:00.609+0000 INFO  [org.neo4j]: Kernel health set to OK
+2015-07-11 09:19:00.627+0000 INFO  [org.neo4j]: Opened logical log [output/neo4j-db/index/lucene.log.1] version=0, lastTxId=1 (clean)
+2015-07-11 09:19:00.638+0000 INFO  [org.neo4j]: --- STARTED diagnostics for KernelDiagnostics:Versions START ---
+2015-07-11 09:19:00.638+0000 INFO  [org.neo4j]: Graph Database: org.neo4j.kernel.EmbeddedGraphDatabase StoreId{creationTime=1436606339939, randomId=4919182774557425831, storeVersion=14406081294923270, upgradeTime=1436606339939, upgradeId=4919182774557425831}
+2015-07-11 09:19:00.638+0000 INFO  [org.neo4j]: Kernel version: Neo4j - Graph Database Kernel (neo4j-kernel), version: 2.1.7
+2015-07-11 09:19:00.638+0000 INFO  [org.neo4j]: Neo4j component versions:
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - JMX support (neo4j-jmx), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Lucene Index (neo4j-lucene-index), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Graph Matching (neo4j-graph-matching), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Cypher Compiler 2.1 (neo4j-cypher-compiler-2.1), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Cypher (neo4j-cypher), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Graph Database Kernel (neo4j-kernel), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Cypher Compiler 2.0 (neo4j-cypher-compiler-2.0), version: 2.0.3; revision: 2.0.3:2.0-maint:72/307c563c11b75fdc71cfa6df05daf9b08d6c37dc
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Graph Algorithms (neo4j-graph-algo), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j Community (neo4j), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Cypher Compiler 1.9 (neo4j-cypher-compiler-1.9), version: 2.0.3; revision: 2.0.3:2.0-maint:72/307c563c11b75fdc71cfa6df05daf9b08d6c37dc
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   neo4j-udc, version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]:   Neo4j - Cypher Commons (neo4j-cypher-commons), version: 2.1.7; revision: 2.1.7:2.1-maint:649/ed233fc1087f4549d1956b8ec4a504fe2f13a446
+2015-07-11 09:19:00.641+0000 INFO  [org.neo4j]: --- STARTED diagnostics for KernelDiagnostics:Versions END ---
+2015-07-11 09:19:00.645+0000 INFO  [org.neo4j]: --- STARTED diagnostics for NEO_STORE_VERSIONS START ---
+2015-07-11 09:19:00.645+0000 INFO  [org.neo4j]: Store versions:
+    Store versions:
+      NeoStore v0.A.3
+      SchemaStore v0.A.3
+      NodeStore v0.A.3
+      RelationshipStore v0.A.3
+      RelationshipTypeStore v0.A.3
+      LabelTokenStore v0.A.3
+      PropertyStore v0.A.3
+      PropertyIndexStore v0.A.3
+      StringPropertyStore v0.A.3
+      ArrayPropertyStore v0.A.3
+      RelationshipGroupStore v0.A.3
+2015-07-11 09:19:00.646+0000 INFO  [org.neo4j]: --- STARTED diagnostics for NEO_STORE_VERSIONS END ---
+2015-07-11 09:19:00.646+0000 INFO  [org.neo4j]: --- STARTED diagnostics for NEO_STORE_ID_USAGE START ---
+2015-07-11 09:19:00.646+0000 INFO  [org.neo4j]: Id usage:
+    Id usage:
+      SchemaStore: used=1 high=0
+      NodeStore: used=0 high=-1
+      RelationshipStore: used=0 high=-1
+      RelationshipTypeStore: used=0 high=-1
+      LabelTokenStore: used=0 high=-1
+      PropertyStore: used=0 high=-1
+      PropertyIndexStore: used=0 high=-1
+      StringPropertyStore: used=1 high=0
+      ArrayPropertyStore: used=1 high=0
+      RelationshipGroupStore: used=1 high=0
+2015-07-11 09:19:00.646+0000 INFO  [org.neo4j]: --- STARTED diagnostics for NEO_STORE_ID_USAGE END ---
+2015-07-11 09:19:00.646+0000 INFO  [org.neo4j]: --- STARTED diagnostics for PERSISTENCE_WINDOW_POOL_STATS START ---
+2015-07-11 09:19:00.646+0000 INFO  [org.neo4j]: --- STARTED diagnostics for PERSISTENCE_WINDOW_POOL_STATS END ---
+2015-07-11 09:19:00.646+0000 INFO  [org.neo4j]: --- STARTED diagnostics for KernelDiagnostics:StoreFiles START ---
+2015-07-11 09:19:00.646+0000 INFO  [org.neo4j]: Disk space on partition (Total / Free / Free %): 243572301824 / 203254984704 / 83
+Storage files: (filename : modification date - size)
+      active_tx_log: 2015-07-11T11:19:00+0200 - 11.00 B
+      index:
+        lucene-store.db: 2015-07-11T11:19:00+0200 - 40.00 B
+        lucene.log.1: 2015-07-11T11:19:00+0200 - 16.00 B
+        lucene.log.active: 2015-07-11T11:19:00+0200 - 4.00 B
+      - Total: 2015-07-11T11:19:00+0200 - 60.00 B
+      lock: 2015-07-11T11:19:00+0200 - 0.00 B
+      messages.log: 2015-07-11T11:19:00+0200 - 52.33 kB
+      neostore: 2015-07-11T11:19:00+0200 - 81.00 B
+      neostore.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.labeltokenstore.db: 2015-07-11T11:19:00+0200 - 0.00 B
+      neostore.labeltokenstore.db.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.labeltokenstore.db.names: 2015-07-11T11:19:00+0200 - 38.00 B
+      neostore.labeltokenstore.db.names.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.nodestore.db: 2015-07-11T11:19:00+0200 - 0.00 B
+      neostore.nodestore.db.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.nodestore.db.labels: 2015-07-11T11:19:00+0200 - 68.00 B
+      neostore.nodestore.db.labels.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.propertystore.db: 2015-07-11T11:19:00+0200 - 0.00 B
+      neostore.propertystore.db.arrays: 2015-07-11T11:19:00+0200 - 128.00 B
+      neostore.propertystore.db.arrays.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.propertystore.db.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.propertystore.db.index: 2015-07-11T11:19:00+0200 - 0.00 B
+      neostore.propertystore.db.index.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.propertystore.db.index.keys: 2015-07-11T11:19:00+0200 - 38.00 B
+      neostore.propertystore.db.index.keys.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.propertystore.db.strings: 2015-07-11T11:19:00+0200 - 128.00 B
+      neostore.propertystore.db.strings.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.relationshipgroupstore.db: 2015-07-11T11:19:00+0200 - 25.00 B
+      neostore.relationshipgroupstore.db.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.relationshipstore.db: 2015-07-11T11:19:00+0200 - 0.00 B
+      neostore.relationshipstore.db.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.relationshiptypestore.db: 2015-07-11T11:19:00+0200 - 0.00 B
+      neostore.relationshiptypestore.db.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.relationshiptypestore.db.names: 2015-07-11T11:19:00+0200 - 38.00 B
+      neostore.relationshiptypestore.db.names.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      neostore.schemastore.db: 2015-07-11T11:19:00+0200 - 64.00 B
+      neostore.schemastore.db.id: 2015-07-11T11:19:00+0200 - 9.00 B
+      nioneo_logical.log.1: 2015-07-11T11:19:00+0200 - 16.00 B
+      nioneo_logical.log.active: 2015-07-11T11:19:00+0200 - 4.00 B
+      schema:
+        label:
+          lucene:
+            write.lock: 2015-07-11T11:19:00+0200 - 0.00 B
+          - Total: 2015-07-11T11:19:00+0200 - 0.00 B
+        - Total: 2015-07-11T11:19:00+0200 - 0.00 B
+      - Total: 2015-07-11T11:19:00+0200 - 0.00 B
+      store_lock: 2015-07-11T11:18:59+0200 - 0.00 B
+      tm_tx_log.1: 2015-07-11T11:19:00+0200 - 0.00 B
+2015-07-11 09:19:00.649+0000 INFO  [org.neo4j]: --- STARTED diagnostics for KernelDiagnostics:StoreFiles END ---
+2015-07-11 09:19:00.693+0000 INFO  [org.neo4j]: Database is now ready
+2015-07-11 09:19:01.013+0000 INFO  [org.neo4j]: Shutdown started
+2015-07-11 09:19:01.013+0000 INFO  [org.neo4j]: Database is now unavailable
+2015-07-11 09:19:01.075+0000 INFO  [org.neo4j]: Closed log output/neo4j-db/index/lucene.log
+2015-07-11 09:19:01.083+0000 INFO  [org.neo4j]: TM shutting down
+2015-07-11 09:19:01.144+0000 INFO  [org.neo4j]: Closed log output/neo4j-db/nioneo_logical.log
+2015-07-11 09:19:01.146+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshiptypestore.db.names hit=0 miss=2 switches=0 ooe=0
+2015-07-11 09:19:01.154+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshiptypestore.db hit=0 miss=1 switches=0 ooe=0
+2015-07-11 09:19:01.161+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.labeltokenstore.db.names hit=0 miss=31 switches=0 ooe=0
+2015-07-11 09:19:01.173+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.labeltokenstore.db hit=0 miss=15 switches=0 ooe=0
+2015-07-11 09:19:01.180+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db.strings hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:01.187+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db.index.keys hit=0 miss=2 switches=0 ooe=0
+2015-07-11 09:19:01.194+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db.index hit=0 miss=2 switches=0 ooe=0
+2015-07-11 09:19:01.201+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db.arrays hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:01.213+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.propertystore.db hit=30 miss=0 switches=0 ooe=0
+2015-07-11 09:19:01.221+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshipstore.db hit=12 miss=0 switches=0 ooe=0
+2015-07-11 09:19:01.229+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.nodestore.db.labels hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:01.237+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.nodestore.db hit=45 miss=0 switches=0 ooe=0
+2015-07-11 09:19:01.244+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.schemastore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:01.251+0000 INFO  [org.neo4j]: output/neo4j-db/neostore.relationshipgroupstore.db hit=0 miss=0 switches=0 ooe=0
+2015-07-11 09:19:01.260+0000 INFO  [org.neo4j]: output/neo4j-db/neostore hit=0 miss=41 switches=0 ooe=0
+2015-07-11 09:19:01.267+0000 INFO  [org.neo4j]: NeoStore closed
+2015-07-11 09:19:01.267+0000 INFO  [org.neo4j]: --- STOPPING diagnostics START ---
+2015-07-11 09:19:01.267+0000 INFO  [org.neo4j]: --- STOPPING diagnostics END ---

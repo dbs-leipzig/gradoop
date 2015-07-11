@@ -1,0 +1,102 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Gradoop Parent
+[INFO] Gradoop Checkstyle
+[INFO] Gradoop Core
+[INFO] Gradoop Giraph
+[INFO] Gradoop MapReduce
+[INFO] Gradoop Examples
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Gradoop Parent 0.0.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ gradoop ---
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Gradoop Checkstyle 0.0.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ gradoop-checkstyle ---
+[INFO] Deleting /home/s1ck/Devel/gradoop/gradoop-checkstyle/target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.3:resources (default-resources) @ gradoop-checkstyle ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 3 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.0:compile (default-compile) @ gradoop-checkstyle ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-resources-plugin:2.3:testResources (default-testResources) @ gradoop-checkstyle ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/s1ck/Devel/gradoop/gradoop-checkstyle/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.0:testCompile (default-testCompile) @ gradoop-checkstyle ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.6:test (default-test) @ gradoop-checkstyle ---
+[INFO] Tests are skipped.
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Gradoop Core 0.0.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ gradoop-core ---
+[INFO] Deleting /home/s1ck/Devel/gradoop/gradoop-core/target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.3:resources (default-resources) @ gradoop-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/s1ck/Devel/gradoop/gradoop-core/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.0:compile (default-compile) @ gradoop-core ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 65 source files to /home/s1ck/Devel/gradoop/gradoop-core/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.3:testResources (default-testResources) @ gradoop-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.0:testCompile (default-testCompile) @ gradoop-core ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 16 source files to /home/s1ck/Devel/gradoop/gradoop-core/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.6:test (default-test) @ gradoop-core ---
+[INFO] Surefire report directory: /home/s1ck/Devel/gradoop/gradoop-core/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Gradoop Parent .................................... SUCCESS [0.249s]
+[INFO] Gradoop Checkstyle ................................ SUCCESS [0.900s]
+[INFO] Gradoop Core ...................................... FAILURE [3.588s]
+[INFO] Gradoop Giraph .................................... SKIPPED
+[INFO] Gradoop MapReduce ................................. SKIPPED
+[INFO] Gradoop Examples .................................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 4.984s
+[INFO] Finished at: Mon May 25 19:46:19 CEST 2015
+[INFO] Final Memory: 27M/346M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:2.6:test (default-test) on project gradoop-core: No tests were executed!  (Set -DfailIfNoTests=false to ignore this error.) -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <goals> -rf :gradoop-core

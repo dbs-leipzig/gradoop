@@ -318,4 +318,19 @@ public abstract class EPFlinkTest {
 
     return FlinkGraphStore.fromCollection(vertices, edges, graphs, env);
   }
+
+  /**
+   * Creates a list of long ids from a given string (e.g. "0 1 2 3")
+   *
+   * @param graphIDString e.g. "0 1 2 3"
+   * @return List with long values
+   */
+  protected List<Long> extractGraphIDs(String graphIDString) {
+    String[] tokens = graphIDString.split(" ");
+    List<Long> graphIDs = Lists.newArrayListWithCapacity(tokens.length);
+    for (String token : tokens) {
+      graphIDs.add(Long.parseLong(token));
+    }
+    return graphIDs;
+  }
 }
