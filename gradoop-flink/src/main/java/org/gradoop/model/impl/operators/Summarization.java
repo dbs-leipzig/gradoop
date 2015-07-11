@@ -39,6 +39,8 @@ import org.gradoop.model.impl.EPGraph;
 
 import java.util.List;
 
+import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
+
 /**
  * @author Martin Junghanns
  */
@@ -55,7 +57,7 @@ public class Summarization {
         // group vertices by the given property
         .groupBy(new VertexGroupingKeySelector(vertexGroupingKey))
           // sort the group (smallest id is group representative)
-        .sortGroup(new EPGraph.VertexKeySelector(), Order.ASCENDING);
+        .sortGroup(VERTEX_ID, Order.ASCENDING);
 
     // create new summarized gelly vertices
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertices = groupedSortedVertices

@@ -53,6 +53,26 @@ import java.util.Map;
  */
 public class EPGraph implements EPGraphData, EPGraphOperators {
 
+  /* Convenience key selectors */
+
+  public static final KeySelector<Subgraph<Long, EPFlinkGraphData>, Long>
+    GRAPH_ID;
+  public static final KeySelector<Vertex<Long, EPFlinkVertexData>, Long>
+    VERTEX_ID;
+  public static final KeySelector<Edge<Long, EPFlinkEdgeData>, Long> EDGE_ID;
+  public static final KeySelector<Edge<Long, EPFlinkEdgeData>, Long>
+    SOURCE_VERTEX_ID;
+  public static final KeySelector<Edge<Long, EPFlinkEdgeData>, Long>
+    TARGET_VERTEX_ID;
+
+  static {
+    GRAPH_ID = new GraphKeySelector();
+    VERTEX_ID = new VertexKeySelector();
+    EDGE_ID = new EdgeKeySelector();
+    SOURCE_VERTEX_ID = new EdgeSourceVertexKeySelector();
+    TARGET_VERTEX_ID = new EdgeTargetVertexKeySelector();
+  }
+
   /**
    * Flink execution environment.
    */
@@ -191,12 +211,10 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     // cannot use Gelly union here because of missing argument for KeySelector
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
       this.graph.getVertices().union(otherGraph.graph.getVertices())
-        .distinct(new VertexKeySelector())
-        .map(new VertexToGraphUpdater(newGraphID));
+        .distinct(VERTEX_ID).map(new VertexToGraphUpdater(newGraphID));
 
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      this.graph.getEdges().union(otherGraph.graph.getEdges())
-        .distinct(new EdgeKeySelector())
+      this.graph.getEdges().union(otherGraph.graph.getEdges()).distinct(EDGE_ID)
         .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
@@ -212,13 +230,12 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     // the group contains two vertices and update them with the new graph id
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
       this.graph.getVertices().union(otherGraph.graph.getVertices())
-        .groupBy(new VertexKeySelector())
-        .reduceGroup(new VertexGroupReducer(2L))
+        .groupBy(VERTEX_ID).reduceGroup(new VertexGroupReducer(2L))
         .map(new VertexToGraphUpdater(newGraphID));
 
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      this.graph.getEdges().union(otherGraph.graph.getEdges())
-        .groupBy(new EdgeKeySelector()).reduceGroup(new EdgeGroupReducer(2L))
+      this.graph.getEdges().union(otherGraph.graph.getEdges()).groupBy(EDGE_ID)
+        .reduceGroup(new EdgeGroupReducer(2L))
         .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
@@ -235,7 +252,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     // called on
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
       this.graph.getVertices().union(otherGraph.graph.getVertices())
-        .groupBy(new VertexKeySelector()).reduceGroup(
+        .groupBy(VERTEX_ID).reduceGroup(
         new VertexGroupReducer(1L, this.getId(), otherGraph.getId()))
         .map(new VertexToGraphUpdater(newGraphID));
 
@@ -256,11 +273,9 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     // that are in the exclusion of the vertex sets. Thus, we join the edges
     // from the left graph with the new vertex set using source and target ids.
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      this.graph.getEdges().join(newVertexSet)
-        .where(new EdgeSourceVertexKeySelector())
-        .equalTo(new VertexKeySelector()).with(joinFunc).join(newVertexSet)
-        .where(new EdgeTargetVertexKeySelector())
-        .equalTo(new VertexKeySelector()).with(joinFunc)
+      this.graph.getEdges().join(newVertexSet).where(SOURCE_VERTEX_ID)
+        .equalTo(VERTEX_ID).with(joinFunc).join(newVertexSet)
+        .where(TARGET_VERTEX_ID).equalTo(VERTEX_ID).with(joinFunc)
         .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
@@ -330,9 +345,20 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   /**
+   * Returns the unique graph identifer.
+   */
+  private static class GraphKeySelector implements
+    KeySelector<Subgraph<Long, EPFlinkGraphData>, Long> {
+    @Override
+    public Long getKey(Subgraph<Long, EPFlinkGraphData> g) throws Exception {
+      return g.f0;
+    }
+  }
+
+  /**
    * Used for distinction of vertices based on their unique id.
    */
-  public static class VertexKeySelector implements
+  private static class VertexKeySelector implements
     KeySelector<Vertex<Long, EPFlinkVertexData>, Long> {
     @Override
     public Long getKey(
