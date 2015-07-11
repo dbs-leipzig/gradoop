@@ -63,11 +63,15 @@ public interface EPGraphOperators {
   <O extends Number> EPGraph aggregate(String propertyKey,
     Aggregate<EPGraph, O> aggregateFunc) throws Exception;
 
-  <O1 extends Number, O2 extends Number> EPGraph summarize(
-    String vertexGroupingKey,
-    Aggregate<Iterable<EPVertexData>, O1> vertexAggregateFunc,
+  EPGraph summarize(String vertexGroupingKey) throws Exception;
+
+  EPGraph summarize(String vertexGroupingKey, String edgeGroupingKey) throws
+    Exception;
+
+  EPGraph summarize(String vertexGroupingKey,
+    Aggregate<Iterable<EPVertexData>, Number> vertexAggregateFunc,
     String edgeGroupingKey,
-    Aggregate<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws Exception;
+    Aggregate<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws Exception;
 
   <O1 extends Number, O2 extends Number> EPGraph summarize(
     List<String> vertexGroupingKeys,

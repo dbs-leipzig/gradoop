@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -38,12 +37,12 @@ import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.operators.Summarization;
 import org.gradoop.model.operators.EPGraphOperators;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Represents a single graph inside the EPGM. Holds information about the
@@ -54,11 +53,23 @@ import java.util.Random;
  */
 public class EPGraph implements EPGraphData, EPGraphOperators {
 
+  /**
+   * Flink execution environment.
+   */
   private ExecutionEnvironment env;
-
+  /**
+   * Gelly graph that encapsulates the vertex and edge datasets associated
+   * with that EPGraph.
+   */
   private Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph;
-
+  /**
+   * Graph payload.
+   */
   private EPFlinkGraphData graphData;
+
+  /* Operators */
+
+  private final Summarization summarization = new Summarization();
 
   private EPGraph(Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
     EPFlinkGraphData graphData, ExecutionEnvironment env) {
@@ -153,115 +164,22 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
-  public <O1 extends Number, O2 extends Number> EPGraph summarize(
-    final String vertexGroupingKey,
-    final Aggregate<Iterable<EPVertexData>, O1> vertexAggregateFunc,
-    final String edgeGroupingKey,
-    final Aggregate<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws
+  public EPGraph summarize(final String vertexGroupingKey) throws Exception {
+    return summarization.summarize(this.graph, vertexGroupingKey);
+  }
+
+  @Override
+  public EPGraph summarize(String vertexGroupingKey,
+    String edgeGroupingKey) throws Exception {
+    return null;
+  }
+
+  @Override
+  public EPGraph summarize(String vertexGroupingKey,
+    Aggregate<Iterable<EPVertexData>, Number> vertexAggregateFunc,
+    String edgeGroupingKey,
+    Aggregate<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws
     Exception {
-
-    final Random r = new Random();
-
-    this.graph.getVertices()
-      .groupBy(new KeySelector<Vertex<Long, EPFlinkVertexData>, String>() {
-        @Override
-        public String getKey(Vertex<Long, EPFlinkVertexData> v) throws
-          Exception {
-          return v.getValue().getProperty(vertexGroupingKey).toString();
-        }
-      }).reduceGroup(
-      new GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
-        EPFlinkVertexData>>() {
-
-        @Override
-        public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
-          Collector<Vertex<Long, EPFlinkVertexData>> collector) throws
-          Exception {
-          List<EPVertexData> vertexData = Lists.newArrayList();
-          String groupValue = null;
-          for (Vertex<Long, EPFlinkVertexData> v : iterable) {
-            vertexData.add(v.getValue());
-            if (groupValue == null) {
-              groupValue =
-                v.getValue().getProperty(vertexGroupingKey).toString();
-            }
-          }
-          O1 aggregateValue = vertexAggregateFunc.aggregate(vertexData);
-
-          Long newVertexID = r.nextLong();
-          EPFlinkVertexData newVertexData = new EPFlinkVertexData();
-          newVertexData.setId(newVertexID);
-          newVertexData.setProperty(vertexGroupingKey, groupValue);
-          newVertexData.setProperty("aggregate", aggregateValue);
-
-          collector.collect(new Vertex<>(newVertexID, newVertexData));
-        }
-      })
-
-
-//      .map(
-//      new MapFunction<Vertex<Long, EPFlinkVertexData>,
-//        Tuple2<EPFlinkVertexData, String>>() {
-//        @Override
-//        public Tuple2<EPFlinkVertexData, String> map(
-//          Vertex<Long, EPFlinkVertexData> v) throws Exception {
-//          return new Tuple2<>(v.getValue(),
-//            v.getValue().getProperty(vertexGroupingKey).toString());
-//        }
-//      })
-
-
-//      .groupBy(1).reduceGroup(
-//      new GroupReduceFunction<Tuple2<Long, String>, Tuple2<String, Long>>() {
-//
-//        @Override
-//        public void reduce(Iterable<Tuple2<Long, String>> iterable,
-//          Collector<Tuple2<String, Long>> collector) throws Exception {
-//          long count = 0L;
-//          String propertyValue = null;
-//          for (Tuple2<Long, String> t : iterable) {
-//            count++;
-//            propertyValue = t.f1;
-//          }
-//          collector.collect(new Tuple2<>(propertyValue, count));
-//        }
-//      })
-//      .groupBy(new KeySelector<EPVertexData, String>() {
-//      @Override
-//      public String getKey(EPVertexData v) throws Exception {
-//        return v.getProperty(vertexGroupingKey).toString();
-//      }
-//    }).combineGroup(new GroupCombineFunction<EPVertexData, Number>() {
-//      @Override
-//      public void combine(Iterable<EPVertexData> iterable,
-//        Collector<Number> collector) throws Exception {
-//        collector.collect(vertexAggregateFunc.aggregate(iterable));
-//      }
-//    })
-      .print();
-
-//    this.graph.getVertices()
-//      .groupBy(new KeySelector<Vertex<Long, EPFlinkVertexData>, Object>() {
-//        @Override
-//        public Object getKey(Vertex<Long, EPFlinkVertexData> v) throws
-//          Exception {
-//          return v.getValue().getProperty(vertexGroupKey);
-//        }
-//      })
-
-//      .combineGroup(
-//      new GroupCombineFunction<Vertex<Long, EPFlinkVertexData>, O1>() {
-//        @Override
-//        public void combine(Iterable<Vertex<Long, EPFlinkVertexData>>
-// iterable,
-//          Collector<O1> collector) throws Exception {
-//
-//
-//          DataSource<Iterable<Vertex<Long, EPFlinkVertexData>>>
-// vertexDataSet =
-//            env.fromElements(iterable);
-//        }
-//      });
     return null;
   }
 
@@ -414,7 +332,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   /**
    * Used for distinction of vertices based on their unique id.
    */
-  private static class VertexKeySelector implements
+  public static class VertexKeySelector implements
     KeySelector<Vertex<Long, EPFlinkVertexData>, Long> {
     @Override
     public Long getKey(
@@ -460,10 +378,10 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   /**
    * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
-   * <p/>
+   * <p>
    * Checks if the number of grouped, duplicate vertices is equal to a
    * given amount. If yes, reducer returns the vertex.
-   * <p/>
+   * <p>
    * Furthermore, to realize exclusion, if two graphs are given, the method
    * checks if the vertex is contained in the first (include graph) but not
    * in the other graph (preclude graph). If this is the case, the vertex
@@ -524,7 +442,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   /**
    * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
-   * <p/>
+   * <p>
    * Used to check if the number of grouped, duplicate edges is equal to a
    * given amount. If yes, reducer returns the vertex.
    */
@@ -594,5 +512,4 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
       return e;
     }
   }
-
 }

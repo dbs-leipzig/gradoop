@@ -20,6 +20,10 @@ package org.gradoop.model.helper;
 public class FlinkConstants {
   public static final String DEFAULT_GRAPH_LABEL = "__GRAPH__";
 
+  public static final String DEFAULT_VERTEX_LABEL = "__VERTEX__";
+
+  public static final String DEFAULT_EDGE_LABEL = "__EDGE__";
+
   public static final Long COMBINE_GRAPH_ID = -1L;
 
   public static final Long OVERLAP_GRAPH_ID = -2L;

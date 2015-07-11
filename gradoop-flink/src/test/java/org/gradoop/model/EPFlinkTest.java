@@ -91,7 +91,14 @@ public abstract class EPFlinkTest {
   protected EPFlinkEdgeData edge22;
   protected EPFlinkEdgeData edge23;
 
-
+  /**
+   * Creates a social network as a basis for tests.
+   * <p>
+   * An image of the network can be found in
+   * gradoop/dev-support/social-network.pdf
+   *
+   * @return graph store containing a simple social network for tests.
+   */
   protected EPGraphStore createSocialGraph() {
 
     // vertices
