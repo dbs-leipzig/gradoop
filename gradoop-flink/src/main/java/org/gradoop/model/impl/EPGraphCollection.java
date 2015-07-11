@@ -719,4 +719,129 @@ public class EPGraphCollection implements
       return leftTuple;
     }
   }
+
+  /**
+   * Used for distinction of vertices based on their unique id.
+   */
+  private static class SubgraphKeySelector implements
+    KeySelector<Subgraph<Long, EPFlinkGraphData>, Long> {
+
+    @Override
+    public Long getKey(Subgraph<Long, EPFlinkGraphData> subgraph) throws
+      Exception {
+      return subgraph.getId();
+    }
+  }
+
+  /**
+   * Used for distinction of vertices based on their unique id.
+   */
+  private static class VertexKeySelector implements
+    KeySelector<Vertex<Long, EPFlinkVertexData>, Long> {
+    @Override
+    public Long getKey(Vertex<Long, EPFlinkVertexData> vertex) throws
+      Exception {
+      return vertex.f0;
+    }
+  }
+
+  /**
+   * Used for distinction of edges based on their unique id.
+   */
+  private static class EdgeKeySelector implements
+    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    @Override
+    public Long getKey(
+      Edge<Long, EPFlinkEdgeData> longEPFlinkEdgeDataEdge) throws Exception {
+      return longEPFlinkEdgeDataEdge.f2.getId();
+    }
+  }
+
+  /**
+   * Used for distinction of edges based on their source.
+   */
+  private static class EdgeSourceSelector implements
+    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    @Override
+    public Long getKey(Edge<Long, EPFlinkEdgeData> edge) throws Exception {
+      return edge.f0;
+    }
+  }
+
+  /**
+   * Used for distinction of edges based on their target.
+   */
+  private static class EdgeTargetSelector implements
+    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    @Override
+    public Long getKey(Edge<Long, EPFlinkEdgeData> edge) throws Exception {
+      return edge.f1;
+    }
+  }
+
+  private static class SubgraphGroupReducer implements
+    GroupReduceFunction<Subgraph<Long, EPFlinkGraphData>, Subgraph<Long,
+      EPFlinkGraphData>> {
+
+    /**
+     * number of times a vertex must occur inside a group
+     */
+    private long amount;
+
+    public SubgraphGroupReducer(long amount) {
+      this.amount = amount;
+    }
+
+    @Override
+    public void reduce(Iterable<Subgraph<Long, EPFlinkGraphData>> iterable,
+      Collector<Subgraph<Long, EPFlinkGraphData>> collector) throws Exception {
+      Iterator<Subgraph<Long, EPFlinkGraphData>> iterator = iterable.iterator();
+      long count = 0L;
+      Subgraph<Long, EPFlinkGraphData> s = null;
+      while (iterator.hasNext()) {
+        s = iterator.next();
+        count++;
+      }
+      if (count == amount) {
+        collector.collect(s);
+      }
+    }
+  }
+
+  private static class Tuple2LongMapper<C> implements
+    MapFunction<C, Tuple2<C, Long>> {
+
+    private Long secondField;
+
+    public Tuple2LongMapper(Long secondField) {
+      this.secondField = secondField;
+    }
+
+    @Override
+    public Tuple2<C, Long> map(C c) throws Exception {
+      return new Tuple2(c, secondField);
+    }
+  }
+
+  private static class SubgraphTupleKeySelector<C> implements
+    KeySelector<Tuple2<Subgraph<Long, EPFlinkGraphData>, C>, Long> {
+    @Override
+    public Long getKey(
+      Tuple2<Subgraph<Long, EPFlinkGraphData>, C> subgraph) throws Exception {
+      return subgraph.f0.getId();
+    }
+  }
+
+
+  public static class EdgeJoinFunction implements
+    JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
+      EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>> {
+
+    @Override
+    public Edge<Long, EPFlinkEdgeData> join(
+      Edge<Long, EPFlinkEdgeData> leftTuple,
+      Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
+      return leftTuple;
+    }
+  }
 }
