@@ -28,11 +28,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnitParamsRunner.class)
-public class FlinkGraphStoreTests extends EPFlinkTest {
+public class FlinkGraphStoreTest extends EPFlinkTest {
 
   private EPGraphStore graphStore;
 
-  public FlinkGraphStoreTests() {
+  public FlinkGraphStoreTest() {
     graphStore = createSocialGraph();
   }
 

@@ -30,7 +30,7 @@ import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.store.EPGraphStore;
 import org.mockito.Mockito;
 
-public class WorkflowTest {
+public abstract class WorkflowTest {
 
   public void summarizedCommunities() throws Exception {
     EPGraphStore db = Mockito.mock(EPGraphStore.class);

@@ -32,27 +32,28 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 @RunWith(JUnitParamsRunner.class)
-public class EPGraphCombineTests extends EPFlinkTest {
-
+public class EPGraphOverlapTest extends EPFlinkTest {
   private EPGraphStore graphStore;
 
-  public EPGraphCombineTests() {
+  public EPGraphOverlapTest() {
     this.graphStore = createSocialGraph();
   }
 
   @Test
-  @Parameters({"0, 0, 3, 4", "0, 2, 5, 8", // same graph
-    "0, 2, 5, 8", // overlapping
-    "2, 0, 5, 8", // overlapping switched
-    "0, 1, 6, 8", // non-overlapping
-    "1, 0, 6, 8"} // non-overlapping switched
-  )
-  public void testCombine(long firstGraph, long secondGraph,
+  @Parameters({"0, 0, 3, 4", // same graph
+    "0, 2, 2, 2", // overlapping
+    "2, 0, 2, 2", // overlapping switched
+    "0, 1, 0, 0", // non-overlapping
+    "1, 0, 0, 0", // non-overlapping switched
+    "3, 1, 2, 1", // overlapping vertex and not edge set
+    "1, 3, 2, 1" // overlapping vertex and not edge set switched
+  })
+  public void testOverlap(long firstGraph, long secondGraph,
     long expectedVertexCount, long expectedEdgeCount) throws Exception {
     EPGraph first = graphStore.getGraph(firstGraph);
     EPGraph second = graphStore.getGraph(secondGraph);
 
-    EPGraph result = first.combine(second);
+    EPGraph result = first.overlap(second);
 
     assertNotNull("resulting graph was null", result);
 
@@ -85,9 +86,9 @@ public class EPGraphCombineTests extends EPFlinkTest {
   @Test
   public void testAssignment() throws Exception {
     EPGraph databaseCommunity = graphStore.getGraph(0L);
-    EPGraph graphCommunity = graphStore.getGraph(1L);
+    EPGraph graphCommunity = graphStore.getGraph(2L);
 
-    EPGraph newGraph = graphCommunity.combine(databaseCommunity);
+    EPGraph newGraph = graphCommunity.overlap(databaseCommunity);
 
     Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
     Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
@@ -98,14 +99,6 @@ public class EPGraphCombineTests extends EPFlinkTest {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (v.equals(bob)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (v.equals(eve)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
-      } else if (v.equals(carol)) {
-        assertEquals("wrong number of graphs", 4, gIDs.size());
-      } else if (v.equals(dave)) {
-        assertEquals("wrong number of graphs", 4, gIDs.size());
-      } else if (v.equals(frank)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
       }
     }
 
@@ -115,18 +108,6 @@ public class EPGraphCombineTests extends EPFlinkTest {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (e.equals(edge1)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (e.equals(edge6)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
-      } else if (e.equals(edge21)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
-      } else if (e.equals(edge4)) {
-        assertEquals("wrong number of graphs", 4, gIDs.size());
-      } else if (e.equals(edge5)) {
-        assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (e.equals(edge22)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
-      } else if (e.equals(edge23)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
       }
     }
   }

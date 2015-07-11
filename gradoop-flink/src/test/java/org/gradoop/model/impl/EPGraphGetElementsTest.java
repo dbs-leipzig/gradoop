@@ -28,10 +28,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnitParamsRunner.class)
-public class EPGraphGetElementsTests extends EPFlinkTest {
+public class EPGraphGetElementsTest extends EPFlinkTest {
   private EPGraphStore graphStore;
 
-  public EPGraphGetElementsTests() {
+  public EPGraphGetElementsTest() {
     this.graphStore = createSocialGraph();
   }
 

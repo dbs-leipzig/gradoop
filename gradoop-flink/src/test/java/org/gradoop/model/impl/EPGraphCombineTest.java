@@ -32,27 +32,27 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 @RunWith(JUnitParamsRunner.class)
-public class EPGraphExcludeTests extends EPFlinkTest {
+public class EPGraphCombineTest extends EPFlinkTest {
 
   private EPGraphStore graphStore;
 
-  public EPGraphExcludeTests() {
+  public EPGraphCombineTest() {
     this.graphStore = createSocialGraph();
   }
 
   @Test
-  @Parameters({"0, 0, 0, 0", // same graph
-    "0, 2, 1, 0", // overlapping graphs
-    "2, 0, 2, 2", // overlapping graphs switched (different counts)
-    "0, 1, 3, 4", // non-overlapping graphs
-    "1, 0, 3, 4", // non-overlapping graphs switched
-  })
-  public void testExclude(long firstGraph, long secondGraph,
+  @Parameters({"0, 0, 3, 4", "0, 2, 5, 8", // same graph
+    "0, 2, 5, 8", // overlapping
+    "2, 0, 5, 8", // overlapping switched
+    "0, 1, 6, 8", // non-overlapping
+    "1, 0, 6, 8"} // non-overlapping switched
+  )
+  public void testCombine(long firstGraph, long secondGraph,
     long expectedVertexCount, long expectedEdgeCount) throws Exception {
     EPGraph first = graphStore.getGraph(firstGraph);
     EPGraph second = graphStore.getGraph(secondGraph);
 
-    EPGraph result = first.exclude(second);
+    EPGraph result = first.combine(second);
 
     assertNotNull("resulting graph was null", result);
 
@@ -85,9 +85,9 @@ public class EPGraphExcludeTests extends EPFlinkTest {
   @Test
   public void testAssignment() throws Exception {
     EPGraph databaseCommunity = graphStore.getGraph(0L);
-    EPGraph hadoopCommunity = graphStore.getGraph(1L);
+    EPGraph graphCommunity = graphStore.getGraph(1L);
 
-    EPGraph newGraph = databaseCommunity.exclude(hadoopCommunity);
+    EPGraph newGraph = graphCommunity.combine(databaseCommunity);
 
     Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
     Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
@@ -99,6 +99,12 @@ public class EPGraphExcludeTests extends EPFlinkTest {
       } else if (v.equals(bob)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (v.equals(eve)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      } else if (v.equals(carol)) {
+        assertEquals("wrong number of graphs", 4, gIDs.size());
+      } else if (v.equals(dave)) {
+        assertEquals("wrong number of graphs", 4, gIDs.size());
+      } else if (v.equals(frank)) {
         assertEquals("wrong number of graphs", 2, gIDs.size());
       }
     }
@@ -112,6 +118,14 @@ public class EPGraphExcludeTests extends EPFlinkTest {
       } else if (e.equals(edge6)) {
         assertEquals("wrong number of graphs", 2, gIDs.size());
       } else if (e.equals(edge21)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      } else if (e.equals(edge4)) {
+        assertEquals("wrong number of graphs", 4, gIDs.size());
+      } else if (e.equals(edge5)) {
+        assertEquals("wrong number of graphs", 3, gIDs.size());
+      } else if (e.equals(edge22)) {
+        assertEquals("wrong number of graphs", 2, gIDs.size());
+      } else if (e.equals(edge23)) {
         assertEquals("wrong number of graphs", 2, gIDs.size());
       }
     }

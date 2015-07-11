@@ -27,10 +27,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class EPGraphSummarizeTests extends EPFlinkTest {
+public class EPGraphSummarizeTest extends EPFlinkTest {
   private EPGraphStore graphStore;
 
-  public EPGraphSummarizeTests() {
+  public EPGraphSummarizeTest() {
     this.graphStore = createSocialGraph();
   }
 
