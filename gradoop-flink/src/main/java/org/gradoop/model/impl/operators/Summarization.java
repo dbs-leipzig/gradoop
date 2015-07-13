@@ -32,6 +32,7 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.helper.MathHelper;
 import org.gradoop.model.impl.EPFlinkEdgeData;
 import org.gradoop.model.impl.EPFlinkGraphData;
 import org.gradoop.model.impl.EPFlinkVertexData;
@@ -42,6 +43,40 @@ import java.util.List;
 import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
 
 /**
+ * The summarization operator determines a structural grouping of similar
+ * vertices and edges to condense a graph and thus help to uncover insights
+ * about patterns hidden in the graph.
+ * <p>
+ * The graph summarization operator represents every vertex group by a single
+ * vertex in the summarized graph; edges between vertices in the summary graph
+ * represent a group of edges between the vertex group members of the
+ * original graph. Summarization is defined by specifying grouping keys for
+ * vertices and edges, respectively, similarly as for GROUP BY in SQL.
+ * <p>
+ * Consider the following example:
+ * <p>
+ * Input graph:
+ * <p>
+ * Vertices:<br>
+ * (0, "Person", {city: L})<br>
+ * (1, "Person", {city: L})<br>
+ * (2, "Person", {city: D})<br>
+ * (3, "Person", {city: D})<br>
+ * <p>
+ * Edges:{(0,1), (1,0), (1,2), (2,1), (2,3), (3,2)}
+ * <p>
+ * Output graph (summarized on vertex property "city"):
+ * <p>
+ * Vertices:<br>
+ * (0, "Person", {city: L, count: 2})
+ * (2, "Person", {city: D, count: 2})
+ * <p>
+ * Edges:<br>
+ * ((0, 0), {count: 2}) // 2 intra-edges in L<br>
+ * ((2, 2), {count: 2}) // 2 intra-edges in L<br>
+ * ((0, 2), {count: 1}) // 1 inter-edge from L to D<br>
+ * ((2, 0), {count: 1}) // 1 inter-edge from D to L<br>
+ *
  * @author Martin Junghanns
  */
 public class Summarization {
@@ -208,14 +243,16 @@ public class Summarization {
           initialized = true;
         }
       }
-      EPFlinkEdgeData newEdgeData = new EPFlinkEdgeData();
-      newEdgeData.setId(vertexID);
-      newEdgeData.setLabel(FlinkConstants.DEFAULT_EDGE_LABEL);
-      newEdgeData.setSourceVertex(vertexID);
-      newEdgeData.setTargetVertex(vertexID);
-      newEdgeData.setProperty("count", edgeCount);
-      newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
-      collector.collect(new Edge<>(vertexID, vertexID, newEdgeData));
+      if (vertexID != null) {
+        EPFlinkEdgeData newEdgeData = new EPFlinkEdgeData();
+        newEdgeData.setId(MathHelper.cantor(vertexID, vertexID));
+        newEdgeData.setLabel(FlinkConstants.DEFAULT_EDGE_LABEL);
+        newEdgeData.setSourceVertex(vertexID);
+        newEdgeData.setTargetVertex(vertexID);
+        newEdgeData.setProperty("count", edgeCount);
+        newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
+        collector.collect(new Edge<>(vertexID, vertexID, newEdgeData));
+      }
     }
   }
 
@@ -241,15 +278,17 @@ public class Summarization {
           initialized = true;
         }
       }
-      EPFlinkEdgeData newEdgeData = new EPFlinkEdgeData();
-      newEdgeData.setId(-1L);
-      newEdgeData.setLabel(FlinkConstants.DEFAULT_EDGE_LABEL);
-      newEdgeData.setSourceVertex(sourceVertexID);
-      newEdgeData.setTargetVertex(targetVertexID);
-      newEdgeData.setProperty("count", edgeCount);
-      newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
-      collector
-        .collect(new Edge<>(sourceVertexID, targetVertexID, newEdgeData));
+      if (sourceVertexID != null && targetVertexID != null) {
+        EPFlinkEdgeData newEdgeData = new EPFlinkEdgeData();
+        newEdgeData.setId(MathHelper.cantor(sourceVertexID, targetVertexID));
+        newEdgeData.setLabel(FlinkConstants.DEFAULT_EDGE_LABEL);
+        newEdgeData.setSourceVertex(sourceVertexID);
+        newEdgeData.setTargetVertex(targetVertexID);
+        newEdgeData.setProperty("count", edgeCount);
+        newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
+        collector
+          .collect(new Edge<>(sourceVertexID, targetVertexID, newEdgeData));
+      }
     }
   }
 
@@ -273,18 +312,18 @@ public class Summarization {
   /**
    * Creates intra/inter edges by replacing source-vertex [and target-vertex]
    * with their corresponding vertex group representative.
-   * <p>
+   * <p/>
    * Takes a tuple (vertex-group, edge) as input and returns a new edge
    * considering three options:
-   * <p>
+   * <p/>
    * 1)
    * source-vertex in group and target-vertex in group =>
    * (group-representative, group-representative) // intra-edge
-   * <p>
+   * <p/>
    * 2)
    * source-vertex in group =>
    * (group-representative, target-vertex) // inter-edge
-   * <p>
+   * <p/>
    * 3)
    * target-vertex in group =>
    * no output as this is processed by another group, edge pair

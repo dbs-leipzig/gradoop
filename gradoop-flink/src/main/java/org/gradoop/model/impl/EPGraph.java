@@ -344,6 +344,27 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     graphData.setLabel(label);
   }
 
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(String.format("EPGraph{%n"));
+    sb.append(
+      String.format("%-10d %s %n", graphData.getId(), graphData.toString()));
+    try {
+      sb.append(String.format("Vertices:%n"));
+      for (EPVertexData v : this.getVertices().collect()) {
+        sb.append(String.format("%-10d %s %n", v.getId(), v));
+      }
+      sb.append(String.format("Edges:%n"));
+      for (EPEdgeData e : this.getEdges().collect()) {
+        sb.append(String.format("%-10d %s %n", e.getId(), e));
+      }
+      sb.append('}');
+    } catch (Exception e) {
+      sb.append(e);
+    }
+    return sb.toString();
+  }
+
   /**
    * Returns the unique graph identifer.
    */
@@ -455,6 +476,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
       }
       if (count == amount) {
         if (includedGraphID != null && precludedGraphID != null) {
+          assert v != null;
           if (v.getValue().getGraphs().contains(includedGraphID) &&
             !v.getValue().getGraphs().contains(precludedGraphID)) {
             collector.collect(v);
