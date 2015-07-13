@@ -22,6 +22,7 @@ import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.EPVertexData;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.helper.MathHelper;
+import org.gradoop.model.impl.operators.Summarization;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
@@ -46,21 +47,20 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     EPGraph summarizedGraph = inputGraph.summarize(vertexGroupingKey);
 
     assertNotNull("summarized graph must not be null", summarizedGraph);
-    // two vertices: dresden and leipzig
-    assertEquals("wrong number of vertices", 2L,
-      summarizedGraph.getVertexCount());
 
     // two summarized vertices:
-    // 0 Person {city: "Leipzig", count: 2}
-    // 2 Person {city: "Dresden", count: 2}
+    // 0 __VERTEX__ {city: "Leipzig", count: 2}
+    // 2 __VERTEX__ {city: "Dresden", count: 2}
+    assertEquals("wrong number of vertices", 2L,
+      summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L;
 
     for (EPVertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
-      assertNotNull("vertex is must not be null", v.getId());
+      assertNotNull("vertex id must not be null", v.getId());
       // check label
-      assertEquals("summarized vertex has wrong label", LABEL_PERSON,
-        v.getLabel());
+      assertEquals("summarized vertex has wrong label",
+        FlinkConstants.DEFAULT_VERTEX_LABEL, v.getLabel());
       // check property count
       assertEquals("summarized vertex has wrong property count", 2,
         v.getPropertyCount());
@@ -84,24 +84,24 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     }
 
     // four summarized edges:
-    // Person:Leipzig -[__EDGE__]-> Person:Leipzig {count: 2}
-    // Person:Leipzig -[__EDGE__]-> Person:Dresden {count: 1}
-    // Person:Dresden -[__EDGE__]-> Person:Leipzig {count: 1}
-    // Person:Dresden -[__EDGE__]-> Person:Dresden {count: 2}
+    // Leipzig -[__EDGE__]-> Leipzig {count: 2}
+    // Leipzig -[__EDGE__]-> Dresden {count: 1}
+    // Dresden -[__EDGE__]-> Leipzig {count: 1}
+    // Dresden -[__EDGE__]-> Dresden {count: 2}
     assertEquals("wrong number of edges", 4L, summarizedGraph.getEdgeCount());
 
     for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
-      assertNotNull("edge is must not be null", e.getId());
+      assertNotNull("edge id must not be null", e.getId());
       // all edges have the "knows label"
       assertEquals("edge has wrong label", FlinkConstants.DEFAULT_EDGE_LABEL,
         e.getLabel());
       if (e.getSourceVertex().equals(vertexIDDresden)) {
-        // Person:Dresden -[__EDGE__]-> Person:Dresden {count: 2}
+        // Dresden -[__EDGE__]-> Dresden {count: 2}
         if (e.getTargetVertex().equals(vertexIDDresden)) {
           assertEquals("wrong edge property", 2,
             e.getProperty(aggregatePropertyKey));
-          // Person:Dresden -[__EDGE__]-> Person:Leipzig {count: 1}
+          // Dresden -[__EDGE__]-> Leipzig {count: 1}
         } else if (e.getTargetVertex().equals(vertexIDLeipzig)) {
           assertEquals("wrong edge property", 1,
             e.getProperty(aggregatePropertyKey));
@@ -109,11 +109,11 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
           assertTrue("unexpected outgoing edge from Dresden", false);
         }
       } else if (e.getSourceVertex().equals(vertexIDLeipzig)) {
-        // Person:Leipzig -[__EDGE__]-> Person:Leipzig {count: 2}
+        // Leipzig -[__EDGE__]-> Leipzig {count: 2}
         if (e.getTargetVertex().equals(vertexIDLeipzig)) {
           assertEquals("wrong edge property", 2,
             e.getProperty(aggregatePropertyKey));
-          // Person:Leipzig -[__EDGE__]-> Person:Dresden {count: 1}
+          // Leipzig -[__EDGE__]-> Dresden {count: 1}
         } else if (e.getTargetVertex().equals(vertexIDDresden)) {
           assertEquals("wrong edge property", 1,
             e.getProperty(aggregatePropertyKey));
@@ -138,21 +138,20 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     EPGraph summarizedGraph = inputGraph.summarize(vertexGroupingKey);
 
     assertNotNull("summarized graph must not be null", summarizedGraph);
-    // two vertices: dresden and leipzig
-    assertEquals("wrong number of vertices", 3L,
-      summarizedGraph.getVertexCount());
 
     // three summarized vertices:
-    // 0 Person {city: "Leipzig", count: 2}
-    // 2 Person {city: "Dresden", count: 3}
-    // 5 Person {city: "Berlin", count: 1}
+    // 0 __VERTEX__ {city: "Leipzig", count: 2}
+    // 2 __VERTEX__ {city: "Dresden", count: 3}
+    // 5 __VERTEX__ {city: "Berlin", count: 1}
+    assertEquals("wrong number of vertices", 3L,
+      summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L;
     for (EPVertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
-      assertNotNull("vertex is must not be null", v.getId());
+      assertNotNull("vertex id must not be null", v.getId());
       // check label
-      assertEquals("summarized vertex has wrong label", LABEL_PERSON,
-        v.getLabel());
+      assertEquals("summarized vertex has wrong label",
+        FlinkConstants.DEFAULT_VERTEX_LABEL, v.getLabel());
       // check property count
       assertEquals("summarized vertex has wrong property count", 2,
         v.getPropertyCount());
@@ -178,24 +177,24 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     }
 
     // four summarized edges:
-    // Person:Dresden -[__EDGE__]-> Person:Dresden {count: 2}
-    // Person:Dresden -[__EDGE__]-> Person:Leipzig {count: 3}
-    // Person:Leipzig -[__EDGE__]-> Person:Leipzig {count: 2}
-    // Person:Leipzig -[__EDGE__]-> Person:Dresden {count: 1}
-    // Person:Berlin -[__EDGE__]-> Person:Dresden {count: 2}
+    // Dresden -[__EDGE__]-> Dresden {count: 2}
+    // Dresden -[__EDGE__]-> Leipzig {count: 3}
+    // Leipzig -[__EDGE__]-> Leipzig {count: 2}
+    // Leipzig -[__EDGE__]-> Dresden {count: 1}
+    // Berlin  -[__EDGE__]-> Dresden {count: 2}
     assertEquals("wrong number of edges", 5L, summarizedGraph.getEdgeCount());
 
     int checkedEdges = 0;
     for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
-      assertNotNull("edge is must not be null", e.getId());
+      assertNotNull("edge id must not be null", e.getId());
       // all edges have the "knows label"
       assertEquals("edge has wrong label", FlinkConstants.DEFAULT_EDGE_LABEL,
         e.getLabel());
       Object edgeAggregateValue = e.getProperty(aggregatePropertyKey);
       // Dresden
       if (e.getSourceVertex().equals(vertexIDDresden)) {
-        // Person:Dresden -[__EDGE__]-> Person:Dresden {count: 2}
+        // Dresden -[__EDGE__]-> Dresden {count: 2}
         if (e.getTargetVertex().equals(vertexIDDresden)) {
           assertEquals("edge id was wrong",
             new Long(MathHelper.cantor(vertexIDDresden, vertexIDDresden)),
@@ -203,7 +202,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
 
           assertEquals("wrong edge property", 2, edgeAggregateValue);
           checkedEdges++;
-          // Person:Dresden -[__EDGE__]-> Person:Leipzig {count: 3}
+          // Dresden -[__EDGE__]-> Leipzig {count: 3}
         } else if (e.getTargetVertex().equals(vertexIDLeipzig)) {
           assertEquals("edge id was wrong",
             new Long(MathHelper.cantor(vertexIDDresden, vertexIDLeipzig)),
@@ -215,14 +214,14 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
         }
         // Leipzig
       } else if (e.getSourceVertex().equals(vertexIDLeipzig)) {
-        // Person:Leipzig -[__EDGE__]-> Person:Leipzig {count: 2}
+        // Leipzig -[__EDGE__]-> Leipzig {count: 2}
         if (e.getTargetVertex().equals(vertexIDLeipzig)) {
           assertEquals("edge id was wrong",
             new Long(MathHelper.cantor(vertexIDLeipzig, vertexIDLeipzig)),
             e.getId());
           assertEquals("wrong edge property", 2, edgeAggregateValue);
           checkedEdges++;
-          // Person:Leipzig -[__EDGE__]-> Person:Dresden {count: 1}
+          // Leipzig -[__EDGE__]-> Dresden {count: 1}
         } else if (e.getTargetVertex().equals(vertexIDDresden)) {
           assertEquals("edge id was wrong",
             new Long(MathHelper.cantor(vertexIDLeipzig, vertexIDDresden)),
@@ -233,7 +232,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
           assertTrue("unexpected outgoing edge from Leipzig", false);
         }
       } else if (e.getSourceVertex().equals(vertexIDBerlin)) {
-        // Person:Berlin -[__EDGE__]-> Person:Dresden {count: 2}
+        // Berlin -[__EDGE__]-> Dresden {count: 2}
         if (e.getTargetVertex().equals(vertexIDDresden)) {
           assertEquals("wrong edge property", 2, edgeAggregateValue);
           checkedEdges++;
@@ -243,5 +242,92 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
     assertEquals("wrong number of checked edges", 5, checkedEdges);
+  }
+
+  @Test
+  public void testSummarizeWithAbsentVertexGroupingKey() throws Exception {
+    EPGraph input = graphStore.getGraph(3L);
+
+    final String vertexGroupingKey = "city";
+    final String aggregatePropertyKey = "count";
+
+    EPGraph summarizedGraph = input.summarize(vertexGroupingKey);
+
+    assertNotNull("summarized graph must not be null", summarizedGraph);
+
+    // two summarized vertices:
+    // 2 __VERTEX__ {city: "Dresden", count: 3}
+    // 10 __VERTEX__ {city: "__DEFAULT_GROUP", count: 1}
+    assertEquals("wrong number of vertices", 2L,
+      summarizedGraph.getVertexCount());
+    long vertexIDDresden = 2L, vertexIDGraphProcessingForum = 10L;
+    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+      // check vertex id
+      assertNotNull("vertex id must not be null", v.getId());
+      // check label
+      assertEquals("summarized vertex has wrong label",
+        FlinkConstants.DEFAULT_VERTEX_LABEL, v.getLabel());
+      // check property count
+      assertEquals("summarized vertex has wrong property count", 2,
+        v.getPropertyCount());
+
+      Object groupPropertyValue = v.getProperty(vertexGroupingKey);
+      Object groupAggregateValue = v.getProperty(aggregatePropertyKey);
+
+      if (v.getId().equals(vertexIDDresden)) {
+        assertEquals("wrong property value", "Dresden", groupPropertyValue);
+        assertEquals("Dresden has wrong count value", 2, groupAggregateValue);
+      } else if (v.getId().equals(vertexIDGraphProcessingForum)) {
+        assertEquals("wrong property value", Summarization.DEFAULT_VERTEX_GROUP,
+          groupPropertyValue);
+        assertEquals("Default has wrong count value", 1, groupAggregateValue);
+      }
+
+      // both vertices are in one new graph
+      assertEquals("wrong number of graphs", 1, v.getGraphs().size());
+      assertTrue("wrong graph id",
+        v.getGraphs().contains(FlinkConstants.SUMMARIZE_GRAPH_ID));
+    }
+
+    // two summarized edges:
+    // Default -[__EDGE__]-> Dresden {count: 3}
+    // Dresden -[__EDGE__]-> Dresden {count: 1}
+    assertEquals("wrong number of edges", 2L, summarizedGraph.getEdgeCount());
+
+    int checkedEdges = 0;
+    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+      // check edge id
+      assertNotNull("edge is must not be null", e.getId());
+      // all edges have the "knows label"
+      assertEquals("edge has wrong label", FlinkConstants.DEFAULT_EDGE_LABEL,
+        e.getLabel());
+      Object edgeAggregateValue = e.getProperty(aggregatePropertyKey);
+      // Dresden
+      if (e.getSourceVertex().equals(vertexIDGraphProcessingForum)) {
+        // Default -[__EDGE__]-> Dresden {count: 3}
+        if (e.getTargetVertex().equals(vertexIDDresden)) {
+          assertEquals("edge id was wrong", new Long(
+            MathHelper.cantor(vertexIDGraphProcessingForum, vertexIDDresden)),
+            e.getId());
+          assertEquals("wrong edge property", 3, edgeAggregateValue);
+          checkedEdges++;
+        } else {
+          assertTrue("unexpected outgoing edge from Dresden", false);
+        }
+        // Dresden
+      } else if (e.getSourceVertex().equals(vertexIDDresden)) {
+        // Dresden -[__EDGE__]-> Dresden {count: 1}
+        if (e.getTargetVertex().equals(vertexIDDresden)) {
+          assertEquals("edge id was wrong",
+            new Long(MathHelper.cantor(vertexIDDresden, vertexIDDresden)),
+            e.getId());
+          assertEquals("wrong edge property", 1, edgeAggregateValue);
+          checkedEdges++;
+        } else {
+          assertTrue("unexpected outgoing edge from Leipzig", false);
+        }
+      }
+    }
+    assertEquals("wrong number of checked edges", 2, checkedEdges);
   }
 }

@@ -81,6 +81,11 @@ import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
  */
 public class Summarization {
 
+  /**
+   * Used to represent vertices that do not have the vertex grouping property.
+   */
+  public static final String DEFAULT_VERTEX_GROUP = "__DEFAULT_GROUP";
+
   public EPGraph summarize(
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
     final String vertexGroupingKey) throws Exception {
@@ -174,7 +179,11 @@ public class Summarization {
 
     @Override
     public String getKey(Vertex<Long, EPFlinkVertexData> v) throws Exception {
-      return v.getValue().getProperty(groupPropertyKey).toString();
+      if (v.getValue().getProperty(groupPropertyKey) != null) {
+        return v.getValue().getProperty(groupPropertyKey).toString();
+      } else {
+        return DEFAULT_VERTEX_GROUP;
+      }
     }
   }
 
@@ -198,7 +207,6 @@ public class Summarization {
       Collector<Vertex<Long, EPFlinkVertexData>> collector) throws Exception {
       int groupCount = 0;
       Long newVertexID = 0L;
-      String groupLabel = null;
       String groupValue = null;
       boolean initialized = false;
       for (Vertex<Long, EPFlinkVertexData> v : iterable) {
@@ -206,15 +214,18 @@ public class Summarization {
         if (!initialized) {
           // will be the minimum vertex id in the group
           newVertexID = v.getId();
-          groupValue = v.getValue().getProperty(groupPropertyKey).toString();
-          groupLabel = v.getValue().getLabel();
+          if (v.getValue().getProperty(groupPropertyKey) != null) {
+            groupValue = v.getValue().getProperty(groupPropertyKey).toString();
+          } else {
+            groupValue = DEFAULT_VERTEX_GROUP;
+          }
           initialized = true;
         }
       }
 
       EPFlinkVertexData newVertexData = new EPFlinkVertexData();
       newVertexData.setId(newVertexID);
-      newVertexData.setLabel(groupLabel);
+      newVertexData.setLabel(FlinkConstants.DEFAULT_VERTEX_LABEL);
       newVertexData.setProperty(groupPropertyKey, groupValue);
       newVertexData.setProperty(COUNT_PROPERTY_KEY, groupCount);
       newVertexData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
