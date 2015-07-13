@@ -40,7 +40,6 @@ import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.operators.EPGraphCollectionOperators;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -107,61 +106,25 @@ public class EPGraphCollection implements
 
   public EPGraphCollection getGraphs(final List<Long> identifiers) throws
     Exception {
-    ArrayList<Tuple1<Long>> idTuples =
-      Lists.newArrayListWithCapacity(identifiers.size());
-    for (Long id : identifiers) {
-      idTuples.add(new Tuple1<>(id));
-    }
-    DataSet<Tuple1<Long>> ids = env.fromCollection(idTuples);
 
     DataSet<Subgraph<Long, EPFlinkGraphData>> newSubGraphs =
-      this.subgraphs.join(ids).where(GRAPH_ID).equalTo(0).with(
-        new JoinFunction<Subgraph<Long, EPFlinkGraphData>, Tuple1<Long>,
-          Subgraph<Long, EPFlinkGraphData>>() {
+      this.subgraphs.filter(new FilterFunction<Subgraph<Long, EPFlinkGraphData>>() {
 
-          @Override
-          public Subgraph<Long, EPFlinkGraphData> join(
-            Subgraph<Long, EPFlinkGraphData> subgraph,
-            Tuple1<Long> longTuple1) throws Exception {
-            return subgraph;
-          }
-        });
-
-    // build new vertex set
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices = this.graph.getVertices()
-      .filter(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
         @Override
-        public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
+        public boolean filter(Subgraph<Long, EPFlinkGraphData> subgraph) throws
           Exception {
-          boolean vertexInGraph = false;
-          for (Long graph : vertex.getValue().getGraphs()) {
-            if (identifiers.contains(graph)) {
-              vertexInGraph = true;
-              break;
-            }
-          }
-          return vertexInGraph;
+          return identifiers.contains(subgraph.getId());
+
         }
       });
 
-    JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
-      EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>
-      joinFunc =
-      new JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
-        EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>() {
-        @Override
-        public Edge<Long, EPFlinkEdgeData> join(
-          Edge<Long, EPFlinkEdgeData> leftTuple,
-          Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
-          return leftTuple;
-        }
-      };
+    // build new vertex set
+    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
+      this.graph.getVertices().filter(new VertexInGraphFilter(identifiers));
 
     // build new edge set
     DataSet<Edge<Long, EPFlinkEdgeData>> edges =
-      this.graph.getEdges().join(vertices).where(SOURCE_VERTEX_ID)
-        .equalTo(VERTEX_ID).with(joinFunc).join(vertices)
-        .where(TARGET_VERTEX_ID).equalTo(VERTEX_ID).with(joinFunc);
+      this.graph.getEdges().filter(new EdgeInGraphFilter(identifiers));
 
     return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
       newSubGraphs, env);
@@ -247,11 +210,11 @@ public class EPGraphCollection implements
       this.subgraphs.union(otherCollection.subgraphs).groupBy(GRAPH_ID)
         .reduceGroup(new SubgraphGroupReducer(2));
 
-    DataSet<Vertex<Long, EPFlinkVertexData>> unionVertices =
+    DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
       this.graph.getVertices();
 
     DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
-      unionVertices.flatMap(
+      thisVertices.flatMap(
         new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
           Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
 
@@ -265,6 +228,7 @@ public class EPGraphCollection implements
             }
           }
         });
+
     DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
       verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
         new JoinFunction<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>,
@@ -372,12 +336,12 @@ public class EPGraphCollection implements
           }
         });
 
-    DataSet<Vertex<Long, EPFlinkVertexData>> unionVertices =
+    DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
       this.graph.getVertices().union(otherCollection.graph.getVertices())
         .distinct(VERTEX_ID);
 
     DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
-      unionVertices.flatMap(
+      thisVertices.flatMap(
         new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
           Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
 
@@ -402,13 +366,15 @@ public class EPGraphCollection implements
             Subgraph<Long, EPFlinkGraphData> subgraph) throws Exception {
             return vertexLongTuple.f0;
           }
-        });
+        }).distinct(VERTEX_ID);
+
+
 
     DataSet<Edge<Long, EPFlinkEdgeData>> edges = this.graph.getEdges();
 
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
       .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
-      .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
+      .equalTo(VERTEX_ID).with(new EdgeJoinFunction()).distinct(EDGE_ID);
 
     return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
       newSubgraphs, env);
@@ -651,6 +617,53 @@ public class EPGraphCollection implements
       Edge<Long, EPFlinkEdgeData> leftTuple,
       Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
       return leftTuple;
+    }
+  }
+
+
+
+  public static class VertexInGraphFilter implements
+    FilterFunction<Vertex<Long, EPFlinkVertexData>> {
+
+    List<Long> identifiers;
+
+    public VertexInGraphFilter(List<Long> identifiers) {
+      this.identifiers = identifiers;
+    }
+
+    @Override
+    public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
+      Exception {
+      boolean vertexInGraph = false;
+      for (Long graph : vertex.getValue().getGraphs()) {
+        if (identifiers.contains(graph)) {
+          vertexInGraph = true;
+          break;
+        }
+      }
+      return vertexInGraph;
+    }
+  }
+
+  public static class EdgeInGraphFilter implements
+    FilterFunction<Edge<Long, EPFlinkEdgeData>> {
+
+    List<Long> identifiers;
+
+    public EdgeInGraphFilter(List<Long> identifiers) {
+      this.identifiers = identifiers;
+    }
+
+    @Override
+    public boolean filter(Edge<Long, EPFlinkEdgeData> vertex) throws Exception {
+      boolean vertexInGraph = false;
+      for (Long graph : vertex.getValue().getGraphs()) {
+        if (identifiers.contains(graph)) {
+          vertexInGraph = true;
+          break;
+        }
+      }
+      return vertexInGraph;
     }
   }
 }
