@@ -20,8 +20,8 @@ package org.gradoop.model.impl;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.EPVertexData;
-import org.gradoop.model.helper.Aggregate;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.helper.MathHelper;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
@@ -38,13 +38,12 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
   public void testSummarizeWithVertexGroupingKeySymmetricGraph() throws
     Exception {
 
-    EPGraph communityGraph = graphStore.getGraph(2L);
-
-    final String aggregatePropertyKey = "count";
+    EPGraph inputGraph = graphStore.getGraph(2L);
 
     final String vertexGroupingKey = "city";
+    final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = communityGraph.summarize(vertexGroupingKey);
+    EPGraph summarizedGraph = inputGraph.summarize(vertexGroupingKey);
 
     assertNotNull("summarized graph must not be null", summarizedGraph);
     // two vertices: dresden and leipzig
@@ -129,15 +128,14 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
   public void testSummarizeWithVertexGroupingKeyAsymmetricGraph() throws
     Exception {
 
-    EPGraph communityGraph =
+    EPGraph inputGraph =
       graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
         .combine(graphStore.getGraph(2L));
 
+    final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
 
-    final String vertexGroupingKey = "city";
-
-    EPGraph summarizedGraph = communityGraph.summarize(vertexGroupingKey);
+    EPGraph summarizedGraph = inputGraph.summarize(vertexGroupingKey);
 
     assertNotNull("summarized graph must not be null", summarizedGraph);
     // two vertices: dresden and leipzig
@@ -199,10 +197,17 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       if (e.getSourceVertex().equals(vertexIDDresden)) {
         // Person:Dresden -[__EDGE__]-> Person:Dresden {count: 2}
         if (e.getTargetVertex().equals(vertexIDDresden)) {
+          assertEquals("edge id was wrong",
+            new Long(MathHelper.cantor(vertexIDDresden, vertexIDDresden)),
+            e.getId());
+
           assertEquals("wrong edge property", 2, edgeAggregateValue);
           checkedEdges++;
           // Person:Dresden -[__EDGE__]-> Person:Leipzig {count: 3}
         } else if (e.getTargetVertex().equals(vertexIDLeipzig)) {
+          assertEquals("edge id was wrong",
+            new Long(MathHelper.cantor(vertexIDDresden, vertexIDLeipzig)),
+            e.getId());
           assertEquals("wrong edge property", 3, edgeAggregateValue);
           checkedEdges++;
         } else {
@@ -212,10 +217,16 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       } else if (e.getSourceVertex().equals(vertexIDLeipzig)) {
         // Person:Leipzig -[__EDGE__]-> Person:Leipzig {count: 2}
         if (e.getTargetVertex().equals(vertexIDLeipzig)) {
+          assertEquals("edge id was wrong",
+            new Long(MathHelper.cantor(vertexIDLeipzig, vertexIDLeipzig)),
+            e.getId());
           assertEquals("wrong edge property", 2, edgeAggregateValue);
           checkedEdges++;
           // Person:Leipzig -[__EDGE__]-> Person:Dresden {count: 1}
         } else if (e.getTargetVertex().equals(vertexIDDresden)) {
+          assertEquals("edge id was wrong",
+            new Long(MathHelper.cantor(vertexIDLeipzig, vertexIDDresden)),
+            e.getId());
           assertEquals("wrong edge property", 1, edgeAggregateValue);
           checkedEdges++;
         } else {
