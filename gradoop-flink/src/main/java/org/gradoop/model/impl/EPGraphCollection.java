@@ -33,12 +33,14 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.EPGraphData;
-import org.gradoop.model.helper.Algorithm;
-import org.gradoop.model.helper.BinaryFunction;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
-import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.EPGraphCollectionOperators;
+import org.gradoop.model.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.model.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -107,8 +109,8 @@ public class EPGraphCollection implements
   public EPGraphCollection getGraphs(final List<Long> identifiers) throws
     Exception {
 
-    DataSet<Subgraph<Long, EPFlinkGraphData>> newSubGraphs =
-      this.subgraphs.filter(new FilterFunction<Subgraph<Long, EPFlinkGraphData>>() {
+    DataSet<Subgraph<Long, EPFlinkGraphData>> newSubGraphs = this.subgraphs
+      .filter(new FilterFunction<Subgraph<Long, EPFlinkGraphData>>() {
 
         @Override
         public boolean filter(Subgraph<Long, EPFlinkGraphData> subgraph) throws
@@ -369,7 +371,6 @@ public class EPGraphCollection implements
         }).distinct(VERTEX_ID);
 
 
-
     DataSet<Edge<Long, EPFlinkEdgeData>> edges = this.graph.getEdges();
 
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
@@ -473,24 +474,31 @@ public class EPGraphCollection implements
   }
 
   @Override
-  public EPGraphCollection apply(UnaryFunction unaryFunction) {
+  public EPGraphCollection apply(UnaryGraphToGraphOperator op) {
     return null;
   }
 
   @Override
-  public EPGraph reduce(BinaryFunction binaryGraphOperator) {
+  public EPGraph reduce(BinaryGraphToGraphOperator op) {
     return null;
   }
 
   @Override
-  public EPGraph callForGraph(Algorithm algorithm, String... params) {
-    return null;
+  public EPGraphCollection callForCollection(
+    UnaryCollectionToCollectionOperator op) {
+    return op.execute(this);
   }
 
   @Override
-  public EPGraphCollection callForCollection(Algorithm algorithm,
-    String... params) {
-    return null;
+  public EPGraphCollection callForCollection(
+    BinaryCollectionToCollectionOperator op,
+    EPGraphCollection otherCollection) {
+    return op.execute(this, otherCollection);
+  }
+
+  @Override
+  public EPGraph callForGraph(UnaryCollectionToGraphOperator op) {
+    return op.execute(this);
   }
 
   @Override
@@ -619,7 +627,6 @@ public class EPGraphCollection implements
       return leftTuple;
     }
   }
-
 
 
   public static class VertexInGraphFilter implements
