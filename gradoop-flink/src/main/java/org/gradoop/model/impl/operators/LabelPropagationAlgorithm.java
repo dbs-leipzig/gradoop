@@ -1,0 +1,132 @@
+package org.gradoop.model.impl.operators;
+
+import org.apache.flink.graph.Graph;
+import org.apache.flink.graph.GraphAlgorithm;
+import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.spargel.MessageIterator;
+import org.apache.flink.graph.spargel.MessagingFunction;
+import org.apache.flink.graph.spargel.VertexUpdateFunction;
+import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
+import org.gradoop.model.impl.EPFlinkEdgeData;
+import org.gradoop.model.impl.EPFlinkVertexData;
+
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Implementation of the Label Propagation Algorithm:
+ * The input graph as adjacency list contains the information about the
+ * vertex (id), value (label) and its edges to neighbors.
+ * <p/>
+ * In super step 0 each vertex will propagate its value within his neighbors
+ * <p/>
+ * In the remaining super steps each vertex will adopt the value of the
+ * majority of their neighbors or the smallest one if there are just one
+ * neighbor. If a vertex adopt a new value it'll propagate the new one again.
+ * <p/>
+ * The computation will terminate if no new values are assigned.
+ */
+public class LabelPropagationAlgorithm implements
+  GraphAlgorithm<Long, EPFlinkVertexData, EPFlinkEdgeData> {
+  /**
+   *
+   */
+  public static final String PROPERTYKEY = "value";
+  /**
+   *
+   */
+  private Integer maxIterations;
+
+  /**
+   * @param maxIterations
+   */
+  public LabelPropagationAlgorithm(Integer maxIterations) {
+    this.maxIterations = maxIterations;
+  }
+
+  @Override
+  public Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> run(
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph) throws Exception {
+    // initialize vertex values and run the Vertex Centric Iteration
+    return graph.runVertexCentricIteration(new LPUpdater(), new LPMessenger(),
+      maxIterations);
+  }
+
+  /**
+   * Updates the value of a vertex by picking the minimum neighbor ID out of
+   * all the incoming messages.
+   */
+  public static final class LPUpdater extends
+    VertexUpdateFunction<Long, EPFlinkVertexData, Long> {
+    @Override
+    public void updateVertex(Vertex<Long, EPFlinkVertexData> vertex,
+      MessageIterator<Long> msg) throws Exception {
+      if (getSuperstepNumber() == 1) {
+        setNewVertexValue(vertex.getValue());
+      } else {
+        List<Long> messages = Lists.newArrayList(msg.iterator());
+        if (messages.size() == 1) {
+          vertex.getValue().setProperty(PROPERTYKEY, Math
+            .min((Long) vertex.getValue().getProperty(PROPERTYKEY),
+              messages.get(0)));
+          setNewVertexValue(vertex.getValue());
+        } else {
+          vertex.getValue()
+            .setProperty(PROPERTYKEY, getMostFrequent(vertex, messages));
+          setNewVertexValue(vertex.getValue());
+        }
+      }
+    }
+
+    /**
+     * @param vertex
+     * @param allMessages
+     * @return
+     */
+    private long getMostFrequent(Vertex<Long, EPFlinkVertexData> vertex,
+      List<Long> allMessages) {
+      Collections.sort(allMessages);
+      long newValue;
+      int currentCounter = 1;
+      long currentValue = allMessages.get(0);
+      int maxCounter = 1;
+      long maxValue = 1;
+      for (int i = 1; i < allMessages.size(); i++) {
+        if (currentValue == allMessages.get(i)) {
+          currentCounter++;
+          if (maxCounter < currentCounter) {
+            maxCounter = currentCounter;
+            maxValue = currentValue;
+          }
+        } else {
+          currentCounter = 1;
+          currentValue = allMessages.get(i);
+        }
+      }
+      // if the frequent of all received messages are just one
+      if (maxCounter == 1) {
+        // to avoid an oscillating state of the calculation we will just use
+        // the smaller value
+        newValue = Math.min((Long) vertex.getValue().getProperty(PROPERTYKEY),
+          allMessages.get(0));
+      } else {
+        newValue = maxValue;
+      }
+      return newValue;
+    }
+  }
+
+  /**
+   * Distributes the value of the vertex
+   */
+  public static final class LPMessenger extends
+    MessagingFunction<Long, EPFlinkVertexData, Long, EPFlinkEdgeData> {
+    @Override
+    public void sendMessages(Vertex<Long, EPFlinkVertexData> vertex) throws
+      Exception {
+      // send current minimum to neighbors
+      sendMessageToAllNeighbors(
+        (Long) vertex.getValue().getProperty(PROPERTYKEY));
+    }
+  }
+}

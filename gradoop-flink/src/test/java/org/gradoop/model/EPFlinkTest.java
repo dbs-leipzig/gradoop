@@ -108,6 +108,7 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_NAME, "Alice");
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Leipzig");
+    properties.put("value", 100l);
     alice = new EPFlinkVertexData(0L, LABEL_PERSON, properties,
       Sets.newHashSet(0L, 2L));
     // Person:Bob (1L)
@@ -115,6 +116,7 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_NAME, "Bob");
     properties.put(PROPERTY_KEY_GENDER, "m");
     properties.put(PROPERTY_KEY_CITY, "Leipzig");
+    properties.put("value", 101l);
     bob = new EPFlinkVertexData(1L, LABEL_PERSON, properties,
       Sets.newHashSet(0L, 2L));
     // Person:Carol (2L)
@@ -122,6 +124,7 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_NAME, "Carol");
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
+    properties.put("value", 102l);
     carol = new EPFlinkVertexData(2L, LABEL_PERSON, properties,
       Sets.newHashSet(1L, 2L, 3L));
     // Person:Dave (3L)
@@ -129,6 +132,7 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_NAME, "Dave");
     properties.put(PROPERTY_KEY_GENDER, "m");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
+    properties.put("value", 103l);
     dave = new EPFlinkVertexData(3L, LABEL_PERSON, properties,
       Sets.newHashSet(1L, 2L, 3L));
     // Person:Eve (4L)
