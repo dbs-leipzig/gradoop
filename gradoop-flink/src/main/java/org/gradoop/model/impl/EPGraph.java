@@ -38,6 +38,7 @@ import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.EPGraphOperators;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 import java.util.Map;
@@ -145,14 +146,14 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   @Override
   public org.gradoop.model.impl.EPGraphCollection match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public EPGraph project(
     UnaryFunction<EPVertexData, EPVertexData> vertexFunction,
     UnaryFunction<EPEdgeData, EPEdgeData> edgeFunction) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
@@ -168,7 +169,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     List<String> edgeGroupingKeys,
     UnaryFunction<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws
     Exception {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
@@ -193,7 +194,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     String edgeGroupingKey,
     UnaryFunction<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws
     Exception {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override

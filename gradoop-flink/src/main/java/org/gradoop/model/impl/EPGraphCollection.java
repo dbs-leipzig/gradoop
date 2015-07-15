@@ -18,6 +18,7 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
+import com.sun.tools.corba.se.idl.constExpr.Not;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -41,6 +42,7 @@ import org.gradoop.model.operators.EPGraphCollectionOperators;
 import org.gradoop.model.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -195,7 +197,7 @@ public class EPGraphCollection implements
   @Override
   public EPGraphCollection select(Predicate<EPGraph> predicateFunction) throws
     Exception {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
@@ -230,27 +232,27 @@ public class EPGraphCollection implements
 
   @Override
   public EPGraphCollection distinct() {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public EPGraphCollection sortBy(String propertyKey, Order order) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public EPGraphCollection top(int limit) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public EPGraphCollection apply(UnaryGraphToGraphOperator op) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public EPGraph reduce(BinaryGraphToGraphOperator op) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
@@ -273,7 +275,7 @@ public class EPGraphCollection implements
 
   @Override
   public <V> Iterable<V> values(Class<V> propertyType, String propertyKey) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
