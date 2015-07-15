@@ -37,6 +37,7 @@ import org.gradoop.model.impl.EPFlinkEdgeData;
 import org.gradoop.model.impl.EPFlinkGraphData;
 import org.gradoop.model.impl.EPFlinkVertexData;
 import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 import java.util.List;
 
@@ -79,17 +80,61 @@ import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
  *
  * @author Martin Junghanns
  */
-public class Summarization {
+public class Summarization implements UnaryGraphToGraphOperator {
 
   /**
    * Used to represent vertices that do not have the vertex grouping property.
    */
-  public static final String DEFAULT_VERTEX_GROUP = "__DEFAULT_GROUP";
+  public static final String NULL_VALUE = "__NULL";
 
-  public EPGraph summarize(
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    final String vertexGroupingKey) throws Exception {
+  private final String vertexGroupingKey;
 
+  private final String edgeGroupingKey;
+
+  private final boolean useVertexLabels;
+
+  private final boolean useEdgeLabels;
+
+  private Summarization(String vertexGroupingKey, String edgeGroupingKey,
+    boolean useVertexLabels, boolean useEdgeLabels) {
+    this.vertexGroupingKey = vertexGroupingKey;
+    this.edgeGroupingKey = edgeGroupingKey;
+    this.useVertexLabels = useVertexLabels;
+    this.useEdgeLabels = useEdgeLabels;
+  }
+
+  @Override
+  public EPGraph execute(EPGraph graph) {
+    EPGraph result;
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> gellyGraph;
+
+    if (vertexGroupingKey != null && !"".equals(vertexGroupingKey)) {
+      EPFlinkGraphData graphData = createNewGraphData();
+      gellyGraph = summarizeOnVertexProperty(graph.getGellyGraph());
+      result =
+        EPGraph.fromGraph(gellyGraph, graphData, gellyGraph.getContext());
+    } else {
+      // graphs stays unchanged
+      result = graph;
+    }
+    return result;
+  }
+
+  @Override
+  public String getName() {
+    return "Summarization";
+  }
+
+  private EPFlinkGraphData createNewGraphData() {
+    EPFlinkGraphData newGraphData = new EPFlinkGraphData();
+    newGraphData.setId(FlinkConstants.SUMMARIZE_GRAPH_ID);
+    newGraphData.setLabel(FlinkConstants.DEFAULT_GRAPH_LABEL);
+    return newGraphData;
+  }
+
+  private Graph<Long, EPFlinkVertexData, EPFlinkEdgeData>
+  summarizeOnVertexProperty(
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph) {
     /* build summarized vertices */
 
     SortedGrouping<Vertex<Long, EPFlinkVertexData>> groupedSortedVertices =
@@ -154,15 +199,7 @@ public class Summarization {
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdges =
       interEdges.union(intraEdges);
 
-    /* create new graph data */
-
-    EPFlinkGraphData newGraphData = new EPFlinkGraphData();
-    newGraphData.setId(FlinkConstants.SUMMARIZE_GRAPH_ID);
-    newGraphData.setLabel(FlinkConstants.DEFAULT_GRAPH_LABEL);
-
-    return EPGraph
-      .fromGraph(Graph.fromDataSet(newVertices, newEdges, graph.getContext()),
-        newGraphData, graph.getContext());
+    return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
   }
 
   /**
@@ -182,7 +219,7 @@ public class Summarization {
       if (v.getValue().getProperty(groupPropertyKey) != null) {
         return v.getValue().getProperty(groupPropertyKey).toString();
       } else {
-        return DEFAULT_VERTEX_GROUP;
+        return NULL_VALUE;
       }
     }
   }
@@ -217,7 +254,7 @@ public class Summarization {
           if (v.getValue().getProperty(groupPropertyKey) != null) {
             groupValue = v.getValue().getProperty(groupPropertyKey).toString();
           } else {
-            groupValue = DEFAULT_VERTEX_GROUP;
+            groupValue = NULL_VALUE;
           }
           initialized = true;
         }
@@ -420,6 +457,43 @@ public class Summarization {
     public Tuple2<Long, Long> map(Edge<Long, EPFlinkEdgeData> e) throws
       Exception {
       return new Tuple2<>(e.getSource(), e.getTarget());
+    }
+  }
+
+  public static class SummarizationBuilder {
+
+    private String vertexGroupingKey;
+
+    private String edgeGroupingKey;
+
+    private boolean useVertexLabels = false;
+
+    private boolean useEdgeLabels = false;
+
+    public SummarizationBuilder vertexGroupingKey(
+      final String vertexGroupingKey) {
+      this.vertexGroupingKey = vertexGroupingKey;
+      return this;
+    }
+
+    public SummarizationBuilder edgeGroupingKey(final String edgeGroupingKey) {
+      this.edgeGroupingKey = edgeGroupingKey;
+      return this;
+    }
+
+    public SummarizationBuilder useVertexLabels(final boolean useVertexLabels) {
+      this.useVertexLabels = useVertexLabels;
+      return this;
+    }
+
+    public SummarizationBuilder useEdgeLabels(final boolean useEdgeLabels) {
+      this.useEdgeLabels = useEdgeLabels;
+      return this;
+    }
+
+    public Summarization build() {
+      return new Summarization(vertexGroupingKey, edgeGroupingKey,
+        useVertexLabels, useEdgeLabels);
     }
   }
 }

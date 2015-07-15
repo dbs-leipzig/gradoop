@@ -20,8 +20,6 @@ package org.gradoop.model.operators;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPPatternGraph;
 import org.gradoop.model.EPVertexData;
-import org.gradoop.model.helper.Aggregate;
-import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EPEdgeCollection;
@@ -54,14 +52,14 @@ public interface EPGraphOperators {
   graph collection
    */
 
-  EPGraphCollection match(String graphPattern,
+  org.gradoop.model.impl.EPGraphCollection match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc);
 
   EPGraph project(UnaryFunction<EPVertexData, EPVertexData> vertexFunction,
     UnaryFunction<EPEdgeData, EPEdgeData> edgeFunction);
 
   <O extends Number> EPGraph aggregate(String propertyKey,
-    Aggregate<EPGraph, O> aggregateFunc) throws Exception;
+    UnaryFunction<EPGraph, O> aggregateFunc) throws Exception;
 
   EPGraph summarize(String vertexGroupingKey) throws Exception;
 
@@ -69,15 +67,16 @@ public interface EPGraphOperators {
     Exception;
 
   EPGraph summarize(String vertexGroupingKey,
-    Aggregate<Iterable<EPVertexData>, Number> vertexAggregateFunc,
+    UnaryFunction<Iterable<EPVertexData>, Number> vertexAggregateFunc,
     String edgeGroupingKey,
-    Aggregate<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws Exception;
+    UnaryFunction<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws
+    Exception;
 
   <O1 extends Number, O2 extends Number> EPGraph summarize(
     List<String> vertexGroupingKeys,
-    Aggregate<Iterable<EPVertexData>, O1> vertexAggregateFunc,
+    UnaryFunction<Iterable<EPVertexData>, O1> vertexAggregateFunc,
     List<String> edgeGroupingKeys,
-    Aggregate<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws Exception;
+    UnaryFunction<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws Exception;
 
   /*
   binary operators take two graphs as input and return a single graph
@@ -92,8 +91,10 @@ public interface EPGraphOperators {
   /*
   auxiliary operators
    */
+  EPGraph callForGraph(UnaryGraphToGraphOperator operator);
 
-  EPGraph callForGraph(Algorithm algorithm, String... params);
+  EPGraph callForGraph(BinaryGraphToGraphOperator operator, EPGraph otherGraph);
 
-  EPGraphCollection callForCollection(Algorithm algorithm, String... params);
+  EPGraphCollection callForCollection(UnaryGraphToCollectionOperator operator);
+
 }

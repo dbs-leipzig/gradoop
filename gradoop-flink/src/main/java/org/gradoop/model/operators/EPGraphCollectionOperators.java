@@ -17,11 +17,8 @@
 package org.gradoop.model.operators;
 
 import org.gradoop.model.EPGraphData;
-import org.gradoop.model.helper.Algorithm;
-import org.gradoop.model.helper.BinaryFunction;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
-import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
 
@@ -78,11 +75,16 @@ public interface EPGraphCollectionOperators<T> extends
   auxiliary operators
    */
 
-  EPGraphCollection apply(UnaryFunction<EPGraph, EPGraph> unaryFunction);
+  EPGraphCollection apply(UnaryGraphToGraphOperator op);
 
-  EPGraph reduce(BinaryFunction<EPGraph, EPGraph> binaryGraphOperator);
+  EPGraph reduce(BinaryGraphToGraphOperator op);
 
-  EPGraph callForGraph(Algorithm algorithm, String... params);
+  EPGraphCollection callForCollection(UnaryCollectionToCollectionOperator op);
 
-  EPGraphCollection callForCollection(Algorithm algorithm, String... params);
+  EPGraphCollection callForCollection(BinaryCollectionToCollectionOperator op,
+    EPGraphCollection otherCollection);
+
+  EPGraph callForGraph(UnaryCollectionToGraphOperator op);
+
+
 }

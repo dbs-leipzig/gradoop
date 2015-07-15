@@ -17,18 +17,20 @@
 
 package org.gradoop.model;
 
-import com.google.common.collect.Lists;
-import org.gradoop.model.helper.Aggregate;
-import org.gradoop.model.helper.Algorithm;
-import org.gradoop.model.helper.BinaryFunction;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
-import org.gradoop.model.helper.SystemProperties;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
+import org.gradoop.model.impl.operators.Aggregation;
+import org.gradoop.model.impl.operators.Combination;
+import org.gradoop.model.impl.operators.Projection;
+import org.gradoop.model.impl.operators.Summarization;
+import org.gradoop.model.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.store.EPGraphStore;
 import org.mockito.Mockito;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public abstract class WorkflowTest {
 
@@ -50,43 +52,22 @@ public abstract class WorkflowTest {
       });
 
     // build single graph
-    EPGraph knowsGraph =
-      friendships.reduce(new BinaryFunction<EPGraph, EPGraph>() {
-        @Override
-        public EPGraph execute(EPGraph first, EPGraph second) {
-          return first.combine(second);
-        }
-      });
+    EPGraph knowsGraph = friendships.reduce(new Combination());
 
     // apply label propagation
-    knowsGraph = knowsGraph
-      .callForGraph(Algorithm.LABEL_PROPAGATION, "propertyKey", "community");
+    EPGraphCollection communities =
+      knowsGraph.callForCollection(new LP("communityID"));
+    // and build one graph
+    knowsGraph = communities.reduce(new Combination());
+
+    Summarization summarization =
+      new Summarization.SummarizationBuilder().vertexGroupingKey("city")
+        .edgeGroupingKey("since").useVertexLabels(true).build();
+
+    knowsGraph.callForGraph(summarization);
 
     // summarize communities
-    knowsGraph
-      .summarize(Lists.newArrayList(SystemProperties.TYPE.name(), "city"),
-        new Aggregate<Iterable<EPVertexData>, Long>() {
-          @Override
-          public Long aggregate(Iterable<EPVertexData> entities) throws
-            Exception {
-            long count = 0L;
-            for (EPVertexData e : entities) {
-              count++;
-            }
-            return count;
-          }
-        }, Lists.newArrayList(SystemProperties.TYPE.name()),
-        new Aggregate<Iterable<EPEdgeData>, Long>() {
-          @Override
-          public Long aggregate(Iterable<EPEdgeData> entities) throws
-            Exception {
-            long count = 0L;
-            for (EPEdgeData e : entities) {
-              count++;
-            }
-            return count;
-          }
-        });
+    knowsGraph.summarize("city", "since");
   }
 
   public void topRevenueBusinessProcess() throws Exception {
@@ -97,7 +78,18 @@ public abstract class WorkflowTest {
 
     // extract business process instances
     EPGraphCollection btgs =
-      dbGraph.callForCollection(Algorithm.BUSINESS_TRANSACTION_GRAPHS);
+      dbGraph.callForCollection(new UnaryGraphToCollectionOperator() {
+        @Override
+        public EPGraphCollection execute(EPGraph graph) {
+          // TODO execute BTG Computation
+          throw new NotImplementedException();
+        }
+
+        @Override
+        public String getName() {
+          return "BTGComputation";
+        }
+      });
 
     // define predicate function (graph contains invoice)
     final Predicate<EPGraph> predicate = new Predicate<EPGraph>() {
@@ -113,10 +105,10 @@ public abstract class WorkflowTest {
     };
 
     // define aggregate function (revenue per graph)
-    final Aggregate<EPGraph, Double> aggregateFunc =
-      new Aggregate<EPGraph, Double>() {
+    final UnaryFunction<EPGraph, Double> aggregateFunc =
+      new UnaryFunction<EPGraph, Double>() {
         @Override
-        public Double aggregate(EPGraph entity) {
+        public Double execute(EPGraph entity) throws Exception {
           Double sum = 0.0;
           for (Double v : entity.getVertices()
             .values(Double.class, "revenue")) {
@@ -128,24 +120,14 @@ public abstract class WorkflowTest {
 
     // apply predicate and aggregate function
     EPGraphCollection invBtgs =
-      btgs.select(predicate).apply(new UnaryFunction<EPGraph, EPGraph>() {
-        @Override
-        public EPGraph execute(EPGraph entity) throws Exception {
-          return entity.aggregate("revenue", aggregateFunc);
-        }
-      });
+      btgs.select(predicate).apply(new Aggregation<>("revenue", aggregateFunc));
 
     // sort graphs by revenue and return top 100
     EPGraphCollection topBTGs =
       invBtgs.sortBy("revenue", Order.DESCENDING).top(100);
 
     // compute overlap to find master store objects (e.g. Employee)
-    EPGraph topOverlap = topBTGs.reduce(new BinaryFunction<EPGraph, EPGraph>() {
-      @Override
-      public EPGraph execute(EPGraph first, EPGraph second) {
-        return first.combine(second);
-      }
-    });
+    EPGraph topOverlap = topBTGs.reduce(new Combination());
   }
 
   public void clusterCharacteristicPatterns() throws Exception {
@@ -153,13 +135,24 @@ public abstract class WorkflowTest {
 
     // generate base collection
     EPGraphCollection btgs = db.getDatabaseGraph()
-      .callForCollection(Algorithm.BUSINESS_TRANSACTION_GRAPHS);
+      .callForCollection(new UnaryGraphToCollectionOperator() {
+        @Override
+        public EPGraphCollection execute(EPGraph graph) {
+          // TODO execute BTG Computation
+          throw new NotImplementedException();
+        }
+
+        @Override
+        public String getName() {
+          return "BTGComputation";
+        }
+      });
 
     // define aggregate function (profit per graph)
-    final Aggregate<EPGraph, Double> aggFunc =
-      new Aggregate<EPGraph, Double>() {
+    final UnaryFunction<EPGraph, Double> aggFunc =
+      new UnaryFunction<EPGraph, Double>() {
         @Override
-        public Double aggregate(EPGraph entity) {
+        public Double execute(EPGraph entity) throws Exception {
           Double revenue = 0.0;
           Double expense = 0.0;
           for (Double v : entity.getVertices()
@@ -175,12 +168,7 @@ public abstract class WorkflowTest {
       };
 
     // apply aggregate function on btgs
-    btgs = btgs.apply(new UnaryFunction<EPGraph, EPGraph>() {
-      @Override
-      public EPGraph execute(EPGraph entity) throws Exception {
-        return entity.aggregate("profit", aggFunc);
-      }
-    });
+    btgs = btgs.apply(new Aggregation<>("profit", aggFunc));
 
     // vertex function for projection
     final UnaryFunction<EPVertexData, EPVertexData> vertexFunc =
@@ -210,12 +198,7 @@ public abstract class WorkflowTest {
       };
 
     // apply projection on all btgs
-    btgs = btgs.apply(new UnaryFunction<EPGraph, EPGraph>() {
-      @Override
-      public EPGraph execute(EPGraph entity) {
-        return entity.project(vertexFunc, edgeFunc);
-      }
-    });
+    btgs = btgs.apply(new Projection(vertexFunc, edgeFunc));
 
     // select profit and loss clusters
     EPGraphCollection profitBtgs = btgs.filter(new Predicate<EPGraphData>() {
@@ -226,16 +209,68 @@ public abstract class WorkflowTest {
     });
     EPGraphCollection lossBtgs = btgs.difference(profitBtgs);
 
-    EPGraphCollection profitFreqPats = profitBtgs
-      .callForCollection(Algorithm.FREQUENT_SUBGRAPHS, "threshold", "0.7");
+    UnaryGraphToCollectionOperator fsm = new UnaryGraphToCollectionOperator() {
 
-    EPGraphCollection lossFreqPats = lossBtgs
-      .callForCollection(Algorithm.FREQUENT_SUBGRAPHS, "threshold", "0.7");
+      @Override
+      public EPGraphCollection execute(EPGraph graph) {
+        throw new NotImplementedException();
+      }
+
+      @Override
+      public String getName() {
+        return "Frequent Subgraphs";
+      }
+    };
+
+
+    EPGraphCollection profitFreqPats =
+      profitBtgs.callForCollection(new FSM(0.7f));
+    EPGraphCollection lossFreqPats = lossBtgs.callForCollection(new FSM(0.7f));
 
     // determine cluster characteristic patterns
     EPGraphCollection trivialPats = profitFreqPats.intersect(lossFreqPats);
     EPGraphCollection profitCharPatterns =
       profitFreqPats.difference(trivialPats);
     EPGraphCollection lossCharPatterns = lossFreqPats.difference(trivialPats);
+  }
+
+  private static class FSM implements UnaryCollectionToCollectionOperator {
+
+    private final float threshold;
+
+    public FSM(float threshold) {
+
+      this.threshold = threshold;
+    }
+
+    @Override
+    public String getName() {
+      return "FSM";
+    }
+
+    @Override
+    public EPGraphCollection execute(EPGraphCollection collection) {
+      throw new NotImplementedException();
+    }
+  }
+
+  private static class LP implements UnaryGraphToCollectionOperator {
+
+    private final String propertyKey;
+
+    public LP(String propertyKey) {
+
+      this.propertyKey = propertyKey;
+    }
+
+    @Override
+    public EPGraphCollection execute(EPGraph graph) {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public String getName() {
+      return "LabelPropagation";
+    }
   }
 }

@@ -32,13 +32,15 @@ import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPGraphData;
 import org.gradoop.model.EPPatternGraph;
 import org.gradoop.model.EPVertexData;
-import org.gradoop.model.helper.Aggregate;
-import org.gradoop.model.helper.Algorithm;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.operators.Combination;
 import org.gradoop.model.impl.operators.Summarization;
+import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.EPGraphOperators;
+import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 import java.util.Iterator;
 import java.util.List;
@@ -77,6 +79,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Flink execution environment.
    */
   private ExecutionEnvironment env;
+
   /**
    * Gelly graph that encapsulates the vertex and edge datasets associated
    * with that EPGraph.
@@ -86,10 +89,6 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Graph payload.
    */
   private EPFlinkGraphData graphData;
-
-  /* Operators */
-
-  private final Summarization summarization = new Summarization();
 
   private EPGraph(Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
     EPFlinkGraphData graphData, ExecutionEnvironment env) {
@@ -102,6 +101,10 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
     EPFlinkGraphData graphData, ExecutionEnvironment env) {
     return new EPGraph(graph, graphData, env);
+  }
+
+  public Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> getGellyGraph() {
+    return this.graph;
   }
 
   @Override
@@ -152,7 +155,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
-  public EPGraphCollection match(String graphPattern,
+  public org.gradoop.model.impl.EPGraphCollection match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc) {
     return null;
   }
@@ -166,8 +169,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public <O extends Number> EPGraph aggregate(String propertyKey,
-    Aggregate<EPGraph, O> aggregateFunc) throws Exception {
-    O result = aggregateFunc.aggregate(this);
+    UnaryFunction<EPGraph, O> aggregateFunc) throws Exception {
+    O result = aggregateFunc.execute(this);
     // copy graph data before updating properties
     EPFlinkGraphData newGraphData = new EPFlinkGraphData(this.graphData);
     newGraphData.setProperty(propertyKey, result);
@@ -177,49 +180,41 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   @Override
   public <O1 extends Number, O2 extends Number> EPGraph summarize(
     List<String> vertexGroupingKeys,
-    Aggregate<Iterable<EPVertexData>, O1> vertexAggregateFunc,
+    UnaryFunction<Iterable<EPVertexData>, O1> vertexAggregateFunc,
     List<String> edgeGroupingKeys,
-    Aggregate<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws Exception {
+    UnaryFunction<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws
+    Exception {
     return null;
   }
 
   @Override
   public EPGraph summarize(final String vertexGroupingKey) throws Exception {
-    return summarization.summarize(this.graph, vertexGroupingKey);
+    Summarization summarization = new Summarization.SummarizationBuilder()
+      .vertexGroupingKey(vertexGroupingKey).build();
+    return callForGraph(summarization);
   }
 
   @Override
   public EPGraph summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
-    return null;
+    Summarization summarization = new Summarization.SummarizationBuilder()
+      .vertexGroupingKey(vertexGroupingKey).edgeGroupingKey(edgeGroupingKey)
+      .build();
+    return callForGraph(summarization);
   }
 
   @Override
   public EPGraph summarize(String vertexGroupingKey,
-    Aggregate<Iterable<EPVertexData>, Number> vertexAggregateFunc,
+    UnaryFunction<Iterable<EPVertexData>, Number> vertexAggregateFunc,
     String edgeGroupingKey,
-    Aggregate<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws
+    UnaryFunction<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws
     Exception {
     return null;
   }
 
   @Override
   public EPGraph combine(EPGraph otherGraph) {
-    final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
-
-    // build distinct union of vertex sets and update graph ids at vertices
-    // cannot use Gelly union here because of missing argument for KeySelector
-    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
-      this.graph.getVertices().union(otherGraph.graph.getVertices())
-        .distinct(VERTEX_ID).map(new VertexToGraphUpdater(newGraphID));
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      this.graph.getEdges().union(otherGraph.graph.getEdges()).distinct(EDGE_ID)
-        .map(new EdgeToGraphUpdater(newGraphID));
-
-    return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
-      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
-      env);
+    return callForGraph(new Combination(), otherGraph);
   }
 
   @Override
@@ -284,14 +279,20 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
-  public EPGraph callForGraph(Algorithm algorithm, String... params) {
-    return null;
+  public EPGraph callForGraph(UnaryGraphToGraphOperator operator) {
+    return operator.execute(this);
   }
 
   @Override
-  public EPGraphCollection callForCollection(Algorithm algorithm,
-    String... params) {
-    return null;
+  public EPGraph callForGraph(BinaryGraphToGraphOperator operator,
+    EPGraph otherGraph) {
+    return operator.execute(this, otherGraph);
+  }
+
+  @Override
+  public EPGraphCollection callForCollection(
+    UnaryGraphToCollectionOperator operator) {
+    return operator.execute(this);
   }
 
   @Override
@@ -523,7 +524,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   /**
    * Adds a given graph ID to the vertex and returns it.
    */
-  private static class VertexToGraphUpdater implements
+  public static class VertexToGraphUpdater implements
     MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
       EPFlinkVertexData>> {
 
@@ -544,7 +545,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   /**
    * Adds a given graph ID to the edge and returns it.
    */
-  private static class EdgeToGraphUpdater implements
+  public static class EdgeToGraphUpdater implements
     MapFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long, EPFlinkEdgeData>> {
 
     private final long newGraphID;

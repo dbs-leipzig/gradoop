@@ -278,7 +278,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
         assertEquals("wrong property value", "Dresden", groupPropertyValue);
         assertEquals("Dresden has wrong count value", 2, groupAggregateValue);
       } else if (v.getId().equals(vertexIDGraphProcessingForum)) {
-        assertEquals("wrong property value", Summarization.DEFAULT_VERTEX_GROUP,
+        assertEquals("wrong property value", Summarization.NULL_VALUE,
           groupPropertyValue);
         assertEquals("Default has wrong count value", 1, groupAggregateValue);
       }

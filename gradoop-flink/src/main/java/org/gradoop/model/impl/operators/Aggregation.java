@@ -15,9 +15,28 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.helper;
+package org.gradoop.model.impl.operators;
 
-public interface Aggregate<I, O> {
+import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.operators.UnaryGraphToGraphOperator;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-  O aggregate(I entity) throws Exception;
+public class Aggregation<O extends Number> implements
+  UnaryGraphToGraphOperator {
+
+  public Aggregation(final String aggregatePropertyKey,
+    UnaryFunction<EPGraph, O> aggregationFunc) {
+
+  }
+
+  @Override
+  public EPGraph execute(EPGraph graph) {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public String getName() {
+    return "Aggregation";
+  }
 }

@@ -18,7 +18,7 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.model.EPFlinkTest;
-import org.gradoop.model.helper.Aggregate;
+import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
@@ -38,12 +38,13 @@ public class EPGraphAggregateTest extends EPFlinkTest {
     EPGraph forumGraph = graphStore.getGraph(3L);
     final String aggPropertyKey = "eCount";
 
-    Aggregate<EPGraph, Long> aggregateFunc = new Aggregate<EPGraph, Long>() {
-      @Override
-      public Long aggregate(EPGraph entity) throws Exception {
-        return entity.getEdges().size();
-      }
-    };
+    UnaryFunction<EPGraph, Long> aggregateFunc =
+      new UnaryFunction<EPGraph, Long>() {
+        @Override
+        public Long execute(EPGraph entity) throws Exception {
+          return entity.getEdges().size();
+        }
+      };
 
     EPGraph newGraph = forumGraph.aggregate(aggPropertyKey, aggregateFunc);
 
