@@ -307,7 +307,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
         // Default -[__EDGE__]-> Dresden {count: 3}
         if (e.getTargetVertex().equals(vertexIDDresden)) {
           assertEquals("edge id was wrong", new Long(
-            MathHelper.cantor(vertexIDGraphProcessingForum, vertexIDDresden)),
+              MathHelper.cantor(vertexIDGraphProcessingForum, vertexIDDresden)),
             e.getId());
           assertEquals("wrong edge property", 3, edgeAggregateValue);
           checkedEdges++;

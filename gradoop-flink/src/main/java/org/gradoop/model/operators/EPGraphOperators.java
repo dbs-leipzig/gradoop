@@ -91,7 +91,7 @@ public interface EPGraphOperators {
   /*
   auxiliary operators
    */
-  EPGraph callForGraph(UnaryGraphToGraphOperator operator);
+  EPGraph callForGraph(UnaryGraphToGraphOperator operator) throws Exception;
 
   EPGraph callForGraph(BinaryGraphToGraphOperator operator, EPGraph otherGraph);
 

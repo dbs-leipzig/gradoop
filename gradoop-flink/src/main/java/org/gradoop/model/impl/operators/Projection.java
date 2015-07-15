@@ -26,10 +26,13 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class Projection implements UnaryGraphToGraphOperator {
 
-  public Projection(
-    UnaryFunction<EPVertexData, EPVertexData> vertexFunc,
-    UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc) {
+  private final UnaryFunction<EPVertexData, EPVertexData> vertexFunc;
+  private final UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc;
 
+  public Projection(UnaryFunction<EPVertexData, EPVertexData> vertexFunc,
+    UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc) {
+    this.vertexFunc = vertexFunc;
+    this.edgeFunc = edgeFunc;
   }
 
   @Override

@@ -111,8 +111,7 @@ public class Summarization implements UnaryGraphToGraphOperator {
     if (vertexGroupingKey != null && !"".equals(vertexGroupingKey)) {
       EPFlinkGraphData graphData = createNewGraphData();
       gellyGraph = summarizeOnVertexProperty(graph.getGellyGraph());
-      result =
-        EPGraph.fromGraph(gellyGraph, graphData, gellyGraph.getContext());
+      result = EPGraph.fromGraph(gellyGraph, graphData);
     } else {
       // graphs stays unchanged
       result = graph;

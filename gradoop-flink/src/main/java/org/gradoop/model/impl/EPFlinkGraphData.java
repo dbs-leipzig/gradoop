@@ -19,7 +19,6 @@ package org.gradoop.model.impl;
 
 import org.gradoop.model.EPGraphData;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**

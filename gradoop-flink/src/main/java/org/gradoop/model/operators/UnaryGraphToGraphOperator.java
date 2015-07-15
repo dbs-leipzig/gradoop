@@ -21,5 +21,5 @@ import org.gradoop.model.impl.EPGraph;
 
 public interface UnaryGraphToGraphOperator extends Operator {
 
-  EPGraph execute(EPGraph graph);
+  EPGraph execute(EPGraph graph) throws Exception;
 }

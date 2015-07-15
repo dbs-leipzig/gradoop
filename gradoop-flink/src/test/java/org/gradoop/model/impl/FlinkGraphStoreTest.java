@@ -18,7 +18,6 @@
 package org.gradoop.model.impl;
 
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;

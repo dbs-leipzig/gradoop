@@ -97,7 +97,7 @@ public class EPGraphCollection implements
               return g.getValue();
             }
           }).first(1).collect().get(0);
-    return EPGraph.fromGraph(subGraph, graphData, env);
+    return EPGraph.fromGraph(subGraph, graphData);
   }
 
   @Override
@@ -530,7 +530,7 @@ public class EPGraphCollection implements
   }
 
   EPGraph getGraph() {
-    return EPGraph.fromGraph(this.graph, null, env);
+    return EPGraph.fromGraph(this.graph, null);
   }
 
   private static class SubgraphGroupReducer implements

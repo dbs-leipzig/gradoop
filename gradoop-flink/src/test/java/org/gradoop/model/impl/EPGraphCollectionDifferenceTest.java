@@ -29,8 +29,7 @@ public class EPGraphCollectionDifferenceTest extends EPFlinkTest {
     EPGraphCollection collection2 =
       graphColl.getGraphs(extractGraphIDs(secondColl));
 
-    EPGraphCollection differenceColl =
-      collection1.difference(collection2);
+    EPGraphCollection differenceColl = collection1.difference(collection2);
 
     assertNotNull("graph collection is null", differenceColl);
     assertEquals("wrong number of graphs", expectedCollSize,

@@ -18,31 +18,27 @@
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.apache.flink.util.Collector;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPGraphData;
 import org.gradoop.model.EPPatternGraph;
 import org.gradoop.model.EPVertexData;
-import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.operators.Aggregation;
 import org.gradoop.model.impl.operators.Combination;
+import org.gradoop.model.impl.operators.Exclusion;
+import org.gradoop.model.impl.operators.Overlap;
 import org.gradoop.model.impl.operators.Summarization;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.EPGraphOperators;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -76,11 +72,6 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   /**
-   * Flink execution environment.
-   */
-  private ExecutionEnvironment env;
-
-  /**
    * Gelly graph that encapsulates the vertex and edge datasets associated
    * with that EPGraph.
    */
@@ -91,16 +82,15 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   private EPFlinkGraphData graphData;
 
   private EPGraph(Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    EPFlinkGraphData graphData, ExecutionEnvironment env) {
+    EPFlinkGraphData graphData) {
     this.graph = graph;
     this.graphData = graphData;
-    this.env = env;
   }
 
   public static EPGraph fromGraph(
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    EPFlinkGraphData graphData, ExecutionEnvironment env) {
-    return new EPGraph(graph, graphData, env);
+    EPFlinkGraphData graphData) {
+    return new EPGraph(graph, graphData);
   }
 
   public Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> getGellyGraph() {
@@ -119,16 +109,14 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPEdgeCollection getOutgoingEdges(final Long vertexID) {
-    DataSet<Edge<Long, EPFlinkEdgeData>> outgoingEdges =
-      this.graph.getEdges().filter(
-
-        new FilterFunction<Edge<Long, EPFlinkEdgeData>>() {
-          @Override
-          public boolean filter(Edge<Long, EPFlinkEdgeData> edgeTuple) throws
-            Exception {
-            return edgeTuple.getValue().getSourceVertex().equals(vertexID);
-          }
-        });
+    DataSet<Edge<Long, EPFlinkEdgeData>> outgoingEdges = this.graph.getEdges()
+      .filter(new FilterFunction<Edge<Long, EPFlinkEdgeData>>() {
+        @Override
+        public boolean filter(Edge<Long, EPFlinkEdgeData> edgeTuple) throws
+          Exception {
+          return edgeTuple.getValue().getSourceVertex().equals(vertexID);
+        }
+      });
     return new EPEdgeCollection(outgoingEdges);
   }
 
@@ -170,11 +158,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   @Override
   public <O extends Number> EPGraph aggregate(String propertyKey,
     UnaryFunction<EPGraph, O> aggregateFunc) throws Exception {
-    O result = aggregateFunc.execute(this);
-    // copy graph data before updating properties
-    EPFlinkGraphData newGraphData = new EPFlinkGraphData(this.graphData);
-    newGraphData.setProperty(propertyKey, result);
-    return EPGraph.fromGraph(this.graph, newGraphData, env);
+    return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
 
   @Override
@@ -219,67 +203,17 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPGraph overlap(EPGraph otherGraph) {
-    final Long newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
-
-    // union vertex sets, group by vertex id, filter vertices where
-    // the group contains two vertices and update them with the new graph id
-    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
-      this.graph.getVertices().union(otherGraph.graph.getVertices())
-        .groupBy(VERTEX_ID).reduceGroup(new VertexGroupReducer(2L))
-        .map(new VertexToGraphUpdater(newGraphID));
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      this.graph.getEdges().union(otherGraph.graph.getEdges()).groupBy(EDGE_ID)
-        .reduceGroup(new EdgeGroupReducer(2L))
-        .map(new EdgeToGraphUpdater(newGraphID));
-
-    return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
-      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
-      env);
+    return callForGraph(new Overlap(), otherGraph);
   }
 
   @Override
   public EPGraph exclude(EPGraph otherGraph) {
-    final Long newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
-
-    // union vertex sets, group by vertex id, filter vertices where the group
-    // contains exactly one vertex which belongs to the graph, the operator is
-    // called on
-    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
-      this.graph.getVertices().union(otherGraph.graph.getVertices())
-        .groupBy(VERTEX_ID).reduceGroup(
-        new VertexGroupReducer(1L, this.getId(), otherGraph.getId()))
-        .map(new VertexToGraphUpdater(newGraphID));
-
-    JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
-      EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>
-      joinFunc =
-      new JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
-        EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>() {
-        @Override
-        public Edge<Long, EPFlinkEdgeData> join(
-          Edge<Long, EPFlinkEdgeData> leftTuple,
-          Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
-          return leftTuple;
-        }
-      };
-
-    // In exclude(), we are only interested in edges that connect vertices
-    // that are in the exclusion of the vertex sets. Thus, we join the edges
-    // from the left graph with the new vertex set using source and target ids.
-    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      this.graph.getEdges().join(newVertexSet).where(SOURCE_VERTEX_ID)
-        .equalTo(VERTEX_ID).with(joinFunc).join(newVertexSet)
-        .where(TARGET_VERTEX_ID).equalTo(VERTEX_ID).with(joinFunc)
-        .map(new EdgeToGraphUpdater(newGraphID));
-
-    return EPGraph.fromGraph(Graph.fromDataSet(newVertexSet, newEdgeSet, env),
-      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL),
-      env);
+    return callForGraph(new Exclusion(), otherGraph);
   }
 
   @Override
-  public EPGraph callForGraph(UnaryGraphToGraphOperator operator) {
+  public EPGraph callForGraph(UnaryGraphToGraphOperator operator) throws
+    Exception {
     return operator.execute(this);
   }
 
@@ -421,144 +355,6 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     @Override
     public Long getKey(Edge<Long, EPFlinkEdgeData> e) throws Exception {
       return e.getTarget();
-    }
-  }
-
-  /**
-   * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
-   * <p>
-   * Checks if the number of grouped, duplicate vertices is equal to a
-   * given amount. If yes, reducer returns the vertex.
-   * <p>
-   * Furthermore, to realize exclusion, if two graphs are given, the method
-   * checks if the vertex is contained in the first (include graph) but not
-   * in the other graph (preclude graph). If this is the case, the vertex
-   * gets returned.
-   */
-  private static class VertexGroupReducer implements
-    GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
-      EPFlinkVertexData>> {
-
-    /**
-     * number of times a vertex must occur inside a group
-     */
-    private long amount;
-
-    /**
-     * graph, a vertex must be part of
-     */
-    private Long includedGraphID;
-
-    /**
-     * graph, a vertex must not be part of
-     */
-    private Long precludedGraphID;
-
-    public VertexGroupReducer(long amount) {
-      this(amount, null, null);
-    }
-
-    public VertexGroupReducer(long amount, Long includedGraphID,
-      Long precludedGraphID) {
-      this.amount = amount;
-      this.includedGraphID = includedGraphID;
-      this.precludedGraphID = precludedGraphID;
-    }
-
-    @Override
-    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
-      Collector<Vertex<Long, EPFlinkVertexData>> collector) throws Exception {
-      Iterator<Vertex<Long, EPFlinkVertexData>> iterator = iterable.iterator();
-      long count = 0L;
-      Vertex<Long, EPFlinkVertexData> v = null;
-      while (iterator.hasNext()) {
-        v = iterator.next();
-        count++;
-      }
-      if (count == amount) {
-        if (includedGraphID != null && precludedGraphID != null) {
-          assert v != null;
-          if (v.getValue().getGraphs().contains(includedGraphID) &&
-            !v.getValue().getGraphs().contains(precludedGraphID)) {
-            collector.collect(v);
-          }
-        } else {
-          collector.collect(v);
-        }
-      }
-    }
-  }
-
-  /**
-   * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
-   * <p>
-   * Used to check if the number of grouped, duplicate edges is equal to a
-   * given amount. If yes, reducer returns the vertex.
-   */
-  private static class EdgeGroupReducer implements
-    GroupReduceFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long,
-      EPFlinkEdgeData>> {
-
-    private long amount;
-
-    public EdgeGroupReducer(long amount) {
-      this.amount = amount;
-    }
-
-    @Override
-    public void reduce(Iterable<Edge<Long, EPFlinkEdgeData>> iterable,
-      Collector<Edge<Long, EPFlinkEdgeData>> collector) throws Exception {
-      Iterator<Edge<Long, EPFlinkEdgeData>> iterator = iterable.iterator();
-      long count = 0L;
-      Edge<Long, EPFlinkEdgeData> e = null;
-      while (iterator.hasNext()) {
-        e = iterator.next();
-        count++;
-      }
-      if (count == amount) {
-        collector.collect(e);
-      }
-    }
-  }
-
-  /**
-   * Adds a given graph ID to the vertex and returns it.
-   */
-  public static class VertexToGraphUpdater implements
-    MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
-      EPFlinkVertexData>> {
-
-    private final long newGraphID;
-
-    public VertexToGraphUpdater(final long newGraphID) {
-      this.newGraphID = newGraphID;
-    }
-
-    @Override
-    public Vertex<Long, EPFlinkVertexData> map(
-      Vertex<Long, EPFlinkVertexData> v) throws Exception {
-      v.getValue().addGraph(newGraphID);
-      return v;
-    }
-  }
-
-  /**
-   * Adds a given graph ID to the edge and returns it.
-   */
-  public static class EdgeToGraphUpdater implements
-    MapFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long, EPFlinkEdgeData>> {
-
-    private final long newGraphID;
-
-    public EdgeToGraphUpdater(final long newGraphID) {
-      this.newGraphID = newGraphID;
-    }
-
-    @Override
-    public Edge<Long, EPFlinkEdgeData> map(Edge<Long, EPFlinkEdgeData> e) throws
-      Exception {
-      e.getValue().addGraph(newGraphID);
-      return e;
     }
   }
 }

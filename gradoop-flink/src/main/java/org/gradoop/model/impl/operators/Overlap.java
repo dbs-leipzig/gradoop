@@ -30,8 +30,7 @@ import org.gradoop.model.impl.EPGraph;
 import static org.gradoop.model.impl.EPGraph.EDGE_ID;
 import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
 
-public class Combination extends AbstractBinaryGraphToGraphOperator {
-
+public class Overlap extends AbstractBinaryGraphToGraphOperator {
   @Override
   public String getName() {
     return "Combination";
@@ -39,21 +38,23 @@ public class Combination extends AbstractBinaryGraphToGraphOperator {
 
   @Override
   protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
-    final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
+    final Long newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
 
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph1 =
       firstGraph.getGellyGraph();
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph2 =
       secondGraph.getGellyGraph();
 
-    // build distinct union of vertex sets and update graph ids at vertices
-    // cannot use Gelly union here because of missing argument for KeySelector
+    // union vertex sets, group by vertex id, filter vertices where
+    // the group contains two vertices and update them with the new graph id
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices()).distinct(VERTEX_ID)
+      graph1.getVertices().union(graph2.getVertices()).groupBy(VERTEX_ID)
+        .reduceGroup(new VertexGroupReducer(2L))
         .map(new VertexToGraphUpdater(newGraphID));
 
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      graph1.getEdges().union(graph2.getEdges()).distinct(EDGE_ID)
+      graph1.getEdges().union(graph2.getEdges()).groupBy(EDGE_ID)
+        .reduceGroup(new EdgeGroupReducer(2L))
         .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(

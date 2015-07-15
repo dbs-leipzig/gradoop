@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.operators;
 
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
@@ -27,33 +28,52 @@ import org.gradoop.model.impl.EPFlinkGraphData;
 import org.gradoop.model.impl.EPFlinkVertexData;
 import org.gradoop.model.impl.EPGraph;
 
-import static org.gradoop.model.impl.EPGraph.EDGE_ID;
-import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
+import static org.gradoop.model.impl.EPGraph.*;
 
-public class Combination extends AbstractBinaryGraphToGraphOperator {
-
+public class Exclusion extends AbstractBinaryGraphToGraphOperator {
   @Override
   public String getName() {
-    return "Combination";
+    return "Exclusion";
   }
 
   @Override
   protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
-    final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
+    final Long newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
 
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph1 =
       firstGraph.getGellyGraph();
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph2 =
       secondGraph.getGellyGraph();
 
-    // build distinct union of vertex sets and update graph ids at vertices
-    // cannot use Gelly union here because of missing argument for KeySelector
+    // union vertex sets, group by vertex id, filter vertices where the group
+    // contains exactly one vertex which belongs to the graph, the operator is
+    // called on
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices()).distinct(VERTEX_ID)
+      graph1.getVertices().union(graph2.getVertices()).groupBy(VERTEX_ID)
+        .reduceGroup(
+          new VertexGroupReducer(1L, firstGraph.getId(), secondGraph.getId()))
         .map(new VertexToGraphUpdater(newGraphID));
 
+    JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
+      EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>
+      joinFunc =
+      new JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
+        EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>() {
+        @Override
+        public Edge<Long, EPFlinkEdgeData> join(
+          Edge<Long, EPFlinkEdgeData> leftTuple,
+          Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
+          return leftTuple;
+        }
+      };
+
+    // In exclude(), we are only interested in edges that connect vertices
+    // that are in the exclusion of the vertex sets. Thus, we join the edges
+    // from the left graph with the new vertex set using source and target ids.
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      graph1.getEdges().union(graph2.getEdges()).distinct(EDGE_ID)
+      graph1.getEdges().join(newVertexSet).where(SOURCE_VERTEX_ID)
+        .equalTo(VERTEX_ID).with(joinFunc).join(newVertexSet)
+        .where(TARGET_VERTEX_ID).equalTo(VERTEX_ID).with(joinFunc)
         .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(

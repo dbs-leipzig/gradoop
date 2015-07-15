@@ -22,10 +22,8 @@ public class EPGraphCollectionGetGraphTest extends EPFlinkTest {
   }
 
   @Test
-  @Parameters({
-    "0, Community, 3, 4", "1, Community, 3, 4", "2, Community, 4, 6",
-    "3, Forum, 3, 4"
-  })
+  @Parameters({"0, Community, 3, 4", "1, Community, 3, 4", "2, Community, 4, 6",
+    "3, Forum, 3, 4"})
   public void testGetGraph(long graphID, String expectedGraphLabel,
     long expectedVertexCount, long expectedEdgeCount) throws Exception {
     EPGraphCollection graphColl = graphStore.getCollection();

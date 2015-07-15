@@ -77,19 +77,7 @@ public abstract class WorkflowTest {
     EPGraph dbGraph = db.getDatabaseGraph();
 
     // extract business process instances
-    EPGraphCollection btgs =
-      dbGraph.callForCollection(new UnaryGraphToCollectionOperator() {
-        @Override
-        public EPGraphCollection execute(EPGraph graph) {
-          // TODO execute BTG Computation
-          throw new NotImplementedException();
-        }
-
-        @Override
-        public String getName() {
-          return "BTGComputation";
-        }
-      });
+    EPGraphCollection btgs = dbGraph.callForCollection(new BTG());
 
     // define predicate function (graph contains invoice)
     final Predicate<EPGraph> predicate = new Predicate<EPGraph>() {
@@ -108,7 +96,7 @@ public abstract class WorkflowTest {
     final UnaryFunction<EPGraph, Double> aggregateFunc =
       new UnaryFunction<EPGraph, Double>() {
         @Override
-        public Double execute(EPGraph entity) throws Exception {
+        public Double execute(EPGraph entity) {
           Double sum = 0.0;
           for (Double v : entity.getVertices()
             .values(Double.class, "revenue")) {
@@ -152,7 +140,7 @@ public abstract class WorkflowTest {
     final UnaryFunction<EPGraph, Double> aggFunc =
       new UnaryFunction<EPGraph, Double>() {
         @Override
-        public Double execute(EPGraph entity) throws Exception {
+        public Double execute(EPGraph entity) {
           Double revenue = 0.0;
           Double expense = 0.0;
           for (Double v : entity.getVertices()
@@ -209,20 +197,6 @@ public abstract class WorkflowTest {
     });
     EPGraphCollection lossBtgs = btgs.difference(profitBtgs);
 
-    UnaryGraphToCollectionOperator fsm = new UnaryGraphToCollectionOperator() {
-
-      @Override
-      public EPGraphCollection execute(EPGraph graph) {
-        throw new NotImplementedException();
-      }
-
-      @Override
-      public String getName() {
-        return "Frequent Subgraphs";
-      }
-    };
-
-
     EPGraphCollection profitFreqPats =
       profitBtgs.callForCollection(new FSM(0.7f));
     EPGraphCollection lossFreqPats = lossBtgs.callForCollection(new FSM(0.7f));
@@ -271,6 +245,20 @@ public abstract class WorkflowTest {
     @Override
     public String getName() {
       return "LabelPropagation";
+    }
+  }
+
+  private static class BTG implements UnaryGraphToCollectionOperator {
+
+    @Override
+    public EPGraphCollection execute(EPGraph graph) {
+      // TODO execute BTG Computation
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public String getName() {
+      return "BTGComputation";
     }
   }
 }

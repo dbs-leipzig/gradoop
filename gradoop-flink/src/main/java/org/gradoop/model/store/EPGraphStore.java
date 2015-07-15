@@ -19,7 +19,6 @@ package org.gradoop.model.store;
 
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
-import org.gradoop.model.operators.EPGraphCollectionOperators;
 
 public interface EPGraphStore {
 
