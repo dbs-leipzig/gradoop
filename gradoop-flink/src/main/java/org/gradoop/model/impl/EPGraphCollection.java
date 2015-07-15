@@ -19,22 +19,22 @@ package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.apache.flink.util.Collector;
 import org.gradoop.model.EPGraphData;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
+import org.gradoop.model.impl.operators.Difference;
+import org.gradoop.model.impl.operators.DifferenceWithSmallResult;
+import org.gradoop.model.impl.operators.Intersect;
+import org.gradoop.model.impl.operators.IntersectWithSmall;
+import org.gradoop.model.impl.operators.Union;
 import org.gradoop.model.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.EPGraphCollectionOperators;
@@ -44,10 +44,9 @@ import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
-import static org.gradoop.model.impl.EPGraph.*;
+import static org.gradoop.model.impl.EPGraph.GRAPH_ID;
 
 /**
  * Represents a collection of graphs inside the EPGM. As graphs may share
@@ -73,6 +72,14 @@ public class EPGraphCollection implements
     this.graph = graph;
     this.subgraphs = subgraphs;
     this.env = env;
+  }
+
+  public Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> getGellyGraph() {
+    return this.graph;
+  }
+
+  public DataSet<Subgraph<Long, EPFlinkGraphData>> getSubgraphs() {
+    return this.subgraphs;
   }
 
   @Override
@@ -106,6 +113,7 @@ public class EPGraphCollection implements
     return getGraphs(Arrays.asList(identifiers));
   }
 
+  @Override
   public EPGraphCollection getGraphs(final List<Long> identifiers) throws
     Exception {
 
@@ -191,272 +199,34 @@ public class EPGraphCollection implements
   }
 
   @Override
-  public EPGraphCollection union(EPGraphCollection otherCollection) {
-    DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
-      this.subgraphs.union(otherCollection.subgraphs).distinct(GRAPH_ID);
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
-      this.graph.getVertices().union(otherCollection.graph.getVertices())
-        .distinct(VERTEX_ID);
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges =
-      this.graph.getEdges().union(otherCollection.graph.getEdges())
-        .distinct(EDGE_ID);
-
-    return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
-      newSubgraphs, env);
+  public EPGraphCollection union(EPGraphCollection otherCollection) throws
+    Exception {
+    return callForCollection(new Union(), otherCollection);
   }
 
   @Override
   public EPGraphCollection intersect(EPGraphCollection otherCollection) throws
     Exception {
-    final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
-      this.subgraphs.union(otherCollection.subgraphs).groupBy(GRAPH_ID)
-        .reduceGroup(new SubgraphGroupReducer(2));
-
-    DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
-      this.graph.getVertices();
-
-    DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
-      thisVertices.flatMap(
-        new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
-          Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
-
-          @Override
-          public void flatMap(Vertex<Long, EPFlinkVertexData> v,
-            Collector<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>
-              collector) throws
-            Exception {
-            for (Long graph : v.getValue().getGraphs()) {
-              collector.collect(new Tuple2<>(v, graph));
-            }
-          }
-        });
-
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
-      verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
-        new JoinFunction<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>,
-          Subgraph<Long, EPFlinkGraphData>, Vertex<Long, EPFlinkVertexData>>() {
-
-          @Override
-          public Vertex<Long, EPFlinkVertexData> join(
-            Tuple2<Vertex<Long, EPFlinkVertexData>, Long> vertices,
-            Subgraph<Long, EPFlinkGraphData> subgraph) throws Exception {
-            return vertices.f0;
-          }
-        });
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = this.graph.getEdges();
-
-    edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
-      .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
-      .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
-
-    return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
-      newSubgraphs, env);
-  }
-
-  public EPGraphCollection alternateIntersect(
-    EPGraphCollection otherCollection) throws Exception {
-
-    final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
-      this.subgraphs.union(otherCollection.subgraphs).groupBy(GRAPH_ID)
-        .reduceGroup(new SubgraphGroupReducer(2));
-
-    final List<Long> identifiers;
-    identifiers = otherCollection.subgraphs
-      .map(new MapFunction<Subgraph<Long, EPFlinkGraphData>, Long>() {
-        @Override
-        public Long map(Subgraph<Long, EPFlinkGraphData> subgraph) throws
-          Exception {
-          return subgraph.getId();
-        }
-      }).collect();
-
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
-      this.graph.getVertices();
-    vertices =
-      vertices.filter(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
-
-        @Override
-        public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
-          Exception {
-          for (Long id : identifiers) {
-            if (vertex.getValue().getGraphs().contains(id)) {
-              return true;
-            }
-          }
-          return false;
-        }
-      });
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = this.graph.getEdges();
-
-    edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
-      .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
-      .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
-
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> newGraph =
-      Graph.fromDataSet(vertices, edges, env);
-
-    return new EPGraphCollection(newGraph, newSubgraphs, env);
+    return callForCollection(new Intersect(), otherCollection);
   }
 
   @Override
-  public EPGraphCollection difference(EPGraphCollection otherCollection) {
-
-    DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> thisGraphs =
-      this.subgraphs
-        .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(1l));
-
-    DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> otherGraphs =
-      otherCollection.subgraphs
-        .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(2l));
-
-    final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
-      thisGraphs.union(otherGraphs)
-        .groupBy(new SubgraphTupleKeySelector<Long>()).reduceGroup(
-        new GroupReduceFunction<Tuple2<Subgraph<Long, EPFlinkGraphData>,
-          Long>, Subgraph<Long, EPFlinkGraphData>>() {
-
-          @Override
-          public void reduce(
-            Iterable<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> iterable,
-            Collector<Subgraph<Long, EPFlinkGraphData>> collector) throws
-            Exception {
-            Iterator<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> it =
-              iterable.iterator();
-            Tuple2<Subgraph<Long, EPFlinkGraphData>, Long> subgraph = null;
-            Boolean inOtherCollection = false;
-            while (it.hasNext()) {
-              subgraph = it.next();
-              if (subgraph.f1.equals(2l)) {
-                inOtherCollection = true;
-              }
-            }
-            if (!inOtherCollection) {
-              collector.collect(subgraph.f0);
-            }
-          }
-        });
-
-    DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
-      this.graph.getVertices().union(otherCollection.graph.getVertices())
-        .distinct(VERTEX_ID);
-
-    DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
-      thisVertices.flatMap(
-        new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
-          Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
-
-          @Override
-          public void flatMap(Vertex<Long, EPFlinkVertexData> vertexData,
-            Collector<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>
-              collector) throws
-            Exception {
-            for (Long graph : vertexData.getValue().getGraphs()) {
-              collector.collect(new Tuple2<>(vertexData, graph));
-            }
-          }
-        });
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
-      verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
-        new JoinFunction<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>,
-          Subgraph<Long, EPFlinkGraphData>, Vertex<Long, EPFlinkVertexData>>() {
-
-          @Override
-          public Vertex<Long, EPFlinkVertexData> join(
-            Tuple2<Vertex<Long, EPFlinkVertexData>, Long> vertexLongTuple,
-            Subgraph<Long, EPFlinkGraphData> subgraph) throws Exception {
-            return vertexLongTuple.f0;
-          }
-        }).distinct(VERTEX_ID);
-
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = this.graph.getEdges();
-
-    edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
-      .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
-      .equalTo(VERTEX_ID).with(new EdgeJoinFunction()).distinct(EDGE_ID);
-
-    return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
-      newSubgraphs, env);
-  }
-
-  public EPGraphCollection alternateDifference(
+  public EPGraphCollection intersectWithSmall(
     EPGraphCollection otherCollection) throws Exception {
-
-    DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> thisGraphs =
-      this.subgraphs
-        .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(1l));
-
-    DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> otherGraphs =
-      otherCollection.subgraphs
-        .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(2l));
-
-    final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
-      thisGraphs.union(otherGraphs)
-        .groupBy(new SubgraphTupleKeySelector<Long>()).reduceGroup(
-        new GroupReduceFunction<Tuple2<Subgraph<Long, EPFlinkGraphData>,
-          Long>, Subgraph<Long, EPFlinkGraphData>>() {
-
-          @Override
-          public void reduce(
-            Iterable<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> iterable,
-            Collector<Subgraph<Long, EPFlinkGraphData>> collector) throws
-            Exception {
-            Iterator<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> it =
-              iterable.iterator();
-            Tuple2<Subgraph<Long, EPFlinkGraphData>, Long> subgraph = null;
-            Boolean inOtherCollection = false;
-            while (it.hasNext()) {
-              subgraph = it.next();
-              if (subgraph.f1.equals(2l)) {
-                inOtherCollection = true;
-              }
-            }
-            if (!inOtherCollection) {
-              collector.collect(subgraph.f0);
-            }
-          }
-        });
-
-    final List<Long> identifiers = newSubgraphs
-      .map(new MapFunction<Subgraph<Long, EPFlinkGraphData>, Long>() {
-        @Override
-        public Long map(Subgraph<Long, EPFlinkGraphData> subgraph) throws
-          Exception {
-          return subgraph.getId();
-        }
-      }).collect();
-
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
-      this.graph.getVertices();
-    vertices =
-      vertices.filter(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
-
-        @Override
-        public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
-          Exception {
-          boolean vertexInGraph = false;
-          for (Long id : identifiers) {
-            if (vertex.getValue().getGraphs().contains(id)) {
-              vertexInGraph = true;
-              break;
-            }
-          }
-          return vertexInGraph;
-        }
-      });
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = this.graph.getEdges();
-
-    edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
-      .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
-      .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
-
-    return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
-      newSubgraphs, env);
+    return callForCollection(new IntersectWithSmall(), otherCollection);
   }
 
+  @Override
+  public EPGraphCollection difference(EPGraphCollection otherCollection) throws
+    Exception {
+    return callForCollection(new Difference(), otherCollection);
+  }
+
+  @Override
+  public EPGraphCollection differenceWithSmallResult(
+    EPGraphCollection otherCollection) throws Exception {
+    return callForCollection(new DifferenceWithSmallResult(), otherCollection);
+  }
 
   @Override
   public EPGraphCollection distinct() {
@@ -492,7 +262,7 @@ public class EPGraphCollection implements
   @Override
   public EPGraphCollection callForCollection(
     BinaryCollectionToCollectionOperator op,
-    EPGraphCollection otherCollection) {
+    EPGraphCollection otherCollection) throws Exception {
     return op.execute(this, otherCollection);
   }
 
@@ -533,58 +303,6 @@ public class EPGraphCollection implements
     return EPGraph.fromGraph(this.graph, null);
   }
 
-  private static class SubgraphGroupReducer implements
-    GroupReduceFunction<Subgraph<Long, EPFlinkGraphData>, Subgraph<Long,
-      EPFlinkGraphData>> {
-
-    /**
-     * number of times a vertex must occur inside a group
-     */
-    private long amount;
-
-    public SubgraphGroupReducer(long amount) {
-      this.amount = amount;
-    }
-
-    @Override
-    public void reduce(Iterable<Subgraph<Long, EPFlinkGraphData>> iterable,
-      Collector<Subgraph<Long, EPFlinkGraphData>> collector) throws Exception {
-      Iterator<Subgraph<Long, EPFlinkGraphData>> iterator = iterable.iterator();
-      long count = 0L;
-      Subgraph<Long, EPFlinkGraphData> s = null;
-      while (iterator.hasNext()) {
-        s = iterator.next();
-        count++;
-      }
-      if (count == amount) {
-        collector.collect(s);
-      }
-    }
-  }
-
-  private static class Tuple2LongMapper<C> implements
-    MapFunction<C, Tuple2<C, Long>> {
-
-    private Long secondField;
-
-    public Tuple2LongMapper(Long secondField) {
-      this.secondField = secondField;
-    }
-
-    @Override
-    public Tuple2<C, Long> map(C c) throws Exception {
-      return new Tuple2<>(c, secondField);
-    }
-  }
-
-  private static class SubgraphTupleKeySelector<C> implements
-    KeySelector<Tuple2<Subgraph<Long, EPFlinkGraphData>, C>, Long> {
-    @Override
-    public Long getKey(
-      Tuple2<Subgraph<Long, EPFlinkGraphData>, C> subgraph) throws Exception {
-      return subgraph.f0.getId();
-    }
-  }
 
   private static class VertexGraphContainmentFilter implements
     FilterFunction<Vertex<Long, EPFlinkVertexData>> {
@@ -616,20 +334,7 @@ public class EPGraphCollection implements
     }
   }
 
-  public static class EdgeJoinFunction implements
-    JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
-      EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>> {
-
-    @Override
-    public Edge<Long, EPFlinkEdgeData> join(
-      Edge<Long, EPFlinkEdgeData> leftTuple,
-      Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
-      return leftTuple;
-    }
-  }
-
-
-  public static class VertexInGraphFilter implements
+  private static class VertexInGraphFilter implements
     FilterFunction<Vertex<Long, EPFlinkVertexData>> {
 
     List<Long> identifiers;
@@ -652,7 +357,7 @@ public class EPGraphCollection implements
     }
   }
 
-  public static class EdgeInGraphFilter implements
+  private static class EdgeInGraphFilter implements
     FilterFunction<Edge<Long, EPFlinkEdgeData>> {
 
     List<Long> identifiers;

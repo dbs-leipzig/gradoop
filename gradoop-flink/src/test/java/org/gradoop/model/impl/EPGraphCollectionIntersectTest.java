@@ -31,7 +31,7 @@ public class EPGraphCollectionIntersectTest extends EPFlinkTest {
       graphColl.getGraphs(extractGraphIDs(secondColl));
 
     EPGraphCollection intersectColl =
-      collection1.alternateIntersect(collection2);
+      collection1.intersectWithSmall(collection2);
 
     assertNotNull("graph collection is null", intersectColl);
     assertEquals("wrong number of graphs", expectedCollSize,

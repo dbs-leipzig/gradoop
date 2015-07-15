@@ -19,7 +19,7 @@ package org.gradoop.model.operators;
 
 import org.gradoop.model.impl.EPGraphCollection;
 
-public interface BinaryCollectionToCollectionOperator {
+public interface BinaryCollectionToCollectionOperator extends Operator {
   EPGraphCollection execute(EPGraphCollection firstCollection,
-    EPGraphCollection secondCollection);
+    EPGraphCollection secondCollection) throws Exception;
 }

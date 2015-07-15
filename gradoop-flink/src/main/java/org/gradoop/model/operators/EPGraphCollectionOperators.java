@@ -22,6 +22,8 @@ import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
 
+import java.util.List;
+
 /**
  * Created by martin on 18.06.15.
  */
@@ -38,6 +40,8 @@ public interface EPGraphCollectionOperators<T> extends
   EPGraph getGraph(final Long graphID) throws Exception;
 
   EPGraphCollection getGraphs(final Long... identifiers) throws Exception;
+
+  EPGraphCollection getGraphs(List<Long> identifiers) throws Exception;
 
   Long getGraphCount() throws Exception;
 
@@ -58,12 +62,19 @@ public interface EPGraphCollectionOperators<T> extends
   EPGraphCollection select(Predicate<EPGraph> predicateFunction) throws
     Exception;
 
-  EPGraphCollection union(EPGraphCollection otherCollection);
+  EPGraphCollection union(EPGraphCollection otherCollection) throws Exception;
 
   EPGraphCollection intersect(EPGraphCollection otherCollection) throws
     Exception;
 
-  EPGraphCollection difference(EPGraphCollection otherCollection);
+  EPGraphCollection intersectWithSmall(EPGraphCollection otherCollection) throws
+    Exception;
+
+  EPGraphCollection difference(EPGraphCollection otherCollection) throws
+    Exception;
+
+  EPGraphCollection differenceWithSmallResult(EPGraphCollection
+    otherCollection) throws Exception;
 
   EPGraphCollection distinct();
 
@@ -82,7 +93,7 @@ public interface EPGraphCollectionOperators<T> extends
   EPGraphCollection callForCollection(UnaryCollectionToCollectionOperator op);
 
   EPGraphCollection callForCollection(BinaryCollectionToCollectionOperator op,
-    EPGraphCollection otherCollection);
+    EPGraphCollection otherCollection) throws Exception;
 
   EPGraph callForGraph(UnaryCollectionToGraphOperator op);
 
