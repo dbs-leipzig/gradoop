@@ -27,12 +27,12 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.SortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.helper.FlinkConstants;
-import org.gradoop.model.helper.MathHelper;
 import org.gradoop.model.impl.EPFlinkEdgeData;
 import org.gradoop.model.impl.EPFlinkGraphData;
 import org.gradoop.model.impl.EPFlinkVertexData;
@@ -154,15 +154,15 @@ public class Summarization implements UnaryGraphToGraphOperator {
     /* build edges */
 
     // map edges to relevant information (source vertex, target vertex)
-    DataSet<Tuple2<Long, Long>> edges =
+    DataSet<Tuple3<Long, Long, Long>> edges =
       graph.getEdges().map(new EdgeProjection());
 
     // compute cross between vertex groups and edges
-    DataSet<Tuple2<List<Long>, Tuple2<Long, Long>>> groupEdgeCross =
+    DataSet<Tuple2<List<Long>, Tuple3<Long, Long, Long>>> groupEdgeCross =
       vertexGroups.cross(edges);
 
     // create intra edges and (possible incomplete) inter edges
-    DataSet<Tuple2<Long, Long>> firstRoundEdges =
+    DataSet<Tuple3<Long, Long, Long>> firstRoundEdges =
       groupEdgeCross.flatMap(new FirstRoundFlatMap());
 
     /* build intra edges */
@@ -171,13 +171,15 @@ public class Summarization implements UnaryGraphToGraphOperator {
       // filter intra edges (source == target)
       .filter(new IntraEdgeFilter())
         // group them by source vertex
-      .groupBy(0)
+      .groupBy(1)
+        // sort group by edge id to get edge representative
+      .sortGroup(0, Order.ASCENDING)
         // and create new gelly edges with payload
-      .reduceGroup(new IntraEdgeGroupSummarizer());
+      .reduceGroup(new EdgeGroupSummarizer());
 
     /* build inter edges */
 
-    DataSet<Tuple2<Long, Long>> secondRoundEdges = firstRoundEdges
+    DataSet<Tuple3<Long, Long, Long>> secondRoundEdges = firstRoundEdges
       // filter inter edge candidates (source != target)
       .filter(new InterEdgeFilter());
 
@@ -189,9 +191,11 @@ public class Summarization implements UnaryGraphToGraphOperator {
       // finalize inter-edges
       .flatMap(new SecondRoundFlatMap())
         // group them by source and target vertex
-      .groupBy(0, 1)
+      .groupBy(1, 2)
+        // sort group by edge id to get edge representative
+      .sortGroup(0, Order.ASCENDING)
         // and create new gelly edges with payload
-      .reduceGroup(new InterEdgeGroupSummarizer());
+      .reduceGroup(new EdgeGroupSummarizer());
 
     /* build final edge set */
 
@@ -271,74 +275,41 @@ public class Summarization implements UnaryGraphToGraphOperator {
   }
 
   /**
-   * Creates a summarized intra-edge from a group of edges.
+   * Creates a summarized edge from a group of edges.
    */
-  private static class IntraEdgeGroupSummarizer implements
-    GroupReduceFunction<Tuple2<Long, Long>, Edge<Long, EPFlinkEdgeData>> {
+  private static class EdgeGroupSummarizer implements
+    GroupReduceFunction<Tuple3<Long, Long, Long>, Edge<Long, EPFlinkEdgeData>> {
 
     @Override
-    public void reduce(Iterable<Tuple2<Long, Long>> iterable,
+    public void reduce(Iterable<Tuple3<Long, Long, Long>> iterable,
       Collector<Edge<Long, EPFlinkEdgeData>> collector) throws Exception {
       int edgeCount = 0;
       boolean initialized = false;
-      Long vertexID = null;
+      // new edge id will be the first edge id in the group (which is sorted)
+      Long newEdgeID = null;
+      Long newSourceVertex = null;
+      Long newTargetVertex = null;
 
-      for (Tuple2<Long, Long> t : iterable) {
+      for (Tuple3<Long, Long, Long> t : iterable) {
         edgeCount++;
         if (!initialized) {
-          vertexID = t.f0;
+          newEdgeID = t.f0;
+          newSourceVertex = t.f1;
+          newTargetVertex = t.f2;
           initialized = true;
         }
       }
-      if (vertexID != null) {
-        EPFlinkEdgeData newEdgeData = new EPFlinkEdgeData();
-        newEdgeData.setId(MathHelper.cantor(vertexID, vertexID));
-        newEdgeData.setLabel(FlinkConstants.DEFAULT_EDGE_LABEL);
-        newEdgeData.setSourceVertex(vertexID);
-        newEdgeData.setTargetVertex(vertexID);
-        newEdgeData.setProperty("count", edgeCount);
-        newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
-        collector.collect(new Edge<>(vertexID, vertexID, newEdgeData));
-      }
+      EPFlinkEdgeData newEdgeData = new EPFlinkEdgeData();
+      newEdgeData.setId(newEdgeID);
+      newEdgeData.setLabel(FlinkConstants.DEFAULT_EDGE_LABEL);
+      newEdgeData.setSourceVertex(newSourceVertex);
+      newEdgeData.setTargetVertex(newTargetVertex);
+      newEdgeData.setProperty("count", edgeCount);
+      newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
+      collector
+        .collect(new Edge<>(newSourceVertex, newTargetVertex, newEdgeData));
     }
   }
-
-  /**
-   * Creates a summarized inter-edge from a group of edges.
-   */
-  private static class InterEdgeGroupSummarizer implements
-    GroupReduceFunction<Tuple2<Long, Long>, Edge<Long, EPFlinkEdgeData>> {
-
-    @Override
-    public void reduce(Iterable<Tuple2<Long, Long>> iterable,
-      Collector<Edge<Long, EPFlinkEdgeData>> collector) throws Exception {
-      int edgeCount = 0;
-      boolean initialized = false;
-      Long sourceVertexID = null;
-      Long targetVertexID = null;
-
-      for (Tuple2<Long, Long> t : iterable) {
-        edgeCount++;
-        if (!initialized) {
-          sourceVertexID = t.f0;
-          targetVertexID = t.f1;
-          initialized = true;
-        }
-      }
-      if (sourceVertexID != null && targetVertexID != null) {
-        EPFlinkEdgeData newEdgeData = new EPFlinkEdgeData();
-        newEdgeData.setId(MathHelper.cantor(sourceVertexID, targetVertexID));
-        newEdgeData.setLabel(FlinkConstants.DEFAULT_EDGE_LABEL);
-        newEdgeData.setSourceVertex(sourceVertexID);
-        newEdgeData.setTargetVertex(targetVertexID);
-        newEdgeData.setProperty("count", edgeCount);
-        newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
-        collector
-          .collect(new Edge<>(sourceVertexID, targetVertexID, newEdgeData));
-      }
-    }
-  }
-
 
   /**
    * Converts grouped gelly vertices to a list of vertex ids.
@@ -376,25 +347,29 @@ public class Summarization implements UnaryGraphToGraphOperator {
    * no output as this is processed by another group, edge pair
    */
   private static class FirstRoundFlatMap implements
-    FlatMapFunction<Tuple2<List<Long>, Tuple2<Long, Long>>, Tuple2<Long,
-      Long>> {
+    FlatMapFunction<Tuple2<List<Long>, Tuple3<Long, Long, Long>>,
+      Tuple3<Long, Long, Long>> {
 
     @Override
-    public void flatMap(Tuple2<List<Long>, Tuple2<Long, Long>> t,
-      Collector<Tuple2<Long, Long>> coll) throws Exception {
+    public void flatMap(Tuple2<List<Long>, Tuple3<Long, Long, Long>> t,
+      Collector<Tuple3<Long, Long, Long>> coll) throws Exception {
       List<Long> sortedVertexGroup = t.f0;
-      Tuple2<Long, Long> edge = t.f1;
+      Tuple3<Long, Long, Long> edge = t.f1;
+      Long edgeID = edge.f0;
+      Long sourceVertex = edge.f1;
+      Long targetVertex = edge.f2;
       // list is sorted, representative is the first element
       Long groupRepresentative = sortedVertexGroup.get(0);
       // source vertex in group ?
-      if (sortedVertexGroup.contains(edge.f0)) {
+      if (sortedVertexGroup.contains(sourceVertex)) {
         // target in vertex group ?
-        if (sortedVertexGroup.contains(edge.f1)) {
+        if (sortedVertexGroup.contains(targetVertex)) {
           // create an intra edge
-          coll.collect(new Tuple2<>(groupRepresentative, groupRepresentative));
+          coll.collect(
+            new Tuple3<>(edgeID, groupRepresentative, groupRepresentative));
         } else {
           // create an inter edge
-          coll.collect(new Tuple2<>(groupRepresentative, edge.f1));
+          coll.collect(new Tuple3<>(edgeID, groupRepresentative, targetVertex));
         }
       }
     }
@@ -405,20 +380,23 @@ public class Summarization implements UnaryGraphToGraphOperator {
    * corresponding vertex group representative.
    */
   private static class SecondRoundFlatMap implements
-    FlatMapFunction<Tuple2<List<Long>, Tuple2<Long, Long>>, Tuple2<Long,
-      Long>> {
+    FlatMapFunction<Tuple2<List<Long>, Tuple3<Long, Long, Long>>,
+      Tuple3<Long, Long, Long>> {
 
     @Override
-    public void flatMap(Tuple2<List<Long>, Tuple2<Long, Long>> t,
-      Collector<Tuple2<Long, Long>> coll) throws Exception {
+    public void flatMap(Tuple2<List<Long>, Tuple3<Long, Long, Long>> t,
+      Collector<Tuple3<Long, Long, Long>> coll) throws Exception {
       List<Long> sortedVertexGroup = t.f0;
-      Tuple2<Long, Long> edge = t.f1;
+      Tuple3<Long, Long, Long> edge = t.f1;
+      Long edgeID = edge.f0;
+      Long sourceVertex = edge.f1;
+      Long targetVertex = edge.f2;
       // list is sorted, representative is the first element
       Long groupRepresentative = sortedVertexGroup.get(0);
 
       // target vertex in group?
-      if (sortedVertexGroup.contains(edge.f1)) {
-        coll.collect(new Tuple2<>(edge.f0, groupRepresentative));
+      if (sortedVertexGroup.contains(targetVertex)) {
+        coll.collect(new Tuple3<>(edgeID, sourceVertex, groupRepresentative));
       }
     }
   }
@@ -427,10 +405,10 @@ public class Summarization implements UnaryGraphToGraphOperator {
    * Filters intra edges (source-vertex == target-vertex).
    */
   private static class IntraEdgeFilter implements
-    FilterFunction<Tuple2<Long, Long>> {
+    FilterFunction<Tuple3<Long, Long, Long>> {
     @Override
-    public boolean filter(Tuple2<Long, Long> t) throws Exception {
-      return t.f0.equals(t.f1);
+    public boolean filter(Tuple3<Long, Long, Long> t) throws Exception {
+      return t.f1.equals(t.f2);
     }
   }
 
@@ -438,11 +416,11 @@ public class Summarization implements UnaryGraphToGraphOperator {
    * Filters inter edges (source-vertex != target-vertex).
    */
   private static class InterEdgeFilter implements
-    FilterFunction<Tuple2<Long, Long>> {
+    FilterFunction<Tuple3<Long, Long, Long>> {
 
     @Override
-    public boolean filter(Tuple2<Long, Long> t) throws Exception {
-      return !t.f0.equals(t.f1);
+    public boolean filter(Tuple3<Long, Long, Long> t) throws Exception {
+      return !t.f1.equals(t.f2);
     }
   }
 
@@ -451,11 +429,11 @@ public class Summarization implements UnaryGraphToGraphOperator {
    * processing (source vertex and target vertex).
    */
   private static class EdgeProjection implements
-    MapFunction<Edge<Long, EPFlinkEdgeData>, Tuple2<Long, Long>> {
+    MapFunction<Edge<Long, EPFlinkEdgeData>, Tuple3<Long, Long, Long>> {
     @Override
-    public Tuple2<Long, Long> map(Edge<Long, EPFlinkEdgeData> e) throws
+    public Tuple3<Long, Long, Long> map(Edge<Long, EPFlinkEdgeData> e) throws
       Exception {
-      return new Tuple2<>(e.getSource(), e.getTarget());
+      return new Tuple3<>(e.getValue().getId(), e.getSource(), e.getTarget());
     }
   }
 
