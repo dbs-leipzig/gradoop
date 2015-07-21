@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Todo: Description
+ * Todo: Description and custom key selector
  */
 public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
   /**
