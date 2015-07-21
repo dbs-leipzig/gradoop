@@ -34,6 +34,7 @@ import org.gradoop.model.impl.operators.Combination;
 import org.gradoop.model.impl.operators.Exclusion;
 import org.gradoop.model.impl.operators.Overlap;
 import org.gradoop.model.impl.operators.Summarization;
+import org.gradoop.model.impl.operators.SummarizationCross;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.EPGraphOperators;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
@@ -174,7 +175,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPGraph summarize(final String vertexGroupingKey) throws Exception {
-    Summarization summarization = new Summarization.SummarizationBuilder()
+    Summarization summarization = new SummarizationCross.SummarizationBuilder()
       .vertexGroupingKey(vertexGroupingKey).build();
     return callForGraph(summarization);
   }
@@ -182,7 +183,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   @Override
   public EPGraph summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
-    Summarization summarization = new Summarization.SummarizationBuilder()
+    Summarization summarization = new SummarizationCross.SummarizationBuilder()
       .vertexGroupingKey(vertexGroupingKey).edgeGroupingKey(edgeGroupingKey)
       .build();
     return callForGraph(summarization);

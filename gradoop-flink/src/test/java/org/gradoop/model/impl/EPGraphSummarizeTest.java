@@ -21,7 +21,7 @@ import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.EPVertexData;
 import org.gradoop.model.helper.FlinkConstants;
-import org.gradoop.model.impl.operators.Summarization;
+import org.gradoop.model.impl.operators.SummarizationCross;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
@@ -222,7 +222,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       } else if (v.getId().equals(vertexIDGraphProcessingForum)) {
         // 10 __VERTEX__ {city: "__DEFAULT_GROUP", count: 1}
         testVertex(v, FlinkConstants.DEFAULT_VERTEX_LABEL, vertexGroupingKey,
-          Summarization.NULL_VALUE, aggregatePropertyKey, 1, 1,
+          SummarizationCross.NULL_VALUE, aggregatePropertyKey, 1, 1,
           FlinkConstants.SUMMARIZE_GRAPH_ID);
       }
     }
@@ -377,7 +377,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       } else if (v.getId().equals(vertexIDGraphProcessingForum)) {
         // 10 __VERTEX__ {city: "__DEFAULT_GROUP", count: 1}
         testVertex(v, FlinkConstants.DEFAULT_VERTEX_LABEL, vertexGroupingKey,
-          Summarization.NULL_VALUE, aggregatePropertyKey, 1, 1,
+          SummarizationCross.NULL_VALUE, aggregatePropertyKey, 1, 1,
           FlinkConstants.SUMMARIZE_GRAPH_ID);
       }
     }
@@ -386,6 +386,10 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     // [16] Default -[__EDGE__]-> Dresden {since: 2013, count: 1}
     // [19] Default -[__EDGE__]-> Dresden {since: NULL, count: 2}
     // [4] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 1}
+    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+      System.out.println(e);
+    }
+
     assertEquals("wrong number of edges", 3L, summarizedGraph.getEdgeCount());
 
     for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
@@ -402,7 +406,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
         // [19] Default -[__EDGE__]-> Dresden {since: NULL, count: 2}
         testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL,
           vertexIDGraphProcessingForum, vertexIDDresden, edgeGroupingKey,
-          Summarization.NULL_VALUE, aggregatePropertyKey, 2, 1,
+          SummarizationCross.NULL_VALUE, aggregatePropertyKey, 2, 1,
           FlinkConstants.SUMMARIZE_GRAPH_ID);
       } else if (e.getId().equals(4L)) {
         // [4] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 1}
@@ -456,7 +460,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
 
     if (edgeGroupingKey != null && expectedGroupingValue != null) {
       assertEquals("wrong group value", expectedGroupingValue,
-        eve.getProperty(edgeGroupingKey));
+        edge.getProperty(edgeGroupingKey));
     }
   }
 }

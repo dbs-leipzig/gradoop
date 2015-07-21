@@ -274,8 +274,10 @@ public abstract class EPFlinkTest {
       alice.getId());
     edges.add(edge15);
     // Forum:Graph Processing-[hasModerator]->Person:Dave (16L)
+    properties = new HashMap<>();
+    properties.put(PROPERTY_KEY_SINCE, 2013);
     edge16 = new EPFlinkEdgeData(16L, LABEL_HAS_MODERATOR, forumGPS.getId(),
-      dave.getId(), Sets.newHashSet(3L));
+      dave.getId(), properties, Sets.newHashSet(3L));
     edges.add(edge16);
     // Forum:Graph Databases-[hasMember]->Person:Alice (17L)
     edge17 = new EPFlinkEdgeData(17L, LABEL_HAS_MEMBER, forumGDBS.getId(),
