@@ -27,14 +27,14 @@ public class EPGraphLabelPropagationTest extends EPFlinkTest {
     Exception {
     EPGraph inputGraph = graphStore.getGraph(2L);
     EPGraphCollection labeledGraph = inputGraph.callForCollection(new
-      LabelPropagation(20, propertyKey , env));
+      LabelPropagation(2, propertyKey , env));
 
     assertNotNull("graph collection is null", inputGraph);
-    assertEquals("wrong number of graphs", 2l,
+    assertEquals("wrong number of graphs", 3l,
       labeledGraph.size());
     assertEquals("wrong number of vertices", 4l,
       labeledGraph.getGraph().getVertexCount());
-    assertEquals("wrong number of edges", 4l,
+    assertEquals("wrong number of edges", 2l,
       labeledGraph.getGraph().getEdgeCount());
 
   }
