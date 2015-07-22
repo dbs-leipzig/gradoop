@@ -308,19 +308,22 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
 
     private boolean useJoinOp = false;
 
-    public SummarizationBuilder vertexGroupingKey(
-      final String vertexGroupingKey) {
+    public SummarizationBuilder(String vertexGroupingKey) {
       this.vertexGroupingKey = vertexGroupingKey;
-      return this;
+    }
+
+    public SummarizationBuilder(boolean useVertexLabels) {
+      this.useVertexLabels = useVertexLabels;
+    }
+
+    public SummarizationBuilder(String vertexGroupingKey,
+      boolean useVertexLabels) {
+      this.vertexGroupingKey = vertexGroupingKey;
+      this.useVertexLabels = useVertexLabels;
     }
 
     public SummarizationBuilder edgeGroupingKey(final String edgeGroupingKey) {
       this.edgeGroupingKey = edgeGroupingKey;
-      return this;
-    }
-
-    public SummarizationBuilder useVertexLabels(final boolean useVertexLabels) {
-      this.useVertexLabels = useVertexLabels;
       return this;
     }
 

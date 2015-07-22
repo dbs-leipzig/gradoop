@@ -61,8 +61,8 @@ public abstract class WorkflowTest {
     knowsGraph = communities.reduce(new Combination());
 
     Summarization summarization =
-      new Summarization.SummarizationBuilder().vertexGroupingKey("city")
-        .edgeGroupingKey("since").useVertexLabels(true).build();
+      new Summarization.SummarizationBuilder("city", true)
+        .edgeGroupingKey("since").build();
 
     knowsGraph.callForGraph(summarization);
 

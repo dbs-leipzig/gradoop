@@ -34,14 +34,12 @@ import org.gradoop.model.impl.operators.Combination;
 import org.gradoop.model.impl.operators.Exclusion;
 import org.gradoop.model.impl.operators.Overlap;
 import org.gradoop.model.impl.operators.Summarization;
-import org.gradoop.model.impl.operators.SummarizationCross;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.EPGraphOperators;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -164,56 +162,66 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
-  public <O1 extends Number, O2 extends Number> EPGraph summarize(
-    List<String> vertexGroupingKeys,
-    UnaryFunction<Iterable<EPVertexData>, O1> vertexAggregateFunc,
-    List<String> edgeGroupingKeys,
-    UnaryFunction<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws
-    Exception {
-    throw new NotImplementedException();
-  }
-
-  @Override
-  public EPGraph summarize(final String vertexGroupingKey) throws Exception {
-    Summarization summarization = new SummarizationCross.SummarizationBuilder()
-      .vertexGroupingKey(vertexGroupingKey).build();
-    return callForGraph(summarization);
+  public EPGraph summarize(String vertexGroupingKey) throws Exception {
+    return summarize(vertexGroupingKey, null);
   }
 
   @Override
   public EPGraph summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
-    Summarization summarization = new SummarizationCross.SummarizationBuilder()
-      .vertexGroupingKey(vertexGroupingKey).edgeGroupingKey(edgeGroupingKey)
-      .build();
-    return callForGraph(summarization);
+    return callForGraph(
+      new Summarization.SummarizationBuilder(vertexGroupingKey, false)
+        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(false).build());
   }
 
   @Override
-  public EPGraph summarize(boolean useVertexLabels,
-    boolean useEdgeLabels) throws Exception {
-    Summarization summarization =
-      new Summarization.SummarizationBuilder().useVertexLabels(useVertexLabels)
-        .useEdgeLabels(useEdgeLabels).build();
-    return callForGraph(summarization);
+  public EPGraph summarizeOnVertexLabel() throws Exception {
+    return summarizeOnVertexLabel(null, null);
   }
 
   @Override
-  public EPGraph summarize(boolean useVertexLabels,
+  public EPGraph summarizeOnVertexLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception {
-    Summarization summarization =
-      new Summarization.SummarizationBuilder().useVertexLabels(useVertexLabels)
-        .vertexGroupingKey(vertexGroupingKey).build();
-    return callForGraph(summarization);
+    return summarizeOnVertexLabel(vertexGroupingKey, null);
   }
 
   @Override
-  public EPGraph summarize(String vertexGroupingKey,
-    UnaryFunction<Iterable<EPVertexData>, Number> vertexAggregateFunc,
-    String edgeGroupingKey,
-    UnaryFunction<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws
-    Exception {
-    throw new NotImplementedException();
+  public EPGraph summarizeOnVertexLabelAndEdgeProperty(
+    String edgeGroupingKey) throws Exception {
+    return summarizeOnVertexLabel(null, edgeGroupingKey);
+  }
+
+  @Override
+  public EPGraph summarizeOnVertexLabel(String vertexGroupingKey,
+    String edgeGroupingKey) throws Exception {
+    return callForGraph(
+      new Summarization.SummarizationBuilder(vertexGroupingKey, true)
+        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(false).build());
+  }
+
+  @Override
+  public EPGraph summarizeOnVertexAndEdgeLabel() throws Exception {
+    return summarizeOnVertexAndEdgeLabel(null, null);
+  }
+
+  @Override
+  public EPGraph summarizeOnVertexAndEdgeLabelAndVertexProperty(
+    String vertexGroupingKey) throws Exception {
+    return summarizeOnVertexAndEdgeLabel(vertexGroupingKey, null);
+  }
+
+  @Override
+  public EPGraph summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+    String edgeGroupingKey) throws Exception {
+    return summarizeOnVertexAndEdgeLabel(null, edgeGroupingKey);
+  }
+
+  @Override
+  public EPGraph summarizeOnVertexAndEdgeLabel(String vertexGroupingKey,
+    String edgeGroupingKey) throws Exception {
+    return callForGraph(
+      new Summarization.SummarizationBuilder(vertexGroupingKey, true)
+        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(true).build());
   }
 
   @Override

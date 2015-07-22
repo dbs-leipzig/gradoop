@@ -27,8 +27,6 @@ import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.EPVertexCollection;
 
-import java.util.List;
-
 /**
  * Describes all operators that can be applied on a single graph inside the
  * EPGM.
@@ -61,28 +59,34 @@ public interface EPGraphOperators {
   <O extends Number> EPGraph aggregate(String propertyKey,
     UnaryFunction<EPGraph, O> aggregateFunc) throws Exception;
 
+  /* Summarization */
+
   EPGraph summarize(String vertexGroupingKey) throws Exception;
 
   EPGraph summarize(String vertexGroupingKey, String edgeGroupingKey) throws
     Exception;
 
-  EPGraph summarize(boolean useVertexLabels, boolean useEdgeLabels) throws
+  EPGraph summarizeOnVertexLabel() throws Exception;
+
+  EPGraph summarizeOnVertexLabelAndVertexProperty(
+    String vertexGroupingKey) throws Exception;
+
+  EPGraph summarizeOnVertexLabelAndEdgeProperty(String edgeGroupingKey) throws
     Exception;
 
-  EPGraph summarize(boolean useVertexLabels, String vertexGroupingKey) throws
-    Exception;
+  EPGraph summarizeOnVertexLabel(String vertexGroupingKey,
+    String edgeGroupingKey) throws Exception;
 
-  EPGraph summarize(String vertexGroupingKey,
-    UnaryFunction<Iterable<EPVertexData>, Number> vertexAggregateFunc,
-    String edgeGroupingKey,
-    UnaryFunction<Iterable<EPEdgeData>, Number> edgeAggregateFunc) throws
-    Exception;
+  EPGraph summarizeOnVertexAndEdgeLabel() throws Exception;
 
-  <O1 extends Number, O2 extends Number> EPGraph summarize(
-    List<String> vertexGroupingKeys,
-    UnaryFunction<Iterable<EPVertexData>, O1> vertexAggregateFunc,
-    List<String> edgeGroupingKeys,
-    UnaryFunction<Iterable<EPEdgeData>, O2> edgeAggregateFunc) throws Exception;
+  EPGraph summarizeOnVertexAndEdgeLabelAndVertexProperty(
+    String vertexGroupingKey) throws Exception;
+
+  EPGraph summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+    String edgeGroupingKey) throws Exception;
+
+  EPGraph summarizeOnVertexAndEdgeLabel(String vertexGroupingKey,
+    String edgeGroupingKey) throws Exception;
 
   /*
   binary operators take two graphs as input and return a single graph
