@@ -190,6 +190,24 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
+  public EPGraph summarize(boolean useVertexLabels,
+    boolean useEdgeLabels) throws Exception {
+    Summarization summarization =
+      new Summarization.SummarizationBuilder().useVertexLabels(useVertexLabels)
+        .useEdgeLabels(useEdgeLabels).build();
+    return callForGraph(summarization);
+  }
+
+  @Override
+  public EPGraph summarize(boolean useVertexLabels,
+    String vertexGroupingKey) throws Exception {
+    Summarization summarization =
+      new Summarization.SummarizationBuilder().useVertexLabels(useVertexLabels)
+        .vertexGroupingKey(vertexGroupingKey).build();
+    return callForGraph(summarization);
+  }
+
+  @Override
   public EPGraph summarize(String vertexGroupingKey,
     UnaryFunction<Iterable<EPVertexData>, Number> vertexAggregateFunc,
     String edgeGroupingKey,

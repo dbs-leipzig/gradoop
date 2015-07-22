@@ -21,6 +21,7 @@ import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.EPVertexData;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.impl.operators.Summarization;
 import org.gradoop.model.impl.operators.SummarizationCross;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     EPGraph summarizedGraph = inputGraph.summarize(vertexGroupingKey);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
-    // two summarized vertices:
+    // 2 summarized vertices:
     // 0 __VERTEX__ {city: "Leipzig", count: 2}
     // 2 __VERTEX__ {city: "Dresden", count: 2}
     assertEquals("wrong number of vertices", 2L,
@@ -70,7 +71,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // four summarized edges:
+    // 4 summarized edges:
     // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
     // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
     // [3] Dresden -[__EDGE__]-> Leipzig {count: 1}
@@ -108,8 +109,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
   }
 
   @Test
-  public void testSummarizeWithVertexGroupingKeyAsymmetricGraph() throws
-    Exception {
+  public void testSummarizeWithVertexGroupingKey() throws Exception {
 
     EPGraph inputGraph =
       graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
@@ -121,7 +121,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     EPGraph summarizedGraph = inputGraph.summarize(vertexGroupingKey);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
-    // three summarized vertices:
+    // 3 summarized vertices:
     // 0 __VERTEX__ {city: "Leipzig", count: 2}
     // 2 __VERTEX__ {city: "Dresden", count: 3}
     // 5 __VERTEX__ {city: "Berlin", count: 1}
@@ -149,7 +149,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // five summarized edges:
+    // 5 summarized edges:
     // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
     // [3] Dresden -[__EDGE__]-> Leipzig {count: 3}
     // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
@@ -204,7 +204,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     EPGraph summarizedGraph = input.summarize(vertexGroupingKey);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
-    // two summarized vertices:
+    // 2 summarized vertices:
     // 2 __VERTEX__ {city: "Dresden", count: 2}
     // 10 __VERTEX__ {city: "__DEFAULT_GROUP", count: 1}
     assertEquals("wrong number of vertices", 2L,
@@ -227,7 +227,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // two summarized edges:
+    // 2 summarized edges:
     // [16] Default -[__EDGE__]-> Dresden {count: 3}
     // [4] Dresden -[__EDGE__]-> Dresden {count: 1}
     assertEquals("wrong number of edges", 2L, summarizedGraph.getEdgeCount());
@@ -253,8 +253,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
   }
 
   @Test
-  public void testSummarizeWithVertexAndEdgeGroupingKeyAsymmetricGraph() throws
-    Exception {
+  public void testSummarizeWithVertexAndEdgeGroupingKey() throws Exception {
     EPGraph inputGraph =
       graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
         .combine(graphStore.getGraph(2L));
@@ -267,7 +266,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       inputGraph.summarize(vertexGroupingKey, edgeGroupingKey);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
-    // three summarized vertices:
+    // 3 summarized vertices:
     // 0 __VERTEX__ {city: "Leipzig", count: 2}
     // 2 __VERTEX__ {city: "Dresden", count: 3}
     // 5 __VERTEX__ {city: "Berlin", count: 1}
@@ -295,7 +294,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // six summarized edges:
+    // 6 summarized edges:
     // [4] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 2}
     // [3] Dresden -[__EDGE__]-> Leipzig {since: 2013, count: 2}
     // [21] Dresden -[__EDGE__]-> Leipzig {since: 2015, count: 1}
@@ -359,7 +358,7 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       input.summarize(vertexGroupingKey, edgeGroupingKey);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
-    // two summarized vertices:
+    // 2 summarized vertices:
     // 2 __VERTEX__ {city: "Dresden", count: 2}
     // 10 __VERTEX__ {city: "__DEFAULT_GROUP", count: 1}
     assertEquals("wrong number of vertices", 2L,
@@ -382,14 +381,10 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // three summarized edges:
+    // 3 summarized edges:
     // [16] Default -[__EDGE__]-> Dresden {since: 2013, count: 1}
     // [19] Default -[__EDGE__]-> Dresden {since: NULL, count: 2}
     // [4] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 1}
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
-      System.out.println(e);
-    }
-
     assertEquals("wrong number of edges", 3L, summarizedGraph.getEdgeCount());
 
     for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
@@ -419,13 +414,395 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     }
   }
 
+  @Test
+  public void testSummarizeWithVertexLabel() throws Exception {
+    EPGraph inputGraph = graphStore.getDatabaseGraph();
+
+    final boolean useVertexLabels = true;
+    final boolean useEdgeLabels = false;
+    final String aggregatePropertyKey = "count";
+
+    EPGraph summarizedGraph =
+      inputGraph.summarize(useVertexLabels, useEdgeLabels);
+    assertNotNull("summarized graph must not be null", summarizedGraph);
+
+    // 3 summarized vertices:
+    // 0 Person {count: 6}
+    // 6 Tag {count: 3}
+    // 9 Forum {count: 2}
+    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+      System.out.println(v);
+    }
+
+    assertEquals("wrong number of vertices", 3L,
+      summarizedGraph.getVertexCount());
+    long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;
+    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+      // check vertex id
+      assertNotNull("vertex id must not be null", v.getId());
+
+      if (v.getId().equals(vertexIDPerson)) {
+        testVertex(v, LABEL_PERSON, aggregatePropertyKey, 6, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDTag)) {
+        testVertex(v, LABEL_TAG, aggregatePropertyKey, 3, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDForum)) {
+        testVertex(v, LABEL_FORUM, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else {
+        assertTrue("unexpected vertex", false);
+      }
+    }
+
+    // 4 summarized edges:
+    // [0] Person -[__EDGE__]-> Person {count: 10}
+    // [7] Person -[__EDGE__]-> Tag {count: 4}
+    // [11] Forum -[__EDGE__]-> Tag {count: 4}
+    // [15] Forum -[__EDGE__]-> Person {count: 6}
+    long expectedEdgeCount = 4L;
+    assertEquals("wrong number of edges", expectedEdgeCount,
+      summarizedGraph.getEdgeCount());
+
+    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+      // check edge id
+      assertNotNull("edge id must not be null", e.getId());
+
+      if (e.getId().equals(0L)) {
+        // [0] Person -[__EDGE__]-> Person {count: 10}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDPerson,
+          vertexIDPerson, aggregatePropertyKey, 10, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(7L)) {
+        // [7] Person -[__EDGE__]-> Tag {count: 4}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDPerson,
+          vertexIDTag, aggregatePropertyKey, 4, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(11L)) {
+        // [11] Forum -[__EDGE__]-> Tag {count: 4}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDForum,
+          vertexIDTag, aggregatePropertyKey, 4, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(15L)) {
+        // [15] Forum -[__EDGE__]-> Person {count: 6}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDForum,
+          vertexIDPerson, aggregatePropertyKey, 6, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else {
+        assertTrue("unexpected edge: " + e.getId(), false);
+      }
+    }
+  }
+
+  @Test
+  public void testSummarizeWithVertexAndEdgeLabel() throws Exception {
+    EPGraph inputGraph = graphStore.getDatabaseGraph();
+
+    final boolean useVertexLabels = true;
+    final boolean useEdgeLabels = true;
+    final String aggregatePropertyKey = "count";
+
+    EPGraph summarizedGraph =
+      inputGraph.summarize(useVertexLabels, useEdgeLabels);
+    assertNotNull("summarized graph must not be null", summarizedGraph);
+
+    // 3 summarized vertices:
+    // 0 Person {count: 6}
+    // 6 Tag {count: 3}
+    // 9 Forum {count: 2}
+    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+      System.out.println(v);
+    }
+
+    assertEquals("wrong number of vertices", 3L,
+      summarizedGraph.getVertexCount());
+    long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;
+    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+      // check vertex id
+      assertNotNull("vertex id must not be null", v.getId());
+
+      if (v.getId().equals(vertexIDPerson)) {
+        testVertex(v, LABEL_PERSON, aggregatePropertyKey, 6, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDTag)) {
+        testVertex(v, LABEL_TAG, aggregatePropertyKey, 3, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDForum)) {
+        testVertex(v, LABEL_FORUM, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else {
+        assertTrue("unexpected vertex", false);
+      }
+    }
+
+    // 5 summarized edges:
+    // [0] Person -[knows]-> Person {count: 10}
+    // [7] Person -[hasInterest]-> Tag {count: 4}
+    // [11] Forum -[hasTag]-> Tag {count: 4}
+    // [15] Forum -[hasModerator]-> Person {count: 2}
+    // [17] Forum -[hasMember]-> Person {count: 4}
+    long expectedEdgeCount = 5L;
+    assertEquals("wrong number of edges", expectedEdgeCount,
+      summarizedGraph.getEdgeCount());
+
+    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+      // check edge id
+      assertNotNull("edge id must not be null", e.getId());
+
+      if (e.getId().equals(0L)) {
+        // [0] Person -[knows]-> Person {count: 10}
+        testEdge(e, LABEL_KNOWS, vertexIDPerson, vertexIDPerson,
+          aggregatePropertyKey, 10, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(7L)) {
+        // [7] Person -[hasInterest]-> Tag {count: 4}
+        testEdge(e, LABEL_HAS_INTEREST, vertexIDPerson, vertexIDTag,
+          aggregatePropertyKey, 4, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(11L)) {
+        // [11] Forum -[hasTag]-> Tag {count: 4}
+        testEdge(e, LABEL_HAS_TAG, vertexIDForum, vertexIDTag,
+          aggregatePropertyKey, 4, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(15L)) {
+        // [15] Forum -[hasModerator]-> Person {count: 2}
+        testEdge(e, LABEL_HAS_MODERATOR, vertexIDForum, vertexIDPerson,
+          aggregatePropertyKey, 2, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(17L)) {
+        // [17] Forum -[hasMember]-> Person {count: 4}
+        testEdge(e, LABEL_HAS_MEMBER, vertexIDForum, vertexIDPerson,
+          aggregatePropertyKey, 4, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else {
+        assertTrue("unexpected edge: " + e.getId(), false);
+      }
+    }
+  }
+
+  @Test
+  public void testSummarizeWithVertexLabelAndProperty() throws Exception {
+    EPGraph inputGraph =
+      graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
+        .combine(graphStore.getGraph(2L));
+
+    final boolean useVertexLabel = true;
+    final String vertexGroupingKey = "city";
+    final String aggregatePropertyKey = "count";
+
+    EPGraph summarizedGraph =
+      inputGraph.summarize(useVertexLabel, vertexGroupingKey);
+    assertNotNull("summarized graph must not be null", summarizedGraph);
+
+    // 3 summarized vertices:
+    // 0 Person {city: "Leipzig", count: 2}
+    // 2 Person {city: "Dresden", count: 3}
+    // 5 Person {city: "Berlin", count: 1}
+    assertEquals("wrong number of vertices", 3L,
+      summarizedGraph.getVertexCount());
+    long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L;
+    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+      // check vertex id
+      assertNotNull("vertex id must not be null", v.getId());
+
+      if (v.getId().equals(vertexIDLeipzig)) {
+        testVertex(v, LABEL_PERSON, vertexGroupingKey, "Leipzig",
+          aggregatePropertyKey, 2, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDDresden)) {
+        testVertex(v, LABEL_PERSON, vertexGroupingKey, "Dresden",
+          aggregatePropertyKey, 3, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDBerlin)) {
+        testVertex(v, LABEL_PERSON, vertexGroupingKey, "Berlin",
+          aggregatePropertyKey, 1, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else {
+        assertTrue("unexpected vertex", false);
+      }
+    }
+
+    // 5 summarized edges:
+    // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
+    // [3] Dresden -[__EDGE__]-> Leipzig {count: 3}
+    // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
+    // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
+    // [22] Berlin  -[__EDGE__]-> Dresden {count: 2}
+    long expectedEdgeCount = 5L;
+    assertEquals("wrong number of edges", expectedEdgeCount,
+      summarizedGraph.getEdgeCount());
+
+    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+      // check edge id
+      assertNotNull("edge id must not be null", e.getId());
+
+      if (e.getId().equals(4L)) {
+        // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDDresden,
+          vertexIDDresden, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(3L)) {
+        // [3] Dresden -[__EDGE__]-> Leipzig {count: 3}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDDresden,
+          vertexIDLeipzig, aggregatePropertyKey, 3, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(0L)) {
+        // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDLeipzig,
+          vertexIDLeipzig, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(2L)) {
+        // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDLeipzig,
+          vertexIDDresden, aggregatePropertyKey, 1, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(22L)) {
+        // [22] Berlin  -[__EDGE__]-> Dresden {count: 2}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDBerlin,
+          vertexIDDresden, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else {
+        assertTrue("unexpected edge: " + e.getId(), false);
+      }
+    }
+  }
+
+  @Test
+  public void testSummarizeWithVertexLabelAndAbsentProperty() throws Exception {
+    EPGraph inputGraph = graphStore.getDatabaseGraph();
+
+    final boolean useVertexLabel = true;
+    final String vertexGroupingKey = "city";
+    final String aggregatePropertyKey = "count";
+
+    EPGraph summarizedGraph =
+      inputGraph.summarize(useVertexLabel, vertexGroupingKey);
+    assertNotNull("summarized graph must not be null", summarizedGraph);
+
+    // 5 summarized vertices:
+    // 0 Person {city: "Leipzig", count: 2}
+    // 2 Person {city: "Dresden", count: 3}
+    // 5 Person {city: "Berlin", count: 1}
+    // 6 Tag {city: "NULL", count: 3}
+    // 9 Forum {city: "NULL", count: 2}
+    assertEquals("wrong number of vertices", 5L,
+      summarizedGraph.getVertexCount());
+    long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L,
+      vertexIDTag = 6L, vertexIDForum = 9L;
+    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+      // check vertex id
+      assertNotNull("vertex id must not be null", v.getId());
+
+      if (v.getId().equals(vertexIDLeipzig)) {
+        testVertex(v, LABEL_PERSON, vertexGroupingKey, "Leipzig",
+          aggregatePropertyKey, 2, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDDresden)) {
+        testVertex(v, LABEL_PERSON, vertexGroupingKey, "Dresden",
+          aggregatePropertyKey, 3, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDBerlin)) {
+        testVertex(v, LABEL_PERSON, vertexGroupingKey, "Berlin",
+          aggregatePropertyKey, 1, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDTag)) {
+        testVertex(v, LABEL_TAG, vertexGroupingKey, Summarization.NULL_VALUE,
+          aggregatePropertyKey, 3, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (v.getId().equals(vertexIDForum)) {
+        testVertex(v, LABEL_FORUM, vertexGroupingKey, Summarization.NULL_VALUE,
+          aggregatePropertyKey, 2, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else {
+        assertTrue("unexpected vertex", false);
+      }
+    }
+
+    // 11 summarized edges:
+    // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
+    // [3] Dresden -[__EDGE__]-> Leipzig {count: 3}
+    // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
+    // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
+    // [22] Berlin  -[__EDGE__]-> Dresden {count: 2}
+    // [16] Forum -[__EDGE__]-> Dresden {count: 3}
+    // [11] Forum -[__EDGE__]-> Tag {count: 4}
+    // [15] Forum -[__EDGE__]-> Leipzig {count: 3}
+    // [10] Berlin-[__EDGE__]-> Tag {count: 1}
+    // [7] Dresden-[__EDGE__]-> Tag {count: 2}
+    // [8] Leipzig-[__EDGE__]-> Tag {count: 1}
+    long expectedEdgeCount = 11L;
+    assertEquals("wrong number of edges", expectedEdgeCount,
+      summarizedGraph.getEdgeCount());
+
+    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+      // check edge id
+      assertNotNull("edge id must not be null", e.getId());
+
+      if (e.getId().equals(4L)) {
+        // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDDresden,
+          vertexIDDresden, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(3L)) {
+        // [3] Dresden -[__EDGE__]-> Leipzig {count: 3}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDDresden,
+          vertexIDLeipzig, aggregatePropertyKey, 3, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(0L)) {
+        // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDLeipzig,
+          vertexIDLeipzig, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(2L)) {
+        // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDLeipzig,
+          vertexIDDresden, aggregatePropertyKey, 1, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(22L)) {
+        // [22] Berlin  -[__EDGE__]-> Dresden {count: 2}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDBerlin,
+          vertexIDDresden, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(16L)) {
+        // [16] Forum -[__EDGE__]-> Dresden {count: 3}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDForum,
+          vertexIDDresden, aggregatePropertyKey, 3, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(11L)) {
+        // [11] Forum -[__EDGE__]-> Tag {count: 4}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDForum,
+          vertexIDTag, aggregatePropertyKey, 4, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(15L)) {
+        // [15] Forum -[__EDGE__]-> Leipzig {count: 3}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDForum,
+          vertexIDLeipzig, aggregatePropertyKey, 3, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(10L)) {
+        // [10] Berlin-[__EDGE__]-> Tag {count: 1}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDBerlin,
+          vertexIDTag, aggregatePropertyKey, 1, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(7L)) {
+        // [7] Dresden-[__EDGE__]-> Tag {count: 2}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDDresden,
+          vertexIDTag, aggregatePropertyKey, 2, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else if (e.getId().equals(8L)) {
+        // [8] Leipzig-[__EDGE__]-> Tag {count: 1}
+        testEdge(e, FlinkConstants.DEFAULT_EDGE_LABEL, vertexIDLeipzig,
+          vertexIDTag, aggregatePropertyKey, 1, 1,
+          FlinkConstants.SUMMARIZE_GRAPH_ID);
+      } else {
+        assertTrue("unexpected edge: " + e.getId(), false);
+      }
+    }
+  }
+
+  private void testVertex(EPVertexData vertex, String expectedVertexLabel,
+    String aggregatePropertyKey, Integer expectedCountValue,
+    int expectedGraphCount, Long expectedGraphID) {
+    testVertex(vertex, expectedVertexLabel, null, null, aggregatePropertyKey,
+      expectedCountValue, expectedGraphCount, expectedGraphID);
+  }
+
+
   private void testVertex(EPVertexData vertex, String expectedVertexLabel,
     String vertexGroupingKey, String expectedVertexGroupingValue,
     String aggregatePropertyKey, Integer expectedCountValue,
     int expectedGraphCount, Long expectedGraphID) {
     assertEquals("wrong vertex label", expectedVertexLabel, vertex.getLabel());
-    assertEquals("wrong property value", expectedVertexGroupingValue,
-      vertex.getProperty(vertexGroupingKey));
+    if (vertexGroupingKey != null && expectedVertexGroupingValue != null) {
+      assertEquals("wrong property value", expectedVertexGroupingValue,
+        vertex.getProperty(vertexGroupingKey));
+    }
     assertEquals("wrong vertex property", expectedCountValue,
       vertex.getProperty(aggregatePropertyKey));
     assertEquals("wrong number of graphs", expectedGraphCount,
@@ -463,4 +840,12 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
         edge.getProperty(edgeGroupingKey));
     }
   }
+
+//  @Test
+//  public void testCantor() {
+//    for (int i = 0; i <= 25; i++) {
+//      System.out.println(
+//        String.format("cantor(%d, %d) = %d", 4, i, MathHelper.cantor(4, i)));
+//    }
+//  }
 }

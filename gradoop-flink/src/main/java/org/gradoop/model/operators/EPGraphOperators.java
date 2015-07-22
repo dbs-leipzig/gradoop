@@ -66,6 +66,12 @@ public interface EPGraphOperators {
   EPGraph summarize(String vertexGroupingKey, String edgeGroupingKey) throws
     Exception;
 
+  EPGraph summarize(boolean useVertexLabels, boolean useEdgeLabels) throws
+    Exception;
+
+  EPGraph summarize(boolean useVertexLabels, String vertexGroupingKey) throws
+    Exception;
+
   EPGraph summarize(String vertexGroupingKey,
     UnaryFunction<Iterable<EPVertexData>, Number> vertexAggregateFunc,
     String edgeGroupingKey,

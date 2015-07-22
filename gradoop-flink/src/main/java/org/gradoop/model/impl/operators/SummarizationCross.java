@@ -24,10 +24,12 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.FilterOperator;
+import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.operators.SortedGrouping;
+import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
@@ -36,8 +38,6 @@ import org.gradoop.model.impl.EPFlinkEdgeData;
 import org.gradoop.model.impl.EPFlinkVertexData;
 
 import java.util.List;
-
-import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
 
 /**
  * The summarization operator determines a structural grouping of similar
@@ -119,111 +119,80 @@ public class SummarizationCross extends Summarization {
   private DataSet<Edge<Long, EPFlinkEdgeData>> buildSummarizedEdges(
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
     DataSet<List<Long>> vertexGroups) {
-    if (edgeGroupingKey != null && !"".equals(edgeGroupingKey)) {
-      return buildSummarizedEdgesWithGrouping(graph, vertexGroups);
-    } else {
-      return buildSummarizedEdgesWithoutGrouping(graph, vertexGroups);
-    }
-  }
-
-  private DataSet<Edge<Long, EPFlinkEdgeData>>
-  buildSummarizedEdgesWithoutGrouping(
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    DataSet<List<Long>> vertexGroups) {
-    // map edges to relevant information (source vertex, target vertex)
-    DataSet<Tuple3<Long, Long, Long>> edges =
-      graph.getEdges().map(new EdgeProjection());
+    // map edges to relevant information
+    // (edge id, source vertex, target vertex, edge label, grouping value)
+    DataSet<Tuple5<Long, Long, Long, String, String>> edges = graph.getEdges()
+      .map(new EdgeProjection(getEdgeGroupingKey(), useEdgeLabels()));
 
     // compute cross between vertex groups and edges
-    DataSet<Tuple2<List<Long>, Tuple3<Long, Long, Long>>> groupEdgeCross =
-      vertexGroups.cross(edges);
+    DataSet<Tuple2<List<Long>, Tuple5<Long, Long, Long, String, String>>>
+      groupEdgeCross = vertexGroups.cross(edges);
 
     // create intra edges and (possible incomplete) inter edges
-    DataSet<Tuple3<Long, Long, Long>> firstRoundEdges =
+    DataSet<Tuple5<Long, Long, Long, String, String>> firstRoundEdges =
       groupEdgeCross.flatMap(new FirstRoundFlatMap());
 
     /* build intra edges */
 
-    DataSet<Edge<Long, EPFlinkEdgeData>> intraEdges = firstRoundEdges
+    FilterOperator<Tuple5<Long, Long, Long, String, String>>
+      filteredIntraEdges = firstRoundEdges
       // filter intra edges (source == target)
-      .filter(new IntraEdgeFilter())
-        // group them by source vertex
-      .groupBy(1)
-        // sort group by edge id to get edge representative
+      .filter(new IntraEdgeFilterWith());
+
+    UnsortedGrouping<Tuple5<Long, Long, Long, String, String>>
+      groupedIntraEdges;
+    if (useEdgeProperty() && useEdgeLabels()) {
+      groupedIntraEdges = filteredIntraEdges.groupBy(1, 3, 4);
+    } else if (useEdgeLabels()) {
+      groupedIntraEdges = filteredIntraEdges.groupBy(1, 3);
+    } else if (useEdgeProperty()) {
+      groupedIntraEdges = filteredIntraEdges.groupBy(1, 4);
+    } else {
+      groupedIntraEdges = filteredIntraEdges.groupBy(1);
+    }
+
+    DataSet<Edge<Long, EPFlinkEdgeData>> intraEdges = groupedIntraEdges
+      // sort group by edge id to get edge representative
       .sortGroup(0, Order.ASCENDING)
         // and create new gelly edges with payload
-      .reduceGroup(new EdgeGroupSummarizer());
+      .reduceGroup(new EdgeGroupSummarizer(getEdgeGroupingKey(),
+        useEdgeLabels()));
 
     /* build inter edges */
 
-    DataSet<Tuple3<Long, Long, Long>> secondRoundEdges = firstRoundEdges
-      // filter inter edge candidates (source != target)
-      .filter(new InterEdgeFilter());
+    DataSet<Tuple5<Long, Long, Long, String, String>> filteredInterEdges =
+      firstRoundEdges
+        // filter inter edge candidates (source != target)
+        .filter(new InterEdgeFilter());
 
     // cross inter-edges candidates with vertex groups
-    groupEdgeCross = vertexGroups.cross(secondRoundEdges);
+    groupEdgeCross = vertexGroups.cross(filteredInterEdges);
 
     // replace target vertex with group representative if possible
-    DataSet<Edge<Long, EPFlinkEdgeData>> interEdges = groupEdgeCross
+    FlatMapOperator<Tuple2<List<Long>, Tuple5<Long, Long, Long, String,
+      String>>, Tuple5<Long, Long, Long, String, String>>
+      secondRoundEdges = groupEdgeCross
       // finalize inter-edges
-      .flatMap(new SecondRoundFlatMap())
-        // group them by source and target vertex
-      .groupBy(1, 2)
-        // sort group by edge id to get edge representative
-      .sortGroup(0, Order.ASCENDING)
+      .flatMap(new SecondRoundFlatMap());
+
+    UnsortedGrouping<Tuple5<Long, Long, Long, String, String>>
+      groupedInterEdges;
+
+    if (useEdgeProperty() && useEdgeLabels()) {
+      groupedInterEdges = secondRoundEdges.groupBy(1, 2, 3, 4);
+    } else if (useEdgeLabels()) {
+      groupedInterEdges = secondRoundEdges.groupBy(1, 2, 3);
+    } else if (useEdgeProperty()) {
+      groupedInterEdges = secondRoundEdges.groupBy(1, 2, 4);
+    } else {
+      groupedInterEdges = secondRoundEdges.groupBy(1, 2);
+    }
+    // sort group by edge id to get edge representative
+    DataSet<Edge<Long, EPFlinkEdgeData>> interEdges =
+      groupedInterEdges.sortGroup(0, Order.ASCENDING)
         // and create new gelly edges with payload
-      .reduceGroup(new EdgeGroupSummarizer());
-
-    return interEdges.union(intraEdges);
-  }
-
-  private DataSet<Edge<Long, EPFlinkEdgeData>> buildSummarizedEdgesWithGrouping(
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    DataSet<List<Long>> vertexGroups) {
-    // map edges to relevant information
-    // (source vertex, target vertex, grouping value)
-    DataSet<Tuple4<Long, Long, Long, String>> edges =
-      graph.getEdges().map(new EdgeGroupProjection(edgeGroupingKey));
-
-    // compute cross between vertex groups and edges
-    DataSet<Tuple2<List<Long>, Tuple4<Long, Long, Long, String>>>
-      groupEdgeCross = vertexGroups.cross(edges);
-
-    // create intra edges and (possible incomplete) inter edges
-    DataSet<Tuple4<Long, Long, Long, String>> firstRoundEdges =
-      groupEdgeCross.flatMap(new FirstRoundFlatMapWithGroupValue());
-
-    /* build intra edges */
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> intraEdges = firstRoundEdges
-      // filter intra edges (source == target)
-      .filter(new IntraEdgeFilterWithGroupValue())
-        // group them by source vertex and group value
-      .groupBy(1, 3)
-        // sort group by edge id to get edge representative
-      .sortGroup(0, Order.ASCENDING)
-        // and create new gelly edges with payload
-      .reduceGroup(new EdgeGroupSummarizerWithGroupValue(edgeGroupingKey));
-
-    /* build inter edges */
-
-    DataSet<Tuple4<Long, Long, Long, String>> secondRoundEdges = firstRoundEdges
-      // filter inter edge candidates (source != target)
-      .filter(new InterEdgeFilterWithGroupValue());
-
-    // cross inter-edges candidates with vertex groups
-    groupEdgeCross = vertexGroups.cross(secondRoundEdges);
-
-    // replace target vertex with group representative if possible
-    DataSet<Edge<Long, EPFlinkEdgeData>> interEdges = groupEdgeCross
-      // finalize inter-edges
-      .flatMap(new SecondRoundFlatMapWithGroupValue())
-        // group them by source and target vertex and group value
-      .groupBy(1, 2, 3)
-        // sort group by edge id to get edge representative
-      .sortGroup(0, Order.ASCENDING)
-        // and create new gelly edges with payload
-      .reduceGroup(new EdgeGroupSummarizerWithGroupValue(edgeGroupingKey));
+        .reduceGroup(new EdgeGroupSummarizer(getEdgeGroupingKey(),
+          useEdgeLabels()));
 
     return interEdges.union(intraEdges);
   }
@@ -264,17 +233,21 @@ public class SummarizationCross extends Summarization {
    * no output as this is processed by another group, edge pair
    */
   private static class FirstRoundFlatMap implements
-    FlatMapFunction<Tuple2<List<Long>, Tuple3<Long, Long, Long>>,
-      Tuple3<Long, Long, Long>> {
+    FlatMapFunction<Tuple2<List<Long>, Tuple5<Long, Long, Long, String,
+      String>>, Tuple5<Long, Long, Long, String, String>> {
 
     @Override
-    public void flatMap(Tuple2<List<Long>, Tuple3<Long, Long, Long>> t,
-      Collector<Tuple3<Long, Long, Long>> coll) throws Exception {
+    public void flatMap(
+      Tuple2<List<Long>, Tuple5<Long, Long, Long, String, String>> t,
+      Collector<Tuple5<Long, Long, Long, String, String>> coll) throws
+      Exception {
       List<Long> sortedVertexGroup = t.f0;
-      Tuple3<Long, Long, Long> edge = t.f1;
+      Tuple5<Long, Long, Long, String, String> edge = t.f1;
       Long edgeID = edge.f0;
       Long sourceVertex = edge.f1;
       Long targetVertex = edge.f2;
+      String edgeLabel = edge.f3;
+      String edgeGroupingValue = edge.f4;
       // list is sorted, representative is the first element
       Long groupRepresentative = sortedVertexGroup.get(0);
       // source vertex in group ?
@@ -283,42 +256,13 @@ public class SummarizationCross extends Summarization {
         if (sortedVertexGroup.contains(targetVertex)) {
           // create an intra edge
           coll.collect(
-            new Tuple3<>(edgeID, groupRepresentative, groupRepresentative));
+            new Tuple5<>(edgeID, groupRepresentative, groupRepresentative,
+              edgeLabel, edgeGroupingValue));
         } else {
           // create an inter edge
-          coll.collect(new Tuple3<>(edgeID, groupRepresentative, targetVertex));
-        }
-      }
-    }
-  }
-
-  private static class FirstRoundFlatMapWithGroupValue implements
-    FlatMapFunction<Tuple2<List<Long>, Tuple4<Long, Long, Long, String>>,
-      Tuple4<Long, Long, Long, String>> {
-
-    @Override
-    public void flatMap(Tuple2<List<Long>, Tuple4<Long, Long, Long, String>> t,
-      Collector<Tuple4<Long, Long, Long, String>> coll) throws Exception {
-      List<Long> sortedVertexGroup = t.f0;
-      Tuple4<Long, Long, Long, String> edge = t.f1;
-      Long edgeID = edge.f0;
-      Long sourceVertex = edge.f1;
-      Long targetVertex = edge.f2;
-      String edgeGroupingValue = edge.f3;
-      // list is sorted, representative is the first element
-      Long groupRepresentative = sortedVertexGroup.get(0);
-      // source vertex in group ?
-      if (sortedVertexGroup.contains(sourceVertex)) {
-        // target in vertex group ?
-        if (sortedVertexGroup.contains(targetVertex)) {
-          // create an intra edge
           coll.collect(
-            new Tuple4<>(edgeID, groupRepresentative, groupRepresentative,
+            new Tuple5<>(edgeID, groupRepresentative, targetVertex, edgeLabel,
               edgeGroupingValue));
-        } else {
-          // create an inter edge
-          coll.collect(new Tuple4<>(edgeID, groupRepresentative, targetVertex,
-            edgeGroupingValue));
         }
       }
     }
@@ -329,51 +273,29 @@ public class SummarizationCross extends Summarization {
    * corresponding vertex group representative.
    */
   private static class SecondRoundFlatMap implements
-    FlatMapFunction<Tuple2<List<Long>, Tuple3<Long, Long, Long>>,
-      Tuple3<Long, Long, Long>> {
+    FlatMapFunction<Tuple2<List<Long>, Tuple5<Long, Long, Long, String,
+      String>>, Tuple5<Long, Long, Long, String, String>> {
 
     @Override
-    public void flatMap(Tuple2<List<Long>, Tuple3<Long, Long, Long>> t,
-      Collector<Tuple3<Long, Long, Long>> coll) throws Exception {
+    public void flatMap(
+      Tuple2<List<Long>, Tuple5<Long, Long, Long, String, String>> t,
+      Collector<Tuple5<Long, Long, Long, String, String>> coll) throws
+      Exception {
       List<Long> sortedVertexGroup = t.f0;
-      Tuple3<Long, Long, Long> edge = t.f1;
+      Tuple5<Long, Long, Long, String, String> edge = t.f1;
       Long edgeID = edge.f0;
       Long sourceVertex = edge.f1;
       Long targetVertex = edge.f2;
+      String edgeLabel = edge.f3;
+      String edgeGroupingValue = edge.f4;
       // list is sorted, representative is the first element
       Long groupRepresentative = sortedVertexGroup.get(0);
 
       // target vertex in group?
       if (sortedVertexGroup.contains(targetVertex)) {
-        coll.collect(new Tuple3<>(edgeID, sourceVertex, groupRepresentative));
-      }
-    }
-  }
-
-  /**
-   * Creates final inter edges by replacing the target vertex with the
-   * corresponding vertex group representative.
-   */
-  private static class SecondRoundFlatMapWithGroupValue implements
-    FlatMapFunction<Tuple2<List<Long>, Tuple4<Long, Long, Long, String>>,
-      Tuple4<Long, Long, Long, String>> {
-
-    @Override
-    public void flatMap(Tuple2<List<Long>, Tuple4<Long, Long, Long, String>> t,
-      Collector<Tuple4<Long, Long, Long, String>> coll) throws Exception {
-      List<Long> sortedVertexGroup = t.f0;
-      Tuple4<Long, Long, Long, String> edge = t.f1;
-      Long edgeID = edge.f0;
-      Long sourceVertex = edge.f1;
-      Long targetVertex = edge.f2;
-      String edgeGroupingValue = edge.f3;
-      // list is sorted, representative is the first element
-      Long groupRepresentative = sortedVertexGroup.get(0);
-
-      // target vertex in group?
-      if (sortedVertexGroup.contains(targetVertex)) {
-        coll.collect(new Tuple4<>(edgeID, sourceVertex, groupRepresentative,
-          edgeGroupingValue));
+        coll.collect(
+          new Tuple5<>(edgeID, sourceVertex, groupRepresentative, edgeLabel,
+            edgeGroupingValue));
       }
     }
   }
@@ -381,21 +303,11 @@ public class SummarizationCross extends Summarization {
   /**
    * Filters intra edges (source-vertex == target-vertex).
    */
-  private static class IntraEdgeFilter implements
-    FilterFunction<Tuple3<Long, Long, Long>> {
+  private static class IntraEdgeFilterWith implements
+    FilterFunction<Tuple5<Long, Long, Long, String, String>> {
     @Override
-    public boolean filter(Tuple3<Long, Long, Long> t) throws Exception {
-      return t.f1.equals(t.f2);
-    }
-  }
-
-  /**
-   * Filters intra edges (source-vertex == target-vertex).
-   */
-  private static class IntraEdgeFilterWithGroupValue implements
-    FilterFunction<Tuple4<Long, Long, Long, String>> {
-    @Override
-    public boolean filter(Tuple4<Long, Long, Long, String> t) throws Exception {
+    public boolean filter(Tuple5<Long, Long, Long, String, String> t) throws
+      Exception {
       return t.f1.equals(t.f2);
     }
   }
@@ -404,59 +316,48 @@ public class SummarizationCross extends Summarization {
    * Filters inter edges (source-vertex != target-vertex).
    */
   private static class InterEdgeFilter implements
-    FilterFunction<Tuple3<Long, Long, Long>> {
+    FilterFunction<Tuple5<Long, Long, Long, String, String>> {
 
     @Override
-    public boolean filter(Tuple3<Long, Long, Long> t) throws Exception {
-      return !t.f1.equals(t.f2);
-    }
-  }
-
-  /**
-   * Filters inter edges (source-vertex != target-vertex).
-   */
-  private static class InterEdgeFilterWithGroupValue implements
-    FilterFunction<Tuple4<Long, Long, Long, String>> {
-
-    @Override
-    public boolean filter(Tuple4<Long, Long, Long, String> t) throws Exception {
+    public boolean filter(Tuple5<Long, Long, Long, String, String> t) throws
+      Exception {
       return !t.f1.equals(t.f2);
     }
   }
 
   /**
    * Reduces edges to the information which is relevant for further
-   * processing (source vertex and target vertex).
+   * processing (source vertex, target vertex, label and group value).
    */
   private static class EdgeProjection implements
-    MapFunction<Edge<Long, EPFlinkEdgeData>, Tuple3<Long, Long, Long>> {
-    @Override
-    public Tuple3<Long, Long, Long> map(Edge<Long, EPFlinkEdgeData> e) throws
-      Exception {
-      return new Tuple3<>(e.getValue().getId(), e.getSource(), e.getTarget());
-    }
-  }
+    MapFunction<Edge<Long, EPFlinkEdgeData>, Tuple5<Long, Long, Long, String,
+      String>> {
 
-  /**
-   * Reduces edges to the information which is relevant for further
-   * processing (source vertex, target vertex and group value).
-   */
-  private static class EdgeGroupProjection implements
-    MapFunction<Edge<Long, EPFlinkEdgeData>, Tuple4<Long, Long, Long, String>> {
+    private String groupPropertyKey;
+    private boolean useLabel;
 
-    private String edgeGroupingKey;
-
-    public EdgeGroupProjection(String edgeGroupingKey) {
-      this.edgeGroupingKey = edgeGroupingKey;
+    public EdgeProjection(String groupPropertyKey, boolean useLabel) {
+      this.groupPropertyKey = groupPropertyKey;
+      this.useLabel = useLabel;
     }
 
     @Override
-    public Tuple4<Long, Long, Long, String> map(
+    public Tuple5<Long, Long, Long, String, String> map(
       Edge<Long, EPFlinkEdgeData> e) throws Exception {
-      Object edgeGroupingValue = e.getValue().getProperty(edgeGroupingKey);
-      return new Tuple4<>(e.getValue().getId(), e.getSource(), e.getTarget(),
-        (edgeGroupingValue != null) ? edgeGroupingValue.toString() :
-          NULL_VALUE);
+      String groupingValue = null;
+      boolean useProperty =
+        groupPropertyKey != null && !"".equals(groupPropertyKey);
+      boolean hasProperty =
+        useProperty && (e.getValue().getProperty(groupPropertyKey) != null);
+
+      if (useProperty && hasProperty) {
+        groupingValue = e.getValue().getProperty(groupPropertyKey).toString();
+      } else if (useProperty) {
+        groupingValue = NULL_VALUE;
+      }
+
+      return new Tuple5<>(e.getValue().getId(), e.getSource(), e.getTarget(),
+        useLabel ? e.getValue().getLabel() : null, groupingValue);
     }
   }
 }
