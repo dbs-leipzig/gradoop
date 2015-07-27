@@ -27,7 +27,6 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.operators.SortedGrouping;
-import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.graph.Edge;
@@ -139,24 +138,13 @@ public class SummarizationCross extends Summarization {
       // filter intra edges (source == target)
       .filter(new IntraEdgeFilterWith());
 
-    UnsortedGrouping<Tuple5<Long, Long, Long, String, String>>
-      groupedIntraEdges;
-    if (useEdgeProperty() && useEdgeLabels()) {
-      groupedIntraEdges = filteredIntraEdges.groupBy(1, 3, 4);
-    } else if (useEdgeLabels()) {
-      groupedIntraEdges = filteredIntraEdges.groupBy(1, 3);
-    } else if (useEdgeProperty()) {
-      groupedIntraEdges = filteredIntraEdges.groupBy(1, 4);
-    } else {
-      groupedIntraEdges = filteredIntraEdges.groupBy(1);
-    }
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> intraEdges = groupedIntraEdges
-      // sort group by edge id to get edge representative
-      .sortGroup(0, Order.ASCENDING)
-        // and create new gelly edges with payload
-      .reduceGroup(new EdgeGroupSummarizer(getEdgeGroupingKey(),
-        useEdgeLabels()));
+    DataSet<Edge<Long, EPFlinkEdgeData>> intraEdges =
+      groupEdges(filteredIntraEdges)
+        // sort group by edge id to get edge representative
+        .sortGroup(0, Order.ASCENDING)
+          // and create new gelly edges with payload
+        .reduceGroup(
+          new EdgeGroupSummarizer(getEdgeGroupingKey(), useEdgeLabels()));
 
     /* build inter edges */
 
@@ -175,24 +163,12 @@ public class SummarizationCross extends Summarization {
       // finalize inter-edges
       .flatMap(new SecondRoundFlatMap());
 
-    UnsortedGrouping<Tuple5<Long, Long, Long, String, String>>
-      groupedInterEdges;
-
-    if (useEdgeProperty() && useEdgeLabels()) {
-      groupedInterEdges = secondRoundEdges.groupBy(1, 2, 3, 4);
-    } else if (useEdgeLabels()) {
-      groupedInterEdges = secondRoundEdges.groupBy(1, 2, 3);
-    } else if (useEdgeProperty()) {
-      groupedInterEdges = secondRoundEdges.groupBy(1, 2, 4);
-    } else {
-      groupedInterEdges = secondRoundEdges.groupBy(1, 2);
-    }
     // sort group by edge id to get edge representative
     DataSet<Edge<Long, EPFlinkEdgeData>> interEdges =
-      groupedInterEdges.sortGroup(0, Order.ASCENDING)
+      groupEdges(secondRoundEdges).sortGroup(0, Order.ASCENDING)
         // and create new gelly edges with payload
-        .reduceGroup(new EdgeGroupSummarizer(getEdgeGroupingKey(),
-          useEdgeLabels()));
+        .reduceGroup(
+          new EdgeGroupSummarizer(getEdgeGroupingKey(), useEdgeLabels()));
 
     return interEdges.union(intraEdges);
   }

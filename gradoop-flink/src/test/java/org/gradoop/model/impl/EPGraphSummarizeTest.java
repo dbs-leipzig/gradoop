@@ -21,19 +21,22 @@ import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
 import org.gradoop.model.EPVertexData;
 import org.gradoop.model.helper.FlinkConstants;
-import org.gradoop.model.helper.MathHelper;
+import org.gradoop.model.impl.operators.Summarization;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
 import static org.gradoop.model.impl.operators.Summarization.NULL_VALUE;
 import static org.junit.Assert.*;
 
-public class EPGraphSummarizeTest extends EPFlinkTest {
+public abstract class EPGraphSummarizeTest extends EPFlinkTest {
   private EPGraphStore graphStore;
 
   public EPGraphSummarizeTest() {
     this.graphStore = createSocialGraph();
   }
+
+  public abstract Summarization getSummarizationImpl(String vertexGroupingKey,
+    boolean useVertexLabel, String edgeGroupingKey, boolean useEdgeLabel);
 
   @Test
   public void testSummarizeOnVertexPropertySymmetricGraph() throws Exception {
@@ -43,7 +46,10 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = inputGraph.summarize(vertexGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, false, null, false);
+
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 2 summarized vertices:
@@ -117,7 +123,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = inputGraph.summarize(vertexGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, false, null, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 3 summarized vertices:
@@ -195,12 +203,14 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
 
   @Test
   public void testSummarizeOnVertexPropertyWithAbsentValue() throws Exception {
-    EPGraph input = graphStore.getGraph(3L);
+    EPGraph inputGraph = graphStore.getGraph(3L);
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = input.summarize(vertexGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, false, null, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 2 summarized vertices:
@@ -261,8 +271,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      inputGraph.summarize(vertexGroupingKey, edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, false, edgeGroupingKey, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 3 summarized vertices:
@@ -347,14 +358,15 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
   @Test
   public void testSummarizeOnVertexAndEdgePropertyWithAbsentValues() throws
     Exception {
-    EPGraph input = graphStore.getGraph(3L);
+    EPGraph inputGraph = graphStore.getGraph(3L);
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      input.summarize(vertexGroupingKey, edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, false, edgeGroupingKey, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 2 summarized vertices:
@@ -419,7 +431,8 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
 
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = inputGraph.summarizeOnVertexLabel();
+    Summarization summarization = getSummarizationImpl(null, true, null, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 3 summarized vertices:
@@ -499,8 +512,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      inputGraph.summarizeOnVertexLabelAndVertexProperty(vertexGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, true, null, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 3 summarized vertices:
@@ -582,8 +596,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      inputGraph.summarizeOnVertexLabelAndVertexProperty(vertexGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, true, null, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 5 summarized vertices:
@@ -710,8 +725,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      inputGraph.summarizeOnVertexLabelAndEdgeProperty(edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(null, true, edgeGroupingKey, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 1 summarized vertex
@@ -771,8 +787,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      inputGraph.summarizeOnVertexLabelAndEdgeProperty(edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(null, true, edgeGroupingKey, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 3 summarized vertices:
@@ -868,8 +885,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      inputGraph.summarizeOnVertexLabel(vertexGroupingKey, edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, true, edgeGroupingKey, false);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 5 summarized vertices:
@@ -954,7 +972,8 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
 
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = inputGraph.summarizeOnVertexAndEdgeLabel();
+    Summarization summarization = getSummarizationImpl(null, true, null, true);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 3 summarized vertices:
@@ -1036,8 +1055,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = inputGraph
-      .summarizeOnVertexAndEdgeLabelAndVertexProperty(vertexGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, true, null, true);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 5 summarized vertices:
@@ -1114,8 +1134,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = inputGraph
-      .summarizeOnVertexAndEdgeLabelAndVertexProperty(vertexGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, true, null, true);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 5 summarized vertices:
@@ -1242,8 +1263,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      inputGraph.summarizeOnVertexAndEdgeLabelAndEdgeProperty(edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(null, true, edgeGroupingKey, true);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 1 summarized vertex
@@ -1304,8 +1326,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph =
-      inputGraph.summarizeOnVertexAndEdgeLabelAndEdgeProperty(edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(null, true, edgeGroupingKey, true);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 3 summarized vertices:
@@ -1411,8 +1434,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = inputGraph
-      .summarizeOnVertexAndEdgeLabel(vertexGroupingKey, edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, true, edgeGroupingKey, true);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 5 summarized vertices:
@@ -1502,8 +1526,9 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
 
-    EPGraph summarizedGraph = inputGraph
-      .summarizeOnVertexAndEdgeLabel(vertexGroupingKey, edgeGroupingKey);
+    Summarization summarization =
+      getSummarizationImpl(vertexGroupingKey, true, edgeGroupingKey, true);
+    EPGraph summarizedGraph = summarization.execute(inputGraph);
     assertNotNull("summarized graph must not be null", summarizedGraph);
 
     // 5 summarized vertices:
@@ -1689,14 +1714,6 @@ public class EPGraphSummarizeTest extends EPFlinkTest {
     if (edgeGroupingKey != null && expectedGroupingValue != null) {
       assertEquals("wrong group value", expectedGroupingValue,
         edge.getProperty(edgeGroupingKey));
-    }
-  }
-
-  @Test
-  public void testCantor() {
-    for (int i = 0; i <= 25; i++) {
-      System.out.println(
-        String.format("cantor(%d, %d) = %d", 4, i, MathHelper.cantor(4, i)));
     }
   }
 }

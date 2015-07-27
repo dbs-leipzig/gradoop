@@ -22,6 +22,7 @@ import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.SortedGrouping;
+import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
@@ -116,6 +117,22 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     SortedGrouping<Vertex<Long, EPFlinkVertexData>> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(
       new VertexGroupSummarizer(getVertexGroupingKey(), useVertexLabels()));
+  }
+
+  protected UnsortedGrouping<Tuple5<Long, Long, Long, String, String>>
+  groupEdges(
+    DataSet<Tuple5<Long, Long, Long, String, String>> edges) {
+    UnsortedGrouping<Tuple5<Long, Long, Long, String, String>> groupedEdges;
+    if (useEdgeProperty() && useEdgeLabels()) {
+      groupedEdges = edges.groupBy(1, 2, 3, 4);
+    } else if (useEdgeLabels()) {
+      groupedEdges = edges.groupBy(1, 2, 3);
+    } else if (useEdgeProperty()) {
+      groupedEdges = edges.groupBy(1, 2, 4);
+    } else {
+      groupedEdges = edges.groupBy(1, 2);
+    }
+    return groupedEdges;
   }
 
   private EPFlinkGraphData createNewGraphData() {
@@ -307,14 +324,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     private boolean useEdgeLabels = false;
 
     private boolean useJoinOp = false;
-
-    public SummarizationBuilder(String vertexGroupingKey) {
-      this.vertexGroupingKey = vertexGroupingKey;
-    }
-
-    public SummarizationBuilder(boolean useVertexLabels) {
-      this.useVertexLabels = useVertexLabels;
-    }
 
     public SummarizationBuilder(String vertexGroupingKey,
       boolean useVertexLabels) {
