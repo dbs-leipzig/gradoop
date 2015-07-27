@@ -38,43 +38,6 @@ import org.gradoop.model.impl.EPFlinkVertexData;
 
 import java.util.List;
 
-/**
- * The summarization operator determines a structural grouping of similar
- * vertices and edges to condense a graph and thus help to uncover insights
- * about patterns hidden in the graph.
- * <p>
- * The graph summarization operator represents every vertex group by a single
- * vertex in the summarized graph; edges between vertices in the summary graph
- * represent a group of edges between the vertex group members of the
- * original graph. Summarization is defined by specifying grouping keys for
- * vertices and edges, respectively, similarly as for GROUP BY in SQL.
- * <p>
- * Consider the following example:
- * <p>
- * Input graph:
- * <p>
- * Vertices:<br>
- * (0, "Person", {city: L})<br>
- * (1, "Person", {city: L})<br>
- * (2, "Person", {city: D})<br>
- * (3, "Person", {city: D})<br>
- * <p>
- * Edges:{(0,1), (1,0), (1,2), (2,1), (2,3), (3,2)}
- * <p>
- * Output graph (summarized on vertex property "city"):
- * <p>
- * Vertices:<br>
- * (0, "Person", {city: L, count: 2})
- * (2, "Person", {city: D, count: 2})
- * <p>
- * Edges:<br>
- * ((0, 0), {count: 2}) // 2 intra-edges in L<br>
- * ((2, 2), {count: 2}) // 2 intra-edges in L<br>
- * ((0, 2), {count: 1}) // 1 inter-edge from L to D<br>
- * ((2, 0), {count: 1}) // 1 inter-edge from D to L<br>
- *
- * @author Martin Junghanns
- */
 public class SummarizationCross extends Summarization {
 
   SummarizationCross(String vertexGroupingKey, String edgeGroupingKey,
@@ -179,10 +142,10 @@ public class SummarizationCross extends Summarization {
   private static class VertexGroupToList implements
     GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, List<Long>> {
     @Override
-    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
+    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> vertices,
       Collector<List<Long>> collector) throws Exception {
       List<Long> vertexIDs = Lists.newArrayList();
-      for (Vertex<Long, EPFlinkVertexData> v : iterable) {
+      for (Vertex<Long, EPFlinkVertexData> v : vertices) {
         vertexIDs.add(v.getId());
       }
       collector.collect(vertexIDs);

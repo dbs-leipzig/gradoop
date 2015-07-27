@@ -63,10 +63,13 @@ public class SummarizationJoin extends Summarization {
   private DataSet<Edge<Long, EPFlinkEdgeData>> buildSummarizedEdges(
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
     DataSet<Tuple2<Long, Long>> vertexToRepresentativeMap) {
-    // join vertex-group-map with source-vertex in edges
+    // join vertex-group-map with edges on vertex-id == edge-source-id
     DataSet<Tuple5<Long, Long, Long, String, String>> edges =
-      vertexToRepresentativeMap.join(graph.getEdges()).where(0).equalTo(0).with(
-        new SourceVertexJoinFunction(getEdgeGroupingKey(), useEdgeLabels()))
+      vertexToRepresentativeMap.join(graph.getEdges()).where(0).equalTo(0)
+        // project edges to necessary information
+        .with(
+          new SourceVertexJoinFunction(getEdgeGroupingKey(), useEdgeLabels()))
+          // join result with vertex-group-map on edge-target-id == vertex-id
         .join(vertexToRepresentativeMap).where(2).equalTo(0)
         .with(new TargetVertexJoinFunction());
 
@@ -80,14 +83,20 @@ public class SummarizationJoin extends Summarization {
     return "SummarizationJoin";
   }
 
+  /**
+   * Takes a group of vertex ids as input an emits a (vertex-id,
+   * group-representative) tuple for each vertex in that group.
+   *
+   * The group representative is the first vertex-id in the group.
+   */
   private static class VertexToRepresentativeReducer implements
     GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Tuple2<Long, Long>> {
 
-    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
+    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> group,
       Collector<Tuple2<Long, Long>> collector) throws Exception {
       Long groupRepresentative = null;
       boolean first = true;
-      for (Vertex<Long, EPFlinkVertexData> groupElement : iterable) {
+      for (Vertex<Long, EPFlinkVertexData> groupElement : group) {
         if (first) {
           groupRepresentative = groupElement.getId();
           first = false;
@@ -98,6 +107,12 @@ public class SummarizationJoin extends Summarization {
     }
   }
 
+  /**
+   * Takes a tuple (vertex-id, group-representative) and an edge as input.
+   * Replaces the edge-source-id with the group-representative and outputs
+   * projected edge information possibly containing the edge label and a
+   * group property.
+   */
   private static class SourceVertexJoinFunction implements
     JoinFunction<Tuple2<Long, Long>, Edge<Long, EPFlinkEdgeData>,
       Tuple5<Long, Long, Long, String, String>> {
@@ -132,6 +147,10 @@ public class SummarizationJoin extends Summarization {
     }
   }
 
+  /**
+   * Takes a projected edge and an (vertex-id, group-representative) tuple
+   * and replaces the edge-target-id with the group-representative.
+   */
   private static class TargetVertexJoinFunction implements
     JoinFunction<Tuple5<Long, Long, Long, String, String>, Tuple2<Long,
       Long>, Tuple5<Long, Long, Long, String, String>> {

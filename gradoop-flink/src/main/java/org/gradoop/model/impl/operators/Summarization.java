@@ -37,6 +37,46 @@ import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
 
+/**
+ * The summarization operator determines a structural grouping of similar
+ * vertices and edges to condense a graph and thus help to uncover insights
+ * about patterns hidden in the graph.
+ * <p>
+ * The graph summarization operator represents every vertex group by a single
+ * vertex in the summarized graph; edges between vertices in the summary graph
+ * represent a group of edges between the vertex group members of the
+ * original graph. Summarization is defined by specifying grouping keys for
+ * vertices and edges, respectively, similarly as for GROUP BY in SQL.
+ * <p>
+ * Consider the following example:
+ * <p>
+ * Input graph:
+ * <p>
+ * Vertices:<br>
+ * (0, "Person", {city: L})<br>
+ * (1, "Person", {city: L})<br>
+ * (2, "Person", {city: D})<br>
+ * (3, "Person", {city: D})<br>
+ * <p>
+ * Edges:{(0,1), (1,0), (1,2), (2,1), (2,3), (3,2)}
+ * <p>
+ * Output graph (summarized on vertex property "city"):
+ * <p>
+ * Vertices:<br>
+ * (0, "Person", {city: L, count: 2})
+ * (2, "Person", {city: D, count: 2})
+ * <p>
+ * Edges:<br>
+ * ((0, 0), {count: 2}) // 2 intra-edges in L<br>
+ * ((2, 2), {count: 2}) // 2 intra-edges in L<br>
+ * ((0, 2), {count: 1}) // 1 inter-edge from L to D<br>
+ * ((2, 0), {count: 1}) // 1 inter-edge from D to L<br>
+ * <p>
+ * In addition to vertex properties, summarization is also possible on edge
+ * properties, vertex- and edge labels as well as combinations of those.
+ *
+ * @author Martin Junghanns
+ */
 public abstract class Summarization implements UnaryGraphToGraphOperator {
   /**
    * Used to represent vertices that do not have the vertex grouping property.
@@ -204,14 +244,14 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     }
 
     @Override
-    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
+    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> vertices,
       Collector<Vertex<Long, EPFlinkVertexData>> collector) throws Exception {
       int groupCount = 0;
       Long newVertexID = 0L;
       String groupLabel = null;
       String groupValue = null;
       boolean initialized = false;
-      for (Vertex<Long, EPFlinkVertexData> v : iterable) {
+      for (Vertex<Long, EPFlinkVertexData> v : vertices) {
         groupCount++;
         if (!initialized) {
           // will be the minimum vertex id in the group
@@ -269,8 +309,7 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     }
 
     @Override
-    public void reduce(
-      Iterable<Tuple5<Long, Long, Long, String, String>> iterable,
+    public void reduce(Iterable<Tuple5<Long, Long, Long, String, String>> edges,
       Collector<Edge<Long, EPFlinkEdgeData>> collector) throws Exception {
       int edgeCount = 0;
       boolean initialized = false;
@@ -281,16 +320,16 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
       String edgeLabel = FlinkConstants.DEFAULT_EDGE_LABEL;
       String edgeGroupingValue = null;
 
-      for (Tuple5<Long, Long, Long, String, String> t : iterable) {
+      for (Tuple5<Long, Long, Long, String, String> e : edges) {
         edgeCount++;
         if (!initialized) {
-          newEdgeID = t.f0;
-          newSourceVertex = t.f1;
-          newTargetVertex = t.f2;
+          newEdgeID = e.f0;
+          newSourceVertex = e.f1;
+          newTargetVertex = e.f2;
           if (useLabel) {
-            edgeLabel = t.f3;
+            edgeLabel = e.f3;
           }
-          edgeGroupingValue = t.f4;
+          edgeGroupingValue = e.f4;
           initialized = true;
         }
       }
