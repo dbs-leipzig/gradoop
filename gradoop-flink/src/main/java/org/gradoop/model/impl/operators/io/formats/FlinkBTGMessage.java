@@ -51,4 +51,9 @@ public class FlinkBTGMessage {
     this.btgID = btgID;
   }
 
+  @Override
+  public String toString(){
+    return senderID + " " + btgID;
+  }
+
 }

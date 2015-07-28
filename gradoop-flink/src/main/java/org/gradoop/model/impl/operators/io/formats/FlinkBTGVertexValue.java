@@ -189,7 +189,10 @@ public class FlinkBTGVertexValue implements GraphElement {
     sb.append(VALUE_TOKEN_SEPARATOR);
     sb.append(vertexType);
     sb.append(VALUE_TOKEN_SEPARATOR);
+    sb.append(getGraphCount());
+    sb.append(VALUE_TOKEN_SEPARATOR);
     sb.append(getGraphs().toString());
+
 
     return sb.toString();
   }
