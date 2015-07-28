@@ -40,10 +40,17 @@ public class FlinkBTGAlgorithm implements
     @Override
     public void updateVertex(Vertex<Long, FlinkBTGVertexValue> vertex,
       MessageIterator<FlinkBTGMessage> messages) throws Exception {
+      System.out.println("### VertexID: " + vertex.getId());
       if (vertex.getValue().getVertexType() == FlinkBTGVertexType.MASTER) {
         processMasterVertex(vertex, messages);
+        System.out.println("### Master");
+        System.out
+          .println("### btgCount: " + vertex.getValue().getGraphCount());
       } else if (vertex.getValue().getVertexType() ==
         FlinkBTGVertexType.TRANSACTIONAL) {
+        System.out.println("### Transactional");
+        System.out
+          .println("### btgCount: " + vertex.getValue().getGraphCount());
         long currentMinValue = getCurrentMinValue(vertex);
         long newMinValue = getNewMinValue(messages, currentMinValue);
         boolean changed = currentMinValue != newMinValue;
@@ -129,9 +136,11 @@ public class FlinkBTGAlgorithm implements
         FlinkBTGVertexType.TRANSACTIONAL) {
         FlinkBTGMessage message = new FlinkBTGMessage();
         message.setSenderID(vertex.getId());
-        if(vertex.getValue().getGraphCount() != 0){
+        if (vertex.getValue().getGraphCount() > 0) {
           message.setBtgID(vertex.getValue().getLastGraph());
         }
+        System.out.println("send to all neighbors: ");
+        System.out.println(message);
         sendMessageToAllNeighbors(message);
       }
     }
