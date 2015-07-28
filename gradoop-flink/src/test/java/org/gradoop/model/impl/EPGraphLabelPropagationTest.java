@@ -9,13 +9,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * Created by galpha on 15.07.15.
- */
 public class EPGraphLabelPropagationTest extends EPFlinkTest {
-
   private EPGraphStore graphStore;
-
   final String propertyKey = LabelPropagationAlgorithm.PROPERTYKEY;
 
   public EPGraphLabelPropagationTest() {
@@ -23,21 +18,15 @@ public class EPGraphLabelPropagationTest extends EPFlinkTest {
   }
 
   @Test
-  public void testLabelPropagationWithCallByPropertyKey() throws
-    Exception {
+  public void testLabelPropagationWithCallByPropertyKey() throws Exception {
     EPGraph inputGraph = graphStore.getGraph(2L);
-    EPGraphCollection labeledGraph = inputGraph.callForCollection(new
-      LabelPropagation(2, propertyKey , env));
-
+    EPGraphCollection labeledGraph =
+      inputGraph.callForCollection(new LabelPropagation(2, propertyKey, env));
     assertNotNull("graph collection is null", inputGraph);
-    assertEquals("wrong number of graphs", 3l,
-      labeledGraph.size());
+    assertEquals("wrong number of graphs", 3l, labeledGraph.size());
     assertEquals("wrong number of vertices", 4l,
       labeledGraph.getGraph().getVertexCount());
     assertEquals("wrong number of edges", 2l,
       labeledGraph.getGraph().getEdgeCount());
-
   }
-
-
 }

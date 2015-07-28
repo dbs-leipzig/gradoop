@@ -14,22 +14,20 @@ import java.io.Serializable;
  * LabelPropagation Graph to Collection Operator
  */
 public class LabelPropagation implements UnaryGraphToCollectionOperator,
-  Serializable{
+  Serializable {
   /**
    * Maximal Iterations for LabelPropagationAlgorithm
    */
   private int maxIterations;
   /**
-   *
+   * Value PropertyKey
    */
   private String propertyKey;
   /**
    * Flink Execution Environment
    */
   private final ExecutionEnvironment env;
-  /**
-   *
-   */
+
   /**
    * Constructor
    *
@@ -53,8 +51,7 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
       e.printStackTrace();
     }
     EPGraph labeledGraph = EPGraph.fromGraph(graph, null, env);
-    SplitBy callByPropertyKey =
-      new SplitBy (propertyKey, env);
+    SplitBy callByPropertyKey = new SplitBy(propertyKey, env);
     return callByPropertyKey.execute(labeledGraph);
   }
 
