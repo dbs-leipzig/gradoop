@@ -5,6 +5,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexType;
 import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexValue;
 
@@ -24,10 +25,10 @@ public class FlinkBTGAlgorithmTestHelper {
    */
   private static final Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile("[ ]");
 
-  public static Graph<Long, FlinkBTGVertexValue, Long> getGraph(String[] graph,
+  public static Graph<Long, FlinkBTGVertexValue, NullValue> getGraph(String[] graph,
     ExecutionEnvironment env) {
     List<Vertex<Long, FlinkBTGVertexValue>> vertices = new ArrayList<>();
-    List<Edge<Long, Long>> edges = new ArrayList<>();
+    List<Edge<Long, NullValue>> edges = new ArrayList<>();
     for (String line : graph) {
       String[] lineTokens = LINE_TOKEN_SEPARATOR.split(line);
       long id = Long.parseLong(lineTokens[0]);
@@ -47,7 +48,7 @@ public class FlinkBTGAlgorithmTestHelper {
           new String[0];
       for (String edgeToken : edgeTokens) {
         long tar = Long.parseLong(edgeToken);
-        edges.add(new Edge<Long, Long>(id, tar, tar));
+        edges.add(new Edge<>(id, tar, NullValue.getInstance()));
       }
     }
     return Graph.fromCollection(vertices, edges, env);

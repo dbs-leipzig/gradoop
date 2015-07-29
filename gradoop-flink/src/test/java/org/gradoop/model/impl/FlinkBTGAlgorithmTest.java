@@ -5,6 +5,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.operators.FlinkBTGAlgorithm;
 import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexValue;
 import org.junit.Test;
@@ -38,8 +39,10 @@ public class FlinkBTGAlgorithmTest {
   public void testConnectedIIG() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, FlinkBTGVertexValue, Long> gellyGraph =
+    Graph<Long, FlinkBTGVertexValue, NullValue> gellyGraph =
       FlinkBTGAlgorithmTestHelper.getGraph(getConnectedIIG(), env);
+
+
     DataSet<Vertex<Long, FlinkBTGVertexValue>> btgGraph =
       gellyGraph.run(new FlinkBTGAlgorithm(maxIteration)).getVertices();
     validateConnectedIIGResult(parseResult(btgGraph.collect()));
@@ -49,7 +52,7 @@ public class FlinkBTGAlgorithmTest {
   public void testDisconnectedIIG() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, FlinkBTGVertexValue, Long> gellyGraph =
+    Graph<Long, FlinkBTGVertexValue, NullValue> gellyGraph =
       FlinkBTGAlgorithmTestHelper.getGraph(getDisconnectedIIG(), env);
     DataSet<Vertex<Long, FlinkBTGVertexValue>> btgGraph =
       gellyGraph.run(new FlinkBTGAlgorithm(maxIteration)).getVertices();
