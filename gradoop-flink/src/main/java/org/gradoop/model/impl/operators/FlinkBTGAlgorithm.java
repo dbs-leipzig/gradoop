@@ -7,6 +7,7 @@ import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.MessagingFunction;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
+import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.operators.io.formats.FlinkBTGMessage;
 import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexType;
 import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexValue;
@@ -17,7 +18,7 @@ import java.util.List;
  * Flink based BTGComputation
  */
 public class FlinkBTGAlgorithm implements
-  GraphAlgorithm<Long, FlinkBTGVertexValue, Long> {
+  GraphAlgorithm<Long, FlinkBTGVertexValue, NullValue> {
   private int maxIterations;
 
   public FlinkBTGAlgorithm(int maxIterations) {
@@ -25,9 +26,9 @@ public class FlinkBTGAlgorithm implements
   }
 
   @Override
-  public Graph<Long, FlinkBTGVertexValue, Long> run(
-    Graph<Long, FlinkBTGVertexValue, Long> graph) throws Exception {
-    Graph<Long, FlinkBTGVertexValue, Long> undirectedGraph =
+  public Graph<Long, FlinkBTGVertexValue, NullValue> run(
+    Graph<Long, FlinkBTGVertexValue, NullValue> graph) throws Exception {
+    Graph<Long, FlinkBTGVertexValue, NullValue> undirectedGraph =
       graph.getUndirected();
     // initialize vertex values and run the Vertex Centric Iteration
     return undirectedGraph
@@ -126,7 +127,7 @@ public class FlinkBTGAlgorithm implements
   }
 
   private static final class BTGMessage extends
-    MessagingFunction<Long, FlinkBTGVertexValue, FlinkBTGMessage, Long> {
+    MessagingFunction<Long, FlinkBTGVertexValue, FlinkBTGMessage, NullValue> {
     @Override
     public void sendMessages(Vertex<Long, FlinkBTGVertexValue> vertex) throws
       Exception {
