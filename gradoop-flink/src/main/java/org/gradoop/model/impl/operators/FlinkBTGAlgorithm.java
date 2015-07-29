@@ -14,7 +14,7 @@ import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexValue;
 import java.util.List;
 
 /**
- * BTGComputation
+ * Flink based BTGComputation
  */
 public class FlinkBTGAlgorithm implements
   GraphAlgorithm<Long, FlinkBTGVertexValue, Long> {
@@ -40,21 +40,13 @@ public class FlinkBTGAlgorithm implements
     @Override
     public void updateVertex(Vertex<Long, FlinkBTGVertexValue> vertex,
       MessageIterator<FlinkBTGMessage> messages) throws Exception {
-      System.out.println("### VertexID: " + vertex.getId());
       if (vertex.getValue().getVertexType() == FlinkBTGVertexType.MASTER) {
         processMasterVertex(vertex, messages);
-        System.out.println("### Master");
-        System.out
-          .println("### btgCount: " + vertex.getValue().getGraphCount());
       } else if (vertex.getValue().getVertexType() ==
         FlinkBTGVertexType.TRANSACTIONAL) {
-        System.out.println("### Transactional");
-        System.out
-          .println("### btgCount: " + vertex.getValue().getGraphCount());
         long currentMinValue = getCurrentMinValue(vertex);
         long newMinValue = getNewMinValue(messages, currentMinValue);
         boolean changed = currentMinValue != newMinValue;
-        //todo check superstep!
         if (getSuperstepNumber() == 1 || changed) {
           processTransactionalVertex(vertex, newMinValue);
         }
@@ -70,15 +62,18 @@ public class FlinkBTGAlgorithm implements
     private void processMasterVertex(Vertex<Long, FlinkBTGVertexValue> vertex,
       MessageIterator<FlinkBTGMessage> messages) {
       FlinkBTGVertexValue vertexValue = vertex.getValue();
-      for (FlinkBTGMessage message : messages) {
-        vertexValue
-          .updateNeighbourBtgID(message.getSenderID(), message.getBtgID());
+      if (getSuperstepNumber() > 1) {
+        for (FlinkBTGMessage message : messages) {
+          vertexValue
+            .updateNeighbourBtgID(message.getSenderID(), message.getBtgID());
+        }
       }
       vertexValue.updateBtgIDs();
       // in case the vertex has no neighbours
       if (vertexValue.getGraphCount() == 0) {
         vertexValue.addGraph(vertex.getId());
       }
+      setNewVertexValue(vertexValue);
     }
 
     /**
@@ -91,6 +86,7 @@ public class FlinkBTGAlgorithm implements
       Vertex<Long, FlinkBTGVertexValue> vertex, long minValue) {
       vertex.getValue().removeLastBtgID();
       vertex.getValue().addGraph(minValue);
+      setNewVertexValue(vertex.getValue());
     }
 
     /**
@@ -104,9 +100,11 @@ public class FlinkBTGAlgorithm implements
     private long getNewMinValue(MessageIterator<FlinkBTGMessage> messages,
       long currentMinValue) {
       long newMinValue = currentMinValue;
-      for (FlinkBTGMessage message : messages) {
-        if (message.getBtgID() < newMinValue) {
-          newMinValue = message.getBtgID();
+      if (getSuperstepNumber() > 1) {
+        for (FlinkBTGMessage message : messages) {
+          if (message.getBtgID() < newMinValue) {
+            newMinValue = message.getBtgID();
+          }
         }
       }
       return newMinValue;
@@ -136,11 +134,9 @@ public class FlinkBTGAlgorithm implements
         FlinkBTGVertexType.TRANSACTIONAL) {
         FlinkBTGMessage message = new FlinkBTGMessage();
         message.setSenderID(vertex.getId());
-        if (vertex.getValue().getGraphCount() > 0) {
+        if (vertex.getValue().getLastGraph() != null) {
           message.setBtgID(vertex.getValue().getLastGraph());
         }
-        System.out.println("send to all neighbors: ");
-        System.out.println(message);
         sendMessageToAllNeighbors(message);
       }
     }
