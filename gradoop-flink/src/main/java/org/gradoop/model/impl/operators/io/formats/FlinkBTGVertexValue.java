@@ -112,7 +112,10 @@ public class FlinkBTGVertexValue implements GraphElement {
    * TODO NEW
    */
   public Long getLastGraph() {
-    return btgIDs.get(btgIDs.size() - 1);
+    if (this.btgIDs.size() > 0) {
+      return btgIDs.get(btgIDs.size() - 1);
+    }
+    return null;
   }
 
   /**
@@ -137,7 +140,7 @@ public class FlinkBTGVertexValue implements GraphElement {
   public void updateNeighbourBtgID(Long vertexID, Long btgID) {
     if (neighborMinimumBTGIds == null) {
       initNeighbourMinimBTGIDMap();
-    } Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile("[ ]");
+    }
     if (!neighborMinimumBTGIds.containsKey(vertexID) ||
       (neighborMinimumBTGIds.containsKey(vertexID) &&
         neighborMinimumBTGIds.get(vertexID) > btgID)) {
@@ -182,18 +185,14 @@ public class FlinkBTGVertexValue implements GraphElement {
   }
 
   @Override
-  public String toString(){
+  public String toString() {
     Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile(" ");
     StringBuilder sb = new StringBuilder();
-    sb.append(vertexValue);
-    sb.append(VALUE_TOKEN_SEPARATOR);
     sb.append(vertexType);
     sb.append(VALUE_TOKEN_SEPARATOR);
-    sb.append(getGraphCount());
+    sb.append(vertexValue);
     sb.append(VALUE_TOKEN_SEPARATOR);
     sb.append(getGraphs().toString());
-
-
     return sb.toString();
   }
 }
