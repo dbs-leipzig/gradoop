@@ -9,6 +9,7 @@ import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.graph.Edge;
@@ -67,7 +68,7 @@ public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
       new LongFromVertexSelector(function);
 
     //get the Gelly graph and vertices
-    Graph graph = epGraph.getGellyGraph();
+    final Graph graph = epGraph.getGellyGraph();
     DataSet<Vertex<Long, EPFlinkVertexData>> vertices = graph.getVertices();
 
     //add the new graphs to the vertices graph lists
@@ -155,64 +156,51 @@ public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
           }
         });
 
+    DataSet<Tuple2<Long, Set<Long>>> newSubgraphs = edgesWithSubgraphs.flatMap(
+      new FlatMapFunction<Tuple4<Long, Set<Long>, Set<Long>, Set<Long>>,
+        Tuple2<Long, Set<Long>>>() {
+
+
+        @Override
+        public void flatMap(
+          Tuple4<Long, Set<Long>, Set<Long>, Set<Long>> tuple4,
+          Collector<Tuple2<Long, Set<Long>>> collector) throws Exception {
+          Set<Long> sourceGraphs = tuple4.f1;
+          Set<Long> targetGraphs = tuple4.f2;
+          Set<Long> newSubgraphs = tuple4.f3;
+          boolean newGraphAdded = false;
+          Set<Long> toBeAddedGraphs = new HashSet<Long>();
+          for (Long graph : newSubgraphs) {
+            if (targetGraphs.contains(graph) && sourceGraphs.contains(graph)) {
+              toBeAddedGraphs.add(graph);
+              newGraphAdded = true;
+            }
+          }
+          if (newGraphAdded) {
+            collector.collect(new Tuple2<>(tuple4.f0, toBeAddedGraphs));
+          }
+        }
+      });
+
     //
-    DataSet<Tuple4<Edge<Long, EPFlinkEdgeData>, Set<Long>, Set<Long>,
-      Set<Long>>>
-      edgesWithGraphs =
-      graph.getEdges().join(edgesWithSubgraphs).where(new EdgeKeySelector())
+    DataSet<Edge<Long, EPFlinkEdgeData>> edges =
+      graph.getEdges().join(newSubgraphs).where(new EdgeKeySelector())
         .equalTo(0).with(
-        new JoinFunction<Edge<Long, EPFlinkEdgeData>, Tuple4<Long, Set<Long>,
-          Set<Long>, Set<Long>>, Tuple4<Edge<Long, EPFlinkEdgeData>,
-          Set<Long>, Set<Long>, Set<Long>>>() {
+        new JoinFunction<Edge<Long, EPFlinkEdgeData>, Tuple2<Long,
+          Set<Long>>, Edge<Long, EPFlinkEdgeData>>() {
           @Override
-          public Tuple4<Edge<Long, EPFlinkEdgeData>, Set<Long>, Set<Long>,
-            Set<Long>> join(
+          public Edge<Long, EPFlinkEdgeData> join(
             Edge<Long, EPFlinkEdgeData> edge,
-            Tuple4<Long, Set<Long>, Set<Long>, Set<Long>> tuple4) throws
-            Exception {
-            return new Tuple4<>(edge, tuple4.f1, tuple4.f2, tuple4.f3);
+            Tuple2<Long, Set<Long>> tuple2) throws Exception {
+            return edge;
           }
         }
 
       );
 
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = edgesWithGraphs.flatMap(
-      new FlatMapFunction<Tuple4<Edge<Long, EPFlinkEdgeData>, Set<Long>,
-        Set<Long>, Set<Long>>, Edge<Long, EPFlinkEdgeData>>() {
-        @Override
-        public void flatMap(
-          Tuple4<Edge<Long, EPFlinkEdgeData>, Set<Long>, Set<Long>,
-            Set<Long>> tuple4,
-          Collector<Edge<Long, EPFlinkEdgeData>> collector) throws Exception {
-          Edge<Long, EPFlinkEdgeData> edge = tuple4.f0;
-          Set<Long> sourceGraphs = tuple4.f1;
-          Set<Long> targetGraphs = tuple4.f2;
-          Set<Long> newSubgraphs = tuple4.f3;
-          boolean newGraphAdded = false;
-          for (Long graph : newSubgraphs) {
-            if (targetGraphs.contains(graph) && sourceGraphs.contains(graph)) {
-              edge.getValue().getGraphs().add(graph);
-              newGraphAdded = true;
-            }
-          }
-          if (newGraphAdded) {
-            collector.collect(edge);
-          }
-        }
-      });
-
-    try {
-      edges.print();
-      System.out.println("fdsa");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> newGraph =
       Graph.fromDataSet(vertices, edges, env);
-    return new
-
-      EPGraphCollection(newGraph, subgraphs, env);
+    return new EPGraphCollection(newGraph, subgraphs, env);
   }
 
   @Override
