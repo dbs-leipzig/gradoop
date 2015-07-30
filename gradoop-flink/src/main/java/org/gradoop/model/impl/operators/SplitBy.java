@@ -33,74 +33,53 @@ import java.util.Set;
  */
 public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
   /**
-   * Flink Execution Enviroment
+   * Flink execution enviroment
    */
   ExecutionEnvironment env;
   /**
-   * EPGM Propertykey
+   * function, that defines a distinct mapping vertex -> long on the graph
    */
-  final String propertyKey;
+  final LongFromVertexFunction function;
 
   /**
-   * Public Constructor
+   * public constructor
    *
-   * @param propertyKey String propertyKey
-   * @param env         ExecutionEnvironment
+   * @param env      ExecutionEnvironment
+   * @param function LongFromVertexFunction
    */
-  public SplitBy(String propertyKey, final ExecutionEnvironment env) {
+  public SplitBy(LongFromVertexFunction function,
+    final ExecutionEnvironment env) {
     this.env = env;
-    this.propertyKey = propertyKey;
+    this.function = function;
   }
 
   /**
    * {@inheritDoc}
+   * executes the SplitBy operation on a graph
+   *
+   * @param epGraph EPGraph
    */
   @Override
   public EPGraphCollection execute(EPGraph epGraph) {
 
-    final String propKey = this.propertyKey;
-
+    // construct a KeySelector using the LongFromVertexFunction
     KeySelector<Vertex<Long, EPFlinkVertexData>, Long> propertySelector =
-      new KeySelector<Vertex<Long, EPFlinkVertexData>, Long>() {
-        @Override
-        public Long getKey(Vertex<Long, EPFlinkVertexData> vertex) throws
-          Exception {
-          return (long) vertex.getValue().getProperties().get(propKey);
-        }
-      };
+      new LongFromVertexSelector(function);
+
+    //get the Gelly graph and vertices
     Graph graph = epGraph.getGellyGraph();
     DataSet<Vertex<Long, EPFlinkVertexData>> vertices = graph.getVertices();
-    vertices = vertices.map(
-      new MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
-        EPFlinkVertexData>>() {
-        @Override
-        public Vertex<Long, EPFlinkVertexData> map(
-          Vertex<Long, EPFlinkVertexData> vertex) throws Exception {
-          Long labelPropIndex =
-            (Long) vertex.getValue().getProperties().get(propKey);
-          vertex.getValue().getGraphs().add(labelPropIndex);
-          return vertex;
-        }
-      });
+
+    //add the new graphs to the vertices graph lists
+    vertices = vertices.map(new AddNewGraphsToVertexMapper(function));
+
+    //construct the list of subgraphs
     DataSet<Subgraph<Long, EPFlinkGraphData>> subgraphs =
-      vertices.groupBy(propertySelector).reduceGroup(
-        new GroupReduceFunction<Vertex<Long, EPFlinkVertexData>,
-          Subgraph<Long, EPFlinkGraphData>>() {
-          @Override
-          public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
-            Collector<Subgraph<Long, EPFlinkGraphData>> collector) throws
-            Exception {
-            Iterator<Vertex<Long, EPFlinkVertexData>> it = iterable.iterator();
-            Vertex<Long, EPFlinkVertexData> vertex = it.next();
-            Long labelPropIndex =
-              (Long) vertex.getValue().getProperties().get(propKey);
-            EPFlinkGraphData subgraphData = new EPFlinkGraphData(labelPropIndex,
-              "propagation graph " + labelPropIndex);
-            Subgraph<Long, EPFlinkGraphData> newSubgraph =
-              new Subgraph(labelPropIndex, subgraphData);
-            collector.collect(newSubgraph);
-          }
-        });
+      vertices.groupBy(propertySelector)
+        .reduceGroup(new SubgraphsFromGroupsReducer(function));
+
+    //construct tuples of the edges with the ids of their source and target
+    // vertices
     DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex = graph.getEdges().map(
       new MapFunction<Edge<Long, EPFlinkEdgeData>, Tuple3<Long, Long, Long>>() {
         @Override
@@ -111,6 +90,8 @@ public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
             edge.getValue().getTargetVertex());
         }
       });
+
+    //replace the source vertex id by the graph list of this vertex
     DataSet<Tuple3<Long, Set<Long>, Long>> edgeGraphsVertex =
       edgeVertexVertex.join(vertices).where(1).equalTo(0).with(
         new JoinFunction<Tuple3<Long, Long, Long>, Vertex<Long,
@@ -123,6 +104,8 @@ public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
               tuple3.f2);
           }
         });
+
+    //replace the target vertex id by the graph list of this vertex
     DataSet<Tuple3<Long, Set<Long>, Set<Long>>> edgeGraphsGraphs =
       edgeGraphsVertex.join(vertices).where(2).equalTo(0).with(
         new JoinFunction<Tuple3<Long, Set<Long>, Long>, Vertex<Long,
@@ -136,16 +119,18 @@ public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
           }
         });
 
+    //transform the new subgraphs into a single set of long, containing all
+    // the identifiers
     DataSet<Set<Long>> newSubgraphIdentifiers = subgraphs
       .map(new MapFunction<Subgraph<Long, EPFlinkGraphData>, Set<Long>>() {
-          @Override
-          public Set<Long> map(Subgraph<Long, EPFlinkGraphData> subgraph) throws
-            Exception {
-            Set<Long> id = new HashSet<Long>();
-            id.add(subgraph.getId());
-            return id;
-          }
-        }).reduce(new ReduceFunction<Set<Long>>() {
+        @Override
+        public Set<Long> map(Subgraph<Long, EPFlinkGraphData> subgraph) throws
+          Exception {
+          Set<Long> id = new HashSet<Long>();
+          id.add(subgraph.getId());
+          return id;
+        }
+      }).reduce(new ReduceFunction<Set<Long>>() {
         @Override
         public Set<Long> reduce(Set<Long> set1, Set<Long> set2) throws
           Exception {
@@ -154,6 +139,8 @@ public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
         }
       });
 
+    //construct new tuples containing the edge, the graphs of its source and
+    // target vertex and the list of new graphs
     DataSet<Tuple4<Long, Set<Long>, Set<Long>, Set<Long>>> edgesWithSubgraphs =
       edgeGraphsGraphs.crossWithTiny(newSubgraphIdentifiers).with(
         new CrossFunction<Tuple3<Long, Set<Long>, Set<Long>>, Set<Long>,
@@ -168,6 +155,7 @@ public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
           }
         });
 
+    //
     DataSet<Tuple4<Edge<Long, EPFlinkEdgeData>, Set<Long>, Set<Long>,
       Set<Long>>>
       edgesWithGraphs =
@@ -241,6 +229,66 @@ public class SplitBy implements UnaryGraphToCollectionOperator, Serializable {
     public Long getKey(
       Edge<Long, EPFlinkEdgeData> longEPFlinkEdgeDataEdge) throws Exception {
       return longEPFlinkEdgeDataEdge.getValue().getId();
+    }
+  }
+
+  private static class LongFromVertexSelector implements
+    KeySelector<Vertex<Long, EPFlinkVertexData>, Long> {
+
+    LongFromVertexFunction function;
+
+    public LongFromVertexSelector(LongFromVertexFunction function) {
+      this.function = function;
+    }
+
+    @Override
+    public Long getKey(Vertex<Long, EPFlinkVertexData> vertex) throws
+      Exception {
+      return function.extractLong(vertex);
+    }
+  }
+
+  private static class AddNewGraphsToVertexMapper implements
+    MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
+      EPFlinkVertexData>> {
+
+    private LongFromVertexFunction function;
+
+    public AddNewGraphsToVertexMapper(LongFromVertexFunction function) {
+      this.function = function;
+    }
+
+    @Override
+    public Vertex<Long, EPFlinkVertexData> map(
+      Vertex<Long, EPFlinkVertexData> vertex) throws Exception {
+      Long labelPropIndex = function.extractLong(vertex);
+      vertex.getValue().getGraphs().add(labelPropIndex);
+      return vertex;
+    }
+  }
+
+
+  private static class SubgraphsFromGroupsReducer implements
+    GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Subgraph<Long,
+      EPFlinkGraphData>> {
+
+    private LongFromVertexFunction function;
+
+    public SubgraphsFromGroupsReducer(LongFromVertexFunction function) {
+      this.function = function;
+    }
+
+    @Override
+    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
+      Collector<Subgraph<Long, EPFlinkGraphData>> collector) throws Exception {
+      Iterator<Vertex<Long, EPFlinkVertexData>> it = iterable.iterator();
+      Vertex<Long, EPFlinkVertexData> vertex = it.next();
+      Long labelPropIndex = function.extractLong(vertex);
+      EPFlinkGraphData subgraphData = new EPFlinkGraphData(labelPropIndex,
+        "propagation graph " + labelPropIndex);
+      Subgraph<Long, EPFlinkGraphData> newSubgraph =
+        new Subgraph(labelPropIndex, subgraphData);
+      collector.collect(newSubgraph);
     }
   }
 }

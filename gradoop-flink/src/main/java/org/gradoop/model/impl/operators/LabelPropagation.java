@@ -2,6 +2,7 @@ package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
+import org.apache.flink.graph.Vertex;
 import org.gradoop.model.impl.EPFlinkEdgeData;
 import org.gradoop.model.impl.EPFlinkVertexData;
 import org.gradoop.model.impl.EPGraph;
@@ -51,12 +52,27 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
       e.printStackTrace();
     }
     EPGraph labeledGraph = EPGraph.fromGraph(graph, null, env);
-    SplitBy callByPropertyKey = new SplitBy(propertyKey, env);
+    LongFromProperty lfp = new LongFromProperty(propertyKey);
+    SplitBy callByPropertyKey = new SplitBy(lfp, env);
     return callByPropertyKey.execute(labeledGraph);
   }
 
   @Override
   public String getName() {
     return "LabelPropagation";
+  }
+
+  private static class LongFromProperty implements LongFromVertexFunction{
+
+    String propertyKey;
+
+    public LongFromProperty(String propertyKey){
+      this.propertyKey = propertyKey;
+    }
+
+    @Override
+    public Long extractLong(Vertex<Long, EPFlinkVertexData> vertex) {
+      return (long) vertex.getValue().getProperties().get(propertyKey);
+    }
   }
 }
