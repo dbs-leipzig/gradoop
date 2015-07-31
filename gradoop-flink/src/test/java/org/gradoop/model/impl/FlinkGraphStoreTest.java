@@ -48,8 +48,8 @@ public class FlinkGraphStoreTest extends EPFlinkTest {
   @Test
   public void testFromJsonFile() throws Exception {
     String vertexFile =
-      FlinkGraphStoreTest.class.getResource("/nodes_small").getFile();
-    String edgeFile = FlinkGraphStoreTest.class.getResource("/edges_small").getFile();
+      FlinkGraphStoreTest.class.getResource("/nodes").getFile();
+    String edgeFile = FlinkGraphStoreTest.class.getResource("/edges").getFile();
 
     EPGraphStore graphStore =
       FlinkGraphStore.fromJsonFile(vertexFile, edgeFile, env);
