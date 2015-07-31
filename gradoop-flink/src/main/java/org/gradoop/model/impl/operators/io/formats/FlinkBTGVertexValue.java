@@ -8,10 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
- * Created by galpha on 27.07.15.
+ * Custom vertex used by {@link org.gradoop.model.impl.operators
+ * .FlinkBTGAlgorithm}.
  */
 public class FlinkBTGVertexValue implements GraphElement {
   /**
@@ -109,7 +109,8 @@ public class FlinkBTGVertexValue implements GraphElement {
   }
 
   /**
-   * TODO NEW
+   * Returned the last inserted BTG ID. This has become necessary for the
+   * Flink-Messaging-Function
    */
   public Long getLastGraph() {
     if (this.btgIDs.size() > 0) {
@@ -182,17 +183,5 @@ public class FlinkBTGVertexValue implements GraphElement {
     } else {
       this.neighborMinimumBTGIds = Maps.newHashMapWithExpectedSize(size);
     }
-  }
-
-  @Override
-  public String toString() {
-    Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile(" ");
-    StringBuilder sb = new StringBuilder();
-    sb.append(vertexType);
-    sb.append(VALUE_TOKEN_SEPARATOR);
-    sb.append(vertexValue);
-    sb.append(VALUE_TOKEN_SEPARATOR);
-    sb.append(getGraphs().toString());
-    return sb.toString();
   }
 }

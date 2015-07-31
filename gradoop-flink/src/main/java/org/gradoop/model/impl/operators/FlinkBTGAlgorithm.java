@@ -19,12 +19,27 @@ import java.util.List;
  */
 public class FlinkBTGAlgorithm implements
   GraphAlgorithm<Long, FlinkBTGVertexValue, NullValue> {
+  /**
+   * Max Iteration counter for the Algorithm
+   */
   private int maxIterations;
 
+  /**
+   * Constructor
+   *
+   * @param maxIterations maximal Iterations of Algorithm
+   */
   public FlinkBTGAlgorithm(int maxIterations) {
     this.maxIterations = maxIterations;
   }
 
+  /**
+   * Graph run function that starts the VertexCentricIteration
+   *
+   * @param graph the actual gelly graph
+   * @return a new gelly graph after BTGComputation
+   * @throws Exception
+   */
   @Override
   public Graph<Long, FlinkBTGVertexValue, NullValue> run(
     Graph<Long, FlinkBTGVertexValue, NullValue> graph) throws Exception {
@@ -36,6 +51,9 @@ public class FlinkBTGAlgorithm implements
         maxIterations);
   }
 
+  /**
+   * Vertex Updater Class
+   */
   private static final class BTGUpdater extends
     VertexUpdateFunction<Long, FlinkBTGVertexValue, FlinkBTGMessage> {
     @Override
@@ -126,6 +144,9 @@ public class FlinkBTGAlgorithm implements
     }
   }
 
+  /**
+   * Vertex Message Class
+   */
   private static final class BTGMessage extends
     MessagingFunction<Long, FlinkBTGVertexValue, FlinkBTGMessage, NullValue> {
     @Override
