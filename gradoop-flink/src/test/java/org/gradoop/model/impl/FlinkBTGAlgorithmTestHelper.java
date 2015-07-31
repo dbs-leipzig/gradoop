@@ -25,8 +25,16 @@ public class FlinkBTGAlgorithmTestHelper {
    */
   private static final Pattern VALUE_TOKEN_SEPARATOR = Pattern.compile("[ ]");
 
-  public static Graph<Long, FlinkBTGVertexValue, NullValue> getGraph(String[] graph,
-    ExecutionEnvironment env) {
+  /**
+   * Function to parse a string array into a gelly graph for the
+   * FlinkBTGComputation
+   *
+   * @param graph String lines decodes vertices
+   * @param env   actual ExecutionEnvironment
+   * @return Gelly Graph based for FlinkBTGComputation
+   */
+  public static Graph<Long, FlinkBTGVertexValue, NullValue> getGraph(
+    String[] graph, ExecutionEnvironment env) {
     List<Vertex<Long, FlinkBTGVertexValue>> vertices = new ArrayList<>();
     List<Edge<Long, NullValue>> edges = new ArrayList<>();
     for (String line : graph) {

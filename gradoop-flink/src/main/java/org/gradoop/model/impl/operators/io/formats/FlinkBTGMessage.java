@@ -1,15 +1,17 @@
 package org.gradoop.model.impl.operators.io.formats;
 
 /**
- * Created by galpha on 27.07.15.
+ * Custom message format for {@link org.gradoop.model.impl.operators
+ * .FlinkBTGAlgorithm}.
+ * Master data nodes need to know who the sender of a message is, so this has to
+ * be stored inside the message. The btgID is the minimum vertex id inside a
+ * BTG.
  */
 public class FlinkBTGMessage {
-
   /**
    * vertex ID of the message sender
    */
   private long senderID;
-
   /**
    * message value
    */
@@ -50,10 +52,4 @@ public class FlinkBTGMessage {
   public void setBtgID(long btgID) {
     this.btgID = btgID;
   }
-
-  @Override
-  public String toString(){
-    return senderID + " " + btgID;
-  }
-
 }

@@ -41,8 +41,6 @@ public class FlinkBTGAlgorithmTest {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, FlinkBTGVertexValue, NullValue> gellyGraph =
       FlinkBTGAlgorithmTestHelper.getGraph(getConnectedIIG(), env);
-
-
     DataSet<Vertex<Long, FlinkBTGVertexValue>> btgGraph =
       gellyGraph.run(new FlinkBTGAlgorithm(maxIteration)).getVertices();
     validateConnectedIIGResult(parseResult(btgGraph.collect()));
