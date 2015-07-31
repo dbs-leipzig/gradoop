@@ -24,11 +24,13 @@ public class FlinkConstants {
 
   public static final String DEFAULT_EDGE_LABEL = "__EDGE__";
 
-  public static final Long COMBINE_GRAPH_ID = -1L;
+  public static final Long DATABASE_GRAPH_ID = -1L;
 
-  public static final Long OVERLAP_GRAPH_ID = -2L;
+  public static final Long COMBINE_GRAPH_ID = -2L;
 
-  public static final Long EXCLUDE_GRAPH_ID = -3L;
+  public static final Long OVERLAP_GRAPH_ID = -3L;
 
-  public static final Long SUMMARIZE_GRAPH_ID = -4L;
+  public static final Long EXCLUDE_GRAPH_ID = -4L;
+
+  public static final Long SUMMARIZE_GRAPH_ID = -5L;
 }

@@ -48,6 +48,14 @@
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
+        <developer>
+            <id>nteichmann</id>
+            <name>Niklas Teichmann</name>
+            <email>mai11hcg@studserv.uni-leipzig.de</email>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
     </developers>
 
     <properties>
@@ -57,7 +65,6 @@
         <project.maven.version>3.0.0</project.maven.version>
         <project.build.targetJdk>1.7</project.build.targetJdk>
 
-
         <dep.flink.version>0.9.0</dep.flink.version>
         <dep.giraph.version>1.1.0-hadoop2</dep.giraph.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
@@ -66,8 +73,6 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>1.10.19</dep.mockito.version>
-
-
 
         <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.13</plugin.maven-checkstyle.version>
@@ -190,6 +195,12 @@
             <dependency>
                 <groupId>de.uni-leipzig.de.dbs</groupId>
                 <artifactId>gradoop-mapreduce</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <artifactId>gradoop-flink</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

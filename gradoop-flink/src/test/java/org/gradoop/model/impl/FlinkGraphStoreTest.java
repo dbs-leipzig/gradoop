@@ -44,4 +44,19 @@ public class FlinkGraphStoreTest extends EPFlinkTest {
       dbGraph.getVertices().size());
     assertEquals("edge set has the wrong size", 24, dbGraph.getEdges().size());
   }
+
+  @Test
+  public void testFromJsonFile() throws Exception {
+    String vertexFile =
+      FlinkGraphStoreTest.class.getResource("/nodes_small").getFile();
+    String edgeFile = FlinkGraphStoreTest.class.getResource("/edges_small").getFile();
+
+    EPGraphStore graphStore =
+      FlinkGraphStore.fromJsonFile(vertexFile, edgeFile, env);
+
+    EPGraph databaseGraph = graphStore.getDatabaseGraph();
+
+    assertEquals("Wrong vertex count", 16, databaseGraph.getVertexCount());
+    assertEquals("Wrong edge count", 21, databaseGraph.getEdgeCount());
+  }
 }

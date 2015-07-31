@@ -171,7 +171,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     String edgeGroupingKey) throws Exception {
     return callForGraph(
       new Summarization.SummarizationBuilder(vertexGroupingKey, false)
-        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(false).build());
+        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(false)
+        .setUseJoinOp(true).build());
   }
 
   @Override
@@ -196,7 +197,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     String edgeGroupingKey) throws Exception {
     return callForGraph(
       new Summarization.SummarizationBuilder(vertexGroupingKey, true)
-        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(false).build());
+        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(false)
+        .setUseJoinOp(true).build());
   }
 
   @Override
@@ -221,7 +223,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     String edgeGroupingKey) throws Exception {
     return callForGraph(
       new Summarization.SummarizationBuilder(vertexGroupingKey, true)
-        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(true).build());
+        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(true).setUseJoinOp(true)
+        .build());
   }
 
   @Override
