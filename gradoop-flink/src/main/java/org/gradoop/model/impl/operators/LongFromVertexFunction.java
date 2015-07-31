@@ -7,9 +7,8 @@ import org.gradoop.model.impl.EPFlinkVertexData;
 import java.io.Serializable;
 
 /**
- * Created by niklas on 29.07.15.
+ * Simple Function defining a mapping from vertex to integer
  */
 public interface LongFromVertexFunction extends Serializable, Function {
-
   Long extractLong(Vertex<Long, EPFlinkVertexData> vertex);
 }

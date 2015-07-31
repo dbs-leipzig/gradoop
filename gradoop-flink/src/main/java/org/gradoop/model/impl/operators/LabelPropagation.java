@@ -42,6 +42,9 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     this.env = env;
   }
 
+  /**
+   * {@inheritDoc }
+   */
   @Override
   public EPGraphCollection execute(EPGraph epGraph) {
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph =
@@ -57,19 +60,36 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     return callByPropertyKey.execute(labeledGraph);
   }
 
+  /**
+   * {@inheritDoc }
+   */
   @Override
   public String getName() {
     return "LabelPropagation";
   }
 
-  private static class LongFromProperty implements LongFromVertexFunction{
-
+  /**
+   * Class defining a mapping from vertex to value (long) of a property of this
+   * vertex
+   */
+  private static class LongFromProperty implements LongFromVertexFunction {
+    /**
+     * String propertyKey
+     */
     String propertyKey;
 
-    public LongFromProperty(String propertyKey){
+    /**
+     * Constructor
+     *
+     * @param propertyKey propertyKey for the property map
+     */
+    public LongFromProperty(String propertyKey) {
       this.propertyKey = propertyKey;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long extractLong(Vertex<Long, EPFlinkVertexData> vertex) {
       return (long) vertex.getValue().getProperties().get(propertyKey);
