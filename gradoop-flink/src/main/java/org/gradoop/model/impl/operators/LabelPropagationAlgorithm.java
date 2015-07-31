@@ -29,21 +29,30 @@ import java.util.List;
 public class LabelPropagationAlgorithm implements
   GraphAlgorithm<Long, EPFlinkVertexData, EPFlinkEdgeData> {
   /**
-   *
+   * PropertyKey for the EP property map
    */
   public static final String PROPERTYKEY = "value";
   /**
-   *
+   * Counter to define maximal Iteration for the Algorithm
    */
   private Integer maxIterations;
 
   /**
-   * @param maxIterations
+   * Constructor
+   *
+   * @param maxIterations int counter to define maximal Iterations
    */
   public LabelPropagationAlgorithm(Integer maxIterations) {
     this.maxIterations = maxIterations;
   }
 
+  /**
+   * Graph run method to start the VertexCentricIteration
+   *
+   * @param graph graph that should be used for LabelPropagation
+   * @return gelly Graph with labeled vertices
+   * @throws Exception
+   */
   @Override
   public Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> run(
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph) throws Exception {
@@ -79,9 +88,11 @@ public class LabelPropagationAlgorithm implements
     }
 
     /**
-     * @param vertex
-     * @param allMessages
-     * @return
+     * Returns the most frequent value based on all received messages.
+     *
+     * @param vertex      the current vertex
+     * @param allMessages all received messages
+     * @return most frequent value below all messages
      */
     private long getMostFrequent(Vertex<Long, EPFlinkVertexData> vertex,
       List<Long> allMessages) {
