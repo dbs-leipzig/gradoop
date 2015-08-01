@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.drivers;
 
 import org.apache.commons.cli.CommandLine;
@@ -14,7 +31,6 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
-import org.gradoop.GConstants;
 import org.gradoop.io.reader.BulkLoadEPG;
 import org.gradoop.io.reader.VertexLineReader;
 import org.gradoop.storage.hbase.EPGGraphHandler;
@@ -68,12 +84,16 @@ public class BulkLoadDriver extends BulkDriver {
     String outputPath = getOutputPath();
     boolean verbose = getVerbose();
     boolean dropTables = cmd.hasOption(LoadConfUtils.OPTION_DROP_TABLES);
+    String verticesTableName = getVerticesTableName();
+    String graphsTableName = getGraphsTableName();
+
     String readerClassName =
       cmd.getOptionValue(LoadConfUtils.OPTION_VERTEX_LINE_READER);
     Class<? extends VertexLineReader> readerClass =
       getLineReaderClass(readerClassName);
-    createGraphStore(conf, dropTables);
-    if (!runBulkLoad(conf, readerClass, inputPath, outputPath, verbose)) {
+    createGraphStore(conf, dropTables, verticesTableName, graphsTableName);
+    if (!runBulkLoad(conf, readerClass, inputPath, outputPath,
+      verticesTableName, verbose)) {
       return -1;
     }
     return 0;
@@ -93,16 +113,18 @@ public class BulkLoadDriver extends BulkDriver {
 
   /**
    * Opens an existing or creates a new graph store.
-   *
    * @param conf       cluster config
    * @param dropTables true, if existing tables shall be dropped
+   * @param tableName (custom) table vertices name
+   * @param graphTabName (custom) table graphs name
    */
-  private void createGraphStore(final Configuration conf, boolean dropTables) {
+  private void createGraphStore(final Configuration conf, boolean dropTables,
+    String tableName, String graphTabName) {
     if (dropTables) {
-      HBaseGraphStoreFactory.deleteGraphStore(conf);
+      HBaseGraphStoreFactory.deleteGraphStore(conf, tableName, graphTabName);
     }
-    HBaseGraphStoreFactory.createOrOpenGraphStore(conf, new EPGVertexHandler(),
-      new EPGGraphHandler());
+    HBaseGraphStoreFactory.createOrOpenGraphStore(conf,
+      new EPGVertexHandler(), new EPGGraphHandler(), tableName, graphTabName);
   }
 
   /**
@@ -135,13 +157,14 @@ public class BulkLoadDriver extends BulkDriver {
    * @param readerClass   class for reading input lines
    * @param graphFileName input file
    * @param outputDirName hfile output dir
-   * @param verbose       print job output
-   * @return true, iff the job succeeded
-   * @throws Exception
+   * @param tableName     (custom) table vertices name
+   * @param verbose       print job output  @return true, iff the job
+   *                      succeeded  @throws Exception
+   * @return true, if the job completed successfully, false otherwise
    */
   private boolean runBulkLoad(final Configuration conf,
     final Class<? extends VertexLineReader> readerClass,
-    final String graphFileName, final String outputDirName,
+    final String graphFileName, final String outputDirName, String tableName,
     final boolean verbose) throws Exception {
     Path inputFile = new Path(graphFileName);
     Path outputDir = new Path(outputDirName);
@@ -166,7 +189,7 @@ public class BulkLoadDriver extends BulkDriver {
     FileInputFormat.addInputPath(job, inputFile);
     // set output directory
     FileOutputFormat.setOutputPath(job, outputDir);
-    HTable htable = new HTable(conf, GConstants.DEFAULT_TABLE_VERTICES);
+    HTable htable = new HTable(conf, tableName);
     // auto configure partitioner and reducer based on table settings (e.g.
     // number of regions)
     HFileOutputFormat2.configureIncrementalLoad(job, htable);

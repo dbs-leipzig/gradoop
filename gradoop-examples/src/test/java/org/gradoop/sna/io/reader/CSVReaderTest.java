@@ -21,6 +21,8 @@ public class CSVReaderTest {
   // Meta Strings
   private final String NODE_META = "long|string|string|string|string|";
   private final String EDGE_META = "long|long|long|string|string|";
+  private final String NODE_PROPERTIES = "id|firstName|lastName|gender|birthday|";
+  private final String EDGE_PROPERTIES = "Person.id|Organisation.id|since|office|department|";
   // node test values, properties and labels
   private static final String LABEL_NODE = "Person";
   private static final String FIRSTNAMEPROPERTY = "firstName";
@@ -164,6 +166,7 @@ public class CSVReaderTest {
     conf.set(CSVReader.META_DATA, NODE_META);
     conf.set(CSVReader.LABEL, "Person");
     conf.set(CSVReader.TYPE, "node");
+    conf.set(CSVReader.PROPERTIES, NODE_PROPERTIES);
     reader.setConf(conf);
     List<Vertex> vertices = Lists.newArrayList();
     for (String line : PERSON_CSV) {
@@ -181,6 +184,7 @@ public class CSVReaderTest {
     conf.set(CSVReader.META_DATA, EDGE_META);
     conf.set(CSVReader.LABEL, "workedAt");
     conf.set(CSVReader.TYPE, "edge");
+    conf.set(CSVReader.PROPERTIES, EDGE_PROPERTIES);
     reader.setConf(conf);
     List<Vertex> vertices = Lists.newArrayList();
     for (String line : KNOWS_CSV) {

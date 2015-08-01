@@ -36,9 +36,8 @@ public class SNAAnalysisDriverTest extends GradoopClusterTest {
       "-" + SNAAnalysisDriver.OPTION_VERBOSE,
       "-" + SNAAnalysisDriver.LoadConfUtils.OPTION_LABLEPROPAGATION,
       "-" + SNAAnalysisDriver.LoadConfUtils.OPTION_WORKERS, "1",
-      "-" + SNAAnalysisDriver.LoadConfUtils.OPTION_SUMMARIZE_OUTPUT_PATH,
-      "/output/summarize",
-      "-" + SNAAnalysisDriver.LoadConfUtils.OPTION_SUMMARIZE
+      "-" + SNAAnalysisDriver.LoadConfUtils.OPTION_SUMMARIZE,
+      "/output/summarize"
     };
     copyFromLocal(nodeFile);
     copyFromLocal(edgeFile);

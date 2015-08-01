@@ -1,17 +1,44 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.storage.hbase;
 
+import com.google.common.collect.Lists;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.mapreduce.RowCounter;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.log4j.Logger;
+import org.gradoop.GConstants;
+import org.gradoop.model.Edge;
 import org.gradoop.model.Graph;
 import org.gradoop.model.Vertex;
 import org.gradoop.storage.GraphStore;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Default HBase graph store that handles reading and writing vertices and
@@ -170,6 +197,203 @@ public class HBaseGraphStore implements GraphStore {
       e.printStackTrace();
     }
     return v;
+  }
+
+
+  @Override
+  public Iterator<Graph> getGraphs(String graphsTableName) {
+    GraphIterator graphIterator = null;
+
+    try {
+      Scan scan = new Scan();
+      scan.setCaching(500);
+      scan.setMaxVersions(1);
+
+      ResultScanner scanner = graphsTable.getScanner(scan);
+      graphIterator = new GraphIterator(scanner);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return graphIterator;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Iterator<Vertex> getVertices(String tableName) throws
+    InterruptedException, IOException, ClassNotFoundException {
+    VertexIterator vertexIterator = null;
+
+    try {
+      Scan scan = new Scan();
+      scan.setCaching(500);
+      scan.setMaxVersions(1);
+
+      ResultScanner scanner = verticesTable.getScanner(scan);
+      vertexIterator = new VertexIterator(scanner);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return vertexIterator;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Iterator<Vertex> getVertices(String tableName, int cacheSize) throws
+    InterruptedException, IOException, ClassNotFoundException {
+    VertexIterator vertexIterator = null;
+
+    try {
+      Scan scan = new Scan();
+      scan.setCaching(cacheSize);
+      scan.setMaxVersions(1);
+
+      ResultScanner scanner = verticesTable.getScanner(scan);
+      vertexIterator = new VertexIterator(scanner);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return vertexIterator;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long getRowCount(String tableName) throws IOException,
+    ClassNotFoundException, InterruptedException {
+    Job rcJob = RowCounter
+      .createSubmittableJob(new Configuration(), new String[]{tableName});
+
+    rcJob.waitForCompletion(true);
+    return rcJob.getCounters().findCounter(GConstants.ROW_COUNTER_MAPRED_JOB,
+      GConstants.ROW_COUNTER_PROPERTY).getValue();
+  }
+
+  /**
+   * Iterator helper class for iterating over HBase result scanner containing
+   * vertices
+   */
+  public class VertexIterator implements Iterator<Vertex> {
+    /**
+     * HBase result
+     */
+    private Result result = null;
+
+    /**
+     * Result iterator
+     */
+    private Iterator<Result> it;
+
+    /**
+     * Constructor
+     * @param scanner HBase result scanner
+     * @throws IOException
+     */
+    public VertexIterator(ResultScanner scanner) throws IOException {
+      this.it = scanner.iterator();
+    }
+
+    @Override
+    public boolean hasNext() {
+      if (it.hasNext()) {
+        result = it.next();
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public Vertex next() {
+      if (result != null) {
+        Vertex vertex = vertexHandler.readVertex(result);
+        result = null;
+        return vertex;
+      } else {
+        throw new NullPointerException();
+      }
+    }
+
+    @Override
+    public void remove() {
+    }
+
+  }
+
+  /**
+   * Iterator helper class for iterating over HBase result scanner containing
+   * vertices
+   */
+  public class GraphIterator implements Iterator<Graph> {
+    /**
+     * HBase result
+     */
+    private Result result = null;
+
+    /**
+     * Result iterator
+     */
+    private Iterator<Result> it;
+
+    /**
+     * Constructor
+     * @param scanner HBase result scanner
+     * @throws IOException
+     */
+    public GraphIterator(ResultScanner scanner) throws IOException {
+      this.it = scanner.iterator();
+    }
+
+    @Override
+    public boolean hasNext() {
+      if (it.hasNext()) {
+        result = it.next();
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public Graph next() {
+      if (result != null) {
+        Graph graph = graphHandler.readGraph(result);
+        result = null;
+        return graph;
+      } else {
+        throw new NullPointerException();
+      }
+    }
+
+    @Override
+    public void remove() {
+    }
+
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Iterable<Edge> getEdges() {
+    List<Edge> eList = Lists.newArrayList();
+    try {
+      ResultScanner scanner = verticesTable.getScanner(new Scan());
+      for (Result res : scanner) {
+        if (!res.isEmpty()) {
+          for (Edge edge : vertexHandler.readOutgoingEdges(res)) {
+            eList.add(edge);
+          }
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return eList;
   }
 
   /**

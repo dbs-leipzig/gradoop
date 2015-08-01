@@ -41,12 +41,31 @@ public abstract class GradoopClusterTest extends GradoopTest {
       .createOrOpenGraphStore(config, verticesHandler, graphsHandler);
   }
 
+  /**
+   * Open graphstore for test purposes.
+   * @return graphstore with vertices and edges
+   */
   protected GraphStore openGraphStore() {
     Configuration config = utility.getConfiguration();
     VertexHandler verticesHandler = new EPGVertexHandler();
     GraphHandler graphsHandler = new EPGGraphHandler();
     return HBaseGraphStoreFactory
       .createOrOpenGraphStore(config, verticesHandler, graphsHandler);
+  }
+
+  /**
+   * Open graphstore for test purposes.
+   * @param tablePrefix table prefix for custom (parallel) tables
+   * @return graphstore with vertices and edges
+   */
+  protected GraphStore openGraphStore(String tablePrefix) {
+    Configuration config = utility.getConfiguration();
+    VertexHandler verticesHandler = new EPGVertexHandler();
+    GraphHandler graphsHandler = new EPGGraphHandler();
+    return HBaseGraphStoreFactory
+      .createOrOpenGraphStore(config, verticesHandler, graphsHandler,
+        tablePrefix + GConstants.DEFAULT_TABLE_VERTICES, tablePrefix +
+          GConstants.DEFAULT_TABLE_GRAPHS);
   }
 
   /**

@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.sna.io.reader;
 
 import com.google.common.collect.Lists;
@@ -29,6 +46,10 @@ public class CSVReader implements ConfigurableVertexLineReader {
    */
   public static final String LABEL = "sna-reader.label";
   /**
+   * CSV Properties
+   */
+  public static final String PROPERTIES = "sna-reader.properties";
+  /**
    * The expected amount of nodes that will be created
    */
   public static final String EXPECTED_SIZE = "sna-reader.expected_size";
@@ -57,11 +78,11 @@ public class CSVReader implements ConfigurableVertexLineReader {
    */
   private boolean isNodeCSV = false;
   /**
-   * Label for vertex creation
+   * String List for vertex creation
    */
-  private String label;
+  private String labels;
   /**
-   * Types of a sna file (e.g. long|string|string|integer)
+   * types of a sna file (e.g. long|string|string|integer)
    */
   private String[] types;
   /**
@@ -83,25 +104,22 @@ public class CSVReader implements ConfigurableVertexLineReader {
     return LINE_TOKEN_SEPARATOR.split(line);
   }
 
-
   /**
    * Initial step: initializations and reading the headline
-   *
-   * @param line line of sna input
    */
-  private void initialStep(String line) {
+  private void initialStep() {
+    // Initialize Lists
+    labels = "";
     // Get properties (e.g. FirstName, LastName...)
-    properties = getTokens(line);
+    properties = getTokens(conf.get(PROPERTIES));
     // Get MetaData (e.g. long, string, string...)
     types = getTokens(conf.get(META_DATA));
     //readTypes(conf.get(META_DATA));
-    // set label
-    label = conf.get(LABEL);
+    // Set Labels
+    labels = conf.get(LABEL);
     // getCSVType
     isNodeCSV = isNodeCSV();
     random = new Random();
-    // initialStep is over
-    initialStep = false;
   }
 
   /**
@@ -134,20 +152,20 @@ public class CSVReader implements ConfigurableVertexLineReader {
   public Vertex readVertex(String line) {
     String[] tokens = getTokens(line);
     long id = Long.parseLong(tokens[0]);
-    Vertex vex = VertexFactory.createDefaultVertexWithLabel(id, label, null);
+    Vertex vex = VertexFactory.createDefaultVertexWithLabel(id, labels, null);
     for (int i = 1; i < properties.length; i++) {
       switch (types[i]) {
       case "long":
-        vex.setProperty(properties[i], Long.parseLong(tokens[i]));
+        vex.addProperty(properties[i], Long.parseLong(tokens[i]));
         break;
       case "string":
-        vex.setProperty(properties[i], tokens[i]);
+        vex.addProperty(properties[i], tokens[i]);
         break;
       case "integer":
-        vex.setProperty(properties[i], Integer.parseInt(tokens[i]));
+        vex.addProperty(properties[i], Integer.parseInt(tokens[i]));
         break;
       default:
-        vex.setProperty(properties[i], tokens[i]);
+        vex.addProperty(properties[i], tokens[i]);
         break;
       }
     }
@@ -161,7 +179,8 @@ public class CSVReader implements ConfigurableVertexLineReader {
   public List<Vertex> readVertexList(String line) {
     List<Vertex> vList = setVList();
     if (initialStep) {
-      initialStep(line);
+      initialStep();
+      initialStep = false;
     } else {
       if (isNodeCSV) {
         vList.add(readVertex(line));
@@ -189,24 +208,26 @@ public class CSVReader implements ConfigurableVertexLineReader {
       EdgeFactory.createDefaultEdgeWithLabel(id1, edgeLabel, random.nextLong());
     Edge incoming =
       EdgeFactory.createDefaultEdgeWithLabel(id0, edgeLabel, random.nextLong());
-    for (int i = 2; i < properties.length; i++) {
-      switch (types[i]) {
-      case "long":
-        outgoing.setProperty(properties[i], Long.parseLong(tokens[i]));
-        incoming.setProperty(properties[i], Long.parseLong(tokens[i]));
-        break;
-      case "string":
-        outgoing.setProperty(properties[i], tokens[i]);
-        incoming.setProperty(properties[i], tokens[i]);
-        break;
-      case "integer":
-        outgoing.setProperty(properties[i], Integer.parseInt(tokens[i]));
-        incoming.setProperty(properties[i], Integer.parseInt(tokens[i]));
-        break;
-      default:
-        outgoing.setProperty(properties[i], tokens[i]);
-        incoming.setProperty(properties[i], tokens[i]);
-        break;
+    if (properties.length > 2) {
+      for (int i = 2; i < properties.length; i++) {
+        switch (types[i]) {
+        case "long":
+          outgoing.addProperty(properties[i], Long.parseLong(tokens[i]));
+          incoming.addProperty(properties[i], Long.parseLong(tokens[i]));
+          break;
+        case "string":
+          outgoing.addProperty(properties[i], tokens[i]);
+          incoming.addProperty(properties[i], tokens[i]);
+          break;
+        case "integer":
+          outgoing.addProperty(properties[i], Integer.parseInt(tokens[i]));
+          incoming.addProperty(properties[i], Integer.parseInt(tokens[i]));
+          break;
+        default:
+          outgoing.addProperty(properties[i], tokens[i]);
+          incoming.addProperty(properties[i], tokens[i]);
+          break;
+        }
       }
     }
     List<Edge> outgoingEdgeList = Lists.newArrayListWithExpectedSize(1);

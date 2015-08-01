@@ -16,10 +16,12 @@ public class BulkLoadDriverTest extends GradoopClusterTest {
   public void testBulkLoadDriver() throws Exception {
     Configuration conf = utility.getConfiguration();
     String graphFile = "json-sample.graph";
+    String prefix = "testPrefix";
     String[] args =
       new String[]{"-" + BulkLoadDriver.OPTION_GRAPH_INPUT_PATH, graphFile,
                    "-" + BulkLoadDriver.OPTION_GRAPH_OUTPUT_PATH,
                    "/output/import/extended-graph",
+                   "-" + BulkLoadDriver.OPTION_TABLE_PREFIX, prefix,
                    "-" + BulkLoadDriver.OPTION_CUSTOM_ARGUMENT,
                    "sna-reader.label=knows, sna-reader" +
                      ".meta_data=person_knows_person.meta",
@@ -33,6 +35,6 @@ public class BulkLoadDriverTest extends GradoopClusterTest {
     int exitCode = bulkLoadDriver.run(args);
     // testing
     assertThat(exitCode, is(0));
-    validateExtendedGraphVertices(openGraphStore());
+    validateExtendedGraphVertices(openGraphStore(prefix));
   }
 }

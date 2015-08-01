@@ -121,8 +121,6 @@ public abstract class GradoopTest {
         validateBasicGraphEdges(edgeList, 2, 0, 2);
       } else if (i.equals(2L)) {
         validateBasicGraphEdges(edgeList, 1, 1);
-//      } else if (i.equals(3L)) {
-//        validateBasicGraphEdges(edgeList, 0);
       }
     }
   }
@@ -151,6 +149,14 @@ public abstract class GradoopTest {
       vertices.add(graphStore.readVertex(id));
     }
     validateExtendedGraphVertices(vertices);
+  }
+
+  protected void validateExtendedGraphEdges(List<Edge> result) {
+    assertEquals(4, result.size());
+    testEdge(result, 1L, "a", 0L, 1);
+    testEdge(result, 0L, "b", 0L, 2);
+    testEdge(result, 2L, "c", 1L, 0);
+    testEdge(result, 2L, "d", 0L, 0);
   }
 
   protected void validateExtendedGraphVertices(List<Vertex> result) {

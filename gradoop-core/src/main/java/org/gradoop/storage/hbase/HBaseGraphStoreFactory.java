@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.storage.hbase;
 
 import org.apache.hadoop.conf.Configuration;
@@ -41,6 +58,24 @@ public class HBaseGraphStoreFactory {
     final VertexHandler vertexHandler, final GraphHandler graphHandler) {
     return createOrOpenGraphStore(config, vertexHandler, graphHandler,
       GConstants.DEFAULT_TABLE_VERTICES, GConstants.DEFAULT_TABLE_GRAPHS);
+  }
+
+  /**
+   * Creates a graph store or opens an existing one based on the given
+   * parameters. If something goes wrong, {@code null} is returned.
+   *
+   * @param config        cluster configuration
+   * @param vertexHandler vertex storage handler
+   * @param graphHandler  graph storage handler
+   * @param prefix        prefix for HBase table name
+   * @return a graph store instance or {@code null in the case of errors}
+   */
+  public static GraphStore createOrOpenGraphStore(final Configuration config,
+    final VertexHandler vertexHandler, final GraphHandler graphHandler, final
+    String prefix) {
+    return createOrOpenGraphStore(config, vertexHandler, graphHandler,
+      prefix + GConstants.DEFAULT_TABLE_VERTICES,
+      prefix + GConstants.DEFAULT_TABLE_GRAPHS);
   }
 
   /**
