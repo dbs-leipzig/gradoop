@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.graph.Graph;
@@ -29,9 +46,9 @@ import java.util.List;
 public class LabelPropagationAlgorithm implements
   GraphAlgorithm<Long, EPFlinkVertexData, EPFlinkEdgeData> {
   /**
-   * PropertyKey for the EP property map
+   * Vertex property key where the resulting label is stored.
    */
-  public static final String PROPERTYKEY = "value";
+  public static final String PROPERTY_KEY = "value";
   /**
    * Counter to define maximal Iteration for the Algorithm
    */
@@ -75,13 +92,13 @@ public class LabelPropagationAlgorithm implements
       } else {
         List<Long> messages = Lists.newArrayList(msg.iterator());
         if (messages.size() == 1) {
-          vertex.getValue().setProperty(PROPERTYKEY, Math
-            .min((Long) vertex.getValue().getProperty(PROPERTYKEY),
+          vertex.getValue().setProperty(PROPERTY_KEY, Math
+            .min((Long) vertex.getValue().getProperty(PROPERTY_KEY),
               messages.get(0)));
           setNewVertexValue(vertex.getValue());
         } else {
           vertex.getValue()
-            .setProperty(PROPERTYKEY, getMostFrequent(vertex, messages));
+            .setProperty(PROPERTY_KEY, getMostFrequent(vertex, messages));
           setNewVertexValue(vertex.getValue());
         }
       }
@@ -118,7 +135,7 @@ public class LabelPropagationAlgorithm implements
       if (maxCounter == 1) {
         // to avoid an oscillating state of the calculation we will just use
         // the smaller value
-        newValue = Math.min((Long) vertex.getValue().getProperty(PROPERTYKEY),
+        newValue = Math.min((Long) vertex.getValue().getProperty(PROPERTY_KEY),
           allMessages.get(0));
       } else {
         newValue = maxValue;
@@ -137,7 +154,7 @@ public class LabelPropagationAlgorithm implements
       Exception {
       // send current minimum to neighbors
       sendMessageToAllNeighbors(
-        (Long) vertex.getValue().getProperty(PROPERTYKEY));
+        (Long) vertex.getValue().getProperty(PROPERTY_KEY));
     }
   }
 }

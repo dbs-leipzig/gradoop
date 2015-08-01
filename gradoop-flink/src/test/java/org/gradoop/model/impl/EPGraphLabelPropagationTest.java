@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class EPGraphLabelPropagationTest extends EPFlinkTest {
   private EPGraphStore graphStore;
-  final String propertyKey = LabelPropagationAlgorithm.PROPERTYKEY;
+  final String propertyKey = LabelPropagationAlgorithm.PROPERTY_KEY;
 
   public EPGraphLabelPropagationTest() {
     this.graphStore = createSocialGraph();
