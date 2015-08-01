@@ -76,7 +76,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 4 summarized edges:
+    // 4 summarized sna_edges:
     // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
     // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
     // [3] Dresden -[__EDGE__]-> Leipzig {count: 1}
@@ -156,7 +156,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 5 summarized edges:
+    // 5 summarized sna_edges:
     // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
     // [3] Dresden -[__EDGE__]-> Leipzig {count: 3}
     // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
@@ -236,7 +236,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 2 summarized edges:
+    // 2 summarized sna_edges:
     // [16] Default -[__EDGE__]-> Dresden {count: 3}
     // [4] Dresden -[__EDGE__]-> Dresden {count: 1}
     assertEquals("wrong number of edges", 2L, summarizedGraph.getEdgeCount());
@@ -304,7 +304,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 6 summarized edges:
+    // 6 summarized sna_edges:
     // [4] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 2}
     // [3] Dresden -[__EDGE__]-> Leipzig {since: 2013, count: 2}
     // [21] Dresden -[__EDGE__]-> Leipzig {since: 2015, count: 1}
@@ -392,7 +392,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 3 summarized edges:
+    // 3 summarized sna_edges:
     // [16] Default -[__EDGE__]-> Dresden {since: 2013, count: 1}
     // [19] Default -[__EDGE__]-> Dresden {since: NULL, count: 2}
     // [4] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 1}
@@ -464,7 +464,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 4 summarized edges:
+    // 4 summarized sna_edges:
     // [0] Person -[__EDGE__]-> Person {count: 10}
     // [7] Person -[__EDGE__]-> Tag {count: 4}
     // [11] Forum -[__EDGE__]-> Tag {count: 4}
@@ -542,7 +542,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 5 summarized edges:
+    // 5 summarized sna_edges:
     // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
     // [3] Dresden -[__EDGE__]-> Leipzig {count: 3}
     // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
@@ -635,7 +635,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 11 summarized edges:
+    // 11 summarized sna_edges:
     // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
     // [3] Dresden -[__EDGE__]-> Leipzig {count: 3}
     // [0] Leipzig -[__EDGE__]-> Leipzig {count: 2}
@@ -746,7 +746,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 3 summarized edges:
+    // 3 summarized sna_edges:
     // [0] Person -[__EDGE__]-> Person {since: 2014, count: 4}
     // [2] Person -[__EDGE__]-> Person {since: 2013, count: 3}
     // [21] Person -[__EDGE__]-> Person {since: 2015, count: 3}
@@ -817,7 +817,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 7 summarized edges:
+    // 7 summarized sna_edges:
     // [0] Person -[__EDGE__]-> Person {since: 2014, count: 4}
     // [2] Person -[__EDGE__]-> Person {since: 2013, count: 3}
     // [21] Person -[__EDGE__]-> Person {since: 2015, count: 3}
@@ -915,7 +915,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 6 summarized edges
+    // 6 summarized sna_edges
     // [4] Dresden -[__EDGE__]-> Dresden {since: "2014", count: 2}
     // [3] Dresden -[__EDGE__]-> Leipzig {since: "2013", count: 2}
     // [21] Dresden -[__EDGE__]-> Leipzig {since: "2015", count: 1}
@@ -1005,7 +1005,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 5 summarized edges:
+    // 5 summarized sna_edges:
     // [0] Person -[knows]-> Person {count: 10}
     // [7] Person -[hasInterest]-> Tag {count: 4}
     // [11] Forum -[hasTag]-> Tag {count: 4}
@@ -1085,7 +1085,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 5 summarized edges
+    // 5 summarized sna_edges
     // [4] Dresden -[knows]-> Dresden {count: 2}
     // [3] Dresden -[knows]-> Leipzig {count: 3}
     // [0] Leipzig -[knows]-> Leipzig {count: 2}
@@ -1173,7 +1173,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 13 summarized edges:
+    // 13 summarized sna_edges:
     // [4] Dresden -[knows]-> Dresden {count: 2}
     // [3] Dresden -[knows]-> Leipzig {count: 3}
     // [0] Leipzig -[knows]-> Leipzig {count: 2}
@@ -1284,7 +1284,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 3 summarized edges:
+    // 3 summarized sna_edges:
     // [0] Person -[knows]-> Person {since: 2014, count: 4}
     // [2] Person -[knows]-> Person {since: 2013, count: 3}
     // [21] Person -[knows]-> Person {since: 2015, count: 3}
@@ -1360,7 +1360,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 8 summarized edges:
+    // 8 summarized sna_edges:
     // [0] Person -[knows]-> Person {since: 2014, count: 4}
     // [2] Person -[knows]-> Person {since: 2013, count: 3}
     // [21] Person -[knows]-> Person {since: 2015, count: 3}
@@ -1464,7 +1464,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 6 summarized edges
+    // 6 summarized sna_edges
     // [4] Dresden -[knows]-> Dresden {since: 2014, count: 2}
     // [3] Dresden -[knows]-> Leipzig {since: 2013, count: 2}
     // [21] Dresden -[knows]-> Leipzig {since: 2015, count: 1}
@@ -1565,7 +1565,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       }
     }
 
-    // 14 summarized edges:
+    // 14 summarized sna_edges:
     // [4] Dresden -[knows]-> Dresden {since: 2014, count: 2}
     // [3] Dresden -[knows]-> Leipzig {since: 2013, count: 2}
     // [21] Dresden -[knows]-> Leipzig {since: 2015, count: 1}

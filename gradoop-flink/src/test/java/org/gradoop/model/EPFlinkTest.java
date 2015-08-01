@@ -175,7 +175,7 @@ public abstract class EPFlinkTest {
       .newArrayList(alice, bob, carol, dave, eve, frank, tagDatabases,
         tagGraphs, tagHadoop, forumGDBS, forumGPS);
 
-    // edges
+    // sna_edges
     List<EPFlinkEdgeData> edges = Lists.newArrayList();
     // Person:Alice-[knows]->Person:Bob (0L)
     properties = new HashMap<>();

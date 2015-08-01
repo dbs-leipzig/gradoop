@@ -66,8 +66,8 @@ public class EPGraphGetElementsTest extends EPFlinkTest {
   @Parameters({"-1, 0, 2, 4", // vertex 0 in db graph
     "0, 0, 1, 2", // vertex 0 in logical graph 0
     "2, 0, 1, 1", // vertex 0 in logical graph 2
-    "-1, 6, 0, 3", // vertex 6 with no outgoing edges
-    "-1, 9, 5, 0", // vertex 9 with no incoming edges
+    "-1, 6, 0, 3", // vertex 6 with no outgoing sna_edges
+    "-1, 9, 5, 0", // vertex 9 with no incoming sna_edges
   })
   public void testGetOutgoingAndIncomingEdges(long graphID, long vertexID,
     long expectedOutgoingEdgeCount, long expectedIncomingEdgeCount) throws

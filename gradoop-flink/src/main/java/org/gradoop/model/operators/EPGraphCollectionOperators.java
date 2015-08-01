@@ -25,7 +25,9 @@ import org.gradoop.model.impl.EPGraphCollection;
 import java.util.List;
 
 /**
- * Created by martin on 18.06.15.
+ * Defines operators that can be called on a collection of logical graphs.
+ *
+ * @author Martin Junghanns
  */
 public interface EPGraphCollectionOperators<T> extends
   EPCollectionOperators<T> {
@@ -33,8 +35,8 @@ public interface EPGraphCollectionOperators<T> extends
   /**
    * Get graph from collection by identifier.
    *
-   * @param graphID
-   * @return
+   * @param graphID graph identifier
+   * @return logical graph with given id
    * @throws Exception
    */
   EPGraph getGraph(final Long graphID) throws Exception;
@@ -43,13 +45,13 @@ public interface EPGraphCollectionOperators<T> extends
 
   EPGraphCollection getGraphs(List<Long> identifiers) throws Exception;
 
-  Long getGraphCount() throws Exception;
+  long getGraphCount() throws Exception;
 
   /**
    * Filter containing graphs based on their properties.
    *
-   * @param predicateFunction
-   * @return
+   * @param predicateFunction predicate function for graph data
+   * @return collection with logical graphs that fulfil the predicate
    * @throws Exception
    */
   EPGraphCollection filter(Predicate<EPGraphData> predicateFunction) throws
@@ -73,8 +75,8 @@ public interface EPGraphCollectionOperators<T> extends
   EPGraphCollection difference(EPGraphCollection otherCollection) throws
     Exception;
 
-  EPGraphCollection differenceWithSmallResult(EPGraphCollection
-    otherCollection) throws Exception;
+  EPGraphCollection differenceWithSmallResult(
+    EPGraphCollection otherCollection) throws Exception;
 
   EPGraphCollection distinct();
 

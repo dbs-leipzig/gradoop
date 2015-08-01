@@ -18,7 +18,6 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
-import com.sun.tools.corba.se.idl.constExpr.Not;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -143,7 +142,7 @@ public class EPGraphCollection implements
   }
 
   @Override
-  public Long getGraphCount() throws Exception {
+  public long getGraphCount() throws Exception {
     return this.subgraphs.count();
   }
 

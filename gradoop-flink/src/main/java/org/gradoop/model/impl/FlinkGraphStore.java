@@ -24,8 +24,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.io.reader.JsonReader;
 import org.gradoop.model.helper.FlinkConstants;
-import org.gradoop.model.io.reader.JsonReader;
 import org.gradoop.model.store.EPGraphStore;
 
 import java.util.Collection;
@@ -83,7 +83,6 @@ public class FlinkGraphStore implements EPGraphStore {
     }
     return new FlinkGraphStore(vertices, edges, graphs, env);
   }
-
 
   public static EPGraphStore fromCollection(
     Collection<EPFlinkVertexData> vertexData,

@@ -1,0 +1,11 @@
+{"id":0,"data":{"gender":"f","city":"Leipzig","name":"Alice"},"meta":{"label":"Person","graphs":[0,2]}}
+{"id":1,"data":{"gender":"m","city":"Leipzig","name":"Bob"},"meta":{"label":"Person","graphs":[0,2]}}
+{"id":2,"data":{"gender":"f","city":"Dresden","name":"Carol"},"meta":{"label":"Person","graphs":[1,2,3]}}
+{"id":3,"data":{"gender":"m","city":"Dresden","name":"Dave"},"meta":{"label":"Person","graphs":[1,2,3]}}
+{"id":4,"data":{"gender":"f","city":"Dresden","speaks":"English","name":"Eve"},"meta":{"label":"Person","graphs":[0]}}
+{"id":5,"data":{"locIP":"127.0.0.1","gender":"m","city":"Berlin","name":"Frank"},"meta":{"label":"Person","graphs":[1]}}
+{"id":6,"data":{"name":"Databases"},"meta":{"label":"Tag"}}
+{"id":7,"data":{"name":"Graphs"},"meta":{"label":"Tag"}}
+{"id":8,"data":{"name":"Hadoop"},"meta":{"label":"Tag"}}
+{"id":9,"data":{"title":"Graph Databases"},"meta":{"label":"Forum"}}
+{"id":10,"data":{"title":"Graph Processing"},"meta":{"label":"Forum","graphs":[3]}}
