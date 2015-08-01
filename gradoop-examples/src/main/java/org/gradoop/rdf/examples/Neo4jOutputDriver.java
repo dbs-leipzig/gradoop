@@ -241,7 +241,7 @@ public class Neo4jOutputDriver extends Configured implements Tool {
       int count = (int) graph.getProperty(
         SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
       if (count > restrictSize) {
-        graphMap.put(graph.getID(), count);
+        graphMap.put(graph.getId(), count);
       }
     }
 

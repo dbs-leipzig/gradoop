@@ -59,10 +59,13 @@
             <artifactId>hbase-server</artifactId>
         </dependency>
 
+        <!-- Neo4j -->
+
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
         </dependency>
+
         <!-- Testing -->
 
         <!-- HBase -->

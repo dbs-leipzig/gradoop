@@ -106,8 +106,8 @@ public class RDFReader implements VertexLineReader {
     Edge edgeIn =
       EdgeFactory.createDefaultEdgeWithLabel(sourceID, p, edgeInIndex);
 
-    return VertexFactory.createDefaultVertex(targetID, o, null, null, Lists
-      .newArrayList(edgeIn), null);
+    return VertexFactory.createDefaultVertex(targetID, o, null, null,
+      Lists.newArrayList(edgeIn), null);
   }
 
   /**
@@ -124,8 +124,8 @@ public class RDFReader implements VertexLineReader {
     Edge edgeOut =
       EdgeFactory.createDefaultEdgeWithLabel(targetID, p, edgeOutIndex);
 
-    return VertexFactory.createDefaultVertexWithLabel(sourceID, s, Lists
-      .newArrayList(edgeOut));
+    return VertexFactory.createDefaultVertexWithLabel(sourceID, s,
+      Lists.newArrayList(edgeOut));
   }
 
   /**
@@ -291,111 +291,4 @@ public class RDFReader implements VertexLineReader {
   public Vertex readVertex(String line) {
     return null;
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<Vertex> readVertexList(String line) {
-    String[] triple = simpleValidate(line);
-    if (triple.length == 0) {
-      return null;
-    }
-    String s = triple[0];
-    String p = triple[1];
-    String o = triple[2];
-
-    List<Vertex> vList = Lists.newArrayListWithCapacity(2);
-    Long sourceID =
-      HASH_FUNCTION.newHasher().putString(s, Charsets.UTF_8).hash().asLong();
-    Long targetID =
-      HASH_FUNCTION.newHasher().putString(o, Charsets.UTF_8).hash().asLong();
-
-    if (o.startsWith("\"")) { // create only one vertex with property
-      Vertex vertex =
-        VertexFactory.createDefaultVertexWithLabel(sourceID, s, null);
-
-      switch (getDatatype(o)) {
-      case "integer":
-        vertex.setProperty(p, Integer.parseInt(getLiteralValue(o)));
-        break;
-      case "double":
-      case "float":
-      case "decimal":
-        vertex.setProperty(p, Double.parseDouble(getLiteralValue(o)));
-        break;
-      default:
-        vertex.setProperty(p, getLiteralValue(o));
-        break;
-      }
-      vList.add(vertex);
-    } else { // 2x resource -> 2x vertex
-      //outgoing edge on source vertex
-      Long edgeOutIndex =
-        HASH_FUNCTION.newHasher().putString(s + p + o, Charsets.UTF_8).hash()
-          .asLong();
-      Edge edgeOut =
-        EdgeFactory.createDefaultEdgeWithLabel(targetID, p, edgeOutIndex);
-      Vertex sourceVertex = VertexFactory
-        .createDefaultVertexWithLabel(sourceID, s, Lists.newArrayList(edgeOut));
-      vList.add(sourceVertex);
-
-      //incoming edge on target vertex
-      Long edgeInIndex =
-        HASH_FUNCTION.newHasher().putString(o + p + s, Charsets.UTF_8).hash()
-          .asLong();
-      Edge edgeIn =
-        EdgeFactory.createDefaultEdgeWithLabel(sourceID, p, edgeInIndex);
-      Vertex targetVertex = VertexFactory
-        .createDefaultVertexWithEdges(targetID, null,
-          Lists.newArrayList(edgeIn));
-      targetVertex.setLabel(o);
-      vList.add(targetVertex);
-    }
-    return vList;
-  }
-
-  /**
-   * Simple validation of input line, not complete.
-   *
-   * @param line single input line
-   * @return input line or null for malformed triple
-   */
-  private String[] simpleValidate(String line) {
-    String[] empty = {};
-    String[] tokens = getTokens(line);
-    String s = tokens[0];
-    String p = tokens[1];
-    String o = tokens[2];
-
-    if (isNTResource(p)) { // predicate has to be URI
-      if (isNTResource(s) || s.charAt(0) == '_') {
-        //subject has to be blank node or URI
-        if (isNTResource(o) || o.charAt(0) == '_' || o.charAt(0) == '"') {
-          s = getPlainResource(s);
-          p = getPlainResource(p);
-          if (isNTResource(o)) {
-            o = getPlainResource(o);
-          }
-
-          return new String[]{s, p, o};
-        } else {
-          return empty; // malformed object
-        }
-      } else {
-        return empty; // malformed subject
-      }
-    } else {
-      return empty; // malformed predicate
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean supportsVertexLists() {
-    return true;
-  }
-
 }

@@ -156,16 +156,16 @@ public class CSVReader implements ConfigurableVertexLineReader {
     for (int i = 1; i < properties.length; i++) {
       switch (types[i]) {
       case "long":
-        vex.addProperty(properties[i], Long.parseLong(tokens[i]));
+        vex.setProperty(properties[i], Long.parseLong(tokens[i]));
         break;
       case "string":
-        vex.addProperty(properties[i], tokens[i]);
+        vex.setProperty(properties[i], tokens[i]);
         break;
       case "integer":
-        vex.addProperty(properties[i], Integer.parseInt(tokens[i]));
+        vex.setProperty(properties[i], Integer.parseInt(tokens[i]));
         break;
       default:
-        vex.addProperty(properties[i], tokens[i]);
+        vex.setProperty(properties[i], tokens[i]);
         break;
       }
     }
@@ -212,20 +212,20 @@ public class CSVReader implements ConfigurableVertexLineReader {
       for (int i = 2; i < properties.length; i++) {
         switch (types[i]) {
         case "long":
-          outgoing.addProperty(properties[i], Long.parseLong(tokens[i]));
-          incoming.addProperty(properties[i], Long.parseLong(tokens[i]));
+          outgoing.setProperty(properties[i], Long.parseLong(tokens[i]));
+          incoming.setProperty(properties[i], Long.parseLong(tokens[i]));
           break;
         case "string":
-          outgoing.addProperty(properties[i], tokens[i]);
-          incoming.addProperty(properties[i], tokens[i]);
+          outgoing.setProperty(properties[i], tokens[i]);
+          incoming.setProperty(properties[i], tokens[i]);
           break;
         case "integer":
-          outgoing.addProperty(properties[i], Integer.parseInt(tokens[i]));
-          incoming.addProperty(properties[i], Integer.parseInt(tokens[i]));
+          outgoing.setProperty(properties[i], Integer.parseInt(tokens[i]));
+          incoming.setProperty(properties[i], Integer.parseInt(tokens[i]));
           break;
         default:
-          outgoing.addProperty(properties[i], tokens[i]);
-          incoming.addProperty(properties[i], tokens[i]);
+          outgoing.setProperty(properties[i], tokens[i]);
+          incoming.setProperty(properties[i], tokens[i]);
           break;
         }
       }

@@ -75,9 +75,9 @@ public class Neo4jLineWriter implements VertexLineWriter {
   @Override
   public String writeVertex(Vertex vertex) {
     Node node = graphDb.createNode();
-    node.setProperty(GConstants.GRADOOP_VERTEX_ID_PROPERTY, vertex.getID());
+    node.setProperty(GConstants.GRADOOP_VERTEX_ID_PROPERTY, vertex.getId());
     gradoopIdIndex.add(node, GConstants.GRADOOP_VERTEX_ID_PROPERTY, vertex
-      .getID());
+      .getId());
     node = writeLabels(node, vertex);
     node = writeProperties(node, vertex);
     node = writeGraphs(node, vertex);
@@ -91,7 +91,7 @@ public class Neo4jLineWriter implements VertexLineWriter {
    */
   public void writeEdges(Vertex vertex) {
     Node node = gradoopIdIndex.get(GConstants.GRADOOP_VERTEX_ID_PROPERTY,
-      vertex.getID()).getSingle();
+      vertex.getId()).getSingle();
     if (vertex.getOutgoingDegree() > 0) {
       for (Edge edge : vertex.getOutgoingEdges()) {
         LOG.info("edge.getOtherID() " + edge.getOtherID());

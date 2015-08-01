@@ -86,13 +86,13 @@ public class RDFAnalysisDriverTest extends GradoopClusterTest {
         g.getProperty(SelectAndAggregate.DEFAULT_AGGREGATE_RESULT_PROPERTY_KEY);
       assertNotNull(count);
       
-      if (g.getID() == MAX_GRAPHS1) {
+      if (g.getId() == MAX_GRAPHS1) {
         assertEquals(VERTICES_COUNT_12, count);
       }
-      if (g.getID() == MAX_GRAPHS2) {
+      if (g.getId() == MAX_GRAPHS2) {
         assertEquals(VERTICES_COUNT_11, count);
       }
-      if (g.getID() == MAX_GRAPHS3) {
+      if (g.getId() == MAX_GRAPHS3) {
         assertEquals(VERTICES_COUNT_11, count);
       }
     }

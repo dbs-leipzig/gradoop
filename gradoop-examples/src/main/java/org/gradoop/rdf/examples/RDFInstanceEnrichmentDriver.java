@@ -135,7 +135,7 @@ public class RDFInstanceEnrichmentDriver extends Configured implements Tool {
         //e.printStackTrace();
         LOG.info(e.toString());
         // too much queries -> parser exception, add dummy property
-        vertex.addProperty(EMPTY_PROPERTY, EMPTY_PROPERTY_VALUE);
+        vertex.setProperty(EMPTY_PROPERTY, EMPTY_PROPERTY_VALUE);
         ++error;
         LOG.info("Error count: " + error);
       }
@@ -176,11 +176,11 @@ public class RDFInstanceEnrichmentDriver extends Configured implements Tool {
         String key = property[0];
         String value = property[1];
         if (!value.isEmpty() || !value.equals("")) {
-          vertex.addProperty(key, value);
+          vertex.setProperty(key, value);
         }
       }
     } else {
-      vertex.addProperty(NO_PROPERTY, EMPTY_PROPERTY_VALUE);
+      vertex.setProperty(NO_PROPERTY, EMPTY_PROPERTY_VALUE);
     }
     return vertex;
   }
