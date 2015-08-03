@@ -70,7 +70,7 @@ public abstract class EPFlinkGraphElementEntity extends EPFlinkEntity implements
   public String toString() {
     return "EPFlinkGraphElementEntity{" +
       "super=" + super.toString() +
-      "graphs=" + graphs +
+      ", graphs=" + graphs +
       '}';
   }
 }
