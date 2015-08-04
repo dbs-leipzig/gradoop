@@ -1,10 +1,11 @@
 # Gradoop : Graph Analytics on Apache Hadoop
 
-Gradoop is an open source (GPLv3) research framework for scalable graph analytics.
-It offers an extended property graph data model (EPGM) which extends the widespread
-property graph model by the concept of logical subgraphs. By providing operators
-for single graphs and collections of graphs, Gradoop offers a flexible way to express
-various analytical workflows.
+[Gradoop](http://www.gradoop.com) is an open source (GPLv3) research framework 
+for scalable graph analytics. It offers a graph data model which extends the widespread 
+[property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
+by the concept of logical subgraphs and further provides operators that can be applied 
+on single graphs and collections of graphs. The combination of these operators allows
+the flexible, declarative definition of graph analytical workflows.
 
 ```java
 // load social network from hdfs
@@ -26,34 +27,38 @@ as a proof of concept implementation and far from production ready.
 
 ## Data Model
 
-Besides vertices and directed edges, the model supports the concept of logical 
-subgraphs with possibly overlapping vertex and edge sets. This way, it is possible 
-to define analytical operations between logical graphs. Vertices, edges and logical
-subgraphs have a single label and may have multiple properties in the form of 
-key-value-pairs. EPGM does not enforce any kind of schema at graph elements.
+In the extended property graph model (EPGM), a database consists of multiple 
+property graphs which are called logical graphs. These graphs are 
+application-specific subsets from shared sets of vertices and edges, i.e., may
+have common vertices and edges. Additionally, not only vertices and edges but
+also logical graphs have a type label and can have different properties.
 
 ### Graph operators
 
-Our operator implementations are based on [Apache Flink](http://flink.apache.org/).
-The following table contains an overview.
+The EPGM provides operators for both single graphs as well as collections of 
+graphs; operators may also return single graphs or graph collections.
 
-| Operator      | Input               | Output         | Output description                               | Implemented  |
-|:--------------|:--------------------|:----------------|:------------------------------------------------|:------------:|
-| Selection     | GraphCollection     | GraphCollection | Graphs that fulfil a predicate function         | Yes          |
-| Distinct      | GraphCollection     | GraphCollection | No duplicate graphs                             | No           |
-| SortBy        | GraphCollection     | GraphCollection | Graphs sorted by graph property                 | No           |
-| Top           | GraphCollection     | GraphCollection | The first n elements of the input collection    | No           |
-| Union         | GraphCollection (2) | GraphCollection | All graphs from both collections                | Yes          |
-| Intersection  | GraphCollection (2) | GraphCollection | Only graphs that exist in both collections      | Yes          |
-| Difference    | GraphCollection (2) | GraphCollection | Only graphs that exist in the one collection    | Yes          |
-| Combination   | Graph (2)           | Graph           | Vertices and edges from both graphs             | Yes          |
-| Overlap       | Graph (2)           | Graph           | Vertices and edges that exist in both graphs    | Yes          |
-| Exclusion     | Graph (2)           | Graph           | Vertices and edges that exist in only one graph | Yes          |
-| Pattern Match | Graph               | GraphCollection | Graphs that fulfil a given pattern              | No           |
-| Aggregation   | Graph               | Graph           | Graph with result of an aggregate function      | Yes          |
-| Projection    | Graph               | Graph           | Graph with projected vertex and edge sets       | No           |
-| Summarization | Graph               | Graph           | Structural condense of the input graph          | Yes          |
-| Apply         | Graph               | Graph           | Structural condense of the input graph          | Yes          |
+Our operator implementations are based on [Apache Flink](http://flink.apache.org/).
+The following table contains an overview (GC = GraphCollection, G = Graph).
+
+| Operator      | Definition    | Output description                              | Implemented  |
+|:--------------|:--------------|:------------------------------------------------|:------------:|
+| Selection     | GC -> GC      | Graphs that fulfil a predicate function         | Yes          |
+| Distinct      | GC -> GC      | No duplicate graphs                             | No           |
+| SortBy        | GC -> GC      | Graphs sorted by graph property                 | No           |
+| Top           | GC -> GC      | The first n elements of the input collection    | No           |
+| Union         | GC x GC -> GC | All graphs from both collections                | Yes          |
+| Intersection  | GC x GC -> GC | Only graphs that exist in both collections      | Yes          |
+| Difference    | GC x GC -> GC | Only graphs that exist in one collection        | Yes          |
+| Combination   | G x G -> G    | Vertices and edges from both graphs             | Yes          |
+| Overlap       | G x G -> G    | Vertices and edges that exist in both graphs    | Yes          |
+| Exclusion     | G x G -> G    | Vertices and edges that exist in only one graph | Yes          |
+| Pattern Match | G -> GC       | Graphs that match a given graph pattern         | No           |
+| Aggregation   | G -> G        | Graph with result of an aggregate function      | Yes          |
+| Projection    | G -> G        | Graph with projected vertex and edge sets       | No           |
+| Summarization | G -> G        | Structural condense of the input graph          | Yes          |
+| Apply         | GC -> GC      | Applies operator to each graph in collection    | No           |
+| Reduce        | GC- > G       | Reduces collection to graph using operator      | No           |
 
 ## Setup
 
@@ -71,13 +76,13 @@ The following table contains an overview.
 
 ### Load data into gradoop
 
-Gradoop supports json as input format for vertices, edges and graphs. Each document
-stores the properties of the specific instance in an embedded document `data`. Meta
-information, like the obligatory label, is stored in another embedded document `meta`.
-The meta document of vertices and edges may contain a mapping to the logical graphs 
-they are contained in.
+Gradoop supports JSON as input format for vertices, edges and graphs. Besides the 
+unique id, each JSON document stores the properties of the specific entity in an 
+embedded document `data`. Meta information, like the obligatory label, is stored
+in a second embedded document `meta`. The meta document of vertices and edges may 
+contain a mapping to the logical graphs they are contained in.
 
-Two users (Alice and Bob) that have three properties each, have an obligatory
+Two users (Alice and Bob) that have three properties each, an obligatory
 vertex label (Person) and are contained in two logical graphs (0 and 2).
 ```
 // content of nodes.json
@@ -85,8 +90,10 @@ vertex label (Person) and are contained in two logical graphs (0 and 2).
 {"id":1,"data":{"gender":"m","city":"Leipzig","name":"Bob"},"meta":{"label":"Person","graphs":[0,2]}}
 ```
 
-Edges are represented in similar way. Alice and Bob are connected by an edge (knows).
-Edges may have properties (e.g., `since:2014`) and may also be contained in logical graphs (0 and 2).
+Edges are represented in a similar way. Alice and Bob are connected by an edge 
+(knows). Edges may have properties (e.g., `since:2014`) and may also be contained 
+in logical graphs (0 and 2). Edge documents also store the obligatory source and 
+target vertex identifier.
 
 ```
 // content of edges.json
@@ -104,6 +111,12 @@ Graphs may also have properties and must have a label (e.g., Community).
 ```
 
 ### Example: Extract schema graph from possibly large-scale graph
+
+In this example, we use the `summarize` operator to create a condensed version 
+of our input graph. By summarizing on vertex and edge labels, we compute the schema
+of our graph. Each vertex in the resulting graph represents all vertices with the
+same label (e.g., Person or Group), each edge represents all edges with the same
+label that connect vertices from vertex groups.
 
 ```java
 EPGraphStore graphStore = FlinkGraphStore.fromJsonFile(vertexInputPath, edgeInputPath, env);
