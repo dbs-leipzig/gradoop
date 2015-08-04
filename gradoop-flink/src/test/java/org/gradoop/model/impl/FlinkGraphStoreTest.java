@@ -17,21 +17,13 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Lists;
 import junitparams.JUnitParamsRunner;
-import org.gradoop.model.Attributed;
-import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
-import org.gradoop.model.EPGraphData;
-import org.gradoop.model.EPGraphElement;
-import org.gradoop.model.EPVertexData;
-import org.gradoop.model.Labeled;
 import org.gradoop.model.store.EPGraphStore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -40,6 +32,9 @@ import static org.junit.Assert.assertNotNull;
 public class FlinkGraphStoreTest extends EPFlinkTest {
 
   private EPGraphStore graphStore;
+
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   public FlinkGraphStoreTest() {
     graphStore = createSocialGraph();
@@ -75,119 +70,21 @@ public class FlinkGraphStoreTest extends EPFlinkTest {
       graphStore.getCollection().getGraphCount());
   }
 
-  final String curlyOpen = "{";
-  final String curlyClose = "}";
-  final String bracketOpen = "[";
-  final String bracketClose = "]";
-  final String id = "\"id\":";
-  final String source = "\"source\":";
-  final String target = "\"target\":";
-  final String meta = "\"meta\":";
-  final String data = "\"data\":";
-  final String graphs = "\"graphs\":";
-  final String label = "\"label\":";
-  final String comma = ",";
-  final String quote = "\"";
-  final String colon = ":";
-
   @Test
-  public void createJson() throws Exception {
-    EPGraph graph = graphStore.getDatabaseGraph();
+  public void testWriteAsJsonFile() throws Exception {
+    String tmpDir = temporaryFolder.getRoot().toString();
+    final String vertexFile = tmpDir + "/nodes.json";
+    final String edgeFile = tmpDir + "/edges.json";
+    final String graphFile = tmpDir + "/graphs.json";
 
-    List<String> lines = Lists.newArrayList();
-    StringBuilder sb;
-    for (EPVertexData v : graph.getVertices().collect()) {
-      sb = new StringBuilder();
-      sb.append(curlyOpen);
-      sb.append(id);
-      sb.append(v.getId());
-      sb.append(comma);
-      sb = buildData(sb, v);
-      sb.append(comma);
-      sb = buildMeta(sb, v);
-      sb.append(curlyClose);
-      lines.add(sb.toString());
-    }
+    graphStore.writeAsJson(vertexFile, edgeFile, graphFile);
 
-    for (EPEdgeData e : graph.getEdges().collect()) {
-      sb = new StringBuilder();
-      sb.append(curlyOpen);
-      sb.append(id);
-      sb.append(e.getId());
-      sb.append(comma);
-      sb.append(source);
-      sb.append(e.getSourceVertex());
-      sb.append(comma);
-      sb.append(target);
-      sb.append(e.getTargetVertex());
-      sb.append(comma);
-      sb = buildData(sb, e);
-      sb.append(comma);
-      sb = buildMeta(sb, e);
-      sb.append(curlyClose);
-      lines.add(sb.toString());
-    }
+    EPGraphStore newGraphStore =
+      FlinkGraphStore.fromJsonFile(vertexFile, edgeFile, graphFile, env);
 
-    for (EPGraphData g : graphStore.getCollection().collect()) {
-      sb = new StringBuilder();
-      sb.append(curlyOpen);
-      sb.append(id);
-      sb.append(g.getId());
-      sb.append(comma);
-      sb = buildData(sb, g);
-      sb.append(comma);
-      sb.append(meta);
-      sb.append(curlyOpen);
-      sb.append(label);
-      sb.append(quote).append(g.getLabel()).append(quote);
-      sb.append(curlyClose);
-      sb.append(curlyClose);
-      lines.add(sb.toString());
-    }
-
-    for (String line : lines) {
-      System.out.println(line);
-    }
-
+    assertEquals(graphStore.getDatabaseGraph().getVertexCount(),
+      newGraphStore.getDatabaseGraph().getVertexCount());
+    assertEquals(graphStore.getDatabaseGraph().getEdgeCount(),
+      newGraphStore.getDatabaseGraph().getEdgeCount());
   }
-
-  private StringBuilder buildData(StringBuilder sb, Attributed entity) {
-    sb.append(data);
-    sb.append(curlyOpen);
-    int propCount = 0;
-    for (Map.Entry<String, Object> p : entity.getProperties().entrySet()) {
-      sb.append(quote).append(p.getKey()).append(quote).append(colon);
-      sb.append((p.getValue() instanceof Number) ? p.getValue() :
-        (quote + p.getValue() + quote));
-      sb.append(comma);
-      propCount++;
-    }
-    if (propCount > 0) {
-      sb.delete(sb.length() - 1, sb.length());
-    }
-    sb.append(curlyClose);
-    return sb;
-  }
-
-  <T extends Labeled & EPGraphElement> StringBuilder buildMeta(StringBuilder sb,
-    T entity) {
-    sb.append(meta);
-    sb.append(curlyOpen);
-    sb.append(label);
-    sb.append(quote).append(entity.getLabel()).append(quote);
-    if (entity.getGraphs().size() > 0) {
-      sb.append(comma);
-      sb.append(graphs);
-      sb.append(bracketOpen);
-      for (Long graphID : entity.getGraphs()) {
-        sb.append(graphID);
-        sb.append(comma);
-      }
-      sb.delete(sb.length() - 1, sb.length());
-      sb.append(bracketClose);
-    }
-    sb.append(curlyClose);
-    return sb;
-  }
-
 }

@@ -15,104 +15,25 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.reader;
+package org.gradoop.io.json;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.model.impl.EPFlinkEdgeData;
 import org.gradoop.model.impl.EPFlinkGraphData;
 import org.gradoop.model.impl.EPFlinkVertexData;
 import org.gradoop.model.impl.Subgraph;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Used to convert json documents into vertices, edges and graphs.
  */
-public class JsonReader {
-  /**
-   * Key for vertex, edge and graph id.
-   */
-  private static final String IDENTIFIER = "id";
-  /**
-   * Key for meta Json object.
-   */
-  private static final String META = "meta";
-  /**
-   * Key for data Json object.
-   */
-  private static final String DATA = "data";
-  /**
-   * Key for vertex, edge and graph label.
-   */
-  private static final String LABEL = "label";
-  /**
-   * Key for graph identifiers at vertices and edges.
-   */
-  private static final String GRAPHS = "graphs";
-  /**
-   * Key for edge source vertex id.
-   */
-  private static final String EDGE_SOURCE = "source";
-  /**
-   * Key for edge target vertex id.
-   */
-  private static final String EDGE_TARGET = "target";
-
-  /**
-   * Contains methods used by all readers (e.g. read label, properties).
-   */
-  private abstract static class JsonToGraphElementMapper {
-
-    // necessary for flink UDF initialization
-    public JsonToGraphElementMapper() {
-    }
-
-    protected Long getID(JSONObject object) throws JSONException {
-      return object.getLong(IDENTIFIER);
-    }
-
-    protected String getLabel(JSONObject object) throws JSONException {
-      return object.getJSONObject(META).getString(LABEL);
-    }
-
-    protected Map<String, Object> getProperties(JSONObject object) throws
-      JSONException {
-      Map<String, Object> props =
-        Maps.newHashMapWithExpectedSize(object.length() * 2);
-      object = object.getJSONObject(DATA);
-      Iterator<?> keys = object.keys();
-      while (keys.hasNext()) {
-        String key = keys.next().toString();
-        Object o = object.get(key);
-        props.put(key, o);
-      }
-      return props;
-    }
-
-    protected Set<Long> getGraphs(JSONObject object) throws JSONException {
-      Set<Long> result;
-      if (!object.getJSONObject(META).has(GRAPHS)) {
-        result = Sets.newHashSetWithExpectedSize(0);
-      } else {
-        JSONArray graphsArray = object.getJSONObject(META).getJSONArray(GRAPHS);
-        result = Sets.newHashSetWithExpectedSize(graphsArray.length());
-        for (int i = 0; i < graphsArray.length(); i++) {
-          result.add(graphsArray.getLong(i));
-        }
-      }
-      return result;
-    }
-  }
+public class JsonReader extends JsonIO {
 
   /**
    * Reads vertex data from a json document. The document contains at least
@@ -129,8 +50,7 @@ public class JsonReader {
    * "meta":{"label":"Employee","graphs":[0,1,2,3]}
    * }
    */
-  public static class JsonToVertexMapper extends
-    JsonToGraphElementMapper implements
+  public static class JsonToVertexMapper extends JsonToEntityMapper implements
     MapFunction<String, Vertex<Long, EPFlinkVertexData>> {
 
     @Override
@@ -162,8 +82,7 @@ public class JsonReader {
    * "meta":{"label":"worksFor","graphs":[1,2,3,4]}
    * }
    */
-  public static class JsonToEdgeMapper extends
-    JsonToGraphElementMapper implements
+  public static class JsonToEdgeMapper extends JsonToEntityMapper implements
     MapFunction<String, Edge<Long, EPFlinkEdgeData>> {
 
     @Override
@@ -204,8 +123,7 @@ public class JsonReader {
    * "meta":{"label":"Community"}
    * }
    */
-  public static class JsonToGraphMapper extends
-    JsonToGraphElementMapper implements
+  public static class JsonToGraphMapper extends JsonToEntityMapper implements
     MapFunction<String, Subgraph<Long, EPFlinkGraphData>> {
 
     @Override

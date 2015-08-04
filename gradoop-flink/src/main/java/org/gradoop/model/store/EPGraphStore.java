@@ -27,4 +27,7 @@ public interface EPGraphStore {
   EPGraphCollection getCollection();
 
   EPGraph getGraph(Long graphID) throws Exception;
+
+  void writeAsJson(final String vertexFile, final String egeFile,
+    final String graphFile) throws Exception;
 }

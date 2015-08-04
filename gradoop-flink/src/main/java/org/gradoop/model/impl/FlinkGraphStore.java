@@ -24,7 +24,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.io.reader.JsonReader;
+import org.gradoop.io.json.JsonReader;
+import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.store.EPGraphStore;
 
@@ -82,6 +83,20 @@ public class FlinkGraphStore implements EPGraphStore {
       graphs = env.fromCollection(Lists.newArrayList(DATABASE_SUBGRAPH));
     }
     return new FlinkGraphStore(vertices, edges, graphs, env);
+  }
+
+  @Override
+  public void writeAsJson(final String vertexFile, final String edgeFile,
+    final String graphFile) throws Exception {
+    getDatabaseGraph().getGellyGraph().getVertices()
+      .writeAsFormattedText(vertexFile, new JsonWriter.VertexTextFormatter())
+      .getDataSet().collect();
+    getDatabaseGraph().getGellyGraph().getEdges()
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter())
+      .getDataSet().collect();
+    getCollection().getSubgraphs()
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter())
+      .getDataSet().collect();
   }
 
   public static EPGraphStore fromCollection(
