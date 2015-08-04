@@ -17,7 +17,7 @@ EPGraphCollection communities = communities.select((EPGraph g) -> g.vertexCount(
 // combine them to a single graph
 EPGraph relevantSubgraph = communities.reduce((EPGraph g1, EPGraph g2) -> g1.combine(g2));
 // summarize the network based on the city users live in
-EPGraph summarizedGraph = relevantSubgraph.summarize("city")
+EPGraph summarizedGraph = relevantSubgraph.summarize("city");
 // write back to HDFS
 summarizedGraph.writeAsJson(...);
 ```
@@ -82,23 +82,22 @@ embedded document `data`. Meta information, like the obligatory label, is stored
 in a second embedded document `meta`. The meta document of vertices and edges may 
 contain a mapping to the logical graphs they are contained in.
 
-Two users (Alice and Bob) that have three properties each, an obligatory
-vertex label (Person) and are contained in two logical graphs (0 and 2).
+Two persons (Alice and Bob) that have three properties each and are contained in 
+two logical graphs (`"graphs":[0,2]`).
 ```
 // content of nodes.json
 {"id":0,"data":{"gender":"f","city":"Leipzig","name":"Alice"},"meta":{"label":"Person","graphs":[0,2]}}
 {"id":1,"data":{"gender":"m","city":"Leipzig","name":"Bob"},"meta":{"label":"Person","graphs":[0,2]}}
 ```
 
-Edges are represented in a similar way. Alice and Bob are connected by an edge 
-(knows). Edges may have properties (e.g., `since:2014`) and may also be contained 
-in logical graphs (0 and 2). Edge documents also store the obligatory source and 
+Edges are represented in a similar way. Alice and Bob are connected by an edge
+(knows). Edges may have properties (e.g., `"since":2014`) and may also be contained 
+in logical graphs. Additionally, edge JSON documents store the obligatory source and 
 target vertex identifier.
 
 ```
 // content of edges.json
 {"id":0,"source":0,"target":1,"data":{"since":2014},"meta":{"label":"knows","graphs":[0,2]}}
-{"id":1,"source":1,"target":0,"data":{"since":2014},"meta":{"label":"knows","graphs":[0,2]}}
 ```
 
 Graphs may also have properties and must have a label (e.g., Community).
@@ -116,7 +115,7 @@ In this example, we use the `summarize` operator to create a condensed version
 of our input graph. By summarizing on vertex and edge labels, we compute the schema
 of our graph. Each vertex in the resulting graph represents all vertices with the
 same label (e.g., Person or Group), each edge represents all edges with the same
-label that connect vertices from vertex groups.
+label that connect vertices from the same vertex groups.
 
 ```java
 EPGraphStore graphStore = FlinkGraphStore.fromJsonFile(vertexInputPath, edgeInputPath, env);
@@ -133,7 +132,7 @@ If you want to execute Gradoop on a cluster, you need *Hadoop 2.5.1* and
 
 > ./bin/yarn-session.sh -n 5 -tm 4096 -s 4
 
-* run your program (e.g. the summarization example)
+* run your program (e.g. the included Summarization example)
 
 > ./bin/flink run -c org.gradoop.examples.Summarization ~/gradoop-flink-0.0.2-jar-with-dependencies.jar --vertex-input-path hdfs:///nodes.json --edge-input-path hdfs://edges.json --use-vertex-labels --use-edge-labels
     
@@ -143,7 +142,7 @@ If you want to execute Gradoop on a cluster, you need *Hadoop 2.5.1* and
 
 The main contents of that module are the Extended Property Graph Data
 Model, the corresponding graph repository and its reference implementation for
-Apache HBase.
+Apache HBase (wip).
 
 Furthermore, the module contains the Bulk Load / Write drivers based on
 MapReduce and file readers / writers for user defined file and graph formats.
@@ -152,8 +151,10 @@ MapReduce and file readers / writers for user defined file and graph formats.
 
 This module contains a reference implementation of the EPGM including the data
 model and its operators. The concepts of the EPGM are mapped to the property
-graph data model offered by Flink Gelly and additional Flink Datasets. The
-gradoop operator implementations leverage existing Flink and Gelly operators.
+graph data model offered by 
+[Flink Gelly](https://ci.apache.org/projects/flink/flink-docs-master/libs/gelly_guide.html) 
+and additional Flink Datasets. The gradoop operator implementations leverage 
+existing Flink and Gelly operators.
 
 ### gradoop-examples
 
