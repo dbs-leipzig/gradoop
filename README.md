@@ -1,26 +1,67 @@
-### Gradoop : Graph Analytics on Apache Hadoop
-***
+# Gradoop : Graph Analytics on Apache Hadoop
 
-#### Setup development environment
+Gradoop is an open source (GPLv3) research framework for scalable graph analytics.
+It offers an extended property graph data model (EPGM) which extends the widespread
+property graph model by the concept of logical subgraphs. By providing operators
+for single graphs and collections of graphs, Gradoop offers a flexible way to express
+various analytical workflows.
 
-##### Development requirements
+```java
+// load social network from hdfs
+EPGraph db = FlinkGraphStore.fromJsonFile(...).getDatabaseGraph();
+// detect communities
+EPGraphCollection communities = db.callForCollection(new LabelPropagation(...));
+// filter large communities
+EPGraphCollection communities = communities.select((EPGraph g) -> g.vertexCount() > 100);
+// combine them to a single graph
+EPGraph relevantSubgraph = communities.reduce((EPGraph g1, EPGraph g2) -> g1.combine(g2));
+// summarize the network based on the city users live in
+EPGraph summarizedGraph = relevantSubgraph.summarize("city")
+// write back to HDFS
+summarizedGraph.writeAsJson(...);
+```
 
-* Maven 3
-* JDK 7 (Oracle or OpenJDK)
+Gradoop is **work in progress** which means APIs may change. It is currently used
+as a proof of concept implementation and far from production ready.
 
-##### Cluster requirements
+## Data Model
 
-If you want to execute Gradoop on a cluster, you need the following components
-installed.
+Besides vertices and directed edges, the model supports the concept of logical 
+subgraphs with possibly overlapping vertex and edge sets. This way, it is possible 
+to define analytical operations between logical graphs. Vertices, edges and logical
+subgraphs have a single label and may have multiple properties in the form of 
+key-value-pairs. EPGM does not enforce any kind of schema at graph elements.
 
-*   Hadoop 2.5.1
-*   HBase 0.98.11-hadoop2
+### Graph operators
 
-##### Setup Gradoop
+Our operator implementations are based on [Apache Flink](http://flink.apache.org/).
+The following table contains an overview.
 
-* Clone Gradoop to your local file system
+| Operator      | Input                | Output         | Output description                              | Implemented  |
+|:--------------|:--------------------|:----------------|:------------------------------------------------|:------------:|
+| Selection     | GraphCollection     | GraphCollection | Graphs that fulfil a predicate function         | Yes          |
+| Distinct      | GraphCollection     | GraphCollection | No duplicate graphs                             | No           |
+| SortBy        | GraphCollection     | GraphCollection | Graphs sorted by graph property                 | No           |
+| Top           | GraphCollection     | GraphCollection | The first n elements of the input collection    | No           |
+| Union         | GraphCollection (2) | GraphCollection | All graphs from both collections                | Yes          |
+| Intersection  | GraphCollection (2) | GraphCollection | Only graphs that exist in both collections      | Yes          |
+| Difference    | GraphCollection (2) | GraphCollection | Only graphs that exist in the one collection    | Yes          |
+| Combination   | Graph (2)           | Graph           | Vertices and edges from both graphs             | Yes          |
+| Overlap       | Graph (2)           | Graph           | Vertices and edges that exist in both graphs    | Yes          |
+| Exclusion     | Graph (2)           | Graph           | Vertices and edges that exist in only one graph | Yes          |
+| Pattern Match | Graph               | GraphCollection | Graphs that fulfil a given pattern              | No           |
+| Aggregation   | Graph               | Graph           | Graph with result of an aggregate function      | Yes          |
+| Projection    | Graph               | Graph           | Graph with projected vertex and edge sets       | No           |
+| Summarization | Graph               | Graph           | Structural condense of the input graph          | Yes          |
+| Apply         | Graph               | Graph           | Structural condense of the input graph          | Yes          |
 
-    > git clone https://github.com/s1ck/gradoop.git
+## Setup
+
+### Build gradoop from source
+
+* Clone Gradoop into your local file system
+
+    > git clone https://github.com/dbs-leipzig/gradoop.git
     
 * Build and execute tests
 
@@ -28,149 +69,64 @@ installed.
     
     > mvn clean install
 
-##### Running example pipelines
+### Load data into gradoop
 
-###### BIIIG
+Gradoop supports json as input format for vertices, edges and graphs. Each document
+stores the properties of the specific instance in an embedded document `data`. Meta
+information, like the obligatory label, is stored in another embedded document `meta`.
+The meta document of vertices and edges may contain a mapping to the logical graphs 
+they are contained in.
 
-The BIIIG example pipeline is used to analyze business data represented as a graph.
-It consists of multiple steps:
+Two users (Alice and Bob) that have three properties each, have an obligatory
+vertex label (Person) and are contained in two logical graphs (0 and 2).
+```
+// content of nodes.json
+{"id":0,"data":{"gender":"f","city":"Leipzig","name":"Alice"},"meta":{"label":"Person","graphs":[0,2]}}
+{"id":1,"data":{"gender":"m","city":"Leipzig","name":"Bob"},"meta":{"label":"Person","graphs":[0,2]}}
+```
 
-1.  Bulk Load a [FoodBroker](https://github.com/dbs-leipzig/foodbroker) data set into Gradoop
-2.  Identify business transaction subgraphs using Giraph
-3.  Select a (sub)set of subgraphs based on an UDF using MapReduce
-4.  Aggregate these graphs based on an UDF using MapReduce
-5.  Store the aggregated result as a graph property
-6.  Sort these subgraphs by a property value using MapReduce
-7.  Select the TOP 100 Subgraphs based on their aggregated property
-8.  Compute the overlapping vertices of these subgraphs
+Edges are represented in similar way. Alice and Bob are connected by an edge (knows).
+Edges may have properties (e.g., `since:2014`) and may also be contained in logical graphs (0 and 2).
 
-The pipeline itself is currently represented by a Hadoop Driver
-(org.gradoop.biiig.examples.BTGAnalysisDriver). Please have a look at the driver
-for further details on how to implement a pipeline.
+```
+// content of edges.json
+{"id":0,"source":0,"target":1,"data":{"since":2014},"meta":{"label":"knows","graphs":[0,2]}}
+{"id":1,"source":1,"target":0,"data":{"since":2014},"meta":{"label":"knows","graphs":[0,2]}}
+```
 
-To execute the pipeline on your hadoop installation, please follow these steps.
+Graphs may also have properties and must have a label (e.g., Community).
 
-*   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar
--with-dependencies.jar`
-    to your Hadoop environment.
+```
+// content of graphs.json
+{"id":0,"data":{"interest":"Databases","vertexCount":3},"meta":{"label":"Community"}}
+{"id":1,"data":{"interest":"Hadoop","vertexCount":3},"meta":{"label":"Community"}}
+{"id":2,"data":{"interest":"Graphs","vertexCount":4},"meta":{"label":"Community"}}
+```
 
-*   For a list of options for that example pipeline call
+### Example: Extract schema graph from possibly large-scale graph
 
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;
-    -jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver --help
+```java
+EPGraphStore graphStore = FlinkGraphStore.fromJsonFile(vertexInputPath, edgeInputPath, env);
+EPGraph schemaGraph = graphStore.getDatabaseGraph().summarizeOnVertexAndEdgeLabels();
+schemaGraph.writeAsJson(vertexOutputPath, edgeOutputPath, graphOutputPath);
+```
 
-*   The following call runs the pipeline on a given input graph (foodbroker) using 11 giraph workers, 11 reducers and a hbase scan cache of 500 rows.
+### Cluster deployment
 
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt; 
-    -jar-with-dependencies.jar org.gradoop.biiig.examples.BTGAnalysisDriver -libjars $HBASE_JARS -gip /user/hduser/input/foodbroker_10.graph -gop /user/hduser/output/hdfiles -w 11 -r 11 -sc 500
+If you want to execute Gradoop on a cluster, you need *Hadoop 2.5.1* and 
+*Flink 0.9.0 for Hadoop 2.4.1* installed and running.
 
-*   See [Foodbroker Repository](https://github.com/dbs-leipzig/foodbroker) if you want to generate your
-    own graphs or implement a custom FileReader to load your own graph format.
+* start a flink yarn-session (e.g. 5 Task managers with 4GB RAM and 4 processing slots each) 
 
-###### SNA
+> ./bin/yarn-session.sh -n 5 -tm 4096 -s 4
 
-The SNA example pipeline is used to analyze a social network represented as a graph.
-It consists of multiple steps:
+* run your program (e.g. the summarization example)
 
-1.  Bulk Load a [LDBC-SNB](https://github.com/ldbc/ldbc_snb_datagen) data set into Gradoop
-2.  Identify communities using Label Propagation in Giraph
-3.  Summarize Communities as single vertices with count value
-4.  Aggregate edges inside a community and between communities to single edges with count value
-
-The pipeline itself is currently represented by a Hadoop Driver
-(org.gradoop.biiig.examples.SNAAnalysisDriver). Please have a look at the driver
-for further details on how to implement a pipeline.
-
-To execute the pipeline on your hadoop installation, please follow these steps.
-
-*   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar
--with-dependencies.jar`
-    to your Hadoop environment.
-
-*   For a list of options for that example pipeline call
-
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;
-    -jar-with-dependencies.jar org.gradoop.biiig.examples.SNAAnalysisDriver --help
-
-*   The following call runs the complete pipeline on a given input graph folder (LDBC-SNB) using 11 giraph workers and a hbase scan cache of 500 rows.
-
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt; 
-    -jar-with-dependencies.jar org.gradoop.biiig.examples.SNAAnalysisDriver -libjars $HBASE_JARS --bulkload --meta-data-path datasets/snb/example/ --vertex-line-reader CSVReader -gip /user/hduser/input/ -gop /user/hduser/output/snaexample11 -lp -w 11 -sum /user/hduser/output/summarize -v
-
-*   See [LDBC-SNB](https://github.com/ldbc/ldbc_snb_datagen) if you want to generate your
-    own graphs or implement a custom FileReader to load your own graph format.
+> ./bin/flink run -c org.gradoop.examples.Summarization ~/gradoop-flink-0.0.2-jar-with-dependencies.jar --vertex-input-path hdfs:///nodes.json --edge-input-path hdfs://edges.json --use-vertex-labels --use-edge-labels
     
-###### RDF
+## Gradoop modules
 
-The RDF example pipeline analyzes a given NTriple using following steps:
-
-1. Bulk Load RDF NTriple file into Gradoop (optional: enrich RDF data based 
-on LOD facts)
-2. Compute Connected Components using Giraph
-3. For each component the contained vertices are counted using MapReduce.
-4. Resulting graphs are written back to Gradoop (and optionally written to a 
-Neo4j database)
-
-The pipeline itself is currently represented by a Hadoop Driver
-(org.gradoop.biiig.examples.RDFAnalysisDriver). Please have a look at the driver
-for further details on how to implement a pipeline.
-
-To execute the pipeline on your hadoop installation, please follow these steps.
-
-*   Copy the generated `gradoop-examples/target/gradoop-examples-<version>-jar-with-dependencies.jar`
-    to your Hadoop environment.
-
-*   For a list of options for that example pipeline call
-
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.biiig.examples.RDFAnalysisDriver
-    --help
-
-*   Bulk load RDF data and delete old data, data is loaded to custom HBase 
-table with prefix 'rdf'
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.drivers.BulkLoadDriver
-    -libjars $HBASE_JARS -gip /user/hduser/input/dataset.nt -gop 
-    /user/hduser/output/rdf/dataset -vlr org.gradoop.io.reader.RDFReader
-     -dt -tp rdf
-
-*   RDF Instance Enrichment (optional) - on all vertices in a given HBase table
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar
-    org.gradoop.rdf.examples.RDFInstanceEnrichmentDriver -libjars $HBASE_JARS
-     -tp rdf
-    
-*   Analysis (ConnectedComponents + Aggregate) on a given HBase table
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.rdf.examples.RDFAnalysisDriver
-    -libjars $HBASE_JARS -si -tp rdf -w 6 -r 6 -gop 
-    /user/hduser/output/rdf/dataset_analysis
-    
-*   Create a Neo4j database which can be used for further analysis
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop-examples-&lt;version&gt;-jar-with-dependencies.jar org.gradoop.rdf.examples.Neo4jOutputDriver
-    -o outputFolder -tp rdf
-
-##### Importing data into Gradoop
-
-*   Gradoop supports Bulk Loading graphs into the repository. The following
-    command gives you a list of options
-
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop.jar org.gradoop.drivers.BulkLoadDriver --help
-
-*   The bulk load supports user defined formats. You need to implement
-    `org.gradoop.io.reader.VertexLineReader`, please have a look at
-    `org.gradoop.io.reader.JsonReader` for an example.
-
-##### Exporting data from Gradoop
-
-*   Gradoop supports Bulk Writing graphs into the HDFS using MapReduce. The
-    following command gives you a list of options
-
-    > $HADOOP_PREFIX/bin/hadoop jar gradoop.jar org.gradoop.drivers.BulkWriteDriver --help
-
-*   The bulk write supports user defined formats. You need to implement
-    `org.gradoop.io.writer.VertexLineWriter`, please have a look at
-    `org.gradoop.io.writer.JsonWriter` for an example.
-
-#### Gradoop modules
-
-##### gradoop-core
+### gradoop-core
 
 The main contents of that module are the Extended Property Graph Data
 Model, the corresponding graph repository and its reference implementation for
@@ -179,32 +135,26 @@ Apache HBase.
 Furthermore, the module contains the Bulk Load / Write drivers based on
 MapReduce and file readers / writers for user defined file and graph formats.
 
-##### gradoop-giraph
+### gradoop-flink
 
-Contains graph algorithms and EPG-operators implemented with Apache Giraph. It
-also contains various formats to read and write the graph from and to the
-graph repository.
+This module contains a reference implementation of the EPGM including the data
+model and its operators. The concepts of the EPGM are mapped to the property
+graph data model offered by Flink Gelly and additional Flink Datasets. The
+gradoop operator implementations leverage existing Flink and Gelly operators.
 
-##### gradoop-mapreduce
-
-Contains EPG-operators implemented with Apache MapReduce and I/O formats used
-by these operator implementations.
-
-##### gradoop-examples
+### gradoop-examples
 
 Contains example pipelines showing use cases for Gradoop. 
 
-*   BIIIG pipeline for business related graph data using specific data readers
-*   SNA pipeline for social network analysis
-*   RDF pipeline for semantic web analysis
+*   Graph summarization (build structural aggregates of property graphs)
 
-##### gradoop-checkstyle
+### gradoop-checkstyle
 
 Used to maintain the codestyle for the whole project.
 
-#### Developer notes
+## Developer notes
 
-##### Code style for IntelliJ IDEA
+### Code style for IntelliJ IDEA
 
 *   copy codestyle from dev-support to your local IDEA config folder
 
@@ -214,7 +164,7 @@ Used to maintain the codestyle for the whole project.
 
 *   `File -> Settings -> Code Style -> Java -> Scheme -> "Gradoop"`
     
-##### Troubleshooting
+### Troubleshooting
 
 * Exception while running test org.apache.giraph.io.hbase
 .TestHBaseRootMarkerVertexFormat (incorrect permissions, see
