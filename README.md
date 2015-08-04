@@ -1,4 +1,4 @@
-# Gradoop : Graph Analytics on Apache Hadoop
+## Gradoop: Distributed Graph Analytics on Hadoop
 
 [Gradoop](http://www.gradoop.com) is an open source (GPLv3) research framework 
 for scalable graph analytics. It offers a graph data model which extends the widespread 
