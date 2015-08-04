@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import org.gradoop.model.EPGraphData;
@@ -25,7 +24,6 @@ import java.util.Map;
  * POJO for graph data.
  */
 public class EPFlinkGraphData extends EPFlinkEntity implements EPGraphData {
-
   public EPFlinkGraphData() {
   }
 

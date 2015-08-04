@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Maps;
@@ -27,11 +26,8 @@ import java.util.Objects;
 
 public abstract class EPFlinkEntity implements Identifiable, Attributed,
   Labeled, Comparable<EPFlinkEntity> {
-
   private Long id;
-
   private String label;
-
   private Map<String, Object> properties;
 
   public EPFlinkEntity() {

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -39,36 +38,30 @@ import java.util.Iterator;
 
 public abstract class AbstractBinaryCollectionToCollectionOperator implements
   BinaryCollectionToCollectionOperator {
-
   protected Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> firstGraph;
   protected Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> secondGraph;
-
   protected DataSet<Subgraph<Long, EPFlinkGraphData>> firstSubgraphs;
   protected DataSet<Subgraph<Long, EPFlinkGraphData>> secondSubgraphs;
-
   protected ExecutionEnvironment env;
 
   @Override
   public EPGraphCollection execute(EPGraphCollection firstCollection,
     EPGraphCollection secondCollection) throws Exception {
-
     firstGraph = firstCollection.getGellyGraph();
     firstSubgraphs = firstCollection.getSubgraphs();
     secondGraph = secondCollection.getGellyGraph();
     secondSubgraphs = secondCollection.getSubgraphs();
     env = firstGraph.getContext();
-
     return executeInternal(firstCollection, secondCollection);
   }
 
   protected abstract EPGraphCollection executeInternal(
-    EPGraphCollection firstCollection, EPGraphCollection secondGraphCollection) throws
-    Exception;
+    EPGraphCollection firstCollection,
+    EPGraphCollection secondGraphCollection) throws Exception;
 
   protected static class SubgraphGroupReducer implements
     GroupReduceFunction<Subgraph<Long, EPFlinkGraphData>, Subgraph<Long,
       EPFlinkGraphData>> {
-
     /**
      * number of times a vertex must occur inside a group
      */
@@ -97,7 +90,6 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
   protected static class EdgeJoinFunction implements
     JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
       EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>> {
-
     @Override
     public Edge<Long, EPFlinkEdgeData> join(
       Edge<Long, EPFlinkEdgeData> leftTuple,
@@ -108,7 +100,6 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
 
   protected static class Tuple2LongMapper<C> implements
     MapFunction<C, Tuple2<C, Long>> {
-
     private Long secondField;
 
     public Tuple2LongMapper(Long secondField) {
@@ -129,5 +120,4 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
       return subgraph.f0.getId();
     }
   }
-
 }

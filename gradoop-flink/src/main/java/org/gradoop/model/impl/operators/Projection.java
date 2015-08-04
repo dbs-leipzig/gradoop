@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.gradoop.model.EPEdgeData;
@@ -25,7 +24,6 @@ import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class Projection implements UnaryGraphToGraphOperator {
-
   private final UnaryFunction<EPVertexData, EPVertexData> vertexFunc;
   private final UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc;
 

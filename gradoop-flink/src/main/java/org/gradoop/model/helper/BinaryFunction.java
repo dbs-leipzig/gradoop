@@ -14,11 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.helper;
 
 public interface BinaryFunction<I, O> {
-
   O execute(I first, I second);
-
 }

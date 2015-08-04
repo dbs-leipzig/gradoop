@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -39,12 +38,10 @@ public class Exclusion extends AbstractBinaryGraphToGraphOperator {
   @Override
   protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
     final Long newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
-
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph1 =
       firstGraph.getGellyGraph();
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph2 =
       secondGraph.getGellyGraph();
-
     // union vertex sets, group by vertex id, filter vertices where the group
     // contains exactly one vertex which belongs to the graph, the operator is
     // called on
@@ -53,7 +50,6 @@ public class Exclusion extends AbstractBinaryGraphToGraphOperator {
         .reduceGroup(
           new VertexGroupReducer(1L, firstGraph.getId(), secondGraph.getId()))
         .map(new VertexToGraphUpdater(newGraphID));
-
     JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
       EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>
       joinFunc =
@@ -66,7 +62,6 @@ public class Exclusion extends AbstractBinaryGraphToGraphOperator {
           return leftTuple;
         }
       };
-
     // In exclude(), we are only interested in edges that connect vertices
     // that are in the exclusion of the vertex sets. Thus, we join the edges
     // from the left graph with the new vertex set using source and target ids.
@@ -75,7 +70,6 @@ public class Exclusion extends AbstractBinaryGraphToGraphOperator {
         .equalTo(VERTEX_ID).with(joinFunc).join(newVertexSet)
         .where(TARGET_VERTEX_ID).equalTo(VERTEX_ID).with(joinFunc)
         .map(new EdgeToGraphUpdater(newGraphID));
-
     return EPGraph.fromGraph(
       Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
       new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL));

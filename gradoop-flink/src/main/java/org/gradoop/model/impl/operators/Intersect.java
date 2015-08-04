@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -40,15 +39,12 @@ public class Intersect extends AbstractBinaryCollectionToCollectionOperator {
     final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
       firstSubgraphs.union(secondSubgraphs).groupBy(GRAPH_ID)
         .reduceGroup(new SubgraphGroupReducer(2));
-
     DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
       firstGraph.getVertices();
-
     DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
       thisVertices.flatMap(
         new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
           Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
-
           @Override
           public void flatMap(Vertex<Long, EPFlinkVertexData> v,
             Collector<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>
@@ -59,12 +55,10 @@ public class Intersect extends AbstractBinaryCollectionToCollectionOperator {
             }
           }
         });
-
     DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
       verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
         new JoinFunction<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>,
           Subgraph<Long, EPFlinkGraphData>, Vertex<Long, EPFlinkVertexData>>() {
-
           @Override
           public Vertex<Long, EPFlinkVertexData> join(
             Tuple2<Vertex<Long, EPFlinkVertexData>, Long> vertices,
@@ -72,13 +66,10 @@ public class Intersect extends AbstractBinaryCollectionToCollectionOperator {
             return vertices.f0;
           }
         });
-
     DataSet<Edge<Long, EPFlinkEdgeData>> edges = firstGraph.getEdges();
-
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
       .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
       .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
-
     return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
       newSubgraphs, env);
   }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.graph.Graph;
@@ -34,13 +33,13 @@ import java.util.List;
  * Implementation of the Label Propagation Algorithm:
  * The input graph as adjacency list contains the information about the
  * vertex (id), value (label) and its edges to neighbors.
- * <p/>
+ * <p>
  * In super step 0 each vertex will propagate its value within his neighbors
- * <p/>
+ * <p>
  * In the remaining super steps each vertex will adopt the value of the
  * majority of their neighbors or the smallest one if there are just one
  * neighbor. If a vertex adopt a new value it'll propagate the new one again.
- * <p/>
+ * <p>
  * The computation will terminate if no new values are assigned.
  */
 public class LabelPropagationAlgorithm implements

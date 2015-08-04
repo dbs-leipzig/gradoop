@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -29,7 +28,6 @@ import java.util.Collection;
 
 public class EPVertexCollection implements
   EPVertexCollectionOperators<EPVertexData> {
-
   private DataSet<Vertex<Long, EPFlinkVertexData>> vertices;
 
   EPVertexCollection(DataSet<Vertex<Long, EPFlinkVertexData>> vertices) {
@@ -50,7 +48,6 @@ public class EPVertexCollection implements
         }
       }));
   }
-
 
   @Override
   public <V> Iterable<V> values(Class<V> propertyType, String propertyKey) {

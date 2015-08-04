@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -82,15 +81,10 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
    * Used to represent vertices that do not have the vertex grouping property.
    */
   public static final String NULL_VALUE = "__NULL";
-
   private static final String COUNT_PROPERTY_KEY = "count";
-
   private final String vertexGroupingKey;
-
   private final String edgeGroupingKey;
-
   private final boolean useVertexLabels;
-
   private final boolean useEdgeLabels;
 
   Summarization(String vertexGroupingKey, String edgeGroupingKey,
@@ -105,7 +99,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
   public EPGraph execute(EPGraph graph) {
     EPGraph result;
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> gellyGraph;
-
     if (!useVertexProperty() &&
       !useEdgeProperty() && !useVertexLabels() && !useEdgeLabels()) {
       // graphs stays unchanged
@@ -191,7 +184,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
    */
   protected static class VertexGroupingKeySelector implements
     KeySelector<Vertex<Long, EPFlinkVertexData>, String> {
-
     private String groupPropertyKey;
     private boolean useLabel;
 
@@ -209,7 +201,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
         groupPropertyKey != null && !"".equals(groupPropertyKey);
       boolean hasProperty =
         useProperty && (v.getValue().getProperty(groupPropertyKey) != null);
-
       if (useLabel && useProperty && hasProperty) {
         groupingValue = String.format("%s_%s", label,
           v.getValue().getProperty(groupPropertyKey).toString());
@@ -222,7 +213,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
       } else if (useProperty) {
         groupingValue = NULL_VALUE;
       }
-
       return groupingValue;
     }
   }
@@ -233,8 +223,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
   protected static class VertexGroupSummarizer implements
     GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
       EPFlinkVertexData>> {
-
-
     private String groupPropertyKey;
     private boolean useLabel;
 
@@ -266,7 +254,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
           initialized = true;
         }
       }
-
       EPFlinkVertexData newVertexData = new EPFlinkVertexData();
       newVertexData.setId(newVertexID);
       newVertexData.setLabel(groupLabel);
@@ -275,7 +262,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
       }
       newVertexData.setProperty(COUNT_PROPERTY_KEY, groupCount);
       newVertexData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
-
       collector.collect(new Vertex<>(newVertexID, newVertexData));
     }
 
@@ -299,7 +285,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
   protected static class EdgeGroupSummarizer implements
     GroupReduceFunction<Tuple5<Long, Long, Long, String, String>, Edge<Long,
       EPFlinkEdgeData>> {
-
     private String groupPropertyKey;
     private boolean useLabel;
 
@@ -319,7 +304,6 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
       Long newTargetVertex = null;
       String edgeLabel = FlinkConstants.DEFAULT_EDGE_LABEL;
       String edgeGroupingValue = null;
-
       for (Tuple5<Long, Long, Long, String, String> e : edges) {
         edgeCount++;
         if (!initialized) {
@@ -353,15 +337,10 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
   }
 
   public static class SummarizationBuilder {
-
     private String vertexGroupingKey;
-
     private String edgeGroupingKey;
-
     private boolean useVertexLabels = false;
-
     private boolean useEdgeLabels = false;
-
     private boolean useJoinOp = false;
 
     public SummarizationBuilder(String vertexGroupingKey,

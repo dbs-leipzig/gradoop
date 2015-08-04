@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -43,17 +42,14 @@ public class Difference extends AbstractBinaryCollectionToCollectionOperator {
     DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> thisGraphs =
       firstSubgraphs
         .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(1l));
-
     DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> otherGraphs =
       secondSubgraphs
         .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(2l));
-
     final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
       thisGraphs.union(otherGraphs)
         .groupBy(new SubgraphTupleKeySelector<Long>()).reduceGroup(
         new GroupReduceFunction<Tuple2<Subgraph<Long, EPFlinkGraphData>,
           Long>, Subgraph<Long, EPFlinkGraphData>>() {
-
           @Override
           public void reduce(
             Iterable<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> iterable,
@@ -74,16 +70,13 @@ public class Difference extends AbstractBinaryCollectionToCollectionOperator {
             }
           }
         });
-
     DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
       firstGraph.getVertices().union(secondGraph.getVertices())
         .distinct(VERTEX_ID);
-
     DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
       thisVertices.flatMap(
         new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
           Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
-
           @Override
           public void flatMap(Vertex<Long, EPFlinkVertexData> vertexData,
             Collector<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>
@@ -98,7 +91,6 @@ public class Difference extends AbstractBinaryCollectionToCollectionOperator {
       verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
         new JoinFunction<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>,
           Subgraph<Long, EPFlinkGraphData>, Vertex<Long, EPFlinkVertexData>>() {
-
           @Override
           public Vertex<Long, EPFlinkVertexData> join(
             Tuple2<Vertex<Long, EPFlinkVertexData>, Long> vertexLongTuple,
@@ -106,13 +98,10 @@ public class Difference extends AbstractBinaryCollectionToCollectionOperator {
             return vertexLongTuple.f0;
           }
         }).distinct(VERTEX_ID);
-
     DataSet<Edge<Long, EPFlinkEdgeData>> edges = firstGraph.getEdges();
-
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
       .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
       .equalTo(VERTEX_ID).with(new EdgeJoinFunction()).distinct(EDGE_ID);
-
     return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
       newSubgraphs, env);
   }

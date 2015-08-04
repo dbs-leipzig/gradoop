@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators;
+package org.gradoop.model.helper;
 
 import org.apache.flink.api.common.functions.Function;
 import org.apache.flink.graph.Vertex;

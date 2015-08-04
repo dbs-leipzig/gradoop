@@ -14,23 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.helper;
 
 public class FlinkConstants {
   public static final String DEFAULT_GRAPH_LABEL = "__GRAPH__";
-
   public static final String DEFAULT_VERTEX_LABEL = "__VERTEX__";
-
   public static final String DEFAULT_EDGE_LABEL = "__EDGE__";
-
   public static final Long DATABASE_GRAPH_ID = -1L;
-
   public static final Long COMBINE_GRAPH_ID = -2L;
-
   public static final Long OVERLAP_GRAPH_ID = -3L;
-
   public static final Long EXCLUDE_GRAPH_ID = -4L;
-
   public static final Long SUMMARIZE_GRAPH_ID = -5L;
 }

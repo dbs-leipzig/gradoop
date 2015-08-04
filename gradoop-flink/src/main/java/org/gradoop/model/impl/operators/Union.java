@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.java.DataSet;
@@ -30,7 +29,6 @@ import org.gradoop.model.impl.Subgraph;
 import static org.gradoop.model.impl.EPGraph.*;
 
 public class Union extends AbstractBinaryCollectionToCollectionOperator {
-
   @Override
   protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
     EPGraphCollection secondGraphCollection) {
@@ -41,7 +39,6 @@ public class Union extends AbstractBinaryCollectionToCollectionOperator {
         .distinct(VERTEX_ID);
     DataSet<Edge<Long, EPFlinkEdgeData>> edges =
       firstGraph.getEdges().union(secondGraph.getEdges()).distinct(EDGE_ID);
-
     return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
       newSubgraphs, env);
   }

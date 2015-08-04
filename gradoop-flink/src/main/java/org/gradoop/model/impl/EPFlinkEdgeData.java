@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import org.gradoop.model.EPEdgeData;
@@ -27,9 +26,7 @@ import java.util.Set;
  */
 public class EPFlinkEdgeData extends EPFlinkGraphElementEntity implements
   EPEdgeData {
-
   private Long sourceVertex;
-
   private Long targetVertex;
 
   public EPFlinkEdgeData() {

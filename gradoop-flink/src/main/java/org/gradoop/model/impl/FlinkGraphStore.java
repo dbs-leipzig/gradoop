@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
@@ -31,9 +30,7 @@ import org.gradoop.model.store.EPGraphStore;
 import java.util.Collection;
 
 public class FlinkGraphStore implements EPGraphStore {
-
   private static EPFlinkGraphData DATABASE_DATA;
-
   private static Subgraph<Long, EPFlinkGraphData> DATABASE_SUBGRAPH;
 
   static {
@@ -47,7 +44,6 @@ public class FlinkGraphStore implements EPGraphStore {
    * Database graph representing the vertex and edge space.
    */
   private EPGraphCollection database;
-
   /**
    * Flink execution environment.
    */
@@ -102,11 +98,9 @@ public class FlinkGraphStore implements EPGraphStore {
     } else {
       epgmGraphSet = env.fromCollection(Lists.newArrayList(DATABASE_DATA));
     }
-
     DataSet<Vertex<Long, EPFlinkVertexData>> vertexDataSet = null;
     DataSet<Edge<Long, EPFlinkEdgeData>> edgeDataSet = null;
     DataSet<Subgraph<Long, EPFlinkGraphData>> graphDataSet = null;
-
     if (epgmVertexSet != null) {
       vertexDataSet = epgmVertexSet.map(new VerticesConverter());
       edgeDataSet = epgmEdgeSet.map(new EdgesConverter());
@@ -136,7 +130,6 @@ public class FlinkGraphStore implements EPGraphStore {
    */
   public static class VerticesConverter implements
     MapFunction<EPFlinkVertexData, Vertex<Long, EPFlinkVertexData>> {
-
     @Override
     public Vertex<Long, EPFlinkVertexData> map(EPFlinkVertexData value) throws
       Exception {
@@ -150,7 +143,6 @@ public class FlinkGraphStore implements EPGraphStore {
    */
   public static class EdgesConverter implements
     MapFunction<EPFlinkEdgeData, Edge<Long, EPFlinkEdgeData>> {
-
     @Override
     public Edge<Long, EPFlinkEdgeData> map(EPFlinkEdgeData value) throws
       Exception {
@@ -165,7 +157,6 @@ public class FlinkGraphStore implements EPGraphStore {
    */
   public static class GraphsConverter implements
     MapFunction<EPFlinkGraphData, Subgraph<Long, EPFlinkGraphData>> {
-
     @Override
     public Subgraph<Long, EPFlinkGraphData> map(EPFlinkGraphData value) throws
       Exception {

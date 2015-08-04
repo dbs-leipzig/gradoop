@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -41,7 +40,6 @@ public class IntersectWithSmall extends
     final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
       firstSubgraphs.union(secondSubgraphs).groupBy(GRAPH_ID)
         .reduceGroup(new SubgraphGroupReducer(2));
-
     final List<Long> identifiers;
     identifiers = secondSubgraphs
       .map(new MapFunction<Subgraph<Long, EPFlinkGraphData>, Long>() {
@@ -51,12 +49,10 @@ public class IntersectWithSmall extends
           return subgraph.getId();
         }
       }).collect();
-
     DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
       firstGraph.getVertices();
     vertices =
       vertices.filter(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
-
         @Override
         public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
           Exception {
@@ -68,16 +64,12 @@ public class IntersectWithSmall extends
           return false;
         }
       });
-
     DataSet<Edge<Long, EPFlinkEdgeData>> edges = firstGraph.getEdges();
-
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
       .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
       .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
-
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> newGraph =
       Graph.fromDataSet(vertices, edges, env);
-
     return new EPGraphCollection(newGraph, newSubgraphs, env);
   }
 

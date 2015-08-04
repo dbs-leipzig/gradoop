@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Sets;
@@ -25,7 +24,6 @@ import java.util.Set;
 
 public abstract class EPFlinkGraphElementEntity extends EPFlinkEntity implements
   EPGraphElement {
-
   private Set<Long> graphs;
 
   public EPFlinkGraphElementEntity() {

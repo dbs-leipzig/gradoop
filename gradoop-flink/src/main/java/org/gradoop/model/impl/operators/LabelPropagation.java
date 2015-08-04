@@ -20,6 +20,7 @@ package org.gradoop.model.impl.operators;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.model.helper.LongFromVertexFunction;
 import org.gradoop.model.impl.EPFlinkEdgeData;
 import org.gradoop.model.impl.EPFlinkVertexData;
 import org.gradoop.model.impl.EPGraph;

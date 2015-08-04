@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -52,7 +51,6 @@ import java.util.Map;
 public class EPGraph implements EPGraphData, EPGraphOperators {
 
   /* Convenience key selectors */
-
   public static final KeySelector<Subgraph<Long, EPFlinkGraphData>, Long>
     GRAPH_ID;
   public static final KeySelector<Vertex<Long, EPFlinkVertexData>, Long>

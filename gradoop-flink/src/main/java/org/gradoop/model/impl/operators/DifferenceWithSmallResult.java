@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -42,23 +41,19 @@ public class DifferenceWithSmallResult extends
   @Override
   protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
     EPGraphCollection secondGraphCollection) throws Exception {
-
     DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> thisGraphs =
       firstSubgraphs.map(
         new AbstractBinaryCollectionToCollectionOperator
           .Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(
           1L));
-
     DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> otherGraphs =
       secondSubgraphs
         .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(2L));
-
     final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
       thisGraphs.union(otherGraphs)
         .groupBy(new SubgraphTupleKeySelector<Long>()).reduceGroup(
         new GroupReduceFunction<Tuple2<Subgraph<Long, EPFlinkGraphData>,
           Long>, Subgraph<Long, EPFlinkGraphData>>() {
-
           @Override
           public void reduce(
             Iterable<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> iterable,
@@ -79,7 +74,6 @@ public class DifferenceWithSmallResult extends
             }
           }
         });
-
     final List<Long> identifiers = newSubgraphs
       .map(new MapFunction<Subgraph<Long, EPFlinkGraphData>, Long>() {
         @Override
@@ -88,12 +82,10 @@ public class DifferenceWithSmallResult extends
           return subgraph.getId();
         }
       }).collect();
-
     DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
       firstGraph.getVertices();
     vertices =
       vertices.filter(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
-
         @Override
         public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
           Exception {
@@ -107,13 +99,10 @@ public class DifferenceWithSmallResult extends
           return vertexInGraph;
         }
       });
-
     DataSet<Edge<Long, EPFlinkEdgeData>> edges = firstGraph.getEdges();
-
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
       .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
       .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
-
     return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
       newSubgraphs, env);
   }

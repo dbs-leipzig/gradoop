@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -31,7 +30,6 @@ import java.util.Iterator;
 
 public abstract class AbstractBinaryGraphToGraphOperator implements
   BinaryGraphToGraphOperator {
-
   @Override
   public EPGraph execute(EPGraph firstGraph, EPGraph secondGraph) {
     return executeInternal(firstGraph, secondGraph);
@@ -54,17 +52,14 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
   protected static class VertexGroupReducer implements
     GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
       EPFlinkVertexData>> {
-
     /**
      * number of times a vertex must occur inside a group
      */
     private long amount;
-
     /**
      * graph, a vertex must be part of
      */
     private Long includedGraphID;
-
     /**
      * graph, a vertex must not be part of
      */
@@ -114,7 +109,6 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
   protected static class EdgeGroupReducer implements
     GroupReduceFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long,
       EPFlinkEdgeData>> {
-
     private long amount;
 
     public EdgeGroupReducer(long amount) {
@@ -143,7 +137,6 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
   protected static class VertexToGraphUpdater implements
     MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
       EPFlinkVertexData>> {
-
     private final long newGraphID;
 
     public VertexToGraphUpdater(final long newGraphID) {
@@ -163,7 +156,6 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
    */
   protected static class EdgeToGraphUpdater implements
     MapFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long, EPFlinkEdgeData>> {
-
     private final long newGraphID;
 
     public EdgeToGraphUpdater(final long newGraphID) {
@@ -177,5 +169,4 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
       return e;
     }
   }
-
 }

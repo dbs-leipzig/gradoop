@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
 import com.google.common.collect.Lists;
@@ -39,7 +38,6 @@ import org.gradoop.model.impl.EPFlinkVertexData;
 import java.util.List;
 
 public class SummarizationCross extends Summarization {
-
   SummarizationCross(String vertexGroupingKey, String edgeGroupingKey,
     boolean useVertexLabels, boolean useEdgeLabels) {
     super(vertexGroupingKey, edgeGroupingKey, useVertexLabels, useEdgeLabels);
@@ -49,14 +47,11 @@ public class SummarizationCross extends Summarization {
   protected Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> summarizeInternal(
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph) {
     /* build summarized vertices */
-
     SortedGrouping<Vertex<Long, EPFlinkVertexData>> groupedSortedVertices =
       groupAndSortVertices(graph);
-
     // create new summarized gelly vertices
     DataSet<Vertex<Long, EPFlinkVertexData>> newVertices =
       buildSummarizedVertices(groupedSortedVertices);
-
     // create a list of vertex ids from each vertex group
     DataSet<List<Long>> vertexGroups =
       createListFromVertexGroup(groupedSortedVertices);
@@ -64,7 +59,6 @@ public class SummarizationCross extends Summarization {
     /* build summarized edges */
     DataSet<Edge<Long, EPFlinkEdgeData>> newEdges =
       buildSummarizedEdges(graph, vertexGroups);
-
     return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
   }
 
@@ -85,22 +79,18 @@ public class SummarizationCross extends Summarization {
     // (edge id, source vertex, target vertex, edge label, grouping value)
     DataSet<Tuple5<Long, Long, Long, String, String>> edges = graph.getEdges()
       .map(new EdgeProjection(getEdgeGroupingKey(), useEdgeLabels()));
-
     // compute cross between vertex groups and edges
     DataSet<Tuple2<List<Long>, Tuple5<Long, Long, Long, String, String>>>
       groupEdgeCross = vertexGroups.cross(edges);
-
     // create intra edges and (possible incomplete) inter edges
     DataSet<Tuple5<Long, Long, Long, String, String>> firstRoundEdges =
       groupEdgeCross.flatMap(new FirstRoundFlatMap());
 
     /* build intra edges */
-
     FilterOperator<Tuple5<Long, Long, Long, String, String>>
       filteredIntraEdges = firstRoundEdges
       // filter intra edges (source == target)
       .filter(new IntraEdgeFilterWith());
-
     DataSet<Edge<Long, EPFlinkEdgeData>> intraEdges =
       groupEdges(filteredIntraEdges)
         // sort group by edge id to get edge representative
@@ -110,29 +100,24 @@ public class SummarizationCross extends Summarization {
           new EdgeGroupSummarizer(getEdgeGroupingKey(), useEdgeLabels()));
 
     /* build inter edges */
-
     DataSet<Tuple5<Long, Long, Long, String, String>> filteredInterEdges =
       firstRoundEdges
         // filter inter edge candidates (source != target)
         .filter(new InterEdgeFilter());
-
     // cross inter-edges candidates with vertex groups
     groupEdgeCross = vertexGroups.cross(filteredInterEdges);
-
     // replace target vertex with group representative if possible
     FlatMapOperator<Tuple2<List<Long>, Tuple5<Long, Long, Long, String,
       String>>, Tuple5<Long, Long, Long, String, String>>
       secondRoundEdges = groupEdgeCross
       // finalize inter-edges
       .flatMap(new SecondRoundFlatMap());
-
     // sort group by edge id to get edge representative
     DataSet<Edge<Long, EPFlinkEdgeData>> interEdges =
       groupEdges(secondRoundEdges).sortGroup(0, Order.ASCENDING)
         // and create new gelly edges with payload
         .reduceGroup(
           new EdgeGroupSummarizer(getEdgeGroupingKey(), useEdgeLabels()));
-
     return interEdges.union(intraEdges);
   }
 
@@ -155,18 +140,18 @@ public class SummarizationCross extends Summarization {
   /**
    * Creates intra/inter edges by replacing source-vertex [and target-vertex]
    * with their corresponding vertex group representative.
-   * <p/>
+   * <p>
    * Takes a tuple (vertex-group, edge) as input and returns a new edge
    * considering three options:
-   * <p/>
+   * <p>
    * 1)
    * source-vertex in group and target-vertex in group =>
    * (group-representative, group-representative) // intra-edge
-   * <p/>
+   * <p>
    * 2)
    * source-vertex in group =>
    * (group-representative, target-vertex) // inter-edge
-   * <p/>
+   * <p>
    * 3)
    * target-vertex in group =>
    * no output as this is processed by another group, edge pair
@@ -174,7 +159,6 @@ public class SummarizationCross extends Summarization {
   private static class FirstRoundFlatMap implements
     FlatMapFunction<Tuple2<List<Long>, Tuple5<Long, Long, Long, String,
       String>>, Tuple5<Long, Long, Long, String, String>> {
-
     @Override
     public void flatMap(
       Tuple2<List<Long>, Tuple5<Long, Long, Long, String, String>> t,
@@ -214,7 +198,6 @@ public class SummarizationCross extends Summarization {
   private static class SecondRoundFlatMap implements
     FlatMapFunction<Tuple2<List<Long>, Tuple5<Long, Long, Long, String,
       String>>, Tuple5<Long, Long, Long, String, String>> {
-
     @Override
     public void flatMap(
       Tuple2<List<Long>, Tuple5<Long, Long, Long, String, String>> t,
@@ -229,7 +212,6 @@ public class SummarizationCross extends Summarization {
       String edgeGroupingValue = edge.f4;
       // list is sorted, representative is the first element
       Long groupRepresentative = sortedVertexGroup.get(0);
-
       // target vertex in group?
       if (sortedVertexGroup.contains(targetVertex)) {
         coll.collect(
@@ -256,7 +238,6 @@ public class SummarizationCross extends Summarization {
    */
   private static class InterEdgeFilter implements
     FilterFunction<Tuple5<Long, Long, Long, String, String>> {
-
     @Override
     public boolean filter(Tuple5<Long, Long, Long, String, String> t) throws
       Exception {
@@ -271,7 +252,6 @@ public class SummarizationCross extends Summarization {
   private static class EdgeProjection implements
     MapFunction<Edge<Long, EPFlinkEdgeData>, Tuple5<Long, Long, Long, String,
       String>> {
-
     private String groupPropertyKey;
     private boolean useLabel;
 
@@ -288,13 +268,11 @@ public class SummarizationCross extends Summarization {
         groupPropertyKey != null && !"".equals(groupPropertyKey);
       boolean hasProperty =
         useProperty && (e.getValue().getProperty(groupPropertyKey) != null);
-
       if (useProperty && hasProperty) {
         groupingValue = e.getValue().getProperty(groupPropertyKey).toString();
       } else if (useProperty) {
         groupingValue = NULL_VALUE;
       }
-
       return new Tuple5<>(e.getValue().getId(), e.getSource(), e.getTarget(),
         useLabel ? e.getValue().getLabel() : null, groupingValue);
     }

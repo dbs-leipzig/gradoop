@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
@@ -59,11 +58,8 @@ import static org.gradoop.model.impl.EPGraph.GRAPH_ID;
  */
 public class EPGraphCollection implements
   EPGraphCollectionOperators<EPGraphData> {
-
   private ExecutionEnvironment env;
-
   private Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph;
-
   private DataSet<Subgraph<Long, EPFlinkGraphData>> subgraphs;
 
   public EPGraphCollection(
@@ -89,10 +85,8 @@ public class EPGraphCollection implements
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> subGraph = this.graph
       .subgraph(new VertexGraphContainmentFilter(graphID),
         new EdgeGraphContainmentFilter(graphID));
-
     DataSet<Tuple1<Long>> graphIDDataSet =
       env.fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
-
     // get graph data based on graph id
     EPFlinkGraphData graphData =
       this.subgraphs.joinWithTiny(graphIDDataSet).where(GRAPH_ID).equalTo(0)
@@ -117,26 +111,20 @@ public class EPGraphCollection implements
   @Override
   public EPGraphCollection getGraphs(final List<Long> identifiers) throws
     Exception {
-
     DataSet<Subgraph<Long, EPFlinkGraphData>> newSubGraphs = this.subgraphs
       .filter(new FilterFunction<Subgraph<Long, EPFlinkGraphData>>() {
-
         @Override
         public boolean filter(Subgraph<Long, EPFlinkGraphData> subgraph) throws
           Exception {
           return identifiers.contains(subgraph.getId());
-
         }
       });
-
     // build new vertex set
     DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
       this.graph.getVertices().filter(new VertexInGraphFilter(identifiers));
-
     // build new edge set
     DataSet<Edge<Long, EPFlinkEdgeData>> edges =
       this.graph.getEdges().filter(new EdgeInGraphFilter(identifiers));
-
     return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
       newSubGraphs, env);
   }
@@ -158,11 +146,9 @@ public class EPGraphCollection implements
           return predicateFunction.filter(g.getValue());
         }
       });
-
     // get the identifiers of these subgraphs
     final Collection<Long> graphIDs = filteredSubgraphs
       .map(new MapFunction<Subgraph<Long, EPFlinkGraphData>, Long>() {
-
         @Override
         public Long map(
           Subgraph<Long, EPFlinkGraphData> longEPFlinkGraphDataSubgraph) throws
@@ -170,12 +156,9 @@ public class EPGraphCollection implements
           return longEPFlinkGraphDataSubgraph.getId();
         }
       }).collect();
-
     // use graph ids to filter vertices from the actual graph structure
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> filteredGraph =
-      this.graph.filterOnVertices(
-
-        new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> filteredGraph = this.graph
+      .filterOnVertices(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
           @Override
           public boolean filter(
             Vertex<Long, EPFlinkVertexData> longEPFlinkVertexDataVertex) throws
@@ -189,7 +172,6 @@ public class EPGraphCollection implements
             return false;
           }
         });
-
     return new EPGraphCollection(filteredGraph, filteredSubgraphs, env);
   }
 
@@ -304,10 +286,8 @@ public class EPGraphCollection implements
     return EPGraph.fromGraph(this.graph, null);
   }
 
-
   private static class VertexGraphContainmentFilter implements
     FilterFunction<Vertex<Long, EPFlinkVertexData>> {
-
     private long graphID;
 
     public VertexGraphContainmentFilter(long graphID) {
@@ -322,7 +302,6 @@ public class EPGraphCollection implements
 
   private static class EdgeGraphContainmentFilter implements
     FilterFunction<Edge<Long, EPFlinkEdgeData>> {
-
     private long graphID;
 
     public EdgeGraphContainmentFilter(long graphID) {
@@ -337,7 +316,6 @@ public class EPGraphCollection implements
 
   private static class VertexInGraphFilter implements
     FilterFunction<Vertex<Long, EPFlinkVertexData>> {
-
     List<Long> identifiers;
 
     public VertexInGraphFilter(List<Long> identifiers) {
@@ -360,7 +338,6 @@ public class EPGraphCollection implements
 
   private static class EdgeInGraphFilter implements
     FilterFunction<Edge<Long, EPFlinkEdgeData>> {
-
     List<Long> identifiers;
 
     public EdgeInGraphFilter(List<Long> identifiers) {
