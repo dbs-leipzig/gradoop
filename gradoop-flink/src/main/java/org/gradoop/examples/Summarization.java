@@ -48,7 +48,7 @@ public class Summarization implements ProgramDescription {
     OPTIONS.addOption(OPTION_EDGE_INPUT_PATH, "edge-input-path", true,
       "Path to edge file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
-      "Path to write output to");
+      "Path to write output files to");
     OPTIONS.addOption(OPTION_VERTEX_GROUPING_KEY, "vertex-grouping-key", true,
       "Property key to group vertices on.");
     OPTIONS.addOption(OPTION_EDGE_GROUPING_KEY, "edge-grouping-key", true,
@@ -113,10 +113,27 @@ public class Summarization implements ProgramDescription {
       summarizedGraph = databaseGraph.summarize(vertexKey);
     }
     if (summarizedGraph != null) {
-      System.out.println(summarizedGraph.toString());
+      if (cmd.hasOption(OPTION_OUTPUT_PATH)) {
+        writeOutputFiles(summarizedGraph,
+          cmd.getOptionValue(OPTION_OUTPUT_PATH));
+      } else {
+        System.out.println(summarizedGraph.toString());
+      }
     } else {
       System.err.println("wrong parameter constellation");
     }
+  }
+
+  private static void writeOutputFiles(EPGraph graph, String outputPath) throws
+    Exception {
+    final String fileSeparator = System.getProperty("file.separator");
+    final String vertexFile =
+      String.format("%s%s%s", outputPath, fileSeparator, "nodes.json");
+    final String edgeFile =
+      String.format("%s%s%s", outputPath, fileSeparator, "edges.json");
+    final String graphFile =
+      String.format("%s%s%s", outputPath, fileSeparator, "graphs.json");
+    graph.writeAsJson(vertexFile, edgeFile, graphFile);
   }
 
   private static CommandLine parseArguments(String[] args) throws

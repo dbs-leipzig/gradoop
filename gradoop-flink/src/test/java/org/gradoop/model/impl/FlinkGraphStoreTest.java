@@ -86,5 +86,7 @@ public class FlinkGraphStoreTest extends EPFlinkTest {
       newGraphStore.getDatabaseGraph().getVertexCount());
     assertEquals(graphStore.getDatabaseGraph().getEdgeCount(),
       newGraphStore.getDatabaseGraph().getEdgeCount());
+    assertEquals(graphStore.getCollection().getGraphCount(),
+      newGraphStore.getCollection().getGraphCount());
   }
 }

@@ -27,6 +27,7 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.EPGraphData;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
@@ -270,6 +271,20 @@ public class EPGraphCollection implements
   @Override
   public EPGraph callForGraph(UnaryCollectionToGraphOperator op) {
     return op.execute(this);
+  }
+
+  @Override
+  public void writeAsJson(String vertexFile, String edgeFile,
+    String graphFile) throws Exception {
+    this.getGellyGraph().getVertices()
+      .writeAsFormattedText(vertexFile, new JsonWriter.VertexTextFormatter())
+      .getDataSet().collect();
+    this.getGellyGraph().getEdges()
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter())
+      .getDataSet().collect();
+    this.getSubgraphs()
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter())
+      .getDataSet().collect();
   }
 
   @Override

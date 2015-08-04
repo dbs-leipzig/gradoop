@@ -19,10 +19,12 @@ package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPGraphData;
 import org.gradoop.model.EPPatternGraph;
@@ -71,6 +73,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
     TARGET_VERTEX_ID = new EdgeTargetVertexKeySelector();
   }
 
+  private ExecutionEnvironment env;
+
   /**
    * Gelly graph that encapsulates the vertex and edge datasets associated
    * with that EPGraph.
@@ -82,15 +86,16 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   private EPFlinkGraphData graphData;
 
   private EPGraph(Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    EPFlinkGraphData graphData) {
+    EPFlinkGraphData graphData, ExecutionEnvironment env) {
     this.graph = graph;
     this.graphData = graphData;
+    this.env = env;
   }
 
   public static EPGraph fromGraph(
     Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
     EPFlinkGraphData graphData) {
-    return new EPGraph(graph, graphData);
+    return new EPGraph(graph, graphData, graph.getContext());
   }
 
   public Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> getGellyGraph() {
@@ -258,6 +263,20 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   public EPGraphCollection callForCollection(
     UnaryGraphToCollectionOperator operator) {
     return operator.execute(this);
+  }
+
+  @Override
+  public void writeAsJson(String vertexFile, String edgeFile,
+    String graphFile) throws Exception {
+    this.getGellyGraph().getVertices()
+      .writeAsFormattedText(vertexFile, new JsonWriter.VertexTextFormatter())
+      .getDataSet().collect();
+    this.getGellyGraph().getEdges()
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter())
+      .getDataSet().collect();
+    env.fromElements(new Subgraph<>(graphData.getId(), graphData))
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter())
+      .getDataSet().collect();
   }
 
   @Override

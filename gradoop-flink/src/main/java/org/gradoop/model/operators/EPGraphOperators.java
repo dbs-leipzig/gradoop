@@ -107,4 +107,7 @@ public interface EPGraphOperators {
 
   EPGraphCollection callForCollection(UnaryGraphToCollectionOperator operator);
 
+  void writeAsJson(final String vertexFile, final String edgeFile,
+    final String graphFile) throws Exception;
+
 }

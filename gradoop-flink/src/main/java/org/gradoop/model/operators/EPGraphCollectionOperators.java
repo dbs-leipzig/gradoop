@@ -99,5 +99,8 @@ public interface EPGraphCollectionOperators<T> extends
 
   EPGraph callForGraph(UnaryCollectionToGraphOperator op);
 
+  void writeAsJson(final String vertexFile, final String edgeFile,
+    final String graphFile) throws Exception;
+
 
 }
