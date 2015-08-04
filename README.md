@@ -1,4 +1,4 @@
-# Gradoop : Graph Analytics on Apache Hadoop
+## Gradoop: Distributed Graph Analytics on Hadoop
 
 Gradoop is an open source (GPLv3) research framework for scalable graph analytics.
 It offers an extended property graph data model (EPGM) which extends the widespread
