@@ -16,11 +16,9 @@
 
     <modules>
         <module>gradoop-core</module>
-        <module>gradoop-giraph</module>
+        <module>gradoop-flink</module>
         <module>gradoop-examples</module>
         <module>gradoop-checkstyle</module>
-        <module>gradoop-mapreduce</module>
-        <module>gradoop-flink</module>
     </modules>
 
     <developers>
@@ -66,9 +64,7 @@
         <project.build.targetJdk>1.7</project.build.targetJdk>
 
         <dep.flink.version>0.9.0</dep.flink.version>
-        <dep.giraph.version>1.1.0-hadoop2</dep.giraph.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
-        <dep.httpclient.version>4.1.3</dep.httpclient.version>
         <dep.junit.version>4.11</dep.junit.version>
         <dep.junitparams.version>1.0.4</dep.junitparams.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
@@ -174,7 +170,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${plugin.maven-surefire.version}</version>
                     <configuration>
-                        <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+                        <argLine>-Xmx1024m</argLine>
                     </configuration>
                 </plugin>
             </plugins>
@@ -188,18 +184,6 @@
             <dependency>
                 <groupId>de.uni-leipzig.de.dbs</groupId>
                 <artifactId>gradoop-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
-                <artifactId>gradoop-giraph</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
-                <artifactId>gradoop-mapreduce</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -228,13 +212,6 @@
                 <version>${dep.flink.version}</version>
             </dependency>
 
-            <!-- Giraph -->
-            <dependency>
-                <groupId>org.apache.giraph</groupId>
-                <artifactId>giraph-core</artifactId>
-                <version>${dep.giraph.version}</version>
-            </dependency>
-
             <!-- HBase -->
             <dependency>
                 <groupId>org.apache.hbase</groupId>
@@ -242,7 +219,7 @@
                 <version>${dep.hbase.version}</version>
                 <scope>provided</scope>
             </dependency>
-            
+
             <!-- Neo4j -->
             <dependency>
                 <groupId>org.neo4j</groupId>
@@ -256,12 +233,6 @@
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
             </dependency>
-            
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${dep.httpclient.version}</version>
-            </dependency>
 
             <!-- test dependencies -->
             <!-- Gradoop -->
@@ -269,23 +240,6 @@
                 <groupId>de.uni-leipzig.de.dbs</groupId>
                 <artifactId>gradoop-core</artifactId>
                 <version>${project.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
-                <artifactId>gradoop-giraph</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- Giraph -->
-            <dependency>
-                <groupId>org.apache.giraph</groupId>
-                <artifactId>giraph-core</artifactId>
-                <version>${dep.giraph.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>

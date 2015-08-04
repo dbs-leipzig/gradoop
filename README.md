@@ -37,7 +37,7 @@ key-value-pairs. EPGM does not enforce any kind of schema at graph elements.
 Our operator implementations are based on [Apache Flink](http://flink.apache.org/).
 The following table contains an overview.
 
-| Operator      | Input                | Output         | Output description                              | Implemented  |
+| Operator      | Input               | Output         | Output description                               | Implemented  |
 |:--------------|:--------------------|:----------------|:------------------------------------------------|:------------:|
 | Selection     | GraphCollection     | GraphCollection | Graphs that fulfil a predicate function         | Yes          |
 | Distinct      | GraphCollection     | GraphCollection | No duplicate graphs                             | No           |
