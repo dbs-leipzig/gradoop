@@ -8,17 +8,16 @@ import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.MessagingFunction;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.operators.io.formats.FlinkBTGMessage;
-import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexType;
-import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexValue;
+import org.gradoop.model.impl.operators.io.formats.BTGVertexType;
+import org.gradoop.model.impl.operators.io.formats.BTGVertexValue;
 
 import java.util.List;
 
 /**
  * Flink based BTGComputation
  */
-public class FlinkBTGAlgorithm implements
-  GraphAlgorithm<Long, FlinkBTGVertexValue, NullValue> {
+public class BTGAlgorithm implements
+  GraphAlgorithm<Long, BTGVertexValue, NullValue> {
   /**
    * Max Iteration counter for the Algorithm
    */
@@ -29,7 +28,7 @@ public class FlinkBTGAlgorithm implements
    *
    * @param maxIterations maximal Iterations of Algorithm
    */
-  public FlinkBTGAlgorithm(int maxIterations) {
+  public BTGAlgorithm(int maxIterations) {
     this.maxIterations = maxIterations;
   }
 
@@ -41,9 +40,9 @@ public class FlinkBTGAlgorithm implements
    * @throws Exception
    */
   @Override
-  public Graph<Long, FlinkBTGVertexValue, NullValue> run(
-    Graph<Long, FlinkBTGVertexValue, NullValue> graph) throws Exception {
-    Graph<Long, FlinkBTGVertexValue, NullValue> undirectedGraph =
+  public Graph<Long, BTGVertexValue, NullValue> run(
+    Graph<Long, BTGVertexValue, NullValue> graph) throws Exception {
+    Graph<Long, BTGVertexValue, NullValue> undirectedGraph =
       graph.getUndirected();
     // initialize vertex values and run the Vertex Centric Iteration
     return undirectedGraph
@@ -55,14 +54,14 @@ public class FlinkBTGAlgorithm implements
    * Vertex Updater Class
    */
   private static final class BTGUpdater extends
-    VertexUpdateFunction<Long, FlinkBTGVertexValue, FlinkBTGMessage> {
+    VertexUpdateFunction<Long, BTGVertexValue, org.gradoop.model.impl.operators.io.formats.BTGMessage> {
     @Override
-    public void updateVertex(Vertex<Long, FlinkBTGVertexValue> vertex,
-      MessageIterator<FlinkBTGMessage> messages) throws Exception {
-      if (vertex.getValue().getVertexType() == FlinkBTGVertexType.MASTER) {
+    public void updateVertex(Vertex<Long, BTGVertexValue> vertex,
+      MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage> messages) throws Exception {
+      if (vertex.getValue().getVertexType() == BTGVertexType.MASTER) {
         processMasterVertex(vertex, messages);
       } else if (vertex.getValue().getVertexType() ==
-        FlinkBTGVertexType.TRANSACTIONAL) {
+        BTGVertexType.TRANSACTIONAL) {
         long currentMinValue = getCurrentMinValue(vertex);
         long newMinValue = getNewMinValue(messages, currentMinValue);
         boolean changed = currentMinValue != newMinValue;
@@ -78,11 +77,11 @@ public class FlinkBTGAlgorithm implements
      * @param vertex   The current vertex
      * @param messages All incoming messages
      */
-    private void processMasterVertex(Vertex<Long, FlinkBTGVertexValue> vertex,
-      MessageIterator<FlinkBTGMessage> messages) {
-      FlinkBTGVertexValue vertexValue = vertex.getValue();
+    private void processMasterVertex(Vertex<Long, BTGVertexValue> vertex,
+      MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage> messages) {
+      BTGVertexValue vertexValue = vertex.getValue();
       if (getSuperstepNumber() > 1) {
-        for (FlinkBTGMessage message : messages) {
+        for (org.gradoop.model.impl.operators.io.formats.BTGMessage message : messages) {
           vertexValue
             .updateNeighbourBtgID(message.getSenderID(), message.getBtgID());
         }
@@ -102,7 +101,7 @@ public class FlinkBTGAlgorithm implements
      * @param minValue All incoming messages
      */
     private void processTransactionalVertex(
-      Vertex<Long, FlinkBTGVertexValue> vertex, long minValue) {
+      Vertex<Long, BTGVertexValue> vertex, long minValue) {
       vertex.getValue().removeLastBtgID();
       vertex.getValue().addGraph(minValue);
       setNewVertexValue(vertex.getValue());
@@ -116,11 +115,11 @@ public class FlinkBTGAlgorithm implements
      * @param currentMinValue The current minimum value
      * @return The new (maybe unchanged) minimum value
      */
-    private long getNewMinValue(MessageIterator<FlinkBTGMessage> messages,
+    private long getNewMinValue(MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage> messages,
       long currentMinValue) {
       long newMinValue = currentMinValue;
       if (getSuperstepNumber() > 1) {
-        for (FlinkBTGMessage message : messages) {
+        for (org.gradoop.model.impl.operators.io.formats.BTGMessage message : messages) {
           if (message.getBtgID() < newMinValue) {
             newMinValue = message.getBtgID();
           }
@@ -137,7 +136,7 @@ public class FlinkBTGAlgorithm implements
      * @param vertex The current vertex
      * @return The minimum BTG ID that vertex knows.
      */
-    private long getCurrentMinValue(Vertex<Long, FlinkBTGVertexValue> vertex) {
+    private long getCurrentMinValue(Vertex<Long, BTGVertexValue> vertex) {
       List<Long> btgIDs = Lists.newArrayList(vertex.getValue().getGraphs());
       return (btgIDs.size() > 0) ? btgIDs.get(btgIDs.size() - 1) :
         vertex.getId();
@@ -148,13 +147,14 @@ public class FlinkBTGAlgorithm implements
    * Vertex Message Class
    */
   private static final class BTGMessage extends
-    MessagingFunction<Long, FlinkBTGVertexValue, FlinkBTGMessage, NullValue> {
+    MessagingFunction<Long, BTGVertexValue, org.gradoop.model.impl.operators.io.formats.BTGMessage, NullValue> {
     @Override
-    public void sendMessages(Vertex<Long, FlinkBTGVertexValue> vertex) throws
+    public void sendMessages(Vertex<Long, BTGVertexValue> vertex) throws
       Exception {
       if (vertex.getValue().getVertexType() ==
-        FlinkBTGVertexType.TRANSACTIONAL) {
-        FlinkBTGMessage message = new FlinkBTGMessage();
+        BTGVertexType.TRANSACTIONAL) {
+        org.gradoop.model.impl.operators.io.formats.BTGMessage
+          message = new org.gradoop.model.impl.operators.io.formats.BTGMessage();
         message.setSenderID(vertex.getId());
         if (vertex.getValue().getLastGraph() != null) {
           message.setBtgID(vertex.getValue().getLastGraph());

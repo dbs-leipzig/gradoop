@@ -11,13 +11,13 @@ import java.util.Set;
 
 /**
  * Custom vertex used by {@link org.gradoop.model.impl.operators
- * .FlinkBTGAlgorithm}.
+ * .BTGAlgorithm}.
  */
-public class FlinkBTGVertexValue implements GraphElement {
+public class BTGVertexValue implements GraphElement {
   /**
-   * The vertex type which is defined in {@link FlinkBTGVertexType}
+   * The vertex type which is defined in {@link BTGVertexType}
    */
-  private FlinkBTGVertexType vertexType;
+  private BTGVertexType vertexType;
   /**
    * The value of that vertex.
    */
@@ -28,7 +28,7 @@ public class FlinkBTGVertexValue implements GraphElement {
   private List<Long> btgIDs;
   /**
    * Stores the minimum vertex ID per message sender. This is only used by
-   * vertices of type {@link FlinkBTGVertexType} MASTER, so it is only
+   * vertices of type {@link BTGVertexType} MASTER, so it is only
    * initialized
    * when needed.
    */
@@ -41,7 +41,7 @@ public class FlinkBTGVertexValue implements GraphElement {
    * @param vertexValue The value stored at that vertex
    * @param btgIDs      A list of BTGs that vertex belongs to
    */
-  public FlinkBTGVertexValue(FlinkBTGVertexType vertexType, Double vertexValue,
+  public BTGVertexValue(BTGVertexType vertexType, Double vertexValue,
     List<Long> btgIDs) {
     this.vertexType = vertexType;
     this.vertexValue = vertexValue;
@@ -53,7 +53,7 @@ public class FlinkBTGVertexValue implements GraphElement {
    *
    * @return vertex type
    */
-  public FlinkBTGVertexType getVertexType() {
+  public BTGVertexType getVertexType() {
     return this.vertexType;
   }
 

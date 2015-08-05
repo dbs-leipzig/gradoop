@@ -3,7 +3,7 @@ package org.gradoop.model.impl.operators.io.formats;
 /**
  * Created by galpha on 27.07.15.
  */
-public enum FlinkBTGVertexType {
+public enum BTGVertexType {
   /**
    * Vertices that are created during a business transaction, like
    * invoices, quotations, deliveries.
