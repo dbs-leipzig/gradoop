@@ -6,8 +6,8 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexType;
-import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexValue;
+import org.gradoop.model.impl.operators.io.formats.BTGVertexType;
+import org.gradoop.model.impl.operators.io.formats.BTGVertexValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,16 +33,16 @@ public class FlinkBTGAlgorithmTestHelper {
    * @param env   actual ExecutionEnvironment
    * @return Gelly Graph based for FlinkBTGComputation
    */
-  public static Graph<Long, FlinkBTGVertexValue, NullValue> getGraph(
+  public static Graph<Long, BTGVertexValue, NullValue> getGraph(
     String[] graph, ExecutionEnvironment env) {
-    List<Vertex<Long, FlinkBTGVertexValue>> vertices = new ArrayList<>();
+    List<Vertex<Long, BTGVertexValue>> vertices = new ArrayList<>();
     List<Edge<Long, NullValue>> edges = new ArrayList<>();
     for (String line : graph) {
       String[] lineTokens = LINE_TOKEN_SEPARATOR.split(line);
       long id = Long.parseLong(lineTokens[0]);
       String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(lineTokens[1]);
-      FlinkBTGVertexType vertexClass =
-        FlinkBTGVertexType.values()[Integer.parseInt(valueTokens[0])];
+      BTGVertexType vertexClass =
+        BTGVertexType.values()[Integer.parseInt(valueTokens[0])];
       Double vertexValue = Double.parseDouble(valueTokens[1]);
       List<Long> btgIDs =
         Lists.newArrayListWithCapacity(valueTokens.length - 1);
@@ -50,7 +50,7 @@ public class FlinkBTGAlgorithmTestHelper {
         btgIDs.add(Long.parseLong(valueTokens[n]));
       }
       vertices.add(new Vertex<>(id,
-        new FlinkBTGVertexValue(vertexClass, vertexValue, btgIDs)));
+        new BTGVertexValue(vertexClass, vertexValue, btgIDs)));
       String[] edgeTokens =
         (lineTokens.length == 3) ? VALUE_TOKEN_SEPARATOR.split(lineTokens[2]) :
           new String[0];

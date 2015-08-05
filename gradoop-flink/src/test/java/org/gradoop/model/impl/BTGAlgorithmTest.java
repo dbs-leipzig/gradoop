@@ -6,8 +6,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.operators.FlinkBTGAlgorithm;
-import org.gradoop.model.impl.operators.io.formats.FlinkBTGVertexValue;
+import org.gradoop.model.impl.operators.BTGAlgorithm;
+import org.gradoop.model.impl.operators.io.formats.BTGVertexValue;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class FlinkBTGAlgorithmTest {
+public class BTGAlgorithmTest {
   private static String[] getConnectedIIG() {
     return new String[] {
       "0,1 0,1 4 9 10", "1,1 1,0 5 6 11 12", "2,1 2,8 13", "3,1 3,7 14 15",
@@ -39,10 +39,10 @@ public class FlinkBTGAlgorithmTest {
   public void testConnectedIIG() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, FlinkBTGVertexValue, NullValue> gellyGraph =
+    Graph<Long, BTGVertexValue, NullValue> gellyGraph =
       FlinkBTGAlgorithmTestHelper.getGraph(getConnectedIIG(), env);
-    DataSet<Vertex<Long, FlinkBTGVertexValue>> btgGraph =
-      gellyGraph.run(new FlinkBTGAlgorithm(maxIteration)).getVertices();
+    DataSet<Vertex<Long, BTGVertexValue>> btgGraph =
+      gellyGraph.run(new BTGAlgorithm(maxIteration)).getVertices();
     validateConnectedIIGResult(parseResult(btgGraph.collect()));
   }
 
@@ -50,17 +50,17 @@ public class FlinkBTGAlgorithmTest {
   public void testDisconnectedIIG() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, FlinkBTGVertexValue, NullValue> gellyGraph =
+    Graph<Long, BTGVertexValue, NullValue> gellyGraph =
       FlinkBTGAlgorithmTestHelper.getGraph(getDisconnectedIIG(), env);
-    DataSet<Vertex<Long, FlinkBTGVertexValue>> btgGraph =
-      gellyGraph.run(new FlinkBTGAlgorithm(maxIteration)).getVertices();
+    DataSet<Vertex<Long, BTGVertexValue>> btgGraph =
+      gellyGraph.run(new BTGAlgorithm(maxIteration)).getVertices();
     validateDisconnectedIIGResult(parseResult(btgGraph.collect()));
   }
 
   private Map<Long, List<Long>> parseResult(
-    List<Vertex<Long, FlinkBTGVertexValue>> graph) {
+    List<Vertex<Long, BTGVertexValue>> graph) {
     Map<Long, List<Long>> result = new HashMap<>();
-    for (Vertex<Long, FlinkBTGVertexValue> v : graph) {
+    for (Vertex<Long, BTGVertexValue> v : graph) {
       result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphs()));
     }
     return result;
