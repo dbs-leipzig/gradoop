@@ -1,25 +1,14 @@
-/*
- * This file is part of Gradoop.
- *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.gradoop.model.impl.operators;
 
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.apache.flink.types.NullValue;
 import org.gradoop.model.helper.LongFromVertexFunction;
 import org.gradoop.model.impl.EPFlinkEdgeData;
 import org.gradoop.model.impl.EPFlinkVertexData;
@@ -30,7 +19,7 @@ import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import java.io.Serializable;
 
 /**
- * LabelPropagation Graph to Collection Operator
+ * Bla bla blubb
  */
 public class LabelPropagation implements UnaryGraphToCollectionOperator,
   Serializable {
@@ -41,18 +30,12 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
   /**
    * Value PropertyKey
    */
-  private String propertyKey;
+  private String propertyKey = "muhuhahahah";
   /**
    * Flink Execution Environment
    */
   private final ExecutionEnvironment env;
 
-  /**
-   * Constructor
-   *
-   * @param maxIterations int defining maximal step counter
-   * @param env           ExecutionEnvironment
-   */
   public LabelPropagation(int maxIterations, String propertyKey,
     ExecutionEnvironment env) {
     this.maxIterations = maxIterations;
@@ -60,27 +43,80 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     this.env = env;
   }
 
-  /**
-   * {@inheritDoc }
-   */
   @Override
-  public EPGraphCollection execute(EPGraph epGraph) {
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph =
-      epGraph.getGellyGraph();
+  public EPGraphCollection execute(EPGraph epGraph) throws Exception {
+    DataSet<Vertex<Long, LabelPropagationValue>> vertices =
+      epGraph.getGellyGraph().getVertices().map(
+        new MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
+          LabelPropagationValue>>() {
+          @Override
+          public Vertex<Long, LabelPropagationValue> map(
+            Vertex<Long, EPFlinkVertexData> vertex) throws Exception {
+            return new Vertex<>(vertex.getId(),
+              new LabelPropagationValue(vertex.getId(), (Long) vertex.getValue()
+                .getProperty(EPGLabelPropagationAlgorithm.CURRENT_VALUE)));
+          }
+        });
+    DataSet<Edge<Long, NullValue>> edges = epGraph.getGellyGraph().getEdges()
+      .map(
+        new MapFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long, NullValue>>() {
+          @Override
+          public Edge<Long, NullValue> map(
+            Edge<Long, EPFlinkEdgeData> edge) throws Exception {
+            return new Edge<>(edge.getSource(), edge.getTarget(),
+              NullValue.getInstance());
+          }
+        });
+    Graph<Long, LabelPropagationValue, NullValue> graph =
+      Graph.fromDataSet(vertices, edges, env);
     try {
       graph = graph.run(new LabelPropagationAlgorithm(this.maxIterations));
     } catch (Exception e) {
       e.printStackTrace();
     }
-    EPGraph labeledGraph = EPGraph.fromGraph(graph, null);
+    DataSet<Vertex<Long, EPFlinkVertexData>> labeledVertices =
+      graph.getVertices().join(epGraph.getGellyGraph().getVertices())
+        .where(new LPKeySelector()).equalTo(new VertexKeySelector())
+        .with(new LPJoin());
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> gellyGraph = Graph
+      .fromDataSet(labeledVertices, epGraph.getGellyGraph().getEdges(), env);
+    EPGraph labeledGraph = EPGraph.fromGraph(gellyGraph, null);
     LongFromProperty lfp = new LongFromProperty(propertyKey);
     SplitBy callByPropertyKey = new SplitBy(lfp, env);
     return callByPropertyKey.execute(labeledGraph);
   }
 
-  /**
-   * {@inheritDoc }
-   */
+  private static class LPKeySelector implements
+    KeySelector<Vertex<Long, LabelPropagationValue>, Long> {
+    @Override
+    public Long getKey(Vertex<Long, LabelPropagationValue> vertex) throws
+      Exception {
+      return vertex.getId();
+    }
+  }
+
+  private static class VertexKeySelector implements
+    KeySelector<Vertex<Long, EPFlinkVertexData>, Long> {
+    @Override
+    public Long getKey(Vertex<Long, EPFlinkVertexData> vex) throws Exception {
+      return vex.getId();
+    }
+  }
+
+  private static class LPJoin implements
+    JoinFunction<Vertex<Long, LabelPropagationValue>, Vertex<Long,
+      EPFlinkVertexData>, Vertex<Long, EPFlinkVertexData>> {
+    @Override
+    public Vertex<Long, EPFlinkVertexData> join(
+      Vertex<Long, LabelPropagationValue> lpVertex,
+      Vertex<Long, EPFlinkVertexData> epVertex) throws Exception {
+      epVertex.getValue()
+        .setProperty(EPGLabelPropagationAlgorithm.CURRENT_VALUE,
+          lpVertex.getValue().getCurrentCommunity());
+      return epVertex;
+    }
+  }
+
   @Override
   public String getName() {
     return "LabelPropagation";

@@ -21,5 +21,5 @@ import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
 
 public interface UnaryGraphToCollectionOperator extends Operator {
-  EPGraphCollection execute(EPGraph graph);
+  EPGraphCollection execute(EPGraph graph) throws Exception;
 }

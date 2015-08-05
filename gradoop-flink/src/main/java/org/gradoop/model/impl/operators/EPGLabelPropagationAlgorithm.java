@@ -23,7 +23,8 @@ import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.MessagingFunction;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
-import org.apache.flink.types.NullValue;
+import org.gradoop.model.impl.EPFlinkEdgeData;
+import org.gradoop.model.impl.EPFlinkVertexData;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,8 +42,24 @@ import java.util.List;
  * <p/>
  * The computation will terminate if no new values are assigned.
  */
-public class LabelPropagationAlgorithm implements
-  GraphAlgorithm<Long, LabelPropagationValue, NullValue> {
+public class EPGLabelPropagationAlgorithm implements
+  GraphAlgorithm<Long, EPFlinkVertexData, EPFlinkEdgeData> {
+  /**
+   * Vertex property key where the resulting label is stored.
+   */
+  public static final String CURRENT_VALUE = "value";
+  /**
+   * Vertex property key where the lasat label is stored
+   */
+  public static final String LAST_VALUE = "lastvalue";
+  /**
+   * Vertex property key where stabilization counter is stored
+   */
+  public static final String STABILIZATION_COUNTER = "stabilization.counter";
+  /**
+   * Vertex property key where the stabilization maxima is stored
+   */
+  public static final String STABILIZATION_MAX = "stabilization.max";
   /**
    * Counter to define maximal Iteration for the Algorithm
    */
@@ -53,7 +70,7 @@ public class LabelPropagationAlgorithm implements
    *
    * @param maxIterations int counter to define maximal Iterations
    */
-  public LabelPropagationAlgorithm(int maxIterations) {
+  public EPGLabelPropagationAlgorithm(int maxIterations) {
     this.maxIterations = maxIterations;
   }
 
@@ -65,14 +82,13 @@ public class LabelPropagationAlgorithm implements
    * @throws Exception
    */
   @Override
-  public Graph<Long, LabelPropagationValue, NullValue> run(
-    Graph<Long, LabelPropagationValue, NullValue> graph) throws Exception {
+  public Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> run(
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph) throws Exception {
     // initialize vertex values and run the Vertex Centric Iteration
-    Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
+    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> epGraph =
       graph.getUndirected();
-    return gellyGraph
-      .runVertexCentricIteration(new LPUpdater(), new LPMessenger(),
-        maxIterations);
+    return epGraph.runVertexCentricIteration(new LPUpdater(), new LPMessenger(),
+      maxIterations);
   }
 
   /**
@@ -80,73 +96,66 @@ public class LabelPropagationAlgorithm implements
    * all the incoming messages.
    */
   public static final class LPUpdater extends
-    VertexUpdateFunction<Long, LabelPropagationValue, Long> {
+    VertexUpdateFunction<Long, EPFlinkVertexData, Long> {
     @Override
-    public void updateVertex(Vertex<Long, LabelPropagationValue> vertex,
+    public void updateVertex(Vertex<Long, EPFlinkVertexData> vertex,
       MessageIterator<Long> msg) throws Exception {
+      System.out.println("Superstep: " + getSuperstepNumber());
       if (getSuperstepNumber() == 1) {
+        vertex.getValue().setProperty(LAST_VALUE, Long.MAX_VALUE);
+        vertex.getValue().setProperty(STABILIZATION_COUNTER, 0);
         //Todo: Use Broadcast to set ChangeMax
-        vertex.getValue().setChangeMax(20);
+        vertex.getValue().setProperty(STABILIZATION_MAX, 20);
         setNewVertexValue(vertex.getValue());
       } else {
-        long currentCommunity = vertex.getValue().getCurrentCommunity();
-        long lastCommunity = vertex.getValue().getLastCommunity();
-        int stabilizationRound = vertex.getValue().getStabilizationCounter();
+        long currentCommunity =
+          (Long) vertex.getValue().getProperty(CURRENT_VALUE);
+        long lastCommunity = (Long) vertex.getValue().getProperty(LAST_VALUE);
+        int stabilizationRound =
+          (int) vertex.getValue().getProperty(STABILIZATION_COUNTER);
         long newCommunity = getNewCommunity(vertex, msg);
         boolean changed = currentCommunity != newCommunity;
         boolean lastEqualsnew = lastCommunity == newCommunity;
-        if (changed && lastEqualsnew) {
-          //Counts the amount of community swaps between 2 communities
+        if (changed &&
+          lastEqualsnew) { //Counts the amount of community swaps between 2
+          // communities
           stabilizationRound++;
-          vertex.getValue().setStabilizationCounter(stabilizationRound);
-          boolean maximalChanges =
-            stabilizationRound <= vertex.getValue().getChangeMax();
+          vertex.getValue()
+            .setProperty(STABILIZATION_COUNTER, stabilizationRound);
+          boolean maximalChanges = stabilizationRound <=
+            (int) vertex.getValue().getProperty(STABILIZATION_MAX);
           if (maximalChanges) {
-            vertex.getValue().setLastCommunity(currentCommunity);
-            vertex.getValue().setCurrentCommunity(newCommunity);
+            vertex.getValue().setProperty(LAST_VALUE, currentCommunity);
+            vertex.getValue().setProperty(CURRENT_VALUE, newCommunity);
             setNewVertexValue(vertex.getValue());
           } else {
-            vertex.getValue()
-              .setCurrentCommunity(Math.min(currentCommunity, newCommunity));
-            vertex.getValue()
-              .setLastCommunity(vertex.getValue().getCurrentCommunity());
+            vertex.getValue().setProperty(CURRENT_VALUE,
+              Math.min(currentCommunity, newCommunity));
+            vertex.getValue().setProperty(LAST_VALUE,
+              vertex.getValue().getProperty(CURRENT_VALUE));
             setNewVertexValue(vertex.getValue());
           }
         }
         if (changed && !lastEqualsnew) {
-          vertex.getValue().setLastCommunity(currentCommunity);
-          vertex.getValue().setCurrentCommunity(newCommunity);
+          vertex.getValue().setProperty(LAST_VALUE, currentCommunity);
+          vertex.getValue().setProperty(CURRENT_VALUE, newCommunity);
           setNewVertexValue(vertex.getValue());
         }
       }
     }
 
-    /**
-     * Returns the current new value. This value is based on all incoming
-     * messages. Depending on the number of messages sent to the vertex, the
-     * method returns:
-     * <p/>
-     * 0 messages:   The current value
-     * <p/>
-     * 1 message:    The minimum of the message and the current vertex value
-     * <p/>
-     * >1 messages:  The most frequent of all message values
-     *
-     * @param vertex The current vertex
-     * @param msg    All incoming messages
-     * @return the new Value the vertex will become
-     */
-    private long getNewCommunity(Vertex<Long, LabelPropagationValue> vertex,
+    private long getNewCommunity(Vertex<Long, EPFlinkVertexData> vertex,
       MessageIterator<Long> msg) {
       long newCommunity;
       List<Long> allMessages = Lists.newArrayList(msg.iterator());
       if (allMessages.isEmpty()) {
         // 1. if no messages are received
-        newCommunity = vertex.getValue().getCurrentCommunity();
+        newCommunity = (Long) vertex.getValue().getProperty(CURRENT_VALUE);
       } else if (allMessages.size() == 1) {
         // 2. if just one message are received
-        newCommunity =
-          Math.min(vertex.getValue().getCurrentCommunity(), allMessages.get(0));
+        newCommunity = Math
+          .min((Long) vertex.getValue().getProperty(CURRENT_VALUE),
+            allMessages.get(0));
       } else {
         // 3. if multiple messages are received
         newCommunity = getMostFrequent(vertex, allMessages);
@@ -161,7 +170,7 @@ public class LabelPropagationAlgorithm implements
      * @param allMessages all received messages
      * @return most frequent value below all messages
      */
-    private long getMostFrequent(Vertex<Long, LabelPropagationValue> vertex,
+    private long getMostFrequent(Vertex<Long, EPFlinkVertexData> vertex,
       List<Long> allMessages) {
       Collections.sort(allMessages);
       long newValue;
@@ -185,8 +194,8 @@ public class LabelPropagationAlgorithm implements
       if (maxCounter == 1) {
         // to avoid an oscillating state of the calculation we will just use
         // the smaller value
-        newValue =
-          Math.min(vertex.getValue().getCurrentCommunity(), allMessages.get(0));
+        newValue = Math.min((Long) vertex.getValue().getProperty(CURRENT_VALUE),
+          allMessages.get(0));
       } else {
         newValue = maxValue;
       }
@@ -198,12 +207,13 @@ public class LabelPropagationAlgorithm implements
    * Distributes the value of the vertex
    */
   public static final class LPMessenger extends
-    MessagingFunction<Long, LabelPropagationValue, Long, NullValue> {
+    MessagingFunction<Long, EPFlinkVertexData, Long, EPFlinkEdgeData> {
     @Override
-    public void sendMessages(Vertex<Long, LabelPropagationValue> vertex) throws
+    public void sendMessages(Vertex<Long, EPFlinkVertexData> vertex) throws
       Exception {
       // send current minimum to neighbors
-      sendMessageToAllNeighbors(vertex.getValue().getCurrentCommunity());
+      sendMessageToAllNeighbors(
+        (Long) vertex.getValue().getProperty(CURRENT_VALUE));
     }
   }
 }

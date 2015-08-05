@@ -105,6 +105,7 @@ public interface EPGraphOperators {
 
   EPGraph callForGraph(BinaryGraphToGraphOperator operator, EPGraph otherGraph);
 
-  EPGraphCollection callForCollection(UnaryGraphToCollectionOperator operator);
+  EPGraphCollection callForCollection(UnaryGraphToCollectionOperator operator) throws
+    Exception;
 
 }

@@ -1,32 +1,33 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.model.EPFlinkTest;
+import org.gradoop.model.impl.operators.EPGLabelPropagationAlgorithm;
 import org.gradoop.model.impl.operators.LabelPropagation;
-import org.gradoop.model.impl.operators.LabelPropagationAlgorithm;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class EPGraphLabelPropagationTest extends EPFlinkTest {
+public class LabelPropagationTest extends EPFlinkTest {
   private EPGraphStore graphStore;
-  final String propertyKey = LabelPropagationAlgorithm.PROPERTY_KEY;
+  final String propertyKey = EPGLabelPropagationAlgorithm.CURRENT_VALUE;
 
-  public EPGraphLabelPropagationTest() {
+  public LabelPropagationTest() {
     this.graphStore = createSocialGraph();
   }
 
   @Test
   public void testLabelPropagationWithCallByPropertyKey() throws Exception {
     EPGraph inputGraph = graphStore.getGraph(2L);
-    EPGraphCollection labeledGraph =
-      inputGraph.callForCollection(new LabelPropagation(2, propertyKey, env));
+    EPGraphCollection labeledGraph = inputGraph
+      .callForCollection(new LabelPropagation(2, propertyKey, env));
+    labeledGraph.getGellyGraph().getVertices().print();
     assertNotNull("graph collection is null", inputGraph);
     assertEquals("wrong number of graphs", 3l, labeledGraph.size());
     assertEquals("wrong number of vertices", 4l,
       labeledGraph.getGraph().getVertexCount());
-    assertEquals("wrong number of edges", 2l,
+    assertEquals("wrong number of edges", 0l,
       labeledGraph.getGraph().getEdgeCount());
   }
 }

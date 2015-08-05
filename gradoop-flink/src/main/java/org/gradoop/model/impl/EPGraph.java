@@ -49,7 +49,6 @@ import java.util.Map;
  * @author Niklas Teichmann
  */
 public class EPGraph implements EPGraphData, EPGraphOperators {
-
   /* Convenience key selectors */
   public static final KeySelector<Subgraph<Long, EPFlinkGraphData>, Long>
     GRAPH_ID;
@@ -254,7 +253,7 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPGraphCollection callForCollection(
-    UnaryGraphToCollectionOperator operator) {
+    UnaryGraphToCollectionOperator operator) throws Exception {
     return operator.execute(this);
   }
 
