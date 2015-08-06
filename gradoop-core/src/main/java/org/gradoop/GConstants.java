@@ -17,11 +17,6 @@
 
 package org.gradoop;
 
-import org.gradoop.storage.hbase.EPGGraphHandler;
-import org.gradoop.storage.hbase.EPGVertexHandler;
-import org.gradoop.storage.hbase.GraphHandler;
-import org.gradoop.storage.hbase.VertexHandler;
-
 /**
  * Constants used in Gradoop.
  */
@@ -119,12 +114,19 @@ public final class GConstants {
    */
   public static final String VERTEX_HANDLER_CLASS = "gradoop.io.vertexhandler";
 
-  /**
-   * Default vertex handler which is used if no vertex handler is defined in
-   * the job configuration.
-   */
-  public static final Class<? extends VertexHandler> DEFAULT_VERTEX_HANDLER =
-    EPGVertexHandler.class;
+//  /**
+//   * Default graph handler which is used if no graph handler is defined the
+//   * job configuration.
+//   */
+//  public static final Class<? extends GraphHandler> DEFAULT_GRAPH_HANDLER =
+//    EPGGraphHandler.class;
+
+//  /**
+//   * Default vertex handler which is used if no vertex handler is defined in
+//   * the job configuration.
+//   */
+//  public static final Class<? extends VertexHandler> DEFAULT_VERTEX_HANDLER =
+//    EPGVertexHandler.class;
 
   /**
    * Row counter path within Map Reduce Row Counter job.
@@ -141,13 +143,4 @@ public final class GConstants {
    * Configuration key to define a custom graph handler.
    */
   public static final String GRAPH_HANDLER_CLASS = "gradoop.io.graphhandler";
-
-  /**
-   * Default graph handler which is used if no graph handler is defined the
-   * job configuration.
-   */
-  public static final Class<? extends GraphHandler> DEFAULT_GRAPH_HANDLER =
-    EPGGraphHandler.class;
-
-
 }

@@ -23,9 +23,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 
@@ -38,44 +38,40 @@ public class IntersectWithSmall extends
   @Override
   protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
     EPGraphCollection secondGraphCollection) throws Exception {
-    final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
+    final DataSet<Subgraph<Long, GraphData>> newSubgraphs =
       firstSubgraphs.union(secondSubgraphs).groupBy(GRAPH_ID)
         .reduceGroup(new SubgraphGroupReducer(2));
 
     final List<Long> identifiers;
-    identifiers = secondSubgraphs
-      .map(new MapFunction<Subgraph<Long, EPFlinkGraphData>, Long>() {
+    identifiers =
+      secondSubgraphs.map(new MapFunction<Subgraph<Long, GraphData>, Long>() {
         @Override
-        public Long map(Subgraph<Long, EPFlinkGraphData> subgraph) throws
-          Exception {
+        public Long map(Subgraph<Long, GraphData> subgraph) throws Exception {
           return subgraph.getId();
         }
       }).collect();
 
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
-      firstGraph.getVertices();
-    vertices =
-      vertices.filter(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
+    DataSet<Vertex<Long, VertexData>> vertices = firstGraph.getVertices();
+    vertices = vertices.filter(new FilterFunction<Vertex<Long, VertexData>>() {
 
-        @Override
-        public boolean filter(Vertex<Long, EPFlinkVertexData> vertex) throws
-          Exception {
-          for (Long id : identifiers) {
-            if (vertex.getValue().getGraphs().contains(id)) {
-              return true;
-            }
+      @Override
+      public boolean filter(Vertex<Long, VertexData> vertex) throws Exception {
+        for (Long id : identifiers) {
+          if (vertex.getValue().getGraphs().contains(id)) {
+            return true;
           }
-          return false;
         }
-      });
+        return false;
+      }
+    });
 
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = firstGraph.getEdges();
+    DataSet<Edge<Long, EdgeData>> edges = firstGraph.getEdges();
 
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
       .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
       .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
 
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> newGraph =
+    Graph<Long, VertexData, EdgeData> newGraph =
       Graph.fromDataSet(vertices, edges, env);
 
     return new EPGraphCollection(newGraph, newSubgraphs, env);

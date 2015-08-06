@@ -25,10 +25,13 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
-import org.gradoop.model.EPEdgeData;
-import org.gradoop.model.EPGraphData;
+import org.gradoop.model.Attributed;
 import org.gradoop.model.EPPatternGraph;
-import org.gradoop.model.EPVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.Identifiable;
+import org.gradoop.model.Labeled;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.operators.Aggregation;
@@ -51,19 +54,16 @@ import java.util.Map;
  * @author Martin Junghanns
  * @author Niklas Teichmann
  */
-public class EPGraph implements EPGraphData, EPGraphOperators {
+public class EPGraph implements EPGraphOperators, Identifiable, Attributed,
+  Labeled {
 
   /* Convenience key selectors */
 
-  public static final KeySelector<Subgraph<Long, EPFlinkGraphData>, Long>
-    GRAPH_ID;
-  public static final KeySelector<Vertex<Long, EPFlinkVertexData>, Long>
-    VERTEX_ID;
-  public static final KeySelector<Edge<Long, EPFlinkEdgeData>, Long> EDGE_ID;
-  public static final KeySelector<Edge<Long, EPFlinkEdgeData>, Long>
-    SOURCE_VERTEX_ID;
-  public static final KeySelector<Edge<Long, EPFlinkEdgeData>, Long>
-    TARGET_VERTEX_ID;
+  public static final KeySelector<Subgraph<Long, GraphData>, Long> GRAPH_ID;
+  public static final KeySelector<Vertex<Long, VertexData>, Long> VERTEX_ID;
+  public static final KeySelector<Edge<Long, EdgeData>, Long> EDGE_ID;
+  public static final KeySelector<Edge<Long, EdgeData>, Long> SOURCE_VERTEX_ID;
+  public static final KeySelector<Edge<Long, EdgeData>, Long> TARGET_VERTEX_ID;
 
   static {
     GRAPH_ID = new GraphKeySelector();
@@ -79,26 +79,25 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Gelly graph that encapsulates the vertex and edge datasets associated
    * with that EPGraph.
    */
-  private Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph;
+  private Graph<Long, VertexData, EdgeData> graph;
   /**
    * Graph payload.
    */
-  private EPFlinkGraphData graphData;
+  private GraphData graphData;
 
-  private EPGraph(Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    EPFlinkGraphData graphData, ExecutionEnvironment env) {
+  private EPGraph(Graph<Long, VertexData, EdgeData> graph, GraphData graphData,
+    ExecutionEnvironment env) {
     this.graph = graph;
     this.graphData = graphData;
     this.env = env;
   }
 
-  public static EPGraph fromGraph(
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
-    EPFlinkGraphData graphData) {
+  public static EPGraph fromGraph(Graph<Long, VertexData, EdgeData> graph,
+    GraphData graphData) {
     return new EPGraph(graph, graphData, graph.getContext());
   }
 
-  public Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> getGellyGraph() {
+  public Graph<Long, VertexData, EdgeData> getGellyGraph() {
     return this.graph;
   }
 
@@ -114,12 +113,11 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPEdgeCollection getOutgoingEdges(final Long vertexID) {
-    DataSet<Edge<Long, EPFlinkEdgeData>> outgoingEdges = this.graph.getEdges()
-      .filter(new FilterFunction<Edge<Long, EPFlinkEdgeData>>() {
+    DataSet<Edge<Long, EdgeData>> outgoingEdges =
+      this.graph.getEdges().filter(new FilterFunction<Edge<Long, EdgeData>>() {
         @Override
-        public boolean filter(Edge<Long, EPFlinkEdgeData> edgeTuple) throws
-          Exception {
-          return edgeTuple.getValue().getSourceVertex().equals(vertexID);
+        public boolean filter(Edge<Long, EdgeData> edgeTuple) throws Exception {
+          return edgeTuple.getValue().getSourceVertexId().equals(vertexID);
         }
       });
     return new EPEdgeCollection(outgoingEdges);
@@ -127,12 +125,11 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
 
   @Override
   public EPEdgeCollection getIncomingEdges(final Long vertexID) {
-    return new EPEdgeCollection(this.graph.getEdges()
-      .filter(new FilterFunction<Edge<Long, EPFlinkEdgeData>>() {
+    return new EPEdgeCollection(
+      this.graph.getEdges().filter(new FilterFunction<Edge<Long, EdgeData>>() {
         @Override
-        public boolean filter(Edge<Long, EPFlinkEdgeData> edgeTuple) throws
-          Exception {
-          return edgeTuple.getValue().getTargetVertex().equals(vertexID);
+        public boolean filter(Edge<Long, EdgeData> edgeTuple) throws Exception {
+          return edgeTuple.getValue().getTargetVertexId().equals(vertexID);
         }
       }));
   }
@@ -154,9 +151,8 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
-  public EPGraph project(
-    UnaryFunction<EPVertexData, EPVertexData> vertexFunction,
-    UnaryFunction<EPEdgeData, EPEdgeData> edgeFunction) {
+  public EPGraph project(UnaryFunction<VertexData, VertexData> vertexFunction,
+    UnaryFunction<EdgeData, EdgeData> edgeFunction) {
     throw new NotImplementedException();
   }
 
@@ -300,6 +296,11 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
   }
 
   @Override
+  public void setProperties(Map<String, Object> properties) {
+    graphData.setProperties(properties);
+  }
+
+  @Override
   public void setProperty(String key, Object value) {
     graphData.setProperty(key, value);
   }
@@ -336,11 +337,11 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
       String.format("%-10d %s %n", graphData.getId(), graphData.toString()));
     try {
       sb.append(String.format("Vertices:%n"));
-      for (EPVertexData v : this.getVertices().collect()) {
+      for (VertexData v : this.getVertices().collect()) {
         sb.append(String.format("%-10d %s %n", v.getId(), v));
       }
       sb.append(String.format("Edges:%n"));
-      for (EPEdgeData e : this.getEdges().collect()) {
+      for (EdgeData e : this.getEdges().collect()) {
         sb.append(String.format("%-10d %s %n", e.getId(), e));
       }
       sb.append('}');
@@ -354,9 +355,9 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Returns the unique graph identifer.
    */
   private static class GraphKeySelector implements
-    KeySelector<Subgraph<Long, EPFlinkGraphData>, Long> {
+    KeySelector<Subgraph<Long, GraphData>, Long> {
     @Override
-    public Long getKey(Subgraph<Long, EPFlinkGraphData> g) throws Exception {
+    public Long getKey(Subgraph<Long, GraphData> g) throws Exception {
       return g.f0;
     }
   }
@@ -365,11 +366,10 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Used for distinction of vertices based on their unique id.
    */
   private static class VertexKeySelector implements
-    KeySelector<Vertex<Long, EPFlinkVertexData>, Long> {
+    KeySelector<Vertex<Long, VertexData>, Long> {
     @Override
     public Long getKey(
-      Vertex<Long, EPFlinkVertexData> longEPFlinkVertexDataVertex) throws
-      Exception {
+      Vertex<Long, VertexData> longEPFlinkVertexDataVertex) throws Exception {
       return longEPFlinkVertexDataVertex.f0;
     }
   }
@@ -378,10 +378,10 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Used for distinction of edges based on their unique id.
    */
   private static class EdgeKeySelector implements
-    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    KeySelector<Edge<Long, EdgeData>, Long> {
     @Override
-    public Long getKey(
-      Edge<Long, EPFlinkEdgeData> longEPFlinkEdgeDataEdge) throws Exception {
+    public Long getKey(Edge<Long, EdgeData> longEPFlinkEdgeDataEdge) throws
+      Exception {
       return longEPFlinkEdgeDataEdge.f2.getId();
     }
   }
@@ -390,9 +390,9 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Used to select the source vertex id of an edge.
    */
   private static class EdgeSourceVertexKeySelector implements
-    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    KeySelector<Edge<Long, EdgeData>, Long> {
     @Override
-    public Long getKey(Edge<Long, EPFlinkEdgeData> e) throws Exception {
+    public Long getKey(Edge<Long, EdgeData> e) throws Exception {
       return e.getSource();
     }
   }
@@ -401,9 +401,9 @@ public class EPGraph implements EPGraphData, EPGraphOperators {
    * Used to select the target vertex id of an edge.
    */
   private static class EdgeTargetVertexKeySelector implements
-    KeySelector<Edge<Long, EPFlinkEdgeData>, Long> {
+    KeySelector<Edge<Long, EdgeData>, Long> {
     @Override
-    public Long getKey(Edge<Long, EPFlinkEdgeData> e) throws Exception {
+    public Long getKey(Edge<Long, EdgeData> e) throws Exception {
       return e.getTarget();
     }
   }

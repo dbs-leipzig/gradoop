@@ -17,6 +17,8 @@
 
 package org.gradoop.model;
 
+import java.util.Set;
+
 /**
  * A graph element is part of a graph. An element can be part of more than one
  * graph.
@@ -27,7 +29,7 @@ public interface GraphElement {
    *
    * @return all graphs of that element
    */
-  Iterable<Long> getGraphs();
+  Set<Long> getGraphs();
 
   /**
    * Adds that element to the given graph. If the element is already an element
@@ -38,12 +40,11 @@ public interface GraphElement {
   void addGraph(Long graph);
 
   /**
-   * Adds graphs to existing graph set. If an element is already element
-   * of the given graph, nothing happens.
+   * Adds the given graph set to the element.
    *
    * @param graphs the graphs to be added
    */
-  void addGraphs(Iterable<Long> graphs);
+  void setGraphs(Set<Long> graphs);
 
   /**
    * Resets all graph elements.

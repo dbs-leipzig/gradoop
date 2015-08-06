@@ -22,9 +22,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.Subgraph;
 
 /**
@@ -42,10 +42,10 @@ public class JsonWriter extends JsonIO {
    */
   public static class VertexTextFormatter extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Vertex<Long, EPFlinkVertexData>> {
+    TextOutputFormat.TextFormatter<Vertex<Long, VertexData>> {
 
     @Override
-    public String format(Vertex<Long, EPFlinkVertexData> v) {
+    public String format(Vertex<Long, VertexData> v) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, v.getId());
@@ -70,10 +70,10 @@ public class JsonWriter extends JsonIO {
    * }
    */
   public static class EdgeTextFormatter extends EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Edge<Long, EPFlinkEdgeData>> {
+    TextOutputFormat.TextFormatter<Edge<Long, EdgeData>> {
 
     @Override
-    public String format(Edge<Long, EPFlinkEdgeData> e) {
+    public String format(Edge<Long, EdgeData> e) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, e.getValue().getId());
@@ -99,10 +99,10 @@ public class JsonWriter extends JsonIO {
    */
   public static class GraphTextFormatter extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Subgraph<Long, EPFlinkGraphData>> {
+    TextOutputFormat.TextFormatter<Subgraph<Long, GraphData>> {
 
     @Override
-    public String format(Subgraph<Long, EPFlinkGraphData> g) {
+    public String format(Subgraph<Long, GraphData> g) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, g.getId());

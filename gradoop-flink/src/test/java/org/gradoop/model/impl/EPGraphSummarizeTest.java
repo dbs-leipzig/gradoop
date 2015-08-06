@@ -17,9 +17,9 @@
 
 package org.gradoop.model.impl;
 
-import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPFlinkTest;
-import org.gradoop.model.EPVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.impl.operators.Summarization;
 import org.gradoop.model.store.EPGraphStore;
@@ -59,7 +59,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L;
 
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -83,7 +83,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     // [4] Dresden -[__EDGE__]-> Dresden {count: 2}
     assertEquals("wrong number of edges", 4L, summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -135,7 +135,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -166,7 +166,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -219,7 +219,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 2L,
       summarizedGraph.getVertexCount());
     long vertexIDDresden = 2L, vertexIDGraphProcessingForum = 10L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -241,7 +241,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     // [4] Dresden -[__EDGE__]-> Dresden {count: 1}
     assertEquals("wrong number of edges", 2L, summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -283,7 +283,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -315,7 +315,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -375,7 +375,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 2L,
       summarizedGraph.getVertexCount());
     long vertexIDDresden = 2L, vertexIDGraphProcessingForum = 10L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -398,7 +398,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     // [4] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 1}
     assertEquals("wrong number of edges", 3L, summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -439,14 +439,14 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     // [0] Person {count: 6}
     // [6] Tag {count: 3}
     // [9] Forum {count: 2}
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       System.out.println(v);
     }
 
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -473,7 +473,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -524,7 +524,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -552,7 +552,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -611,7 +611,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L,
       vertexIDTag = 6L, vertexIDForum = 9L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -651,7 +651,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -735,7 +735,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 1L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
       if (v.getId().equals(vertexIDPerson)) {
@@ -754,7 +754,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -799,7 +799,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -829,7 +829,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -897,7 +897,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -926,7 +926,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -980,14 +980,14 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     // [0] Person {count: 6}
     // [6] Tag {count: 3}
     // [9] Forum {count: 2}
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       System.out.println(v);
     }
 
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -1015,7 +1015,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -1067,7 +1067,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -1095,7 +1095,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -1149,7 +1149,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L,
       vertexIDTag = 6L, vertexIDForum = 9L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -1191,7 +1191,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -1273,7 +1273,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 1L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
       if (v.getId().equals(vertexIDPerson)) {
@@ -1292,7 +1292,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -1335,14 +1335,14 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     // [0] Person {count: 6}
     // [6] Tag {count: 3}
     // [9] Forum {count: 2}
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       System.out.println(v);
     }
 
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -1373,7 +1373,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -1446,7 +1446,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -1475,7 +1475,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -1541,7 +1541,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       summarizedGraph.getVertexCount());
     long vertexIDLeipzig = 0L, vertexIDDresden = 2L, vertexIDBerlin = 5L,
       vertexIDTag = 6L, vertexIDForum = 9L;
-    for (EPVertexData v : summarizedGraph.getVertices().collect()) {
+    for (VertexData v : summarizedGraph.getVertices().collect()) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
 
@@ -1584,7 +1584,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       summarizedGraph.getEdgeCount());
 
-    for (EPEdgeData e : summarizedGraph.getEdges().collect()) {
+    for (EdgeData e : summarizedGraph.getEdges().collect()) {
       // check edge id
       assertNotNull("edge id must not be null", e.getId());
 
@@ -1663,14 +1663,14 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     }
   }
 
-  private void testVertex(EPVertexData vertex, String expectedVertexLabel,
+  private void testVertex(VertexData vertex, String expectedVertexLabel,
     String aggregatePropertyKey, Integer expectedCountValue,
     int expectedGraphCount, Long expectedGraphID) {
     testVertex(vertex, expectedVertexLabel, null, null, aggregatePropertyKey,
       expectedCountValue, expectedGraphCount, expectedGraphID);
   }
 
-  private void testVertex(EPVertexData vertex, String expectedVertexLabel,
+  private void testVertex(VertexData vertex, String expectedVertexLabel,
     String vertexGroupingKey, String expectedVertexGroupingValue,
     String aggregatePropertyKey, Integer expectedCountValue,
     int expectedGraphCount, Long expectedGraphID) {
@@ -1686,7 +1686,7 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
     assertTrue("wrong graph id", vertex.getGraphs().contains(expectedGraphID));
   }
 
-  private void testEdge(EPEdgeData edge, String expectedEdgeLabel,
+  private void testEdge(EdgeData edge, String expectedEdgeLabel,
     Long expectedSourceVertex, Long expectedTargetVertex,
     String aggregatePropertyKey, Integer expectedCountValue,
     int expectedGraphCount, Long expectedGraphID) {
@@ -1695,16 +1695,16 @@ public abstract class EPGraphSummarizeTest extends EPFlinkTest {
       expectedCountValue, expectedGraphCount, expectedGraphID);
   }
 
-  private void testEdge(EPEdgeData edge, String expectedEdgeLabel,
+  private void testEdge(EdgeData edge, String expectedEdgeLabel,
     Long expectedSourceVertex, Long expectedTargetVertex,
     String edgeGroupingKey, String expectedGroupingValue,
     String aggregatePropertyKey, Integer expectedCountValue,
     int expectedGraphCount, Long expectedGraphID) {
     assertEquals("wrong edge label", expectedEdgeLabel, edge.getLabel());
     assertEquals("wrong source vertex", expectedSourceVertex,
-      edge.getSourceVertex());
+      edge.getSourceVertexId());
     assertEquals("wrong target vertex", expectedTargetVertex,
-      edge.getTargetVertex());
+      edge.getTargetVertexId());
     assertEquals("wrong edge property", expectedCountValue,
       edge.getProperty(aggregatePropertyKey));
     assertEquals("wrong number of graphs", expectedGraphCount,

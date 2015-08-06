@@ -22,10 +22,13 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
+import org.gradoop.model.impl.EdgeDataFactory;
+import org.gradoop.model.impl.GraphDataFactory;
 import org.gradoop.model.impl.Subgraph;
+import org.gradoop.model.impl.VertexDataFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -47,22 +50,24 @@ public class JsonReader extends JsonIO {
    * {
    * "id":0,
    * "data":{"name":"Alice","gender":"female","age":42},
-   * "meta":{"label":"Employee","graphs":[0,1,2,3]}
+   * "meta":{"label":"Employee", "out-edges":[0,1,2,3], in-edges:[4,5,6,7],
+   * "graphs":[0,1,2,3]}
    * }
    */
   public static class JsonToVertexMapper extends JsonToEntityMapper implements
-    MapFunction<String, Vertex<Long, EPFlinkVertexData>> {
+    MapFunction<String, Vertex<Long, VertexData>> {
 
     @Override
-    public Vertex<Long, EPFlinkVertexData> map(String s) throws Exception {
+    public Vertex<Long, VertexData> map(String s) throws Exception {
       JSONObject jsonVertex = new JSONObject(s);
       Long vertexID = getID(jsonVertex);
       String label = getLabel(jsonVertex);
       Map<String, Object> properties = getProperties(jsonVertex);
       Set<Long> graphs = getGraphs(jsonVertex);
 
-      return new Vertex<>(vertexID,
-        new EPFlinkVertexData(vertexID, label, properties, graphs));
+      return new Vertex(vertexID,
+        VertexDataFactory
+          .createDefaultVertex(vertexID, label, properties, graphs));
     }
   }
 
@@ -83,10 +88,10 @@ public class JsonReader extends JsonIO {
    * }
    */
   public static class JsonToEdgeMapper extends JsonToEntityMapper implements
-    MapFunction<String, Edge<Long, EPFlinkEdgeData>> {
+    MapFunction<String, Edge<Long, EdgeData>> {
 
     @Override
-    public Edge<Long, EPFlinkEdgeData> map(String s) throws Exception {
+    public Edge<Long, EdgeData> map(String s) throws Exception {
       JSONObject jsonEdge = new JSONObject(s);
       Long edgeID = getID(jsonEdge);
       String edgeLabel = getLabel(jsonEdge);
@@ -95,8 +100,8 @@ public class JsonReader extends JsonIO {
       Map<String, Object> properties = getProperties(jsonEdge);
       Set<Long> graphs = getGraphs(jsonEdge);
 
-      return new Edge<>(sourceID, targetID,
-        new EPFlinkEdgeData(edgeID, edgeLabel, sourceID, targetID, properties,
+      return new Edge<>(sourceID, targetID, EdgeDataFactory
+        .createDefaultEdge(edgeID, edgeLabel, sourceID, targetID, properties,
           graphs));
     }
 
@@ -113,28 +118,33 @@ public class JsonReader extends JsonIO {
    * Reads graph data from a json document. The document contains at least
    * the graph id, an embedded data document and an embedded meta document.
    * The data document contains all key-value pairs stored at the graphs, the
-   * meta document contains the graph label.
+   * meta document contains the graph label and the vertex/edge identifiers
+   * of vertices/edges contained in that graph.
    *
    * Example:
    *
    * {
    * "id":0,
    * "data":{"title":"Graph Databases"},
-   * "meta":{"label":"Community"}
+   * "meta":{"label":"Community","vertices":[0,1,2],"edges":[4,5,6]}
    * }
    */
   public static class JsonToGraphMapper extends JsonToEntityMapper implements
-    MapFunction<String, Subgraph<Long, EPFlinkGraphData>> {
+    MapFunction<String, Subgraph<Long, GraphData>> {
 
     @Override
-    public Subgraph<Long, EPFlinkGraphData> map(String s) throws Exception {
+    public Subgraph<Long, GraphData> map(String s) throws Exception {
       JSONObject jsonGraph = new JSONObject(s);
       Long graphID = getID(jsonGraph);
       String label = getLabel(jsonGraph);
       Map<String, Object> properties = getProperties(jsonGraph);
+      Set<Long> vertices =
+        getArrayValues(jsonGraph.getJSONObject(META).getJSONArray(VERTICES));
+      Set<Long> edges =
+        getArrayValues(jsonGraph.getJSONObject(META).getJSONArray(EDGES));
 
-      return new Subgraph<>(graphID,
-        new EPFlinkGraphData(graphID, label, properties));
+      return new Subgraph<>(graphID, GraphDataFactory
+        .createDefaultGraph(graphID, label, properties, vertices, edges));
     }
   }
 }

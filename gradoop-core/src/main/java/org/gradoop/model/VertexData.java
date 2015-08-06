@@ -15,20 +15,11 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.operators;
-
-import org.apache.hadoop.io.Writable;
-import org.gradoop.model.Vertex;
+package org.gradoop.model;
 
 /**
- * Used to calculate a double aggregate based on a single vertex.
+ * Describes data assigned to a vertex in the EPGM.
  */
-public interface VertexAggregate {
-  /**
-   * Returns a value based on the given vertex.
-   *
-   * @param vertex vertex to be aggregated
-   * @return aggregate
-   */
-  Writable aggregate(Vertex vertex);
+public interface VertexData extends Identifiable, Attributed, Labeled,
+  GraphElement {
 }

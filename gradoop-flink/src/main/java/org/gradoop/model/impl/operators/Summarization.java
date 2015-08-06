@@ -28,11 +28,14 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
 import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.EdgeDataFactory;
+import org.gradoop.model.impl.GraphDataFactory;
+import org.gradoop.model.impl.VertexDataFactory;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
@@ -104,14 +107,14 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
   @Override
   public EPGraph execute(EPGraph graph) {
     EPGraph result;
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> gellyGraph;
+    Graph<Long, VertexData, EdgeData> gellyGraph;
 
     if (!useVertexProperty() &&
       !useEdgeProperty() && !useVertexLabels() && !useEdgeLabels()) {
       // graphs stays unchanged
       result = graph;
     } else {
-      EPFlinkGraphData graphData = createNewGraphData();
+      GraphData graphData = createNewGraphData();
       gellyGraph = summarizeInternal(graph.getGellyGraph());
       result = EPGraph.fromGraph(gellyGraph, graphData);
     }
@@ -142,9 +145,8 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     return useEdgeLabels;
   }
 
-  protected SortedGrouping<Vertex<Long, EPFlinkVertexData>>
-  groupAndSortVertices(
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph) {
+  protected SortedGrouping<Vertex<Long, VertexData>> groupAndSortVertices(
+    Graph<Long, VertexData, EdgeData> graph) {
     return graph.getVertices()
       // group vertices by the given property
       .groupBy(new VertexGroupingKeySelector(getVertexGroupingKey(),
@@ -153,8 +155,8 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
       .sortGroup(VERTEX_ID, Order.ASCENDING);
   }
 
-  protected DataSet<Vertex<Long, EPFlinkVertexData>> buildSummarizedVertices(
-    SortedGrouping<Vertex<Long, EPFlinkVertexData>> groupedSortedVertices) {
+  protected DataSet<Vertex<Long, VertexData>> buildSummarizedVertices(
+    SortedGrouping<Vertex<Long, VertexData>> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(
       new VertexGroupSummarizer(getVertexGroupingKey(), useVertexLabels()));
   }
@@ -175,22 +177,19 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     return groupedEdges;
   }
 
-  private EPFlinkGraphData createNewGraphData() {
-    EPFlinkGraphData newGraphData = new EPFlinkGraphData();
-    newGraphData.setId(FlinkConstants.SUMMARIZE_GRAPH_ID);
-    newGraphData.setLabel(FlinkConstants.DEFAULT_GRAPH_LABEL);
-    return newGraphData;
+  private GraphData createNewGraphData() {
+    return GraphDataFactory
+      .createDefaultGraphWithID(FlinkConstants.SUMMARIZE_GRAPH_ID);
   }
 
-  protected abstract Graph<Long, EPFlinkVertexData, EPFlinkEdgeData>
-  summarizeInternal(
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph);
+  protected abstract Graph<Long, VertexData, EdgeData> summarizeInternal(
+    Graph<Long, VertexData, EdgeData> graph);
 
   /**
    * Selects the key to group vertices.
    */
   protected static class VertexGroupingKeySelector implements
-    KeySelector<Vertex<Long, EPFlinkVertexData>, String> {
+    KeySelector<Vertex<Long, VertexData>, String> {
 
     private String groupPropertyKey;
     private boolean useLabel;
@@ -202,7 +201,7 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     }
 
     @Override
-    public String getKey(Vertex<Long, EPFlinkVertexData> v) throws Exception {
+    public String getKey(Vertex<Long, VertexData> v) throws Exception {
       String label = v.getValue().getLabel();
       String groupingValue = null;
       boolean useProperty =
@@ -231,8 +230,7 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
    * Creates a summarized vertex from a group of vertices.
    */
   protected static class VertexGroupSummarizer implements
-    GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
-      EPFlinkVertexData>> {
+    GroupReduceFunction<Vertex<Long, VertexData>, Vertex<Long, VertexData>> {
 
 
     private String groupPropertyKey;
@@ -244,14 +242,14 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     }
 
     @Override
-    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> vertices,
-      Collector<Vertex<Long, EPFlinkVertexData>> collector) throws Exception {
+    public void reduce(Iterable<Vertex<Long, VertexData>> vertices,
+      Collector<Vertex<Long, VertexData>> collector) throws Exception {
       int groupCount = 0;
       Long newVertexID = 0L;
       String groupLabel = null;
       String groupValue = null;
       boolean initialized = false;
-      for (Vertex<Long, EPFlinkVertexData> v : vertices) {
+      for (Vertex<Long, VertexData> v : vertices) {
         groupCount++;
         if (!initialized) {
           // will be the minimum vertex id in the group
@@ -267,9 +265,8 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
         }
       }
 
-      EPFlinkVertexData newVertexData = new EPFlinkVertexData();
-      newVertexData.setId(newVertexID);
-      newVertexData.setLabel(groupLabel);
+      VertexData newVertexData =
+        VertexDataFactory.createDefaultVertexWithLabel(newVertexID, groupLabel);
       if (storeGroupProperty()) {
         newVertexData.setProperty(groupPropertyKey, groupValue);
       }
@@ -283,7 +280,7 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
       return groupPropertyKey != null && !"".equals(groupPropertyKey);
     }
 
-    private String getGroupProperty(Vertex<Long, EPFlinkVertexData> v) {
+    private String getGroupProperty(Vertex<Long, VertexData> v) {
       if (v.getValue().getProperty(groupPropertyKey) != null) {
         return v.getValue().getProperty(groupPropertyKey).toString();
       } else {
@@ -298,7 +295,7 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
    */
   protected static class EdgeGroupSummarizer implements
     GroupReduceFunction<Tuple5<Long, Long, Long, String, String>, Edge<Long,
-      EPFlinkEdgeData>> {
+      EdgeData>> {
 
     private String groupPropertyKey;
     private boolean useLabel;
@@ -310,7 +307,7 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
 
     @Override
     public void reduce(Iterable<Tuple5<Long, Long, Long, String, String>> edges,
-      Collector<Edge<Long, EPFlinkEdgeData>> collector) throws Exception {
+      Collector<Edge<Long, EdgeData>> collector) throws Exception {
       int edgeCount = 0;
       boolean initialized = false;
       // new edge id will be the first edge id in the group (which is sorted)
@@ -333,11 +330,11 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
           initialized = true;
         }
       }
-      EPFlinkEdgeData newEdgeData = new EPFlinkEdgeData();
-      newEdgeData.setId(newEdgeID);
-      newEdgeData.setLabel(edgeLabel);
-      newEdgeData.setSourceVertex(newSourceVertex);
-      newEdgeData.setTargetVertex(newTargetVertex);
+      
+      EdgeData newEdgeData = EdgeDataFactory
+        .createDefaultEdgeWithLabel(newEdgeID, edgeLabel, newSourceVertex,
+          newTargetVertex);
+
       if (storeGroupProperty()) {
         newEdgeData.setProperty(groupPropertyKey, edgeGroupingValue);
       }

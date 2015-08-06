@@ -22,8 +22,8 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 
@@ -52,8 +52,8 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
    * gets returned.
    */
   protected static class VertexGroupReducer implements
-    GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
-      EPFlinkVertexData>> {
+    GroupReduceFunction<Vertex<Long, VertexData>, Vertex<Long,
+      VertexData>> {
 
     /**
      * number of times a vertex must occur inside a group
@@ -82,11 +82,11 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
     }
 
     @Override
-    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> iterable,
-      Collector<Vertex<Long, EPFlinkVertexData>> collector) throws Exception {
-      Iterator<Vertex<Long, EPFlinkVertexData>> iterator = iterable.iterator();
+    public void reduce(Iterable<Vertex<Long, VertexData>> iterable,
+      Collector<Vertex<Long, VertexData>> collector) throws Exception {
+      Iterator<Vertex<Long, VertexData>> iterator = iterable.iterator();
       long count = 0L;
-      Vertex<Long, EPFlinkVertexData> v = null;
+      Vertex<Long, VertexData> v = null;
       while (iterator.hasNext()) {
         v = iterator.next();
         count++;
@@ -112,8 +112,8 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
    * given amount. If yes, reducer returns the vertex.
    */
   protected static class EdgeGroupReducer implements
-    GroupReduceFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long,
-      EPFlinkEdgeData>> {
+    GroupReduceFunction<Edge<Long, EdgeData>, Edge<Long,
+      EdgeData>> {
 
     private long amount;
 
@@ -122,11 +122,11 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
     }
 
     @Override
-    public void reduce(Iterable<Edge<Long, EPFlinkEdgeData>> iterable,
-      Collector<Edge<Long, EPFlinkEdgeData>> collector) throws Exception {
-      Iterator<Edge<Long, EPFlinkEdgeData>> iterator = iterable.iterator();
+    public void reduce(Iterable<Edge<Long, EdgeData>> iterable,
+      Collector<Edge<Long, EdgeData>> collector) throws Exception {
+      Iterator<Edge<Long, EdgeData>> iterator = iterable.iterator();
       long count = 0L;
-      Edge<Long, EPFlinkEdgeData> e = null;
+      Edge<Long, EdgeData> e = null;
       while (iterator.hasNext()) {
         e = iterator.next();
         count++;
@@ -141,8 +141,8 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
    * Adds a given graph ID to the vertex and returns it.
    */
   protected static class VertexToGraphUpdater implements
-    MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
-      EPFlinkVertexData>> {
+    MapFunction<Vertex<Long, VertexData>, Vertex<Long,
+      VertexData>> {
 
     private final long newGraphID;
 
@@ -151,8 +151,8 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
     }
 
     @Override
-    public Vertex<Long, EPFlinkVertexData> map(
-      Vertex<Long, EPFlinkVertexData> v) throws Exception {
+    public Vertex<Long, VertexData> map(
+      Vertex<Long, VertexData> v) throws Exception {
       v.getValue().addGraph(newGraphID);
       return v;
     }
@@ -162,7 +162,7 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
    * Adds a given graph ID to the edge and returns it.
    */
   protected static class EdgeToGraphUpdater implements
-    MapFunction<Edge<Long, EPFlinkEdgeData>, Edge<Long, EPFlinkEdgeData>> {
+    MapFunction<Edge<Long, EdgeData>, Edge<Long, EdgeData>> {
 
     private final long newGraphID;
 
@@ -171,7 +171,7 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
     }
 
     @Override
-    public Edge<Long, EPFlinkEdgeData> map(Edge<Long, EPFlinkEdgeData> e) throws
+    public Edge<Long, EdgeData> map(Edge<Long, EdgeData> e) throws
       Exception {
       e.getValue().addGraph(newGraphID);
       return e;

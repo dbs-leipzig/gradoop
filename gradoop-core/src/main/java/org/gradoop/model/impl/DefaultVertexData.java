@@ -17,43 +17,46 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Sets;
-import org.gradoop.model.EPGraphElement;
+import org.gradoop.model.VertexData;
 
 import java.util.Map;
 import java.util.Set;
 
-public abstract class EPFlinkGraphElementEntity extends EPFlinkEntity implements
-  EPGraphElement {
+/**
+ * Transient representation of a vertex.
+ */
+public class DefaultVertexData extends EPGMElement implements VertexData {
 
+  /**
+   * Holds all graphs that contain the vertex.
+   */
   private Set<Long> graphs;
 
-  public EPFlinkGraphElementEntity() {
-    this.graphs = Sets.newHashSet();
+  public DefaultVertexData() {
   }
 
-  public EPFlinkGraphElementEntity(Set<Long> graphs) {
-    this.graphs = graphs;
-  }
-
-  public EPFlinkGraphElementEntity(EPFlinkGraphElementEntity otherEntity) {
-    super(otherEntity);
-    this.graphs = Sets.newHashSet(otherEntity.graphs);
-  }
-
-  public EPFlinkGraphElementEntity(Long id, String label,
-    Map<String, Object> properties, Set<Long> graphs) {
+  /**
+   * Creates a vertex based on the given parameters.
+   *
+   * @param id         vertex id
+   * @param label      label (cannot be {@code null})
+   * @param properties key-value-map  (can be {@code null})
+   * @param graphs     graphs that contain that vertex (can be {@code null})
+   */
+  DefaultVertexData(final Long id, final String label,
+    final Map<String, Object> properties, final Set<Long> graphs) {
     super(id, label, properties);
-    if (graphs != null) {
-      this.graphs = graphs;
-    } else {
-      this.graphs = Sets.newHashSet();
-    }
+    this.graphs = graphs;
   }
 
   @Override
   public Set<Long> getGraphs() {
-    return this.graphs;
+    return graphs;
+  }
+
+  @Override
+  public void addGraph(Long graph) {
+    graphs.add(graph);
   }
 
   @Override
@@ -62,14 +65,19 @@ public abstract class EPFlinkGraphElementEntity extends EPFlinkEntity implements
   }
 
   @Override
-  public void addGraph(Long graph) {
-    this.graphs.add(graph);
+  public void resetGraphs() {
+    graphs.clear();
+  }
+
+  @Override
+  public int getGraphCount() {
+    return graphs.size();
   }
 
   @Override
   public String toString() {
-    return "EPFlinkGraphElementEntity{" +
-      "super=" + super.toString() +
+    return "DefaultVertexData{" +
+      super.toString() +
       ", graphs=" + graphs +
       '}';
   }

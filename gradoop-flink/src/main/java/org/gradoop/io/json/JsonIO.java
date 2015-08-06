@@ -23,7 +23,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.model.Attributed;
-import org.gradoop.model.EPGraphElement;
+import org.gradoop.model.GraphElement;
 import org.gradoop.model.Labeled;
 
 import java.util.Iterator;
@@ -51,6 +51,14 @@ public abstract class JsonIO {
    * Key for graph identifiers at vertices and edges.
    */
   protected static final String GRAPHS = "graphs";
+  /**
+   * Key for vertex identifiers at graphs.
+   */
+  protected static final String VERTICES = "vertices";
+  /**
+   * Key for edge identifiers at graphs.
+   */
+  protected static final String EDGES = "edges";
   /**
    * Key for edge source vertex id.
    */
@@ -96,11 +104,16 @@ public abstract class JsonIO {
       if (!object.getJSONObject(META).has(GRAPHS)) {
         result = Sets.newHashSetWithExpectedSize(0);
       } else {
-        JSONArray graphsArray = object.getJSONObject(META).getJSONArray(GRAPHS);
-        result = Sets.newHashSetWithExpectedSize(graphsArray.length());
-        for (int i = 0; i < graphsArray.length(); i++) {
-          result.add(graphsArray.getLong(i));
-        }
+        result =
+          getArrayValues(object.getJSONObject(META).getJSONArray(GRAPHS));
+      }
+      return result;
+    }
+
+    protected Set<Long> getArrayValues(JSONArray array) throws JSONException {
+      Set<Long> result = Sets.newHashSetWithExpectedSize(array.length());
+      for (int i = 0; i < array.length(); i++) {
+        result.add(array.getLong(i));
       }
       return result;
     }
@@ -125,7 +138,7 @@ public abstract class JsonIO {
       return meta;
     }
 
-    protected <T extends Labeled & EPGraphElement> JSONObject
+    protected <T extends Labeled & GraphElement> JSONObject
     writeGraphElementMeta(
       T entity) throws JSONException {
       JSONObject meta = writeMeta(entity);
@@ -133,7 +146,7 @@ public abstract class JsonIO {
       return meta;
     }
 
-    private JSONArray getGraphsArray(final EPGraphElement graphElement) throws
+    private JSONArray getGraphsArray(final GraphElement graphElement) throws
       JSONException {
       JSONArray graphArray = new JSONArray();
       for (Long graph : graphElement.getGraphs()) {

@@ -18,8 +18,35 @@
 package org.gradoop.model;
 
 /**
- * A vertex in the Extended Property Graph Model.
+ * Describes data assigned to an edge in the EPGM.
  */
-public interface Vertex extends Identifiable, Connected, Attributed, Labeled,
+public interface EdgeData extends Identifiable, Labeled, Attributed,
   GraphElement {
+  /**
+   * Returns the source vertex identifier.
+   *
+   * @return source vertex id
+   */
+  Long getSourceVertexId();
+
+  /**
+   * Sets the source vertex identifier.
+   *
+   * @param sourceVertexId source vertex id
+   */
+  void setSourceVertexId(Long sourceVertexId);
+
+  /**
+   * Returns the target vertex identifier.
+   *
+   * @return target vertex id
+   */
+  Long getTargetVertexId();
+
+  /**
+   * Sets the target vertex identifier.
+   *
+   * @param targetVertexId target vertex id.
+   */
+  void setTargetVertexId(Long targetVertexId);
 }

@@ -17,8 +17,8 @@
 
 package org.gradoop.model.impl.operators;
 
-import org.gradoop.model.EPEdgeData;
-import org.gradoop.model.EPVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
@@ -26,11 +26,11 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class Projection implements UnaryGraphToGraphOperator {
 
-  private final UnaryFunction<EPVertexData, EPVertexData> vertexFunc;
-  private final UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc;
+  private final UnaryFunction<VertexData, VertexData> vertexFunc;
+  private final UnaryFunction<EdgeData, EdgeData> edgeFunc;
 
-  public Projection(UnaryFunction<EPVertexData, EPVertexData> vertexFunc,
-    UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc) {
+  public Projection(UnaryFunction<VertexData, VertexData> vertexFunc,
+    UnaryFunction<EdgeData, EdgeData> edgeFunc) {
     this.vertexFunc = vertexFunc;
     this.edgeFunc = edgeFunc;
   }

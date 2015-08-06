@@ -26,9 +26,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 
@@ -40,28 +40,25 @@ public class Difference extends AbstractBinaryCollectionToCollectionOperator {
   @Override
   protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
     EPGraphCollection secondGraphCollection) throws Exception {
-    DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> thisGraphs =
-      firstSubgraphs
-        .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(1l));
+    DataSet<Tuple2<Subgraph<Long, GraphData>, Long>> thisGraphs =
+      firstSubgraphs.map(new Tuple2LongMapper<Subgraph<Long, GraphData>>(1l));
 
-    DataSet<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> otherGraphs =
-      secondSubgraphs
-        .map(new Tuple2LongMapper<Subgraph<Long, EPFlinkGraphData>>(2l));
+    DataSet<Tuple2<Subgraph<Long, GraphData>, Long>> otherGraphs =
+      secondSubgraphs.map(new Tuple2LongMapper<Subgraph<Long, GraphData>>(2l));
 
-    final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
+    final DataSet<Subgraph<Long, GraphData>> newSubgraphs =
       thisGraphs.union(otherGraphs)
         .groupBy(new SubgraphTupleKeySelector<Long>()).reduceGroup(
-        new GroupReduceFunction<Tuple2<Subgraph<Long, EPFlinkGraphData>,
-          Long>, Subgraph<Long, EPFlinkGraphData>>() {
+        new GroupReduceFunction<Tuple2<Subgraph<Long, GraphData>, Long>,
+          Subgraph<Long, GraphData>>() {
 
           @Override
           public void reduce(
-            Iterable<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> iterable,
-            Collector<Subgraph<Long, EPFlinkGraphData>> collector) throws
-            Exception {
-            Iterator<Tuple2<Subgraph<Long, EPFlinkGraphData>, Long>> it =
+            Iterable<Tuple2<Subgraph<Long, GraphData>, Long>> iterable,
+            Collector<Subgraph<Long, GraphData>> collector) throws Exception {
+            Iterator<Tuple2<Subgraph<Long, GraphData>, Long>> it =
               iterable.iterator();
-            Tuple2<Subgraph<Long, EPFlinkGraphData>, Long> subgraph = null;
+            Tuple2<Subgraph<Long, GraphData>, Long> subgraph = null;
             Boolean inOtherCollection = false;
             while (it.hasNext()) {
               subgraph = it.next();
@@ -75,39 +72,38 @@ public class Difference extends AbstractBinaryCollectionToCollectionOperator {
           }
         });
 
-    DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
+    DataSet<Vertex<Long, VertexData>> thisVertices =
       firstGraph.getVertices().union(secondGraph.getVertices())
         .distinct(VERTEX_ID);
 
-    DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
+    DataSet<Tuple2<Vertex<Long, VertexData>, Long>> verticesWithGraphs =
       thisVertices.flatMap(
-        new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
-          Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
+        new FlatMapFunction<Vertex<Long, VertexData>, Tuple2<Vertex<Long,
+          VertexData>, Long>>() {
 
           @Override
-          public void flatMap(Vertex<Long, EPFlinkVertexData> vertexData,
-            Collector<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>
-              collector) throws
+          public void flatMap(Vertex<Long, VertexData> vertexData,
+            Collector<Tuple2<Vertex<Long, VertexData>, Long>> collector) throws
             Exception {
             for (Long graph : vertexData.getValue().getGraphs()) {
               collector.collect(new Tuple2<>(vertexData, graph));
             }
           }
         });
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
+    DataSet<Vertex<Long, VertexData>> vertices =
       verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
-        new JoinFunction<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>,
-          Subgraph<Long, EPFlinkGraphData>, Vertex<Long, EPFlinkVertexData>>() {
+        new JoinFunction<Tuple2<Vertex<Long, VertexData>, Long>,
+          Subgraph<Long, GraphData>, Vertex<Long, VertexData>>() {
 
           @Override
-          public Vertex<Long, EPFlinkVertexData> join(
-            Tuple2<Vertex<Long, EPFlinkVertexData>, Long> vertexLongTuple,
-            Subgraph<Long, EPFlinkGraphData> subgraph) throws Exception {
+          public Vertex<Long, VertexData> join(
+            Tuple2<Vertex<Long, VertexData>, Long> vertexLongTuple,
+            Subgraph<Long, GraphData> subgraph) throws Exception {
             return vertexLongTuple.f0;
           }
         }).distinct(VERTEX_ID);
 
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = firstGraph.getEdges();
+    DataSet<Edge<Long, EdgeData>> edges = firstGraph.getEdges();
 
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
       .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)

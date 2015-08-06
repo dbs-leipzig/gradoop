@@ -25,9 +25,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 
@@ -37,22 +37,20 @@ public class Intersect extends AbstractBinaryCollectionToCollectionOperator {
   @Override
   protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
     EPGraphCollection secondGraphCollection) {
-    final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
+    final DataSet<Subgraph<Long, GraphData>> newSubgraphs =
       firstSubgraphs.union(secondSubgraphs).groupBy(GRAPH_ID)
         .reduceGroup(new SubgraphGroupReducer(2));
 
-    DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
-      firstGraph.getVertices();
+    DataSet<Vertex<Long, VertexData>> thisVertices = firstGraph.getVertices();
 
-    DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
+    DataSet<Tuple2<Vertex<Long, VertexData>, Long>> verticesWithGraphs =
       thisVertices.flatMap(
-        new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
-          Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
+        new FlatMapFunction<Vertex<Long, VertexData>, Tuple2<Vertex<Long,
+          VertexData>, Long>>() {
 
           @Override
-          public void flatMap(Vertex<Long, EPFlinkVertexData> v,
-            Collector<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>
-              collector) throws
+          public void flatMap(Vertex<Long, VertexData> v,
+            Collector<Tuple2<Vertex<Long, VertexData>, Long>> collector) throws
             Exception {
             for (Long graph : v.getValue().getGraphs()) {
               collector.collect(new Tuple2<>(v, graph));
@@ -60,20 +58,20 @@ public class Intersect extends AbstractBinaryCollectionToCollectionOperator {
           }
         });
 
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
+    DataSet<Vertex<Long, VertexData>> vertices =
       verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
-        new JoinFunction<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>,
-          Subgraph<Long, EPFlinkGraphData>, Vertex<Long, EPFlinkVertexData>>() {
+        new JoinFunction<Tuple2<Vertex<Long, VertexData>, Long>,
+          Subgraph<Long, GraphData>, Vertex<Long, VertexData>>() {
 
           @Override
-          public Vertex<Long, EPFlinkVertexData> join(
-            Tuple2<Vertex<Long, EPFlinkVertexData>, Long> vertices,
-            Subgraph<Long, EPFlinkGraphData> subgraph) throws Exception {
+          public Vertex<Long, VertexData> join(
+            Tuple2<Vertex<Long, VertexData>, Long> vertices,
+            Subgraph<Long, GraphData> subgraph) throws Exception {
             return vertices.f0;
           }
         });
 
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = firstGraph.getEdges();
+    DataSet<Edge<Long, EdgeData>> edges = firstGraph.getEdges();
 
     edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
       .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)

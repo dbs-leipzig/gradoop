@@ -28,9 +28,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 import org.gradoop.model.operators.BinaryCollectionToCollectionOperator;
@@ -40,11 +40,11 @@ import java.util.Iterator;
 public abstract class AbstractBinaryCollectionToCollectionOperator implements
   BinaryCollectionToCollectionOperator {
 
-  protected Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> firstGraph;
-  protected Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> secondGraph;
+  protected Graph<Long, VertexData, EdgeData> firstGraph;
+  protected Graph<Long, VertexData, EdgeData> secondGraph;
 
-  protected DataSet<Subgraph<Long, EPFlinkGraphData>> firstSubgraphs;
-  protected DataSet<Subgraph<Long, EPFlinkGraphData>> secondSubgraphs;
+  protected DataSet<Subgraph<Long, GraphData>> firstSubgraphs;
+  protected DataSet<Subgraph<Long, GraphData>> secondSubgraphs;
 
   protected ExecutionEnvironment env;
 
@@ -62,12 +62,11 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
   }
 
   protected abstract EPGraphCollection executeInternal(
-    EPGraphCollection firstCollection, EPGraphCollection secondGraphCollection) throws
-    Exception;
+    EPGraphCollection firstCollection,
+    EPGraphCollection secondGraphCollection) throws Exception;
 
   protected static class SubgraphGroupReducer implements
-    GroupReduceFunction<Subgraph<Long, EPFlinkGraphData>, Subgraph<Long,
-      EPFlinkGraphData>> {
+    GroupReduceFunction<Subgraph<Long, GraphData>, Subgraph<Long, GraphData>> {
 
     /**
      * number of times a vertex must occur inside a group
@@ -79,11 +78,11 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
     }
 
     @Override
-    public void reduce(Iterable<Subgraph<Long, EPFlinkGraphData>> iterable,
-      Collector<Subgraph<Long, EPFlinkGraphData>> collector) throws Exception {
-      Iterator<Subgraph<Long, EPFlinkGraphData>> iterator = iterable.iterator();
+    public void reduce(Iterable<Subgraph<Long, GraphData>> iterable,
+      Collector<Subgraph<Long, GraphData>> collector) throws Exception {
+      Iterator<Subgraph<Long, GraphData>> iterator = iterable.iterator();
       long count = 0L;
-      Subgraph<Long, EPFlinkGraphData> s = null;
+      Subgraph<Long, GraphData> s = null;
       while (iterator.hasNext()) {
         s = iterator.next();
         count++;
@@ -95,13 +94,12 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
   }
 
   protected static class EdgeJoinFunction implements
-    JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
-      EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>> {
+    JoinFunction<Edge<Long, EdgeData>, Vertex<Long, VertexData>, Edge<Long,
+      EdgeData>> {
 
     @Override
-    public Edge<Long, EPFlinkEdgeData> join(
-      Edge<Long, EPFlinkEdgeData> leftTuple,
-      Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
+    public Edge<Long, EdgeData> join(Edge<Long, EdgeData> leftTuple,
+      Vertex<Long, VertexData> rightTuple) throws Exception {
       return leftTuple;
     }
   }
@@ -122,10 +120,10 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
   }
 
   protected static class SubgraphTupleKeySelector<C> implements
-    KeySelector<Tuple2<Subgraph<Long, EPFlinkGraphData>, C>, Long> {
+    KeySelector<Tuple2<Subgraph<Long, GraphData>, C>, Long> {
     @Override
-    public Long getKey(
-      Tuple2<Subgraph<Long, EPFlinkGraphData>, C> subgraph) throws Exception {
+    public Long getKey(Tuple2<Subgraph<Long, GraphData>, C> subgraph) throws
+      Exception {
       return subgraph.f0.getId();
     }
   }

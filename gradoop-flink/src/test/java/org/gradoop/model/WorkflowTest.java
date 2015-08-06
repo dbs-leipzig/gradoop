@@ -83,9 +83,9 @@ public abstract class WorkflowTest {
     final Predicate<EPGraph> predicate = new Predicate<EPGraph>() {
       @Override
       public boolean filter(EPGraph graph) throws Exception {
-        return graph.getVertices().filter(new Predicate<EPVertexData>() {
+        return graph.getVertices().filter(new Predicate<VertexData>() {
           @Override
-          public boolean filter(EPVertexData entity) {
+          public boolean filter(VertexData entity) {
             return entity.getLabel().equals("SalesInvoice");
           }
         }).size() > 0;
@@ -159,11 +159,11 @@ public abstract class WorkflowTest {
     btgs = btgs.apply(new Aggregation<>("profit", aggFunc));
 
     // vertex function for projection
-    final UnaryFunction<EPVertexData, EPVertexData> vertexFunc =
-      new UnaryFunction<EPVertexData, EPVertexData>() {
+    final UnaryFunction<VertexData, VertexData> vertexFunc =
+      new UnaryFunction<VertexData, VertexData>() {
         @Override
-        public EPVertexData execute(EPVertexData entity) {
-          EPVertexData newVertex = Mockito.mock(EPVertexData.class);
+        public VertexData execute(VertexData entity) {
+          VertexData newVertex = Mockito.mock(VertexData.class);
           if ((Boolean) entity.getProperty("IsMasterData")) {
             newVertex.setLabel(entity.getProperty("sourceID").toString());
           } else {
@@ -175,11 +175,11 @@ public abstract class WorkflowTest {
       };
 
     // edge function for projection
-    final UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc =
-      new UnaryFunction<EPEdgeData, EPEdgeData>() {
+    final UnaryFunction<EdgeData, EdgeData> edgeFunc =
+      new UnaryFunction<EdgeData, EdgeData>() {
         @Override
-        public EPEdgeData execute(EPEdgeData entity) {
-          EPEdgeData newEdge = Mockito.mock(EPEdgeData.class);
+        public EdgeData execute(EdgeData entity) {
+          EdgeData newEdge = Mockito.mock(EdgeData.class);
           newEdge.setLabel(entity.getLabel());
           return newEdge;
         }
@@ -189,9 +189,9 @@ public abstract class WorkflowTest {
     btgs = btgs.apply(new Projection(vertexFunc, edgeFunc));
 
     // select profit and loss clusters
-    EPGraphCollection profitBtgs = btgs.filter(new Predicate<EPGraphData>() {
+    EPGraphCollection profitBtgs = btgs.filter(new Predicate<GraphData>() {
       @Override
-      public boolean filter(EPGraphData entity) {
+      public boolean filter(GraphData entity) {
         return (Double) entity.getProperty("result") >= 0;
       }
     });

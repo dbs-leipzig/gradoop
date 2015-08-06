@@ -21,11 +21,11 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
 import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.GraphDataFactory;
 
 import static org.gradoop.model.impl.EPGraph.EDGE_ID;
 import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
@@ -40,25 +40,23 @@ public class Overlap extends AbstractBinaryGraphToGraphOperator {
   protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
     final Long newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
 
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph1 =
-      firstGraph.getGellyGraph();
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph2 =
-      secondGraph.getGellyGraph();
+    Graph<Long, VertexData, EdgeData> graph1 = firstGraph.getGellyGraph();
+    Graph<Long, VertexData, EdgeData> graph2 = secondGraph.getGellyGraph();
 
     // union vertex sets, group by vertex id, filter vertices where
     // the group contains two vertices and update them with the new graph id
-    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
+    DataSet<Vertex<Long, VertexData>> newVertexSet =
       graph1.getVertices().union(graph2.getVertices()).groupBy(VERTEX_ID)
         .reduceGroup(new VertexGroupReducer(2L))
         .map(new VertexToGraphUpdater(newGraphID));
 
-    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
+    DataSet<Edge<Long, EdgeData>> newEdgeSet =
       graph1.getEdges().union(graph2.getEdges()).groupBy(EDGE_ID)
         .reduceGroup(new EdgeGroupReducer(2L))
         .map(new EdgeToGraphUpdater(newGraphID));
 
     return EPGraph.fromGraph(
       Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
-      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL));
+      GraphDataFactory.createDefaultGraphWithID(newGraphID));
   }
 }

@@ -17,11 +17,11 @@
 
 package org.gradoop.model.operators;
 
-import org.gradoop.model.EPEdgeData;
+import org.gradoop.model.EdgeData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.impl.EPEdgeCollection;
 
 public interface EPEdgeCollectionOperators<T> extends EPCollectionOperators<T> {
 
-  EPEdgeCollection filter(final Predicate<EPEdgeData> predicateFunction);
+  EPEdgeCollection filter(final Predicate<EdgeData> predicateFunction);
 }

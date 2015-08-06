@@ -21,36 +21,32 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.EPVertexData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.operators.EPVertexCollectionOperators;
 
 import java.util.Collection;
 
 public class EPVertexCollection implements
-  EPVertexCollectionOperators<EPVertexData> {
+  EPVertexCollectionOperators<VertexData> {
 
-  private DataSet<Vertex<Long, EPFlinkVertexData>> vertices;
+  private DataSet<Vertex<Long, VertexData>> vertices;
 
-  EPVertexCollection(DataSet<Vertex<Long, EPFlinkVertexData>> vertices) {
+  EPVertexCollection(DataSet<Vertex<Long, VertexData>> vertices) {
     this.vertices = vertices;
   }
 
   @Override
   public EPVertexCollection filter(
-    final Predicate<EPVertexData> predicateFunction) {
+    final Predicate<VertexData> predicateFunction) {
     return new EPVertexCollection(
-      vertices.filter(new FilterFunction<Vertex<Long, EPFlinkVertexData>>() {
+      vertices.filter(new FilterFunction<Vertex<Long, VertexData>>() {
         @Override
-        public boolean filter(
-          Vertex<Long, EPFlinkVertexData> longEPFlinkVertexDataVertex) throws
-          Exception {
-          return predicateFunction
-            .filter(longEPFlinkVertexDataVertex.getValue());
+        public boolean filter(Vertex<Long, VertexData> v) throws Exception {
+          return predicateFunction.filter(v.getValue());
         }
       }));
   }
-
 
   @Override
   public <V> Iterable<V> values(Class<V> propertyType, String propertyKey) {
@@ -58,12 +54,11 @@ public class EPVertexCollection implements
   }
 
   @Override
-  public Collection<EPVertexData> collect() throws Exception {
+  public Collection<VertexData> collect() throws Exception {
     return vertices
-      .map(new MapFunction<Vertex<Long, EPFlinkVertexData>, EPVertexData>() {
+      .map(new MapFunction<Vertex<Long, VertexData>, VertexData>() {
         @Override
-        public EPFlinkVertexData map(Vertex<Long, EPFlinkVertexData> v) throws
-          Exception {
+        public VertexData map(Vertex<Long, VertexData> v) throws Exception {
           return v.getValue();
         }
       }).collect();

@@ -17,23 +17,21 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
-import org.gradoop.model.EPEdgeData;
+import org.gradoop.model.EdgeData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.operators.EPEdgeCollectionOperators;
 
 import java.util.Collection;
-import java.util.List;
 
-public class EPEdgeCollection implements EPEdgeCollectionOperators<EPEdgeData> {
+public class EPEdgeCollection implements EPEdgeCollectionOperators<EdgeData> {
 
-  private DataSet<Edge<Long, EPFlinkEdgeData>> edges;
+  private DataSet<Edge<Long, EdgeData>> edges;
 
-  EPEdgeCollection(DataSet<Edge<Long, EPFlinkEdgeData>> edges) {
+  EPEdgeCollection(DataSet<Edge<Long, EdgeData>> edges) {
     this.edges = edges;
   }
 
@@ -53,30 +51,23 @@ public class EPEdgeCollection implements EPEdgeCollectionOperators<EPEdgeData> {
   }
 
   @Override
-  public EPEdgeCollection filter(
-    final Predicate<EPEdgeData> predicateFunction) {
+  public EPEdgeCollection filter(final Predicate<EdgeData> predicateFunction) {
     return new EPEdgeCollection(
-      edges.filter(new FilterFunction<Edge<Long, EPFlinkEdgeData>>() {
+      edges.filter(new FilterFunction<Edge<Long, EdgeData>>() {
         @Override
-        public boolean filter(
-          Edge<Long, EPFlinkEdgeData> longEPFlinkEdgeDataEdge) throws
-          Exception {
-          return predicateFunction.filter(longEPFlinkEdgeDataEdge.getValue());
+        public boolean filter(Edge<Long, EdgeData> e) throws Exception {
+          return predicateFunction.filter(e.getValue());
         }
       }));
   }
 
   @Override
-  public Collection<EPEdgeData> collect() throws Exception {
-    List<EPEdgeData> result = Lists.newArrayList();
-    return edges
-      .map(new MapFunction<Edge<Long, EPFlinkEdgeData>, EPEdgeData>() {
-        @Override
-        public EPEdgeData map(
-          Edge<Long, EPFlinkEdgeData> longEPFlinkEdgeDataEdge) throws
-          Exception {
-          return longEPFlinkEdgeDataEdge.getValue();
-        }
-      }).collect();
+  public Collection<EdgeData> collect() throws Exception {
+    return edges.map(new MapFunction<Edge<Long, EdgeData>, EdgeData>() {
+      @Override
+      public EdgeData map(Edge<Long, EdgeData> e) throws Exception {
+        return e.getValue();
+      }
+    }).collect();
   }
 }

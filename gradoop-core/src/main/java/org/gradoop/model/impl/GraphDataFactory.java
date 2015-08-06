@@ -18,19 +18,20 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.GConstants;
-import org.gradoop.model.Graph;
+import org.gradoop.model.GraphData;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Factory for creating graphs.
  */
-public class GraphFactory {
+public class GraphDataFactory {
 
   /**
    * Avoid instantiation.
    */
-  public GraphFactory() {
+  public GraphDataFactory() {
   }
 
   /**
@@ -39,8 +40,33 @@ public class GraphFactory {
    * @param id graph identifier
    * @return graph with identifier
    */
-  public static Graph createDefaultGraphWithID(final Long id) {
-    return createDefaultGraph(id, null, null, null);
+  public static GraphData createDefaultGraphWithID(final Long id) {
+    return createDefaultGraph(id, GConstants.DEFAULT_GRAPH_LABEL, null, null,
+      null);
+  }
+
+  /**
+   * Creates a graph using the given id.
+   *
+   * @param id    graph identifier
+   * @param label graph label
+   * @return graph with identifier and label
+   */
+  public static GraphData createDefaultGraphWithIDAndLabel(final Long id,
+    final String label) {
+    return createDefaultGraph(id, label, null, null, null);
+  }
+
+  /**
+   * Creates a graph using the given id.
+   *
+   * @param id    graph identifier
+   * @param label graph label
+   * @return graph with identifier and label
+   */
+  public static GraphData createDefaultGraphWithIDAndLabelAndProperties(
+    final Long id, final String label, Map<String, Object> properties) {
+    return createDefaultGraph(id, label, properties, null, null);
   }
 
   /**
@@ -52,16 +78,16 @@ public class GraphFactory {
    * @param vertices   vertices contained in the graph
    * @return graph
    */
-  public static Graph createDefaultGraph(final Long id, final String label,
-    final Map<String, Object> properties, final Iterable<Long> vertices) {
+  public static GraphData createDefaultGraph(final Long id, final String label,
+    final Map<String, Object> properties, final Set<Long> vertices,
+    final Set<Long> edges) {
     checkGraphID(id);
     if (label == null || "".equals(label)) {
-      return new DefaultGraph(id, GConstants.DEFAULT_GRAPH_LABEL, properties,
-        vertices);
+      return new DefaultGraphData(id, GConstants.DEFAULT_GRAPH_LABEL,
+        properties, vertices, edges);
     } else {
-      return new DefaultGraph(id, label, properties, vertices);
+      return new DefaultGraphData(id, label, properties, vertices, edges);
     }
-
   }
 
   /**

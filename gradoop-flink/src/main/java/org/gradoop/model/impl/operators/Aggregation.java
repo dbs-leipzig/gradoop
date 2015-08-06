@@ -17,9 +17,10 @@
 
 package org.gradoop.model.impl.operators;
 
+import org.gradoop.model.GraphData;
 import org.gradoop.model.helper.UnaryFunction;
-import org.gradoop.model.impl.EPFlinkGraphData;
 import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.GraphDataFactory;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 public class Aggregation<O extends Number> implements
@@ -39,9 +40,9 @@ public class Aggregation<O extends Number> implements
   public EPGraph execute(EPGraph graph) throws Exception {
     O result = aggregationFunc.execute(graph);
     // copy graph data before updating properties
-    EPFlinkGraphData newGraphData =
-      new EPFlinkGraphData(graph.getId(), graph.getLabel(),
-        graph.getProperties());
+    GraphData newGraphData = GraphDataFactory
+      .createDefaultGraphWithIDAndLabel(graph.getId(), graph.getLabel());
+    newGraphData.setProperties(graph.getProperties());
     newGraphData.setProperty(aggregatePropertyKey, result);
     return EPGraph.fromGraph(graph.getGellyGraph(), newGraphData);
   }

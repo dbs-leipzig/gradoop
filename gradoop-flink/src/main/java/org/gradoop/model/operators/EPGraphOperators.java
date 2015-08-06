@@ -17,9 +17,9 @@
 
 package org.gradoop.model.operators;
 
-import org.gradoop.model.EPEdgeData;
 import org.gradoop.model.EPPatternGraph;
-import org.gradoop.model.EPVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EPEdgeCollection;
@@ -53,8 +53,8 @@ public interface EPGraphOperators {
   org.gradoop.model.impl.EPGraphCollection match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc);
 
-  EPGraph project(UnaryFunction<EPVertexData, EPVertexData> vertexFunction,
-    UnaryFunction<EPEdgeData, EPEdgeData> edgeFunction);
+  EPGraph project(UnaryFunction<VertexData, VertexData> vertexFunction,
+    UnaryFunction<EdgeData, EdgeData> edgeFunction);
 
   <O extends Number> EPGraph aggregate(String propertyKey,
     UnaryFunction<EPGraph, O> aggregateFunc) throws Exception;

@@ -16,7 +16,7 @@
  */
 package org.gradoop.model.operators;
 
-import org.gradoop.model.EPGraphData;
+import org.gradoop.model.GraphData;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.impl.EPGraph;
@@ -54,7 +54,7 @@ public interface EPGraphCollectionOperators<T> extends
    * @return collection with logical graphs that fulfil the predicate
    * @throws Exception
    */
-  EPGraphCollection filter(Predicate<EPGraphData> predicateFunction) throws
+  EPGraphCollection filter(Predicate<GraphData> predicateFunction) throws
     Exception;
 
   /*

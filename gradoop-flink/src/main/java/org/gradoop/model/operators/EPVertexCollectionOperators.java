@@ -17,12 +17,12 @@
 
 package org.gradoop.model.operators;
 
-import org.gradoop.model.EPVertexData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.impl.EPVertexCollection;
 
 public interface EPVertexCollectionOperators<T> extends
   EPCollectionOperators<T> {
 
-  EPVertexCollection filter(Predicate<EPVertexData> predicateFunction);
+  EPVertexCollection filter(Predicate<VertexData> predicateFunction);
 }

@@ -28,8 +28,8 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.VertexData;
 
 public class SummarizationJoin extends Summarization {
   SummarizationJoin(String vertexGroupingKey, String edgeGroupingKey,
@@ -38,15 +38,15 @@ public class SummarizationJoin extends Summarization {
   }
 
   @Override
-  protected Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> summarizeInternal(
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph) {
+  protected Graph<Long, VertexData, EdgeData> summarizeInternal(
+    Graph<Long, VertexData, EdgeData> graph) {
 
     /* build summarized vertices */
-    SortedGrouping<Vertex<Long, EPFlinkVertexData>> groupedSortedVertices =
+    SortedGrouping<Vertex<Long, VertexData>> groupedSortedVertices =
       groupAndSortVertices(graph);
 
     // create new summarized gelly vertices
-    DataSet<Vertex<Long, EPFlinkVertexData>> newVertices =
+    DataSet<Vertex<Long, VertexData>> newVertices =
       buildSummarizedVertices(groupedSortedVertices);
 
     // create mapping from vertex-id to group representative
@@ -54,14 +54,14 @@ public class SummarizationJoin extends Summarization {
       groupedSortedVertices.reduceGroup(new VertexToRepresentativeReducer());
 
     /* build summarized vertices */
-    DataSet<Edge<Long, EPFlinkEdgeData>> newEdges =
+    DataSet<Edge<Long, EdgeData>> newEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
     return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
   }
 
-  private DataSet<Edge<Long, EPFlinkEdgeData>> buildSummarizedEdges(
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph,
+  private DataSet<Edge<Long, EdgeData>> buildSummarizedEdges(
+    Graph<Long, VertexData, EdgeData> graph,
     DataSet<Tuple2<Long, Long>> vertexToRepresentativeMap) {
     // join vertex-group-map with edges on vertex-id == edge-source-id
     DataSet<Tuple5<Long, Long, Long, String, String>> edges =
@@ -90,13 +90,13 @@ public class SummarizationJoin extends Summarization {
    * The group representative is the first vertex-id in the group.
    */
   private static class VertexToRepresentativeReducer implements
-    GroupReduceFunction<Vertex<Long, EPFlinkVertexData>, Tuple2<Long, Long>> {
+    GroupReduceFunction<Vertex<Long, VertexData>, Tuple2<Long, Long>> {
 
-    public void reduce(Iterable<Vertex<Long, EPFlinkVertexData>> group,
+    public void reduce(Iterable<Vertex<Long, VertexData>> group,
       Collector<Tuple2<Long, Long>> collector) throws Exception {
       Long groupRepresentative = null;
       boolean first = true;
-      for (Vertex<Long, EPFlinkVertexData> groupElement : group) {
+      for (Vertex<Long, VertexData> groupElement : group) {
         if (first) {
           groupRepresentative = groupElement.getId();
           first = false;
@@ -114,7 +114,7 @@ public class SummarizationJoin extends Summarization {
    * group property.
    */
   private static class SourceVertexJoinFunction implements
-    JoinFunction<Tuple2<Long, Long>, Edge<Long, EPFlinkEdgeData>,
+    JoinFunction<Tuple2<Long, Long>, Edge<Long, EdgeData>,
       Tuple5<Long, Long, Long, String, String>> {
 
     private final String groupPropertyKey;
@@ -128,7 +128,7 @@ public class SummarizationJoin extends Summarization {
     @Override
     public Tuple5<Long, Long, Long, String, String> join(
       Tuple2<Long, Long> vertexRepresentativeTuple,
-      Edge<Long, EPFlinkEdgeData> e) throws Exception {
+      Edge<Long, EdgeData> e) throws Exception {
       String groupingValue = null;
       boolean useProperty =
         groupPropertyKey != null && !"".equals(groupPropertyKey);

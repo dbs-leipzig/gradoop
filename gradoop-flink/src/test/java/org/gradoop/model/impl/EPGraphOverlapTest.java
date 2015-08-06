@@ -19,9 +19,9 @@ package org.gradoop.model.impl;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.gradoop.model.EPEdgeData;
+import org.gradoop.model.EdgeData;
 import org.gradoop.model.EPFlinkTest;
-import org.gradoop.model.EPVertexData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,20 +64,20 @@ public class EPGraphOverlapTest extends EPFlinkTest {
     assertEquals("wrong number of edges", expectedEdgeCount,
       result.getEdgeCount());
 
-    Collection<EPVertexData> vertexData = result.getVertices().collect();
-    Collection<EPEdgeData> edgeData = result.getEdges().collect();
+    Collection<VertexData> vertexData = result.getVertices().collect();
+    Collection<EdgeData> edgeData = result.getEdges().collect();
 
     assertEquals("wrong number of vertex values", expectedVertexCount,
       vertexData.size());
     assertEquals("wrong number of edge values", expectedEdgeCount,
       edgeData.size());
 
-    for (EPVertexData v : vertexData) {
+    for (VertexData v : vertexData) {
       assertTrue("vertex is not in new graph",
         v.getGraphs().contains(newGraphID));
     }
 
-    for (EPEdgeData e : edgeData) {
+    for (EdgeData e : edgeData) {
       assertTrue("edge is not in new graph",
         e.getGraphs().contains(newGraphID));
     }
@@ -90,10 +90,10 @@ public class EPGraphOverlapTest extends EPFlinkTest {
 
     EPGraph newGraph = graphCommunity.overlap(databaseCommunity);
 
-    Collection<EPVertexData> vertexData = newGraph.getVertices().collect();
-    Collection<EPEdgeData> edgeData = newGraph.getEdges().collect();
+    Collection<VertexData> vertexData = newGraph.getVertices().collect();
+    Collection<EdgeData> edgeData = newGraph.getEdges().collect();
 
-    for (EPVertexData v : vertexData) {
+    for (VertexData v : vertexData) {
       Set<Long> gIDs = v.getGraphs();
       if (v.equals(alice)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
@@ -102,7 +102,7 @@ public class EPGraphOverlapTest extends EPFlinkTest {
       }
     }
 
-    for (EPEdgeData e : edgeData) {
+    for (EdgeData e : edgeData) {
       Set<Long> gIDs = e.getGraphs();
       if (e.equals(edge0)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());

@@ -1,52 +1,52 @@
-/*
- * This file is part of Gradoop.
- *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-package org.gradoop.io.writer;
-
-import org.gradoop.model.Edge;
-import org.gradoop.model.Vertex;
-
-/**
- * Creates an entry for a simple adjacency list of an directed graph.
- * <p/>
- * vertex-id neighbour1-id neighbour2-id ..
- */
-public class SimpleVertexWriter implements VertexLineWriter {
-  /**
-   * Token separator in the output.
-   */
-  private static final String LINE_TOKEN_SEPARATOR = " ";
-
-  /**
-   * Used to create the string representation of a vertex.
-   */
-  private final StringBuilder sb = new StringBuilder();
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String writeVertex(final Vertex vertex) {
-    sb.setLength(0);
-    sb.append(vertex.getId().toString());
-    for (Edge e : vertex.getOutgoingEdges()) {
-      sb.append(LINE_TOKEN_SEPARATOR);
-      sb.append(e.getOtherID());
-    }
-    return sb.toString();
-  }
-}
+///*
+// * This file is part of Gradoop.
+// *
+// * Gradoop is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * Gradoop is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+// */
+//
+//package org.gradoop.io.writer;
+//
+//import org.gradoop.model.EdgeData;
+//import org.gradoop.model.VertexData;
+//
+///**
+// * Creates an entry for a simple adjacency list of an directed graph.
+// * <p/>
+// * vertex-id neighbour1-id neighbour2-id ..
+// */
+//public class SimpleVertexWriter implements VertexLineWriter {
+//  /**
+//   * Token separator in the output.
+//   */
+//  private static final String LINE_TOKEN_SEPARATOR = " ";
+//
+//  /**
+//   * Used to create the string representation of a vertex.
+//   */
+//  private final StringBuilder sb = new StringBuilder();
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  @Override
+//  public String writeVertex(final VertexData vertexData) {
+//    sb.setLength(0);
+//    sb.append(vertexData.getId().toString());
+//    for (EdgeData e : vertexData.getOutgoingEdges()) {
+//      sb.append(LINE_TOKEN_SEPARATOR);
+//      sb.append(e.getOtherID());
+//    }
+//    return sb.toString();
+//  }
+//}

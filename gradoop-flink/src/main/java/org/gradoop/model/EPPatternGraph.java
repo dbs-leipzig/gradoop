@@ -19,7 +19,7 @@ package org.gradoop.model;
 
 public interface EPPatternGraph {
 
-  Vertex getVertex(String variable);
+  VertexData getVertex(String variable);
 
-  Edge getEdge(String variable);
+  EdgeData getEdge(String variable);
 }

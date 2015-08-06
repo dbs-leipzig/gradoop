@@ -21,9 +21,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 
@@ -34,12 +34,12 @@ public class Union extends AbstractBinaryCollectionToCollectionOperator {
   @Override
   protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
     EPGraphCollection secondGraphCollection) {
-    DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
+    DataSet<Subgraph<Long, GraphData>> newSubgraphs =
       firstSubgraphs.union(secondSubgraphs).distinct(GRAPH_ID);
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
+    DataSet<Vertex<Long, VertexData>> vertices =
       firstGraph.getVertices().union(secondGraph.getVertices())
         .distinct(VERTEX_ID);
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges =
+    DataSet<Edge<Long, EdgeData>> edges =
       firstGraph.getEdges().union(secondGraph.getEdges()).distinct(EDGE_ID);
 
     return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
