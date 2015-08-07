@@ -22,41 +22,48 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.impl.EPGraph;
-import org.gradoop.model.impl.GraphDataFactory;
 
-import static org.gradoop.model.impl.EPGraph.EDGE_ID;
-import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
+public class Overlap<VD extends VertexData, ED extends EdgeData, GD extends
+  GraphData> extends
+  AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
 
-public class Overlap extends AbstractBinaryGraphToGraphOperator {
   @Override
   public String getName() {
     return "Combination";
   }
 
   @Override
-  protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
+  protected EPGraph<VD, ED, GD> executeInternal(EPGraph<VD, ED, GD> firstGraph,
+    EPGraph<VD, ED, GD> secondGraph) {
     final Long newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
 
-    Graph<Long, VertexData, EdgeData> graph1 = firstGraph.getGellyGraph();
-    Graph<Long, VertexData, EdgeData> graph2 = secondGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph2 = secondGraph.getGellyGraph();
 
     // union vertex sets, group by vertex id, filter vertices where
     // the group contains two vertices and update them with the new graph id
-    DataSet<Vertex<Long, VertexData>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices()).groupBy(VERTEX_ID)
-        .reduceGroup(new VertexGroupReducer(2L))
-        .map(new VertexToGraphUpdater(newGraphID));
+    DataSet<Vertex<Long, VD>> newVertexSet =
+      graph1.getVertices().union(graph2.getVertices())
+        .groupBy(new KeySelectors.VertexKeySelector<VD>())
+        .reduceGroup(new VertexGroupReducer<VD>(2L))
+        .map(new VertexToGraphUpdater<VD>(newGraphID));
 
-    DataSet<Edge<Long, EdgeData>> newEdgeSet =
-      graph1.getEdges().union(graph2.getEdges()).groupBy(EDGE_ID)
-        .reduceGroup(new EdgeGroupReducer(2L))
-        .map(new EdgeToGraphUpdater(newGraphID));
+    DataSet<Edge<Long, ED>> newEdgeSet =
+      graph1.getEdges().union(graph2.getEdges())
+        .groupBy(new KeySelectors.EdgeKeySelector<ED>())
+        .reduceGroup(new EdgeGroupReducer<ED>(2L))
+        .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return EPGraph.fromGraph(
       Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
-      GraphDataFactory.createDefaultGraphWithID(newGraphID));
+      firstGraph.getGraphDataFactory().createGraphData(newGraphID),
+      firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
+      firstGraph.getGraphDataFactory());
   }
 }

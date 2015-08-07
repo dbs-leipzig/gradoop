@@ -23,6 +23,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.model.Attributed;
+import org.gradoop.model.GraphData;
 import org.gradoop.model.GraphElement;
 import org.gradoop.model.Labeled;
 
@@ -132,27 +133,36 @@ public abstract class JsonIO {
       return data;
     }
 
-    protected JSONObject writeMeta(Labeled entity) throws JSONException {
+    protected <T extends Labeled & GraphElement> JSONObject
+    writeGraphElementMeta(
+      T entity) throws JSONException {
+      JSONObject meta = writeMeta(entity);
+      if (entity.getGraphCount() > 0) {
+        meta.put(GRAPHS, getJSONArray(entity.getGraphs()));
+      }
+      return meta;
+    }
+
+    protected <T extends GraphData> JSONObject writeGraphMeta(T entity) throws
+      JSONException {
+      JSONObject meta = writeMeta(entity);
+      meta.put(VERTICES, getJSONArray(entity.getVertices()));
+      meta.put(EDGES, getJSONArray(entity.getEdges()));
+      return meta;
+    }
+
+    private JSONObject writeMeta(Labeled entity) throws JSONException {
       JSONObject meta = new JSONObject();
       meta.put(LABEL, entity.getLabel());
       return meta;
     }
 
-    protected <T extends Labeled & GraphElement> JSONObject
-    writeGraphElementMeta(
-      T entity) throws JSONException {
-      JSONObject meta = writeMeta(entity);
-      meta.put(GRAPHS, getGraphsArray(entity));
-      return meta;
-    }
-
-    private JSONArray getGraphsArray(final GraphElement graphElement) throws
-      JSONException {
-      JSONArray graphArray = new JSONArray();
-      for (Long graph : graphElement.getGraphs()) {
-        graphArray.put(graph);
+    private JSONArray getJSONArray(final Set<Long> values) {
+      JSONArray jsonArray = new JSONArray();
+      for (Long val : values) {
+        jsonArray.put(val);
       }
-      return graphArray;
+      return jsonArray;
     }
   }
 }

@@ -20,13 +20,17 @@ package org.gradoop.model;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.model.impl.EdgeDataFactory;
+import org.gradoop.model.impl.DefaultEdgeData;
+import org.gradoop.model.impl.DefaultEdgeDataFactory;
+import org.gradoop.model.impl.DefaultGraphData;
+import org.gradoop.model.impl.DefaultGraphDataFactory;
+import org.gradoop.model.impl.DefaultVertexData;
+import org.gradoop.model.impl.DefaultVertexDataFactory;
 import org.gradoop.model.impl.FlinkGraphStore;
-import org.gradoop.model.impl.GraphDataFactory;
-import org.gradoop.model.impl.VertexDataFactory;
 import org.gradoop.model.store.EPGraphStore;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -54,42 +58,42 @@ public abstract class EPFlinkTest {
   protected ExecutionEnvironment env =
     ExecutionEnvironment.getExecutionEnvironment();
 
-  protected VertexData alice;
-  protected VertexData bob;
-  protected VertexData carol;
-  protected VertexData dave;
-  protected VertexData eve;
-  protected VertexData frank;
-  protected VertexData tagDatabases;
-  protected VertexData tagGraphs;
-  protected VertexData tagHadoop;
-  protected VertexData forumGDBS;
-  protected VertexData forumGPS;
+  protected DefaultVertexData alice;
+  protected DefaultVertexData bob;
+  protected DefaultVertexData carol;
+  protected DefaultVertexData dave;
+  protected DefaultVertexData eve;
+  protected DefaultVertexData frank;
+  protected DefaultVertexData tagDatabases;
+  protected DefaultVertexData tagGraphs;
+  protected DefaultVertexData tagHadoop;
+  protected DefaultVertexData forumGDBS;
+  protected DefaultVertexData forumGPS;
 
-  protected EdgeData edge0;
-  protected EdgeData edge1;
-  protected EdgeData edge2;
-  protected EdgeData edge3;
-  protected EdgeData edge4;
-  protected EdgeData edge5;
-  protected EdgeData edge6;
-  protected EdgeData edge7;
-  protected EdgeData edge8;
-  protected EdgeData edge9;
-  protected EdgeData edge10;
-  protected EdgeData edge11;
-  protected EdgeData edge12;
-  protected EdgeData edge13;
-  protected EdgeData edge14;
-  protected EdgeData edge15;
-  protected EdgeData edge16;
-  protected EdgeData edge17;
-  protected EdgeData edge18;
-  protected EdgeData edge19;
-  protected EdgeData edge20;
-  protected EdgeData edge21;
-  protected EdgeData edge22;
-  protected EdgeData edge23;
+  protected DefaultEdgeData edge0;
+  protected DefaultEdgeData edge1;
+  protected DefaultEdgeData edge2;
+  protected DefaultEdgeData edge3;
+  protected DefaultEdgeData edge4;
+  protected DefaultEdgeData edge5;
+  protected DefaultEdgeData edge6;
+  protected DefaultEdgeData edge7;
+  protected DefaultEdgeData edge8;
+  protected DefaultEdgeData edge9;
+  protected DefaultEdgeData edge10;
+  protected DefaultEdgeData edge11;
+  protected DefaultEdgeData edge12;
+  protected DefaultEdgeData edge13;
+  protected DefaultEdgeData edge14;
+  protected DefaultEdgeData edge15;
+  protected DefaultEdgeData edge16;
+  protected DefaultEdgeData edge17;
+  protected DefaultEdgeData edge18;
+  protected DefaultEdgeData edge19;
+  protected DefaultEdgeData edge20;
+  protected DefaultEdgeData edge21;
+  protected DefaultEdgeData edge22;
+  protected DefaultEdgeData edge23;
 
   /**
    * Creates a social network as a basis for tests.
@@ -99,37 +103,38 @@ public abstract class EPFlinkTest {
    *
    * @return graph store containing a simple social network for tests.
    */
-  protected EPGraphStore createSocialGraph() {
+  protected EPGraphStore<DefaultVertexData, DefaultEdgeData,
+    DefaultGraphData> createSocialGraph() {
 
     // vertices
-
+    DefaultVertexDataFactory vertexDataFactory = new DefaultVertexDataFactory();
     // Person:Alice (0L)
     Map<String, Object> properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Alice");
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Leipzig");
-    alice = VertexDataFactory.createDefaultVertex(0L, LABEL_PERSON, properties,
-      Sets.newHashSet(0L, 2L));
+    alice = vertexDataFactory
+      .createVertexData(0L, LABEL_PERSON, properties, Sets.newHashSet(0L, 2L));
     // Person:Bob (1L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Bob");
     properties.put(PROPERTY_KEY_GENDER, "m");
     properties.put(PROPERTY_KEY_CITY, "Leipzig");
-    bob = VertexDataFactory.createDefaultVertex(1L, LABEL_PERSON, properties,
-      Sets.newHashSet(0L, 2L));
+    bob = vertexDataFactory
+      .createVertexData(1L, LABEL_PERSON, properties, Sets.newHashSet(0L, 2L));
     // Person:Carol (2L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Carol");
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
-    carol = VertexDataFactory.createDefaultVertex(2L, LABEL_PERSON, properties,
+    carol = vertexDataFactory.createVertexData(2L, LABEL_PERSON, properties,
       Sets.newHashSet(1L, 2L, 3L));
     // Person:Dave (3L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Dave");
     properties.put(PROPERTY_KEY_GENDER, "m");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
-    dave = VertexDataFactory.createDefaultVertex(3L, LABEL_PERSON, properties,
+    dave = vertexDataFactory.createVertexData(3L, LABEL_PERSON, properties,
       Sets.newHashSet(1L, 2L, 3L));
     // Person:Eve (4L)
     properties = new HashMap<>();
@@ -137,220 +142,212 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
     properties.put(PROPERTY_KEY_SPEAKS, "English");
-    eve = VertexDataFactory
-      .createDefaultVertex(4L, LABEL_PERSON, properties, Sets.newHashSet(0L));
+    eve = vertexDataFactory
+      .createVertexData(4L, LABEL_PERSON, properties, Sets.newHashSet(0L));
     // Person:Frank (5L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Frank");
     properties.put(PROPERTY_KEY_GENDER, "m");
     properties.put(PROPERTY_KEY_CITY, "Berlin");
     properties.put(PROPERTY_KEY_LOC_IP, "127.0.0.1");
-    frank = VertexDataFactory
-      .createDefaultVertex(5L, LABEL_PERSON, properties, Sets.newHashSet(1L));
+    frank = vertexDataFactory
+      .createVertexData(5L, LABEL_PERSON, properties, Sets.newHashSet(1L));
 
     // Tag:Databases (6L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Databases");
-    tagDatabases = VertexDataFactory
-      .createDefaultVertexWithProperties(6L, LABEL_TAG, properties);
+    tagDatabases =
+      vertexDataFactory.createVertexData(6L, LABEL_TAG, properties);
     // Tag:Databases (7L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Graphs");
-    tagGraphs = VertexDataFactory
-      .createDefaultVertexWithProperties(7L, LABEL_TAG, properties);
+    tagGraphs = vertexDataFactory.createVertexData(7L, LABEL_TAG, properties);
     // Tag:Databases (8L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Hadoop");
-    tagHadoop = VertexDataFactory
-      .createDefaultVertexWithProperties(8L, LABEL_TAG, properties);
+    tagHadoop = vertexDataFactory.createVertexData(8L, LABEL_TAG, properties);
 
     // Forum:Graph Databases (9L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_TITLE, "Graph Databases");
-    forumGDBS = VertexDataFactory
-      .createDefaultVertexWithProperties(9L, LABEL_FORUM, properties);
+    forumGDBS = vertexDataFactory.createVertexData(9L, LABEL_FORUM, properties);
     // Forum:Graph Processing (10L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_TITLE, "Graph Processing");
-    forumGPS = VertexDataFactory
-      .createDefaultVertex(10L, LABEL_FORUM, properties, Sets.newHashSet(3L));
+    forumGPS = vertexDataFactory
+      .createVertexData(10L, LABEL_FORUM, properties, Sets.newHashSet(3L));
 
-    List<VertexData> vertices = Lists
+    List<DefaultVertexData> vertices = Lists
       .newArrayList(alice, bob, carol, dave, eve, frank, tagDatabases,
         tagGraphs, tagHadoop, forumGDBS, forumGPS);
 
     // sna_edges
-    List<EdgeData> edges = Lists.newArrayList();
+    DefaultEdgeDataFactory edgeDataFactory = new DefaultEdgeDataFactory();
+
+    List<DefaultEdgeData> edges = Lists.newArrayList();
     // Person:Alice-[knows]->Person:Bob (0L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2014);
-    edge0 = EdgeDataFactory
-      .createDefaultEdge(0L, LABEL_KNOWS, alice.getId(), bob.getId(),
-        properties, Sets.newHashSet(0L, 2L));
+    edge0 = edgeDataFactory
+      .createEdgeData(0L, LABEL_KNOWS, alice.getId(), bob.getId(), properties,
+        Sets.newHashSet(0L, 2L));
     edges.add(edge0);
     // Person:Bob-[knows]->Person:Alice (1L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2014);
-    edge1 = EdgeDataFactory
-      .createDefaultEdge(1L, LABEL_KNOWS, bob.getId(), alice.getId(),
-        properties, Sets.newHashSet(0L, 2L));
+    edge1 = edgeDataFactory
+      .createEdgeData(1L, LABEL_KNOWS, bob.getId(), alice.getId(), properties,
+        Sets.newHashSet(0L, 2L));
     edges.add(edge1);
     // Person:Bob-[knows]->Person:Carol (2L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2013);
-    edge2 = EdgeDataFactory
-      .createDefaultEdge(2L, LABEL_KNOWS, bob.getId(), carol.getId(),
-        properties, Sets.newHashSet(2L));
+    edge2 = edgeDataFactory
+      .createEdgeData(2L, LABEL_KNOWS, bob.getId(), carol.getId(), properties,
+        Sets.newHashSet(2L));
     edges.add(edge2);
     // Person:Carol-[knows]->Person:Bob (3L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2013);
-    edge3 = EdgeDataFactory
-      .createDefaultEdge(3L, LABEL_KNOWS, carol.getId(), bob.getId(),
-        properties, Sets.newHashSet(2L));
+    edge3 = edgeDataFactory
+      .createEdgeData(3L, LABEL_KNOWS, carol.getId(), bob.getId(), properties,
+        Sets.newHashSet(2L));
     edges.add(edge3);
     // Person:Carol-[knows]->Person:Dave (4L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2014);
-    edge4 = EdgeDataFactory
-      .createDefaultEdge(4L, LABEL_KNOWS, carol.getId(), dave.getId(),
-        properties, Sets.newHashSet(1L, 2L, 3L));
+    edge4 = edgeDataFactory
+      .createEdgeData(4L, LABEL_KNOWS, carol.getId(), dave.getId(), properties,
+        Sets.newHashSet(1L, 2L, 3L));
     edges.add(edge4);
     // Person:Dave-[knows]->Person:Carol (5L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2014);
-    edge5 = EdgeDataFactory
-      .createDefaultEdge(5L, LABEL_KNOWS, dave.getId(), carol.getId(),
-        properties, Sets.newHashSet(1L, 2L));
+    edge5 = edgeDataFactory
+      .createEdgeData(5L, LABEL_KNOWS, dave.getId(), carol.getId(), properties,
+        Sets.newHashSet(1L, 2L));
     edges.add(edge5);
     // Person:Eve-[knows]->Person:Alice (6L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2013);
-    edge6 = EdgeDataFactory
-      .createDefaultEdge(6L, LABEL_KNOWS, eve.getId(), alice.getId(),
-        properties, Sets.newHashSet(0L));
+    edge6 = edgeDataFactory
+      .createEdgeData(6L, LABEL_KNOWS, eve.getId(), alice.getId(), properties,
+        Sets.newHashSet(0L));
     edges.add(edge6);
     // Person:Eve-[knows]->Person:Bob (21L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2015);
-    edge21 = EdgeDataFactory
-      .createDefaultEdge(21L, LABEL_KNOWS, eve.getId(), bob.getId(), properties,
+    edge21 = edgeDataFactory
+      .createEdgeData(21L, LABEL_KNOWS, eve.getId(), bob.getId(), properties,
         Sets.newHashSet(0L));
     edges.add(edge21);
     // Person:Frank-[knows]->Person:Carol (22L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2015);
-    edge22 = EdgeDataFactory
-      .createDefaultEdge(22L, LABEL_KNOWS, frank.getId(), carol.getId(),
+    edge22 = edgeDataFactory
+      .createEdgeData(22L, LABEL_KNOWS, frank.getId(), carol.getId(),
         properties, Sets.newHashSet(1L));
     edges.add(edge22);
     // Person:Frank-[knows]->Person:Dave (23L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2015);
-    edge23 = EdgeDataFactory
-      .createDefaultEdge(23L, LABEL_KNOWS, frank.getId(), dave.getId(),
-        properties, Sets.newHashSet(1L));
+    edge23 = edgeDataFactory
+      .createEdgeData(23L, LABEL_KNOWS, frank.getId(), dave.getId(), properties,
+        Sets.newHashSet(1L));
     edges.add(edge23);
     // Person:Eve-[hasInterest]->Tag:Databases (7L)
-    edge7 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(7L, LABEL_HAS_INTEREST, eve.getId(),
-        tagDatabases.getId());
+    edge7 = edgeDataFactory.createEdgeData(7L, LABEL_HAS_INTEREST, eve.getId(),
+      tagDatabases.getId());
     edges.add(edge7);
     // Person:Alice-[hasInterest]->Tag:Databases (8L)
-    edge8 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(8L, LABEL_HAS_INTEREST, alice.getId(),
+    edge8 = edgeDataFactory
+      .createEdgeData(8L, LABEL_HAS_INTEREST, alice.getId(),
         tagDatabases.getId());
     edges.add(edge8);
     // Person:Dave-[hasInterest]->Tag:Hadoop (9L)
-    edge9 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(9L, LABEL_HAS_INTEREST, dave.getId(),
-        tagHadoop.getId());
+    edge9 = edgeDataFactory
+      .createEdgeData(9L, LABEL_HAS_INTEREST, dave.getId(), tagHadoop.getId());
     edges.add(edge9);
     // Person:Frank-[hasInterest]->Tag:Hadoop (10L)
-    edge10 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(10L, LABEL_HAS_INTEREST, frank.getId(),
+    edge10 = edgeDataFactory
+      .createEdgeData(10L, LABEL_HAS_INTEREST, frank.getId(),
         tagHadoop.getId());
     edges.add(edge10);
     // Forum:Graph Databases-[hasTag]->Tag:Databases (11L)
-    edge11 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(11L, LABEL_HAS_TAG, forumGDBS.getId(),
+    edge11 = edgeDataFactory
+      .createEdgeData(11L, LABEL_HAS_TAG, forumGDBS.getId(),
         tagDatabases.getId());
     edges.add(edge11);
     // Forum:Graph Databases-[hasTag]->Tag:Graphs (12L)
-    edge12 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(12L, LABEL_HAS_TAG, forumGDBS.getId(),
-        tagGraphs.getId());
+    edge12 = edgeDataFactory
+      .createEdgeData(12L, LABEL_HAS_TAG, forumGDBS.getId(), tagGraphs.getId());
     edges.add(edge12);
     // Forum:Graph Processing-[hasTag]->Tag:Graphs (13L)
-    edge13 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(13L, LABEL_HAS_TAG, forumGPS.getId(),
-        tagGraphs.getId());
+    edge13 = edgeDataFactory
+      .createEdgeData(13L, LABEL_HAS_TAG, forumGPS.getId(), tagGraphs.getId());
     edges.add(edge13);
     // Forum:Graph Processing-[hasTag]->Tag:Hadoop (14L)
-    edge14 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(14L, LABEL_HAS_TAG, forumGPS.getId(),
-        tagHadoop.getId());
+    edge14 = edgeDataFactory
+      .createEdgeData(14L, LABEL_HAS_TAG, forumGPS.getId(), tagHadoop.getId());
     edges.add(edge14);
     // Forum:Graph Databases-[hasModerator]->Person:Alice (15L)
-    edge15 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(15L, LABEL_HAS_MODERATOR, forumGDBS.getId(),
+    edge15 = edgeDataFactory
+      .createEdgeData(15L, LABEL_HAS_MODERATOR, forumGDBS.getId(),
         alice.getId());
     edges.add(edge15);
     // Forum:Graph Processing-[hasModerator]->Person:Dave (16L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_SINCE, 2013);
-    edge16 = EdgeDataFactory
-      .createDefaultEdge(16L, LABEL_HAS_MODERATOR, forumGPS.getId(),
-        dave.getId(), properties, Sets.newHashSet(3L));
+    edge16 = edgeDataFactory
+      .createEdgeData(16L, LABEL_HAS_MODERATOR, forumGPS.getId(), dave.getId(),
+        properties, Sets.newHashSet(3L));
     edges.add(edge16);
     // Forum:Graph Databases-[hasMember]->Person:Alice (17L)
-    edge17 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(17L, LABEL_HAS_MEMBER, forumGDBS.getId(),
-        alice.getId());
+    edge17 = edgeDataFactory
+      .createEdgeData(17L, LABEL_HAS_MEMBER, forumGDBS.getId(), alice.getId());
     edges.add(edge17);
     // Forum:Graph Databases-[hasMember]->Person:Bob (18L)
-    edge18 = EdgeDataFactory
-      .createDefaultEdgeWithLabel(18L, LABEL_HAS_MEMBER, forumGDBS.getId(),
-        bob.getId());
+    edge18 = edgeDataFactory
+      .createEdgeData(18L, LABEL_HAS_MEMBER, forumGDBS.getId(), bob.getId());
     edges.add(edge18);
     // Forum:Graph Processing-[hasMember]->Person:Carol (19L)
-    edge19 = EdgeDataFactory
-      .createDefaultEdgeWithGraphs(19L, LABEL_HAS_MEMBER, forumGPS.getId(),
-        carol.getId(), Sets.newHashSet(3L));
+    edge19 = edgeDataFactory
+      .createEdgeData(19L, LABEL_HAS_MEMBER, forumGPS.getId(), carol.getId(),
+        Sets.newHashSet(3L));
     edges.add(edge19);
     // Forum:Graph Processing-[hasMember]->Person:Dave (20L)
-    edge20 = EdgeDataFactory
-      .createDefaultEdgeWithGraphs(20L, LABEL_HAS_MEMBER, forumGPS.getId(),
-        dave.getId(), Sets.newHashSet(3L));
+    edge20 = edgeDataFactory
+      .createEdgeData(20L, LABEL_HAS_MEMBER, forumGPS.getId(), dave.getId(),
+        Sets.newHashSet(3L));
     edges.add(edge20);
 
     // graphs
-    List<GraphData> graphs = Lists.newArrayList();
+    DefaultGraphDataFactory graphDataFactory = new DefaultGraphDataFactory();
+    List<DefaultGraphData> graphs = Lists.newArrayList();
     // Community {interest: Databases, vertexCount: 3} (0L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_INTEREST, "Databases");
     properties.put(PROPERTY_KEY_VERTEX_COUNT, 3);
-    graphs.add(GraphDataFactory
-      .createDefaultGraphWithIDAndLabelAndProperties(0L, LABEL_COMMUNITY,
-        properties));
+    graphs.add(graphDataFactory.createGraphData(0L, LABEL_COMMUNITY, properties,
+      Sets.newHashSet(0L, 1L, 4L), Sets.newHashSet(0L, 1L, 6L, 21L)));
     // Community {interest: Hadoop, vertexCount: 3} (1L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_INTEREST, "Hadoop");
     properties.put(PROPERTY_KEY_VERTEX_COUNT, 3);
-    graphs.add(GraphDataFactory
-      .createDefaultGraphWithIDAndLabelAndProperties(1L, LABEL_COMMUNITY,
-        properties));
+    graphs.add(graphDataFactory.createGraphData(1L, LABEL_COMMUNITY, properties,
+      Sets.newHashSet(2L, 3L, 5L), Sets.newHashSet(4L, 5L, 22L, 23L)));
     // Community {interest: Graphs, vertexCount: 4} (2L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_INTEREST, "Graphs");
     properties.put(PROPERTY_KEY_VERTEX_COUNT, 4);
-    graphs.add(GraphDataFactory
-      .createDefaultGraphWithIDAndLabelAndProperties(2L, LABEL_COMMUNITY,
-        properties));
+    graphs.add(graphDataFactory.createGraphData(2L, LABEL_COMMUNITY, properties,
+      Sets.newHashSet(0L, 1L, 2L, 3L),
+      Sets.newHashSet(0L, 1L, 2L, 3L, 4L, 5L)));
 
     // Forum {} (3L)
-    graphs
-      .add(GraphDataFactory.createDefaultGraphWithIDAndLabel(3L, LABEL_FORUM));
+    graphs.add(graphDataFactory
+      .createGraphData(3L, LABEL_FORUM, Sets.newHashSet(2L, 3L, 10L),
+        Sets.newHashSet(4L, 5L, 16L, 19L, 20L)));
 
     return FlinkGraphStore.fromCollection(vertices, edges, graphs, env);
   }

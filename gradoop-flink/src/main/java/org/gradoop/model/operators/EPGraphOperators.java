@@ -19,6 +19,7 @@ package org.gradoop.model.operators;
 
 import org.gradoop.model.EPPatternGraph;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
@@ -31,15 +32,16 @@ import org.gradoop.model.impl.EPVertexCollection;
  * Describes all operators that can be applied on a single graph inside the
  * EPGM.
  */
-public interface EPGraphOperators {
+public interface EPGraphOperators<VD extends VertexData, ED extends EdgeData,
+  GD extends GraphData> {
 
-  EPVertexCollection getVertices();
+  EPVertexCollection<VD> getVertices();
 
-  EPEdgeCollection getEdges();
+  EPEdgeCollection<ED> getEdges();
 
-  EPEdgeCollection getOutgoingEdges(final Long vertexID);
+  EPEdgeCollection<ED> getOutgoingEdges(final Long vertexID);
 
-  EPEdgeCollection getIncomingEdges(final Long vertexID);
+  EPEdgeCollection<ED> getIncomingEdges(final Long vertexID);
 
   long getVertexCount() throws Exception;
 
@@ -50,62 +52,66 @@ public interface EPGraphOperators {
   graph collection
    */
 
-  org.gradoop.model.impl.EPGraphCollection match(String graphPattern,
+  EPGraphCollection<VD, ED, GD> match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc);
 
-  EPGraph project(UnaryFunction<VertexData, VertexData> vertexFunction,
-    UnaryFunction<EdgeData, EdgeData> edgeFunction);
+  EPGraph<VD, ED, GD> project(UnaryFunction<VD, VD> vertexFunction,
+    UnaryFunction<ED, ED> edgeFunction);
 
-  <O extends Number> EPGraph aggregate(String propertyKey,
-    UnaryFunction<EPGraph, O> aggregateFunc) throws Exception;
+  <O extends Number> EPGraph<VD, ED, GD> aggregate(String propertyKey,
+    UnaryFunction<EPGraph<VD, ED, GD>, O> aggregateFunc) throws Exception;
 
   /* Summarization */
 
-  EPGraph summarize(String vertexGroupingKey) throws Exception;
+  EPGraph<VD, ED, GD> summarize(String vertexGroupingKey) throws Exception;
 
-  EPGraph summarize(String vertexGroupingKey, String edgeGroupingKey) throws
-    Exception;
-
-  EPGraph summarizeOnVertexLabel() throws Exception;
-
-  EPGraph summarizeOnVertexLabelAndVertexProperty(
-    String vertexGroupingKey) throws Exception;
-
-  EPGraph summarizeOnVertexLabelAndEdgeProperty(String edgeGroupingKey) throws
-    Exception;
-
-  EPGraph summarizeOnVertexLabel(String vertexGroupingKey,
+  EPGraph<VD, ED, GD> summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception;
 
-  EPGraph summarizeOnVertexAndEdgeLabel() throws Exception;
+  EPGraph<VD, ED, GD> summarizeOnVertexLabel() throws Exception;
 
-  EPGraph summarizeOnVertexAndEdgeLabelAndVertexProperty(
+  EPGraph<VD, ED, GD> summarizeOnVertexLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception;
 
-  EPGraph summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+  EPGraph<VD, ED, GD> summarizeOnVertexLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception;
 
-  EPGraph summarizeOnVertexAndEdgeLabel(String vertexGroupingKey,
+  EPGraph<VD, ED, GD> summarizeOnVertexLabel(String vertexGroupingKey,
+    String edgeGroupingKey) throws Exception;
+
+  EPGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel() throws Exception;
+
+  EPGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndVertexProperty(
+    String vertexGroupingKey) throws Exception;
+
+  EPGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+    String edgeGroupingKey) throws Exception;
+
+  EPGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception;
 
   /*
   binary operators take two graphs as input and return a single graph
    */
 
-  EPGraph combine(EPGraph otherGraph);
+  EPGraph<VD, ED, GD> combine(EPGraph<VD, ED, GD> otherGraph);
 
-  EPGraph overlap(EPGraph otherGraph);
+  EPGraph<VD, ED, GD> overlap(EPGraph<VD, ED, GD> otherGraph);
 
-  EPGraph exclude(EPGraph otherGraph);
+  EPGraph<VD, ED, GD> exclude(EPGraph<VD, ED, GD> otherGraph);
 
   /*
   auxiliary operators
    */
-  EPGraph callForGraph(UnaryGraphToGraphOperator operator) throws Exception;
+  EPGraph<VD, ED, GD> callForGraph(
+    UnaryGraphToGraphOperator<VD, ED, GD> operator) throws Exception;
 
-  EPGraph callForGraph(BinaryGraphToGraphOperator operator, EPGraph otherGraph);
+  EPGraph<VD, ED, GD> callForGraph(
+    BinaryGraphToGraphOperator<VD, ED, GD> operator,
+    EPGraph<VD, ED, GD> otherGraph);
 
-  EPGraphCollection callForCollection(UnaryGraphToCollectionOperator operator);
+  EPGraphCollection<VD, ED, GD> callForCollection(
+    UnaryGraphToCollectionOperator<VD, ED, GD> operator);
 
   void writeAsJson(final String vertexFile, final String edgeFile,
     final String graphFile) throws Exception;

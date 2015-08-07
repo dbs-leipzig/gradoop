@@ -26,8 +26,7 @@ public abstract class EPGMElement implements Identifiable, Labeled, Attributed {
    */
   protected Map<String, Object> properties;
 
-  public EPGMElement() {
-
+  protected EPGMElement() {
   }
 
   /**

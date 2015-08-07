@@ -40,12 +40,12 @@ public class JsonWriter extends JsonIO {
    * "meta":{"label":"Employee","graphs":[0,1,2,3]}
    * }
    */
-  public static class VertexTextFormatter extends
+  public static class VertexTextFormatter<VD extends VertexData> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Vertex<Long, VertexData>> {
+    TextOutputFormat.TextFormatter<Vertex<Long, VD>> {
 
     @Override
-    public String format(Vertex<Long, VertexData> v) {
+    public String format(Vertex<Long, VD> v) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, v.getId());
@@ -69,11 +69,12 @@ public class JsonWriter extends JsonIO {
    * "meta":{"label":"friendOf","graphs":[0,1,2,3]}
    * }
    */
-  public static class EdgeTextFormatter extends EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Edge<Long, EdgeData>> {
+  public static class EdgeTextFormatter<ED extends EdgeData> extends
+    EntityToJsonFormatter implements
+    TextOutputFormat.TextFormatter<Edge<Long, ED>> {
 
     @Override
-    public String format(Edge<Long, EdgeData> e) {
+    public String format(Edge<Long, ED> e) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, e.getValue().getId());
@@ -97,17 +98,17 @@ public class JsonWriter extends JsonIO {
    * "meta":{"label":"Community"}
    * }
    */
-  public static class GraphTextFormatter extends
+  public static class GraphTextFormatter<GD extends GraphData> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Subgraph<Long, GraphData>> {
+    TextOutputFormat.TextFormatter<Subgraph<Long, GD>> {
 
     @Override
-    public String format(Subgraph<Long, GraphData> g) {
+    public String format(Subgraph<Long, GD> g) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, g.getId());
         json.put(DATA, writeProperties(g.getValue()));
-        json.put(META, writeMeta(g.getValue()));
+        json.put(META, writeGraphMeta(g.getValue()));
       } catch (JSONException ex) {
         ex.printStackTrace();
       }

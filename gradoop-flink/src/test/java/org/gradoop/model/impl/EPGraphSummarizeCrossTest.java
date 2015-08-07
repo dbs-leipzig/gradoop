@@ -18,13 +18,15 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.model.impl.operators.Summarization;
+import org.gradoop.model.impl.operators.SummarizationCross;
 
 public class EPGraphSummarizeCrossTest extends EPGraphSummarizeTest {
   @Override
-  public Summarization getSummarizationImpl(String vertexGroupingKey,
-    boolean useVertexLabel, String edgeGroupingKey, boolean useEdgeLabel) {
-    return new Summarization.SummarizationBuilder(vertexGroupingKey,
-      useVertexLabel).useEdgeLabels(useEdgeLabel)
-      .edgeGroupingKey(edgeGroupingKey).build();
+  public Summarization<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+  getSummarizationImpl(
+    String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
+    boolean useEdgeLabel) {
+    return new SummarizationCross<>(vertexGroupingKey, edgeGroupingKey,
+      useVertexLabel, useEdgeLabel);
   }
 }

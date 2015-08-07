@@ -19,26 +19,30 @@ package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.operators.Order;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.SortedGrouping;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.EdgeDataFactory;
 import org.gradoop.model.GraphData;
+import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.VertexDataFactory;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.impl.EPGraph;
-import org.gradoop.model.impl.EdgeDataFactory;
-import org.gradoop.model.impl.GraphDataFactory;
-import org.gradoop.model.impl.VertexDataFactory;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
-
-import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
 
 /**
  * The summarization operator determines a structural grouping of similar
@@ -80,7 +84,9 @@ import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
  *
  * @author Martin Junghanns
  */
-public abstract class Summarization implements UnaryGraphToGraphOperator {
+public abstract class Summarization<VD extends VertexData, ED extends
+  EdgeData, GD extends GraphData> implements
+  UnaryGraphToGraphOperator<VD, ED, GD> {
   /**
    * Used to represent vertices that do not have the vertex grouping property.
    */
@@ -96,6 +102,12 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
 
   private final boolean useEdgeLabels;
 
+  protected GraphDataFactory<GD> graphDataFactory;
+
+  protected VertexDataFactory<VD> vertexDataFactory;
+
+  protected EdgeDataFactory<ED> edgeDataFactory;
+
   Summarization(String vertexGroupingKey, String edgeGroupingKey,
     boolean useVertexLabels, boolean useEdgeLabels) {
     this.vertexGroupingKey = vertexGroupingKey;
@@ -105,18 +117,23 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
   }
 
   @Override
-  public EPGraph execute(EPGraph graph) {
-    EPGraph result;
-    Graph<Long, VertexData, EdgeData> gellyGraph;
+  public EPGraph<VD, ED, GD> execute(EPGraph<VD, ED, GD> graph) {
+    EPGraph<VD, ED, GD> result;
+    Graph<Long, VD, ED> gellyGraph;
+
+    vertexDataFactory = graph.getVertexDataFactory();
+    edgeDataFactory = graph.getEdgeDataFactory();
+    graphDataFactory = graph.getGraphDataFactory();
 
     if (!useVertexProperty() &&
       !useEdgeProperty() && !useVertexLabels() && !useEdgeLabels()) {
       // graphs stays unchanged
       result = graph;
     } else {
-      GraphData graphData = createNewGraphData();
+      GD GD = createNewGraphData();
       gellyGraph = summarizeInternal(graph.getGellyGraph());
-      result = EPGraph.fromGraph(gellyGraph, graphData);
+      result = EPGraph.fromGraph(gellyGraph, GD, graph.getVertexDataFactory(),
+        graph.getEdgeDataFactory(), graph.getGraphDataFactory());
     }
     return result;
   }
@@ -145,20 +162,21 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     return useEdgeLabels;
   }
 
-  protected SortedGrouping<Vertex<Long, VertexData>> groupAndSortVertices(
-    Graph<Long, VertexData, EdgeData> graph) {
+  protected SortedGrouping<Vertex<Long, VD>> groupAndSortVertices(
+    Graph<Long, VD, ED> graph) {
     return graph.getVertices()
       // group vertices by the given property
-      .groupBy(new VertexGroupingKeySelector(getVertexGroupingKey(),
+      .groupBy(new VertexGroupingKeySelector<VD>(getVertexGroupingKey(),
         useVertexLabels()))
         // sort the group (smallest id is group representative)
-      .sortGroup(VERTEX_ID, Order.ASCENDING);
+      .sortGroup(new KeySelectors.VertexKeySelector<VD>(), Order.ASCENDING);
   }
 
-  protected DataSet<Vertex<Long, VertexData>> buildSummarizedVertices(
-    SortedGrouping<Vertex<Long, VertexData>> groupedSortedVertices) {
+  protected DataSet<Vertex<Long, VD>> buildSummarizedVertices(
+    SortedGrouping<Vertex<Long, VD>> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(
-      new VertexGroupSummarizer(getVertexGroupingKey(), useVertexLabels()));
+      new VertexGroupSummarizer<>(getVertexGroupingKey(), useVertexLabels(),
+        vertexDataFactory));
   }
 
   protected UnsortedGrouping<Tuple5<Long, Long, Long, String, String>>
@@ -177,19 +195,19 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     return groupedEdges;
   }
 
-  private GraphData createNewGraphData() {
-    return GraphDataFactory
-      .createDefaultGraphWithID(FlinkConstants.SUMMARIZE_GRAPH_ID);
+  private GD createNewGraphData() {
+    return graphDataFactory.createGraphData(FlinkConstants.SUMMARIZE_GRAPH_ID);
   }
 
-  protected abstract Graph<Long, VertexData, EdgeData> summarizeInternal(
-    Graph<Long, VertexData, EdgeData> graph);
+  protected abstract Graph<Long, VD, ED> summarizeInternal(
+    Graph<Long, VD, ED> graph);
 
   /**
    * Selects the key to group vertices.
    */
-  protected static class VertexGroupingKeySelector implements
-    KeySelector<Vertex<Long, VertexData>, String> {
+  protected static class VertexGroupingKeySelector<VD extends VertexData>
+    implements
+    KeySelector<Vertex<Long, VD>, String> {
 
     private String groupPropertyKey;
     private boolean useLabel;
@@ -201,7 +219,7 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     }
 
     @Override
-    public String getKey(Vertex<Long, VertexData> v) throws Exception {
+    public String getKey(Vertex<Long, VD> v) throws Exception {
       String label = v.getValue().getLabel();
       String groupingValue = null;
       boolean useProperty =
@@ -229,27 +247,30 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
   /**
    * Creates a summarized vertex from a group of vertices.
    */
-  protected static class VertexGroupSummarizer implements
-    GroupReduceFunction<Vertex<Long, VertexData>, Vertex<Long, VertexData>> {
+  protected static class VertexGroupSummarizer<VD extends VertexData> implements
+    GroupReduceFunction<Vertex<Long, VD>, Vertex<Long, VD>>,
+    ResultTypeQueryable<Vertex<Long, VD>> {
 
-
+    private final VertexDataFactory<VD> vertexDataFactory;
     private String groupPropertyKey;
     private boolean useLabel;
 
-    public VertexGroupSummarizer(String groupPropertyKey, boolean useLabel) {
+    public VertexGroupSummarizer(String groupPropertyKey, boolean useLabel,
+      VertexDataFactory<VD> vertexDataFactory) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
+      this.vertexDataFactory = vertexDataFactory;
     }
 
     @Override
-    public void reduce(Iterable<Vertex<Long, VertexData>> vertices,
-      Collector<Vertex<Long, VertexData>> collector) throws Exception {
+    public void reduce(Iterable<Vertex<Long, VD>> vertices,
+      Collector<Vertex<Long, VD>> collector) throws Exception {
       int groupCount = 0;
       Long newVertexID = 0L;
       String groupLabel = null;
       String groupValue = null;
       boolean initialized = false;
-      for (Vertex<Long, VertexData> v : vertices) {
+      for (Vertex<Long, VD> v : vertices) {
         groupCount++;
         if (!initialized) {
           // will be the minimum vertex id in the group
@@ -265,8 +286,8 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
         }
       }
 
-      VertexData newVertexData =
-        VertexDataFactory.createDefaultVertexWithLabel(newVertexID, groupLabel);
+      VD newVertexData =
+        vertexDataFactory.createVertexData(newVertexID, groupLabel);
       if (storeGroupProperty()) {
         newVertexData.setProperty(groupPropertyKey, groupValue);
       }
@@ -280,12 +301,19 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
       return groupPropertyKey != null && !"".equals(groupPropertyKey);
     }
 
-    private String getGroupProperty(Vertex<Long, VertexData> v) {
+    private String getGroupProperty(Vertex<Long, VD> v) {
       if (v.getValue().getProperty(groupPropertyKey) != null) {
         return v.getValue().getProperty(groupPropertyKey).toString();
       } else {
         return NULL_VALUE;
       }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public TypeInformation<Vertex<Long, VD>> getProducedType() {
+      return new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
+        TypeExtractor.createTypeInfo(vertexDataFactory.getType()));
     }
   }
 
@@ -293,21 +321,25 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
    * Creates a summarized edge from a group of edges including a edge
    * grouping value.
    */
-  protected static class EdgeGroupSummarizer implements
+  protected static class EdgeGroupSummarizer<ED extends EdgeData> implements
     GroupReduceFunction<Tuple5<Long, Long, Long, String, String>, Edge<Long,
-      EdgeData>> {
+      ED>>,
+    ResultTypeQueryable<Edge<Long, ED>> {
 
+    private final EdgeDataFactory<ED> edgeDataFactory;
     private String groupPropertyKey;
     private boolean useLabel;
 
-    public EdgeGroupSummarizer(String groupPropertyKey, boolean useLabel) {
+    public EdgeGroupSummarizer(String groupPropertyKey, boolean useLabel,
+      EdgeDataFactory<ED> edgeDataFactory) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
+      this.edgeDataFactory = edgeDataFactory;
     }
 
     @Override
     public void reduce(Iterable<Tuple5<Long, Long, Long, String, String>> edges,
-      Collector<Edge<Long, EdgeData>> collector) throws Exception {
+      Collector<Edge<Long, ED>> collector) throws Exception {
       int edgeCount = 0;
       boolean initialized = false;
       // new edge id will be the first edge id in the group (which is sorted)
@@ -330,10 +362,9 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
           initialized = true;
         }
       }
-      
-      EdgeData newEdgeData = EdgeDataFactory
-        .createDefaultEdgeWithLabel(newEdgeID, edgeLabel, newSourceVertex,
-          newTargetVertex);
+
+      ED newEdgeData = edgeDataFactory
+        .createEdgeData(newEdgeID, edgeLabel, newSourceVertex, newTargetVertex);
 
       if (storeGroupProperty()) {
         newEdgeData.setProperty(groupPropertyKey, edgeGroupingValue);
@@ -347,49 +378,13 @@ public abstract class Summarization implements UnaryGraphToGraphOperator {
     private boolean storeGroupProperty() {
       return groupPropertyKey != null && !"".equals(groupPropertyKey);
     }
-  }
 
-  public static class SummarizationBuilder {
-
-    private String vertexGroupingKey;
-
-    private String edgeGroupingKey;
-
-    private boolean useVertexLabels = false;
-
-    private boolean useEdgeLabels = false;
-
-    private boolean useJoinOp = false;
-
-    public SummarizationBuilder(String vertexGroupingKey,
-      boolean useVertexLabels) {
-      this.vertexGroupingKey = vertexGroupingKey;
-      this.useVertexLabels = useVertexLabels;
-    }
-
-    public SummarizationBuilder edgeGroupingKey(final String edgeGroupingKey) {
-      this.edgeGroupingKey = edgeGroupingKey;
-      return this;
-    }
-
-    public SummarizationBuilder useEdgeLabels(final boolean useEdgeLabels) {
-      this.useEdgeLabels = useEdgeLabels;
-      return this;
-    }
-
-    public SummarizationBuilder setUseJoinOp(boolean useJoinOp) {
-      this.useJoinOp = useJoinOp;
-      return this;
-    }
-
-    public Summarization build() {
-      if (useJoinOp) {
-        return new SummarizationJoin(vertexGroupingKey, edgeGroupingKey,
-          useVertexLabels, useEdgeLabels);
-      } else {
-        return new SummarizationCross(vertexGroupingKey, edgeGroupingKey,
-          useVertexLabels, useEdgeLabels);
-      }
+    @Override
+    @SuppressWarnings("unchecked")
+    public TypeInformation<Edge<Long, ED>> getProducedType() {
+      return new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
+        BasicTypeInfo.LONG_TYPE_INFO,
+        TypeExtractor.createTypeInfo(edgeDataFactory.getType()));
     }
   }
 }

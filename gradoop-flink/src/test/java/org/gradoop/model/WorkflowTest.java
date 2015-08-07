@@ -20,18 +20,21 @@ package org.gradoop.model;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.DefaultEdgeData;
+import org.gradoop.model.impl.DefaultGraphData;
+import org.gradoop.model.impl.DefaultVertexData;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.operators.Aggregation;
 import org.gradoop.model.impl.operators.Combination;
 import org.gradoop.model.impl.operators.Projection;
-import org.gradoop.model.impl.operators.Summarization;
 import org.gradoop.model.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.store.EPGraphStore;
 import org.mockito.Mockito;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+@SuppressWarnings("unchecked")
 public abstract class WorkflowTest {
 
   public void summarizedCommunities() throws Exception {
@@ -60,14 +63,8 @@ public abstract class WorkflowTest {
     // and build one graph
     knowsGraph = communities.reduce(new Combination());
 
-    Summarization summarization =
-      new Summarization.SummarizationBuilder("city", true)
-        .edgeGroupingKey("since").build();
-
-    knowsGraph.callForGraph(summarization);
-
     // summarize communities
-    knowsGraph.summarize("city", "since");
+    knowsGraph = knowsGraph.summarize("city", "since");
   }
 
   public void topRevenueBusinessProcess() throws Exception {
@@ -93,18 +90,21 @@ public abstract class WorkflowTest {
     };
 
     // define aggregate function (revenue per graph)
-    final UnaryFunction<EPGraph, Double> aggregateFunc =
-      new UnaryFunction<EPGraph, Double>() {
-        @Override
-        public Double execute(EPGraph entity) {
-          Double sum = 0.0;
-          for (Double v : entity.getVertices()
-            .values(Double.class, "revenue")) {
-            sum += v;
-          }
-          return sum;
+    final UnaryFunction<EPGraph<DefaultVertexData, DefaultEdgeData,
+      DefaultGraphData>, Double>
+      aggregateFunc = null;
+    new UnaryFunction<EPGraph<DefaultVertexData, DefaultEdgeData,
+      DefaultGraphData>, Double>() {
+      @Override
+      public Double execute(
+        EPGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> entity) {
+        Double sum = 0.0;
+        for (Double v : entity.getVertices().values(Double.class, "revenue")) {
+          sum += v;
         }
-      };
+        return sum;
+      }
+    };
 
     // apply predicate and aggregate function
     EPGraphCollection invBtgs =
@@ -137,23 +137,25 @@ public abstract class WorkflowTest {
       });
 
     // define aggregate function (profit per graph)
-    final UnaryFunction<EPGraph, Double> aggFunc =
-      new UnaryFunction<EPGraph, Double>() {
-        @Override
-        public Double execute(EPGraph entity) {
-          Double revenue = 0.0;
-          Double expense = 0.0;
-          for (Double v : entity.getVertices()
-            .values(Double.class, "revenue")) {
-            revenue += v;
-          }
-          for (Double v : entity.getVertices()
-            .values(Double.class, "expense")) {
-            expense += v;
-          }
-          return revenue - expense;
+    final UnaryFunction<EPGraph<DefaultVertexData, DefaultEdgeData,
+      DefaultGraphData>, Double>
+      aggFunc = null;
+    new UnaryFunction<EPGraph<DefaultVertexData, DefaultEdgeData,
+      DefaultGraphData>, Double>() {
+      @Override
+      public Double execute(
+        EPGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> entity) {
+        Double revenue = 0.0;
+        Double expense = 0.0;
+        for (Double v : entity.getVertices().values(Double.class, "revenue")) {
+          revenue += v;
         }
-      };
+        for (Double v : entity.getVertices().values(Double.class, "expense")) {
+          expense += v;
+        }
+        return revenue - expense;
+      }
+    };
 
     // apply aggregate function on btgs
     btgs = btgs.apply(new Aggregation<>("profit", aggFunc));

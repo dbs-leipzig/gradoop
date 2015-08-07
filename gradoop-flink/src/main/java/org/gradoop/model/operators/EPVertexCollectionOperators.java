@@ -21,8 +21,8 @@ import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.impl.EPVertexCollection;
 
-public interface EPVertexCollectionOperators<T> extends
-  EPCollectionOperators<T> {
+public interface EPVertexCollectionOperators<VD extends VertexData> extends
+  EPCollectionOperators<VD> {
 
-  EPVertexCollection filter(Predicate<VertexData> predicateFunction);
+  EPVertexCollection<VD> filter(Predicate<VD> predicateFunction);
 }

@@ -19,7 +19,9 @@ package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.helper.Predicate;
@@ -27,11 +29,12 @@ import org.gradoop.model.operators.EPEdgeCollectionOperators;
 
 import java.util.Collection;
 
-public class EPEdgeCollection implements EPEdgeCollectionOperators<EdgeData> {
+public class EPEdgeCollection<ED extends EdgeData> implements
+  EPEdgeCollectionOperators<ED> {
 
-  private DataSet<Edge<Long, EdgeData>> edges;
+  private DataSet<Edge<Long, ED>> edges;
 
-  EPEdgeCollection(DataSet<Edge<Long, EdgeData>> edges) {
+  EPEdgeCollection(DataSet<Edge<Long, ED>> edges) {
     this.edges = edges;
   }
 
@@ -51,21 +54,21 @@ public class EPEdgeCollection implements EPEdgeCollectionOperators<EdgeData> {
   }
 
   @Override
-  public EPEdgeCollection filter(final Predicate<EdgeData> predicateFunction) {
-    return new EPEdgeCollection(
-      edges.filter(new FilterFunction<Edge<Long, EdgeData>>() {
+  public EPEdgeCollection<ED> filter(final Predicate<ED> predicateFunction) {
+    return new EPEdgeCollection<>(
+      edges.filter(new FilterFunction<Edge<Long, ED>>() {
         @Override
-        public boolean filter(Edge<Long, EdgeData> e) throws Exception {
+        public boolean filter(Edge<Long, ED> e) throws Exception {
           return predicateFunction.filter(e.getValue());
         }
       }));
   }
 
   @Override
-  public Collection<EdgeData> collect() throws Exception {
-    return edges.map(new MapFunction<Edge<Long, EdgeData>, EdgeData>() {
+  public Collection<ED> collect() throws Exception {
+    return edges.map(new MapFunction<Edge<Long, ED>, ED>() {
       @Override
-      public EdgeData map(Edge<Long, EdgeData> e) throws Exception {
+      public ED map(Edge<Long, ED> e) throws Exception {
         return e.getValue();
       }
     }).collect();

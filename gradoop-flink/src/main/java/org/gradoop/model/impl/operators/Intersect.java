@@ -28,29 +28,32 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 
-import static org.gradoop.model.impl.EPGraph.*;
-
-public class Intersect extends AbstractBinaryCollectionToCollectionOperator {
+public class Intersect<VD extends VertexData, ED extends EdgeData, GD extends
+  GraphData> extends
+  AbstractBinaryCollectionToCollectionOperator<VD, ED, GD> {
   @Override
-  protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
-    EPGraphCollection secondGraphCollection) {
-    final DataSet<Subgraph<Long, GraphData>> newSubgraphs =
-      firstSubgraphs.union(secondSubgraphs).groupBy(GRAPH_ID)
-        .reduceGroup(new SubgraphGroupReducer(2));
+  protected EPGraphCollection<VD, ED, GD> executeInternal(
+    EPGraphCollection<VD, ED, GD> firstCollection,
+    EPGraphCollection<VD, ED, GD> secondGraphCollection) {
+    final DataSet<Subgraph<Long, GD>> newSubgraphs =
+      firstSubgraphs.union(secondSubgraphs)
+        .groupBy(new KeySelectors.GraphKeySelector<GD>())
+        .reduceGroup(new SubgraphGroupReducer<GD>(2));
 
-    DataSet<Vertex<Long, VertexData>> thisVertices = firstGraph.getVertices();
+    DataSet<Vertex<Long, VD>> thisVertices = firstGraph.getVertices();
 
-    DataSet<Tuple2<Vertex<Long, VertexData>, Long>> verticesWithGraphs =
-      thisVertices.flatMap(
-        new FlatMapFunction<Vertex<Long, VertexData>, Tuple2<Vertex<Long,
-          VertexData>, Long>>() {
+    DataSet<Tuple2<Vertex<Long, VD>, Long>> verticesWithGraphs = thisVertices
+      .flatMap(
+        new FlatMapFunction<Vertex<Long, VD>, Tuple2<Vertex<Long, VD>, Long>>
+          () {
 
           @Override
-          public void flatMap(Vertex<Long, VertexData> v,
-            Collector<Tuple2<Vertex<Long, VertexData>, Long>> collector) throws
+          public void flatMap(Vertex<Long, VD> v,
+            Collector<Tuple2<Vertex<Long, VD>, Long>> collector) throws
             Exception {
             for (Long graph : v.getValue().getGraphs()) {
               collector.collect(new Tuple2<>(v, graph));
@@ -58,27 +61,31 @@ public class Intersect extends AbstractBinaryCollectionToCollectionOperator {
           }
         });
 
-    DataSet<Vertex<Long, VertexData>> vertices =
-      verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
-        new JoinFunction<Tuple2<Vertex<Long, VertexData>, Long>,
-          Subgraph<Long, GraphData>, Vertex<Long, VertexData>>() {
+    DataSet<Vertex<Long, VD>> vertices =
+      verticesWithGraphs.join(newSubgraphs).where(1)
+        .equalTo(new KeySelectors.GraphKeySelector<GD>()).with(
+        new JoinFunction<Tuple2<Vertex<Long, VD>, Long>, Subgraph<Long, GD>,
+          Vertex<Long, VD>>() {
 
           @Override
-          public Vertex<Long, VertexData> join(
-            Tuple2<Vertex<Long, VertexData>, Long> vertices,
-            Subgraph<Long, GraphData> subgraph) throws Exception {
+          public Vertex<Long, VD> join(Tuple2<Vertex<Long, VD>, Long> vertices,
+            Subgraph<Long, GD> subgraph) throws Exception {
             return vertices.f0;
           }
         });
 
-    DataSet<Edge<Long, EdgeData>> edges = firstGraph.getEdges();
+    DataSet<Edge<Long, ED>> edges = firstGraph.getEdges().join(vertices)
+      .where(new KeySelectors.EdgeSourceVertexKeySelector<ED>())
+      .equalTo(new KeySelectors.VertexKeySelector<VD>())
+      .with(new EdgeJoinFunction<VD, ED>()).join(vertices)
+      .where(new KeySelectors.EdgeTargetVertexKeySelector<ED>())
+      .equalTo(new KeySelectors.VertexKeySelector<VD>())
+      .with(new EdgeJoinFunction<VD, ED>());
 
-    edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
-      .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
-      .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
-
-    return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
-      newSubgraphs, env);
+    return new EPGraphCollection<>(Graph.fromDataSet(vertices, edges, env),
+      newSubgraphs, firstCollection.getVertexDataFactory(),
+      firstCollection.getEdgeDataFactory(),
+      firstCollection.getGraphDataFactory(), env);
   }
 
   @Override

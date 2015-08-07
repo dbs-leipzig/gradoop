@@ -37,20 +37,22 @@ import org.gradoop.model.operators.BinaryCollectionToCollectionOperator;
 
 import java.util.Iterator;
 
-public abstract class AbstractBinaryCollectionToCollectionOperator implements
-  BinaryCollectionToCollectionOperator {
+public abstract class AbstractBinaryCollectionToCollectionOperator<VD extends
+  VertexData, ED extends EdgeData, GD extends GraphData> implements
+  BinaryCollectionToCollectionOperator<VD, ED, GD> {
 
-  protected Graph<Long, VertexData, EdgeData> firstGraph;
-  protected Graph<Long, VertexData, EdgeData> secondGraph;
+  protected Graph<Long, VD, ED> firstGraph;
+  protected Graph<Long, VD, ED> secondGraph;
 
-  protected DataSet<Subgraph<Long, GraphData>> firstSubgraphs;
-  protected DataSet<Subgraph<Long, GraphData>> secondSubgraphs;
+  protected DataSet<Subgraph<Long, GD>> firstSubgraphs;
+  protected DataSet<Subgraph<Long, GD>> secondSubgraphs;
 
   protected ExecutionEnvironment env;
 
   @Override
-  public EPGraphCollection execute(EPGraphCollection firstCollection,
-    EPGraphCollection secondCollection) throws Exception {
+  public EPGraphCollection<VD, ED, GD> execute(
+    EPGraphCollection<VD, ED, GD> firstCollection,
+    EPGraphCollection<VD, ED, GD> secondCollection) throws Exception {
 
     firstGraph = firstCollection.getGellyGraph();
     firstSubgraphs = firstCollection.getSubgraphs();
@@ -61,12 +63,12 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
     return executeInternal(firstCollection, secondCollection);
   }
 
-  protected abstract EPGraphCollection executeInternal(
-    EPGraphCollection firstCollection,
-    EPGraphCollection secondGraphCollection) throws Exception;
+  protected abstract EPGraphCollection<VD, ED, GD> executeInternal(
+    EPGraphCollection<VD, ED, GD> firstCollection,
+    EPGraphCollection<VD, ED, GD> secondGraphCollection) throws Exception;
 
-  protected static class SubgraphGroupReducer implements
-    GroupReduceFunction<Subgraph<Long, GraphData>, Subgraph<Long, GraphData>> {
+  protected static class SubgraphGroupReducer<GD extends GraphData> implements
+    GroupReduceFunction<Subgraph<Long, GD>, Subgraph<Long, GD>> {
 
     /**
      * number of times a vertex must occur inside a group
@@ -78,11 +80,11 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
     }
 
     @Override
-    public void reduce(Iterable<Subgraph<Long, GraphData>> iterable,
-      Collector<Subgraph<Long, GraphData>> collector) throws Exception {
-      Iterator<Subgraph<Long, GraphData>> iterator = iterable.iterator();
+    public void reduce(Iterable<Subgraph<Long, GD>> iterable,
+      Collector<Subgraph<Long, GD>> collector) throws Exception {
+      Iterator<Subgraph<Long, GD>> iterator = iterable.iterator();
       long count = 0L;
-      Subgraph<Long, GraphData> s = null;
+      Subgraph<Long, GD> s = null;
       while (iterator.hasNext()) {
         s = iterator.next();
         count++;
@@ -93,13 +95,13 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
     }
   }
 
-  protected static class EdgeJoinFunction implements
-    JoinFunction<Edge<Long, EdgeData>, Vertex<Long, VertexData>, Edge<Long,
-      EdgeData>> {
+  protected static class EdgeJoinFunction<VD extends VertexData, ED extends
+    EdgeData> implements
+    JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> {
 
     @Override
-    public Edge<Long, EdgeData> join(Edge<Long, EdgeData> leftTuple,
-      Vertex<Long, VertexData> rightTuple) throws Exception {
+    public Edge<Long, ED> join(Edge<Long, ED> leftTuple,
+      Vertex<Long, VD> rightTuple) throws Exception {
       return leftTuple;
     }
   }
@@ -119,10 +121,11 @@ public abstract class AbstractBinaryCollectionToCollectionOperator implements
     }
   }
 
-  protected static class SubgraphTupleKeySelector<C> implements
-    KeySelector<Tuple2<Subgraph<Long, GraphData>, C>, Long> {
+  protected static class SubgraphTupleKeySelector<GD extends GraphData, C>
+    implements
+    KeySelector<Tuple2<Subgraph<Long, GD>, C>, Long> {
     @Override
-    public Long getKey(Tuple2<Subgraph<Long, GraphData>, C> subgraph) throws
+    public Long getKey(Tuple2<Subgraph<Long, GD>, C> subgraph) throws
       Exception {
       return subgraph.f0.getId();
     }

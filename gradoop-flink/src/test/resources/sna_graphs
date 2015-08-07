@@ -1,4 +1,4 @@
-{"id":0,"data":{"interest":"Databases","vertexCount":3},"meta":{"label":"Community"}}
-{"id":1,"data":{"interest":"Hadoop","vertexCount":3},"meta":{"label":"Community"}}
-{"id":2,"data":{"interest":"Graphs","vertexCount":4},"meta":{"label":"Community"}}
-{"id":3,"data":{},"meta":{"label":"Forum"}}
+{"id":0,"data":{"interest":"Databases","vertexCount":3},"meta":{"label":"Community","vertices":[0,1,4],"edges":[0,1,6,21]}}
+{"id":1,"data":{"interest":"Hadoop","vertexCount":3},"meta":{"label":"Community","vertices":[2,3,5],"edges":[4,5,22,23]}}
+{"id":2,"data":{"interest":"Graphs","vertexCount":4},"meta":{"label":"Community","vertices":[0,1,2,],"edges":[0,1,6,21]}}
+{"id":3,"data":{},"meta":{"label":"Forum","vertices":[2,3,10],"edges":[4,5,16,19,20]}}

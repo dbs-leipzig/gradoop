@@ -17,16 +17,20 @@
 
 package org.gradoop.model.store;
 
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.impl.EPGraphCollection;
 
-public interface EPGraphStore {
+public interface EPGraphStore<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData> {
 
-  EPGraph getDatabaseGraph();
+  EPGraph<VD, ED, GD> getDatabaseGraph();
 
-  EPGraphCollection getCollection();
+  EPGraphCollection<VD, ED, GD> getCollection();
 
-  EPGraph getGraph(Long graphID) throws Exception;
+  EPGraph<VD, ED, GD> getGraph(Long graphID) throws Exception;
 
   void writeAsJson(final String vertexFile, final String egeFile,
     final String graphFile) throws Exception;

@@ -17,34 +17,41 @@
 
 package org.gradoop.model.impl.operators;
 
+import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
+import org.gradoop.model.GraphDataFactory;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.DefaultGraphDataFactory;
 import org.gradoop.model.impl.EPGraph;
-import org.gradoop.model.impl.GraphDataFactory;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
-public class Aggregation<O extends Number> implements
-  UnaryGraphToGraphOperator {
+public class Aggregation<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData, O extends Number> implements
+  UnaryGraphToGraphOperator<VD, ED, GD> {
 
   private final String aggregatePropertyKey;
-  private final UnaryFunction<EPGraph, O> aggregationFunc;
+  private final UnaryFunction<EPGraph<VD, ED, GD>, O> aggregationFunc;
 
   public Aggregation(final String aggregatePropertyKey,
-    UnaryFunction<EPGraph, O> aggregationFunc) {
+    UnaryFunction<EPGraph<VD, ED, GD>, O> aggregationFunc) {
 
     this.aggregatePropertyKey = aggregatePropertyKey;
     this.aggregationFunc = aggregationFunc;
   }
 
   @Override
-  public EPGraph execute(EPGraph graph) throws Exception {
+  public EPGraph<VD, ED, GD> execute(EPGraph<VD, ED, GD> graph) throws
+    Exception {
     O result = aggregationFunc.execute(graph);
     // copy graph data before updating properties
-    GraphData newGraphData = GraphDataFactory
-      .createDefaultGraphWithIDAndLabel(graph.getId(), graph.getLabel());
+    GD newGraphData = graph.getGraphDataFactory()
+      .createGraphData(graph.getId(), graph.getLabel());
     newGraphData.setProperties(graph.getProperties());
     newGraphData.setProperty(aggregatePropertyKey, result);
-    return EPGraph.fromGraph(graph.getGellyGraph(), newGraphData);
+    return EPGraph.fromGraph(graph.getGellyGraph(), newGraphData,
+      graph.getVertexDataFactory(), graph.getEdgeDataFactory(),
+      graph.getGraphDataFactory());
   }
 
   @Override

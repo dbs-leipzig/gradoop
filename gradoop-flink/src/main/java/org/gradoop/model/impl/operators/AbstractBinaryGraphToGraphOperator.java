@@ -23,22 +23,25 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 
 import java.util.Iterator;
 
-public abstract class AbstractBinaryGraphToGraphOperator implements
-  BinaryGraphToGraphOperator {
+public abstract class AbstractBinaryGraphToGraphOperator<VD extends
+  VertexData, ED extends EdgeData, GD extends GraphData> implements
+  BinaryGraphToGraphOperator<VD, ED, GD> {
 
   @Override
-  public EPGraph execute(EPGraph firstGraph, EPGraph secondGraph) {
+  public EPGraph<VD, ED, GD> execute(EPGraph<VD, ED, GD> firstGraph,
+    EPGraph<VD, ED, GD> secondGraph) {
     return executeInternal(firstGraph, secondGraph);
   }
 
-  protected abstract EPGraph executeInternal(EPGraph firstGraph,
-    EPGraph secondGraph);
+  protected abstract EPGraph<VD, ED, GD> executeInternal(
+    EPGraph<VD, ED, GD> firstGraph, EPGraph<VD, ED, GD> secondGraph);
 
   /**
    * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
@@ -51,9 +54,8 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
    * in the other graph (preclude graph). If this is the case, the vertex
    * gets returned.
    */
-  protected static class VertexGroupReducer implements
-    GroupReduceFunction<Vertex<Long, VertexData>, Vertex<Long,
-      VertexData>> {
+  protected static class VertexGroupReducer<VD extends VertexData> implements
+    GroupReduceFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
 
     /**
      * number of times a vertex must occur inside a group
@@ -82,11 +84,11 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
     }
 
     @Override
-    public void reduce(Iterable<Vertex<Long, VertexData>> iterable,
-      Collector<Vertex<Long, VertexData>> collector) throws Exception {
-      Iterator<Vertex<Long, VertexData>> iterator = iterable.iterator();
+    public void reduce(Iterable<Vertex<Long, VD>> iterable,
+      Collector<Vertex<Long, VD>> collector) throws Exception {
+      Iterator<Vertex<Long, VD>> iterator = iterable.iterator();
       long count = 0L;
-      Vertex<Long, VertexData> v = null;
+      Vertex<Long, VD> v = null;
       while (iterator.hasNext()) {
         v = iterator.next();
         count++;
@@ -111,9 +113,8 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
    * Used to check if the number of grouped, duplicate edges is equal to a
    * given amount. If yes, reducer returns the vertex.
    */
-  protected static class EdgeGroupReducer implements
-    GroupReduceFunction<Edge<Long, EdgeData>, Edge<Long,
-      EdgeData>> {
+  protected static class EdgeGroupReducer<ED extends EdgeData> implements
+    GroupReduceFunction<Edge<Long, ED>, Edge<Long, ED>> {
 
     private long amount;
 
@@ -122,11 +123,11 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
     }
 
     @Override
-    public void reduce(Iterable<Edge<Long, EdgeData>> iterable,
-      Collector<Edge<Long, EdgeData>> collector) throws Exception {
-      Iterator<Edge<Long, EdgeData>> iterator = iterable.iterator();
+    public void reduce(Iterable<Edge<Long, ED>> iterable,
+      Collector<Edge<Long, ED>> collector) throws Exception {
+      Iterator<Edge<Long, ED>> iterator = iterable.iterator();
       long count = 0L;
-      Edge<Long, EdgeData> e = null;
+      Edge<Long, ED> e = null;
       while (iterator.hasNext()) {
         e = iterator.next();
         count++;
@@ -140,9 +141,8 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
   /**
    * Adds a given graph ID to the vertex and returns it.
    */
-  protected static class VertexToGraphUpdater implements
-    MapFunction<Vertex<Long, VertexData>, Vertex<Long,
-      VertexData>> {
+  protected static class VertexToGraphUpdater<VD extends VertexData> implements
+    MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
 
     private final long newGraphID;
 
@@ -151,8 +151,7 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
     }
 
     @Override
-    public Vertex<Long, VertexData> map(
-      Vertex<Long, VertexData> v) throws Exception {
+    public Vertex<Long, VD> map(Vertex<Long, VD> v) throws Exception {
       v.getValue().addGraph(newGraphID);
       return v;
     }
@@ -161,8 +160,8 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
   /**
    * Adds a given graph ID to the edge and returns it.
    */
-  protected static class EdgeToGraphUpdater implements
-    MapFunction<Edge<Long, EdgeData>, Edge<Long, EdgeData>> {
+  protected static class EdgeToGraphUpdater<ED extends EdgeData> implements
+    MapFunction<Edge<Long, ED>, Edge<Long, ED>> {
 
     private final long newGraphID;
 
@@ -171,11 +170,9 @@ public abstract class AbstractBinaryGraphToGraphOperator implements
     }
 
     @Override
-    public Edge<Long, EdgeData> map(Edge<Long, EdgeData> e) throws
-      Exception {
+    public Edge<Long, ED> map(Edge<Long, ED> e) throws Exception {
       e.getValue().addGraph(newGraphID);
       return e;
     }
   }
-
 }

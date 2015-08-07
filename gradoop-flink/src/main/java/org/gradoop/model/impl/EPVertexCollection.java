@@ -27,41 +27,39 @@ import org.gradoop.model.operators.EPVertexCollectionOperators;
 
 import java.util.Collection;
 
-public class EPVertexCollection implements
-  EPVertexCollectionOperators<VertexData> {
+public class EPVertexCollection<VD extends VertexData> implements
+  EPVertexCollectionOperators<VD> {
 
-  private DataSet<Vertex<Long, VertexData>> vertices;
+  private DataSet<Vertex<Long, VD>> vertices;
 
-  EPVertexCollection(DataSet<Vertex<Long, VertexData>> vertices) {
+  EPVertexCollection(DataSet<Vertex<Long, VD>> vertices) {
     this.vertices = vertices;
   }
 
   @Override
-  public EPVertexCollection filter(
-    final Predicate<VertexData> predicateFunction) {
-    return new EPVertexCollection(
-      vertices.filter(new FilterFunction<Vertex<Long, VertexData>>() {
+  public EPVertexCollection<VD> filter(final Predicate<VD> predicateFunction) {
+    return new EPVertexCollection<>(
+      vertices.filter(new FilterFunction<Vertex<Long, VD>>() {
         @Override
-        public boolean filter(Vertex<Long, VertexData> v) throws Exception {
+        public boolean filter(Vertex<Long, VD> v) throws Exception {
           return predicateFunction.filter(v.getValue());
         }
       }));
   }
 
   @Override
-  public <V> Iterable<V> values(Class<V> propertyType, String propertyKey) {
+  public <T> Iterable<T> values(Class<T> propertyType, String propertyKey) {
     return null;
   }
 
   @Override
-  public Collection<VertexData> collect() throws Exception {
-    return vertices
-      .map(new MapFunction<Vertex<Long, VertexData>, VertexData>() {
-        @Override
-        public VertexData map(Vertex<Long, VertexData> v) throws Exception {
-          return v.getValue();
-        }
-      }).collect();
+  public Collection<VD> collect() throws Exception {
+    return vertices.map(new MapFunction<Vertex<Long, VD>, VD>() {
+      @Override
+      public VD map(Vertex<Long, VD> v) throws Exception {
+        return v.getValue();
+      }
+    }).collect();
   }
 
   @Override

@@ -16,7 +16,9 @@
  */
 package org.gradoop.model.operators;
 
+import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.impl.EPGraph;
@@ -29,8 +31,9 @@ import java.util.List;
  *
  * @author Martin Junghanns
  */
-public interface EPGraphCollectionOperators<T> extends
-  EPCollectionOperators<T> {
+public interface EPGraphCollectionOperators<VD extends VertexData, ED extends
+  EdgeData, GD extends GraphData> extends
+  EPCollectionOperators<GD> {
 
   /**
    * Get graph from collection by identifier.
@@ -39,11 +42,13 @@ public interface EPGraphCollectionOperators<T> extends
    * @return logical graph with given id
    * @throws Exception
    */
-  EPGraph getGraph(final Long graphID) throws Exception;
+  EPGraph<VD, ED, GD> getGraph(final Long graphID) throws Exception;
 
-  EPGraphCollection getGraphs(final Long... identifiers) throws Exception;
+  EPGraphCollection<VD, ED, GD> getGraphs(final Long... identifiers) throws
+    Exception;
 
-  EPGraphCollection getGraphs(List<Long> identifiers) throws Exception;
+  EPGraphCollection<VD, ED, GD> getGraphs(List<Long> identifiers) throws
+    Exception;
 
   long getGraphCount() throws Exception;
 
@@ -54,50 +59,51 @@ public interface EPGraphCollectionOperators<T> extends
    * @return collection with logical graphs that fulfil the predicate
    * @throws Exception
    */
-  EPGraphCollection filter(Predicate<GraphData> predicateFunction) throws
+  EPGraphCollection<VD, ED, GD> filter(Predicate<GD> predicateFunction) throws
     Exception;
 
   /*
   collection operators
    */
 
-  EPGraphCollection select(Predicate<EPGraph> predicateFunction) throws
-    Exception;
+  EPGraphCollection<VD, ED, GD> select(
+    Predicate<EPGraph<VD, ED, GD>> predicateFunction) throws Exception;
 
-  EPGraphCollection union(EPGraphCollection otherCollection) throws Exception;
+  EPGraphCollection<VD, ED, GD> union(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception;
 
-  EPGraphCollection intersect(EPGraphCollection otherCollection) throws
-    Exception;
+  EPGraphCollection<VD, ED, GD> intersect(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception;
 
-  EPGraphCollection intersectWithSmall(EPGraphCollection otherCollection) throws
-    Exception;
+  EPGraphCollection<VD, ED, GD> intersectWithSmall(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception;
 
-  EPGraphCollection difference(EPGraphCollection otherCollection) throws
-    Exception;
+  EPGraphCollection<VD, ED, GD> difference(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception;
 
-  EPGraphCollection differenceWithSmallResult(
-    EPGraphCollection otherCollection) throws Exception;
+  EPGraphCollection<VD, ED, GD> differenceWithSmallResult(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception;
 
-  EPGraphCollection distinct();
+  EPGraphCollection<VD, ED, GD> distinct();
 
-  EPGraphCollection sortBy(String propertyKey, Order order);
+  EPGraphCollection<VD, ED, GD> sortBy(String propertyKey, Order order);
 
-  EPGraphCollection top(int limit);
+  EPGraphCollection<VD, ED, GD> top(int limit);
 
   /*
   auxiliary operators
    */
 
-  EPGraphCollection apply(UnaryGraphToGraphOperator op);
+  EPGraphCollection<VD, ED, GD> apply(UnaryGraphToGraphOperator<VD, ED, GD> op);
 
-  EPGraph reduce(BinaryGraphToGraphOperator op);
+  EPGraph<VD, ED, GD> reduce(BinaryGraphToGraphOperator<VD, ED, GD> op);
 
-  EPGraphCollection callForCollection(UnaryCollectionToCollectionOperator op);
+  EPGraphCollection<VD, ED, GD> callForCollection(UnaryCollectionToCollectionOperator<VD, ED, GD> op);
 
-  EPGraphCollection callForCollection(BinaryCollectionToCollectionOperator op,
-    EPGraphCollection otherCollection) throws Exception;
+  EPGraphCollection<VD, ED, GD> callForCollection(BinaryCollectionToCollectionOperator<VD, ED, GD> op,
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception;
 
-  EPGraph callForGraph(UnaryCollectionToGraphOperator op);
+  EPGraph<VD, ED, GD> callForGraph(UnaryCollectionToGraphOperator<VD, ED, GD> op);
 
   void writeAsJson(final String vertexFile, final String edgeFile,
     final String graphFile) throws Exception;

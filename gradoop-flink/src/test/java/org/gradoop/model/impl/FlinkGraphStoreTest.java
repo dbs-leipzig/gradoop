@@ -19,6 +19,7 @@ package org.gradoop.model.impl;
 
 import junitparams.JUnitParamsRunner;
 import org.gradoop.model.EPFlinkTest;
+import org.gradoop.model.GraphData;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +32,8 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(JUnitParamsRunner.class)
 public class FlinkGraphStoreTest extends EPFlinkTest {
 
-  private EPGraphStore graphStore;
+  private EPGraphStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    graphStore;
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -59,10 +61,12 @@ public class FlinkGraphStoreTest extends EPFlinkTest {
     String graphFile =
       FlinkGraphStoreTest.class.getResource("/sna_graphs").getFile();
 
-    EPGraphStore graphStore =
+    EPGraphStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphStore =
       FlinkGraphStore.fromJsonFile(vertexFile, edgeFile, graphFile, env);
 
-    EPGraph databaseGraph = graphStore.getDatabaseGraph();
+    EPGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      databaseGraph = graphStore.getDatabaseGraph();
 
     assertEquals("Wrong vertex count", 11, databaseGraph.getVertexCount());
     assertEquals("Wrong edge count", 24, databaseGraph.getEdgeCount());

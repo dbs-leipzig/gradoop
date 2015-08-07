@@ -18,25 +18,28 @@
 package org.gradoop.model.impl.operators;
 
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EPGraph;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class Projection implements UnaryGraphToGraphOperator {
+public class Projection<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData> implements
+  UnaryGraphToGraphOperator<VD, ED, GD> {
 
-  private final UnaryFunction<VertexData, VertexData> vertexFunc;
-  private final UnaryFunction<EdgeData, EdgeData> edgeFunc;
+  private final UnaryFunction<VD, VD> vertexFunc;
+  private final UnaryFunction<ED, ED> edgeFunc;
 
-  public Projection(UnaryFunction<VertexData, VertexData> vertexFunc,
-    UnaryFunction<EdgeData, EdgeData> edgeFunc) {
+  public Projection(UnaryFunction<VD, VD> vertexFunc,
+    UnaryFunction<ED, ED> edgeFunc) {
     this.vertexFunc = vertexFunc;
     this.edgeFunc = edgeFunc;
   }
 
   @Override
-  public EPGraph execute(EPGraph graph) {
+  public EPGraph<VD, ED, GD> execute(EPGraph<VD, ED, GD> graph) {
     throw new NotImplementedException();
   }
 

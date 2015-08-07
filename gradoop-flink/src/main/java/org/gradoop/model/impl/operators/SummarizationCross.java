@@ -23,38 +23,47 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.operators.Order;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.operators.SortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.EdgeDataFactory;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.VertexDataFactory;
 
 import java.util.List;
 
-public class SummarizationCross extends Summarization {
+public class SummarizationCross<VD extends VertexData, ED extends EdgeData,
+  GD extends GraphData> extends
+  Summarization<VD, ED, GD> {
 
-  SummarizationCross(String vertexGroupingKey, String edgeGroupingKey,
+  public SummarizationCross(String vertexGroupingKey, String edgeGroupingKey,
     boolean useVertexLabels, boolean useEdgeLabels) {
     super(vertexGroupingKey, edgeGroupingKey, useVertexLabels, useEdgeLabels);
   }
 
   @Override
-  protected Graph<Long, VertexData, EdgeData> summarizeInternal(
-    Graph<Long, VertexData, EdgeData> graph) {
+  protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
     /* build summarized vertices */
 
-    SortedGrouping<Vertex<Long, VertexData>> groupedSortedVertices =
+    SortedGrouping<Vertex<Long, VD>> groupedSortedVertices =
       groupAndSortVertices(graph);
 
     // create new summarized gelly vertices
-    DataSet<Vertex<Long, VertexData>> newVertices =
+    DataSet<Vertex<Long, VD>> newVertices =
       buildSummarizedVertices(groupedSortedVertices);
 
     // create a list of vertex ids from each vertex group
@@ -62,7 +71,7 @@ public class SummarizationCross extends Summarization {
       createListFromVertexGroup(groupedSortedVertices);
 
     /* build summarized edges */
-    DataSet<Edge<Long, EdgeData>> newEdges =
+    DataSet<Edge<Long, ED>> newEdges =
       buildSummarizedEdges(graph, vertexGroups);
 
     return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
@@ -74,16 +83,16 @@ public class SummarizationCross extends Summarization {
   }
 
   private DataSet<List<Long>> createListFromVertexGroup(
-    SortedGrouping<Vertex<Long, VertexData>> groupedSortedVertices) {
-    return groupedSortedVertices.reduceGroup(new VertexGroupToList());
+    SortedGrouping<Vertex<Long, VD>> groupedSortedVertices) {
+    return groupedSortedVertices.reduceGroup(new VertexGroupToList<VD>());
   }
 
-  private DataSet<Edge<Long, EdgeData>> buildSummarizedEdges(
-    Graph<Long, VertexData, EdgeData> graph, DataSet<List<Long>> vertexGroups) {
+  private DataSet<Edge<Long, ED>> buildSummarizedEdges(
+    Graph<Long, VD, ED> graph, DataSet<List<Long>> vertexGroups) {
     // map edges to relevant information
     // (edge id, source vertex, target vertex, edge label, grouping value)
     DataSet<Tuple5<Long, Long, Long, String, String>> edges = graph.getEdges()
-      .map(new EdgeProjection(getEdgeGroupingKey(), useEdgeLabels()));
+      .map(new EdgeProjection<ED>(getEdgeGroupingKey(), useEdgeLabels()));
 
     // compute cross between vertex groups and edges
     DataSet<Tuple2<List<Long>, Tuple5<Long, Long, Long, String, String>>>
@@ -100,12 +109,13 @@ public class SummarizationCross extends Summarization {
       // filter intra edges (source == target)
       .filter(new IntraEdgeFilterWith());
 
-    DataSet<Edge<Long, EdgeData>> intraEdges = groupEdges(filteredIntraEdges)
+    DataSet<Edge<Long, ED>> intraEdges = groupEdges(filteredIntraEdges)
       // sort group by edge id to get edge representative
       .sortGroup(0, Order.ASCENDING)
         // and create new gelly edges with payload
       .reduceGroup(
-        new EdgeGroupSummarizer(getEdgeGroupingKey(), useEdgeLabels()));
+        new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
+          edgeDataFactory));
 
     /* build inter edges */
 
@@ -125,11 +135,12 @@ public class SummarizationCross extends Summarization {
       .flatMap(new SecondRoundFlatMap());
 
     // sort group by edge id to get edge representative
-    DataSet<Edge<Long, EdgeData>> interEdges =
+    DataSet<Edge<Long, ED>> interEdges =
       groupEdges(secondRoundEdges).sortGroup(0, Order.ASCENDING)
         // and create new gelly edges with payload
         .reduceGroup(
-          new EdgeGroupSummarizer(getEdgeGroupingKey(), useEdgeLabels()));
+          new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
+            edgeDataFactory));
 
     return interEdges.union(intraEdges);
   }
@@ -137,13 +148,13 @@ public class SummarizationCross extends Summarization {
   /**
    * Converts grouped gelly vertices to a list of vertex ids.
    */
-  private static class VertexGroupToList implements
-    GroupReduceFunction<Vertex<Long, VertexData>, List<Long>> {
+  private static class VertexGroupToList<VD extends VertexData> implements
+    GroupReduceFunction<Vertex<Long, VD>, List<Long>> {
     @Override
-    public void reduce(Iterable<Vertex<Long, VertexData>> vertices,
+    public void reduce(Iterable<Vertex<Long, VD>> vertices,
       Collector<List<Long>> collector) throws Exception {
       List<Long> vertexIDs = Lists.newArrayList();
-      for (Vertex<Long, VertexData> v : vertices) {
+      for (Vertex<Long, VD> v : vertices) {
         vertexIDs.add(v.getId());
       }
       collector.collect(vertexIDs);
@@ -266,9 +277,8 @@ public class SummarizationCross extends Summarization {
    * Reduces edges to the information which is relevant for further
    * processing (source vertex, target vertex, label and group value).
    */
-  private static class EdgeProjection implements
-    MapFunction<Edge<Long, EdgeData>, Tuple5<Long, Long, Long, String,
-      String>> {
+  private static class EdgeProjection<ED extends EdgeData> implements
+    MapFunction<Edge<Long, ED>, Tuple5<Long, Long, Long, String, String>> {
 
     private String groupPropertyKey;
     private boolean useLabel;
@@ -279,8 +289,8 @@ public class SummarizationCross extends Summarization {
     }
 
     @Override
-    public Tuple5<Long, Long, Long, String, String> map(
-      Edge<Long, EdgeData> e) throws Exception {
+    public Tuple5<Long, Long, Long, String, String> map(Edge<Long, ED> e) throws
+      Exception {
       String groupingValue = null;
       boolean useProperty =
         groupPropertyKey != null && !"".equals(groupPropertyKey);

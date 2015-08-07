@@ -29,8 +29,12 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.EdgeDataFactory;
 import org.gradoop.model.GraphData;
+import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.VertexDataFactory;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.helper.Order;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.impl.operators.Difference;
@@ -50,8 +54,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.gradoop.model.impl.EPGraph.GRAPH_ID;
-
 /**
  * Represents a collection of graphs inside the EPGM. As graphs may share
  * vertices and edges, the collections contains a single gelly graph
@@ -60,86 +62,110 @@ import static org.gradoop.model.impl.EPGraph.GRAPH_ID;
  * @author Martin Junghanns
  * @author Niklas Teichmann
  */
-public class EPGraphCollection implements
-  EPGraphCollectionOperators<GraphData> {
+public class EPGraphCollection<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData> implements
+  EPGraphCollectionOperators<VD, ED, GD> {
+
+  private final VertexDataFactory<VD> vertexDataFactory;
+
+  private final EdgeDataFactory<ED> edgeDataFactory;
+
+  private final GraphDataFactory<GD> graphDataFactory;
 
   private ExecutionEnvironment env;
 
-  private Graph<Long, VertexData, EdgeData> graph;
+  private Graph<Long, VD, ED> graph;
 
-  private DataSet<Subgraph<Long, GraphData>> subgraphs;
+  private DataSet<Subgraph<Long, GD>> subgraphs;
 
-  public EPGraphCollection(Graph<Long, VertexData, EdgeData> graph,
-    DataSet<Subgraph<Long, GraphData>> subgraphs, ExecutionEnvironment env) {
+  public EPGraphCollection(Graph<Long, VD, ED> graph,
+    DataSet<Subgraph<Long, GD>> subgraphs,
+    VertexDataFactory<VD> vertexDataFactory,
+    EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD> graphDataFactory,
+    ExecutionEnvironment env) {
     this.graph = graph;
     this.subgraphs = subgraphs;
+    this.vertexDataFactory = vertexDataFactory;
+    this.edgeDataFactory = edgeDataFactory;
+    this.graphDataFactory = graphDataFactory;
     this.env = env;
   }
 
-  public Graph<Long, VertexData, EdgeData> getGellyGraph() {
+  public VertexDataFactory<VD> getVertexDataFactory() {
+    return vertexDataFactory;
+  }
+
+  public EdgeDataFactory<ED> getEdgeDataFactory() {
+    return edgeDataFactory;
+  }
+
+  public GraphDataFactory<GD> getGraphDataFactory() {
+    return graphDataFactory;
+  }
+
+  public Graph<Long, VD, ED> getGellyGraph() {
     return this.graph;
   }
 
-  public DataSet<Subgraph<Long, GraphData>> getSubgraphs() {
+  public DataSet<Subgraph<Long, GD>> getSubgraphs() {
     return this.subgraphs;
   }
 
   @Override
-  public EPGraph getGraph(final Long graphID) throws Exception {
+  public EPGraph<VD, ED, GD> getGraph(final Long graphID) throws Exception {
     // filter vertices and edges based on given graph id
-    Graph<Long, VertexData, EdgeData> subGraph = this.graph
-      .subgraph(new VertexGraphContainmentFilter(graphID),
-        new EdgeGraphContainmentFilter(graphID));
+    Graph<Long, VD, ED> subGraph = this.graph
+      .subgraph(new VertexInGraphFilter<VD>(graphID),
+        new EdgeInGraphFilter<ED>(graphID));
 
     DataSet<Tuple1<Long>> graphIDDataSet =
       env.fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
 
     // get graph data based on graph id
-    GraphData graphData =
-      this.subgraphs.joinWithTiny(graphIDDataSet).where(GRAPH_ID).equalTo(0)
-        .with(
-          new JoinFunction<Subgraph<Long, GraphData>, Tuple1<Long>,
-            GraphData>() {
-            @Override
-            public GraphData join(Subgraph<Long, GraphData> g,
-              Tuple1<Long> gID) throws Exception {
-              return g.getValue();
-            }
-          }).first(1).collect().get(0);
-    return EPGraph.fromGraph(subGraph, graphData);
+    GD graphData = this.subgraphs.joinWithTiny(graphIDDataSet)
+      .where(new KeySelectors.GraphKeySelector<GD>()).equalTo(0)
+      .with(new JoinFunction<Subgraph<Long, GD>, Tuple1<Long>, GD>() {
+        @Override
+        public GD join(Subgraph<Long, GD> g, Tuple1<Long> gID) throws
+          Exception {
+          return g.getValue();
+        }
+      }).first(1).collect().get(0);
+    return EPGraph
+      .fromGraph(subGraph, graphData, vertexDataFactory, edgeDataFactory,
+        graphDataFactory);
   }
 
   @Override
-  public EPGraphCollection getGraphs(final Long... identifiers) throws
-    Exception {
+  public EPGraphCollection<VD, ED, GD> getGraphs(
+    final Long... identifiers) throws Exception {
     return getGraphs(Arrays.asList(identifiers));
   }
 
   @Override
-  public EPGraphCollection getGraphs(final List<Long> identifiers) throws
-    Exception {
+  public EPGraphCollection<VD, ED, GD> getGraphs(
+    final List<Long> identifiers) throws Exception {
 
-    DataSet<Subgraph<Long, GraphData>> newSubGraphs =
-      this.subgraphs.filter(new FilterFunction<Subgraph<Long, GraphData>>() {
+    DataSet<Subgraph<Long, GD>> newSubGraphs =
+      this.subgraphs.filter(new FilterFunction<Subgraph<Long, GD>>() {
 
         @Override
-        public boolean filter(Subgraph<Long, GraphData> subgraph) throws
-          Exception {
+        public boolean filter(Subgraph<Long, GD> subgraph) throws Exception {
           return identifiers.contains(subgraph.getId());
 
         }
       });
 
     // build new vertex set
-    DataSet<Vertex<Long, VertexData>> vertices =
-      this.graph.getVertices().filter(new VertexInGraphFilter(identifiers));
+    DataSet<Vertex<Long, VD>> vertices = this.graph.getVertices()
+      .filter(new VertexInGraphsFilter<VD>(identifiers));
 
     // build new edge set
-    DataSet<Edge<Long, EdgeData>> edges =
-      this.graph.getEdges().filter(new EdgeInGraphFilter(identifiers));
+    DataSet<Edge<Long, ED>> edges =
+      this.graph.getEdges().filter(new EdgeInGraphsFilter<ED>(identifiers));
 
-    return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
-      newSubGraphs, env);
+    return new EPGraphCollection<>(Graph.fromDataSet(vertices, edges, env),
+      newSubGraphs, vertexDataFactory, edgeDataFactory, graphDataFactory, env);
   }
 
   @Override
@@ -148,136 +174,139 @@ public class EPGraphCollection implements
   }
 
   @Override
-  public EPGraphCollection filter(
-    final Predicate<GraphData> predicateFunction) throws Exception {
+  public EPGraphCollection<VD, ED, GD> filter(
+    final Predicate<GD> predicateFunction) throws Exception {
     // find subgraphs matching the predicate
-    DataSet<Subgraph<Long, GraphData>> filteredSubgraphs =
-      this.subgraphs.filter(new FilterFunction<Subgraph<Long, GraphData>>() {
+    DataSet<Subgraph<Long, GD>> filteredSubgraphs =
+      this.subgraphs.filter(new FilterFunction<Subgraph<Long, GD>>() {
         @Override
-        public boolean filter(Subgraph<Long, GraphData> g) throws Exception {
+        public boolean filter(Subgraph<Long, GD> g) throws Exception {
           return predicateFunction.filter(g.getValue());
         }
       });
 
     // get the identifiers of these subgraphs
     final Collection<Long> graphIDs =
-      filteredSubgraphs.map(new MapFunction<Subgraph<Long, GraphData>, Long>() {
+      filteredSubgraphs.map(new MapFunction<Subgraph<Long, GD>, Long>() {
 
         @Override
-        public Long map(Subgraph<Long, GraphData> g) throws Exception {
+        public Long map(Subgraph<Long, GD> g) throws Exception {
           return g.getId();
         }
       }).collect();
 
     // use graph ids to filter vertices from the actual graph structure
-    Graph<Long, VertexData, EdgeData> filteredGraph =
-      this.graph.filterOnVertices(
+    Graph<Long, VD, ED> filteredGraph = this.graph.filterOnVertices(
 
-        new FilterFunction<Vertex<Long, VertexData>>() {
-          @Override
-          public boolean filter(Vertex<Long, VertexData> v) throws Exception {
-            for (Long graphID : v.getValue().getGraphs()) {
-              if (graphIDs.contains(graphID)) {
-                return true;
-              }
+      new FilterFunction<Vertex<Long, VD>>() {
+        @Override
+        public boolean filter(Vertex<Long, VD> v) throws Exception {
+          for (Long graphID : v.getValue().getGraphs()) {
+            if (graphIDs.contains(graphID)) {
+              return true;
             }
-            return false;
           }
-        });
+          return false;
+        }
+      });
 
-    return new EPGraphCollection(filteredGraph, filteredSubgraphs, env);
+    return new EPGraphCollection<>(filteredGraph, filteredSubgraphs,
+      vertexDataFactory, edgeDataFactory, graphDataFactory, env);
   }
 
   @Override
-  public EPGraphCollection select(Predicate<EPGraph> predicateFunction) throws
-    Exception {
+  public EPGraphCollection<VD, ED, GD> select(
+    Predicate<EPGraph<VD, ED, GD>> predicateFunction) throws Exception {
     throw new NotImplementedException();
   }
 
   @Override
-  public EPGraphCollection union(EPGraphCollection otherCollection) throws
-    Exception {
-    return callForCollection(new Union(), otherCollection);
+  public EPGraphCollection<VD, ED, GD> union(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception {
+    return callForCollection(new Union<VD, ED, GD>(), otherCollection);
   }
 
   @Override
-  public EPGraphCollection intersect(EPGraphCollection otherCollection) throws
-    Exception {
-    return callForCollection(new Intersect(), otherCollection);
+  public EPGraphCollection<VD, ED, GD> intersect(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception {
+    return callForCollection(new Intersect<VD, ED, GD>(), otherCollection);
   }
 
   @Override
-  public EPGraphCollection intersectWithSmall(
-    EPGraphCollection otherCollection) throws Exception {
-    return callForCollection(new IntersectWithSmall(), otherCollection);
+  public EPGraphCollection<VD, ED, GD> intersectWithSmall(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception {
+    return callForCollection(new IntersectWithSmall<VD, ED, GD>(),
+      otherCollection);
   }
 
   @Override
-  public EPGraphCollection difference(EPGraphCollection otherCollection) throws
-    Exception {
-    return callForCollection(new Difference(), otherCollection);
+  public EPGraphCollection<VD, ED, GD> difference(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception {
+    return callForCollection(new Difference<VD, ED, GD>(), otherCollection);
   }
 
   @Override
-  public EPGraphCollection differenceWithSmallResult(
-    EPGraphCollection otherCollection) throws Exception {
-    return callForCollection(new DifferenceWithSmallResult(), otherCollection);
+  public EPGraphCollection<VD, ED, GD> differenceWithSmallResult(
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception {
+    return callForCollection(new DifferenceWithSmallResult<VD, ED, GD>(),
+      otherCollection);
   }
 
   @Override
-  public EPGraphCollection distinct() {
+  public EPGraphCollection<VD, ED, GD> distinct() {
     throw new NotImplementedException();
   }
 
   @Override
-  public EPGraphCollection sortBy(String propertyKey, Order order) {
+  public EPGraphCollection<VD, ED, GD> sortBy(String propertyKey, Order order) {
     throw new NotImplementedException();
   }
 
   @Override
-  public EPGraphCollection top(int limit) {
+  public EPGraphCollection<VD, ED, GD> top(int limit) {
     throw new NotImplementedException();
   }
 
   @Override
-  public EPGraphCollection apply(UnaryGraphToGraphOperator op) {
+  public EPGraphCollection<VD, ED, GD> apply(
+    UnaryGraphToGraphOperator<VD, ED, GD> op) {
     throw new NotImplementedException();
   }
 
   @Override
-  public EPGraph reduce(BinaryGraphToGraphOperator op) {
+  public EPGraph<VD, ED, GD> reduce(BinaryGraphToGraphOperator<VD, ED, GD> op) {
     throw new NotImplementedException();
   }
 
   @Override
-  public EPGraphCollection callForCollection(
-    UnaryCollectionToCollectionOperator op) {
+  public EPGraphCollection<VD, ED, GD> callForCollection(
+    UnaryCollectionToCollectionOperator<VD, ED, GD> op) {
     return op.execute(this);
   }
 
   @Override
-  public EPGraphCollection callForCollection(
-    BinaryCollectionToCollectionOperator op,
-    EPGraphCollection otherCollection) throws Exception {
+  public EPGraphCollection<VD, ED, GD> callForCollection(
+    BinaryCollectionToCollectionOperator<VD, ED, GD> op,
+    EPGraphCollection<VD, ED, GD> otherCollection) throws Exception {
     return op.execute(this, otherCollection);
   }
 
   @Override
-  public EPGraph callForGraph(UnaryCollectionToGraphOperator op) {
+  public EPGraph<VD, ED, GD> callForGraph(
+    UnaryCollectionToGraphOperator<VD, ED, GD> op) {
     return op.execute(this);
   }
 
   @Override
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {
-    this.getGellyGraph().getVertices()
-      .writeAsFormattedText(vertexFile, new JsonWriter.VertexTextFormatter())
-      .getDataSet().collect();
+    this.getGellyGraph().getVertices().writeAsFormattedText(vertexFile,
+      new JsonWriter.VertexTextFormatter<VD>()).getDataSet().collect();
     this.getGellyGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter())
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>())
       .getDataSet().collect();
     this.getSubgraphs()
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter())
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>())
       .getDataSet().collect();
   }
 
@@ -287,14 +316,13 @@ public class EPGraphCollection implements
   }
 
   @Override
-  public Collection<GraphData> collect() throws Exception {
-    return this.subgraphs
-      .map(new MapFunction<Subgraph<Long, GraphData>, GraphData>() {
-        @Override
-        public GraphData map(Subgraph<Long, GraphData> g) throws Exception {
-          return g.getValue();
-        }
-      }).collect();
+  public Collection<GD> collect() throws Exception {
+    return this.subgraphs.map(new MapFunction<Subgraph<Long, GD>, GD>() {
+      @Override
+      public GD map(Subgraph<Long, GD> g) throws Exception {
+        return g.getValue();
+      }
+    }).collect();
   }
 
   @Override
@@ -307,79 +335,87 @@ public class EPGraphCollection implements
     subgraphs.print();
   }
 
-  EPGraph getGraph() {
-    return EPGraph.fromGraph(this.graph, null);
+  EPGraph<VD, ED, GD> getGraph() {
+    return EPGraph
+      .fromGraph(this.graph, null, vertexDataFactory, edgeDataFactory,
+        graphDataFactory);
   }
 
 
-  private static class VertexGraphContainmentFilter implements
-    FilterFunction<Vertex<Long, VertexData>> {
+  private static class VertexInGraphFilter<VD extends VertexData> implements
+    FilterFunction<Vertex<Long, VD>> {
 
     private long graphID;
 
-    public VertexGraphContainmentFilter(long graphID) {
+    public VertexInGraphFilter(long graphID) {
       this.graphID = graphID;
     }
 
     @Override
-    public boolean filter(Vertex<Long, VertexData> v) throws Exception {
-      return v.f1.getGraphs().contains(graphID);
+    public boolean filter(Vertex<Long, VD> v) throws Exception {
+      return (v.getValue().getGraphCount() > 0) &&
+        v.getValue().getGraphs().contains(graphID);
     }
   }
 
-  private static class EdgeGraphContainmentFilter implements
-    FilterFunction<Edge<Long, EdgeData>> {
+  private static class EdgeInGraphFilter<ED extends EdgeData> implements
+    FilterFunction<Edge<Long, ED>> {
 
     private long graphID;
 
-    public EdgeGraphContainmentFilter(long graphID) {
+    public EdgeInGraphFilter(long graphID) {
       this.graphID = graphID;
     }
 
     @Override
-    public boolean filter(Edge<Long, EdgeData> e) throws Exception {
-      return e.f2.getGraphs().contains(graphID);
+    public boolean filter(Edge<Long, ED> e) throws Exception {
+      return (e.getValue().getGraphCount() > 0) &&
+        e.getValue().getGraphs().contains(graphID);
     }
   }
 
-  private static class VertexInGraphFilter implements
-    FilterFunction<Vertex<Long, VertexData>> {
+  private static class VertexInGraphsFilter<VD extends VertexData> implements
+    FilterFunction<Vertex<Long, VD>> {
 
     List<Long> identifiers;
 
-    public VertexInGraphFilter(List<Long> identifiers) {
+    public VertexInGraphsFilter(List<Long> identifiers) {
       this.identifiers = identifiers;
     }
 
     @Override
-    public boolean filter(Vertex<Long, VertexData> vertex) throws Exception {
+    public boolean filter(Vertex<Long, VD> vertex) throws Exception {
       boolean vertexInGraph = false;
-      for (Long graph : vertex.getValue().getGraphs()) {
-        if (identifiers.contains(graph)) {
-          vertexInGraph = true;
-          break;
+      if (vertex.getValue().getGraphCount() > 0) {
+        for (Long graph : vertex.getValue().getGraphs()) {
+          if (identifiers.contains(graph)) {
+            vertexInGraph = true;
+            break;
+          }
         }
       }
       return vertexInGraph;
     }
   }
 
-  private static class EdgeInGraphFilter implements
-    FilterFunction<Edge<Long, EdgeData>> {
+  private static class EdgeInGraphsFilter<ED extends EdgeData> implements
+    FilterFunction<Edge<Long, ED>> {
 
     List<Long> identifiers;
 
-    public EdgeInGraphFilter(List<Long> identifiers) {
+    public EdgeInGraphsFilter(List<Long> identifiers) {
       this.identifiers = identifiers;
     }
 
     @Override
-    public boolean filter(Edge<Long, EdgeData> e) throws Exception {
+    public boolean filter(Edge<Long, ED> e) throws Exception {
       boolean vertexInGraph = false;
-      for (Long graph : e.getValue().getGraphs()) {
-        if (identifiers.contains(graph)) {
-          vertexInGraph = true;
-          break;
+      if (e.getValue().getGraphCount() > 0) {
+        for (Long graph : e.getValue().getGraphs()) {
+          if (identifiers.contains(graph)) {
+            vertexInGraph = true;
+            break;
+          }
         }
       }
       return vertexInGraph;

@@ -24,43 +24,43 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
+import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.impl.EPGraph;
-import org.gradoop.model.impl.GraphDataFactory;
 
-import static org.gradoop.model.impl.EPGraph.*;
+public class Exclusion<VD extends VertexData, ED extends EdgeData, GD extends
+  GraphData> extends
+  AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
 
-public class Exclusion extends AbstractBinaryGraphToGraphOperator {
   @Override
   public String getName() {
     return "Exclusion";
   }
 
   @Override
-  protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
+  protected EPGraph<VD, ED, GD> executeInternal(EPGraph<VD, ED, GD> firstGraph,
+    EPGraph<VD, ED, GD> secondGraph) {
     final Long newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
 
-    Graph<Long, VertexData, EdgeData> graph1 = firstGraph.getGellyGraph();
-    Graph<Long, VertexData, EdgeData> graph2 = secondGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph2 = secondGraph.getGellyGraph();
 
     // union vertex sets, group by vertex id, filter vertices where the group
     // contains exactly one vertex which belongs to the graph, the operator is
     // called on
-    DataSet<Vertex<Long, VertexData>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices()).groupBy(VERTEX_ID)
-        .reduceGroup(
-          new VertexGroupReducer(1L, firstGraph.getId(), secondGraph.getId()))
-        .map(new VertexToGraphUpdater(newGraphID));
+    DataSet<Vertex<Long, VD>> newVertexSet =
+      graph1.getVertices().union(graph2.getVertices())
+        .groupBy(new KeySelectors.VertexKeySelector<VD>()).reduceGroup(
+        new VertexGroupReducer<VD>(1L, firstGraph.getId(), secondGraph.getId()))
+        .map(new VertexToGraphUpdater<VD>(newGraphID));
 
-    JoinFunction<Edge<Long, EdgeData>, Vertex<Long, VertexData>, Edge<Long,
-      EdgeData>>
-      joinFunc =
-      new JoinFunction<Edge<Long, EdgeData>, Vertex<Long, VertexData>,
-        Edge<Long, EdgeData>>() {
+    JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> joinFunc =
+      new JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>>() {
         @Override
-        public Edge<Long, EdgeData> join(Edge<Long, EdgeData> leftTuple,
-          Vertex<Long, VertexData> rightTuple) throws Exception {
+        public Edge<Long, ED> join(Edge<Long, ED> leftTuple,
+          Vertex<Long, VD> rightTuple) throws Exception {
           return leftTuple;
         }
       };
@@ -68,14 +68,18 @@ public class Exclusion extends AbstractBinaryGraphToGraphOperator {
     // In exclude(), we are only interested in edges that connect vertices
     // that are in the exclusion of the vertex sets. Thus, we join the edges
     // from the left graph with the new vertex set using source and target ids.
-    DataSet<Edge<Long, EdgeData>> newEdgeSet =
-      graph1.getEdges().join(newVertexSet).where(SOURCE_VERTEX_ID)
-        .equalTo(VERTEX_ID).with(joinFunc).join(newVertexSet)
-        .where(TARGET_VERTEX_ID).equalTo(VERTEX_ID).with(joinFunc)
-        .map(new EdgeToGraphUpdater(newGraphID));
+    DataSet<Edge<Long, ED>> newEdgeSet = graph1.getEdges().join(newVertexSet)
+      .where(new KeySelectors.EdgeSourceVertexKeySelector<ED>())
+      .equalTo(new KeySelectors.VertexKeySelector<VD>()).with(joinFunc)
+      .join(newVertexSet)
+      .where(new KeySelectors.EdgeTargetVertexKeySelector<ED>())
+      .equalTo(new KeySelectors.VertexKeySelector<VD>()).with(joinFunc)
+      .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return EPGraph.fromGraph(
       Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
-      GraphDataFactory.createDefaultGraphWithID(newGraphID));
+      firstGraph.getGraphDataFactory().createGraphData(newGraphID),
+      firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
+      firstGraph.getGraphDataFactory());
   }
 }

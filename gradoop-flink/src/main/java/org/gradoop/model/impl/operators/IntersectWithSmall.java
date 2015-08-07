@@ -26,36 +26,38 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 
 import java.util.List;
 
-import static org.gradoop.model.impl.EPGraph.*;
-
-public class IntersectWithSmall extends
-  AbstractBinaryCollectionToCollectionOperator {
+public class IntersectWithSmall<VD extends VertexData, ED extends EdgeData,
+  GD extends GraphData> extends
+  AbstractBinaryCollectionToCollectionOperator<VD, ED, GD> {
   @Override
-  protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
-    EPGraphCollection secondGraphCollection) throws Exception {
-    final DataSet<Subgraph<Long, GraphData>> newSubgraphs =
-      firstSubgraphs.union(secondSubgraphs).groupBy(GRAPH_ID)
-        .reduceGroup(new SubgraphGroupReducer(2));
+  protected EPGraphCollection<VD, ED, GD> executeInternal(
+    EPGraphCollection<VD, ED, GD> firstCollection,
+    EPGraphCollection<VD, ED, GD> secondGraphCollection) throws Exception {
+    final DataSet<Subgraph<Long, GD>> newSubgraphs =
+      firstSubgraphs.union(secondSubgraphs)
+        .groupBy(new KeySelectors.GraphKeySelector<GD>())
+        .reduceGroup(new SubgraphGroupReducer<GD>(2));
 
     final List<Long> identifiers;
     identifiers =
-      secondSubgraphs.map(new MapFunction<Subgraph<Long, GraphData>, Long>() {
+      secondSubgraphs.map(new MapFunction<Subgraph<Long, GD>, Long>() {
         @Override
-        public Long map(Subgraph<Long, GraphData> subgraph) throws Exception {
+        public Long map(Subgraph<Long, GD> subgraph) throws Exception {
           return subgraph.getId();
         }
       }).collect();
 
-    DataSet<Vertex<Long, VertexData>> vertices = firstGraph.getVertices();
-    vertices = vertices.filter(new FilterFunction<Vertex<Long, VertexData>>() {
+    DataSet<Vertex<Long, VD>> vertices = firstGraph.getVertices();
+    vertices = vertices.filter(new FilterFunction<Vertex<Long, VD>>() {
 
       @Override
-      public boolean filter(Vertex<Long, VertexData> vertex) throws Exception {
+      public boolean filter(Vertex<Long, VD> vertex) throws Exception {
         for (Long id : identifiers) {
           if (vertex.getValue().getGraphs().contains(id)) {
             return true;
@@ -65,16 +67,20 @@ public class IntersectWithSmall extends
       }
     });
 
-    DataSet<Edge<Long, EdgeData>> edges = firstGraph.getEdges();
+    DataSet<Edge<Long, ED>> edges = firstGraph.getEdges().join(vertices)
+      .where(new KeySelectors.EdgeSourceVertexKeySelector<ED>())
+      .equalTo(new KeySelectors.VertexKeySelector<VD>())
+      .with(new EdgeJoinFunction<VD, ED>()).join(vertices)
+      .where(new KeySelectors.EdgeTargetVertexKeySelector<ED>())
+      .equalTo(new KeySelectors.VertexKeySelector<VD>())
+      .with(new EdgeJoinFunction<VD, ED>());
 
-    edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
-      .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
-      .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
+    Graph<Long, VD, ED> newGraph = Graph.fromDataSet(vertices, edges, env);
 
-    Graph<Long, VertexData, EdgeData> newGraph =
-      Graph.fromDataSet(vertices, edges, env);
-
-    return new EPGraphCollection(newGraph, newSubgraphs, env);
+    return new EPGraphCollection<>(newGraph, newSubgraphs,
+      firstCollection.getVertexDataFactory(),
+      firstCollection.getEdgeDataFactory(),
+      firstCollection.getGraphDataFactory(), env);
   }
 
   @Override

@@ -17,9 +17,13 @@
 
 package org.gradoop.model.operators;
 
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraph;
 
-public interface UnaryGraphToGraphOperator extends Operator {
-
-  EPGraph execute(EPGraph graph) throws Exception;
+public interface UnaryGraphToGraphOperator<VD extends VertexData, ED extends
+  EdgeData, GD extends GraphData> extends
+  Operator {
+  EPGraph<VD, ED, GD> execute(EPGraph<VD, ED, GD> graph) throws Exception;
 }

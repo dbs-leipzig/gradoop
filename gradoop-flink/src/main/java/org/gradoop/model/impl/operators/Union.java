@@ -24,26 +24,32 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 
-import static org.gradoop.model.impl.EPGraph.*;
-
-public class Union extends AbstractBinaryCollectionToCollectionOperator {
+public class Union<VD extends VertexData, ED extends EdgeData, GD extends
+  GraphData> extends
+  AbstractBinaryCollectionToCollectionOperator<VD, ED, GD> {
 
   @Override
-  protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
-    EPGraphCollection secondGraphCollection) {
-    DataSet<Subgraph<Long, GraphData>> newSubgraphs =
-      firstSubgraphs.union(secondSubgraphs).distinct(GRAPH_ID);
-    DataSet<Vertex<Long, VertexData>> vertices =
+  protected EPGraphCollection<VD, ED, GD> executeInternal(
+    EPGraphCollection<VD, ED, GD> firstCollection,
+    EPGraphCollection<VD, ED, GD> secondGraphCollection) {
+    DataSet<Subgraph<Long, GD>> newSubgraphs =
+      firstSubgraphs.union(secondSubgraphs)
+        .distinct(new KeySelectors.GraphKeySelector<GD>());
+    DataSet<Vertex<Long, VD>> vertices =
       firstGraph.getVertices().union(secondGraph.getVertices())
-        .distinct(VERTEX_ID);
-    DataSet<Edge<Long, EdgeData>> edges =
-      firstGraph.getEdges().union(secondGraph.getEdges()).distinct(EDGE_ID);
+        .distinct(new KeySelectors.VertexKeySelector<VD>());
+    DataSet<Edge<Long, ED>> edges =
+      firstGraph.getEdges().union(secondGraph.getEdges())
+        .distinct(new KeySelectors.EdgeKeySelector<ED>());
 
-    return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
-      newSubgraphs, env);
+    return new EPGraphCollection<>(Graph.fromDataSet(vertices, edges, env),
+      newSubgraphs, firstCollection.getVertexDataFactory(),
+      firstCollection.getEdgeDataFactory(),
+      firstCollection.getGraphDataFactory(), env);
   }
 
   @Override

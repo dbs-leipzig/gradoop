@@ -25,9 +25,7 @@ import java.util.Set;
 /**
  * Transient representation of edge data.
  */
-public class DefaultEdgeData extends EPGMElement implements EdgeData {
-
-  private Set<Long> graphs;
+public class DefaultEdgeData extends EPGMGraphElement implements EdgeData {
 
   private Long sourceVertexId;
 
@@ -49,8 +47,7 @@ public class DefaultEdgeData extends EPGMElement implements EdgeData {
   DefaultEdgeData(final Long id, final String label, final Long sourceVertexId,
     final Long targetVertexId, final Map<String, Object> properties,
     Set<Long> graphs) {
-    super(id, label, properties);
-    this.graphs = graphs;
+    super(id, label, properties, graphs);
     this.sourceVertexId = sourceVertexId;
     this.targetVertexId = targetVertexId;
   }
@@ -76,35 +73,9 @@ public class DefaultEdgeData extends EPGMElement implements EdgeData {
   }
 
   @Override
-  public Set<Long> getGraphs() {
-    return graphs;
-  }
-
-  @Override
-  public void addGraph(Long graph) {
-    graphs.add(graph);
-  }
-
-  @Override
-  public void setGraphs(Set<Long> graphs) {
-    this.graphs = graphs;
-  }
-
-  @Override
-  public void resetGraphs() {
-    graphs.clear();
-  }
-
-  @Override
-  public int getGraphCount() {
-    return graphs.size();
-  }
-
-  @Override
   public String toString() {
     return "DefaultEdgeData{" +
       super.toString() +
-      ", graphs=" + graphs +
       ", sourceVertexId=" + sourceVertexId +
       ", targetVertexId=" + targetVertexId +
       '}';

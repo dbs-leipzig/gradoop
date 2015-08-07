@@ -20,62 +20,70 @@ package org.gradoop.model.impl.operators;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.operators.Order;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.SortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 
-public class SummarizationJoin extends Summarization {
-  SummarizationJoin(String vertexGroupingKey, String edgeGroupingKey,
+public class SummarizationJoin<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData> extends
+  Summarization<VD, ED, GD> {
+  public SummarizationJoin(String vertexGroupingKey, String edgeGroupingKey,
     boolean useVertexLabels, boolean useEdgeLabels) {
     super(vertexGroupingKey, edgeGroupingKey, useVertexLabels, useEdgeLabels);
   }
 
   @Override
-  protected Graph<Long, VertexData, EdgeData> summarizeInternal(
-    Graph<Long, VertexData, EdgeData> graph) {
+  protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
 
     /* build summarized vertices */
-    SortedGrouping<Vertex<Long, VertexData>> groupedSortedVertices =
+    SortedGrouping<Vertex<Long, VD>> groupedSortedVertices =
       groupAndSortVertices(graph);
 
     // create new summarized gelly vertices
-    DataSet<Vertex<Long, VertexData>> newVertices =
+    DataSet<Vertex<Long, VD>> newVertices =
       buildSummarizedVertices(groupedSortedVertices);
 
     // create mapping from vertex-id to group representative
     DataSet<Tuple2<Long, Long>> vertexToRepresentativeMap =
-      groupedSortedVertices.reduceGroup(new VertexToRepresentativeReducer());
+      groupedSortedVertices
+        .reduceGroup(new VertexToRepresentativeReducer<VD>());
 
     /* build summarized vertices */
-    DataSet<Edge<Long, EdgeData>> newEdges =
+    DataSet<Edge<Long, ED>> newEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
     return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
   }
 
-  private DataSet<Edge<Long, EdgeData>> buildSummarizedEdges(
-    Graph<Long, VertexData, EdgeData> graph,
+  private DataSet<Edge<Long, ED>> buildSummarizedEdges(
+    Graph<Long, VD, ED> graph,
     DataSet<Tuple2<Long, Long>> vertexToRepresentativeMap) {
     // join vertex-group-map with edges on vertex-id == edge-source-id
     DataSet<Tuple5<Long, Long, Long, String, String>> edges =
       vertexToRepresentativeMap.join(graph.getEdges()).where(0).equalTo(0)
         // project edges to necessary information
-        .with(
-          new SourceVertexJoinFunction(getEdgeGroupingKey(), useEdgeLabels()))
+        .with(new SourceVertexJoinFunction<ED>(getEdgeGroupingKey(),
+          useEdgeLabels()))
           // join result with vertex-group-map on edge-target-id == vertex-id
         .join(vertexToRepresentativeMap).where(2).equalTo(0)
         .with(new TargetVertexJoinFunction());
 
     // sort group by edge id to get edge group representative (smallest id)
     return groupEdges(edges).sortGroup(0, Order.ASCENDING).reduceGroup(
-      new EdgeGroupSummarizer(getEdgeGroupingKey(), useEdgeLabels()));
+      new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
+        edgeDataFactory));
   }
 
   @Override
@@ -89,14 +97,15 @@ public class SummarizationJoin extends Summarization {
    *
    * The group representative is the first vertex-id in the group.
    */
-  private static class VertexToRepresentativeReducer implements
-    GroupReduceFunction<Vertex<Long, VertexData>, Tuple2<Long, Long>> {
+  private static class VertexToRepresentativeReducer<VD extends VertexData>
+    implements
+    GroupReduceFunction<Vertex<Long, VD>, Tuple2<Long, Long>> {
 
-    public void reduce(Iterable<Vertex<Long, VertexData>> group,
+    public void reduce(Iterable<Vertex<Long, VD>> group,
       Collector<Tuple2<Long, Long>> collector) throws Exception {
       Long groupRepresentative = null;
       boolean first = true;
-      for (Vertex<Long, VertexData> groupElement : group) {
+      for (Vertex<Long, VD> groupElement : group) {
         if (first) {
           groupRepresentative = groupElement.getId();
           first = false;
@@ -113,9 +122,9 @@ public class SummarizationJoin extends Summarization {
    * projected edge information possibly containing the edge label and a
    * group property.
    */
-  private static class SourceVertexJoinFunction implements
-    JoinFunction<Tuple2<Long, Long>, Edge<Long, EdgeData>,
-      Tuple5<Long, Long, Long, String, String>> {
+  private static class SourceVertexJoinFunction<ED extends EdgeData> implements
+    JoinFunction<Tuple2<Long, Long>, Edge<Long, ED>, Tuple5<Long, Long, Long,
+      String, String>> {
 
     private final String groupPropertyKey;
     private final boolean useLabel;
@@ -127,8 +136,8 @@ public class SummarizationJoin extends Summarization {
 
     @Override
     public Tuple5<Long, Long, Long, String, String> join(
-      Tuple2<Long, Long> vertexRepresentativeTuple,
-      Edge<Long, EdgeData> e) throws Exception {
+      Tuple2<Long, Long> vertexRepresentativeTuple, Edge<Long, ED> e) throws
+      Exception {
       String groupingValue = null;
       boolean useProperty =
         groupPropertyKey != null && !"".equals(groupPropertyKey);

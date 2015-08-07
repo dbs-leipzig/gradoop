@@ -22,15 +22,15 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.impl.EPGraph;
-import org.gradoop.model.impl.GraphDataFactory;
 
-import static org.gradoop.model.impl.EPGraph.EDGE_ID;
-import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
-
-public class Combination extends AbstractBinaryGraphToGraphOperator {
+public class Combination<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData> extends
+  AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
 
   @Override
   public String getName() {
@@ -38,24 +38,29 @@ public class Combination extends AbstractBinaryGraphToGraphOperator {
   }
 
   @Override
-  protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
+  protected EPGraph<VD, ED, GD> executeInternal(EPGraph<VD, ED, GD> firstGraph,
+    EPGraph<VD, ED, GD> secondGraph) {
     final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
 
-    Graph<Long, VertexData, EdgeData> graph1 = firstGraph.getGellyGraph();
-    Graph<Long, VertexData, EdgeData> graph2 = secondGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph2 = secondGraph.getGellyGraph();
 
     // build distinct union of vertex sets and update graph ids at vertices
     // cannot use Gelly union here because of missing argument for KeySelector
-    DataSet<Vertex<Long, VertexData>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices()).distinct(VERTEX_ID)
-        .map(new VertexToGraphUpdater(newGraphID));
+    DataSet<Vertex<Long, VD>> newVertexSet =
+      graph1.getVertices().union(graph2.getVertices())
+        .distinct(new KeySelectors.VertexKeySelector<VD>())
+        .map(new VertexToGraphUpdater<VD>(newGraphID));
 
-    DataSet<Edge<Long, EdgeData>> newEdgeSet =
-      graph1.getEdges().union(graph2.getEdges()).distinct(EDGE_ID)
-        .map(new EdgeToGraphUpdater(newGraphID));
+    DataSet<Edge<Long, ED>> newEdgeSet =
+      graph1.getEdges().union(graph2.getEdges())
+        .distinct(new KeySelectors.EdgeKeySelector<ED>())
+        .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return EPGraph.fromGraph(
       Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
-      GraphDataFactory.createDefaultGraphWithID(newGraphID));
+      firstGraph.getGraphDataFactory().createGraphData(newGraphID),
+      firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
+      firstGraph.getGraphDataFactory());
   }
 }

@@ -18,17 +18,22 @@
 package org.gradoop.io.json;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.model.EdgeData;
+import org.gradoop.model.EdgeDataFactory;
 import org.gradoop.model.GraphData;
+import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
-import org.gradoop.model.impl.EdgeDataFactory;
-import org.gradoop.model.impl.GraphDataFactory;
+import org.gradoop.model.VertexDataFactory;
 import org.gradoop.model.impl.Subgraph;
-import org.gradoop.model.impl.VertexDataFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -54,20 +59,25 @@ public class JsonReader extends JsonIO {
    * "graphs":[0,1,2,3]}
    * }
    */
-  public static class JsonToVertexMapper extends JsonToEntityMapper implements
-    MapFunction<String, Vertex<Long, VertexData>> {
+  public static class JsonToVertexMapper<VD extends VertexData> extends
+    JsonToEntityMapper implements MapFunction<String, Vertex<Long, VD>> {
+
+    private final VertexDataFactory<VD> vertexDataFactory;
+
+    public JsonToVertexMapper(VertexDataFactory<VD> vertexDataFactory) {
+      this.vertexDataFactory = vertexDataFactory;
+    }
 
     @Override
-    public Vertex<Long, VertexData> map(String s) throws Exception {
+    public Vertex<Long, VD> map(String s) throws Exception {
       JSONObject jsonVertex = new JSONObject(s);
       Long vertexID = getID(jsonVertex);
       String label = getLabel(jsonVertex);
       Map<String, Object> properties = getProperties(jsonVertex);
       Set<Long> graphs = getGraphs(jsonVertex);
 
-      return new Vertex(vertexID,
-        VertexDataFactory
-          .createDefaultVertex(vertexID, label, properties, graphs));
+      return new Vertex<>(vertexID, vertexDataFactory
+        .createVertexData(vertexID, label, properties, graphs));
     }
   }
 
@@ -87,11 +97,17 @@ public class JsonReader extends JsonIO {
    * "meta":{"label":"worksFor","graphs":[1,2,3,4]}
    * }
    */
-  public static class JsonToEdgeMapper extends JsonToEntityMapper implements
-    MapFunction<String, Edge<Long, EdgeData>> {
+  public static class JsonToEdgeMapper<ED extends EdgeData> extends
+    JsonToEntityMapper implements MapFunction<String, Edge<Long, ED>> {
+
+    private final EdgeDataFactory<ED> edgeDataFactory;
+
+    public JsonToEdgeMapper(EdgeDataFactory<ED> edgeDataFactory) {
+      this.edgeDataFactory = edgeDataFactory;
+    }
 
     @Override
-    public Edge<Long, EdgeData> map(String s) throws Exception {
+    public Edge<Long, ED> map(String s) throws Exception {
       JSONObject jsonEdge = new JSONObject(s);
       Long edgeID = getID(jsonEdge);
       String edgeLabel = getLabel(jsonEdge);
@@ -100,8 +116,8 @@ public class JsonReader extends JsonIO {
       Map<String, Object> properties = getProperties(jsonEdge);
       Set<Long> graphs = getGraphs(jsonEdge);
 
-      return new Edge<>(sourceID, targetID, EdgeDataFactory
-        .createDefaultEdge(edgeID, edgeLabel, sourceID, targetID, properties,
+      return new Edge<>(sourceID, targetID, edgeDataFactory
+        .createEdgeData(edgeID, edgeLabel, sourceID, targetID, properties,
           graphs));
     }
 
@@ -129,11 +145,17 @@ public class JsonReader extends JsonIO {
    * "meta":{"label":"Community","vertices":[0,1,2],"edges":[4,5,6]}
    * }
    */
-  public static class JsonToGraphMapper extends JsonToEntityMapper implements
-    MapFunction<String, Subgraph<Long, GraphData>> {
+  public static class JsonToGraphMapper<GD extends GraphData> extends
+    JsonToEntityMapper implements MapFunction<String, Subgraph<Long, GD>> {
+
+    private final GraphDataFactory<GD> graphDataFactory;
+
+    public JsonToGraphMapper(GraphDataFactory<GD> graphDataFactory) {
+      this.graphDataFactory = graphDataFactory;
+    }
 
     @Override
-    public Subgraph<Long, GraphData> map(String s) throws Exception {
+    public Subgraph<Long, GD> map(String s) throws Exception {
       JSONObject jsonGraph = new JSONObject(s);
       Long graphID = getID(jsonGraph);
       String label = getLabel(jsonGraph);
@@ -143,8 +165,8 @@ public class JsonReader extends JsonIO {
       Set<Long> edges =
         getArrayValues(jsonGraph.getJSONObject(META).getJSONArray(EDGES));
 
-      return new Subgraph<>(graphID, GraphDataFactory
-        .createDefaultGraph(graphID, label, properties, vertices, edges));
+      return new Subgraph<>(graphID, graphDataFactory
+        .createGraphData(graphID, label, properties, vertices, edges));
     }
   }
 }

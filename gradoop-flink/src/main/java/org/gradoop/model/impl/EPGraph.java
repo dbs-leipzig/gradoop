@@ -20,25 +20,17 @@ package org.gradoop.model.impl;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
-import org.gradoop.model.Attributed;
-import org.gradoop.model.EPPatternGraph;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.Identifiable;
-import org.gradoop.model.Labeled;
-import org.gradoop.model.VertexData;
+import org.gradoop.model.*;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.operators.Aggregation;
 import org.gradoop.model.impl.operators.Combination;
 import org.gradoop.model.impl.operators.Exclusion;
 import org.gradoop.model.impl.operators.Overlap;
-import org.gradoop.model.impl.operators.Summarization;
+import org.gradoop.model.impl.operators.SummarizationJoin;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.EPGraphOperators;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
@@ -54,81 +46,94 @@ import java.util.Map;
  * @author Martin Junghanns
  * @author Niklas Teichmann
  */
-public class EPGraph implements EPGraphOperators, Identifiable, Attributed,
-  Labeled {
+public class EPGraph<VD extends VertexData, ED extends EdgeData, GD extends
+  GraphData> implements
+  EPGraphOperators<VD, ED, GD>, Identifiable, Attributed, Labeled {
 
-  /* Convenience key selectors */
+  private final VertexDataFactory<VD> vertexDataFactory;
 
-  public static final KeySelector<Subgraph<Long, GraphData>, Long> GRAPH_ID;
-  public static final KeySelector<Vertex<Long, VertexData>, Long> VERTEX_ID;
-  public static final KeySelector<Edge<Long, EdgeData>, Long> EDGE_ID;
-  public static final KeySelector<Edge<Long, EdgeData>, Long> SOURCE_VERTEX_ID;
-  public static final KeySelector<Edge<Long, EdgeData>, Long> TARGET_VERTEX_ID;
+  private final EdgeDataFactory<ED> edgeDataFactory;
 
-  static {
-    GRAPH_ID = new GraphKeySelector();
-    VERTEX_ID = new VertexKeySelector();
-    EDGE_ID = new EdgeKeySelector();
-    SOURCE_VERTEX_ID = new EdgeSourceVertexKeySelector();
-    TARGET_VERTEX_ID = new EdgeTargetVertexKeySelector();
-  }
+  private final GraphDataFactory<GD> graphDataFactory;
 
-  private ExecutionEnvironment env;
+  private final ExecutionEnvironment env;
 
   /**
    * Gelly graph that encapsulates the vertex and edge datasets associated
    * with that EPGraph.
    */
-  private Graph<Long, VertexData, EdgeData> graph;
+  private Graph<Long, VD, ED> graph;
   /**
    * Graph payload.
    */
-  private GraphData graphData;
+  private GD graphData;
 
-  private EPGraph(Graph<Long, VertexData, EdgeData> graph, GraphData graphData,
+  private EPGraph(Graph<Long, VD, ED> graph, GD graphData,
+    VertexDataFactory<VD> vertexDataFactory,
+    EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD> graphDataFactory,
     ExecutionEnvironment env) {
     this.graph = graph;
     this.graphData = graphData;
+    this.vertexDataFactory = vertexDataFactory;
+    this.edgeDataFactory = edgeDataFactory;
+    this.graphDataFactory = graphDataFactory;
     this.env = env;
   }
 
-  public static EPGraph fromGraph(Graph<Long, VertexData, EdgeData> graph,
-    GraphData graphData) {
-    return new EPGraph(graph, graphData, graph.getContext());
+  public VertexDataFactory<VD> getVertexDataFactory() {
+    return vertexDataFactory;
   }
 
-  public Graph<Long, VertexData, EdgeData> getGellyGraph() {
+  public EdgeDataFactory<ED> getEdgeDataFactory() {
+    return edgeDataFactory;
+  }
+
+  public GraphDataFactory<GD> getGraphDataFactory() {
+    return graphDataFactory;
+  }
+
+  public static <VD extends VertexData, ED extends EdgeData, GD extends
+    GraphData> EPGraph<VD, ED, GD> fromGraph(
+    Graph<Long, VD, ED> graph, GD graphData,
+    VertexDataFactory<VD> vertexDataFactory,
+    EdgeDataFactory<ED> edgeDataFactory,
+    GraphDataFactory<GD> graphDataFactory) {
+    return new EPGraph<>(graph, graphData, vertexDataFactory, edgeDataFactory,
+      graphDataFactory, graph.getContext());
+  }
+
+  public Graph<Long, VD, ED> getGellyGraph() {
     return this.graph;
   }
 
   @Override
-  public EPVertexCollection getVertices() {
-    return new EPVertexCollection(graph.getVertices());
+  public EPVertexCollection<VD> getVertices() {
+    return new EPVertexCollection<>(graph.getVertices());
   }
 
   @Override
-  public EPEdgeCollection getEdges() {
-    return new EPEdgeCollection(graph.getEdges());
+  public EPEdgeCollection<ED> getEdges() {
+    return new EPEdgeCollection<>(graph.getEdges());
   }
 
   @Override
-  public EPEdgeCollection getOutgoingEdges(final Long vertexID) {
-    DataSet<Edge<Long, EdgeData>> outgoingEdges =
-      this.graph.getEdges().filter(new FilterFunction<Edge<Long, EdgeData>>() {
+  public EPEdgeCollection<ED> getOutgoingEdges(final Long vertexID) {
+    DataSet<Edge<Long, ED>> outgoingEdges =
+      this.graph.getEdges().filter(new FilterFunction<Edge<Long, ED>>() {
         @Override
-        public boolean filter(Edge<Long, EdgeData> edgeTuple) throws Exception {
+        public boolean filter(Edge<Long, ED> edgeTuple) throws Exception {
           return edgeTuple.getValue().getSourceVertexId().equals(vertexID);
         }
       });
-    return new EPEdgeCollection(outgoingEdges);
+    return new EPEdgeCollection<>(outgoingEdges);
   }
 
   @Override
-  public EPEdgeCollection getIncomingEdges(final Long vertexID) {
-    return new EPEdgeCollection(
-      this.graph.getEdges().filter(new FilterFunction<Edge<Long, EdgeData>>() {
+  public EPEdgeCollection<ED> getIncomingEdges(final Long vertexID) {
+    return new EPEdgeCollection<>(
+      this.graph.getEdges().filter(new FilterFunction<Edge<Long, ED>>() {
         @Override
-        public boolean filter(Edge<Long, EdgeData> edgeTuple) throws Exception {
+        public boolean filter(Edge<Long, ED> edgeTuple) throws Exception {
           return edgeTuple.getValue().getTargetVertexId().equals(vertexID);
         }
       }));
@@ -145,133 +150,131 @@ public class EPGraph implements EPGraphOperators, Identifiable, Attributed,
   }
 
   @Override
-  public org.gradoop.model.impl.EPGraphCollection match(String graphPattern,
+  public EPGraphCollection<VD, ED, GD> match(String graphPattern,
     Predicate<EPPatternGraph> predicateFunc) {
     throw new NotImplementedException();
   }
 
   @Override
-  public EPGraph project(UnaryFunction<VertexData, VertexData> vertexFunction,
-    UnaryFunction<EdgeData, EdgeData> edgeFunction) {
+  public EPGraph<VD, ED, GD> project(UnaryFunction<VD, VD> vertexFunction,
+    UnaryFunction<ED, ED> edgeFunction) {
     throw new NotImplementedException();
   }
 
   @Override
-  public <O extends Number> EPGraph aggregate(String propertyKey,
-    UnaryFunction<EPGraph, O> aggregateFunc) throws Exception {
+  public <O extends Number> EPGraph<VD, ED, GD> aggregate(String propertyKey,
+    UnaryFunction<EPGraph<VD, ED, GD>, O> aggregateFunc) throws Exception {
     return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
 
   @Override
-  public EPGraph summarize(String vertexGroupingKey) throws Exception {
+  public EPGraph<VD, ED, GD> summarize(String vertexGroupingKey) throws
+    Exception {
     return summarize(vertexGroupingKey, null);
   }
 
   @Override
-  public EPGraph summarize(String vertexGroupingKey,
+  public EPGraph<VD, ED, GD> summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new Summarization.SummarizationBuilder(vertexGroupingKey, false)
-        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(false)
-        .setUseJoinOp(true).build());
+      new SummarizationJoin<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
+        false, false));
   }
 
   @Override
-  public EPGraph summarizeOnVertexLabel() throws Exception {
+  public EPGraph<VD, ED, GD> summarizeOnVertexLabel() throws Exception {
     return summarizeOnVertexLabel(null, null);
   }
 
   @Override
-  public EPGraph summarizeOnVertexLabelAndVertexProperty(
+  public EPGraph<VD, ED, GD> summarizeOnVertexLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception {
     return summarizeOnVertexLabel(vertexGroupingKey, null);
   }
 
   @Override
-  public EPGraph summarizeOnVertexLabelAndEdgeProperty(
+  public EPGraph<VD, ED, GD> summarizeOnVertexLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception {
     return summarizeOnVertexLabel(null, edgeGroupingKey);
   }
 
   @Override
-  public EPGraph summarizeOnVertexLabel(String vertexGroupingKey,
+  public EPGraph<VD, ED, GD> summarizeOnVertexLabel(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new Summarization.SummarizationBuilder(vertexGroupingKey, true)
-        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(false)
-        .setUseJoinOp(true).build());
+      new SummarizationJoin<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
+        true, false));
   }
 
   @Override
-  public EPGraph summarizeOnVertexAndEdgeLabel() throws Exception {
+  public EPGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel() throws Exception {
     return summarizeOnVertexAndEdgeLabel(null, null);
   }
 
   @Override
-  public EPGraph summarizeOnVertexAndEdgeLabelAndVertexProperty(
+  public EPGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception {
     return summarizeOnVertexAndEdgeLabel(vertexGroupingKey, null);
   }
 
   @Override
-  public EPGraph summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+  public EPGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception {
     return summarizeOnVertexAndEdgeLabel(null, edgeGroupingKey);
   }
 
   @Override
-  public EPGraph summarizeOnVertexAndEdgeLabel(String vertexGroupingKey,
-    String edgeGroupingKey) throws Exception {
+  public EPGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel(
+    String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new Summarization.SummarizationBuilder(vertexGroupingKey, true)
-        .edgeGroupingKey(edgeGroupingKey).useEdgeLabels(true).setUseJoinOp(true)
-        .build());
+      new SummarizationJoin<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
+        true, true));
   }
 
   @Override
-  public EPGraph combine(EPGraph otherGraph) {
-    return callForGraph(new Combination(), otherGraph);
+  public EPGraph<VD, ED, GD> combine(EPGraph<VD, ED, GD> otherGraph) {
+    return callForGraph(new Combination<VD, ED, GD>(), otherGraph);
   }
 
   @Override
-  public EPGraph overlap(EPGraph otherGraph) {
-    return callForGraph(new Overlap(), otherGraph);
+  public EPGraph<VD, ED, GD> overlap(EPGraph<VD, ED, GD> otherGraph) {
+    return callForGraph(new Overlap<VD, ED, GD>(), otherGraph);
   }
 
   @Override
-  public EPGraph exclude(EPGraph otherGraph) {
-    return callForGraph(new Exclusion(), otherGraph);
+  public EPGraph<VD, ED, GD> exclude(EPGraph<VD, ED, GD> otherGraph) {
+    return callForGraph(new Exclusion<VD, ED, GD>(), otherGraph);
   }
 
   @Override
-  public EPGraph callForGraph(UnaryGraphToGraphOperator operator) throws
-    Exception {
+  public EPGraph<VD, ED, GD> callForGraph(
+    UnaryGraphToGraphOperator<VD, ED, GD> operator) throws Exception {
     return operator.execute(this);
   }
 
   @Override
-  public EPGraph callForGraph(BinaryGraphToGraphOperator operator,
-    EPGraph otherGraph) {
+  public EPGraph<VD, ED, GD> callForGraph(
+    BinaryGraphToGraphOperator<VD, ED, GD> operator,
+    EPGraph<VD, ED, GD> otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
   @Override
-  public EPGraphCollection callForCollection(
-    UnaryGraphToCollectionOperator operator) {
+  public EPGraphCollection<VD, ED, GD> callForCollection(
+    UnaryGraphToCollectionOperator<VD, ED, GD> operator) {
     return operator.execute(this);
   }
 
   @Override
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {
-    this.getGellyGraph().getVertices()
-      .writeAsFormattedText(vertexFile, new JsonWriter.VertexTextFormatter())
-      .getDataSet().collect();
+    this.getGellyGraph().getVertices().writeAsFormattedText(vertexFile,
+      new JsonWriter.VertexTextFormatter<VD>()).getDataSet().collect();
     this.getGellyGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter())
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>())
       .getDataSet().collect();
     env.fromElements(new Subgraph<>(graphData.getId(), graphData))
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter())
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>())
       .getDataSet().collect();
   }
 
@@ -337,11 +340,11 @@ public class EPGraph implements EPGraphOperators, Identifiable, Attributed,
       String.format("%-10d %s %n", graphData.getId(), graphData.toString()));
     try {
       sb.append(String.format("Vertices:%n"));
-      for (VertexData v : this.getVertices().collect()) {
+      for (VD v : this.getVertices().collect()) {
         sb.append(String.format("%-10d %s %n", v.getId(), v));
       }
       sb.append(String.format("Edges:%n"));
-      for (EdgeData e : this.getEdges().collect()) {
+      for (ED e : this.getEdges().collect()) {
         sb.append(String.format("%-10d %s %n", e.getId(), e));
       }
       sb.append('}');
@@ -351,60 +354,5 @@ public class EPGraph implements EPGraphOperators, Identifiable, Attributed,
     return sb.toString();
   }
 
-  /**
-   * Returns the unique graph identifer.
-   */
-  private static class GraphKeySelector implements
-    KeySelector<Subgraph<Long, GraphData>, Long> {
-    @Override
-    public Long getKey(Subgraph<Long, GraphData> g) throws Exception {
-      return g.f0;
-    }
-  }
 
-  /**
-   * Used for distinction of vertices based on their unique id.
-   */
-  private static class VertexKeySelector implements
-    KeySelector<Vertex<Long, VertexData>, Long> {
-    @Override
-    public Long getKey(
-      Vertex<Long, VertexData> longEPFlinkVertexDataVertex) throws Exception {
-      return longEPFlinkVertexDataVertex.f0;
-    }
-  }
-
-  /**
-   * Used for distinction of edges based on their unique id.
-   */
-  private static class EdgeKeySelector implements
-    KeySelector<Edge<Long, EdgeData>, Long> {
-    @Override
-    public Long getKey(Edge<Long, EdgeData> longEPFlinkEdgeDataEdge) throws
-      Exception {
-      return longEPFlinkEdgeDataEdge.f2.getId();
-    }
-  }
-
-  /**
-   * Used to select the source vertex id of an edge.
-   */
-  private static class EdgeSourceVertexKeySelector implements
-    KeySelector<Edge<Long, EdgeData>, Long> {
-    @Override
-    public Long getKey(Edge<Long, EdgeData> e) throws Exception {
-      return e.getSource();
-    }
-  }
-
-  /**
-   * Used to select the target vertex id of an edge.
-   */
-  private static class EdgeTargetVertexKeySelector implements
-    KeySelector<Edge<Long, EdgeData>, Long> {
-    @Override
-    public Long getKey(Edge<Long, EdgeData> e) throws Exception {
-      return e.getTarget();
-    }
-  }
 }

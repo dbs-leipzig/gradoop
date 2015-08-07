@@ -17,8 +17,12 @@
 
 package org.gradoop.model.operators;
 
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGraphCollection;
 
-public interface UnaryCollectionToCollectionOperator extends Operator {
-  EPGraphCollection execute(EPGraphCollection collection);
+public interface UnaryCollectionToCollectionOperator<VD extends VertexData,
+  ED extends EdgeData, GD extends GraphData> extends Operator {
+  EPGraphCollection<VD, ED, GD> execute(EPGraphCollection<VD, ED, GD> collection);
 }
