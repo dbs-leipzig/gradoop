@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model;
 
 import com.google.common.collect.Lists;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class EPFlinkTest {
-
   protected static final String LABEL_COMMUNITY = "Community";
   protected static final String LABEL_PERSON = "Person";
   protected static final String LABEL_FORUM = "Forum";
@@ -50,10 +48,9 @@ public abstract class EPFlinkTest {
   protected static final String PROPERTY_KEY_SINCE = "since";
   protected static final String PROPERTY_KEY_INTEREST = "interest";
   protected static final String PROPERTY_KEY_VERTEX_COUNT = "vertexCount";
-
+  protected static final String PROPERTY_KEY_VERTEX_BTGID = "vertexbtgid";
   protected ExecutionEnvironment env =
     ExecutionEnvironment.getExecutionEnvironment();
-
   protected EPFlinkVertexData alice;
   protected EPFlinkVertexData bob;
   protected EPFlinkVertexData carol;
@@ -65,7 +62,6 @@ public abstract class EPFlinkTest {
   protected EPFlinkVertexData tagHadoop;
   protected EPFlinkVertexData forumGDBS;
   protected EPFlinkVertexData forumGPS;
-
   protected EPFlinkEdgeData edge0;
   protected EPFlinkEdgeData edge1;
   protected EPFlinkEdgeData edge2;
@@ -93,21 +89,20 @@ public abstract class EPFlinkTest {
 
   /**
    * Creates a social network as a basis for tests.
-   * <p>
+   * <p/>
    * An image of the network can be found in
    * gradoop/dev-support/social-network.pdf
    *
    * @return graph store containing a simple social network for tests.
    */
   protected EPGraphStore createSocialGraph() {
-
     // vertices
-
     // Person:Alice (0L)
     Map<String, Object> properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Alice");
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Leipzig");
+    properties.put(PROPERTY_KEY_VERTEX_BTGID, "1,2,3,4");
     alice = new EPFlinkVertexData(0L, LABEL_PERSON, properties,
       Sets.newHashSet(0L, 2L));
     // Person:Bob (1L)
@@ -115,6 +110,7 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_NAME, "Bob");
     properties.put(PROPERTY_KEY_GENDER, "m");
     properties.put(PROPERTY_KEY_CITY, "Leipzig");
+    properties.put(PROPERTY_KEY_VERTEX_BTGID, "1,2,4");
     bob = new EPFlinkVertexData(1L, LABEL_PERSON, properties,
       Sets.newHashSet(0L, 2L));
     // Person:Carol (2L)
@@ -122,6 +118,7 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_NAME, "Carol");
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
+    properties.put(PROPERTY_KEY_VERTEX_BTGID, "3,4");
     carol = new EPFlinkVertexData(2L, LABEL_PERSON, properties,
       Sets.newHashSet(1L, 2L, 3L));
     // Person:Dave (3L)
@@ -129,6 +126,7 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_NAME, "Dave");
     properties.put(PROPERTY_KEY_GENDER, "m");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
+    properties.put(PROPERTY_KEY_VERTEX_BTGID, "2");
     dave = new EPFlinkVertexData(3L, LABEL_PERSON, properties,
       Sets.newHashSet(1L, 2L, 3L));
     // Person:Eve (4L)
@@ -137,6 +135,7 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_GENDER, "f");
     properties.put(PROPERTY_KEY_CITY, "Dresden");
     properties.put(PROPERTY_KEY_SPEAKS, "English");
+    properties.put(PROPERTY_KEY_VERTEX_BTGID, "2");
     eve =
       new EPFlinkVertexData(4L, LABEL_PERSON, properties, Sets.newHashSet(0L));
     // Person:Frank (5L)
@@ -147,7 +146,6 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_LOC_IP, "127.0.0.1");
     frank =
       new EPFlinkVertexData(5L, LABEL_PERSON, properties, Sets.newHashSet(1L));
-
     // Tag:Databases (6L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Databases");
@@ -160,7 +158,6 @@ public abstract class EPFlinkTest {
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Hadoop");
     tagHadoop = new EPFlinkVertexData(8L, LABEL_TAG, properties);
-
     // Forum:Graph Databases (9L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_TITLE, "Graph Databases");
@@ -170,11 +167,9 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_TITLE, "Graph Processing");
     forumGPS =
       new EPFlinkVertexData(10L, LABEL_FORUM, properties, Sets.newHashSet(3L));
-
     List<EPFlinkVertexData> vertices = Lists
       .newArrayList(alice, bob, carol, dave, eve, frank, tagDatabases,
         tagGraphs, tagHadoop, forumGDBS, forumGPS);
-
     // sna_edges
     List<EPFlinkEdgeData> edges = Lists.newArrayList();
     // Person:Alice-[knows]->Person:Bob (0L)
@@ -296,7 +291,6 @@ public abstract class EPFlinkTest {
       new EPFlinkEdgeData(20L, LABEL_HAS_MEMBER, forumGPS.getId(), dave.getId(),
         Sets.newHashSet(3L));
     edges.add(edge20);
-
     // graphs
     List<EPFlinkGraphData> graphs = Lists.newArrayList();
     // Community {interest: Databases, vertexCount: 3} (0L)
@@ -314,10 +308,8 @@ public abstract class EPFlinkTest {
     properties.put(PROPERTY_KEY_INTEREST, "Graphs");
     properties.put(PROPERTY_KEY_VERTEX_COUNT, 4);
     graphs.add(new EPFlinkGraphData(2L, LABEL_COMMUNITY, properties));
-
     // Forum {} (3L)
     graphs.add(new EPFlinkGraphData(3L, LABEL_FORUM));
-
     return FlinkGraphStore.fromCollection(vertices, edges, graphs, env);
   }
 
