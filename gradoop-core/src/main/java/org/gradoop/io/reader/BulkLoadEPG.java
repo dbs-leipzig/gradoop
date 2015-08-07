@@ -106,7 +106,8 @@
 //   * @throws IOException
 //   * @throws InterruptedException
 //   */
-//  private void addVertexToContext(Context context, VertexData vertexData) throws
+//  private void addVertexToContext(Context context, VertexData vertexData)
+// throws
 //    IOException, InterruptedException {
 //    byte[] vertexID = vertexHandler.getRowKey(vertexData.getId());
 //    ImmutableBytesWritable outKey = new ImmutableBytesWritable(vertexID);

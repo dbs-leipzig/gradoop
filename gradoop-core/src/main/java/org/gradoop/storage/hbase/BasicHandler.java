@@ -57,7 +57,8 @@
 //  @Override
 //  public Put writeLabel(final Put put, final Labeled entity) {
 //    return (entity.getLabel() == null) ? put :
-//      put.add(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
+//      put.add(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel
+// ()));
 //  }
 //
 //  /**
@@ -66,7 +67,8 @@
 //  @Override
 //  public Put writeProperty(final Put put, final String key,
 //    final Object value) {
-//    put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key), encodeValueToBytes(value));
+//    put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key), encodeValueToBytes
+// (value));
 //    return put;
 //  }
 //
@@ -156,7 +158,8 @@
 //   * @param value value as string
 //   * @return decoded object
 //   */
-//  protected Object decodeValueFromString(final byte type, final String value) {
+//  protected Object decodeValueFromString(final byte type, final String
+// value) {
 //    Object o;
 //    switch (type) {
 //    case GConstants.TYPE_BOOLEAN:
@@ -207,10 +210,12 @@
 //        .add(new byte[]{GConstants.TYPE_FLOAT}, Bytes.toBytes((Float) value));
 //    } else if (valueClass.equals(Double.class)) {
 //      decodedValue = Bytes
-//        .add(new byte[]{GConstants.TYPE_DOUBLE}, Bytes.toBytes((Double) value));
+//        .add(new byte[]{GConstants.TYPE_DOUBLE}, Bytes.toBytes((Double)
+// value));
 //    } else if (valueClass.equals(String.class)) {
 //      decodedValue = Bytes
-//        .add(new byte[]{GConstants.TYPE_STRING}, Bytes.toBytes((String) value));
+//        .add(new byte[]{GConstants.TYPE_STRING}, Bytes.toBytes((String)
+// value));
 //    } else {
 //      throw new UnsupportedTypeException(valueClass + " not supported");
 //    }

@@ -17,20 +17,32 @@
 
 package org.gradoop.model.helper;
 
+/**
+ * Constants required by operator implementations in Flink.
+ */
 public class FlinkConstants {
-  public static final String DEFAULT_GRAPH_LABEL = "__GRAPH__";
-
-  public static final String DEFAULT_VERTEX_LABEL = "__VERTEX__";
-
-  public static final String DEFAULT_EDGE_LABEL = "__EDGE__";
-
+  /**
+   * Identifier of the database graph.
+   */
   public static final Long DATABASE_GRAPH_ID = -1L;
 
+  /**
+   * Temporary identifier of a graph created by combine.
+   */
   public static final Long COMBINE_GRAPH_ID = -2L;
 
+  /**
+   * Temporary identifier of a graph created by overlap.
+   */
   public static final Long OVERLAP_GRAPH_ID = -3L;
 
+  /**
+   * Temporary identifier of a graph created by exclude.
+   */
   public static final Long EXCLUDE_GRAPH_ID = -4L;
 
+  /**
+   * Temporary identifier of a graph created by summarize.
+   */
   public static final Long SUMMARIZE_GRAPH_ID = -5L;
 }

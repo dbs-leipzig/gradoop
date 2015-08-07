@@ -75,7 +75,8 @@
 //  @Override
 //  public String writeVertex(VertexData vertexData) {
 //    Node node = graphDb.createNode();
-//    node.setProperty(GConstants.GRADOOP_VERTEX_ID_PROPERTY, vertexData.getId());
+//    node.setProperty(GConstants.GRADOOP_VERTEX_ID_PROPERTY, vertexData
+// .getId());
 //    gradoopIdIndex.add(node, GConstants.GRADOOP_VERTEX_ID_PROPERTY, vertexData
 //      .getId());
 //    node = writeLabels(node, vertexData);
@@ -123,7 +124,8 @@
 //   * @param outEdges outEdges
 //   * @return updated Neo4j node
 //   */
-//  private Node writeNodeRelationships(Node node, Iterable<EdgeData> outEdges) {
+//  private Node writeNodeRelationships(Node node, Iterable<EdgeData>
+// outEdges) {
 //    for (EdgeData edgeData : outEdges) {
 //      Node target = gradoopIdIndex.get(GConstants.GRADOOP_VERTEX_ID_PROPERTY,
 //        edgeData.getOtherID()).getSingle();
@@ -239,7 +241,8 @@
 //   * Shut down helper.
 //   * @param graphDb foo
 //   */
-//  private static void registerShutdownHook(final GraphDatabaseService graphDb) {
+//  private static void registerShutdownHook(final GraphDatabaseService
+// graphDb) {
 //    // Registers a shutdown hook for the Neo4j instance so that it
 //    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
 //    // running application).

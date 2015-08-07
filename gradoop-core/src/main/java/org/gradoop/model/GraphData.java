@@ -20,7 +20,7 @@ package org.gradoop.model;
 import java.util.Set;
 
 /**
- * Describes data assigned to a logical graph in the EPGM.
+ * Describes data specifically assigned to a logical graph in the EPGM.
  */
 public interface GraphData extends Identifiable, Attributed, Labeled {
   /**

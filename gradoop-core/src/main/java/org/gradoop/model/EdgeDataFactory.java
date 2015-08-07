@@ -3,21 +3,26 @@ package org.gradoop.model;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Creates {@link EdgeData} objects of a given type.
+ *
+ * @param <T> edge data type
+ */
 public interface EdgeDataFactory<T extends EdgeData> extends
   EPGMElementFactory<T> {
 
   /**
-   * Creates a default edge based on the given parameters.
+   * Creates edge data based on the given parameters.
    *
    * @param id             unique edge id
    * @param sourceVertexId source vertex id
    * @param targetVertexId target vertex id
-   * @return edge connected to otherID with index
+   * @return edge data
    */
   T createEdgeData(Long id, Long sourceVertexId, Long targetVertexId);
 
   /**
-   * Creates a default edge based on the given parameters.
+   * Creates edge data based on the given parameters.
    *
    * @param id             unique edge id
    * @param sourceVertexId source vertex id
@@ -29,7 +34,7 @@ public interface EdgeDataFactory<T extends EdgeData> extends
     Long targetVertexId);
 
   /**
-   * Creates a default edge based on the given parameters.
+   * Creates edge data based on the given parameters.
    *
    * @param id             unique edge id
    * @param label          edge label
@@ -42,27 +47,27 @@ public interface EdgeDataFactory<T extends EdgeData> extends
     Long targetVertexId, Map<String, Object> properties);
 
   /**
-   * Creates a default edge based on the given parameters.
+   * Creates edge data based on the given parameters.
    *
    * @param id             unique edge id
    * @param label          edge label
    * @param sourceVertexId source vertex id
    * @param targetVertexId target vertex id
-   * @param graphs         graphs, that edge is contained in
+   * @param graphs         graphs, that contain the edge
    * @return edge data
    */
   T createEdgeData(Long id, String label, Long sourceVertexId,
     Long targetVertexId, Set<Long> graphs);
 
   /**
-   * Creates a default edge based on the given parameters.
+   * Creates edge data based on the given parameters.
    *
    * @param id             unique edge id
    * @param label          edge label
    * @param sourceVertexId source vertex id
    * @param targetVertexId target vertex id
    * @param properties     edge properties
-   * @param graphs         graphs, that edge is contained in
+   * @param graphs         graphs, that contain the edge
    * @return edge data
    */
   T createEdgeData(Long id, String label, Long sourceVertexId,

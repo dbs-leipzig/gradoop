@@ -49,7 +49,8 @@
 //   *
 //   * @param label      label of that vertex (can not be {@code null})
 //   * @param properties key-value-map (can be {@code null})
-//   * @param graphs     graphs that vertex belongs to (can be {@code null} and is
+//   * @param graphs     graphs that vertex belongs to (can be {@code null}
+// and is
 //   *                   stores as a set
 //   */
 //  public EPGVertexValueWritable(String label, Map<String, Object> properties,

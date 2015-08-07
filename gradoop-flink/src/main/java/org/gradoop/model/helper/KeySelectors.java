@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.helper;
 
 import org.apache.flink.api.java.functions.KeySelector;
@@ -8,9 +25,12 @@ import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.Subgraph;
 
+/**
+ * Key selectors used in the operator implementations.
+ */
 public class KeySelectors {
   /**
-   * Returns the unique graph identifer.
+   * Returns the unique graph identifier.
    */
   public static class GraphKeySelector<GD extends GraphData> implements
     KeySelector<Subgraph<Long, GD>, Long> {

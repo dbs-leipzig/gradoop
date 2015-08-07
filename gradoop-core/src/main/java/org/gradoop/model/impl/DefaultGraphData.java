@@ -38,6 +38,9 @@ public class DefaultGraphData extends EPGMElement implements GraphData {
    */
   private Set<Long> edges;
 
+  /**
+   * Default constructor.
+   */
   public DefaultGraphData() {
   }
 

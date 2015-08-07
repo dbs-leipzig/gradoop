@@ -24,7 +24,8 @@
 //import org.gradoop.model.VertexData;
 //
 ///**
-// * VertexHandler is responsible for reading and writing EPG vertices from and to
+// * VertexHandler is responsible for reading and writing EPG vertices from
+// and to
 // * HBase.
 // */
 //public interface VertexHandler extends EntityHandler {
@@ -33,7 +34,8 @@
 //   * Creates a globally unique row key based on the given vertexID. The
 //   * created row key is used to persist the vertex in the graph store.
 //   *
-//   * @param vertexID vertexID to create row key from (must not be {@code null}).
+//   * @param vertexID vertexID to create row key from (must not be {@code
+// null}).
 //   * @return persistent vertex identifier
 //   */
 //  byte[] getRowKey(final Long vertexID);
@@ -55,7 +57,8 @@
 //   * @param edges edges to add
 //   * @return put with edges
 //   */
-//  Put writeOutgoingEdges(final Put put, final Iterable<? extends EdgeData> edges);
+//  Put writeOutgoingEdges(final Put put, final Iterable<? extends EdgeData>
+// edges);
 //
 //  /**
 //   * Adds the given incoming edges to the given
@@ -66,7 +69,8 @@
 //   * @param edges edges to add
 //   * @return put with edges
 //   */
-//  Put writeIncomingEdges(final Put put, final Iterable<? extends EdgeData> edges);
+//  Put writeIncomingEdges(final Put put, final Iterable<? extends EdgeData>
+// edges);
 //
 //  /**
 //   * Adds the given graphs information to the given

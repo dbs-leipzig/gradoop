@@ -20,11 +20,28 @@ package org.gradoop.model.operators;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
-import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.LogicalGraph;
 
+/**
+ * Creates a {@link LogicalGraph} based on two input graphs.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ * @see org.gradoop.model.impl.operators.Combination
+ * @see org.gradoop.model.impl.operators.Exclusion
+ * @see org.gradoop.model.impl.operators.Overlap
+ */
 public interface BinaryGraphToGraphOperator<VD extends VertexData, ED extends
   EdgeData, GD extends GraphData> extends
   Operator {
-  EPGraph<VD, ED, GD> execute(EPGraph<VD, ED, GD> firstGraph,
-    EPGraph<VD, ED, GD> secondGraph);
+  /**
+   * Executes the operator.
+   *
+   * @param firstGraph  first input graph
+   * @param secondGraph second input graph
+   * @return operator result
+   */
+  LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> firstGraph,
+    LogicalGraph<VD, ED, GD> secondGraph);
 }

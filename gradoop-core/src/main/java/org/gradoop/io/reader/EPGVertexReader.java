@@ -31,7 +31,8 @@
 //import java.util.regex.Pattern;
 //
 ///**
-// * An example for a {@link org.gradoop.io.reader.VertexLineReader} that reads a
+// * An example for a {@link org.gradoop.io.reader.VertexLineReader} that
+// reads a
 // * vertex input line given in the following format:
 // * <p/>
 // * {@code <vertex-id>|[<label-list>]|<properties>|[<out-edges>]|[<in-edges>]|
@@ -148,7 +149,8 @@
 //  }
 //
 //  /**
-//   * Reads the properties into a map. Uses the property-type to correctly decode
+//   * Reads the properties into a map. Uses the property-type to correctly
+// decode
 //   * the property-value.
 //   *
 //   * @param token string including properties
@@ -181,7 +183,8 @@
 //      final String[] edgeStrings = LIST_TOKEN_SEPARATOR.split(token);
 //      edgeDatas = Lists.newArrayListWithCapacity(edgeStrings.length);
 //      for (String edgeString : edgeStrings) {
-//        int propStartIdx = edgeString.indexOf(VALUE_TOKEN_SEPARATOR.toString());
+//        int propStartIdx = edgeString.indexOf(VALUE_TOKEN_SEPARATOR
+// .toString());
 //        // parse edge key
 //        String edgeKey = edgeString.substring(0, propStartIdx);
 //        String[] edgeKeyTokens = EDGE_KEY_TOKEN_SEPARATOR.split(edgeKey);

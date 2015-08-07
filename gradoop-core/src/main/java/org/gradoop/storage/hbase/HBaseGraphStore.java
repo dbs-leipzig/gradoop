@@ -140,7 +140,8 @@
 //      put = graphHandler.writeGraph(put, graphData);
 //      // write to table
 //      graphsTable.put(put);
-//    } catch (RetriesExhaustedWithDetailsException | InterruptedIOException e) {
+//    } catch (RetriesExhaustedWithDetailsException | InterruptedIOException
+// e) {
 //      e.printStackTrace();
 //    }
 //  }
@@ -242,7 +243,8 @@
 //   * {@inheritDoc}
 //   */
 //  @Override
-//  public Iterator<VertexData> getVertices(String tableName, int cacheSize) throws
+//  public Iterator<VertexData> getVertices(String tableName, int cacheSize)
+// throws
 //    InterruptedException, IOException, ClassNotFoundException {
 //    VertexIterator vertexIterator = null;
 //

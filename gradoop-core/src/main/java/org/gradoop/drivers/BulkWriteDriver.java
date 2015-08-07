@@ -84,10 +84,12 @@
 //    String writerClassName =
 //      cmd.getOptionValue(LoadConfUtils.OPTION_VERTEX_LINE_WRITER);
 //    int hbaseScanCache = Integer
-//      .parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_HBASE_SCAN_CACHE, "0"));
+//      .parseInt(cmd.getOptionValue(LoadConfUtils.OPTION_HBASE_SCAN_CACHE,
+// "0"));
 //    Class<? extends VertexLineWriter> writerClass =
 //      getLineWriterClass(writerClassName);
-//    if (!runBulkWrite(conf, writerClass, outputPath, hbaseScanCache, verbose)) {
+//    if (!runBulkWrite(conf, writerClass, outputPath, hbaseScanCache,
+// verbose)) {
 //      return -1;
 //    }
 //    return 0;
@@ -195,7 +197,8 @@
 //      OPTIONS.addOption(OPTION_HBASE_SCAN_CACHE, "scan-cache", true,
 //        "Number of rows to read from HTable as input for map tasks.");
 //      OPTIONS.addOption(OPTION_VERTEX_LINE_WRITER, "vertex-line-writer", true,
-//        "VertexLineWriter implementation which is used to write a vertex to a" +
+//        "VertexLineWriter implementation which is used to write a vertex to
+// a" +
 //          " single line in the output.");
 //    }
 //  }

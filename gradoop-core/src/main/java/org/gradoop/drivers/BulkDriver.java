@@ -170,10 +170,12 @@
 //      graphsTableName = tablePrefix + GConstants.DEFAULT_TABLE_GRAPHS;
 //    }
 //    if (cmd.hasOption(OPTION_CUSTOM_ARGUMENT)) {
-//      for (String caOptionValue : cmd.getOptionValues(OPTION_CUSTOM_ARGUMENT)) {
+//      for (String caOptionValue : cmd.getOptionValues
+// (OPTION_CUSTOM_ARGUMENT)) {
 //        for (String paramValue : Splitter.on(',').split(caOptionValue)) {
 //          String[] parts =
-//            Iterables.toArray(Splitter.on('=').split(paramValue), String.class);
+//            Iterables.toArray(Splitter.on('=').split(paramValue), String
+// .class);
 //          if (parts.length != 2) {
 //            throw new IllegalArgumentException("Unable to parse custom " +
 //              " argument: " + paramValue);
@@ -203,7 +205,8 @@
 //   */
 //  public static class ConfUtils {
 //    /**
-//     * Maintains accepted options for {@link org.gradoop.drivers.BulkLoadDriver}
+//     * Maintains accepted options for {@link org.gradoop.drivers
+// .BulkLoadDriver}
 //     */
 //    protected static final Options OPTIONS;
 //
@@ -217,12 +220,14 @@
 //      OPTIONS.addOption(OPTION_GRAPH_OUTPUT_PATH, "graph-output-path", true,
 //        "Path to store HFiles in HDFS (used by Bulk Load)");
 //      OPTIONS.addOption(OPTION_TABLE_PREFIX, "table-vertices-prefix",
-//        true, "Custom prefix for vertices table to distinguish different use " +
+//        true, "Custom prefix for vertices table to distinguish different
+// use " +
 //          "cases.");
 //      OPTIONS.addOption(OPTION_CUSTOM_ARGUMENT, "customArguments", true,
 //        "provide custom" +
 //          " arguments for the job configuration in the form:" +
-//          " -ca <param1>=<value1>,<param2>=<value2> -ca <param3>=<value3> etc" +
+//          " -ca <param1>=<value1>,<param2>=<value2> -ca <param3>=<value3>
+// etc" +
 //          "." +
 //          " It can appear multiple times, and the last one has effect" +
 //          " for the same param.");

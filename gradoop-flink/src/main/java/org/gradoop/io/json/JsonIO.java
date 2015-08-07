@@ -31,6 +31,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Base class for Json reader and writer.
+ *
+ * @see JsonReader
+ * @see JsonWriter
+ */
 public abstract class JsonIO {
   /**
    * Key for vertex, edge and graph id.
@@ -74,18 +80,41 @@ public abstract class JsonIO {
    */
   protected abstract static class JsonToEntityMapper {
 
-    // necessary for flink UDF initialization
+    /**
+     * Default constructor.
+     */
     public JsonToEntityMapper() {
     }
 
+    /**
+     * Reads the entity identifier from the json object.
+     *
+     * @param object json object
+     * @return entity identifier
+     * @throws JSONException
+     */
     protected Long getID(JSONObject object) throws JSONException {
       return object.getLong(IDENTIFIER);
     }
 
+    /**
+     * Reads the entity label from the json object.
+     *
+     * @param object json object
+     * @return entity label
+     * @throws JSONException
+     */
     protected String getLabel(JSONObject object) throws JSONException {
       return object.getJSONObject(META).getString(LABEL);
     }
 
+    /**
+     * Reads the key-value properties from the json object.
+     *
+     * @param object json object
+     * @return key-value properties
+     * @throws JSONException
+     */
     protected Map<String, Object> getProperties(JSONObject object) throws
       JSONException {
       Map<String, Object> props =
@@ -100,6 +129,13 @@ public abstract class JsonIO {
       return props;
     }
 
+    /**
+     * Reads a set of graph identifiers from the json object.
+     *
+     * @param object json object
+     * @return graph identifiers
+     * @throws JSONException
+     */
     protected Set<Long> getGraphs(JSONObject object) throws JSONException {
       Set<Long> result;
       if (!object.getJSONObject(META).has(GRAPHS)) {
@@ -111,6 +147,13 @@ public abstract class JsonIO {
       return result;
     }
 
+    /**
+     * Reads a set of Long values from a given json array.
+     *
+     * @param array json array
+     * @return long values
+     * @throws JSONException
+     */
     protected Set<Long> getArrayValues(JSONArray array) throws JSONException {
       Set<Long> result = Sets.newHashSetWithExpectedSize(array.length());
       for (int i = 0; i < array.length(); i++) {
@@ -120,8 +163,18 @@ public abstract class JsonIO {
     }
   }
 
+  /**
+   * Contains methods used by all entity writers (e.g. write meta, data).
+   */
   protected abstract static class EntityToJsonFormatter {
 
+    /**
+     * Writes all key-value properties to a json object and returns it.
+     *
+     * @param entity entity with key-value properties
+     * @return json object containing the properties
+     * @throws JSONException
+     */
     protected JSONObject writeProperties(Attributed entity) throws
       JSONException {
       JSONObject data = new JSONObject();
@@ -133,31 +186,62 @@ public abstract class JsonIO {
       return data;
     }
 
+    /**
+     * Writes all meta data regarding a labeled graph element to a json
+     * object and returns it.
+     *
+     * @param entity labeled graph element (e.g., vertex and edge)
+     * @param <T>    input element type
+     * @return json object containing meta information
+     * @throws JSONException
+     */
     protected <T extends Labeled & GraphElement> JSONObject
     writeGraphElementMeta(
       T entity) throws JSONException {
       JSONObject meta = writeMeta(entity);
       if (entity.getGraphCount() > 0) {
-        meta.put(GRAPHS, getJSONArray(entity.getGraphs()));
+        meta.put(GRAPHS, writeJsonArray(entity.getGraphs()));
       }
       return meta;
     }
 
+    /**
+     * Writes all meta data regarding a logical graph to a json object and
+     * returns it.
+     *
+     * @param entity logical graph data
+     * @param <T>    graph data type
+     * @return json object with graph meta data
+     * @throws JSONException
+     */
     protected <T extends GraphData> JSONObject writeGraphMeta(T entity) throws
       JSONException {
       JSONObject meta = writeMeta(entity);
-      meta.put(VERTICES, getJSONArray(entity.getVertices()));
-      meta.put(EDGES, getJSONArray(entity.getEdges()));
+      meta.put(VERTICES, writeJsonArray(entity.getVertices()));
+      meta.put(EDGES, writeJsonArray(entity.getEdges()));
       return meta;
     }
 
+    /**
+     * Writes meta data (e.g., label) to a json object and returns it.
+     *
+     * @param entity labeled entity
+     * @return json object with meta data containing the label
+     * @throws JSONException
+     */
     private JSONObject writeMeta(Labeled entity) throws JSONException {
       JSONObject meta = new JSONObject();
       meta.put(LABEL, entity.getLabel());
       return meta;
     }
 
-    private JSONArray getJSONArray(final Set<Long> values) {
+    /**
+     * Creates a json array from a given set of identifiers.
+     *
+     * @param values identifier set
+     * @return json array containing the identifiers
+     */
+    private JSONArray writeJsonArray(final Set<Long> values) {
       JSONArray jsonArray = new JSONArray();
       for (Long val : values) {
         jsonArray.put(val);

@@ -37,7 +37,8 @@
 //  private Long otherID;
 //
 //  /**
-//   * The vertex centric index of that edge, which is necessary to allow multiple
+//   * The vertex centric index of that edge, which is necessary to allow
+// multiple
 //   * edges between the same nodes with the same label.
 //   */
 //  private Long index;

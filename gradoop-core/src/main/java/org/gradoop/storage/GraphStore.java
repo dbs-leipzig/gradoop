@@ -72,7 +72,8 @@
 //   * {@code vertexID} does not exist, {@code null} is returned.
 //   *
 //   * @param vertexID vertex id
-//   * @return vertex entity or {@code null} if there is no entity with the given
+//   * @return vertex entity or {@code null} if there is no entity with the
+// given
 //   * {@code vertexID}
 //   */
 //  VertexData readVertex(final Long vertexID);
@@ -83,7 +84,8 @@
 //   * @param tableName HBase table name
 //   * @return all vertices or {@code null} if graph store is empty
 //   */
-//  Iterator<VertexData> getVertices(String tableName) throws InterruptedException,
+//  Iterator<VertexData> getVertices(String tableName) throws
+// InterruptedException,
 //    IOException, ClassNotFoundException;
 //
 //  /**
@@ -108,7 +110,8 @@
 //   * @param tableName HBase table name
 //   * @return row count
 //   */
-//  long getRowCount(String tableName) throws IOException, ClassNotFoundException,
+//  long getRowCount(String tableName) throws IOException,
+// ClassNotFoundException,
 //    InterruptedException;
 //
 //  /**

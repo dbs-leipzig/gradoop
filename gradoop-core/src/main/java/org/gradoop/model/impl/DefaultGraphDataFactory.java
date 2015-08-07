@@ -18,7 +18,6 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.GConstants;
-import org.gradoop.model.GraphData;
 import org.gradoop.model.GraphDataFactory;
 
 import java.io.Serializable;
@@ -26,65 +25,62 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Factory for creating graphs.
+ * Factory for creating graph data.
  */
-public class DefaultGraphDataFactory implements
-  GraphDataFactory<DefaultGraphData>, Serializable {
+public class DefaultGraphDataFactory extends
+  DefaultEPGMElementFactory implements GraphDataFactory<DefaultGraphData>,
+  Serializable {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultGraphData createGraphData(final Long id) {
     return createGraphData(id, GConstants.DEFAULT_GRAPH_LABEL, null, null,
       null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultGraphData createGraphData(final Long id, final String label) {
     return createGraphData(id, label, null, null, null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultGraphData createGraphData(final Long id, final String label,
     Map<String, Object> properties) {
     return createGraphData(id, label, properties, null, null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultGraphData createGraphData(Long id, String label,
     Set<Long> vertices, Set<Long> edges) {
     return createGraphData(id, label, null, vertices, edges);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultGraphData createGraphData(final Long id, final String label,
     final Map<String, Object> properties, final Set<Long> vertices,
     final Set<Long> edges) {
-    checkGraphID(id);
+    checkId(id);
     checkLabel(label);
     return new DefaultGraphData(id, label, properties, vertices, edges);
   }
 
   /**
-   * Checks if the given graphID is valid.
-   *
-   * @param graphID graph identifier
+   * {@inheritDoc}
    */
-  private static void checkGraphID(final Long graphID) {
-    if (graphID == null) {
-      throw new IllegalArgumentException("graphID must not be null");
-    }
-  }
-
-  /**
-   * Checks if {@code label} is valid (not null or empty).
-   *
-   * @param label edge label
-   */
-  private static void checkLabel(String label) {
-    if (label == null || "".equals(label)) {
-      throw new IllegalArgumentException("label must not be null or empty");
-    }
-  }
-
   @Override
   public Class<DefaultGraphData> getType() {
     return DefaultGraphData.class;

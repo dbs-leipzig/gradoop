@@ -25,11 +25,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Factory for creating edges.
+ * Factory for creating default edge data.
  */
-public class DefaultEdgeDataFactory implements EdgeDataFactory<DefaultEdgeData>,
-  Serializable {
+public class DefaultEdgeDataFactory extends DefaultEPGMElementFactory implements
+  EdgeDataFactory<DefaultEdgeData>, Serializable {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultEdgeData createEdgeData(final Long id,
     final Long sourceVertexId, final Long targetVertexId) {
@@ -37,6 +40,9 @@ public class DefaultEdgeDataFactory implements EdgeDataFactory<DefaultEdgeData>,
       targetVertexId);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultEdgeData createEdgeData(final Long id, final String label,
     final Long sourceVertexId, final Long targetVertexId) {
@@ -44,6 +50,9 @@ public class DefaultEdgeDataFactory implements EdgeDataFactory<DefaultEdgeData>,
       null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultEdgeData createEdgeData(Long id, String label,
     Long sourceVertexId, Long targetVertexId, Map<String, Object> properties) {
@@ -51,6 +60,9 @@ public class DefaultEdgeDataFactory implements EdgeDataFactory<DefaultEdgeData>,
       null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultEdgeData createEdgeData(final Long id, final String label,
     final Long sourceVertexId, final Long targetVertexId, Set<Long> graphs) {
@@ -58,41 +70,25 @@ public class DefaultEdgeDataFactory implements EdgeDataFactory<DefaultEdgeData>,
       graphs);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultEdgeData createEdgeData(final Long id, final String label,
     final Long sourceVertexId, final Long targetVertexId,
     final Map<String, Object> properties, Set<Long> graphs) {
-    checkID(id);
+    checkId(id);
     checkLabel(label);
-    checkID(sourceVertexId);
-    checkID(targetVertexId);
+    checkId(sourceVertexId);
+    checkId(targetVertexId);
+
     return new DefaultEdgeData(id, label, sourceVertexId, targetVertexId,
       properties, graphs);
   }
 
   /**
-   * Checks if {@code otherID} is valid.
-   *
-   * @param otherID id of entity that edge points to
+   * {@inheritDoc}
    */
-  private static void checkID(Long otherID) {
-    if (otherID == null) {
-      throw new IllegalArgumentException(
-        "edge-, source-, target-id must not be null");
-    }
-  }
-
-  /**
-   * Checks if {@code label} is valid (not null or empty).
-   *
-   * @param label edge label
-   */
-  private static void checkLabel(String label) {
-    if (label == null || "".equals(label)) {
-      throw new IllegalArgumentException("label must not be null or empty");
-    }
-  }
-
   @Override
   public Class<DefaultEdgeData> getType() {
     return DefaultEdgeData.class;

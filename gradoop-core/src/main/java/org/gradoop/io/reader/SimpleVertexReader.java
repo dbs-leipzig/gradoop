@@ -56,14 +56,16 @@
 //    Long vertexID = Long.valueOf(tokens[0]);
 //
 //    if (tokens.length > 1) {
-//      List<EdgeData> edgeDatas = Lists.newArrayListWithCapacity(tokens.length - 1);
+//      List<EdgeData> edgeDatas = Lists.newArrayListWithCapacity(tokens
+// .length - 1);
 //      for (int i = 1; i < tokens.length; i++) {
 //        Long otherID = Long.valueOf(tokens[i]);
 //        EdgeData e = EdgeFactory.createDefaultEdge(otherID, (long) i - 1);
 //        edgeDatas.add(e);
 //      }
 //      return
-//        VertexFactory.createDefaultVertexWithOutgoingEdges(vertexID, edgeDatas);
+//        VertexFactory.createDefaultVertexWithOutgoingEdges(vertexID,
+// edgeDatas);
 //    } else {
 //      return VertexFactory.createDefaultVertexWithID(vertexID);
 //    }

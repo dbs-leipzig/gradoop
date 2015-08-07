@@ -33,7 +33,7 @@ import org.gradoop.model.impl.Subgraph;
 public class JsonWriter extends JsonIO {
   /**
    * Converts a vertex into the following format:
-   *
+   * <p>
    * {
    * "id":0,
    * "data":{"name":"Alice","gender":"female","age":42},
@@ -44,6 +44,12 @@ public class JsonWriter extends JsonIO {
     EntityToJsonFormatter implements
     TextOutputFormat.TextFormatter<Vertex<Long, VD>> {
 
+    /**
+     * Creates a JSON string representation of a vertex data object.
+     *
+     * @param v vertex data
+     * @return JSON string representation
+     */
     @Override
     public String format(Vertex<Long, VD> v) {
       JSONObject json = new JSONObject();
@@ -60,7 +66,7 @@ public class JsonWriter extends JsonIO {
 
   /**
    * Converts an edge into the following format:
-   *
+   * <p>
    * {
    * "id":0,
    * "source":1,
@@ -73,6 +79,12 @@ public class JsonWriter extends JsonIO {
     EntityToJsonFormatter implements
     TextOutputFormat.TextFormatter<Edge<Long, ED>> {
 
+    /**
+     * Creates a JSON string representation from a given edge data object.
+     *
+     * @param e edge data object
+     * @return JSON string representation
+     */
     @Override
     public String format(Edge<Long, ED> e) {
       JSONObject json = new JSONObject();
@@ -91,7 +103,7 @@ public class JsonWriter extends JsonIO {
 
   /**
    * Converts a graph into the following format:
-   *
+   * <p>
    * {
    * "id":0,
    * "data":{"title":"Graph Community"},
@@ -102,6 +114,12 @@ public class JsonWriter extends JsonIO {
     EntityToJsonFormatter implements
     TextOutputFormat.TextFormatter<Subgraph<Long, GD>> {
 
+    /**
+     * Creates a JSON string representation of a given graph data object.
+     *
+     * @param g graph data object
+     * @return JSON string representation
+     */
     @Override
     public String format(Subgraph<Long, GD> g) {
       JSONObject json = new JSONObject();

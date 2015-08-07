@@ -17,7 +17,20 @@
 
 package org.gradoop.model.helper;
 
+/**
+ * Defines a function with singe input and output. Used e.g. in projection.
+ *
+ * @param <I> input type
+ * @param <O> output type
+ */
 public interface UnaryFunction<I, O> {
 
+  /**
+   * Creates output from given input.
+   *
+   * @param entity some entity
+   * @return some object
+   * @throws Exception
+   */
   O execute(I entity) throws Exception;
 }

@@ -33,6 +33,7 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
+import org.gradoop.GConstants;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.EdgeDataFactory;
 import org.gradoop.model.GraphData;
@@ -41,7 +42,7 @@ import org.gradoop.model.VertexData;
 import org.gradoop.model.VertexDataFactory;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.helper.KeySelectors;
-import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 /**
@@ -82,7 +83,9 @@ import org.gradoop.model.operators.UnaryGraphToGraphOperator;
  * In addition to vertex properties, summarization is also possible on edge
  * properties, vertex- and edge labels as well as combinations of those.
  *
- * @author Martin Junghanns
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
  */
 public abstract class Summarization<VD extends VertexData, ED extends
   EdgeData, GD extends GraphData> implements
@@ -91,23 +94,47 @@ public abstract class Summarization<VD extends VertexData, ED extends
    * Used to represent vertices that do not have the vertex grouping property.
    */
   public static final String NULL_VALUE = "__NULL";
-
+  /**
+   * Property key to store the number of summarized entities in a group.
+   */
   private static final String COUNT_PROPERTY_KEY = "count";
-
+  /**
+   * Creates new graph data objects.
+   */
+  protected GraphDataFactory<GD> graphDataFactory;
+  /**
+   * Creates new vertex data objects.
+   */
+  protected VertexDataFactory<VD> vertexDataFactory;
+  /**
+   * Creates new edge data objects.
+   */
+  protected EdgeDataFactory<ED> edgeDataFactory;
+  /**
+   * Used to summarize vertices.
+   */
   private final String vertexGroupingKey;
-
+  /**
+   * Used to summarize edges.
+   */
   private final String edgeGroupingKey;
-
+  /**
+   * True if vertices shall be summarized using their label.
+   */
   private final boolean useVertexLabels;
-
+  /**
+   * True if edges shall be summarized using their label.
+   */
   private final boolean useEdgeLabels;
 
-  protected GraphDataFactory<GD> graphDataFactory;
-
-  protected VertexDataFactory<VD> vertexDataFactory;
-
-  protected EdgeDataFactory<ED> edgeDataFactory;
-
+  /**
+   * Creates summarization.
+   *
+   * @param vertexGroupingKey property key to summarize vertices
+   * @param edgeGroupingKey   property key to summarize edges
+   * @param useVertexLabels   summarize on vertex label true/false
+   * @param useEdgeLabels     summarize on edge label true/false
+   */
   Summarization(String vertexGroupingKey, String edgeGroupingKey,
     boolean useVertexLabels, boolean useEdgeLabels) {
     this.vertexGroupingKey = vertexGroupingKey;
@@ -116,9 +143,12 @@ public abstract class Summarization<VD extends VertexData, ED extends
     this.useEdgeLabels = useEdgeLabels;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public EPGraph<VD, ED, GD> execute(EPGraph<VD, ED, GD> graph) {
-    EPGraph<VD, ED, GD> result;
+  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
+    LogicalGraph<VD, ED, GD> result;
     Graph<Long, VD, ED> gellyGraph;
 
     vertexDataFactory = graph.getVertexDataFactory();
@@ -130,48 +160,96 @@ public abstract class Summarization<VD extends VertexData, ED extends
       // graphs stays unchanged
       result = graph;
     } else {
-      GD GD = createNewGraphData();
+      GD graphData = createNewGraphData();
       gellyGraph = summarizeInternal(graph.getGellyGraph());
-      result = EPGraph.fromGraph(gellyGraph, GD, graph.getVertexDataFactory(),
-        graph.getEdgeDataFactory(), graph.getGraphDataFactory());
+      result = LogicalGraph
+        .fromGraph(gellyGraph, graphData, graph.getVertexDataFactory(),
+          graph.getEdgeDataFactory(), graph.getGraphDataFactory());
     }
     return result;
   }
 
+  /**
+   * Returns true if the vertex property shall be used for summarization.
+   *
+   * @return true if vertex property shall be used for summarization, false
+   * otherwise
+   */
   protected boolean useVertexProperty() {
     return vertexGroupingKey != null && !"".equals(vertexGroupingKey);
   }
 
+  /**
+   * Vertex property key to use for summarizing vertices.
+   *
+   * @return vertex property key
+   */
   protected String getVertexGroupingKey() {
     return vertexGroupingKey;
   }
 
+  /**
+   * True, if vertex labels shall be used for summarization.
+   *
+   * @return true, if vertex labels shall be used for summarization, false
+   * otherwise
+   */
   protected boolean useVertexLabels() {
     return useVertexLabels;
   }
 
+  /**
+   * Returns true if the edge property shall be used for summarization.
+   *
+   * @return true if edge property shall be used for summarization, false
+   * otherwise
+   */
   protected boolean useEdgeProperty() {
     return edgeGroupingKey != null && !"".equals(edgeGroupingKey);
   }
 
+  /**
+   * Edge property key to use for summarizing edges.
+   *
+   * @return edge property key
+   */
   protected String getEdgeGroupingKey() {
     return edgeGroupingKey;
   }
 
+  /**
+   * True, if edge labels shall be used for summarization.
+   *
+   * @return true, if edge labels shall be used for summarization, false
+   * otherwise
+   */
   protected boolean useEdgeLabels() {
     return useEdgeLabels;
   }
 
+  /**
+   * Groups vertices by vertex grouping key and sorts them by their
+   * identifier ascending.
+   *
+   * @param graph input graph
+   * @return grouped and sorted vertices
+   */
   protected SortedGrouping<Vertex<Long, VD>> groupAndSortVertices(
     Graph<Long, VD, ED> graph) {
     return graph.getVertices()
       // group vertices by the given property
-      .groupBy(new VertexGroupingKeySelector<VD>(getVertexGroupingKey(),
+      .groupBy(new VertexGroupingValueSelector<VD>(getVertexGroupingKey(),
         useVertexLabels()))
         // sort the group (smallest id is group representative)
       .sortGroup(new KeySelectors.VertexKeySelector<VD>(), Order.ASCENDING);
   }
 
+  /**
+   * Constructs new summarized vertices representing a group of vertices.
+   *
+   * @param groupedSortedVertices grouped and sorted vertices
+   * @return summarized vertices
+   */
   protected DataSet<Vertex<Long, VD>> buildSummarizedVertices(
     SortedGrouping<Vertex<Long, VD>> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(
@@ -179,6 +257,12 @@ public abstract class Summarization<VD extends VertexData, ED extends
         vertexDataFactory));
   }
 
+  /**
+   * Groups edges based on the algorithm parameters.
+   *
+   * @param edges input graph edges
+   * @return grouped edges
+   */
   protected UnsortedGrouping<Tuple5<Long, Long, Long, String, String>>
   groupEdges(
     DataSet<Tuple5<Long, Long, Long, String, String>> edges) {
@@ -195,29 +279,57 @@ public abstract class Summarization<VD extends VertexData, ED extends
     return groupedEdges;
   }
 
+  /**
+   * Creates new graph data for the resulting logical graph.
+   *
+   * @return graph data
+   */
   private GD createNewGraphData() {
     return graphDataFactory.createGraphData(FlinkConstants.SUMMARIZE_GRAPH_ID);
   }
 
+  /**
+   * Overridden by concrete implementations.
+   *
+   * @param graph input graph
+   * @return summarized output graph
+   */
   protected abstract Graph<Long, VD, ED> summarizeInternal(
     Graph<Long, VD, ED> graph);
 
   /**
-   * Selects the key to group vertices.
+   * Selects the property value to group vertices. If grouping on property
+   * and label is requested, the selector returns a concatenated string value
+   * build from label and property value.
    */
-  protected static class VertexGroupingKeySelector<VD extends VertexData>
+  protected static class VertexGroupingValueSelector<VD extends VertexData>
     implements
     KeySelector<Vertex<Long, VD>, String> {
 
-    private String groupPropertyKey;
-    private boolean useLabel;
+    /**
+     * Vertex property key
+     */
+    private final String groupPropertyKey;
+    /**
+     * True, if label shall be considered
+     */
+    private final boolean useLabel;
 
-    public VertexGroupingKeySelector(String groupPropertyKey,
+    /**
+     * Creates key selector
+     *
+     * @param groupPropertyKey vertex property key
+     * @param useLabel         use vertex label
+     */
+    public VertexGroupingValueSelector(String groupPropertyKey,
       boolean useLabel) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getKey(Vertex<Long, VD> v) throws Exception {
       String label = v.getValue().getLabel();
@@ -251,10 +363,26 @@ public abstract class Summarization<VD extends VertexData, ED extends
     GroupReduceFunction<Vertex<Long, VD>, Vertex<Long, VD>>,
     ResultTypeQueryable<Vertex<Long, VD>> {
 
+    /**
+     * Vertex data factory
+     */
     private final VertexDataFactory<VD> vertexDataFactory;
-    private String groupPropertyKey;
-    private boolean useLabel;
+    /**
+     * Vertex property key to store group value
+     */
+    private final String groupPropertyKey;
+    /**
+     * True, if label shall be considered
+     */
+    private final boolean useLabel;
 
+    /**
+     * Creates group reducer
+     *
+     * @param groupPropertyKey  vertex property key to store group value
+     * @param useLabel          use vertex label
+     * @param vertexDataFactory vertex data factory
+     */
     public VertexGroupSummarizer(String groupPropertyKey, boolean useLabel,
       VertexDataFactory<VD> vertexDataFactory) {
       this.groupPropertyKey = groupPropertyKey;
@@ -262,6 +390,9 @@ public abstract class Summarization<VD extends VertexData, ED extends
       this.vertexDataFactory = vertexDataFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reduce(Iterable<Vertex<Long, VD>> vertices,
       Collector<Vertex<Long, VD>> collector) throws Exception {
@@ -277,10 +408,10 @@ public abstract class Summarization<VD extends VertexData, ED extends
           newVertexID = v.getId();
           // get label if necessary
           groupLabel = useLabel ? v.getValue().getLabel() :
-            FlinkConstants.DEFAULT_VERTEX_LABEL;
+            GConstants.DEFAULT_VERTEX_LABEL;
           // get group value if necessary
           if (storeGroupProperty()) {
-            groupValue = getGroupProperty(v);
+            groupValue = getGroupProperty(v.getValue());
           }
           initialized = true;
         }
@@ -297,18 +428,34 @@ public abstract class Summarization<VD extends VertexData, ED extends
       collector.collect(new Vertex<>(newVertexID, newVertexData));
     }
 
+    /**
+     * True, if the group property value shall be stored at the summarized
+     * vertex.
+     *
+     * @return true if group value shall be stored, false otherwise
+     */
     private boolean storeGroupProperty() {
       return groupPropertyKey != null && !"".equals(groupPropertyKey);
     }
 
-    private String getGroupProperty(Vertex<Long, VD> v) {
-      if (v.getValue().getProperty(groupPropertyKey) != null) {
-        return v.getValue().getProperty(groupPropertyKey).toString();
+    /**
+     * Returns the group property value or the default value if vertices in
+     * the group do not have the property.
+     *
+     * @param vertexData vertex data object of the summarized vertex
+     * @return vertex group value
+     */
+    private String getGroupProperty(VD vertexData) {
+      if (vertexData.getProperty(groupPropertyKey) != null) {
+        return vertexData.getProperty(groupPropertyKey).toString();
       } else {
         return NULL_VALUE;
       }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public TypeInformation<Vertex<Long, VD>> getProducedType() {
@@ -318,7 +465,7 @@ public abstract class Summarization<VD extends VertexData, ED extends
   }
 
   /**
-   * Creates a summarized edge from a group of edges including a edge
+   * Creates a summarized edge from a group of edges including an edge
    * grouping value.
    */
   protected static class EdgeGroupSummarizer<ED extends EdgeData> implements
@@ -326,10 +473,26 @@ public abstract class Summarization<VD extends VertexData, ED extends
       ED>>,
     ResultTypeQueryable<Edge<Long, ED>> {
 
+    /**
+     * Edge data factory
+     */
     private final EdgeDataFactory<ED> edgeDataFactory;
-    private String groupPropertyKey;
+    /**
+     * Edge property key to store group value
+     */
+    private final String groupPropertyKey;
+    /**
+     * True, if label shall be considered
+     */
     private boolean useLabel;
 
+    /**
+     * Creates group reducer
+     *
+     * @param groupPropertyKey edge property key to store group value
+     * @param useLabel         use edge label
+     * @param edgeDataFactory  edge data factory
+     */
     public EdgeGroupSummarizer(String groupPropertyKey, boolean useLabel,
       EdgeDataFactory<ED> edgeDataFactory) {
       this.groupPropertyKey = groupPropertyKey;
@@ -337,6 +500,9 @@ public abstract class Summarization<VD extends VertexData, ED extends
       this.edgeDataFactory = edgeDataFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reduce(Iterable<Tuple5<Long, Long, Long, String, String>> edges,
       Collector<Edge<Long, ED>> collector) throws Exception {
@@ -346,7 +512,7 @@ public abstract class Summarization<VD extends VertexData, ED extends
       Long newEdgeID = null;
       Long newSourceVertex = null;
       Long newTargetVertex = null;
-      String edgeLabel = FlinkConstants.DEFAULT_EDGE_LABEL;
+      String edgeLabel = GConstants.DEFAULT_EDGE_LABEL;
       String edgeGroupingValue = null;
 
       for (Tuple5<Long, Long, Long, String, String> e : edges) {
@@ -375,10 +541,19 @@ public abstract class Summarization<VD extends VertexData, ED extends
         .collect(new Edge<>(newSourceVertex, newTargetVertex, newEdgeData));
     }
 
+    /**
+     * True, if the group property value shall be stored at the summarized
+     * vertex.
+     *
+     * @return true if group value shall be stored, false otherwise
+     */
     private boolean storeGroupProperty() {
       return groupPropertyKey != null && !"".equals(groupPropertyKey);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public TypeInformation<Edge<Long, ED>> getProducedType() {

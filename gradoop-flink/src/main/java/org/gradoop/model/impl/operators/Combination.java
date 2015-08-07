@@ -26,20 +26,27 @@ import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.helper.KeySelectors;
-import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.LogicalGraph;
 
+/**
+ * Creates a new logical graph by combining the vertex and edge sets of two
+ * input graphs. Vertex and edge equality is based on their
+ * respective identifiers.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ */
 public class Combination<VD extends VertexData, ED extends EdgeData, GD
   extends GraphData> extends
   AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public String getName() {
-    return "Combination";
-  }
-
-  @Override
-  protected EPGraph<VD, ED, GD> executeInternal(EPGraph<VD, ED, GD> firstGraph,
-    EPGraph<VD, ED, GD> secondGraph) {
+  protected LogicalGraph<VD, ED, GD> executeInternal(
+    LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
     final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
 
     Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
@@ -57,10 +64,18 @@ public class Combination<VD extends VertexData, ED extends EdgeData, GD
         .distinct(new KeySelectors.EdgeKeySelector<ED>())
         .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return EPGraph.fromGraph(
+    return LogicalGraph.fromGraph(
       Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
       firstGraph.getGraphDataFactory().createGraphData(newGraphID),
       firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
       firstGraph.getGraphDataFactory());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return "Combination";
   }
 }

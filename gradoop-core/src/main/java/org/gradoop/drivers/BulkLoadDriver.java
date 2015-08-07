@@ -231,7 +231,8 @@
 //      OPTIONS.addOption(OPTION_DROP_TABLES, "drop-tables", false,
 //        "Drop HBase EPG tables if they exist.");
 //      OPTIONS.addOption(OPTION_VERTEX_LINE_READER, "vertex-line-reader", true,
-//        "VertexLineReader implementation which is used to read a single line " +
+//        "VertexLineReader implementation which is used to read a single
+// line " +
 //          "in the input.");
 //    }
 //  }

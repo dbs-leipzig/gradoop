@@ -83,7 +83,8 @@
 //    final HTableDescriptor tableDescriptor) throws IOException {
 //    LOG.info("creating table " + tableDescriptor.getNameAsString());
 //    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
-//    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
+//    tableDescriptor.addFamily(new HColumnDescriptor(GConstants
+// .CF_PROPERTIES));
 //    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_OUT_EDGES));
 //    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_IN_EDGES));
 //    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_GRAPHS));
@@ -274,7 +275,8 @@
 //            propertyValue);
 //        propertyStrings.add(propertyString);
 //      }
-//      result = Joiner.on(PROPERTY_TOKEN_SEPARATOR_STRING).join(propertyStrings);
+//      result = Joiner.on(PROPERTY_TOKEN_SEPARATOR_STRING).join
+// (propertyStrings);
 //    }
 //    return result;
 //  }

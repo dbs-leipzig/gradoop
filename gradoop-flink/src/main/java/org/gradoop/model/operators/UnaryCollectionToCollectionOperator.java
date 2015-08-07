@@ -20,9 +20,23 @@ package org.gradoop.model.operators;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
-import org.gradoop.model.impl.EPGraphCollection;
+import org.gradoop.model.impl.GraphCollection;
 
+/**
+ * Creates a {@link GraphCollection} based on one input collection.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ */
 public interface UnaryCollectionToCollectionOperator<VD extends VertexData,
-  ED extends EdgeData, GD extends GraphData> extends Operator {
-  EPGraphCollection<VD, ED, GD> execute(EPGraphCollection<VD, ED, GD> collection);
+  ED extends EdgeData, GD extends GraphData> extends
+  Operator {
+  /**
+   * Executes the operator.
+   *
+   * @param collection input collection
+   * @return operator result
+   */
+  GraphCollection<VD, ED, GD> execute(GraphCollection<VD, ED, GD> collection);
 }

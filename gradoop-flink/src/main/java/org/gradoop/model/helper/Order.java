@@ -17,6 +17,16 @@
 
 package org.gradoop.model.helper;
 
+/**
+ * Used for sort operations.
+ */
 public enum Order {
-  ASCENDING, DESCENDING
+  /**
+   * Ascending sort order
+   */
+  ASCENDING,
+  /**
+   * Descending sort order
+   */
+  DESCENDING
 }

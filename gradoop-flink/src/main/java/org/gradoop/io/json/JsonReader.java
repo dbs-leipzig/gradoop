@@ -18,11 +18,6 @@
 package org.gradoop.io.json;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.codehaus.jettison.json.JSONException;
@@ -49,9 +44,9 @@ public class JsonReader extends JsonIO {
    * The data document contains all key-value pairs stored at the vertex, the
    * meta document contains the vertex label and an optional list of graph
    * identifiers the vertex is contained in.
-   *
+   * <p>
    * Example:
-   *
+   * <p>
    * {
    * "id":0,
    * "data":{"name":"Alice","gender":"female","age":42},
@@ -62,12 +57,27 @@ public class JsonReader extends JsonIO {
   public static class JsonToVertexMapper<VD extends VertexData> extends
     JsonToEntityMapper implements MapFunction<String, Vertex<Long, VD>> {
 
+    /**
+     * Creates vertex data objects.
+     */
     private final VertexDataFactory<VD> vertexDataFactory;
 
+    /**
+     * Creates map function
+     *
+     * @param vertexDataFactory vertex data factory
+     */
     public JsonToVertexMapper(VertexDataFactory<VD> vertexDataFactory) {
       this.vertexDataFactory = vertexDataFactory;
     }
 
+    /**
+     * Constructs a vertex from a given JSON string representation.
+     *
+     * @param s json string
+     * @return Gelly vertex storing gradoop vertex data
+     * @throws Exception
+     */
     @Override
     public Vertex<Long, VD> map(String s) throws Exception {
       JSONObject jsonVertex = new JSONObject(s);
@@ -88,9 +98,9 @@ public class JsonReader extends JsonIO {
    * The data document contains all key-value pairs stored at the edge, the
    * meta document contains the edge label and an optional list of graph
    * identifiers the edge is contained in.
-   *
+   * <p>
    * Example:
-   *
+   * <p>
    * {
    * "id":0,"start":15,"end":12,
    * "data":{"since":2015},
@@ -100,12 +110,27 @@ public class JsonReader extends JsonIO {
   public static class JsonToEdgeMapper<ED extends EdgeData> extends
     JsonToEntityMapper implements MapFunction<String, Edge<Long, ED>> {
 
+    /**
+     * Edge data factory.
+     */
     private final EdgeDataFactory<ED> edgeDataFactory;
 
+    /**
+     * Creates map function.
+     *
+     * @param edgeDataFactory edge data factory
+     */
     public JsonToEdgeMapper(EdgeDataFactory<ED> edgeDataFactory) {
       this.edgeDataFactory = edgeDataFactory;
     }
 
+    /**
+     * Creates an edge from JSON string representation.
+     *
+     * @param s json string
+     * @return Gelly edge storing gradoop edge data
+     * @throws Exception
+     */
     @Override
     public Edge<Long, ED> map(String s) throws Exception {
       JSONObject jsonEdge = new JSONObject(s);
@@ -121,10 +146,24 @@ public class JsonReader extends JsonIO {
           graphs));
     }
 
+    /**
+     * Reads the source vertex identifier from the json object.
+     *
+     * @param jsonEdge json string representation
+     * @return source vertex identifier
+     * @throws JSONException
+     */
     private Long getSourceVertexID(JSONObject jsonEdge) throws JSONException {
       return jsonEdge.getLong(EDGE_SOURCE);
     }
 
+    /**
+     * Reads the target vertex identifier from the json object.
+     *
+     * @param jsonEdge json string representation
+     * @return target vertex identifier
+     * @throws JSONException
+     */
     private Long getTargetVertexID(JSONObject jsonEdge) throws JSONException {
       return jsonEdge.getLong(EDGE_TARGET);
     }
@@ -136,9 +175,9 @@ public class JsonReader extends JsonIO {
    * The data document contains all key-value pairs stored at the graphs, the
    * meta document contains the graph label and the vertex/edge identifiers
    * of vertices/edges contained in that graph.
-   *
+   * <p>
    * Example:
-   *
+   * <p>
    * {
    * "id":0,
    * "data":{"title":"Graph Databases"},
@@ -148,12 +187,27 @@ public class JsonReader extends JsonIO {
   public static class JsonToGraphMapper<GD extends GraphData> extends
     JsonToEntityMapper implements MapFunction<String, Subgraph<Long, GD>> {
 
+    /**
+     * Creates graph data objects
+     */
     private final GraphDataFactory<GD> graphDataFactory;
 
+    /**
+     * Creates map function
+     *
+     * @param graphDataFactory graph data factory
+     */
     public JsonToGraphMapper(GraphDataFactory<GD> graphDataFactory) {
       this.graphDataFactory = graphDataFactory;
     }
 
+    /**
+     * Creates graph data from JSON string representation.
+     *
+     * @param s json string representation
+     * @return Subgraph storing graph data
+     * @throws Exception
+     */
     @Override
     public Subgraph<Long, GD> map(String s) throws Exception {
       JSONObject jsonGraph = new JSONObject(s);

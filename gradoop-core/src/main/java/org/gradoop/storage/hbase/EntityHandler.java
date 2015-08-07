@@ -28,7 +28,8 @@
 //import java.util.Map;
 //
 ///**
-// * Handles writing and reading label and properties of an EPGM entity, normally
+// * Handles writing and reading label and properties of an EPGM entity,
+// normally
 // * vertices and graphs.
 // */
 //public interface EntityHandler {

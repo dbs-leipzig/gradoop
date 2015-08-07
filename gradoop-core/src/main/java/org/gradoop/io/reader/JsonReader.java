@@ -55,7 +55,8 @@
 //      // vertex properties
 //      Map<String, Object> properties = null;
 //      if (json.has(JsonWriter.PROPERTIES)) {
-//        properties = readProperties(json.getJSONObject(JsonWriter.PROPERTIES));
+//        properties = readProperties(json.getJSONObject(JsonWriter
+// .PROPERTIES));
 //      }
 //      // outgoing edges
 //      Iterable<EdgeData> outgoingEdges = null;
@@ -133,7 +134,8 @@
 //   */
 //  private Iterable<EdgeData> readEdges(final JSONArray edgeArray) throws
 //    JSONException {
-//    List<EdgeData> edgeDatas = Lists.newArrayListWithCapacity(edgeArray.length());
+//    List<EdgeData> edgeDatas = Lists.newArrayListWithCapacity(edgeArray
+// .length());
 //    for (int i = 0; i < edgeArray.length(); i++) {
 //      JSONObject edge = edgeArray.getJSONObject(i);
 //      String label = edge.getString(JsonWriter.EDGE_LABEL);

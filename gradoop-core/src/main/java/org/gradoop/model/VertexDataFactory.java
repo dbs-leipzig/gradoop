@@ -3,51 +3,58 @@ package org.gradoop.model;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Creates {@link VertexData} objects of a given type.
+ *
+ * @param <T> vertex data type
+ */
 public interface VertexDataFactory<T extends VertexData> extends
   EPGMElementFactory<T> {
   /**
-   * Creates a vertex with default label.
+   * Creates vertex data based on the given parameters.
    *
    * @param id vertex identifier
-   * @return vertex with identifier
+   * @return vertex data
    */
   T createVertexData(Long id);
 
   /**
-   * Creates a labelled vertex.
+   * Creates vertex data based on the given parameters.
    *
-   * @param id vertex identifier
-   * @return vertex with identifier and label.
+   * @param id    vertex identifier
+   * @param label vertex label
+   * @return vertex data
    */
   T createVertexData(Long id, String label);
 
   /**
-   * Creates a labelled vertex with properties.
+   * Creates vertex data based on the given parameters.
    *
    * @param id         vertex identifier
    * @param label      vertex labels
    * @param properties vertex properties
-   * @return vertex with identifier, labels and outgoing edges
+   * @return vertex data
    */
   T createVertexData(Long id, String label, Map<String, Object> properties);
 
   /**
-   * Create a labelled vertex with logical graphs.
+   * Creates vertex data based on the given parameters.
    *
    * @param id     vertex identifier
-   * @param graphs graphs that vertex belongs to
-   * @return vertex with identifier and properties and outgoing edges
+   * @param label  vertex label
+   * @param graphs graphs, that contain the vertex
+   * @return vertex data
    */
   T createVertexData(Long id, String label, Set<Long> graphs);
 
   /**
-   * Creates a labelled vertex with properties and graphs.
+   * Creates vertex data based on the given parameters.
    *
    * @param id         vertex identifier
    * @param label      vertex labels
    * @param properties vertex properties
-   * @param graphs     graphs that vertex belongs to
-   * @return vertex
+   * @param graphs     graphs, that contain the vertex
+   * @return vertex data
    */
   T createVertexData(Long id, String label, Map<String, Object> properties,
     Set<Long> graphs);

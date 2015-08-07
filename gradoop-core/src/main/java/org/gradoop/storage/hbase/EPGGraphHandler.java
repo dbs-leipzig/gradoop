@@ -116,7 +116,8 @@
 //    final HTableDescriptor tableDescriptor) throws IOException {
 //    LOG.info("creating table " + tableDescriptor.getNameAsString());
 //    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
-//    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
+//    tableDescriptor.addFamily(new HColumnDescriptor(GConstants
+// .CF_PROPERTIES));
 //    tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_VERTICES));
 //    admin.createTable(tableDescriptor);
 //  }

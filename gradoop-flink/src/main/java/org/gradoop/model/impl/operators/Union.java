@@ -19,41 +19,59 @@ package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.KeySelectors;
-import org.gradoop.model.impl.EPGraphCollection;
 import org.gradoop.model.impl.Subgraph;
 
+/**
+ * Returns a collection with all logical graphs from two input collections.
+ * Graph equality is based on their identifiers.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ */
 public class Union<VD extends VertexData, ED extends EdgeData, GD extends
   GraphData> extends
-  AbstractBinaryCollectionToCollectionOperator<VD, ED, GD> {
+  SetOperator<VD, ED, GD> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected EPGraphCollection<VD, ED, GD> executeInternal(
-    EPGraphCollection<VD, ED, GD> firstCollection,
-    EPGraphCollection<VD, ED, GD> secondGraphCollection) {
-    DataSet<Subgraph<Long, GD>> newSubgraphs =
-      firstSubgraphs.union(secondSubgraphs)
-        .distinct(new KeySelectors.GraphKeySelector<GD>());
-    DataSet<Vertex<Long, VD>> vertices =
-      firstGraph.getVertices().union(secondGraph.getVertices())
-        .distinct(new KeySelectors.VertexKeySelector<VD>());
-    DataSet<Edge<Long, ED>> edges =
-      firstGraph.getEdges().union(secondGraph.getEdges())
-        .distinct(new KeySelectors.EdgeKeySelector<ED>());
-
-    return new EPGraphCollection<>(Graph.fromDataSet(vertices, edges, env),
-      newSubgraphs, firstCollection.getVertexDataFactory(),
-      firstCollection.getEdgeDataFactory(),
-      firstCollection.getGraphDataFactory(), env);
+  protected DataSet<Vertex<Long, VD>> computeNewVertices(
+    DataSet<Subgraph<Long, GD>> newSubgraphs) throws Exception {
+    return firstGraph.getVertices().union(secondGraph.getVertices())
+      .distinct(new KeySelectors.VertexKeySelector<VD>());
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected DataSet<Subgraph<Long, GD>> computeNewSubgraphs() {
+    return firstSubgraphs.union(secondSubgraphs)
+      .distinct(new KeySelectors.GraphKeySelector<GD>());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected DataSet<Edge<Long, ED>> computeNewEdges(
+    DataSet<Vertex<Long, VD>> newVertices) {
+    return firstGraph.getEdges().union(secondGraph.getEdges())
+      .distinct(new KeySelectors.EdgeKeySelector<ED>());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
-    return "Union";
+    return Union.class.getName();
   }
 }

@@ -29,7 +29,8 @@
 //import java.io.IOException;
 //
 ///**
-// * Manages {@link org.gradoop.storage.GraphStore} instances which can be used to
+// * Manages {@link org.gradoop.storage.GraphStore} instances which can be
+// used to
 // * store an EPG instance in HBase.
 // */
 //public class HBaseGraphStoreFactory {

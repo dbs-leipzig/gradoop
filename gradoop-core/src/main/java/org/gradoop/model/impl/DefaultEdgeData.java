@@ -23,14 +23,24 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Transient representation of edge data.
+ * Default transient representation of edge data that is a POJO and can thus be
+ * used with Apache Flink.
  */
 public class DefaultEdgeData extends EPGMGraphElement implements EdgeData {
 
+  /**
+   * Vertex identifier of the source vertex.
+   */
   private Long sourceVertexId;
 
+  /**
+   * Vertex identifier of the target vertex.
+   */
   private Long targetVertexId;
 
+  /**
+   * Default constructor is necessary to apply to POJO rules.
+   */
   public DefaultEdgeData() {
   }
 
@@ -52,26 +62,41 @@ public class DefaultEdgeData extends EPGMGraphElement implements EdgeData {
     this.targetVertexId = targetVertexId;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Long getSourceVertexId() {
     return sourceVertexId;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void setSourceVertexId(Long sourceVertexId) {
     this.sourceVertexId = sourceVertexId;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Long getTargetVertexId() {
     return targetVertexId;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void setTargetVertexId(Long targetVertexId) {
     this.targetVertexId = targetVertexId;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString() {
     return "DefaultEdgeData{" +

@@ -27,63 +27,60 @@ import java.util.Set;
 /**
  * Factory for creating vertices.
  */
-public class DefaultVertexDataFactory implements
-  VertexDataFactory<DefaultVertexData>, Serializable {
+public class DefaultVertexDataFactory extends
+  DefaultEPGMElementFactory implements VertexDataFactory<DefaultVertexData>,
+  Serializable {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultVertexData createVertexData(final Long vertexID) {
     return createVertexData(vertexID, GConstants.DEFAULT_VERTEX_LABEL, null,
       null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultVertexData createVertexData(final Long vertexID,
     final String label) {
     return createVertexData(vertexID, label, null, null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultVertexData createVertexData(final Long vertexID,
     final String label, Map<String, Object> properties) {
     return createVertexData(vertexID, label, properties, null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultVertexData createVertexData(final Long vertexID,
     final String label, final Set<Long> graphs) {
     return createVertexData(vertexID, label, null, graphs);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DefaultVertexData createVertexData(final Long id, final String label,
     final Map<String, Object> properties, final Set<Long> graphs) {
-    checkVertexID(id);
+    checkId(id);
     checkLabel(label);
     return new DefaultVertexData(id, label, properties, graphs);
   }
 
   /**
-   * Checks if the given vertexID is valid.
-   *
-   * @param vertexID vertex identifier
+   * {@inheritDoc}
    */
-  private void checkVertexID(final Long vertexID) {
-    if (vertexID == null) {
-      throw new IllegalArgumentException("vertexID must not be null");
-    }
-  }
-
-  /**
-   * Checks if {@code label} is valid (not null or empty).
-   *
-   * @param label edge label
-   */
-  private static void checkLabel(String label) {
-    if (label == null || "".equals(label)) {
-      throw new IllegalArgumentException("label must not be null or empty");
-    }
-  }
-
   @Override
   public Class<DefaultVertexData> getType() {
     return DefaultVertexData.class;

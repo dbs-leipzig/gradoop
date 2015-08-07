@@ -25,26 +25,44 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
-import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 
 import java.util.Iterator;
 
+/**
+ * Abstract operator implementation which can be used with binary graph to
+ * graph operators.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ */
 public abstract class AbstractBinaryGraphToGraphOperator<VD extends
   VertexData, ED extends EdgeData, GD extends GraphData> implements
   BinaryGraphToGraphOperator<VD, ED, GD> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public EPGraph<VD, ED, GD> execute(EPGraph<VD, ED, GD> firstGraph,
-    EPGraph<VD, ED, GD> secondGraph) {
+  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> firstGraph,
+    LogicalGraph<VD, ED, GD> secondGraph) {
     return executeInternal(firstGraph, secondGraph);
   }
 
-  protected abstract EPGraph<VD, ED, GD> executeInternal(
-    EPGraph<VD, ED, GD> firstGraph, EPGraph<VD, ED, GD> secondGraph);
+  /**
+   * Executes the actual operator implementation.
+   *
+   * @param firstGraph  first input graph
+   * @param secondGraph second input graph
+   * @return operator result
+   */
+  protected abstract LogicalGraph<VD, ED, GD> executeInternal(
+    LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph);
 
   /**
-   * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
+   * Used for {@link Overlap} and {@link Exclusion}.
    * <p>
    * Checks if the number of grouped, duplicate vertices is equal to a
    * given amount. If yes, reducer returns the vertex.
@@ -58,24 +76,37 @@ public abstract class AbstractBinaryGraphToGraphOperator<VD extends
     GroupReduceFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
 
     /**
-     * number of times a vertex must occur inside a group
+     * Number of times, a vertex must occur inside a group
      */
     private long amount;
 
     /**
-     * graph, a vertex must be part of
+     * Graph, a vertex must be part of
      */
     private Long includedGraphID;
 
     /**
-     * graph, a vertex must not be part of
+     * Graph, a vertex must not be part of
      */
     private Long precludedGraphID;
 
+    /**
+     * Creates group reducer.
+     *
+     * @param amount number of times, a vertex must occur inside a group
+     */
     public VertexGroupReducer(long amount) {
       this(amount, null, null);
     }
 
+    /**
+     * Creates group reducer
+     *
+     * @param amount           number of number of times, a vertex must occur
+     *                         inside a group
+     * @param includedGraphID  graph, a vertex must be part of
+     * @param precludedGraphID graph, a vertex must not be part of
+     */
     public VertexGroupReducer(long amount, Long includedGraphID,
       Long precludedGraphID) {
       this.amount = amount;
@@ -83,6 +114,9 @@ public abstract class AbstractBinaryGraphToGraphOperator<VD extends
       this.precludedGraphID = precludedGraphID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reduce(Iterable<Vertex<Long, VD>> iterable,
       Collector<Vertex<Long, VD>> collector) throws Exception {
@@ -108,20 +142,32 @@ public abstract class AbstractBinaryGraphToGraphOperator<VD extends
   }
 
   /**
-   * Used for {@code EPGraph.overlap()} and {@code EPGraph.exclude()}
+   * Used for {@link Overlap} and {@link Exclusion}.
    * <p>
    * Used to check if the number of grouped, duplicate edges is equal to a
-   * given amount. If yes, reducer returns the vertex.
+   * given amount. If yes, reducer returns the edge.
    */
   protected static class EdgeGroupReducer<ED extends EdgeData> implements
     GroupReduceFunction<Edge<Long, ED>, Edge<Long, ED>> {
 
-    private long amount;
+    /**
+     * Number of group elements that must be reached.
+     */
+    private final long amount;
 
+    /**
+     * Creates group reducer.
+     *
+     * @param amount number of group elements that must be reached to collect
+     *               the vertex
+     */
     public EdgeGroupReducer(long amount) {
       this.amount = amount;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reduce(Iterable<Edge<Long, ED>> iterable,
       Collector<Edge<Long, ED>> collector) throws Exception {
@@ -140,16 +186,29 @@ public abstract class AbstractBinaryGraphToGraphOperator<VD extends
 
   /**
    * Adds a given graph ID to the vertex and returns it.
+   *
+   * @param <VD> vertex data type
    */
   protected static class VertexToGraphUpdater<VD extends VertexData> implements
     MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
 
+    /**
+     * Graph identifier to add.
+     */
     private final long newGraphID;
 
+    /**
+     * Creates map function
+     *
+     * @param newGraphID graph identifier to add to the vertex
+     */
     public VertexToGraphUpdater(final long newGraphID) {
       this.newGraphID = newGraphID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Vertex<Long, VD> map(Vertex<Long, VD> v) throws Exception {
       v.getValue().addGraph(newGraphID);
@@ -159,16 +218,29 @@ public abstract class AbstractBinaryGraphToGraphOperator<VD extends
 
   /**
    * Adds a given graph ID to the edge and returns it.
+   *
+   * @param <ED> edge data type
    */
   protected static class EdgeToGraphUpdater<ED extends EdgeData> implements
     MapFunction<Edge<Long, ED>, Edge<Long, ED>> {
 
+    /**
+     * Graph identifier to add.
+     */
     private final long newGraphID;
 
+    /**
+     * Creates map function
+     *
+     * @param newGraphID graph identifier to add
+     */
     public EdgeToGraphUpdater(final long newGraphID) {
       this.newGraphID = newGraphID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Edge<Long, ED> map(Edge<Long, ED> e) throws Exception {
       e.getValue().addGraph(newGraphID);
