@@ -7,7 +7,7 @@
     <parent>
         <artifactId>gradoop</artifactId>
         <groupId>de.uni-leipzig.de.dbs</groupId>
-        <version>0.0.2</version>
+        <version>0.0.3</version>
     </parent>
     <artifactId>gradoop-flink</artifactId>
     <packaging>jar</packaging>

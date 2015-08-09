@@ -499,6 +499,7 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {

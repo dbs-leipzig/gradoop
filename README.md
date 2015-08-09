@@ -9,17 +9,17 @@ the flexible, declarative definition of graph analytical workflows.
 
 ```java
 // load social network from hdfs
-EPGraph db = FlinkGraphStore.fromJsonFile(...).getDatabaseGraph();
+LogicalGraph db = EPGMDatabase.fromJsonFile("hdfs://...").getDatabaseGraph();
 // detect communities
-EPGraphCollection communities = db.callForCollection(new LabelPropagation(...));
+GraphCollection communities = db.callForCollection(new LabelPropagation(...));
 // filter large communities
-EPGraphCollection communities = communities.select((EPGraph g) -> g.vertexCount() > 100);
+GraphCollection communities = communities.select((LogicalGraph g) -> g.vertexCount() > 100);
 // combine them to a single graph
-EPGraph relevantSubgraph = communities.reduce((EPGraph g1, EPGraph g2) -> g1.combine(g2));
+LogicalGraph relevantSubgraph = communities.reduce((LogicalGraph g1, LogicalGraph g2) -> g1.combine(g2));
 // summarize the network based on the city users live in
-EPGraph summarizedGraph = relevantSubgraph.summarize("city");
+LogicalGraph summarizedGraph = relevantSubgraph.summarize("city");
 // write back to HDFS
-summarizedGraph.writeAsJson(...);
+summarizedGraph.writeAsJson("hdfs://...");
 ```
 
 Gradoop is **work in progress** which means APIs may change. It is currently used
@@ -195,6 +195,14 @@ following line in /etc/hosts
 * And add your hostname to the localhost entry
 
     `127.0.0.1  localhost <your-host-name>`
+
+### Version History
+
+* 0.0.1 first prototype using Hadoop MapReduce and Apache Giraph for operator
+ processing
+* 0.0.2 support for HBase as distributed graph storage
+* 0.0.3 Apache Flink replaces MapReduce and Giraph as operator implementation
+ layer and distributed execution engine
 
 
 

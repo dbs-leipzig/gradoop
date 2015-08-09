@@ -14,7 +14,8 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(JUnitParamsRunner.class)
 public class GraphCollectionGetGraphTest extends FlinkTest {
 
-  private EPGMDatabase graphStore;
+  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    graphStore;
 
   public GraphCollectionGetGraphTest() {
     this.graphStore = createSocialGraph();
@@ -27,9 +28,11 @@ public class GraphCollectionGetGraphTest extends FlinkTest {
   })
   public void testGetGraph(long graphID, String expectedGraphLabel,
     long expectedVertexCount, long expectedEdgeCount) throws Exception {
-    GraphCollection graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
 
-    LogicalGraph g = graphColl.getGraph(graphID);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> g =
+      graphColl.getGraph(graphID);
     assertNotNull("graph was null", g);
     assertEquals("vertex set has the wrong size", expectedVertexCount,
       g.getVertices().size());
@@ -42,10 +45,12 @@ public class GraphCollectionGetGraphTest extends FlinkTest {
   @Parameters({"0 1, 6, 8", "0 3, 6, 8", "0 1 2, 6, 10", "1 3, 4, 7"})
   public void testGetGraphs(String graphIDString, long expectedVertexCount,
     long expectedEdgeCount) throws Exception {
-    GraphCollection graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
 
     List<Long> graphIDs = extractGraphIDs(graphIDString);
-    GraphCollection graphs = graphColl.getGraphs(graphIDs);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphs = graphColl.getGraphs(graphIDs);
 
     assertNotNull("graph collection is null", graphs);
     assertEquals("wrong number of graphs", graphIDs.size(), graphs.size());

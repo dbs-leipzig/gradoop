@@ -7,7 +7,7 @@
     <groupId>de.uni-leipzig.de.dbs</groupId>
     <artifactId>gradoop</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -70,7 +70,6 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>1.10.19</dep.mockito.version>
-        <dep.neo4j.version>2.1.7</dep.neo4j.version>
 
         <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.13</plugin.maven-checkstyle.version>
@@ -198,12 +197,14 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-java</artifactId>
                 <version>${dep.flink.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-clients</artifactId>
                 <version>${dep.flink.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -220,18 +221,12 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- Neo4j -->
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j</artifactId>
-                <version>${dep.neo4j.version}</version>
-            </dependency>
-
             <!-- Others -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- test dependencies -->
