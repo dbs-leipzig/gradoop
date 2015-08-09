@@ -33,7 +33,7 @@
 //
 //    try (Transaction tx = db.beginTx()) {
 //      for (VertexData v : createExtendedGraphVertices()) {
-//        writer.writeVertex(v);
+//        writer.writeVertexData(v);
 //      }
 //      validateNodes(writer);
 //      tx.success();

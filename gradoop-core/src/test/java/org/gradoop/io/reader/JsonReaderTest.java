@@ -18,7 +18,7 @@
 //      Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
 //    VertexLineReader reader = new JsonReader();
 //    for (String line : EXTENDED_GRAPH_JSON) {
-//      vertices.add(reader.readVertex(line));
+//      vertices.add(reader.readVertexData(line));
 //    }
 //    validateExtendedGraphVertices(vertices);
 //  }

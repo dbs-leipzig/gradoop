@@ -23,7 +23,7 @@ import java.util.Set;
  * A graph element is part of a logical graph. An element can be part of more
  * than one logical graph. This applies to vertices and edges in the EPGM.
  */
-public interface GraphElement {
+public interface GraphElement extends Element {
   /**
    * Returns all graphs that element belongs to.
    *

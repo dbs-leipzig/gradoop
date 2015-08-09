@@ -28,6 +28,8 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.io.hbase.HBaseReader;
+import org.gradoop.io.hbase.HBaseWriter;
 import org.gradoop.io.json.JsonReader;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.EdgeData;
@@ -37,6 +39,13 @@ import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.VertexDataFactory;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.storage.EPGMStore;
+import org.gradoop.storage.PersistentEdgeData;
+import org.gradoop.storage.PersistentEdgeDataFactory;
+import org.gradoop.storage.PersistentGraphData;
+import org.gradoop.storage.PersistentGraphDataFactory;
+import org.gradoop.storage.PersistentVertexData;
+import org.gradoop.storage.PersistentVertexDataFactory;
 
 import java.util.Collection;
 
@@ -266,6 +275,46 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
   }
 
   /**
+   * Writes the EPGM database instance to HBase using the given arguments.
+   *
+   * HBase tables must be created before calling this method.
+   *
+   * @param epgmStore                   EPGM store to handle HBase
+   * @param persistentVertexDataFactory persistent vertex data factory
+   * @param persistentEdgeDataFactory   persistent edge data factory
+   * @param persistentGraphDataFactory  persistent graph data factory
+   * @param <PVD>                       persistent vertex data type
+   * @param <PED>                       persistent edge data type
+   * @param <PGD>                       persistent graph data type
+   * @throws Exception
+   */
+  public <PVD extends PersistentVertexData<ED>, PED extends
+    PersistentEdgeData<VD>, PGD extends PersistentGraphData> void writeToHBase(
+    EPGMStore<VD, ED, GD> epgmStore,
+    final PersistentVertexDataFactory<VD, ED, PVD> persistentVertexDataFactory,
+    final PersistentEdgeDataFactory<ED, VD, PED> persistentEdgeDataFactory,
+    final PersistentGraphDataFactory<GD, PGD> persistentGraphDataFactory) throws
+    Exception {
+
+    HBaseWriter<VD, ED, GD> hBaseWriter = new HBaseWriter<>();
+
+    // transform graph data to persistent graph data and write it
+    hBaseWriter.writeGraphData(this, epgmStore.getGraphDataHandler(),
+      persistentGraphDataFactory, epgmStore.getGraphDataTableName());
+    env.execute();
+
+    // transform vertex data to persistent vertex data and write it
+    hBaseWriter.writeVertexData(this, epgmStore.getVertexDataHandler(),
+      persistentVertexDataFactory, epgmStore.getVertexDataTableName());
+    env.execute();
+
+    // transform edge data to persistent edge data and write it
+    hBaseWriter.writeEdgeData(this, epgmStore.getEdgeDataHandler(),
+      persistentEdgeDataFactory, epgmStore.getEdgeDataTableName());
+    env.execute();
+  }
+
+  /**
    * Creates a database from collections of vertex and edge data objects.
    * <p>
    * Uses default factories for POJO creation.
@@ -354,6 +403,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
    * @param <GD>                 graph data type
    * @return EPGM database
    */
+  @SuppressWarnings("unchecked")
   public static <VD extends VertexData, ED extends EdgeData, GD extends
     GraphData> EPGMDatabase fromCollection(
     Collection<VD> vertexDataCollection, Collection<ED> edgeDataCollection,
@@ -381,6 +431,57 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     }
     return new EPGMDatabase<>(vertexDataSet, edgeDataSet, graphDataSet,
       vertexDataFactory, edgeDataFactory, graphDataFactory, env);
+  }
+
+  /**
+   * Creates an EPGM database from an EPGM Store using the given arguments.
+   *
+   * @param epgmStore EPGM store
+   * @param env       Flink execution environment
+   * @param <VD>      vertex data type
+   * @param <ED>      edge data type
+   * @param <GD>      graph data type
+   * @return EPGM database
+   */
+  @SuppressWarnings("unchecked")
+  public static <VD extends VertexData, ED extends EdgeData, GD extends
+    GraphData> EPGMDatabase<VD, ED, GD> fromHBase(
+    EPGMStore<VD, ED, GD> epgmStore, final ExecutionEnvironment env) {
+
+    // used for type hinting when loading vertex data
+    TypeInformation<Vertex<Long, VD>> vertexTypeInfo =
+      new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
+        TypeExtractor.createTypeInfo(
+          epgmStore.getVertexDataHandler().getVertexDataFactory().getType()));
+    // used for type hinting when loading edge data
+    TypeInformation<Edge<Long, ED>> edgeTypeInfo =
+      new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
+        BasicTypeInfo.LONG_TYPE_INFO, TypeExtractor.createTypeInfo(
+          epgmStore.getEdgeDataHandler().getEdgeDataFactory().getType()));
+    // used for type hinting when loading graph data
+    TypeInformation<Subgraph<Long, GD>> graphTypeInfo =
+      new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
+        TypeExtractor.createTypeInfo(
+          epgmStore.getGraphDataHandler().getGraphDataFactory().getType()));
+
+    DataSet<Vertex<Long, VD>> vertexDataSet = env.createInput(
+      new HBaseReader.VertexDataTableInputFormat<>(
+        epgmStore.getVertexDataHandler(), epgmStore.getVertexDataTableName()),
+      vertexTypeInfo);
+
+    DataSet<Edge<Long, ED>> edgeDataSet = env.createInput(
+      new HBaseReader.EdgeDataTableInputFormat<>(epgmStore.getEdgeDataHandler(),
+        epgmStore.getEdgeDataTableName()), edgeTypeInfo);
+
+    DataSet<Subgraph<Long, GD>> subgraphDataSet = env.createInput(
+      new HBaseReader.GraphDataTableInputFormat<>(
+        epgmStore.getGraphDataHandler(), epgmStore.getGraphDataTableName()),
+      graphTypeInfo);
+
+    return new EPGMDatabase<>(vertexDataSet, edgeDataSet, subgraphDataSet,
+      epgmStore.getVertexDataHandler().getVertexDataFactory(),
+      epgmStore.getEdgeDataHandler().getEdgeDataFactory(),
+      epgmStore.getGraphDataHandler().getGraphDataFactory(), env);
   }
 
   /**

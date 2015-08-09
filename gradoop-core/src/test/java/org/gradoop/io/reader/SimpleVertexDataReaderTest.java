@@ -20,7 +20,7 @@
 //    List<VertexData> vertices = Lists.newArrayList();
 //
 //    for (String line : BASIC_GRAPH) {
-//      vertices.add(reader.readVertex(line));
+//      vertices.add(reader.readVertexData(line));
 //    }
 //
 //    validateBasicGraphVertices(vertices);

@@ -26,7 +26,7 @@ import java.util.Set;
  * Default transient representation of edge data that is a POJO and can thus be
  * used with Apache Flink.
  */
-public class DefaultEdgeData extends EPGMGraphElement implements EdgeData {
+public class DefaultEdgeData extends DefaultGraphElement implements EdgeData {
 
   /**
    * Vertex identifier of the source vertex.

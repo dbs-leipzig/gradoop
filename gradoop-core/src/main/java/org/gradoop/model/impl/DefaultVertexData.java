@@ -25,7 +25,8 @@ import java.util.Set;
 /**
  * Transient representation of a vertex.
  */
-public class DefaultVertexData extends EPGMGraphElement implements VertexData {
+public class DefaultVertexData extends DefaultGraphElement implements
+  VertexData {
 
   /**
    * Default constructor.

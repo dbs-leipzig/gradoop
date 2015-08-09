@@ -20,7 +20,6 @@ package org.gradoop.model.impl;
 import org.gradoop.GConstants;
 import org.gradoop.model.EdgeDataFactory;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +27,12 @@ import java.util.Set;
  * Factory for creating default edge data.
  */
 public class DefaultEdgeDataFactory extends DefaultEPGMElementFactory implements
-  EdgeDataFactory<DefaultEdgeData>, Serializable {
+  EdgeDataFactory<DefaultEdgeData> {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
 
   /**
    * {@inheritDoc}

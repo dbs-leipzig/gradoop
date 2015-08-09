@@ -25,7 +25,7 @@
 //    List<VertexData> vertexDataResult =
 //      Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
 //    for (long l = 0L; l < EXTENDED_GRAPH.length; l++) {
-//      vertexDataResult.add(graphStore.readVertex(l));
+//      vertexDataResult.add(graphStore.readVertexData(l));
 //    }
 //    validateExtendedGraphVertices(vertexDataResult);
 //

@@ -214,13 +214,9 @@ public class JsonReader extends JsonIO {
       Long graphID = getID(jsonGraph);
       String label = getLabel(jsonGraph);
       Map<String, Object> properties = getProperties(jsonGraph);
-      Set<Long> vertices =
-        getArrayValues(jsonGraph.getJSONObject(META).getJSONArray(VERTICES));
-      Set<Long> edges =
-        getArrayValues(jsonGraph.getJSONObject(META).getJSONArray(EDGES));
 
-      return new Subgraph<>(graphID, graphDataFactory
-        .createGraphData(graphID, label, properties, vertices, edges));
+      return new Subgraph<>(graphID,
+        graphDataFactory.createGraphData(graphID, label, properties));
     }
   }
 }

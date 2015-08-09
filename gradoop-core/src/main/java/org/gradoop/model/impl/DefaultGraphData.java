@@ -17,26 +17,14 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Sets;
 import org.gradoop.model.GraphData;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Transient representation of a graph.
  */
-public class DefaultGraphData extends EPGMElement implements GraphData {
-
-  /**
-   * Holds vertex identifiers contained in that graph.
-   */
-  private Set<Long> vertices;
-
-  /**
-   * Holds edge identifiers contained in that graph.
-   */
-  private Set<Long> edges;
+public class DefaultGraphData extends DefaultElement implements GraphData {
 
   /**
    * Default constructor.
@@ -50,95 +38,16 @@ public class DefaultGraphData extends EPGMElement implements GraphData {
    * @param id         graph identifier
    * @param label      labels of that graph
    * @param properties key-value-map
-   * @param vertices   vertices contained in that graph
-   * @param edges      edges contains in that graph
    */
   DefaultGraphData(final Long id, final String label,
-    final Map<String, Object> properties, final Set<Long> vertices,
-    final Set<Long> edges) {
+    final Map<String, Object> properties) {
     super(id, label, properties);
-    this.vertices = (vertices != null) ? Sets.newHashSet(vertices) : null;
-    this.edges = (edges != null) ? Sets.newHashSet(edges) : null;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Set<Long> getVertices() {
-    return vertices;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setVertices(Set<Long> vertices) {
-    this.vertices = vertices;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void addVertex(Long vertexID) {
-    if (vertices != null) {
-      vertices.add(vertexID);
-    } else {
-      vertices = Sets.newHashSet(vertexID);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long getVertexCount() {
-    return (vertices != null) ? vertices.size() : 0;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Set<Long> getEdges() {
-    return edges;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setEdges(Set<Long> edges) {
-    this.edges = edges;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void addEdge(Long edgeID) {
-    if (edges != null) {
-      edges.add(edgeID);
-    } else {
-      edges = Sets.newHashSet(edgeID);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long getEdgeCount() {
-    return (edges != null) ? edges.size() : 0;
   }
 
   @Override
   public String toString() {
     return "DefaultGraphData{" +
       super.toString() +
-      ", vertices=" + vertices +
-      ", edges=" + edges +
       '}';
   }
 }

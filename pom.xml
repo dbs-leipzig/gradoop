@@ -213,12 +213,19 @@
                 <version>${dep.flink.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-hbase</artifactId>
+                <version>${dep.flink.version}</version>
+            </dependency>
+
             <!-- HBase -->
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-server</artifactId>
                 <version>${dep.hbase.version}</version>
                 <scope>provided</scope>
+
             </dependency>
 
             <!-- Others -->

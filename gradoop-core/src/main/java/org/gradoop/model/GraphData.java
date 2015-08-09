@@ -17,65 +17,9 @@
 
 package org.gradoop.model;
 
-import java.util.Set;
-
 /**
  * Describes data specifically assigned to a logical graph in the EPGM.
  */
-public interface GraphData extends Identifiable, Attributed, Labeled {
-  /**
-   * Returns all vertex identifiers that are contained in that graph.
-   *
-   * @return vertex ids that are contained in that graph
-   */
-  Set<Long> getVertices();
+public interface GraphData extends Element {
 
-  /**
-   * Sets the vertices that are contained in that graph.
-   *
-   * @param vertices vertex ids
-   */
-  void setVertices(Set<Long> vertices);
-
-  /**
-   * Adds a vertex identifier to the graph data.
-   *
-   * @param vertex vertex id
-   */
-  void addVertex(Long vertex);
-
-  /**
-   * Returns the number of vertices stored in the graph data.
-   *
-   * @return number of vertices
-   */
-  long getVertexCount();
-
-  /**
-   * Returns all edge identifiers that are contained in that graph.
-   *
-   * @return edge ids that are contained in that graph
-   */
-  Set<Long> getEdges();
-
-  /**
-   * Sets the edges that are contained in that graph.
-   *
-   * @param edges edge ids
-   */
-  void setEdges(Set<Long> edges);
-
-  /**
-   * Adds an edge identifier to the graph data.
-   *
-   * @param edge edge id
-   */
-  void addEdge(Long edge);
-
-  /**
-   * Returns the number of edges stored in the graph data.
-   *
-   * @return edge count
-   */
-  long getEdgeCount();
 }

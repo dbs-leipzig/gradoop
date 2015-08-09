@@ -216,10 +216,7 @@ public abstract class JsonIO {
      */
     protected <T extends GraphData> JSONObject writeGraphMeta(T entity) throws
       JSONException {
-      JSONObject meta = writeMeta(entity);
-      meta.put(VERTICES, writeJsonArray(entity.getVertices()));
-      meta.put(EDGES, writeJsonArray(entity.getEdges()));
-      return meta;
+      return writeMeta(entity);
     }
 
     /**

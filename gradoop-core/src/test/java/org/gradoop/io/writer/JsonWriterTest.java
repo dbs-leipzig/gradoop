@@ -16,7 +16,7 @@
 //    VertexLineWriter writer = new JsonWriter();
 //    int i = 0;
 //    for (VertexData v : createExtendedGraphVertices()) {
-//      JSONAssert.assertEquals(EXTENDED_GRAPH_JSON[i], writer.writeVertex(v), false);
+//      JSONAssert.assertEquals(EXTENDED_GRAPH_JSON[i], writer.writeVertexData(v), false);
 //      i++;
 //    }
 //  }

@@ -102,7 +102,7 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
    * Creates a graph collection from the given arguments.
    *
    * @param graph             Flink Gelly graph
-   * @param subgraphs         graph data associatd with logical graphs in that
+   * @param subgraphs         graph data associated with logical graphs in that
    *                          collection
    * @param vertexDataFactory vertex data factory
    * @param edgeDataFactory   edge data factory
@@ -188,6 +188,7 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("unchecked")
   @Override
   public LogicalGraph<VD, ED, GD> getGraph(final Long graphID) throws
     Exception {

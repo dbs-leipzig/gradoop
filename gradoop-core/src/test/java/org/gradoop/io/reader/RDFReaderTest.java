@@ -72,7 +72,7 @@
 //
 //  public void validateDetails(GraphStore graphStore) throws
 //    InterruptedException, IOException, ClassNotFoundException {
-//    Iterator<VertexData> vertices = graphStore.getVertices(GConstants
+//    Iterator<VertexData> vertices = graphStore.getVertexSpace(GConstants
 //      .DEFAULT_TABLE_VERTICES);
 //    while (vertices.hasNext()) {
 //      VertexData v = vertices.next();
@@ -126,7 +126,7 @@
 //    VertexLineReader rdfReader = new RDFReader();
 //    for (String line : RDF_NTRIPLES) {
 //      for (VertexData v : rdfReader.readVertexList(line)) {
-//        graphStore.writeVertex(v);
+//        graphStore.writeVertexData(v);
 //      }
 //    }
 //
@@ -136,10 +136,10 @@
 //  }
 //
 //  private void validateRDFGraph(GraphStore graphStore) {
-//    validateVertex(graphStore.readVertex(lgdID), 0, 1, 0);
-//    validateVertex(graphStore.readVertex(geoID), 0, 0, 2);
-//    validateVertex(graphStore.readVertex(dbpID), 2, 2, 0);
-//    validateVertex(graphStore.readVertex(hedbpID), 0, 0, 1);
+//    validateVertex(graphStore.readVertexData(lgdID), 0, 1, 0);
+//    validateVertex(graphStore.readVertexData(geoID), 0, 0, 2);
+//    validateVertex(graphStore.readVertexData(dbpID), 2, 2, 0);
+//    validateVertex(graphStore.readVertexData(hedbpID), 0, 0, 1);
 //  }
 //
 //  private void validateVertex(VertexData vertexData, int expectedPropertyCount,

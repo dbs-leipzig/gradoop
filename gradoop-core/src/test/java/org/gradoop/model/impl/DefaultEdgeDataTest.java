@@ -1,121 +1,88 @@
-//package org.gradoop.model.impl;
-//
-//import com.google.common.collect.Maps;
-//import org.gradoop.GConstants;
-//import org.gradoop.model.EdgeData;
-//import org.hamcrest.core.Is;
-//import org.junit.Test;
-//
-//import java.util.Map;
-//
-//import static org.hamcrest.core.Is.is;
-//import static org.junit.Assert.*;
-//
-//public class DefaultEdgeDataTest {
-//
-//  @Test
-//  public void createWithOtherIDIndexTest() {
-//    Long otherID = 0L;
-//    Long index = 0L;
-//    EdgeData e = EdgeFactory.createDefaultEdge(otherID, index);
-//    assertThat(e.getOtherID(), is(otherID));
-//    assertThat(e.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
-//    assertThat(e.getIndex(), is(index));
-//  }
-//
-//  @Test
-//  public void createWithOtherIDLabelIndexTest() {
-//    Long otherID = 0L;
-//    String label = "label";
-//    Long index = 0L;
-//    EdgeData e = EdgeFactory.createDefaultEdgeWithLabel(otherID, label, index);
-//    assertThat(e.getOtherID(), is(otherID));
-//    assertThat(e.getLabel(), is(label));
-//    assertThat(e.getIndex(), is(index));
-//  }
-//
-//  @Test
-//  public void createWithOtherIDLabelIndexPropertiesTest() {
-//    Long otherID = 0L;
-//    String label = "label";
-//    Long index = 0L;
-//    Map<String, Object> properties = Maps.newHashMapWithExpectedSize(1);
-//    properties.put("k1", "v1");
-//    EdgeData e = EdgeFactory.createDefaultEdge(otherID, label, index, properties);
-//
-//    assertThat(e.getOtherID(), is(otherID));
-//    assertThat(e.getLabel(), is(label));
-//    assertThat(e.getIndex(), is(index));
-//    assertThat(e.getPropertyCount(), is(1));
-//    assertThat(e.getProperty("k1"), Is.<Object>is("v1"));
-//  }
-//
-//  @Test(expected = IllegalArgumentException.class)
-//  public void createWithMissingOtherIDTest() {
-//    Long index = 0L;
-//    EdgeFactory.createDefaultEdge(null, index);
-//  }
-//
-//  @Test(expected = IllegalArgumentException.class)
-//  public void createWithMissingIndexTest() {
-//    Long otherID = 0L;
-//    EdgeFactory.createDefaultEdge(otherID, null);
-//  }
-//
-//  @Test(expected = IllegalArgumentException.class)
-//  public void createWithMissingLabelTest() {
-//    Long otherID = 0L;
-//    Long index = 0L;
-//    EdgeFactory.createDefaultEdgeWithLabel(otherID, null, index);
-//  }
-//
-//
-//  @Test
-//  public void testEquals() {
-//    EdgeData e1 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 0L);
-//    EdgeData e2 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 0L);
-//    EdgeData e3 = EdgeFactory.createDefaultEdgeWithLabel(1L, "a", 0L);
-//    assertEquals(e1, e2);
-//    assertNotEquals(e1, e3);
-//    assertNotEquals(e2, e3);
-//  }
-//
-//  @Test
-//  public void testCompareTo() {
-//    EdgeData e1 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 0L);
-//    EdgeData e2 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 0L);
-//    EdgeData e3 = EdgeFactory.createDefaultEdgeWithLabel(0L, "a", 1L);
-//    EdgeData e4 = EdgeFactory.createDefaultEdgeWithLabel(0L, "b", 1L);
-//    EdgeData e5 = EdgeFactory.createDefaultEdgeWithLabel(1L, "b", 1L);
-//    EdgeComparator edgeComparator = new EdgeComparator();
-//    assertTrue(edgeComparator.compare(e1, e1) == 0);
-//    assertTrue(edgeComparator.compare(e1, e2) == 0);
-//    assertTrue(edgeComparator.compare(e1, e3) == -1);
-//    assertTrue(edgeComparator.compare(e1, e4) == -1);
-//    assertTrue(edgeComparator.compare(e1, e5) == -1);
-//    assertTrue(edgeComparator.compare(e2, e2) == 0);
-//    assertTrue(edgeComparator.compare(e2, e1) == 0);
-//    assertTrue(edgeComparator.compare(e2, e3) == -1);
-//    assertTrue(edgeComparator.compare(e2, e4) == -1);
-//    assertTrue(edgeComparator.compare(e2, e5) == -1);
-//    assertTrue(edgeComparator.compare(e3, e3) == 0);
-//    assertTrue(edgeComparator.compare(e3, e2) == 1);
-//    assertTrue(edgeComparator.compare(e3, e1) == 1);
-//    assertTrue(edgeComparator.compare(e3, e4) == -1);
-//    assertTrue(edgeComparator.compare(e3, e5) == -1);
-//    assertTrue(edgeComparator.compare(e4, e4) == 0);
-//    assertTrue(edgeComparator.compare(e4, e3) == 1);
-//    assertTrue(edgeComparator.compare(e4, e2) == 1);
-//    assertTrue(edgeComparator.compare(e4, e1) == 1);
-//    assertTrue(edgeComparator.compare(e4, e4) == 0);
-//    assertTrue(edgeComparator.compare(e4, e3) == 1);
-//    assertTrue(edgeComparator.compare(e4, e2) == 1);
-//    assertTrue(edgeComparator.compare(e4, e1) == 1);
-//    assertTrue(edgeComparator.compare(e4, e5) == -1);
-//    assertTrue(edgeComparator.compare(e5, e5) == 0);
-//    assertTrue(edgeComparator.compare(e5, e4) == 1);
-//    assertTrue(edgeComparator.compare(e5, e3) == 1);
-//    assertTrue(edgeComparator.compare(e5, e2) == 1);
-//    assertTrue(edgeComparator.compare(e5, e1) == 1);
-//  }
-//}
+package org.gradoop.model.impl;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.gradoop.GConstants;
+import org.gradoop.model.EdgeData;
+import org.hamcrest.core.Is;
+import org.junit.Test;
+
+import java.util.Map;
+import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.*;
+
+public class DefaultEdgeDataTest {
+
+  @Test
+  public void createWithIDTest() {
+    Long edgeId = 0L;
+    Long sourceId = 23L;
+    Long targetId = 42L;
+    EdgeData e =
+      new DefaultEdgeDataFactory().createEdgeData(edgeId, sourceId, targetId);
+    assertThat(e.getId(), is(edgeId));
+    assertThat(e.getSourceVertexId(), is(sourceId));
+    assertThat(e.getTargetVertexId(), is(targetId));
+    assertThat(e.getPropertyCount(), is(0));
+    assertThat(e.getGraphCount(), is(0));
+  }
+
+  @Test
+  public void createDefaultEdgeDataTest() {
+    Long edgeId = 0L;
+    String label = "A";
+    Long sourceId = 23L;
+    Long targetId = 42L;
+    Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
+    props.put("k1", "v1");
+    props.put("k2", "v2");
+    Set<Long> graphs = Sets.newHashSet(0L, 1L);
+
+    EdgeData edgeData = new DefaultEdgeDataFactory()
+      .createEdgeData(edgeId, label, sourceId, targetId, props, graphs);
+
+    assertThat(edgeData.getId(), is(edgeId));
+    assertEquals(label, edgeData.getLabel());
+    assertThat(edgeData.getSourceVertexId(), is(sourceId));
+    assertThat(edgeData.getTargetVertexId(), is(targetId));
+    assertThat(edgeData.getPropertyCount(), is(2));
+    assertThat(edgeData.getProperty("k1"), Is.<Object>is("v1"));
+    assertThat(edgeData.getProperty("k2"), Is.<Object>is("v2"));
+    assertThat(edgeData.getGraphCount(), is(2));
+    assertTrue(edgeData.getGraphs().contains(0L));
+    assertTrue(edgeData.getGraphs().contains(1L));
+  }
+
+  @Test
+  public void createWithMissingLabelTest() {
+    EdgeData v = new DefaultEdgeDataFactory().createEdgeData(0L, 23L, 42L);
+    assertThat(v.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createWithNullIDTest() {
+    new DefaultEdgeDataFactory().createEdgeData(null, 23L, 42L);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createWithNullSourceIdTest() {
+    new DefaultEdgeDataFactory().createEdgeData(0L, null, 42L);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createWithNullTargetIdTest() {
+    new DefaultEdgeDataFactory().createEdgeData(0L, 23L, null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createWithEmptyLabelTest() {
+    new DefaultEdgeDataFactory().createEdgeData(0L, "", 23L, 42L);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createWithNullLabelTest() {
+    new DefaultEdgeDataFactory().createEdgeData(0L, null, 23L, 42L);
+  }
+}

@@ -20,24 +20,25 @@ package org.gradoop.model.impl;
 import org.gradoop.GConstants;
 import org.gradoop.model.GraphDataFactory;
 
-import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Factory for creating graph data.
  */
 public class DefaultGraphDataFactory extends
-  DefaultEPGMElementFactory implements GraphDataFactory<DefaultGraphData>,
-  Serializable {
+  DefaultEPGMElementFactory implements GraphDataFactory<DefaultGraphData> {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public DefaultGraphData createGraphData(final Long id) {
-    return createGraphData(id, GConstants.DEFAULT_GRAPH_LABEL, null, null,
-      null);
+    return createGraphData(id, GConstants.DEFAULT_GRAPH_LABEL, null);
   }
 
   /**
@@ -45,7 +46,7 @@ public class DefaultGraphDataFactory extends
    */
   @Override
   public DefaultGraphData createGraphData(final Long id, final String label) {
-    return createGraphData(id, label, null, null, null);
+    return createGraphData(id, label, null);
   }
 
   /**
@@ -54,28 +55,9 @@ public class DefaultGraphDataFactory extends
   @Override
   public DefaultGraphData createGraphData(final Long id, final String label,
     Map<String, Object> properties) {
-    return createGraphData(id, label, properties, null, null);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DefaultGraphData createGraphData(Long id, String label,
-    Set<Long> vertices, Set<Long> edges) {
-    return createGraphData(id, label, null, vertices, edges);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DefaultGraphData createGraphData(final Long id, final String label,
-    final Map<String, Object> properties, final Set<Long> vertices,
-    final Set<Long> edges) {
     checkId(id);
     checkLabel(label);
-    return new DefaultGraphData(id, label, properties, vertices, edges);
+    return new DefaultGraphData(id, label, properties);
   }
 
   /**

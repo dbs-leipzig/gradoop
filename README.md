@@ -33,6 +33,11 @@ application-specific subsets from shared sets of vertices and edges, i.e., may
 have common vertices and edges. Additionally, not only vertices and edges but
 also logical graphs have a type label and can have different properties.
 
+Data Model elements (logical graphs, vertices and edges) have a unique identifier
+inside their domain, a single label (e.g., User) and a number of key-value 
+properties (e.g, name = Alice). There is no schema involved, meaning each element
+can have arbitrary number of properties even if they have the same label.
+
 ### Graph operators
 
 The EPGM provides operators for both single graphs as well as collections of 
@@ -76,6 +81,8 @@ The following table contains an overview (GC = GraphCollection, G = Graph).
 
 ### Load data into gradoop
 
+#### JSON
+
 Gradoop supports JSON as input format for vertices, edges and graphs. Besides the 
 unique id, each JSON document stores the properties of the specific entity in an 
 embedded document `data`. Meta information, like the obligatory label, is stored
@@ -85,7 +92,7 @@ contain a mapping to the logical graphs they are contained in.
 Two persons (Alice and Bob) that have three properties each and are contained in 
 two logical graphs (`"graphs":[0,2]`).
 ```
-// content of nodes.json
+// content of hdfs:///input/nodes.json
 {"id":0,"data":{"gender":"f","city":"Leipzig","name":"Alice"},"meta":{"label":"Person","graphs":[0,2]}}
 {"id":1,"data":{"gender":"m","city":"Leipzig","name":"Bob"},"meta":{"label":"Person","graphs":[0,2]}}
 ```
@@ -96,17 +103,48 @@ in logical graphs. Additionally, edge JSON documents store the obligatory source
 target vertex identifier.
 
 ```
-// content of edges.json
+// content of hdfs:///input/edges.json
 {"id":0,"source":0,"target":1,"data":{"since":2014},"meta":{"label":"knows","graphs":[0,2]}}
 ```
 
 Graphs may also have properties and must have a label (e.g., Community).
 
 ```
-// content of graphs.json
+// content of hdfs:///input/graphs.json
 {"id":0,"data":{"interest":"Databases","vertexCount":3},"meta":{"label":"Community"}}
 {"id":1,"data":{"interest":"Hadoop","vertexCount":3},"meta":{"label":"Community"}}
 {"id":2,"data":{"interest":"Graphs","vertexCount":4},"meta":{"label":"Community"}}
+```
+
+#### HBase
+
+Gradoop can read and write an EPGM database from HBase using an EPGM store. The
+current implementation is work in progress, at the moment one can read or write
+the whole database. We are working on reading only data that is needed for the
+analysis (e.g., a collection of specific communities).
+
+The following example shows how to create an EPGM Store and how to write a EPGM
+database to it.
+
+```java
+EPGMDataBase epgmDB = EPGMDatabase.fromJsonFile(...);
+
+// do some fancy analysis ...
+
+EPGMStore epgmStore = HBaseEPGMStore.createOrOpenEPGMStore(vertexDataTable, edgeDataTable, graphDataTable);
+epgmDB.writeToHBase(epgmStore);
+epgmStore.close();
+```
+
+You can now read the database from HBase.
+
+```java
+EPGMStore epgmStore = HBaseEPGMStore.createOrOpenEPGMStore(vertexDataTable, edgeDataTable, graphDataTable);
+EPGMDatabase epgmDB = EPGMDatabase.fromHBase(epgmStore);
+
+// do some fancy analysis ...
+
+epgmStore.close()
 ```
 
 ### Example: Extract schema graph from possibly large-scale graph
@@ -118,8 +156,11 @@ same label (e.g., Person or Group), each edge represents all edges with the same
 label that connect vertices from the same vertex groups.
 
 ```java
-EPGraphStore graphStore = FlinkGraphStore.fromJsonFile(vertexInputPath, edgeInputPath, env);
-EPGraph schemaGraph = graphStore.getDatabaseGraph().summarizeOnVertexAndEdgeLabels();
+String vertexInputPath = "hdfs:///input/nodes.json";
+String edgeInputPath = "hdfs:///input/edges.json";
+String graphInputPath = "hdfs:///input/graphs.json";
+EPGMDatabase db = EPGMDatabase.fromJsonFile(vertexInputPath, edgeInputPath, graphInputPath, env);
+LogicalGraph schemaGraph = db.getDatabaseGraph().summarizeOnVertexAndEdgeLabels();
 schemaGraph.writeAsJson(vertexOutputPath, edgeOutputPath, graphOutputPath);
 ```
 

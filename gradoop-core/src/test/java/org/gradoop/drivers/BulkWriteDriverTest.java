@@ -19,7 +19,7 @@
 //  public void testBulkWriteDriver() throws Exception {
 //    GraphStore store = createEmptyGraphStore();
 //    for (VertexData v : createBasicGraphVertices()) {
-//      store.writeVertex(v);
+//      store.writeVertexData(v);
 //    }
 //    store.close();
 //

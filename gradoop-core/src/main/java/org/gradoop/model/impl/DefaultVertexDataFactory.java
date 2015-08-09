@@ -20,7 +20,6 @@ package org.gradoop.model.impl;
 import org.gradoop.GConstants;
 import org.gradoop.model.VertexDataFactory;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,8 +27,12 @@ import java.util.Set;
  * Factory for creating vertices.
  */
 public class DefaultVertexDataFactory extends
-  DefaultEPGMElementFactory implements VertexDataFactory<DefaultVertexData>,
-  Serializable {
+  DefaultEPGMElementFactory implements VertexDataFactory<DefaultVertexData> {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
 
   /**
    * {@inheritDoc}

@@ -30,7 +30,7 @@
 //    // create store and store some test data
 //    GraphStore store = createEmptyGraphStore();
 //    for (VertexData v : createBasicGraphVertices()) {
-//      store.writeVertex(v);
+//      store.writeVertexData(v);
 //    }
 //    store.close();
 //

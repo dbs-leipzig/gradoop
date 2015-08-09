@@ -1,11 +1,13 @@
 package org.gradoop.model;
 
+import java.io.Serializable;
+
 /**
  * Base interface for all element factories.
  *
  * @param <T> Type of the element object.
  */
-public interface EPGMElementFactory<T> {
+public interface EPGMElementFactory<T> extends Serializable {
   /**
    * Returns the type of the objects, the factory is creating. This is necessary
    * for type hinting in Apache Flink.

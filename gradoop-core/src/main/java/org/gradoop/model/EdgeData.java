@@ -20,8 +20,7 @@ package org.gradoop.model;
 /**
  * Describes data assigned to an edge in the EPGM.
  */
-public interface EdgeData extends Identifiable, Labeled, Attributed,
-  GraphElement {
+public interface EdgeData extends GraphElement {
   /**
    * Returns the source vertex identifier.
    *

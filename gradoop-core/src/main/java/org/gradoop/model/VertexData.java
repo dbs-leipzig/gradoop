@@ -20,6 +20,5 @@ package org.gradoop.model;
 /**
  * Describes data assigned to a vertex in the EPGM.
  */
-public interface VertexData extends Identifiable, Attributed, Labeled,
-  GraphElement {
+public interface VertexData extends GraphElement {
 }

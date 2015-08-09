@@ -15,7 +15,7 @@
 //    List<VertexData> vertices = Lists.newArrayList();
 //
 //    for (String line : EXTENDED_GRAPH) {
-//      vertices.add(vertexLineReader.readVertex(line));
+//      vertices.add(vertexLineReader.readVertexData(line));
 //    }
 //
 //    validateExtendedGraphVertices(vertices);
