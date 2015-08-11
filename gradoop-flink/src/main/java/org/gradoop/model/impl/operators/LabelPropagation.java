@@ -19,23 +19,30 @@ import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import java.io.Serializable;
 
 /**
- * Bla bla blubb
+ * LabelPropagation Graph to Collection Operator
  */
 public class LabelPropagation implements UnaryGraphToCollectionOperator,
   Serializable {
   /**
-   * Maximal Iterations for LabelPropagationAlgorithm
+   * Counter to define maximal Iteration for the Algorithm
    */
   private int maxIterations;
   /**
    * Value PropertyKey
    */
-  private String propertyKey = "muhuhahahah";
+  private String propertyKey = "lpvertex.value";
   /**
    * Flink Execution Environment
    */
   private final ExecutionEnvironment env;
 
+  /**
+   * Constructor
+   *
+   * @param maxIterations Counter to define maximal Iteration for the Algorithm
+   * @param propertyKey   PropertyKey of the EPVertex value
+   * @param env           ExecutionEnvironment
+   */
   public LabelPropagation(int maxIterations, String propertyKey,
     ExecutionEnvironment env) {
     this.maxIterations = maxIterations;
@@ -43,6 +50,9 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     this.env = env;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public EPGraphCollection execute(EPGraph epGraph) throws Exception {
     DataSet<Vertex<Long, LabelPropagationValue>> vertices =
@@ -86,6 +96,9 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     return callByPropertyKey.execute(labeledGraph);
   }
 
+  /**
+   * KeySelector class for LPVertex
+   */
   private static class LPKeySelector implements
     KeySelector<Vertex<Long, LabelPropagationValue>, Long> {
     @Override
@@ -95,6 +108,9 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     }
   }
 
+  /**
+   * KeySelector class for EPVertex
+   */
   private static class VertexKeySelector implements
     KeySelector<Vertex<Long, EPFlinkVertexData>, Long> {
     @Override
@@ -103,6 +119,9 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     }
   }
 
+  /**
+   * JoinFunction over LPVertex id and EPVertex id
+   */
   private static class LPJoin implements
     JoinFunction<Vertex<Long, LabelPropagationValue>, Vertex<Long,
       EPFlinkVertexData>, Vertex<Long, EPFlinkVertexData>> {
@@ -117,6 +136,9 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return "LabelPropagation";
@@ -135,7 +157,8 @@ public class LabelPropagation implements UnaryGraphToCollectionOperator,
     /**
      * Constructor
      *
-     * @param propertyKey propertyKey for the property map
+     * @param propertyKey propertyKey for the p   * @param env ExecutionEnvironment
+roperty map
      */
     public LongFromProperty(String propertyKey) {
       this.propertyKey = propertyKey;

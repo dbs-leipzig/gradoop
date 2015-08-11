@@ -81,6 +81,9 @@ public class LabelPropagationAlgorithm implements
    */
   public static final class LPUpdater extends
     VertexUpdateFunction<Long, LabelPropagationValue, Long> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateVertex(Vertex<Long, LabelPropagationValue> vertex,
       MessageIterator<Long> msg) throws Exception {
@@ -199,6 +202,9 @@ public class LabelPropagationAlgorithm implements
    */
   public static final class LPMessenger extends
     MessagingFunction<Long, LabelPropagationValue, Long, NullValue> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendMessages(Vertex<Long, LabelPropagationValue> vertex) throws
       Exception {
