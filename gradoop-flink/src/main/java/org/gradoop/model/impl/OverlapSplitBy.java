@@ -1,5 +1,6 @@
 package org.gradoop.model.impl;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -16,23 +17,23 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.helper.LongSetFromVertexFunction;
+import org.gradoop.model.helper.LongListFromVertexFunction;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * split an EPGraph into an EPGraphCollection by a self defined mapping from
+ * Split an EPGraph into an EPGraphCollection by a self defined mapping from
  * vertex to long
  */
 public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
   Serializable {
   ExecutionEnvironment env;
-  final LongSetFromVertexFunction function;
+  final LongListFromVertexFunction function;
 
-  public OverlapSplitBy(LongSetFromVertexFunction function,
+  public OverlapSplitBy(LongListFromVertexFunction function,
     ExecutionEnvironment env) {
     this.env = env;
     this.function = function;
@@ -41,6 +42,7 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
   /**
    * execute the operator, split the EPGraph into an EPGraphCollection which
    * graphs can be overlapping
+   *
    * @param epGraph the epGraph that will be split
    * @return a GraphCollection containing the newly created EPGraphs
    */
@@ -60,26 +62,27 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
     DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex =
       graph.getEdges().map(new EdgeSourceTargetMapper());
     //replace the source vertex id by the graph set of this vertex
-    DataSet<Tuple3<Long, Set<Long>, Long>> edgeGraphsVertex =
+    DataSet<Tuple3<Long, List<Long>, Long>> edgeGraphsVertex =
       edgeVertexVertex.join(vertices).where(1).equalTo(0)
         .with(new EdgesSourceGraphSetJoin());
     //replace the target vertex id by the graph set of this vertex
-    DataSet<Tuple3<Long, Set<Long>, Set<Long>>> edgeGraphsGraphs =
+    DataSet<Tuple3<Long, List<Long>, List<Long>>> edgeGraphsGraphs =
       edgeGraphsVertex.join(vertices).where(2).equalTo(0)
         .with(new EdgesTargetGraphSetJoin());
     //transform the new subgraphs into a single set of long, containing all
     // the identifiers
-    DataSet<Set<Long>> newSubgraphIdentifiers =
+    DataSet<List<Long>> newSubgraphIdentifiers =
       newSubgraphs.map(new SubgraphsToLongSetMapper())
         .reduce(new SubgraphLongSetReducer());
     //construct new tuples containing the edge, the graphs of its source and
     //target vertex and the list of new graphs
-    DataSet<Tuple4<Long, Set<Long>, Set<Long>, Set<Long>>> edgesWithSubgraphs =
+    DataSet<Tuple4<Long, List<Long>, List<Long>, List<Long>>>
+      edgesWithSubgraphs =
       edgeGraphsGraphs.crossWithTiny(newSubgraphIdentifiers)
         .with(new CrossEdgeWithSubgraphSet());
     //remove all edges which source and target are not in at least one common
     // graph
-    DataSet<Tuple2<Long, Set<Long>>> subgraphs =
+    DataSet<Tuple2<Long, List<Long>>> subgraphs =
       edgesWithSubgraphs.flatMap(new EdgesInSubgraphsFlatMapper());
     //join the graph set tuples with the edges, add all new graphs to the
     //edge graph sets
@@ -98,16 +101,16 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
   private static class AddNewGraphsToVertexMapper implements
     MapFunction<Vertex<Long, EPFlinkVertexData>, Vertex<Long,
       EPFlinkVertexData>> {
-    private LongSetFromVertexFunction function;
+    private LongListFromVertexFunction function;
 
-    public AddNewGraphsToVertexMapper(LongSetFromVertexFunction function) {
+    public AddNewGraphsToVertexMapper(LongListFromVertexFunction function) {
       this.function = function;
     }
 
     @Override
     public Vertex<Long, EPFlinkVertexData> map(
       Vertex<Long, EPFlinkVertexData> vertex) throws Exception {
-      Set<Long> labelPropIndex = function.extractLongSet(vertex);
+      List<Long> labelPropIndex = function.extractLongList(vertex);
       vertex.getValue().getGraphs().addAll(labelPropIndex);
       return vertex;
     }
@@ -118,16 +121,16 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
    */
   private static class VertexToGraphIDFlatMapper implements
     FlatMapFunction<Vertex<Long, EPFlinkVertexData>, Tuple1<Long>> {
-    LongSetFromVertexFunction function;
+    LongListFromVertexFunction function;
 
-    public VertexToGraphIDFlatMapper(LongSetFromVertexFunction function) {
+    public VertexToGraphIDFlatMapper(LongListFromVertexFunction function) {
       this.function = function;
     }
 
     @Override
     public void flatMap(Vertex<Long, EPFlinkVertexData> vertex,
       Collector<Tuple1<Long>> collector) throws Exception {
-      Set<Long> graphIDSet = function.extractLongSet(vertex);
+      List<Long> graphIDSet = function.extractLongList(vertex);
       for (Long id : graphIDSet) {
         collector.collect(new Tuple1<>(id));
       }
@@ -180,11 +183,13 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
    */
   private static class EdgesSourceGraphSetJoin implements
     JoinFunction<Tuple3<Long, Long, Long>, Vertex<Long, EPFlinkVertexData>,
-      Tuple3<Long, Set<Long>, Long>> {
+      Tuple3<Long, List<Long>, Long>> {
     @Override
-    public Tuple3<Long, Set<Long>, Long> join(Tuple3<Long, Long, Long> tuple3,
+    public Tuple3<Long, List<Long>, Long> join(Tuple3<Long, Long, Long> tuple3,
       Vertex<Long, EPFlinkVertexData> vertex) throws Exception {
-      return new Tuple3<>(tuple3.f0, vertex.getValue().getGraphs(), tuple3.f2);
+      return new Tuple3<>(tuple3.f0,
+        (List<Long>) Lists.newArrayList(vertex.getValue().getGraphs()),
+        tuple3.f2);
     }
   }
 
@@ -192,13 +197,14 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
    * join edge tuples with the graph sets of their targets
    */
   private static class EdgesTargetGraphSetJoin implements
-    JoinFunction<Tuple3<Long, Set<Long>, Long>, Vertex<Long,
-      EPFlinkVertexData>, Tuple3<Long, Set<Long>, Set<Long>>> {
+    JoinFunction<Tuple3<Long, List<Long>, Long>, Vertex<Long,
+      EPFlinkVertexData>, Tuple3<Long, List<Long>, List<Long>>> {
     @Override
-    public Tuple3<Long, Set<Long>, Set<Long>> join(
-      Tuple3<Long, Set<Long>, Long> tuple3,
+    public Tuple3<Long, List<Long>, List<Long>> join(
+      Tuple3<Long, List<Long>, Long> tuple3,
       Vertex<Long, EPFlinkVertexData> vertex) throws Exception {
-      return new Tuple3<>(tuple3.f0, tuple3.f1, vertex.getValue().getGraphs());
+      return new Tuple3<>(tuple3.f0, tuple3.f1,
+        (List<Long>) Lists.newArrayList(vertex.getValue().getGraphs()));
     }
   }
 
@@ -207,11 +213,11 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
    * the subgraph
    */
   private static class SubgraphsToLongSetMapper implements
-    MapFunction<Subgraph<Long, EPFlinkGraphData>, Set<Long>> {
+    MapFunction<Subgraph<Long, EPFlinkGraphData>, List<Long>> {
     @Override
-    public Set<Long> map(Subgraph<Long, EPFlinkGraphData> subgraph) throws
+    public List<Long> map(Subgraph<Long, EPFlinkGraphData> subgraph) throws
       Exception {
-      Set<Long> id = new HashSet<Long>();
+      List<Long> id = new ArrayList<Long>();
       id.add(subgraph.getId());
       return id;
     }
@@ -221,9 +227,10 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
    * reduce a dataset of sets of longs into a single set of longs
    */
   private static class SubgraphLongSetReducer implements
-    ReduceFunction<Set<Long>> {
+    ReduceFunction<List<Long>> {
     @Override
-    public Set<Long> reduce(Set<Long> set1, Set<Long> set2) throws Exception {
+    public List<Long> reduce(List<Long> set1, List<Long> set2) throws
+      Exception {
       set1.addAll(set2);
       return set1;
     }
@@ -233,11 +240,11 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
    * add the set of subgraphs to the edge tuples
    */
   private static class CrossEdgeWithSubgraphSet implements
-    CrossFunction<Tuple3<Long, Set<Long>, Set<Long>>, Set<Long>, Tuple4<Long,
-      Set<Long>, Set<Long>, Set<Long>>> {
+    CrossFunction<Tuple3<Long, List<Long>, List<Long>>, List<Long>,
+      Tuple4<Long, List<Long>, List<Long>, List<Long>>> {
     @Override
-    public Tuple4<Long, Set<Long>, Set<Long>, Set<Long>> cross(
-      Tuple3<Long, Set<Long>, Set<Long>> tuple3, Set<Long> subgraphs) throws
+    public Tuple4<Long, List<Long>, List<Long>, List<Long>> cross(
+      Tuple3<Long, List<Long>, List<Long>> tuple3, List<Long> subgraphs) throws
       Exception {
       return new Tuple4<>(tuple3.f0, tuple3.f1, tuple3.f2, subgraphs);
     }
@@ -245,19 +252,19 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
 
   /**
    * check if the source and target vertices of the edges are in the
-   * same new subgraphs and to update the edges
+   * same new subgraphs and to update the edgesList
    */
   private static class EdgesInSubgraphsFlatMapper implements
-    FlatMapFunction<Tuple4<Long, Set<Long>, Set<Long>, Set<Long>>,
-      Tuple2<Long, Set<Long>>> {
+    FlatMapFunction<Tuple4<Long, List<Long>, List<Long>, List<Long>>,
+      Tuple2<Long, List<Long>>> {
     @Override
-    public void flatMap(Tuple4<Long, Set<Long>, Set<Long>, Set<Long>> tuple4,
-      Collector<Tuple2<Long, Set<Long>>> collector) throws Exception {
-      Set<Long> sourceGraphs = tuple4.f1;
-      Set<Long> targetGraphs = tuple4.f2;
-      Set<Long> newSubgraphs = tuple4.f3;
+    public void flatMap(Tuple4<Long, List<Long>, List<Long>, List<Long>> tuple4,
+      Collector<Tuple2<Long, List<Long>>> collector) throws Exception {
+      List<Long> sourceGraphs = tuple4.f1;
+      List<Long> targetGraphs = tuple4.f2;
+      List<Long> newSubgraphs = tuple4.f3;
       boolean newGraphAdded = false;
-      Set<Long> toBeAddedGraphs = new HashSet<Long>();
+      List<Long> toBeAddedGraphs = new ArrayList<Long>();
       for (Long graph : newSubgraphs) {
         if (targetGraphs.contains(graph) && sourceGraphs.contains(graph)) {
           toBeAddedGraphs.add(graph);
@@ -274,11 +281,11 @@ public class OverlapSplitBy implements UnaryGraphToCollectionOperator,
    * join the edge tuples with the actual edges
    */
   private static class EdgeTuplesWithEdgesJoin implements
-    JoinFunction<Edge<Long, EPFlinkEdgeData>, Tuple2<Long, Set<Long>>,
+    JoinFunction<Edge<Long, EPFlinkEdgeData>, Tuple2<Long, List<Long>>,
       Edge<Long, EPFlinkEdgeData>> {
     @Override
     public Edge<Long, EPFlinkEdgeData> join(Edge<Long, EPFlinkEdgeData> edge,
-      Tuple2<Long, Set<Long>> tuple2) throws Exception {
+      Tuple2<Long, List<Long>> tuple2) throws Exception {
       return edge;
     }
   }

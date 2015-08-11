@@ -33,11 +33,7 @@ public class BTGAlgorithm implements
   }
 
   /**
-   * Graph run function that starts the VertexCentricIteration
-   *
-   * @param graph the actual gelly graph
-   * @return a new gelly graph after BTGComputation
-   * @throws Exception
+   * {@inheritDoc}
    */
   @Override
   public Graph<Long, BTGVertexValue, NullValue> run(
@@ -54,10 +50,13 @@ public class BTGAlgorithm implements
    * Vertex Updater Class
    */
   private static final class BTGUpdater extends
-    VertexUpdateFunction<Long, BTGVertexValue, org.gradoop.model.impl.operators.io.formats.BTGMessage> {
+    VertexUpdateFunction<Long, BTGVertexValue, org.gradoop.model.impl
+      .operators.io.formats.BTGMessage> {
     @Override
     public void updateVertex(Vertex<Long, BTGVertexValue> vertex,
-      MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage> messages) throws Exception {
+      MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage>
+        messages) throws
+      Exception {
       if (vertex.getValue().getVertexType() == BTGVertexType.MASTER) {
         processMasterVertex(vertex, messages);
       } else if (vertex.getValue().getVertexType() ==
@@ -78,10 +77,12 @@ public class BTGAlgorithm implements
      * @param messages All incoming messages
      */
     private void processMasterVertex(Vertex<Long, BTGVertexValue> vertex,
-      MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage> messages) {
+      MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage>
+        messages) {
       BTGVertexValue vertexValue = vertex.getValue();
       if (getSuperstepNumber() > 1) {
-        for (org.gradoop.model.impl.operators.io.formats.BTGMessage message : messages) {
+        for (org.gradoop.model.impl.operators.io.formats.BTGMessage message :
+          messages) {
           vertexValue
             .updateNeighbourBtgID(message.getSenderID(), message.getBtgID());
         }
@@ -100,8 +101,8 @@ public class BTGAlgorithm implements
      * @param vertex   The current vertex
      * @param minValue All incoming messages
      */
-    private void processTransactionalVertex(
-      Vertex<Long, BTGVertexValue> vertex, long minValue) {
+    private void processTransactionalVertex(Vertex<Long, BTGVertexValue> vertex,
+      long minValue) {
       vertex.getValue().removeLastBtgID();
       vertex.getValue().addGraph(minValue);
       setNewVertexValue(vertex.getValue());
@@ -115,11 +116,14 @@ public class BTGAlgorithm implements
      * @param currentMinValue The current minimum value
      * @return The new (maybe unchanged) minimum value
      */
-    private long getNewMinValue(MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage> messages,
+    private long getNewMinValue(
+      MessageIterator<org.gradoop.model.impl.operators.io.formats.BTGMessage>
+        messages,
       long currentMinValue) {
       long newMinValue = currentMinValue;
       if (getSuperstepNumber() > 1) {
-        for (org.gradoop.model.impl.operators.io.formats.BTGMessage message : messages) {
+        for (org.gradoop.model.impl.operators.io.formats.BTGMessage message :
+          messages) {
           if (message.getBtgID() < newMinValue) {
             newMinValue = message.getBtgID();
           }
@@ -147,14 +151,17 @@ public class BTGAlgorithm implements
    * Vertex Message Class
    */
   private static final class BTGMessage extends
-    MessagingFunction<Long, BTGVertexValue, org.gradoop.model.impl.operators.io.formats.BTGMessage, NullValue> {
+    MessagingFunction<Long, BTGVertexValue, org.gradoop.model.impl.operators
+      .io.formats.BTGMessage, NullValue> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendMessages(Vertex<Long, BTGVertexValue> vertex) throws
       Exception {
-      if (vertex.getValue().getVertexType() ==
-        BTGVertexType.TRANSACTIONAL) {
-        org.gradoop.model.impl.operators.io.formats.BTGMessage
-          message = new org.gradoop.model.impl.operators.io.formats.BTGMessage();
+      if (vertex.getValue().getVertexType() == BTGVertexType.TRANSACTIONAL) {
+        org.gradoop.model.impl.operators.io.formats.BTGMessage message =
+          new org.gradoop.model.impl.operators.io.formats.BTGMessage();
         message.setSenderID(vertex.getId());
         if (vertex.getValue().getLastGraph() != null) {
           message.setBtgID(vertex.getValue().getLastGraph());
