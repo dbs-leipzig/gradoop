@@ -1,7 +1,7 @@
 package org.gradoop.model.impl;
 
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.EPFlinkTest;
+import org.gradoop.model.OverlapSplitByGraphTest;
 import org.gradoop.model.helper.LongSetFromVertexFunction;
 import org.gradoop.model.store.EPGraphStore;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class EPGraphOverlapSplitByTest extends EPFlinkTest {
+public class EPGraphOverlapSplitByTest extends OverlapSplitByGraphTest {
   private EPGraphStore graphStore;
 
   public EPGraphOverlapSplitByTest() {
