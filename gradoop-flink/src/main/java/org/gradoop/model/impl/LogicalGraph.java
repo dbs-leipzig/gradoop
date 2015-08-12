@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -39,6 +38,7 @@ import org.gradoop.model.impl.operators.Aggregation;
 import org.gradoop.model.impl.operators.Combination;
 import org.gradoop.model.impl.operators.Exclusion;
 import org.gradoop.model.impl.operators.Overlap;
+import org.gradoop.model.impl.operators.Projection;
 import org.gradoop.model.impl.operators.SummarizationUsingJoin;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.LogicalGraphOperators;
@@ -58,33 +58,27 @@ import java.util.Map;
 public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   extends GraphData> implements
   LogicalGraphOperators<VD, ED, GD>, Identifiable, Attributed, Labeled {
-
   /**
    * Used to create new vertex data.
    */
   private final VertexDataFactory<VD> vertexDataFactory;
-
   /**
    * Used to create new edge data.
    */
   private final EdgeDataFactory<ED> edgeDataFactory;
-
   /**
    * Uses to create new graph data.
    */
   private final GraphDataFactory<GD> graphDataFactory;
-
   /**
    * Flink execution environment.
    */
   private final ExecutionEnvironment env;
-
   /**
    * Flink Gelly graph that holds the vertex and edge datasets associated
    * with that logical graph.
    */
   private final Graph<Long, VD, ED> graph;
-
   /**
    * Graph data associated with that logical graph.
    */
@@ -246,8 +240,8 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
    */
   @Override
   public LogicalGraph<VD, ED, GD> project(UnaryFunction<VD, VD> vertexFunction,
-    UnaryFunction<ED, ED> edgeFunction) {
-    throw new NotImplementedException();
+    UnaryFunction<ED, ED> edgeFunction) throws Exception {
+    return callForGraph(new Projection<VD, ED, GD>(vertexFunction, edgeFunction));
   }
 
   /**

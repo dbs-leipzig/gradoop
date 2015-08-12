@@ -14,10 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.graph.Edge;
+import org.apache.flink.graph.Graph;
+import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
@@ -36,7 +39,6 @@ import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 public class Projection<VD extends VertexData, ED extends EdgeData, GD
   extends GraphData> implements
   UnaryGraphToGraphOperator<VD, ED, GD> {
-
   /**
    * Vertex projection function.
    */
@@ -45,6 +47,24 @@ public class Projection<VD extends VertexData, ED extends EdgeData, GD
    * Edge projection function.
    */
   private final UnaryFunction<ED, ED> edgeFunc;
+
+  /**
+   * Unary function to apply the projection on the vertices
+   *
+   * @return unary vertex to vertex function
+   */
+  protected UnaryFunction<VD, VD> getVertexFunc() {
+    return this.vertexFunc;
+  }
+
+  /**
+   * Unary function to apply the projection on the edges
+   *
+   * @return unary vertex to vertex function
+   */
+  protected UnaryFunction<ED, ED> getEdgeFunc() {
+    return this.edgeFunc;
+  }
 
   /**
    * Creates new projection.
@@ -63,7 +83,77 @@ public class Projection<VD extends VertexData, ED extends EdgeData, GD
    */
   @Override
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
-    throw new NotImplementedException();
+    DataSet<Vertex<Long, VD>> vertices = graph.getGellyGraph().getVertices();
+    vertices = vertices.map(new ProjectionVerticesMapper<>(getVertexFunc(),
+      graph.getVertexDataFactory()));
+    DataSet<Edge<Long, ED>> edges = graph.getGellyGraph().getEdges();
+    edges = edges.map(
+      new ProjectionEdgesMapper<>(getEdgeFunc(), graph.getEdgeDataFactory()));
+    return LogicalGraph.fromGraph(
+      Graph.fromDataSet(vertices, edges, graph.getGellyGraph().getContext()),
+      graph.getGraphDataFactory().createGraphData(graph.getId()),
+      graph.getVertexDataFactory(), graph.getEdgeDataFactory(),
+      graph.getGraphDataFactory());
+  }
+
+  /**
+   * apply the vertex projection to all vertices
+   *
+   * @param <VD> vertex data type
+   */
+  private static class ProjectionVerticesMapper<VD extends VertexData>
+    implements
+    MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
+    /**
+     * Vertex to vertex function
+     */
+    private UnaryFunction<VD, VD> vertexFunc;
+
+    /**
+     * create a new ProjectVerticesMapper
+     *
+     * @param vertexFunc the vertex projection function
+     */
+    public ProjectionVerticesMapper(UnaryFunction<VD, VD> vertexFunc) {
+      this.vertexFunc = vertexFunc;
+    }
+
+    @Override
+    public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
+      return new Vertex<>(vertex.getId(),
+        vertexFunc.execute(vertex.getValue()));
+    }
+  }
+
+  /**
+   * apply the edge projection to all edges
+   *
+   * @param <ED> edge data type
+   */
+  private static class ProjectionEdgesMapper<ED extends EdgeData> implements
+    MapFunction<Edge<Long, ED>, Edge<Long, ED>> {
+    /**
+     * Edge to edge function
+     */
+    private UnaryFunction<ED, ED> edgeFunc;
+
+    /**
+     * Create a new ProjectEdgesMapper
+     *
+     * @param edgeFunc the edge projection function
+     */
+    public ProjectionEdgesMapper(UnaryFunction<ED, ED> edgeFunc) {
+      this.edgeFunc = edgeFunc;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Edge<Long, ED> map(Edge<Long, ED> edge) throws Exception {
+      return new Edge<>(edge.getSource(), edge.getTarget(),
+        edgeFunc.execute(edge.getValue()));
+    }
   }
 
   /**
@@ -71,6 +161,6 @@ public class Projection<VD extends VertexData, ED extends EdgeData, GD
    */
   @Override
   public String getName() {
-    return "Projection";
+    return Projection.class.getName();
   }
 }

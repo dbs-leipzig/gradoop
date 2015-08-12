@@ -112,7 +112,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @return projected logical graph
    */
   LogicalGraph<VD, ED, GD> project(UnaryFunction<VD, VD> vertexFunction,
-    UnaryFunction<ED, ED> edgeFunction);
+    UnaryFunction<ED, ED> edgeFunction) throws Exception;
 
   /**
    * Applies the given aggregate function to the logical graph and stores the

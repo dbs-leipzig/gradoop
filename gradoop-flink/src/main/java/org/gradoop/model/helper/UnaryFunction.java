@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.helper;
+
+import java.io.Serializable;
 
 /**
  * Defines a function with singe input and output. Used e.g. in projection.
@@ -23,8 +24,7 @@ package org.gradoop.model.helper;
  * @param <I> input type
  * @param <O> output type
  */
-public interface UnaryFunction<I, O> {
-
+public interface UnaryFunction<I, O> extends Serializable {
   /**
    * Creates output from given input.
    *
