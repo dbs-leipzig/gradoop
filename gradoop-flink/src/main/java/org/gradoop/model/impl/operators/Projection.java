@@ -84,11 +84,10 @@ public class Projection<VD extends VertexData, ED extends EdgeData, GD
   @Override
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
     DataSet<Vertex<Long, VD>> vertices = graph.getGellyGraph().getVertices();
-    vertices = vertices.map(new ProjectionVerticesMapper<>(getVertexFunc(),
-      graph.getVertexDataFactory()));
+    vertices = vertices.map(new ProjectionVerticesMapper<>(getVertexFunc()));
     DataSet<Edge<Long, ED>> edges = graph.getGellyGraph().getEdges();
     edges = edges.map(
-      new ProjectionEdgesMapper<>(getEdgeFunc(), graph.getEdgeDataFactory()));
+      new ProjectionEdgesMapper<>(getEdgeFunc()));
     return LogicalGraph.fromGraph(
       Graph.fromDataSet(vertices, edges, graph.getGellyGraph().getContext()),
       graph.getGraphDataFactory().createGraphData(graph.getId()),
