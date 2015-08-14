@@ -49,6 +49,18 @@ public class Projection<VD extends VertexData, ED extends EdgeData, GD
   private final UnaryFunction<ED, ED> edgeFunc;
 
   /**
+   * Creates new projection.
+   *
+   * @param vertexFunc vertex projection function
+   * @param edgeFunc   edge projection function
+   */
+  public Projection(UnaryFunction<VD, VD> vertexFunc,
+    UnaryFunction<ED, ED> edgeFunc) {
+    this.vertexFunc = vertexFunc;
+    this.edgeFunc = edgeFunc;
+  }
+
+  /**
    * Unary function to apply the projection on the vertices
    *
    * @return unary vertex to vertex function
@@ -67,18 +79,6 @@ public class Projection<VD extends VertexData, ED extends EdgeData, GD
   }
 
   /**
-   * Creates new projection.
-   *
-   * @param vertexFunc vertex projection function
-   * @param edgeFunc   edge projection function
-   */
-  public Projection(UnaryFunction<VD, VD> vertexFunc,
-    UnaryFunction<ED, ED> edgeFunc) {
-    this.vertexFunc = vertexFunc;
-    this.edgeFunc = edgeFunc;
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
@@ -86,13 +86,13 @@ public class Projection<VD extends VertexData, ED extends EdgeData, GD
     DataSet<Vertex<Long, VD>> vertices = graph.getGellyGraph().getVertices();
     vertices = vertices.map(new ProjectionVerticesMapper<>(getVertexFunc()));
     DataSet<Edge<Long, ED>> edges = graph.getGellyGraph().getEdges();
-    edges = edges.map(
-      new ProjectionEdgesMapper<>(getEdgeFunc()));
+    edges = edges.map(new ProjectionEdgesMapper<>(getEdgeFunc()));
     return LogicalGraph.fromGraph(
       Graph.fromDataSet(vertices, edges, graph.getGellyGraph().getContext()),
-      graph.getGraphDataFactory().createGraphData(graph.getId()),
-      graph.getVertexDataFactory(), graph.getEdgeDataFactory(),
-      graph.getGraphDataFactory());
+      graph.getGraphDataFactory()
+        .createGraphData(graph.getId(), graph.getLabel(),
+          graph.getProperties()), graph.getVertexDataFactory(),
+      graph.getEdgeDataFactory(), graph.getGraphDataFactory());
   }
 
   /**

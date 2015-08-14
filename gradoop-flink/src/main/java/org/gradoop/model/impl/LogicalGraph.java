@@ -241,7 +241,8 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   @Override
   public LogicalGraph<VD, ED, GD> project(UnaryFunction<VD, VD> vertexFunction,
     UnaryFunction<ED, ED> edgeFunction) throws Exception {
-    return callForGraph(new Projection<VD, ED, GD>(vertexFunction, edgeFunction));
+    return callForGraph(
+      new Projection<VD, ED, GD>(vertexFunction, edgeFunction));
   }
 
   /**

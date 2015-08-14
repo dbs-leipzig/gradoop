@@ -60,7 +60,7 @@ The following table contains an overview (GC = GraphCollection, G = Graph).
 | Exclusion     | G x G -> G    | Vertices and edges that exist in only one graph | Yes          |
 | Pattern Match | G -> GC       | Graphs that match a given graph pattern         | No           |
 | Aggregation   | G -> G        | Graph with result of an aggregate function      | Yes          |
-| Projection    | G -> G        | Graph with projected vertex and edge sets       | No           |
+| Projection    | G -> G        | Graph with projected vertex and edge sets       | Yes          |
 | Summarization | G -> G        | Structural condense of the input graph          | Yes          |
 | Apply         | GC -> GC      | Applies operator to each graph in collection    | No           |
 | Reduce        | GC- > G       | Reduces collection to graph using operator      | No           |
