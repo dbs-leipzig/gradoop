@@ -46,24 +46,24 @@ graphs; operators may also return single graphs or graph collections.
 Our operator implementations are based on [Apache Flink](http://flink.apache.org/).
 The following table contains an overview (GC = GraphCollection, G = Graph).
 
-| Operator      | In      | Out | Output description                              | Implemented  |
-|:--------------|:--------|:----|:------------------------------------------------|:------------:|
-| Selection     | GC      | GC  | Graphs that fulfil a predicate function         | Yes          |
-| Distinct      | GC      | GC  | No duplicate graphs                             | No           |
-| SortBy        | GC      | GC  | Graphs sorted by graph property                 | No           |
-| Top           | GC      | GC  | The first n elements of the input collection    | No           |
-| Union         | GC x GC | GC  | All graphs from both collections                | Yes          |
-| Intersection  | GC x GC | GC  | Only graphs that exist in both collections      | Yes          |
-| Difference    | GC x GC | GC  | Only graphs that exist in one collection        | Yes          |
-| Combination   | G x G   | G   | Vertices and edges from both graphs             | Yes          |
-| Overlap       | G x G   | G   | Vertices and edges that exist in both graphs    | Yes          |
-| Exclusion     | G x G   | G   | Vertices and edges that exist in only one graph | Yes          |
-| Pattern Match | G       | GC  | Graphs that match a given graph pattern         | No           |
-| Aggregation   | G       | G   | Graph with result of an aggregate function      | Yes          |
-| Projection    | G       | G   | Graph with projected vertex and edge sets       | Yes          |
-| Summarization | G       | G   | Structural condense of the input graph          | Yes          |
-| Apply         | GC      | GC  | Applies operator to each graph in collection    | No           |
-| Reduce        | GC      | G   | Reduces collection to graph using operator      | No           |
+| Operator      | In      | Out | Output description                              | Impl |
+|:--------------|:--------|:----|:------------------------------------------------|:----:|
+| Selection     | GC      | GC  | Graphs that fulfil a predicate function         | Yes  |
+| Distinct      | GC      | GC  | No duplicate graphs                             | No   |
+| SortBy        | GC      | GC  | Graphs sorted by graph property                 | No   |
+| Top           | GC      | GC  | The first n elements of the input collection    | No   |
+| Union         | GC x GC | GC  | All graphs from both collections                | Yes  |
+| Intersection  | GC x GC | GC  | Only graphs that exist in both collections      | Yes  |
+| Difference    | GC x GC | GC  | Only graphs that exist in one collection        | Yes  |
+| Combination   | G x G   | G   | Vertices and edges from both graphs             | Yes  |
+| Overlap       | G x G   | G   | Vertices and edges that exist in both graphs    | Yes  |
+| Exclusion     | G x G   | G   | Vertices and edges that exist in only one graph | Yes  |
+| Pattern Match | G       | GC  | Graphs that match a given graph pattern         | No   |
+| Aggregation   | G       | G   | Graph with result of an aggregate function      | Yes  |
+| Projection    | G       | G   | Graph with projected vertex and edge sets       | Yes  |
+| Summarization | G       | G   | Structural condense of the input graph          | Yes  |
+| Apply         | GC      | GC  | Applies operator to each graph in collection    | No   |
+| Reduce        | GC      | G   | Reduces collection to graph using operator      | No   |
 
 ## Setup
 
