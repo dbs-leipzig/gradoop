@@ -399,7 +399,7 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
    */
   @Override
   public GraphCollection<VD, ED, GD> callForCollection(
-    UnaryGraphToCollectionOperator<VD, ED, GD> operator) {
+    UnaryGraphToCollectionOperator<VD, ED, GD> operator) throws Exception {
     return operator.execute(this);
   }
 

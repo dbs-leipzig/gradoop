@@ -41,8 +41,11 @@ import java.util.List;
  * neighbor. If a vertex adopt a new value it'll propagate the new one again.
  * <p/>
  * The computation will terminate if no new values are assigned.
+ *
+ * @param <VD> VertexData contains information about the vertex
+ * @param <ED> EdgeData contains information about all edges of the vertex
  */
-public class EPGLabelPropagationAlgorithm<VD extends VertexData, ED extends
+public class EPGMLabelPropagationAlgorithm<VD extends VertexData, ED extends
   EdgeData> implements
   GraphAlgorithm<Long, VD, ED> {
   /**
@@ -71,14 +74,14 @@ public class EPGLabelPropagationAlgorithm<VD extends VertexData, ED extends
    *
    * @param maxIterations int counter to define maximal Iterations
    */
-  public EPGLabelPropagationAlgorithm(int maxIterations) {
+  public EPGMLabelPropagationAlgorithm(int maxIterations) {
     this.maxIterations = maxIterations;
   }
 
   /**
    * Graph run method to start the VertexCentricIteration
    *
-   * @param graph graph that should be used for EPGLabelPropagation
+   * @param graph graph that should be used for EPGMLabelPropagation
    * @return gelly Graph with labeled vertices
    * @throws Exception
    */
@@ -102,6 +105,7 @@ public class EPGLabelPropagationAlgorithm<VD extends VertexData, ED extends
       MessageIterator<Long> msg) throws Exception {
       System.out.println("Superstep: " + getSuperstepNumber());
       if (getSuperstepNumber() == 1) {
+        vertex.getValue().setProperty(CURRENT_VALUE, vertex.getId());
         vertex.getValue().setProperty(LAST_VALUE, Long.MAX_VALUE);
         vertex.getValue().setProperty(STABILIZATION_COUNTER, 0);
         //Todo: Use Broadcast to set ChangeMax
@@ -144,6 +148,21 @@ public class EPGLabelPropagationAlgorithm<VD extends VertexData, ED extends
       }
     }
 
+    /**
+     * Returns the current new value. This value is based on all incoming
+     * messages. Depending on the number of messages sent to the vertex, the
+     * method returns:
+     * <p/>
+     * 0 messages:   The current value
+     * <p/>
+     * 1 message:    The minimum of the message and the current vertex value
+     * <p/>
+     * >1 messages:  The most frequent of all message values
+     *
+     * @param vertex The current vertex
+     * @param msg    All incoming messages
+     * @return the new Value the vertex will become
+     */
     private long getNewCommunity(Vertex<Long, VD> vertex,
       MessageIterator<Long> msg) {
       long newCommunity;
@@ -212,8 +231,12 @@ public class EPGLabelPropagationAlgorithm<VD extends VertexData, ED extends
     @Override
     public void sendMessages(Vertex<Long, VD> vertex) throws Exception {
       // send current minimum to neighbors
-      sendMessageToAllNeighbors(
-        (Long) vertex.getValue().getProperty(CURRENT_VALUE));
+      if (getSuperstepNumber() == 1) {
+        sendMessageToAllNeighbors(0L);
+      } else {
+        sendMessageToAllNeighbors(
+          (Long) vertex.getValue().getProperty(CURRENT_VALUE));
+      }
     }
   }
 }

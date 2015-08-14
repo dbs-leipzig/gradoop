@@ -2,18 +2,18 @@ package org.gradoop.model.impl;
 
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTest;
-import org.gradoop.model.helper.LongFromVertexFunction;
+import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.operators.SplitBy;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class EPGraphSplitByTest extends FlinkTest {
+public class LogicalGraphSplitByTest extends FlinkTest {
   private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
     graphStore;
 
-  public EPGraphSplitByTest() {
+  public LogicalGraphSplitByTest() {
     this.graphStore = createSocialGraph();
   }
 
@@ -21,7 +21,7 @@ public class EPGraphSplitByTest extends FlinkTest {
   public void testSplitBy() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       inputGraph = graphStore.getGraph(0L);
-    LongFromVertexFunction<DefaultVertexData> function =
+    UnaryFunction<Vertex<Long, DefaultVertexData>, Long> function =
       new SplitByIdOddOrEven();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
@@ -38,10 +38,11 @@ public class EPGraphSplitByTest extends FlinkTest {
   }
 
   private static class SplitByIdOddOrEven implements
-    LongFromVertexFunction<DefaultVertexData> {
+    UnaryFunction<Vertex<Long, DefaultVertexData>, Long> {
     @Override
-    public Long extractLong(Vertex<Long, DefaultVertexData> vertex) {
-      return (vertex.getId() % 2) - 2;
+    public Long execute(Vertex<Long, DefaultVertexData> entity) throws
+      Exception {
+      return (entity.getId() % 2) - 2;
     }
   }
 }

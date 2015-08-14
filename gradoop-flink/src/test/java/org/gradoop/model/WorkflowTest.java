@@ -247,7 +247,7 @@ public abstract class WorkflowTest {
 
     @Override
     public String getName() {
-      return "EPGLabelPropagation";
+      return "EPGMLabelPropagation";
     }
   }
 

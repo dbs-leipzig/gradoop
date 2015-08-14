@@ -60,7 +60,7 @@ public class LabelPropagationAlgorithm implements
   /**
    * Graph run method to start the VertexCentricIteration
    *
-   * @param graph graph that should be used for EPGLabelPropagation
+   * @param graph graph that should be used for EPGMLabelPropagation
    * @return gelly Graph with labeled vertices
    * @throws Exception
    */
@@ -90,6 +90,7 @@ public class LabelPropagationAlgorithm implements
       if (getSuperstepNumber() == 1) {
         //Todo: Use Broadcast to set ChangeMax
         vertex.getValue().setChangeMax(20);
+        vertex.getValue().setCurrentCommunity(vertex.getId());
         setNewVertexValue(vertex.getValue());
       } else {
         long currentCommunity = vertex.getValue().getCurrentCommunity();

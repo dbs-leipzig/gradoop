@@ -1,20 +1,25 @@
-package org.gradoop.model.impl;
+package org.gradoop.model.impl.LabelPropagation;
 
 import org.gradoop.model.FlinkTest;
-import org.gradoop.model.impl.operators.labelpropagation
-  .EPGLabelPropagationAlgorithm;
-import org.gradoop.model.impl.operators.labelpropagation.LabelPropagation;
+import org.gradoop.model.impl.DefaultEdgeData;
+import org.gradoop.model.impl.DefaultGraphData;
+import org.gradoop.model.impl.DefaultVertexData;
+import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.operators.labelpropagation.EPGMLabelPropagation;
+import org.gradoop.model.impl.operators.labelpropagation.EPGMLabelPropagationAlgorithm;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class LabelPropagationTest extends FlinkTest {
+public class EPGMLabelPropagationTest extends FlinkTest {
   private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
     graphStore;
-  final String propertyKey = EPGLabelPropagationAlgorithm.CURRENT_VALUE;
+  final String propertyKey = EPGMLabelPropagationAlgorithm.CURRENT_VALUE;
 
-  public LabelPropagationTest() {
+  public EPGMLabelPropagationTest() {
     this.graphStore = createSocialGraph();
   }
 
@@ -24,8 +29,8 @@ public class LabelPropagationTest extends FlinkTest {
       inputGraph = graphStore.getGraph(2L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
-      new LabelPropagation<DefaultVertexData, DefaultEdgeData,
-        DefaultGraphData>(
+      new EPGMLabelPropagation<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
+
         2, propertyKey, env));
     labeledGraphCollection.getGellyGraph().getVertices().print();
     assertNotNull("graph collection is null", labeledGraphCollection);

@@ -7,12 +7,17 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
@@ -22,7 +27,7 @@ import org.gradoop.model.GraphData;
 import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.KeySelectors;
-import org.gradoop.model.helper.LongFromVertexFunction;
+import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.Subgraph;
@@ -34,8 +39,14 @@ import java.util.Set;
 
 /**
  * operator used to split an EPGraph into a EPGraphCollection of graphs with
- * distinct vertices, uses a LongFromVertexFunction to define the groups of
+ * distinct vertices, uses a LongFromVertexFunction (result of this function
+ * needs to be below 0)
+ * to define the groups of
  * vertices that form the new graphs
+ *
+ * @param <VD> VertexData contains information about the vertex
+ * @param <ED> EdgeData contains information about all edges of the vertex
+ * @param <GD> GraphData contains information about all graphs of the vertex
  */
 public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
   GraphData> implements
@@ -43,11 +54,11 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
   /**
    * Flink execution enviroment
    */
-  ExecutionEnvironment env;
+  private ExecutionEnvironment env;
   /**
    * function, that defines a distinct mapping vertex -> long on the graph
    */
-  final LongFromVertexFunction<VD> function;
+  private final UnaryFunction<Vertex<Long, VD>, Long> function;
 
   /**
    * public constructor
@@ -55,7 +66,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
    * @param env      ExecutionEnvironment
    * @param function LongFromVertexFunction
    */
-  public SplitBy(LongFromVertexFunction<VD> function,
+  public SplitBy(UnaryFunction<Vertex<Long, VD>, Long> function,
     final ExecutionEnvironment env) {
     this.env = env;
     this.function = function;
@@ -78,9 +89,9 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
     //add the new graphs to the vertices graph lists
     vertices = vertices.map(new AddNewGraphsToVertexMapper<>(function));
     //construct the list of subgraphs
+    GraphDataFactory<GD> gdFactory = epGraph.getGraphDataFactory();
     DataSet<Subgraph<Long, GD>> subgraphs = vertices.groupBy(propertySelector)
-      .reduceGroup(new SubgraphsFromGroupsReducer<>(function,
-        epGraph.getGraphDataFactory()));
+      .reduceGroup(new SubgraphsFromGroupsReducer<>(function, gdFactory));
     //construct tuples of the edges with the ids of their source and target
     // vertices
     DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex = graph.getEdges()
@@ -203,15 +214,27 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
    */
   private static class LongFromVertexSelector<VD extends VertexData> implements
     KeySelector<Vertex<Long, VD>, Long> {
-    LongFromVertexFunction<VD> function;
+    /**
+     * Unary Function
+     */
+    private UnaryFunction<Vertex<Long, VD>, Long> function;
 
-    public LongFromVertexSelector(LongFromVertexFunction<VD> function) {
+    /**
+     * Constructor
+     *
+     * @param function UnaryFunction maps a Vertex<Long, VD> --> Long
+     */
+    public LongFromVertexSelector(
+      UnaryFunction<Vertex<Long, VD>, Long> function) {
       this.function = function;
     }
 
+    /**
+     * {{@inheritDoc}}
+     */
     @Override
     public Long getKey(Vertex<Long, VD> vertex) throws Exception {
-      return function.extractLong(vertex);
+      return function.execute(vertex);
     }
   }
 
@@ -222,15 +245,27 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
   private static class AddNewGraphsToVertexMapper<VD extends VertexData>
     implements
     MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
-    private LongFromVertexFunction<VD> function;
+    /**
+     * UnaryFunction
+     */
+    private UnaryFunction<Vertex<Long, VD>, Long> function;
 
-    public AddNewGraphsToVertexMapper(LongFromVertexFunction<VD> function) {
+    /**
+     * Constructor
+     *
+     * @param function UnaryFunction maps a Vertex<Long, VD> -> Long
+     */
+    public AddNewGraphsToVertexMapper(
+      UnaryFunction<Vertex<Long, VD>, Long> function) {
       this.function = function;
     }
 
+    /**
+     * {{@inheritDoc}}
+     */
     @Override
     public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
-      Long labelPropIndex = function.extractLong(vertex);
+      Long labelPropIndex = function.execute(vertex);
       vertex.getValue().getGraphs().add(labelPropIndex);
       return vertex;
     }
@@ -241,27 +276,53 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
    */
   private static class SubgraphsFromGroupsReducer<VD extends VertexData, GD
     extends GraphData> implements
-    GroupReduceFunction<Vertex<Long, VD>, Subgraph<Long, GD>> {
-    private LongFromVertexFunction<VD> function;
+    GroupReduceFunction<Vertex<Long, VD>, Subgraph<Long, GD>>,
+    ResultTypeQueryable<Vertex<Long, VD>> {
+    /**
+     * UnaryFunction maps a Vertex<Long, VD> -> Long
+     */
+    private UnaryFunction<Vertex<Long, VD>, Long> function;
+    /**
+     * GraphDataFactory to build new GraphData
+     */
     private final GraphDataFactory<GD> graphDataFactory;
 
-    public SubgraphsFromGroupsReducer(LongFromVertexFunction<VD> function,
+    /**
+     * Constructor
+     *
+     * @param function         UnaryFunction maps a Vertex<Long, VD> -> Long
+     * @param graphDataFactory GraphDataFactory to build new GraphData
+     */
+    public SubgraphsFromGroupsReducer(
+      UnaryFunction<Vertex<Long, VD>, Long> function,
       GraphDataFactory<GD> graphDataFactory) {
       this.function = function;
       this.graphDataFactory = graphDataFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reduce(Iterable<Vertex<Long, VD>> iterable,
       Collector<Subgraph<Long, GD>> collector) throws Exception {
       Iterator<Vertex<Long, VD>> it = iterable.iterator();
       Vertex<Long, VD> vertex = it.next();
-      Long labelPropIndex = function.extractLong(vertex);
-      GD subgraphData = graphDataFactory
-        .createGraphData(labelPropIndex, "split graph " + labelPropIndex);
-      Subgraph<Long, GD> newSubgraph =
-        new Subgraph<>(labelPropIndex, subgraphData);
+      Long labelPropIndex = function.execute(vertex);
+      Subgraph<Long, GD> newSubgraph = new Subgraph<>(labelPropIndex,
+        graphDataFactory
+          .createGraphData(labelPropIndex, "split graph " + labelPropIndex));
       collector.collect(newSubgraph);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public TypeInformation<Vertex<Long, VD>> getProducedType() {
+      return new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
+        TypeExtractor.createTypeInfo(graphDataFactory.getType()));
     }
   }
 }

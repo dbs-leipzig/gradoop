@@ -39,5 +39,6 @@ public interface UnaryGraphToCollectionOperator<VD extends VertexData, ED
    * @param graph input graph
    * @return operator result
    */
-  GraphCollection<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph);
+  GraphCollection<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) throws
+    Exception;
 }

@@ -4,8 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.impl.operators.labelpropagation
-  .EPGLabelPropagationAlgorithm;
+import org.gradoop.model.impl.operators.labelpropagation.EPGMLabelPropagationAlgorithm;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -14,7 +13,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class EPGLabelPropagationAlgorithmTest {
+public class EPGMLabelPropagationAlgorithmTest {
   /**
    * @return a connected graph where each vertex has its id as value
    */
@@ -50,7 +49,7 @@ public class EPGLabelPropagationAlgorithmTest {
       LabelPropagationAlgorithmTestHelper
         .getEPGraph(getConnectedGraphWithVertexValues(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = epGraph.run(
-      new EPGLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+      new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
         maxIteration)).getVertices();
     labeledGraph.print();
     validateConnectedGraphResult(parseResult(labeledGraph.collect()));
@@ -64,7 +63,7 @@ public class EPGLabelPropagationAlgorithmTest {
       LabelPropagationAlgorithmTestHelper
         .getEPGraph(getCompleteBipartiteGraphWithVertexValue(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
-      new EPGLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+      new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
         maxIteration)).getVertices();
     labeledGraph.print();
     validateCompleteBipartiteGraphResult(parseResult(labeledGraph.collect()));
@@ -78,7 +77,7 @@ public class EPGLabelPropagationAlgorithmTest {
       LabelPropagationAlgorithmTestHelper
         .getEPGraph(getLoopGraphWithVertexValues(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
-      new EPGLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+      new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
         maxIteration)).getVertices();
     labeledGraph.print();
     validateLoopGraphResult(parseResult(labeledGraph.collect()));
@@ -89,7 +88,7 @@ public class EPGLabelPropagationAlgorithmTest {
     Map<Long, Long> result = new HashMap<>();
     for (Vertex<Long, DefaultVertexData> v : graph) {
       result.put(v.getId(), (Long) v.getValue()
-        .getProperty(EPGLabelPropagationAlgorithm.CURRENT_VALUE));
+        .getProperty(EPGMLabelPropagationAlgorithm.CURRENT_VALUE));
     }
     return result;
   }

@@ -22,7 +22,7 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
-import org.gradoop.model.helper.LongFromVertexFunction;
+import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.SplitBy;
@@ -31,11 +31,19 @@ import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import java.io.Serializable;
 
 /**
- * EPGLabelPropagation Graph to Collection Operator
+ * EPGMLabelPropagation Graph to Collection Operator
+ *
+ * @param <VD> VertexData contains information about the vertex
+ * @param <ED> EdgeData contains information about all edges of the vertex
+ * @param <GD> GraphData contains information about all graphs of the vertex
  */
-public class EPGLabelPropagation<VD extends VertexData, ED extends EdgeData,
+public class EPGMLabelPropagation<VD extends VertexData, ED extends EdgeData,
   GD extends GraphData> implements
   UnaryGraphToCollectionOperator<VD, ED, GD>, Serializable {
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 513465233451L;
   /**
    * Maximal Iterations for LabelPropagationAlgorithm
    */
@@ -47,15 +55,16 @@ public class EPGLabelPropagation<VD extends VertexData, ED extends EdgeData,
   /**
    * Flink Execution Environment
    */
-  private final ExecutionEnvironment env;
+  private final transient ExecutionEnvironment env;
 
   /**
    * Constructor
    *
    * @param maxIterations int defining maximal step counter
+   * @param propertyKey   PropertyKey of the Vertex value
    * @param env           ExecutionEnvironment
    */
-  public EPGLabelPropagation(int maxIterations, String propertyKey,
+  public EPGMLabelPropagation(int maxIterations, String propertyKey,
     ExecutionEnvironment env) {
     this.maxIterations = maxIterations;
     this.propertyKey = propertyKey;
@@ -66,19 +75,16 @@ public class EPGLabelPropagation<VD extends VertexData, ED extends EdgeData,
    * {@inheritDoc }
    */
   @Override
-  public GraphCollection<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> epGraph) {
+  public GraphCollection<VD, ED, GD> execute(
+    LogicalGraph<VD, ED, GD> epGraph) throws Exception {
     Graph<Long, VD, ED> graph = epGraph.getGellyGraph();
-    try {
-      graph =
-        graph.run(new EPGLabelPropagationAlgorithm<VD, ED>(this.maxIterations));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    graph =
+      graph.run(new EPGMLabelPropagationAlgorithm<VD, ED>(this.maxIterations));
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
       .fromGraph(graph, null, epGraph.getVertexDataFactory(),
         epGraph.getEdgeDataFactory(), epGraph.getGraphDataFactory());
-    LongFromProperty lfp = new LongFromProperty(propertyKey);
-    SplitBy callByPropertyKey = new SplitBy(lfp, env);
+    LongFromProperty<VD> lfp = new LongFromProperty<>(propertyKey);
+    SplitBy<VD, ED, GD> callByPropertyKey = new SplitBy<>(lfp, env);
     return callByPropertyKey.execute(labeledGraph);
   }
 
@@ -87,7 +93,7 @@ public class EPGLabelPropagation<VD extends VertexData, ED extends EdgeData,
    */
   @Override
   public String getName() {
-    return EPGLabelPropagation.class.getName();
+    return EPGMLabelPropagation.class.getName();
   }
 
   /**
@@ -95,11 +101,11 @@ public class EPGLabelPropagation<VD extends VertexData, ED extends EdgeData,
    * vertex
    */
   private static class LongFromProperty<VD extends VertexData> implements
-    LongFromVertexFunction<VD> {
+    UnaryFunction<Vertex<Long, VD>, Long> {
     /**
      * String propertyKey
      */
-    String propertyKey;
+    private String propertyKey;
 
     /**
      * Constructor
@@ -114,8 +120,8 @@ public class EPGLabelPropagation<VD extends VertexData, ED extends EdgeData,
      * {@inheritDoc}
      */
     @Override
-    public Long extractLong(Vertex<Long, VD> vertex) {
-      return (long) vertex.getValue().getProperties().get(propertyKey);
+    public Long execute(Vertex<Long, VD> entity) throws Exception {
+      return ((Long) entity.getValue().getProperty(propertyKey) + 1) * -1;
     }
   }
 }

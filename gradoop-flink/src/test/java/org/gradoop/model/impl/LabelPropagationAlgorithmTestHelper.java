@@ -6,8 +6,7 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.operators.labelpropagation
-  .EPGLabelPropagationAlgorithm;
+import org.gradoop.model.impl.operators.labelpropagation.EPGMLabelPropagationAlgorithm;
 import org.gradoop.model.impl.operators.labelpropagation.LabelPropagationValue;
 
 import java.util.HashMap;
@@ -58,10 +57,10 @@ public class LabelPropagationAlgorithmTestHelper {
 
   private static DefaultVertexData getEPFlinkVertexValue(long id, long value) {
     Map<String, Object> props = new HashMap<>();
-    props.put(EPGLabelPropagationAlgorithm.CURRENT_VALUE, value);
-    props.put(EPGLabelPropagationAlgorithm.LAST_VALUE, Long.MAX_VALUE);
-    props.put(EPGLabelPropagationAlgorithm.STABILIZATION_COUNTER, 0);
-    props.put(EPGLabelPropagationAlgorithm.STABILIZATION_MAX, 20);
+    props.put(EPGMLabelPropagationAlgorithm.CURRENT_VALUE, value);
+    props.put(EPGMLabelPropagationAlgorithm.LAST_VALUE, Long.MAX_VALUE);
+    props.put(EPGMLabelPropagationAlgorithm.STABILIZATION_COUNTER, 0);
+    props.put(EPGMLabelPropagationAlgorithm.STABILIZATION_MAX, 20);
     return new DefaultVertexDataFactory().createVertexData(id, " ", props);
   }
 

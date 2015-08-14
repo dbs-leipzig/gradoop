@@ -13,7 +13,7 @@ import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.KeySelectors;
-import org.gradoop.model.helper.LongFromVertexFunction;
+import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.SplitBy;
@@ -21,6 +21,10 @@ import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 
 /**
  * LabelPropagation Graph to Collection Operator
+ *
+ * @param <VD> VertexData contains information about the vertex
+ * @param <ED> EdgeData contains information about all edges of the vertex
+ * @param <GD> GraphData contains information about the graphs of the vertex
  */
 public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
   extends GraphData> implements
@@ -56,7 +60,8 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> epGraph) {
+  public GraphCollection<VD, ED, GD> execute(
+    LogicalGraph<VD, ED, GD> epGraph) throws Exception {
     DataSet<Vertex<Long, LabelPropagationValue>> vertices =
       epGraph.getGellyGraph().getVertices().map(
         new MapFunction<Vertex<Long, VD>, Vertex<Long,
@@ -65,8 +70,7 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
           public Vertex<Long, LabelPropagationValue> map(
             Vertex<Long, VD> vertex) throws Exception {
             return new Vertex<>(vertex.getId(),
-              new LabelPropagationValue(vertex.getId(), (Long) vertex.getValue()
-                .getProperty(EPGLabelPropagationAlgorithm.CURRENT_VALUE)));
+              new LabelPropagationValue(vertex.getId(), vertex.getId()));
           }
         });
     DataSet<Edge<Long, NullValue>> edges = epGraph.getGellyGraph().getEdges()
@@ -79,25 +83,19 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
       });
     Graph<Long, LabelPropagationValue, NullValue> graph =
       Graph.fromDataSet(vertices, edges, env);
-    try {
-      graph = graph.run(new LabelPropagationAlgorithm(this.maxIterations));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
+    graph = graph.run(new LabelPropagationAlgorithm(this.maxIterations));
     DataSet<Vertex<Long, VD>> labeledVertices =
       graph.getVertices().join(epGraph.getGellyGraph().getVertices())
         .where(new LPKeySelector())
         .equalTo(new KeySelectors.VertexKeySelector<VD>())
         .with(new LPJoin<VD>());
-
     Graph<Long, VD, ED> gellyGraph = Graph
       .fromDataSet(labeledVertices, epGraph.getGellyGraph().getEdges(), env);
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
       .fromGraph(gellyGraph, null, epGraph.getVertexDataFactory(),
         epGraph.getEdgeDataFactory(), epGraph.getGraphDataFactory());
-    LongFromProperty lfp = new LongFromProperty(propertyKey);
-    SplitBy callByPropertyKey = new SplitBy(lfp, env);
+    LongFromProperty<VD> lfp = new LongFromProperty<>(propertyKey);
+    SplitBy<VD, ED, GD> callByPropertyKey = new SplitBy<>(lfp, env);
     return callByPropertyKey.execute(labeledGraph);
   }
 
@@ -123,7 +121,7 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
     public Vertex<Long, VD> join(Vertex<Long, LabelPropagationValue> lpVertex,
       Vertex<Long, VD> epVertex) throws Exception {
       epVertex.getValue()
-        .setProperty(EPGLabelPropagationAlgorithm.CURRENT_VALUE,
+        .setProperty(EPGMLabelPropagationAlgorithm.CURRENT_VALUE,
           lpVertex.getValue().getCurrentCommunity());
       return epVertex;
     }
@@ -142,18 +140,16 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
    * vertex
    */
   private static class LongFromProperty<VD extends VertexData> implements
-    LongFromVertexFunction<VD> {
+    UnaryFunction<Vertex<Long, VD>, Long> {
     /**
      * String propertyKey
      */
-    String propertyKey;
+    private String propertyKey;
 
     /**
      * Constructor
      *
-     * @param propertyKey propertyKey for the p   * @param env
-     *                    ExecutionEnvironment
-     *                    roperty map
+     * @param propertyKey propertyKey for the property map
      */
     public LongFromProperty(String propertyKey) {
       this.propertyKey = propertyKey;
@@ -163,8 +159,8 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
      * {@inheritDoc}
      */
     @Override
-    public Long extractLong(Vertex<Long, VD> vertex) {
-      return (long) vertex.getValue().getProperties().get(propertyKey);
+    public Long execute(Vertex<Long, VD> entity) throws Exception {
+      return ((Long) entity.getValue().getProperty(propertyKey) + 1) * -1;
     }
   }
 }
