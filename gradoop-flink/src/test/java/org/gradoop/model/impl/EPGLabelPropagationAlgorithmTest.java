@@ -4,7 +4,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.impl.operators.EPGLabelPropagationAlgorithm;
+import org.gradoop.model.impl.operators.labelpropagation
+  .EPGLabelPropagationAlgorithm;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -13,19 +14,14 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by galpha on 05.08.15.
- */
 public class EPGLabelPropagationAlgorithmTest {
   /**
    * @return a connected graph where each vertex has its id as value
    */
   static String[] getConnectedGraphWithVertexValues() {
-    return new String[] {
-      "0 0 1 2 3", "1 1 0 2 3", "2 2 0 1 3 4", "3 3 0 1 2", "4 4 2 5 6 7",
-      "5 5 4 6 7 8", "6 6 4 5 7", "7 7 4 5 6", "8 8 5 9 10 11", "9 9 8 10 11",
-      "10 10 8 9 11", "11 11 8 9 10"
-    };
+    return new String[]{"0 0 1 2 3", "1 1 0 2 3", "2 2 0 1 3 4", "3 3 0 1 2",
+      "4 4 2 5 6 7", "5 5 4 6 7 8", "6 6 4 5 7", "7 7 4 5 6", "8 8 5 9 10 11",
+      "9 9 8 10 11", "10 10 8 9 11", "11 11 8 9 10"};
   }
 
   /**
@@ -34,30 +30,28 @@ public class EPGLabelPropagationAlgorithmTest {
    * @return a complete bipartite graph where each vertex has its id as value
    */
   static String[] getCompleteBipartiteGraphWithVertexValue() {
-    return new String[] {
-      "0 0 4 5 6 7", "1 1 4 5 6 7", "2 2 4 5 6 7", "3 3 4 5 6 7", "4 4 0 1 2 3",
-      "5 5 0 1 2 3", "6 6 0 1 2 3", "7 7 0 1 2 3"
-    };
+    return new String[]{"0 0 4 5 6 7", "1 1 4 5 6 7", "2 2 4 5 6 7",
+      "3 3 4 5 6 7", "4 4 0 1 2 3", "5 5 0 1 2 3", "6 6 0 1 2 3",
+      "7 7 0 1 2 3"};
   }
 
   /**
    * @return a graph containing a loop with a vertex value
    */
   static String[] getLoopGraphWithVertexValues() {
-    return new String[] {
-      "0 0 1 2", "1 1 0 3", "2 1 0 3", "3 0 1 2"
-    };
+    return new String[]{"0 0 1 2", "1 1 0 3", "2 1 0 3", "3 0 1 2"};
   }
 
   @Test
   public void testConnectedGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> epGraph =
+    Graph<Long, DefaultVertexData, DefaultEdgeData> epGraph =
       LabelPropagationAlgorithmTestHelper
         .getEPGraph(getConnectedGraphWithVertexValues(), env);
-    DataSet<Vertex<Long, EPFlinkVertexData>> labeledGraph =
-      epGraph.run(new EPGLabelPropagationAlgorithm(maxIteration)).getVertices();
+    DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = epGraph.run(
+      new EPGLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+        maxIteration)).getVertices();
     labeledGraph.print();
     validateConnectedGraphResult(parseResult(labeledGraph.collect()));
   }
@@ -66,12 +60,12 @@ public class EPGLabelPropagationAlgorithmTest {
   public void testBipartiteGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> gellyGraph =
+    Graph<Long, DefaultVertexData, DefaultEdgeData> gellyGraph =
       LabelPropagationAlgorithmTestHelper
         .getEPGraph(getCompleteBipartiteGraphWithVertexValue(), env);
-    DataSet<Vertex<Long, EPFlinkVertexData>> labeledGraph =
-      gellyGraph.run(new EPGLabelPropagationAlgorithm(maxIteration))
-        .getVertices();
+    DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
+      new EPGLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+        maxIteration)).getVertices();
     labeledGraph.print();
     validateCompleteBipartiteGraphResult(parseResult(labeledGraph.collect()));
   }
@@ -80,20 +74,20 @@ public class EPGLabelPropagationAlgorithmTest {
   public void testLoopGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> gellyGraph =
+    Graph<Long, DefaultVertexData, DefaultEdgeData> gellyGraph =
       LabelPropagationAlgorithmTestHelper
         .getEPGraph(getLoopGraphWithVertexValues(), env);
-    DataSet<Vertex<Long, EPFlinkVertexData>> labeledGraph =
-      gellyGraph.run(new EPGLabelPropagationAlgorithm(maxIteration))
-        .getVertices();
+    DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
+      new EPGLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+        maxIteration)).getVertices();
     labeledGraph.print();
     validateLoopGraphResult(parseResult(labeledGraph.collect()));
   }
 
   private Map<Long, Long> parseResult(
-    List<Vertex<Long, EPFlinkVertexData>> graph) {
+    List<Vertex<Long, DefaultVertexData>> graph) {
     Map<Long, Long> result = new HashMap<>();
-    for (Vertex<Long, EPFlinkVertexData> v : graph) {
+    for (Vertex<Long, DefaultVertexData> v : graph) {
       result.put(v.getId(), (Long) v.getValue()
         .getProperty(EPGLabelPropagationAlgorithm.CURRENT_VALUE));
     }

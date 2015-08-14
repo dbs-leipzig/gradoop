@@ -5,8 +5,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.operators.LabelPropagationAlgorithm;
-import org.gradoop.model.impl.operators.LabelPropagationValue;
+import org.gradoop.model.impl.operators.labelpropagation.LabelPropagationAlgorithm;
+import org.gradoop.model.impl.operators.labelpropagation.LabelPropagationValue;
 import org.junit.Test;
 
 import java.util.HashMap;

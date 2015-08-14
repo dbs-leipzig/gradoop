@@ -6,8 +6,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.operators.EPGLabelPropagationAlgorithm;
-import org.gradoop.model.impl.operators.LabelPropagationValue;
+import org.gradoop.model.impl.operators.labelpropagation
+  .EPGLabelPropagationAlgorithm;
+import org.gradoop.model.impl.operators.labelpropagation.LabelPropagationValue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +23,7 @@ public class LabelPropagationAlgorithmTestHelper {
 
   public static Graph<Long, LabelPropagationValue, NullValue> getGraph(
     String[] graph, ExecutionEnvironment env) {
-    List<Vertex<Long, LabelPropagationValue>> vertices =
-      Lists.newArrayList();
+    List<Vertex<Long, LabelPropagationValue>> vertices = Lists.newArrayList();
     List<Edge<Long, NullValue>> edges = Lists.newArrayList();
     for (String line : graph) {
       String[] tokens = SEPARATOR.split(line);
@@ -39,11 +39,10 @@ public class LabelPropagationAlgorithmTestHelper {
   }
 
 
-  public static Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> getEPGraph(
+  public static Graph<Long, DefaultVertexData, DefaultEdgeData> getEPGraph(
     String[] graph, ExecutionEnvironment env) {
-    List<Vertex<Long, EPFlinkVertexData>> vertices =
-      Lists.newArrayList();
-    List<Edge<Long, EPFlinkEdgeData>> edges = Lists.newArrayList();
+    List<Vertex<Long, DefaultVertexData>> vertices = Lists.newArrayList();
+    List<Edge<Long, DefaultEdgeData>> edges = Lists.newArrayList();
     for (String line : graph) {
       String[] tokens = SEPARATOR.split(line);
       long id = Long.parseLong(tokens[0]);
@@ -57,16 +56,16 @@ public class LabelPropagationAlgorithmTestHelper {
     return Graph.fromCollection(vertices, edges, env);
   }
 
-  private static EPFlinkVertexData getEPFlinkVertexValue(long id, long value){
+  private static DefaultVertexData getEPFlinkVertexValue(long id, long value) {
     Map<String, Object> props = new HashMap<>();
     props.put(EPGLabelPropagationAlgorithm.CURRENT_VALUE, value);
     props.put(EPGLabelPropagationAlgorithm.LAST_VALUE, Long.MAX_VALUE);
     props.put(EPGLabelPropagationAlgorithm.STABILIZATION_COUNTER, 0);
     props.put(EPGLabelPropagationAlgorithm.STABILIZATION_MAX, 20);
-    return new EPFlinkVertexData(id, " ", props);
+    return new DefaultVertexDataFactory().createVertexData(id, " ", props);
   }
 
-  private static EPFlinkEdgeData getEPFlinkEdgeValue(long id, long tar){
-    return new EPFlinkEdgeData(id, " ", id, tar);
+  private static DefaultEdgeData getEPFlinkEdgeValue(long id, long tar) {
+    return new DefaultEdgeDataFactory().createEdgeData(id, " ", id, tar);
   }
 }

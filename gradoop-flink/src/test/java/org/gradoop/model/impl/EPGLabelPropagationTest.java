@@ -1,16 +1,17 @@
 package org.gradoop.model.impl;
 
-import org.gradoop.model.EPFlinkTest;
-import org.gradoop.model.impl.operators.EPGLabelPropagation;
-import org.gradoop.model.impl.operators.EPGLabelPropagationAlgorithm;
-import org.gradoop.model.store.EPGraphStore;
+import org.gradoop.model.FlinkTest;
+import org.gradoop.model.impl.operators.labelpropagation.EPGLabelPropagation;
+import org.gradoop.model.impl.operators.labelpropagation
+  .EPGLabelPropagationAlgorithm;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class EPGLabelPropagationTest extends EPFlinkTest {
-  private EPGraphStore graphStore;
+public class EPGLabelPropagationTest extends FlinkTest {
+  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    graphStore;
   final String propertyKey = EPGLabelPropagationAlgorithm.CURRENT_VALUE;
 
   public EPGLabelPropagationTest() {
@@ -19,15 +20,19 @@ public class EPGLabelPropagationTest extends EPFlinkTest {
 
   @Test
   public void testLabelPropagationWithCallByPropertyKey() throws Exception {
-    EPGraph inputGraph = graphStore.getGraph(2L);
-    EPGraphCollection labeledGraph = inputGraph
-      .callForCollection(new EPGLabelPropagation(2, propertyKey, env));
-    labeledGraph.getGellyGraph().getVertices().print();
-    assertNotNull("graph collection is null", inputGraph);
-    assertEquals("wrong number of graphs", 3l, labeledGraph.size());
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      inputGraph = graphStore.getGraph(2L);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      labeledGraphCollection = inputGraph.callForCollection(
+      new EPGLabelPropagation<DefaultVertexData, DefaultEdgeData,
+        DefaultGraphData>(
+        2, propertyKey, env));
+    labeledGraphCollection.getGellyGraph().getVertices().print();
+    assertNotNull("graph collection is null", labeledGraphCollection);
+    assertEquals("wrong number of graphs", 3l, labeledGraphCollection.size());
     assertEquals("wrong number of vertices", 4l,
-      labeledGraph.getGraph().getVertexCount());
+      labeledGraphCollection.getTotalVertexCount());
     assertEquals("wrong number of edges", 0l,
-      labeledGraph.getGraph().getEdgeCount());
+      labeledGraphCollection.getTotalEdgeCount());
   }
 }
