@@ -16,30 +16,150 @@
  */
 package org.gradoop.model.impl.operators;
 
-import org.gradoop.model.EPEdgeData;
-import org.gradoop.model.EPVertexData;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.graph.Edge;
+import org.apache.flink.graph.Graph;
+import org.apache.flink.graph.Vertex;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.UnaryFunction;
-import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class Projection implements UnaryGraphToGraphOperator {
-  private final UnaryFunction<EPVertexData, EPVertexData> vertexFunc;
-  private final UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc;
+/**
+ * Creates a projected version of the logical graph using the user defined
+ * vertex and edge data projection functions.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ */
+public class Projection<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData> implements
+  UnaryGraphToGraphOperator<VD, ED, GD> {
+  /**
+   * Vertex projection function.
+   */
+  private final UnaryFunction<VD, VD> vertexFunc;
+  /**
+   * Edge projection function.
+   */
+  private final UnaryFunction<ED, ED> edgeFunc;
 
-  public Projection(UnaryFunction<EPVertexData, EPVertexData> vertexFunc,
-    UnaryFunction<EPEdgeData, EPEdgeData> edgeFunc) {
+  /**
+   * Creates new projection.
+   *
+   * @param vertexFunc vertex projection function
+   * @param edgeFunc   edge projection function
+   */
+  public Projection(UnaryFunction<VD, VD> vertexFunc,
+    UnaryFunction<ED, ED> edgeFunc) {
     this.vertexFunc = vertexFunc;
     this.edgeFunc = edgeFunc;
   }
 
-  @Override
-  public EPGraph execute(EPGraph graph) {
-    throw new NotImplementedException();
+  /**
+   * Unary function to apply the projection on the vertices
+   *
+   * @return unary vertex to vertex function
+   */
+  protected UnaryFunction<VD, VD> getVertexFunc() {
+    return this.vertexFunc;
   }
 
+  /**
+   * Unary function to apply the projection on the edges
+   *
+   * @return unary vertex to vertex function
+   */
+  protected UnaryFunction<ED, ED> getEdgeFunc() {
+    return this.edgeFunc;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
+    DataSet<Vertex<Long, VD>> vertices = graph.getGellyGraph().getVertices();
+    vertices = vertices.map(new ProjectionVerticesMapper<>(getVertexFunc()));
+    DataSet<Edge<Long, ED>> edges = graph.getGellyGraph().getEdges();
+    edges = edges.map(new ProjectionEdgesMapper<>(getEdgeFunc()));
+    return LogicalGraph.fromGraph(
+      Graph.fromDataSet(vertices, edges, graph.getGellyGraph().getContext()),
+      graph.getGraphDataFactory()
+        .createGraphData(graph.getId(), graph.getLabel(),
+          graph.getProperties()), graph.getVertexDataFactory(),
+      graph.getEdgeDataFactory(), graph.getGraphDataFactory());
+  }
+
+  /**
+   * apply the vertex projection to all vertices
+   *
+   * @param <VD> vertex data type
+   */
+  private static class ProjectionVerticesMapper<VD extends VertexData>
+    implements
+    MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
+    /**
+     * Vertex to vertex function
+     */
+    private UnaryFunction<VD, VD> vertexFunc;
+
+    /**
+     * create a new ProjectVerticesMapper
+     *
+     * @param vertexFunc the vertex projection function
+     */
+    public ProjectionVerticesMapper(UnaryFunction<VD, VD> vertexFunc) {
+      this.vertexFunc = vertexFunc;
+    }
+
+    @Override
+    public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
+      return new Vertex<>(vertex.getId(),
+        vertexFunc.execute(vertex.getValue()));
+    }
+  }
+
+  /**
+   * apply the edge projection to all edges
+   *
+   * @param <ED> edge data type
+   */
+  private static class ProjectionEdgesMapper<ED extends EdgeData> implements
+    MapFunction<Edge<Long, ED>, Edge<Long, ED>> {
+    /**
+     * Edge to edge function
+     */
+    private UnaryFunction<ED, ED> edgeFunc;
+
+    /**
+     * Create a new ProjectEdgesMapper
+     *
+     * @param edgeFunc the edge projection function
+     */
+    public ProjectionEdgesMapper(UnaryFunction<ED, ED> edgeFunc) {
+      this.edgeFunc = edgeFunc;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Edge<Long, ED> map(Edge<Long, ED> edge) throws Exception {
+      return new Edge<>(edge.getSource(), edge.getTarget(),
+        edgeFunc.execute(edge.getValue()));
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
-    return "Projection";
+    return Projection.class.getName();
   }
 }

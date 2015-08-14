@@ -18,7 +18,7 @@
 package org.gradoop.model;
 
 /**
- * Entity is identifiable in a given context.
+ * Describes an identifiable entity.
  */
 public interface Identifiable {
   /**

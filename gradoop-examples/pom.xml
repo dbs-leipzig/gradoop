@@ -7,7 +7,7 @@
     <parent>
         <artifactId>gradoop</artifactId>
         <groupId>de.uni-leipzig.de.dbs</groupId>
-        <version>0.0.2</version>
+        <version>0.0.3</version>
     </parent>
     <artifactId>gradoop-examples</artifactId>
     <packaging>jar</packaging>
@@ -58,26 +58,9 @@
 
     <dependencies>
         <!-- Compile -->
-
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
-            <artifactId>gradoop-giraph</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>de.uni-leipzig.de.dbs</groupId>
-            <artifactId>gradoop-mapreduce</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <scope>provided</scope>
+            <artifactId>gradoop-flink</artifactId>
         </dependency>
 
         <!-- Testing -->
@@ -86,21 +69,6 @@
         <dependency>
             <groupId>de.uni-leipzig.de.dbs</groupId>
             <artifactId>gradoop-core</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>de.uni-leipzig.de.dbs</groupId>
-            <artifactId>gradoop-giraph</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Giraph -->
-        <dependency>
-            <groupId>org.apache.giraph</groupId>
-            <artifactId>giraph-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

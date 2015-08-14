@@ -14,37 +14,75 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.model.impl.operators;
 
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.UnaryFunction;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
-public class Aggregation<O extends Number> implements
-  UnaryGraphToGraphOperator {
-  private final String aggregatePropertyKey;
-  private final UnaryFunction<EPGraph, O> aggregationFunc;
+/**
+ * Takes a logical graph and a user defined aggregate function as input. The
+ * aggregate function is applied on the logical graph and the resulting
+ * aggregate is stored as an additional property at the result graph.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ * @param <O>  output type of aggregate function
+ */
+public class Aggregation<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData, O extends Number> implements
+  UnaryGraphToGraphOperator<VD, ED, GD> {
 
+  /**
+   * Used to store aggregate result.
+   */
+  private final String aggregatePropertyKey;
+  /**
+   * User defined aggregate function.
+   */
+  private final UnaryFunction<LogicalGraph<VD, ED, GD>, O> aggregationFunc;
+
+  /**
+   * Creates new aggregation.
+   *
+   * @param aggregatePropertyKey property key to store result of {@code
+   *                             aggregationFunc}
+   * @param aggregationFunc      user defined aggregation function which gets
+   *                             called on the input graph
+   */
   public Aggregation(final String aggregatePropertyKey,
-    UnaryFunction<EPGraph, O> aggregationFunc) {
+    UnaryFunction<LogicalGraph<VD, ED, GD>, O> aggregationFunc) {
     this.aggregatePropertyKey = aggregatePropertyKey;
     this.aggregationFunc = aggregationFunc;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public EPGraph execute(EPGraph graph) throws Exception {
+  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) throws
+    Exception {
     O result = aggregationFunc.execute(graph);
     // copy graph data before updating properties
-    EPFlinkGraphData newGraphData =
-      new EPFlinkGraphData(graph.getId(), graph.getLabel(),
-        graph.getProperties());
+    GD newGraphData = graph.getGraphDataFactory()
+      .createGraphData(graph.getId(), graph.getLabel());
+    newGraphData.setProperties(graph.getProperties());
     newGraphData.setProperty(aggregatePropertyKey, result);
-    return EPGraph.fromGraph(graph.getGellyGraph(), newGraphData);
+    return LogicalGraph.fromGraph(graph.getGellyGraph(), newGraphData,
+      graph.getVertexDataFactory(), graph.getEdgeDataFactory(),
+      graph.getGraphDataFactory());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
-    return "Aggregation";
+    return Aggregation.class.getName();
   }
 }

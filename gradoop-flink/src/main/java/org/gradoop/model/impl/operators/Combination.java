@@ -14,44 +14,68 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
-import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.helper.KeySelectors;
+import org.gradoop.model.impl.LogicalGraph;
 
-import static org.gradoop.model.impl.EPGraph.EDGE_ID;
-import static org.gradoop.model.impl.EPGraph.VERTEX_ID;
+/**
+ * Creates a new logical graph by combining the vertex and edge sets of two
+ * input graphs. Vertex and edge equality is based on their
+ * respective identifiers.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ */
+public class Combination<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData> extends
+  AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
 
-public class Combination extends AbstractBinaryGraphToGraphOperator {
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected LogicalGraph<VD, ED, GD> executeInternal(
+    LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
+    final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
+
+    Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph2 = secondGraph.getGellyGraph();
+
+    // build distinct union of vertex sets and update graph ids at vertices
+    // cannot use Gelly union here because of missing argument for KeySelector
+    DataSet<Vertex<Long, VD>> newVertexSet =
+      graph1.getVertices().union(graph2.getVertices())
+        .distinct(new KeySelectors.VertexKeySelector<VD>())
+        .map(new VertexToGraphUpdater<VD>(newGraphID));
+
+    DataSet<Edge<Long, ED>> newEdgeSet =
+      graph1.getEdges().union(graph2.getEdges())
+        .distinct(new KeySelectors.EdgeKeySelector<ED>())
+        .map(new EdgeToGraphUpdater<ED>(newGraphID));
+
+    return LogicalGraph.fromGraph(
+      Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
+      firstGraph.getGraphDataFactory().createGraphData(newGraphID),
+      firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
+      firstGraph.getGraphDataFactory());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return "Combination";
-  }
-
-  @Override
-  protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
-    final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph1 =
-      firstGraph.getGellyGraph();
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph2 =
-      secondGraph.getGellyGraph();
-    // build distinct union of vertex sets and update graph ids at vertices
-    // cannot use Gelly union here because of missing argument for KeySelector
-    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices()).distinct(VERTEX_ID)
-        .map(new VertexToGraphUpdater(newGraphID));
-    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      graph1.getEdges().union(graph2.getEdges()).distinct(EDGE_ID)
-        .map(new EdgeToGraphUpdater(newGraphID));
-    return EPGraph.fromGraph(
-      Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
-      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL));
   }
 }

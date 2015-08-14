@@ -18,7 +18,7 @@
 package org.gradoop.model;
 
 /**
- * A single labeled entity is tagged with zero or one label.
+ * Describes an entity that has a label.
  */
 public interface Labeled {
   /**

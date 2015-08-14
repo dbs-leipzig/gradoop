@@ -17,6 +17,14 @@
 
 package org.gradoop.model.operators;
 
+/**
+ * Base interface for all EPGM operators.
+ */
 public interface Operator {
+  /**
+   * Returns the operators name.
+   *
+   * @return operator name
+   */
   String getName();
 }

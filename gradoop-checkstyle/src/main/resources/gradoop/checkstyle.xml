@@ -170,11 +170,11 @@
             <property name="message" value="Trailing whitespace"/>
         </module>
         <!-- No System.out.println() statements -->
-        <module name="Regexp">
-            <!-- No sysouts -->
-            <property name="format" value="System\.out\.println"/>
-            <property name="illegalPattern" value="true"/>
-        </module>
+        <!--<module name="Regexp">-->
+            <!--&lt;!&ndash; No sysouts &ndash;&gt;-->
+            <!--<property name="format" value="System\.out\.println"/>-->
+            <!--<property name="illegalPattern" value="true"/>-->
+        <!--</module>-->
         <!-- Authors should be in pom.xml file -->
         <module name="Regexp">
             <property name="format" value="@author"/>

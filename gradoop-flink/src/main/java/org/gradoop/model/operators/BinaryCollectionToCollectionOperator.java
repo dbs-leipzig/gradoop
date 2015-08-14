@@ -17,9 +17,33 @@
 
 package org.gradoop.model.operators;
 
-import org.gradoop.model.impl.EPGraphCollection;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
+import org.gradoop.model.impl.GraphCollection;
 
-public interface BinaryCollectionToCollectionOperator extends Operator {
-  EPGraphCollection execute(EPGraphCollection firstCollection,
-    EPGraphCollection secondCollection) throws Exception;
+/**
+ * Creates a {@link GraphCollection} based on two input collections.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ * @see org.gradoop.model.impl.operators.Union
+ * @see org.gradoop.model.impl.operators.Intersect
+ * @see org.gradoop.model.impl.operators.Difference
+ */
+public interface BinaryCollectionToCollectionOperator<VD extends VertexData,
+  ED extends EdgeData, GD extends GraphData> extends
+  Operator {
+  /**
+   * Executes the operator.
+   *
+   * @param firstCollection  first input collection
+   * @param secondCollection second input collection
+   * @return operator result
+   * @throws Exception
+   */
+  GraphCollection<VD, ED, GD> execute(
+    GraphCollection<VD, ED, GD> firstCollection,
+    GraphCollection<VD, ED, GD> secondCollection) throws Exception;
 }
