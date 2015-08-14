@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dbs-leipzig/gradoop.svg?branch=master)](https://travis-ci.org/dbs-leipzig/gradoop)
+
 ## Gradoop: Distributed Graph Analytics on Hadoop
 
 [Gradoop](http://www.gradoop.com) is an open source (GPLv3) research framework 
