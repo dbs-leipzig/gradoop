@@ -1,57 +1,110 @@
 package org.gradoop.model.impl;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.gradoop.model.FlinkTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(JUnitParamsRunner.class)
-public class GraphCollectionIntersectTest extends FlinkTest {
+@RunWith(Parameterized.class)
+public class GraphCollectionIntersectTest extends
+  BinaryCollectionOperatorsTestBase {
 
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
-
-  public GraphCollectionIntersectTest() {
-    this.graphStore = createSocialGraph();
+  public GraphCollectionIntersectTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test
-  @Parameters({
-    "0 1 2, 0 1, 2, 6, 10", "0, 1, 0, 0, 0", "0 2 3, 1 2 3, 2, 5, 9"
-  })
-  public void testIntersect(String firstColl, String secondColl,
-    long expectedCollSize, long expectedVertexCount,
-    long expectedEdgeCount) throws Exception {
+  public void testOverlappingCollections() throws Exception {
+    long expectedCollectionSize = 2L;
+    long expectedVertexCount = 6L;
+    long expectedEdgeCount = 10L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       graphColl = graphStore.getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      collection1 = graphColl.getGraphs(extractGraphIDs(firstColl));
+      collection1 = graphColl.getGraphs(0L, 1L, 2L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      collection2 = graphColl.getGraphs(extractGraphIDs(secondColl));
+      collection2 = graphColl.getGraphs(0L, 1L);
 
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       intersectColl = collection1.intersect(collection2);
 
-    assertNotNull("graph collection is null", intersectColl);
-    assertEquals("wrong number of graphs", expectedCollSize,
-      intersectColl.size());
-    assertEquals("wrong number of vertices", expectedVertexCount,
-      intersectColl.getTotalVertexCount());
-    assertEquals("wrong number of edges", expectedEdgeCount,
-      intersectColl.getTotalEdgeCount());
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      intersectColl);
+    intersectColl = collection1.intersectWithSmall(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      intersectColl);
+  }
+
+  @Test
+  public void testOverlappingCollections2() throws Exception {
+    long expectedCollectionSize = 2L;
+    long expectedVertexCount = 5L;
+    long expectedEdgeCount = 9L;
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection1 = graphColl.getGraphs(0L, 2L, 3L);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection2 = graphColl.getGraphs(1L, 2L, 3L);
+
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      intersectColl = collection1.intersect(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      intersectColl);
+    intersectColl = collection1.intersectWithSmall(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      intersectColl);
+  }
+
+  @Test
+  public void testNonOverlappingCollections() throws Exception {
+    long expectedCollectionSize = 0L;
+    long expectedVertexCount = 0L;
+    long expectedEdgeCount = 0L;
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection1 = graphColl.getGraphs(0L);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection2 = graphColl.getGraphs(1L);
+
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      intersectColl = collection1.intersect(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      intersectColl);
 
     intersectColl = collection1.intersectWithSmall(collection2);
 
-    assertNotNull("graph collection is null", intersectColl);
-    assertEquals("wrong number of graphs", expectedCollSize,
-      intersectColl.size());
-    assertEquals("wrong number of vertices", expectedVertexCount,
-      intersectColl.getTotalVertexCount());
-    assertEquals("wrong number of edges", expectedEdgeCount,
-      intersectColl.getTotalEdgeCount());
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      intersectColl);
+  }
+
+  @Test
+  public void testTotalOverlappingCollections() throws Exception {
+    long expectedCollectionSize = 3L;
+    long expectedVertexCount = 6L;
+    long expectedEdgeCount = 11L;
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection1 = graphColl.getGraphs(0L, 2L, 3L);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection2 = graphColl.getGraphs(0L, 2L, 3L);
+
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      intersectColl = collection1.intersect(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      intersectColl);
+    intersectColl = collection1.intersectWithSmall(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      intersectColl);
   }
 }

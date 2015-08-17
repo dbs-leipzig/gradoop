@@ -19,21 +19,20 @@ package org.gradoop.model.impl;
 
 import org.gradoop.GConstants;
 import org.gradoop.model.EdgeData;
-import org.gradoop.model.FlinkTest;
+import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.impl.operators.Summarization;
 import org.junit.Test;
 
+import static org.gradoop.GradoopTestBaseUtils.*;
 import static org.gradoop.model.impl.operators.Summarization.NULL_VALUE;
 import static org.junit.Assert.*;
 
-public abstract class LogicalGraphSummarizeTest extends FlinkTest {
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
+public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
 
-  public LogicalGraphSummarizeTest() {
-    this.graphStore = createSocialGraph();
+  public LogicalGraphSummarizeTestBase(TestExecutionMode mode) {
+    super(mode);
   }
 
   public abstract Summarization<DefaultVertexData, DefaultEdgeData,
@@ -456,10 +455,6 @@ public abstract class LogicalGraphSummarizeTest extends FlinkTest {
     // [0] Person {count: 6}
     // [6] Tag {count: 3}
     // [9] Forum {count: 2}
-    for (VertexData v : summarizedGraph.getVertices().collect()) {
-      System.out.println(v);
-    }
-
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;
@@ -1004,10 +999,6 @@ public abstract class LogicalGraphSummarizeTest extends FlinkTest {
     // [0] Person {count: 6}
     // [6] Tag {count: 3}
     // [9] Forum {count: 2}
-    for (VertexData v : summarizedGraph.getVertices().collect()) {
-      System.out.println(v);
-    }
-
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;
@@ -1365,10 +1356,6 @@ public abstract class LogicalGraphSummarizeTest extends FlinkTest {
     // [0] Person {count: 6}
     // [6] Tag {count: 3}
     // [9] Forum {count: 2}
-    for (VertexData v : summarizedGraph.getVertices().collect()) {
-      System.out.println(v);
-    }
-
     assertEquals("wrong number of vertices", 3L,
       summarizedGraph.getVertexCount());
     long vertexIDPerson = 0L, vertexIDTag = 6L, vertexIDForum = 9L;

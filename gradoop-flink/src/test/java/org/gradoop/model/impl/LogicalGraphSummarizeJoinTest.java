@@ -19,8 +19,17 @@ package org.gradoop.model.impl;
 
 import org.gradoop.model.impl.operators.Summarization;
 import org.gradoop.model.impl.operators.SummarizationUsingJoin;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-public class LogicalGraphSummarizeJoinTest extends LogicalGraphSummarizeTest {
+@RunWith(Parameterized.class)
+public class LogicalGraphSummarizeJoinTest extends
+  LogicalGraphSummarizeTestBase {
+
+  public LogicalGraphSummarizeJoinTest(TestExecutionMode mode) {
+    super(mode);
+  }
+
   @Override
   public Summarization<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
   getSummarizationImpl(

@@ -201,7 +201,7 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
       env.fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
 
     // get graph data based on graph id
-    GD graphData = this.subgraphs.joinWithTiny(graphIDDataSet)
+    List<GD> graphData = this.subgraphs.joinWithTiny(graphIDDataSet)
       .where(new KeySelectors.GraphKeySelector<GD>()).equalTo(0)
       .with(new JoinFunction<Subgraph<Long, GD>, Tuple1<Long>, GD>() {
         @Override
@@ -209,10 +209,11 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
           Exception {
           return g.getValue();
         }
-      }).first(1).collect().get(0);
-    return LogicalGraph
-      .fromGraph(subGraph, graphData, vertexDataFactory, edgeDataFactory,
-        graphDataFactory);
+      }).first(1).collect();
+
+    return (graphData.size() > 0) ? LogicalGraph
+      .fromGraph(subGraph, graphData.get(0), vertexDataFactory, edgeDataFactory,
+        graphDataFactory) : null;
   }
 
   /**
@@ -276,7 +277,7 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
         }
       });
 
-    // get the identifiers of these subgraphs
+// get the identifiers of these subgraphs
     final Collection<Long> graphIDs =
       filteredSubgraphs.map(new MapFunction<Subgraph<Long, GD>, Long>() {
 
@@ -582,7 +583,8 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
   }
 
   /**
-   * Checks if an edge is contained in at least one of the given logical graphs.
+   * Checks if an edge is contained in at least one of the given logical
+   * graphs.
    *
    * @param <ED> edge data type
    */

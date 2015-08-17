@@ -1,53 +1,89 @@
 package org.gradoop.model.impl;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.gradoop.model.FlinkTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(JUnitParamsRunner.class)
-public class GraphCollectionDifferenceTest extends FlinkTest {
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
+@RunWith(Parameterized.class)
+public class GraphCollectionDifferenceTest extends
+  BinaryCollectionOperatorsTestBase {
 
-  public GraphCollectionDifferenceTest() {
-    this.graphStore = createSocialGraph();
+  public GraphCollectionDifferenceTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test
-  @Parameters({"0 1 2, 0, 2, 5, 8", "0 1, 2 3, 2, 6, 8"})
-  public void testDifference(String firstColl, String secondColl,
-    long expectedCollSize, long expectedVertexCount,
-    long expectedEdgeCount) throws Exception {
+  public void testOverlappingCollections() throws Exception {
+    // 0 1 2, 0, 2, 5, 8
+    long expectedCollectionSize = 2L;
+    long expectedVertexCount = 5L;
+    long expectedEdgeCount = 8L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       graphColl = graphStore.getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      collection1 = graphColl.getGraphs(extractGraphIDs(firstColl));
+      collection1 = graphColl.getGraphs(0L, 1L, 2L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      collection2 = graphColl.getGraphs(extractGraphIDs(secondColl));
+      collection2 = graphColl.getGraphs(0L);
 
     GraphCollection differenceColl = collection1.difference(collection2);
 
-    assertNotNull("graph collection is null", differenceColl);
-    assertEquals("wrong number of graphs", expectedCollSize,
-      differenceColl.size());
-    assertEquals("wrong number of vertices", expectedVertexCount,
-      differenceColl.getTotalVertexCount());
-    assertEquals("wrong number of edges", expectedEdgeCount,
-      differenceColl.getTotalEdgeCount());
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      differenceColl);
 
     differenceColl = collection1.differenceWithSmallResult(collection2);
 
-    assertNotNull("graph collection is null", differenceColl);
-    assertEquals("wrong number of graphs", expectedCollSize,
-      differenceColl.size());
-    assertEquals("wrong number of vertices", expectedVertexCount,
-      differenceColl.getTotalVertexCount());
-    assertEquals("wrong number of edges", expectedEdgeCount,
-      differenceColl.getTotalEdgeCount());
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      differenceColl);
+  }
+
+  @Test
+  public void testNonOverlappingCollections() throws Exception {
+    // "0 1, 2 3, 2, 6, 8"
+    long expectedCollectionSize = 2L;
+    long expectedVertexCount = 6L;
+    long expectedEdgeCount = 8L;
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection1 = graphColl.getGraphs(0L, 1L);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection2 = graphColl.getGraphs(2L, 3L);
+
+    GraphCollection differenceColl = collection1.difference(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      differenceColl);
+
+    differenceColl = collection1.differenceWithSmallResult(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      differenceColl);
+  }
+
+  @Test
+  public void testTotalOverlappingCollections() throws Exception {
+    // "0 1, 0 1, 0, 0, 0"
+    long expectedCollectionSize = 0L;
+    long expectedVertexCount = 0L;
+    long expectedEdgeCount = 0L;
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection1 = graphColl.getGraphs(0L, 1L);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection2 = graphColl.getGraphs(0L, 1L);
+
+    GraphCollection differenceColl = collection1.difference(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      differenceColl);
+
+    differenceColl = collection1.differenceWithSmallResult(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      differenceColl);
   }
 }

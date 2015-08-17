@@ -17,39 +17,32 @@
 
 package org.gradoop.model.impl;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import org.gradoop.GradoopTestBaseUtils;
 import org.gradoop.model.EdgeData;
-import org.gradoop.model.FlinkTest;
 import org.gradoop.model.VertexData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.Collection;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-@RunWith(JUnitParamsRunner.class)
-public class LogicalGraphOverlapTest extends FlinkTest {
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
+@RunWith(Parameterized.class)
+public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
-  public LogicalGraphOverlapTest() {
-    this.graphStore = createSocialGraph();
+  public LogicalGraphOverlapTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test
-  @Parameters({"0, 0, 3, 4", // same graph
-    "0, 2, 2, 2", // overlapping
-    "2, 0, 2, 2", // overlapping switched
-    "0, 1, 0, 0", // non-overlapping
-    "1, 0, 0, 0", // non-overlapping switched
-    "3, 1, 2, 1", // overlapping vertex and not edge set
-    "1, 3, 2, 1" // overlapping vertex and not edge set switched
-  })
-  public void testOverlap(long firstGraph, long secondGraph,
-    long expectedVertexCount, long expectedEdgeCount) throws Exception {
+  public void testSameGraph() throws Exception {
+    Long firstGraph = 0L;
+    Long secondGraph = 0L;
+    long expectedVertexCount = 3L;
+    long expectedEdgeCount = 4L;
+
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
       graphStore.getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
@@ -58,32 +51,115 @@ public class LogicalGraphOverlapTest extends FlinkTest {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.overlap(second);
 
-    assertNotNull("resulting graph was null", result);
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
 
-    long newGraphID = result.getId();
+  @Test
+  public void testOverlappingGraphs() throws Exception {
+    Long firstGraph = 0L;
+    Long secondGraph = 2L;
+    long expectedVertexCount = 2L;
+    long expectedEdgeCount = 2L;
 
-    assertEquals("wrong number of vertices", expectedVertexCount,
-      result.getVertexCount());
-    assertEquals("wrong number of edges", expectedEdgeCount,
-      result.getEdgeCount());
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
 
-    Collection<DefaultVertexData> vertexData = result.getVertices().collect();
-    Collection<DefaultEdgeData> edgeData = result.getEdges().collect();
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.overlap(second);
 
-    assertEquals("wrong number of vertex values", expectedVertexCount,
-      vertexData.size());
-    assertEquals("wrong number of edge values", expectedEdgeCount,
-      edgeData.size());
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
 
-    for (VertexData v : vertexData) {
-      assertTrue("vertex is not in new graph",
-        v.getGraphs().contains(newGraphID));
-    }
+  @Test
+  public void testOverlappingSwitchedGraphs() throws Exception {
+    Long firstGraph = 2L;
+    Long secondGraph = 0L;
+    long expectedVertexCount = 2L;
+    long expectedEdgeCount = 2L;
 
-    for (EdgeData e : edgeData) {
-      assertTrue("edge is not in new graph",
-        e.getGraphs().contains(newGraphID));
-    }
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.overlap(second);
+
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
+
+  @Test
+  public void testNonOverlappingGraphs() throws Exception {
+    Long firstGraph = 0L;
+    Long secondGraph = 1L;
+    long expectedVertexCount = 0L;
+    long expectedEdgeCount = 0L;
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.overlap(second);
+
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
+
+  @Test
+  public void testNonOverlappingSwitchedGraphs() throws Exception {
+    Long firstGraph = 1L;
+    Long secondGraph = 0L;
+    long expectedVertexCount = 0L;
+    long expectedEdgeCount = 0L;
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.overlap(second);
+
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
+
+  @Test
+  public void testOverlappingVertexSetGraphs() throws Exception {
+    Long firstGraph = 3L;
+    Long secondGraph = 1L;
+    long expectedVertexCount = 2L;
+    long expectedEdgeCount = 1L;
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.overlap(second);
+
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
+
+  @Test
+  public void testOverlappingVertexSetSwitchedGraphs() throws Exception {
+    Long firstGraph = 1L;
+    Long secondGraph = 3L;
+    long expectedVertexCount = 2L;
+    long expectedEdgeCount = 1L;
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.overlap(second);
+
+    performTest(result, expectedVertexCount, expectedEdgeCount);
   }
 
   @Test
@@ -101,18 +177,18 @@ public class LogicalGraphOverlapTest extends FlinkTest {
 
     for (VertexData v : vertexData) {
       Set<Long> gIDs = v.getGraphs();
-      if (v.equals(alice)) {
+      if (v.equals(GradoopTestBaseUtils.VERTEX_PERSON_ALICE)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (v.equals(bob)) {
+      } else if (v.equals(GradoopTestBaseUtils.VERTEX_PERSON_BOB)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       }
     }
 
     for (EdgeData e : edgeData) {
       Set<Long> gIDs = e.getGraphs();
-      if (e.equals(edge0)) {
+      if (e.equals(GradoopTestBaseUtils.EDGE_0_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (e.equals(edge1)) {
+      } else if (e.equals(GradoopTestBaseUtils.EDGE_1_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       }
     }
