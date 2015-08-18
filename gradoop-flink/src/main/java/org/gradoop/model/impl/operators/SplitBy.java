@@ -92,6 +92,13 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
       logicalGraph.getGraphDataFactory(), env);
   }
 
+  /**
+   * compute the vertices in the new graphs created by the SplitBy and add
+   * these graphs to the graph sets of the vertices
+   * @param logicalGraph input graph
+   * @return a DataSet containing all vertices, each vertex has one new graph
+   * in its graph set
+   */
   private DataSet<Vertex<Long, VD>> computeNewVertices(
     LogicalGraph<VD, ED, GD> logicalGraph) {
     //get the Gelly graph and vertices
@@ -101,6 +108,12 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
     return vertices.map(new AddNewGraphsToVertexMapper<>(function));
   }
 
+  /**
+   * compute the new subgraphs created by the SplitBy
+   * @param logicalGraph the input graph
+   * @param vertices the computed vertices with their graphs
+   * @return a DataSet containing all newly created subgraphs
+   */
   private DataSet<Subgraph<Long, GD>> computeNewSubgraphs(
     LogicalGraph<VD, ED, GD> logicalGraph, DataSet<Vertex<Long, VD>> vertices) {
     // construct a KeySelector using the LongFromVertexFunction
@@ -112,6 +125,15 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
       .reduceGroup(new SubgraphsFromGroupsReducer<>(function, gdFactory));
   }
 
+  /**
+   * compute the edges which source and target are in the same newly created
+   * graph
+   * @param logicalGraph the input graph
+   * @param vertices the computed vertices with their graphs
+   * @param subgraphs the computed subgraphs
+   * @return a DataSet containing all newly created edges, each edge has a
+   * new graph in its graph set
+   */
   private DataSet<Edge<Long, ED>> computeNewEdges(
     LogicalGraph<VD, ED, GD> logicalGraph, DataSet<Vertex<Long, VD>> vertices,
     DataSet<Subgraph<Long, GD>> subgraphs) {
