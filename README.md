@@ -125,7 +125,7 @@ current implementation is work in progress, at the moment one can read or write
 the whole database. We are working on reading only data that is needed for the
 analysis (e.g., a collection of specific communities).
 
-The following example shows how to create an EPGM Store and how to write a EPGM
+The following example shows how to create an EPGM Store and how to write an EPGM
 database to it.
 
 ```java
