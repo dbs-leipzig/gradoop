@@ -304,12 +304,19 @@ public abstract class Summarization<VD extends VertexData, ED extends
    */
   protected static class VertexGroupingValueSelector<VD extends VertexData>
     implements
-    KeySelector<Vertex<Long, VD>, String> {
-
+    KeySelector<Vertex<Long, VD>, Integer> {
+    /**
+     * Defines how label and grouping value are represented.
+     */
+    private static final String GROUPING_VALUE_FORMAT = "%s%s";
     /**
      * Vertex property key
      */
     private final String groupPropertyKey;
+    /**
+     * True, if property shall be considered.
+     */
+    private final boolean useProperty;
     /**
      * True, if label shall be considered
      */
@@ -325,25 +332,25 @@ public abstract class Summarization<VD extends VertexData, ED extends
       boolean useLabel) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
+      this.useProperty =
+        groupPropertyKey != null && !"".equals(groupPropertyKey);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getKey(Vertex<Long, VD> v) throws Exception {
+    public Integer getKey(Vertex<Long, VD> v) throws Exception {
       String label = v.getValue().getLabel();
       String groupingValue = null;
-      boolean useProperty =
-        groupPropertyKey != null && !"".equals(groupPropertyKey);
       boolean hasProperty =
         useProperty && (v.getValue().getProperty(groupPropertyKey) != null);
 
       if (useLabel && useProperty && hasProperty) {
-        groupingValue = String.format("%s_%s", label,
+        groupingValue = String.format(GROUPING_VALUE_FORMAT, label,
           v.getValue().getProperty(groupPropertyKey).toString());
       } else if (useLabel && useProperty) {
-        groupingValue = String.format("%s_%s", label, NULL_VALUE);
+        groupingValue = String.format(GROUPING_VALUE_FORMAT, label, NULL_VALUE);
       } else if (useLabel) {
         groupingValue = label;
       } else if (useProperty && hasProperty) {
@@ -351,8 +358,8 @@ public abstract class Summarization<VD extends VertexData, ED extends
       } else if (useProperty) {
         groupingValue = NULL_VALUE;
       }
-
-      return groupingValue;
+      assert groupingValue != null;
+      return groupingValue.hashCode();
     }
   }
 
@@ -375,6 +382,14 @@ public abstract class Summarization<VD extends VertexData, ED extends
      * True, if label shall be considered
      */
     private final boolean useLabel;
+    /**
+     * True, if property shall be considered.
+     */
+    private final boolean useProperty;
+    /**
+     * Avoid object instantiation in each reduce call.
+     */
+    private final Vertex<Long, VD> reuseVertex;
 
     /**
      * Creates group reducer
@@ -387,7 +402,10 @@ public abstract class Summarization<VD extends VertexData, ED extends
       VertexDataFactory<VD> vertexDataFactory) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
+      this.useProperty =
+        groupPropertyKey != null && !"".equals(groupPropertyKey);
       this.vertexDataFactory = vertexDataFactory;
+      this.reuseVertex = new Vertex<>();
     }
 
     /**
@@ -410,32 +428,24 @@ public abstract class Summarization<VD extends VertexData, ED extends
           groupLabel = useLabel ? v.getValue().getLabel() :
             GConstants.DEFAULT_VERTEX_LABEL;
           // get group value if necessary
-          if (storeGroupProperty()) {
+          if (useProperty) {
             groupValue = getGroupProperty(v.getValue());
           }
           initialized = true;
         }
       }
-
-      VD newVertexData =
+      VD vertexData =
         vertexDataFactory.createVertexData(newVertexID, groupLabel);
-      if (storeGroupProperty()) {
-        newVertexData.setProperty(groupPropertyKey, groupValue);
+      if (useProperty) {
+        vertexData.setProperty(groupPropertyKey, groupValue);
       }
-      newVertexData.setProperty(COUNT_PROPERTY_KEY, groupCount);
-      newVertexData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
+      vertexData.setProperty(COUNT_PROPERTY_KEY, groupCount);
+      vertexData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
 
-      collector.collect(new Vertex<>(newVertexID, newVertexData));
-    }
+      reuseVertex.f0 = newVertexID;
+      reuseVertex.f1 = vertexData;
 
-    /**
-     * True, if the group property value shall be stored at the summarized
-     * vertex.
-     *
-     * @return true if group value shall be stored, false otherwise
-     */
-    private boolean storeGroupProperty() {
-      return groupPropertyKey != null && !"".equals(groupPropertyKey);
+      collector.collect(reuseVertex);
     }
 
     /**
@@ -487,6 +497,15 @@ public abstract class Summarization<VD extends VertexData, ED extends
     private boolean useLabel;
 
     /**
+     * True, if property shall be considered.
+     */
+    private boolean useProperty;
+    /**
+     * Avoid object instantiation in each reduce call.
+     */
+    private final Edge<Long, ED> reuseEdge;
+
+    /**
      * Creates group reducer
      *
      * @param groupPropertyKey edge property key to store group value
@@ -497,7 +516,10 @@ public abstract class Summarization<VD extends VertexData, ED extends
       EdgeDataFactory<ED> edgeDataFactory) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
+      this.useProperty =
+        groupPropertyKey != null && !"".equals(groupPropertyKey);
       this.edgeDataFactory = edgeDataFactory;
+      this.reuseEdge = new Edge<>();
     }
 
     /**
@@ -510,8 +532,8 @@ public abstract class Summarization<VD extends VertexData, ED extends
       boolean initialized = false;
       // new edge id will be the first edge id in the group (which is sorted)
       Long newEdgeID = null;
-      Long newSourceVertex = null;
-      Long newTargetVertex = null;
+      Long newSourceVertexId = null;
+      Long newTargetVertexId = null;
       String edgeLabel = GConstants.DEFAULT_EDGE_LABEL;
       String edgeGroupingValue = null;
 
@@ -519,8 +541,8 @@ public abstract class Summarization<VD extends VertexData, ED extends
         edgeCount++;
         if (!initialized) {
           newEdgeID = e.f0;
-          newSourceVertex = e.f1;
-          newTargetVertex = e.f2;
+          newSourceVertexId = e.f1;
+          newTargetVertexId = e.f2;
           if (useLabel) {
             edgeLabel = e.f3;
           }
@@ -530,25 +552,19 @@ public abstract class Summarization<VD extends VertexData, ED extends
       }
 
       ED newEdgeData = edgeDataFactory
-        .createEdgeData(newEdgeID, edgeLabel, newSourceVertex, newTargetVertex);
+        .createEdgeData(newEdgeID, edgeLabel, newSourceVertexId,
+          newTargetVertexId);
 
-      if (storeGroupProperty()) {
+      if (useProperty) {
         newEdgeData.setProperty(groupPropertyKey, edgeGroupingValue);
       }
       newEdgeData.setProperty(COUNT_PROPERTY_KEY, edgeCount);
       newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
-      collector
-        .collect(new Edge<>(newSourceVertex, newTargetVertex, newEdgeData));
-    }
 
-    /**
-     * True, if the group property value shall be stored at the summarized
-     * vertex.
-     *
-     * @return true if group value shall be stored, false otherwise
-     */
-    private boolean storeGroupProperty() {
-      return groupPropertyKey != null && !"".equals(groupPropertyKey);
+      reuseEdge.setSource(newSourceVertexId);
+      reuseEdge.setTarget(newTargetVertexId);
+      reuseEdge.setValue(newEdgeData);
+      collector.collect(reuseEdge);
     }
 
     /**

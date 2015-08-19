@@ -266,13 +266,12 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     final String graphFile) throws Exception {
     getDatabaseGraph().getGellyGraph().getVertices()
       .writeAsFormattedText(vertexFile,
-        new JsonWriter.VertexTextFormatter<VD>()).getDataSet().collect();
+        new JsonWriter.VertexTextFormatter<VD>());
     getDatabaseGraph().getGellyGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>())
-      .getDataSet().collect();
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
     getCollection().getSubgraphs()
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>())
-      .getDataSet().collect();
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
+    env.execute();
   }
 
   /**

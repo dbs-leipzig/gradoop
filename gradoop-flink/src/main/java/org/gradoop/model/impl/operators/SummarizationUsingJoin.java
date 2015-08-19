@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.operators.SortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
@@ -93,9 +94,9 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
   private DataSet<Edge<Long, ED>> buildSummarizedEdges(
     Graph<Long, VD, ED> graph,
     DataSet<Tuple2<Long, Long>> vertexToRepresentativeMap) {
-    // join vertex-group-map with edges on vertex-id == edge-source-id
+    // join edges with vertex-group-map on vertex-id == edge-source-id
     DataSet<Tuple5<Long, Long, Long, String, String>> edges =
-      vertexToRepresentativeMap.join(graph.getEdges()).where(0).equalTo(0)
+      graph.getEdges().join(vertexToRepresentativeMap).where(0).equalTo(0)
         // project edges to necessary information
         .with(new SourceVertexJoinFunction<ED>(getEdgeGroupingKey(),
           useEdgeLabels()))
@@ -106,7 +107,7 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
     // sort group by edge id to get edge group representative (smallest id)
     return groupEdges(edges).sortGroup(0, Order.ASCENDING).reduceGroup(
       new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
-        edgeDataFactory));
+        edgeDataFactory)).withForwardedFields("f0");
   }
 
   /**
@@ -128,6 +129,18 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
     GroupReduceFunction<Vertex<Long, VD>, Tuple2<Long, Long>> {
 
     /**
+     * Avoid object instantiation in each reduce call.
+     */
+    private final Tuple2<Long, Long> reuseTuple;
+
+    /**
+     * Creates a group reduce function.
+     */
+    public VertexToRepresentativeReducer() {
+      this.reuseTuple = new Tuple2<>();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -140,20 +153,23 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
           groupRepresentative = groupElement.getId();
           first = false;
         }
-        collector
-          .collect(new Tuple2<>(groupElement.getId(), groupRepresentative));
+        reuseTuple.f0 = groupElement.getId();
+        reuseTuple.f1 = groupRepresentative;
+        collector.collect(reuseTuple);
       }
     }
   }
 
   /**
-   * Takes a tuple (vertex-id, group-representative) and an edge as input.
+   * Takes an edge and a tuple (vertex-id, group-representative) as input.
    * Replaces the edge-source-id with the group-representative and outputs
    * projected edge information possibly containing the edge label and a
    * group property.
    */
+  @FunctionAnnotation.ForwardedFieldsFirst("f1->f2") // edge target id
+  @FunctionAnnotation.ForwardedFieldsSecond("f1") // edge source id
   private static class SourceVertexJoinFunction<ED extends EdgeData> implements
-    JoinFunction<Tuple2<Long, Long>, Edge<Long, ED>, Tuple5<Long, Long, Long,
+    JoinFunction<Edge<Long, ED>, Tuple2<Long, Long>, Tuple5<Long, Long, Long,
       String, String>> {
 
     /**
@@ -166,6 +182,11 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
     private final boolean useLabel;
 
     /**
+     * Avoid object initialization in each call.
+     */
+    private final Tuple5<Long, Long, Long, String, String> reuseTuple;
+
+    /**
      * Creates join function.
      *
      * @param groupPropertyKey vertex property key for grouping
@@ -174,15 +195,15 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
     public SourceVertexJoinFunction(String groupPropertyKey, boolean useLabel) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
+      this.reuseTuple = new Tuple5<>();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tuple5<Long, Long, Long, String, String> join(
-      Tuple2<Long, Long> vertexRepresentativeTuple, Edge<Long, ED> e) throws
-      Exception {
+    public Tuple5<Long, Long, Long, String, String> join(Edge<Long, ED> e,
+      Tuple2<Long, Long> vertexRepresentativeTuple) throws Exception {
       String groupingValue = null;
       boolean useProperty =
         groupPropertyKey != null && !"".equals(groupPropertyKey);
@@ -195,9 +216,13 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
         groupingValue = NULL_VALUE;
       }
 
-      return new Tuple5<>(e.getValue().getId(), vertexRepresentativeTuple.f1,
-        e.getTarget(), useLabel ? e.getValue().getLabel() : null,
-        groupingValue);
+      reuseTuple.f0 = e.getValue().getId();
+      reuseTuple.f1 = vertexRepresentativeTuple.f1;
+      reuseTuple.f2 = e.getTarget();
+      reuseTuple.f3 = useLabel ? e.getValue().getLabel() : null;
+      reuseTuple.f4 = groupingValue;
+
+      return reuseTuple;
     }
   }
 
@@ -205,6 +230,8 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
    * Takes a projected edge and an (vertex-id, group-representative) tuple
    * and replaces the edge-target-id with the group-representative.
    */
+  @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3;f4")
+  @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
   private static class TargetVertexJoinFunction implements
     JoinFunction<Tuple5<Long, Long, Long, String, String>, Tuple2<Long,
       Long>, Tuple5<Long, Long, Long, String, String>> {
