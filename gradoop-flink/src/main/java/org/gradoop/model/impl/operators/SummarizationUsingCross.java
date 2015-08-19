@@ -22,7 +22,6 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.operators.FlatMapOperator;
@@ -137,9 +136,8 @@ public class SummarizationUsingCross<VD extends VertexData, ED extends
       .filter(new IntraEdgeFilterWith());
 
     DataSet<Edge<Long, ED>> intraEdges = groupEdges(filteredIntraEdges)
-      // sort group by edge id to get edge representative
-      .sortGroup(0, Order.ASCENDING)
-        // and create new gelly edges with payload
+      // get edge group representative
+      // and create new gelly edges with payload
       .reduceGroup(
         new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
           edgeDataFactory));
@@ -161,13 +159,12 @@ public class SummarizationUsingCross<VD extends VertexData, ED extends
       // finalize inter-edges
       .flatMap(new SecondRoundFlatMap());
 
-    // sort group by edge id to get edge representative
-    DataSet<Edge<Long, ED>> interEdges =
-      groupEdges(secondRoundEdges).sortGroup(0, Order.ASCENDING)
-        // and create new gelly edges with payload
-        .reduceGroup(
-          new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
-            edgeDataFactory));
+    // get edge group representative
+    DataSet<Edge<Long, ED>> interEdges = groupEdges(secondRoundEdges)
+      // and create new gelly edges with payload
+      .reduceGroup(
+        new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
+          edgeDataFactory));
 
     return interEdges.union(intraEdges);
   }

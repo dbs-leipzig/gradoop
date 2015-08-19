@@ -19,7 +19,6 @@ package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.operators.SortedGrouping;
@@ -61,7 +60,6 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
    */
   @Override
   protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
-
     /* build summarized vertices */
     SortedGrouping<Vertex<Long, VD>> groupedSortedVertices =
       groupAndSortVertices(graph);
@@ -104,8 +102,7 @@ public class SummarizationUsingJoin<VD extends VertexData, ED extends
         .join(vertexToRepresentativeMap).where(2).equalTo(0)
         .with(new TargetVertexJoinFunction());
 
-    // sort group by edge id to get edge group representative (smallest id)
-    return groupEdges(edges).sortGroup(0, Order.ASCENDING).reduceGroup(
+    return groupEdges(edges).reduceGroup(
       new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
         edgeDataFactory)).withForwardedFields("f0");
   }
