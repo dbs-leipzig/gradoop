@@ -20,7 +20,7 @@ import org.gradoop.model.impl.operators.SplitBy;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 
 /**
- * LabelPropagation Graph to Collection Operator
+ * labelpropagation Graph to Collection Operator
  *
  * @param <VD> VertexData contains information about the vertex
  * @param <ED> EdgeData contains information about all edges of the vertex
@@ -132,7 +132,7 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
    */
   @Override
   public String getName() {
-    return "LabelPropagation";
+    return "labelpropagation";
   }
 
   /**

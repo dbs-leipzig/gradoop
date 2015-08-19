@@ -1,4 +1,4 @@
-package org.gradoop.model.impl;
+package org.gradoop.model.impl.labelpropagation;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -6,6 +6,10 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
+import org.gradoop.model.impl.DefaultEdgeData;
+import org.gradoop.model.impl.DefaultEdgeDataFactory;
+import org.gradoop.model.impl.DefaultVertexData;
+import org.gradoop.model.impl.DefaultVertexDataFactory;
 import org.gradoop.model.impl.operators.labelpropagation.EPGMLabelPropagationAlgorithm;
 import org.gradoop.model.impl.operators.labelpropagation.LabelPropagationValue;
 
