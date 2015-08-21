@@ -439,13 +439,12 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {
     this.getGellyGraph().getVertices().writeAsFormattedText(vertexFile,
-      new JsonWriter.VertexTextFormatter<VD>()).getDataSet().collect();
+      new JsonWriter.VertexTextFormatter<VD>());
     this.getGellyGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>())
-      .getDataSet().collect();
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
     this.getSubgraphs()
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>())
-      .getDataSet().collect();
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
+    env.execute();
   }
 
   /**

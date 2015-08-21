@@ -17,16 +17,16 @@
 
 package org.gradoop.model.impl;
 
-import org.gradoop.model.impl.operators.Summarization;
-import org.gradoop.model.impl.operators.SummarizationUsingCross;
+import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupWithLists;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class LogicalGraphSummarizeCrossTest extends
+public class LogicalGraphSummarizeGroupWithListsTest extends
   LogicalGraphSummarizeTestBase {
 
-  public LogicalGraphSummarizeCrossTest(TestExecutionMode mode) {
+  public LogicalGraphSummarizeGroupWithListsTest(TestExecutionMode mode) {
     super(mode);
   }
 
@@ -35,7 +35,7 @@ public class LogicalGraphSummarizeCrossTest extends
   getSummarizationImpl(
     String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
     boolean useEdgeLabel) {
-    return new SummarizationUsingCross<>(vertexGroupingKey, edgeGroupingKey,
+    return new SummarizationGroupWithLists<>(vertexGroupingKey, edgeGroupingKey,
       useVertexLabel, useEdgeLabel);
   }
 }

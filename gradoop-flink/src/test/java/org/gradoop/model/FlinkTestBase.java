@@ -33,8 +33,11 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
   protected EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
     graphStore;
 
+  protected ExecutionEnvironment env;
+
   public FlinkTestBase(TestExecutionMode mode) {
     super(mode);
+    this.env = ExecutionEnvironment.getExecutionEnvironment();
     this.graphStore = createSocialGraph();
   }
 
@@ -51,7 +54,6 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
     return EPGMDatabase
       .fromCollection(GradoopTestBaseUtils.createVertexDataCollection(),
         GradoopTestBaseUtils.createEdgeDataCollection(),
-        GradoopTestBaseUtils.createGraphDataCollection(),
-        ExecutionEnvironment.getExecutionEnvironment());
+        GradoopTestBaseUtils.createGraphDataCollection(), env);
   }
 }

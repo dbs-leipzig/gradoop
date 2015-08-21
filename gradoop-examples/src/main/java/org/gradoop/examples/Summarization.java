@@ -172,6 +172,7 @@ public class Summarization implements ProgramDescription {
       String.format("%s%s%s", outputPath, fileSeparator, "edges.json");
     final String graphFile =
       String.format("%s%s%s", outputPath, fileSeparator, "graphs.json");
+
     graph.writeAsJson(vertexFile, edgeFile, graphFile);
   }
 
