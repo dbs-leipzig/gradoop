@@ -271,8 +271,8 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   public LogicalGraph<VD, ED, GD> summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
-        false, false));
+      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+        edgeGroupingKey, false, false));
   }
 
   /**
@@ -308,8 +308,8 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   public LogicalGraph<VD, ED, GD> summarizeOnVertexLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
-        true, false));
+      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+        edgeGroupingKey, true, false));
   }
 
   /**
@@ -347,8 +347,8 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   public LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
-        true, true));
+      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+        edgeGroupingKey, true, true));
   }
 
   /**

@@ -41,6 +41,19 @@ import java.util.List;
 /**
  * Summarization implementation that does not require sorting of vertex groups.
  *
+ * Algorithmic idea:
+ *
+ * 1) group vertices by label / property / both
+ * 2) reduce groups
+ * - create summarized vertex
+ * - create list of vertex identifiers in the group
+ * 3a) forward summarized vertices to vertex dataset
+ * 3b) flat map build a {@link VertexWithRepresentative} per list item
+ * 4) join output from 3b) with edges
+ * - replace source / target vertex id with vertex group representative
+ * 5) group edges on source/target vertex and possibly edge label / property
+ * 6) build summarized edges
+ *
  * @param <VD> vertex data type
  * @param <ED> edge data type
  * @param <GD> graph data type
@@ -132,7 +145,9 @@ public class SummarizationGroupWithLists<VD extends VertexData, ED extends
      * Avoid object instantiation in each reduce call.
      */
     private final Vertex<Long, VD> reuseVertex;
-
+    /**
+     * Avoid object instantiation.
+     */
     private final Tuple2<Vertex<Long, VD>, List<Long>> reuseTuple;
 
     /**

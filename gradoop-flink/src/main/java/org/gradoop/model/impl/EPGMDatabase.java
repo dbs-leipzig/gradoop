@@ -24,12 +24,10 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.io.TextOutputFormat;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Triplet;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.hbase.HBaseReader;
 import org.gradoop.io.hbase.HBaseWriter;
@@ -222,7 +220,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     TypeInformation<Edge<Long, ED>> edgeTypeInfo =
       new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
         BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(edgeDataFactory.getType()));
+          TypeExtractor.createTypeInfo(edgeDataFactory.getType()));
     // used for type hinting when loading graph data
     TypeInformation<Subgraph<Long, GD>> graphTypeInfo =
       new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
@@ -273,24 +271,6 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
       .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
     getCollection().getSubgraphs()
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
-    env.execute();
-  }
-
-  public void writeAsEdgeList(final String edgeListFile) throws Exception {
-    getDatabaseGraph().getGellyGraph().getTriplets()
-      .writeAsFormattedText(edgeListFile,
-        new TextOutputFormat.TextFormatter<Triplet<Long, VD, ED>>() {
-          @Override
-          public String format(Triplet<Long, VD, ED> longVDEDTriplet) {
-            return String.format("[%d][%s] --[%d][%s]--> [%d][%s]",
-              longVDEDTriplet.getSrcVertex().getId(),
-              longVDEDTriplet.getSrcVertex().getValue().getLabel(),
-              longVDEDTriplet.getEdge().getValue().getId(),
-              longVDEDTriplet.getEdge().getValue().getLabel(),
-              longVDEDTriplet.getTrgVertex().getId(),
-              longVDEDTriplet.getTrgVertex().getValue().getLabel());
-          }
-        });
     env.execute();
   }
 
@@ -382,7 +362,8 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
   }
 
   /**
-   * Creates a database from collections of vertex, edge and graph data objects.
+   * Creates a database from collections of vertex, edge and graph data
+   * objects.
    * <p/>
    * Uses default factories for POJO creation.
    *
@@ -477,7 +458,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     TypeInformation<Edge<Long, ED>> edgeTypeInfo =
       new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
         BasicTypeInfo.LONG_TYPE_INFO, TypeExtractor.createTypeInfo(
-        epgmStore.getEdgeDataHandler().getEdgeDataFactory().getType()));
+          epgmStore.getEdgeDataHandler().getEdgeDataFactory().getType()));
     // used for type hinting when loading graph data
     TypeInformation<Subgraph<Long, GD>> graphTypeInfo =
       new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,

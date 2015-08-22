@@ -44,6 +44,10 @@ import org.gradoop.model.helper.FlinkConstants;
 /**
  * Summarization implementation that does not require sorting of vertex groups.
  *
+ * Note: This implementation uses the group combine operator in Flink. The
+ * operator is performed in memory and throws exceptions when the data to
+ * process exceed available memory.
+ *
  * Algorithmic idea:
  *
  * 1) group vertices by label / property / both
@@ -291,11 +295,128 @@ public class SummarizationGroupCombine<VD extends VertexData, ED extends
   }
 
   /**
+   * Takes a vertex as input and creates an initial {@link VertexGroupItem}.
+   * As group combine is executed per partition, there may be partial results
+   * which need to be combined in the group reduce function later.
+   *
+   * Each partition creates a {@link VertexGroupItem} for each element in the
+   * group and one additional {@link VertexGroupItem} that represents the
+   * partition (i.e, partition count).
+   *
+   * @param <VD>
+   */
+  private static class VertexGroupCombineFunction<VD extends VertexData>
+    implements
+    GroupCombineFunction<Vertex<Long, VD>, VertexGroupItem> {
+
+    /**
+     * Vertex property key used for grouping.
+     */
+    private final String groupPropertyKey;
+    /**
+     * True, if vertex label shall be considered.
+     */
+    private final boolean useLabel;
+    /**
+     * True, if vertex property shall be considered.
+     */
+    private final boolean useProperty;
+    /**
+     * Avoid additional object initialization.
+     */
+    private final VertexGroupItem reuseVertexGroupItem;
+
+    /**
+     * Creates group combine function
+     *
+     * @param groupPropertyKey vertex grouping key
+     * @param useLabel         true, if vertex label shall be considered
+     */
+    public VertexGroupCombineFunction(String groupPropertyKey,
+      boolean useLabel) {
+      this.groupPropertyKey = groupPropertyKey;
+      this.useLabel = useLabel;
+      this.useProperty =
+        groupPropertyKey != null && !"".equals(groupPropertyKey);
+      this.reuseVertexGroupItem = new VertexGroupItem();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void combine(Iterable<Vertex<Long, VD>> vertices,
+      Collector<VertexGroupItem> collector) throws Exception {
+
+      Long groupRepresentativeVertexId = null;
+      Long groupPartitionCount = 0L;
+      String groupLabel;
+      String groupPropertyValue;
+      boolean firstElement = true;
+
+      for (Vertex<Long, VD> vertex : vertices) {
+        reuseVertexGroupItem.setVertexId(vertex.getId());
+        if (firstElement) {
+          groupRepresentativeVertexId = vertex.getId();
+          groupLabel = getGroupLabel(vertex.getValue());
+          groupPropertyValue = getGroupPropertyValue(vertex.getValue());
+
+
+          reuseVertexGroupItem
+            .setGroupRepresentativeVertexId(groupRepresentativeVertexId);
+          reuseVertexGroupItem.setGroupLabel(groupLabel);
+          reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);
+
+          firstElement = false;
+        }
+
+        groupPartitionCount++;
+        collector.collect(reuseVertexGroupItem);
+      }
+      reuseVertexGroupItem.setVertexId(groupRepresentativeVertexId);
+      reuseVertexGroupItem.setGroupCount(groupPartitionCount);
+
+      collector.collect(reuseVertexGroupItem);
+      reuseVertexGroupItem.reset();
+    }
+
+    /**
+     * Returns the group label to be set or null if grouping on vertex label
+     * is not necessary.
+     *
+     * @param vertexData vertex data object
+     * @return vertex group label
+     */
+    private String getGroupLabel(VD vertexData) {
+      return useLabel ? vertexData.getLabel() : null;
+    }
+
+    /**
+     * Returns the group property value or the default value if vertices in
+     * the group do not have the property.
+     *
+     * @param vertexData vertex data object of the summarized vertex
+     * @return vertex group value
+     */
+    private String getGroupPropertyValue(VD vertexData) {
+      if (useProperty && vertexData.getProperty(groupPropertyKey) != null) {
+        return vertexData.getProperty(groupPropertyKey).toString();
+      } else if (useProperty) {
+        // just in case we need to group on property and the vertex has none
+        return NULL_VALUE;
+      } else {
+        return null;
+      }
+    }
+  }
+
+
+  /**
    * Takes the output tuples of the group combine step and chooses a group
    * representative (group representative of first incoming tuple).
    * Replaces the group representative of all following tuples with group
    * final group representative.
-   *
+   * <p/>
    * When reading partition representative tuple, the final group count gets
    * accumulated and the group label / property is read from the first
    * partition representative tuple.
@@ -333,23 +454,24 @@ public class SummarizationGroupCombine<VD extends VertexData, ED extends
           groupRepresentativeVertexId =
             vertexGroupItem.getGroupRepresentativeVertexId();
           firstElement = false;
-
+          // if label grouping is needed, each tuple carries the label
           if (vertexGroupItem.getGroupLabel() != null) {
             groupLabel = vertexGroupItem.getGroupLabel();
           }
-
+          // if property grouping is needed, each tuple carries the value
           if (vertexGroupItem.getGroupPropertyValue() != null) {
             groupPropertyValue = vertexGroupItem.getGroupPropertyValue();
           }
         }
-
         reuseVertexGroupItem.setVertexId(vertexGroupItem.getVertexId());
         reuseVertexGroupItem
           .setGroupRepresentativeVertexId(groupRepresentativeVertexId);
 
+        // only partition representative tuples have a group count > 0
         if (vertexGroupItem.getGroupCount().equals(0L)) {
           collector.collect(reuseVertexGroupItem);
         } else {
+          // accumulate final group count from partition representative tuples
           groupCount += vertexGroupItem.getGroupCount();
         }
       }
@@ -362,83 +484,6 @@ public class SummarizationGroupCombine<VD extends VertexData, ED extends
 
       collector.collect(reuseVertexGroupItem);
       reuseVertexGroupItem.reset();
-    }
-  }
-
-  private static class VertexGroupCombineFunction<VD extends VertexData>
-    implements
-    GroupCombineFunction<Vertex<Long, VD>, VertexGroupItem> {
-
-    private final String groupPropertyKey;
-    private final boolean useLabel;
-    private final boolean useProperty;
-    private final VertexGroupItem reuseVertexGroupItem;
-
-    public VertexGroupCombineFunction(String groupPropertyKey,
-      boolean useLabel) {
-      this.groupPropertyKey = groupPropertyKey;
-      this.useLabel = useLabel;
-      this.useProperty =
-        groupPropertyKey != null && !"".equals(groupPropertyKey);
-      this.reuseVertexGroupItem = new VertexGroupItem();
-    }
-
-    @Override
-    public void combine(Iterable<Vertex<Long, VD>> vertices,
-      Collector<VertexGroupItem> collector) throws Exception {
-
-      Long groupRepresentativeVertexId = null;
-      Long groupPartitionCount = 0L;
-      String groupLabel;
-      String groupPropertyValue;
-      boolean firstElement = true;
-
-      for (Vertex<Long, VD> vertex : vertices) {
-        reuseVertexGroupItem.setVertexId(vertex.getId());
-        if (firstElement) {
-          groupRepresentativeVertexId = vertex.getId();
-          groupLabel = getGroupLabel(vertex.getValue());
-          groupPropertyValue = getGroupPropertyValue(vertex.getValue());
-
-
-          reuseVertexGroupItem
-            .setGroupRepresentativeVertexId(groupRepresentativeVertexId);
-          reuseVertexGroupItem.setGroupLabel(groupLabel);
-          reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);
-
-          firstElement = false;
-        }
-
-        groupPartitionCount++;
-        collector.collect(reuseVertexGroupItem);
-      }
-      reuseVertexGroupItem.setVertexId(groupRepresentativeVertexId);
-      reuseVertexGroupItem.setGroupCount(groupPartitionCount);
-
-      collector.collect(reuseVertexGroupItem);
-      reuseVertexGroupItem.reset();
-    }
-
-    private String getGroupLabel(VD vertexData) {
-      return useLabel ? vertexData.getLabel() : null;
-    }
-
-    /**
-     * Returns the group property value or the default value if vertices in
-     * the group do not have the property.
-     *
-     * @param vertexData vertex data object of the summarized vertex
-     * @return vertex group value
-     */
-    private String getGroupPropertyValue(VD vertexData) {
-      if (useProperty && vertexData.getProperty(groupPropertyKey) != null) {
-        return vertexData.getProperty(groupPropertyKey).toString();
-      } else if (useProperty) {
-        // just in case we need to group on property and the vertex has none
-        return NULL_VALUE;
-      } else {
-        return null;
-      }
     }
   }
 

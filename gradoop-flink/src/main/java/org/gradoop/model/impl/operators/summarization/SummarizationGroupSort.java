@@ -17,12 +17,25 @@ import org.gradoop.model.helper.KeySelectors;
  * Summarization implementation that requires sorting of vertex groups to chose
  * a group representative.
  *
+ * Algorithmic idea:
+ *
+ * 1) group vertices by label / property / both
+ * 2) sort groups by vertex identifier ascending
+ * 3a) reduce group 1
+ * - build summarized vertex from each group (group count, group label/prop)
+ * 3b) reduce group 2
+ * - build {@link VertexWithRepresentative} tuples for each group element
+ * 4) join output from 3b) with edges
+ * - replace source / target vertex id with vertex group representative
+ * 5) group edges on source/target vertex and possibly edge label / property
+ * 6) build summarized edges
+ *
  * @param <VD> vertex data type
  * @param <ED> edge data type
  * @param <GD> graph data type
  */
-public class SummarizationGroupSort<VD extends VertexData, ED extends EdgeData,
-  GD extends GraphData> extends
+public class SummarizationGroupSort<VD extends VertexData, ED extends
+  EdgeData, GD extends GraphData> extends
   Summarization<VD, ED, GD> {
 
   /**
@@ -74,7 +87,7 @@ public class SummarizationGroupSort<VD extends VertexData, ED extends EdgeData,
   /**
    * Takes a group of vertex ids as input an emits a (vertex-id,
    * group-representative) tuple for each vertex in that group.
-   * <p>
+   * <p/>
    * The group representative is the first vertex-id in the group.
    */
   private static class VertexToRepresentativeReducer<VD extends VertexData>

@@ -617,10 +617,12 @@ public abstract class Summarization<VD extends VertexData, ED extends
      */
     private final String groupPropertyKey;
     /**
-     * True if vertex label shall be used
+     * True, if vertex label shall be considered.
      */
     private final boolean useLabel;
-
+    /**
+     * True, if vertex property shall be considered.
+     */
     private final boolean useProperty;
 
     /**
