@@ -27,11 +27,17 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupCombine;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupMap;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupSort;
+import org.gradoop.model.impl.operators.summarization
+  .SummarizationGroupWithLists;
 
 /**
- * Summarization example that can be executed on a cluster.
+ * SummarizationExample example that can be executed on a cluster.
  */
-public class Summarization implements ProgramDescription {
+public class SummarizationExample implements ProgramDescription {
 
   /**
    * Vertex input path option
@@ -58,9 +64,13 @@ public class Summarization implements ProgramDescription {
    */
   public static final String OPTION_USE_VERTEX_LABELS = "uvl";
   /**
-   * Use edge label options
+   * Use edge label option
    */
   public static final String OPTION_USE_EDGE_LABELS = "uel";
+  /**
+   * Summarize strategy option
+   */
+  public static final String OPTION_SUMMARIZE_STRATEGY = "sst";
 
   /**
    * Command line options
@@ -83,6 +93,8 @@ public class Summarization implements ProgramDescription {
       "Summarize on vertex labels");
     OPTIONS.addOption(OPTION_USE_EDGE_LABELS, "use-edge-labels", false,
       "Summarize on edge labels");
+    OPTIONS.addOption(OPTION_SUMMARIZE_STRATEGY, "summarize-strategy", true,
+      "Set summarization strategy [combine (default),map,sort,list]");
   }
 
   /**
@@ -91,21 +103,15 @@ public class Summarization implements ProgramDescription {
    * @param args program arguments
    * @throws Exception
    */
+  @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args);
     if (cmd == null) {
       return;
     }
-
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
+    // read arguments from command line
     final String vertexInputPath = cmd.getOptionValue(OPTION_VERTEX_INPUT_PATH);
     final String edgeInputPath = cmd.getOptionValue(OPTION_EDGE_INPUT_PATH);
-
-    EPGMDatabase graphStore =
-      EPGMDatabase.fromJsonFile(vertexInputPath, edgeInputPath, env);
-
-    LogicalGraph databaseGraph = graphStore.getDatabaseGraph();
 
     boolean useVertexKey = cmd.hasOption(OPTION_VERTEX_GROUPING_KEY);
     String vertexKey =
@@ -115,35 +121,22 @@ public class Summarization implements ProgramDescription {
       useEdgeKey ? cmd.getOptionValue(OPTION_EDGE_GROUPING_KEY) : null;
     boolean useVertexLabels = cmd.hasOption(OPTION_USE_VERTEX_LABELS);
     boolean useEdgeLabels = cmd.hasOption(OPTION_USE_EDGE_LABELS);
+    String summarizationStrategy =
+      cmd.getOptionValue(OPTION_SUMMARIZE_STRATEGY, "combine");
 
-    LogicalGraph summarizedGraph = null;
-    if (useVertexLabels && useEdgeLabels && useVertexKey && useEdgeKey) {
-      summarizedGraph =
-        databaseGraph.summarizeOnVertexAndEdgeLabel(vertexKey, edgeKey);
-    } else if (useVertexLabels && useEdgeLabels && useVertexKey) {
-      summarizedGraph =
-        databaseGraph.summarizeOnVertexAndEdgeLabelAndVertexProperty(vertexKey);
-    } else if (useVertexLabels && useEdgeLabels && useEdgeKey) {
-      summarizedGraph =
-        databaseGraph.summarizeOnVertexAndEdgeLabelAndEdgeProperty(edgeKey);
-    } else if (useVertexLabels && useEdgeLabels) {
-      summarizedGraph = databaseGraph.summarizeOnVertexAndEdgeLabel();
-    } else if (useVertexLabels && useVertexKey && useEdgeKey) {
-      summarizedGraph =
-        databaseGraph.summarizeOnVertexLabel(vertexKey, edgeKey);
-    } else if (useVertexLabels && useVertexKey) {
-      summarizedGraph =
-        databaseGraph.summarizeOnVertexLabelAndVertexProperty(vertexKey);
-    } else if (useVertexLabels && useEdgeKey) {
-      summarizedGraph =
-        databaseGraph.summarizeOnVertexLabelAndEdgeProperty(edgeKey);
-    } else if (useVertexLabels) {
-      summarizedGraph = databaseGraph.summarizeOnVertexLabel();
-    } else if (useVertexKey && useEdgeKey) {
-      summarizedGraph = databaseGraph.summarize(vertexKey, edgeKey);
-    } else if (useVertexKey) {
-      summarizedGraph = databaseGraph.summarize(vertexKey);
-    }
+    // initialize EPGM database
+    EPGMDatabase graphDatabase = EPGMDatabase
+      .fromJsonFile(vertexInputPath, edgeInputPath,
+        ExecutionEnvironment.getExecutionEnvironment());
+
+    // initialize summarization method
+    Summarization summarization =
+      getSummarization(vertexKey, edgeKey, useVertexLabels, useEdgeLabels,
+        summarizationStrategy);
+    // call summarization on whole database graph
+    LogicalGraph summarizedGraph =
+      graphDatabase.getDatabaseGraph().callForGraph(summarization);
+
     if (summarizedGraph != null) {
       if (cmd.hasOption(OPTION_OUTPUT_PATH)) {
         writeOutputFiles(summarizedGraph,
@@ -154,6 +147,45 @@ public class Summarization implements ProgramDescription {
     } else {
       System.err.println("wrong parameter constellation");
     }
+  }
+
+  /**
+   * Returns the summarization implementation based on the given strategy.
+   *
+   * @param vertexKey             vertex property key used for summarization
+   * @param edgeKey               edge property key used for summarization
+   * @param useVertexLabels       use vertex label for summarization,
+   *                              true/false
+   * @param useEdgeLabels         use edge label for summarization, true/false
+   * @param summarizationStrategy summarization strategy
+   * @return summarization implementation
+   */
+  private static Summarization getSummarization(String vertexKey,
+    String edgeKey, boolean useVertexLabels, boolean useEdgeLabels,
+    String summarizationStrategy) {
+    Summarization summarization;
+    switch (summarizationStrategy) {
+    case "map":
+      summarization =
+        new SummarizationGroupMap(vertexKey, edgeKey, useVertexLabels,
+          useEdgeLabels);
+      break;
+    case "sort":
+      summarization =
+        new SummarizationGroupSort(vertexKey, edgeKey, useVertexLabels,
+          useEdgeLabels);
+      break;
+    case "list":
+      summarization =
+        new SummarizationGroupWithLists(vertexKey, edgeKey, useVertexLabels,
+          useEdgeLabels);
+      break;
+    default:
+      summarization =
+        new SummarizationGroupCombine(vertexKey, edgeKey, useVertexLabels,
+          useEdgeLabels);
+    }
+    return summarization;
   }
 
   /**
@@ -187,7 +219,7 @@ public class Summarization implements ProgramDescription {
     ParseException {
     if (args.length == 0) {
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp(Summarization.class.getName(), OPTIONS, true);
+      formatter.printHelp(SummarizationExample.class.getName(), OPTIONS, true);
       return null;
     }
     CommandLineParser parser = new BasicParser();
@@ -222,6 +254,6 @@ public class Summarization implements ProgramDescription {
    */
   @Override
   public String getDescription() {
-    return Summarization.class.getName();
+    return SummarizationExample.class.getName();
   }
 }

@@ -241,6 +241,45 @@ public abstract class Summarization<VD extends VertexData, ED extends
   }
 
   /**
+   * Group vertices by either vertex label, vertex property or both.
+   *
+   * @param groupVertices dataset containing vertex representation for grouping
+   * @return unsorted vertex grouping
+   */
+  protected UnsortedGrouping<VertexForGrouping> groupVertices(
+    DataSet<VertexForGrouping> groupVertices) {
+    UnsortedGrouping<VertexForGrouping> vertexGrouping;
+    if (useVertexLabels() && useVertexProperty()) {
+      vertexGrouping = groupVertices.groupBy(1, 2);
+    } else if (useVertexLabels()) {
+      vertexGrouping = groupVertices.groupBy(1);
+    } else {
+      vertexGrouping = groupVertices.groupBy(2);
+    }
+    return vertexGrouping;
+  }
+
+  /**
+   * Groups {@link VertexGroupItem} by either vertex label, vertex property
+   * or both. This is used by group combine approaches.
+   *
+   * @param groupedVertices dataset containing vertex group items
+   * @return unsorted grouping
+   */
+  protected UnsortedGrouping<VertexGroupItem> groupVertexGroupItems(
+    DataSet<VertexGroupItem> groupedVertices) {
+    UnsortedGrouping<VertexGroupItem> vertexGrouping;
+    if (useVertexLabels() && useVertexProperty()) {
+      vertexGrouping = groupedVertices.groupBy(2, 3);
+    } else if (useVertexLabels()) {
+      vertexGrouping = groupedVertices.groupBy(2);
+    } else {
+      vertexGrouping = groupedVertices.groupBy(3);
+    }
+    return vertexGrouping;
+  }
+
+  /**
    * Constructs new summarized vertices representing a group of vertices.
    *
    * @param groupedSortedVertices grouped and sorted vertices

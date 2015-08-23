@@ -17,27 +17,14 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
-import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.tuple.Tuple3;
 
 /**
- * Vertex representation which is used as output of group reduce.
+ * Minimalistic representation of a vertex which is used for grouping.
  *
- * Consists of
- * - vertex id
- * - group representative vertex id
- * - group label
- * - group property
- * - total group count
+ * Consists of vertex id, vertex label and vertex property value.
  */
-public class VertexGroupItem extends Tuple5<Long, Long, String, String, Long> {
-
-  /**
-   * Creates a vertex group item.
-   */
-  public VertexGroupItem() {
-    setGroupCount(0L);
-  }
-
+public class VertexForGrouping extends Tuple3<Long, String, String> {
   public Long getVertexId() {
     return f0;
   }
@@ -46,47 +33,19 @@ public class VertexGroupItem extends Tuple5<Long, Long, String, String, Long> {
     f0 = vertexId;
   }
 
-  public Long getGroupRepresentativeVertexId() {
+  public String getGroupLabel() {
     return f1;
   }
 
-  public void setGroupRepresentativeVertexId(Long groupRepresentativeVertexId) {
-    f1 = groupRepresentativeVertexId;
-  }
-
-  public String getGroupLabel() {
-    return f2;
-  }
-
   public void setGroupLabel(String groupLabel) {
-    f2 = groupLabel;
+    f1 = groupLabel;
   }
 
   public String getGroupPropertyValue() {
-    return f3;
+    return f2;
   }
 
   public void setGroupPropertyValue(String groupPropertyValue) {
-    f3 = groupPropertyValue;
-  }
-
-  public Long getGroupCount() {
-    return f4;
-  }
-
-  public void setGroupCount(Long groupCount) {
-    f4 = groupCount;
-  }
-
-  /**
-   * Resets the fields to initial values. This is necessary if the tuples are
-   * reused and not all fields are set by a thread.
-   */
-  public void reset() {
-    f0 = null;
-    f1 = null;
-    f2 = null;
-    f3 = null;
-    f4 = 0L;
+    f2 = groupPropertyValue;
   }
 }
