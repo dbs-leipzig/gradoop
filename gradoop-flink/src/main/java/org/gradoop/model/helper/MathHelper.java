@@ -17,6 +17,9 @@
 
 package org.gradoop.model.helper;
 
+/**
+ * Contains math helper methods.
+ */
 public abstract class MathHelper {
 
   /**

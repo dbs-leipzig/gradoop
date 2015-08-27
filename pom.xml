@@ -7,7 +7,7 @@
     <groupId>de.uni-leipzig.de.dbs</groupId>
     <artifactId>gradoop</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -16,11 +16,9 @@
 
     <modules>
         <module>gradoop-core</module>
-        <module>gradoop-giraph</module>
+        <module>gradoop-flink</module>
         <module>gradoop-examples</module>
         <module>gradoop-checkstyle</module>
-        <module>gradoop-mapreduce</module>
-        <module>gradoop-flink</module>
     </modules>
 
     <developers>
@@ -66,22 +64,21 @@
         <project.build.targetJdk>1.7</project.build.targetJdk>
 
         <dep.flink.version>0.9.0</dep.flink.version>
-        <dep.giraph.version>1.1.0-hadoop2</dep.giraph.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
-        <dep.httpclient.version>4.1.3</dep.httpclient.version>
         <dep.junit.version>4.11</dep.junit.version>
         <dep.junitparams.version>1.0.4</dep.junitparams.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>1.10.19</dep.mockito.version>
-        <dep.neo4j.version>2.1.7</dep.neo4j.version>
+
+        <log4j.properties>log4j-test.properties</log4j.properties>
 
         <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.13</plugin.maven-checkstyle.version>
         <plugin.maven-findbugs.version>2.5.2</plugin.maven-findbugs.version>
         <plugin.maven_assembly.version>2.4</plugin.maven_assembly.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
-        <plugin.maven-surefire.version>2.6</plugin.maven-surefire.version>
+        <plugin.maven-surefire.version>2.7</plugin.maven-surefire.version>
     </properties>
 
     <build>
@@ -174,7 +171,10 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${plugin.maven-surefire.version}</version>
                     <configuration>
-                        <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+                        <excludes>
+                            <exclude>**/*TestBase*.class</exclude>
+                        </excludes>
+                        <argLine>-Xmx512M -Dlog4j.configuration=${log4j.properties}</argLine>
                     </configuration>
                 </plugin>
             </plugins>
@@ -193,18 +193,6 @@
 
             <dependency>
                 <groupId>de.uni-leipzig.de.dbs</groupId>
-                <artifactId>gradoop-giraph</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
-                <artifactId>gradoop-mapreduce</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
                 <artifactId>gradoop-flink</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -214,12 +202,14 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-java</artifactId>
                 <version>${dep.flink.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-clients</artifactId>
                 <version>${dep.flink.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -228,11 +218,10 @@
                 <version>${dep.flink.version}</version>
             </dependency>
 
-            <!-- Giraph -->
             <dependency>
-                <groupId>org.apache.giraph</groupId>
-                <artifactId>giraph-core</artifactId>
-                <version>${dep.giraph.version}</version>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-hbase</artifactId>
+                <version>${dep.flink.version}</version>
             </dependency>
 
             <!-- HBase -->
@@ -242,25 +231,13 @@
                 <version>${dep.hbase.version}</version>
                 <scope>provided</scope>
             </dependency>
-            
-            <!-- Neo4j -->
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j</artifactId>
-                <version>${dep.neo4j.version}</version>
-            </dependency>
 
             <!-- Others -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${dep.httpclient.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- test dependencies -->
@@ -269,23 +246,6 @@
                 <groupId>de.uni-leipzig.de.dbs</groupId>
                 <artifactId>gradoop-core</artifactId>
                 <version>${project.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
-                <artifactId>gradoop-giraph</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- Giraph -->
-            <dependency>
-                <groupId>org.apache.giraph</groupId>
-                <artifactId>giraph-core</artifactId>
-                <version>${dep.giraph.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -312,13 +272,6 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${dep.junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>pl.pragmatists</groupId>
-                <artifactId>JUnitParams</artifactId>
-                <version>${dep.junitparams.version}</version>
                 <scope>test</scope>
             </dependency>
 

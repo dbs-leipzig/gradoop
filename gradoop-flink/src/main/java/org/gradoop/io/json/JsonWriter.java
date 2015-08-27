@@ -22,9 +22,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.Subgraph;
 
 /**
@@ -33,19 +33,25 @@ import org.gradoop.model.impl.Subgraph;
 public class JsonWriter extends JsonIO {
   /**
    * Converts a vertex into the following format:
-   *
+   * <p>
    * {
    * "id":0,
    * "data":{"name":"Alice","gender":"female","age":42},
    * "meta":{"label":"Employee","graphs":[0,1,2,3]}
    * }
    */
-  public static class VertexTextFormatter extends
+  public static class VertexTextFormatter<VD extends VertexData> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Vertex<Long, EPFlinkVertexData>> {
+    TextOutputFormat.TextFormatter<Vertex<Long, VD>> {
 
+    /**
+     * Creates a JSON string representation of a vertex data object.
+     *
+     * @param v vertex data
+     * @return JSON string representation
+     */
     @Override
-    public String format(Vertex<Long, EPFlinkVertexData> v) {
+    public String format(Vertex<Long, VD> v) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, v.getId());
@@ -60,7 +66,7 @@ public class JsonWriter extends JsonIO {
 
   /**
    * Converts an edge into the following format:
-   *
+   * <p>
    * {
    * "id":0,
    * "source":1,
@@ -69,11 +75,18 @@ public class JsonWriter extends JsonIO {
    * "meta":{"label":"friendOf","graphs":[0,1,2,3]}
    * }
    */
-  public static class EdgeTextFormatter extends EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Edge<Long, EPFlinkEdgeData>> {
+  public static class EdgeTextFormatter<ED extends EdgeData> extends
+    EntityToJsonFormatter implements
+    TextOutputFormat.TextFormatter<Edge<Long, ED>> {
 
+    /**
+     * Creates a JSON string representation from a given edge data object.
+     *
+     * @param e edge data object
+     * @return JSON string representation
+     */
     @Override
-    public String format(Edge<Long, EPFlinkEdgeData> e) {
+    public String format(Edge<Long, ED> e) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, e.getValue().getId());
@@ -90,24 +103,30 @@ public class JsonWriter extends JsonIO {
 
   /**
    * Converts a graph into the following format:
-   *
+   * <p>
    * {
    * "id":0,
    * "data":{"title":"Graph Community"},
    * "meta":{"label":"Community"}
    * }
    */
-  public static class GraphTextFormatter extends
+  public static class GraphTextFormatter<GD extends GraphData> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Subgraph<Long, EPFlinkGraphData>> {
+    TextOutputFormat.TextFormatter<Subgraph<Long, GD>> {
 
+    /**
+     * Creates a JSON string representation of a given graph data object.
+     *
+     * @param g graph data object
+     * @return JSON string representation
+     */
     @Override
-    public String format(Subgraph<Long, EPFlinkGraphData> g) {
+    public String format(Subgraph<Long, GD> g) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, g.getId());
         json.put(DATA, writeProperties(g.getValue()));
-        json.put(META, writeMeta(g.getValue()));
+        json.put(META, writeGraphMeta(g.getValue()));
       } catch (JSONException ex) {
         ex.printStackTrace();
       }

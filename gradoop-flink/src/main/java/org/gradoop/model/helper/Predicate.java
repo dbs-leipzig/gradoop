@@ -17,7 +17,19 @@
 
 package org.gradoop.model.helper;
 
+/**
+ * Used by predicate based operations (e.g., Selection, Filter).
+ *
+ * @param <T> type to perform predicate function on
+ */
 public interface Predicate<T> {
 
+  /**
+   * Returns true if {@code entity} fulfils the predicate.
+   *
+   * @param entity entity to apply predicate on
+   * @return true if predicate is fulfilled, false otherwise
+   * @throws Exception
+   */
   boolean filter(T entity) throws Exception;
 }

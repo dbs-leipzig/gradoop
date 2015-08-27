@@ -1,196 +1,204 @@
 package org.gradoop.storage.hbase;
 
 import com.google.common.collect.Lists;
-import org.gradoop.GConstants;
-import org.gradoop.GradoopClusterTest;
-import org.gradoop.model.Edge;
-import org.gradoop.model.Graph;
-import org.gradoop.model.Vertex;
-import org.gradoop.model.impl.GraphFactory;
-import org.gradoop.model.impl.VertexFactory;
-import org.gradoop.storage.GraphStore;
+import com.google.common.collect.Sets;
+import org.gradoop.HBaseTestBase;
+import org.gradoop.model.VertexData;
+import org.gradoop.model.VertexDataFactory;
+import org.gradoop.model.impl.DefaultEdgeData;
+import org.gradoop.model.impl.DefaultGraphData;
+import org.gradoop.model.impl.DefaultVertexData;
+import org.gradoop.model.impl.DefaultVertexDataFactory;
+import org.gradoop.storage.EPGMStore;
+import org.gradoop.storage.PersistentEdgeData;
+import org.gradoop.storage.PersistentGraphData;
+import org.gradoop.storage.PersistentVertexData;
+import org.gradoop.storage.PersistentVertexDataFactory;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class HBaseGraphStoreTest extends GradoopClusterTest {
+public class HBaseGraphStoreTest extends HBaseTestBase {
 
-  private Iterable<Graph> createGraphs() {
-    List<Graph> graphs = new ArrayList<>();
-
-    // graph 0
-    Long graphID = 0L;
-    String graphLabel = "A";
-    Map<String, Object> graphProperties = new HashMap<>();
-    graphProperties.put("k1", "v1");
-    graphProperties.put("k2", "v2");
-    List<Long> vertices = new ArrayList<>();
-    vertices.add(0L);
-    vertices.add(1L);
-
-    graphs.add(GraphFactory
-      .createDefaultGraph(graphID, graphLabel, graphProperties, vertices));
-
-    // graph 1
-    graphID = 1L;
-    graphLabel = "A";
-    graphProperties = new HashMap<>();
-    graphProperties.put("k1", "v1");
-    vertices = new ArrayList<>();
-    vertices.add(1L);
-    vertices.add(2L);
-
-    graphs.add(GraphFactory
-      .createDefaultGraph(graphID, graphLabel, graphProperties, vertices));
-
-    return graphs;
-  }
-
+  /**
+   * Creates persistent graph, vertex and edge data. Writes data to HBase,
+   * closes the store, opens it and reads/validates the data again.
+   */
   @Test
-  public void writeCloseOpenReadTest() throws InterruptedException, IOException,
-    ClassNotFoundException {
-    GraphStore graphStore = createEmptyGraphStore();
+  public void writeCloseOpenReadTest() {
+    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData> graphStore =
+      createEmptyEPGMStore();
 
-    // storage some data
-    for (Vertex v : createExtendedGraphVertices()) {
-      graphStore.writeVertex(v);
+    for (PersistentVertexData<DefaultEdgeData> v : createPersistentVertexData
+      ()) {
+      graphStore.writeVertexData(v);
     }
-
-    for (Graph g : createGraphs()) {
-      graphStore.writeGraph(g);
+    for (PersistentEdgeData<DefaultVertexData> e : createPersistentEdgeData()) {
+      graphStore.writeEdgeData(e);
+    }
+    for (PersistentGraphData g : createPersistentGraphData()) {
+      graphStore.writeGraphData(g);
     }
 
     // re-open
     graphStore.close();
-    graphStore = openGraphStore();
+    graphStore = openEPGMStore();
 
     // validate
-    validateGraphs(graphStore);
-    validateSingleVertices(graphStore);
-    validateAllVertices(graphStore);
-    validateEdges(graphStore);
+    validateGraphData(graphStore);
+    validateVertexData(graphStore);
+    validateEdgeData(graphStore);
     graphStore.close();
   }
 
-  @Test
-  public void writeFlushReadEdgesTest() {
-    GraphStore graphStore = createEmptyGraphStore();
-    graphStore.setAutoFlush(false);
-    for (Vertex v : createExtendedGraphVertices()) {
-      graphStore.writeVertex(v);
-    }
-    graphStore.flush();
-
-    validateEdges(graphStore);
-    graphStore.close();
-  }
-
+  /**
+   * Creates persistent graph, vertex and edge data. Writes data to HBase,
+   * flushes the tables and reads/validates the data.
+   */
   @Test
   public void writeFlushReadTest() {
-    GraphStore graphStore = createEmptyGraphStore();
+    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData> graphStore =
+      createEmptyEPGMStore();
     graphStore.setAutoFlush(false);
 
     // store some data
-    for (Vertex v : createExtendedGraphVertices()) {
-      graphStore.writeVertex(v);
+    for (PersistentGraphData g : createPersistentGraphData()) {
+      graphStore.writeGraphData(g);
     }
-    for (Graph g : createGraphs()) {
-      graphStore.writeGraph(g);
+    for (PersistentVertexData<DefaultEdgeData> v : createPersistentVertexData
+      ()) {
+      graphStore.writeVertexData(v);
+    }
+    for (PersistentEdgeData<DefaultVertexData> e : createPersistentEdgeData()) {
+      graphStore.writeEdgeData(e);
     }
 
     // flush changes
     graphStore.flush();
 
     // validate
-    validateGraphs(graphStore);
-    validateSingleVertices(graphStore);
+    validateGraphData(graphStore);
+    validateVertexData(graphStore);
+    validateEdgeData(graphStore);
+
     graphStore.close();
   }
 
-  private void validateGraphs(GraphStore graphStore) {
-    // g0
-    Graph g = graphStore.readGraph(0L);
-    assertNotNull(g);
-    assertEquals("A", g.getLabel());
-    List<Long> vertices = Lists.newArrayList(g.getVertices());
-    assertEquals(2, vertices.size());
-    assertTrue(vertices.contains(0L));
-    assertTrue(vertices.contains(1L));
-    List<String> propertyKeys = Lists.newArrayList(g.getPropertyKeys());
-    assertEquals(2, propertyKeys.size());
-    for (String key : propertyKeys) {
-      if (key.equals("k1")) {
-        assertEquals("v1", g.getProperty("k1"));
-      } else if (key.equals("v2")) {
-        assertEquals("v2", g.getProperty("k2"));
-      }
+  /**
+   * Stores some data and iterates over it. Checks correct amount.
+   *
+   * @throws InterruptedException
+   * @throws IOException
+   * @throws ClassNotFoundException
+   */
+  @Test
+  public void iteratorTest() throws InterruptedException, IOException,
+    ClassNotFoundException {
+    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData> graphStore =
+      createEmptyEPGMStore();
+
+    Collection<PersistentVertexData<DefaultEdgeData>> persistentVertexData =
+      createPersistentSocialVertexData();
+    Collection<PersistentEdgeData<DefaultVertexData>> persistentEdgeData =
+      createPersistentSocialEdgeData();
+    Collection<PersistentGraphData> persistentGraphData =
+      createPersistentSocialGraphData();
+
+    // store some data
+    for (PersistentGraphData g : persistentGraphData) {
+      graphStore.writeGraphData(g);
+    }
+    for (PersistentVertexData<DefaultEdgeData> v : persistentVertexData) {
+      graphStore.writeVertexData(v);
+    }
+    for (PersistentEdgeData<DefaultVertexData> e : persistentEdgeData) {
+      graphStore.writeEdgeData(e);
     }
 
-    // g1
-    g = graphStore.readGraph(1L);
-    assertNotNull(g);
-    assertEquals("A", g.getLabel());
-    vertices = Lists.newArrayList(g.getVertices());
-    assertEquals(2, vertices.size());
-    assertTrue(vertices.contains(1L));
-    assertTrue(vertices.contains(2L));
-    propertyKeys = Lists.newArrayList(g.getPropertyKeys());
-    assertEquals(1, propertyKeys.size());
-    assertEquals("v1", g.getProperty("k1"));
-  }
+    graphStore.flush();
 
-  private void validateSingleVertices(GraphStore graphStore) {
-    List<Vertex> vertexResult =
-      Lists.newArrayListWithCapacity(EXTENDED_GRAPH.length);
-    for (long l = 0L; l < EXTENDED_GRAPH.length; l++) {
-      vertexResult.add(graphStore.readVertex(l));
+    // check graph count
+    int cnt = 0;
+    for (Iterator<DefaultGraphData> graphDataIterator =
+         graphStore.getGraphSpace(); graphDataIterator.hasNext(); ) {
+      cnt++;
     }
-    validateExtendedGraphVertices(vertexResult);
+    assertEquals("wrong graph count", persistentGraphData.size(), cnt);
+
+    // check vertex count
+    cnt = 0;
+    for (Iterator<DefaultVertexData> vertexDataIterator =
+         graphStore.getVertexSpace(); vertexDataIterator.hasNext(); ) {
+      cnt++;
+    }
+    assertEquals("wrong vertex count", persistentVertexData.size(), cnt);
+
+    // check edge count
+    cnt = 0;
+    for (Iterator<DefaultEdgeData> edgeDataIterator =
+         graphStore.getEdgeSpace(); edgeDataIterator.hasNext(); ) {
+      cnt++;
+    }
+    assertEquals("wrong edge count", persistentEdgeData.size(), cnt);
+
+    graphStore.close();
   }
 
-  private void validateAllVertices(GraphStore graphStore) throws
-    InterruptedException, IOException, ClassNotFoundException {
-    List<Vertex> vertexResult = Lists.newArrayList(graphStore.getVertices(
-      GConstants.DEFAULT_TABLE_VERTICES));
-    validateExtendedGraphVertices(vertexResult);
-  }
-
-  private void validateEdges(GraphStore graphStore) {
-    List<Edge> edgeResult = Lists.newArrayList(graphStore.getEdges());
-    validateExtendedGraphEdges(edgeResult);
-  }
-
+  /**
+   * Tries to add an unsupported property type {@link List} as property value.
+   */
   @Test(expected = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() {
-    GraphStore graphStore = createEmptyGraphStore();
+    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData> graphStore =
+      createEmptyEPGMStore();
 
-    // list is not supported
+    PersistentVertexDataFactory<DefaultVertexData, DefaultEdgeData,
+      DefaultPersistentVertexData>
+      persistentVertexDataFactory = new DefaultPersistentVertexDataFactory();
+    VertexDataFactory<DefaultVertexData> vertexDataFactory =
+      new DefaultVertexDataFactory();
+
+    // list is not supported by
     final List<String> value = Lists.newArrayList();
 
     Long vertexID = 0L;
     final String label = "A";
     final Map<String, Object> properties = new HashMap<>();
-    properties.put(KEY_1, value);
+    properties.put("k1", value);
 
-    final Iterable<Edge> outEdges = Lists.newArrayListWithCapacity(0);
-    final Iterable<Edge> inEdges = Lists.newArrayListWithCapacity(0);
-    final Iterable<Long> graphs = Lists.newArrayList();
-    Vertex v = VertexFactory
-      .createDefaultVertex(vertexID, label, properties, outEdges, inEdges,
-        graphs);
-    graphStore.writeVertex(v);
+    final Set<DefaultEdgeData> outEdges = Sets.newHashSetWithExpectedSize(0);
+    final Set<DefaultEdgeData> inEdges = Sets.newHashSetWithExpectedSize(0);
+    final Set<Long> graphs = Sets.newHashSetWithExpectedSize(0);
+    PersistentVertexData<DefaultEdgeData> v = persistentVertexDataFactory
+      .createVertexData(
+        vertexDataFactory.createVertexData(vertexID, label, properties, graphs),
+        outEdges, inEdges);
+
+    graphStore.writeVertexData(v);
   }
 
+  /**
+   * Checks if property values are read correctly.
+   */
   @Test
   public void propertyTypeTest() {
-    GraphStore graphStore = createEmptyGraphStore();
+    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData> graphStore =
+      createEmptyEPGMStore();
+
+    PersistentVertexDataFactory<DefaultVertexData, DefaultEdgeData,
+      DefaultPersistentVertexData>
+      persistentVertexDataFactory = new DefaultPersistentVertexDataFactory();
+    VertexDataFactory<DefaultVertexData> vertexDataFactory =
+      new DefaultVertexDataFactory();
 
     final int propertyCount = 6;
     final String keyBoolean = "key1";
@@ -217,23 +225,20 @@ public class HBaseGraphStoreTest extends GradoopClusterTest {
     properties.put(keyDouble, valueDouble);
     properties.put(keyString, valueString);
 
-    final Iterable<Edge> outEdges = Lists.newArrayListWithCapacity(0);
-    final Iterable<Edge> inEdges = Lists.newArrayListWithCapacity(0);
-    final Iterable<Long> graphs = Lists.newArrayList();
+    final Set<DefaultEdgeData> outEdges = Sets.newHashSetWithExpectedSize(0);
+    final Set<DefaultEdgeData> inEdges = Sets.newHashSetWithExpectedSize(0);
+    final Set<Long> graphs = Sets.newHashSetWithExpectedSize(0);
 
-    Vertex v = VertexFactory
-      .createDefaultVertex(vertexID, label, properties, outEdges, inEdges,
-        graphs);
-    graphStore.writeVertex(v);
+    // write to store
+    graphStore.writeVertexData(persistentVertexDataFactory.createVertexData(
+      vertexDataFactory.createVertexData(vertexID, label, properties, graphs),
+      outEdges, inEdges));
 
-    // reopen
-    graphStore.close();
-    graphStore = openGraphStore();
+    graphStore.flush();
 
-    v = graphStore.readVertex(vertexID);
-
+    // read from store
+    VertexData v = graphStore.readVertexData(vertexID);
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
-
     assertEquals(propertyCount, propertyKeys.size());
 
     for (String propertyKey : propertyKeys) {

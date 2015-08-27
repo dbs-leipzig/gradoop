@@ -1,90 +1,44 @@
-/*
- * This file is part of Gradoop.
- *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.gradoop.model.impl.operators;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
-import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
-import org.gradoop.model.impl.EPGraphCollection;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
+import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.impl.Subgraph;
 
-import static org.gradoop.model.impl.EPGraph.*;
+/**
+ * Returns a collection with all logical graphs that exist in both input
+ * collections. Graph equality is based on their identifiers.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ * @see IntersectUsingList
+ */
+public class Intersect<VD extends VertexData, ED extends EdgeData, GD extends
+  GraphData> extends
+  SetOperator<VD, ED, GD> {
 
-public class Intersect extends AbstractBinaryCollectionToCollectionOperator {
+  /**
+   * Computes new subgraphs by grouping both graph collections by graph
+   * identifier and returning those graphs where the group contains more
+   * than one element.
+   *
+   * @return subgraph dataset of the resulting collection
+   */
   @Override
-  protected EPGraphCollection executeInternal(EPGraphCollection firstCollection,
-    EPGraphCollection secondGraphCollection) {
-    final DataSet<Subgraph<Long, EPFlinkGraphData>> newSubgraphs =
-      firstSubgraphs.union(secondSubgraphs).groupBy(GRAPH_ID)
-        .reduceGroup(new SubgraphGroupReducer(2));
-
-    DataSet<Vertex<Long, EPFlinkVertexData>> thisVertices =
-      firstGraph.getVertices();
-
-    DataSet<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>> verticesWithGraphs =
-      thisVertices.flatMap(
-        new FlatMapFunction<Vertex<Long, EPFlinkVertexData>,
-          Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>() {
-
-          @Override
-          public void flatMap(Vertex<Long, EPFlinkVertexData> v,
-            Collector<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>>
-              collector) throws
-            Exception {
-            for (Long graph : v.getValue().getGraphs()) {
-              collector.collect(new Tuple2<>(v, graph));
-            }
-          }
-        });
-
-    DataSet<Vertex<Long, EPFlinkVertexData>> vertices =
-      verticesWithGraphs.join(newSubgraphs).where(1).equalTo(GRAPH_ID).with(
-        new JoinFunction<Tuple2<Vertex<Long, EPFlinkVertexData>, Long>,
-          Subgraph<Long, EPFlinkGraphData>, Vertex<Long, EPFlinkVertexData>>() {
-
-          @Override
-          public Vertex<Long, EPFlinkVertexData> join(
-            Tuple2<Vertex<Long, EPFlinkVertexData>, Long> vertices,
-            Subgraph<Long, EPFlinkGraphData> subgraph) throws Exception {
-            return vertices.f0;
-          }
-        });
-
-    DataSet<Edge<Long, EPFlinkEdgeData>> edges = firstGraph.getEdges();
-
-    edges = edges.join(vertices).where(SOURCE_VERTEX_ID).equalTo(VERTEX_ID)
-      .with(new EdgeJoinFunction()).join(vertices).where(TARGET_VERTEX_ID)
-      .equalTo(VERTEX_ID).with(new EdgeJoinFunction());
-
-    return new EPGraphCollection(Graph.fromDataSet(vertices, edges, env),
-      newSubgraphs, env);
+  protected DataSet<Subgraph<Long, GD>> computeNewSubgraphs() {
+    return firstSubgraphs.union(secondSubgraphs)
+      .groupBy(new KeySelectors.GraphKeySelector<GD>())
+      .reduceGroup(new SubgraphGroupReducer<GD>(2));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
-    return "Difference";
+    return Intersect.class.getName();
   }
 }

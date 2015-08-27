@@ -22,47 +22,51 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
-import org.gradoop.model.impl.EPFlinkEdgeData;
-import org.gradoop.model.impl.EPFlinkGraphData;
-import org.gradoop.model.impl.EPFlinkVertexData;
-import org.gradoop.model.impl.EPGraph;
+import org.gradoop.model.helper.KeySelectors;
+import org.gradoop.model.impl.LogicalGraph;
 
-import static org.gradoop.model.impl.EPGraph.*;
+/**
+ * Creates a new logical graph containing only vertices and edges that
+ * exist in the first input graph but not in the second input graph. Vertex and
+ * edge equality is based on their respective identifiers.
+ *
+ * @param <VD> vertex data type
+ * @param <ED> edge data type
+ * @param <GD> graph data type
+ */
+public class Exclusion<VD extends VertexData, ED extends EdgeData, GD extends
+  GraphData> extends
+  AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
 
-public class Exclusion extends AbstractBinaryGraphToGraphOperator {
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public String getName() {
-    return "Exclusion";
-  }
-
-  @Override
-  protected EPGraph executeInternal(EPGraph firstGraph, EPGraph secondGraph) {
+  protected LogicalGraph<VD, ED, GD> executeInternal(
+    LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
     final Long newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
 
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph1 =
-      firstGraph.getGellyGraph();
-    Graph<Long, EPFlinkVertexData, EPFlinkEdgeData> graph2 =
-      secondGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
+    Graph<Long, VD, ED> graph2 = secondGraph.getGellyGraph();
 
     // union vertex sets, group by vertex id, filter vertices where the group
     // contains exactly one vertex which belongs to the graph, the operator is
     // called on
-    DataSet<Vertex<Long, EPFlinkVertexData>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices()).groupBy(VERTEX_ID)
-        .reduceGroup(
-          new VertexGroupReducer(1L, firstGraph.getId(), secondGraph.getId()))
-        .map(new VertexToGraphUpdater(newGraphID));
+    DataSet<Vertex<Long, VD>> newVertexSet =
+      graph1.getVertices().union(graph2.getVertices())
+        .groupBy(new KeySelectors.VertexKeySelector<VD>()).reduceGroup(
+        new VertexGroupReducer<VD>(1L, firstGraph.getId(), secondGraph.getId()))
+        .map(new VertexToGraphUpdater<VD>(newGraphID));
 
-    JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
-      EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>
-      joinFunc =
-      new JoinFunction<Edge<Long, EPFlinkEdgeData>, Vertex<Long,
-        EPFlinkVertexData>, Edge<Long, EPFlinkEdgeData>>() {
+    JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> joinFunc =
+      new JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>>() {
         @Override
-        public Edge<Long, EPFlinkEdgeData> join(
-          Edge<Long, EPFlinkEdgeData> leftTuple,
-          Vertex<Long, EPFlinkVertexData> rightTuple) throws Exception {
+        public Edge<Long, ED> join(Edge<Long, ED> leftTuple,
+          Vertex<Long, VD> rightTuple) throws Exception {
           return leftTuple;
         }
       };
@@ -70,14 +74,26 @@ public class Exclusion extends AbstractBinaryGraphToGraphOperator {
     // In exclude(), we are only interested in edges that connect vertices
     // that are in the exclusion of the vertex sets. Thus, we join the edges
     // from the left graph with the new vertex set using source and target ids.
-    DataSet<Edge<Long, EPFlinkEdgeData>> newEdgeSet =
-      graph1.getEdges().join(newVertexSet).where(SOURCE_VERTEX_ID)
-        .equalTo(VERTEX_ID).with(joinFunc).join(newVertexSet)
-        .where(TARGET_VERTEX_ID).equalTo(VERTEX_ID).with(joinFunc)
-        .map(new EdgeToGraphUpdater(newGraphID));
+    DataSet<Edge<Long, ED>> newEdgeSet = graph1.getEdges().join(newVertexSet)
+      .where(new KeySelectors.EdgeSourceVertexKeySelector<ED>())
+      .equalTo(new KeySelectors.VertexKeySelector<VD>()).with(joinFunc)
+      .join(newVertexSet)
+      .where(new KeySelectors.EdgeTargetVertexKeySelector<ED>())
+      .equalTo(new KeySelectors.VertexKeySelector<VD>()).with(joinFunc)
+      .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return EPGraph.fromGraph(
+    return LogicalGraph.fromGraph(
       Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
-      new EPFlinkGraphData(newGraphID, FlinkConstants.DEFAULT_GRAPH_LABEL));
+      firstGraph.getGraphDataFactory().createGraphData(newGraphID),
+      firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
+      firstGraph.getGraphDataFactory());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return Exclusion.class.getName();
   }
 }

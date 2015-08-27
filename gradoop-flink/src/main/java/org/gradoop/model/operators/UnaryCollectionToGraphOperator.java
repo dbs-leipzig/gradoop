@@ -17,9 +17,27 @@
 
 package org.gradoop.model.operators;
 
-import org.gradoop.model.impl.EPGraph;
-import org.gradoop.model.impl.EPGraphCollection;
+import org.gradoop.model.EdgeData;
+import org.gradoop.model.GraphData;
+import org.gradoop.model.VertexData;
+import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
 
-public interface UnaryCollectionToGraphOperator extends Operator {
-  EPGraph execute(EPGraphCollection collection);
+/**
+ * Creates a {@link LogicalGraph} from one input collection.
+ *
+ * @param <VD> vertex data
+ * @param <ED> edge data
+ * @param <GD> graph data
+ */
+public interface UnaryCollectionToGraphOperator<VD extends VertexData, ED
+  extends EdgeData, GD extends GraphData> extends
+  Operator {
+  /**
+   * Executes the operator.
+   *
+   * @param collection input collection
+   * @return operator result
+   */
+  LogicalGraph<VD, ED, GD> execute(GraphCollection<VD, ED, GD> collection);
 }

@@ -61,8 +61,16 @@ public interface Attributed {
   <T> T getProperty(String key, Class<T> type);
 
   /**
-   * Adds a given property to that entity. If {@code} does not exist, it will be
-   * created, if it exists, the value will be overwritten by the given value.
+   * Sets the given properties as new properties.
+   *
+   * @param properties new properties
+   */
+  void setProperties(Map<String, Object> properties);
+
+  /**
+   * Adds a given property to that entity. If {@code key} does not exist, it
+   * will be created, if it exists, the value will be overwritten by the
+   * given value.
    *
    * @param key   property key
    * @param value property value
