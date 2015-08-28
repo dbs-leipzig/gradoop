@@ -28,8 +28,6 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
       labeledGraphCollection = inputGraph.callForCollection(
       new SplitBy<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
         function, ExecutionEnvironment.getExecutionEnvironment()));
-    labeledGraphCollection.getGellyGraph().getVertices().print();
-    labeledGraphCollection.getGellyGraph().getEdges().print();
     assertNotNull("graph collection is null", labeledGraphCollection);
     assertEquals("wrong number of graphs", 2l, labeledGraphCollection.size());
     assertEquals("wrong number of vertices", 3l,
