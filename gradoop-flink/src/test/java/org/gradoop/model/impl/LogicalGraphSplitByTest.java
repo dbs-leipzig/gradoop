@@ -1,20 +1,21 @@
 package org.gradoop.model.impl;
 
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.FlinkTest;
+import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.operators.SplitBy;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class LogicalGraphSplitByTest extends FlinkTest {
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
-
-  public LogicalGraphSplitByTest() {
-    this.graphStore = createSocialGraph();
+@RunWith(Parameterized.class)
+public class LogicalGraphSplitByTest extends FlinkTestBase {
+  public LogicalGraphSplitByTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test
@@ -26,7 +27,7 @@ public class LogicalGraphSplitByTest extends FlinkTest {
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
       new SplitBy<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
-        function, env));
+        function, ExecutionEnvironment.getExecutionEnvironment()));
     labeledGraphCollection.getGellyGraph().getVertices().print();
     labeledGraphCollection.getGellyGraph().getEdges().print();
     assertNotNull("graph collection is null", labeledGraphCollection);

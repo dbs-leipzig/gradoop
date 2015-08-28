@@ -5,9 +5,13 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.operators.labelpropagation.LabelPropagationAlgorithm;
+import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.impl.operators.labelpropagation
+  .LabelPropagationAlgorithm;
 import org.gradoop.model.impl.operators.labelpropagation.LabelPropagationValue;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +19,12 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class LabelPropagationAlgorithmTest {
+@RunWith(Parameterized.class)
+public class LabelPropagationAlgorithmTest extends FlinkTestBase {
+  public LabelPropagationAlgorithmTest(TestExecutionMode mode) {
+    super(mode);
+  }
+
   /**
    * @return a connected graph where each vertex has its id as value
    */
@@ -69,7 +78,6 @@ public class LabelPropagationAlgorithmTest {
         .getGraph(getCompleteBipartiteGraphWithVertexValue(), env);
     DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
-    labeledGraph.print();
     validateCompleteBipartiteGraphResult(parseResult(labeledGraph.collect()));
   }
 
@@ -82,7 +90,6 @@ public class LabelPropagationAlgorithmTest {
         .getGraph(getLoopGraphWithVertexValues(), env);
     DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
-    labeledGraph.print();
     validateLoopGraphResult(parseResult(labeledGraph.collect()));
   }
 

@@ -103,7 +103,6 @@ public class EPGMLabelPropagationAlgorithm<VD extends VertexData, ED extends
     @Override
     public void updateVertex(Vertex<Long, VD> vertex,
       MessageIterator<Long> msg) throws Exception {
-      System.out.println("Superstep: " + getSuperstepNumber());
       if (getSuperstepNumber() == 1) {
         vertex.getValue().setProperty(CURRENT_VALUE, vertex.getId());
         vertex.getValue().setProperty(LAST_VALUE, Long.MAX_VALUE);
