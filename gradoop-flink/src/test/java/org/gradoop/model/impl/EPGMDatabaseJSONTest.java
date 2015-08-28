@@ -17,26 +17,25 @@
 
 package org.gradoop.model.impl;
 
-import junitparams.JUnitParamsRunner;
-import org.gradoop.model.FlinkTest;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.model.FlinkTestBase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(JUnitParamsRunner.class)
-public class EPGMDatabaseJSONTest extends FlinkTest {
-
-  private EPGMDatabase graphStore;
+@RunWith(Parameterized.class)
+public class EPGMDatabaseJSONTest extends FlinkTestBase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  public EPGMDatabaseJSONTest() {
-    graphStore = createSocialGraph();
+  public EPGMDatabaseJSONTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test
@@ -52,15 +51,15 @@ public class EPGMDatabaseJSONTest extends FlinkTest {
   @Test
   public void testFromJsonFile() throws Exception {
     String vertexFile =
-      EPGMDatabaseJSONTest.class.getResource("/sna_nodes").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/sna_nodes").getFile();
     String edgeFile =
-      EPGMDatabaseJSONTest.class.getResource("/sna_edges").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/sna_edges").getFile();
     String graphFile =
-      EPGMDatabaseJSONTest.class.getResource("/sna_graphs").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/sna_graphs").getFile();
 
     EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphStore =
-      EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile, env);
+      graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
+      ExecutionEnvironment.getExecutionEnvironment());
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       databaseGraph = graphStore.getDatabaseGraph();
@@ -81,8 +80,8 @@ public class EPGMDatabaseJSONTest extends FlinkTest {
     graphStore.writeAsJson(vertexFile, edgeFile, graphFile);
 
     EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      newGraphStore =
-      EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile, env);
+      newGraphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
+      ExecutionEnvironment.getExecutionEnvironment());
 
     assertEquals(graphStore.getDatabaseGraph().getVertexCount(),
       newGraphStore.getDatabaseGraph().getVertexCount());

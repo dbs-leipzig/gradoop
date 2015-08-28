@@ -1,3 +1,0 @@
-{"id":0,"label":"A","properties":{"k1":"v1", "k2":"v2", "k3":"v3"},"out-edges":[{"otherid":1,"label":"a","properties":{"k1": "v1"}}], "in-edges":[{"otherid":1,"label":"b","properties":{"k1":"v1","k2":"v2"}}],"graphs":[0]}
-{"id":1,"label":"B","properties":{"k1":"v1","k2":"v2"},"out-edges":[{"otherid":0,"label":"b","properties":{"k1":"v1","k2":"v2"}},{"otherid":2,"label":"c"}],"in-edges":[{"otherid":0,"label":"a","properties":{"k1":"v1"}}],"graphs":[0, 1]}
-{"id":2,"label":"C","properties":{"k1":"v1","k2":"v2"},"out-edges":[{"otherid":2,"label":"d"}],"in-edges":[{"otherid":	2,"label":"d"},{"otherid":1,"label":"c"}],"graphs":[1]}

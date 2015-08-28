@@ -18,6 +18,7 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -119,7 +120,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
   /**
    * Creates a database from JSON files. Paths can be local (file://) or HDFS
    * (hdfs://).
-   * <p>
+   * <p/>
    * Uses default factories for POJO creation.
    *
    * @param vertexFile path to vertex data file
@@ -165,7 +166,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
   /**
    * Creates a database from JSON files. Paths can be local (file://) or HDFS
    * (hdfs://).
-   * <p>
+   * <p/>
    * Uses default factories for POJO creation.
    *
    * @param vertexFile vertex data file
@@ -251,7 +252,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
    * Writes the epgm database into three separate JSON files. {@code
    * vertexFile} contains all vertex data, {@code edgeFile} contains all edge
    * data and {@code graphFile} contains graph data of all logical graphs.
-   * <p>
+   * <p/>
    * Operation uses Flink to write the internal datasets, thus writing to
    * local file system ({@code file://}) as well as HDFS ({@code hdfs://}) is
    * supported.
@@ -276,7 +277,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
 
   /**
    * Writes the EPGM database instance to HBase using the given arguments.
-   *
+   * <p/>
    * HBase tables must be created before calling this method.
    *
    * @param epgmStore                   EPGM store to handle HBase
@@ -316,7 +317,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
 
   /**
    * Creates a database from collections of vertex and edge data objects.
-   * <p>
+   * <p/>
    * Uses default factories for POJO creation.
    *
    * @param vertexDataCollection collection of vertex data objects
@@ -363,7 +364,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
 
   /**
    * Creates a database from collections of vertex, edge and graph data objects.
-   * <p>
+   * <p/>
    * Uses default factories for POJO creation.
    *
    * @param vertexDataCollection collection of vertex data objects
@@ -513,7 +514,26 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
    * @return collection of all logical graphs
    */
   public GraphCollection<VD, ED, GD> getCollection() {
-    return database;
+    DataSet<Vertex<Long, VD>> newVertices =
+      database.getGellyGraph().getVertices()
+        .filter(new FilterFunction<Vertex<Long, VD>>() {
+          @Override
+          public boolean filter(Vertex<Long, VD> longVDVertex) throws
+            Exception {
+            return longVDVertex.getValue().getGraphCount() > 0;
+          }
+        });
+    DataSet<Edge<Long, ED>> newEdges = database.getGellyGraph().getEdges()
+      .filter(new FilterFunction<Edge<Long, ED>>() {
+        @Override
+        public boolean filter(Edge<Long, ED> longEDEdge) throws Exception {
+          return longEDEdge.getValue().getGraphCount() > 0;
+        }
+      });
+
+    return new GraphCollection<>(Graph.fromDataSet(newVertices, newEdges, env),
+      database.getSubgraphs(), database.getVertexDataFactory(),
+      database.getEdgeDataFactory(), database.getGraphDataFactory(), env);
   }
 
   /**

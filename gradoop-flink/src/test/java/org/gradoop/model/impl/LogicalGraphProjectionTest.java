@@ -18,22 +18,24 @@ package org.gradoop.model.impl;
 
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.FlinkTest;
+import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.helper.UnaryFunction;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.gradoop.GradoopTestBaseUtils.PROPERTY_KEY_SINCE;
 import static org.junit.Assert.*;
 
-public class LogicalGraphProjectionTest extends FlinkTest {
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
+@RunWith(Parameterized.class)
+public class LogicalGraphProjectionTest extends FlinkTestBase {
 
-  public LogicalGraphProjectionTest() {
-    this.graphStore = createSocialGraph();
+  public LogicalGraphProjectionTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test
@@ -98,7 +100,7 @@ public class LogicalGraphProjectionTest extends FlinkTest {
     }
   }
 
-  public static class VertexLabelProjectionFunction implements
+  private static class VertexLabelProjectionFunction implements
     UnaryFunction<DefaultVertexData, DefaultVertexData> {
     @Override
     public DefaultVertexData execute(DefaultVertexData vertexData) throws
@@ -108,7 +110,7 @@ public class LogicalGraphProjectionTest extends FlinkTest {
     }
   }
 
-  public static class EdgePropertyProjectionFunction implements
+  private static class EdgePropertyProjectionFunction implements
     UnaryFunction<DefaultEdgeData, DefaultEdgeData> {
     @Override
     public DefaultEdgeData execute(DefaultEdgeData edgeData) throws Exception {

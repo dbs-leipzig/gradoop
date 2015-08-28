@@ -26,6 +26,7 @@ import org.gradoop.model.impl.DefaultVertexData;
 import org.gradoop.model.impl.DefaultVertexDataFactory;
 import org.gradoop.storage.*;
 import org.gradoop.storage.hbase.*;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.BufferedReader;
@@ -38,18 +39,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.gradoop.GradoopTestBaseUtils.*;
 import static org.junit.Assert.*;
 
 /**
- * Used for test cases that need a HDFS/HBase/MR mini cluster to run.
- * Initializes a test cluster before the first test runs.
+ * Used for tests that need a HBase cluster to run.
  */
-public abstract class HBaseTest extends GradoopTest {
+public class HBaseTestBase {
 
   protected static HBaseTestingUtility utility;
 
-  protected EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-  createEmptyEPGMStore() {
+  /**
+   * Starts the mini cluster for all tests.
+   *
+   * @throws Exception
+   */
+  @BeforeClass
+  public static void setUp() throws Exception {
+    if (utility == null) {
+      utility = new HBaseTestingUtility(HBaseConfiguration.create());
+      utility.startMiniCluster().waitForActiveAndReadyMaster();
+    }
+  }
+
+  /**
+   * Stops the test cluster after the test.
+   *
+   * @throws Exception
+   */
+  @AfterClass
+  public static void tearDown() throws Exception {
+    if (utility != null) {
+      utility.shutdownMiniCluster();
+    }
+  }
+
+  public static EPGMStore<DefaultVertexData, DefaultEdgeData,
+    DefaultGraphData> createEmptyEPGMStore() {
     Configuration config = utility.getConfiguration();
     VertexDataHandler<DefaultVertexData, DefaultEdgeData> vertexDataHandler =
       new DefaultVertexDataHandler<>(new DefaultVertexDataFactory());
@@ -69,8 +95,8 @@ public abstract class HBaseTest extends GradoopTest {
    *
    * @return EPGMStore with vertices and edges
    */
-  protected EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-  openEPGMStore() {
+  public static EPGMStore<DefaultVertexData, DefaultEdgeData,
+    DefaultGraphData> openEPGMStore() {
     Configuration config = utility.getConfiguration();
     VertexDataHandler<DefaultVertexData, DefaultEdgeData> vertexDataHandler =
       new DefaultVertexDataHandler<>(new DefaultVertexDataFactory());
@@ -81,29 +107,6 @@ public abstract class HBaseTest extends GradoopTest {
     return HBaseEPGMStoreFactory
       .createOrOpenEPGMStore(config, vertexDataHandler, edgeDataHandler,
         graphDataHandler);
-  }
-
-  /**
-   * Open EPGMStore for test purposes.
-   *
-   * @param tablePrefix table prefix for custom (parallel) tables
-   * @return EPGMStore with vertices and edges
-   */
-  protected EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-  openEPGMStore(
-    String tablePrefix) {
-    Configuration config = utility.getConfiguration();
-    VertexDataHandler<DefaultVertexData, DefaultEdgeData> vertexDataHandler =
-      new DefaultVertexDataHandler<>(new DefaultVertexDataFactory());
-    EdgeDataHandler<DefaultEdgeData, DefaultVertexData> edgeDataHandler =
-      new DefaultEdgeDataHandler<>(new DefaultEdgeDataFactory());
-    GraphDataHandler<DefaultGraphData> graphDataHandler =
-      new DefaultGraphDataHandler<>(new DefaultGraphDataFactory());
-    return HBaseEPGMStoreFactory
-      .createOrOpenEPGMStore(config, vertexDataHandler, edgeDataHandler,
-        graphDataHandler, tablePrefix + GConstants.DEFAULT_TABLE_VERTICES,
-        tablePrefix + GConstants.DEFAULT_TABLE_EDGES,
-        tablePrefix + GConstants.DEFAULT_TABLE_GRAPHS);
   }
 
   /**
@@ -145,19 +148,6 @@ public abstract class HBaseTest extends GradoopTest {
   }
 
   /**
-   * Starts the mini cluster once for all test cases implementing this class.
-   *
-   * @throws Exception
-   */
-  @BeforeClass
-  public static void setup() throws Exception {
-    if (utility == null) {
-      utility = new HBaseTestingUtility(HBaseConfiguration.create());
-      utility.startMiniCluster().waitForActiveAndReadyMaster();
-    }
-  }
-
-  /**
    * Reads a graph file in HDFS line by line into an array and returns it.
    *
    * @param graphFileName file in HDFS
@@ -179,7 +169,7 @@ public abstract class HBaseTest extends GradoopTest {
     return fileContent;
   }
 
-  protected Collection<PersistentVertexData<DefaultEdgeData>>
+  public static Collection<PersistentVertexData<DefaultEdgeData>>
   createPersistentSocialVertexData() {
     Collection<DefaultVertexData> vertexDataCollection =
       createVertexDataCollection();
@@ -193,39 +183,55 @@ public abstract class HBaseTest extends GradoopTest {
     Set<DefaultEdgeData> outEdges = null;
     Set<DefaultEdgeData> inEdges = null;
     for (DefaultVertexData vertexData : vertexDataCollection) {
-      if (vertexData.getId().equals(alice.getId())) {
-        outEdges = Sets.newHashSet(edge0, edge8);
-        inEdges = Sets.newHashSet(edge1, edge6, edge15, edge17);
+      if (vertexData.getId().equals(VERTEX_PERSON_ALICE.getId())) {
+        outEdges = Sets.newHashSet(EDGE_0_KNOWS, EDGE_8_HAS_INTEREST);
+        inEdges = Sets
+          .newHashSet(EDGE_1_KNOWS, EDGE_6_KNOWS, EDGE_15_HAS_MODERATOR,
+            EDGE_17_HAS_MEMBER);
 
-      } else if (vertexData.getId().equals(bob.getId())) {
-        outEdges = Sets.newHashSet(edge1, edge2);
-        inEdges = Sets.newHashSet(edge0, edge3, edge18, edge21);
-      } else if (vertexData.getId().equals(carol.getId())) {
-        outEdges = Sets.newHashSet(edge3, edge4);
-        inEdges = Sets.newHashSet(edge2, edge5, edge19, edge22);
-      } else if (vertexData.getId().equals(dave.getId())) {
-        outEdges = Sets.newHashSet(edge5, edge9);
-        inEdges = Sets.newHashSet(edge4, edge16, edge20, edge23);
-      } else if (vertexData.getId().equals(eve.getId())) {
-        outEdges = Sets.newHashSet(edge6, edge7, edge21);
+      } else if (vertexData.getId().equals(VERTEX_PERSON_BOB.getId())) {
+        outEdges = Sets.newHashSet(EDGE_1_KNOWS, EDGE_2_KNOWS);
+        inEdges = Sets
+          .newHashSet(EDGE_0_KNOWS, EDGE_3_KNOWS, EDGE_18_HAS_MEMBER,
+            EDGE_21_KNOWS);
+      } else if (vertexData.getId().equals(VERTEX_PERSON_CAROL.getId())) {
+        outEdges = Sets.newHashSet(EDGE_3_KNOWS, EDGE_4_KNOWS);
+        inEdges = Sets
+          .newHashSet(EDGE_2_KNOWS, EDGE_5_KNOWS, EDGE_19_HAS_MEMBER,
+            EDGE_22_KNOWS);
+      } else if (vertexData.getId().equals(VERTEX_PERSON_DAVE.getId())) {
+        outEdges = Sets.newHashSet(EDGE_5_KNOWS, EDGE_9_HAS_INTEREST);
+        inEdges = Sets
+          .newHashSet(EDGE_4_KNOWS, EDGE_16_HAS_MODERATOR, EDGE_20_HAS_MEMBER,
+            EDGE_23_KNOWS);
+      } else if (vertexData.getId().equals(VERTEX_PERSON_EVE.getId())) {
+        outEdges =
+          Sets.newHashSet(EDGE_6_KNOWS, EDGE_7_HAS_INTEREST, EDGE_21_KNOWS);
         inEdges = Sets.newHashSet();
-      } else if (vertexData.getId().equals(frank.getId())) {
-        outEdges = Sets.newHashSet(edge10, edge22, edge23);
+      } else if (vertexData.getId().equals(VERTEX_PERSON_FRANK.getId())) {
+        outEdges =
+          Sets.newHashSet(EDGE_10_HAS_INTEREST, EDGE_22_KNOWS, EDGE_23_KNOWS);
         inEdges = Sets.newHashSet();
-      } else if (vertexData.getId().equals(tagDatabases.getId())) {
+      } else if (vertexData.getId().equals(VERTEX_TAG_DATABASES.getId())) {
         outEdges = Sets.newHashSet();
-        inEdges = Sets.newHashSet(edge7, edge8, edge11);
-      } else if (vertexData.getId().equals(tagGraphs.getId())) {
+        inEdges = Sets.newHashSet(EDGE_7_HAS_INTEREST, EDGE_8_HAS_INTEREST,
+          EDGE_11_HAS_TAG);
+      } else if (vertexData.getId().equals(VERTEX_TAG_GRAPHS.getId())) {
         outEdges = Sets.newHashSet();
-        inEdges = Sets.newHashSet(edge12, edge13);
-      } else if (vertexData.getId().equals(tagHadoop.getId())) {
+        inEdges = Sets.newHashSet(EDGE_12_HAS_TAG, EDGE_13_HAS_TAG);
+      } else if (vertexData.getId().equals(VERTEX_TAG_HADOOP.getId())) {
         outEdges = Sets.newHashSet();
-        inEdges = Sets.newHashSet(edge9, edge10, edge14);
-      } else if (vertexData.getId().equals(forumGDBS.getId())) {
-        outEdges = Sets.newHashSet(edge11, edge12, edge15, edge17, edge18);
+        inEdges = Sets.newHashSet(EDGE_9_HAS_INTEREST, EDGE_10_HAS_INTEREST,
+          EDGE_14_HAS_TAG);
+      } else if (vertexData.getId().equals(VERTEX_FORUM_GDBS.getId())) {
+        outEdges = Sets
+          .newHashSet(EDGE_11_HAS_TAG, EDGE_12_HAS_TAG, EDGE_15_HAS_MODERATOR,
+            EDGE_17_HAS_MEMBER, EDGE_18_HAS_MEMBER);
         inEdges = Sets.newHashSet();
-      } else if (vertexData.getId().equals(forumGPS.getId())) {
-        outEdges = Sets.newHashSet(edge13, edge14, edge16, edge19, edge20);
+      } else if (vertexData.getId().equals(VERTEX_FORUM_GPS.getId())) {
+        outEdges = Sets
+          .newHashSet(EDGE_13_HAS_TAG, EDGE_14_HAS_TAG, EDGE_16_HAS_MODERATOR,
+            EDGE_19_HAS_MEMBER, EDGE_20_HAS_MEMBER);
         inEdges = Sets.newHashSet();
       }
       persistentVertexData
@@ -234,7 +240,7 @@ public abstract class HBaseTest extends GradoopTest {
     return persistentVertexData;
   }
 
-  protected Collection<PersistentEdgeData<DefaultVertexData>>
+  public static Collection<PersistentEdgeData<DefaultVertexData>>
   createPersistentSocialEdgeData() {
     Collection<DefaultEdgeData> edgeDataCollection = createEdgeDataCollection();
     List<PersistentEdgeData<DefaultVertexData>> persistentEdgeData =
@@ -246,78 +252,78 @@ public abstract class HBaseTest extends GradoopTest {
     DefaultVertexData sourceVertexData = null;
     DefaultVertexData targetVertexData = null;
     for (DefaultEdgeData edgeData : edgeDataCollection) {
-      if (edgeData.getId().equals(edge0.getId())) {
-        sourceVertexData = alice;
-        targetVertexData = bob;
-      } else if (edgeData.getId().equals(edge1.getId())) {
-        sourceVertexData = bob;
-        targetVertexData = alice;
-      } else if (edgeData.getId().equals(edge2.getId())) {
-        sourceVertexData = bob;
-        targetVertexData = carol;
-      } else if (edgeData.getId().equals(edge3.getId())) {
-        sourceVertexData = carol;
-        targetVertexData = bob;
-      } else if (edgeData.getId().equals(edge4.getId())) {
-        sourceVertexData = carol;
-        targetVertexData = dave;
-      } else if (edgeData.getId().equals(edge5.getId())) {
-        sourceVertexData = dave;
-        targetVertexData = carol;
-      } else if (edgeData.getId().equals(edge6.getId())) {
-        sourceVertexData = eve;
-        targetVertexData = alice;
-      } else if (edgeData.getId().equals(edge7.getId())) {
-        sourceVertexData = eve;
-        targetVertexData = tagDatabases;
-      } else if (edgeData.getId().equals(edge8.getId())) {
-        sourceVertexData = alice;
-        targetVertexData = tagDatabases;
-      } else if (edgeData.getId().equals(edge9.getId())) {
-        sourceVertexData = dave;
-        targetVertexData = tagHadoop;
-      } else if (edgeData.getId().equals(edge10.getId())) {
-        sourceVertexData = frank;
-        targetVertexData = tagHadoop;
-      } else if (edgeData.getId().equals(edge11.getId())) {
-        sourceVertexData = forumGDBS;
-        targetVertexData = tagDatabases;
-      } else if (edgeData.getId().equals(edge12.getId())) {
-        sourceVertexData = forumGDBS;
-        targetVertexData = tagGraphs;
-      } else if (edgeData.getId().equals(edge13.getId())) {
-        sourceVertexData = forumGPS;
-        targetVertexData = tagGraphs;
-      } else if (edgeData.getId().equals(edge14.getId())) {
-        sourceVertexData = forumGPS;
-        targetVertexData = tagHadoop;
-      } else if (edgeData.getId().equals(edge15.getId())) {
-        sourceVertexData = forumGDBS;
-        targetVertexData = alice;
-      } else if (edgeData.getId().equals(edge16.getId())) {
-        sourceVertexData = forumGPS;
-        targetVertexData = dave;
-      } else if (edgeData.getId().equals(edge17.getId())) {
-        sourceVertexData = forumGDBS;
-        targetVertexData = alice;
-      } else if (edgeData.getId().equals(edge18.getId())) {
-        sourceVertexData = forumGDBS;
-        targetVertexData = bob;
-      } else if (edgeData.getId().equals(edge19.getId())) {
-        sourceVertexData = forumGPS;
-        targetVertexData = carol;
-      } else if (edgeData.getId().equals(edge20.getId())) {
-        sourceVertexData = forumGPS;
-        targetVertexData = dave;
-      } else if (edgeData.getId().equals(edge21.getId())) {
-        sourceVertexData = eve;
-        targetVertexData = bob;
-      } else if (edgeData.getId().equals(edge22.getId())) {
-        sourceVertexData = frank;
-        targetVertexData = carol;
-      } else if (edgeData.getId().equals(edge23.getId())) {
-        sourceVertexData = frank;
-        targetVertexData = dave;
+      if (edgeData.getId().equals(EDGE_0_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_ALICE;
+        targetVertexData = VERTEX_PERSON_BOB;
+      } else if (edgeData.getId().equals(EDGE_1_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_BOB;
+        targetVertexData = VERTEX_PERSON_ALICE;
+      } else if (edgeData.getId().equals(EDGE_2_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_BOB;
+        targetVertexData = VERTEX_PERSON_CAROL;
+      } else if (edgeData.getId().equals(EDGE_3_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_CAROL;
+        targetVertexData = VERTEX_PERSON_BOB;
+      } else if (edgeData.getId().equals(EDGE_4_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_CAROL;
+        targetVertexData = VERTEX_PERSON_DAVE;
+      } else if (edgeData.getId().equals(EDGE_5_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_DAVE;
+        targetVertexData = VERTEX_PERSON_CAROL;
+      } else if (edgeData.getId().equals(EDGE_6_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_EVE;
+        targetVertexData = VERTEX_PERSON_ALICE;
+      } else if (edgeData.getId().equals(EDGE_7_HAS_INTEREST.getId())) {
+        sourceVertexData = VERTEX_PERSON_EVE;
+        targetVertexData = VERTEX_TAG_DATABASES;
+      } else if (edgeData.getId().equals(EDGE_8_HAS_INTEREST.getId())) {
+        sourceVertexData = VERTEX_PERSON_ALICE;
+        targetVertexData = VERTEX_TAG_DATABASES;
+      } else if (edgeData.getId().equals(EDGE_9_HAS_INTEREST.getId())) {
+        sourceVertexData = VERTEX_PERSON_DAVE;
+        targetVertexData = VERTEX_TAG_HADOOP;
+      } else if (edgeData.getId().equals(EDGE_10_HAS_INTEREST.getId())) {
+        sourceVertexData = VERTEX_PERSON_FRANK;
+        targetVertexData = VERTEX_TAG_HADOOP;
+      } else if (edgeData.getId().equals(EDGE_11_HAS_TAG.getId())) {
+        sourceVertexData = VERTEX_FORUM_GDBS;
+        targetVertexData = VERTEX_TAG_DATABASES;
+      } else if (edgeData.getId().equals(EDGE_12_HAS_TAG.getId())) {
+        sourceVertexData = VERTEX_FORUM_GDBS;
+        targetVertexData = VERTEX_TAG_GRAPHS;
+      } else if (edgeData.getId().equals(EDGE_13_HAS_TAG.getId())) {
+        sourceVertexData = VERTEX_FORUM_GPS;
+        targetVertexData = VERTEX_TAG_GRAPHS;
+      } else if (edgeData.getId().equals(EDGE_14_HAS_TAG.getId())) {
+        sourceVertexData = VERTEX_FORUM_GPS;
+        targetVertexData = VERTEX_TAG_HADOOP;
+      } else if (edgeData.getId().equals(EDGE_15_HAS_MODERATOR.getId())) {
+        sourceVertexData = VERTEX_FORUM_GDBS;
+        targetVertexData = VERTEX_PERSON_ALICE;
+      } else if (edgeData.getId().equals(EDGE_16_HAS_MODERATOR.getId())) {
+        sourceVertexData = VERTEX_FORUM_GPS;
+        targetVertexData = VERTEX_PERSON_DAVE;
+      } else if (edgeData.getId().equals(EDGE_17_HAS_MEMBER.getId())) {
+        sourceVertexData = VERTEX_FORUM_GDBS;
+        targetVertexData = VERTEX_PERSON_ALICE;
+      } else if (edgeData.getId().equals(EDGE_18_HAS_MEMBER.getId())) {
+        sourceVertexData = VERTEX_FORUM_GDBS;
+        targetVertexData = VERTEX_PERSON_BOB;
+      } else if (edgeData.getId().equals(EDGE_19_HAS_MEMBER.getId())) {
+        sourceVertexData = VERTEX_FORUM_GPS;
+        targetVertexData = VERTEX_PERSON_CAROL;
+      } else if (edgeData.getId().equals(EDGE_20_HAS_MEMBER.getId())) {
+        sourceVertexData = VERTEX_FORUM_GPS;
+        targetVertexData = VERTEX_PERSON_DAVE;
+      } else if (edgeData.getId().equals(EDGE_21_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_EVE;
+        targetVertexData = VERTEX_PERSON_BOB;
+      } else if (edgeData.getId().equals(EDGE_22_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_FRANK;
+        targetVertexData = VERTEX_PERSON_CAROL;
+      } else if (edgeData.getId().equals(EDGE_23_KNOWS.getId())) {
+        sourceVertexData = VERTEX_PERSON_FRANK;
+        targetVertexData = VERTEX_PERSON_DAVE;
       }
       persistentEdgeData.add(edgeDataFactory
         .createEdgeData(edgeData, sourceVertexData, targetVertexData));
@@ -326,7 +332,8 @@ public abstract class HBaseTest extends GradoopTest {
     return persistentEdgeData;
   }
 
-  protected Collection<PersistentGraphData> createPersistentSocialGraphData() {
+  public static Collection<PersistentGraphData>
+  createPersistentSocialGraphData() {
     Collection<DefaultGraphData> graphDataCollection =
       createGraphDataCollection();
     List<PersistentGraphData> persistentGraphData =
@@ -339,23 +346,47 @@ public abstract class HBaseTest extends GradoopTest {
 
     for (DefaultGraphData graphData : graphDataCollection) {
       if (graphData.getId().equals(communityDatabases.getId())) {
-        vertexIds = Sets.newHashSet(alice.getId(), bob.getId(), eve.getId());
-        edgeIds = Sets.newHashSet(edge0.getId(), edge1.getId(), edge6.getId(),
-          edge21.getId());
+        vertexIds =
+          Sets.newHashSet(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB
+
+            .getId(), VERTEX_PERSON_EVE
+
+            .getId());
+        edgeIds = Sets
+          .newHashSet(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_6_KNOWS
+
+            .getId(), EDGE_21_KNOWS.getId());
       } else if (graphData.getId().equals(communityHadoop.getId())) {
-        vertexIds = Sets.newHashSet(carol.getId(), dave.getId(), frank.getId());
-        edgeIds = Sets.newHashSet(edge4.getId(), edge5.getId(), edge22.getId(),
-          edge23.getId());
+        vertexIds =
+          Sets.newHashSet(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE
+
+            .getId(), VERTEX_PERSON_FRANK
+
+            .getId());
+        edgeIds = Sets
+          .newHashSet(EDGE_4_KNOWS.getId(), EDGE_5_KNOWS.getId(), EDGE_22_KNOWS
+
+            .getId(), EDGE_23_KNOWS.getId());
       } else if (graphData.getId().equals(communityGraphs.getId())) {
         vertexIds = Sets
-          .newHashSet(alice.getId(), bob.getId(), carol.getId(), dave.getId());
-        edgeIds = Sets.newHashSet(edge0.getId(), edge1.getId(), edge2.getId(),
-          edge3.getId(), edge4.getId(), edge5.getId());
+          .newHashSet(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB.getId(),
+            VERTEX_PERSON_CAROL
+
+              .getId(), VERTEX_PERSON_DAVE
+
+              .getId());
+        edgeIds = Sets
+          .newHashSet(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_2_KNOWS
+
+              .getId(), EDGE_3_KNOWS.getId(), EDGE_4_KNOWS.getId(),
+            EDGE_5_KNOWS.getId());
       } else if (graphData.getId().equals(forumGraph.getId())) {
-        vertexIds = Sets.newHashSet(carol.getId(), dave.getId(), frank.getId(),
-          forumGPS.getId());
-        edgeIds = Sets.newHashSet(edge4.getId(), edge16.getId(), edge19.getId(),
-          edge20.getId());
+        vertexIds = Sets
+          .newHashSet(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE.getId(),
+            VERTEX_PERSON_FRANK.getId(), VERTEX_FORUM_GPS.getId());
+        edgeIds = Sets
+          .newHashSet(EDGE_4_KNOWS.getId(), EDGE_16_HAS_MODERATOR.getId(),
+            EDGE_19_HAS_MEMBER.getId(), EDGE_20_HAS_MEMBER.getId());
       }
       persistentGraphData
         .add(graphDataFactory.createGraphData(graphData, vertexIds, edgeIds));
@@ -364,7 +395,7 @@ public abstract class HBaseTest extends GradoopTest {
     return persistentGraphData;
   }
 
-  protected Iterable<PersistentGraphData> createPersistentGraphData() {
+  public static Iterable<PersistentGraphData> createPersistentGraphData() {
     List<PersistentGraphData> persistentGraphData =
       Lists.newArrayListWithExpectedSize(2);
 
@@ -406,7 +437,7 @@ public abstract class HBaseTest extends GradoopTest {
     return persistentGraphData;
   }
 
-  protected Iterable<PersistentVertexData<DefaultEdgeData>>
+  public static Iterable<PersistentVertexData<DefaultEdgeData>>
   createPersistentVertexData() {
     List<PersistentVertexData<DefaultEdgeData>> persistentVertexData =
       Lists.newArrayListWithExpectedSize(2);
@@ -462,7 +493,7 @@ public abstract class HBaseTest extends GradoopTest {
     return persistentVertexData;
   }
 
-  protected Iterable<PersistentEdgeData<DefaultVertexData>>
+  public static Iterable<PersistentEdgeData<DefaultVertexData>>
   createPersistentEdgeData() {
     List<PersistentEdgeData<DefaultVertexData>> persistentEdgeData =
       Lists.newArrayListWithExpectedSize(2);
@@ -517,7 +548,7 @@ public abstract class HBaseTest extends GradoopTest {
    *
    * @param graphStore graph store
    */
-  protected void validateGraphData(
+  public static void validateGraphData(
     EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       graphStore) {
     // g0
@@ -548,7 +579,7 @@ public abstract class HBaseTest extends GradoopTest {
    *
    * @param graphStore graph store
    */
-  protected void validateVertexData(
+  public static void validateVertexData(
     EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       graphStore) {
     // vertex 0
@@ -585,12 +616,11 @@ public abstract class HBaseTest extends GradoopTest {
    *
    * @param graphStore graph store
    */
-  protected void validateEdgeData(
+  public static void validateEdgeData(
     EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       graphStore) {
     // edge 0
     EdgeData e = graphStore.readEdgeData(0L);
-    System.out.println("*** " + e);
     assertNotNull(e);
     assertEquals("a", e.getLabel());
     assertEquals(new Long(0L), e.getSourceVertexId());

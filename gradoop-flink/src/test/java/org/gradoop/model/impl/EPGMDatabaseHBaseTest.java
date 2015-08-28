@@ -18,7 +18,8 @@
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.HBaseTest;
+import org.gradoop.HBaseTestBase;
+import org.gradoop.model.FlinkHBaseTestBase;
 import org.gradoop.storage.EPGMStore;
 import org.gradoop.storage.PersistentEdgeData;
 import org.gradoop.storage.PersistentGraphData;
@@ -27,12 +28,20 @@ import org.gradoop.storage.hbase.DefaultPersistentEdgeDataFactory;
 import org.gradoop.storage.hbase.DefaultPersistentGraphDataFactory;
 import org.gradoop.storage.hbase.DefaultPersistentVertexDataFactory;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.Iterator;
 
+import static org.gradoop.HBaseTestBase.*;
 import static org.junit.Assert.assertEquals;
 
-public class EPGMDatabaseHBaseTest extends HBaseTest {
+@RunWith(Parameterized.class)
+public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
+
+  public EPGMDatabaseHBaseTest(TestExecutionMode mode) {
+    super(mode);
+  }
 
   /**
    * Writes persistent data using the {@link EPGMStore} and reads it via the
@@ -43,7 +52,7 @@ public class EPGMDatabaseHBaseTest extends HBaseTest {
   @Test
   public void readFromHBaseTest() throws Exception {
     EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData> epgmStore =
-      createEmptyEPGMStore();
+      HBaseTestBase.createEmptyEPGMStore();
 
     for (PersistentGraphData graphData : createPersistentSocialGraphData()) {
       epgmStore.writeGraphData(graphData);
@@ -87,11 +96,11 @@ public class EPGMDatabaseHBaseTest extends HBaseTest {
 
     // read test data from json into EPGM database
     String vertexFile =
-      EPGMDatabaseJSONTest.class.getResource("/sna_nodes").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/sna_nodes").getFile();
     String edgeFile =
-      EPGMDatabaseJSONTest.class.getResource("/sna_edges").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/sna_edges").getFile();
     String graphFile =
-      EPGMDatabaseJSONTest.class.getResource("/sna_graphs").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/sna_graphs").getFile();
 
     EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData> graphDB =
       EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,

@@ -17,24 +17,30 @@
 
 package org.gradoop.model;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.GradoopTest;
+import org.apache.flink.test.util.MultipleProgramsTestBase;
+import org.gradoop.GradoopTestBaseUtils;
 import org.gradoop.model.impl.DefaultEdgeData;
 import org.gradoop.model.impl.DefaultGraphData;
 import org.gradoop.model.impl.DefaultVertexData;
 import org.gradoop.model.impl.EPGMDatabase;
 
-import java.util.List;
+/**
+ * Used for tests that require a Flink cluster up and running.
+ */
+public class FlinkTestBase extends MultipleProgramsTestBase {
 
-public abstract class FlinkTest extends GradoopTest {
+  protected EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    graphStore;
 
-  protected ExecutionEnvironment env =
-    ExecutionEnvironment.getExecutionEnvironment();
+  public FlinkTestBase(TestExecutionMode mode) {
+    super(mode);
+    this.graphStore = createSocialGraph();
+  }
 
   /**
    * Creates a social network as a basis for tests.
-   * <p>
+   * <p/>
    * An image of the network can be found in
    * gradoop/dev-support/social-network.pdf
    *
@@ -43,22 +49,9 @@ public abstract class FlinkTest extends GradoopTest {
   protected EPGMDatabase<DefaultVertexData, DefaultEdgeData,
     DefaultGraphData> createSocialGraph() {
     return EPGMDatabase
-      .fromCollection(createVertexDataCollection(), createEdgeDataCollection(),
-        createGraphDataCollection(), env);
-  }
-
-  /**
-   * Creates a list of long ids from a given string (e.g. "0 1 2 3")
-   *
-   * @param graphIDString e.g. "0 1 2 3"
-   * @return List with long values
-   */
-  protected List<Long> extractGraphIDs(String graphIDString) {
-    String[] tokens = graphIDString.split(" ");
-    List<Long> graphIDs = Lists.newArrayListWithCapacity(tokens.length);
-    for (String token : tokens) {
-      graphIDs.add(Long.parseLong(token));
-    }
-    return graphIDs;
+      .fromCollection(GradoopTestBaseUtils.createVertexDataCollection(),
+        GradoopTestBaseUtils.createEdgeDataCollection(),
+        GradoopTestBaseUtils.createGraphDataCollection(),
+        ExecutionEnvironment.getExecutionEnvironment());
   }
 }

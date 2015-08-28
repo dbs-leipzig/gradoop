@@ -17,19 +17,20 @@
 
 package org.gradoop.model.impl;
 
-import org.gradoop.model.FlinkTest;
+import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.helper.UnaryFunction;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class LogicalGraphAggregateTest extends FlinkTest {
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
+@RunWith(Parameterized.class)
+public class LogicalGraphAggregateTest extends FlinkTestBase {
 
-  public LogicalGraphAggregateTest() {
-    this.graphStore = createSocialGraph();
+  public LogicalGraphAggregateTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test

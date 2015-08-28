@@ -2,7 +2,7 @@ package org.gradoop.storage.hbase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.gradoop.HBaseTest;
+import org.gradoop.HBaseTestBase;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.VertexDataFactory;
 import org.gradoop.model.impl.DefaultEdgeData;
@@ -27,7 +27,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class HBaseGraphStoreTest extends HBaseTest {
+public class HBaseGraphStoreTest extends HBaseTestBase {
 
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,

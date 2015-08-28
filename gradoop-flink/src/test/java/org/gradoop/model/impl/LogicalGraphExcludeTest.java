@@ -17,38 +17,33 @@
 
 package org.gradoop.model.impl;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.gradoop.model.EdgeData;
-import org.gradoop.model.FlinkTest;
+import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.VertexData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.Collection;
 import java.util.Set;
 
+import static org.gradoop.GradoopTestBaseUtils.*;
 import static org.junit.Assert.*;
 
-@RunWith(JUnitParamsRunner.class)
-public class LogicalGraphExcludeTest extends FlinkTest {
+@RunWith(Parameterized.class)
+public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
 
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
-
-  public LogicalGraphExcludeTest() {
-    this.graphStore = createSocialGraph();
+  public LogicalGraphExcludeTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test
-  @Parameters({"0, 0, 0, 0", // same graph
-    "0, 2, 1, 0", // overlapping graphs
-    "2, 0, 2, 2", // overlapping graphs switched (different counts)
-    "0, 1, 3, 4", // non-overlapping graphs
-    "1, 0, 3, 4", // non-overlapping graphs switched
-  })
-  public void testExclude(long firstGraph, long secondGraph,
-    long expectedVertexCount, long expectedEdgeCount) throws Exception {
+  public void testSameGraph() throws Exception {
+    // "0, 0, 0, 0"
+    Long firstGraph = 0L;
+    Long secondGraph = 0L;
+    long expectedVertexCount = 0L;
+    long expectedEdgeCount = 0L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
       graphStore.getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
@@ -57,32 +52,79 @@ public class LogicalGraphExcludeTest extends FlinkTest {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.exclude(second);
 
-    assertNotNull("resulting graph was null", result);
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
 
-    long newGraphID = result.getId();
+  @Test
+  public void testOverlappingGraphs() throws Exception {
+    // "0, 2, 1, 0"
+    Long firstGraph = 0L;
+    Long secondGraph = 2L;
+    long expectedVertexCount = 1L;
+    long expectedEdgeCount = 0L;
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
 
-    assertEquals("wrong number of vertices", expectedVertexCount,
-      result.getVertexCount());
-    assertEquals("wrong number of edges", expectedEdgeCount,
-      result.getEdgeCount());
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.exclude(second);
 
-    Collection<DefaultVertexData> vertexData = result.getVertices().collect();
-    Collection<DefaultEdgeData> edgeData = result.getEdges().collect();
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
 
-    assertEquals("wrong number of vertex values", expectedVertexCount,
-      vertexData.size());
-    assertEquals("wrong number of edge values", expectedEdgeCount,
-      edgeData.size());
+  @Test
+  public void testOverlappingSwitchedGraphs() throws Exception {
+    // "2, 0, 2, 2"
+    Long firstGraph = 2L;
+    Long secondGraph = 0L;
+    long expectedVertexCount = 2L;
+    long expectedEdgeCount = 2L;
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
 
-    for (VertexData v : vertexData) {
-      assertTrue("vertex is not in new graph",
-        v.getGraphs().contains(newGraphID));
-    }
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.exclude(second);
 
-    for (EdgeData e : edgeData) {
-      assertTrue("edge is not in new graph",
-        e.getGraphs().contains(newGraphID));
-    }
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
+
+  @Test
+  public void testNonOverlappingGraphs() throws Exception {
+    // "0, 1, 3, 4"
+    Long firstGraph = 0L;
+    Long secondGraph = 1L;
+    long expectedVertexCount = 3L;
+    long expectedEdgeCount = 4L;
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.exclude(second);
+
+    performTest(result, expectedVertexCount, expectedEdgeCount);
+  }
+
+  @Test
+  public void testNonOverlappingSwitchedGraphs() throws Exception {
+    // "1, 0, 3, 4"
+    Long firstGraph = 1L;
+    Long secondGraph = 0L;
+    long expectedVertexCount = 3L;
+    long expectedEdgeCount = 4L;
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
+      graphStore.getGraph(firstGraph);
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
+      graphStore.getGraph(secondGraph);
+
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
+      first.exclude(second);
+
+    performTest(result, expectedVertexCount, expectedEdgeCount);
   }
 
   @Test
@@ -100,24 +142,24 @@ public class LogicalGraphExcludeTest extends FlinkTest {
 
     for (VertexData v : vertexData) {
       Set<Long> gIDs = v.getGraphs();
-      if (v.equals(alice)) {
+      if (v.equals(VERTEX_PERSON_ALICE)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (v.equals(bob)) {
+      } else if (v.equals(VERTEX_PERSON_BOB)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (v.equals(eve)) {
+      } else if (v.equals(VERTEX_PERSON_EVE)) {
         assertEquals("wrong number of graphs", 2, gIDs.size());
       }
     }
 
     for (EdgeData e : edgeData) {
       Set<Long> gIDs = e.getGraphs();
-      if (e.equals(edge0)) {
+      if (e.equals(EDGE_0_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (e.equals(edge1)) {
+      } else if (e.equals(EDGE_1_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (e.equals(edge6)) {
+      } else if (e.equals(EDGE_6_KNOWS)) {
         assertEquals("wrong number of graphs", 2, gIDs.size());
-      } else if (e.equals(edge21)) {
+      } else if (e.equals(EDGE_21_KNOWS)) {
         assertEquals("wrong number of graphs", 2, gIDs.size());
       }
     }

@@ -71,12 +71,14 @@
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>1.10.19</dep.mockito.version>
 
+        <log4j.properties>log4j-test.properties</log4j.properties>
+
         <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.13</plugin.maven-checkstyle.version>
         <plugin.maven-findbugs.version>2.5.2</plugin.maven-findbugs.version>
         <plugin.maven_assembly.version>2.4</plugin.maven_assembly.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
-        <plugin.maven-surefire.version>2.6</plugin.maven-surefire.version>
+        <plugin.maven-surefire.version>2.7</plugin.maven-surefire.version>
     </properties>
 
     <build>
@@ -169,7 +171,10 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${plugin.maven-surefire.version}</version>
                     <configuration>
-                        <argLine>-Xmx1024m</argLine>
+                        <excludes>
+                            <exclude>**/*TestBase*.class</exclude>
+                        </excludes>
+                        <argLine>-Xmx512M -Dlog4j.configuration=${log4j.properties}</argLine>
                     </configuration>
                 </plugin>
             </plugins>
@@ -225,7 +230,6 @@
                 <artifactId>hbase-server</artifactId>
                 <version>${dep.hbase.version}</version>
                 <scope>provided</scope>
-
             </dependency>
 
             <!-- Others -->
@@ -268,13 +272,6 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${dep.junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>pl.pragmatists</groupId>
-                <artifactId>JUnitParams</artifactId>
-                <version>${dep.junitparams.version}</version>
                 <scope>test</scope>
             </dependency>
 

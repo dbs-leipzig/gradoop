@@ -1,44 +1,75 @@
 package org.gradoop.model.impl;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.gradoop.model.FlinkTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(JUnitParamsRunner.class)
-public class GraphCollectionUnionTest extends FlinkTest {
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-    graphStore;
+@RunWith(Parameterized.class)
+public class GraphCollectionUnionTest extends
+  BinaryCollectionOperatorsTestBase {
 
-  public GraphCollectionUnionTest() {
-    this.graphStore = createSocialGraph();
+  public GraphCollectionUnionTest(TestExecutionMode mode) {
+    super(mode);
   }
 
   @Test
-  @Parameters({"0 2, 2, 2, 5, 8", "0 1, 2 3, 4, 7, 13", "0, 0, 1, 3, 4"})
-  public void testUnion(String firstColl, String secondColl,
-    long expectedCollSize, long expectedVertexCount,
-    long expectedEdgeCount) throws Exception {
+  public void testOverlappingCollections() throws Exception {
+    long expectedCollectionSize = 2L;
+    long expectedVertexCount = 5L;
+    long expectedEdgeCount = 8L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       graphColl = graphStore.getCollection();
 
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      collection1 = graphColl.getGraphs(extractGraphIDs(firstColl));
+      collection1 = graphColl.getGraphs(0L, 2L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      collection2 = graphColl.getGraphs(extractGraphIDs(secondColl));
+      collection2 = graphColl.getGraphs(2L);
 
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       unionColl = collection1.union(collection2);
 
-    assertNotNull("graph collection is null", unionColl);
-    assertEquals("wrong number of graphs", expectedCollSize, unionColl.size());
-    assertEquals("wrong number of vertices", expectedVertexCount,
-      unionColl.getTotalVertexCount());
-    assertEquals("wrong number of edges", expectedEdgeCount,
-      unionColl.getTotalEdgeCount());
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      unionColl);
+  }
+
+  @Test
+  public void testNonOverlappingCollections() throws Exception {
+    long expectedCollectionSize = 4L;
+    long expectedVertexCount = 7L;
+    long expectedEdgeCount = 13L;
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection1 = graphColl.getGraphs(0L, 1L);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection2 = graphColl.getGraphs(2L, 3L);
+
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      unionColl = collection1.union(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      unionColl);
+  }
+
+  @Test
+  public void testTotalOverlappingCollections() throws Exception {
+    long expectedCollectionSize = 1L;
+    long expectedVertexCount = 3L;
+    long expectedEdgeCount = 4L;
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      graphColl = graphStore.getCollection();
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection1 = graphColl.getGraphs(0L);
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      collection2 = graphColl.getGraphs(0L);
+
+    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      unionColl = collection1.union(collection2);
+
+    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
+      unionColl);
   }
 }
