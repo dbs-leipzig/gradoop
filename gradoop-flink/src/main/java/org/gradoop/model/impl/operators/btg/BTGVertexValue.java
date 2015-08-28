@@ -1,8 +1,7 @@
-package org.gradoop.model.impl.operators.io.formats;
+package org.gradoop.model.impl.operators.btg;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.gradoop.model.GraphElement;
 
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.Set;
  * Custom vertex used by {@link org.gradoop.model.impl.operators
  * .BTGAlgorithm}.
  */
-public class BTGVertexValue implements GraphElement {
+public class BTGVertexValue {
   /**
    * The vertex type which is defined in {@link BTGVertexType}
    */
@@ -75,12 +74,20 @@ public class BTGVertexValue implements GraphElement {
     this.vertexValue = vertexValue;
   }
 
-  @Override
+  /**
+   * Returns the list of BTGs that vertex belongs to.
+   *
+   * @return list of BTGs containing that vertex.
+   */
   public Iterable<Long> getGraphs() {
     return this.btgIDs;
   }
 
-  @Override
+  /**
+   * Adds a BTG to the list of BTGs. BTGs can occur multiple times.
+   *
+   * @param graph BTG ID to be added
+   */
   public void addGraph(Long graph) {
     if (this.btgIDs.isEmpty()) {
       resetGraphs();
@@ -88,7 +95,11 @@ public class BTGVertexValue implements GraphElement {
     this.btgIDs.add(graph);
   }
 
-  @Override
+  /**
+   * Adds BTGs to the list of BTGs. BTGs can occur multiple times.
+   *
+   * @param graphs BTG IDs to be added
+   */
   public void addGraphs(Iterable<Long> graphs) {
     if (this.btgIDs.isEmpty()) {
       resetGraphs();
@@ -98,12 +109,18 @@ public class BTGVertexValue implements GraphElement {
     }
   }
 
-  @Override
+  /**
+   * Resets the list of BTGs
+   */
   public void resetGraphs() {
     this.btgIDs = Lists.newArrayList();
   }
 
-  @Override
+  /**
+   * Returns the size of the BTGs
+   *
+   * @return actual size of BTG List
+   */
   public int getGraphCount() {
     return this.btgIDs.size();
   }
@@ -111,6 +128,8 @@ public class BTGVertexValue implements GraphElement {
   /**
    * Returned the last inserted BTG ID. This has become necessary for the
    * Flink-Messaging-Function
+   *
+   * @return last added BTG ID
    */
   public Long getLastGraph() {
     if (this.btgIDs.size() > 0) {

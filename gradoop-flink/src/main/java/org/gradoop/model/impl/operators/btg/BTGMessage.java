@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.io.formats;
+package org.gradoop.model.impl.operators.btg;
 
 /**
  * Custom message format for {@link org.gradoop.model.impl.operators

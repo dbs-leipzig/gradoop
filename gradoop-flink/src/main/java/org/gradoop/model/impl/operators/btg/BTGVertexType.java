@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.io.formats;
+package org.gradoop.model.impl.operators.btg;
 
 /**
  * Created by galpha on 27.07.15.

@@ -1,4 +1,4 @@
-package org.gradoop.model.impl;
+package org.gradoop.model.impl.btg;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -6,14 +6,14 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.operators.io.formats.BTGVertexType;
-import org.gradoop.model.impl.operators.io.formats.BTGVertexValue;
+import org.gradoop.model.impl.operators.btg.BTGVertexType;
+import org.gradoop.model.impl.operators.btg.BTGVertexValue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class FlinkBTGAlgorithmTestHelper {
+public class BTGAlgorithmTestHelper {
   /**
    * Used for splitting the line into the main tokens (vertex id, vertex value,
    * edges)
