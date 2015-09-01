@@ -95,6 +95,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
   /**
    * compute the vertices in the new graphs created by the SplitBy and add
    * these graphs to the graph sets of the vertices
+   *
    * @param logicalGraph input graph
    * @return a DataSet containing all vertices, each vertex has one new graph
    * in its graph set
@@ -110,8 +111,9 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
 
   /**
    * compute the new subgraphs created by the SplitBy
+   *
    * @param logicalGraph the input graph
-   * @param vertices the computed vertices with their graphs
+   * @param vertices     the computed vertices with their graphs
    * @return a DataSet containing all newly created subgraphs
    */
   private DataSet<Subgraph<Long, GD>> computeNewSubgraphs(
@@ -128,9 +130,10 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
   /**
    * compute the edges which source and target are in the same newly created
    * graph
+   *
    * @param logicalGraph the input graph
-   * @param vertices the computed vertices with their graphs
-   * @param subgraphs the computed subgraphs
+   * @param vertices     the computed vertices with their graphs
+   * @param subgraphs    the computed subgraphs
    * @return a DataSet containing all newly created edges, each edge has a
    * new graph in its graph set
    */
@@ -236,6 +239,9 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
     @Override
     public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
       Long labelPropIndex = function.execute(vertex);
+      if (vertex.getValue().getGraphs() == null) {
+        vertex.getValue().setGraphs(new HashSet<Long>());
+      }
       vertex.getValue().getGraphs().add(labelPropIndex);
       return vertex;
     }
