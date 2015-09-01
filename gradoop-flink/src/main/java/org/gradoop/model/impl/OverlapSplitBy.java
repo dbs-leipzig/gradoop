@@ -31,6 +31,7 @@ import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -209,6 +210,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     @Override
     public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
       List<Long> labelPropIndex = function.execute(vertex);
+      if(vertex.getValue().getGraphs() == null){
+        vertex.getValue().setGraphs(new HashSet<Long>());
+      }
       vertex.getValue().getGraphs().addAll(labelPropIndex);
       return vertex;
     }
