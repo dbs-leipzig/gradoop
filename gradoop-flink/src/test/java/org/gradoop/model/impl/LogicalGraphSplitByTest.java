@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.List;
+
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -32,6 +35,20 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
     assertEquals("wrong number of graphs", 2L, labeledGraphCollection.size());
     assertEquals("wrong number of vertices", 3L,
       labeledGraphCollection.getTotalVertexCount());
+    List<Vertex<Long, DefaultVertexData>> oldVertices =
+      inputGraph.getGellyGraph().getVertices().collect();
+    List<Vertex<Long, DefaultVertexData>> newVertices =
+      labeledGraphCollection.getGellyGraph().getVertices().collect();
+    for (int i = 0; i < newVertices.size(); i++) {
+      Vertex<Long, DefaultVertexData> oldVertex = oldVertices.get(i);
+      Vertex<Long, DefaultVertexData> newVertex = newVertices.get(i);
+      assertTrue((oldVertex.getValue().getGraphCount() + 1) ==
+        newVertex.getValue().getGraphCount());
+      assertTrue(newVertex.getValue().getGraphs()
+        .containsAll(oldVertex.getValue().getGraphs()));
+      assertTrue(
+        newVertex.getValue().getGraphs().contains(function.execute(newVertex)));
+    }
     assertEquals("wrong number of edges", 1L,
       labeledGraphCollection.getTotalEdgeCount());
   }
