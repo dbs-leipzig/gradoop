@@ -39,7 +39,7 @@ import org.gradoop.model.impl.operators.Combination;
 import org.gradoop.model.impl.operators.Exclusion;
 import org.gradoop.model.impl.operators.Overlap;
 import org.gradoop.model.impl.operators.Projection;
-import org.gradoop.model.impl.operators.SummarizationUsingJoin;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupCombine;
 import org.gradoop.model.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.operators.LogicalGraphOperators;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
@@ -271,8 +271,8 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   public LogicalGraph<VD, ED, GD> summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationUsingJoin<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
-        false, false));
+      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+        edgeGroupingKey, false, false));
   }
 
   /**
@@ -308,8 +308,8 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   public LogicalGraph<VD, ED, GD> summarizeOnVertexLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationUsingJoin<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
-        true, false));
+      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+        edgeGroupingKey, true, false));
   }
 
   /**
@@ -347,8 +347,8 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   public LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationUsingJoin<VD, ED, GD>(vertexGroupingKey, edgeGroupingKey,
-        true, true));
+      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+        edgeGroupingKey, true, true));
   }
 
   /**
@@ -499,13 +499,12 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {
     this.getGellyGraph().getVertices().writeAsFormattedText(vertexFile,
-      new JsonWriter.VertexTextFormatter<VD>()).getDataSet().collect();
+      new JsonWriter.VertexTextFormatter<VD>());
     this.getGellyGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>())
-      .getDataSet().collect();
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
     env.fromElements(new Subgraph<>(graphData.getId(), graphData))
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>())
-      .getDataSet().collect();
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
+    env.execute();
   }
 
   /**

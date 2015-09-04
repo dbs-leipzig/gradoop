@@ -24,8 +24,8 @@ import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.EdgeDataCollection;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.VertexDataCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.VertexDataCollection;
 
 /**
  * Describes all operators that can be applied on a single logical graph in the
@@ -121,7 +121,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    *
    * @param propertyKey   used to store result of aggregate func
    * @param aggregateFunc computes an aggregate on the logical graph
-   * @param <O>           output type of the aggregte function
+   * @param <O>           output type of the aggregate function
    * @return logical graph with additional property storing the aggregate
    * @throws Exception
    */
@@ -141,7 +141,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @param vertexGroupingKey property key to group vertices
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarize(String vertexGroupingKey) throws Exception;
 
@@ -157,7 +157,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @param edgeGroupingKey   edge property key
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception;
@@ -170,7 +170,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    *
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarizeOnVertexLabel() throws Exception;
 
@@ -185,7 +185,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @param vertexGroupingKey vertex property key
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarizeOnVertexLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception;
@@ -201,7 +201,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @param edgeGroupingKey edge property key
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarizeOnVertexLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception;
@@ -219,7 +219,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @param edgeGroupingKey   edge property key
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarizeOnVertexLabel(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception;
@@ -233,7 +233,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    *
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel() throws Exception;
 
@@ -248,7 +248,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @param vertexGroupingKey vertex property key
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception;
@@ -265,7 +265,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @param edgeGroupingKey edge property key
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception;
@@ -282,7 +282,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @param edgeGroupingKey   edge property key
    * @return summarized logical graph
    * @throws Exception
-   * @see org.gradoop.model.impl.operators.Summarization
+   * @see org.gradoop.model.impl.operators.summarization.Summarization
    */
   LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception;

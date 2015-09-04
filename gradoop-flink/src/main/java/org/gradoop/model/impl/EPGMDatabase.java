@@ -220,7 +220,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     TypeInformation<Edge<Long, ED>> edgeTypeInfo =
       new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
         BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(edgeDataFactory.getType()));
+          TypeExtractor.createTypeInfo(edgeDataFactory.getType()));
     // used for type hinting when loading graph data
     TypeInformation<Subgraph<Long, GD>> graphTypeInfo =
       new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
@@ -266,13 +266,12 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     final String graphFile) throws Exception {
     getDatabaseGraph().getGellyGraph().getVertices()
       .writeAsFormattedText(vertexFile,
-        new JsonWriter.VertexTextFormatter<VD>()).getDataSet().collect();
+        new JsonWriter.VertexTextFormatter<VD>());
     getDatabaseGraph().getGellyGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>())
-      .getDataSet().collect();
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
     getCollection().getSubgraphs()
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>())
-      .getDataSet().collect();
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
+    env.execute();
   }
 
   /**
@@ -363,7 +362,8 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
   }
 
   /**
-   * Creates a database from collections of vertex, edge and graph data objects.
+   * Creates a database from collections of vertex, edge and graph data
+   * objects.
    * <p/>
    * Uses default factories for POJO creation.
    *

@@ -177,7 +177,7 @@ If you want to execute Gradoop on a cluster, you need *Hadoop 2.5.1* and
 
 * run your program (e.g. the included Summarization example)
 
-> ./bin/flink run -c org.gradoop.examples.Summarization ~/gradoop-flink-0.0.2-jar-with-dependencies.jar --vertex-input-path hdfs:///nodes.json --edge-input-path hdfs://edges.json --use-vertex-labels --use-edge-labels
+> ./bin/flink run -c org.gradoop.examples.SummarizationExample ~/gradoop-flink-0.0.2-jar-with-dependencies.jar --vertex-input-path hdfs:///nodes.json --edge-input-path hdfs://edges.json --use-vertex-labels --use-edge-labels
     
 ## Gradoop modules
 
