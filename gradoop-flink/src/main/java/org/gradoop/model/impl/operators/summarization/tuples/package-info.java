@@ -15,27 +15,8 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.summarization;
-
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-
 /**
- * Filter those tuples which are used to create {@link
- * VertexWithRepresentative} objects.
- *
- * @see SummarizationGroupCombine
- * @see SummarizationGroupMap
+ * Contains all tuple classes related to the graph summarization operator
+ * implementations.
  */
-@FunctionAnnotation.ForwardedFields("*->*")
-class VertexGroupItemToRepresentativeFilter implements
-  FilterFunction<VertexGroupItem> {
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
-    return vertexGroupItem.getGroupCount().equals(0L);
-  }
-}
+package org.gradoop.model.impl.operators.summarization.tuples;

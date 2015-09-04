@@ -15,7 +15,7 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.summarization;
+package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
@@ -28,9 +28,8 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.VertexDataFactory;
 import org.gradoop.model.helper.FlinkConstants;
-
-import static org.gradoop.model.impl.operators.summarization.Summarization
-  .COUNT_PROPERTY_KEY;
+import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 
 /**
  * Creates a new vertex representing a vertex group. The vertex stores the
@@ -38,11 +37,10 @@ import static org.gradoop.model.impl.operators.summarization.Summarization
  * group.
  *
  * @param <VD> vertex data type
- * @see SummarizationGroupCombine
- * @see SummarizationGroupMap
  */
 @FunctionAnnotation.ForwardedFields("f0")
-class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData> implements
+public class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData>
+  implements
   MapFunction<VertexGroupItem, Vertex<Long, VD>>,
   ResultTypeQueryable<Vertex<Long, VD>> {
 
@@ -104,8 +102,8 @@ class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData> implements
       summarizedVertexData
         .setProperty(groupPropertyKey, vertexGroupItem.getGroupPropertyValue());
     }
-    summarizedVertexData
-      .setProperty(COUNT_PROPERTY_KEY, vertexGroupItem.getGroupCount());
+    summarizedVertexData.setProperty(Summarization.COUNT_PROPERTY_KEY,
+      vertexGroupItem.getGroupCount());
     summarizedVertexData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
 
     reuseVertex.setId(vertexGroupItem.getVertexId());

@@ -21,10 +21,15 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
@@ -35,6 +40,11 @@ import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.VertexDataFactory;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexDataToGroupVertexMapper;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.operators.summarization.tuples
+  .VertexWithRepresentative;
 
 import java.util.List;
 
@@ -80,7 +90,14 @@ public class SummarizationGroupWithLists<VD extends VertexData, ED extends
   @Override
   protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
     /* build summarized vertices */
-    UnsortedGrouping<Vertex<Long, VD>> groupedVertices = groupVertices(graph);
+    // map vertex data to a smaller representation for grouping
+    DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
+      new VertexDataToGroupVertexMapper<VD>(getVertexGroupingKey(),
+        useVertexLabels()));
+
+    // group vertices by either label or property or both
+    UnsortedGrouping<VertexForGrouping> groupedVertices =
+      groupVertices(verticesForGrouping);
 
     // create new summarized gelly vertices
     DataSet<Tuple2<Vertex<Long, VD>, List<Long>>>
@@ -111,7 +128,7 @@ public class SummarizationGroupWithLists<VD extends VertexData, ED extends
    */
   protected DataSet<Tuple2<Vertex<Long, VD>, List<Long>>>
   buildSummarizedVerticesWithVertexIdList(
-    UnsortedGrouping<Vertex<Long, VD>> groupedSortedVertices) {
+    UnsortedGrouping<VertexForGrouping> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(
       new VertexGroupSummarizer<>(getVertexGroupingKey(), useVertexLabels(),
         vertexDataFactory));
@@ -122,8 +139,9 @@ public class SummarizationGroupWithLists<VD extends VertexData, ED extends
    * vertex identifiers that the summarized vertex represents.
    */
   private static class VertexGroupSummarizer<VD extends VertexData> implements
-    GroupReduceFunction<Vertex<Long, VD>, Tuple2<Vertex<Long, VD>,
-      List<Long>>> {
+    GroupReduceFunction<VertexForGrouping, Tuple2<Vertex<Long, VD>,
+      List<Long>>>,
+    ResultTypeQueryable<Tuple2<Vertex<Long, VD>, List<Long>>> {
 
     /**
      * Vertex data factory
@@ -172,7 +190,7 @@ public class SummarizationGroupWithLists<VD extends VertexData, ED extends
      * {@inheritDoc}
      */
     @Override
-    public void reduce(Iterable<Vertex<Long, VD>> vertices,
+    public void reduce(Iterable<VertexForGrouping> vertices,
       Collector<Tuple2<Vertex<Long, VD>, List<Long>>> collector) throws
       Exception {
       Long newVertexID = 0L;
@@ -180,17 +198,17 @@ public class SummarizationGroupWithLists<VD extends VertexData, ED extends
       String groupValue = null;
       List<Long> groupedVertexIds = Lists.newArrayList();
       boolean initialized = false;
-      for (Vertex<Long, VD> v : vertices) {
-        groupedVertexIds.add(v.getId());
+      for (VertexForGrouping v : vertices) {
+        groupedVertexIds.add(v.getVertexId());
         if (!initialized) {
           // will be the minimum vertex id in the group
-          newVertexID = v.getId();
+          newVertexID = v.getVertexId();
           // get label if necessary
-          groupLabel = useLabel ? v.getValue().getLabel() :
-            GConstants.DEFAULT_VERTEX_LABEL;
+          groupLabel =
+            useLabel ? v.getGroupLabel() : GConstants.DEFAULT_VERTEX_LABEL;
           // get group value if necessary
           if (useProperty) {
-            groupValue = getGroupProperty(v.getValue());
+            groupValue = getGroupProperty(v.getGroupPropertyValue());
           }
           initialized = true;
         }
@@ -217,15 +235,20 @@ public class SummarizationGroupWithLists<VD extends VertexData, ED extends
      * Returns the group property value or the default value if vertices in
      * the group do not have the property.
      *
-     * @param vertexData vertex data object of the summarized vertex
-     * @return vertex group value
+     * @param vertexPropertyValue vertex property value
+     * @return final vertex group value
      */
-    private String getGroupProperty(VD vertexData) {
-      if (vertexData.getProperty(groupPropertyKey) != null) {
-        return vertexData.getProperty(groupPropertyKey).toString();
-      } else {
-        return NULL_VALUE;
-      }
+    private String getGroupProperty(String vertexPropertyValue) {
+      return (vertexPropertyValue != null) ? vertexPropertyValue : NULL_VALUE;
+    }
+
+    @Override
+    public TypeInformation<Tuple2<Vertex<Long, VD>, List<Long>>>
+    getProducedType() {
+      return new TupleTypeInfo<>(
+        new TupleTypeInfo<>(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
+          TypeExtractor.getForClass(vertexDataFactory.getType())),
+        TypeExtractor.getForClass(List.class));
     }
   }
 

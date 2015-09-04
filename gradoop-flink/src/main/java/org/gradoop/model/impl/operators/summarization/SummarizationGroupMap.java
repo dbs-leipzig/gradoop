@@ -17,16 +17,29 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexDataToGroupVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToRepresentativeFilter;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToSummarizedVertexFilter;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToSummarizedVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToVertexWithRepresentativeMapper;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupReducer;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.tuples
+  .VertexWithRepresentative;
 
 /**
  * Summarization implementation that does not require sorting of vertex groups.
@@ -74,23 +87,29 @@ public class SummarizationGroupMap<VD extends VertexData, ED extends
    */
   @Override
   protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
-    // map vertex data to a smaller representation for grouping
-    DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
-      new VertexDataToGroupVertexMapper<VD>(getVertexGroupingKey(),
+    DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices()
+      // map vertex data to a smaller representation for grouping
+      .map(new VertexDataToGroupVertexMapper<VD>(getVertexGroupingKey(),
         useVertexLabels()));
-    // group vertices and build vertex group items
+
     DataSet<VertexGroupItem> groupedVertices =
-      groupVertices(verticesForGrouping).reduceGroup(new VertexGroupReducer());
+      // group vertices by label / property / both
+      groupVertices(verticesForGrouping)
+        // build vertex group item
+        .reduceGroup(new VertexGroupReducer());
 
-    // filter group representative tuples and build final vertices
-    DataSet<Vertex<Long, VD>> summarizedVertices =
-      groupedVertices.filter(new VertexGroupItemToSummarizedVertexFilter()).map(
-        new VertexGroupItemToSummarizedVertexMapper<>(vertexDataFactory,
-          getVertexGroupingKey(), useVertexLabels()));
+    DataSet<Vertex<Long, VD>> summarizedVertices = groupedVertices
+      // filter group representative tuples
+      .filter(new VertexGroupItemToSummarizedVertexFilter())
+      // build summarized vertex
+      .map(new VertexGroupItemToSummarizedVertexMapper<>(vertexDataFactory,
+        getVertexGroupingKey(), useVertexLabels()));
 
-    // filter vertex to representative tuples (used for edge join)
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
-      groupedVertices.filter(new VertexGroupItemToRepresentativeFilter())
+      groupedVertices
+        // filter group element tuples
+        .filter(new VertexGroupItemToRepresentativeFilter())
+        // build vertex to group representative tuple
         .map(new VertexGroupItemToVertexWithRepresentativeMapper());
 
     // build summarized edges
@@ -99,80 +118,6 @@ public class SummarizationGroupMap<VD extends VertexData, ED extends
 
     return Graph
       .fromDataSet(summarizedVertices, summarizedEdges, graph.getContext());
-  }
-
-  /**
-   * Creates a single {@link VertexGroupItem} for each group element
-   * containing the vertex id and the id of the group representative (the
-   * first tuple in the input iterable.
-   *
-   * Creates one {@link VertexGroupItem} for the whole group that contains the
-   * vertex id of the group representative, the group label, the group
-   * property value and the total number of group elements.
-   */
-  @FunctionAnnotation.ForwardedFields("f0;f1->f2;f2->f3")
-  private static class VertexGroupReducer implements
-    GroupReduceFunction<VertexForGrouping, VertexGroupItem> {
-    /**
-     * Reduce object instantiations.
-     */
-    private final VertexGroupItem reuseVertexGroupItem;
-
-    /**
-     * Creates group reduce function.
-     */
-    private VertexGroupReducer() {
-      reuseVertexGroupItem = new VertexGroupItem();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void reduce(Iterable<VertexForGrouping> groupVertices,
-      Collector<VertexGroupItem> collector) throws Exception {
-      Long groupRepresentative = null;
-      String groupLabel = null;
-      String groupPropertyValue = null;
-      boolean first = true;
-      long groupCount = 0L;
-      for (VertexForGrouping vertexForGrouping : groupVertices) {
-        if (first) {
-          groupRepresentative = vertexForGrouping.getVertexId();
-          groupLabel = vertexForGrouping.getGroupLabel();
-          groupPropertyValue = vertexForGrouping.getGroupPropertyValue();
-          first = false;
-        }
-        // no need to set group label / property value for those tuples
-        reuseVertexGroupItem.setVertexId(vertexForGrouping.getVertexId());
-        reuseVertexGroupItem
-          .setGroupRepresentativeVertexId(groupRepresentative);
-        collector.collect(reuseVertexGroupItem);
-        groupCount++;
-      }
-
-      createGroupRepresentativeTuple(groupRepresentative, groupLabel,
-        groupPropertyValue, groupCount);
-      collector.collect(reuseVertexGroupItem);
-      reuseVertexGroupItem.reset();
-    }
-
-    /**
-     * Creates one tuple representing the whole group. This tuple is later
-     * used to create a summarized vertex for each group.
-     *
-     * @param groupRepresentative group representative vertex id
-     * @param groupLabel          group label
-     * @param groupPropertyValue  group property value
-     * @param groupCount          total group count
-     */
-    private void createGroupRepresentativeTuple(Long groupRepresentative,
-      String groupLabel, String groupPropertyValue, long groupCount) {
-      reuseVertexGroupItem.setVertexId(groupRepresentative);
-      reuseVertexGroupItem.setGroupLabel(groupLabel);
-      reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);
-      reuseVertexGroupItem.setGroupCount(groupCount);
-    }
   }
 
   /**

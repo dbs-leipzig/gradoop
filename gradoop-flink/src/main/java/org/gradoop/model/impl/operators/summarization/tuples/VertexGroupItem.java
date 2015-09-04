@@ -15,19 +15,21 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.summarization;
+package org.gradoop.model.impl.operators.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 
 /**
  * Vertex representation which is used as output of group reduce.
  *
- * Consists of
- * - vertex id
- * - group representative vertex id
- * - group label
- * - group property
- * - total group count
+ * Consists of:
+ * <ul>
+ * <li> vertex id
+ * <li> group representative vertex id
+ * <li> vertex group label
+ * <li> vertex group property
+ * <li> total group count
+ * </ul>
  */
 public class VertexGroupItem extends Tuple5<Long, Long, String, String, Long> {
 

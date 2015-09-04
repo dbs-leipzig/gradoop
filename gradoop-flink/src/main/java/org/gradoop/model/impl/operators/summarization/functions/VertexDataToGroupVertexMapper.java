@@ -15,27 +15,26 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.summarization;
+package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 
 /**
  * Creates a minimal representation of vertex data to be used for grouping.
  *
- * The output of that mapper is {@link org.gradoop.model.impl.operators
- * .summarization.SummarizationGroupMap.VertexForGrouping} that contains
+ * The output of that mapper is {@link VertexForGrouping} that contains
  * the vertex id, vertex label and vertex property. Depending on the
  * summarization parameters, label and property can be null.
  *
  * @param <VD> vertex data type
- * @see SummarizationGroupCombine
- * @see SummarizationGroupMap
  */
 @FunctionAnnotation.ForwardedFields("f0")
-class VertexDataToGroupVertexMapper<VD extends VertexData> implements
+public class VertexDataToGroupVertexMapper<VD extends VertexData> implements
   MapFunction<Vertex<Long, VD>, VertexForGrouping> {
 
   /**

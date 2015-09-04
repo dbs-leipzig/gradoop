@@ -29,6 +29,20 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexDataToGroupVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToRepresentativeFilter;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToSummarizedVertexFilter;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToSummarizedVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToVertexWithRepresentativeMapper;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.tuples
+  .VertexWithRepresentative;
 
 /**
  * Summarization implementation that does not require sorting of vertex groups.
@@ -225,7 +239,6 @@ public class SummarizationGroupCombine<VD extends VertexData, ED extends
           // take final group representative vertex id from first tuple
           groupRepresentativeVertexId =
             vertexGroupItem.getGroupRepresentativeVertexId();
-          firstElement = false;
           // if label grouping is needed, each tuple carries the label
           if (vertexGroupItem.getGroupLabel() != null) {
             groupLabel = vertexGroupItem.getGroupLabel();
@@ -234,6 +247,7 @@ public class SummarizationGroupCombine<VD extends VertexData, ED extends
           if (vertexGroupItem.getGroupPropertyValue() != null) {
             groupPropertyValue = vertexGroupItem.getGroupPropertyValue();
           }
+          firstElement = false;
         }
         reuseVertexGroupItem.setVertexId(vertexGroupItem.getVertexId());
         reuseVertexGroupItem

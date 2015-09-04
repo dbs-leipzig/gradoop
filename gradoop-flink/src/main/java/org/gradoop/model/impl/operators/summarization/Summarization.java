@@ -23,15 +23,12 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.operators.SortedGrouping;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.GConstants;
 import org.gradoop.model.EdgeData;
@@ -42,6 +39,11 @@ import org.gradoop.model.VertexData;
 import org.gradoop.model.VertexDataFactory;
 import org.gradoop.model.helper.FlinkConstants;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.tuples
+  .VertexWithRepresentative;
 import org.gradoop.model.operators.UnaryGraphToGraphOperator;
 
 /**
@@ -96,7 +98,7 @@ public abstract class Summarization<VD extends VertexData, ED extends
   /**
    * Property key to store the number of summarized entities in a group.
    */
-  protected static final String COUNT_PROPERTY_KEY = "count";
+  public static final String COUNT_PROPERTY_KEY = "count";
   /**
    * Creates new graph data objects.
    */
@@ -227,20 +229,6 @@ public abstract class Summarization<VD extends VertexData, ED extends
   }
 
   /**
-   * Groups vertices by vertex label and/or grouping key.
-   *
-   * @param graph input graph
-   * @return grouped vertices
-   */
-  protected UnsortedGrouping<Vertex<Long, VD>> groupVertices(
-    Graph<Long, VD, ED> graph) {
-    return graph.getVertices()
-      // group vertices by the given property
-      .groupBy(new VertexGroupingValueSelector<VD>(getVertexGroupingKey(),
-        useVertexLabels()));
-  }
-
-  /**
    * Group vertices by either vertex label, vertex property or both.
    *
    * @param groupVertices dataset containing vertex representation for grouping
@@ -277,19 +265,6 @@ public abstract class Summarization<VD extends VertexData, ED extends
       vertexGrouping = groupedVertices.groupBy(3);
     }
     return vertexGrouping;
-  }
-
-  /**
-   * Constructs new summarized vertices representing a group of vertices.
-   *
-   * @param groupedSortedVertices grouped and sorted vertices
-   * @return summarized vertices
-   */
-  protected DataSet<Vertex<Long, VD>> buildSummarizedVertices(
-    SortedGrouping<Vertex<Long, VD>> groupedSortedVertices) {
-    return groupedSortedVertices.reduceGroup(
-      new VertexGroupSummarizer<>(getVertexGroupingKey(), useVertexLabels(),
-        vertexDataFactory));
   }
 
   /**
@@ -357,183 +332,6 @@ public abstract class Summarization<VD extends VertexData, ED extends
    */
   protected abstract Graph<Long, VD, ED> summarizeInternal(
     Graph<Long, VD, ED> graph);
-
-  /**
-   * Selects the property value to group vertices. If grouping on property
-   * and label is requested, the selector returns a concatenated string value
-   * build from label and property value.
-   */
-  protected static class VertexGroupingValueSelector<VD extends VertexData>
-    implements
-    KeySelector<Vertex<Long, VD>, Integer> {
-    /**
-     * Defines how label and grouping value are represented.
-     */
-    private static final String GROUPING_VALUE_FORMAT = "%s%s";
-    /**
-     * Vertex property key
-     */
-    private final String groupPropertyKey;
-    /**
-     * True, if property shall be considered.
-     */
-    private final boolean useProperty;
-    /**
-     * True, if label shall be considered
-     */
-    private final boolean useLabel;
-
-    /**
-     * Creates key selector
-     *
-     * @param groupPropertyKey vertex property key
-     * @param useLabel         use vertex label
-     */
-    public VertexGroupingValueSelector(String groupPropertyKey,
-      boolean useLabel) {
-      this.groupPropertyKey = groupPropertyKey;
-      this.useLabel = useLabel;
-      this.useProperty =
-        groupPropertyKey != null && !"".equals(groupPropertyKey);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getKey(Vertex<Long, VD> v) throws Exception {
-      String label = v.getValue().getLabel();
-      String groupingValue = null;
-      boolean hasProperty =
-        useProperty && (v.getValue().getProperty(groupPropertyKey) != null);
-
-      if (useLabel && useProperty && hasProperty) {
-        groupingValue = String.format(GROUPING_VALUE_FORMAT, label,
-          v.getValue().getProperty(groupPropertyKey).toString());
-      } else if (useLabel && useProperty) {
-        groupingValue = String.format(GROUPING_VALUE_FORMAT, label, NULL_VALUE);
-      } else if (useLabel) {
-        groupingValue = label;
-      } else if (useProperty && hasProperty) {
-        groupingValue = v.getValue().getProperty(groupPropertyKey).toString();
-      } else if (useProperty) {
-        groupingValue = NULL_VALUE;
-      }
-      assert groupingValue != null;
-      return groupingValue.hashCode();
-    }
-  }
-
-  /**
-   * Creates a summarized vertex from a group of vertices.
-   */
-  protected static class VertexGroupSummarizer<VD extends VertexData> implements
-    GroupReduceFunction<Vertex<Long, VD>, Vertex<Long, VD>>,
-    ResultTypeQueryable<Vertex<Long, VD>> {
-
-    /**
-     * Vertex data factory
-     */
-    private final VertexDataFactory<VD> vertexDataFactory;
-    /**
-     * Vertex property key to store group value
-     */
-    private final String groupPropertyKey;
-    /**
-     * True, if label shall be considered
-     */
-    private final boolean useLabel;
-    /**
-     * True, if property shall be considered.
-     */
-    private final boolean useProperty;
-    /**
-     * Avoid object instantiation in each reduce call.
-     */
-    private final Vertex<Long, VD> reuseVertex;
-
-    /**
-     * Creates group reducer
-     *
-     * @param groupPropertyKey  vertex property key to store group value
-     * @param useLabel          use vertex label
-     * @param vertexDataFactory vertex data factory
-     */
-    public VertexGroupSummarizer(String groupPropertyKey, boolean useLabel,
-      VertexDataFactory<VD> vertexDataFactory) {
-      this.groupPropertyKey = groupPropertyKey;
-      this.useLabel = useLabel;
-      this.useProperty =
-        groupPropertyKey != null && !"".equals(groupPropertyKey);
-      this.vertexDataFactory = vertexDataFactory;
-      this.reuseVertex = new Vertex<>();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void reduce(Iterable<Vertex<Long, VD>> vertices,
-      Collector<Vertex<Long, VD>> collector) throws Exception {
-      long groupCount = 0L;
-      Long newVertexID = 0L;
-      String groupLabel = null;
-      String groupValue = null;
-      boolean initialized = false;
-      for (Vertex<Long, VD> v : vertices) {
-        groupCount++;
-        if (!initialized) {
-          // will be the minimum vertex id in the group
-          newVertexID = v.getId();
-          // get label if necessary
-          groupLabel = useLabel ? v.getValue().getLabel() :
-            GConstants.DEFAULT_VERTEX_LABEL;
-          // get group value if necessary
-          if (useProperty) {
-            groupValue = getGroupProperty(v.getValue());
-          }
-          initialized = true;
-        }
-      }
-      VD vertexData =
-        vertexDataFactory.createVertexData(newVertexID, groupLabel);
-      if (useProperty) {
-        vertexData.setProperty(groupPropertyKey, groupValue);
-      }
-      vertexData.setProperty(COUNT_PROPERTY_KEY, groupCount);
-      vertexData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
-
-      reuseVertex.f0 = newVertexID;
-      reuseVertex.f1 = vertexData;
-
-      collector.collect(reuseVertex);
-    }
-
-    /**
-     * Returns the group property value or the default value if vertices in
-     * the group do not have the property.
-     *
-     * @param vertexData vertex data object of the summarized vertex
-     * @return vertex group value
-     */
-    private String getGroupProperty(VD vertexData) {
-      if (vertexData.getProperty(groupPropertyKey) != null) {
-        return vertexData.getProperty(groupPropertyKey).toString();
-      } else {
-        return NULL_VALUE;
-      }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public TypeInformation<Vertex<Long, VD>> getProducedType() {
-      return new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(vertexDataFactory.getType()));
-    }
-  }
 
   /**
    * Creates a summarized edge from a group of edges including an edge

@@ -15,12 +15,21 @@
  * along with gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.summarization;
+package org.gradoop.model.impl.operators.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 
 /**
  * Edge representation used in grouping edges to summarized edges.
+ *
+ * Consists of:
+ * <ul>
+ * <li> edge id
+ * <li> source vertex id
+ * <li> target vertex id
+ * <li> edge group label
+ * <li> edge group property value
+ * </ul>
  */
 public class EdgeGroupItem extends Tuple5<Long, Long, Long, String, String> {
 

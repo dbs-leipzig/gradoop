@@ -1,10 +1,17 @@
-package org.gradoop.model.impl.operators.summarization;
+package org.gradoop.model.impl.operators.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * Representation of a vertex id and its corresponding vertex group
  * representative.
+ *
+ * Consists of:
+ *
+ * <ul>
+ * <li> vertex id
+ * <li> group representative vertex id
+ * </ul>
  */
 public class VertexWithRepresentative extends Tuple2<Long, Long> {
 

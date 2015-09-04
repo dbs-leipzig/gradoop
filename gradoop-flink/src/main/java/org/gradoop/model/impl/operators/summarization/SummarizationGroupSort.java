@@ -1,17 +1,29 @@
 package org.gradoop.model.impl.operators.summarization;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.SortedGrouping;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.apache.flink.util.Collector;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
-import org.gradoop.model.helper.KeySelectors;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexDataToGroupVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToRepresentativeFilter;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToSummarizedVertexFilter;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToSummarizedVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupItemToVertexWithRepresentativeMapper;
+import org.gradoop.model.impl.operators.summarization.functions
+  .VertexGroupReducer;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.tuples
+  .VertexWithRepresentative;
 
 /**
  * Summarization implementation that requires sorting of vertex groups to chose
@@ -56,24 +68,40 @@ public class SummarizationGroupSort<VD extends VertexData, ED extends
    */
   @Override
   protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
-    /* build summarized vertices */
-    SortedGrouping<Vertex<Long, VD>> groupedSortedVertices =
-      groupVertices(graph)
-        .sortGroup(new KeySelectors.VertexKeySelector<VD>(), Order.ASCENDING);
-    // create new summarized gelly vertices
-    DataSet<Vertex<Long, VD>> newVertices =
-      buildSummarizedVertices(groupedSortedVertices);
+    DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices()
+      // map vertices to a compact representation
+      .map(new VertexDataToGroupVertexMapper<VD>(
+        getVertexGroupingKey(), useVertexLabels()));
 
-    // create mapping from vertex-id to group representative
+    // sort group by vertex id ascending
+    DataSet<VertexGroupItem> sortedGroupedVertices =
+      // group vertices by label / property / both
+      groupVertices(verticesForGrouping)
+        // sort group by vertex id ascending
+        .sortGroup(0, Order.ASCENDING)
+        // create vertex group items
+        .reduceGroup(new VertexGroupReducer());
+
+    DataSet<Vertex<Long, VD>> summarizedVertices = sortedGroupedVertices
+      // filter group representative tuples
+      .filter(new VertexGroupItemToSummarizedVertexFilter())
+        // build summarized vertex
+      .map(new VertexGroupItemToSummarizedVertexMapper<>(vertexDataFactory,
+        getVertexGroupingKey(), useVertexLabels()));
+
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
-      groupedSortedVertices
-        .reduceGroup(new VertexToRepresentativeReducer<VD>());
+      sortedGroupedVertices
+        // filter group element tuples
+        .filter(new VertexGroupItemToRepresentativeFilter())
+          // build vertex to group representative tuple
+        .map(new VertexGroupItemToVertexWithRepresentativeMapper());
 
-    /* build summarized vertices */
-    DataSet<Edge<Long, ED>> newEdges =
+    // build summarized edges
+    DataSet<Edge<Long, ED>> summarizedEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
-    return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
+    return Graph
+      .fromDataSet(summarizedVertices, summarizedEdges, graph.getContext());
   }
 
   /**
@@ -82,47 +110,5 @@ public class SummarizationGroupSort<VD extends VertexData, ED extends
   @Override
   public String getName() {
     return SummarizationGroupSort.class.getName();
-  }
-
-  /**
-   * Takes a group of vertex ids as input an emits a (vertex-id,
-   * group-representative) tuple for each vertex in that group.
-   * <p/>
-   * The group representative is the first vertex-id in the group.
-   */
-  private static class VertexToRepresentativeReducer<VD extends VertexData>
-    implements
-    GroupReduceFunction<Vertex<Long, VD>, VertexWithRepresentative> {
-
-    /**
-     * Avoid object instantiation in each reduce call.
-     */
-    private final VertexWithRepresentative reuseTuple;
-
-    /**
-     * Creates a group reduce function.
-     */
-    public VertexToRepresentativeReducer() {
-      this.reuseTuple = new VertexWithRepresentative();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void reduce(Iterable<Vertex<Long, VD>> group,
-      Collector<VertexWithRepresentative> collector) throws Exception {
-      Long groupRepresentative = null;
-      boolean first = true;
-      for (Vertex<Long, VD> groupElement : group) {
-        if (first) {
-          groupRepresentative = groupElement.getId();
-          first = false;
-        }
-        reuseTuple.setVertexId(groupElement.getId());
-        reuseTuple.setGroupRepresentativeVertexId(groupRepresentative);
-        collector.collect(reuseTuple);
-      }
-    }
   }
 }
