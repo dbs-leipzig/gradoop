@@ -29,10 +29,10 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
       new SplitBy<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
         function, ExecutionEnvironment.getExecutionEnvironment()));
     assertNotNull("graph collection is null", labeledGraphCollection);
-    assertEquals("wrong number of graphs", 2l, labeledGraphCollection.size());
-    assertEquals("wrong number of vertices", 3l,
+    assertEquals("wrong number of graphs", 2L, labeledGraphCollection.size());
+    assertEquals("wrong number of vertices", 3L,
       labeledGraphCollection.getTotalVertexCount());
-    assertEquals("wrong number of edges", 1l,
+    assertEquals("wrong number of edges", 1L,
       labeledGraphCollection.getTotalEdgeCount());
   }
 
