@@ -1,6 +1,5 @@
 package org.gradoop.model.impl.btg;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
@@ -13,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +49,8 @@ public class BTGAlgorithmTest extends FlinkTestBase {
       BTGAlgorithmTestHelper.getGraph(getConnectedIIG(), env);
     DataSet<Vertex<Long, BTGVertexValue>> btgGraph =
       gellyGraph.run(new BTGAlgorithm(maxIteration)).getVertices();
-    validateConnectedIIGResult(parseResult(btgGraph.collect()));
+    validateConnectedIIGResult(
+      BTGAlgorithmTestHelper.parseResultBTGVertexData(btgGraph.collect()));
   }
 
   @Test
@@ -62,16 +61,8 @@ public class BTGAlgorithmTest extends FlinkTestBase {
       BTGAlgorithmTestHelper.getGraph(getDisconnectedIIG(), env);
     DataSet<Vertex<Long, BTGVertexValue>> btgGraph =
       gellyGraph.run(new BTGAlgorithm(maxIteration)).getVertices();
-    validateDisconnectedIIGResult(parseResult(btgGraph.collect()));
-  }
-
-  private Map<Long, List<Long>> parseResult(
-    List<Vertex<Long, BTGVertexValue>> graph) {
-    Map<Long, List<Long>> result = new HashMap<>();
-    for (Vertex<Long, BTGVertexValue> v : graph) {
-      result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphs()));
-    }
-    return result;
+    validateDisconnectedIIGResult(
+      BTGAlgorithmTestHelper.parseResultBTGVertexData(btgGraph.collect()));
   }
 
   private void validateConnectedIIGResult(Map<Long, List<Long>> btgIDs) {

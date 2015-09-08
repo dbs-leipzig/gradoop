@@ -1,7 +1,7 @@
 package org.gradoop.model.impl.operators.btg;
 
 /**
- * Created by galpha on 27.07.15.
+ * Used for {@link BTGAlgorithm}.
  */
 public enum BTGVertexType {
   /**

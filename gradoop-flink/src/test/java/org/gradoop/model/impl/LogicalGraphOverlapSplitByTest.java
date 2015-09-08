@@ -14,10 +14,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
-/**
- * Created by galpha on 27.08.15.
- */
-
 @RunWith(Parameterized.class)
 public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
   public LogicalGraphOverlapSplitByTest(TestExecutionMode mode) {
@@ -59,7 +55,7 @@ public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
         list.add(-3l);
         inNewGraph = true;
       }
-      if(!inNewGraph){
+      if (!inNewGraph) {
         list.add(-1l);
       }
       return list;

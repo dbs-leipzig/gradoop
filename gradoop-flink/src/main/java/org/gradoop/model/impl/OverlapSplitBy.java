@@ -37,13 +37,33 @@ import java.util.List;
 /**
  * Split an EPGraph into an EPGraphCollection by a self defined mapping from
  * vertex to long
+ *
+ * @param <VD> VertexData contains information about the vertex
+ * @param <ED> EdgeData contains information about all edges of the vertex
+ * @param <GD> GraphData contains information about all graphs of the vertex
  */
 public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
   extends GraphData> implements
   UnaryGraphToCollectionOperator<VD, ED, GD>, Serializable {
-  ExecutionEnvironment env;
-  final UnaryFunction<Vertex<Long, VD>, List<Long>> function;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 513465233452L;
+  /**
+   * Flink Execution Environment
+   */
+  private final transient ExecutionEnvironment env;
+  /**
+   * Self defined function for graph extraction
+   */
+  private final UnaryFunction<Vertex<Long, VD>, List<Long>> function;
 
+  /**
+   * Constructor
+   *
+   * @param function self defined function
+   * @param env      execution environment
+   */
   public OverlapSplitBy(UnaryFunction<Vertex<Long, VD>, List<Long>> function,
     ExecutionEnvironment env) {
     this.env = env;
@@ -60,12 +80,12 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
   @Override
   public GraphCollection<VD, ED, GD> execute(
     LogicalGraph<VD, ED, GD> logicalGraph) {
-    //add all new subgraphs to the graph sets of the vertices
+    // add all new subgraphs to the graph sets of the vertices
     DataSet<Vertex<Long, VD>> vertices = computeNewVertices(logicalGraph);
-    //construct the new subgraph objects
+    // construct the new subgraph objects
     DataSet<Subgraph<Long, GD>> subgraphs =
       computeNewSubgraphs(logicalGraph, vertices);
-    //construct tuples containing the edge, source and target vertex ids
+    // construct tuples containing the edge, source and target vertex ids
     DataSet<Edge<Long, ED>> edges =
       computeNewEdges(logicalGraph, vertices, subgraphs);
     Graph<Long, VD, ED> newGraph = Graph.fromDataSet(vertices, edges, env);
@@ -84,10 +104,10 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
    */
   private DataSet<Vertex<Long, VD>> computeNewVertices(
     LogicalGraph<VD, ED, GD> logicalGraph) {
-    //get the Gelly graph and vertices
+    // get the Gelly graph and vertices
     final Graph<Long, VD, ED> graph = logicalGraph.getGellyGraph();
     DataSet<Vertex<Long, VD>> vertices = graph.getVertices();
-    //add the new graphs to the vertices graph lists
+    // add the new graphs to the vertices graph lists
     return vertices.map(new AddNewGraphsToVertexMapper<>(function));
   }
 
@@ -106,38 +126,46 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     return newSubgraphIDs.map(new SubgraphMapper<>(gdFactory));
   }
 
+  /**
+   * compute the new edges between all subgraphs
+   *
+   * @param logicalGraph the input graph
+   * @param vertices     the computed vertices with their edges
+   * @param subgraphs    the subgraphs of the vertices
+   * @return all edges between all subgraphs
+   */
   private DataSet<Edge<Long, ED>> computeNewEdges(
     LogicalGraph<VD, ED, GD> logicalGraph, DataSet<Vertex<Long, VD>> vertices,
     DataSet<Subgraph<Long, GD>> subgraphs) {
     final Graph<Long, VD, ED> graph = logicalGraph.getGellyGraph();
-    //construct tuples of the edges with the ids of their source and target
+    // construct tuples of the edges with the ids of their source and target
     // vertices
     DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex =
       graph.getEdges().map(new EdgeToTupleMapper<ED>());
-    //replace the source vertex id by the graph list of this vertex
+    // replace the source vertex id by the graph list of this vertex
     DataSet<Tuple3<Long, List<Long>, Long>> edgeGraphsVertex =
       edgeVertexVertex.join(vertices).where(1).equalTo(0)
         .with(new JoinEdgeTupleWithSourceGraphs<VD>());
-    //replace the target vertex id by the graph list of this vertex
+    // replace the target vertex id by the graph list of this vertex
     DataSet<Tuple3<Long, List<Long>, List<Long>>> edgeGraphsGraphs =
       edgeGraphsVertex.join(vertices).where(2).equalTo(0)
         .with(new JoinEdgeTupleWithTargetGraphs<VD>());
-    //transform the new subgraphs into a single set of long, containing all
+    // transform the new subgraphs into a single set of long, containing all
     // the identifiers
     DataSet<List<Long>> newSubgraphIdentifiers =
       subgraphs.map(new MapSubgraphIdToSet<GD>()).reduce(new ReduceSets());
-    //construct new tuples containing the edge, the graphs of its source and
-    //target vertex and the list of new graphs
+    // construct new tuples containing the edge, the graphs of its source and
+    // target vertex and the list of new graphs
     DataSet<Tuple4<Long, List<Long>, List<Long>, List<Long>>>
       edgesWithSubgraphs =
       edgeGraphsGraphs.crossWithTiny(newSubgraphIdentifiers)
         .with(new CrossEdgesWithGraphSet());
-    //remove all edges which source and target are not in at least one common
+    // remove all edges which source and target are not in at least one common
     // graph
     DataSet<Tuple2<Long, List<Long>>> newSubgraphs =
       edgesWithSubgraphs.flatMap(new CheckEdgesSourceTargetGraphs());
-    //join the graph set tuples with the edges, add all new graphs to the
-    //edge graph sets
+    // join the graph set tuples with the edges, add all new graphs to the
+    // edge graph sets
     return graph.getEdges().join(newSubgraphs)
       .where(new KeySelectors.EdgeKeySelector<ED>()).equalTo(0)
       .with(new JoinEdgeTuplesWithEdges<ED>());
@@ -149,12 +177,23 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
   private static class SubgraphMapper<GD extends GraphData> implements
     MapFunction<Tuple1<Long>, Subgraph<Long, GD>>,
     ResultTypeQueryable<Subgraph<Long, GD>> {
+    /**
+     * GraphDataFactory
+     */
     private GraphDataFactory<GD> graphDataFactory;
 
+    /**
+     * Constructor
+     *
+     * @param graphDataFactory actual GraphDataFactory
+     */
     public SubgraphMapper(GraphDataFactory<GD> graphDataFactory) {
       this.graphDataFactory = graphDataFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Subgraph<Long, GD> map(Tuple1<Long> idTuple) throws Exception {
       Long id = idTuple.f0;
@@ -162,6 +201,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
         graphDataFactory.createGraphData(id, "split graph " + id));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
     public TypeInformation<Subgraph<Long, GD>> getProducedType() {
@@ -176,13 +218,24 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
   private static class VertexToGraphIDFlatMapper<VD extends VertexData>
     implements
     FlatMapFunction<Vertex<Long, VD>, Tuple1<Long>> {
-    UnaryFunction<Vertex<Long, VD>, List<Long>> function;
+    /**
+     * Self defined Function
+     */
+    private UnaryFunction<Vertex<Long, VD>, List<Long>> function;
 
+    /**
+     * Constructor
+     *
+     * @param function actual defined Function
+     */
     public VertexToGraphIDFlatMapper(
       UnaryFunction<Vertex<Long, VD>, List<Long>> function) {
       this.function = function;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void flatMap(Vertex<Long, VD> vertex,
       Collector<Tuple1<Long>> collector) throws Exception {
@@ -200,17 +253,28 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
   private static class AddNewGraphsToVertexMapper<VD extends VertexData>
     implements
     MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
+    /**
+     * Self defined Function
+     */
     private UnaryFunction<Vertex<Long, VD>, List<Long>> function;
 
+    /**
+     * Constructor
+     *
+     * @param function actual defined Function
+     */
     public AddNewGraphsToVertexMapper(
       UnaryFunction<Vertex<Long, VD>, List<Long>> function) {
       this.function = function;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
       List<Long> labelPropIndex = function.execute(vertex);
-      if(vertex.getValue().getGraphs() == null){
+      if (vertex.getValue().getGraphs() == null) {
         vertex.getValue().setGraphs(new HashSet<Long>());
       }
       vertex.getValue().getGraphs().addAll(labelPropIndex);
@@ -239,6 +303,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     implements
     JoinFunction<Tuple3<Long, Long, Long>, Vertex<Long, VD>, Tuple3<Long,
       List<Long>, Long>> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tuple3<Long, List<Long>, Long> join(Tuple3<Long, Long, Long> tuple3,
       Vertex<Long, VD> vertex) throws Exception {
@@ -255,6 +322,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     implements
     JoinFunction<Tuple3<Long, List<Long>, Long>, Vertex<Long, VD>,
       Tuple3<Long, List<Long>, List<Long>>> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tuple3<Long, List<Long>, List<Long>> join(
       Tuple3<Long, List<Long>, Long> tuple3, Vertex<Long, VD> vertex) throws
@@ -282,6 +352,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
    * reduce a dataset of sets of longs into a single set of longs
    */
   private static class ReduceSets implements ReduceFunction<List<Long>> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Long> reduce(List<Long> set1, List<Long> set2) throws
       Exception {
@@ -296,6 +369,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
   private static class CrossEdgesWithGraphSet implements
     CrossFunction<Tuple3<Long, List<Long>, List<Long>>, List<Long>,
       Tuple4<Long, List<Long>, List<Long>, List<Long>>> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tuple4<Long, List<Long>, List<Long>, List<Long>> cross(
       Tuple3<Long, List<Long>, List<Long>> tuple3, List<Long> subgraphs) throws
@@ -311,6 +387,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
   private static class CheckEdgesSourceTargetGraphs implements
     FlatMapFunction<Tuple4<Long, List<Long>, List<Long>, List<Long>>,
       Tuple2<Long, List<Long>>> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void flatMap(Tuple4<Long, List<Long>, List<Long>, List<Long>> tuple4,
       Collector<Tuple2<Long, List<Long>>> collector) throws Exception {
@@ -336,6 +415,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
    */
   private static class JoinEdgeTuplesWithEdges<ED extends EdgeData> implements
     JoinFunction<Edge<Long, ED>, Tuple2<Long, List<Long>>, Edge<Long, ED>> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Edge<Long, ED> join(Edge<Long, ED> edge,
       Tuple2<Long, List<Long>> tuple2) throws Exception {
@@ -343,6 +425,9 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return "OverlapSplitBy";

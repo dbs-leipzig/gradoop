@@ -6,11 +6,14 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
+import org.gradoop.model.impl.DefaultVertexData;
 import org.gradoop.model.impl.operators.btg.BTGVertexType;
 import org.gradoop.model.impl.operators.btg.BTGVertexValue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class BTGAlgorithmTestHelper {
@@ -33,8 +36,8 @@ public class BTGAlgorithmTestHelper {
    * @param env   actual ExecutionEnvironment
    * @return Gelly Graph based for FlinkBTGComputation
    */
-  public static Graph<Long, BTGVertexValue, NullValue> getGraph(
-    String[] graph, ExecutionEnvironment env) {
+  public static Graph<Long, BTGVertexValue, NullValue> getGraph(String[] graph,
+    ExecutionEnvironment env) {
     List<Vertex<Long, BTGVertexValue>> vertices = new ArrayList<>();
     List<Edge<Long, NullValue>> edges = new ArrayList<>();
     for (String line : graph) {
@@ -49,8 +52,8 @@ public class BTGAlgorithmTestHelper {
       for (int n = 2; n < valueTokens.length; n++) {
         btgIDs.add(Long.parseLong(valueTokens[n]));
       }
-      vertices.add(new Vertex<>(id,
-        new BTGVertexValue(vertexClass, vertexValue, btgIDs)));
+      vertices.add(
+        new Vertex<>(id, new BTGVertexValue(vertexClass, vertexValue, btgIDs)));
       String[] edgeTokens =
         (lineTokens.length == 3) ? VALUE_TOKEN_SEPARATOR.split(lineTokens[2]) :
           new String[0];
@@ -60,6 +63,24 @@ public class BTGAlgorithmTestHelper {
       }
     }
     return Graph.fromCollection(vertices, edges, env);
+  }
+
+  public static Map<Long, List<Long>> parseResultBTGVertexData(
+    List<Vertex<Long, BTGVertexValue>> graph) {
+    Map<Long, List<Long>> result = new HashMap<>();
+    for (Vertex<Long, BTGVertexValue> v : graph) {
+      result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphs()));
+    }
+    return result;
+  }
+
+  public static Map<Long, List<Long>> parseResultDefaultVertexData(
+    List<Vertex<Long, DefaultVertexData>> graph) {
+    Map<Long, List<Long>> result = new HashMap<>();
+    for (Vertex<Long, DefaultVertexData> v : graph) {
+      result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphs()));
+    }
+    return result;
   }
 }
 
