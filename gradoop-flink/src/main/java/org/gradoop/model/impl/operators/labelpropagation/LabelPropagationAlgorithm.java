@@ -98,8 +98,8 @@ public class LabelPropagationAlgorithm implements
         int stabilizationRound = vertex.getValue().getStabilizationCounter();
         long newCommunity = getNewCommunity(vertex, msg);
         boolean changed = currentCommunity != newCommunity;
-        boolean lastEqualsnew = lastCommunity == newCommunity;
-        if (changed && lastEqualsnew) {
+        boolean lastEqualsNew = lastCommunity == newCommunity;
+        if (changed && lastEqualsNew) {
           //Counts the amount of community swaps between 2 communities
           stabilizationRound++;
           vertex.getValue().setStabilizationCounter(stabilizationRound);
@@ -117,7 +117,7 @@ public class LabelPropagationAlgorithm implements
             setNewVertexValue(vertex.getValue());
           }
         }
-        if (changed && !lastEqualsnew) {
+        if (changed && !lastEqualsNew) {
           vertex.getValue().setLastCommunity(currentCommunity);
           vertex.getValue().setCurrentCommunity(newCommunity);
           setNewVertexValue(vertex.getValue());

@@ -19,9 +19,12 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests the algorithm using the Gelly Graph.run() method.
+ */
 @RunWith(Parameterized.class)
-public class EPGMLabelPropagationAlgorithmTest extends FlinkTestBase {
-  public EPGMLabelPropagationAlgorithmTest(TestExecutionMode mode) {
+public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
+  public EPGMLabelPropagationGellyTest(TestExecutionMode mode) {
     super(mode);
   }
 
@@ -60,7 +63,7 @@ public class EPGMLabelPropagationAlgorithmTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, DefaultVertexData, DefaultEdgeData> epGraph =
-      LabelPropagationAlgorithmTestHelper
+      LabelPropagationGellyTestHelper
         .getEPGraph(getConnectedGraphWithVertexValues(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = epGraph.run(
       new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
@@ -73,7 +76,7 @@ public class EPGMLabelPropagationAlgorithmTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, DefaultVertexData, DefaultEdgeData> gellyGraph =
-      LabelPropagationAlgorithmTestHelper
+      LabelPropagationGellyTestHelper
         .getEPGraph(getCompleteBipartiteGraphWithVertexValue(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
       new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
@@ -86,7 +89,7 @@ public class EPGMLabelPropagationAlgorithmTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, DefaultVertexData, DefaultEdgeData> gellyGraph =
-      LabelPropagationAlgorithmTestHelper
+      LabelPropagationGellyTestHelper
         .getEPGraph(getLoopGraphWithVertexValues(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
       new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
@@ -104,40 +107,40 @@ public class EPGMLabelPropagationAlgorithmTest extends FlinkTestBase {
     return result;
   }
 
-  private void validateConnectedGraphResult(Map<Long, Long> vertexIDwithValue) {
-    assertEquals(12, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0L).longValue());
-    assertEquals(0, vertexIDwithValue.get(1L).longValue());
-    assertEquals(0, vertexIDwithValue.get(2L).longValue());
-    assertEquals(0, vertexIDwithValue.get(3L).longValue());
-    assertEquals(4, vertexIDwithValue.get(4L).longValue());
-    assertEquals(4, vertexIDwithValue.get(5L).longValue());
-    assertEquals(4, vertexIDwithValue.get(6L).longValue());
-    assertEquals(4, vertexIDwithValue.get(7L).longValue());
-    assertEquals(8, vertexIDwithValue.get(8L).longValue());
-    assertEquals(8, vertexIDwithValue.get(9L).longValue());
-    assertEquals(8, vertexIDwithValue.get(10L).longValue());
-    assertEquals(8, vertexIDwithValue.get(11L).longValue());
+  private void validateConnectedGraphResult(Map<Long, Long> vertexIDWithValue) {
+    assertEquals(12, vertexIDWithValue.size());
+    assertEquals(0, vertexIDWithValue.get(0L).longValue());
+    assertEquals(0, vertexIDWithValue.get(1L).longValue());
+    assertEquals(0, vertexIDWithValue.get(2L).longValue());
+    assertEquals(0, vertexIDWithValue.get(3L).longValue());
+    assertEquals(4, vertexIDWithValue.get(4L).longValue());
+    assertEquals(4, vertexIDWithValue.get(5L).longValue());
+    assertEquals(4, vertexIDWithValue.get(6L).longValue());
+    assertEquals(4, vertexIDWithValue.get(7L).longValue());
+    assertEquals(8, vertexIDWithValue.get(8L).longValue());
+    assertEquals(8, vertexIDWithValue.get(9L).longValue());
+    assertEquals(8, vertexIDWithValue.get(10L).longValue());
+    assertEquals(8, vertexIDWithValue.get(11L).longValue());
   }
 
   private void validateCompleteBipartiteGraphResult(
-    Map<Long, Long> vertexIDwithValue) {
-    assertEquals(8, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0L).longValue());
-    assertEquals(0, vertexIDwithValue.get(1L).longValue());
-    assertEquals(0, vertexIDwithValue.get(2L).longValue());
-    assertEquals(0, vertexIDwithValue.get(3L).longValue());
-    assertEquals(0, vertexIDwithValue.get(4L).longValue());
-    assertEquals(0, vertexIDwithValue.get(5L).longValue());
-    assertEquals(0, vertexIDwithValue.get(6L).longValue());
-    assertEquals(0, vertexIDwithValue.get(7L).longValue());
+    Map<Long, Long> vertexIDWithValue) {
+    assertEquals(8, vertexIDWithValue.size());
+    assertEquals(0, vertexIDWithValue.get(0L).longValue());
+    assertEquals(0, vertexIDWithValue.get(1L).longValue());
+    assertEquals(0, vertexIDWithValue.get(2L).longValue());
+    assertEquals(0, vertexIDWithValue.get(3L).longValue());
+    assertEquals(0, vertexIDWithValue.get(4L).longValue());
+    assertEquals(0, vertexIDWithValue.get(5L).longValue());
+    assertEquals(0, vertexIDWithValue.get(6L).longValue());
+    assertEquals(0, vertexIDWithValue.get(7L).longValue());
   }
 
-  private void validateLoopGraphResult(Map<Long, Long> vertexIDwithValue) {
-    assertEquals(4, vertexIDwithValue.size());
-    assertEquals(0, vertexIDwithValue.get(0L).longValue());
-    assertEquals(0, vertexIDwithValue.get(1L).longValue());
-    assertEquals(0, vertexIDwithValue.get(2L).longValue());
-    assertEquals(0, vertexIDwithValue.get(3L).longValue());
+  private void validateLoopGraphResult(Map<Long, Long> vertexIDWithValue) {
+    assertEquals(4, vertexIDWithValue.size());
+    assertEquals(0, vertexIDWithValue.get(0L).longValue());
+    assertEquals(0, vertexIDWithValue.get(1L).longValue());
+    assertEquals(0, vertexIDWithValue.get(2L).longValue());
+    assertEquals(0, vertexIDWithValue.get(3L).longValue());
   }
 }

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * Helper Class for LPTest
  */
-public class LabelPropagationAlgorithmTestHelper {
+public class LabelPropagationGellyTestHelper {
   private static final Pattern SEPARATOR = Pattern.compile(" ");
 
   public static Graph<Long, LabelPropagationValue, NullValue> getGraph(

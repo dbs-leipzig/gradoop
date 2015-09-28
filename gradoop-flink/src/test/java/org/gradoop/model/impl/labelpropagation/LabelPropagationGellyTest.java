@@ -19,9 +19,12 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests the algorithm using the Gelly Graph.run() method.
+ */
 @RunWith(Parameterized.class)
-public class LabelPropagationAlgorithmTest extends FlinkTestBase {
-  public LabelPropagationAlgorithmTest(TestExecutionMode mode) {
+public class LabelPropagationGellyTest extends FlinkTestBase {
+  public LabelPropagationGellyTest(TestExecutionMode mode) {
     super(mode);
   }
 
@@ -62,7 +65,7 @@ public class LabelPropagationAlgorithmTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
-      LabelPropagationAlgorithmTestHelper
+      LabelPropagationGellyTestHelper
         .getGraph(getConnectedGraphWithVertexValues(), env);
     DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
@@ -74,7 +77,7 @@ public class LabelPropagationAlgorithmTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
-      LabelPropagationAlgorithmTestHelper
+      LabelPropagationGellyTestHelper
         .getGraph(getCompleteBipartiteGraphWithVertexValue(), env);
     DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
@@ -86,7 +89,7 @@ public class LabelPropagationAlgorithmTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
-      LabelPropagationAlgorithmTestHelper
+      LabelPropagationGellyTestHelper
         .getGraph(getLoopGraphWithVertexValues(), env);
     DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();

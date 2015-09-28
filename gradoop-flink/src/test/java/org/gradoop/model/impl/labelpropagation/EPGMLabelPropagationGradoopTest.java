@@ -17,12 +17,15 @@ import org.junit.runners.Parameterized;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+/**
+ * Tests the algorithm using the Gradoop Graph.callForCollection() method.
+ */
 @RunWith(Parameterized.class)
-public class EPGMLabelPropagationTest extends FlinkTestBase {
+public class EPGMLabelPropagationGradoopTest extends FlinkTestBase {
 
   final String propertyKey = EPGMLabelPropagationAlgorithm.CURRENT_VALUE;
 
-  public EPGMLabelPropagationTest(TestExecutionMode mode) {
+  public EPGMLabelPropagationGradoopTest(TestExecutionMode mode) {
     super(mode);
   }
 
