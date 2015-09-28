@@ -15,7 +15,7 @@ import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.OverlapSplitBy;
+import org.gradoop.model.impl.operators.OverlapSplitBy;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
    * Constructor
    *
    * @param maxIterations int defining maximal step counter
-   * @param env           ExectuionEnvironment
+   * @param env           ExecutionEnvironment
    */
   public BTG(int maxIterations, ExecutionEnvironment env) {
     this.maxIterations = maxIterations;
@@ -154,8 +154,8 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
       } else {
         List<Long> btgList = new ArrayList<>();
         String[] btgIDArray = btgIDs.split(",");
-        for (int i = 0; i < btgIDArray.length; i++) {
-          btgList.add(Long.parseLong(btgIDArray[i]));
+        for (String aBtgIDArray : btgIDArray) {
+          btgList.add(Long.parseLong(aBtgIDArray));
         }
         return btgList;
       }

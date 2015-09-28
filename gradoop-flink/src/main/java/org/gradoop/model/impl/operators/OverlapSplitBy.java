@@ -1,4 +1,4 @@
-package org.gradoop.model.impl;
+package org.gradoop.model.impl.operators;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.CrossFunction;
@@ -27,6 +27,9 @@ import org.gradoop.model.GraphDataFactory;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.KeySelectors;
 import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.Subgraph;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 
 import java.io.Serializable;
@@ -35,8 +38,8 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Split an EPGraph into an EPGraphCollection by a self defined mapping from
- * vertex to long
+ * Split a LogicalGraph into an GraphCollection by a self defined mapping from
+ * vertex to graph id.
  *
  * @param <VD> VertexData contains information about the vertex
  * @param <ED> EdgeData contains information about all edges of the vertex
@@ -342,7 +345,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     MapFunction<Subgraph<Long, GD>, List<Long>> {
     @Override
     public List<Long> map(Subgraph<Long, GD> subgraph) throws Exception {
-      List<Long> id = new ArrayList<Long>();
+      List<Long> id = new ArrayList<>();
       id.add(subgraph.getId());
       return id;
     }
@@ -397,7 +400,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
       List<Long> targetGraphs = tuple4.f2;
       List<Long> newSubgraphs = tuple4.f3;
       boolean newGraphAdded = false;
-      List<Long> toBeAddedGraphs = new ArrayList<Long>();
+      List<Long> toBeAddedGraphs = new ArrayList<>();
       for (Long graph : newSubgraphs) {
         if (targetGraphs.contains(graph) && sourceGraphs.contains(graph)) {
           toBeAddedGraphs.add(graph);
