@@ -63,7 +63,7 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, DefaultVertexData, DefaultEdgeData> epGraph =
-      LabelPropagationGellyTestHelper
+      LabelPropagationTestHelper
         .getEPGraph(getConnectedGraphWithVertexValues(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = epGraph.run(
       new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
@@ -76,7 +76,7 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, DefaultVertexData, DefaultEdgeData> gellyGraph =
-      LabelPropagationGellyTestHelper
+      LabelPropagationTestHelper
         .getEPGraph(getCompleteBipartiteGraphWithVertexValue(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
       new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
@@ -89,7 +89,7 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, DefaultVertexData, DefaultEdgeData> gellyGraph =
-      LabelPropagationGellyTestHelper
+      LabelPropagationTestHelper
         .getEPGraph(getLoopGraphWithVertexValues(), env);
     DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
       new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(

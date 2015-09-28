@@ -20,11 +20,14 @@ import org.gradoop.model.impl.operators.SplitBy;
 import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 
 /**
- * labelpropagation Graph to Collection Operator
+ * LabelPropagation Graph to Collection Operator.
+ *
+ * Encapsulates {@link LabelPropagationAlgorithm} in a Gradoop operator.
  *
  * @param <VD> VertexData contains information about the vertex
  * @param <ED> EdgeData contains information about all edges of the vertex
  * @param <GD> GraphData contains information about the graphs of the vertex
+ * @see LabelPropagationAlgorithm
  */
 public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
   extends GraphData> implements

@@ -31,11 +31,14 @@ import org.gradoop.model.operators.UnaryGraphToCollectionOperator;
 import java.io.Serializable;
 
 /**
- * EPGMLabelPropagation Graph to Collection Operator
+ * EPGMLabelPropagation Graph to Collection Operator.
+ *
+ * Encapsulates {@link EPGMLabelPropagationAlgorithm} in a Gradoop operator.
  *
  * @param <VD> VertexData contains information about the vertex
  * @param <ED> EdgeData contains information about all edges of the vertex
  * @param <GD> GraphData contains information about all graphs of the vertex
+ * @see EPGMLabelPropagationAlgorithm
  */
 public class EPGMLabelPropagation<VD extends VertexData, ED extends EdgeData,
   GD extends GraphData> implements

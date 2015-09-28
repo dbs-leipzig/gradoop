@@ -65,7 +65,7 @@ public class LabelPropagationGellyTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
-      LabelPropagationGellyTestHelper
+      LabelPropagationTestHelper
         .getGraph(getConnectedGraphWithVertexValues(), env);
     DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
@@ -77,7 +77,7 @@ public class LabelPropagationGellyTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
-      LabelPropagationGellyTestHelper
+      LabelPropagationTestHelper
         .getGraph(getCompleteBipartiteGraphWithVertexValue(), env);
     DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
@@ -89,7 +89,7 @@ public class LabelPropagationGellyTest extends FlinkTestBase {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
-      LabelPropagationGellyTestHelper
+      LabelPropagationTestHelper
         .getGraph(getLoopGraphWithVertexValues(), env);
     DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();

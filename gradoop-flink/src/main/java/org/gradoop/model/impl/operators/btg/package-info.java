@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains all EPGM operator implementations in Flink.
+ * Contains classes related to the Business Transaction Graphs (BTG) extraction
+ * algorithm.
  */
 package org.gradoop.model.impl.operators.btg;

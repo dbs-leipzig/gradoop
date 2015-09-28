@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains all labelpropagation implementations in Flink.
+ * Contains classes related to the Label Propagation algorithm.
  */
 package org.gradoop.model.impl.operators.labelpropagation;

@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Custom vertex used by {@link org.gradoop.model.impl.operators
- * .BTGAlgorithm}.
+ * Custom vertex used by {@link BTGAlgorithm}.
  */
 public class BTGVertexValue {
   /**

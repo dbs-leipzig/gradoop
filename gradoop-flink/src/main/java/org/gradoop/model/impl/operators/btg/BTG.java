@@ -22,11 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * BTG Graph to Collection Operator
+ * BTG Graph to Collection Operator.
+ *
+ * Encapsulates {@link BTGAlgorithm} in a Gradoop Operator.
  *
  * @param <VD> VertexData
  * @param <ED> EdgeData
  * @param <GD> GraphData
+ * @see BTGAlgorithm
  */
 public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
   GraphData> implements
@@ -238,6 +241,7 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
      * use negative values
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<Long> execute(Vertex<Long, VD> vertex) throws Exception {
       return (List<Long>) vertex.getValue().getProperty(propertyKey);

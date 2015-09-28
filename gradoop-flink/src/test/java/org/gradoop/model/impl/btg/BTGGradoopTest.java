@@ -22,18 +22,18 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
-public class BTGTest extends FlinkTestBase {
+public class BTGGradoopTest extends FlinkTestBase {
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  public BTGTest(MultipleProgramsTestBase.TestExecutionMode mode) {
+  public BTGGradoopTest(MultipleProgramsTestBase.TestExecutionMode mode) {
     super(mode);
   }
 
   @Test
   public void testFromJsonFile() throws Exception {
-    String vertexFile = BTGTest.class.getResource("/btg/btg_nodes").getFile();
-    String edgeFile = BTGTest.class.getResource("/btg/btg_edges").getFile();
+    String vertexFile = BTGGradoopTest.class.getResource("/btg/btg_nodes").getFile();
+    String edgeFile = BTGGradoopTest.class.getResource("/btg/btg_edges").getFile();
     EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile,
       ExecutionEnvironment.getExecutionEnvironment());

@@ -19,8 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
-public class BTGAlgorithmTest extends FlinkTestBase {
-  public BTGAlgorithmTest(TestExecutionMode mode) {
+public class BTGGellyTest extends FlinkTestBase {
+  public BTGGellyTest(TestExecutionMode mode) {
     super(mode);
   }
 
