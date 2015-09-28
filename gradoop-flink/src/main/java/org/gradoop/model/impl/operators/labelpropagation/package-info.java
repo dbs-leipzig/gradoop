@@ -14,18 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.helper;
 
 /**
- * Used for sort operations.
+ * Contains all labelpropagation implementations in Flink.
  */
-public enum Order {
-  /**
-   * Ascending sort order
-   */
-  ASCENDING,
-  /**
-   * Descending sort order
-   */
-  DESCENDING
-}
+package org.gradoop.model.impl.operators.labelpropagation;

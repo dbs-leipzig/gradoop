@@ -358,7 +358,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @return result of given operator
    */
   GraphCollection<VD, ED, GD> callForCollection(
-    UnaryGraphToCollectionOperator<VD, ED, GD> operator);
+    UnaryGraphToCollectionOperator<VD, ED, GD> operator) throws Exception;
 
   /**
    * Writes the logical graph into three separate JSON files. {@code

@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.helper;
 
 /**
  * Contains math helper methods.
  */
 public abstract class MathHelper {
-
   /**
    * Pairing function to uniquely encode two natural numbers into a single
    * number.
