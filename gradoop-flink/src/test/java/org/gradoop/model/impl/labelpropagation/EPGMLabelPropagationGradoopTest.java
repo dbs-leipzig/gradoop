@@ -32,12 +32,11 @@ public class EPGMLabelPropagationGradoopTest extends FlinkTestBase {
   @Test
   public void testLabelPropagationWithCallByPropertyKey() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(2L);
+      inputGraph = getGraphStore().getGraph(2L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
       new EPGMLabelPropagation<DefaultVertexData, DefaultEdgeData,
-        DefaultGraphData>(
-        2, propertyKey, ExecutionEnvironment.getExecutionEnvironment()));
+        DefaultGraphData>(2, propertyKey, getExecutionEnvironment()));
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> sub1 =
       labeledGraphCollection.getGraph(-2L);
     assertEquals("Sub graph has no edge", 0L, sub1.getEdgeCount());

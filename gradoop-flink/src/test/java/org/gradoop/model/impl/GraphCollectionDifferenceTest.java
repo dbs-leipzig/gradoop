@@ -22,7 +22,7 @@ public class GraphCollectionDifferenceTest extends
     long expectedVertexCount = 5L;
     long expectedEdgeCount = 8L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L, 1L, 2L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
@@ -46,7 +46,7 @@ public class GraphCollectionDifferenceTest extends
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 8L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L, 1L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
@@ -70,7 +70,7 @@ public class GraphCollectionDifferenceTest extends
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L, 1L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>

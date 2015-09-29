@@ -42,7 +42,8 @@ import java.util.List;
  * The computation will terminate if no new values are assigned.
  */
 public class LabelPropagationAlgorithm implements
-  GraphAlgorithm<Long, LabelPropagationValue, NullValue> {
+  GraphAlgorithm<Long, LabelPropagationValue, NullValue,
+    Graph<Long, LabelPropagationValue, NullValue>> {
   /**
    * Counter to define maximal Iteration for the Algorithm
    */

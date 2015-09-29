@@ -36,7 +36,8 @@ import java.util.List;
  * BTG ids the master data node is involved in.
  */
 public class BTGAlgorithm implements
-  GraphAlgorithm<Long, BTGVertexValue, NullValue> {
+  GraphAlgorithm<Long, BTGVertexValue, NullValue,
+    Graph<Long, BTGVertexValue, NullValue>> {
   /**
    * Max Iteration counter for the Algorithm
    */

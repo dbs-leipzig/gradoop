@@ -40,7 +40,7 @@ public class EPGMDatabaseJSONTest extends FlinkTestBase {
 
   @Test
   public void testGetDatabaseGraph() throws Exception {
-    LogicalGraph dbGraph = graphStore.getDatabaseGraph();
+    LogicalGraph dbGraph = getGraphStore().getDatabaseGraph();
 
     assertNotNull("database graph was null", dbGraph);
     assertEquals("vertex set has the wrong size", 11,
@@ -77,17 +77,17 @@ public class EPGMDatabaseJSONTest extends FlinkTestBase {
     final String edgeFile = tmpDir + "/edges.json";
     final String graphFile = tmpDir + "/graphs.json";
 
-    graphStore.writeAsJson(vertexFile, edgeFile, graphFile);
+    getGraphStore().writeAsJson(vertexFile, edgeFile, graphFile);
 
     EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
       ExecutionEnvironment.getExecutionEnvironment());
 
-    assertEquals(graphStore.getDatabaseGraph().getVertexCount(),
+    assertEquals(getGraphStore().getDatabaseGraph().getVertexCount(),
       newGraphStore.getDatabaseGraph().getVertexCount());
-    assertEquals(graphStore.getDatabaseGraph().getEdgeCount(),
+    assertEquals(getGraphStore().getDatabaseGraph().getEdgeCount(),
       newGraphStore.getDatabaseGraph().getEdgeCount());
-    assertEquals(graphStore.getCollection().getGraphCount(),
+    assertEquals(getGraphStore().getCollection().getGraphCount(),
       newGraphStore.getCollection().getGraphCount());
   }
 }

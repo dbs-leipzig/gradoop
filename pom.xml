@@ -63,7 +63,7 @@
         <project.maven.version>3.0.0</project.maven.version>
         <project.build.targetJdk>1.7</project.build.targetJdk>
 
-        <dep.flink.version>0.9.1</dep.flink.version>
+        <dep.flink.version>0.10-SNAPSHOT</dep.flink.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
         <dep.junit.version>4.11</dep.junit.version>
         <dep.junitparams.version>1.0.4</dep.junitparams.version>
@@ -80,6 +80,16 @@
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
         <plugin.maven-surefire.version>2.7</plugin.maven-surefire.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Development Snapshot Repository</name>
+            <url>https://repository.apache.org/content/repositories/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <pluginManagement>

@@ -47,7 +47,7 @@ import java.util.List;
  */
 public class EPGMLabelPropagationAlgorithm<VD extends VertexData, ED extends
   EdgeData> implements
-  GraphAlgorithm<Long, VD, ED> {
+  GraphAlgorithm<Long, VD, ED, Graph<Long, VD, ED>> {
   /**
    * Vertex property key where the resulting label is stored.
    */

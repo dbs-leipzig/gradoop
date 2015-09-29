@@ -21,7 +21,7 @@ public class GraphCollectionIntersectTest extends
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 10L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L, 1L, 2L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
@@ -44,7 +44,7 @@ public class GraphCollectionIntersectTest extends
     long expectedVertexCount = 5L;
     long expectedEdgeCount = 9L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L, 2L, 3L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
@@ -67,7 +67,7 @@ public class GraphCollectionIntersectTest extends
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
@@ -91,7 +91,7 @@ public class GraphCollectionIntersectTest extends
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 11L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L, 2L, 3L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>

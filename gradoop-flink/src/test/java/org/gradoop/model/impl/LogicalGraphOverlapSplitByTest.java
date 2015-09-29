@@ -24,7 +24,7 @@ public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
   @Test
   public void testOverlappingResultGraphs() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getDatabaseGraph();
+      inputGraph = getGraphStore().getDatabaseGraph();
     UnaryFunction<Vertex<Long, DefaultVertexData>, List<Long>> function =
       new SplitByModulo();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>

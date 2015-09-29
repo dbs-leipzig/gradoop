@@ -41,7 +41,7 @@ public class LogicalGraphProjectionTest extends FlinkTestBase {
   @Test
   public void projectionTest() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      forumGraph = graphStore.getGraph(3L);
+      forumGraph = getGraphStore().getGraph(3L);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = forumGraph.project(new VertexLabelProjectionFunction(),
       new EdgePropertyProjectionFunction());

@@ -11,9 +11,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class LogicalGraphSplitByTest extends FlinkTestBase {
@@ -24,7 +24,7 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
   @Test
   public void testSplitBy() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L);
+      inputGraph = getGraphStore().getGraph(0L);
     UnaryFunction<Vertex<Long, DefaultVertexData>, Long> function =
       new SplitByIdOddOrEven();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>

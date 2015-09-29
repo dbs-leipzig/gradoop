@@ -44,9 +44,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     long expectedEdgeCount = 4L;
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.overlap(second);
@@ -62,9 +62,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     long expectedEdgeCount = 2L;
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.overlap(second);
@@ -80,9 +80,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     long expectedEdgeCount = 2L;
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.overlap(second);
@@ -98,9 +98,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     long expectedEdgeCount = 0L;
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.overlap(second);
@@ -116,9 +116,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     long expectedEdgeCount = 0L;
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.overlap(second);
@@ -134,9 +134,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     long expectedEdgeCount = 1L;
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.overlap(second);
@@ -152,9 +152,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     long expectedEdgeCount = 1L;
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.overlap(second);
@@ -165,9 +165,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testAssignment() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      databaseCommunity = graphStore.getGraph(0L);
+      databaseCommunity = getGraphStore().getGraph(0L);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphCommunity = graphStore.getGraph(2L);
+      graphCommunity = getGraphStore().getGraph(2L);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = graphCommunity.overlap(databaseCommunity);

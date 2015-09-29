@@ -18,7 +18,6 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.model.EdgeData;
-import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.VertexData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,9 +43,9 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraphID);
+      getGraphStore().getGraph(firstGraphID);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraphID);
+      getGraphStore().getGraph(secondGraphID);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.combine(second);
@@ -61,9 +60,9 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 5L;
     long expectedEdgeCount = 8L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraphID);
+      getGraphStore().getGraph(firstGraphID);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraphID);
+      getGraphStore().getGraph(secondGraphID);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.combine(second);
@@ -78,9 +77,9 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 5L;
     long expectedEdgeCount = 8L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraphID);
+      getGraphStore().getGraph(firstGraphID);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraphID);
+      getGraphStore().getGraph(secondGraphID);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.combine(second);
@@ -95,9 +94,9 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 8L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraphID);
+      getGraphStore().getGraph(firstGraphID);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraphID);
+      getGraphStore().getGraph(secondGraphID);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.combine(second);
@@ -112,9 +111,9 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 8L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraphID);
+      getGraphStore().getGraph(firstGraphID);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraphID);
+      getGraphStore().getGraph(secondGraphID);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.combine(second);
@@ -125,9 +124,9 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testAssignment() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      databaseCommunity = graphStore.getGraph(0L);
+      databaseCommunity = getGraphStore().getGraph(0L);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphCommunity = graphStore.getGraph(1L);
+      graphCommunity = getGraphStore().getGraph(1L);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = graphCommunity.combine(databaseCommunity);

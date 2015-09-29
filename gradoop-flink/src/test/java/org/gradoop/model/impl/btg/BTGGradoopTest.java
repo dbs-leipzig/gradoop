@@ -34,15 +34,14 @@ public class BTGGradoopTest extends FlinkTestBase {
   public void testFromJsonFile() throws Exception {
     String vertexFile = BTGGradoopTest.class.getResource("/btg/btg_nodes").getFile();
     String edgeFile = BTGGradoopTest.class.getResource("/btg/btg_edges").getFile();
+    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile,
-      ExecutionEnvironment.getExecutionEnvironment());
+      graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, env);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       databaseGraph = graphStore.getDatabaseGraph();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       btgGraph = databaseGraph.callForCollection(
-      new BTG<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(50,
-        ExecutionEnvironment.getExecutionEnvironment()));
+      new BTG<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(50, env));
     assertNotNull("graph collection is null", databaseGraph);
     assertEquals("wrong number of graphs", 2l, btgGraph.size());
     assertEquals("wrong number of vertices", 9l,

@@ -30,10 +30,10 @@ import org.gradoop.model.impl.EPGMDatabase;
  */
 public class FlinkTestBase extends MultipleProgramsTestBase {
 
-  protected EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
     graphStore;
 
-  protected ExecutionEnvironment env;
+  private ExecutionEnvironment env;
 
   public FlinkTestBase(TestExecutionMode mode) {
     super(mode);
@@ -55,5 +55,14 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
       .fromCollection(GradoopTestBaseUtils.createVertexDataCollection(),
         GradoopTestBaseUtils.createEdgeDataCollection(),
         GradoopTestBaseUtils.createGraphDataCollection(), env);
+  }
+
+  protected EPGMDatabase<DefaultVertexData, DefaultEdgeData,
+    DefaultGraphData> getGraphStore() {
+    return graphStore;
+  }
+
+  protected ExecutionEnvironment getExecutionEnvironment() {
+    return env;
   }
 }

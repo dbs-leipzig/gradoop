@@ -37,7 +37,7 @@ public class LogicalGraphAggregateTest extends FlinkTestBase {
   public void aggregateEdgeCountTest() throws Exception {
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      forumGraph = graphStore.getGraph(3L);
+      forumGraph = getGraphStore().getGraph(3L);
     final String aggPropertyKey = "eCount";
 
     UnaryFunction<LogicalGraph<DefaultVertexData, DefaultEdgeData,

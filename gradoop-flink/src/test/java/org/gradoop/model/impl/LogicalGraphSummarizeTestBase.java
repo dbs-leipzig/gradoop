@@ -52,7 +52,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexPropertySymmetricGraph() throws Exception {
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(2L);
+      inputGraph = getGraphStore().getGraph(2L);
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -137,8 +137,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   @Test
   public void testSummarizeOnVertexProperty() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
-      .combine(graphStore.getGraph(2L));
+      inputGraph =
+      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
+        .combine(getGraphStore().getGraph(2L));
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -238,7 +239,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   @Test
   public void testSummarizeOnVertexPropertyWithAbsentValue() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(3L);
+      inputGraph = getGraphStore().getGraph(3L);
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -307,8 +308,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   @Test
   public void testSummarizeOnVertexAndEdgeProperty() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
-      .combine(graphStore.getGraph(2L));
+      inputGraph =
+      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
+        .combine(getGraphStore().getGraph(2L));
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -419,7 +421,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexAndEdgePropertyWithAbsentValues() throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(3L);
+      inputGraph = getGraphStore().getGraph(3L);
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -497,7 +499,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   @Test
   public void testSummarizeOnVertexLabel() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getDatabaseGraph();
+      inputGraph = getGraphStore().getDatabaseGraph();
 
     final String aggregatePropertyKey = "count";
 
@@ -586,8 +588,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   @Test
   public void testSummarizeOnVertexLabelAndVertexProperty() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
-      .combine(graphStore.getGraph(2L));
+      inputGraph =
+      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
+        .combine(getGraphStore().getGraph(2L));
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -689,7 +692,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
     throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getDatabaseGraph();
+      inputGraph = getGraphStore().getDatabaseGraph();
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -841,8 +844,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   @Test
   public void testSummarizeOnVertexLabelAndEdgeProperty() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
-      .combine(graphStore.getGraph(2L));
+      inputGraph =
+      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
+        .combine(getGraphStore().getGraph(2L));
 
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
@@ -910,7 +914,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexLabelAndEdgePropertyWithAbsentValue() throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getDatabaseGraph();
+      inputGraph = getGraphStore().getDatabaseGraph();
 
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
@@ -1026,8 +1030,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexLabelAndVertexAndEdgeProperty() throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
-      .combine(graphStore.getGraph(2L));
+      inputGraph =
+      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
+        .combine(getGraphStore().getGraph(2L));
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -1132,7 +1137,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   @Test
   public void testSummarizeOnVertexAndEdgeLabel() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getDatabaseGraph();
+      inputGraph = getGraphStore().getDatabaseGraph();
 
     final String aggregatePropertyKey = "count";
 
@@ -1231,8 +1236,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexAndEdgeLabelAndVertexProperty() throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
-      .combine(graphStore.getGraph(2L));
+      inputGraph =
+      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
+        .combine(getGraphStore().getGraph(2L));
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -1327,7 +1333,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   testSummarizeOnVertexAndEdgeLabelAndVertexPropertyWithAbsentValue() throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getDatabaseGraph();
+      inputGraph = getGraphStore().getDatabaseGraph();
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -1483,8 +1489,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexAndEdgeLabelAndEdgeProperty() throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
-      .combine(graphStore.getGraph(2L));
+      inputGraph =
+      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
+        .combine(getGraphStore().getGraph(2L));
 
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
@@ -1554,7 +1561,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
     () throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getDatabaseGraph();
+      inputGraph = getGraphStore().getDatabaseGraph();
 
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
@@ -1675,8 +1682,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexAndEdgeLabelAndVertexAndEdgeProperty() throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getGraph(0L).combine(graphStore.getGraph(1L))
-      .combine(graphStore.getGraph(2L));
+      inputGraph =
+      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
+        .combine(getGraphStore().getGraph(2L));
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -1786,7 +1794,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
     throws
     Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      inputGraph = graphStore.getDatabaseGraph();
+      inputGraph = getGraphStore().getDatabaseGraph();
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -2077,7 +2085,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
         .output(new LocalCollectionOutputFormat<>(edges));
 
       // execute the job
-      env.execute();
+      getExecutionEnvironment().execute();
 
       return this;
     }

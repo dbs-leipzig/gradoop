@@ -18,7 +18,6 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.model.EdgeData;
-import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.VertexData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,9 +44,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.exclude(second);
@@ -63,9 +62,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 1L;
     long expectedEdgeCount = 0L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.exclude(second);
@@ -81,9 +80,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 2L;
     long expectedEdgeCount = 2L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.exclude(second);
@@ -99,9 +98,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.exclude(second);
@@ -117,9 +116,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> first =
-      graphStore.getGraph(firstGraph);
+      getGraphStore().getGraph(firstGraph);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> second =
-      graphStore.getGraph(secondGraph);
+      getGraphStore().getGraph(secondGraph);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> result =
       first.exclude(second);
@@ -130,9 +129,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testAssignment() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      databaseCommunity = graphStore.getGraph(0L);
+      databaseCommunity = getGraphStore().getGraph(0L);
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      hadoopCommunity = graphStore.getGraph(1L);
+      hadoopCommunity = getGraphStore().getGraph(1L);
 
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = databaseCommunity.exclude(hadoopCommunity);

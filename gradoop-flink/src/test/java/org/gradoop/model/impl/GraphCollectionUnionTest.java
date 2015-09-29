@@ -21,7 +21,7 @@ public class GraphCollectionUnionTest extends
     long expectedVertexCount = 5L;
     long expectedEdgeCount = 8L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
 
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L, 2L);
@@ -41,7 +41,7 @@ public class GraphCollectionUnionTest extends
     long expectedVertexCount = 7L;
     long expectedEdgeCount = 13L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L, 1L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
@@ -60,7 +60,7 @@ public class GraphCollectionUnionTest extends
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       collection1 = graphColl.getGraphs(0L);
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>

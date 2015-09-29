@@ -18,7 +18,7 @@ public class EPGMDatabaseTest extends FlinkTestBase {
   @Test
   public void testGetExistingGraph() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> g =
-      graphStore.getGraph(0L);
+      getGraphStore().getGraph(0L);
     assertNotNull("graph was null", g);
     assertEquals("vertex set has the wrong size", 3L, g.getVertices().size());
     assertEquals("edge set has the wrong size", 4L, g.getEdges().size());
@@ -27,13 +27,13 @@ public class EPGMDatabaseTest extends FlinkTestBase {
 
   @Test
   public void testNonExistingGraph() throws Exception {
-    assertNull("graph was not null", graphStore.getGraph(4L));
+    assertNull("graph was not null", getGraphStore().getGraph(4L));
   }
 
   @Test
   public void testGetGraphs() throws Exception {
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
 
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       graphs = graphColl.getGraphs(0L, 1L, 2L);
@@ -47,7 +47,7 @@ public class EPGMDatabaseTest extends FlinkTestBase {
   @Test
   public void testGetCollection() throws Exception {
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphColl = graphStore.getCollection();
+      graphColl = getGraphStore().getCollection();
 
     assertNotNull("graph collection was null", graphColl);
     assertEquals("graph collection has wrong size", 4L,
