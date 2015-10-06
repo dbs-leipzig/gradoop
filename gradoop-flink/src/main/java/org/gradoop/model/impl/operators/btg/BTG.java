@@ -135,7 +135,7 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
      */
     private BTGVertexValue createNewVertexValue(
       Vertex<Long, VD> logicalVertex) {
-      BTGVertexType type = BTGVertexType.values()[Integer.valueOf(
+      BTGVertexType type = BTGVertexType.values()[Integer.parseInt(
         (String) logicalVertex.getValue()
           .getProperty(VERTEX_TYPE_PROPERTYKEY))];
       double value = Double.parseDouble((String) logicalVertex.getValue()
