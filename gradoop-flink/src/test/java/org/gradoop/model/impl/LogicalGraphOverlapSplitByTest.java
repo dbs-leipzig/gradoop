@@ -36,9 +36,9 @@ public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
     TestCase.assertEquals("wrong number of graphs", 3l,
       labeledGraphCollection.size());
     TestCase.assertEquals("wrong number of vertices", 11l,
-      labeledGraphCollection.getTotalVertexCount());
+      labeledGraphCollection.getVertexCount());
     TestCase.assertEquals("wrong number of edges", 8l,
-      labeledGraphCollection.getTotalEdgeCount());
+      labeledGraphCollection.getEdgeCount());
   }
 
   private static class SplitByModulo implements

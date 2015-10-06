@@ -51,8 +51,8 @@ public class LabelPropagationGradoopTest extends FlinkTestBase {
     assertNotNull("graph collection is null", labeledGraphCollection);
     assertEquals("wrong number of graphs", 3l, labeledGraphCollection.size());
     assertEquals("wrong number of vertices", 4l,
-      labeledGraphCollection.getTotalVertexCount());
+      labeledGraphCollection.getVertexCount());
     assertEquals("wrong number of edges", 0l,
-      labeledGraphCollection.getTotalEdgeCount());
+      labeledGraphCollection.getEdgeCount());
   }
 }

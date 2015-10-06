@@ -17,6 +17,9 @@
 
 package org.gradoop.model.impl;
 
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.graph.Edge;
+import org.apache.flink.graph.Vertex;
 import org.gradoop.GradoopTestBaseUtils;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.VertexData;
@@ -172,10 +175,12 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = graphCommunity.overlap(databaseCommunity);
 
-    Collection<DefaultVertexData> vertexData = newGraph.getVertices().collect();
-    Collection<DefaultEdgeData> edgeData = newGraph.getEdges().collect();
+    Collection<DefaultVertexData> vertexData = newGraph.getVertexData()
+      .collect();
+    Collection<DefaultEdgeData> edgeData = newGraph.getEdgeData()
+      .collect();
 
-    for (VertexData v : vertexData) {
+    for (DefaultVertexData v : vertexData) {
       Set<Long> gIDs = v.getGraphs();
       if (v.equals(GradoopTestBaseUtils.VERTEX_PERSON_ALICE)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
@@ -184,7 +189,7 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
       }
     }
 
-    for (EdgeData e : edgeData) {
+    for (DefaultEdgeData e : edgeData) {
       Set<Long> gIDs = e.getGraphs();
       if (e.equals(GradoopTestBaseUtils.EDGE_0_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());

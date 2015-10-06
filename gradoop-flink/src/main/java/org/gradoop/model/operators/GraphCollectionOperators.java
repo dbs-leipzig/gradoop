@@ -39,24 +39,6 @@ public interface GraphCollectionOperators<VD extends VertexData, ED extends
   DataCollectionOperators<GD> {
 
   /**
-   * Returns the total number of vertices contained in all logical graphs in
-   * that collection.
-   *
-   * @return vertex count
-   * @throws Exception
-   */
-  long getTotalVertexCount() throws Exception;
-
-  /**
-   * Returns the total number of edges contained in all logical graphs in
-   * that collection.
-   *
-   * @return edge count
-   * @throws Exception
-   */
-  long getTotalEdgeCount() throws Exception;
-
-  /**
    * Returns logical graph from collection using the given identifier.
    *
    * @param graphID graph identifier

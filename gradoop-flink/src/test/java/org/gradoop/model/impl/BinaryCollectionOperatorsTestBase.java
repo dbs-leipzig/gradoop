@@ -18,9 +18,9 @@ public class BinaryCollectionOperatorsTestBase extends FlinkTestBase {
     assertEquals("wrong number of graphs", expectedCollectionSize,
       differenceColl.size());
     assertEquals("wrong number of vertices", expectedVertexCount,
-      differenceColl.getTotalVertexCount());
+      differenceColl.getVertexCount());
     assertEquals("wrong number of edges", expectedEdgeCount,
-      differenceColl.getTotalEdgeCount());
+      differenceColl.getEdgeCount());
   }
 
 }

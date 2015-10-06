@@ -50,7 +50,7 @@ public class LogicalGraphAggregateTest extends FlinkTestBase {
           LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
             entity) throws
           Exception {
-          return entity.getEdges().size();
+          return entity.getEdges().count();
         }
       };
 

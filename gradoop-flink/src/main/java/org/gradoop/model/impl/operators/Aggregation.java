@@ -73,8 +73,11 @@ public class Aggregation<VD extends VertexData, ED extends EdgeData, GD
       .createGraphData(graph.getId(), graph.getLabel());
     newGraphData.setProperties(graph.getProperties());
     newGraphData.setProperty(aggregatePropertyKey, result);
-    return LogicalGraph.fromGraph(graph.getGellyGraph(), newGraphData,
-      graph.getVertexDataFactory(), graph.getEdgeDataFactory(),
+    return LogicalGraph.fromDataSets(graph.getVertices(),
+      graph.getEdges(),
+      newGraphData,
+      graph.getVertexDataFactory(),
+      graph.getEdgeDataFactory(),
       graph.getGraphDataFactory());
   }
 

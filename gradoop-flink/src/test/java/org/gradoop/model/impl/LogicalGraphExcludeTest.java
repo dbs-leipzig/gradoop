@@ -136,8 +136,10 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = databaseCommunity.exclude(hadoopCommunity);
 
-    Collection<DefaultVertexData> vertexData = newGraph.getVertices().collect();
-    Collection<DefaultEdgeData> edgeData = newGraph.getEdges().collect();
+    Collection<DefaultVertexData> vertexData = newGraph.getVertexData()
+      .collect();
+    Collection<DefaultEdgeData> edgeData = newGraph.getEdgeData()
+      .collect();
 
     for (VertexData v : vertexData) {
       Set<Long> gIDs = v.getGraphs();

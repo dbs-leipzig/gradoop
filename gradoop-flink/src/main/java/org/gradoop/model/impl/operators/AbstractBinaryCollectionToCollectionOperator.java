@@ -81,11 +81,16 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<VD extends
     GraphCollection<VD, ED, GD> secondCollection) throws Exception {
 
     // do some init stuff for the actual operator
-    firstGraph = firstCollection.getGellyGraph();
+    env = firstCollection.getVertices().getExecutionEnvironment();
+    firstGraph = Graph.fromDataSet(firstCollection.getVertices(),
+      firstCollection.getEdges(),
+      env);
     firstSubgraphs = firstCollection.getSubgraphs();
-    secondGraph = secondCollection.getGellyGraph();
+
+    secondGraph = Graph.fromDataSet(secondCollection.getVertices(),
+      secondCollection.getEdges(),
+      env);
     secondSubgraphs = secondCollection.getSubgraphs();
-    env = firstGraph.getContext();
 
     final DataSet<Subgraph<Long, GD>> newSubgraphs = computeNewSubgraphs();
     final DataSet<Vertex<Long, VD>> newVertices =

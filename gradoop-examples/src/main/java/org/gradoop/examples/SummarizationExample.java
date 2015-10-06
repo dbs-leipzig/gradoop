@@ -142,7 +142,7 @@ public class SummarizationExample implements ProgramDescription {
         writeOutputFiles(summarizedGraph,
           cmd.getOptionValue(OPTION_OUTPUT_PATH));
       } else {
-        System.out.println(summarizedGraph.print());
+        summarizedGraph.print();
       }
     } else {
       System.err.println("wrong parameter constellation");
