@@ -66,7 +66,7 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
   public GraphCollection<VD, ED, GD> execute(
     LogicalGraph<VD, ED, GD> epGraph) throws Exception {
     DataSet<Vertex<Long, LabelPropagationValue>> vertices =
-      epGraph.getGellyGraph().getVertices().map(
+      epGraph.getVertices().map(
         new MapFunction<Vertex<Long, VD>, Vertex<Long,
           LabelPropagationValue>>() {
           @Override
@@ -76,7 +76,7 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
               new LabelPropagationValue(vertex.getId(), vertex.getId()));
           }
         });
-    DataSet<Edge<Long, NullValue>> edges = epGraph.getGellyGraph().getEdges()
+    DataSet<Edge<Long, NullValue>> edges = epGraph.getEdges()
       .map(new MapFunction<Edge<Long, ED>, Edge<Long, NullValue>>() {
         @Override
         public Edge<Long, NullValue> map(Edge<Long, ED> edge) throws Exception {
@@ -88,15 +88,18 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
       Graph.fromDataSet(vertices, edges, env);
     graph = graph.run(new LabelPropagationAlgorithm(this.maxIterations));
     DataSet<Vertex<Long, VD>> labeledVertices =
-      graph.getVertices().join(epGraph.getGellyGraph().getVertices())
+      graph.getVertices().join(epGraph.getVertices())
         .where(new LPKeySelector())
         .equalTo(new KeySelectors.VertexKeySelector<VD>())
         .with(new LPJoin<VD>());
-    Graph<Long, VD, ED> gellyGraph = Graph
-      .fromDataSet(labeledVertices, epGraph.getGellyGraph().getEdges(), env);
+
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
-      .fromGraph(gellyGraph, null, epGraph.getVertexDataFactory(),
-        epGraph.getEdgeDataFactory(), epGraph.getGraphDataFactory());
+      .fromDataSets(labeledVertices,
+        epGraph.getEdges(),
+        null,
+        epGraph.getVertexDataFactory(),
+        epGraph.getEdgeDataFactory(),
+        epGraph.getGraphDataFactory());
     LongFromProperty<VD> lfp = new LongFromProperty<>(propertyKey);
     SplitBy<VD, ED, GD> callByPropertyKey = new SplitBy<>(lfp, env);
     return callByPropertyKey.execute(labeledGraph);

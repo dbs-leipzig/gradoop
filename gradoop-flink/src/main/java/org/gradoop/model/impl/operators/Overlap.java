@@ -19,7 +19,6 @@ package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
@@ -49,25 +48,23 @@ public class Overlap<VD extends VertexData, ED extends EdgeData, GD extends
     LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
     final Long newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
 
-    Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
-    Graph<Long, VD, ED> graph2 = secondGraph.getGellyGraph();
-
     // union vertex sets, group by vertex id, filter vertices where
     // the group contains two vertices and update them with the new graph id
     DataSet<Vertex<Long, VD>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices())
+      firstGraph.getVertices().union(secondGraph.getVertices())
         .groupBy(new KeySelectors.VertexKeySelector<VD>())
         .reduceGroup(new VertexGroupReducer<VD>(2L))
         .map(new VertexToGraphUpdater<VD>(newGraphID));
 
     DataSet<Edge<Long, ED>> newEdgeSet =
-      graph1.getEdges().union(graph2.getEdges())
+      firstGraph.getEdges().union(secondGraph.getEdges())
         .groupBy(new KeySelectors.EdgeKeySelector<ED>())
         .reduceGroup(new EdgeGroupReducer<ED>(2L))
         .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromGraph(
-      Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
+    return LogicalGraph.fromDataSets(
+      newVertexSet,
+      newEdgeSet,
       firstGraph.getGraphDataFactory().createGraphData(newGraphID),
       firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
       firstGraph.getGraphDataFactory());

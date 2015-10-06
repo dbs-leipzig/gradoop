@@ -38,7 +38,7 @@ public class LogicalGraphGetterTest extends FlinkTestBase {
     LogicalGraph g = getGraphStore().getDatabaseGraph();
 
     assertNotNull("graph was null", g);
-    assertEquals("wrong number of vertices", 11L, g.getVertices().size());
+    assertEquals("wrong number of vertices", 11L, g.getVertices().count());
     assertEquals("wrong number of vertices", 11L, g.getVertexCount());
   }
 
@@ -47,7 +47,7 @@ public class LogicalGraphGetterTest extends FlinkTestBase {
     LogicalGraph g = getGraphStore().getDatabaseGraph();
 
     assertNotNull("graph was null", g);
-    assertEquals("wrong number of edges", 24L, g.getEdges().size());
+    assertEquals("wrong number of edges", 24L, g.getEdges().count());
     assertEquals("wrong number of edges", 24L, g.getEdgeCount());
   }
 
@@ -57,7 +57,7 @@ public class LogicalGraphGetterTest extends FlinkTestBase {
     assertNotNull("graph was null", g);
     assertEquals("wrong number of outgoing edges", 2L,
       g.getOutgoingEdges(GradoopTestBaseUtils.VERTEX_PERSON_ALICE.getId())
-        .size());
+        .count());
   }
 
   @Test
@@ -66,7 +66,7 @@ public class LogicalGraphGetterTest extends FlinkTestBase {
     assertNotNull("graph was null", g);
     assertEquals("wrong number of outgoing edges", 0L,
       g.getOutgoingEdges(GradoopTestBaseUtils.VERTEX_TAG_DATABASES.getId())
-        .size());
+        .count());
   }
 
   @Test
@@ -75,7 +75,7 @@ public class LogicalGraphGetterTest extends FlinkTestBase {
     assertNotNull("graph was null", g);
     assertEquals("wrong number of outgoing edges", 4,
       g.getIncomingEdges(GradoopTestBaseUtils.VERTEX_PERSON_ALICE.getId())
-        .size());
+        .count());
   }
 
   @Test
@@ -84,6 +84,6 @@ public class LogicalGraphGetterTest extends FlinkTestBase {
     assertNotNull("graph was null", g);
     assertEquals("wrong number of outgoing edges", 0L,
       g.getIncomingEdges(GradoopTestBaseUtils.VERTEX_FORUM_GDBS.getId())
-        .size());
+        .count());
   }
 }

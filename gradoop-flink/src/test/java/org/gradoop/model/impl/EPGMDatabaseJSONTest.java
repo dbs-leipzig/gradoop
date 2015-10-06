@@ -44,8 +44,8 @@ public class EPGMDatabaseJSONTest extends FlinkTestBase {
 
     assertNotNull("database graph was null", dbGraph);
     assertEquals("vertex set has the wrong size", 11,
-      dbGraph.getVertices().size());
-    assertEquals("edge set has the wrong size", 24, dbGraph.getEdges().size());
+      dbGraph.getVertices().count());
+    assertEquals("edge set has the wrong size", 24, dbGraph.getEdges().count());
   }
 
   @Test

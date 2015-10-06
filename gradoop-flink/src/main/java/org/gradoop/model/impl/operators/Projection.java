@@ -19,7 +19,6 @@ package org.gradoop.model.impl.operators;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
@@ -83,16 +82,20 @@ public class Projection<VD extends VertexData, ED extends EdgeData, GD
    */
   @Override
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
-    DataSet<Vertex<Long, VD>> vertices = graph.getGellyGraph().getVertices();
+    DataSet<Vertex<Long, VD>> vertices = graph.getVertices();
     vertices = vertices.map(new ProjectionVerticesMapper<>(getVertexFunc()));
-    DataSet<Edge<Long, ED>> edges = graph.getGellyGraph().getEdges();
+    DataSet<Edge<Long, ED>> edges = graph.getEdges();
     edges = edges.map(new ProjectionEdgesMapper<>(getEdgeFunc()));
-    return LogicalGraph.fromGraph(
-      Graph.fromDataSet(vertices, edges, graph.getGellyGraph().getContext()),
-      graph.getGraphDataFactory()
-        .createGraphData(graph.getId(), graph.getLabel(),
-          graph.getProperties()), graph.getVertexDataFactory(),
-      graph.getEdgeDataFactory(), graph.getGraphDataFactory());
+    return LogicalGraph.fromDataSets(
+      vertices,
+      edges,
+      graph.getGraphDataFactory().createGraphData(
+        graph.getId(),
+        graph.getLabel(),
+        graph.getProperties()),
+      graph.getVertexDataFactory(),
+      graph.getEdgeDataFactory(),
+      graph.getGraphDataFactory());
   }
 
   /**

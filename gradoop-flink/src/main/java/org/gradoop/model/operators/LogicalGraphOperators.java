@@ -22,10 +22,8 @@ import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.Predicate;
 import org.gradoop.model.helper.UnaryFunction;
-import org.gradoop.model.impl.EdgeDataCollection;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.VertexDataCollection;
 
 /**
  * Describes all operators that can be applied on a single logical graph in the
@@ -37,54 +35,6 @@ import org.gradoop.model.impl.VertexDataCollection;
  */
 public interface LogicalGraphOperators<VD extends VertexData, ED extends
   EdgeData, GD extends GraphData> {
-
-  /**
-   * Returns all vertex data associated with that logical graph.
-   *
-   * @return vertex data collection
-   */
-  VertexDataCollection<VD> getVertices();
-
-  /**
-   * Returns all edge data associated with that logical graph.
-   *
-   * @return edge data collection
-   */
-  EdgeDataCollection<ED> getEdges();
-
-  /**
-   * Returns the edge data associated with the outgoing edges of the given
-   * vertex.
-   *
-   * @param vertexID vertex identifier
-   * @return outgoing edge data of given vertex
-   */
-  EdgeDataCollection<ED> getOutgoingEdges(final Long vertexID);
-
-  /**
-   * Returns the edge data associated with the incoming edges of the given
-   * vertex.
-   *
-   * @param vertexID vertex identifier
-   * @return incoming edge data of given vertex
-   */
-  EdgeDataCollection<ED> getIncomingEdges(final Long vertexID);
-
-  /**
-   * Returns the number of vertices in that logical graph.
-   *
-   * @return number of vertices
-   * @throws Exception
-   */
-  long getVertexCount() throws Exception;
-
-  /**
-   * Returns the number of edges in that logical graph.
-   *
-   * @return number of edges
-   * @throws Exception
-   */
-  long getEdgeCount() throws Exception;
 
   /*
   unary operators take one graph as input and return a single graph or a
@@ -380,8 +330,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Prints the logical graph to system out.
    *
-   * @return string representation of the logical graph
    * @throws Exception
    */
-  String print() throws Exception;
+  void print() throws Exception;
 }

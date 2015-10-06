@@ -63,35 +63,12 @@ import java.util.List;
  * @param <ED> edge data type
  * @param <GD> graph data type
  */
-public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> implements
-  GraphCollectionOperators<VD, ED, GD> {
-
-  /**
-   * Used to create new vertex data.
-   */
-  private final VertexDataFactory<VD> vertexDataFactory;
-
-  /**
-   * Used to create new edge data.
-   */
-  private final EdgeDataFactory<ED> edgeDataFactory;
-
-  /**
-   * Used to create new graph data.
-   */
-  private final GraphDataFactory<GD> graphDataFactory;
-
-  /**
-   * Flink execution environment.
-   */
-  private final ExecutionEnvironment env;
-
-  /**
-   * Flink Gelly graph that holds all vertices and edges of the logical
-   * graphs contained in that graph collection.
-   */
-  private Graph<Long, VD, ED> graph;
+public class GraphCollection<
+  VD extends VertexData,
+  ED extends EdgeData,
+  GD extends GraphData>
+  extends AbstractGraph<VD, ED, GD>
+  implements GraphCollectionOperators<VD, ED, GD> {
 
   /**
    * Graph data associated with the logical graphs in that collection.
@@ -114,49 +91,8 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
     VertexDataFactory<VD> vertexDataFactory,
     EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD> graphDataFactory,
     ExecutionEnvironment env) {
-    this.graph = graph;
+    super(graph, vertexDataFactory, edgeDataFactory, graphDataFactory, env);
     this.subgraphs = subgraphs;
-    this.vertexDataFactory = vertexDataFactory;
-    this.edgeDataFactory = edgeDataFactory;
-    this.graphDataFactory = graphDataFactory;
-    this.env = env;
-  }
-
-  /**
-   * Returns the vertex data factory.
-   *
-   * @return vertex data factory
-   */
-  public VertexDataFactory<VD> getVertexDataFactory() {
-    return vertexDataFactory;
-  }
-
-  /**
-   * Returns the edge data factory.
-   *
-   * @return edge data factory
-   */
-  public EdgeDataFactory<ED> getEdgeDataFactory() {
-    return edgeDataFactory;
-  }
-
-  /**
-   * Returns the graph data factory.
-   *
-   * @return graph data factory
-   */
-  public GraphDataFactory<GD> getGraphDataFactory() {
-    return graphDataFactory;
-  }
-
-  /**
-   * Returns the gelly graph which contains the vertex and edge set of all
-   * logical graphs in that collection.
-   *
-   * @return Gelly graph
-   */
-  public Graph<Long, VD, ED> getGellyGraph() {
-    return this.graph;
   }
 
   /**
@@ -172,33 +108,17 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
   /**
    * {@inheritDoc}
    */
-  @Override
-  public long getTotalVertexCount() throws Exception {
-    return this.graph.numberOfVertices();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long getTotalEdgeCount() throws Exception {
-    return this.graph.numberOfEdges();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @SuppressWarnings("unchecked")
   @Override
   public LogicalGraph<VD, ED, GD> getGraph(final Long graphID) throws
     Exception {
     // filter vertices and edges based on given graph id
-    Graph<Long, VD, ED> subGraph = this.graph
+    Graph<Long, VD, ED> subGraph = getGellyGraph()
       .subgraph(new VertexInGraphFilter<VD>(graphID),
         new EdgeInGraphFilter<ED>(graphID));
 
-    DataSet<Tuple1<Long>> graphIDDataSet =
-      env.fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
+    DataSet<Tuple1<Long>> graphIDDataSet = getExecutionEnvironment()
+      .fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
 
     // get graph data based on graph id
     List<GD> graphData = this.subgraphs.joinWithTiny(graphIDDataSet)
@@ -212,8 +132,8 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
       }).first(1).collect();
 
     return (graphData.size() > 0) ? LogicalGraph
-      .fromGraph(subGraph, graphData.get(0), vertexDataFactory, edgeDataFactory,
-        graphDataFactory) : null;
+      .fromGellyGraph(subGraph, graphData.get(0), getVertexDataFactory(),
+        getEdgeDataFactory(), getGraphDataFactory()) : null;
   }
 
   /**
@@ -243,15 +163,20 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
       });
 
     // build new vertex set
-    DataSet<Vertex<Long, VD>> vertices = this.graph.getVertices()
+    DataSet<Vertex<Long, VD>> vertices = getVertices()
       .filter(new VertexInGraphsFilter<VD>(identifiers));
 
     // build new edge set
-    DataSet<Edge<Long, ED>> edges =
-      this.graph.getEdges().filter(new EdgeInGraphsFilter<ED>(identifiers));
+    DataSet<Edge<Long, ED>> edges = getEdges()
+      .filter(new EdgeInGraphsFilter<ED>(identifiers));
 
-    return new GraphCollection<>(Graph.fromDataSet(vertices, edges, env),
-      newSubGraphs, vertexDataFactory, edgeDataFactory, graphDataFactory, env);
+    return new GraphCollection<>(Graph.fromDataSet(vertices, edges,
+      getExecutionEnvironment()),
+      newSubGraphs,
+      getVertexDataFactory(),
+      getEdgeDataFactory(),
+      getGraphDataFactory(),
+      getExecutionEnvironment());
   }
 
   /**
@@ -288,7 +213,7 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
       }).collect();
 
     // use graph ids to filter vertices from the actual graph structure
-    Graph<Long, VD, ED> filteredGraph = this.graph.filterOnVertices(
+    Graph<Long, VD, ED> filteredGraph = getGellyGraph().filterOnVertices(
 
       new FilterFunction<Vertex<Long, VD>>() {
         @Override
@@ -302,8 +227,12 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
         }
       });
 
-    return new GraphCollection<>(filteredGraph, filteredSubgraphs,
-      vertexDataFactory, edgeDataFactory, graphDataFactory, env);
+    return new GraphCollection<>(filteredGraph,
+      filteredSubgraphs,
+      getVertexDataFactory(),
+      getEdgeDataFactory(),
+      getGraphDataFactory(),
+      getExecutionEnvironment());
   }
 
   /**
@@ -444,7 +373,7 @@ public class GraphCollection<VD extends VertexData, ED extends EdgeData, GD
       .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
     this.getSubgraphs()
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
-    env.execute();
+    getExecutionEnvironment().execute();
   }
 
   /**

@@ -493,7 +493,7 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
    */
   public LogicalGraph<VD, ED, GD> getDatabaseGraph() {
     return LogicalGraph
-      .fromGraph(database.getGellyGraph(), databaseData, vertexDataFactory,
+      .fromGellyGraph(database.getGellyGraph(), databaseData, vertexDataFactory,
         edgeDataFactory, graphDataFactory);
   }
 

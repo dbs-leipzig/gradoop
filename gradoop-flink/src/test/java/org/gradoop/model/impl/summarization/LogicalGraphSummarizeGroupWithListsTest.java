@@ -15,8 +15,11 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl;
+package org.gradoop.model.impl.summarization;
 
+import org.gradoop.model.impl.DefaultEdgeData;
+import org.gradoop.model.impl.DefaultGraphData;
+import org.gradoop.model.impl.DefaultVertexData;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.gradoop.model.impl.operators.summarization.SummarizationGroupWithLists;
 import org.junit.runner.RunWith;

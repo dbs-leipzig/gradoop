@@ -20,7 +20,6 @@ package org.gradoop.model.impl.operators;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
@@ -50,14 +49,11 @@ public class Exclusion<VD extends VertexData, ED extends EdgeData, GD extends
     LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
     final Long newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
 
-    Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
-    Graph<Long, VD, ED> graph2 = secondGraph.getGellyGraph();
-
     // union vertex sets, group by vertex id, filter vertices where the group
     // contains exactly one vertex which belongs to the graph, the operator is
     // called on
     DataSet<Vertex<Long, VD>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices())
+      firstGraph.getVertices().union(secondGraph.getVertices())
         .groupBy(new KeySelectors.VertexKeySelector<VD>()).reduceGroup(
         new VertexGroupReducer<VD>(1L, firstGraph.getId(), secondGraph.getId()))
         .map(new VertexToGraphUpdater<VD>(newGraphID));
@@ -74,7 +70,8 @@ public class Exclusion<VD extends VertexData, ED extends EdgeData, GD extends
     // In exclude(), we are only interested in edges that connect vertices
     // that are in the exclusion of the vertex sets. Thus, we join the edges
     // from the left graph with the new vertex set using source and target ids.
-    DataSet<Edge<Long, ED>> newEdgeSet = graph1.getEdges().join(newVertexSet)
+    DataSet<Edge<Long, ED>> newEdgeSet = firstGraph.getEdges()
+      .join(newVertexSet)
       .where(new KeySelectors.EdgeSourceVertexKeySelector<ED>())
       .equalTo(new KeySelectors.VertexKeySelector<VD>()).with(joinFunc)
       .join(newVertexSet)
@@ -82,8 +79,9 @@ public class Exclusion<VD extends VertexData, ED extends EdgeData, GD extends
       .equalTo(new KeySelectors.VertexKeySelector<VD>()).with(joinFunc)
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromGraph(
-      Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
+    return LogicalGraph.fromDataSets(
+      newVertexSet,
+      newEdgeSet,
       firstGraph.getGraphDataFactory().createGraphData(newGraphID),
       firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
       firstGraph.getGraphDataFactory());

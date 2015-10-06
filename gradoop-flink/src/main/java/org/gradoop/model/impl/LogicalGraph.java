@@ -17,11 +17,11 @@
 package org.gradoop.model.impl;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
+import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.Attributed;
 import org.gradoop.model.EdgeData;
@@ -55,30 +55,14 @@ import java.util.Map;
  * @param <ED> edge data type
  * @param <GD> graph data type
  */
-public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> implements
+public class LogicalGraph<
+  VD extends VertexData,
+  ED extends EdgeData,
+  GD extends GraphData>
+  extends AbstractGraph<VD, ED, GD>
+  implements
   LogicalGraphOperators<VD, ED, GD>, Identifiable, Attributed, Labeled {
-  /**
-   * Used to create new vertex data.
-   */
-  private final VertexDataFactory<VD> vertexDataFactory;
-  /**
-   * Used to create new edge data.
-   */
-  private final EdgeDataFactory<ED> edgeDataFactory;
-  /**
-   * Uses to create new graph data.
-   */
-  private final GraphDataFactory<GD> graphDataFactory;
-  /**
-   * Flink execution environment.
-   */
-  private final ExecutionEnvironment env;
-  /**
-   * Flink Gelly graph that holds the vertex and edge datasets associated
-   * with that logical graph.
-   */
-  private final Graph<Long, VD, ED> graph;
+
   /**
    * Graph data associated with that logical graph.
    */
@@ -94,43 +78,14 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
    * @param graphDataFactory  used to create graph data
    * @param env               Flink execution environment
    */
-  private LogicalGraph(Graph<Long, VD, ED> graph, GD graphData,
+  private LogicalGraph(Graph<Long, VD, ED> graph,
+    GD graphData,
     VertexDataFactory<VD> vertexDataFactory,
-    EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD> graphDataFactory,
+    EdgeDataFactory<ED> edgeDataFactory,
+    GraphDataFactory<GD> graphDataFactory,
     ExecutionEnvironment env) {
-    this.graph = graph;
+    super(graph, vertexDataFactory, edgeDataFactory, graphDataFactory, env);
     this.graphData = graphData;
-    this.vertexDataFactory = vertexDataFactory;
-    this.edgeDataFactory = edgeDataFactory;
-    this.graphDataFactory = graphDataFactory;
-    this.env = env;
-  }
-
-  /**
-   * Returns the vertex data factory.
-   *
-   * @return vertex data factory
-   */
-  public VertexDataFactory<VD> getVertexDataFactory() {
-    return vertexDataFactory;
-  }
-
-  /**
-   * Returns the edge data factory.
-   *
-   * @return edge data factory
-   */
-  public EdgeDataFactory<ED> getEdgeDataFactory() {
-    return edgeDataFactory;
-  }
-
-  /**
-   * Returns the graph data factory.
-   *
-   * @return graph data factory
-   */
-  public GraphDataFactory<GD> getGraphDataFactory() {
-    return graphDataFactory;
   }
 
   /**
@@ -147,84 +102,50 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
    * @return logical graph
    */
   public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> LogicalGraph<VD, ED, GD> fromGraph(
+    GraphData> LogicalGraph<VD, ED, GD> fromGellyGraph(
     Graph<Long, VD, ED> graph, GD graphData,
+    VertexDataFactory<VD> vertexDataFactory,
+    EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD>
+    graphDataFactory) {
+    return new LogicalGraph<>(graph,
+      graphData,
+      vertexDataFactory,
+      edgeDataFactory,
+      graphDataFactory,
+      graph.getContext());
+  }
+
+  /**
+   * Creates a logical graph from the given arguments.
+   *
+   * @param vertices          Vertex DataSet
+   * @param edges             Edge DataSet
+   * @param graphData         graph data associated with the logical graph
+   * @param vertexDataFactory vertex data factory
+   * @param edgeDataFactory   edge data factory
+   * @param graphDataFactory  graph data factory
+   * @param <VD>              vertex data type
+   * @param <ED>              edge data type
+   * @param <GD>              graph data type
+   * @return logical graph
+   */
+  public static <VD extends VertexData, ED extends EdgeData, GD extends
+    GraphData> LogicalGraph<VD, ED, GD> fromDataSets(
+    DataSet<Vertex<Long, VD>> vertices,
+    DataSet<Edge<Long, ED>> edges,
+    GD graphData,
     VertexDataFactory<VD> vertexDataFactory,
     EdgeDataFactory<ED> edgeDataFactory,
     GraphDataFactory<GD> graphDataFactory) {
-    return new LogicalGraph<>(graph, graphData, vertexDataFactory,
-      edgeDataFactory, graphDataFactory, graph.getContext());
+    Graph<Long, VD, ED> gellyGraph = Graph.fromDataSet(vertices,
+      edges,
+      vertices.getExecutionEnvironment());
+
+    return fromGellyGraph(gellyGraph, graphData, vertexDataFactory,
+      edgeDataFactory, graphDataFactory);
+
   }
 
-  /**
-   * Returns the gelly graph which is represented by this logical graph.
-   *
-   * @return Gelly graph
-   */
-  public Graph<Long, VD, ED> getGellyGraph() {
-    return this.graph;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public VertexDataCollection<VD> getVertices() {
-    return new VertexDataCollection<>(graph.getVertices());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public EdgeDataCollection<ED> getEdges() {
-    return new EdgeDataCollection<>(graph.getEdges());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public EdgeDataCollection<ED> getOutgoingEdges(final Long vertexID) {
-    DataSet<Edge<Long, ED>> outgoingEdges =
-      this.graph.getEdges().filter(new FilterFunction<Edge<Long, ED>>() {
-        @Override
-        public boolean filter(Edge<Long, ED> edgeTuple) throws Exception {
-          return edgeTuple.getSource().equals(vertexID);
-        }
-      });
-    return new EdgeDataCollection<>(outgoingEdges);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public EdgeDataCollection<ED> getIncomingEdges(final Long vertexID) {
-    return new EdgeDataCollection<>(
-      this.graph.getEdges().filter(new FilterFunction<Edge<Long, ED>>() {
-        @Override
-        public boolean filter(Edge<Long, ED> edgeTuple) throws Exception {
-          return edgeTuple.getTarget().equals(vertexID);
-        }
-      }));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long getVertexCount() throws Exception {
-    return this.graph.numberOfVertices();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long getEdgeCount() throws Exception {
-    return this.graph.numberOfEdges();
-  }
 
   /**
    * {@inheritDoc}
@@ -498,33 +419,35 @@ public class LogicalGraph<VD extends VertexData, ED extends EdgeData, GD
   @Override
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {
-    this.getGellyGraph().getVertices().writeAsFormattedText(vertexFile,
+    getVertices().writeAsFormattedText(vertexFile,
       new JsonWriter.VertexTextFormatter<VD>());
-    this.getGellyGraph().getEdges()
+    getEdges()
       .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
-    env.fromElements(new Subgraph<>(graphData.getId(), graphData))
+    getExecutionEnvironment().fromElements(
+      new Subgraph<>(graphData.getId(), graphData))
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
-    env.execute();
+    getExecutionEnvironment().execute();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String print() throws Exception {
+  public void print() throws Exception {
     final StringBuilder sb =
       new StringBuilder(String.format("LogicalGraph{%n"));
     sb.append(
       String.format("%-10d %s %n", graphData.getId(), graphData.toString()));
     sb.append(String.format("Vertices:%n"));
-    for (VD v : this.getVertices().collect()) {
+    for (VD v : this.getVertexData().collect()) {
       sb.append(String.format("%-10d %s %n", v.getId(), v));
     }
     sb.append(String.format("Edges:%n"));
-    for (ED e : this.getEdges().collect()) {
+    for (ED e : this.getEdgeData().collect()) {
       sb.append(String.format("%-10d %s %n", e.getId(), e));
     }
     sb.append('}');
-    return sb.toString();
+
+    System.out.println(sb);
   }
 }

@@ -15,7 +15,7 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl;
+package org.gradoop.model.impl.summarization;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -27,6 +27,10 @@ import org.gradoop.model.EdgeData;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.impl.DefaultEdgeData;
+import org.gradoop.model.impl.DefaultGraphData;
+import org.gradoop.model.impl.DefaultVertexData;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.junit.Test;
 
@@ -43,8 +47,7 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
     super(mode);
   }
 
-  public abstract Summarization<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> getSummarizationImpl(
+  public abstract Summarization<DefaultVertexData, DefaultEdgeData, DefaultGraphData> getSummarizationImpl(
     String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
     boolean useEdgeLabel);
 
@@ -2063,25 +2066,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
       edges = Lists.newArrayList();
 
       // use collections as data sink
-      summarizedGraph.getGellyGraph().getVertices().map(
-        new MapFunction<Vertex<Long, DefaultVertexData>, DefaultVertexData>() {
-          @Override
-          public DefaultVertexData map(
-            Vertex<Long, DefaultVertexData> longDefaultVertexDataVertex) throws
-            Exception {
-            return longDefaultVertexDataVertex.f1;
-          }
-        }).withForwardedFields("f1->*")
+      summarizedGraph.getVertexData()
         .output(new LocalCollectionOutputFormat<>(vertices));
-      summarizedGraph.getGellyGraph().getEdges()
-        .map(new MapFunction<Edge<Long, DefaultEdgeData>, DefaultEdgeData>() {
-          @Override
-          public DefaultEdgeData map(
-            Edge<Long, DefaultEdgeData> longDefaultEdgeDataEdge) throws
-            Exception {
-            return longDefaultEdgeDataEdge.f2;
-          }
-        }).withForwardedFields("f2->*")
+      summarizedGraph.getEdgeData()
         .output(new LocalCollectionOutputFormat<>(edges));
 
       // execute the job

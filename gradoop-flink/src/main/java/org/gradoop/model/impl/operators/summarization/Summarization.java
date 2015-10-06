@@ -162,9 +162,10 @@ public abstract class Summarization<VD extends VertexData, ED extends
       result = graph;
     } else {
       GD graphData = createNewGraphData();
-      gellyGraph = summarizeInternal(graph.getGellyGraph());
+      gellyGraph = summarizeInternal(Graph.fromDataSet(graph.getVertices(),
+        graph.getEdges(), graph.getExecutionEnvironment()));
       result = LogicalGraph
-        .fromGraph(gellyGraph, graphData, graph.getVertexDataFactory(),
+        .fromGellyGraph(gellyGraph, graphData, graph.getVertexDataFactory(),
           graph.getEdgeDataFactory(), graph.getGraphDataFactory());
     }
     return result;

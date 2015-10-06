@@ -33,7 +33,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.apache.hadoop.hbase.client.Mutation;
@@ -45,6 +44,7 @@ import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
 import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.Subgraph;
 import org.gradoop.storage.EdgeDataHandler;
 import org.gradoop.storage.GraphDataHandler;
@@ -86,8 +86,8 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     final PersistentVertexDataFactory<VD, ED, PVD> persistentVertexDataFactory,
     final String vertexDataTableName) throws Exception {
 
-    final Graph<Long, VD, ED> graph =
-      epgmDatabase.getDatabaseGraph().getGellyGraph();
+    final LogicalGraph<VD, ED, GD> graph =
+      epgmDatabase.getDatabaseGraph();
 
     // group edges by source vertex id (vertex-id, [out-edge-data])
     GroupReduceOperator<Edge<Long, ED>, Tuple2<Long, Set<ED>>>
@@ -196,7 +196,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     final PersistentEdgeDataFactory<ED, VD, PED> persistentEdgeDataFactory,
     final String edgeDataTableName) throws IOException {
 
-    Graph<Long, VD, ED> graph = epgmDatabase.getDatabaseGraph().getGellyGraph();
+    LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
 
     DataSet<PersistentEdgeData<VD>> persistentEdgeDataSet = graph.getVertices()
       // join vertex with edges on edge source vertex id
@@ -233,8 +233,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     final GraphDataHandler<GD> graphDataHandler,
     final PersistentGraphDataFactory<GD, PGD> persistentGraphDataFactory,
     final String graphDataTableName) throws IOException {
-    final Graph<Long, VD, ED> graph =
-      epgmDatabase.getDatabaseGraph().getGellyGraph();
+    final LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
 
     // build (graph-id, vertex-id) tuples from vertices
     FlatMapOperator<Vertex<Long, VD>, Tuple2<Long, Long>> graphIdToVertexId =

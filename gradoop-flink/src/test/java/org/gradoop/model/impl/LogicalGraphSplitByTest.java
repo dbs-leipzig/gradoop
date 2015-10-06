@@ -34,7 +34,7 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
     assertNotNull("graph collection is null", labeledGraphCollection);
     assertEquals("wrong number of graphs", 2L, labeledGraphCollection.size());
     assertEquals("wrong number of vertices", 3L,
-      labeledGraphCollection.getTotalVertexCount());
+      labeledGraphCollection.getVertexCount());
     List<Vertex<Long, DefaultVertexData>> oldVertices =
       inputGraph.getGellyGraph().getVertices().collect();
     List<Vertex<Long, DefaultVertexData>> newVertices =
@@ -50,7 +50,7 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
         newVertex.getValue().getGraphs().contains(function.execute(newVertex)));
     }
     assertEquals("wrong number of edges", 1L,
-      labeledGraphCollection.getTotalEdgeCount());
+      labeledGraphCollection.getEdgeCount());
   }
 
   private static class SplitByIdOddOrEven implements

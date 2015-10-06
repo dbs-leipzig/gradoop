@@ -80,12 +80,15 @@ public class EPGMLabelPropagation<VD extends VertexData, ED extends EdgeData,
   @Override
   public GraphCollection<VD, ED, GD> execute(
     LogicalGraph<VD, ED, GD> epGraph) throws Exception {
-    Graph<Long, VD, ED> graph = epGraph.getGellyGraph();
-    graph =
-      graph.run(new EPGMLabelPropagationAlgorithm<VD, ED>(this.maxIterations));
-    LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
-      .fromGraph(graph, null, epGraph.getVertexDataFactory(),
-        epGraph.getEdgeDataFactory(), epGraph.getGraphDataFactory());
+    Graph<Long, VD, ED> graph = Graph.fromDataSet(epGraph.getVertices(),
+      epGraph.getEdges(), epGraph.getExecutionEnvironment());
+
+    graph = graph
+      .run(new EPGMLabelPropagationAlgorithm<VD, ED>(this.maxIterations));
+
+    LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph.fromGellyGraph(graph,
+      null, epGraph.getVertexDataFactory(), epGraph.getEdgeDataFactory(),
+      epGraph.getGraphDataFactory());
     LongFromProperty<VD> lfp = new LongFromProperty<>(propertyKey);
     SplitBy<VD, ED, GD> callByPropertyKey = new SplitBy<>(lfp, env);
     return callByPropertyKey.execute(labeledGraph);

@@ -100,11 +100,9 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
    */
   private DataSet<Vertex<Long, VD>> computeNewVertices(
     LogicalGraph<VD, ED, GD> logicalGraph) {
-    // get the Gelly graph and vertices
-    final Graph<Long, VD, ED> graph = logicalGraph.getGellyGraph();
-    DataSet<Vertex<Long, VD>> vertices = graph.getVertices();
     // add the new graphs to the vertices graph lists
-    return vertices.map(new AddNewGraphsToVertexMapper<>(vertexToLongFunc));
+    return logicalGraph.getVertices()
+      .map(new AddNewGraphsToVertexMapper<>(vertexToLongFunc));
   }
 
   /**
@@ -138,11 +136,10 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
   private DataSet<Edge<Long, ED>> computeNewEdges(
     LogicalGraph<VD, ED, GD> logicalGraph, DataSet<Vertex<Long, VD>> vertices,
     DataSet<Subgraph<Long, GD>> subgraphs) {
-    final Graph<Long, VD, ED> graph = logicalGraph.getGellyGraph();
     // construct tuples of the edges with the ids of their source and target
     // vertices
     DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex =
-      graph.getEdges().map(new EdgeToTupleMapper<ED>());
+      logicalGraph.getEdges().map(new EdgeToTupleMapper<ED>());
     // replace the source vertex id by the graph list of this vertex
     DataSet<Tuple3<Long, Set<Long>, Long>> edgeGraphsVertex =
       edgeVertexVertex.join(vertices).where(1).equalTo(0)
@@ -166,7 +163,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
       edgesWithSubgraphs.flatMap(new CheckEdgesSourceTargetGraphs());
     // join the graph set tuples with the edges, add all new graphs to the
     // edge graph sets
-    return graph.getEdges().join(newSubgraphs)
+    return logicalGraph.getEdges().join(newSubgraphs)
       .where(new KeySelectors.EdgeKeySelector<ED>()).equalTo(0)
       .with(new JoinEdgeTuplesWithEdges<ED>());
   }

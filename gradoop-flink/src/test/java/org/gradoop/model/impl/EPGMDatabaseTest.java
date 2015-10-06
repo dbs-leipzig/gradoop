@@ -20,8 +20,8 @@ public class EPGMDatabaseTest extends FlinkTestBase {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> g =
       getGraphStore().getGraph(0L);
     assertNotNull("graph was null", g);
-    assertEquals("vertex set has the wrong size", 3L, g.getVertices().size());
-    assertEquals("edge set has the wrong size", 4L, g.getEdges().size());
+    assertEquals("vertex set has the wrong size", 3L, g.getVertices().count());
+    assertEquals("edge set has the wrong size", 4L, g.getEdges().count());
     assertEquals("wrong label", LABEL_COMMUNITY, g.getLabel());
   }
 
@@ -40,8 +40,8 @@ public class EPGMDatabaseTest extends FlinkTestBase {
 
     assertNotNull("graph collection is null", graphs);
     assertEquals("wrong number of graphs", 3L, graphs.size());
-    assertEquals("wrong number of vertices", 6L, graphs.getTotalVertexCount());
-    assertEquals("wrong number of edges", 10L, graphs.getTotalEdgeCount());
+    assertEquals("wrong number of vertices", 6L, graphs.getVertexCount());
+    assertEquals("wrong number of edges", 10L, graphs.getEdgeCount());
   }
 
   @Test
@@ -53,8 +53,8 @@ public class EPGMDatabaseTest extends FlinkTestBase {
     assertEquals("graph collection has wrong size", 4L,
       graphColl.getGraphCount());
     assertEquals("graph collection has wrong vertex count", 7L,
-      graphColl.getTotalVertexCount());
+      graphColl.getVertexCount());
     assertEquals("graph collection has wrong edge count", 13L,
-      graphColl.getTotalEdgeCount());
+      graphColl.getEdgeCount());
   }
 }

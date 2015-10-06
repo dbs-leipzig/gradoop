@@ -49,23 +49,21 @@ public class Combination<VD extends VertexData, ED extends EdgeData, GD
     LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
     final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
 
-    Graph<Long, VD, ED> graph1 = firstGraph.getGellyGraph();
-    Graph<Long, VD, ED> graph2 = secondGraph.getGellyGraph();
-
     // build distinct union of vertex sets and update graph ids at vertices
     // cannot use Gelly union here because of missing argument for KeySelector
     DataSet<Vertex<Long, VD>> newVertexSet =
-      graph1.getVertices().union(graph2.getVertices())
+      firstGraph.getVertices().union(secondGraph.getVertices())
         .distinct(new KeySelectors.VertexKeySelector<VD>())
         .map(new VertexToGraphUpdater<VD>(newGraphID));
 
     DataSet<Edge<Long, ED>> newEdgeSet =
-      graph1.getEdges().union(graph2.getEdges())
+      firstGraph.getEdges().union(secondGraph.getEdges())
         .distinct(new KeySelectors.EdgeKeySelector<ED>())
         .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromGraph(
-      Graph.fromDataSet(newVertexSet, newEdgeSet, graph1.getContext()),
+    return LogicalGraph.fromGellyGraph(Graph
+        .fromDataSet(newVertexSet, newEdgeSet,
+          newVertexSet.getExecutionEnvironment()),
       firstGraph.getGraphDataFactory().createGraphData(newGraphID),
       firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
       firstGraph.getGraphDataFactory());

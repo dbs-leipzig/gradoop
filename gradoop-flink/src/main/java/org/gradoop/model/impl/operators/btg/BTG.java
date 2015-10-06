@@ -73,24 +73,26 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
   public GraphCollection<VD, ED, GD> execute(
     final LogicalGraph<VD, ED, GD> logicalGraph) throws Exception {
     DataSet<Vertex<Long, BTGVertexValue>> vertices =
-      logicalGraph.getGellyGraph().getVertices()
+      logicalGraph.getVertices()
         .map(new CreateBTGVertexValueMapFunction<VD>());
     DataSet<Edge<Long, NullValue>> edges =
-      logicalGraph.getGellyGraph().getEdges()
+      logicalGraph.getEdges()
         .map(new CreateEdgesMapFunction<ED>());
     Graph<Long, BTGVertexValue, NullValue> btgGraph =
       Graph.fromDataSet(vertices, edges, env);
     btgGraph = btgGraph.run(new BTGAlgorithm(this.maxIterations));
     DataSet<Vertex<Long, VD>> btgLabeledVertices =
-      btgGraph.getVertices().join(logicalGraph.getGellyGraph().getVertices())
+      btgGraph.getVertices().join(logicalGraph.getVertices())
         .where(new BTGKeySelector()).equalTo(new VertexKeySelector<VD>())
         .with(new BTGJoin<VD>());
-    Graph<Long, VD, ED> gellyBTGGraph = Graph
-      .fromDataSet(btgLabeledVertices, logicalGraph.getGellyGraph().getEdges(),
-        env);
+    // create new graph
     LogicalGraph<VD, ED, GD> btgEPGraph = LogicalGraph
-      .fromGraph(gellyBTGGraph, null, logicalGraph.getVertexDataFactory(),
-        logicalGraph.getEdgeDataFactory(), logicalGraph.getGraphDataFactory());
+      .fromDataSets(btgLabeledVertices,
+        logicalGraph.getEdges(),
+        null,
+        logicalGraph.getVertexDataFactory(),
+        logicalGraph.getEdgeDataFactory(),
+        logicalGraph.getGraphDataFactory());
     LongListFromProperty<VD> lsfp =
       new LongListFromProperty<>(VERTEX_BTGIDS_PROPERTYKEY);
     OverlapSplitBy<VD, ED, GD> callByBtgIds = new OverlapSplitBy<>(lsfp, env);
