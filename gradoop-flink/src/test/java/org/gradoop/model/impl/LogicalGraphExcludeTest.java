@@ -17,6 +17,8 @@
 
 package org.gradoop.model.impl;
 
+import com.google.common.collect.Lists;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.VertexData;
 import org.junit.Test;
@@ -136,10 +138,16 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = databaseCommunity.exclude(hadoopCommunity);
 
-    Collection<DefaultVertexData> vertexData = newGraph.getVertexData()
-      .collect();
-    Collection<DefaultEdgeData> edgeData = newGraph.getEdgeData()
-      .collect();
+    // use collections as data sink
+    Collection<DefaultVertexData> vertexData = Lists.newArrayList();
+    Collection<DefaultEdgeData> edgeData = Lists.newArrayList();
+
+    newGraph.getVertexData()
+      .output(new LocalCollectionOutputFormat<>(vertexData));
+    newGraph.getEdgeData()
+      .output(new LocalCollectionOutputFormat<>(edgeData));
+
+    getExecutionEnvironment().execute();
 
     for (VertexData v : vertexData) {
       Set<Long> gIDs = v.getGraphs();

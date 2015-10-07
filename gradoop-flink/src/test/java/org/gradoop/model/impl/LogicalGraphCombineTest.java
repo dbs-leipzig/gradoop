@@ -17,7 +17,9 @@
 
 package org.gradoop.model.impl;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
@@ -134,10 +136,16 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = graphCommunity.combine(databaseCommunity);
 
-    Collection<DefaultVertexData> vertexData = newGraph.getVertexData()
-      .collect();
-    Collection<DefaultEdgeData> edgeData = newGraph.getEdgeData()
-      .collect();
+    // use collections as data sink
+    Collection<DefaultVertexData> vertexData = Lists.newArrayList();
+    Collection<DefaultEdgeData> edgeData = Lists.newArrayList();
+
+    newGraph.getVertexData()
+      .output(new LocalCollectionOutputFormat<>(vertexData));
+    newGraph.getEdgeData()
+      .output(new LocalCollectionOutputFormat<>(edgeData));
+
+    getExecutionEnvironment().execute();
 
     for (VertexData v : vertexData) {
       Set<Long> gIDs = v.getGraphs();
