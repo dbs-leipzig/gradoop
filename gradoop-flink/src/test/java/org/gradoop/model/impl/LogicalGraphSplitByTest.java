@@ -1,6 +1,7 @@
 package org.gradoop.model.impl;
 
-import org.apache.flink.api.java.ExecutionEnvironment;
+import com.google.common.collect.Lists;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.helper.UnaryFunction;
@@ -9,11 +10,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
 public class LogicalGraphSplitByTest extends FlinkTestBase {
@@ -25,38 +26,42 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
   public void testSplitBy() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       inputGraph = getGraphStore().getGraph(0L);
-    UnaryFunction<Vertex<Long, DefaultVertexData>, Long> function =
-      new SplitByIdOddOrEven();
+    UnaryFunction<DefaultVertexData, Long> function = new SplitByIdOddOrEven();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
       new SplitBy<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
-        function, ExecutionEnvironment.getExecutionEnvironment()));
-    assertNotNull("graph collection is null", labeledGraphCollection);
+        new SplitByIdOddOrEven(), getExecutionEnvironment()));
+
+    List<DefaultVertexData> oldVertices = Lists.newArrayList();
+    inputGraph.getVertexData().output(
+      new LocalCollectionOutputFormat<>(oldVertices));
+
+    List<DefaultVertexData> newVertices = Lists.newArrayList();
+    labeledGraphCollection.getVertexData().output(
+      new LocalCollectionOutputFormat<>(newVertices));
+
+    List<DefaultEdgeData> newEdges = Lists.newArrayList();
+    labeledGraphCollection.getEdgeData().output(
+      new LocalCollectionOutputFormat<>(newEdges));
+
+      assertNotNull("graph collection is null", labeledGraphCollection);
     assertEquals("wrong number of graphs", 2L, labeledGraphCollection.size());
-    assertEquals("wrong number of vertices", 3L,
-      labeledGraphCollection.getVertexCount());
-    List<Vertex<Long, DefaultVertexData>> oldVertices =
-      inputGraph.getGellyGraph().getVertices().collect();
-    List<Vertex<Long, DefaultVertexData>> newVertices =
-      labeledGraphCollection.getGellyGraph().getVertices().collect();
+    assertEquals("wrong number of vertices", 3L, newVertices.size());
+    assertEquals("wrong number of edges", 1L, newEdges.size());
+
     for (int i = 0; i < newVertices.size(); i++) {
-      Vertex<Long, DefaultVertexData> oldVertex = oldVertices.get(i);
-      Vertex<Long, DefaultVertexData> newVertex = newVertices.get(i);
-      assertTrue((oldVertex.getValue().getGraphCount() + 1) ==
-        newVertex.getValue().getGraphCount());
-      assertTrue(newVertex.getValue().getGraphs()
-        .containsAll(oldVertex.getValue().getGraphs()));
-      assertTrue(
-        newVertex.getValue().getGraphs().contains(function.execute(newVertex)));
+      DefaultVertexData oldVertex = oldVertices.get(i);
+      DefaultVertexData newVertex = newVertices.get(i);
+      assertTrue((oldVertex.getGraphCount() + 1) == newVertex.getGraphCount());
+      assertTrue(newVertex.getGraphs().containsAll(oldVertex.getGraphs()));
+      assertTrue(newVertex.getGraphs().contains(function.execute(newVertex)));
     }
-    assertEquals("wrong number of edges", 1L,
-      labeledGraphCollection.getEdgeCount());
   }
 
   private static class SplitByIdOddOrEven implements
-    UnaryFunction<Vertex<Long, DefaultVertexData>, Long> {
+    UnaryFunction<DefaultVertexData, Long> {
     @Override
-    public Long execute(Vertex<Long, DefaultVertexData> entity) throws
+    public Long execute(DefaultVertexData entity) throws
       Exception {
       return (entity.getId() % 2) - 2;
     }

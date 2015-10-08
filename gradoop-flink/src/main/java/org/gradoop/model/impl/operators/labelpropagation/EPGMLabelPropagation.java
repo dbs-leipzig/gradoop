@@ -18,7 +18,6 @@ package org.gradoop.model.impl.operators.labelpropagation;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.EdgeData;
 import org.gradoop.model.GraphData;
 import org.gradoop.model.VertexData;
@@ -107,7 +106,7 @@ public class EPGMLabelPropagation<VD extends VertexData, ED extends EdgeData,
    * vertex
    */
   private static class LongFromProperty<VD extends VertexData> implements
-    UnaryFunction<Vertex<Long, VD>, Long> {
+    UnaryFunction<VD, Long> {
     /**
      * String propertyKey
      */
@@ -126,8 +125,8 @@ public class EPGMLabelPropagation<VD extends VertexData, ED extends EdgeData,
      * {@inheritDoc}
      */
     @Override
-    public Long execute(Vertex<Long, VD> entity) throws Exception {
-      return ((Long) entity.getValue().getProperty(propertyKey) + 1) * -1;
+    public Long execute(VD entity) throws Exception {
+      return ((Long) entity.getProperty(propertyKey) + 1) * -1;
     }
   }
 }

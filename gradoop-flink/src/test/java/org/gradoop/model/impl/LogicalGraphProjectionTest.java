@@ -16,8 +16,8 @@
  */
 package org.gradoop.model.impl;
 
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
+import com.google.common.collect.Lists;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.helper.UnaryFunction;
 import org.junit.Test;
@@ -45,58 +45,67 @@ public class LogicalGraphProjectionTest extends FlinkTestBase {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = forumGraph.project(new VertexLabelProjectionFunction(),
       new EdgePropertyProjectionFunction());
-    Comparator<Vertex<Long, DefaultVertexData>> vertexComp =
-      new Comparator<Vertex<Long, DefaultVertexData>>() {
-        @Override
-        public int compare(Vertex<Long, DefaultVertexData> vertex1,
-          Vertex<Long, DefaultVertexData> vertex2) {
-          return Long.compare(vertex1.getId(), vertex2.getId());
-        }
-      };
-    Comparator<Edge<Long, DefaultEdgeData>> edgeComp =
-      new Comparator<Edge<Long, DefaultEdgeData>>() {
-        @Override
-        public int compare(Edge<Long, DefaultEdgeData> edge1,
-          Edge<Long, DefaultEdgeData> edge2) {
-          return Long
-            .compare(edge1.getValue().getId(), edge2.getValue().getId());
-        }
-      };
-    List<Vertex<Long, DefaultVertexData>> oldVertices =
-      forumGraph.getGellyGraph().getVertices().collect();
-    Collections.sort(oldVertices, vertexComp);
-    List<Edge<Long, DefaultEdgeData>> oldEdges =
-      forumGraph.getGellyGraph().getEdges().collect();
-    Collections.sort(oldEdges, edgeComp);
-    List<Vertex<Long, DefaultVertexData>> newVertices =
-      newGraph.getGellyGraph().getVertices().collect();
-    Collections.sort(newVertices, vertexComp);
-    List<Edge<Long, DefaultEdgeData>> newEdges =
-      newGraph.getGellyGraph().getEdges().collect();
-    Collections.sort(newEdges, edgeComp);
+
+    List<DefaultVertexData> oldVertices = Lists.newArrayList();
+    List<DefaultEdgeData> oldEdges = Lists.newArrayList();
+    List<DefaultVertexData> newVertices = Lists.newArrayList();
+    List<DefaultEdgeData> newEdges = Lists.newArrayList();
+
+    forumGraph.getVertexData().output(
+      new LocalCollectionOutputFormat<>(oldVertices));
+    forumGraph.getEdgeData().output(
+      new LocalCollectionOutputFormat<>(oldEdges));
+    newGraph.getVertexData().output(
+      new LocalCollectionOutputFormat<>(newVertices));
+    newGraph.getEdgeData().output(
+      new LocalCollectionOutputFormat<>(newEdges));
+
+    getExecutionEnvironment().execute();
+
+    Collections.sort(oldVertices, new VertexComparator());
+    Collections.sort(newVertices, new VertexComparator());
+    Collections.sort(oldEdges, new EdgeComparator());
+    Collections.sort(newEdges, new EdgeComparator());
+
     assertNotNull("graph was null", newGraph);
-    assertEquals(forumGraph.getVertexCount(), newGraph.getVertexCount());
-    assertEquals(forumGraph.getEdgeCount(), newGraph.getEdgeCount());
+    assertEquals(oldVertices.size(), newVertices.size());
+    assertEquals(oldEdges.size(), newEdges.size());
     assertEquals(forumGraph.getLabel(), newGraph.getLabel());
     assertEquals(forumGraph.getProperties(), newGraph.getProperties());
 
     for (int i = 0; i < newVertices.size(); i++) {
-      Vertex<Long, DefaultVertexData> oldVertex = oldVertices.get(i);
-      Vertex<Long, DefaultVertexData> newVertex = newVertices.get(i);
+      DefaultVertexData oldVertex = oldVertices.get(i);
+      DefaultVertexData newVertex = newVertices.get(i);
       assertEquals(oldVertex.getId(), newVertex.getId());
-      assertEquals(oldVertex.getValue().getProperties(),
-        newVertex.getValue().getProperties());
-      assertEquals(newVertex.getValue().getLabel(), "test_label");
+      assertEquals(oldVertex.getProperties(), newVertex.getProperties());
+      assertEquals(newVertex.getLabel(), "test_label");
     }
     for (int i = 0; i < newEdges.size(); i++) {
-      Edge<Long, DefaultEdgeData> oldEdge = oldEdges.get(i);
-      Edge<Long, DefaultEdgeData> newEdge = newEdges.get(i);
-      assertEquals(oldEdge.getValue().getId(), newEdge.getValue().getId());
-      assertEquals(oldEdge.getValue().getLabel(),
-        newEdge.getValue().getLabel());
-      assertEquals(newEdge.getValue().getProperties().get("test_property"),
-        "test_value");
-      assertNull(newEdge.getValue().getProperties().get(PROPERTY_KEY_SINCE));
+      DefaultEdgeData oldEdge = oldEdges.get(i);
+      DefaultEdgeData newEdge = newEdges.get(i);
+      assertEquals(oldEdge.getId(), newEdge.getId());
+      assertEquals(oldEdge.getLabel(), newEdge.getLabel());
+      assertEquals(newEdge.getProperties().get("test_property"), "test_value");
+      assertNull(newEdge.getProperties().get(PROPERTY_KEY_SINCE));
+    }
+  }
+
+  private static class VertexComparator
+    implements Comparator<DefaultVertexData> {
+    @Override
+    public int compare(DefaultVertexData vertex1,
+      DefaultVertexData vertex2) {
+      return Long.compare(vertex1.getId(), vertex2.getId());
+    }
+  }
+
+  private static class EdgeComparator
+    implements Comparator<DefaultEdgeData> {
+    @Override
+    public int compare(DefaultEdgeData edge1,
+      DefaultEdgeData edge2) {
+      return Long
+        .compare(edge1.getId(), edge2.getId());
     }
   }
 

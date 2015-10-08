@@ -59,7 +59,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
   /**
    * Mapping from a vertex to a long value
    */
-  private final UnaryFunction<Vertex<Long, VD>, Long> vertexToLongFunc;
+  private final UnaryFunction<VD, Long> vertexToLongFunc;
 
   /**
    * Creates a split by instance.
@@ -67,7 +67,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
    * @param env              Flink Execution Environment
    * @param vertexToLongFunc Function to select a graph id from a vertex
    */
-  public SplitBy(UnaryFunction<Vertex<Long, VD>, Long> vertexToLongFunc,
+  public SplitBy(UnaryFunction<VD, Long> vertexToLongFunc,
     final ExecutionEnvironment env) {
     this.env = env;
     this.vertexToLongFunc = vertexToLongFunc;
@@ -183,7 +183,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
     /**
      * Unary Function
      */
-    private final UnaryFunction<Vertex<Long, VD>, Long> function;
+    private final UnaryFunction<VD, Long> function;
 
     /**
      * Creates a KeySelector instance.
@@ -191,7 +191,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
      * @param function Mapping from vertex to long value
      */
     public LongFromVertexSelector(
-      UnaryFunction<Vertex<Long, VD>, Long> function) {
+      UnaryFunction<VD, Long> function) {
       this.function = function;
     }
 
@@ -200,7 +200,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
      */
     @Override
     public Long getKey(Vertex<Long, VD> vertex) throws Exception {
-      return function.execute(vertex);
+      return function.execute(vertex.getValue());
     }
   }
 
@@ -216,7 +216,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
     /**
      * Mapping from vertex to long value
      */
-    private final UnaryFunction<Vertex<Long, VD>, Long> function;
+    private final UnaryFunction<VD, Long> function;
 
     /**
      * Creates MapFunction instance.
@@ -224,7 +224,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
      * @param function Mapping from vertex to long value
      */
     public AddNewGraphsToVertexMapper(
-      UnaryFunction<Vertex<Long, VD>, Long> function) {
+      UnaryFunction<VD, Long> function) {
       this.function = function;
     }
 
@@ -233,7 +233,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
      */
     @Override
     public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
-      Long labelPropIndex = function.execute(vertex);
+      Long labelPropIndex = function.execute(vertex.getValue());
       if (vertex.getValue().getGraphs() == null) {
         vertex.getValue().setGraphs(Sets.newHashSet(labelPropIndex));
       } else {
@@ -256,7 +256,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
     /**
      * Mapping from vertex to long value
      */
-    private final UnaryFunction<Vertex<Long, VD>, Long> function;
+    private final UnaryFunction<VD, Long> function;
     /**
      * GraphDataFactory to build new GraphData
      */
@@ -273,7 +273,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
      * @param graphDataFactory GraphDataFactory to build new GraphData
      */
     public SubgraphsFromGroupsReducer(
-      UnaryFunction<Vertex<Long, VD>, Long> function,
+      UnaryFunction<VD, Long> function,
       GraphDataFactory<GD> graphDataFactory) {
       this.function = function;
       this.graphDataFactory = graphDataFactory;
@@ -288,7 +288,7 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
       Collector<Subgraph<Long, GD>> collector) throws Exception {
       Iterator<Vertex<Long, VD>> it = iterable.iterator();
       Vertex<Long, VD> vertex = it.next();
-      Long labelPropIndex = function.execute(vertex);
+      Long labelPropIndex = function.execute(vertex.getValue());
       reuseSubgraph.setId(labelPropIndex);
       reuseSubgraph.setValue(graphDataFactory.createGraphData(labelPropIndex,
         GConstants.DEFAULT_GRAPH_LABEL));
