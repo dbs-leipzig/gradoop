@@ -15,7 +15,20 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.model.impl.algorithms.btg.functions;
+
+import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.graph.Vertex;
+import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+
 /**
- * Contains the Business Transaction Graphs (BTG) extraction algorithm.
+ * KeySelector class for the BTGVertex
  */
-package org.gradoop.model.impl.algorithms.btg;
+public class BTGKeySelector implements
+  KeySelector<Vertex<Long, BTGVertexValue>, Long> {
+  @Override
+  public Long getKey(Vertex<Long, BTGVertexValue> btgVertex) throws
+    Exception {
+    return btgVertex.getId();
+  }
+}

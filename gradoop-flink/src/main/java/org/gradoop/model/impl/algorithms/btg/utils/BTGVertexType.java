@@ -1,7 +1,7 @@
-package org.gradoop.model.impl.algorithms.btg;
+package org.gradoop.model.impl.algorithms.btg.utils;
 
 /**
- * Used for {@link BTGAlgorithm}.
+ * Used for {@link org.gradoop.model.impl.algorithms.btg.BTGAlgorithm}.
  */
 public enum BTGVertexType {
   /**

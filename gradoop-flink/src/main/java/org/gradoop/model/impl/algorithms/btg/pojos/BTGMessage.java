@@ -1,8 +1,8 @@
-package org.gradoop.model.impl.algorithms.btg;
+package org.gradoop.model.impl.algorithms.btg.pojos;
 
 /**
- * Custom message format for {@link org.gradoop.model.impl.operators
- * .BTGAlgorithm}.
+ * Custom message format for
+ * {@link org.gradoop.model.impl.algorithms.btg.BTGAlgorithm}.
  * Master data nodes need to know who the sender of a message is, so this has to
  * be stored inside the message. The btgID is the minimum vertex id inside a
  * BTG.

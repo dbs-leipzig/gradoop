@@ -59,7 +59,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
   /**
    * Self defined function for graph extraction
    */
-  private final UnaryFunction<Vertex<Long, VD>, List<Long>> function;
+  private final UnaryFunction<VD, List<Long>> function;
 
   /**
    * Constructor
@@ -67,7 +67,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
    * @param function self defined function
    * @param env      execution environment
    */
-  public OverlapSplitBy(UnaryFunction<Vertex<Long, VD>, List<Long>> function,
+  public OverlapSplitBy(UnaryFunction<VD, List<Long>> function,
     ExecutionEnvironment env) {
     this.env = env;
     this.function = function;
@@ -221,7 +221,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     /**
      * Self defined Function
      */
-    private UnaryFunction<Vertex<Long, VD>, List<Long>> function;
+    private UnaryFunction<VD, List<Long>> function;
 
     /**
      * Constructor
@@ -229,7 +229,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
      * @param function actual defined Function
      */
     public VertexToGraphIDFlatMapper(
-      UnaryFunction<Vertex<Long, VD>, List<Long>> function) {
+      UnaryFunction<VD, List<Long>> function) {
       this.function = function;
     }
 
@@ -239,7 +239,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     @Override
     public void flatMap(Vertex<Long, VD> vertex,
       Collector<Tuple1<Long>> collector) throws Exception {
-      List<Long> graphIDSet = function.execute(vertex);
+      List<Long> graphIDSet = function.execute(vertex.getValue());
       for (Long id : graphIDSet) {
         collector.collect(new Tuple1<>(id));
       }
@@ -256,7 +256,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     /**
      * Self defined Function
      */
-    private UnaryFunction<Vertex<Long, VD>, List<Long>> function;
+    private UnaryFunction<VD, List<Long>> function;
 
     /**
      * Constructor
@@ -264,7 +264,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
      * @param function actual defined Function
      */
     public AddNewGraphsToVertexMapper(
-      UnaryFunction<Vertex<Long, VD>, List<Long>> function) {
+      UnaryFunction<VD, List<Long>> function) {
       this.function = function;
     }
 
@@ -273,7 +273,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
      */
     @Override
     public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
-      List<Long> labelPropIndex = function.execute(vertex);
+      List<Long> labelPropIndex = function.execute(vertex.getValue());
       if (vertex.getValue().getGraphs() == null) {
         vertex.getValue().setGraphs(new HashSet<Long>());
       }

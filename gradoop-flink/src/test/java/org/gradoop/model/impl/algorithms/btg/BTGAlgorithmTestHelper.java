@@ -6,6 +6,8 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
+import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
+import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
 
 import java.util.ArrayList;

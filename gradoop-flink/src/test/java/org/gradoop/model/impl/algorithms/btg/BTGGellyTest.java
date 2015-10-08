@@ -6,6 +6,7 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
 import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

@@ -30,12 +30,12 @@ public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
   public void testOverlappingResultGraphs() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       inputGraph = getGraphStore().getDatabaseGraph();
-    UnaryFunction<Vertex<Long, DefaultVertexData>, List<Long>> function =
+    UnaryFunction<DefaultVertexData, List<Long>> function =
       new SplitByModulo();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
       new OverlapSplitBy<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
-        function, ExecutionEnvironment.getExecutionEnvironment()));
+        function, getExecutionEnvironment()));
     labeledGraphCollection.getSubgraphs();
     assertNotNull("graph collection is null", labeledGraphCollection);
     TestCase.assertEquals("wrong number of graphs", 3l,
@@ -47,9 +47,9 @@ public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
   }
 
   private static class SplitByModulo implements
-    UnaryFunction<Vertex<Long, DefaultVertexData>, List<Long>> {
+    UnaryFunction<DefaultVertexData, List<Long>> {
     @Override
-    public List<Long> execute(Vertex<Long, DefaultVertexData> vertex) throws
+    public List<Long> execute(DefaultVertexData vertex) throws
       Exception {
       List<Long> list = new ArrayList<>();
       boolean inNewGraph = false;

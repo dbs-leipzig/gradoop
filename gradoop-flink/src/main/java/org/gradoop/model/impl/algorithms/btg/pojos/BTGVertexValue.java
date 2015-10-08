@@ -1,7 +1,8 @@
-package org.gradoop.model.impl.algorithms.btg;
+package org.gradoop.model.impl.algorithms.btg.pojos;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 
 import java.util.HashSet;
 import java.util.List;
@@ -9,11 +10,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Custom vertex used by {@link BTGAlgorithm}.
+ * Custom vertex used by
+ * {@link org.gradoop.model.impl.algorithms.btg.BTGAlgorithm}.
  */
 public class BTGVertexValue {
   /**
-   * The vertex type which is defined in {@link BTGVertexType}
+   * The vertex type.
    */
   private BTGVertexType vertexType;
   /**

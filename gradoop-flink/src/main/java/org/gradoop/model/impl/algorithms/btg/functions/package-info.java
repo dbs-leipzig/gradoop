@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains the Business Transaction Graphs (BTG) extraction algorithm.
+ * Contains functions used for the Business Transaction Graph (BTG) extraction
+ * algorithm.
  */
-package org.gradoop.model.impl.algorithms.btg;
+package org.gradoop.model.impl.algorithms.btg.functions;
