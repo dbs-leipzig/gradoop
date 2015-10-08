@@ -30,21 +30,21 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.util.Collector;
-import org.gradoop.GConstants;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.EdgeDataFactory;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.GraphDataFactory;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.VertexDataFactory;
-import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.util.GConstants;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.EdgeDataFactory;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.GraphDataFactory;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.util.FlinkConstants;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples
   .VertexWithRepresentative;
-import org.gradoop.model.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 
 /**
  * The summarization operator determines a structural grouping of similar

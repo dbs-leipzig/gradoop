@@ -22,11 +22,11 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.VertexData;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.VertexData;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.operators.BinaryGraphToGraphOperator;
+import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 
 import java.util.Iterator;
 

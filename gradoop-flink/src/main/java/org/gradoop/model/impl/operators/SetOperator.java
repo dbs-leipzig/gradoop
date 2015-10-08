@@ -7,11 +7,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.helper.KeySelectors;
-import org.gradoop.model.impl.Subgraph;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.functions.KeySelectors;
+import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
  * Base class for set operations that share common methods to build vertex,

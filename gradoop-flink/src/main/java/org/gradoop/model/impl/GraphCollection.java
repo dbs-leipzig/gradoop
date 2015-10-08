@@ -29,26 +29,27 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.EdgeDataFactory;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.GraphDataFactory;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.VertexDataFactory;
-import org.gradoop.model.helper.KeySelectors;
-import org.gradoop.model.helper.Order;
-import org.gradoop.model.helper.Predicate;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.EdgeDataFactory;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.GraphDataFactory;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.model.impl.functions.KeySelectors;
+import org.gradoop.util.Order;
+import org.gradoop.model.impl.functions.Predicate;
+import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.model.impl.operators.Difference;
 import org.gradoop.model.impl.operators.DifferenceUsingList;
 import org.gradoop.model.impl.operators.Intersect;
 import org.gradoop.model.impl.operators.IntersectUsingList;
 import org.gradoop.model.impl.operators.Union;
-import org.gradoop.model.operators.BinaryCollectionToCollectionOperator;
-import org.gradoop.model.operators.BinaryGraphToGraphOperator;
-import org.gradoop.model.operators.GraphCollectionOperators;
-import org.gradoop.model.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.model.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.model.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.model.api.operators.GraphCollectionOperators;
+import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -374,35 +375,6 @@ public class GraphCollection<
     this.getSubgraphs()
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
     getExecutionEnvironment().execute();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <V> Iterable<V> values(Class<V> propertyType, String propertyKey) {
-    throw new NotImplementedException();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Collection<GD> collect() throws Exception {
-    return this.subgraphs.map(new MapFunction<Subgraph<Long, GD>, GD>() {
-      @Override
-      public GD map(Subgraph<Long, GD> g) throws Exception {
-        return g.getValue();
-      }
-    }).collect();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long size() throws Exception {
-    return subgraphs.count();
   }
 
   /**

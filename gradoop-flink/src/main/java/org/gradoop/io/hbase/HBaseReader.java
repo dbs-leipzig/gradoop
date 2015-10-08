@@ -22,14 +22,14 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.GConstants;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.impl.Subgraph;
-import org.gradoop.storage.EdgeDataHandler;
-import org.gradoop.storage.GraphDataHandler;
-import org.gradoop.storage.VertexDataHandler;
+import org.gradoop.util.GConstants;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.tuples.Subgraph;
+import org.gradoop.storage.api.EdgeDataHandler;
+import org.gradoop.storage.api.GraphDataHandler;
+import org.gradoop.storage.api.VertexDataHandler;
 
 /**
  * Contains classes to read an EPGM database from HBase.

@@ -12,20 +12,20 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.EdgeDataFactory;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.GraphDataFactory;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.VertexDataFactory;
-import org.gradoop.model.impl.DefaultEdgeData;
-import org.gradoop.model.impl.DefaultEdgeDataFactory;
-import org.gradoop.model.impl.DefaultGraphData;
-import org.gradoop.model.impl.DefaultGraphDataFactory;
-import org.gradoop.model.impl.DefaultVertexData;
-import org.gradoop.model.impl.DefaultVertexDataFactory;
-import org.gradoop.storage.*;
-import org.gradoop.storage.hbase.*;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.EdgeDataFactory;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.GraphDataFactory;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.model.impl.pojo.DefaultEdgeData;
+import org.gradoop.model.impl.pojo.DefaultEdgeDataFactory;
+import org.gradoop.model.impl.pojo.DefaultGraphData;
+import org.gradoop.model.impl.pojo.DefaultGraphDataFactory;
+import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.DefaultVertexDataFactory;
+import org.gradoop.storage.api.*;
+import org.gradoop.storage.impl.hbase.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -75,7 +75,7 @@ public class HBaseTestBase {
   }
 
   public static EPGMStore<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> createEmptyEPGMStore() {
+      DefaultGraphData> createEmptyEPGMStore() {
     Configuration config = utility.getConfiguration();
     VertexDataHandler<DefaultVertexData, DefaultEdgeData> vertexDataHandler =
       new DefaultVertexDataHandler<>(new DefaultVertexDataFactory());
@@ -175,8 +175,7 @@ public class HBaseTestBase {
       createVertexDataCollection();
     List<PersistentVertexData<DefaultEdgeData>> persistentVertexData =
       Lists.newArrayListWithExpectedSize(vertexDataCollection.size());
-    PersistentVertexDataFactory<DefaultVertexData, DefaultEdgeData,
-      DefaultPersistentVertexData>
+    PersistentVertexDataFactory<DefaultVertexData, DefaultEdgeData, DefaultPersistentVertexData>
       vertexDataFactory = new DefaultPersistentVertexDataFactory();
 
 
@@ -245,8 +244,7 @@ public class HBaseTestBase {
     Collection<DefaultEdgeData> edgeDataCollection = createEdgeDataCollection();
     List<PersistentEdgeData<DefaultVertexData>> persistentEdgeData =
       Lists.newArrayListWithExpectedSize(edgeDataCollection.size());
-    PersistentEdgeDataFactory<DefaultEdgeData, DefaultVertexData,
-      DefaultPersistentEdgeData>
+    PersistentEdgeDataFactory<DefaultEdgeData, DefaultVertexData, DefaultPersistentEdgeData>
       edgeDataFactory = new DefaultPersistentEdgeDataFactory();
 
     DefaultVertexData sourceVertexData = null;

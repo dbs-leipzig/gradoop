@@ -20,9 +20,9 @@ package org.gradoop.model;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.test.util.MultipleProgramsTestBase;
 import org.gradoop.GradoopTestBaseUtils;
-import org.gradoop.model.impl.DefaultEdgeData;
-import org.gradoop.model.impl.DefaultGraphData;
-import org.gradoop.model.impl.DefaultVertexData;
+import org.gradoop.model.impl.pojo.DefaultEdgeData;
+import org.gradoop.model.impl.pojo.DefaultGraphData;
+import org.gradoop.model.impl.pojo.DefaultVertexData;
 import org.gradoop.model.impl.EPGMDatabase;
 
 /**

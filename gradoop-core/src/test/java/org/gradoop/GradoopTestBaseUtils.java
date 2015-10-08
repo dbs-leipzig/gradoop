@@ -19,12 +19,12 @@ package org.gradoop;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.gradoop.model.impl.DefaultEdgeData;
-import org.gradoop.model.impl.DefaultEdgeDataFactory;
-import org.gradoop.model.impl.DefaultGraphData;
-import org.gradoop.model.impl.DefaultGraphDataFactory;
-import org.gradoop.model.impl.DefaultVertexData;
-import org.gradoop.model.impl.DefaultVertexDataFactory;
+import org.gradoop.model.impl.pojo.DefaultEdgeData;
+import org.gradoop.model.impl.pojo.DefaultEdgeDataFactory;
+import org.gradoop.model.impl.pojo.DefaultGraphData;
+import org.gradoop.model.impl.pojo.DefaultGraphDataFactory;
+import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.DefaultVertexDataFactory;
 
 import java.util.Collection;
 import java.util.HashMap;

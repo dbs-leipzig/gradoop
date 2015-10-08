@@ -24,13 +24,13 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.EdgeDataFactory;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.GraphDataFactory;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.VertexDataFactory;
-import org.gradoop.model.operators.GraphOperators;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.EdgeDataFactory;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.GraphDataFactory;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.model.api.operators.GraphOperators;
 
 /**
  * Base class for graph representations.

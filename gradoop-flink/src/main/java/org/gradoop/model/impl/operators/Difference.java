@@ -4,10 +4,10 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.impl.Subgraph;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.tuples.Subgraph;
 
 import java.util.Iterator;
 

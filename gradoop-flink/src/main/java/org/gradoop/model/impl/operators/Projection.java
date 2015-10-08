@@ -20,12 +20,12 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 
 /**
  * Creates a projected version of the logical graph using the user defined

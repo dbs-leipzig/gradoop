@@ -22,10 +22,10 @@ import com.google.common.collect.Sets;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.model.Attributed;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.GraphElement;
-import org.gradoop.model.Labeled;
+import org.gradoop.model.api.Attributed;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.GraphElement;
+import org.gradoop.model.api.Labeled;
 
 import java.util.Iterator;
 import java.util.Map;

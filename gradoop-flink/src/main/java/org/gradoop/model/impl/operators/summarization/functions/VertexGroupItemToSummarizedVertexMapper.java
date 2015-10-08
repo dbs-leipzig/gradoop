@@ -25,9 +25,9 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.VertexDataFactory;
-import org.gradoop.model.helper.FlinkConstants;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.util.FlinkConstants;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 

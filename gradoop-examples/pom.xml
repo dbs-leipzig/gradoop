@@ -7,8 +7,9 @@
     <parent>
         <artifactId>gradoop</artifactId>
         <groupId>de.uni-leipzig.de.dbs</groupId>
-        <version>0.0.3</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
+
     <artifactId>gradoop-examples</artifactId>
     <packaging>jar</packaging>
 

@@ -20,7 +20,7 @@ package org.gradoop.model.impl.operators.summarization.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.VertexData;
+import org.gradoop.model.api.VertexData;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 

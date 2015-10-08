@@ -17,12 +17,12 @@
 
 package org.gradoop.model.impl.operators;
 
-import org.gradoop.model.EdgeData;
-import org.gradoop.model.GraphData;
-import org.gradoop.model.VertexData;
-import org.gradoop.model.helper.UnaryFunction;
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 
 /**
  * Takes a logical graph and a user defined aggregate function as input. The
