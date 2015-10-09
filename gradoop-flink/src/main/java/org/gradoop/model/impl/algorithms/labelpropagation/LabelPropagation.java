@@ -40,7 +40,7 @@ import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .VertexToLPVertexMapper;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
-import org.gradoop.model.impl.operators.SplitBy;
+import org.gradoop.model.impl.operators.auxiliary.SplitBy;
 
 /**
  * LabelPropagation Graph to Collection Operator.

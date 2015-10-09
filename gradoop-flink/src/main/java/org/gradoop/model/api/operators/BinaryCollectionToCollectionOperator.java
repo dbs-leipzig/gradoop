@@ -28,9 +28,9 @@ import org.gradoop.model.impl.GraphCollection;
  * @param <VD> vertex data type
  * @param <ED> edge data type
  * @param <GD> graph data type
- * @see org.gradoop.model.impl.operators.Union
- * @see org.gradoop.model.impl.operators.Intersect
- * @see org.gradoop.model.impl.operators.Difference
+ * @see org.gradoop.model.impl.operators.collection.Union
+ * @see org.gradoop.model.impl.operators.collection.Intersect
+ * @see org.gradoop.model.impl.operators.collection.Difference
  */
 public interface BinaryCollectionToCollectionOperator<VD extends VertexData,
   ED extends EdgeData, GD extends GraphData> extends

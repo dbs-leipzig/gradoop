@@ -28,9 +28,9 @@ import org.gradoop.model.impl.LogicalGraph;
  * @param <VD> vertex data type
  * @param <ED> edge data type
  * @param <GD> graph data type
- * @see org.gradoop.model.impl.operators.Combination
- * @see org.gradoop.model.impl.operators.Exclusion
- * @see org.gradoop.model.impl.operators.Overlap
+ * @see org.gradoop.model.impl.operators.binary.Combination
+ * @see org.gradoop.model.impl.operators.binary.Exclusion
+ * @see org.gradoop.model.impl.operators.binary.Overlap
  */
 public interface BinaryGraphToGraphOperator<VD extends VertexData, ED extends
   EdgeData, GD extends GraphData> extends

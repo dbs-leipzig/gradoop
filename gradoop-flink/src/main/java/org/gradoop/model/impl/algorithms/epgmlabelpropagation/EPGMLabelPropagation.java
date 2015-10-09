@@ -26,7 +26,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .CommunityDiscriminatorFunction;
-import org.gradoop.model.impl.operators.SplitBy;
+import org.gradoop.model.impl.operators.auxiliary.SplitBy;
 
 import java.io.Serializable;
 

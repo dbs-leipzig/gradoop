@@ -35,15 +35,19 @@ import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphFilter;
+import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
+import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphFilter;
+import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.util.Order;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.tuples.Subgraph;
-import org.gradoop.model.impl.operators.Difference;
-import org.gradoop.model.impl.operators.DifferenceUsingList;
-import org.gradoop.model.impl.operators.Intersect;
-import org.gradoop.model.impl.operators.IntersectUsingList;
-import org.gradoop.model.impl.operators.Union;
+import org.gradoop.model.impl.operators.collection.Difference;
+import org.gradoop.model.impl.operators.collection.DifferenceUsingList;
+import org.gradoop.model.impl.operators.collection.Intersect;
+import org.gradoop.model.impl.operators.collection.IntersectUsingList;
+import org.gradoop.model.impl.operators.collection.Union;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.GraphCollectionOperators;
@@ -115,14 +119,16 @@ public class GraphCollection<
     Exception {
     // filter vertices and edges based on given graph id
     Graph<Long, VD, ED> subGraph = getGellyGraph()
-      .subgraph(new VertexInGraphFilter<VD>(graphID),
+      .subgraph(
+        new VertexInGraphFilter<VD>(graphID),
         new EdgeInGraphFilter<ED>(graphID));
 
     DataSet<Tuple1<Long>> graphIDDataSet = getExecutionEnvironment()
       .fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
 
     // get graph data based on graph id
-    List<GD> graphData = this.subgraphs.joinWithTiny(graphIDDataSet)
+    List<GD> graphData = this.subgraphs
+      .joinWithTiny(graphIDDataSet)
       .where(new GraphKeySelector<GD>())
       .equalTo(0)
       .with(new JoinFunction<Subgraph<Long, GD>, Tuple1<Long>, GD>() {
@@ -204,7 +210,7 @@ public class GraphCollection<
         }
       });
 
-// get the identifiers of these subgraphs
+    // get the identifiers of these subgraphs
     final Collection<Long> graphIDs =
       filteredSubgraphs.map(new MapFunction<Subgraph<Long, GD>, Long>() {
 
@@ -215,9 +221,8 @@ public class GraphCollection<
       }).collect();
 
     // use graph ids to filter vertices from the actual graph structure
-    Graph<Long, VD, ED> filteredGraph = getGellyGraph().filterOnVertices(
-
-      new FilterFunction<Vertex<Long, VD>>() {
+    Graph<Long, VD, ED> filteredGraph = getGellyGraph()
+      .filterOnVertices(new FilterFunction<Vertex<Long, VD>>() {
         @Override
         public boolean filter(Vertex<Long, VD> v) throws Exception {
           for (Long graphID : v.getValue().getGraphs()) {
@@ -376,151 +381,5 @@ public class GraphCollection<
     this.getSubgraphs()
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
     getExecutionEnvironment().execute();
-  }
-
-  /**
-   * Checks if a vertex is contained in the given graph.
-   *
-   * @param <VD> vertex data type
-   */
-  private static class VertexInGraphFilter<VD extends VertexData> implements
-    FilterFunction<Vertex<Long, VD>> {
-
-    /**
-     * Graph identifier
-     */
-    private final long graphId;
-
-    /**
-     * Creates a filter
-     *
-     * @param graphId graphId for containment check
-     */
-    public VertexInGraphFilter(long graphId) {
-      this.graphId = graphId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean filter(Vertex<Long, VD> v) throws Exception {
-      return (v.getValue().getGraphCount() > 0) &&
-        v.getValue().getGraphs().contains(graphId);
-    }
-  }
-
-  /**
-   * Checks if an edge is contained in the given graph.
-   *
-   * @param <ED> edge data type
-   */
-  private static class EdgeInGraphFilter<ED extends EdgeData> implements
-    FilterFunction<Edge<Long, ED>> {
-
-    /**
-     * Graph identifier
-     */
-    private final long graphId;
-
-    /**
-     * Creates a filter
-     *
-     * @param graphId graphId for containment check
-     */
-    public EdgeInGraphFilter(long graphId) {
-      this.graphId = graphId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean filter(Edge<Long, ED> e) throws Exception {
-      return (e.getValue().getGraphCount() > 0) &&
-        e.getValue().getGraphs().contains(graphId);
-    }
-  }
-
-  /**
-   * Checks if a vertex is contained in at least one of the given logical
-   * graphs.
-   *
-   * @param <VD> vertex data type
-   */
-  private static class VertexInGraphsFilter<VD extends VertexData> implements
-    FilterFunction<Vertex<Long, VD>> {
-
-    /**
-     * Graph identifiers
-     */
-    private final List<Long> identifiers;
-
-    /**
-     * Creates a filter
-     *
-     * @param identifiers graph identifiers for containment check
-     */
-    public VertexInGraphsFilter(List<Long> identifiers) {
-      this.identifiers = identifiers;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean filter(Vertex<Long, VD> vertex) throws Exception {
-      boolean vertexInGraph = false;
-      if (vertex.getValue().getGraphCount() > 0) {
-        for (Long graph : vertex.getValue().getGraphs()) {
-          if (identifiers.contains(graph)) {
-            vertexInGraph = true;
-            break;
-          }
-        }
-      }
-      return vertexInGraph;
-    }
-  }
-
-  /**
-   * Checks if an edge is contained in at least one of the given logical
-   * graphs.
-   *
-   * @param <ED> edge data type
-   */
-  private static class EdgeInGraphsFilter<ED extends EdgeData> implements
-    FilterFunction<Edge<Long, ED>> {
-
-    /**
-     * Graph identifiers
-     */
-    private final List<Long> identifiers;
-
-    /**
-     * Creates a filter
-     *
-     * @param identifiers graph identifiers for containment check
-     */
-    public EdgeInGraphsFilter(List<Long> identifiers) {
-      this.identifiers = identifiers;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean filter(Edge<Long, ED> e) throws Exception {
-      boolean vertexInGraph = false;
-      if (e.getValue().getGraphCount() > 0) {
-        for (Long graph : e.getValue().getGraphs()) {
-          if (identifiers.contains(graph)) {
-            vertexInGraph = true;
-            break;
-          }
-        }
-      }
-      return vertexInGraph;
-    }
   }
 }

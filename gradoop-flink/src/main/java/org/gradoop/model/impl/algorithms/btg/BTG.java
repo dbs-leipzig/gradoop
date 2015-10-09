@@ -20,7 +20,7 @@ import org.gradoop.model.impl.algorithms.btg.functions
 import org.gradoop.model.impl.algorithms.btg.functions.VertexToBTGVertexMapper;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
-import org.gradoop.model.impl.operators.OverlapSplitBy;
+import org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy;
 
 /**
  * BTG Graph to Collection Operator.

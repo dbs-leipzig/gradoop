@@ -22,8 +22,8 @@ import org.gradoop.model.impl.functions.UnaryFunction;
 
 /**
  * Given a vertex, the method returns the community id, that vertex is in. This
- * is used by {@link org.gradoop.model.impl.operators.SplitBy} and
- * {@link org.gradoop.model.impl.operators.OverlapSplitBy}.
+ * is used by {@link org.gradoop.model.impl.operators.auxiliary.SplitBy} and
+ * {@link org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy}.
  *
  * @param <VD> vertex data type
  */

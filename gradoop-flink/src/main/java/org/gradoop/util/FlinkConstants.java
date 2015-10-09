@@ -28,25 +28,25 @@ public class FlinkConstants {
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.Combination}.
+   * {@link org.gradoop.model.impl.operators.binary.Combination}.
    */
   public static final Long COMBINE_GRAPH_ID = -2L;
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.Overlap}.
+   * {@link org.gradoop.model.impl.operators.binary.Overlap}.
    */
   public static final Long OVERLAP_GRAPH_ID = -3L;
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.Exclusion}.
+   * {@link org.gradoop.model.impl.operators.binary.Exclusion}.
    */
   public static final Long EXCLUDE_GRAPH_ID = -4L;
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.summarization.Summarization}.
+   * {@link org.gradoop.model.impl.operators.unary.summarization.Summarization}.
    */
   public static final Long SUMMARIZE_GRAPH_ID = -5L;
 }
