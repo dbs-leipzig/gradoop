@@ -23,6 +23,8 @@ import org.gradoop.model.api.EdgeData;
 
 /**
  * Used for distinction of edges based on their unique id.
+ *
+ * @param <ED> edge data type
  */
 public class EdgeKeySelector<ED extends EdgeData>
   implements KeySelector<Edge<Long, ED>, Long> {

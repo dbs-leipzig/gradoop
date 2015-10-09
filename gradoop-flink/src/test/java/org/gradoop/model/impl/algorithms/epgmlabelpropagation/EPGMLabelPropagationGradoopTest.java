@@ -1,6 +1,10 @@
-package org.gradoop.model.impl.algorithms.labelpropagation;
+package org.gradoop.model.impl.algorithms.epgmlabelpropagation;
 
 import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.impl.algorithms.epgmlabelpropagation
+  .EPGMLabelPropagation;
+import org.gradoop.model.impl.algorithms.epgmlabelpropagation
+  .EPGMLabelPropagationAlgorithm;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
 import org.gradoop.model.impl.pojo.DefaultGraphData;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
@@ -32,7 +36,7 @@ public class EPGMLabelPropagationGradoopTest extends FlinkTestBase {
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
       new EPGMLabelPropagation<DefaultVertexData, DefaultEdgeData,
-        DefaultGraphData>(2, propertyKey, getExecutionEnvironment()));
+              DefaultGraphData>(2, propertyKey, getExecutionEnvironment()));
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> sub1 =
       labeledGraphCollection.getGraph(-2L);
     assertEquals("Sub graph has no edge", 0L, sub1.getEdgeCount());

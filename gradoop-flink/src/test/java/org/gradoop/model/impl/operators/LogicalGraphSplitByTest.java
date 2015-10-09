@@ -3,6 +3,8 @@ package org.gradoop.model.impl.operators;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.api.Attributed;
+import org.gradoop.model.api.Element;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
@@ -28,25 +30,27 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
   public void testSplitBy() throws Exception {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       inputGraph = getGraphStore().getGraph(0L);
-    UnaryFunction<DefaultVertexData, Long> function = new SplitByIdOddOrEven();
+    UnaryFunction<DefaultVertexData, Long> splitFunc = new SplitByIdOddOrEven();
+
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
       new SplitBy<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
-        new SplitByIdOddOrEven(), getExecutionEnvironment()));
+        splitFunc,
+        getExecutionEnvironment()));
 
     List<DefaultVertexData> oldVertices = Lists.newArrayList();
-    inputGraph.getVertexData().output(
-      new LocalCollectionOutputFormat<>(oldVertices));
+    inputGraph.getVertexData()
+      .output(new LocalCollectionOutputFormat<>(oldVertices));
 
     List<DefaultVertexData> newVertices = Lists.newArrayList();
-    labeledGraphCollection.getVertexData().output(
-      new LocalCollectionOutputFormat<>(newVertices));
+    labeledGraphCollection.getVertexData()
+      .output(new LocalCollectionOutputFormat<>(newVertices));
 
     List<DefaultEdgeData> newEdges = Lists.newArrayList();
-    labeledGraphCollection.getEdgeData().output(
-      new LocalCollectionOutputFormat<>(newEdges));
+    labeledGraphCollection.getEdgeData()
+      .output(new LocalCollectionOutputFormat<>(newEdges));
 
-      assertNotNull("graph collection is null", labeledGraphCollection);
+    assertNotNull("graph collection is null", labeledGraphCollection);
     assertEquals("wrong number of graphs", 2L,
       labeledGraphCollection.getGraphCount());
     assertEquals("wrong number of vertices", 3L, newVertices.size());
@@ -57,7 +61,7 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
       DefaultVertexData newVertex = newVertices.get(i);
       assertTrue((oldVertex.getGraphCount() + 1) == newVertex.getGraphCount());
       assertTrue(newVertex.getGraphs().containsAll(oldVertex.getGraphs()));
-      assertTrue(newVertex.getGraphs().contains(function.execute(newVertex)));
+      assertTrue(newVertex.getGraphs().contains(splitFunc.execute(newVertex)));
     }
   }
 

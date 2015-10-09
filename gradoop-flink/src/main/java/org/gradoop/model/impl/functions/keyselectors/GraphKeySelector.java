@@ -23,6 +23,8 @@ import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
  * Returns the unique graph identifier.
+ *
+ * @param <GD> graph data type
  */
 public class GraphKeySelector<GD extends GraphData>
   implements KeySelector<Subgraph<Long, GD>, Long> {

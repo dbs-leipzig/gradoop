@@ -23,17 +23,17 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
-import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.tuples.Subgraph;
-import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.util.GConstants;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -119,8 +119,11 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
       new LongFromVertexSelector<>(vertexToLongFunc);
     // construct the list of subgraphs
     GraphDataFactory<GD> gdFactory = logicalGraph.getGraphDataFactory();
-    return vertices.groupBy(propertySelector).reduceGroup(
-      new SubgraphsFromGroupsReducer<>(vertexToLongFunc, gdFactory));
+    return vertices
+      .groupBy(propertySelector)
+      .reduceGroup(new SubgraphsFromGroupsReducer<>(
+        vertexToLongFunc,
+        gdFactory));
   }
 
   /**
@@ -252,8 +255,8 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
    * @param <GD> graph data type
    */
   private static class SubgraphsFromGroupsReducer<VD extends VertexData, GD
-    extends GraphData> implements
-    GroupReduceFunction<Vertex<Long, VD>, Subgraph<Long, GD>>,
+    extends GraphData>
+    implements GroupReduceFunction<Vertex<Long, VD>, Subgraph<Long, GD>>,
     ResultTypeQueryable<Vertex<Long, VD>> {
     /**
      * Mapping from vertex to long value

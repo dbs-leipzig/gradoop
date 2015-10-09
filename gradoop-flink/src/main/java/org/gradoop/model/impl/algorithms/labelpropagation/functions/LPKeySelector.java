@@ -15,21 +15,20 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.keyselectors;
+package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.graph.Edge;
-import org.gradoop.model.api.EdgeData;
+import org.apache.flink.graph.Vertex;
+import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 
 /**
- * Used to select the source vertex id of an edge.
- *
- * @param <ED> edge data type
+ * KeySelector class for the LP Vertex value
  */
-public class EdgeSourceVertexKeySelector<ED extends EdgeData>
-  implements KeySelector<Edge<Long, ED>, Long> {
+public class LPKeySelector
+  implements KeySelector<Vertex<Long, LPVertexValue>, Long> {
   @Override
-  public Long getKey(Edge<Long, ED> e) throws Exception {
-    return e.getSource();
+  public Long getKey(Vertex<Long, LPVertexValue> vertex) throws
+    Exception {
+    return vertex.getId();
   }
 }

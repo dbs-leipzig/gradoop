@@ -1,9 +1,27 @@
-package org.gradoop.model.impl.algorithms.labelpropagation;
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.gradoop.model.impl.algorithms.labelpropagation.pojos;
 
 /**
- * Value for LabelPropagationAlgorithm
+ * Custom vertex used by {@link org.gradoop.model.impl.algorithms
+ * .labelpropagation.LabelPropagationAlgorithm}.
  */
-public class LabelPropagationValue {
+public class LPVertexValue {
   /**
    * Vertex ID
    */
@@ -31,7 +49,7 @@ public class LabelPropagationValue {
    * @param id    actual vertex id
    * @param value actual vertex value
    */
-  public LabelPropagationValue(long id, long value) {
+  public LPVertexValue(long id, long value) {
     this.id = id;
     this.currentCommunity = value;
     this.lastCommunity = Long.MAX_VALUE;

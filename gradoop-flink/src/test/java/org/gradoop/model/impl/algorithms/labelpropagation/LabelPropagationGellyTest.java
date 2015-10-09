@@ -6,6 +6,7 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
 import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -61,10 +62,10 @@ public class LabelPropagationGellyTest extends FlinkTestBase {
   public void testConnectedGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
+    Graph<Long, LPVertexValue, NullValue> gellyGraph =
       LabelPropagationTestHelper
         .getGraph(getConnectedGraphWithVertexValues(), env);
-    DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
+    DataSet<Vertex<Long, LPVertexValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
     validateConnectedGraphResult(parseResult(labeledGraph.collect()));
   }
@@ -73,10 +74,10 @@ public class LabelPropagationGellyTest extends FlinkTestBase {
   public void testBipartiteGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
+    Graph<Long, LPVertexValue, NullValue> gellyGraph =
       LabelPropagationTestHelper
         .getGraph(getCompleteBipartiteGraphWithVertexValue(), env);
-    DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
+    DataSet<Vertex<Long, LPVertexValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
     validateCompleteBipartiteGraphResult(parseResult(labeledGraph.collect()));
   }
@@ -85,18 +86,18 @@ public class LabelPropagationGellyTest extends FlinkTestBase {
   public void testLoopGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, LabelPropagationValue, NullValue> gellyGraph =
+    Graph<Long, LPVertexValue, NullValue> gellyGraph =
       LabelPropagationTestHelper
         .getGraph(getLoopGraphWithVertexValues(), env);
-    DataSet<Vertex<Long, LabelPropagationValue>> labeledGraph =
+    DataSet<Vertex<Long, LPVertexValue>> labeledGraph =
       gellyGraph.run(new LabelPropagationAlgorithm(maxIteration)).getVertices();
     validateLoopGraphResult(parseResult(labeledGraph.collect()));
   }
 
   private Map<Long, Long> parseResult(
-    List<Vertex<Long, LabelPropagationValue>> graph) {
+    List<Vertex<Long, LPVertexValue>> graph) {
     Map<Long, Long> result = new HashMap<>();
-    for (Vertex<Long, LabelPropagationValue> v : graph) {
+    for (Vertex<Long, LPVertexValue> v : graph) {
       result.put(v.getId(), v.getValue().getCurrentCommunity());
     }
     return result;

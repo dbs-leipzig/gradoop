@@ -15,21 +15,29 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.keyselectors;
+package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
-import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.algorithms.epgmlabelpropagation
+  .EPGMLabelPropagationAlgorithm;
+import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 
 /**
- * Used for distinction of vertices based on their unique id.
+ * JoinFunction over VertexIDs
  *
  * @param <VD> vertex data type
  */
-public class VertexKeySelector<VD extends VertexData>
-  implements KeySelector<Vertex<Long, VD>, Long> {
+public class LPJoin<VD extends VertexData>
+  implements JoinFunction<Vertex<Long, LPVertexValue>, Vertex<Long, VD>,
+  Vertex<Long, VD>> {
   @Override
-  public Long getKey(Vertex<Long, VD> v) throws Exception {
-    return v.f0;
+  public Vertex<Long, VD> join(Vertex<Long, LPVertexValue> lpVertex,
+    Vertex<Long, VD> epVertex) throws Exception {
+    epVertex.getValue()
+      .setProperty(EPGMLabelPropagationAlgorithm.CURRENT_VALUE,
+        lpVertex.getValue().getCurrentCommunity());
+    return epVertex;
   }
 }

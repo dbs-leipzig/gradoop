@@ -1,6 +1,8 @@
 package org.gradoop.model.impl.algorithms.labelpropagation;
 
 import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.impl.algorithms.epgmlabelpropagation
+  .EPGMLabelPropagationAlgorithm;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
 import org.gradoop.model.impl.pojo.DefaultGraphData;
 import org.gradoop.model.impl.pojo.DefaultVertexData;

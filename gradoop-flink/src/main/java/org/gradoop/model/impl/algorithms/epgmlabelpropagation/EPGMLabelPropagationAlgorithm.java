@@ -15,16 +15,16 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.algorithms.labelpropagation;
+package org.gradoop.model.impl.algorithms.epgmlabelpropagation;
 
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.GraphAlgorithm;
-import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions
+import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
   .LPMessageFunction;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions
+import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
   .LPUpdateFunction;
-import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 
 /**
  * Implementation of the Label Propagation Algorithm:
@@ -38,10 +38,30 @@ import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
  * neighbor. If a vertex adopt a new value it'll propagate the new one again.
  * <p/>
  * The computation will terminate if no new values are assigned.
+ *
+ * @param <VD> VertexData contains information about the vertex
+ * @param <ED> EdgeData contains information about all edges of the vertex
  */
-public class LabelPropagationAlgorithm
-  implements GraphAlgorithm<Long, LPVertexValue, NullValue,
-    Graph<Long, LPVertexValue, NullValue>> {
+public class EPGMLabelPropagationAlgorithm<
+  VD extends VertexData,
+  ED extends EdgeData>
+  implements GraphAlgorithm<Long, VD, ED, Graph<Long, VD, ED>> {
+  /**
+   * Vertex property key where the resulting label is stored.
+   */
+  public static final String CURRENT_VALUE = "value";
+  /**
+   * Vertex property key where the lasat label is stored
+   */
+  public static final String LAST_VALUE = "lastvalue";
+  /**
+   * Vertex property key where stabilization counter is stored
+   */
+  public static final String STABILIZATION_COUNTER = "stabilization.counter";
+  /**
+   * Vertex property key where the stabilization maxima is stored
+   */
+  public static final String STABILIZATION_MAX = "stabilization.max";
   /**
    * Counter to define maximal Iteration for the Algorithm
    */
@@ -52,7 +72,7 @@ public class LabelPropagationAlgorithm
    *
    * @param maxIterations int counter to define maximal Iterations
    */
-  public LabelPropagationAlgorithm(int maxIterations) {
+  public EPGMLabelPropagationAlgorithm(int maxIterations) {
     this.maxIterations = maxIterations;
   }
 
@@ -64,15 +84,13 @@ public class LabelPropagationAlgorithm
    * @throws Exception
    */
   @Override
-  public Graph<Long, LPVertexValue, NullValue> run(
-    Graph<Long, LPVertexValue, NullValue> graph) throws Exception {
+  public Graph<Long, VD, ED> run(Graph<Long, VD, ED> graph) throws Exception {
     // initialize vertex values and run the Vertex Centric Iteration
-    Graph<Long, LPVertexValue, NullValue> gellyGraph =
-      graph.getUndirected();
-    return gellyGraph
+    Graph<Long, VD, ED> epGraph = graph.getUndirected();
+    return epGraph
       .runVertexCentricIteration(
-        new LPUpdateFunction(),
-        new LPMessageFunction(),
+        new LPUpdateFunction<VD>(),
+        new LPMessageFunction<VD, ED>(),
         maxIterations);
   }
 }

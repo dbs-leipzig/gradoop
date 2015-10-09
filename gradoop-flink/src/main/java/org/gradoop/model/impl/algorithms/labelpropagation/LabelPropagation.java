@@ -1,10 +1,24 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.algorithms.labelpropagation;
 
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
@@ -12,12 +26,21 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.algorithms.labelpropagation.functions
+  .CommunityDiscriminatorFunction;
+import org.gradoop.model.impl.algorithms.labelpropagation.functions
+  .EdgeToLPEdgeMapper;
+import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPJoin;
+import org.gradoop.model.impl.algorithms.labelpropagation.functions
+  .LPKeySelector;
+import org.gradoop.model.impl.algorithms.labelpropagation.functions
+  .VertexToLPVertexMapper;
+import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.operators.SplitBy;
-import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 
 /**
  * LabelPropagation Graph to Collection Operator.
@@ -29,9 +52,11 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
  * @param <GD> GraphData contains information about the graphs of the vertex
  * @see LabelPropagationAlgorithm
  */
-public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> implements
-  UnaryGraphToCollectionOperator<VD, ED, GD> {
+public class LabelPropagation<
+  VD extends VertexData,
+  ED extends EdgeData,
+  GD extends GraphData>
+  implements UnaryGraphToCollectionOperator<VD, ED, GD> {
   /**
    * Counter to define maximal Iteration for the Algorithm
    */
@@ -65,34 +90,26 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
   @Override
   public GraphCollection<VD, ED, GD> execute(
     LogicalGraph<VD, ED, GD> epGraph) throws Exception {
-    DataSet<Vertex<Long, LabelPropagationValue>> vertices =
-      epGraph.getVertices().map(
-        new MapFunction<Vertex<Long, VD>, Vertex<Long,
-          LabelPropagationValue>>() {
-          @Override
-          public Vertex<Long, LabelPropagationValue> map(
-            Vertex<Long, VD> vertex) throws Exception {
-            return new Vertex<>(vertex.getId(),
-              new LabelPropagationValue(vertex.getId(), vertex.getId()));
-          }
-        });
-    DataSet<Edge<Long, NullValue>> edges = epGraph.getEdges()
-      .map(new MapFunction<Edge<Long, ED>, Edge<Long, NullValue>>() {
-        @Override
-        public Edge<Long, NullValue> map(Edge<Long, ED> edge) throws Exception {
-          return new Edge<>(edge.getSource(), edge.getTarget(),
-            NullValue.getInstance());
-        }
-      });
-    Graph<Long, LabelPropagationValue, NullValue> graph =
+    // transform vertices and edges to LP representation
+    DataSet<Vertex<Long, LPVertexValue>> vertices = epGraph
+      .getVertices().map(new VertexToLPVertexMapper<VD>());
+    DataSet<Edge<Long, NullValue>> edges = epGraph
+      .getEdges().map(new EdgeToLPEdgeMapper<ED>());
+
+    // construct gelly graph and execute the algorithm
+    Graph<Long, LPVertexValue, NullValue> graph =
       Graph.fromDataSet(vertices, edges, env);
     graph = graph.run(new LabelPropagationAlgorithm(this.maxIterations));
+
+    // map the result back to the original vertex set
     DataSet<Vertex<Long, VD>> labeledVertices =
-      graph.getVertices().join(epGraph.getVertices())
+      graph.getVertices()
+        .join(epGraph.getVertices())
         .where(new LPKeySelector())
         .equalTo(new VertexKeySelector<VD>())
         .with(new LPJoin<VD>());
 
+    // create a logical graph from the result
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
       .fromDataSets(labeledVertices,
         epGraph.getEdges(),
@@ -100,37 +117,12 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
         epGraph.getVertexDataFactory(),
         epGraph.getEdgeDataFactory(),
         epGraph.getGraphDataFactory());
-    LongFromProperty<VD> lfp = new LongFromProperty<>(propertyKey);
-    SplitBy<VD, ED, GD> callByPropertyKey = new SplitBy<>(lfp, env);
-    return callByPropertyKey.execute(labeledGraph);
-  }
 
-  /**
-   * KeySelector class for LPVertex
-   */
-  private static class LPKeySelector implements
-    KeySelector<Vertex<Long, LabelPropagationValue>, Long> {
-    @Override
-    public Long getKey(Vertex<Long, LabelPropagationValue> vertex) throws
-      Exception {
-      return vertex.getId();
-    }
-  }
-
-  /**
-   * JoinFunction over LPVertex id and EPVertex id
-   */
-  private static class LPJoin<VD extends VertexData> implements
-    JoinFunction<Vertex<Long, LabelPropagationValue>, Vertex<Long, VD>,
-      Vertex<Long, VD>> {
-    @Override
-    public Vertex<Long, VD> join(Vertex<Long, LabelPropagationValue> lpVertex,
-      Vertex<Long, VD> epVertex) throws Exception {
-      epVertex.getValue()
-        .setProperty(EPGMLabelPropagationAlgorithm.CURRENT_VALUE,
-          lpVertex.getValue().getCurrentCommunity());
-      return epVertex;
-    }
+    // and split it into a collection according the result
+    return new SplitBy<VD, ED, GD>(
+      new CommunityDiscriminatorFunction<VD>(propertyKey),
+      env)
+      .execute(labeledGraph);
   }
 
   /**
@@ -138,35 +130,6 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
    */
   @Override
   public String getName() {
-    return "labelpropagation";
-  }
-
-  /**
-   * Class defining a mapping from vertex to value (long) of a property of this
-   * vertex
-   */
-  private static class LongFromProperty<VD extends VertexData> implements
-    UnaryFunction<VD, Long> {
-    /**
-     * String propertyKey
-     */
-    private String propertyKey;
-
-    /**
-     * Constructor
-     *
-     * @param propertyKey propertyKey for the property map
-     */
-    public LongFromProperty(String propertyKey) {
-      this.propertyKey = propertyKey;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Long execute(VD entity) throws Exception {
-      return ((Long) entity.getProperty(propertyKey) + 1) * -1;
-    }
+    return LabelPropagation.class.getName();
   }
 }

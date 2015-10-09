@@ -1,10 +1,12 @@
-package org.gradoop.model.impl.algorithms.labelpropagation;
+package org.gradoop.model.impl.algorithms.epgmlabelpropagation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.impl.algorithms.labelpropagation
+  .LabelPropagationTestHelper;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
 import org.junit.Test;

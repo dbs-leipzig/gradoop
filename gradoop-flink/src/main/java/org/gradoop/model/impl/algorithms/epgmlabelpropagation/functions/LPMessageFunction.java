@@ -15,21 +15,34 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.keyselectors;
+package org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions;
 
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.spargel.MessagingFunction;
+import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.VertexData;
 
+import static org.gradoop.model.impl.algorithms.epgmlabelpropagation
+  .EPGMLabelPropagationAlgorithm.CURRENT_VALUE;
+
 /**
- * Used for distinction of vertices based on their unique id.
+ * Distributes the value of the vertex
  *
  * @param <VD> vertex data type
+ * @param <ED> edge data type
  */
-public class VertexKeySelector<VD extends VertexData>
-  implements KeySelector<Vertex<Long, VD>, Long> {
+public class LPMessageFunction<
+  VD extends VertexData,
+  ED extends EdgeData>
+  extends MessagingFunction<Long, VD, Long, ED> {
   @Override
-  public Long getKey(Vertex<Long, VD> v) throws Exception {
-    return v.f0;
+  public void sendMessages(Vertex<Long, VD> vertex) throws Exception {
+    // send current minimum to neighbors
+    if (getSuperstepNumber() == 1) {
+      sendMessageToAllNeighbors(0L);
+    } else {
+      sendMessageToAllNeighbors(
+        (Long) vertex.getValue().getProperty(CURRENT_VALUE));
+    }
   }
 }

@@ -6,6 +6,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
+import org.gradoop.model.impl.algorithms.epgmlabelpropagation
+  .EPGMLabelPropagationAlgorithm;
+import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
 import org.gradoop.model.impl.pojo.DefaultEdgeDataFactory;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
@@ -22,15 +25,15 @@ import java.util.regex.Pattern;
 public class LabelPropagationTestHelper {
   private static final Pattern SEPARATOR = Pattern.compile(" ");
 
-  public static Graph<Long, LabelPropagationValue, NullValue> getGraph(
+  public static Graph<Long, LPVertexValue, NullValue> getGraph(
     String[] graph, ExecutionEnvironment env) {
-    List<Vertex<Long, LabelPropagationValue>> vertices = Lists.newArrayList();
+    List<Vertex<Long, LPVertexValue>> vertices = Lists.newArrayList();
     List<Edge<Long, NullValue>> edges = Lists.newArrayList();
     for (String line : graph) {
       String[] tokens = SEPARATOR.split(line);
       long id = Long.parseLong(tokens[0]);
       long value = Long.parseLong(tokens[1]);
-      vertices.add(new Vertex<>(id, new LabelPropagationValue(id, value)));
+      vertices.add(new Vertex<>(id, new LPVertexValue(id, value)));
       for (int n = 2; n < tokens.length; n++) {
         long tar = Long.parseLong(tokens[n]);
         edges.add(new Edge<>(id, tar, NullValue.getInstance()));

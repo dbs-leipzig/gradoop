@@ -17,16 +17,14 @@
 
 package org.gradoop.model.impl.functions.keyselectors;
 
-/**
- * Used to select the target vertex id of an edge.
- */
-
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.graph.Edge;
 import org.gradoop.model.api.EdgeData;
 
 /**
  * Used to select the target vertex id of an edge.
+ *
+ * @param <ED> edge data type
  */
 public class EdgeTargetVertexKeySelector<ED extends EdgeData>
   implements KeySelector<Edge<Long, ED>, Long> {

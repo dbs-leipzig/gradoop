@@ -15,21 +15,23 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.keyselectors;
+package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
-import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Edge;
+import org.apache.flink.types.NullValue;
 import org.gradoop.model.api.EdgeData;
 
 /**
- * Used to select the source vertex id of an edge.
+ * Maps EPGM edges to a Label propagation specific representation.
  *
  * @param <ED> edge data type
  */
-public class EdgeSourceVertexKeySelector<ED extends EdgeData>
-  implements KeySelector<Edge<Long, ED>, Long> {
+public class EdgeToLPEdgeMapper<ED extends EdgeData>
+  implements MapFunction<Edge<Long, ED>, Edge<Long, NullValue>> {
   @Override
-  public Long getKey(Edge<Long, ED> e) throws Exception {
-    return e.getSource();
+  public Edge<Long, NullValue> map(Edge<Long, ED> edge) throws Exception {
+    return new Edge<>(edge.getSource(), edge.getTarget(),
+      NullValue.getInstance());
   }
 }

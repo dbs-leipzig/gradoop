@@ -164,8 +164,7 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     // target vertex and the list of new graphs
     DataSet<Tuple4<Long, List<Long>, List<Long>, List<Long>>>
       edgesWithSubgraphs = edgeGraphsGraphs
-      .crossWithTiny(newSubgraphIdentifiers)
-      .with(new CrossEdgesWithGraphSet());
+      .crossWithTiny(newSubgraphIdentifiers).with(new CrossEdgesWithGraphSet());
     // remove all edges which source and target are not in at least one common
     // graph
     DataSet<Tuple2<Long, List<Long>>> newSubgraphs = edgesWithSubgraphs

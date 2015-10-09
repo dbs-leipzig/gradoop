@@ -15,21 +15,7 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.keyselectors;
-
-import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.graph.Edge;
-import org.gradoop.model.api.EdgeData;
-
 /**
- * Used to select the source vertex id of an edge.
- *
- * @param <ED> edge data type
+ * Contains POJOs used for the Label Propagation algorithm.
  */
-public class EdgeSourceVertexKeySelector<ED extends EdgeData>
-  implements KeySelector<Edge<Long, ED>, Long> {
-  @Override
-  public Long getKey(Edge<Long, ED> e) throws Exception {
-    return e.getSource();
-  }
-}
+package org.gradoop.model.impl.algorithms.labelpropagation.pojos;
