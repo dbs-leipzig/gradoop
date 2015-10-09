@@ -35,7 +35,7 @@ import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.api.VertexDataFactory;
-import org.gradoop.model.impl.functions.KeySelectors;
+import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.util.Order;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.tuples.Subgraph;
@@ -123,7 +123,8 @@ public class GraphCollection<
 
     // get graph data based on graph id
     List<GD> graphData = this.subgraphs.joinWithTiny(graphIDDataSet)
-      .where(new KeySelectors.GraphKeySelector<GD>()).equalTo(0)
+      .where(new GraphKeySelector<GD>())
+      .equalTo(0)
       .with(new JoinFunction<Subgraph<Long, GD>, Tuple1<Long>, GD>() {
         @Override
         public GD join(Subgraph<Long, GD> g, Tuple1<Long> gID) throws

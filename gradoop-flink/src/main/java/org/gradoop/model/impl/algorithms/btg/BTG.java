@@ -19,7 +19,7 @@ import org.gradoop.model.impl.algorithms.btg.functions
   .LongListFromPropertyFunction;
 import org.gradoop.model.impl.algorithms.btg.functions.VertexToBTGVertexMapper;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
-import org.gradoop.model.impl.functions.KeySelectors;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.operators.OverlapSplitBy;
 
 /**
@@ -82,8 +82,8 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
     btgGraph = btgGraph.run(new BTGAlgorithm(this.maxIterations));
     DataSet<Vertex<Long, VD>> btgLabeledVertices =
       btgGraph.getVertices().join(logicalGraph.getVertices())
-        .where(new BTGKeySelector()).equalTo(
-          new KeySelectors.VertexKeySelector<VD>())
+        .where(new BTGKeySelector())
+        .equalTo(new VertexKeySelector<VD>())
         .with(new BTGJoin<VD>());
     // create new graph
     LogicalGraph<VD, ED, GD> btgEPGraph = LogicalGraph

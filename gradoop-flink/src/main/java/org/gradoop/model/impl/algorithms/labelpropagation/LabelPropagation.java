@@ -12,10 +12,10 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.KeySelectors;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.operators.SplitBy;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 
@@ -90,7 +90,7 @@ public class LabelPropagation<VD extends VertexData, ED extends EdgeData, GD
     DataSet<Vertex<Long, VD>> labeledVertices =
       graph.getVertices().join(epGraph.getVertices())
         .where(new LPKeySelector())
-        .equalTo(new KeySelectors.VertexKeySelector<VD>())
+        .equalTo(new VertexKeySelector<VD>())
         .with(new LPJoin<VD>());
 
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph

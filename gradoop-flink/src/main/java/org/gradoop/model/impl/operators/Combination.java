@@ -24,8 +24,9 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.util.FlinkConstants;
-import org.gradoop.model.impl.functions.KeySelectors;
 import org.gradoop.model.impl.LogicalGraph;
 
 /**
@@ -53,12 +54,12 @@ public class Combination<VD extends VertexData, ED extends EdgeData, GD
     // cannot use Gelly union here because of missing argument for KeySelector
     DataSet<Vertex<Long, VD>> newVertexSet =
       firstGraph.getVertices().union(secondGraph.getVertices())
-        .distinct(new KeySelectors.VertexKeySelector<VD>())
+        .distinct(new VertexKeySelector<VD>())
         .map(new VertexToGraphUpdater<VD>(newGraphID));
 
     DataSet<Edge<Long, ED>> newEdgeSet =
       firstGraph.getEdges().union(secondGraph.getEdges())
-        .distinct(new KeySelectors.EdgeKeySelector<ED>())
+        .distinct(new EdgeKeySelector<ED>())
         .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return LogicalGraph.fromGellyGraph(Graph

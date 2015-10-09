@@ -10,7 +10,13 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.KeySelectors;
+import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
+import org.gradoop.model.impl.functions.keyselectors
+  .EdgeSourceVertexKeySelector;
+import org.gradoop.model.impl.functions.keyselectors
+  .EdgeTargetVertexKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
@@ -53,17 +59,20 @@ public abstract class SetOperator<VD extends VertexData, ED extends EdgeData,
           }
         });
 
-    return verticesWithGraphs.join(newSubgraphs).where(1)
-      .equalTo(new KeySelectors.GraphKeySelector<GD>()).with(
+    return verticesWithGraphs
+      .join(newSubgraphs)
+      .where(1)
+      .equalTo(new GraphKeySelector<GD>())
+      .with(
         new JoinFunction<Tuple2<Vertex<Long, VD>, Long>, Subgraph<Long, GD>,
           Vertex<Long, VD>>() {
-
           @Override
           public Vertex<Long, VD> join(Tuple2<Vertex<Long, VD>, Long> vertices,
             Subgraph<Long, GD> subgraph) throws Exception {
             return vertices.f0;
           }
-        }).distinct(new KeySelectors.VertexKeySelector<VD>());
+        })
+      .distinct(new VertexKeySelector<VD>());
   }
 
   /**
@@ -79,12 +88,12 @@ public abstract class SetOperator<VD extends VertexData, ED extends EdgeData,
   protected DataSet<Edge<Long, ED>> computeNewEdges(
     DataSet<Vertex<Long, VD>> newVertices) {
     return firstGraph.getEdges().join(newVertices)
-      .where(new KeySelectors.EdgeSourceVertexKeySelector<ED>())
-      .equalTo(new KeySelectors.VertexKeySelector<VD>())
+      .where(new EdgeSourceVertexKeySelector<ED>())
+      .equalTo(new VertexKeySelector<VD>())
       .with(new EdgeJoinFunction<VD, ED>()).join(newVertices)
-      .where(new KeySelectors.EdgeTargetVertexKeySelector<ED>())
-      .equalTo(new KeySelectors.VertexKeySelector<VD>())
+      .where(new EdgeTargetVertexKeySelector<ED>())
+      .equalTo(new VertexKeySelector<VD>())
       .with(new EdgeJoinFunction<VD, ED>())
-      .distinct(new KeySelectors.EdgeKeySelector<ED>());
+      .distinct(new EdgeKeySelector<ED>());
   }
 }

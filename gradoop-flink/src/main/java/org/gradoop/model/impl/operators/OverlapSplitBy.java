@@ -25,10 +25,10 @@ import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.KeySelectors;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 
@@ -143,31 +143,39 @@ public class OverlapSplitBy<VD extends VertexData, ED extends EdgeData, GD
     DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex =
       logicalGraph.getEdges().map(new EdgeToTupleMapper<ED>());
     // replace the source vertex id by the graph list of this vertex
-    DataSet<Tuple3<Long, List<Long>, Long>> edgeGraphsVertex =
-      edgeVertexVertex.join(vertices).where(1).equalTo(0)
+    DataSet<Tuple3<Long, List<Long>, Long>> edgeGraphsVertex = edgeVertexVertex
+        .join(vertices)
+        .where(1)
+        .equalTo(0)
         .with(new JoinEdgeTupleWithSourceGraphs<VD>());
     // replace the target vertex id by the graph list of this vertex
     DataSet<Tuple3<Long, List<Long>, List<Long>>> edgeGraphsGraphs =
-      edgeGraphsVertex.join(vertices).where(2).equalTo(0)
+      edgeGraphsVertex
+        .join(vertices)
+        .where(2)
+        .equalTo(0)
         .with(new JoinEdgeTupleWithTargetGraphs<VD>());
     // transform the new subgraphs into a single set of long, containing all
     // the identifiers
-    DataSet<List<Long>> newSubgraphIdentifiers =
-      subgraphs.map(new MapSubgraphIdToSet<GD>()).reduce(new ReduceSets());
+    DataSet<List<Long>> newSubgraphIdentifiers = subgraphs
+      .map(new MapSubgraphIdToSet<GD>())
+      .reduce(new ReduceSets());
     // construct new tuples containing the edge, the graphs of its source and
     // target vertex and the list of new graphs
     DataSet<Tuple4<Long, List<Long>, List<Long>, List<Long>>>
-      edgesWithSubgraphs =
-      edgeGraphsGraphs.crossWithTiny(newSubgraphIdentifiers)
-        .with(new CrossEdgesWithGraphSet());
+      edgesWithSubgraphs = edgeGraphsGraphs
+      .crossWithTiny(newSubgraphIdentifiers)
+      .with(new CrossEdgesWithGraphSet());
     // remove all edges which source and target are not in at least one common
     // graph
-    DataSet<Tuple2<Long, List<Long>>> newSubgraphs =
-      edgesWithSubgraphs.flatMap(new CheckEdgesSourceTargetGraphs());
+    DataSet<Tuple2<Long, List<Long>>> newSubgraphs = edgesWithSubgraphs
+      .flatMap(new CheckEdgesSourceTargetGraphs());
     // join the graph set tuples with the edges, add all new graphs to the
     // edge graph sets
-    return logicalGraph.getEdges().join(newSubgraphs)
-      .where(new KeySelectors.EdgeKeySelector<ED>()).equalTo(0)
+    return logicalGraph.getEdges()
+      .join(newSubgraphs)
+      .where(new EdgeKeySelector<ED>())
+      .equalTo(0)
       .with(new JoinEdgeTuplesWithEdges<ED>());
   }
 

@@ -24,8 +24,12 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.functions.keyselectors
+  .EdgeSourceVertexKeySelector;
+import org.gradoop.model.impl.functions.keyselectors
+  .EdgeTargetVertexKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.util.FlinkConstants;
-import org.gradoop.model.impl.functions.KeySelectors;
 import org.gradoop.model.impl.LogicalGraph;
 
 /**
@@ -54,8 +58,9 @@ public class Exclusion<VD extends VertexData, ED extends EdgeData, GD extends
     // called on
     DataSet<Vertex<Long, VD>> newVertexSet =
       firstGraph.getVertices().union(secondGraph.getVertices())
-        .groupBy(new KeySelectors.VertexKeySelector<VD>()).reduceGroup(
-        new VertexGroupReducer<VD>(1L, firstGraph.getId(), secondGraph.getId()))
+        .groupBy(new VertexKeySelector<VD>())
+        .reduceGroup(new VertexGroupReducer<VD>(1L, firstGraph.getId(),
+          secondGraph.getId()))
         .map(new VertexToGraphUpdater<VD>(newGraphID));
 
     JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> joinFunc =
@@ -72,11 +77,11 @@ public class Exclusion<VD extends VertexData, ED extends EdgeData, GD extends
     // from the left graph with the new vertex set using source and target ids.
     DataSet<Edge<Long, ED>> newEdgeSet = firstGraph.getEdges()
       .join(newVertexSet)
-      .where(new KeySelectors.EdgeSourceVertexKeySelector<ED>())
-      .equalTo(new KeySelectors.VertexKeySelector<VD>()).with(joinFunc)
+      .where(new EdgeSourceVertexKeySelector<ED>())
+      .equalTo(new VertexKeySelector<VD>()).with(joinFunc)
       .join(newVertexSet)
-      .where(new KeySelectors.EdgeTargetVertexKeySelector<ED>())
-      .equalTo(new KeySelectors.VertexKeySelector<VD>()).with(joinFunc)
+      .where(new EdgeTargetVertexKeySelector<ED>())
+      .equalTo(new VertexKeySelector<VD>()).with(joinFunc)
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return LogicalGraph.fromDataSets(

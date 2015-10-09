@@ -23,12 +23,12 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
+import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.KeySelectors;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -163,8 +163,10 @@ public class SplitBy<VD extends VertexData, ED extends EdgeData, GD extends
       edgesWithSubgraphs.flatMap(new CheckEdgesSourceTargetGraphs());
     // join the graph set tuples with the edges, add all new graphs to the
     // edge graph sets
-    return logicalGraph.getEdges().join(newSubgraphs)
-      .where(new KeySelectors.EdgeKeySelector<ED>()).equalTo(0)
+    return logicalGraph.getEdges()
+      .join(newSubgraphs)
+      .where(new EdgeKeySelector<ED>())
+      .equalTo(0)
       .with(new JoinEdgeTuplesWithEdges<ED>());
   }
 

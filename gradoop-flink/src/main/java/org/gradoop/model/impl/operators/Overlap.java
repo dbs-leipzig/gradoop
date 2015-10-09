@@ -23,8 +23,9 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.util.FlinkConstants;
-import org.gradoop.model.impl.functions.KeySelectors;
 import org.gradoop.model.impl.LogicalGraph;
 
 /**
@@ -50,17 +51,17 @@ public class Overlap<VD extends VertexData, ED extends EdgeData, GD extends
 
     // union vertex sets, group by vertex id, filter vertices where
     // the group contains two vertices and update them with the new graph id
-    DataSet<Vertex<Long, VD>> newVertexSet =
-      firstGraph.getVertices().union(secondGraph.getVertices())
-        .groupBy(new KeySelectors.VertexKeySelector<VD>())
-        .reduceGroup(new VertexGroupReducer<VD>(2L))
-        .map(new VertexToGraphUpdater<VD>(newGraphID));
+    DataSet<Vertex<Long, VD>> newVertexSet = firstGraph.getVertices()
+      .union(secondGraph.getVertices())
+      .groupBy(new VertexKeySelector<VD>())
+      .reduceGroup(new VertexGroupReducer<VD>(2L))
+      .map(new VertexToGraphUpdater<VD>(newGraphID));
 
-    DataSet<Edge<Long, ED>> newEdgeSet =
-      firstGraph.getEdges().union(secondGraph.getEdges())
-        .groupBy(new KeySelectors.EdgeKeySelector<ED>())
-        .reduceGroup(new EdgeGroupReducer<ED>(2L))
-        .map(new EdgeToGraphUpdater<ED>(newGraphID));
+    DataSet<Edge<Long, ED>> newEdgeSet = firstGraph.getEdges()
+      .union(secondGraph.getEdges())
+      .groupBy(new EdgeKeySelector<ED>())
+      .reduceGroup(new EdgeGroupReducer<ED>(2L))
+      .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return LogicalGraph.fromDataSets(
       newVertexSet,

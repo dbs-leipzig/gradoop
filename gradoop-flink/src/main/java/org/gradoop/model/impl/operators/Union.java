@@ -23,7 +23,9 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.KeySelectors;
+import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
@@ -44,8 +46,9 @@ public class Union<VD extends VertexData, ED extends EdgeData, GD extends
   @Override
   protected DataSet<Vertex<Long, VD>> computeNewVertices(
     DataSet<Subgraph<Long, GD>> newSubgraphs) throws Exception {
-    return firstGraph.getVertices().union(secondGraph.getVertices())
-      .distinct(new KeySelectors.VertexKeySelector<VD>());
+    return firstGraph.getVertices()
+      .union(secondGraph.getVertices())
+      .distinct(new VertexKeySelector<VD>());
   }
 
   /**
@@ -53,8 +56,9 @@ public class Union<VD extends VertexData, ED extends EdgeData, GD extends
    */
   @Override
   protected DataSet<Subgraph<Long, GD>> computeNewSubgraphs() {
-    return firstSubgraphs.union(secondSubgraphs)
-      .distinct(new KeySelectors.GraphKeySelector<GD>());
+    return firstSubgraphs
+      .union(secondSubgraphs)
+      .distinct(new GraphKeySelector<GD>());
   }
 
   /**
@@ -63,8 +67,9 @@ public class Union<VD extends VertexData, ED extends EdgeData, GD extends
   @Override
   protected DataSet<Edge<Long, ED>> computeNewEdges(
     DataSet<Vertex<Long, VD>> newVertices) {
-    return firstGraph.getEdges().union(secondGraph.getEdges())
-      .distinct(new KeySelectors.EdgeKeySelector<ED>());
+    return firstGraph.getEdges()
+      .union(secondGraph.getEdges())
+      .distinct(new EdgeKeySelector<ED>());
   }
 
   /**

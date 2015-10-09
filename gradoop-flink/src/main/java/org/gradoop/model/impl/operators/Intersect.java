@@ -4,7 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.KeySelectors;
+import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
@@ -30,7 +30,7 @@ public class Intersect<VD extends VertexData, ED extends EdgeData, GD extends
   @Override
   protected DataSet<Subgraph<Long, GD>> computeNewSubgraphs() {
     return firstSubgraphs.union(secondSubgraphs)
-      .groupBy(new KeySelectors.GraphKeySelector<GD>())
+      .groupBy(new GraphKeySelector<GD>())
       .reduceGroup(new SubgraphGroupReducer<GD>(2));
   }
 
