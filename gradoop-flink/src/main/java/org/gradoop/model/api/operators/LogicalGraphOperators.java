@@ -14,16 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.api.operators;
 
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.Predicate;
-import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.Predicate;
+import org.gradoop.model.impl.functions.UnaryFunction;
 
 /**
  * Describes all operators that can be applied on a single logical graph in the
@@ -87,14 +86,14 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * @return logical graph with random nodes and their associated edges
    * @throws Exception
    */
-  LogicalGraph<VD, ED, GD> sampleRandomNodes(Long sampleSize) throws Exception;
+  LogicalGraph<VD, ED, GD> sampleRandomNodes(Float sampleSize) throws Exception;
 
   /* Summarization */
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by the given property key. Edges are grouped
    * accordingly. Vertices with missing property key are represented by an
    * additional vertex.
@@ -109,7 +108,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by the given property key, edges are grouped by the
    * given property key. Vertices and edges with missing property key are
    * represented by an additional vertex.
@@ -126,7 +125,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by their label. Edges are grouped accordingly.
    *
    * @return summarized logical graph
@@ -138,7 +137,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by their label and the given property key. Edges are
    * grouped accordingly. Vertices with missing property key are represented
    * by an additional vertex.
@@ -154,7 +153,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by their label. Edges are grouped by the given
    * property key. Edges with missing property key are represented by an
    * additional edge.
@@ -170,7 +169,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by their label and the given property key. Edges are
    * grouped the given property key.
    * Vertices and edges with missing property keys are represented by an
@@ -188,7 +187,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by their label, edges are grouped
    * by their label.
    *
@@ -201,7 +200,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by their label and the  given property key. Edges are
    * grouped by their label. Vertices with missing property key are
    * represented by an additional vertex.
@@ -217,7 +216,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices are grouped by their label. Edges are grouped by their label
    * and the given property key.
    * Edges with missing property key are represented by an
@@ -234,7 +233,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p>
+   * <p/>
    * Vertices and edges are grouped by their label and the given property keys.
    * Vertices and edges with missing property key are represented by an
    * additional vertex / edge.
@@ -325,7 +324,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * Writes the logical graph into three separate JSON files. {@code
    * vertexFile} contains the vertex data, {@code edgeFile} contains the edge
    * data and {@code graphFile} contains the graph data of that logical graph.
-   * <p>
+   * <p/>
    * Operation uses Flink to write the internal datasets, thus writing to
    * local file system ({@code file://}) as well as HDFS ({@code hdfs://}) is
    * supported.

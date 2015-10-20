@@ -52,15 +52,22 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
   /**
    *
    */
-  private final Long sampleSize;
+  private final Float sampleSize;
+  private final Long randomSeed;
 
   /**
    * Creates new aggregation.
    *
-   * @param sampleSize     size of the sample
+   * @param sampleSize size of the sample
    */
-  public RandomNodeSampling(Long sampleSize) {
+  public RandomNodeSampling(Float sampleSize) {
     this.sampleSize = sampleSize;
+    this.randomSeed = null;
+  }
+
+  public RandomNodeSampling(Float sampleSize, Long randomSeed) {
+    this.sampleSize = sampleSize;
+    this.randomSeed = randomSeed;
   }
 
   /**
@@ -71,10 +78,14 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
     Exception {
     final Long newGraphID = FlinkConstants.RANDOM_NODE_SAMPLING_GRAPH_ID;
     DataSet<Vertex<Long, VD>> vertices = graph.getVertices();
-    Long vertexCount = vertices.count();
-    vertices =
-      vertices.filter(new VertexRandomFilter<VD>(sampleSize, vertexCount))
+    if (randomSeed != null) {
+      vertices =
+        vertices.filter(new VertexRandomFilter<VD>(sampleSize, randomSeed))
+          .map(new VertexToGraphUpdater<VD>(newGraphID));
+    } else {
+      vertices = vertices.filter(new VertexRandomFilter<VD>(sampleSize))
         .map(new VertexToGraphUpdater<VD>(newGraphID));
+    }
     JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> joinFunc =
       new JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>>() {
         @Override
@@ -103,14 +114,19 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
     return RandomNodeSampling.class.getName();
   }
 
-  public static class VertexRandomFilter<VD extends VertexData> implements
+  private static class VertexRandomFilter<VD extends VertexData> implements
     FilterFunction<Vertex<Long, VD>> {
     Float threshold;
     Random randomGenerator;
 
-    public VertexRandomFilter(Long sampleSize, Long vertexCount) {
-      threshold = ((float) sampleSize) / ((float) vertexCount);
+    public VertexRandomFilter(Float sampleSize) {
+      threshold = sampleSize;
       randomGenerator = new Random();
+    }
+
+    public VertexRandomFilter(Float sampleSize, Long randomSeed) {
+      threshold = sampleSize;
+      randomGenerator = new Random(randomSeed);
     }
 
     @Override

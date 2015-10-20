@@ -182,7 +182,7 @@ public class LogicalGraph<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> sampleRandomNodes(Long
+  public LogicalGraph<VD, ED, GD> sampleRandomNodes(Float
     sampleSize) throws Exception {
     return callForGraph(new RandomNodeSampling<VD, ED, GD>(sampleSize));
   }

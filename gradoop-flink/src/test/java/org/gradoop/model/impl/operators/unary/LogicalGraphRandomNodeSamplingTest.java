@@ -16,6 +16,8 @@
  */
 package org.gradoop.model.impl.operators.unary;
 
+import com.google.common.collect.Lists;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTestBase;
@@ -27,10 +29,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
 public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
@@ -43,21 +47,71 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> dbGraph =
       getGraphStore().getDatabaseGraph();
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      newGraph = dbGraph.sampleRandomNodes(3l);
-    List<Vertex<Long, DefaultVertexData>> dbVertices =
-      dbGraph.getVertices().collect();
-    List<Vertex<Long, DefaultVertexData>> newVertices =
-      newGraph.getVertices().collect();
-    List<Edge<Long, DefaultEdgeData>> dbEdges = dbGraph.getEdges().collect();
-    List<Edge<Long, DefaultEdgeData>> newEdges = dbGraph.getEdges().collect();
+      newGraph = dbGraph.sampleRandomNodes(0.272f);
+    List<Vertex<Long, DefaultVertexData>> dbVertices = Lists.newArrayList();
+    List<Edge<Long, DefaultEdgeData>> dbEdges = Lists.newArrayList();
+    List<Vertex<Long, DefaultVertexData>> newVertices = Lists.newArrayList();
+    List<Edge<Long, DefaultEdgeData>> newEdges = Lists.newArrayList();
+    dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
+    dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
+    newGraph.getVertices()
+      .output(new LocalCollectionOutputFormat<>(newVertices));
+    newGraph.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
+    getExecutionEnvironment().execute();
     assertNotNull("graph was null", newGraph);
-    System.out.println(newVertices.size());
-    assertTrue(newVertices.size() > 0);
+    Set<Long> newVertexIDs = new HashSet<>();
     for (Vertex<Long, DefaultVertexData> vertex : newVertices) {
       assertTrue(dbVertices.contains(vertex));
+      newVertexIDs.add(vertex.getId());
     }
     for (Edge<Long, DefaultEdgeData> edge : newEdges) {
       assertTrue(dbEdges.contains(edge));
+      assertTrue(newVertexIDs.contains(edge.getSource()));
+      assertTrue(newVertexIDs.contains(edge.getTarget()));
+    }
+    dbEdges.removeAll(newEdges);
+    for (Edge<Long, DefaultEdgeData> edge : dbEdges) {
+      assertFalse(newVertexIDs.contains(edge.getSource()) &&
+        newVertexIDs.contains(edge.getTarget()));
+    }
+  }
+
+  @Test
+  public void randomNodeSamplingTestWithSeed() throws Exception {
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> dbGraph =
+      getGraphStore().getDatabaseGraph();
+    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+      newGraph = dbGraph.callForGraph(
+      new RandomNodeSampling<DefaultVertexData, DefaultEdgeData,
+        DefaultGraphData>(
+        0.272f, -4181668494294894490L));
+    List<Vertex<Long, DefaultVertexData>> dbVertices = Lists.newArrayList();
+    List<Edge<Long, DefaultEdgeData>> dbEdges = Lists.newArrayList();
+    List<Vertex<Long, DefaultVertexData>> newVertices = Lists.newArrayList();
+    List<Edge<Long, DefaultEdgeData>> newEdges = Lists.newArrayList();
+    dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
+    dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
+    newGraph.getVertices()
+      .output(new LocalCollectionOutputFormat<>(newVertices));
+    newGraph.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
+    getExecutionEnvironment().execute();
+    assertNotNull("graph was null", newGraph);
+    Set<Long> newVertexIDs = new HashSet<>();
+    for (Vertex<Long, DefaultVertexData> vertex : newVertices) {
+      assertTrue(dbVertices.contains(vertex));
+      newVertexIDs.add(vertex.getId());
+    }
+    System.out.println(newVertexIDs);
+    for (Edge<Long, DefaultEdgeData> edge : newEdges) {
+      assertTrue(dbEdges.contains(edge));
+      assertTrue(newVertexIDs.contains(edge.getSource()));
+      assertTrue(newVertexIDs.contains(edge.getTarget()));
+      System.out.println(edge.getSource() + " " + edge.getTarget());
+    }
+    dbEdges.removeAll(newEdges);
+    for (Edge<Long, DefaultEdgeData> edge : dbEdges) {
+      assertFalse(newVertexIDs.contains(edge.getSource()) &&
+        newVertexIDs.contains(edge.getTarget()));
     }
   }
 }
