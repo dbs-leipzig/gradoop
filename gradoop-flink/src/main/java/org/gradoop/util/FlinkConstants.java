@@ -49,6 +49,12 @@ public class FlinkConstants {
    * {@link org.gradoop.model.impl.operators.unary.summarization.Summarization}.
    */
   public static final Long SUMMARIZE_GRAPH_ID = -5L;
+
+  /**
+   * Temporary identifier of a graph created by
+   * {@link org.gradoop.model.impl.operators.unary.RandomNodeSampling}.
+   */
+  public static final Long RANDOM_NODE_SAMPLING_GRAPH_ID = -6L;
 }
 
 

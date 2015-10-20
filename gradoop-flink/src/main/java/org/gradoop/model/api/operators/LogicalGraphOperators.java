@@ -78,6 +78,17 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   <O extends Number> LogicalGraph<VD, ED, GD> aggregate(String propertyKey,
     UnaryFunction<LogicalGraph<VD, ED, GD>, O> aggregateFunc) throws Exception;
 
+  /**
+   * Creates a new graph from a randomly chosen subset of nodes and their
+   * associated edges.
+   *
+   * @param sampleSize the requested amount of nodes in the result, actual
+   *                   size may differ because of probabilistic algorithm
+   * @return logical graph with random nodes and their associated edges
+   * @throws Exception
+   */
+  LogicalGraph<VD, ED, GD> sampleRandomNodes(Long sampleSize) throws Exception;
+
   /* Summarization */
 
   /**
