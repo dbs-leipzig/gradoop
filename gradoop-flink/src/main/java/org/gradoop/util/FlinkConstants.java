@@ -17,6 +17,8 @@
 
 package org.gradoop.util;
 
+import org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling;
+
 /**
  * Constants required by operator implementations in Flink.
  */
@@ -52,7 +54,7 @@ public class FlinkConstants {
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.unary.RandomNodeSampling}.
+   * {@link RandomNodeSampling}.
    */
   public static final Long RANDOM_NODE_SAMPLING_GRAPH_ID = -6L;
 }

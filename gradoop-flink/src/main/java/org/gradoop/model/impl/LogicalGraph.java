@@ -34,7 +34,7 @@ import org.gradoop.model.api.VertexData;
 import org.gradoop.model.api.VertexDataFactory;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.operators.unary.RandomNodeSampling;
+import org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling;
 import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.model.impl.operators.unary.Aggregation;
 import org.gradoop.model.impl.operators.binary.Combination;

@@ -81,8 +81,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
    * Creates a new graph from a randomly chosen subset of nodes and their
    * associated edges.
    *
-   * @param sampleSize the requested amount of nodes in the result, actual
-   *                   size may differ because of probabilistic algorithm
+   * @param sampleSize relative amount of nodes in the result graph
    * @return logical graph with random nodes and their associated edges
    * @throws Exception
    */
@@ -93,7 +92,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p/>
+   *
    * Vertices are grouped by the given property key. Edges are grouped
    * accordingly. Vertices with missing property key are represented by an
    * additional vertex.
@@ -108,7 +107,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p/>
+   *
    * Vertices are grouped by the given property key, edges are grouped by the
    * given property key. Vertices and edges with missing property key are
    * represented by an additional vertex.
@@ -125,7 +124,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p/>
+   *
    * Vertices are grouped by their label. Edges are grouped accordingly.
    *
    * @return summarized logical graph
@@ -137,7 +136,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p/>
+   *
    * Vertices are grouped by their label and the given property key. Edges are
    * grouped accordingly. Vertices with missing property key are represented
    * by an additional vertex.
@@ -153,7 +152,7 @@ public interface LogicalGraphOperators<VD extends VertexData, ED extends
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
-   * <p/>
+   *
    * Vertices are grouped by their label. Edges are grouped by the given
    * property key. Edges with missing property key are represented by an
    * additional edge.

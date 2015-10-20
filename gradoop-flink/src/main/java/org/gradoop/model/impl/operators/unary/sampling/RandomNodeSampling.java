@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.impl.operators.unary;
+package org.gradoop.model.impl.operators.unary.sampling;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -50,9 +50,14 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
   GD extends GraphData> implements
   UnaryGraphToGraphOperator<VD, ED, GD> {
   /**
-   *
+   * relative amount of nodes in the result graph
    */
   private final Float sampleSize;
+
+  /**
+   * seed for the random number generator
+   * if no seed is null, the random generator is created without seed
+   */
   private final Long randomSeed;
 
   /**
@@ -61,8 +66,7 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
    * @param sampleSize size of the sample
    */
   public RandomNodeSampling(Float sampleSize) {
-    this.sampleSize = sampleSize;
-    this.randomSeed = null;
+    this(sampleSize, null);
   }
 
   public RandomNodeSampling(Float sampleSize, Long randomSeed) {
@@ -76,16 +80,14 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
   @Override
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) throws
     Exception {
+
     final Long newGraphID = FlinkConstants.RANDOM_NODE_SAMPLING_GRAPH_ID;
+
     DataSet<Vertex<Long, VD>> vertices = graph.getVertices();
-    if (randomSeed != null) {
-      vertices =
-        vertices.filter(new VertexRandomFilter<VD>(sampleSize, randomSeed))
-          .map(new VertexToGraphUpdater<VD>(newGraphID));
-    } else {
-      vertices = vertices.filter(new VertexRandomFilter<VD>(sampleSize))
+    vertices =
+      vertices.filter(new VertexRandomFilter<VD>(sampleSize, randomSeed))
         .map(new VertexToGraphUpdater<VD>(newGraphID));
-    }
+
     JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> joinFunc =
       new JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>>() {
         @Override
@@ -94,12 +96,14 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
           return leftTuple;
         }
       };
+
     DataSet<Edge<Long, ED>> edges = graph.getEdges().join(vertices)
       .where(new EdgeSourceVertexKeySelector<ED>())
       .equalTo(new VertexKeySelector<VD>()).with(joinFunc).join(vertices)
       .where(new EdgeTargetVertexKeySelector<ED>())
       .equalTo(new VertexKeySelector<VD>()).with(joinFunc)
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
+
     return LogicalGraph.fromDataSets(vertices, edges,
       graph.getGraphDataFactory().createGraphData(newGraphID),
       graph.getVertexDataFactory(), graph.getEdgeDataFactory(),
@@ -119,20 +123,15 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
     Float threshold;
     Random randomGenerator;
 
-    public VertexRandomFilter(Float sampleSize) {
-      threshold = sampleSize;
-      randomGenerator = new Random();
-    }
-
     public VertexRandomFilter(Float sampleSize, Long randomSeed) {
       threshold = sampleSize;
-      randomGenerator = new Random(randomSeed);
+      randomGenerator =
+        (randomSeed != null) ? new Random(randomSeed) : new Random();
     }
 
     @Override
     public boolean filter(Vertex<Long, VD> vertex) throws Exception {
-      Float randomFloat = randomGenerator.nextFloat();
-      return randomFloat < threshold;
+      return randomGenerator.nextFloat() < threshold;
     }
   }
 }

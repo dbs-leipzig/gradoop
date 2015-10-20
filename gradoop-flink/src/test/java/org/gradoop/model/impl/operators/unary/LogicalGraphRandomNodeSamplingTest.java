@@ -22,6 +22,7 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
 import org.gradoop.model.impl.pojo.DefaultGraphData;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
@@ -31,7 +32,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -101,12 +101,10 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
       assertTrue(dbVertices.contains(vertex));
       newVertexIDs.add(vertex.getId());
     }
-    System.out.println(newVertexIDs);
     for (Edge<Long, DefaultEdgeData> edge : newEdges) {
       assertTrue(dbEdges.contains(edge));
       assertTrue(newVertexIDs.contains(edge.getSource()));
       assertTrue(newVertexIDs.contains(edge.getTarget()));
-      System.out.println(edge.getSource() + " " + edge.getTarget());
     }
     dbEdges.removeAll(newEdges);
     for (Edge<Long, DefaultEdgeData> edge : dbEdges) {
