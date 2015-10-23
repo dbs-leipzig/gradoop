@@ -61,14 +61,20 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
   private final Long randomSeed;
 
   /**
-   * Creates new aggregation.
+   * Creates new RandomNodeSampling instance.
    *
-   * @param sampleSize size of the sample
+   * @param sampleSize relative sample size
    */
   public RandomNodeSampling(Float sampleSize) {
     this(sampleSize, null);
   }
 
+  /**
+   * Creates new RandomNodeSampling instance.
+   *
+   * @param sampleSize relative sample size
+   * @param randomSeed random seed value (can be {@code null})
+   */
   public RandomNodeSampling(Float sampleSize, Long randomSeed) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
@@ -118,17 +124,38 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
     return RandomNodeSampling.class.getName();
   }
 
+  /**
+   * Creates a random value for each vertex and filters those that are below
+   * a given threshold.
+   *
+   * @param <VD> vertex data type
+   */
   private static class VertexRandomFilter<VD extends VertexData> implements
     FilterFunction<Vertex<Long, VD>> {
-    Float threshold;
-    Random randomGenerator;
+    /**
+     * Threshold to decide if a vertex needs to be filtered.
+     */
+    private final Float threshold;
+    /**
+     * Random instance
+     */
+    private final Random randomGenerator;
 
+    /**
+     * Creates a new filter instance.
+     *
+     * @param sampleSize relative sample size
+     * @param randomSeed random seed (can be {@code} null)
+     */
     public VertexRandomFilter(Float sampleSize, Long randomSeed) {
       threshold = sampleSize;
       randomGenerator =
         (randomSeed != null) ? new Random(randomSeed) : new Random();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean filter(Vertex<Long, VD> vertex) throws Exception {
       return randomGenerator.nextFloat() < threshold;
