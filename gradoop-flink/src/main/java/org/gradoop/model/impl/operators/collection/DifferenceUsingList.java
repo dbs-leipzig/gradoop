@@ -21,10 +21,9 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
+import org.gradoop.model.impl.functions.filterfunctions
+  .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
-
-import java.util.List;
 
 /**
  * Returns a collection with all logical graphs that are contained in the
@@ -55,11 +54,12 @@ public class DifferenceUsingList<
   @Override
   protected DataSet<VD> computeNewVertices(
     DataSet<GD> newSubgraphs) throws Exception {
-    final List<Long> identifiers = newSubgraphs
-      .map(new GraphToIdentifierMapper<GD>()).collect();
+    DataSet<Long> identifiers = newSubgraphs
+      .map(new GraphToIdentifierMapper<GD>());
 
     return firstCollection.getVertices()
-      .filter(new VertexInGraphsFilter<VD>(identifiers));
+      .filter(new VertexInGraphsFilterWithBC<VD>())
+      .withBroadcastSet(identifiers, VertexInGraphsFilterWithBC.BC_IDENTIFIERS);
   }
 
   /**

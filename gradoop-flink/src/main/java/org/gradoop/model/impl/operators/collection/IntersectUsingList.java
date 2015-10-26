@@ -21,10 +21,9 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
+import org.gradoop.model.impl.functions.filterfunctions
+  .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
-
-import java.util.List;
 
 /**
  * Returns a collection with all logical graphs that exist in both input
@@ -46,11 +45,12 @@ public class IntersectUsingList<
   @Override
   protected DataSet<VD> computeNewVertices(
     DataSet<GD> newSubgraphs) throws Exception {
-    final List<Long> identifiers = secondCollection.getGraphHeads()
-      .map(new GraphToIdentifierMapper<GD>()).collect();
+    DataSet<Long> identifiers = secondCollection.getGraphHeads()
+      .map(new GraphToIdentifierMapper<GD>());
 
     DataSet<VD> vertices = firstCollection.getVertices();
-    return vertices.filter(new VertexInGraphsFilter<VD>(identifiers));
+    return vertices.filter(new VertexInGraphsFilterWithBC<VD>())
+      .withBroadcastSet(identifiers, VertexInGraphsFilterWithBC.BC_IDENTIFIERS);
   }
 
   @Override

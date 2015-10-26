@@ -41,8 +41,12 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphFilter;
 import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
+import org.gradoop.model.impl.functions.filterfunctions
+  .EdgeInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphFilter;
 import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
+import org.gradoop.model.impl.functions.filterfunctions
+  .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.operators.collection.Difference;
 import org.gradoop.model.impl.operators.collection.DifferenceUsingList;
@@ -207,19 +211,21 @@ public class GraphCollection<
       });
 
     // get the identifiers of these subgraphs
-    final List<Long> graphIDs =
+    DataSet<Long> graphIDs =
       filteredGraphHeads.map(new MapFunction<GD, Long>() {
         @Override
         public Long map(GD g) throws Exception {
           return g.getId();
         }
-      }).collect();
+      });
 
     // use graph ids to filter vertices from the actual graph structure
     DataSet<VD> vertices = getVertices()
-      .filter(new VertexInGraphsFilter<VD>(graphIDs));
+      .filter(new VertexInGraphsFilterWithBC<VD>())
+      .withBroadcastSet(graphIDs, VertexInGraphsFilterWithBC.BC_IDENTIFIERS);
     DataSet<ED> edges = getEdges()
-      .filter(new EdgeInGraphsFilter<ED>(graphIDs));
+      .filter(new EdgeInGraphsFilterWithBC<ED>())
+      .withBroadcastSet(graphIDs, EdgeInGraphsFilterWithBC.BC_IDENTIFIERS);
 
     return new GraphCollection<>(vertices,
       edges,
