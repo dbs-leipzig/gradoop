@@ -18,16 +18,15 @@
 package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.VertexData;
 
 /**
  * Adds a given graph ID to the vertex and returns it.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
 public class VertexToGraphUpdater<VD extends VertexData> implements
-  MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
+  MapFunction<VD, VD> {
 
   /**
    * Graph identifier to add.
@@ -47,8 +46,8 @@ public class VertexToGraphUpdater<VD extends VertexData> implements
    * {@inheritDoc}
    */
   @Override
-  public Vertex<Long, VD> map(Vertex<Long, VD> v) throws Exception {
-    v.getValue().addGraph(newGraphID);
+  public VD map(VD v) throws Exception {
+    v.addGraph(newGraphID);
     return v;
   }
 }

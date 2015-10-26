@@ -146,9 +146,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     Collection<DefaultVertexData> vertexData = Lists.newArrayList();
     Collection<DefaultEdgeData> edgeData = Lists.newArrayList();
 
-    newGraph.getVertexData()
+    newGraph.getVertices()
       .output(new LocalCollectionOutputFormat<>(vertexData));
-    newGraph.getEdgeData()
+    newGraph.getEdges()
       .output(new LocalCollectionOutputFormat<>(edgeData));
 
     getExecutionEnvironment().execute();

@@ -22,12 +22,9 @@ import org.apache.flink.api.java.tuple.Tuple3;
 /**
  * Minimalistic representation of a vertex which is used for grouping.
  *
- * Consists of:
- * <ul>
- * <li> vertex id
- * <li> vertex label
- * <li> vertex property value
- * </ul>
+ * f0: vertex id
+ * f1: vertex label
+ * f2: vertex property value
  */
 public class VertexForGrouping extends Tuple3<Long, String, String> {
   public Long getVertexId() {

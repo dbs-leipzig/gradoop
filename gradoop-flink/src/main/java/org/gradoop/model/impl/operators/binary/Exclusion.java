@@ -19,11 +19,10 @@ package org.gradoop.model.impl.operators.binary;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.keyselectors
   .EdgeSourceVertexKeySelector;
 import org.gradoop.model.impl.functions.keyselectors
@@ -32,16 +31,15 @@ import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
 import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
 import org.gradoop.util.FlinkConstants;
-import org.gradoop.model.impl.LogicalGraph;
 
 /**
  * Creates a new logical graph containing only vertices and edges that
  * exist in the first input graph but not in the second input graph. Vertex and
  * edge equality is based on their respective identifiers.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class Exclusion<
   VD extends VertexData,
@@ -60,26 +58,25 @@ public class Exclusion<
     // union vertex sets, group by vertex id, filter vertices where the group
     // contains exactly one vertex which belongs to the graph, the operator is
     // called on
-    DataSet<Vertex<Long, VD>> newVertexSet = firstGraph.getVertices()
+    DataSet<VD> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
       .groupBy(new VertexKeySelector<VD>())
       .reduceGroup(
         new VertexGroupReducer<VD>(1L, firstGraph.getId(), secondGraph.getId()))
       .map(new VertexToGraphUpdater<VD>(newGraphID));
 
-    JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> joinFunc =
-      new JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>>() {
+    JoinFunction<ED, VD, ED> joinFunc = new JoinFunction<ED, VD, ED>() {
         @Override
-        public Edge<Long, ED> join(Edge<Long, ED> leftTuple,
-          Vertex<Long, VD> rightTuple) throws Exception {
-          return leftTuple;
+        public ED join(ED leftEdge,
+          VD rightVertex) throws Exception {
+          return leftEdge;
         }
       };
 
     // In exclude(), we are only interested in edges that connect vertices
     // that are in the exclusion of the vertex sets. Thus, we join the edges
     // from the left graph with the new vertex set using source and target ids.
-    DataSet<Edge<Long, ED>> newEdgeSet = firstGraph.getEdges()
+    DataSet<ED> newEdgeSet = firstGraph.getEdges()
       .join(newVertexSet)
       .where(new EdgeSourceVertexKeySelector<ED>())
       .equalTo(new VertexKeySelector<VD>()).with(joinFunc)

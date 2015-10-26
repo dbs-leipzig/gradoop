@@ -17,15 +17,13 @@
 package org.gradoop.model.impl.operators.unary.sampling;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.joinfunctions.EdgeVertexJoinKeepEdge;
 import org.gradoop.model.impl.functions.keyselectors
   .EdgeSourceVertexKeySelector;
 import org.gradoop.model.impl.functions.keyselectors
@@ -42,9 +40,9 @@ import java.util.Random;
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
   GD extends GraphData> implements
@@ -86,31 +84,24 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
   @Override
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) throws
     Exception {
-
     final Long newGraphID = FlinkConstants.RANDOM_NODE_SAMPLING_GRAPH_ID;
 
-    DataSet<Vertex<Long, VD>> vertices = graph.getVertices();
-    vertices =
-      vertices.filter(new VertexRandomFilter<VD>(sampleSize, randomSeed))
-        .map(new VertexToGraphUpdater<VD>(newGraphID));
+    DataSet<VD> newVertices = graph.getVertices()
+      .filter(new VertexRandomFilter<VD>(sampleSize, randomSeed))
+      .map(new VertexToGraphUpdater<VD>(newGraphID));
 
-    JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> joinFunc =
-      new JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>>() {
-        @Override
-        public Edge<Long, ED> join(Edge<Long, ED> leftTuple,
-          Vertex<Long, VD> rightTuple) throws Exception {
-          return leftTuple;
-        }
-      };
-
-    DataSet<Edge<Long, ED>> edges = graph.getEdges().join(vertices)
+    DataSet<ED> newEdges = graph.getEdges()
+      .join(newVertices)
       .where(new EdgeSourceVertexKeySelector<ED>())
-      .equalTo(new VertexKeySelector<VD>()).with(joinFunc).join(vertices)
+      .equalTo(new VertexKeySelector<VD>())
+      .with(new EdgeVertexJoinKeepEdge<VD, ED>())
+      .join(newVertices)
       .where(new EdgeTargetVertexKeySelector<ED>())
-      .equalTo(new VertexKeySelector<VD>()).with(joinFunc)
+      .equalTo(new VertexKeySelector<VD>())
+      .with(new EdgeVertexJoinKeepEdge<VD, ED>())
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromDataSets(vertices, edges,
+    return LogicalGraph.fromDataSets(newVertices, newEdges,
       graph.getGraphDataFactory().createGraphData(newGraphID),
       graph.getVertexDataFactory(), graph.getEdgeDataFactory(),
       graph.getGraphDataFactory());
@@ -130,8 +121,8 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
    *
    * @param <VD> vertex data type
    */
-  private static class VertexRandomFilter<VD extends VertexData> implements
-    FilterFunction<Vertex<Long, VD>> {
+  private static class VertexRandomFilter<VD extends VertexData>
+    implements FilterFunction<VD> {
     /**
      * Threshold to decide if a vertex needs to be filtered.
      */
@@ -157,7 +148,7 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
      * {@inheritDoc}
      */
     @Override
-    public boolean filter(Vertex<Long, VD> vertex) throws Exception {
+    public boolean filter(VD vertex) throws Exception {
       return randomGenerator.nextFloat() < threshold;
     }
   }

@@ -47,9 +47,9 @@ import org.gradoop.model.impl.operators.auxiliary.SplitBy;
  *
  * Encapsulates {@link LabelPropagationAlgorithm} in a Gradoop operator.
  *
- * @param <VD> VertexData contains information about the vertex
- * @param <ED> EdgeData contains information about all edges of the vertex
- * @param <GD> GraphData contains information about the graphs of the vertex
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  * @see LabelPropagationAlgorithm
  */
 public class LabelPropagation<
@@ -89,11 +89,11 @@ public class LabelPropagation<
    */
   @Override
   public GraphCollection<VD, ED, GD> execute(
-    LogicalGraph<VD, ED, GD> epGraph) throws Exception {
+    LogicalGraph<VD, ED, GD> logicalGraph) throws Exception {
     // transform vertices and edges to LP representation
-    DataSet<Vertex<Long, LPVertexValue>> vertices = epGraph
+    DataSet<Vertex<Long, LPVertexValue>> vertices = logicalGraph
       .getVertices().map(new VertexToLPVertexMapper<VD>());
-    DataSet<Edge<Long, NullValue>> edges = epGraph
+    DataSet<Edge<Long, NullValue>> edges = logicalGraph
       .getEdges().map(new EdgeToLPEdgeMapper<ED>());
 
     // construct gelly graph and execute the algorithm
@@ -102,9 +102,9 @@ public class LabelPropagation<
     graph = graph.run(new LabelPropagationAlgorithm(this.maxIterations));
 
     // map the result back to the original vertex set
-    DataSet<Vertex<Long, VD>> labeledVertices =
+    DataSet<VD> labeledVertices =
       graph.getVertices()
-        .join(epGraph.getVertices())
+        .join(logicalGraph.getVertices())
         .where(new LPKeySelector())
         .equalTo(new VertexKeySelector<VD>())
         .with(new LPJoin<VD>());
@@ -112,17 +112,16 @@ public class LabelPropagation<
     // create a logical graph from the result
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
       .fromDataSets(labeledVertices,
-        epGraph.getEdges(),
+        logicalGraph.getEdges(),
         null,
-        epGraph.getVertexDataFactory(),
-        epGraph.getEdgeDataFactory(),
-        epGraph.getGraphDataFactory());
+        logicalGraph.getVertexDataFactory(),
+        logicalGraph.getEdgeDataFactory(),
+        logicalGraph.getGraphDataFactory());
 
     // and split it into a collection according the result
     return new SplitBy<VD, ED, GD>(
       new CommunityDiscriminatorFunction<VD>(propertyKey),
-      env)
-      .execute(labeledGraph);
+      env).execute(labeledGraph);
   }
 
   /**

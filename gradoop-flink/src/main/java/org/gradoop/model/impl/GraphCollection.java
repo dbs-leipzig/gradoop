@@ -25,9 +25,6 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.EdgeDataFactory;
@@ -35,28 +32,26 @@ import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.api.VertexDataFactory;
-import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphFilter;
-import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
-import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphFilter;
-import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
-import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
-import org.gradoop.util.Order;
-import org.gradoop.model.impl.functions.Predicate;
-import org.gradoop.model.impl.tuples.Subgraph;
-import org.gradoop.model.impl.operators.collection.Difference;
-import org.gradoop.model.impl.operators.collection.DifferenceUsingList;
-import org.gradoop.model.impl.operators.collection.Intersect;
-import org.gradoop.model.impl.operators.collection.IntersectUsingList;
-import org.gradoop.model.impl.operators.collection.Union;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.GraphCollectionOperators;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.impl.functions.Predicate;
+import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphFilter;
+import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
+import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphFilter;
+import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
+import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
+import org.gradoop.model.impl.operators.collection.Difference;
+import org.gradoop.model.impl.operators.collection.DifferenceUsingList;
+import org.gradoop.model.impl.operators.collection.Intersect;
+import org.gradoop.model.impl.operators.collection.IntersectUsingList;
+import org.gradoop.model.impl.operators.collection.Union;
+import org.gradoop.util.Order;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -64,9 +59,9 @@ import java.util.List;
  * vertices and edges, the collections contains a single gelly graph
  * representing all subgraphs. Graph data is stored in an additional dataset.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class GraphCollection<
   VD extends VertexData,
@@ -78,36 +73,38 @@ public class GraphCollection<
   /**
    * Graph data associated with the logical graphs in that collection.
    */
-  private DataSet<Subgraph<Long, GD>> subgraphs;
+  private DataSet<GD> graphHeads;
 
   /**
    * Creates a graph collection from the given arguments.
    *
-   * @param graph             Flink Gelly graph
-   * @param subgraphs         graph data associated with logical graphs in that
-   *                          collection
+   * @param vertices          vertices
+   * @param edges             edges
+   * @param graphHeads        graph heads
    * @param vertexDataFactory vertex data factory
    * @param edgeDataFactory   edge data factory
    * @param graphDataFactory  graph data factory
    * @param env               Flink execution environment
    */
-  public GraphCollection(Graph<Long, VD, ED> graph,
-    DataSet<Subgraph<Long, GD>> subgraphs,
+  public GraphCollection(DataSet<VD> vertices,
+    DataSet<ED> edges,
+    DataSet<GD> graphHeads,
     VertexDataFactory<VD> vertexDataFactory,
     EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD> graphDataFactory,
     ExecutionEnvironment env) {
-    super(graph, vertexDataFactory, edgeDataFactory, graphDataFactory, env);
-    this.subgraphs = subgraphs;
+    super(vertices, edges, vertexDataFactory, edgeDataFactory, graphDataFactory,
+      env);
+    this.graphHeads = graphHeads;
   }
 
   /**
-   * Returns the graph data associated with the logical graphs in that
+   * Returns the graph heads associated with the logical graphs in that
    * collection.
    *
-   * @return all logical graph data
+   * @return graph heads
    */
-  public DataSet<Subgraph<Long, GD>> getSubgraphs() {
-    return this.subgraphs;
+  public DataSet<GD> getGraphHeads() {
+    return this.graphHeads;
   }
 
   /**
@@ -118,30 +115,29 @@ public class GraphCollection<
   public LogicalGraph<VD, ED, GD> getGraph(final Long graphID) throws
     Exception {
     // filter vertices and edges based on given graph id
-    Graph<Long, VD, ED> subGraph = getGellyGraph()
-      .subgraph(
-        new VertexInGraphFilter<VD>(graphID),
-        new EdgeInGraphFilter<ED>(graphID));
+    DataSet<VD> vertices = getVertices()
+      .filter(new VertexInGraphFilter<VD>(graphID));
+    DataSet<ED> edges = getEdges()
+      .filter(new EdgeInGraphFilter<ED>(graphID));
 
     DataSet<Tuple1<Long>> graphIDDataSet = getExecutionEnvironment()
       .fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
 
     // get graph data based on graph id
-    List<GD> graphData = this.subgraphs
+    List<GD> graphData = this.graphHeads
       .joinWithTiny(graphIDDataSet)
       .where(new GraphKeySelector<GD>())
       .equalTo(0)
-      .with(new JoinFunction<Subgraph<Long, GD>, Tuple1<Long>, GD>() {
+      .with(new JoinFunction<GD, Tuple1<Long>, GD>() {
         @Override
-        public GD join(Subgraph<Long, GD> g, Tuple1<Long> gID) throws
-          Exception {
-          return g.getValue();
+        public GD join(GD g, Tuple1<Long> gID) throws Exception {
+          return g;
         }
       }).first(1).collect();
 
-    return (graphData.size() > 0) ? LogicalGraph
-      .fromGellyGraph(subGraph, graphData.get(0), getVertexDataFactory(),
-        getEdgeDataFactory(), getGraphDataFactory()) : null;
+    return (graphData.size() > 0) ? LogicalGraph.fromDataSets(vertices, edges,
+      graphData.get(0), getVertexDataFactory(), getEdgeDataFactory(),
+      getGraphDataFactory()) : null;
   }
 
   /**
@@ -160,27 +156,27 @@ public class GraphCollection<
   public GraphCollection<VD, ED, GD> getGraphs(
     final List<Long> identifiers) throws Exception {
 
-    DataSet<Subgraph<Long, GD>> newSubGraphs =
-      this.subgraphs.filter(new FilterFunction<Subgraph<Long, GD>>() {
+    DataSet<GD> newGraphHeads =
+      this.graphHeads.filter(new FilterFunction<GD>() {
 
         @Override
-        public boolean filter(Subgraph<Long, GD> subgraph) throws Exception {
-          return identifiers.contains(subgraph.getId());
+        public boolean filter(GD graphHead) throws Exception {
+          return identifiers.contains(graphHead.getId());
 
         }
       });
 
     // build new vertex set
-    DataSet<Vertex<Long, VD>> vertices = getVertices()
+    DataSet<VD> vertices = getVertices()
       .filter(new VertexInGraphsFilter<VD>(identifiers));
 
     // build new edge set
-    DataSet<Edge<Long, ED>> edges = getEdges()
+    DataSet<ED> edges = getEdges()
       .filter(new EdgeInGraphsFilter<ED>(identifiers));
 
-    return new GraphCollection<>(Graph.fromDataSet(vertices, edges,
-      getExecutionEnvironment()),
-      newSubGraphs,
+    return new GraphCollection<>(vertices,
+      edges,
+      newGraphHeads,
       getVertexDataFactory(),
       getEdgeDataFactory(),
       getGraphDataFactory(),
@@ -192,7 +188,7 @@ public class GraphCollection<
    */
   @Override
   public long getGraphCount() throws Exception {
-    return this.subgraphs.count();
+    return this.graphHeads.count();
   }
 
   /**
@@ -201,41 +197,33 @@ public class GraphCollection<
   @Override
   public GraphCollection<VD, ED, GD> filter(
     final Predicate<GD> predicateFunction) throws Exception {
-    // find subgraphs matching the predicate
-    DataSet<Subgraph<Long, GD>> filteredSubgraphs =
-      this.subgraphs.filter(new FilterFunction<Subgraph<Long, GD>>() {
+    // find graph heads matching the predicate
+    DataSet<GD> filteredGraphHeads =
+      this.graphHeads.filter(new FilterFunction<GD>() {
         @Override
-        public boolean filter(Subgraph<Long, GD> g) throws Exception {
-          return predicateFunction.filter(g.getValue());
+        public boolean filter(GD g) throws Exception {
+          return predicateFunction.filter(g);
         }
       });
 
     // get the identifiers of these subgraphs
-    final Collection<Long> graphIDs =
-      filteredSubgraphs.map(new MapFunction<Subgraph<Long, GD>, Long>() {
-
+    final List<Long> graphIDs =
+      filteredGraphHeads.map(new MapFunction<GD, Long>() {
         @Override
-        public Long map(Subgraph<Long, GD> g) throws Exception {
+        public Long map(GD g) throws Exception {
           return g.getId();
         }
       }).collect();
 
     // use graph ids to filter vertices from the actual graph structure
-    Graph<Long, VD, ED> filteredGraph = getGellyGraph()
-      .filterOnVertices(new FilterFunction<Vertex<Long, VD>>() {
-        @Override
-        public boolean filter(Vertex<Long, VD> v) throws Exception {
-          for (Long graphID : v.getValue().getGraphs()) {
-            if (graphIDs.contains(graphID)) {
-              return true;
-            }
-          }
-          return false;
-        }
-      });
+    DataSet<VD> vertices = getVertices()
+      .filter(new VertexInGraphsFilter<VD>(graphIDs));
+    DataSet<ED> edges = getEdges()
+      .filter(new EdgeInGraphsFilter<ED>(graphIDs));
 
-    return new GraphCollection<>(filteredGraph,
-      filteredSubgraphs,
+    return new GraphCollection<>(vertices,
+      edges,
+      filteredGraphHeads,
       getVertexDataFactory(),
       getEdgeDataFactory(),
       getGraphDataFactory(),
@@ -374,12 +362,12 @@ public class GraphCollection<
   @Override
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {
-    this.getGellyGraph().getVertices().writeAsFormattedText(vertexFile,
+    getVertices().writeAsFormattedText(vertexFile,
       new JsonWriter.VertexTextFormatter<VD>());
-    this.getGellyGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
-    this.getSubgraphs()
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
+    getEdges().writeAsFormattedText(edgeFile,
+      new JsonWriter.EdgeTextFormatter<ED>());
+    getGraphHeads().writeAsFormattedText(graphFile,
+      new JsonWriter.GraphTextFormatter<GD>());
     getExecutionEnvironment().execute();
   }
 }

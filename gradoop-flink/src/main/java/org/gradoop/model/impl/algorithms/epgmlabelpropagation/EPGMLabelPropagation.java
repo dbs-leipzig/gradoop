@@ -35,9 +35,9 @@ import java.io.Serializable;
  *
  * Encapsulates {@link EPGMLabelPropagationAlgorithm} in a Gradoop operator.
  *
- * @param <VD> VertexData contains information about the vertex
- * @param <ED> EdgeData contains information about all edges of the vertex
- * @param <GD> GraphData contains information about all graphs of the vertex
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  * @see EPGMLabelPropagationAlgorithm
  */
 public class EPGMLabelPropagation<
@@ -81,10 +81,9 @@ public class EPGMLabelPropagation<
    */
   @Override
   public GraphCollection<VD, ED, GD> execute(
-    LogicalGraph<VD, ED, GD> epGraph) throws Exception {
+    LogicalGraph<VD, ED, GD> logicalGraph) throws Exception {
     // construct a gelly graph
-    Graph<Long, VD, ED> graph = Graph.fromDataSet(epGraph.getVertices(),
-      epGraph.getEdges(), epGraph.getExecutionEnvironment());
+    Graph<Long, VD, ED> graph = logicalGraph.toGellyGraph();
 
     // run the label propagation algorithm
     graph = graph
@@ -92,8 +91,10 @@ public class EPGMLabelPropagation<
 
     // create a logical graph
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph.fromGellyGraph(graph,
-      null, epGraph.getVertexDataFactory(), epGraph.getEdgeDataFactory(),
-      epGraph.getGraphDataFactory());
+      null,
+      logicalGraph.getVertexDataFactory(),
+      logicalGraph.getEdgeDataFactory(),
+      logicalGraph.getGraphDataFactory());
 
     // and split it into a collection according the result
     return new SplitBy<VD, ED, GD>(

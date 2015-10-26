@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.functions.filterfunctions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.VertexData;
 
 import java.util.List;
@@ -27,10 +26,10 @@ import java.util.List;
  * Checks if a vertex is contained in at least one of the given logical
  * graphs.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
-public class VertexInGraphsFilter<VD extends VertexData> implements
-  FilterFunction<Vertex<Long, VD>> {
+public class VertexInGraphsFilter<VD extends VertexData>
+  implements FilterFunction<VD> {
 
   /**
    * Graph identifiers
@@ -50,10 +49,10 @@ public class VertexInGraphsFilter<VD extends VertexData> implements
    * {@inheritDoc}
    */
   @Override
-  public boolean filter(Vertex<Long, VD> vertex) throws Exception {
+  public boolean filter(VD vertex) throws Exception {
     boolean vertexInGraph = false;
-    if (vertex.getValue().getGraphCount() > 0) {
-      for (Long graph : vertex.getValue().getGraphs()) {
+    if (vertex.getGraphCount() > 0) {
+      for (Long graph : vertex.getGraphs()) {
         if (identifiers.contains(graph)) {
           vertexInGraph = true;
           break;

@@ -5,15 +5,14 @@ import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
-import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
  * Returns a collection with all logical graphs that exist in both input
  * collections. Graph equality is based on their identifiers.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  * @see IntersectUsingList
  */
 public class Intersect<
@@ -30,11 +29,11 @@ public class Intersect<
    * @return subgraph dataset of the resulting collection
    */
   @Override
-  protected DataSet<Subgraph<Long, GD>> computeNewSubgraphs() {
-    return firstSubgraphs
-      .union(secondSubgraphs)
+  protected DataSet<GD> computeNewGraphHeads() {
+    return firstCollection.getGraphHeads()
+      .union(secondCollection.getGraphHeads())
       .groupBy(new GraphKeySelector<GD>())
-      .reduceGroup(new SubgraphGroupReducer<GD>(2));
+      .reduceGroup(new GraphHeadGroupReducer<GD>(2));
   }
 
   /**

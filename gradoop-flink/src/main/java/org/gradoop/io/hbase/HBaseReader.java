@@ -39,7 +39,7 @@ public class HBaseReader {
   /**
    * Reads graph data from HBase.
    *
-   * @param <GD> graph data type
+   * @param <GD> EPGM graph head type
    */
   public static class GraphDataTableInputFormat<GD extends GraphData> extends
     TableInputFormat<Subgraph<Long, GD>> {
@@ -97,8 +97,8 @@ public class HBaseReader {
   /**
    * Reads vertex data from HBase.
    *
-   * @param <VD> vertex data type
-   * @param <ED> edge data type
+   * @param <VD> EPGM vertex type
+   * @param <ED> EPGM edge type
    */
   public static class VertexDataTableInputFormat<VD extends VertexData, ED
     extends EdgeData> extends
@@ -157,7 +157,7 @@ public class HBaseReader {
   /**
    * Reads edge data from HBase.
    *
-   * @param <ED> edge data type
+   * @param <ED> EPGM edge type
    */
   public static class EdgeDataTableInputFormat<ED extends EdgeData, VD
     extends VertexData> extends

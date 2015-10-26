@@ -18,18 +18,17 @@
 package org.gradoop.model.impl.functions.keyselectors;
 
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.graph.Edge;
 import org.gradoop.model.api.EdgeData;
 
 /**
  * Used for distinction of edges based on their unique id.
  *
- * @param <ED> edge data type
+ * @param <ED> EPGM edge type
  */
 public class EdgeKeySelector<ED extends EdgeData>
-  implements KeySelector<Edge<Long, ED>, Long> {
+  implements KeySelector<ED, Long> {
   @Override
-  public Long getKey(Edge<Long, ED> e) throws Exception {
-    return e.f2.getId();
+  public Long getKey(ED edge) throws Exception {
+    return edge.getId();
   }
 }

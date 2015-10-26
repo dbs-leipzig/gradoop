@@ -27,9 +27,9 @@ import org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy;
  *
  * Encapsulates {@link BTGAlgorithm} in a Gradoop Operator.
  *
- * @param <VD> VertexData
- * @param <ED> EdgeData
- * @param <GD> GraphData
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  * @see BTGAlgorithm
  */
 public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
@@ -80,7 +80,7 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
     Graph<Long, BTGVertexValue, NullValue> btgGraph =
       Graph.fromDataSet(vertices, edges, env);
     btgGraph = btgGraph.run(new BTGAlgorithm(this.maxIterations));
-    DataSet<Vertex<Long, VD>> btgLabeledVertices =
+    DataSet<VD> btgLabeledVertices =
       btgGraph.getVertices().join(logicalGraph.getVertices())
         .where(new BTGKeySelector())
         .equalTo(new VertexKeySelector<VD>())

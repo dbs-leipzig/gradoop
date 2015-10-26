@@ -28,9 +28,9 @@ import org.gradoop.model.impl.functions.UnaryFunction;
  * Describes all operators that can be applied on a single logical graph in the
  * EPGM.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public interface LogicalGraphOperators<VD extends VertexData, ED extends
   EdgeData, GD extends GraphData> {

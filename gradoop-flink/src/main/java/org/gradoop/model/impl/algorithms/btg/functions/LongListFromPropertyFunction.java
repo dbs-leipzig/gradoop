@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Maps an EPGM vertex to a property value of that vertex.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
 public class LongListFromPropertyFunction<VD extends VertexData>
   implements UnaryFunction<VD, List<Long>> {

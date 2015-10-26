@@ -25,9 +25,9 @@ import org.gradoop.model.impl.GraphCollection;
 /**
  * Creates a {@link GraphCollection} based on two input collections.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  * @see org.gradoop.model.impl.operators.collection.Union
  * @see org.gradoop.model.impl.operators.collection.Intersect
  * @see org.gradoop.model.impl.operators.collection.Difference

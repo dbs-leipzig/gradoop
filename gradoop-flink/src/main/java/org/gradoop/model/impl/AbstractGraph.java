@@ -64,30 +64,36 @@ public abstract class AbstractGraph<
   private final ExecutionEnvironment env;
 
   /**
-   * Flink Gelly graph that holds the vertex and edge datasets associated
-   * with that logical graph.
+   * DataSet containing vertices associated with that graph.
    */
-  private final Graph<Long, VD, ED> graph;
+  private final DataSet<VD> vertices;
+  /**
+   * DataSet containing edges associated with that graph.
+   */
+  private final DataSet<ED> edges;
 
   /**
    * Creates a new graph instance.
    *
-   * @param graph               Gelly graph
+   * @param vertices            vertex data set
+   * @param edges               edge data set
    * @param vertexDataFactory   vertex data factory
    * @param edgeDataFactory     edge data factory
    * @param graphDataFactory    graph data factory
    * @param env                 Flink execution environment
    */
-  protected AbstractGraph(Graph<Long, VD, ED> graph,
+  protected AbstractGraph(DataSet<VD> vertices,
+    DataSet<ED> edges,
     VertexDataFactory<VD> vertexDataFactory,
     EdgeDataFactory<ED> edgeDataFactory,
     GraphDataFactory<GD> graphDataFactory,
     ExecutionEnvironment env) {
+    this.vertices = vertices;
+    this.edges = edges;
     this.vertexDataFactory = vertexDataFactory;
     this.edgeDataFactory = edgeDataFactory;
     this.graphDataFactory = graphDataFactory;
     this.env = env;
-    this.graph = graph;
   }
 
   /**
@@ -121,54 +127,28 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Vertex<Long, VD>> getVertices() {
-    return graph.getVertices();
+  public DataSet<VD> getVertices() {
+    return vertices;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public DataSet<VD> getVertexData() {
-    return getVertices().map(new MapFunction<Vertex<Long, VD>, VD>() {
-      @Override
-      public VD map(Vertex<Long, VD> longVDVertex) throws Exception {
-        return longVDVertex.getValue();
-      }
-    }).withForwardedFields("f1->*");
+  public DataSet<ED> getEdges() {
+    return edges;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Edge<Long, ED>> getEdges() {
-    return graph.getEdges();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<ED> getEdgeData() {
-    return getEdges().map(new MapFunction<Edge<Long, ED>, ED>() {
-      @Override
-      public ED map(Edge<Long, ED> longEDEdge) throws Exception {
-        return longEDEdge.getValue();
-      }
-    }).withForwardedFields("f2->*");
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Edge<Long, ED>> getOutgoingEdges(final Long vertexID) {
+  public DataSet<ED> getOutgoingEdges(final Long vertexID) {
     return
-      this.graph.getEdges().filter(new FilterFunction<Edge<Long, ED>>() {
+      this.edges.filter(new FilterFunction<ED>() {
         @Override
-        public boolean filter(Edge<Long, ED> edgeTuple) throws Exception {
-          return edgeTuple.getSource().equals(vertexID);
+        public boolean filter(ED edge) throws Exception {
+          return edge.getSourceVertexId().equals(vertexID);
         }
       });
   }
@@ -177,14 +157,37 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Edge<Long, ED>> getIncomingEdges(final Long vertexID) {
+  public DataSet<ED> getIncomingEdges(final Long vertexID) {
     return
-      this.graph.getEdges().filter(new FilterFunction<Edge<Long, ED>>() {
+      this.edges.filter(new FilterFunction<ED>() {
         @Override
-        public boolean filter(Edge<Long, ED> edgeTuple) throws Exception {
-          return edgeTuple.getTarget().equals(vertexID);
+        public boolean filter(ED edge) throws Exception {
+          return edge.getTargetVertexId().equals(vertexID);
         }
       });
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Graph<Long, VD, ED> toGellyGraph() {
+    return Graph.fromDataSet(getVertices().map(
+      new MapFunction<VD, Vertex<Long, VD>>() {
+        @Override
+        public Vertex<Long, VD> map(VD epgmVertex) throws Exception {
+          return new Vertex<>(epgmVertex.getId(), epgmVertex);
+        }
+      }).withForwardedFields("*->f1"),
+      getEdges().map(new MapFunction<ED, Edge<Long, ED>>() {
+        @Override
+        public Edge<Long, ED> map(ED epgmEdge) throws Exception {
+          return new Edge<>(epgmEdge.getSourceVertexId(),
+            epgmEdge.getTargetVertexId(),
+            epgmEdge);
+        }
+      }).withForwardedFields("*->f2"),
+      getExecutionEnvironment());
   }
 
   /**
@@ -192,7 +195,7 @@ public abstract class AbstractGraph<
    */
   @Override
   public long getVertexCount() throws Exception {
-    return this.graph.numberOfVertices();
+    return vertices.count();
   }
 
   /**
@@ -200,7 +203,7 @@ public abstract class AbstractGraph<
    */
   @Override
   public long getEdgeCount() throws Exception {
-    return this.graph.numberOfEdges();
+    return edges.count();
   }
 
   /**
@@ -210,15 +213,5 @@ public abstract class AbstractGraph<
    */
   public ExecutionEnvironment getExecutionEnvironment() {
     return this.env;
-  }
-
-  /**
-   * Returns the internal Gelly graph representation. Must only be used by
-   * inheriting classes.
-   *
-   * @return Gelly graph representation
-   */
-  protected Graph<Long, VD, ED> getGellyGraph() {
-    return this.graph;
   }
 }

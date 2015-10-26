@@ -25,9 +25,9 @@ import org.gradoop.model.impl.LogicalGraph;
 /**
  * Creates a {@link LogicalGraph} based on two input graphs.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  * @see org.gradoop.model.impl.operators.binary.Combination
  * @see org.gradoop.model.impl.operators.binary.Exclusion
  * @see org.gradoop.model.impl.operators.binary.Overlap

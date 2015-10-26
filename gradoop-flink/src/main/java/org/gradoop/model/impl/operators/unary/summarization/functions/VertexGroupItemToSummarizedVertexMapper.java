@@ -36,7 +36,7 @@ import org.gradoop.model.impl.operators.unary.summarization.tuples.VertexGroupIt
  * group label, the group property value and the number of vertices in the
  * group.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("f0")
 public class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData>

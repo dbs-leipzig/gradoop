@@ -18,27 +18,24 @@
 package org.gradoop.model.impl.operators.binary;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
 import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
 import org.gradoop.util.FlinkConstants;
-import org.gradoop.model.impl.LogicalGraph;
 
 /**
  * Creates a new logical graph by combining the vertex and edge sets of two
  * input graphs. Vertex and edge equality is based on their
  * respective identifiers.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class Combination<
   VD extends VertexData,
@@ -56,18 +53,17 @@ public class Combination<
 
     // build distinct union of vertex sets and update graph ids at vertices
     // cannot use Gelly union here because of missing argument for KeySelector
-    DataSet<Vertex<Long, VD>> newVertexSet = firstGraph.getVertices()
+    DataSet<VD> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
       .distinct(new VertexKeySelector<VD>())
       .map(new VertexToGraphUpdater<VD>(newGraphID));
 
-    DataSet<Edge<Long, ED>> newEdgeSet = firstGraph.getEdges()
+    DataSet<ED> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
       .distinct(new EdgeKeySelector<ED>())
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromGellyGraph(Graph.fromDataSet(newVertexSet,
-        newEdgeSet, newVertexSet.getExecutionEnvironment()),
+    return LogicalGraph.fromDataSets(newVertexSet, newEdgeSet,
       firstGraph.getGraphDataFactory().createGraphData(newGraphID),
       firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
       firstGraph.getGraphDataFactory());

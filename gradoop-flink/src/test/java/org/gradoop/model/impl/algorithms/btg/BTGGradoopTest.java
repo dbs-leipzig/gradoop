@@ -52,8 +52,8 @@ public class BTGGradoopTest extends FlinkTestBase {
     assertEquals("wrong number of edges", 0l,
       btgGraph.getGraph(4L).getEdgeCount());
     validateConnectedIIGResult(BTGAlgorithmTestHelper
-      .parseResultDefaultVertexData(
-        btgGraph.getVertices().collect()));
+      .parseResultDefaultVertexData(btgGraph.toGellyGraph().getVertices()
+        .collect()));
   }
 
   private void validateConnectedIIGResult(Map<Long, List<Long>> btgIDs) {

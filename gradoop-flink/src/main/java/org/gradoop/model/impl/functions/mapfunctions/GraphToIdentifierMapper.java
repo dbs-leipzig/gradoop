@@ -19,18 +19,17 @@ package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.GraphData;
-import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
  * Maps a graph to its identifier.
  *
- * @param <GD> graph data type
+ * @param <GD> EPGM graph head type
  */
 public class GraphToIdentifierMapper<GD extends GraphData>
-  implements MapFunction<Subgraph<Long, GD>, Long> {
+  implements MapFunction<GD, Long> {
 
   @Override
-  public Long map(Subgraph<Long, GD> subgraph) throws Exception {
-    return subgraph.getId();
+  public Long map(GD graphHead) throws Exception {
+    return graphHead.getId();
   }
 }

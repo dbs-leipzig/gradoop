@@ -30,9 +30,9 @@ import java.util.List;
  * Describes all operators that can be applied on a collection of logical
  * graphs in the EPGM.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public interface GraphCollectionOperators<VD extends VertexData, ED extends
   EdgeData, GD extends GraphData> {

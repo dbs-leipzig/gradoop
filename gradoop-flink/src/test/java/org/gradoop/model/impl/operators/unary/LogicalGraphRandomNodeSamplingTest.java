@@ -18,8 +18,6 @@ package org.gradoop.model.impl.operators.unary;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling;
@@ -48,10 +46,10 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
       getGraphStore().getDatabaseGraph();
     LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       newGraph = dbGraph.sampleRandomNodes(0.272f);
-    List<Vertex<Long, DefaultVertexData>> dbVertices = Lists.newArrayList();
-    List<Edge<Long, DefaultEdgeData>> dbEdges = Lists.newArrayList();
-    List<Vertex<Long, DefaultVertexData>> newVertices = Lists.newArrayList();
-    List<Edge<Long, DefaultEdgeData>> newEdges = Lists.newArrayList();
+    List<DefaultVertexData> dbVertices = Lists.newArrayList();
+    List<DefaultEdgeData> dbEdges = Lists.newArrayList();
+    List<DefaultVertexData> newVertices = Lists.newArrayList();
+    List<DefaultEdgeData> newEdges = Lists.newArrayList();
     dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
     dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
     newGraph.getVertices()
@@ -60,19 +58,19 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
     getExecutionEnvironment().execute();
     assertNotNull("graph was null", newGraph);
     Set<Long> newVertexIDs = new HashSet<>();
-    for (Vertex<Long, DefaultVertexData> vertex : newVertices) {
+    for (DefaultVertexData vertex : newVertices) {
       assertTrue(dbVertices.contains(vertex));
       newVertexIDs.add(vertex.getId());
     }
-    for (Edge<Long, DefaultEdgeData> edge : newEdges) {
+    for (DefaultEdgeData edge : newEdges) {
       assertTrue(dbEdges.contains(edge));
-      assertTrue(newVertexIDs.contains(edge.getSource()));
-      assertTrue(newVertexIDs.contains(edge.getTarget()));
+      assertTrue(newVertexIDs.contains(edge.getSourceVertexId()));
+      assertTrue(newVertexIDs.contains(edge.getTargetVertexId()));
     }
     dbEdges.removeAll(newEdges);
-    for (Edge<Long, DefaultEdgeData> edge : dbEdges) {
-      assertFalse(newVertexIDs.contains(edge.getSource()) &&
-        newVertexIDs.contains(edge.getTarget()));
+    for (DefaultEdgeData edge : dbEdges) {
+      assertFalse(newVertexIDs.contains(edge.getSourceVertexId()) &&
+        newVertexIDs.contains(edge.getTargetVertexId()));
     }
   }
 
@@ -85,10 +83,10 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
       new RandomNodeSampling<DefaultVertexData, DefaultEdgeData,
         DefaultGraphData>(
         0.272f, -4181668494294894490L));
-    List<Vertex<Long, DefaultVertexData>> dbVertices = Lists.newArrayList();
-    List<Edge<Long, DefaultEdgeData>> dbEdges = Lists.newArrayList();
-    List<Vertex<Long, DefaultVertexData>> newVertices = Lists.newArrayList();
-    List<Edge<Long, DefaultEdgeData>> newEdges = Lists.newArrayList();
+    List<DefaultVertexData> dbVertices = Lists.newArrayList();
+    List<DefaultEdgeData> dbEdges = Lists.newArrayList();
+    List<DefaultVertexData> newVertices = Lists.newArrayList();
+    List<DefaultEdgeData> newEdges = Lists.newArrayList();
     dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
     dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
     newGraph.getVertices()
@@ -97,19 +95,19 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
     getExecutionEnvironment().execute();
     assertNotNull("graph was null", newGraph);
     Set<Long> newVertexIDs = new HashSet<>();
-    for (Vertex<Long, DefaultVertexData> vertex : newVertices) {
+    for (DefaultVertexData vertex : newVertices) {
       assertTrue(dbVertices.contains(vertex));
       newVertexIDs.add(vertex.getId());
     }
-    for (Edge<Long, DefaultEdgeData> edge : newEdges) {
+    for (DefaultEdgeData edge : newEdges) {
       assertTrue(dbEdges.contains(edge));
-      assertTrue(newVertexIDs.contains(edge.getSource()));
-      assertTrue(newVertexIDs.contains(edge.getTarget()));
+      assertTrue(newVertexIDs.contains(edge.getSourceVertexId()));
+      assertTrue(newVertexIDs.contains(edge.getTargetVertexId()));
     }
     dbEdges.removeAll(newEdges);
-    for (Edge<Long, DefaultEdgeData> edge : dbEdges) {
-      assertFalse(newVertexIDs.contains(edge.getSource()) &&
-        newVertexIDs.contains(edge.getTarget()));
+    for (DefaultEdgeData edge : dbEdges) {
+      assertFalse(newVertexIDs.contains(edge.getSourceVertexId()) &&
+        newVertexIDs.contains(edge.getTargetVertexId()));
     }
   }
 }

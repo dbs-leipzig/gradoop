@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.functions.filterfunctions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.graph.Edge;
 import org.gradoop.model.api.EdgeData;
 
 import java.util.List;
@@ -27,10 +26,10 @@ import java.util.List;
  * Checks if an edge is contained in at least one of the given logical
  * graphs.
  *
- * @param <ED> edge data type
+ * @param <ED> EPGM edge type
  */
-public class EdgeInGraphsFilter<ED extends EdgeData> implements
-  FilterFunction<Edge<Long, ED>> {
+public class EdgeInGraphsFilter<ED extends EdgeData>
+  implements FilterFunction<ED> {
 
   /**
    * Graph identifiers
@@ -50,10 +49,10 @@ public class EdgeInGraphsFilter<ED extends EdgeData> implements
    * {@inheritDoc}
    */
   @Override
-  public boolean filter(Edge<Long, ED> e) throws Exception {
+  public boolean filter(ED edge) throws Exception {
     boolean vertexInGraph = false;
-    if (e.getValue().getGraphCount() > 0) {
-      for (Long graph : e.getValue().getGraphs()) {
+    if (edge.getGraphCount() > 0) {
+      for (Long graph : edge.getGraphs()) {
         if (identifiers.contains(graph)) {
           vertexInGraph = true;
           break;

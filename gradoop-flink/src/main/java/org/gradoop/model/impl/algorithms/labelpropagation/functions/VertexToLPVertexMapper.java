@@ -25,16 +25,14 @@ import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 /**
  * Maps EPGM vertices to a Label Propagation specific representation.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  * @see LPVertexValue
  */
 public class VertexToLPVertexMapper<VD extends VertexData>
-  implements MapFunction<Vertex<Long, VD>,
-  Vertex<Long, LPVertexValue>> {
+  implements MapFunction<VD, Vertex<Long, LPVertexValue>> {
 
   @Override
-  public Vertex<Long, LPVertexValue> map(
-    Vertex<Long, VD> vertex) throws Exception {
+  public Vertex<Long, LPVertexValue> map(VD vertex) throws Exception {
     return new Vertex<>(vertex.getId(),
       new LPVertexValue(vertex.getId(), vertex.getId()));
   }

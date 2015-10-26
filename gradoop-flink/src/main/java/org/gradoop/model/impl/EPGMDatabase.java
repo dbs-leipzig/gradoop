@@ -27,7 +27,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.hbase.HBaseReader;
 import org.gradoop.io.hbase.HBaseWriter;
@@ -39,14 +38,13 @@ import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.api.VertexDataFactory;
-import org.gradoop.util.FlinkConstants;
-import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
 import org.gradoop.model.impl.pojo.DefaultEdgeDataFactory;
 import org.gradoop.model.impl.pojo.DefaultGraphData;
 import org.gradoop.model.impl.pojo.DefaultGraphDataFactory;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
 import org.gradoop.model.impl.pojo.DefaultVertexDataFactory;
+import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdgeData;
 import org.gradoop.storage.api.PersistentEdgeDataFactory;
@@ -54,15 +52,16 @@ import org.gradoop.storage.api.PersistentGraphData;
 import org.gradoop.storage.api.PersistentGraphDataFactory;
 import org.gradoop.storage.api.PersistentVertexData;
 import org.gradoop.storage.api.PersistentVertexDataFactory;
+import org.gradoop.util.FlinkConstants;
 
 import java.util.Collection;
 
 /**
  * Enables the access an EPGM instance.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
   extends GraphData> {
@@ -102,14 +101,14 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
    *
    * @param vertices          vertex data set
    * @param edges             edge data set
-   * @param graphs            graph data set
+   * @param graphHeads        graph data set
    * @param vertexDataFactory vertex data factory
    * @param edgeDataFactory   edge data factory
    * @param graphDataFactory  graph data factory
    * @param env               Flink execution environment
    */
-  private EPGMDatabase(DataSet<Vertex<Long, VD>> vertices,
-    DataSet<Edge<Long, ED>> edges, DataSet<Subgraph<Long, GD>> graphs,
+  private EPGMDatabase(DataSet<VD> vertices,
+    DataSet<ED> edges, DataSet<GD> graphHeads,
     VertexDataFactory<VD> vertexDataFactory,
     EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD> graphDataFactory,
     ExecutionEnvironment env) {
@@ -117,11 +116,11 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     this.edgeDataFactory = edgeDataFactory;
     this.graphDataFactory = graphDataFactory;
     this.database =
-      new GraphCollection<>(Graph.fromDataSet(vertices, edges, env), graphs,
+      new GraphCollection<>(vertices, edges, graphHeads,
         vertexDataFactory, edgeDataFactory, graphDataFactory, env);
     this.env = env;
-    this.databaseData =
-      graphDataFactory.createGraphData(FlinkConstants.DATABASE_GRAPH_ID);
+    this.databaseData = graphDataFactory
+      .createGraphData(FlinkConstants.DATABASE_GRAPH_ID);
   }
 
   /**
@@ -220,38 +219,33 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     ExecutionEnvironment env) {
 
     // used for type hinting when loading vertex data
-    TypeInformation<Vertex<Long, VD>> vertexTypeInfo =
-      new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(vertexDataFactory.getType()));
+    TypeInformation<VD> vertexTypeInfo = (TypeInformation<VD>)
+      TypeExtractor.createTypeInfo(vertexDataFactory.getType());
     // used for type hinting when loading edge data
-    TypeInformation<Edge<Long, ED>> edgeTypeInfo =
-      new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
-        BasicTypeInfo.LONG_TYPE_INFO,
-          TypeExtractor.createTypeInfo(edgeDataFactory.getType()));
+    TypeInformation<ED> edgeTypeInfo = (TypeInformation<ED>)
+      TypeExtractor.createTypeInfo(edgeDataFactory.getType());
     // used for type hinting when loading graph data
-    TypeInformation<Subgraph<Long, GD>> graphTypeInfo =
-      new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(graphDataFactory.getType()));
+    TypeInformation<GD> graphTypeInfo = (TypeInformation<GD>)
+      TypeExtractor.createTypeInfo(graphDataFactory.getType());
 
     // read vertex, edge and graph data
-    DataSet<Vertex<Long, VD>> vertices = env.readTextFile(vertexFile)
+    DataSet<VD> vertices = env.readTextFile(vertexFile)
       .map(new JsonReader.JsonToVertexMapper<>(vertexDataFactory))
       .returns(vertexTypeInfo);
-    DataSet<Edge<Long, ED>> edges = env.readTextFile(edgeFile)
+    DataSet<ED> edges = env.readTextFile(edgeFile)
       .map(new JsonReader.JsonToEdgeMapper<>(edgeDataFactory))
       .returns(edgeTypeInfo);
-    DataSet<Subgraph<Long, GD>> graphs;
+    DataSet<GD> graphHeads;
     if (graphFile != null) {
-      graphs = env.readTextFile(graphFile)
+      graphHeads = env.readTextFile(graphFile)
         .map(new JsonReader.JsonToGraphMapper<>(graphDataFactory))
         .returns(graphTypeInfo);
     } else {
-      graphs = env.fromCollection(Lists.newArrayList(
-        new Subgraph<>(FlinkConstants.DATABASE_GRAPH_ID,
-          graphDataFactory.createGraphData(FlinkConstants.DATABASE_GRAPH_ID))));
+      graphHeads = env.fromCollection(Lists.newArrayList(
+        graphDataFactory.createGraphData(FlinkConstants.DATABASE_GRAPH_ID)));
     }
 
-    return new EPGMDatabase<>(vertices, edges, graphs, vertexDataFactory,
+    return new EPGMDatabase<>(vertices, edges, graphHeads, vertexDataFactory,
       edgeDataFactory, graphDataFactory, env);
   }
 
@@ -271,12 +265,12 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
    */
   public void writeAsJson(final String vertexFile, final String edgeFile,
     final String graphFile) throws Exception {
-    getDatabaseGraph().getGellyGraph().getVertices()
+    getDatabaseGraph().getVertices()
       .writeAsFormattedText(vertexFile,
         new JsonWriter.VertexTextFormatter<VD>());
-    getDatabaseGraph().getGellyGraph().getEdges()
+    getDatabaseGraph().getEdges()
       .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
-    getCollection().getSubgraphs()
+    getCollection().getGraphHeads()
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
     env.execute();
   }
@@ -306,17 +300,17 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     HBaseWriter<VD, ED, GD> hBaseWriter = new HBaseWriter<>();
 
     // transform graph data to persistent graph data and write it
-    hBaseWriter.writeGraphData(this, epgmStore.getGraphDataHandler(),
+    hBaseWriter.writeGraphHeads(this, epgmStore.getGraphDataHandler(),
       persistentGraphDataFactory, epgmStore.getGraphDataTableName());
     env.execute();
 
     // transform vertex data to persistent vertex data and write it
-    hBaseWriter.writeVertexData(this, epgmStore.getVertexDataHandler(),
+    hBaseWriter.writeVertices(this, epgmStore.getVertexDataHandler(),
       persistentVertexDataFactory, epgmStore.getVertexDataTableName());
     env.execute();
 
     // transform edge data to persistent edge data and write it
-    hBaseWriter.writeEdgeData(this, epgmStore.getEdgeDataHandler(),
+    hBaseWriter.writeEdges(this, epgmStore.getEdgeDataHandler(),
       persistentEdgeDataFactory, epgmStore.getEdgeDataTableName());
     env.execute();
   }
@@ -398,10 +392,9 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
   /**
    * Creates a database from collections of vertex and data objects.
    *
-   * @param vertexDataCollection collection of vertex data objects
-   * @param edgeDataCollection   collection of edge data objects
-   * @param graphDataCollection  collection of graph data objects* @param
-   *                             edgeDataCollection
+   * @param vertexDataCollection collection of vertices
+   * @param edgeDataCollection   collection of edges
+   * @param graphDataCollection  collection of graph heads
    * @param vertexDataFactory    vertex data factory
    * @param edgeDataFactory      edge data factory
    * @param graphDataFactory     graph data factory
@@ -418,26 +411,17 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
     Collection<GD> graphDataCollection, VertexDataFactory<VD> vertexDataFactory,
     EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD> graphDataFactory,
     ExecutionEnvironment env) {
-    DataSet<VD> epgmVertexSet = env.fromCollection(vertexDataCollection);
-    DataSet<ED> epgmEdgeSet = env.fromCollection(edgeDataCollection);
-    DataSet<GD> epgmGraphSet;
+    DataSet<VD> vertices = env.fromCollection(vertexDataCollection);
+    DataSet<ED> edges = env.fromCollection(edgeDataCollection);
+    DataSet<GD> graphHeads;
     if (graphDataCollection != null) {
-      epgmGraphSet = env.fromCollection(graphDataCollection);
+      graphHeads = env.fromCollection(graphDataCollection);
     } else {
-      epgmGraphSet = env.fromCollection(Lists.newArrayList(
+      graphHeads = env.fromCollection(Lists.newArrayList(
         graphDataFactory.createGraphData(FlinkConstants.DATABASE_GRAPH_ID)));
     }
 
-    DataSet<Vertex<Long, VD>> vertexDataSet = null;
-    DataSet<Edge<Long, ED>> edgeDataSet = null;
-    DataSet<Subgraph<Long, GD>> graphDataSet = null;
-
-    if (epgmVertexSet != null) {
-      vertexDataSet = epgmVertexSet.map(new VerticesConverter<VD>());
-      edgeDataSet = epgmEdgeSet.map(new EdgesConverter<ED>());
-      graphDataSet = epgmGraphSet.map(new GraphsConverter<GD>());
-    }
-    return new EPGMDatabase<>(vertexDataSet, edgeDataSet, graphDataSet,
+    return new EPGMDatabase<>(vertices, edges, graphHeads,
       vertexDataFactory, edgeDataFactory, graphDataFactory, env);
   }
 
@@ -486,7 +470,25 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
         epgmStore.getGraphDataHandler(), epgmStore.getGraphDataTableName()),
       graphTypeInfo);
 
-    return new EPGMDatabase<>(vertexDataSet, edgeDataSet, subgraphDataSet,
+    return new EPGMDatabase<>(
+      vertexDataSet.map(new MapFunction<Vertex<Long, VD>, VD>() {
+        @Override
+        public VD map(Vertex<Long, VD> longVDVertex) throws Exception {
+          return longVDVertex.getValue();
+        }
+      }).withForwardedFields("f1->*"),
+      edgeDataSet.map(new MapFunction<Edge<Long, ED>, ED>() {
+        @Override
+        public ED map(Edge<Long, ED> longEDEdge) throws Exception {
+          return longEDEdge.getValue();
+        }
+      }).withForwardedFields("f2->*"),
+      subgraphDataSet.map(new MapFunction<Subgraph<Long, GD>, GD>() {
+        @Override
+        public GD map(Subgraph<Long, GD> longGDSubgraph) throws Exception {
+          return longGDSubgraph.getValue();
+        }
+      }).withForwardedFields("f1->*"),
       epgmStore.getVertexDataHandler().getVertexDataFactory(),
       epgmStore.getEdgeDataHandler().getEdgeDataFactory(),
       epgmStore.getGraphDataHandler().getGraphDataFactory(), env);
@@ -500,8 +502,8 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
    */
   public LogicalGraph<VD, ED, GD> getDatabaseGraph() {
     return LogicalGraph
-      .fromGellyGraph(database.getGellyGraph(), databaseData, vertexDataFactory,
-        edgeDataFactory, graphDataFactory);
+      .fromDataSets(database.getVertices(), database.getEdges(), databaseData,
+        vertexDataFactory, edgeDataFactory, graphDataFactory);
   }
 
   /**
@@ -521,71 +523,25 @@ public class EPGMDatabase<VD extends VertexData, ED extends EdgeData, GD
    * @return collection of all logical graphs
    */
   public GraphCollection<VD, ED, GD> getCollection() {
-    DataSet<Vertex<Long, VD>> newVertices =
-      database.getGellyGraph().getVertices()
-        .filter(new FilterFunction<Vertex<Long, VD>>() {
+    DataSet<VD> newVertices =
+      database.getVertices()
+        .filter(new FilterFunction<VD>() {
           @Override
-          public boolean filter(Vertex<Long, VD> longVDVertex) throws
+          public boolean filter(VD vertex) throws
             Exception {
-            return longVDVertex.getValue().getGraphCount() > 0;
+            return vertex.getGraphCount() > 0;
           }
         });
-    DataSet<Edge<Long, ED>> newEdges = database.getGellyGraph().getEdges()
-      .filter(new FilterFunction<Edge<Long, ED>>() {
+    DataSet<ED> newEdges = database.getEdges()
+      .filter(new FilterFunction<ED>() {
         @Override
-        public boolean filter(Edge<Long, ED> longEDEdge) throws Exception {
-          return longEDEdge.getValue().getGraphCount() > 0;
+        public boolean filter(ED longEDEdge) throws Exception {
+          return longEDEdge.getGraphCount() > 0;
         }
       });
 
-    return new GraphCollection<>(Graph.fromDataSet(newVertices, newEdges, env),
-      database.getSubgraphs(), database.getVertexDataFactory(),
+    return new GraphCollection<>(newVertices, newEdges,
+      database.getGraphHeads(), database.getVertexDataFactory(),
       database.getEdgeDataFactory(), database.getGraphDataFactory(), env);
-  }
-
-  /**
-   * Takes an EPGM vertex data object and converts it into a Gelly vertex.
-   */
-  private static class VerticesConverter<VD extends VertexData> implements
-    MapFunction<VD, Vertex<Long, VD>> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Vertex<Long, VD> map(VD value) throws Exception {
-      return new Vertex<>(value.getId(), value);
-    }
-  }
-
-  /**
-   * Takes an EPGM edge data object and converts it into a Gelly edge.
-   */
-  public static class EdgesConverter<ED extends EdgeData> implements
-    MapFunction<ED, Edge<Long, ED>> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Edge<Long, ED> map(ED value) throws Exception {
-      return new Edge<>(value.getSourceVertexId(), value.getTargetVertexId(),
-        value);
-    }
-  }
-
-  /**
-   * Takes an EPGM graph data object and converts into a subgraph.
-   */
-  private static class GraphsConverter<GD extends GraphData> implements
-    MapFunction<GD, Subgraph<Long, GD>> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Subgraph<Long, GD> map(GD value) throws Exception {
-      return new Subgraph<>(value.getId(), value);
-    }
   }
 }

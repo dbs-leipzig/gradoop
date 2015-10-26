@@ -2062,9 +2062,9 @@ public abstract class LogicalGraphSummarizeTestBase extends FlinkTestBase {
       edges = Lists.newArrayList();
 
       // use collections as data sink
-      summarizedGraph.getVertexData()
+      summarizedGraph.getVertices()
         .output(new LocalCollectionOutputFormat<>(vertices));
-      summarizedGraph.getEdgeData()
+      summarizedGraph.getEdges()
         .output(new LocalCollectionOutputFormat<>(edges));
 
       // execute the job

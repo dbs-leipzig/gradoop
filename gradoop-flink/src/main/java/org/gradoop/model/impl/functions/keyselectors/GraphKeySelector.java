@@ -19,17 +19,16 @@ package org.gradoop.model.impl.functions.keyselectors;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.model.api.GraphData;
-import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
  * Returns the unique graph identifier.
  *
- * @param <GD> graph data type
+ * @param <GD> EPGM graph head type
  */
 public class GraphKeySelector<GD extends GraphData>
-  implements KeySelector<Subgraph<Long, GD>, Long> {
+  implements KeySelector<GD, Long> {
   @Override
-  public Long getKey(Subgraph<Long, GD> g) throws Exception {
-    return g.f0;
+  public Long getKey(GD graph) throws Exception {
+    return graph.getId();
   }
 }

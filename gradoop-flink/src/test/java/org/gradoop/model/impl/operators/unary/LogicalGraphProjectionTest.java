@@ -55,13 +55,13 @@ public class LogicalGraphProjectionTest extends FlinkTestBase {
     List<DefaultVertexData> newVertices = Lists.newArrayList();
     List<DefaultEdgeData> newEdges = Lists.newArrayList();
 
-    forumGraph.getVertexData().output(
+    forumGraph.getVertices().output(
       new LocalCollectionOutputFormat<>(oldVertices));
-    forumGraph.getEdgeData().output(
+    forumGraph.getEdges().output(
       new LocalCollectionOutputFormat<>(oldEdges));
-    newGraph.getVertexData().output(
+    newGraph.getVertices().output(
       new LocalCollectionOutputFormat<>(newVertices));
-    newGraph.getEdgeData().output(
+    newGraph.getEdges().output(
       new LocalCollectionOutputFormat<>(newEdges));
 
     getExecutionEnvironment().execute();

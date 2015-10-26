@@ -18,13 +18,11 @@
 package org.gradoop.model.impl.operators.collection;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
-import org.gradoop.model.impl.tuples.Subgraph;
 
 import java.util.List;
 
@@ -35,9 +33,9 @@ import java.util.List;
  * This operator implementation requires that a list of subgraph identifiers
  * in the resulting graph collections fits into the workers main memory.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class IntersectUsingList<
   VD extends VertexData,
@@ -46,12 +44,12 @@ public class IntersectUsingList<
   extends Intersect<VD, ED, GD> {
 
   @Override
-  protected DataSet<Vertex<Long, VD>> computeNewVertices(
-    DataSet<Subgraph<Long, GD>> newSubgraphs) throws Exception {
-    final List<Long> identifiers = secondSubgraphs
+  protected DataSet<VD> computeNewVertices(
+    DataSet<GD> newSubgraphs) throws Exception {
+    final List<Long> identifiers = secondCollection.getGraphHeads()
       .map(new GraphToIdentifierMapper<GD>()).collect();
 
-    DataSet<Vertex<Long, VD>> vertices = firstGraph.getVertices();
+    DataSet<VD> vertices = firstCollection.getVertices();
     return vertices.filter(new VertexInGraphsFilter<VD>(identifiers));
   }
 

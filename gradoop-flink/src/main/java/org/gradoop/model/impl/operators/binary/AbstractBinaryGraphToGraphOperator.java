@@ -18,14 +18,12 @@
 package org.gradoop.model.impl.operators.binary;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.model.impl.LogicalGraph;
 
 import java.util.Iterator;
 
@@ -33,9 +31,9 @@ import java.util.Iterator;
  * Abstract operator implementation which can be used with binary graph to
  * graph operators.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public abstract class AbstractBinaryGraphToGraphOperator<
   VD extends VertexData,
@@ -74,7 +72,7 @@ public abstract class AbstractBinaryGraphToGraphOperator<
    * gets returned.
    */
   protected static class VertexGroupReducer<VD extends VertexData> implements
-    GroupReduceFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
+    GroupReduceFunction<VD, VD> {
 
     /**
      * Number of times, a vertex must occur inside a group
@@ -119,24 +117,24 @@ public abstract class AbstractBinaryGraphToGraphOperator<
      * {@inheritDoc}
      */
     @Override
-    public void reduce(Iterable<Vertex<Long, VD>> iterable,
-      Collector<Vertex<Long, VD>> collector) throws Exception {
-      Iterator<Vertex<Long, VD>> iterator = iterable.iterator();
+    public void reduce(Iterable<VD> iterable,
+      Collector<VD> collector) throws Exception {
+      Iterator<VD> iterator = iterable.iterator();
       long count = 0L;
-      Vertex<Long, VD> v = null;
+      VD vertex = null;
       while (iterator.hasNext()) {
-        v = iterator.next();
+        vertex = iterator.next();
         count++;
       }
       if (count == amount) {
         if (includedGraphID != null && precludedGraphID != null) {
-          assert v != null;
-          if (v.getValue().getGraphs().contains(includedGraphID) &&
-            !v.getValue().getGraphs().contains(precludedGraphID)) {
-            collector.collect(v);
+          assert vertex != null;
+          if (vertex.getGraphs().contains(includedGraphID) &&
+            !vertex.getGraphs().contains(precludedGraphID)) {
+            collector.collect(vertex);
           }
         } else {
-          collector.collect(v);
+          collector.collect(vertex);
         }
       }
     }
@@ -149,7 +147,7 @@ public abstract class AbstractBinaryGraphToGraphOperator<
    * given amount. If yes, reducer returns the edge.
    */
   protected static class EdgeGroupReducer<ED extends EdgeData> implements
-    GroupReduceFunction<Edge<Long, ED>, Edge<Long, ED>> {
+    GroupReduceFunction<ED, ED> {
 
     /**
      * Number of group elements that must be reached.
@@ -170,17 +168,17 @@ public abstract class AbstractBinaryGraphToGraphOperator<
      * {@inheritDoc}
      */
     @Override
-    public void reduce(Iterable<Edge<Long, ED>> iterable,
-      Collector<Edge<Long, ED>> collector) throws Exception {
-      Iterator<Edge<Long, ED>> iterator = iterable.iterator();
+    public void reduce(Iterable<ED> iterable,
+      Collector<ED> collector) throws Exception {
+      Iterator<ED> iterator = iterable.iterator();
       long count = 0L;
-      Edge<Long, ED> e = null;
+      ED edge = null;
       while (iterator.hasNext()) {
-        e = iterator.next();
+        edge = iterator.next();
         count++;
       }
       if (count == amount) {
-        collector.collect(e);
+        collector.collect(edge);
       }
     }
   }

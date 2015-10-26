@@ -18,22 +18,17 @@
 package org.gradoop.model.impl.operators.collection;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.model.impl.GraphCollection;
 
 import java.util.Iterator;
 
@@ -41,9 +36,9 @@ import java.util.Iterator;
  * Abstract operator implementation which can be used with binary collection
  * to collection operators.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public abstract class AbstractBinaryCollectionToCollectionOperator<
   VD extends VertexData,
@@ -52,27 +47,13 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
   implements BinaryCollectionToCollectionOperator<VD, ED, GD> {
 
   /**
-   * Gelly graph representing the first input collection.
+   * First input collection.
    */
-  protected Graph<Long, VD, ED> firstGraph;
+  protected GraphCollection<VD, ED, GD> firstCollection;
   /**
-   * Gelly graph representing the second input collection.
+   * Second input collection.
    */
-  protected Graph<Long, VD, ED> secondGraph;
-
-  /**
-   * Graph data of the first input collection.
-   */
-  protected DataSet<Subgraph<Long, GD>> firstSubgraphs;
-  /**
-   * Graph data of the second input collection.
-   */
-  protected DataSet<Subgraph<Long, GD>> secondSubgraphs;
-
-  /**
-   * Flink execution environment.
-   */
-  protected ExecutionEnvironment env;
+  protected GraphCollection<VD, ED, GD> secondCollection;
 
   /**
    * {@inheritDoc}
@@ -83,61 +64,54 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
     GraphCollection<VD, ED, GD> secondCollection) throws Exception {
 
     // do some init stuff for the actual operator
-    env = firstCollection.getVertices().getExecutionEnvironment();
-    firstGraph = Graph.fromDataSet(firstCollection.getVertices(),
-      firstCollection.getEdges(),
-      env);
-    firstSubgraphs = firstCollection.getSubgraphs();
+    this.firstCollection = firstCollection;
+    this.secondCollection = secondCollection;
 
-    secondGraph = Graph.fromDataSet(secondCollection.getVertices(),
-      secondCollection.getEdges(),
-      env);
-    secondSubgraphs = secondCollection.getSubgraphs();
+    final DataSet<GD> newGraphHeads = computeNewGraphHeads();
+    final DataSet<VD> newVertices = computeNewVertices(newGraphHeads);
+    final DataSet<ED> newEdges = computeNewEdges(newVertices);
 
-    final DataSet<Subgraph<Long, GD>> newSubgraphs = computeNewSubgraphs();
-    final DataSet<Vertex<Long, VD>> newVertices =
-      computeNewVertices(newSubgraphs);
-    final DataSet<Edge<Long, ED>> newEdges = computeNewEdges(newVertices);
-
-    return new GraphCollection<>(Graph.fromDataSet(newVertices, newEdges, env),
-      newSubgraphs, firstCollection.getVertexDataFactory(),
+    return new GraphCollection<>(newVertices,
+      newEdges,
+      newGraphHeads,
+      firstCollection.getVertexDataFactory(),
       firstCollection.getEdgeDataFactory(),
-      firstCollection.getGraphDataFactory(), env);
+      firstCollection.getGraphDataFactory(),
+      firstCollection.getExecutionEnvironment());
   }
 
   /**
    * Overridden by inheriting classes.
    *
-   * @param newSubgraphs graph dataset of the resulting graph collection
+   * @param newGraphHeads new graph heads
    * @return vertex set of the resulting graph collection
    */
-  protected abstract DataSet<Vertex<Long, VD>> computeNewVertices(
-    DataSet<Subgraph<Long, GD>> newSubgraphs) throws Exception;
+  protected abstract DataSet<VD> computeNewVertices(
+    DataSet<GD> newGraphHeads) throws Exception;
 
   /**
    * Overridden by inheriting classes.
    *
    * @return subgraph dataset of the resulting collection
    */
-  protected abstract DataSet<Subgraph<Long, GD>> computeNewSubgraphs();
+  protected abstract DataSet<GD> computeNewGraphHeads();
 
   /**
-   * Overriden by inheriting classes.
+   * Overridden by inheriting classes.
    *
    * @param newVertices vertex set of the resulting graph collection
    * @return edges set only connect vertices in {@code newVertices}
    */
-  protected abstract DataSet<Edge<Long, ED>> computeNewEdges(
-    DataSet<Vertex<Long, VD>> newVertices);
+  protected abstract DataSet<ED> computeNewEdges(DataSet<VD> newVertices);
 
   /**
    * Checks if the number of grouped elements equals a given expected size.
    *
-   * @param <GD> graph data type
+   * @param <GD> EPGM graph head type
    * @see Intersect
    */
-  protected static class SubgraphGroupReducer<GD extends GraphData> implements
-    GroupReduceFunction<Subgraph<Long, GD>, Subgraph<Long, GD>> {
+  protected static class GraphHeadGroupReducer<GD extends GraphData> implements
+    GroupReduceFunction<GD, GD> {
 
     /**
      * User defined expectedGroupSize.
@@ -149,7 +123,7 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
      *
      * @param expectedGroupSize expected group size
      */
-    public SubgraphGroupReducer(long expectedGroupSize) {
+    public GraphHeadGroupReducer(long expectedGroupSize) {
       this.expectedGroupSize = expectedGroupSize;
     }
 
@@ -162,43 +136,18 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
      * @throws Exception
      */
     @Override
-    public void reduce(Iterable<Subgraph<Long, GD>> iterable,
-      Collector<Subgraph<Long, GD>> collector) throws Exception {
-      Iterator<Subgraph<Long, GD>> iterator = iterable.iterator();
+    public void reduce(Iterable<GD> iterable,
+      Collector<GD> collector) throws Exception {
+      Iterator<GD> iterator = iterable.iterator();
       long count = 0L;
-      Subgraph<Long, GD> s = null;
+      GD graphHead = null;
       while (iterator.hasNext()) {
-        s = iterator.next();
+        graphHead = iterator.next();
         count++;
       }
       if (count == expectedGroupSize) {
-        collector.collect(s);
+        collector.collect(graphHead);
       }
-    }
-  }
-
-  /**
-   * Returns only the edge as result of an edge vertex join.
-   *
-   * @param <VD> vertex data type
-   * @param <ED> edge data type
-   */
-  protected static class EdgeJoinFunction<VD extends VertexData, ED extends
-    EdgeData> implements
-    JoinFunction<Edge<Long, ED>, Vertex<Long, VD>, Edge<Long, ED>> {
-
-    /**
-     * Returns only the left tuple of the join result.
-     *
-     * @param leftTuple  edge
-     * @param rightTuple vertex
-     * @return edge
-     * @throws Exception
-     */
-    @Override
-    public Edge<Long, ED> join(Edge<Long, ED> leftTuple,
-      Vertex<Long, VD> rightTuple) throws Exception {
-      return leftTuple;
     }
   }
 
@@ -207,6 +156,7 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
    *
    * @param <C> input type
    */
+  @FunctionAnnotation.ForwardedFields("*->f0")
   protected static class Tuple2LongMapper<C> implements
     MapFunction<C, Tuple2<C, Long>> {
 
@@ -241,12 +191,12 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
    */
   protected static class SubgraphTupleKeySelector<GD extends GraphData, C>
     implements
-    KeySelector<Tuple2<Subgraph<Long, GD>, C>, Long> {
+    KeySelector<Tuple2<GD, C>, Long> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Long getKey(Tuple2<Subgraph<Long, GD>, C> subgraph) throws
+    public Long getKey(Tuple2<GD, C> subgraph) throws
       Exception {
       return subgraph.f0.getId();
     }

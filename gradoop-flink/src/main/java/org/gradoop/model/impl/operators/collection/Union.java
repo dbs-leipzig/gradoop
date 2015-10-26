@@ -18,23 +18,20 @@
 package org.gradoop.model.impl.operators.collection;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
-import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
  * Returns a collection with all logical graphs from two input collections.
  * Graph equality is based on their identifiers.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class Union<
   VD extends VertexData,
@@ -46,10 +43,10 @@ public class Union<
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<Vertex<Long, VD>> computeNewVertices(
-    DataSet<Subgraph<Long, GD>> newSubgraphs) throws Exception {
-    return firstGraph.getVertices()
-      .union(secondGraph.getVertices())
+  protected DataSet<VD> computeNewVertices(
+    DataSet<GD> newGraphHeads) throws Exception {
+    return firstCollection.getVertices()
+      .union(secondCollection.getVertices())
       .distinct(new VertexKeySelector<VD>());
   }
 
@@ -57,9 +54,9 @@ public class Union<
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<Subgraph<Long, GD>> computeNewSubgraphs() {
-    return firstSubgraphs
-      .union(secondSubgraphs)
+  protected DataSet<GD> computeNewGraphHeads() {
+    return firstCollection.getGraphHeads()
+      .union(secondCollection.getGraphHeads())
       .distinct(new GraphKeySelector<GD>());
   }
 
@@ -67,10 +64,9 @@ public class Union<
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<Edge<Long, ED>> computeNewEdges(
-    DataSet<Vertex<Long, VD>> newVertices) {
-    return firstGraph.getEdges()
-      .union(secondGraph.getEdges())
+  protected DataSet<ED> computeNewEdges(DataSet<VD> newVertices) {
+    return firstCollection.getEdges()
+      .union(secondCollection.getEdges())
       .distinct(new EdgeKeySelector<ED>());
   }
 

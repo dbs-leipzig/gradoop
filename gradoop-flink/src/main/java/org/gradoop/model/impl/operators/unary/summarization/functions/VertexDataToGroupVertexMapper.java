@@ -31,7 +31,7 @@ import org.gradoop.model.impl.operators.unary.summarization.tuples.VertexForGrou
  * the vertex id, vertex label and vertex property. Depending on the
  * summarization parameters, label and property can be null.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("f0")
 public class VertexDataToGroupVertexMapper<VD extends VertexData> implements

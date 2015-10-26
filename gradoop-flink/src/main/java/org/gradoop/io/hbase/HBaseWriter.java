@@ -24,16 +24,11 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.hadoop.mapreduce.HadoopOutputFormat;
-import org.apache.flink.api.java.operators.CoGroupOperator;
-import org.apache.flink.api.java.operators.FlatMapOperator;
-import org.apache.flink.api.java.operators.GroupReduceOperator;
-import org.apache.flink.api.java.operators.JoinOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
@@ -45,7 +40,11 @@ import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.tuples.Subgraph;
+import org.gradoop.model.impl.functions.keyselectors
+  .EdgeSourceVertexKeySelector;
+import org.gradoop.model.impl.functions.keyselectors
+  .EdgeTargetVertexKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.storage.api.EdgeDataHandler;
 import org.gradoop.storage.api.GraphDataHandler;
 import org.gradoop.storage.api.PersistentEdgeData;
@@ -57,17 +56,18 @@ import org.gradoop.storage.api.PersistentVertexDataFactory;
 import org.gradoop.storage.api.VertexDataHandler;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Set;
 
 /**
  * Contains methods and classes to write an EPGM database to HBase.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> {
+  extends GraphData> implements Serializable {
 
   /**
    * Converts runtime vertex data to persistent vertex data (includes
@@ -80,77 +80,75 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <PVD>                       persistent vertex data type
    * @throws Exception
    */
-  public <PVD extends PersistentVertexData<ED>> void writeVertexData(
+  public <PVD extends PersistentVertexData<ED>> void writeVertices(
     final EPGMDatabase<VD, ED, GD> epgmDatabase,
     final VertexDataHandler<VD, ED> vertexDataHandler,
     final PersistentVertexDataFactory<VD, ED, PVD> persistentVertexDataFactory,
     final String vertexDataTableName) throws Exception {
 
-    final LogicalGraph<VD, ED, GD> graph =
-      epgmDatabase.getDatabaseGraph();
+    final LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
 
     // group edges by source vertex id (vertex-id, [out-edge-data])
-    GroupReduceOperator<Edge<Long, ED>, Tuple2<Long, Set<ED>>>
-      vertexToOutgoingEdges =
-      graph.getEdges().groupBy(0) // group by source vertex id
-        .reduceGroup(
-          new GroupReduceFunction<Edge<Long, ED>, Tuple2<Long, Set<ED>>>() {
-            @Override
-            public void reduce(Iterable<Edge<Long, ED>> edgeIterable,
-              Collector<Tuple2<Long, Set<ED>>> collector) throws Exception {
-              Set<ED> outgoingEdgeData = Sets.newHashSet();
-              Long vertexId = null;
-              boolean initialized = false;
-              for (Edge<Long, ED> edgeData : edgeIterable) {
-                if (!initialized) {
-                  vertexId = edgeData.getSource();
-                  initialized = true;
-                }
-                outgoingEdgeData.add(edgeData.getValue());
-              }
-              collector.collect(new Tuple2<>(vertexId, outgoingEdgeData));
+    DataSet<Tuple2<Long, Set<ED>>> vertexToOutgoingEdges = graph.getEdges()
+      .groupBy(new EdgeSourceVertexKeySelector<ED>())
+      .reduceGroup(new GroupReduceFunction<ED, Tuple2<Long, Set<ED>>>() {
+        @Override
+        public void reduce(Iterable<ED> edgeIterable,
+          Collector<Tuple2<Long, Set<ED>>> collector) throws Exception {
+          Set<ED> outgoingEdgeData = Sets.newHashSet();
+          Long vertexId = null;
+          boolean initialized = false;
+          for (ED edge : edgeIterable) {
+            if (!initialized) {
+              vertexId = edge.getSourceVertexId();
+              initialized = true;
             }
-          });
+            outgoingEdgeData.add(edge);
+          }
+          collector.collect(new Tuple2<>(vertexId, outgoingEdgeData));
+        }
+      });
 
     // group edges by target vertex id (vertex-id, [in-edge-data])
-    GroupReduceOperator<Edge<Long, ED>, Tuple2<Long, Set<ED>>>
-      vertexToIncomingEdges =
-      graph.getEdges().groupBy(1) // group by target vertex id
-        .reduceGroup(
-          new GroupReduceFunction<Edge<Long, ED>, Tuple2<Long, Set<ED>>>() {
-            @Override
-            public void reduce(Iterable<Edge<Long, ED>> edgeIterable,
-              Collector<Tuple2<Long, Set<ED>>> collector) throws Exception {
-              Set<ED> outgoingEdgeData = Sets.newHashSet();
-              Long vertexId = null;
-              boolean initialized = false;
-              for (Edge<Long, ED> edgeData : edgeIterable) {
-                if (!initialized) {
-                  vertexId = edgeData.getTarget();
-                  initialized = true;
-                }
-                outgoingEdgeData.add(edgeData.getValue());
-              }
-              collector.collect(new Tuple2<>(vertexId, outgoingEdgeData));
+    DataSet<Tuple2<Long, Set<ED>>> vertexToIncomingEdges = graph.getEdges()
+      .groupBy(new EdgeTargetVertexKeySelector<ED>())
+      .reduceGroup(new GroupReduceFunction<ED, Tuple2<Long, Set<ED>>>() {
+        @Override
+        public void reduce(Iterable<ED> edgeIterable,
+          Collector<Tuple2<Long, Set<ED>>> collector) throws Exception {
+          Set<ED> outgoingEdgeData = Sets.newHashSet();
+          Long vertexId = null;
+          boolean initialized = false;
+          for (ED edge : edgeIterable) {
+            if (!initialized) {
+              vertexId = edge.getTargetVertexId();
+              initialized = true;
             }
-          });
+            outgoingEdgeData.add(edge);
+          }
+          collector.collect(new Tuple2<>(vertexId, outgoingEdgeData));
+        }
+      });
 
     // co-group (vertex-data) with (vertex-id, [out-edge-data]) to simulate left
     // outer join
-    DataSet<Tuple2<Vertex<Long, VD>, Set<ED>>> vertexDataWithOutgoingEdges =
-      graph.getVertices().coGroup(vertexToOutgoingEdges).where(0).equalTo(0)
+    DataSet<Tuple2<VD, Set<ED>>> vertexDataWithOutgoingEdges =
+      graph.getVertices()
+        .coGroup(vertexToOutgoingEdges)
+        .where("id")
+        .equalTo(0)
         .with(
-          new CoGroupFunction<Vertex<Long, VD>, Tuple2<Long, Set<ED>>,
-            Tuple2<Vertex<Long, VD>, Set<ED>>>() {
+          new CoGroupFunction<VD, Tuple2<Long, Set<ED>>,
+            Tuple2<VD, Set<ED>>>() {
             @Override
-            public void coGroup(Iterable<Vertex<Long, VD>> vertexIterable,
+            public void coGroup(Iterable<VD> vertexIterable,
               Iterable<Tuple2<Long, Set<ED>>> outEdgesIterable,
-              Collector<Tuple2<Vertex<Long, VD>, Set<ED>>> collector) throws
+              Collector<Tuple2<VD, Set<ED>>> collector) throws
               Exception {
-              Vertex<Long, VD> vertex = null;
+              VD vertex = null;
               Set<ED> outgoingEdgeData = null;
               // read vertex data from left group
-              for (Vertex<Long, VD> v : vertexIterable) {
+              for (VD v : vertexIterable) {
                 vertex = v;
               }
               // read outgoing edge from right group (may be empty)
@@ -164,9 +162,17 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     // co-group (vertex-data, (vertex-id, [out-edge-data])) with (vertex-id,
     // [in-edge-data]) to simulate left outer join
     DataSet<PersistentVertexData<ED>> persistentVertexDataSet =
-      vertexDataWithOutgoingEdges.coGroup(vertexToIncomingEdges).where("0.0")
-        .equalTo(0).with(
-        new PersistentVertexDataCoGroupFunction<>(persistentVertexDataFactory));
+      vertexDataWithOutgoingEdges
+        .coGroup(vertexToIncomingEdges)
+        .where(new KeySelector<Tuple2<VD, Set<ED>>, Long>() {
+          @Override
+          public Long getKey(Tuple2<VD, Set<ED>> vdSetTuple2) throws Exception {
+            return vdSetTuple2.f0.getId();
+          }
+        })
+        .equalTo(0)
+        .with(new PersistentVertexDataCoGroupFunction<>(
+          persistentVertexDataFactory));
 
     // write (persistent-vertex-data) to HBase table
     Job job = Job.getInstance();
@@ -190,7 +196,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <PED>                     persistent edge data type
    * @throws IOException
    */
-  public <PED extends PersistentEdgeData<VD>> void writeEdgeData(
+  public <PED extends PersistentEdgeData<VD>> void writeEdges(
     final EPGMDatabase<VD, ED, GD> epgmDatabase,
     final EdgeDataHandler<ED, VD> edgeDataHandler,
     final PersistentEdgeDataFactory<ED, VD, PED> persistentEdgeDataFactory,
@@ -200,10 +206,14 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
 
     DataSet<PersistentEdgeData<VD>> persistentEdgeDataSet = graph.getVertices()
       // join vertex with edges on edge source vertex id
-      .join(graph.getEdges()).where(0).equalTo(1)
-        // join result with vertices on edge target vertex id
-      .join(graph.getVertices()).where("1.1").equalTo(0)
-        // ((source-vertex-data, edge-data), target-vertex-data)
+      .join(graph.getEdges())
+      .where(new VertexKeySelector<VD>())
+      .equalTo(new EdgeSourceVertexKeySelector<ED>())
+      // join result with vertices on edge target vertex id
+      .join(graph.getVertices())
+      .where("f1.targetVertexId")
+      .equalTo(new VertexKeySelector<VD>())
+      // ((source-vertex-data, edge-data), target-vertex-data)
       .with(new PersistentEdgeDataJoinFunction<>(persistentEdgeDataFactory));
 
     // write (persistent-edge-data) to HBase table
@@ -228,7 +238,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <PGD>                      persistent graph data type
    * @throws IOException
    */
-  public <PGD extends PersistentGraphData> void writeGraphData(
+  public <PGD extends PersistentGraphData> void writeGraphHeads(
     final EPGMDatabase<VD, ED, GD> epgmDatabase,
     final GraphDataHandler<GD> graphDataHandler,
     final PersistentGraphDataFactory<GD, PGD> persistentGraphDataFactory,
@@ -236,31 +246,31 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     final LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
 
     // build (graph-id, vertex-id) tuples from vertices
-    FlatMapOperator<Vertex<Long, VD>, Tuple2<Long, Long>> graphIdToVertexId =
+    DataSet<Tuple2<Long, Long>> graphIdToVertexId =
       graph.getVertices()
-        .flatMap(new FlatMapFunction<Vertex<Long, VD>, Tuple2<Long, Long>>() {
+        .flatMap(new FlatMapFunction<VD, Tuple2<Long, Long>>() {
           @Override
-          public void flatMap(Vertex<Long, VD> vertex,
+          public void flatMap(VD vertex,
             Collector<Tuple2<Long, Long>> collector) throws Exception {
-            if (vertex.getValue().getGraphCount() > 0) {
-              for (Long graphID : vertex.getValue().getGraphs()) {
-                collector.collect(new Tuple2<>(graphID, vertex.f0));
+            if (vertex.getGraphCount() > 0) {
+              for (Long graphID : vertex.getGraphs()) {
+                collector.collect(new Tuple2<>(graphID, vertex.getId()));
               }
             }
           }
         });
 
     // build (graph-id, edge-id) tuples from vertices
-    FlatMapOperator<Edge<Long, ED>, Tuple2<Long, Long>> graphIdToEdgeId =
+    DataSet<Tuple2<Long, Long>> graphIdToEdgeId =
       graph.getEdges()
-        .flatMap(new FlatMapFunction<Edge<Long, ED>, Tuple2<Long, Long>>() {
+        .flatMap(new FlatMapFunction<ED, Tuple2<Long, Long>>() {
           @Override
-          public void flatMap(Edge<Long, ED> edge,
+          public void flatMap(ED edge,
             Collector<Tuple2<Long, Long>> collector) throws Exception {
-            if (edge.getValue().getGraphCount() > 0) {
-              for (Long graphId : edge.getValue().getGraphs()) {
+            if (edge.getGraphCount() > 0) {
+              for (Long graphId : edge.getGraphs()) {
                 collector
-                  .collect(new Tuple2<>(graphId, edge.getValue().getId()));
+                  .collect(new Tuple2<>(graphId, edge.getId()));
               }
             }
           }
@@ -268,43 +278,47 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
 
     // co-group (graph-id, vertex-id) and (graph-id, edge-id) tuples to
     // (graph-id, {vertex-id}, {edge-id}) triples
-    CoGroupOperator<Tuple2<Long, Long>, Tuple2<Long, Long>, Tuple3<Long,
-      Set<Long>, Set<Long>>>
-      graphToVertexIdsAndEdgeIds =
-      graphIdToVertexId.coGroup(graphIdToEdgeId).where(0).equalTo(0).with(
-        new CoGroupFunction<Tuple2<Long, Long>, Tuple2<Long, Long>,
-          Tuple3<Long, Set<Long>, Set<Long>>>() {
+    DataSet<Tuple3<Long, Set<Long>, Set<Long>>> graphToVertexIdsAndEdgeIds =
+      graphIdToVertexId
+        .coGroup(graphIdToEdgeId)
+        .where(0)
+        .equalTo(0)
+        .with(
+          new CoGroupFunction<Tuple2<Long, Long>, Tuple2<Long, Long>,
+            Tuple3<Long, Set<Long>, Set<Long>>>() {
 
-          @Override
-          public void coGroup(Iterable<Tuple2<Long, Long>> graphToVertexIds,
-            Iterable<Tuple2<Long, Long>> graphToEdgeIds,
-            Collector<Tuple3<Long, Set<Long>, Set<Long>>> collector) throws
-            Exception {
-            Set<Long> vertexIds = Sets.newHashSet();
-            Set<Long> edgeIds = Sets.newHashSet();
-            Long graphId = null;
-            boolean initialized = false;
-            for (Tuple2<Long, Long> graphToVertexTuple : graphToVertexIds) {
-              if (!initialized) {
-                graphId = graphToVertexTuple.f0;
-                initialized = true;
+            @Override
+            public void coGroup(Iterable<Tuple2<Long, Long>> graphToVertexIds,
+              Iterable<Tuple2<Long, Long>> graphToEdgeIds,
+              Collector<Tuple3<Long, Set<Long>, Set<Long>>> collector) throws
+              Exception {
+              Set<Long> vertexIds = Sets.newHashSet();
+              Set<Long> edgeIds = Sets.newHashSet();
+              Long graphId = null;
+              boolean initialized = false;
+              for (Tuple2<Long, Long> graphToVertexTuple : graphToVertexIds) {
+                if (!initialized) {
+                  graphId = graphToVertexTuple.f0;
+                  initialized = true;
+                }
+                vertexIds.add(graphToVertexTuple.f1);
               }
-              vertexIds.add(graphToVertexTuple.f1);
+              for (Tuple2<Long, Long> graphToEdgeTuple : graphToEdgeIds) {
+                edgeIds.add(graphToEdgeTuple.f1);
+              }
+              collector.collect(new Tuple3<>(graphId, vertexIds, edgeIds));
             }
-            for (Tuple2<Long, Long> graphToEdgeTuple : graphToEdgeIds) {
-              edgeIds.add(graphToEdgeTuple.f1);
-            }
-            collector.collect(new Tuple3<>(graphId, vertexIds, edgeIds));
-          }
-        });
+          });
 
     // join (graph-id, {vertex-id}, {edge-id}) triples with
     // (graph-id, graph-data) and build (persistent-graph-data)
-    JoinOperator.EquiJoin<Tuple3<Long, Set<Long>, Set<Long>>, Subgraph<Long,
-      GD>, PersistentGraphData>
-      persistentGraphDataSet = graphToVertexIdsAndEdgeIds
-      .join(epgmDatabase.getCollection().getSubgraphs()).where(0).equalTo(0)
-      .with(new PersistentGraphDataJoinFunction<>(persistentGraphDataFactory));
+    DataSet<PersistentGraphData> persistentGraphDataSet =
+      graphToVertexIdsAndEdgeIds
+        .join(epgmDatabase.getCollection().getGraphHeads())
+        .where(0)
+        .equalTo("id")
+        .with(new PersistentGraphDataJoinFunction<>(
+          persistentGraphDataFactory));
 
     // write (persistent-graph-data) to HBase table
     Job job = Job.getInstance();
@@ -321,14 +335,14 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * Used to create persistent vertex data from vertex data and
    * outgoing/incoming edge data.
    *
-   * @param <VD>  vertex data type
-   * @param <ED>  edge data type
-   * @param <PVD> persistent vertex data type
+   * @param <VD>  EPGM vertex type
+   * @param <ED>  EPGM edge type
+   * @param <PVD> EPGM persistent vertex type
    */
   public static class PersistentVertexDataCoGroupFunction<VD extends
     VertexData, ED extends EdgeData, PVD extends PersistentVertexData<ED>>
     implements
-    CoGroupFunction<Tuple2<Vertex<Long, VD>, Set<ED>>, Tuple2<Long, Set<ED>>,
+    CoGroupFunction<Tuple2<VD, Set<ED>>, Tuple2<Long, Set<ED>>,
       PersistentVertexData<ED>> {
 
     /**
@@ -350,13 +364,13 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
      * {@inheritDoc}
      */
     @Override
-    public void coGroup(Iterable<Tuple2<Vertex<Long, VD>, Set<ED>>> iterable,
+    public void coGroup(Iterable<Tuple2<VD, Set<ED>>> iterable,
       Iterable<Tuple2<Long, Set<ED>>> iterable1,
       Collector<PersistentVertexData<ED>> collector) throws Exception {
-      Vertex<Long, VD> vertex = null;
+      VD vertex = null;
       Set<ED> outgoingEdgeData = null;
       Set<ED> incomingEdgeData = null;
-      for (Tuple2<Vertex<Long, VD>, Set<ED>> left : iterable) {
+      for (Tuple2<VD, Set<ED>> left : iterable) {
         vertex = left.f0;
         outgoingEdgeData = left.f1;
       }
@@ -365,7 +379,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
       }
       assert vertex != null;
       collector.collect(vertexDataFactory
-        .createVertexData(vertex.f1, outgoingEdgeData, incomingEdgeData));
+        .createVertexData(vertex, outgoingEdgeData, incomingEdgeData));
     }
   }
 
@@ -373,14 +387,13 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * Creates persistent edge data objects from edge data and source/target
    * vertex data
    *
-   * @param <ED>  edge data type
-   * @param <VD>  vertex data type
-   * @param <PED> persistent edge data type
+   * @param <ED>  EPGM edge type
+   * @param <VD>  EPGM vertex type
+   * @param <PED> EPGM persistent edge type
    */
   public static class PersistentEdgeDataJoinFunction<ED extends EdgeData, VD
     extends VertexData, PED extends PersistentEdgeData<VD>> implements
-    JoinFunction<Tuple2<Vertex<Long, VD>, Edge<Long, ED>>, Vertex<Long, VD>,
-      PersistentEdgeData<VD>> {
+    JoinFunction<Tuple2<VD, ED>, VD, PersistentEdgeData<VD>> {
 
     /**
      * Persistent edge data factory.
@@ -402,25 +415,21 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
      */
     @Override
     public PersistentEdgeData<VD> join(
-      Tuple2<Vertex<Long, VD>, Edge<Long, ED>> vertexEdgeTuple2,
-      Vertex<Long, VD> longVDVertex) throws Exception {
-      VD sourceVertexData = vertexEdgeTuple2.f0.getValue();
-      ED edgeData = vertexEdgeTuple2.f1.getValue();
-      VD targetVertexData = longVDVertex.f1;
-      return edgeDataFactory
-        .createEdgeData(edgeData, sourceVertexData, targetVertexData);
+      Tuple2<VD, ED> sourceVertexAndEdge, VD targetVertex) throws Exception {
+      return edgeDataFactory.createEdgeData(sourceVertexAndEdge.f1,
+        sourceVertexAndEdge.f0, targetVertex);
     }
   }
 
   /**
    * Creates persistent graph data from graph data and vertex/edge identifiers.
    *
-   * @param <GD>  graph data
-   * @param <PGD> persistent graph data
+   * @param <GD>  EPGM graph head type
+   * @param <PGD> EPGM persistent graph head type
    */
   public static class PersistentGraphDataJoinFunction<GD extends GraphData,
     PGD extends PersistentGraphData> implements
-    JoinFunction<Tuple3<Long, Set<Long>, Set<Long>>, Subgraph<Long, GD>,
+    JoinFunction<Tuple3<Long, Set<Long>, Set<Long>>, GD,
       PersistentGraphData> {
 
     /**
@@ -444,11 +453,9 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     @Override
     public PersistentGraphData join(
       Tuple3<Long, Set<Long>, Set<Long>> longSetSetTuple3,
-      Subgraph<Long, GD> longGDSubgraph) throws Exception {
-
-      return graphDataFactory
-        .createGraphData(longGDSubgraph.f1, longSetSetTuple3.f1,
-          longSetSetTuple3.f2);
+      GD graphHead) throws Exception {
+      return graphDataFactory.createGraphData(graphHead, longSetSetTuple3.f1,
+        longSetSetTuple3.f2);
     }
   }
 
@@ -456,8 +463,8 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * Creates HBase {@link Mutation} from persistent graph data using graph
    * data handler.
    *
-   * @param <GD>  graph data type
-   * @param <PGD> persistent graph data type
+   * @param <GD>  EPGM graph head type
+   * @param <PGD> EPGM persistent graph type
    */
   public static class GraphDataToHBaseMapper<GD extends GraphData, PGD
     extends PersistentGraphData> extends
@@ -517,9 +524,9 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * Creates HBase {@link Mutation} from persistent vertex data using vertex
    * data handler.
    *
-   * @param <VD>  vertex data
-   * @param <ED>  edge data
-   * @param <PVD> persistent vertex data
+   * @param <VD>  EPGM vertex type
+   * @param <ED>  EPGM edge type
+   * @param <PVD> EPGM persistent vertex type
    */
   public static class VertexDataToHBaseMapper<VD extends VertexData, ED
     extends EdgeData, PVD extends PersistentVertexData<ED>> extends
@@ -580,9 +587,9 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * Creates HBase {@link Mutation} from persistent edge data using edge
    * data handler.
    *
-   * @param <ED>  edge data
-   * @param <VD>  vertex data
-   * @param <PED> persistent edge data
+   * @param <ED>  EPGM edge type
+   * @param <VD>  EPGM vertex type
+   * @param <PED> EPGM persistent edge type
    */
   private static class EdgeDataToHBaseMapper<ED extends EdgeData, VD extends
     VertexData, PED extends PersistentEdgeData<VD>> extends

@@ -26,21 +26,19 @@ import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 /**
  * JoinFunction over VertexIDs
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
 public class BTGJoin<VD extends VertexData>
   implements JoinFunction<
-  Vertex<Long, BTGVertexValue>,
-  Vertex<Long, VD>,
-  Vertex<Long, VD>> {
+  Vertex<Long, BTGVertexValue>, VD, VD> {
   @Override
-  public Vertex<Long, VD> join(Vertex<Long, BTGVertexValue> btgVertex,
-    Vertex<Long, VD> epVertex) throws Exception {
-    epVertex.getValue().setProperty(BTG.VERTEX_TYPE_PROPERTYKEY,
+  public VD join(Vertex<Long, BTGVertexValue> btgVertex, VD epVertex)
+      throws Exception {
+    epVertex.setProperty(BTG.VERTEX_TYPE_PROPERTYKEY,
       btgVertex.getValue().getVertexType());
-    epVertex.getValue().setProperty(BTG.VERTEX_VALUE_PROPERTYKEY,
+    epVertex.setProperty(BTG.VERTEX_VALUE_PROPERTYKEY,
       btgVertex.getValue().getVertexValue());
-    epVertex.getValue().setProperty(BTG.VERTEX_BTGIDS_PROPERTYKEY,
+    epVertex.setProperty(BTG.VERTEX_BTGIDS_PROPERTYKEY,
       btgVertex.getValue().getGraphs());
     return epVertex;
   }

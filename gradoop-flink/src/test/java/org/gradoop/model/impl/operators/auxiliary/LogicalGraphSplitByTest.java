@@ -6,7 +6,6 @@ import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.operators.auxiliary.SplitBy;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
 import org.gradoop.model.impl.pojo.DefaultGraphData;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
@@ -37,15 +36,15 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
         getExecutionEnvironment()));
 
     List<DefaultVertexData> oldVertices = Lists.newArrayList();
-    inputGraph.getVertexData()
+    inputGraph.getVertices()
       .output(new LocalCollectionOutputFormat<>(oldVertices));
 
     List<DefaultVertexData> newVertices = Lists.newArrayList();
-    labeledGraphCollection.getVertexData()
+    labeledGraphCollection.getVertices()
       .output(new LocalCollectionOutputFormat<>(newVertices));
 
     List<DefaultEdgeData> newEdges = Lists.newArrayList();
-    labeledGraphCollection.getEdgeData()
+    labeledGraphCollection.getEdges()
       .output(new LocalCollectionOutputFormat<>(newEdges));
 
     assertNotNull("graph collection is null", labeledGraphCollection);

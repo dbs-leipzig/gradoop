@@ -27,17 +27,17 @@ import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 /**
  * JoinFunction over VertexIDs
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
 public class LPJoin<VD extends VertexData>
-  implements JoinFunction<Vertex<Long, LPVertexValue>, Vertex<Long, VD>,
-  Vertex<Long, VD>> {
+  implements JoinFunction<Vertex<Long, LPVertexValue>, VD, VD> {
+
   @Override
-  public Vertex<Long, VD> join(Vertex<Long, LPVertexValue> lpVertex,
-    Vertex<Long, VD> epVertex) throws Exception {
-    epVertex.getValue()
-      .setProperty(EPGMLabelPropagationAlgorithm.CURRENT_VALUE,
-        lpVertex.getValue().getCurrentCommunity());
-    return epVertex;
+  public VD join(Vertex<Long, LPVertexValue> lpVertex,
+    VD epgmVertex) throws Exception {
+    epgmVertex.setProperty(
+      EPGMLabelPropagationAlgorithm.CURRENT_VALUE,
+      lpVertex.getValue().getCurrentCommunity());
+    return epgmVertex;
   }
 }

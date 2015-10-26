@@ -22,14 +22,11 @@ import org.apache.flink.api.java.tuple.Tuple5;
 /**
  * Edge representation used in grouping edges to summarized edges.
  *
- * Consists of:
- * <ul>
- * <li> edge id
- * <li> source vertex id
- * <li> target vertex id
- * <li> edge group label
- * <li> edge group property value
- * </ul>
+ * f0: edge id
+ * f1: source vertex id
+ * f2: target vertex id
+ * f3: edge group label
+ * f4: edge group property value
  */
 public class EdgeGroupItem extends Tuple5<Long, Long, Long, String, String> {
 

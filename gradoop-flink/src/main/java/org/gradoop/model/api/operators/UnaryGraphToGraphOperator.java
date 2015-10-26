@@ -25,9 +25,9 @@ import org.gradoop.model.impl.LogicalGraph;
 /**
  * Creates a {@link LogicalGraph} based on one input {@link LogicalGraph}.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public interface UnaryGraphToGraphOperator<VD extends VertexData, ED extends
   EdgeData, GD extends GraphData> extends

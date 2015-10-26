@@ -40,7 +40,7 @@ import static org.gradoop.model.impl.algorithms.epgmlabelpropagation
  * Updates the value of a vertex by picking the minimum neighbor ID out of
  * all the incoming messages.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
 public class LPUpdateFunction<VD extends VertexData>
   extends VertexUpdateFunction<Long, VD, Long> {

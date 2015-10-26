@@ -1,7 +1,5 @@
 package org.gradoop.model.impl.operators.binary;
 
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
@@ -31,10 +29,10 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
     assertEquals("wrong number of edges", expectedEdgeCount,
       resultGraph.getEdgeCount());
 
-    Collection<Vertex<Long, DefaultVertexData>> vertexData =
-      resultGraph.getVertices().collect();
-    Collection<Edge<Long, DefaultEdgeData>> edgeData =
-      resultGraph.getEdges().collect();
+    Collection<DefaultVertexData> vertexData = resultGraph.getVertices()
+      .collect();
+    Collection<DefaultEdgeData> edgeData = resultGraph.getEdges()
+      .collect();
 
     checkVertexAndEdgeCount(expectedVertexCount, expectedEdgeCount, vertexData,
       edgeData);
@@ -43,23 +41,23 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
   }
 
   protected void checkGraphContainment(long newGraphID,
-    Collection<Vertex<Long, DefaultVertexData>> vertexData,
-    Collection<Edge<Long, DefaultEdgeData>> edgeData) {
-    for (Vertex<Long, DefaultVertexData> v : vertexData) {
+    Collection<DefaultVertexData> vertexData,
+    Collection<DefaultEdgeData> edgeData) {
+    for (DefaultVertexData v : vertexData) {
       assertTrue("vertex is not in new graph",
-        v.getValue().getGraphs().contains(newGraphID));
+        v.getGraphs().contains(newGraphID));
     }
 
-    for (Edge<Long, DefaultEdgeData> e : edgeData) {
-      assertTrue("edge is not in new graph",
-        e.getValue().getGraphs().contains(newGraphID));
+    for (DefaultEdgeData e : edgeData) {
+      assertTrue("edge is not in new graph", e.getGraphs().contains
+        (newGraphID));
     }
   }
 
   protected void checkVertexAndEdgeCount(long expectedVertexCount,
     long expectedEdgeCount,
-    Collection<Vertex<Long, DefaultVertexData>> vertexData,
-    Collection<Edge<Long, DefaultEdgeData>> edgeData) {
+    Collection<DefaultVertexData> vertexData,
+    Collection<DefaultEdgeData> edgeData) {
     assertEquals("wrong number of vertex values", expectedVertexCount,
       vertexData.size());
     assertEquals("wrong number of edge values", expectedEdgeCount,

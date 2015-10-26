@@ -39,8 +39,8 @@ import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
  * <p/>
  * The computation will terminate if no new values are assigned.
  *
- * @param <VD> VertexData contains information about the vertex
- * @param <ED> EdgeData contains information about all edges of the vertex
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
  */
 public class EPGMLabelPropagationAlgorithm<
   VD extends VertexData,

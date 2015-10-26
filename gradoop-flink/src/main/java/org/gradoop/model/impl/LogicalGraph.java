@@ -17,6 +17,7 @@
 package org.gradoop.model.impl;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
@@ -32,20 +33,20 @@ import org.gradoop.model.api.Identifiable;
 import org.gradoop.model.api.Labeled;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.api.VertexDataFactory;
-import org.gradoop.model.impl.functions.Predicate;
-import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling;
-import org.gradoop.model.impl.tuples.Subgraph;
-import org.gradoop.model.impl.operators.unary.Aggregation;
-import org.gradoop.model.impl.operators.binary.Combination;
-import org.gradoop.model.impl.operators.binary.Exclusion;
-import org.gradoop.model.impl.operators.binary.Overlap;
-import org.gradoop.model.impl.operators.unary.Projection;
-import org.gradoop.model.impl.operators.unary.summarization.SummarizationGroupCombine;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.impl.functions.Predicate;
+import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.operators.binary.Combination;
+import org.gradoop.model.impl.operators.binary.Exclusion;
+import org.gradoop.model.impl.operators.binary.Overlap;
+import org.gradoop.model.impl.operators.unary.Aggregation;
+import org.gradoop.model.impl.operators.unary.Projection;
+import org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling;
+import org.gradoop.model.impl.operators.unary.summarization
+  .SummarizationGroupCombine;
 
 import java.util.Map;
 
@@ -53,9 +54,9 @@ import java.util.Map;
  * Represents a logical graph inside the EPGM. Holds the graph data (label,
  * properties) and offers unary, binary and auxiliary operators.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class LogicalGraph<
   VD extends VertexData,
@@ -73,20 +74,23 @@ public class LogicalGraph<
   /**
    * Creates a new logical graph based on the given parameters.
    *
-   * @param graph             flink gelly graph holding vertex and edge set
+   * @param vertices          vertex data set
+   * @param edges             edge data set
    * @param graphData         graph data associated with that logical graph
    * @param vertexDataFactory used to create vertex data
    * @param edgeDataFactory   used to create edge data
    * @param graphDataFactory  used to create graph data
    * @param env               Flink execution environment
    */
-  private LogicalGraph(Graph<Long, VD, ED> graph,
+  private LogicalGraph(DataSet<VD> vertices,
+    DataSet<ED> edges,
     GD graphData,
     VertexDataFactory<VD> vertexDataFactory,
     EdgeDataFactory<ED> edgeDataFactory,
     GraphDataFactory<GD> graphDataFactory,
     ExecutionEnvironment env) {
-    super(graph, vertexDataFactory, edgeDataFactory, graphDataFactory, env);
+    super(vertices, edges, vertexDataFactory, edgeDataFactory, graphDataFactory,
+      env);
     this.graphData = graphData;
   }
 
@@ -107,14 +111,25 @@ public class LogicalGraph<
     GraphData> LogicalGraph<VD, ED, GD> fromGellyGraph(
     Graph<Long, VD, ED> graph, GD graphData,
     VertexDataFactory<VD> vertexDataFactory,
-    EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD>
-    graphDataFactory) {
-    return new LogicalGraph<>(graph,
+    EdgeDataFactory<ED> edgeDataFactory,
+    GraphDataFactory<GD> graphDataFactory) {
+    return fromDataSets(graph.getVertices().map(
+      new MapFunction<Vertex<Long, VD>, VD>() {
+        @Override
+        public VD map(Vertex<Long, VD> gellyVertex) throws Exception {
+          return gellyVertex.getValue();
+        }
+      }).withForwardedFields("f1->*"),
+      graph.getEdges().map(new MapFunction<Edge<Long, ED>, ED>() {
+        @Override
+        public ED map(Edge<Long, ED> gellyEdge) throws Exception {
+          return gellyEdge.getValue();
+        }
+      }).withForwardedFields("f2->*"),
       graphData,
       vertexDataFactory,
       edgeDataFactory,
-      graphDataFactory,
-      graph.getContext());
+      graphDataFactory);
   }
 
   /**
@@ -132,20 +147,19 @@ public class LogicalGraph<
    * @return logical graph
    */
   public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> LogicalGraph<VD, ED, GD> fromDataSets(
-    DataSet<Vertex<Long, VD>> vertices,
-    DataSet<Edge<Long, ED>> edges,
+    GraphData> LogicalGraph<VD, ED, GD> fromDataSets(DataSet<VD> vertices,
+    DataSet<ED> edges,
     GD graphData,
     VertexDataFactory<VD> vertexDataFactory,
     EdgeDataFactory<ED> edgeDataFactory,
     GraphDataFactory<GD> graphDataFactory) {
-    Graph<Long, VD, ED> gellyGraph = Graph.fromDataSet(vertices,
+    return new LogicalGraph<>(vertices,
       edges,
+      graphData,
+      vertexDataFactory,
+      edgeDataFactory,
+      graphDataFactory,
       vertices.getExecutionEnvironment());
-
-    return fromGellyGraph(gellyGraph, graphData, vertexDataFactory,
-      edgeDataFactory, graphDataFactory);
-
   }
 
 
@@ -432,10 +446,9 @@ public class LogicalGraph<
     String graphFile) throws Exception {
     getVertices().writeAsFormattedText(vertexFile,
       new JsonWriter.VertexTextFormatter<VD>());
-    getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
-    getExecutionEnvironment().fromElements(
-      new Subgraph<>(graphData.getId(), graphData))
+    getEdges().writeAsFormattedText(edgeFile,
+      new JsonWriter.EdgeTextFormatter<ED>());
+    getExecutionEnvironment().fromElements(graphData)
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
     getExecutionEnvironment().execute();
   }
@@ -450,11 +463,11 @@ public class LogicalGraph<
     sb.append(
       String.format("%-10d %s %n", graphData.getId(), graphData.toString()));
     sb.append(String.format("Vertices:%n"));
-    for (VD v : this.getVertexData().collect()) {
+    for (VD v : this.getVertices().collect()) {
       sb.append(String.format("%-10d %s %n", v.getId(), v));
     }
     sb.append(String.format("Edges:%n"));
-    for (ED e : this.getEdgeData().collect()) {
+    for (ED e : this.getEdges().collect()) {
       sb.append(String.format("%-10d %s %n", e.getId(), e));
     }
     sb.append('}');

@@ -84,9 +84,9 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
  * In addition to vertex properties, summarization is also possible on edge
  * properties, vertex- and edge labels as well as combinations of those.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public abstract class Summarization<
   VD extends VertexData,
@@ -152,7 +152,6 @@ public abstract class Summarization<
   @Override
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
     LogicalGraph<VD, ED, GD> result;
-    Graph<Long, VD, ED> gellyGraph;
 
     vertexDataFactory = graph.getVertexDataFactory();
     edgeDataFactory = graph.getEdgeDataFactory();
@@ -164,11 +163,12 @@ public abstract class Summarization<
       result = graph;
     } else {
       GD graphData = createNewGraphData();
-      gellyGraph = summarizeInternal(Graph.fromDataSet(graph.getVertices(),
-        graph.getEdges(), graph.getExecutionEnvironment()));
-      result = LogicalGraph
-        .fromGellyGraph(gellyGraph, graphData, graph.getVertexDataFactory(),
-          graph.getEdgeDataFactory(), graph.getGraphDataFactory());
+      result = LogicalGraph.fromGellyGraph(
+        summarizeInternal(graph.toGellyGraph()),
+        graphData,
+        vertexDataFactory,
+        edgeDataFactory,
+        graphDataFactory);
     }
     return result;
   }

@@ -42,9 +42,9 @@ import org.gradoop.model.impl.operators.unary.summarization.tuples
  * 5) group edges on source/target vertex and possibly edge label / property
  * 6) build summarized edges
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class SummarizationGroupSort<
   VD extends VertexData,

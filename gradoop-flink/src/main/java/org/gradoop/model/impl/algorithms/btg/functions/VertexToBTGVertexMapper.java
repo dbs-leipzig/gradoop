@@ -21,8 +21,8 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.impl.algorithms.btg.BTG;
-import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +30,16 @@ import java.util.List;
 /**
  * Maps EPGM vertices to a BTG specific representation.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  * @see BTGVertexValue
  */
 public class VertexToBTGVertexMapper<VD extends VertexData>
-  implements MapFunction<Vertex<Long, VD>, Vertex<Long, BTGVertexValue>> {
+  implements MapFunction<VD, Vertex<Long, BTGVertexValue>> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public Vertex<Long, BTGVertexValue> map(
-    Vertex<Long, VD> logicalVertex) throws Exception {
+  public Vertex<Long, BTGVertexValue> map(VD logicalVertex) throws Exception {
     BTGVertexValue btgValue = createNewVertexValue(logicalVertex);
     return new Vertex<>(logicalVertex.getId(), btgValue);
   }
@@ -48,18 +47,16 @@ public class VertexToBTGVertexMapper<VD extends VertexData>
   /**
    * Method to create a new BTG vertex value from a given vertex
    *
-   * @param logicalVertex actual vertex
+   * @param vertex actual vertex
    * @return BTGVertexValue
    */
-  private BTGVertexValue createNewVertexValue(
-    Vertex<Long, VD> logicalVertex) {
+  private BTGVertexValue createNewVertexValue(VD vertex) {
     BTGVertexType type = BTGVertexType.values()[Integer.parseInt(
-      (String) logicalVertex.getValue()
-        .getProperty(BTG.VERTEX_TYPE_PROPERTYKEY))];
-    double value = Double.parseDouble((String) logicalVertex.getValue()
-      .getProperty(BTG.VERTEX_VALUE_PROPERTYKEY));
-    List<Long> btgIDs = getBTGIDs((String) logicalVertex.getValue()
-      .getProperty(BTG.VERTEX_BTGIDS_PROPERTYKEY));
+      (String) vertex.getProperty(BTG.VERTEX_TYPE_PROPERTYKEY))];
+    double value = Double.parseDouble(
+      (String) vertex.getProperty(BTG.VERTEX_VALUE_PROPERTYKEY));
+    List<Long> btgIDs = getBTGIDs(
+      (String) vertex.getProperty(BTG.VERTEX_BTGIDS_PROPERTYKEY));
     return new BTGVertexValue(type, value, btgIDs);
   }
 

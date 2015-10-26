@@ -18,16 +18,15 @@
 package org.gradoop.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.Graph;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.VertexData;
 
 /**
  * Operators that are available at all graph structures.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
  * @see org.gradoop.model.impl.LogicalGraph
  * @see org.gradoop.model.impl.GraphCollection
  */
@@ -40,28 +39,14 @@ public interface GraphOperators<
    *
    * @return vertices
    */
-  DataSet<Vertex<Long, VD>> getVertices();
-
-  /**
-   * Returns all vertex data associated with that graph.
-   *
-   * @return vertex data
-   */
-  DataSet<VD> getVertexData();
+  DataSet<VD> getVertices();
 
   /**
    * Returns all edge data associated with that logical graph.
    *
    * @return edges
    */
-  DataSet<Edge<Long, ED>> getEdges();
-
-  /**
-   * Returns all edge data associated with that logical graph.
-   *
-   * @return edge data
-   */
-  DataSet<ED> getEdgeData();
+  DataSet<ED> getEdges();
 
   /**
    * Returns the edge data associated with the outgoing edges of the given
@@ -70,7 +55,7 @@ public interface GraphOperators<
    * @param vertexID vertex identifier
    * @return outgoing edge data of given vertex
    */
-  DataSet<Edge<Long, ED>> getOutgoingEdges(final Long vertexID);
+  DataSet<ED> getOutgoingEdges(final Long vertexID);
 
   /**
    * Returns the edge data associated with the incoming edges of the given
@@ -79,7 +64,14 @@ public interface GraphOperators<
    * @param vertexID vertex identifier
    * @return incoming edge data of given vertex
    */
-  DataSet<Edge<Long, ED>> getIncomingEdges(final Long vertexID);
+  DataSet<ED> getIncomingEdges(final Long vertexID);
+
+  /**
+   * Transforms the EPGM graph to a Gelly Graph.
+   *
+   * @return Gelly Graph
+   */
+  Graph<Long, VD, ED> toGellyGraph();
 
   /**
    * Returns the number of vertices in that logical graph.

@@ -66,9 +66,9 @@ public class BTGAlgorithmTestHelper {
   }
 
   public static Map<Long, List<Long>> parseResultBTGVertexData(
-    List<Vertex<Long, BTGVertexValue>> graph) {
+    List<Vertex<Long, BTGVertexValue>> vertices) {
     Map<Long, List<Long>> result = new HashMap<>();
-    for (Vertex<Long, BTGVertexValue> v : graph) {
+    for (Vertex<Long, BTGVertexValue> v : vertices) {
       result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphs()));
     }
     return result;

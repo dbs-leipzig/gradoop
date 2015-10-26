@@ -18,22 +18,20 @@ package org.gradoop.model.impl.operators.unary;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.UnaryFunction;
 
 /**
  * Creates a projected version of the logical graph using the user defined
  * vertex and edge data projection functions.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class Projection<
   VD extends VertexData,
@@ -84,10 +82,10 @@ public class Projection<
    */
   @Override
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
-    DataSet<Vertex<Long, VD>> vertices = graph.getVertices();
-    vertices = vertices.map(new ProjectionVerticesMapper<>(getVertexFunc()));
-    DataSet<Edge<Long, ED>> edges = graph.getEdges();
-    edges = edges.map(new ProjectionEdgesMapper<>(getEdgeFunc()));
+    DataSet<VD> vertices = graph.getVertices()
+      .map(new ProjectionVerticesMapper<>(getVertexFunc()));
+    DataSet<ED> edges = graph.getEdges()
+      .map(new ProjectionEdgesMapper<>(getEdgeFunc()));
     return LogicalGraph.fromDataSets(
       vertices,
       edges,
@@ -107,7 +105,7 @@ public class Projection<
    */
   private static class ProjectionVerticesMapper<VD extends VertexData>
     implements
-    MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
+    MapFunction<VD, VD> {
     /**
      * Vertex to vertex function
      */
@@ -123,9 +121,8 @@ public class Projection<
     }
 
     @Override
-    public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
-      return new Vertex<>(vertex.getId(),
-        vertexFunc.execute(vertex.getValue()));
+    public VD map(VD vertex) throws Exception {
+      return vertexFunc.execute(vertex);
     }
   }
 
@@ -135,7 +132,7 @@ public class Projection<
    * @param <ED> edge data type
    */
   private static class ProjectionEdgesMapper<ED extends EdgeData> implements
-    MapFunction<Edge<Long, ED>, Edge<Long, ED>> {
+    MapFunction<ED, ED> {
     /**
      * Edge to edge function
      */
@@ -154,9 +151,8 @@ public class Projection<
      * {@inheritDoc}
      */
     @Override
-    public Edge<Long, ED> map(Edge<Long, ED> edge) throws Exception {
-      return new Edge<>(edge.getSource(), edge.getTarget(),
-        edgeFunc.execute(edge.getValue()));
+    public ED map(ED edge) throws Exception {
+      return edgeFunc.execute(edge);
     }
   }
 

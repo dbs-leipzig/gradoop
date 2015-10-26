@@ -5,7 +5,6 @@ import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy;
 import org.gradoop.model.impl.pojo.DefaultEdgeData;
 import org.gradoop.model.impl.pojo.DefaultGraphData;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
@@ -34,7 +33,7 @@ public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
       labeledGraphCollection = inputGraph.callForCollection(
       new OverlapSplitBy<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
         function, getExecutionEnvironment()));
-    labeledGraphCollection.getSubgraphs();
+    labeledGraphCollection.getGraphHeads();
     assertNotNull("graph collection is null", labeledGraphCollection);
     TestCase.assertEquals("wrong number of graphs", 3l,
       labeledGraphCollection.getGraphCount());

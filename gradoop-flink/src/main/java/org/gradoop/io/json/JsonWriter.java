@@ -18,14 +18,11 @@
 package org.gradoop.io.json;
 
 import org.apache.flink.api.java.io.TextOutputFormat;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.tuples.Subgraph;
 
 /**
  * Used to convert vertices, edges and graphs into json documents.
@@ -39,24 +36,26 @@ public class JsonWriter extends JsonIO {
    * "data":{"name":"Alice","gender":"female","age":42},
    * "meta":{"label":"Employee","graphs":[0,1,2,3]}
    * }
+   *
+   * @param <VD> EPGM vertex type
    */
   public static class VertexTextFormatter<VD extends VertexData> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Vertex<Long, VD>> {
+    TextOutputFormat.TextFormatter<VD> {
 
     /**
-     * Creates a JSON string representation of a vertex data object.
+     * Creates a JSON string representation from a given vertex.
      *
-     * @param v vertex data
+     * @param v vertex
      * @return JSON string representation
      */
     @Override
-    public String format(Vertex<Long, VD> v) {
+    public String format(VD v) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, v.getId());
-        json.put(DATA, writeProperties(v.getValue()));
-        json.put(META, writeGraphElementMeta(v.getValue()));
+        json.put(DATA, writeProperties(v));
+        json.put(META, writeGraphElementMeta(v));
       } catch (JSONException e) {
         e.printStackTrace();
       }
@@ -74,26 +73,28 @@ public class JsonWriter extends JsonIO {
    * "data":{"since":2015},
    * "meta":{"label":"friendOf","graphs":[0,1,2,3]}
    * }
+   *
+   * @param <ED> EPGM edge type
    */
   public static class EdgeTextFormatter<ED extends EdgeData> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Edge<Long, ED>> {
+    TextOutputFormat.TextFormatter<ED> {
 
     /**
-     * Creates a JSON string representation from a given edge data object.
+     * Creates a JSON string representation from a given edge.
      *
-     * @param e edge data object
+     * @param e edge
      * @return JSON string representation
      */
     @Override
-    public String format(Edge<Long, ED> e) {
+    public String format(ED e) {
       JSONObject json = new JSONObject();
       try {
-        json.put(IDENTIFIER, e.getValue().getId());
-        json.put(EDGE_SOURCE, e.getSource());
-        json.put(EDGE_TARGET, e.getTarget());
-        json.put(DATA, writeProperties(e.getValue()));
-        json.put(META, writeGraphElementMeta(e.getValue()));
+        json.put(IDENTIFIER, e.getId());
+        json.put(EDGE_SOURCE, e.getSourceVertexId());
+        json.put(EDGE_TARGET, e.getTargetVertexId());
+        json.put(DATA, writeProperties(e));
+        json.put(META, writeGraphElementMeta(e));
       } catch (JSONException ex) {
         ex.printStackTrace();
       }
@@ -109,24 +110,26 @@ public class JsonWriter extends JsonIO {
    * "data":{"title":"Graph Community"},
    * "meta":{"label":"Community"}
    * }
+   *
+   * @param <GD> EPGM graph head type
    */
   public static class GraphTextFormatter<GD extends GraphData> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<Subgraph<Long, GD>> {
+    TextOutputFormat.TextFormatter<GD> {
 
     /**
-     * Creates a JSON string representation of a given graph data object.
+     * Creates a JSON string representation of a given graph head object.
      *
-     * @param g graph data object
+     * @param g graph head
      * @return JSON string representation
      */
     @Override
-    public String format(Subgraph<Long, GD> g) {
+    public String format(GD g) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, g.getId());
-        json.put(DATA, writeProperties(g.getValue()));
-        json.put(META, writeGraphMeta(g.getValue()));
+        json.put(DATA, writeProperties(g));
+        json.put(META, writeGraphMeta(g));
       } catch (JSONException ex) {
         ex.printStackTrace();
       }

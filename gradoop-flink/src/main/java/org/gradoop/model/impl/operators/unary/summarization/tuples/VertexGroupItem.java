@@ -22,14 +22,11 @@ import org.apache.flink.api.java.tuple.Tuple5;
 /**
  * Vertex representation which is used as output of group reduce.
  *
- * Consists of:
- * <ul>
- * <li> vertex id
- * <li> group representative vertex id
- * <li> vertex group label
- * <li> vertex group property
- * <li> total group count
- * </ul>
+ * f0: vertex id
+ * f1: group representative vertex id
+ * f2: vertex group label
+ * f3: vertex group property
+ * f4: total group count
  */
 public class VertexGroupItem extends Tuple5<Long, Long, String, String, Long> {
 

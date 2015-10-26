@@ -18,8 +18,6 @@
 package org.gradoop.io.json;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.model.api.EdgeData;
@@ -28,7 +26,6 @@ import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
 import org.gradoop.model.api.VertexDataFactory;
-import org.gradoop.model.impl.tuples.Subgraph;
 
 import java.util.Map;
 import java.util.Set;
@@ -53,9 +50,11 @@ public class JsonReader extends JsonIO {
    * "meta":{"label":"Employee", "out-edges":[0,1,2,3], in-edges:[4,5,6,7],
    * "graphs":[0,1,2,3]}
    * }
+   *
+   * @param <VD> EPGM vertex type class
    */
   public static class JsonToVertexMapper<VD extends VertexData> extends
-    JsonToEntityMapper implements MapFunction<String, Vertex<Long, VD>> {
+    JsonToEntityMapper implements MapFunction<String, VD> {
 
     /**
      * Creates vertex data objects.
@@ -79,15 +78,15 @@ public class JsonReader extends JsonIO {
      * @throws Exception
      */
     @Override
-    public Vertex<Long, VD> map(String s) throws Exception {
+    public VD map(String s) throws Exception {
       JSONObject jsonVertex = new JSONObject(s);
       Long vertexID = getID(jsonVertex);
       String label = getLabel(jsonVertex);
       Map<String, Object> properties = getProperties(jsonVertex);
       Set<Long> graphs = getGraphs(jsonVertex);
 
-      return new Vertex<>(vertexID, vertexDataFactory
-        .createVertexData(vertexID, label, properties, graphs));
+      return vertexDataFactory.createVertexData(vertexID, label, properties,
+        graphs);
     }
   }
 
@@ -106,9 +105,11 @@ public class JsonReader extends JsonIO {
    * "data":{"since":2015},
    * "meta":{"label":"worksFor","graphs":[1,2,3,4]}
    * }
+   *
+   * @param <ED> EPGM edge type
    */
   public static class JsonToEdgeMapper<ED extends EdgeData> extends
-    JsonToEntityMapper implements MapFunction<String, Edge<Long, ED>> {
+    JsonToEntityMapper implements MapFunction<String, ED> {
 
     /**
      * Edge data factory.
@@ -132,7 +133,7 @@ public class JsonReader extends JsonIO {
      * @throws Exception
      */
     @Override
-    public Edge<Long, ED> map(String s) throws Exception {
+    public ED map(String s) throws Exception {
       JSONObject jsonEdge = new JSONObject(s);
       Long edgeID = getID(jsonEdge);
       String edgeLabel = getLabel(jsonEdge);
@@ -141,9 +142,8 @@ public class JsonReader extends JsonIO {
       Map<String, Object> properties = getProperties(jsonEdge);
       Set<Long> graphs = getGraphs(jsonEdge);
 
-      return new Edge<>(sourceID, targetID, edgeDataFactory
-        .createEdgeData(edgeID, edgeLabel, sourceID, targetID, properties,
-          graphs));
+      return edgeDataFactory.createEdgeData(edgeID, edgeLabel, sourceID,
+        targetID, properties, graphs);
     }
 
     /**
@@ -183,9 +183,11 @@ public class JsonReader extends JsonIO {
    * "data":{"title":"Graph Databases"},
    * "meta":{"label":"Community","vertices":[0,1,2],"edges":[4,5,6]}
    * }
+   *
+   * @param <GD> EPGM graph head type
    */
   public static class JsonToGraphMapper<GD extends GraphData> extends
-    JsonToEntityMapper implements MapFunction<String, Subgraph<Long, GD>> {
+    JsonToEntityMapper implements MapFunction<String, GD> {
 
     /**
      * Creates graph data objects
@@ -209,14 +211,13 @@ public class JsonReader extends JsonIO {
      * @throws Exception
      */
     @Override
-    public Subgraph<Long, GD> map(String s) throws Exception {
+    public GD map(String s) throws Exception {
       JSONObject jsonGraph = new JSONObject(s);
       Long graphID = getID(jsonGraph);
       String label = getLabel(jsonGraph);
       Map<String, Object> properties = getProperties(jsonGraph);
 
-      return new Subgraph<>(graphID,
-        graphDataFactory.createGraphData(graphID, label, properties));
+      return graphDataFactory.createGraphData(graphID, label, properties);
     }
   }
 }

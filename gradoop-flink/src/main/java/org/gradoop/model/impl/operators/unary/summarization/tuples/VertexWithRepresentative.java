@@ -6,12 +6,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
  * Representation of a vertex id and its corresponding vertex group
  * representative.
  *
- * Consists of:
- *
- * <ul>
- * <li> vertex id
- * <li> group representative vertex id
- * </ul>
+ * f0: vertex id
+ * f1: group representative vertex id
  */
 public class VertexWithRepresentative extends Tuple2<Long, Long> {
 

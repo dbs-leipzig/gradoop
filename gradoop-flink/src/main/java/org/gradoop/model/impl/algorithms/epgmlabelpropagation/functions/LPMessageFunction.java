@@ -28,8 +28,8 @@ import static org.gradoop.model.impl.algorithms.epgmlabelpropagation
 /**
  * Distributes the value of the vertex
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
  */
 public class LPMessageFunction<
   VD extends VertexData,

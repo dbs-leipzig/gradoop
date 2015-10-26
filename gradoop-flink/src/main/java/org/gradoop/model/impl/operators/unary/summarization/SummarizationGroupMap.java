@@ -62,9 +62,9 @@ import org.gradoop.model.impl.operators.unary.summarization.tuples
  * and/or edge property.
  * 8) Group reduce edges and create final summarized edges.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class SummarizationGroupMap<
   VD extends VertexData,

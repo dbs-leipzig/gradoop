@@ -25,9 +25,9 @@ import org.gradoop.model.impl.GraphCollection;
 /**
  * Creates a {@link GraphCollection} based on one input collection.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public interface UnaryCollectionToCollectionOperator<VD extends VertexData,
   ED extends EdgeData, GD extends GraphData> extends

@@ -25,13 +25,14 @@ import org.gradoop.model.api.EdgeData;
 /**
  * Maps EPGM edges to a Label propagation specific representation.
  *
- * @param <ED> edge data type
+ * @param <ED> EPGM edge type
  */
 public class EdgeToLPEdgeMapper<ED extends EdgeData>
-  implements MapFunction<Edge<Long, ED>, Edge<Long, NullValue>> {
+  implements MapFunction<ED, Edge<Long, NullValue>> {
   @Override
-  public Edge<Long, NullValue> map(Edge<Long, ED> edge) throws Exception {
-    return new Edge<>(edge.getSource(), edge.getTarget(),
+  public Edge<Long, NullValue> map(ED edge) throws Exception {
+    return new Edge<>(edge.getSourceVertexId(),
+      edge.getTargetVertexId(),
       NullValue.getInstance());
   }
 }

@@ -29,9 +29,9 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  * @param <O>  output type of aggregate function
  */
 public class Aggregation<

@@ -7,7 +7,6 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -17,11 +16,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
@@ -32,7 +27,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
-import org.gradoop.model.impl.tuples.Subgraph;
+import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.util.GConstants;
 
 import java.util.HashSet;
@@ -45,9 +40,9 @@ import java.util.Set;
  * {@link LongFromVertexSelector} to retrieve the logical graph identifier
  * from the vertices in the input graph.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public class SplitBy<
   VD extends VertexData,
@@ -81,13 +76,10 @@ public class SplitBy<
   @Override
   public GraphCollection<VD, ED, GD> execute(
     LogicalGraph<VD, ED, GD> logicalGraph) {
-    DataSet<Vertex<Long, VD>> vertices = computeNewVertices(logicalGraph);
-    DataSet<Subgraph<Long, GD>> subgraphs =
-      computeNewSubgraphs(logicalGraph, vertices);
-    DataSet<Edge<Long, ED>> edges =
-      computeNewEdges(logicalGraph, vertices, subgraphs);
-    Graph<Long, VD, ED> newGraph = Graph.fromDataSet(vertices, edges, env);
-    return new GraphCollection<>(newGraph, subgraphs,
+    DataSet<VD> vertices = computeNewVertices(logicalGraph);
+    DataSet<GD> graphHeads = computeNewGraphHeads(logicalGraph, vertices);
+    DataSet<ED> edges = computeNewEdges(logicalGraph, vertices, graphHeads);
+    return new GraphCollection<>(vertices, edges, graphHeads,
       logicalGraph.getVertexDataFactory(), logicalGraph.getEdgeDataFactory(),
       logicalGraph.getGraphDataFactory(), env);
   }
@@ -100,7 +92,7 @@ public class SplitBy<
    * @return a DataSet containing all vertices, each vertex has one new graph
    * in its graph set
    */
-  private DataSet<Vertex<Long, VD>> computeNewVertices(
+  private DataSet<VD> computeNewVertices(
     LogicalGraph<VD, ED, GD> logicalGraph) {
     // add the new graphs to the vertices graph lists
     return logicalGraph.getVertices()
@@ -114,10 +106,10 @@ public class SplitBy<
    * @param vertices     the computed vertices with their graphs
    * @return a DataSet containing all newly created subgraphs
    */
-  private DataSet<Subgraph<Long, GD>> computeNewSubgraphs(
-    LogicalGraph<VD, ED, GD> logicalGraph, DataSet<Vertex<Long, VD>> vertices) {
+  private DataSet<GD> computeNewGraphHeads(
+    LogicalGraph<VD, ED, GD> logicalGraph, DataSet<VD> vertices) {
     // construct a KeySelector using the LongFromVertexFunction
-    KeySelector<Vertex<Long, VD>, Long> propertySelector =
+    KeySelector<VD, Long> propertySelector =
       new LongFromVertexSelector<>(vertexToLongFunc);
     // construct the list of subgraphs
     GraphDataFactory<GD> gdFactory = logicalGraph.getGraphDataFactory();
@@ -134,29 +126,34 @@ public class SplitBy<
    *
    * @param logicalGraph the input graph
    * @param vertices     the computed vertices with their graphs
-   * @param subgraphs    the computed subgraphs
+   * @param graphHeads    the computed subgraphs
    * @return a DataSet containing all newly created edges, each edge has a
    * new graph in its graph set
    */
-  private DataSet<Edge<Long, ED>> computeNewEdges(
-    LogicalGraph<VD, ED, GD> logicalGraph, DataSet<Vertex<Long, VD>> vertices,
-    DataSet<Subgraph<Long, GD>> subgraphs) {
+  private DataSet<ED> computeNewEdges(LogicalGraph<VD, ED, GD> logicalGraph,
+    DataSet<VD> vertices,
+    DataSet<GD> graphHeads) {
     // construct tuples of the edges with the ids of their source and target
     // vertices
     DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex =
       logicalGraph.getEdges().map(new EdgeToTupleMapper<ED>());
     // replace the source vertex id by the graph list of this vertex
-    DataSet<Tuple3<Long, Set<Long>, Long>> edgeGraphsVertex =
-      edgeVertexVertex.join(vertices).where(1).equalTo(0)
-        .with(new JoinEdgeTupleWithSourceGraphs<VD>());
+    DataSet<Tuple3<Long, Set<Long>, Long>> edgeGraphsVertex = edgeVertexVertex
+      .join(vertices)
+      .where(1)
+      .equalTo(new VertexKeySelector<VD>())
+      .with(new JoinEdgeTupleWithSourceGraphs<VD>());
     // replace the target vertex id by the graph list of this vertex
     DataSet<Tuple3<Long, Set<Long>, Set<Long>>> edgeGraphsGraphs =
-      edgeGraphsVertex.join(vertices).where(2).equalTo(0)
+      edgeGraphsVertex
+        .join(vertices)
+        .where(2)
+        .equalTo(new VertexKeySelector<VD>())
         .with(new JoinEdgeTupleWithTargetGraphs<VD>());
-    // transform the new subgraphs into a single set of long, containing all
+    // transform the new graph heads into a single set of long, containing all
     // the identifiers
     DataSet<Set<Long>> newSubgraphIdentifiers =
-      subgraphs.map(new MapSubgraphIdToSet<GD>()).reduce(new ReduceSets());
+      graphHeads.map(new MapSubgraphIdToSet<GD>()).reduce(new ReduceSets());
     // construct new tuples containing the edge, the graphs of its source and
     // target vertex and the list of new graphs
     DataSet<Tuple4<Long, Set<Long>, Set<Long>, Set<Long>>> edgesWithSubgraphs =
@@ -186,7 +183,7 @@ public class SplitBy<
    * @param <VD> vertex data
    */
   private static class LongFromVertexSelector<VD extends VertexData> implements
-    KeySelector<Vertex<Long, VD>, Long> {
+    KeySelector<VD, Long> {
     /**
      * Unary Function
      */
@@ -206,8 +203,8 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Long getKey(Vertex<Long, VD> vertex) throws Exception {
-      return function.execute(vertex.getValue());
+    public Long getKey(VD vertex) throws Exception {
+      return function.execute(vertex);
     }
   }
 
@@ -218,8 +215,7 @@ public class SplitBy<
    * @param <VD> vertex data type
    */
   private static class AddNewGraphsToVertexMapper<VD extends VertexData>
-    implements
-    MapFunction<Vertex<Long, VD>, Vertex<Long, VD>> {
+    implements MapFunction<VD, VD> {
     /**
      * Mapping from vertex to long value
      */
@@ -239,12 +235,12 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Vertex<Long, VD> map(Vertex<Long, VD> vertex) throws Exception {
-      Long labelPropIndex = function.execute(vertex.getValue());
-      if (vertex.getValue().getGraphs() == null) {
-        vertex.getValue().setGraphs(Sets.newHashSet(labelPropIndex));
+    public VD map(VD vertex) throws Exception {
+      Long labelPropIndex = function.execute(vertex);
+      if (vertex.getGraphs() == null) {
+        vertex.setGraphs(Sets.newHashSet(labelPropIndex));
       } else {
-        vertex.getValue().getGraphs().add(labelPropIndex);
+        vertex.getGraphs().add(labelPropIndex);
       }
       return vertex;
     }
@@ -253,13 +249,13 @@ public class SplitBy<
   /**
    * Builds new graphs from vertices and the LongFromVertexFunction
    *
-   * @param <VD> vertex data type
-   * @param <GD> graph data type
+   * @param <VD> EPGM vertex type
+   * @param <GD> EPGM graph type
    */
   private static class SubgraphsFromGroupsReducer<VD extends VertexData, GD
     extends GraphData>
-    implements GroupReduceFunction<Vertex<Long, VD>, Subgraph<Long, GD>>,
-    ResultTypeQueryable<Vertex<Long, VD>> {
+    implements GroupReduceFunction<VD, GD>,
+    ResultTypeQueryable<GD> {
     /**
      * Mapping from vertex to long value
      */
@@ -268,10 +264,6 @@ public class SplitBy<
      * GraphDataFactory to build new GraphData
      */
     private final GraphDataFactory<GD> graphDataFactory;
-    /**
-     * Reduce object instantiation.
-     */
-    private final Subgraph<Long, GD> reuseSubgraph;
 
     /**
      * Creates GroupReduceFunction instance.
@@ -284,22 +276,19 @@ public class SplitBy<
       GraphDataFactory<GD> graphDataFactory) {
       this.function = function;
       this.graphDataFactory = graphDataFactory;
-      reuseSubgraph = new Subgraph<>();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void reduce(Iterable<Vertex<Long, VD>> iterable,
-      Collector<Subgraph<Long, GD>> collector) throws Exception {
-      Iterator<Vertex<Long, VD>> it = iterable.iterator();
-      Vertex<Long, VD> vertex = it.next();
-      Long labelPropIndex = function.execute(vertex.getValue());
-      reuseSubgraph.setId(labelPropIndex);
-      reuseSubgraph.setValue(graphDataFactory.createGraphData(labelPropIndex,
+    public void reduce(Iterable<VD> iterable,
+      Collector<GD> collector) throws Exception {
+      Iterator<VD> it = iterable.iterator();
+      VD vertex = it.next();
+      Long labelPropIndex = function.execute(vertex);
+      collector.collect(graphDataFactory.createGraphData(labelPropIndex,
         GConstants.DEFAULT_GRAPH_LABEL));
-      collector.collect(reuseSubgraph);
     }
 
     /**
@@ -307,9 +296,9 @@ public class SplitBy<
      */
     @Override
     @SuppressWarnings("unchecked")
-    public TypeInformation<Vertex<Long, VD>> getProducedType() {
-      return new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(graphDataFactory.getType()));
+    public TypeInformation<GD> getProducedType() {
+      return (TypeInformation<GD>) TypeExtractor.createTypeInfo(
+        graphDataFactory.getType());
     }
   }
 
@@ -319,9 +308,9 @@ public class SplitBy<
    *
    * @param <ED> edge data
    */
-  @FunctionAnnotation.ForwardedFields("f0->f1;f1->f2")
+  @FunctionAnnotation.ForwardedFields("sourceVertexId->f1;targetVertexId->f2")
   private static class EdgeToTupleMapper<ED extends EdgeData> implements
-    MapFunction<Edge<Long, ED>, Tuple3<Long, Long, Long>> {
+    MapFunction<ED, Tuple3<Long, Long, Long>> {
     /**
      * Reduce object instantiation.
      */
@@ -338,10 +327,10 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Tuple3<Long, Long, Long> map(Edge<Long, ED> edge) throws Exception {
-      reuseTuple.f0 = edge.getValue().getId();
-      reuseTuple.f1 = edge.getSource();
-      reuseTuple.f2 = edge.getTarget();
+    public Tuple3<Long, Long, Long> map(ED edge) throws Exception {
+      reuseTuple.f0 = edge.getId();
+      reuseTuple.f1 = edge.getSourceVertexId();
+      reuseTuple.f2 = edge.getTargetVertexId();
       return reuseTuple;
     }
   }
@@ -350,12 +339,12 @@ public class SplitBy<
    * Replace the id of the source vertex of each edge with the set of graphs
    * this vertex belongs to.
    *
-   * @param <VD> vertex data type
+   * @param <VD> EPGM vertex type
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f2")
   private static class JoinEdgeTupleWithSourceGraphs<VD extends VertexData>
     implements
-    JoinFunction<Tuple3<Long, Long, Long>, Vertex<Long, VD>, Tuple3<Long,
+    JoinFunction<Tuple3<Long, Long, Long>, VD, Tuple3<Long,
       Set<Long>, Long>> {
     /**
      * Reduce object instantiation
@@ -374,11 +363,11 @@ public class SplitBy<
      */
     @Override
     public Tuple3<Long, Set<Long>, Long> join(Tuple3<Long, Long, Long> tuple3,
-      Vertex<Long, VD> vertex) throws Exception {
+      VD vertex) throws Exception {
       reuseTuple.f0 = tuple3.f0;
-      reuseTuple.f1 = vertex.getValue().getGraphs();
+      reuseTuple.f1 = vertex.getGraphs();
       reuseTuple.f2 = tuple3.f2;
-      return new Tuple3<>(tuple3.f0, vertex.getValue().getGraphs(), tuple3.f2);
+      return new Tuple3<>(tuple3.f0, vertex.getGraphs(), tuple3.f2);
     }
   }
 
@@ -391,7 +380,7 @@ public class SplitBy<
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f1")
   private static class JoinEdgeTupleWithTargetGraphs<VD extends VertexData>
     implements
-    JoinFunction<Tuple3<Long, Set<Long>, Long>, Vertex<Long, VD>,
+    JoinFunction<Tuple3<Long, Set<Long>, Long>, VD,
       Tuple3<Long, Set<Long>, Set<Long>>> {
     /**
      * Reduce object instantiations.
@@ -410,11 +399,11 @@ public class SplitBy<
      */
     @Override
     public Tuple3<Long, Set<Long>, Set<Long>> join(
-      Tuple3<Long, Set<Long>, Long> tuple3, Vertex<Long, VD> vertex) throws
+      Tuple3<Long, Set<Long>, Long> tuple3, VD vertex) throws
       Exception {
       reuseTuple.f0 = tuple3.f0;
       reuseTuple.f1 = tuple3.f1;
-      reuseTuple.f2 = vertex.getValue().getGraphs();
+      reuseTuple.f2 = vertex.getGraphs();
       return reuseTuple;
     }
   }
@@ -425,12 +414,12 @@ public class SplitBy<
    * @param <GD> graph data type
    */
   private static class MapSubgraphIdToSet<GD extends GraphData> implements
-    MapFunction<Subgraph<Long, GD>, Set<Long>> {
+    MapFunction<GD, Set<Long>> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Long> map(Subgraph<Long, GD> subgraph) throws Exception {
+    public Set<Long> map(GD subgraph) throws Exception {
       Set<Long> idSet = Sets.newHashSet();
       idSet.add(subgraph.getId());
       return idSet;
@@ -536,14 +525,14 @@ public class SplitBy<
    * @param <ED> edge data type
    */
   private static class JoinEdgeTuplesWithEdges<ED extends EdgeData> implements
-    JoinFunction<Edge<Long, ED>, Tuple2<Long, Set<Long>>, Edge<Long, ED>> {
+    JoinFunction<ED, Tuple2<Long, Set<Long>>, ED> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Edge<Long, ED> join(Edge<Long, ED> edge,
+    public ED join(ED edge,
       Tuple2<Long, Set<Long>> tuple2) throws Exception {
-      edge.getValue().getGraphs().addAll(tuple2.f1);
+      edge.getGraphs().addAll(tuple2.f1);
       return edge;
     }
   }

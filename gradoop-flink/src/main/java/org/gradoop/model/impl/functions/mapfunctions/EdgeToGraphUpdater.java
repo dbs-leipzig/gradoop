@@ -18,16 +18,15 @@
 package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.graph.Edge;
 import org.gradoop.model.api.EdgeData;
 
 /**
  * Adds a given graph ID to the edge and returns it.
  *
- * @param <ED> edge data type
+ * @param <ED> EPGM edge type
  */
 public class EdgeToGraphUpdater<ED extends EdgeData> implements
-  MapFunction<Edge<Long, ED>, Edge<Long, ED>> {
+  MapFunction<ED, ED> {
 
   /**
    * Graph identifier to add.
@@ -47,8 +46,8 @@ public class EdgeToGraphUpdater<ED extends EdgeData> implements
    * {@inheritDoc}
    */
   @Override
-  public Edge<Long, ED> map(Edge<Long, ED> e) throws Exception {
-    e.getValue().addGraph(newGraphID);
+  public ED map(ED e) throws Exception {
+    e.addGraph(newGraphID);
     return e;
   }
 }

@@ -25,7 +25,7 @@ import org.gradoop.model.impl.functions.UnaryFunction;
  * is used by {@link org.gradoop.model.impl.operators.auxiliary.SplitBy} and
  * {@link org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy}.
  *
- * @param <VD> vertex data type
+ * @param <VD> EPGM vertex type
  */
 public class CommunityDiscriminatorFunction<VD extends VertexData> implements
   UnaryFunction<VD, Long> {
