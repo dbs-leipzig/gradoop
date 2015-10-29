@@ -71,13 +71,8 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
     final DataSet<VD> newVertices = computeNewVertices(newGraphHeads);
     final DataSet<ED> newEdges = computeNewEdges(newVertices);
 
-    return new GraphCollection<>(newVertices,
-      newEdges,
-      newGraphHeads,
-      firstCollection.getVertexDataFactory(),
-      firstCollection.getEdgeDataFactory(),
-      firstCollection.getGraphDataFactory(),
-      firstCollection.getExecutionEnvironment());
+    return new GraphCollection<>(newVertices, newEdges, newGraphHeads,
+      firstCollection.getConfig());
   }
 
   /**

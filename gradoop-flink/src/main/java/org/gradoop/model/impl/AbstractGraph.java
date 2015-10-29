@@ -20,17 +20,14 @@ package org.gradoop.model.impl;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.EdgeDataFactory;
 import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.api.VertexDataFactory;
 import org.gradoop.model.api.operators.GraphOperators;
+import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * Base class for graph representations.
@@ -46,22 +43,11 @@ public abstract class AbstractGraph<
   ED extends EdgeData,
   GD extends GraphData>
   implements GraphOperators<VD, ED> {
+
   /**
-   * Used to create new vertex data.
+   * Gradoop Flink configuration.
    */
-  private final VertexDataFactory<VD> vertexDataFactory;
-  /**
-   * Used to create new edge data.
-   */
-  private final EdgeDataFactory<ED> edgeDataFactory;
-  /**
-   * Used to create new graph data.
-   */
-  private final GraphDataFactory<GD> graphDataFactory;
-  /**
-   * Flink execution environment.
-   */
-  private final ExecutionEnvironment env;
+  private final GradoopFlinkConfig<VD, ED, GD> config;
 
   /**
    * DataSet containing vertices associated with that graph.
@@ -75,52 +61,25 @@ public abstract class AbstractGraph<
   /**
    * Creates a new graph instance.
    *
-   * @param vertices            vertex data set
-   * @param edges               edge data set
-   * @param vertexDataFactory   vertex data factory
-   * @param edgeDataFactory     edge data factory
-   * @param graphDataFactory    graph data factory
-   * @param env                 Flink execution environment
+   * @param vertices  vertex data set
+   * @param edges     edge data set
+   * @param config    Gradoop Flink configuration
    */
   protected AbstractGraph(DataSet<VD> vertices,
     DataSet<ED> edges,
-    VertexDataFactory<VD> vertexDataFactory,
-    EdgeDataFactory<ED> edgeDataFactory,
-    GraphDataFactory<GD> graphDataFactory,
-    ExecutionEnvironment env) {
+    GradoopFlinkConfig<VD, ED, GD> config) {
     this.vertices = vertices;
     this.edges = edges;
-    this.vertexDataFactory = vertexDataFactory;
-    this.edgeDataFactory = edgeDataFactory;
-    this.graphDataFactory = graphDataFactory;
-    this.env = env;
+    this.config = config;
   }
 
   /**
-   * Returns the vertex data factory.
+   * Returns the Gradoop Flink configuration.
    *
-   * @return vertex data factory
+   * @return Gradoop Flink configuration
    */
-  public VertexDataFactory<VD> getVertexDataFactory() {
-    return vertexDataFactory;
-  }
-
-  /**
-   * Returns the edge data factory.
-   *
-   * @return edge data factory
-   */
-  public EdgeDataFactory<ED> getEdgeDataFactory() {
-    return edgeDataFactory;
-  }
-
-  /**
-   * Returns the graph data factory.
-   *
-   * @return graph data factory
-   */
-  public GraphDataFactory<GD> getGraphDataFactory() {
-    return graphDataFactory;
+  public GradoopFlinkConfig<VD, ED, GD> getConfig() {
+    return config;
   }
 
   /**
@@ -187,7 +146,7 @@ public abstract class AbstractGraph<
             epgmEdge);
         }
       }).withForwardedFields("*->f2"),
-      getExecutionEnvironment());
+      config.getExecutionEnvironment());
   }
 
   /**
@@ -204,14 +163,5 @@ public abstract class AbstractGraph<
   @Override
   public long getEdgeCount() throws Exception {
     return edges.count();
-  }
-
-  /**
-   * Returns the Flink execution environment associated with that graph.
-   *
-   * @return Flink execution environment
-   */
-  public ExecutionEnvironment getExecutionEnvironment() {
-    return this.env;
   }
 }

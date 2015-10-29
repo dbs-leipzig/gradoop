@@ -20,6 +20,7 @@ package org.gradoop.storage.api;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
+import org.gradoop.util.GradoopConfig;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -28,32 +29,18 @@ import java.util.Iterator;
  * The EPGM store is responsible for writing and reading graph, vertex and
  * edge data.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
+ * @param <GD> EPGM graph head type
  */
 public interface EPGMStore<VD extends VertexData, ED extends EdgeData, GD
   extends GraphData> {
   /**
-   * Returns the vertex data handler used by this store.
+   * Returns the Gradoop configuration associated with that EPGM Store,
    *
-   * @return vertex data handler
+   * @return Gradoop Configuration
    */
-  VertexDataHandler<VD, ED> getVertexDataHandler();
-
-  /**
-   * Returns the edge data handler used by this store.
-   *
-   * @return edge data handler
-   */
-  EdgeDataHandler<ED, VD> getEdgeDataHandler();
-
-  /**
-   * Returns the graph data handler used by this store.
-   *
-   * @return graph data handler
-   */
-  GraphDataHandler<GD> getGraphDataHandler();
+  GradoopConfig<VD, ED, GD> getConfig();
 
   /**
    * Returns the HBase table name where vertex data is stored.

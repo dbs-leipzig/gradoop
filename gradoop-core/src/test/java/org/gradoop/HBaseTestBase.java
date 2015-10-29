@@ -24,8 +24,21 @@ import org.gradoop.model.impl.pojo.DefaultGraphData;
 import org.gradoop.model.impl.pojo.DefaultGraphDataFactory;
 import org.gradoop.model.impl.pojo.DefaultVertexData;
 import org.gradoop.model.impl.pojo.DefaultVertexDataFactory;
-import org.gradoop.storage.api.*;
-import org.gradoop.storage.impl.hbase.*;
+import org.gradoop.storage.api.EPGMStore;
+import org.gradoop.storage.api.PersistentEdgeData;
+import org.gradoop.storage.api.PersistentEdgeDataFactory;
+import org.gradoop.storage.api.PersistentGraphData;
+import org.gradoop.storage.api.PersistentGraphDataFactory;
+import org.gradoop.storage.api.PersistentVertexData;
+import org.gradoop.storage.api.PersistentVertexDataFactory;
+import org.gradoop.storage.impl.hbase.DefaultPersistentEdgeData;
+import org.gradoop.storage.impl.hbase.DefaultPersistentEdgeDataFactory;
+import org.gradoop.storage.impl.hbase.DefaultPersistentGraphData;
+import org.gradoop.storage.impl.hbase.DefaultPersistentGraphDataFactory;
+import org.gradoop.storage.impl.hbase.DefaultPersistentVertexData;
+import org.gradoop.storage.impl.hbase.DefaultPersistentVertexDataFactory;
+import org.gradoop.storage.impl.hbase.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStoreFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -77,17 +90,10 @@ public class HBaseTestBase {
   public static EPGMStore<DefaultVertexData, DefaultEdgeData,
       DefaultGraphData> createEmptyEPGMStore() {
     Configuration config = utility.getConfiguration();
-    VertexDataHandler<DefaultVertexData, DefaultEdgeData> vertexDataHandler =
-      new DefaultVertexDataHandler<>(new DefaultVertexDataFactory());
-    EdgeDataHandler<DefaultEdgeData, DefaultVertexData> edgeDataHandler =
-      new DefaultEdgeDataHandler<>(new DefaultEdgeDataFactory());
-    GraphDataHandler<DefaultGraphData> graphDataHandler =
-      new DefaultGraphDataHandler<>(new DefaultGraphDataFactory());
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config);
-    return HBaseEPGMStoreFactory
-      .createOrOpenEPGMStore(config, vertexDataHandler, edgeDataHandler,
-        graphDataHandler);
+    return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,
+      GradoopHBaseConfig.getDefaultConfig());
   }
 
   /**
@@ -98,15 +104,9 @@ public class HBaseTestBase {
   public static EPGMStore<DefaultVertexData, DefaultEdgeData,
     DefaultGraphData> openEPGMStore() {
     Configuration config = utility.getConfiguration();
-    VertexDataHandler<DefaultVertexData, DefaultEdgeData> vertexDataHandler =
-      new DefaultVertexDataHandler<>(new DefaultVertexDataFactory());
-    EdgeDataHandler<DefaultEdgeData, DefaultVertexData> edgeDataHandler =
-      new DefaultEdgeDataHandler<>(new DefaultEdgeDataFactory());
-    GraphDataHandler<DefaultGraphData> graphDataHandler =
-      new DefaultGraphDataHandler<>(new DefaultGraphDataFactory());
-    return HBaseEPGMStoreFactory
-      .createOrOpenEPGMStore(config, vertexDataHandler, edgeDataHandler,
-        graphDataHandler);
+
+    return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,
+      GradoopHBaseConfig.getDefaultConfig());
   }
 
   /**

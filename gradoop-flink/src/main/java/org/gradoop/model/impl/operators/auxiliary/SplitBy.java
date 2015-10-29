@@ -80,8 +80,7 @@ public class SplitBy<
     DataSet<GD> graphHeads = computeNewGraphHeads(logicalGraph, vertices);
     DataSet<ED> edges = computeNewEdges(logicalGraph, vertices, graphHeads);
     return new GraphCollection<>(vertices, edges, graphHeads,
-      logicalGraph.getVertexDataFactory(), logicalGraph.getEdgeDataFactory(),
-      logicalGraph.getGraphDataFactory(), env);
+      logicalGraph.getConfig());
   }
 
   /**
@@ -112,12 +111,11 @@ public class SplitBy<
     KeySelector<VD, Long> propertySelector =
       new LongFromVertexSelector<>(vertexToLongFunc);
     // construct the list of subgraphs
-    GraphDataFactory<GD> gdFactory = logicalGraph.getGraphDataFactory();
     return vertices
       .groupBy(propertySelector)
       .reduceGroup(new SubgraphsFromGroupsReducer<>(
         vertexToLongFunc,
-        gdFactory));
+        logicalGraph.getConfig().getGraphHeadFactory()));
   }
 
   /**

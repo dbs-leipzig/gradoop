@@ -123,7 +123,7 @@ public class SummarizationGroupCombine<
     // filter group representative tuples and build final vertices
     DataSet<Vertex<Long, VD>> summarizedVertices =
       reduceGroup.filter(new VertexGroupItemToSummarizedVertexFilter()).map(
-        new VertexGroupItemToSummarizedVertexMapper<>(vertexDataFactory,
+        new VertexGroupItemToSummarizedVertexMapper<>(config.getVertexFactory(),
           getVertexGroupingKey(), useVertexLabels()));
 
     // filter vertex to representative tuples (used for edge join)

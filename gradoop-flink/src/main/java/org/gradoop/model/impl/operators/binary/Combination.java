@@ -64,9 +64,8 @@ public class Combination<
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return LogicalGraph.fromDataSets(newVertexSet, newEdgeSet,
-      firstGraph.getGraphDataFactory().createGraphData(newGraphID),
-      firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
-      firstGraph.getGraphDataFactory());
+      firstGraph.getConfig().getGraphHeadFactory().createGraphData(newGraphID),
+      firstGraph.getConfig());
   }
 
   /**

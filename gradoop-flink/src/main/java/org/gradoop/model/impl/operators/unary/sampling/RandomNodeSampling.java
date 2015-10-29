@@ -102,9 +102,8 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return LogicalGraph.fromDataSets(newVertices, newEdges,
-      graph.getGraphDataFactory().createGraphData(newGraphID),
-      graph.getVertexDataFactory(), graph.getEdgeDataFactory(),
-      graph.getGraphDataFactory());
+      graph.getConfig().getGraphHeadFactory().createGraphData(newGraphID),
+      graph.getConfig());
   }
 
   /**

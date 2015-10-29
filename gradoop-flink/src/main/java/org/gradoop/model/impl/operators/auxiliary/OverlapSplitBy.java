@@ -8,7 +8,6 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -50,10 +49,6 @@ public class OverlapSplitBy<
    */
   private static final long serialVersionUID = 513465233452L;
   /**
-   * Flink Execution Environment
-   */
-  private final transient ExecutionEnvironment env;
-  /**
    * Self defined function for graph extraction
    */
   private final UnaryFunction<VD, List<Long>> function;
@@ -62,11 +57,8 @@ public class OverlapSplitBy<
    * Constructor
    *
    * @param function self defined function
-   * @param env      execution environment
    */
-  public OverlapSplitBy(UnaryFunction<VD, List<Long>> function,
-    ExecutionEnvironment env) {
-    this.env = env;
+  public OverlapSplitBy(UnaryFunction<VD, List<Long>> function) {
     this.function = function;
   }
 
@@ -89,8 +81,7 @@ public class OverlapSplitBy<
     DataSet<ED> edges =
       computeNewEdges(logicalGraph, vertices, subgraphs);
     return new GraphCollection<>(vertices, edges, subgraphs,
-      logicalGraph.getVertexDataFactory(), logicalGraph.getEdgeDataFactory(),
-      logicalGraph.getGraphDataFactory(), env);
+      logicalGraph.getConfig());
   }
 
   /**
@@ -119,8 +110,8 @@ public class OverlapSplitBy<
     LogicalGraph<VD, ED, GD> logicalGraph, DataSet<VD> vertices) {
     DataSet<Tuple1<Long>> newSubgraphIDs =
       vertices.flatMap(new VertexToGraphIDFlatMapper<>(function)).distinct();
-    GraphDataFactory<GD> gdFactory = logicalGraph.getGraphDataFactory();
-    return newSubgraphIDs.map(new SubgraphMapper<>(gdFactory));
+    return newSubgraphIDs.map(new SubgraphMapper<>(logicalGraph.getConfig()
+      .getGraphHeadFactory()));
   }
 
   /**

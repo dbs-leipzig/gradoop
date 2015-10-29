@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.algorithms.btg;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
@@ -51,20 +50,14 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
    * Counter to define maximal Iteration for the Algorithm
    */
   private int maxIterations;
-  /**
-   * Flink Execution Environment
-   */
-  private final ExecutionEnvironment env;
 
   /**
    * Constructor
    *
    * @param maxIterations int defining maximal step counter
-   * @param env           ExecutionEnvironment
    */
-  public BTG(int maxIterations, ExecutionEnvironment env) {
+  public BTG(int maxIterations) {
     this.maxIterations = maxIterations;
-    this.env = env;
   }
 
   /**
@@ -78,7 +71,8 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
     DataSet<Edge<Long, NullValue>> edges =
       logicalGraph.getEdges().map(new EdgeToBTGEdgeMapper<ED>());
     Graph<Long, BTGVertexValue, NullValue> btgGraph =
-      Graph.fromDataSet(vertices, edges, env);
+      Graph.fromDataSet(vertices, edges, logicalGraph.getConfig()
+        .getExecutionEnvironment());
     btgGraph = btgGraph.run(new BTGAlgorithm(this.maxIterations));
     DataSet<VD> btgLabeledVertices =
       btgGraph.getVertices().join(logicalGraph.getVertices())
@@ -90,13 +84,11 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
       .fromDataSets(btgLabeledVertices,
         logicalGraph.getEdges(),
         null,
-        logicalGraph.getVertexDataFactory(),
-        logicalGraph.getEdgeDataFactory(),
-        logicalGraph.getGraphDataFactory());
+       logicalGraph.getConfig());
 
     // create collection from result and return
     return new OverlapSplitBy<VD, ED, GD>(
-      new LongListFromPropertyFunction<VD>(VERTEX_BTGIDS_PROPERTYKEY), env)
+      new LongListFromPropertyFunction<VD>(VERTEX_BTGIDS_PROPERTYKEY))
       .execute(btgEPGraph);
   }
 

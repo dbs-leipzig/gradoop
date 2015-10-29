@@ -103,8 +103,8 @@ public class SummarizationGroupMap<
       // filter group representative tuples
       .filter(new VertexGroupItemToSummarizedVertexFilter())
       // build summarized vertex
-      .map(new VertexGroupItemToSummarizedVertexMapper<>(vertexDataFactory,
-        getVertexGroupingKey(), useVertexLabels()));
+      .map(new VertexGroupItemToSummarizedVertexMapper<>(
+        config.getVertexFactory(), getVertexGroupingKey(), useVertexLabels()));
 
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
       groupedVertices

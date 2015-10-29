@@ -72,16 +72,12 @@ public class Aggregation<
     Exception {
     O result = aggregationFunc.execute(graph);
     // copy graph data before updating properties
-    GD newGraphData = graph.getGraphDataFactory()
+    GD newGraphData = graph.getConfig().getGraphHeadFactory()
       .createGraphData(graph.getId(), graph.getLabel());
     newGraphData.setProperties(graph.getProperties());
     newGraphData.setProperty(aggregatePropertyKey, result);
-    return LogicalGraph.fromDataSets(graph.getVertices(),
-      graph.getEdges(),
-      newGraphData,
-      graph.getVertexDataFactory(),
-      graph.getEdgeDataFactory(),
-      graph.getGraphDataFactory());
+    return LogicalGraph.fromDataSets(graph.getVertices(), graph.getEdges(),
+      newGraphData, graph.getConfig());
   }
 
   /**

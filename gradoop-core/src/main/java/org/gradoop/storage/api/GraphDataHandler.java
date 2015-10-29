@@ -30,7 +30,9 @@ import java.util.Set;
  *
  * @param <GD> graph data type
  */
-public interface GraphDataHandler<GD extends GraphData> extends ElementHandler {
+public interface GraphDataHandler<
+  GD extends GraphData>
+  extends ElementHandler {
   /**
    * Adds all vertex identifiers of the given graph to the given {@link Put}
    * and returns it.

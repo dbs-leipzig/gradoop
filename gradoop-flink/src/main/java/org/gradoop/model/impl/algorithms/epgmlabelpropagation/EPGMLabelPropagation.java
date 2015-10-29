@@ -91,10 +91,7 @@ public class EPGMLabelPropagation<
 
     // create a logical graph
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph.fromGellyGraph(graph,
-      null,
-      logicalGraph.getVertexDataFactory(),
-      logicalGraph.getEdgeDataFactory(),
-      logicalGraph.getGraphDataFactory());
+      null, logicalGraph.getConfig());
 
     // and split it into a collection according the result
     return new SplitBy<VD, ED, GD>(

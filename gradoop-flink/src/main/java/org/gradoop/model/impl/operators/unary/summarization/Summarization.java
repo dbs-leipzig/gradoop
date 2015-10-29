@@ -30,21 +30,23 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.util.Collector;
-import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.EdgeDataFactory;
 import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.api.VertexDataFactory;
-import org.gradoop.util.FlinkConstants;
+import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.unary.summarization.tuples.EdgeGroupItem;
-import org.gradoop.model.impl.operators.unary.summarization.tuples.VertexForGrouping;
-import org.gradoop.model.impl.operators.unary.summarization.tuples.VertexGroupItem;
+import org.gradoop.model.impl.operators.unary.summarization.tuples
+  .EdgeGroupItem;
+import org.gradoop.model.impl.operators.unary.summarization.tuples
+  .VertexForGrouping;
+import org.gradoop.model.impl.operators.unary.summarization.tuples
+  .VertexGroupItem;
 import org.gradoop.model.impl.operators.unary.summarization.tuples
   .VertexWithRepresentative;
-import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.util.FlinkConstants;
+import org.gradoop.util.GConstants;
+import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * The summarization operator determines a structural grouping of similar
@@ -101,18 +103,11 @@ public abstract class Summarization<
    * Property key to store the number of summarized entities in a group.
    */
   public static final String COUNT_PROPERTY_KEY = "count";
+
   /**
-   * Creates new graph data objects.
+   * Gradoop Flink configuration.
    */
-  protected GraphDataFactory<GD> graphDataFactory;
-  /**
-   * Creates new vertex data objects.
-   */
-  protected VertexDataFactory<VD> vertexDataFactory;
-  /**
-   * Creates new edge data objects.
-   */
-  protected EdgeDataFactory<ED> edgeDataFactory;
+  protected GradoopFlinkConfig<VD, ED, GD> config;
   /**
    * Used to summarize vertices.
    */
@@ -153,9 +148,7 @@ public abstract class Summarization<
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
     LogicalGraph<VD, ED, GD> result;
 
-    vertexDataFactory = graph.getVertexDataFactory();
-    edgeDataFactory = graph.getEdgeDataFactory();
-    graphDataFactory = graph.getGraphDataFactory();
+    config = graph.getConfig();
 
     if (!useVertexProperty() &&
       !useEdgeProperty() && !useVertexLabels() && !useEdgeLabels()) {
@@ -165,10 +158,7 @@ public abstract class Summarization<
       GD graphData = createNewGraphData();
       result = LogicalGraph.fromGellyGraph(
         summarizeInternal(graph.toGellyGraph()),
-        graphData,
-        vertexDataFactory,
-        edgeDataFactory,
-        graphDataFactory);
+        graphData, graph.getConfig());
     }
     return result;
   }
@@ -294,7 +284,7 @@ public abstract class Summarization<
 
     return groupEdges(edges).reduceGroup(
       new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
-        edgeDataFactory)).withForwardedFields("f0");
+        config.getEdgeFactory())).withForwardedFields("f0");
   }
 
   /**
@@ -324,7 +314,8 @@ public abstract class Summarization<
    * @return graph data
    */
   private GD createNewGraphData() {
-    return graphDataFactory.createGraphData(FlinkConstants.SUMMARIZE_GRAPH_ID);
+    return config.getGraphHeadFactory()
+      .createGraphData(FlinkConstants.SUMMARIZE_GRAPH_ID);
   }
 
   /**

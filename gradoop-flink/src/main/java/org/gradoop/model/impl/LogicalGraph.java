@@ -19,20 +19,16 @@ package org.gradoop.model.impl;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.Attributed;
 import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.EdgeDataFactory;
 import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.Identifiable;
 import org.gradoop.model.api.Labeled;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.api.VertexDataFactory;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
@@ -47,6 +43,7 @@ import org.gradoop.model.impl.operators.unary.Projection;
 import org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling;
 import org.gradoop.model.impl.operators.unary.summarization
   .SummarizationGroupCombine;
+import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Map;
 
@@ -74,45 +71,34 @@ public class LogicalGraph<
   /**
    * Creates a new logical graph based on the given parameters.
    *
-   * @param vertices          vertex data set
-   * @param edges             edge data set
-   * @param graphData         graph data associated with that logical graph
-   * @param vertexDataFactory used to create vertex data
-   * @param edgeDataFactory   used to create edge data
-   * @param graphDataFactory  used to create graph data
-   * @param env               Flink execution environment
+   * @param vertices  vertex data set
+   * @param edges     edge data set
+   * @param graphData graph data associated with that logical graph
+   * @param config    Gradoop Flink configuration
    */
   private LogicalGraph(DataSet<VD> vertices,
     DataSet<ED> edges,
     GD graphData,
-    VertexDataFactory<VD> vertexDataFactory,
-    EdgeDataFactory<ED> edgeDataFactory,
-    GraphDataFactory<GD> graphDataFactory,
-    ExecutionEnvironment env) {
-    super(vertices, edges, vertexDataFactory, edgeDataFactory, graphDataFactory,
-      env);
+    GradoopFlinkConfig<VD, ED, GD> config) {
+    super(vertices, edges, config);
     this.graphData = graphData;
   }
 
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param graph             Flink Gelly graph
-   * @param graphData         graph data associated with the logical graph
-   * @param vertexDataFactory vertex data factory
-   * @param edgeDataFactory   edge data factory
-   * @param graphDataFactory  graph data factory
-   * @param <VD>              vertex data type
-   * @param <ED>              edge data type
-   * @param <GD>              graph data type
+   * @param graph     Flink Gelly graph
+   * @param graphData Graph head associated with the logical graph
+   * @param config    Gradoop Flink configuration
+   * @param <VD>      vertex data type
+   * @param <ED>      edge data type
+   * @param <GD>      graph data type
    * @return logical graph
    */
   public static <VD extends VertexData, ED extends EdgeData, GD extends
     GraphData> LogicalGraph<VD, ED, GD> fromGellyGraph(
     Graph<Long, VD, ED> graph, GD graphData,
-    VertexDataFactory<VD> vertexDataFactory,
-    EdgeDataFactory<ED> edgeDataFactory,
-    GraphDataFactory<GD> graphDataFactory) {
+    GradoopFlinkConfig<VD, ED, GD> config) {
     return fromDataSets(graph.getVertices().map(
       new MapFunction<Vertex<Long, VD>, VD>() {
         @Override
@@ -127,39 +113,30 @@ public class LogicalGraph<
         }
       }).withForwardedFields("f2->*"),
       graphData,
-      vertexDataFactory,
-      edgeDataFactory,
-      graphDataFactory);
+      config);
   }
 
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param vertices          Vertex DataSet
-   * @param edges             Edge DataSet
-   * @param graphData         graph data associated with the logical graph
-   * @param vertexDataFactory vertex data factory
-   * @param edgeDataFactory   edge data factory
-   * @param graphDataFactory  graph data factory
-   * @param <VD>              vertex data type
-   * @param <ED>              edge data type
-   * @param <GD>              graph data type
+   * @param vertices  Vertex DataSet
+   * @param edges     Edge DataSet
+   * @param graphData graph data associated with the logical graph
+   * @param config    Gradoop Flink configuration
+   * @param <VD>      EPGM vertex type
+   * @param <ED>      EPGM edge type
+   * @param <GD>      EPGM graph head graph head type
    * @return logical graph
    */
   public static <VD extends VertexData, ED extends EdgeData, GD extends
     GraphData> LogicalGraph<VD, ED, GD> fromDataSets(DataSet<VD> vertices,
     DataSet<ED> edges,
     GD graphData,
-    VertexDataFactory<VD> vertexDataFactory,
-    EdgeDataFactory<ED> edgeDataFactory,
-    GraphDataFactory<GD> graphDataFactory) {
+    GradoopFlinkConfig<VD, ED, GD> config) {
     return new LogicalGraph<>(vertices,
       edges,
       graphData,
-      vertexDataFactory,
-      edgeDataFactory,
-      graphDataFactory,
-      vertices.getExecutionEnvironment());
+      config);
   }
 
 
@@ -448,9 +425,9 @@ public class LogicalGraph<
       new JsonWriter.VertexTextFormatter<VD>());
     getEdges().writeAsFormattedText(edgeFile,
       new JsonWriter.EdgeTextFormatter<ED>());
-    getExecutionEnvironment().fromElements(graphData)
+    getConfig().getExecutionEnvironment().fromElements(graphData)
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
-    getExecutionEnvironment().execute();
+    getConfig().getExecutionEnvironment().execute();
   }
 
   /**

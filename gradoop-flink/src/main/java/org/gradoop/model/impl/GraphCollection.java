@@ -23,15 +23,11 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.EdgeDataFactory;
 import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.GraphDataFactory;
 import org.gradoop.model.api.VertexData;
-import org.gradoop.model.api.VertexDataFactory;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.GraphCollectionOperators;
@@ -53,6 +49,7 @@ import org.gradoop.model.impl.operators.collection.DifferenceUsingList;
 import org.gradoop.model.impl.operators.collection.Intersect;
 import org.gradoop.model.impl.operators.collection.IntersectUsingList;
 import org.gradoop.model.impl.operators.collection.Union;
+import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
 import java.util.Arrays;
@@ -82,22 +79,16 @@ public class GraphCollection<
   /**
    * Creates a graph collection from the given arguments.
    *
-   * @param vertices          vertices
-   * @param edges             edges
-   * @param graphHeads        graph heads
-   * @param vertexDataFactory vertex data factory
-   * @param edgeDataFactory   edge data factory
-   * @param graphDataFactory  graph data factory
-   * @param env               Flink execution environment
+   * @param vertices    vertices
+   * @param edges       edges
+   * @param graphHeads  graph heads
+   * @param config      Gradoop Flink configuration
    */
   public GraphCollection(DataSet<VD> vertices,
     DataSet<ED> edges,
     DataSet<GD> graphHeads,
-    VertexDataFactory<VD> vertexDataFactory,
-    EdgeDataFactory<ED> edgeDataFactory, GraphDataFactory<GD> graphDataFactory,
-    ExecutionEnvironment env) {
-    super(vertices, edges, vertexDataFactory, edgeDataFactory, graphDataFactory,
-      env);
+    GradoopFlinkConfig<VD, ED, GD> config) {
+    super(vertices, edges, config);
     this.graphHeads = graphHeads;
   }
 
@@ -124,7 +115,8 @@ public class GraphCollection<
     DataSet<ED> edges = getEdges()
       .filter(new EdgeInGraphFilter<ED>(graphID));
 
-    DataSet<Tuple1<Long>> graphIDDataSet = getExecutionEnvironment()
+    DataSet<Tuple1<Long>> graphIDDataSet = getConfig()
+      .getExecutionEnvironment()
       .fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
 
     // get graph data based on graph id
@@ -140,8 +132,7 @@ public class GraphCollection<
       }).first(1).collect();
 
     return (graphData.size() > 0) ? LogicalGraph.fromDataSets(vertices, edges,
-      graphData.get(0), getVertexDataFactory(), getEdgeDataFactory(),
-      getGraphDataFactory()) : null;
+      graphData.get(0), getConfig()) : null;
   }
 
   /**
@@ -178,13 +169,7 @@ public class GraphCollection<
     DataSet<ED> edges = getEdges()
       .filter(new EdgeInGraphsFilter<ED>(identifiers));
 
-    return new GraphCollection<>(vertices,
-      edges,
-      newGraphHeads,
-      getVertexDataFactory(),
-      getEdgeDataFactory(),
-      getGraphDataFactory(),
-      getExecutionEnvironment());
+    return new GraphCollection<>(vertices, edges, newGraphHeads, getConfig());
   }
 
   /**
@@ -227,13 +212,8 @@ public class GraphCollection<
       .filter(new EdgeInGraphsFilterWithBC<ED>())
       .withBroadcastSet(graphIDs, EdgeInGraphsFilterWithBC.BC_IDENTIFIERS);
 
-    return new GraphCollection<>(vertices,
-      edges,
-      filteredGraphHeads,
-      getVertexDataFactory(),
-      getEdgeDataFactory(),
-      getGraphDataFactory(),
-      getExecutionEnvironment());
+    return new GraphCollection<>(vertices, edges, filteredGraphHeads,
+      getConfig());
   }
 
   /**
@@ -374,6 +354,6 @@ public class GraphCollection<
       new JsonWriter.EdgeTextFormatter<ED>());
     getGraphHeads().writeAsFormattedText(graphFile,
       new JsonWriter.GraphTextFormatter<GD>());
-    getExecutionEnvironment().execute();
+    getConfig().getExecutionEnvironment().execute();
   }
 }

@@ -26,10 +26,12 @@ import org.gradoop.model.api.VertexData;
 /**
  * Responsible for reading and writing edge data from and to HBase.
  *
- * @param <ED> edge data type
- * @param <VD> vertex data type
+ * @param <ED>  EPGM edge type
+ * @param <VD>  EPGM vertex type
  */
-public interface EdgeDataHandler<ED extends EdgeData, VD extends VertexData>
+public interface EdgeDataHandler<
+  ED extends EdgeData,
+  VD extends VertexData>
   extends
   GraphElementHandler {
 

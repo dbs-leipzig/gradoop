@@ -114,9 +114,7 @@ public class LabelPropagation<
       .fromDataSets(labeledVertices,
         logicalGraph.getEdges(),
         null,
-        logicalGraph.getVertexDataFactory(),
-        logicalGraph.getEdgeDataFactory(),
-        logicalGraph.getGraphDataFactory());
+        logicalGraph.getConfig());
 
     // and split it into a collection according the result
     return new SplitBy<VD, ED, GD>(

@@ -40,7 +40,7 @@ public class BTGGradoopTest extends FlinkTestBase {
       databaseGraph = graphStore.getDatabaseGraph();
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       btgGraph = databaseGraph.callForCollection(
-      new BTG<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(50, env));
+      new BTG<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(50));
     assertNotNull("graph collection is null", databaseGraph);
     assertEquals("wrong number of graphs", 2l, btgGraph.getGraphCount());
     assertEquals("wrong number of vertices", 9l,

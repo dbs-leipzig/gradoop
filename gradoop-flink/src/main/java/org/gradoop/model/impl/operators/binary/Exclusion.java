@@ -85,12 +85,9 @@ public class Exclusion<
       .equalTo(new VertexKeySelector<VD>()).with(joinFunc)
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromDataSets(
-      newVertexSet,
-      newEdgeSet,
-      firstGraph.getGraphDataFactory().createGraphData(newGraphID),
-      firstGraph.getVertexDataFactory(), firstGraph.getEdgeDataFactory(),
-      firstGraph.getGraphDataFactory());
+    return LogicalGraph.fromDataSets(newVertexSet, newEdgeSet,
+      firstGraph.getConfig().getGraphHeadFactory().createGraphData(newGraphID),
+      firstGraph.getConfig());
   }
 
   /**

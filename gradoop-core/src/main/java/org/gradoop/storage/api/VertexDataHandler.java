@@ -31,7 +31,9 @@ import java.util.Set;
  * @param <VD> vertex data type
  * @param <ED> edge data type
  */
-public interface VertexDataHandler<VD extends VertexData, ED extends EdgeData>
+public interface VertexDataHandler<
+  VD extends VertexData,
+  ED extends EdgeData>
   extends GraphElementHandler {
 
   /**

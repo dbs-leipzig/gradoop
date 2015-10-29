@@ -32,7 +32,7 @@ public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
     GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
       labeledGraphCollection = inputGraph.callForCollection(
       new OverlapSplitBy<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(
-        function, getExecutionEnvironment()));
+        function));
     labeledGraphCollection.getGraphHeads();
     assertNotNull("graph collection is null", labeledGraphCollection);
     TestCase.assertEquals("wrong number of graphs", 3l,

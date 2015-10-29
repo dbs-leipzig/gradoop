@@ -133,7 +133,7 @@ public class SummarizationGroupWithLists<
     UnsortedGrouping<VertexForGrouping> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(
       new VertexGroupSummarizer<>(getVertexGroupingKey(), useVertexLabels(),
-        vertexDataFactory));
+        config.getVertexFactory()));
   }
 
   /**

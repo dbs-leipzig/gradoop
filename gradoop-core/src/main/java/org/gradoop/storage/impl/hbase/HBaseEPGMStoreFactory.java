@@ -23,7 +23,6 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.log4j.Logger;
-import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
@@ -31,6 +30,8 @@ import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.EdgeDataHandler;
 import org.gradoop.storage.api.GraphDataHandler;
 import org.gradoop.storage.api.VertexDataHandler;
+import org.gradoop.util.GConstants;
+import org.gradoop.util.GradoopConfig;
 
 import java.io.IOException;
 
@@ -56,9 +57,7 @@ public class HBaseEPGMStoreFactory {
    * parameters. If something goes wrong, {@code null} is returned.
    *
    * @param config            cluster configuration
-   * @param vertexDataHandler vertex storage handler
-   * @param edgeDataHandler   edge storage handler
-   * @param graphDataHandler  graph storage handler
+   * @param gradoopConfig     Gradoop configuration
    * @param <VD>              vertex data type
    * @param <ED>              edge data type
    * @param <GD>              graph data type
@@ -66,23 +65,20 @@ public class HBaseEPGMStoreFactory {
    */
   public static <VD extends VertexData, ED extends EdgeData, GD extends
     GraphData> EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
-    final Configuration config,
-    final VertexDataHandler<VD, ED> vertexDataHandler,
-    final EdgeDataHandler<ED, VD> edgeDataHandler,
-    final GraphDataHandler<GD> graphDataHandler) {
-    return createOrOpenEPGMStore(config, vertexDataHandler, edgeDataHandler,
-      graphDataHandler, GConstants.DEFAULT_TABLE_VERTICES,
-      GConstants.DEFAULT_TABLE_EDGES, GConstants.DEFAULT_TABLE_GRAPHS);
+    final Configuration config, final GradoopConfig<VD, ED, GD> gradoopConfig) {
+    return createOrOpenEPGMStore(config, GradoopHBaseConfig.createConfig(
+      gradoopConfig,
+      GConstants.DEFAULT_TABLE_VERTICES,
+      GConstants.DEFAULT_TABLE_EDGES,
+      GConstants.DEFAULT_TABLE_GRAPHS));
   }
 
   /**
    * Creates a graph store or opens an existing one based on the given
    * parameters. If something goes wrong, {@code null} is returned.
    *
-   * @param config            cluster configuration
-   * @param vertexDataHandler vertex storage handler
-   * @param edgeDataHandler   edge storage handler
-   * @param graphDataHandler  graph storage handler
+   * @param config            Hadoop cluster configuration
+   * @param gradoopConfig     Gradoop configuration
    * @param prefix            prefix for HBase table name
    * @param <VD>              vertex data type
    * @param <ED>              edge data type
@@ -91,49 +87,47 @@ public class HBaseEPGMStoreFactory {
    */
   public static <VD extends VertexData, ED extends EdgeData, GD extends
     GraphData> EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
-    final Configuration config,
-    final VertexDataHandler<VD, ED> vertexDataHandler,
-    final EdgeDataHandler<ED, VD> edgeDataHandler,
-    final GraphDataHandler<GD> graphDataHandler, final String prefix) {
-    return createOrOpenEPGMStore(config, vertexDataHandler, edgeDataHandler,
-      graphDataHandler, prefix + GConstants.DEFAULT_TABLE_VERTICES,
+    final Configuration config, final GradoopConfig<VD, ED, GD> gradoopConfig,
+    final String prefix) {
+    return createOrOpenEPGMStore(config, GradoopHBaseConfig.createConfig(
+      gradoopConfig,
+      prefix + GConstants.DEFAULT_TABLE_VERTICES,
       prefix + GConstants.DEFAULT_TABLE_EDGES,
-      prefix + GConstants.DEFAULT_TABLE_GRAPHS);
+      prefix + GConstants.DEFAULT_TABLE_GRAPHS));
   }
 
   /**
    * Creates a graph store or opens an existing one based on the given
    * parameters. If something goes wrong, {@code null} is returned.
    *
-   * @param config            cluster configuration
-   * @param vertexDataHandler vertex storage handler
-   * @param edgeDataHandler   edge storage handler
-   * @param graphDataHandler  graph graph storage handler
-   * @param vertexTableName   vertex data table name
-   * @param edgeTableName     edge data table name
-   * @param graphTableName    graph data table name
-   * @param <VD>              vertex data type
-   * @param <ED>              edge data type
-   * @param <GD>              graph data type
+   * @param config              Hadoop cluster configuration
+   * @param gradoopHBaseConfig  Gradoop HBase configuration
+   * @param <VD>                vertex data type
+   * @param <ED>                edge data type
+   * @param <GD>                graph data type
    * @return EPGM store instance or {@code null in the case of errors}
    */
   public static <VD extends VertexData, ED extends EdgeData, GD extends
     GraphData> EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
     final Configuration config,
-    final VertexDataHandler<VD, ED> vertexDataHandler,
-    final EdgeDataHandler<ED, VD> edgeDataHandler,
-    final GraphDataHandler<GD> graphDataHandler, final String vertexTableName,
-    final String edgeTableName, final String graphTableName) {
+    final GradoopHBaseConfig<VD, ED, GD> gradoopHBaseConfig) {
     try {
-      createTablesIfNotExists(config, vertexDataHandler, edgeDataHandler,
-        graphDataHandler, vertexTableName, edgeTableName, graphTableName);
+      createTablesIfNotExists(config, gradoopHBaseConfig.getVertexHandler(),
+        gradoopHBaseConfig.getEdgeHandler(),
+        gradoopHBaseConfig.getGraphHeadHandler(),
+        gradoopHBaseConfig.getVertexTableName(),
+        gradoopHBaseConfig.getEdgeTableName(),
+        gradoopHBaseConfig.getGraphTableName());
 
-      HTable vertexDataTable = new HTable(config, vertexTableName);
-      HTable edgeDataTable = new HTable(config, edgeTableName);
-      HTable graphDataTable = new HTable(config, graphTableName);
+      HTable vertexDataTable = new HTable(config,
+        gradoopHBaseConfig.getVertexTableName());
+      HTable edgeDataTable = new HTable(config,
+        gradoopHBaseConfig.getEdgeTableName());
+      HTable graphDataTable = new HTable(config,
+        gradoopHBaseConfig.getGraphTableName());
 
       return new HBaseEPGMStore<>(vertexDataTable, edgeDataTable,
-        graphDataTable, vertexDataHandler, edgeDataHandler, graphDataHandler);
+        graphDataTable, gradoopHBaseConfig);
     } catch (IOException e) {
       e.printStackTrace();
       return null;

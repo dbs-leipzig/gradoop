@@ -86,16 +86,12 @@ public class Projection<
       .map(new ProjectionVerticesMapper<>(getVertexFunc()));
     DataSet<ED> edges = graph.getEdges()
       .map(new ProjectionEdgesMapper<>(getEdgeFunc()));
-    return LogicalGraph.fromDataSets(
-      vertices,
-      edges,
-      graph.getGraphDataFactory().createGraphData(
+    return LogicalGraph.fromDataSets(vertices, edges,
+      graph.getConfig().getGraphHeadFactory().createGraphData(
         graph.getId(),
         graph.getLabel(),
         graph.getProperties()),
-      graph.getVertexDataFactory(),
-      graph.getEdgeDataFactory(),
-      graph.getGraphDataFactory());
+      graph.getConfig());
   }
 
   /**
