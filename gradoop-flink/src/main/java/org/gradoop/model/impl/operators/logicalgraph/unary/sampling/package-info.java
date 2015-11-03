@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains operators that handle graph collections.
+ * Contains a collection of graph sampling methods.
  */
-package org.gradoop.model.impl.operators.collection;
+package org.gradoop.model.impl.operators.logicalgraph.unary.sampling;

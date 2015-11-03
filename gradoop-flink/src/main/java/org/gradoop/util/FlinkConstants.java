@@ -17,6 +17,12 @@
 
 package org.gradoop.util;
 
+import org.gradoop.model.impl.operators.logicalgraph.binary.Combination;
+import org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion;
+import org.gradoop.model.impl.operators.logicalgraph.binary.Overlap;
+import org.gradoop.model.impl.operators.logicalgraph.unary.sampling.RandomNodeSampling;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
+
 /**
  * Constants required by operator implementations in Flink.
  */
@@ -28,31 +34,31 @@ public class FlinkConstants {
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.binary.Combination}.
+   * {@link Combination}.
    */
   public static final Long COMBINE_GRAPH_ID = -2L;
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.binary.Overlap}.
+   * {@link Overlap}.
    */
   public static final Long OVERLAP_GRAPH_ID = -3L;
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.binary.Exclusion}.
+   * {@link Exclusion}.
    */
   public static final Long EXCLUDE_GRAPH_ID = -4L;
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.unary.summarization.Summarization}.
+   * {@link Summarization}.
    */
   public static final Long SUMMARIZE_GRAPH_ID = -5L;
 
   /**
    * Temporary identifier of a graph created by
-   * {@link org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling}.
+   * {@link RandomNodeSampling}.
    */
   public static final Long RANDOM_NODE_SAMPLING_GRAPH_ID = -6L;
 }

@@ -27,11 +27,11 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.EPGMDatabase;
-import org.gradoop.model.impl.operators.unary.summarization.Summarization;
-import org.gradoop.model.impl.operators.unary.summarization.SummarizationGroupCombine;
-import org.gradoop.model.impl.operators.unary.summarization.SummarizationGroupMap;
-import org.gradoop.model.impl.operators.unary.summarization.SummarizationGroupSort;
-import org.gradoop.model.impl.operators.unary.summarization
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.SummarizationGroupCombine;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.SummarizationGroupMap;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.SummarizationGroupSort;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization
   .SummarizationGroupWithLists;
 
 /**

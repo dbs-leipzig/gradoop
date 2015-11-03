@@ -107,7 +107,9 @@
         <!-- Import should be explicit, really needed and only from pure
          java packages -->
         <module name="AvoidStarImport"/>
-        <module name="UnusedImports"/>
+        <module name="UnusedImports">
+            <property name="processJavadoc" value="true"/>
+        </module>
         <module name="IllegalImport"/>
 
         <!-- Checks for Javadoc comments (tree walker).       -->
@@ -188,7 +190,7 @@
         <!-- Lines cannot exceed 80 chars -->
         <module name="LineLength">
             <property name="max" value="80"/>
-            <property name="ignorePattern" value="^import"/>
+            <property name="ignorePattern" value="^[import|package]|@see|@link"/>
         </module>
         <!-- Over time, we will revised this down -->
         <module name="MethodLength">

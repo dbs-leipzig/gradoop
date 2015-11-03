@@ -28,9 +28,9 @@ import org.gradoop.model.impl.GraphCollection;
  * @param <VD> EPGM vertex type
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
- * @see org.gradoop.model.impl.operators.collection.Union
- * @see org.gradoop.model.impl.operators.collection.Intersect
- * @see org.gradoop.model.impl.operators.collection.Difference
+ * @see org.gradoop.model.impl.operators.collection.binary.Union
+ * @see org.gradoop.model.impl.operators.collection.binary.Intersect
+ * @see org.gradoop.model.impl.operators.collection.binary.Difference
  */
 public interface BinaryCollectionToCollectionOperator<VD extends VertexData,
   ED extends EdgeData, GD extends GraphData> extends

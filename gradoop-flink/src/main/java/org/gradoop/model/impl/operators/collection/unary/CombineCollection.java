@@ -14,34 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.gradoop.model.api.operators;
+package org.gradoop.model.impl.operators.collection.unary;
 
 import org.gradoop.model.api.EdgeData;
 import org.gradoop.model.api.GraphData;
 import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.util.FlinkConstants;
 
 /**
- * Creates a {@link LogicalGraph} based on two input graphs.
+ * Combines all logical graphs of a GraphCollection into a single LogicalGraph.
  *
  * @param <VD> EPGM vertex type
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
- * @see org.gradoop.model.impl.operators.logicalgraph.binary.Combination
- * @see org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion
- * @see org.gradoop.model.impl.operators.logicalgraph.binary.Overlap
  */
-public interface BinaryGraphToGraphOperator<VD extends VertexData, ED extends
-  EdgeData, GD extends GraphData> extends
-  Operator {
-  /**
-   * Executes the operator.
-   *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return operator result
-   */
-  LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> firstGraph,
-    LogicalGraph<VD, ED, GD> secondGraph);
+public class CombineCollection<VD extends VertexData, ED extends EdgeData, GD
+  extends GraphData> implements
+  UnaryCollectionToGraphOperator<VD, ED, GD> {
+  @Override
+  public LogicalGraph<VD, ED, GD> execute(
+    GraphCollection<VD, ED, GD> collection) {
+    return LogicalGraph
+      .fromDataSets(collection.getVertices(), collection.getEdges(),
+        collection.getConfig().getGraphHeadFactory()
+          .createGraphData(FlinkConstants.COMBINE_GRAPH_ID),
+        collection.getConfig());
+  }
+
+  @Override
+  public String getName() {
+    return CombineCollection.class.getName();
+  }
 }

@@ -35,13 +35,13 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.operators.binary.Combination;
-import org.gradoop.model.impl.operators.binary.Exclusion;
-import org.gradoop.model.impl.operators.binary.Overlap;
-import org.gradoop.model.impl.operators.unary.Aggregation;
-import org.gradoop.model.impl.operators.unary.Projection;
-import org.gradoop.model.impl.operators.unary.sampling.RandomNodeSampling;
-import org.gradoop.model.impl.operators.unary.summarization
+import org.gradoop.model.impl.operators.logicalgraph.binary.Combination;
+import org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion;
+import org.gradoop.model.impl.operators.logicalgraph.binary.Overlap;
+import org.gradoop.model.impl.operators.logicalgraph.unary.Aggregation;
+import org.gradoop.model.impl.operators.logicalgraph.unary.Projection;
+import org.gradoop.model.impl.operators.logicalgraph.unary.sampling.RandomNodeSampling;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization
   .SummarizationGroupCombine;
 import org.gradoop.util.GradoopFlinkConfig;
 

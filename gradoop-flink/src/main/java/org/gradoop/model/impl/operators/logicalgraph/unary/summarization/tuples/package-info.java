@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains operators that handle graph collections.
+ * Contains all tuple classes related to the graph summarization operator
+ * implementations.
  */
-package org.gradoop.model.impl.operators.collection;
+package org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples;

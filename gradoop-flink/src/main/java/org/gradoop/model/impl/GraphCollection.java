@@ -44,11 +44,11 @@ import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
-import org.gradoop.model.impl.operators.collection.Difference;
-import org.gradoop.model.impl.operators.collection.DifferenceUsingList;
-import org.gradoop.model.impl.operators.collection.Intersect;
-import org.gradoop.model.impl.operators.collection.IntersectUsingList;
-import org.gradoop.model.impl.operators.collection.Union;
+import org.gradoop.model.impl.operators.collection.binary.Difference;
+import org.gradoop.model.impl.operators.collection.binary.DifferenceUsingList;
+import org.gradoop.model.impl.operators.collection.binary.Intersect;
+import org.gradoop.model.impl.operators.collection.binary.IntersectUsingList;
+import org.gradoop.model.impl.operators.collection.binary.Union;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 

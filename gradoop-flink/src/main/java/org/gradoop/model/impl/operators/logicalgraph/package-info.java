@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains operators that handle graph collections.
+ * Contains operators that handle logical graphs.
  */
-package org.gradoop.model.impl.operators.collection;
+package org.gradoop.model.impl.operators.logicalgraph;

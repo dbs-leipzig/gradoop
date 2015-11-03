@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains operators that handle graph collections.
+ * Contains all implementations of the graph summarization operator.
  */
-package org.gradoop.model.impl.operators.collection;
+package org.gradoop.model.impl.operators.logicalgraph.unary.summarization;
