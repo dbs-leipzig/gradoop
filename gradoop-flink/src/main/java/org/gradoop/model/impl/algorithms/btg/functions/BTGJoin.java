@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.btg.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.btg.BTG;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 
@@ -28,7 +28,7 @@ import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
  *
  * @param <VD> EPGM vertex type
  */
-public class BTGJoin<VD extends VertexData>
+public class BTGJoin<VD extends EPGMVertex>
   implements JoinFunction<
   Vertex<Long, BTGVertexValue>, VD, VD> {
   @Override

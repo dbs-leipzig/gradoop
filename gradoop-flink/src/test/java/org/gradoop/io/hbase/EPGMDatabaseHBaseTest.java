@@ -21,16 +21,16 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.HBaseTestBase;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.io.json.EPGMDatabaseJSONTest;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.storage.api.EPGMStore;
-import org.gradoop.storage.api.PersistentEdgeData;
-import org.gradoop.storage.api.PersistentGraphData;
-import org.gradoop.storage.api.PersistentVertexData;
-import org.gradoop.storage.impl.hbase.DefaultPersistentEdgeDataFactory;
-import org.gradoop.storage.impl.hbase.DefaultPersistentGraphDataFactory;
-import org.gradoop.storage.impl.hbase.DefaultPersistentVertexDataFactory;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.impl.hbase.HBaseEdgeFactory;
+import org.gradoop.storage.impl.hbase.HBaseGraphHeadFactory;
+import org.gradoop.storage.impl.hbase.HBaseVertexFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -55,24 +55,24 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
    */
   @Test
   public void readFromHBaseTest() throws Exception {
-    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData> epgmStore =
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> epgmStore =
       HBaseTestBase.createEmptyEPGMStore();
 
-    for (PersistentGraphData graphData : createPersistentSocialGraphData()) {
-      epgmStore.writeGraphData(graphData);
+    for (PersistentGraphHead graphData : createPersistentSocialGraphHead()) {
+      epgmStore.writeGraphHead(graphData);
     }
-    for (PersistentVertexData<DefaultEdgeData> vertexData :
-      createPersistentSocialVertexData()) {
-      epgmStore.writeVertexData(vertexData);
+    for (PersistentVertex<EdgePojo> vertexData :
+      createPersistentSocialVertices()) {
+      epgmStore.writeVertex(vertexData);
     }
-    for (PersistentEdgeData<DefaultVertexData> edgeData :
-      createPersistentSocialEdgeData()) {
-      epgmStore.writeEdgeData(edgeData);
+    for (PersistentEdge<VertexPojo> edgeData :
+      createPersistentSocialEdges()) {
+      epgmStore.writeEdge(edgeData);
     }
 
     epgmStore.flush();
 
-    EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
       epgmDatabase = EPGMDatabase
       .fromHBase(epgmStore, ExecutionEnvironment.getExecutionEnvironment());
 
@@ -95,7 +95,7 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
   @Test
   public void writeToHBaseTest() throws Exception {
     // create empty EPGM store
-    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData> epgmStore =
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> epgmStore =
       createEmptyEPGMStore();
 
     // read test data from json into EPGM database
@@ -106,20 +106,20 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
     String graphFile =
       EPGMDatabaseJSONTest.class.getResource("/data/sna_graphs").getFile();
 
-    EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData> graphDB =
+    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> graphDB =
       EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
         ExecutionEnvironment.getExecutionEnvironment());
 
     // write EPGM database to HBase
-    graphDB.writeToHBase(epgmStore, new DefaultPersistentVertexDataFactory(),
-      new DefaultPersistentEdgeDataFactory(),
-      new DefaultPersistentGraphDataFactory());
+    graphDB.writeToHBase(epgmStore, new HBaseVertexFactory(),
+      new HBaseEdgeFactory(),
+      new HBaseGraphHeadFactory());
 
     epgmStore.flush();
 
     // check graph count
     int cnt = 0;
-    for (Iterator<DefaultGraphData> graphDataIterator =
+    for (Iterator<GraphHeadPojo> graphDataIterator =
          epgmStore.getGraphSpace(); graphDataIterator.hasNext(); ) {
       cnt++;
     }
@@ -127,7 +127,7 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
 
     // check edge count
     cnt = 0;
-    for (Iterator<DefaultEdgeData> edgeDataIterator =
+    for (Iterator<EdgePojo> edgeDataIterator =
          epgmStore.getEdgeSpace(); edgeDataIterator.hasNext(); ) {
       cnt++;
     }
@@ -135,7 +135,7 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
 
     // check vertex count
     cnt = 0;
-    for (Iterator<DefaultVertexData> vertexDataIterator =
+    for (Iterator<VertexPojo> vertexDataIterator =
          epgmStore.getVertexSpace(); vertexDataIterator.hasNext(); ) {
       cnt++;
     }

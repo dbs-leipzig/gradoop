@@ -25,16 +25,16 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.log4j.Logger;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.storage.api.EPGMStore;
-import org.gradoop.storage.api.EdgeDataHandler;
-import org.gradoop.storage.api.GraphDataHandler;
-import org.gradoop.storage.api.PersistentEdgeData;
-import org.gradoop.storage.api.PersistentGraphData;
-import org.gradoop.storage.api.PersistentVertexData;
-import org.gradoop.storage.api.VertexDataHandler;
+import org.gradoop.storage.api.EdgeHandler;
+import org.gradoop.storage.api.GraphHeadHandler;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
 import org.gradoop.util.GradoopConfig;
 
@@ -50,8 +50,8 @@ import java.util.Iterator;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> implements
+public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
+  extends EPGMGraphHead> implements
   EPGMStore<VD, ED, GD> {
   /**
    * Logger
@@ -74,37 +74,37 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
   /**
    * HBase table for storing graphs.
    */
-  private final HTable graphDataTable;
+  private final HTable graphHeadTable;
   /**
    * HBase table for storing vertex data.
    */
-  private final HTable vertexDataTable;
+  private final HTable vertexTable;
   /**
    * HBase table for storing edge data.
    */
-  private final HTable edgeDataTable;
+  private final HTable edgeTable;
 
   /**
    * Creates a HBaseEPGMStore based on the given parameters. All parameters
    * are mandatory and must not be {@code null}.
    *
-   * @param vertexDataTable HBase table to store vertex data
-   * @param edgeDataTable   HBase table to store edge data
-   * @param graphDataTable  HBase table to store graph data
+   * @param vertexTable HBase table to store vertex data
+   * @param edgeTable   HBase table to store edge data
+   * @param graphHeadTable  HBase table to store graph data
    * @param config          Gradoop Configuration
    */
-  HBaseEPGMStore(final HTable vertexDataTable,
-    final HTable edgeDataTable,
-    final HTable graphDataTable,
+  HBaseEPGMStore(final HTable vertexTable,
+    final HTable edgeTable,
+    final HTable graphHeadTable,
     final GradoopHBaseConfig<VD, ED, GD> config) {
-    if (vertexDataTable == null) {
-      throw new IllegalArgumentException("vertexDataTable must not be null");
+    if (vertexTable == null) {
+      throw new IllegalArgumentException("vertexTable must not be null");
     }
-    if (edgeDataTable == null) {
-      throw new IllegalArgumentException("edgeDataTable must not be null");
+    if (edgeTable == null) {
+      throw new IllegalArgumentException("edgeTable must not be null");
     }
-    if (graphDataTable == null) {
-      throw new IllegalArgumentException("graphDataTable must not be null");
+    if (graphHeadTable == null) {
+      throw new IllegalArgumentException("graphHeadTable must not be null");
     }
     if (config == null) {
       throw new IllegalArgumentException("Config must not be null");
@@ -112,15 +112,15 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
 
     this.config = config;
 
-    this.vertexDataTable = vertexDataTable;
-    this.edgeDataTable = edgeDataTable;
-    this.graphDataTable = graphDataTable;
+    this.vertexTable = vertexTable;
+    this.edgeTable = edgeTable;
+    this.graphHeadTable = graphHeadTable;
 
-    this.vertexDataTable
+    this.vertexTable
       .setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
-    this.edgeDataTable
+    this.edgeTable
       .setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
-    this.graphDataTable
+    this.graphHeadTable
       .setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
   }
 
@@ -136,40 +136,40 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * {@inheritDoc}
    */
   @Override
-  public String getVertexDataTableName() {
-    return vertexDataTable.getName().getNameAsString();
+  public String getVertexTableName() {
+    return vertexTable.getName().getNameAsString();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String getEdgeDataTableName() {
-    return edgeDataTable.getName().getNameAsString();
+  public String getEdgeTableName() {
+    return edgeTable.getName().getNameAsString();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String getGraphDataTableName() {
-    return graphDataTable.getName().getNameAsString();
+  public String getGraphHeadName() {
+    return graphHeadTable.getName().getNameAsString();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void writeGraphData(final PersistentGraphData graphData) {
+  public void writeGraphHead(final PersistentGraphHead graphData) {
     LOG.info("Writing graph data: " + graphData);
     try {
-      GraphDataHandler graphHeadHandler = config.getGraphHeadHandler();
+      GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();
       // graph id
       Put put = new Put(graphHeadHandler.getRowKey(graphData.getId()));
       // write graph to Put
-      put = graphHeadHandler.writeGraphData(put, graphData);
+      put = graphHeadHandler.writeGraphHead(put, graphData);
       // write to table
-      graphDataTable.put(put);
+      graphHeadTable.put(put);
     } catch (RetriesExhaustedWithDetailsException | InterruptedIOException e) {
       e.printStackTrace();
     }
@@ -179,16 +179,16 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * {@inheritDoc}
    */
   @Override
-  public void writeVertexData(final PersistentVertexData<ED> vertexData) {
+  public void writeVertex(final PersistentVertex<ED> vertexData) {
     LOG.info("Writing vertex data: " + vertexData);
     try {
-      VertexDataHandler<VD, ED> vertexHandler = config.getVertexHandler();
+      VertexHandler<VD, ED> vertexHandler = config.getVertexHandler();
       // vertex id
       Put put = new Put(vertexHandler.getRowKey(vertexData.getId()));
       // write vertex data to Put
-      put = vertexHandler.writeVertexData(put, vertexData);
+      put = vertexHandler.writeVertex(put, vertexData);
       // write to table
-      vertexDataTable.put(put);
+      vertexTable.put(put);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -198,16 +198,16 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * {@inheritDoc}
    */
   @Override
-  public void writeEdgeData(final PersistentEdgeData<VD> edgeData) {
+  public void writeEdge(final PersistentEdge<VD> edgeData) {
     LOG.info("Writing edge data: " + edgeData);
-    EdgeDataHandler<ED, VD> edgeHandler = config.getEdgeHandler();
+    EdgeHandler<ED, VD> edgeHandler = config.getEdgeHandler();
     // edge id
     Put put = new Put(edgeHandler.getRowKey(edgeData.getId()));
     // write edge data to Put
-    put = edgeHandler.writeEdgeData(put, edgeData);
+    put = edgeHandler.writeEdge(put, edgeData);
     // write to table
     try {
-      edgeDataTable.put(put);
+      edgeTable.put(put);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -217,14 +217,14 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * {@inheritDoc}
    */
   @Override
-  public GD readGraphData(final Long graphId) {
+  public GD readGraph(final Long graphId) {
     GD graphData = null;
     try {
-      GraphDataHandler<GD> graphDataHandler = config.getGraphHeadHandler();
-      byte[] rowKey = graphDataHandler.getRowKey(graphId);
-      Result res = graphDataTable.get(new Get(rowKey));
+      GraphHeadHandler<GD> graphHeadHandler = config.getGraphHeadHandler();
+      byte[] rowKey = graphHeadHandler.getRowKey(graphId);
+      Result res = graphHeadTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
-        graphData = graphDataHandler.readGraphData(res);
+        graphData = graphHeadHandler.readGraphHead(res);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -236,14 +236,14 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * {@inheritDoc}
    */
   @Override
-  public VD readVertexData(final Long vertexId) {
+  public VD readVertex(final Long vertexId) {
     VD vertexData = null;
     try {
-      VertexDataHandler<VD, ED> vertexHandler = config.getVertexHandler();
+      VertexHandler<VD, ED> vertexHandler = config.getVertexHandler();
       byte[] rowKey = vertexHandler.getRowKey(vertexId);
-      Result res = vertexDataTable.get(new Get(rowKey));
+      Result res = vertexTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
-        vertexData = vertexHandler.readVertexData(res);
+        vertexData = vertexHandler.readVertex(res);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -255,14 +255,14 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * {@inheritDoc}
    */
   @Override
-  public ED readEdgeData(final Long edgeId) {
+  public ED readEdge(final Long edgeId) {
     ED edgeData = null;
     try {
-      EdgeDataHandler<ED, VD> edgeHandler = config.getEdgeHandler();
+      EdgeHandler<ED, VD> edgeHandler = config.getEdgeHandler();
       byte[] rowKey = edgeHandler.getRowKey(edgeId);
-      Result res = edgeDataTable.get(new Get(rowKey));
+      Result res = edgeTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
-        edgeData = edgeHandler.readEdgeData(res);
+        edgeData = edgeHandler.readEdge(res);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -286,7 +286,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
-    return new GraphDataIterator(graphDataTable.getScanner(scan));
+    return new GraphHeadIterator(graphHeadTable.getScanner(scan));
   }
 
   /**
@@ -305,7 +305,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
-    return new VertexDataIterator(vertexDataTable.getScanner(scan));
+    return new VertexIterator(vertexTable.getScanner(scan));
   }
 
   /**
@@ -324,7 +324,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
-    return new EdgeDataIterator(edgeDataTable.getScanner(scan));
+    return new EdgeIterator(edgeTable.getScanner(scan));
   }
 
   /**
@@ -332,9 +332,9 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    */
   @Override
   public void setAutoFlush(boolean autoFlush) {
-    vertexDataTable.setAutoFlush(autoFlush, true);
-    edgeDataTable.setAutoFlush(autoFlush, true);
-    graphDataTable.setAutoFlush(autoFlush, true);
+    vertexTable.setAutoFlush(autoFlush, true);
+    edgeTable.setAutoFlush(autoFlush, true);
+    graphHeadTable.setAutoFlush(autoFlush, true);
   }
 
   /**
@@ -343,9 +343,9 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
   @Override
   public void flush() {
     try {
-      vertexDataTable.flushCommits();
-      edgeDataTable.flushCommits();
-      graphDataTable.flushCommits();
+      vertexTable.flushCommits();
+      edgeTable.flushCommits();
+      graphHeadTable.flushCommits();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -357,9 +357,9 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
   @Override
   public void close() {
     try {
-      vertexDataTable.close();
-      edgeDataTable.close();
-      graphDataTable.close();
+      vertexTable.close();
+      edgeTable.close();
+      graphHeadTable.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -369,7 +369,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * Iterator helper class for iterating over HBase result scanner containing
    * graph data.
    */
-  public class GraphDataIterator implements Iterator<GD> {
+  public class GraphHeadIterator implements Iterator<GD> {
     /**
      * HBase result
      */
@@ -385,7 +385,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
      * @param scanner HBase result scanner
      * @throws IOException
      */
-    public GraphDataIterator(ResultScanner scanner) throws IOException {
+    public GraphHeadIterator(ResultScanner scanner) throws IOException {
       this.it = scanner.iterator();
     }
 
@@ -409,7 +409,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
     public GD next() {
       GD val = null;
       if (result != null) {
-        val = config.getGraphHeadHandler().readGraphData(result);
+        val = config.getGraphHeadHandler().readGraphHead(result);
         result = null;
       }
       return val;
@@ -427,7 +427,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * Iterator helper class for iterating over HBase result scanner containing
    * vertex data.
    */
-  public class VertexDataIterator implements Iterator<VD> {
+  public class VertexIterator implements Iterator<VD> {
     /**
      * HBase result
      */
@@ -443,7 +443,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
      * @param scanner HBase result scanner
      * @throws IOException
      */
-    public VertexDataIterator(ResultScanner scanner) throws IOException {
+    public VertexIterator(ResultScanner scanner) throws IOException {
       this.it = scanner.iterator();
     }
 
@@ -467,7 +467,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
     public VD next() {
       VD val = null;
       if (result != null) {
-        val = config.getVertexHandler().readVertexData(result);
+        val = config.getVertexHandler().readVertex(result);
         result = null;
       }
       return val;
@@ -485,7 +485,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * Iterator helper class for iterating over HBase result scanner containing
    * edge data.
    */
-  public class EdgeDataIterator implements Iterator<ED> {
+  public class EdgeIterator implements Iterator<ED> {
     /**
      * HBase result
      */
@@ -501,7 +501,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
      * @param scanner HBase result scanner
      * @throws IOException
      */
-    public EdgeDataIterator(ResultScanner scanner) throws IOException {
+    public EdgeIterator(ResultScanner scanner) throws IOException {
       this.it = scanner.iterator();
     }
 
@@ -525,7 +525,7 @@ public class HBaseEPGMStore<VD extends VertexData, ED extends EdgeData, GD
     public ED next() {
       ED val = null;
       if (result != null) {
-        val = config.getEdgeHandler().readEdgeData(result);
+        val = config.getEdgeHandler().readEdge(result);
         result = null;
       }
       return val;

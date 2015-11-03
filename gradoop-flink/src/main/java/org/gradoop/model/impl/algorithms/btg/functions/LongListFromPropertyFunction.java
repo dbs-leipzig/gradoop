@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.algorithms.btg.functions;
 
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.UnaryFunction;
 
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @param <VD> EPGM vertex type
  */
-public class LongListFromPropertyFunction<VD extends VertexData>
+public class LongListFromPropertyFunction<VD extends EPGMVertex>
   implements UnaryFunction<VD, List<Long>> {
   /**
    * String propertyKey

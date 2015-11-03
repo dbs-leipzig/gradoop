@@ -18,13 +18,13 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.GraphDataFactory;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
@@ -45,9 +45,9 @@ import java.util.Set;
  * @param <GD> EPGM graph head type
  */
 public class SplitBy<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   implements UnaryGraphToCollectionOperator<VD, ED, GD> {
   /**
    * Flink execution environment
@@ -75,38 +75,38 @@ public class SplitBy<
    */
   @Override
   public GraphCollection<VD, ED, GD> execute(
-    LogicalGraph<VD, ED, GD> logicalGraph) {
-    DataSet<VD> vertices = computeNewVertices(logicalGraph);
-    DataSet<GD> graphHeads = computeNewGraphHeads(logicalGraph, vertices);
-    DataSet<ED> edges = computeNewEdges(logicalGraph, vertices, graphHeads);
+    LogicalGraph<VD, ED, GD> graph) {
+    DataSet<VD> vertices = computeNewVertices(graph);
+    DataSet<GD> graphHeads = computeNewGraphHeads(graph, vertices);
+    DataSet<ED> edges = computeNewEdges(graph, vertices, graphHeads);
     return new GraphCollection<>(vertices, edges, graphHeads,
-      logicalGraph.getConfig());
+      graph.getConfig());
   }
 
   /**
    * Computes the vertices in the new graphs created by the SplitBy and add
    * these graphs to the graph sets of the vertices.
    *
-   * @param logicalGraph input graph
+   * @param graph input graph
    * @return a DataSet containing all vertices, each vertex has one new graph
    * in its graph set
    */
   private DataSet<VD> computeNewVertices(
-    LogicalGraph<VD, ED, GD> logicalGraph) {
+    LogicalGraph<VD, ED, GD> graph) {
     // add the new graphs to the vertices graph lists
-    return logicalGraph.getVertices()
+    return graph.getVertices()
       .map(new AddNewGraphsToVertexMapper<>(vertexToLongFunc));
   }
 
   /**
    * Computes the new subgraphs created by the SplitBy.
    *
-   * @param logicalGraph the input graph
+   * @param graph the input graph
    * @param vertices     the computed vertices with their graphs
    * @return a DataSet containing all newly created subgraphs
    */
   private DataSet<GD> computeNewGraphHeads(
-    LogicalGraph<VD, ED, GD> logicalGraph, DataSet<VD> vertices) {
+    LogicalGraph<VD, ED, GD> graph, DataSet<VD> vertices) {
     // construct a KeySelector using the LongFromVertexFunction
     KeySelector<VD, Long> propertySelector =
       new LongFromVertexSelector<>(vertexToLongFunc);
@@ -115,26 +115,26 @@ public class SplitBy<
       .groupBy(propertySelector)
       .reduceGroup(new SubgraphsFromGroupsReducer<>(
         vertexToLongFunc,
-        logicalGraph.getConfig().getGraphHeadFactory()));
+        graph.getConfig().getGraphHeadFactory()));
   }
 
   /**
    * Computes those edges where source and target are in the same newly created
    * graph.
    *
-   * @param logicalGraph the input graph
+   * @param graph the input graph
    * @param vertices     the computed vertices with their graphs
    * @param graphHeads    the computed subgraphs
    * @return a DataSet containing all newly created edges, each edge has a
    * new graph in its graph set
    */
-  private DataSet<ED> computeNewEdges(LogicalGraph<VD, ED, GD> logicalGraph,
+  private DataSet<ED> computeNewEdges(LogicalGraph<VD, ED, GD> graph,
     DataSet<VD> vertices,
     DataSet<GD> graphHeads) {
     // construct tuples of the edges with the ids of their source and target
     // vertices
     DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex =
-      logicalGraph.getEdges().map(new EdgeToTupleMapper<ED>());
+      graph.getEdges().map(new EdgeToTupleMapper<ED>());
     // replace the source vertex id by the graph list of this vertex
     DataSet<Tuple3<Long, Set<Long>, Long>> edgeGraphsVertex = edgeVertexVertex
       .join(vertices)
@@ -163,7 +163,7 @@ public class SplitBy<
       edgesWithSubgraphs.flatMap(new CheckEdgesSourceTargetGraphs());
     // join the graph set tuples with the edges, add all new graphs to the
     // edge graph sets
-    return logicalGraph.getEdges()
+    return graph.getEdges()
       .join(newSubgraphs)
       .where(new EdgeKeySelector<ED>())
       .equalTo(0)
@@ -180,7 +180,7 @@ public class SplitBy<
    *
    * @param <VD> vertex data
    */
-  private static class LongFromVertexSelector<VD extends VertexData> implements
+  private static class LongFromVertexSelector<VD extends EPGMVertex> implements
     KeySelector<VD, Long> {
     /**
      * Unary Function
@@ -212,7 +212,7 @@ public class SplitBy<
    *
    * @param <VD> vertex data type
    */
-  private static class AddNewGraphsToVertexMapper<VD extends VertexData>
+  private static class AddNewGraphsToVertexMapper<VD extends EPGMVertex>
     implements MapFunction<VD, VD> {
     /**
      * Mapping from vertex to long value
@@ -250,8 +250,8 @@ public class SplitBy<
    * @param <VD> EPGM vertex type
    * @param <GD> EPGM graph type
    */
-  private static class SubgraphsFromGroupsReducer<VD extends VertexData, GD
-    extends GraphData>
+  private static class SubgraphsFromGroupsReducer<VD extends EPGMVertex, GD
+    extends EPGMGraphHead>
     implements GroupReduceFunction<VD, GD>,
     ResultTypeQueryable<GD> {
     /**
@@ -259,21 +259,21 @@ public class SplitBy<
      */
     private final UnaryFunction<VD, Long> function;
     /**
-     * GraphDataFactory to build new GraphData
+     * EPGMGraphHeadFactory to build new EPGMGraphHead
      */
-    private final GraphDataFactory<GD> graphDataFactory;
+    private final EPGMGraphHeadFactory<GD> graphHeadFactory;
 
     /**
      * Creates GroupReduceFunction instance.
      *
      * @param function         Mapping from vertex to long value
-     * @param graphDataFactory GraphDataFactory to build new GraphData
+     * @param graphHeadFactory EPGMGraphHeadFactory to build new EPGMGraphHead
      */
     public SubgraphsFromGroupsReducer(
       UnaryFunction<VD, Long> function,
-      GraphDataFactory<GD> graphDataFactory) {
+      EPGMGraphHeadFactory<GD> graphHeadFactory) {
       this.function = function;
-      this.graphDataFactory = graphDataFactory;
+      this.graphHeadFactory = graphHeadFactory;
     }
 
     /**
@@ -285,7 +285,7 @@ public class SplitBy<
       Iterator<VD> it = iterable.iterator();
       VD vertex = it.next();
       Long labelPropIndex = function.execute(vertex);
-      collector.collect(graphDataFactory.createGraphData(labelPropIndex,
+      collector.collect(graphHeadFactory.createGraphHead(labelPropIndex,
         GConstants.DEFAULT_GRAPH_LABEL));
     }
 
@@ -296,7 +296,7 @@ public class SplitBy<
     @SuppressWarnings("unchecked")
     public TypeInformation<GD> getProducedType() {
       return (TypeInformation<GD>) TypeExtractor.createTypeInfo(
-        graphDataFactory.getType());
+        graphHeadFactory.getType());
     }
   }
 
@@ -307,7 +307,7 @@ public class SplitBy<
    * @param <ED> edge data
    */
   @FunctionAnnotation.ForwardedFields("sourceVertexId->f1;targetVertexId->f2")
-  private static class EdgeToTupleMapper<ED extends EdgeData> implements
+  private static class EdgeToTupleMapper<ED extends EPGMEdge> implements
     MapFunction<ED, Tuple3<Long, Long, Long>> {
     /**
      * Reduce object instantiation.
@@ -340,7 +340,7 @@ public class SplitBy<
    * @param <VD> EPGM vertex type
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f2")
-  private static class JoinEdgeTupleWithSourceGraphs<VD extends VertexData>
+  private static class JoinEdgeTupleWithSourceGraphs<VD extends EPGMVertex>
     implements
     JoinFunction<Tuple3<Long, Long, Long>, VD, Tuple3<Long,
       Set<Long>, Long>> {
@@ -376,7 +376,7 @@ public class SplitBy<
    * @param <VD> vertex data type
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f1")
-  private static class JoinEdgeTupleWithTargetGraphs<VD extends VertexData>
+  private static class JoinEdgeTupleWithTargetGraphs<VD extends EPGMVertex>
     implements
     JoinFunction<Tuple3<Long, Set<Long>, Long>, VD,
       Tuple3<Long, Set<Long>, Set<Long>>> {
@@ -411,7 +411,7 @@ public class SplitBy<
    *
    * @param <GD> graph data type
    */
-  private static class MapSubgraphIdToSet<GD extends GraphData> implements
+  private static class MapSubgraphIdToSet<GD extends EPGMGraphHead> implements
     MapFunction<GD, Set<Long>> {
     /**
      * {@inheritDoc}
@@ -522,7 +522,7 @@ public class SplitBy<
    *
    * @param <ED> edge data type
    */
-  private static class JoinEdgeTuplesWithEdges<ED extends EdgeData> implements
+  private static class JoinEdgeTuplesWithEdges<ED extends EPGMEdge> implements
     JoinFunction<ED, Tuple2<Long, Set<Long>>, ED> {
     /**
      * {@inheritDoc}

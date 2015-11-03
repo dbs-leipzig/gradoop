@@ -18,18 +18,18 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.apache.commons.lang.StringUtils;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultEdgeDataFactory;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultGraphDataFactory;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
-import org.gradoop.model.impl.pojo.DefaultVertexDataFactory;
-import org.gradoop.storage.api.EdgeDataHandler;
-import org.gradoop.storage.api.GraphDataHandler;
-import org.gradoop.storage.api.VertexDataHandler;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.EdgePojoFactory;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojoFactory;
+import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.model.impl.pojo.VertexPojoFactory;
+import org.gradoop.storage.api.EdgeHandler;
+import org.gradoop.storage.api.GraphHeadHandler;
+import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
 import org.gradoop.util.GradoopConfig;
 
@@ -41,9 +41,9 @@ import org.gradoop.util.GradoopConfig;
  * @param <GD> EPGM graph head type
  */
 public class GradoopHBaseConfig<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData> extends GradoopConfig<VD, ED, GD> {
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead> extends GradoopConfig<VD, ED, GD> {
 
   /**
    * Vertex table name.
@@ -71,9 +71,9 @@ public class GradoopHBaseConfig<
    * @param graphTableName  graph table name
    *
    */
-  private GradoopHBaseConfig(VertexDataHandler<VD, ED> vertexHandler,
-    EdgeDataHandler<ED, VD> edgeHandler,
-    GraphDataHandler<GD> graphHeadHandler,
+  private GradoopHBaseConfig(VertexHandler<VD, ED> vertexHandler,
+    EdgeHandler<ED, VD> edgeHandler,
+    GraphHeadHandler<GD> graphHeadHandler,
     String vertexTableName,
     String edgeTableName,
     String graphTableName) {
@@ -118,16 +118,16 @@ public class GradoopHBaseConfig<
    *
    * @return Default Gradoop HBase configuration.
    */
-  public static GradoopHBaseConfig<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> getDefaultConfig() {
-    VertexDataHandler<DefaultVertexData, DefaultEdgeData> vertexDataHandler =
-      new DefaultVertexDataHandler<>(new DefaultVertexDataFactory());
-    EdgeDataHandler<DefaultEdgeData, DefaultVertexData> edgeDataHandler =
-      new DefaultEdgeDataHandler<>(new DefaultEdgeDataFactory());
-    GraphDataHandler<DefaultGraphData> graphDataHandler =
-      new DefaultGraphDataHandler<>(new DefaultGraphDataFactory());
-    return new GradoopHBaseConfig<>(vertexDataHandler, edgeDataHandler,
-      graphDataHandler, GConstants.DEFAULT_TABLE_VERTICES,
+  public static GradoopHBaseConfig<VertexPojo, EdgePojo, GraphHeadPojo>
+  getDefaultConfig() {
+    VertexHandler<VertexPojo, EdgePojo> vertexHandler =
+      new HBaseVertexHandler<>(new VertexPojoFactory());
+    EdgeHandler<EdgePojo, VertexPojo> edgeHandler =
+      new HBaseEdgeHandler<>(new EdgePojoFactory());
+    GraphHeadHandler<GraphHeadPojo> graphHeadHandler =
+      new HBaseGraphHeadHandler<>(new GraphHeadPojoFactory());
+    return new GradoopHBaseConfig<>(vertexHandler, edgeHandler,
+      graphHeadHandler, GConstants.DEFAULT_TABLE_VERTICES,
       GConstants.DEFAULT_TABLE_EDGES, GConstants.DEFAULT_TABLE_GRAPHS);
   }
 
@@ -144,8 +144,8 @@ public class GradoopHBaseConfig<
    *
    * @return Gradoop HBase configuration
    */
-  public static <VD extends VertexData, ED extends EdgeData,
-    GD extends GraphData> GradoopHBaseConfig<VD, ED, GD> createConfig(
+  public static <VD extends EPGMVertex, ED extends EPGMEdge,
+    GD extends EPGMGraphHead> GradoopHBaseConfig<VD, ED, GD> createConfig(
     GradoopConfig<VD, ED, GD> gradoopConfig, String vertexTableName,
     String edgeTableName, String graphTableName) {
     return new GradoopHBaseConfig<>(gradoopConfig, vertexTableName,

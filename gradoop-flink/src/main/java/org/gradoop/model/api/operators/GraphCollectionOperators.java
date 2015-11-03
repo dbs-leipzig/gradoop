@@ -16,13 +16,13 @@
  */
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.util.Order;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
 
 import java.util.List;
 
@@ -34,8 +34,7 @@ import java.util.List;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public interface GraphCollectionOperators<VD extends VertexData, ED extends
-  EdgeData, GD extends GraphData> {
+public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead> {
 
   /**
    * Returns logical graph from collection using the given identifier.

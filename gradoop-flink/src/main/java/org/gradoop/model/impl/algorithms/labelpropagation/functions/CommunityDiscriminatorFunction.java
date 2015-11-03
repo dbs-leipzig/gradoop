@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.UnaryFunction;
 
 /**
@@ -27,7 +27,7 @@ import org.gradoop.model.impl.functions.UnaryFunction;
  *
  * @param <VD> EPGM vertex type
  */
-public class CommunityDiscriminatorFunction<VD extends VertexData> implements
+public class CommunityDiscriminatorFunction<VD extends EPGMVertex> implements
   UnaryFunction<VD, Long> {
 
   /**

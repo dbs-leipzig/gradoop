@@ -22,14 +22,14 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.util.GConstants;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.tuples.Subgraph;
-import org.gradoop.storage.api.EdgeDataHandler;
-import org.gradoop.storage.api.GraphDataHandler;
-import org.gradoop.storage.api.VertexDataHandler;
+import org.gradoop.storage.api.EdgeHandler;
+import org.gradoop.storage.api.GraphHeadHandler;
+import org.gradoop.storage.api.VertexHandler;
 
 /**
  * Contains classes to read an EPGM database from HBase.
@@ -41,29 +41,29 @@ public class HBaseReader {
    *
    * @param <GD> EPGM graph head type
    */
-  public static class GraphDataTableInputFormat<GD extends GraphData> extends
-    TableInputFormat<Subgraph<Long, GD>> {
+  public static class GraphHeadTableInputFormat<GD extends EPGMGraphHead>
+    extends TableInputFormat<Subgraph<Long, GD>> {
 
     /**
      * Handles reading of persistent graph data.
      */
-    private final GraphDataHandler<GD> graphDataHandler;
+    private final GraphHeadHandler<GD> graphHeadHandler;
 
     /**
      * Table to read from.
      */
-    private final String graphDataTableName;
+    private final String graphHeadTableName;
 
     /**
      * Creates an graph table input format.
      *
-     * @param graphDataHandler   graph data handler
-     * @param graphDataTableName graph data table name
+     * @param graphHeadHandler   graph data handler
+     * @param graphHeadTableName graph data table name
      */
-    public GraphDataTableInputFormat(GraphDataHandler<GD> graphDataHandler,
-      String graphDataTableName) {
-      this.graphDataHandler = graphDataHandler;
-      this.graphDataTableName = graphDataTableName;
+    public GraphHeadTableInputFormat(GraphHeadHandler<GD> graphHeadHandler,
+      String graphHeadTableName) {
+      this.graphHeadHandler = graphHeadHandler;
+      this.graphHeadTableName = graphHeadTableName;
     }
 
     /**
@@ -81,7 +81,7 @@ public class HBaseReader {
      */
     @Override
     protected String getTableName() {
-      return graphDataTableName;
+      return graphHeadTableName;
     }
 
     /**
@@ -89,7 +89,7 @@ public class HBaseReader {
      */
     @Override
     protected Subgraph<Long, GD> mapResultToTuple(Result result) {
-      GD graphData = graphDataHandler.readGraphData(result);
+      GD graphData = graphHeadHandler.readGraphHead(result);
       return new Subgraph<>(graphData.getId(), graphData);
     }
   }
@@ -100,30 +100,30 @@ public class HBaseReader {
    * @param <VD> EPGM vertex type
    * @param <ED> EPGM edge type
    */
-  public static class VertexDataTableInputFormat<VD extends VertexData, ED
-    extends EdgeData> extends
+  public static class VertexTableInputFormat<VD extends EPGMVertex, ED
+    extends EPGMEdge> extends
     TableInputFormat<Vertex<Long, VD>> {
 
     /**
      * Handles reading of persistent vertex data.
      */
-    private final VertexDataHandler<VD, ED> vertexDataHandler;
+    private final VertexHandler<VD, ED> vertexHandler;
 
     /**
      * Table to read from.
      */
-    private final String vertexDataTableName;
+    private final String vertexTableName;
 
     /**
      * Creates an vertex table input format.
      *
-     * @param vertexDataHandler   vertex data handler
-     * @param vertexDataTableName vertex data table name
+     * @param vertexHandler   vertex data handler
+     * @param vertexTableName vertex data table name
      */
-    public VertexDataTableInputFormat(
-      VertexDataHandler<VD, ED> vertexDataHandler, String vertexDataTableName) {
-      this.vertexDataHandler = vertexDataHandler;
-      this.vertexDataTableName = vertexDataTableName;
+    public VertexTableInputFormat(VertexHandler<VD, ED> vertexHandler,
+      String vertexTableName) {
+      this.vertexHandler = vertexHandler;
+      this.vertexTableName = vertexTableName;
     }
 
     /**
@@ -141,7 +141,7 @@ public class HBaseReader {
      */
     @Override
     protected String getTableName() {
-      return vertexDataTableName;
+      return vertexTableName;
     }
 
     /**
@@ -149,7 +149,7 @@ public class HBaseReader {
      */
     @Override
     protected Vertex<Long, VD> mapResultToTuple(Result result) {
-      VD vertexData = vertexDataHandler.readVertexData(result);
+      VD vertexData = vertexHandler.readVertex(result);
       return new Vertex<>(vertexData.getId(), vertexData);
     }
   }
@@ -159,30 +159,30 @@ public class HBaseReader {
    *
    * @param <ED> EPGM edge type
    */
-  public static class EdgeDataTableInputFormat<ED extends EdgeData, VD
-    extends VertexData> extends
+  public static class EdgeTableInputFormat<ED extends EPGMEdge, VD
+    extends EPGMVertex> extends
     TableInputFormat<Edge<Long, ED>> {
 
     /**
      * Handles reading of persistent edge data.
      */
-    private final EdgeDataHandler<ED, VD> edgeDataHandler;
+    private final EdgeHandler<ED, VD> edgeHandler;
 
     /**
      * Table to read from.
      */
-    private final String edgeDataTableName;
+    private final String edgeTableName;
 
     /**
      * Creates an edge table input format.
      *
-     * @param edgeDataHandler   edge data handler
-     * @param edgeDataTableName edge data table name
+     * @param edgeHandler   edge data handler
+     * @param edgeTableName edge data table name
      */
-    public EdgeDataTableInputFormat(EdgeDataHandler<ED, VD> edgeDataHandler,
-      String edgeDataTableName) {
-      this.edgeDataHandler = edgeDataHandler;
-      this.edgeDataTableName = edgeDataTableName;
+    public EdgeTableInputFormat(EdgeHandler<ED, VD> edgeHandler,
+      String edgeTableName) {
+      this.edgeHandler = edgeHandler;
+      this.edgeTableName = edgeTableName;
     }
 
     /**
@@ -200,7 +200,7 @@ public class HBaseReader {
      */
     @Override
     protected String getTableName() {
-      return edgeDataTableName;
+      return edgeTableName;
     }
 
     /**
@@ -208,7 +208,7 @@ public class HBaseReader {
      */
     @Override
     protected Edge<Long, ED> mapResultToTuple(Result result) {
-      ED edgeData = edgeDataHandler.readEdgeData(result);
+      ED edgeData = edgeHandler.readEdge(result);
       return new Edge<>(edgeData.getSourceVertexId(),
         edgeData.getTargetVertexId(), edgeData);
     }

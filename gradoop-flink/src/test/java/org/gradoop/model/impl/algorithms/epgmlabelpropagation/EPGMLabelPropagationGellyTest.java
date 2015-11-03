@@ -7,8 +7,8 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.algorithms.labelpropagation
   .LabelPropagationTestHelper;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -62,11 +62,11 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
   public void testConnectedGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, DefaultVertexData, DefaultEdgeData> epGraph =
+    Graph<Long, VertexPojo, EdgePojo> epGraph =
       LabelPropagationTestHelper
         .getEPGraph(getConnectedGraphWithVertexValues(), env);
-    DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = epGraph.run(
-      new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+    DataSet<Vertex<Long, VertexPojo>> labeledGraph = epGraph.run(
+      new EPGMLabelPropagationAlgorithm<VertexPojo, EdgePojo>(
         maxIteration)).getVertices();
     validateConnectedGraphResult(parseResult(labeledGraph.collect()));
   }
@@ -75,11 +75,11 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
   public void testBipartiteGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, DefaultVertexData, DefaultEdgeData> gellyGraph =
+    Graph<Long, VertexPojo, EdgePojo> gellyGraph =
       LabelPropagationTestHelper
         .getEPGraph(getCompleteBipartiteGraphWithVertexValue(), env);
-    DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
-      new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+    DataSet<Vertex<Long, VertexPojo>> labeledGraph = gellyGraph.run(
+      new EPGMLabelPropagationAlgorithm<VertexPojo, EdgePojo>(
         maxIteration)).getVertices();
     validateCompleteBipartiteGraphResult(parseResult(labeledGraph.collect()));
   }
@@ -88,19 +88,19 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
   public void testLoopGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, DefaultVertexData, DefaultEdgeData> gellyGraph =
+    Graph<Long, VertexPojo, EdgePojo> gellyGraph =
       LabelPropagationTestHelper
         .getEPGraph(getLoopGraphWithVertexValues(), env);
-    DataSet<Vertex<Long, DefaultVertexData>> labeledGraph = gellyGraph.run(
-      new EPGMLabelPropagationAlgorithm<DefaultVertexData, DefaultEdgeData>(
+    DataSet<Vertex<Long, VertexPojo>> labeledGraph = gellyGraph.run(
+      new EPGMLabelPropagationAlgorithm<VertexPojo, EdgePojo>(
         maxIteration)).getVertices();
     validateLoopGraphResult(parseResult(labeledGraph.collect()));
   }
 
   private Map<Long, Long> parseResult(
-    List<Vertex<Long, DefaultVertexData>> graph) {
+    List<Vertex<Long, VertexPojo>> graph) {
     Map<Long, Long> result = new HashMap<>();
-    for (Vertex<Long, DefaultVertexData> v : graph) {
+    for (Vertex<Long, VertexPojo> v : graph) {
       result.put(v.getId(), (Long) v.getValue()
         .getProperty(EPGMLabelPropagationAlgorithm.CURRENT_VALUE));
     }

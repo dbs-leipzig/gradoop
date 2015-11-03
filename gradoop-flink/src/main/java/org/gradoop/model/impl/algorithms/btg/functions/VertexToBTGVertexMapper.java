@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.btg.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.btg.BTG;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
@@ -33,7 +33,7 @@ import java.util.List;
  * @param <VD> EPGM vertex type
  * @see BTGVertexValue
  */
-public class VertexToBTGVertexMapper<VD extends VertexData>
+public class VertexToBTGVertexMapper<VD extends EPGMVertex>
   implements MapFunction<VD, Vertex<Long, BTGVertexValue>> {
   /**
    * {@inheritDoc}

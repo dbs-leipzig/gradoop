@@ -3,12 +3,12 @@ package org.gradoop.model.impl.algorithms.btg;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.test.util.MultipleProgramsTestBase;
 import org.gradoop.model.FlinkTestBase;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -34,13 +34,13 @@ public class BTGGradoopTest extends FlinkTestBase {
     String vertexFile = BTGGradoopTest.class.getResource("/btg/btg_nodes").getFile();
     String edgeFile = BTGGradoopTest.class.getResource("/btg/btg_edges").getFile();
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
       graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, env);
-    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       databaseGraph = graphStore.getDatabaseGraph();
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       btgGraph = databaseGraph.callForCollection(
-      new BTG<DefaultVertexData, DefaultEdgeData, DefaultGraphData>(50));
+      new BTG<VertexPojo, EdgePojo, GraphHeadPojo>(50));
     assertNotNull("graph collection is null", databaseGraph);
     assertEquals("wrong number of graphs", 2l, btgGraph.getGraphCount());
     assertEquals("wrong number of vertices", 9l,
@@ -52,8 +52,7 @@ public class BTGGradoopTest extends FlinkTestBase {
     assertEquals("wrong number of edges", 0l,
       btgGraph.getGraph(4L).getEdgeCount());
     validateConnectedIIGResult(BTGAlgorithmTestHelper
-      .parseResultDefaultVertexData(btgGraph.toGellyGraph().getVertices()
-        .collect()));
+      .parseResultVertexPojos(btgGraph.toGellyGraph().getVertices().collect()));
   }
 
   private void validateConnectedIIGResult(Map<Long, List<Long>> btgIDs) {

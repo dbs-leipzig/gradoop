@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.functions.unaryfunctions;
 
-import org.gradoop.model.api.Attributed;
+import org.gradoop.model.api.EPGMAttributed;
 import org.gradoop.model.impl.functions.UnaryFunction;
 
 /**
@@ -26,7 +26,7 @@ import org.gradoop.model.impl.functions.UnaryFunction;
  * @param <IN>  entity that holds properties
  * @param <OUT> property value type
  */
-public class PropertyValueByKeyFunction<IN extends Attributed, OUT>
+public class PropertyValueByKeyFunction<IN extends EPGMAttributed, OUT>
   implements UnaryFunction<IN, OUT> {
 
   /**

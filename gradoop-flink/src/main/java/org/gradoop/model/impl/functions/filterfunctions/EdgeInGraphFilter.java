@@ -18,14 +18,14 @@
 package org.gradoop.model.impl.functions.filterfunctions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.EPGMEdge;
 
 /**
  * Checks if an edge is contained in the given graph.
  *
  * @param <ED> EPGM edge type
  */
-public class EdgeInGraphFilter<ED extends EdgeData>
+public class EdgeInGraphFilter<ED extends EPGMEdge>
   implements FilterFunction<ED> {
 
   /**

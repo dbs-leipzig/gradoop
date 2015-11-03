@@ -23,12 +23,12 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
-import org.gradoop.model.api.Attributed;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.Identifiable;
-import org.gradoop.model.api.Labeled;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMAttributed;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMIdentifiable;
+import org.gradoop.model.api.EPGMLabeled;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
@@ -55,33 +55,29 @@ import java.util.Map;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class LogicalGraph<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+public class LogicalGraph
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
   extends AbstractGraph<VD, ED, GD>
-  implements
-  LogicalGraphOperators<VD, ED, GD>, Identifiable, Attributed, Labeled {
+  implements LogicalGraphOperators<VD, ED, GD>,
+  EPGMIdentifiable, EPGMAttributed, EPGMLabeled {
 
   /**
    * Graph data associated with that logical graph.
    */
-  private final GD graphData;
+  private final GD graphHead;
 
   /**
    * Creates a new logical graph based on the given parameters.
    *
    * @param vertices  vertex data set
    * @param edges     edge data set
-   * @param graphData graph data associated with that logical graph
+   * @param graphHead graph data associated with that logical graph
    * @param config    Gradoop Flink configuration
    */
-  private LogicalGraph(DataSet<VD> vertices,
-    DataSet<ED> edges,
-    GD graphData,
+  private LogicalGraph(DataSet<VD> vertices, DataSet<ED> edges, GD graphHead,
     GradoopFlinkConfig<VD, ED, GD> config) {
     super(vertices, edges, config);
-    this.graphData = graphData;
+    this.graphHead = graphHead;
   }
 
   /**
@@ -95,8 +91,9 @@ public class LogicalGraph<
    * @param <GD>      graph data type
    * @return logical graph
    */
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> LogicalGraph<VD, ED, GD> fromGellyGraph(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  LogicalGraph<VD, ED, GD> fromGellyGraph(
     Graph<Long, VD, ED> graph, GD graphData,
     GradoopFlinkConfig<VD, ED, GD> config) {
     return fromDataSets(graph.getVertices().map(
@@ -128,8 +125,9 @@ public class LogicalGraph<
    * @param <GD>      EPGM graph head graph head type
    * @return logical graph
    */
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> LogicalGraph<VD, ED, GD> fromDataSets(DataSet<VD> vertices,
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  LogicalGraph<VD, ED, GD> fromDataSets(DataSet<VD> vertices,
     DataSet<ED> edges,
     GD graphData,
     GradoopFlinkConfig<VD, ED, GD> config) {
@@ -331,7 +329,7 @@ public class LogicalGraph<
    */
   @Override
   public Map<String, Object> getProperties() {
-    return graphData.getProperties();
+    return graphHead.getProperties();
   }
 
   /**
@@ -339,7 +337,7 @@ public class LogicalGraph<
    */
   @Override
   public Iterable<String> getPropertyKeys() {
-    return graphData.getPropertyKeys();
+    return graphHead.getPropertyKeys();
   }
 
   /**
@@ -347,7 +345,7 @@ public class LogicalGraph<
    */
   @Override
   public Object getProperty(String key) {
-    return graphData.getProperty(key);
+    return graphHead.getProperty(key);
   }
 
   /**
@@ -355,7 +353,7 @@ public class LogicalGraph<
    */
   @Override
   public <T> T getProperty(String key, Class<T> type) {
-    return graphData.getProperty(key, type);
+    return graphHead.getProperty(key, type);
   }
 
   /**
@@ -363,7 +361,7 @@ public class LogicalGraph<
    */
   @Override
   public void setProperties(Map<String, Object> properties) {
-    graphData.setProperties(properties);
+    graphHead.setProperties(properties);
   }
 
   /**
@@ -371,7 +369,7 @@ public class LogicalGraph<
    */
   @Override
   public void setProperty(String key, Object value) {
-    graphData.setProperty(key, value);
+    graphHead.setProperty(key, value);
   }
 
   /**
@@ -379,7 +377,7 @@ public class LogicalGraph<
    */
   @Override
   public int getPropertyCount() {
-    return graphData.getPropertyCount();
+    return graphHead.getPropertyCount();
   }
 
   /**
@@ -387,7 +385,7 @@ public class LogicalGraph<
    */
   @Override
   public Long getId() {
-    return graphData.getId();
+    return graphHead.getId();
   }
 
   /**
@@ -395,7 +393,7 @@ public class LogicalGraph<
    */
   @Override
   public void setId(Long id) {
-    graphData.setId(id);
+    graphHead.setId(id);
   }
 
   /**
@@ -403,7 +401,7 @@ public class LogicalGraph<
    */
   @Override
   public String getLabel() {
-    return graphData.getLabel();
+    return graphHead.getLabel();
   }
 
   /**
@@ -411,7 +409,7 @@ public class LogicalGraph<
    */
   @Override
   public void setLabel(String label) {
-    graphData.setLabel(label);
+    graphHead.setLabel(label);
   }
 
   /**
@@ -425,7 +423,7 @@ public class LogicalGraph<
       new JsonWriter.VertexTextFormatter<VD>());
     getEdges().writeAsFormattedText(edgeFile,
       new JsonWriter.EdgeTextFormatter<ED>());
-    getConfig().getExecutionEnvironment().fromElements(graphData)
+    getConfig().getExecutionEnvironment().fromElements(graphHead)
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
     getConfig().getExecutionEnvironment().execute();
   }
@@ -438,7 +436,7 @@ public class LogicalGraph<
     final StringBuilder sb =
       new StringBuilder(String.format("LogicalGraph{%n"));
     sb.append(
-      String.format("%-10d %s %n", graphData.getId(), graphData.toString()));
+      String.format("%-10d %s %n", graphHead.getId(), graphHead.toString()));
     sb.append(String.format("Vertices:%n"));
     for (VD v : this.getVertices().collect()) {
       sb.append(String.format("%-10d %s %n", v.getId(), v));

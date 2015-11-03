@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.epgmlabelpropagation
   .EPGMLabelPropagationAlgorithm;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
@@ -29,7 +29,7 @@ import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
  *
  * @param <VD> EPGM vertex type
  */
-public class LPJoin<VD extends VertexData>
+public class LPJoin<VD extends EPGMVertex>
   implements JoinFunction<Vertex<Long, LPVertexValue>, VD, VD> {
 
   @Override

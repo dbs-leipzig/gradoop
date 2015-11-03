@@ -2,9 +2,9 @@ package org.gradoop.model.impl.operators.logicalgraph.binary;
 
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 
 import java.util.Collection;
 
@@ -17,7 +17,7 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
   }
 
   protected void performTest(
-    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       resultGraph,
     long expectedVertexCount, long expectedEdgeCount) throws Exception {
     assertNotNull("resulting graph was null", resultGraph);
@@ -29,9 +29,9 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
     assertEquals("wrong number of edges", expectedEdgeCount,
       resultGraph.getEdgeCount());
 
-    Collection<DefaultVertexData> vertexData = resultGraph.getVertices()
+    Collection<VertexPojo> vertexData = resultGraph.getVertices()
       .collect();
-    Collection<DefaultEdgeData> edgeData = resultGraph.getEdges()
+    Collection<EdgePojo> edgeData = resultGraph.getEdges()
       .collect();
 
     checkVertexAndEdgeCount(expectedVertexCount, expectedEdgeCount, vertexData,
@@ -41,14 +41,14 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
   }
 
   protected void checkGraphContainment(long newGraphID,
-    Collection<DefaultVertexData> vertexData,
-    Collection<DefaultEdgeData> edgeData) {
-    for (DefaultVertexData v : vertexData) {
+    Collection<VertexPojo> vertexData,
+    Collection<EdgePojo> edgeData) {
+    for (VertexPojo v : vertexData) {
       assertTrue("vertex is not in new graph",
         v.getGraphs().contains(newGraphID));
     }
 
-    for (DefaultEdgeData e : edgeData) {
+    for (EdgePojo e : edgeData) {
       assertTrue("edge is not in new graph", e.getGraphs().contains
         (newGraphID));
     }
@@ -56,8 +56,8 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
 
   protected void checkVertexAndEdgeCount(long expectedVertexCount,
     long expectedEdgeCount,
-    Collection<DefaultVertexData> vertexData,
-    Collection<DefaultEdgeData> edgeData) {
+    Collection<VertexPojo> vertexData,
+    Collection<EdgePojo> edgeData) {
     assertEquals("wrong number of vertex values", expectedVertexCount,
       vertexData.size());
     assertEquals("wrong number of edge values", expectedEdgeCount,

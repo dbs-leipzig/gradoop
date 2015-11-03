@@ -19,7 +19,7 @@ package org.gradoop.storage.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.model.api.GraphElement;
+import org.gradoop.model.api.EPGMGraphElement;
 
 import java.util.Set;
 
@@ -35,7 +35,7 @@ public interface GraphElementHandler extends ElementHandler {
    * @param graphElement graph element
    * @return put with graph identifiers
    */
-  Put writeGraphs(final Put put, final GraphElement graphElement);
+  Put writeGraphs(final Put put, final EPGMGraphElement graphElement);
 
   /**
    * Reads the graph identifiers from the given {@link Result}.

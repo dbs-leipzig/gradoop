@@ -18,14 +18,14 @@
 package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 
 /**
  * Adds a given graph ID to the vertex and returns it.
  *
  * @param <VD> EPGM vertex type
  */
-public class VertexToGraphUpdater<VD extends VertexData> implements
+public class VertexToGraphUpdater<VD extends EPGMVertex> implements
   MapFunction<VD, VD> {
 
   /**

@@ -18,9 +18,9 @@ package org.gradoop.model.impl.operators.logicalgraph.unary;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
@@ -34,9 +34,9 @@ import org.gradoop.model.impl.functions.UnaryFunction;
  * @param <GD> EPGM graph head type
  */
 public class Projection<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   implements UnaryGraphToGraphOperator<VD, ED, GD> {
   /**
    * Vertex projection function.
@@ -87,11 +87,9 @@ public class Projection<
     DataSet<ED> edges = graph.getEdges()
       .map(new ProjectionEdgesMapper<>(getEdgeFunc()));
     return LogicalGraph.fromDataSets(vertices, edges,
-      graph.getConfig().getGraphHeadFactory().createGraphData(
-        graph.getId(),
-        graph.getLabel(),
-        graph.getProperties()),
-      graph.getConfig());
+      graph.getConfig().getGraphHeadFactory()
+        .createGraphHead(graph.getId(), graph.getLabel(),
+          graph.getProperties()), graph.getConfig());
   }
 
   /**
@@ -99,7 +97,7 @@ public class Projection<
    *
    * @param <VD> vertex data type
    */
-  private static class ProjectionVerticesMapper<VD extends VertexData>
+  private static class ProjectionVerticesMapper<VD extends EPGMVertex>
     implements
     MapFunction<VD, VD> {
     /**
@@ -127,7 +125,7 @@ public class Projection<
    *
    * @param <ED> edge data type
    */
-  private static class ProjectionEdgesMapper<ED extends EdgeData> implements
+  private static class ProjectionEdgesMapper<ED extends EPGMEdge> implements
     MapFunction<ED, ED> {
     /**
      * Edge to edge function

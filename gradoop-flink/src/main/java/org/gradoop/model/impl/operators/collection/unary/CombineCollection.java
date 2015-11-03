@@ -16,12 +16,12 @@
  */
 package org.gradoop.model.impl.operators.collection.unary;
 
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.util.FlinkConstants;
 
 /**
@@ -31,8 +31,8 @@ import org.gradoop.util.FlinkConstants;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class CombineCollection<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> implements
+public class CombineCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
+  extends EPGMGraphHead> implements
   UnaryCollectionToGraphOperator<VD, ED, GD> {
   @Override
   public LogicalGraph<VD, ED, GD> execute(
@@ -40,7 +40,7 @@ public class CombineCollection<VD extends VertexData, ED extends EdgeData, GD
     return LogicalGraph
       .fromDataSets(collection.getVertices(), collection.getEdges(),
         collection.getConfig().getGraphHeadFactory()
-          .createGraphData(FlinkConstants.COMBINE_GRAPH_ID),
+          .createGraphHead(FlinkConstants.COMBINE_GRAPH_ID),
         collection.getConfig());
   }
 

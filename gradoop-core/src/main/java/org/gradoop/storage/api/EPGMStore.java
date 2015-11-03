@@ -17,9 +17,9 @@
 
 package org.gradoop.storage.api;
 
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.util.GradoopConfig;
 
 import java.io.IOException;
@@ -33,8 +33,8 @@ import java.util.Iterator;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public interface EPGMStore<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> {
+public interface EPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
+  extends EPGMGraphHead> {
   /**
    * Returns the Gradoop configuration associated with that EPGM Store,
    *
@@ -47,42 +47,42 @@ public interface EPGMStore<VD extends VertexData, ED extends EdgeData, GD
    *
    * @return vertex data table name
    */
-  String getVertexDataTableName();
+  String getVertexTableName();
 
   /**
    * Returns the HBase table name where edge data is stored.
    *
    * @return edge data table name
    */
-  String getEdgeDataTableName();
+  String getEdgeTableName();
 
   /**
    * Returns the HBase table name where graph data is stored.
    *
    * @return graph data table name
    */
-  String getGraphDataTableName();
+  String getGraphHeadName();
 
   /**
    * Writes the given graph data into the graph store.
    *
    * @param graphData graph data to write
    */
-  void writeGraphData(final PersistentGraphData graphData);
+  void writeGraphHead(final PersistentGraphHead graphData);
 
   /**
    * Writes the given vertex data into the graph store.
    *
    * @param vertexData vertex data to write
    */
-  void writeVertexData(final PersistentVertexData<ED> vertexData);
+  void writeVertex(final PersistentVertex<ED> vertexData);
 
   /**
    * Writes the given edge data into the graph store.
    *
    * @param edgeData edge data to write
    */
-  void writeEdgeData(final PersistentEdgeData<VD> edgeData);
+  void writeEdge(final PersistentEdge<VD> edgeData);
 
   /**
    * Reads a graph data entity from the EPGM store using the given graph
@@ -92,7 +92,7 @@ public interface EPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * @return graph data entity or {@code null} if there is no entity with the
    * given {@code graphId}
    */
-  GD readGraphData(final Long graphId);
+  GD readGraph(final Long graphId);
 
   /**
    * Reads a vertex data entity from the EPGM store using the given vertex
@@ -102,7 +102,7 @@ public interface EPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * @return vertex data entity or {@code null} if there is no entity with the
    * given {@code vertexId}
    */
-  VD readVertexData(final Long vertexId);
+  VD readVertex(final Long vertexId);
 
   /**
    * Reads an edge data entity from the EPGM store using the given edge
@@ -112,7 +112,7 @@ public interface EPGMStore<VD extends VertexData, ED extends EdgeData, GD
    * @return edge data entity or {@code null} if there is no entity with the
    * given {@code edgeId}
    */
-  ED readEdgeData(final Long edgeId);
+  ED readEdge(final Long edgeId);
 
   /**
    * Reads all vertices from the EPGM store. If EPGM store is empty, {@code

@@ -2,8 +2,8 @@ package org.gradoop.model.impl.functions.joinfunctions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 
 /**
  * Used when joining edges and vertices and the edges are of interest.
@@ -13,8 +13,8 @@ import org.gradoop.model.api.VertexData;
  */
 @FunctionAnnotation.ForwardedFieldsFirst("*->*")
 public class EdgeVertexJoinKeepEdge<
-  VD extends VertexData,
-  ED extends EdgeData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge>
   implements JoinFunction<ED, VD, ED> {
 
   /**

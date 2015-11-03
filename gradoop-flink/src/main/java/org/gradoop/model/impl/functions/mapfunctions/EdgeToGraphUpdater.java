@@ -18,14 +18,14 @@
 package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.EPGMEdge;
 
 /**
  * Adds a given graph ID to the edge and returns it.
  *
  * @param <ED> EPGM edge type
  */
-public class EdgeToGraphUpdater<ED extends EdgeData> implements
+public class EdgeToGraphUpdater<ED extends EPGMEdge> implements
   MapFunction<ED, ED> {
 
   /**

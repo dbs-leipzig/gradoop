@@ -21,7 +21,7 @@ import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +42,7 @@ import static org.gradoop.model.impl.algorithms.epgmlabelpropagation
  *
  * @param <VD> EPGM vertex type
  */
-public class LPUpdateFunction<VD extends VertexData>
+public class LPUpdateFunction<VD extends EPGMVertex>
   extends VertexUpdateFunction<Long, VD, Long> {
   @Override
   public void updateVertex(Vertex<Long, VD> vertex,

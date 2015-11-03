@@ -19,20 +19,21 @@ package org.gradoop.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.LogicalGraph;
 
 /**
  * Operators that are available at all graph structures.
  *
  * @param <VD> EPGM vertex type
  * @param <ED> EPGM edge type
- * @see org.gradoop.model.impl.LogicalGraph
+ * @see LogicalGraph
  * @see org.gradoop.model.impl.GraphCollection
  */
 public interface GraphOperators<
-  VD extends VertexData,
-  ED extends EdgeData> {
+  VD extends EPGMVertex,
+  ED extends EPGMEdge> {
 
   /**
    * Returns all vertices including vertex data associated with that graph.

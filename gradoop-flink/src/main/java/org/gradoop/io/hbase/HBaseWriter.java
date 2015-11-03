@@ -35,9 +35,9 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.keyselectors
@@ -45,15 +45,15 @@ import org.gradoop.model.impl.functions.keyselectors
 import org.gradoop.model.impl.functions.keyselectors
   .EdgeTargetVertexKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
-import org.gradoop.storage.api.EdgeDataHandler;
-import org.gradoop.storage.api.GraphDataHandler;
-import org.gradoop.storage.api.PersistentEdgeData;
-import org.gradoop.storage.api.PersistentEdgeDataFactory;
-import org.gradoop.storage.api.PersistentGraphData;
-import org.gradoop.storage.api.PersistentGraphDataFactory;
-import org.gradoop.storage.api.PersistentVertexData;
-import org.gradoop.storage.api.PersistentVertexDataFactory;
-import org.gradoop.storage.api.VertexDataHandler;
+import org.gradoop.storage.api.EdgeHandler;
+import org.gradoop.storage.api.GraphHeadHandler;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentEdgeFactory;
+import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.storage.api.PersistentGraphHeadFactory;
+import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.api.PersistentVertexFactory;
+import org.gradoop.storage.api.VertexHandler;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -66,24 +66,24 @@ import java.util.Set;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> implements Serializable {
+public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
+  extends EPGMGraphHead> implements Serializable {
 
   /**
    * Converts runtime vertex data to persistent vertex data (includes
    * incoming and outgoing edge data) and writes it to HBase.
    *
    * @param epgmDatabase                EPGM database instance
-   * @param vertexDataHandler           vertex data handler
-   * @param persistentVertexDataFactory persistent vertex data factory
+   * @param vertexHandler           vertex data handler
+   * @param persistentVertexFactory persistent vertex data factory
    * @param vertexDataTableName         HBase vertex data table name
    * @param <PVD>                       persistent vertex data type
    * @throws Exception
    */
-  public <PVD extends PersistentVertexData<ED>> void writeVertices(
+  public <PVD extends PersistentVertex<ED>> void writeVertices(
     final EPGMDatabase<VD, ED, GD> epgmDatabase,
-    final VertexDataHandler<VD, ED> vertexDataHandler,
-    final PersistentVertexDataFactory<VD, ED, PVD> persistentVertexDataFactory,
+    final VertexHandler<VD, ED> vertexHandler,
+    final PersistentVertexFactory<VD, ED, PVD> persistentVertexFactory,
     final String vertexDataTableName) throws Exception {
 
     final LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
@@ -161,7 +161,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
 
     // co-group (vertex-data, (vertex-id, [out-edge-data])) with (vertex-id,
     // [in-edge-data]) to simulate left outer join
-    DataSet<PersistentVertexData<ED>> persistentVertexDataSet =
+    DataSet<PersistentVertex<ED>> persistentVertexDataSet =
       vertexDataWithOutgoingEdges
         .coGroup(vertexToIncomingEdges)
         .where(new KeySelector<Tuple2<VD, Set<ED>>, Long>() {
@@ -171,8 +171,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
           }
         })
         .equalTo(0)
-        .with(new PersistentVertexDataCoGroupFunction<>(
-          persistentVertexDataFactory));
+        .with(new PersistentVertexCoGroupFunction<>(persistentVertexFactory));
 
     // write (persistent-vertex-data) to HBase table
     Job job = Job.getInstance();
@@ -180,7 +179,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
       .set(TableOutputFormat.OUTPUT_TABLE, vertexDataTableName);
 
     persistentVertexDataSet
-      .map(new HBaseWriter.VertexDataToHBaseMapper<>(vertexDataHandler)).
+      .map(new VertexToHBaseMapper<>(vertexHandler)).
       output(
         new HadoopOutputFormat<>(new TableOutputFormat<LongWritable>(), job));
   }
@@ -190,21 +189,21 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * source/target vertex data) and writes it to HBase.
    *
    * @param epgmDatabase              EPGM database instance
-   * @param edgeDataHandler           edge data handler
-   * @param persistentEdgeDataFactory persistent edge data factory
+   * @param edgeHandler           edge data handler
+   * @param persistentEdgeFactory persistent edge data factory
    * @param edgeDataTableName         HBase edge data table name
    * @param <PED>                     persistent edge data type
    * @throws IOException
    */
-  public <PED extends PersistentEdgeData<VD>> void writeEdges(
+  public <PED extends PersistentEdge<VD>> void writeEdges(
     final EPGMDatabase<VD, ED, GD> epgmDatabase,
-    final EdgeDataHandler<ED, VD> edgeDataHandler,
-    final PersistentEdgeDataFactory<ED, VD, PED> persistentEdgeDataFactory,
+    final EdgeHandler<ED, VD> edgeHandler,
+    final PersistentEdgeFactory<ED, VD, PED> persistentEdgeFactory,
     final String edgeDataTableName) throws IOException {
 
     LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
 
-    DataSet<PersistentEdgeData<VD>> persistentEdgeDataSet = graph.getVertices()
+    DataSet<PersistentEdge<VD>> persistentEdgeDataSet = graph.getVertices()
       // join vertex with edges on edge source vertex id
       .join(graph.getEdges())
       .where(new VertexKeySelector<VD>())
@@ -214,7 +213,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
       .where("f1.targetVertexId")
       .equalTo(new VertexKeySelector<VD>())
       // ((source-vertex-data, edge-data), target-vertex-data)
-      .with(new PersistentEdgeDataJoinFunction<>(persistentEdgeDataFactory));
+      .with(new PersistentEdgeJoinFunction<>(persistentEdgeFactory));
 
     // write (persistent-edge-data) to HBase table
     Job job = Job.getInstance();
@@ -222,7 +221,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
       .set(TableOutputFormat.OUTPUT_TABLE, edgeDataTableName);
 
     persistentEdgeDataSet
-      .map(new HBaseWriter.EdgeDataToHBaseMapper<>(edgeDataHandler)).
+      .map(new EdgeToHBaseMapper<>(edgeHandler)).
       output(
         new HadoopOutputFormat<>(new TableOutputFormat<LongWritable>(), job));
   }
@@ -232,16 +231,16 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * and edge identifiers) and writes it to HBase.
    *
    * @param epgmDatabase               EPGM database instance
-   * @param graphDataHandler           graph data handler
-   * @param persistentGraphDataFactory persistent graph data factory
+   * @param graphHeadHandler           graph data handler
+   * @param persistentGraphHeadFactory persistent graph data factory
    * @param graphDataTableName         HBase graph data table name
    * @param <PGD>                      persistent graph data type
    * @throws IOException
    */
-  public <PGD extends PersistentGraphData> void writeGraphHeads(
+  public <PGD extends PersistentGraphHead> void writeGraphHeads(
     final EPGMDatabase<VD, ED, GD> epgmDatabase,
-    final GraphDataHandler<GD> graphDataHandler,
-    final PersistentGraphDataFactory<GD, PGD> persistentGraphDataFactory,
+    final GraphHeadHandler<GD> graphHeadHandler,
+    final PersistentGraphHeadFactory<GD, PGD> persistentGraphHeadFactory,
     final String graphDataTableName) throws IOException {
     final LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
 
@@ -312,13 +311,13 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
 
     // join (graph-id, {vertex-id}, {edge-id}) triples with
     // (graph-id, graph-data) and build (persistent-graph-data)
-    DataSet<PersistentGraphData> persistentGraphDataSet =
+    DataSet<PersistentGraphHead> persistentGraphDataSet =
       graphToVertexIdsAndEdgeIds
         .join(epgmDatabase.getCollection().getGraphHeads())
         .where(0)
         .equalTo("id")
-        .with(new PersistentGraphDataJoinFunction<>(
-          persistentGraphDataFactory));
+        .with(
+          new PersistentGraphHeadJoinFunction<>(persistentGraphHeadFactory));
 
     // write (persistent-graph-data) to HBase table
     Job job = Job.getInstance();
@@ -326,7 +325,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
       .set(TableOutputFormat.OUTPUT_TABLE, graphDataTableName);
 
     persistentGraphDataSet
-      .map(new HBaseWriter.GraphDataToHBaseMapper<>(graphDataHandler)).
+      .map(new GraphHeadToHBaseMapper<>(graphHeadHandler)).
       output(
         new HadoopOutputFormat<>(new TableOutputFormat<LongWritable>(), job));
   }
@@ -339,25 +338,24 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <ED>  EPGM edge type
    * @param <PVD> EPGM persistent vertex type
    */
-  public static class PersistentVertexDataCoGroupFunction<VD extends
-    VertexData, ED extends EdgeData, PVD extends PersistentVertexData<ED>>
-    implements
+  public static class PersistentVertexCoGroupFunction<VD extends EPGMVertex,
+    ED extends EPGMEdge, PVD extends PersistentVertex<ED>> implements
     CoGroupFunction<Tuple2<VD, Set<ED>>, Tuple2<Long, Set<ED>>,
-      PersistentVertexData<ED>> {
+      PersistentVertex<ED>> {
 
     /**
      * Persistent vertex data factory.
      */
-    private final PersistentVertexDataFactory<VD, ED, PVD> vertexDataFactory;
+    private final PersistentVertexFactory<VD, ED, PVD> vertexFactory;
 
     /**
      * Creates co group function.
      *
-     * @param vertexDataFactory persistent vertex data factory
+     * @param vertexFactory persistent vertex data factory
      */
-    public PersistentVertexDataCoGroupFunction(
-      PersistentVertexDataFactory<VD, ED, PVD> vertexDataFactory) {
-      this.vertexDataFactory = vertexDataFactory;
+    public PersistentVertexCoGroupFunction(
+      PersistentVertexFactory<VD, ED, PVD> vertexFactory) {
+      this.vertexFactory = vertexFactory;
     }
 
     /**
@@ -366,7 +364,7 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     @Override
     public void coGroup(Iterable<Tuple2<VD, Set<ED>>> iterable,
       Iterable<Tuple2<Long, Set<ED>>> iterable1,
-      Collector<PersistentVertexData<ED>> collector) throws Exception {
+      Collector<PersistentVertex<ED>> collector) throws Exception {
       VD vertex = null;
       Set<ED> outgoingEdgeData = null;
       Set<ED> incomingEdgeData = null;
@@ -378,8 +376,8 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
         incomingEdgeData = right.f1;
       }
       assert vertex != null;
-      collector.collect(vertexDataFactory
-        .createVertexData(vertex, outgoingEdgeData, incomingEdgeData));
+      collector.collect(vertexFactory
+        .createVertex(vertex, outgoingEdgeData, incomingEdgeData));
     }
   }
 
@@ -391,32 +389,32 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <VD>  EPGM vertex type
    * @param <PED> EPGM persistent edge type
    */
-  public static class PersistentEdgeDataJoinFunction<ED extends EdgeData, VD
-    extends VertexData, PED extends PersistentEdgeData<VD>> implements
-    JoinFunction<Tuple2<VD, ED>, VD, PersistentEdgeData<VD>> {
+  public static class PersistentEdgeJoinFunction<ED extends EPGMEdge, VD
+    extends EPGMVertex, PED extends PersistentEdge<VD>> implements
+    JoinFunction<Tuple2<VD, ED>, VD, PersistentEdge<VD>> {
 
     /**
      * Persistent edge data factory.
      */
-    private final PersistentEdgeDataFactory<ED, VD, PED> edgeDataFactory;
+    private final PersistentEdgeFactory<ED, VD, PED> edgeFactory;
 
     /**
      * Creates join function
      *
-     * @param edgeDataFactory persistent edge data factory.
+     * @param edgeFactory persistent edge data factory.
      */
-    public PersistentEdgeDataJoinFunction(
-      PersistentEdgeDataFactory<ED, VD, PED> edgeDataFactory) {
-      this.edgeDataFactory = edgeDataFactory;
+    public PersistentEdgeJoinFunction(
+      PersistentEdgeFactory<ED, VD, PED> edgeFactory) {
+      this.edgeFactory = edgeFactory;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PersistentEdgeData<VD> join(
+    public PersistentEdge<VD> join(
       Tuple2<VD, ED> sourceVertexAndEdge, VD targetVertex) throws Exception {
-      return edgeDataFactory.createEdgeData(sourceVertexAndEdge.f1,
+      return edgeFactory.createEdge(sourceVertexAndEdge.f1,
         sourceVertexAndEdge.f0, targetVertex);
     }
   }
@@ -427,34 +425,33 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <GD>  EPGM graph head type
    * @param <PGD> EPGM persistent graph head type
    */
-  public static class PersistentGraphDataJoinFunction<GD extends GraphData,
-    PGD extends PersistentGraphData> implements
-    JoinFunction<Tuple3<Long, Set<Long>, Set<Long>>, GD,
-      PersistentGraphData> {
+  public static class PersistentGraphHeadJoinFunction<GD extends EPGMGraphHead,
+    PGD extends PersistentGraphHead> implements
+    JoinFunction<Tuple3<Long, Set<Long>, Set<Long>>, GD, PersistentGraphHead> {
 
     /**
      * Persistent graph data factory.
      */
-    private PersistentGraphDataFactory<GD, PGD> graphDataFactory;
+    private PersistentGraphHeadFactory<GD, PGD> graphHeadFactory;
 
     /**
      * Creates join function.
      *
-     * @param graphDataFactory persistent graph data factory
+     * @param graphHeadFactory persistent graph data factory
      */
-    public PersistentGraphDataJoinFunction(
-      PersistentGraphDataFactory<GD, PGD> graphDataFactory) {
-      this.graphDataFactory = graphDataFactory;
+    public PersistentGraphHeadJoinFunction(
+      PersistentGraphHeadFactory<GD, PGD> graphHeadFactory) {
+      this.graphHeadFactory = graphHeadFactory;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PersistentGraphData join(
+    public PersistentGraphHead join(
       Tuple3<Long, Set<Long>, Set<Long>> longSetSetTuple3,
       GD graphHead) throws Exception {
-      return graphDataFactory.createGraphData(graphHead, longSetSetTuple3.f1,
+      return graphHeadFactory.createGraphHead(graphHead, longSetSetTuple3.f1,
         longSetSetTuple3.f2);
     }
   }
@@ -466,8 +463,8 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <GD>  EPGM graph head type
    * @param <PGD> EPGM persistent graph type
    */
-  public static class GraphDataToHBaseMapper<GD extends GraphData, PGD
-    extends PersistentGraphData> extends
+  public static class GraphHeadToHBaseMapper<GD extends EPGMGraphHead, PGD
+    extends PersistentGraphHead> extends
     RichMapFunction<PGD, Tuple2<LongWritable, Mutation>> {
 
     /**
@@ -483,15 +480,15 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     /**
      * Graph data handler to create Mutations.
      */
-    private final GraphDataHandler<GD> graphDataHandler;
+    private final GraphHeadHandler<GD> graphHeadHandler;
 
     /**
      * Creates rich map function.
      *
-     * @param graphDataHandler graph data handler
+     * @param graphHeadHandler graph data handler
      */
-    public GraphDataToHBaseMapper(GraphDataHandler<GD> graphDataHandler) {
-      this.graphDataHandler = graphDataHandler;
+    public GraphHeadToHBaseMapper(GraphHeadHandler<GD> graphHeadHandler) {
+      this.graphHeadHandler = graphHeadHandler;
     }
 
     /**
@@ -511,8 +508,8 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
       Exception {
       LongWritable key = new LongWritable(persistentGraphData.getId());
       Put put =
-        new Put(graphDataHandler.getRowKey(persistentGraphData.getId()));
-      put = graphDataHandler.writeGraphData(put, persistentGraphData);
+        new Put(graphHeadHandler.getRowKey(persistentGraphData.getId()));
+      put = graphHeadHandler.writeGraphHead(put, persistentGraphData);
 
       reuseTuple.f0 = key;
       reuseTuple.f1 = put;
@@ -528,8 +525,8 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <ED>  EPGM edge type
    * @param <PVD> EPGM persistent vertex type
    */
-  public static class VertexDataToHBaseMapper<VD extends VertexData, ED
-    extends EdgeData, PVD extends PersistentVertexData<ED>> extends
+  public static class VertexToHBaseMapper<VD extends EPGMVertex, ED
+    extends EPGMEdge, PVD extends PersistentVertex<ED>> extends
     RichMapFunction<PVD, Tuple2<LongWritable, Mutation>> {
 
     /**
@@ -545,16 +542,15 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     /**
      * Vertex data handler to create Mutations.
      */
-    private final VertexDataHandler<VD, ED> vertexDataHandler;
+    private final VertexHandler<VD, ED> vertexHandler;
 
     /**
      * Creates rich map function.
      *
-     * @param vertexDataHandler vertex data handler
+     * @param vertexHandler vertex data handler
      */
-    public VertexDataToHBaseMapper(
-      VertexDataHandler<VD, ED> vertexDataHandler) {
-      this.vertexDataHandler = vertexDataHandler;
+    public VertexToHBaseMapper(VertexHandler<VD, ED> vertexHandler) {
+      this.vertexHandler = vertexHandler;
     }
 
     /**
@@ -574,8 +570,8 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
       Exception {
       LongWritable key = new LongWritable(persistentVertexData.getId());
       Put put =
-        new Put(vertexDataHandler.getRowKey(persistentVertexData.getId()));
-      put = vertexDataHandler.writeVertexData(put, persistentVertexData);
+        new Put(vertexHandler.getRowKey(persistentVertexData.getId()));
+      put = vertexHandler.writeVertex(put, persistentVertexData);
 
       reuseTuple.f0 = key;
       reuseTuple.f1 = put;
@@ -591,9 +587,9 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
    * @param <VD>  EPGM vertex type
    * @param <PED> EPGM persistent edge type
    */
-  private static class EdgeDataToHBaseMapper<ED extends EdgeData, VD extends
-    VertexData, PED extends PersistentEdgeData<VD>> extends
-    RichMapFunction<PED, Tuple2<LongWritable, Mutation>> {
+  private static class EdgeToHBaseMapper
+    <ED extends EPGMEdge, VD extends EPGMVertex, PED extends PersistentEdge<VD>>
+    extends RichMapFunction<PED, Tuple2<LongWritable, Mutation>> {
 
     /**
      * Serial version uid.
@@ -608,15 +604,15 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     /**
      * Edge data handler to create Mutations.
      */
-    private final EdgeDataHandler<ED, VD> edgeDataHandler;
+    private final EdgeHandler<ED, VD> edgeHandler;
 
     /**
      * Creates rich map function.
      *
-     * @param edgeDataHandler edge data handler
+     * @param edgeHandler edge data handler
      */
-    public EdgeDataToHBaseMapper(EdgeDataHandler<ED, VD> edgeDataHandler) {
-      this.edgeDataHandler = edgeDataHandler;
+    public EdgeToHBaseMapper(EdgeHandler<ED, VD> edgeHandler) {
+      this.edgeHandler = edgeHandler;
     }
 
     /**
@@ -626,8 +622,8 @@ public class HBaseWriter<VD extends VertexData, ED extends EdgeData, GD
     public Tuple2<LongWritable, Mutation> map(PED persistentEdgeData) throws
       Exception {
       LongWritable key = new LongWritable(persistentEdgeData.getId());
-      Put put = new Put(edgeDataHandler.getRowKey(persistentEdgeData.getId()));
-      put = edgeDataHandler.writeEdgeData(put, persistentEdgeData);
+      Put put = new Put(edgeHandler.getRowKey(persistentEdgeData.getId()));
+      put = edgeHandler.writeEdge(put, persistentEdgeData);
 
       reuseTuple.f0 = key;
       reuseTuple.f1 = put;

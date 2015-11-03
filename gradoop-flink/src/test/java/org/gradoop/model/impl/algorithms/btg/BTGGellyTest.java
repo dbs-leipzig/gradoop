@@ -49,7 +49,7 @@ public class BTGGellyTest extends FlinkTestBase {
     DataSet<Vertex<Long, BTGVertexValue>> btgGraph =
       gellyGraph.run(new BTGAlgorithm(maxIteration)).getVertices();
     validateConnectedIIGResult(
-      BTGAlgorithmTestHelper.parseResultBTGVertexData(btgGraph.collect()));
+      BTGAlgorithmTestHelper.parseResultBTGVertices(btgGraph.collect()));
   }
 
   @Test
@@ -61,7 +61,7 @@ public class BTGGellyTest extends FlinkTestBase {
     DataSet<Vertex<Long, BTGVertexValue>> btgGraph =
       gellyGraph.run(new BTGAlgorithm(maxIteration)).getVertices();
     validateDisconnectedIIGResult(
-      BTGAlgorithmTestHelper.parseResultBTGVertexData(btgGraph.collect()));
+      BTGAlgorithmTestHelper.parseResultBTGVertices(btgGraph.collect()));
   }
 
   private void validateConnectedIIGResult(Map<Long, List<Long>> btgIDs) {

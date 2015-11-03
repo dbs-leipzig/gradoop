@@ -25,9 +25,9 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.io.json.JsonWriter;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.GraphCollectionOperators;
@@ -65,9 +65,9 @@ import java.util.List;
  * @param <GD> EPGM graph head type
  */
 public class GraphCollection<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   extends AbstractGraph<VD, ED, GD>
   implements GraphCollectionOperators<VD, ED, GD> {
 
@@ -131,8 +131,8 @@ public class GraphCollection<
         }
       }).first(1).collect();
 
-    return (graphData.size() > 0) ? LogicalGraph.fromDataSets(vertices, edges,
-      graphData.get(0), getConfig()) : null;
+    return (graphData.size() > 0) ? LogicalGraph
+      .fromDataSets(vertices, edges, graphData.get(0), getConfig()) : null;
   }
 
   /**

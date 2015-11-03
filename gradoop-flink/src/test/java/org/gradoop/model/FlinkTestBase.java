@@ -20,9 +20,9 @@ package org.gradoop.model;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.test.util.MultipleProgramsTestBase;
 import org.gradoop.GradoopTestBaseUtils;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.EPGMDatabase;
 
 /**
@@ -30,7 +30,7 @@ import org.gradoop.model.impl.EPGMDatabase;
  */
 public class FlinkTestBase extends MultipleProgramsTestBase {
 
-  private EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+  private EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
     graphStore;
 
   private ExecutionEnvironment env;
@@ -49,16 +49,14 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
    *
    * @return graph store containing a simple social network for tests.
    */
-  protected EPGMDatabase<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> createSocialGraph() {
+  protected EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> createSocialGraph() {
     return EPGMDatabase
-      .fromCollection(GradoopTestBaseUtils.createVertexDataCollection(),
-        GradoopTestBaseUtils.createEdgeDataCollection(),
-        GradoopTestBaseUtils.createGraphDataCollection(), env);
+      .fromCollection(GradoopTestBaseUtils.createVertexPojoCollection(),
+        GradoopTestBaseUtils.createEdgePojoCollection(),
+        GradoopTestBaseUtils.createGraphHeadCollection(), env);
   }
 
-  protected EPGMDatabase<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> getGraphStore() {
+  protected EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> getGraphStore() {
     return graphStore;
   }
 

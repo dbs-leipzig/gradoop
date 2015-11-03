@@ -5,11 +5,10 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions
-  .VertexDataToGroupVertexMapper;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions.VertexToGroupVertexMapper;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions
   .VertexGroupItemToRepresentativeFilter;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions
@@ -47,9 +46,9 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
  * @param <GD> EPGM graph head type
  */
 public class SummarizationGroupSort<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   extends Summarization<VD, ED, GD> {
 
   /**
@@ -72,7 +71,7 @@ public class SummarizationGroupSort<
   protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices()
       // map vertices to a compact representation
-      .map(new VertexDataToGroupVertexMapper<VD>(
+      .map(new VertexToGroupVertexMapper<VD>(
         getVertexGroupingKey(), useVertexLabels()));
 
     // sort group by vertex id ascending

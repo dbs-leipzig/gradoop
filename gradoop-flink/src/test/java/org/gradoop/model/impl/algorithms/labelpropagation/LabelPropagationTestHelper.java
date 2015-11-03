@@ -9,10 +9,10 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.algorithms.epgmlabelpropagation
   .EPGMLabelPropagationAlgorithm;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultEdgeDataFactory;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
-import org.gradoop.model.impl.pojo.DefaultVertexDataFactory;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.EdgePojoFactory;
+import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.model.impl.pojo.VertexPojoFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,10 +43,10 @@ public class LabelPropagationTestHelper {
   }
 
 
-  public static Graph<Long, DefaultVertexData, DefaultEdgeData> getEPGraph(
+  public static Graph<Long, VertexPojo, EdgePojo> getEPGraph(
     String[] graph, ExecutionEnvironment env) {
-    List<Vertex<Long, DefaultVertexData>> vertices = Lists.newArrayList();
-    List<Edge<Long, DefaultEdgeData>> edges = Lists.newArrayList();
+    List<Vertex<Long, VertexPojo>> vertices = Lists.newArrayList();
+    List<Edge<Long, EdgePojo>> edges = Lists.newArrayList();
     for (String line : graph) {
       String[] tokens = SEPARATOR.split(line);
       long id = Long.parseLong(tokens[0]);
@@ -60,16 +60,16 @@ public class LabelPropagationTestHelper {
     return Graph.fromCollection(vertices, edges, env);
   }
 
-  private static DefaultVertexData getEPFlinkVertexValue(long id, long value) {
+  private static VertexPojo getEPFlinkVertexValue(long id, long value) {
     Map<String, Object> props = new HashMap<>();
     props.put(EPGMLabelPropagationAlgorithm.CURRENT_VALUE, value);
     props.put(EPGMLabelPropagationAlgorithm.LAST_VALUE, Long.MAX_VALUE);
     props.put(EPGMLabelPropagationAlgorithm.STABILIZATION_COUNTER, 0);
     props.put(EPGMLabelPropagationAlgorithm.STABILIZATION_MAX, 20);
-    return new DefaultVertexDataFactory().createVertexData(id, " ", props);
+    return new VertexPojoFactory().createVertex(id, " ", props);
   }
 
-  private static DefaultEdgeData getEPFlinkEdgeValue(long id, long tar) {
-    return new DefaultEdgeDataFactory().createEdgeData(id, " ", id, tar);
+  private static EdgePojo getEPFlinkEdgeValue(long id, long tar) {
+    return new EdgePojoFactory().createEdge(id, " ", id, tar);
   }
 }

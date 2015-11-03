@@ -23,13 +23,13 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.log4j.Logger;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.storage.api.EPGMStore;
-import org.gradoop.storage.api.EdgeDataHandler;
-import org.gradoop.storage.api.GraphDataHandler;
-import org.gradoop.storage.api.VertexDataHandler;
+import org.gradoop.storage.api.EdgeHandler;
+import org.gradoop.storage.api.GraphHeadHandler;
+import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
 import org.gradoop.util.GradoopConfig;
 
@@ -63,8 +63,9 @@ public class HBaseEPGMStoreFactory {
    * @param <GD>              graph data type
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
     final Configuration config, final GradoopConfig<VD, ED, GD> gradoopConfig) {
     return createOrOpenEPGMStore(config, GradoopHBaseConfig.createConfig(
       gradoopConfig,
@@ -85,8 +86,9 @@ public class HBaseEPGMStoreFactory {
    * @param <GD>              graph data type
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
     final Configuration config, final GradoopConfig<VD, ED, GD> gradoopConfig,
     final String prefix) {
     return createOrOpenEPGMStore(config, GradoopHBaseConfig.createConfig(
@@ -107,8 +109,9 @@ public class HBaseEPGMStoreFactory {
    * @param <GD>                graph data type
    * @return EPGM store instance or {@code null in the case of errors}
    */
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
     final Configuration config,
     final GradoopHBaseConfig<VD, ED, GD> gradoopHBaseConfig) {
     try {
@@ -167,18 +170,18 @@ public class HBaseEPGMStoreFactory {
    * Creates the tables used by the graph store.
    *
    * @param config              Hadoop configuration
-   * @param vertexDataHandler   vertex storage handler
-   * @param edgeDataHandler     edge storage handler
-   * @param graphDataHandler    graph storage handler
+   * @param vertexHandler   vertex storage handler
+   * @param edgeHandler     edge storage handler
+   * @param graphHeadHandler    graph storage handler
    * @param vertexDataTableName vertex data table name
    * @param edgeTableName       edge data table name
    * @param graphDataTableName  graph data table name
    * @throws IOException
    */
   private static void createTablesIfNotExists(final Configuration config,
-    final VertexDataHandler vertexDataHandler,
-    final EdgeDataHandler edgeDataHandler,
-    final GraphDataHandler graphDataHandler, final String vertexDataTableName,
+    final VertexHandler vertexHandler,
+    final EdgeHandler edgeHandler,
+    final GraphHeadHandler graphHeadHandler, final String vertexDataTableName,
     final String edgeTableName, final String graphDataTableName) throws
     IOException {
     HTableDescriptor vertexDataTableDescriptor =
@@ -191,13 +194,13 @@ public class HBaseEPGMStoreFactory {
     HBaseAdmin admin = new HBaseAdmin(config);
 
     if (!admin.tableExists(vertexDataTableDescriptor.getName())) {
-      vertexDataHandler.createTable(admin, vertexDataTableDescriptor);
+      vertexHandler.createTable(admin, vertexDataTableDescriptor);
     }
     if (!admin.tableExists(edgeDataTableDescriptor.getName())) {
-      edgeDataHandler.createTable(admin, edgeDataTableDescriptor);
+      edgeHandler.createTable(admin, edgeDataTableDescriptor);
     }
     if (!admin.tableExists(graphDataTableDescriptor.getName())) {
-      graphDataHandler.createTable(admin, graphDataTableDescriptor);
+      graphHeadHandler.createTable(admin, graphDataTableDescriptor);
     }
 
     admin.close();

@@ -23,9 +23,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.GraphOperators;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -39,9 +39,9 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @see GraphCollection
  */
 public abstract class AbstractGraph<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   implements GraphOperators<VD, ED> {
 
   /**

@@ -1,9 +1,9 @@
 package org.gradoop.model.impl.operators.collection.binary;
 
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -25,11 +25,11 @@ public class GraphCollectionDifferenceTest extends
     long expectedCollectionSize = 2L;
     long expectedVertexCount = 5L;
     long expectedEdgeCount = 8L;
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       collection1 = graphColl.getGraphs(0L, 1L, 2L);
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       collection2 = graphColl.getGraphs(0L);
 
     GraphCollection differenceColl = collection1.difference(collection2);
@@ -49,11 +49,11 @@ public class GraphCollectionDifferenceTest extends
     long expectedCollectionSize = 2L;
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 8L;
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       collection1 = graphColl.getGraphs(0L, 1L);
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       collection2 = graphColl.getGraphs(2L, 3L);
 
     GraphCollection differenceColl = collection1.difference(collection2);
@@ -73,11 +73,11 @@ public class GraphCollectionDifferenceTest extends
     long expectedCollectionSize = 0L;
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       collection1 = graphColl.getGraphs(0L, 1L);
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       collection2 = graphColl.getGraphs(0L, 1L);
 
     GraphCollection differenceColl = collection1.difference(collection2);

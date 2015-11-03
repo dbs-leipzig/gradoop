@@ -5,9 +5,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -31,8 +31,7 @@ import org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy;
  * @param <GD> EPGM graph head type
  * @see BTGAlgorithm
  */
-public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
-  GraphData> implements
+public class BTG<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead> implements
   UnaryGraphToCollectionOperator<VD, ED, GD> {
   /**
    * BTG ID PropertyKey
@@ -65,26 +64,24 @@ public class BTG<VD extends VertexData, ED extends EdgeData, GD extends
    */
   @Override
   public GraphCollection<VD, ED, GD> execute(
-    final LogicalGraph<VD, ED, GD> logicalGraph) throws Exception {
+    final LogicalGraph<VD, ED, GD> graph) throws Exception {
     DataSet<Vertex<Long, BTGVertexValue>> vertices =
-      logicalGraph.getVertices().map(new VertexToBTGVertexMapper<VD>());
+      graph.getVertices().map(new VertexToBTGVertexMapper<VD>());
     DataSet<Edge<Long, NullValue>> edges =
-      logicalGraph.getEdges().map(new EdgeToBTGEdgeMapper<ED>());
+      graph.getEdges().map(new EdgeToBTGEdgeMapper<ED>());
     Graph<Long, BTGVertexValue, NullValue> btgGraph =
-      Graph.fromDataSet(vertices, edges, logicalGraph.getConfig()
+      Graph.fromDataSet(vertices, edges, graph.getConfig()
         .getExecutionEnvironment());
     btgGraph = btgGraph.run(new BTGAlgorithm(this.maxIterations));
     DataSet<VD> btgLabeledVertices =
-      btgGraph.getVertices().join(logicalGraph.getVertices())
+      btgGraph.getVertices().join(graph.getVertices())
         .where(new BTGKeySelector())
         .equalTo(new VertexKeySelector<VD>())
         .with(new BTGJoin<VD>());
     // create new graph
     LogicalGraph<VD, ED, GD> btgEPGraph = LogicalGraph
-      .fromDataSets(btgLabeledVertices,
-        logicalGraph.getEdges(),
-        null,
-       logicalGraph.getConfig());
+      .fromDataSets(btgLabeledVertices, graph.getEdges(), null,
+        graph.getConfig());
 
     // create collection from result and return
     return new OverlapSplitBy<VD, ED, GD>(

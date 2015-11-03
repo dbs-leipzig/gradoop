@@ -16,11 +16,11 @@
  */
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
@@ -33,8 +33,7 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summari
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public interface LogicalGraphOperators<VD extends VertexData, ED extends
-  EdgeData, GD extends GraphData> {
+public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead> {
 
   /*
   unary operators take one graph as input and return a single graph or a

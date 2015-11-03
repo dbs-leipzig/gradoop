@@ -17,9 +17,9 @@
 
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 
 /**
@@ -29,8 +29,8 @@ import org.gradoop.model.impl.GraphCollection;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public interface UnaryCollectionToCollectionOperator<VD extends VertexData,
-  ED extends EdgeData, GD extends GraphData> extends
+public interface UnaryCollectionToCollectionOperator<VD extends EPGMVertex,
+  ED extends EPGMEdge, GD extends EPGMGraphHead> extends
   Operator {
   /**
    * Executes the operator.

@@ -25,8 +25,8 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.util.FlinkConstants;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.VertexGroupItem;
@@ -39,7 +39,7 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.
  * @param <VD> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("f0")
-public class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData>
+public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
   implements
   MapFunction<VertexGroupItem, Vertex<Long, VD>>,
   ResultTypeQueryable<Vertex<Long, VD>> {
@@ -47,7 +47,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData>
   /**
    * Vertex data factory.
    */
-  private final VertexDataFactory<VD> vertexDataFactory;
+  private final EPGMVertexFactory<VD> vertexFactory;
   /**
    * Vertex property key used for grouping.
    */
@@ -68,14 +68,14 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData>
   /**
    * Creates map function.
    *
-   * @param vertexDataFactory vertex data factory
+   * @param vertexFactory vertex data factory
    * @param groupPropertyKey  vertex property key for grouping
    * @param useLabel          true, if vertex label shall be considered
    */
   public VertexGroupItemToSummarizedVertexMapper(
-    VertexDataFactory<VD> vertexDataFactory, String groupPropertyKey,
+    EPGMVertexFactory<VD> vertexFactory, String groupPropertyKey,
     boolean useLabel) {
-    this.vertexDataFactory = vertexDataFactory;
+    this.vertexFactory = vertexFactory;
     this.groupPropertyKey = groupPropertyKey;
     this.useLabel = useLabel;
     useProperty = groupPropertyKey != null && !"".equals(groupPropertyKey);
@@ -83,7 +83,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData>
   }
 
   /**
-   * Creates a {@link VertexData} object from the given {@link
+   * Creates a {@link EPGMVertex} object from the given {@link
    * VertexGroupItem} and returns a new {@link Vertex}.
    *
    * @param vertexGroupItem vertex group item
@@ -94,7 +94,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData>
   public Vertex<Long, VD> map(VertexGroupItem vertexGroupItem) throws
     Exception {
     VD summarizedVertexData =
-      vertexDataFactory.createVertexData(vertexGroupItem.getVertexId());
+      vertexFactory.createVertex(vertexGroupItem.getVertexId());
     if (useLabel) {
       summarizedVertexData.setLabel(vertexGroupItem.getGroupLabel());
     }
@@ -118,6 +118,6 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends VertexData>
   @Override
   public TypeInformation<Vertex<Long, VD>> getProducedType() {
     return new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
-      TypeExtractor.createTypeInfo(vertexDataFactory.getType()));
+      TypeExtractor.createTypeInfo(vertexFactory.getType()));
   }
 }

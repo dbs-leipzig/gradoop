@@ -1,11 +1,11 @@
 package org.gradoop.model.impl.operators;
 
 import org.gradoop.model.FlinkTestBase;
-import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -22,7 +22,7 @@ public class EPGMDatabaseTest extends FlinkTestBase {
 
   @Test
   public void testGetExistingGraph() throws Exception {
-    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData> g =
+    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g =
       getGraphStore().getGraph(0L);
     assertNotNull("graph was null", g);
     assertEquals("vertex set has the wrong size", 3L, g.getVertices().count());
@@ -37,10 +37,10 @@ public class EPGMDatabaseTest extends FlinkTestBase {
 
   @Test
   public void testGetGraphs() throws Exception {
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
 
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphs = graphColl.getGraphs(0L, 1L, 2L);
 
     assertNotNull("graph collection is null", graphs);
@@ -51,7 +51,7 @@ public class EPGMDatabaseTest extends FlinkTestBase {
 
   @Test
   public void testGetCollection() throws Exception {
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
 
     assertNotNull("graph collection was null", graphColl);

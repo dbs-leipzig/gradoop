@@ -21,9 +21,9 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -62,11 +62,11 @@ public class EPGMDatabaseJSONTest extends FlinkTestBase {
     String graphFile =
       EPGMDatabaseJSONTest.class.getResource("/data/sna_graphs").getFile();
 
-    EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
       graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
       ExecutionEnvironment.getExecutionEnvironment());
 
-    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       databaseGraph = graphStore.getDatabaseGraph();
 
     assertEquals("Wrong vertex count", 11, databaseGraph.getVertexCount());
@@ -84,7 +84,7 @@ public class EPGMDatabaseJSONTest extends FlinkTestBase {
 
     getGraphStore().writeAsJson(vertexFile, edgeFile, graphFile);
 
-    EPGMDatabase<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
       ExecutionEnvironment.getExecutionEnvironment());
 

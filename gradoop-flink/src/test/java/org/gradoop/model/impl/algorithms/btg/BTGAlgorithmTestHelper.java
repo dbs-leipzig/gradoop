@@ -8,7 +8,7 @@ import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.pojo.VertexPojo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +65,7 @@ public class BTGAlgorithmTestHelper {
     return Graph.fromCollection(vertices, edges, env);
   }
 
-  public static Map<Long, List<Long>> parseResultBTGVertexData(
+  public static Map<Long, List<Long>> parseResultBTGVertices(
     List<Vertex<Long, BTGVertexValue>> vertices) {
     Map<Long, List<Long>> result = new HashMap<>();
     for (Vertex<Long, BTGVertexValue> v : vertices) {
@@ -74,10 +74,10 @@ public class BTGAlgorithmTestHelper {
     return result;
   }
 
-  public static Map<Long, List<Long>> parseResultDefaultVertexData(
-    List<Vertex<Long, DefaultVertexData>> graph) {
+  public static Map<Long, List<Long>> parseResultVertexPojos(
+    List<Vertex<Long, VertexPojo>> graph) {
     Map<Long, List<Long>> result = new HashMap<>();
-    for (Vertex<Long, DefaultVertexData> v : graph) {
+    for (Vertex<Long, VertexPojo> v : graph) {
       result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphs()));
     }
     return result;

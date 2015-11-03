@@ -20,14 +20,14 @@ package org.gradoop.model.impl.algorithms.btg.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.EPGMEdge;
 
 /**
  * Maps EPGM edges to a BTG specific representation.
  *
  * @param <ED> EPGM edge type
  */
-public class EdgeToBTGEdgeMapper<ED extends EdgeData> implements
+public class EdgeToBTGEdgeMapper<ED extends EPGMEdge> implements
   MapFunction<ED, Edge<Long, NullValue>> {
   @Override
   public Edge<Long, NullValue> map(ED edge) throws Exception {

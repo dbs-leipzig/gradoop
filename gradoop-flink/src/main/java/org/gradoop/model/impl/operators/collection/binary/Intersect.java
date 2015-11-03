@@ -1,9 +1,9 @@
 package org.gradoop.model.impl.operators.collection.binary;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 
 /**
@@ -16,9 +16,9 @@ import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
  * @see IntersectUsingList
  */
 public class Intersect<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   extends SetOperator<VD, ED, GD> {
 
   /**

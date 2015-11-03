@@ -19,8 +19,8 @@ package org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions;
 
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.MessagingFunction;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 
 import static org.gradoop.model.impl.algorithms.epgmlabelpropagation
   .EPGMLabelPropagationAlgorithm.CURRENT_VALUE;
@@ -32,8 +32,8 @@ import static org.gradoop.model.impl.algorithms.epgmlabelpropagation
  * @param <ED> EPGM edge type
  */
 public class LPMessageFunction<
-  VD extends VertexData,
-  ED extends EdgeData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge>
   extends MessagingFunction<Long, VD, Long, ED> {
   @Override
   public void sendMessages(Vertex<Long, VD> vertex) throws Exception {

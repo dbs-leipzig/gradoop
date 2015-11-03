@@ -32,20 +32,23 @@ import org.gradoop.io.hbase.HBaseReader;
 import org.gradoop.io.hbase.HBaseWriter;
 import org.gradoop.io.json.JsonReader;
 import org.gradoop.io.json.JsonWriter;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.EdgePojoFactory;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojoFactory;
+import org.gradoop.model.impl.pojo.VertexPojoFactory;
 import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.storage.api.EPGMStore;
-import org.gradoop.storage.api.PersistentEdgeData;
-import org.gradoop.storage.api.PersistentEdgeDataFactory;
-import org.gradoop.storage.api.PersistentGraphData;
-import org.gradoop.storage.api.PersistentGraphDataFactory;
-import org.gradoop.storage.api.PersistentVertexData;
-import org.gradoop.storage.api.PersistentVertexDataFactory;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentEdgeFactory;
+import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.storage.api.PersistentGraphHeadFactory;
+import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.api.PersistentVertexFactory;
 import org.gradoop.util.FlinkConstants;
 import org.gradoop.util.GradoopConfig;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -60,9 +63,9 @@ import java.util.Collection;
  * @param <GD> EPGM graph head type
  */
 public class EPGMDatabase<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData> {
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead> {
 
   /**
    * Gradoop Flink configuration.
@@ -92,8 +95,8 @@ public class EPGMDatabase<
     GradoopFlinkConfig<VD, ED, GD> config) {
     this.config = config;
     this.database = new GraphCollection<>(vertices, edges, graphHeads, config);
-    this.databaseData = config.getGraphHeadHandler().getGraphDataFactory()
-      .createGraphData(FlinkConstants.DATABASE_GRAPH_ID);
+    this.databaseData = config.getGraphHeadHandler().getGraphHeadFactory()
+      .createGraphHead(FlinkConstants.DATABASE_GRAPH_ID);
   }
 
   /**
@@ -106,13 +109,12 @@ public class EPGMDatabase<
    * @param edgeFile   path to edge data file
    * @param env        Flink execution environment
    * @return EPGM database with default factories.
-   * @see org.gradoop.model.impl.pojo.DefaultVertexDataFactory
-   * @see org.gradoop.model.impl.pojo.DefaultEdgeDataFactory
-   * @see org.gradoop.model.impl.pojo.DefaultGraphDataFactory
+   * @see VertexPojoFactory
+   * @see EdgePojoFactory
+   * @see GraphHeadPojoFactory
    */
   @SuppressWarnings("unchecked")
-  public static EPGMDatabase<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> fromJsonFile(
+  public static EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> fromJsonFile(
     String vertexFile, String edgeFile, ExecutionEnvironment env) {
     return fromJsonFile(vertexFile, edgeFile,
       GradoopFlinkConfig.createDefaultConfig(env));
@@ -130,8 +132,9 @@ public class EPGMDatabase<
    * @param <GD>        graph data type
    * @return EPGM database
    */
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> EPGMDatabase fromJsonFile(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  EPGMDatabase fromJsonFile(
     String vertexFile, String edgeFile, GradoopFlinkConfig<VD, ED, GD> config) {
     return fromJsonFile(vertexFile, edgeFile, null, config);
   }
@@ -147,13 +150,12 @@ public class EPGMDatabase<
    * @param graphFile  graph data file
    * @param env        Flink execution environment
    * @return EPGM database
-   * @see org.gradoop.model.impl.pojo.DefaultVertexDataFactory
-   * @see org.gradoop.model.impl.pojo.DefaultEdgeDataFactory
-   * @see org.gradoop.model.impl.pojo.DefaultGraphDataFactory
+   * @see VertexPojoFactory
+   * @see EdgePojoFactory
+   * @see GraphHeadPojoFactory
    */
   @SuppressWarnings("unchecked")
-  public static EPGMDatabase<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> fromJsonFile(
+  public static EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> fromJsonFile(
     String vertexFile, String edgeFile, String graphFile,
     ExecutionEnvironment env) {
     return fromJsonFile(vertexFile, edgeFile, graphFile,
@@ -175,8 +177,9 @@ public class EPGMDatabase<
    * @return EPGM database
    */
   @SuppressWarnings("unchecked")
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> EPGMDatabase fromJsonFile(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  EPGMDatabase fromJsonFile(
     String vertexFile, String edgeFile, String graphFile,
     GradoopFlinkConfig<VD, ED, GD> config) {
     if (config == null) {
@@ -210,7 +213,7 @@ public class EPGMDatabase<
     } else {
       graphHeads = env.fromCollection(Lists.newArrayList(
         config.getGraphHeadFactory()
-          .createGraphData(FlinkConstants.DATABASE_GRAPH_ID)));
+          .createGraphHead(FlinkConstants.DATABASE_GRAPH_ID)));
     }
 
     return new EPGMDatabase<>(vertices, edges, graphHeads, config);
@@ -248,20 +251,21 @@ public class EPGMDatabase<
    * HBase tables must be created before calling this method.
    *
    * @param epgmStore                   EPGM store to handle HBase
-   * @param persistentVertexDataFactory persistent vertex data factory
-   * @param persistentEdgeDataFactory   persistent edge data factory
-   * @param persistentGraphDataFactory  persistent graph data factory
+   * @param persistentVertexFactory persistent vertex data factory
+   * @param persistentEdgeFactory   persistent edge data factory
+   * @param persistentGraphHeadFactory  persistent graph data factory
    * @param <PVD>                       persistent vertex data type
    * @param <PED>                       persistent edge data type
    * @param <PGD>                       persistent graph data type
    * @throws Exception
    */
-  public <PVD extends PersistentVertexData<ED>, PED extends
-    PersistentEdgeData<VD>, PGD extends PersistentGraphData> void writeToHBase(
+  public <PVD extends PersistentVertex<ED>, PED
+    extends PersistentEdge<VD>, PGD extends PersistentGraphHead>
+  void writeToHBase(
     EPGMStore<VD, ED, GD> epgmStore,
-    final PersistentVertexDataFactory<VD, ED, PVD> persistentVertexDataFactory,
-    final PersistentEdgeDataFactory<ED, VD, PED> persistentEdgeDataFactory,
-    final PersistentGraphDataFactory<GD, PGD> persistentGraphDataFactory) throws
+    final PersistentVertexFactory<VD, ED, PVD> persistentVertexFactory,
+    final PersistentEdgeFactory<ED, VD, PED> persistentEdgeFactory,
+    final PersistentGraphHeadFactory<GD, PGD> persistentGraphHeadFactory) throws
     Exception {
 
     HBaseWriter<VD, ED, GD> hBaseWriter = new HBaseWriter<>();
@@ -269,17 +273,17 @@ public class EPGMDatabase<
     GradoopConfig<VD, ED, GD> conf = epgmStore.getConfig();
     // transform graph data to persistent graph data and write it
     hBaseWriter.writeGraphHeads(this, conf.getGraphHeadHandler(),
-      persistentGraphDataFactory, epgmStore.getGraphDataTableName());
+      persistentGraphHeadFactory, epgmStore.getGraphHeadName());
     this.config.getExecutionEnvironment().execute();
 
     // transform vertex data to persistent vertex data and write it
     hBaseWriter.writeVertices(this, conf.getVertexHandler(),
-      persistentVertexDataFactory, epgmStore.getVertexDataTableName());
+      persistentVertexFactory, epgmStore.getVertexTableName());
     this.config.getExecutionEnvironment().execute();
 
     // transform edge data to persistent edge data and write it
-    hBaseWriter.writeEdges(this, conf.getEdgeHandler(),
-      persistentEdgeDataFactory, epgmStore.getEdgeDataTableName());
+    hBaseWriter.writeEdges(this, conf.getEdgeHandler(), persistentEdgeFactory,
+      epgmStore.getEdgeTableName());
     this.config.getExecutionEnvironment().execute();
   }
 
@@ -292,15 +296,15 @@ public class EPGMDatabase<
    * @param edgeDataCollection   collection of edge data objects
    * @param env                  Flink execution environment
    * @return EPGM database
-   * @see org.gradoop.model.impl.pojo.DefaultVertexDataFactory
-   * @see org.gradoop.model.impl.pojo.DefaultEdgeDataFactory
-   * @see org.gradoop.model.impl.pojo.DefaultGraphDataFactory
+   * @see VertexPojoFactory
+   * @see EdgePojoFactory
+   * @see GraphHeadPojoFactory
    */
   @SuppressWarnings("unchecked")
-  public static EPGMDatabase<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> fromCollection(
-    Collection<DefaultVertexData> vertexDataCollection,
-    Collection<DefaultEdgeData> edgeDataCollection, ExecutionEnvironment env) {
+  public static EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
+  fromCollection(
+    Collection<VertexPojo> vertexDataCollection,
+    Collection<EdgePojo> edgeDataCollection, ExecutionEnvironment env) {
     return fromCollection(vertexDataCollection, edgeDataCollection, null,
       GradoopFlinkConfig.createDefaultConfig(env));
   }
@@ -316,8 +320,9 @@ public class EPGMDatabase<
    * @param <GD>                  graph data typeFlink execution environment
    * @return EPGM database
    */
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> EPGMDatabase fromCollection(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  EPGMDatabase fromCollection(
     Collection<VD> vertexDataCollection, Collection<ED> edgeDataCollection,
     GradoopFlinkConfig<VD, ED, GD> config) {
     return fromCollection(vertexDataCollection, edgeDataCollection, null,
@@ -335,16 +340,16 @@ public class EPGMDatabase<
    * @param graphDataCollection  collection of graph data objects
    * @param env                  Flink execution environment
    * @return EPGM database
-   * @see org.gradoop.model.impl.pojo.DefaultVertexDataFactory
-   * @see org.gradoop.model.impl.pojo.DefaultEdgeDataFactory
-   * @see org.gradoop.model.impl.pojo.DefaultGraphDataFactory
+   * @see VertexPojoFactory
+   * @see EdgePojoFactory
+   * @see GraphHeadPojoFactory
    */
   @SuppressWarnings("unchecked")
-  public static EPGMDatabase<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> fromCollection(
-    Collection<DefaultVertexData> vertexDataCollection,
-    Collection<DefaultEdgeData> edgeDataCollection,
-    Collection<DefaultGraphData> graphDataCollection,
+  public static EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
+  fromCollection(
+    Collection<VertexPojo> vertexDataCollection,
+    Collection<EdgePojo> edgeDataCollection,
+    Collection<GraphHeadPojo> graphDataCollection,
     ExecutionEnvironment env) {
     return fromCollection(vertexDataCollection, edgeDataCollection,
       graphDataCollection, GradoopFlinkConfig.createDefaultConfig(env));
@@ -363,8 +368,10 @@ public class EPGMDatabase<
    * @return EPGM database
    */
   @SuppressWarnings("unchecked")
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> EPGMDatabase fromCollection(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  EPGMDatabase fromCollection(
+
     Collection<VD> vertexDataCollection,
     Collection<ED> edgeDataCollection,
     Collection<GD> graphDataCollection,
@@ -381,7 +388,7 @@ public class EPGMDatabase<
     } else {
       graphHeads = env.fromCollection(Lists.newArrayList(
         config.getGraphHeadFactory()
-          .createGraphData(FlinkConstants.DATABASE_GRAPH_ID)));
+          .createGraphHead(FlinkConstants.DATABASE_GRAPH_ID)));
     }
 
     return new EPGMDatabase<>(vertices, edges, graphHeads, config);
@@ -398,8 +405,9 @@ public class EPGMDatabase<
    * @return EPGM database
    */
   @SuppressWarnings("unchecked")
-  public static <VD extends VertexData, ED extends EdgeData, GD extends
-    GraphData> EPGMDatabase<VD, ED, GD> fromHBase(
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  EPGMDatabase<VD, ED, GD> fromHBase(
     EPGMStore<VD, ED, GD> epgmStore, ExecutionEnvironment env) {
 
     GradoopConfig<VD, ED, GD> conf = epgmStore.getConfig();
@@ -412,25 +420,25 @@ public class EPGMDatabase<
     TypeInformation<Edge<Long, ED>> edgeTypeInfo =
       new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
         BasicTypeInfo.LONG_TYPE_INFO, TypeExtractor.createTypeInfo(
-          conf.getEdgeHandler().getEdgeDataFactory().getType()));
+          conf.getEdgeHandler().getEdgeFactory().getType()));
     // used for type hinting when loading graph data
     TypeInformation<Subgraph<Long, GD>> graphTypeInfo =
       new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
         TypeExtractor.createTypeInfo(
-          conf.getGraphHeadHandler().getGraphDataFactory().getType()));
+          conf.getGraphHeadHandler().getGraphHeadFactory().getType()));
 
     DataSet<Vertex<Long, VD>> vertexDataSet = env.createInput(
-      new HBaseReader.VertexDataTableInputFormat<>(
-        conf.getVertexHandler(), epgmStore.getVertexDataTableName()),
+      new HBaseReader.VertexTableInputFormat<>(
+        conf.getVertexHandler(), epgmStore.getVertexTableName()),
       vertexTypeInfo);
 
     DataSet<Edge<Long, ED>> edgeDataSet = env.createInput(
-      new HBaseReader.EdgeDataTableInputFormat<>(conf.getEdgeHandler(),
-        epgmStore.getEdgeDataTableName()), edgeTypeInfo);
+      new HBaseReader.EdgeTableInputFormat<>(conf.getEdgeHandler(),
+        epgmStore.getEdgeTableName()), edgeTypeInfo);
 
     DataSet<Subgraph<Long, GD>> subgraphDataSet = env.createInput(
-      new HBaseReader.GraphDataTableInputFormat<>(
-        conf.getGraphHeadHandler(), epgmStore.getGraphDataTableName()),
+      new HBaseReader.GraphHeadTableInputFormat<>(
+        conf.getGraphHeadHandler(), epgmStore.getGraphHeadName()),
       graphTypeInfo);
 
     return new EPGMDatabase<>(
@@ -463,9 +471,7 @@ public class EPGMDatabase<
    */
   public LogicalGraph<VD, ED, GD> getDatabaseGraph() {
     return LogicalGraph
-      .fromDataSets(database.getVertices(),
-        database.getEdges(),
-        databaseData,
+      .fromDataSets(database.getVertices(), database.getEdges(), databaseData,
         config);
   }
 

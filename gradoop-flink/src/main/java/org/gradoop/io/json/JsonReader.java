@@ -20,12 +20,12 @@ package org.gradoop.io.json;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.EdgeDataFactory;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.GraphDataFactory;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -53,21 +53,21 @@ public class JsonReader extends JsonIO {
    *
    * @param <VD> EPGM vertex type class
    */
-  public static class JsonToVertexMapper<VD extends VertexData> extends
+  public static class JsonToVertexMapper<VD extends EPGMVertex> extends
     JsonToEntityMapper implements MapFunction<String, VD> {
 
     /**
      * Creates vertex data objects.
      */
-    private final VertexDataFactory<VD> vertexDataFactory;
+    private final EPGMVertexFactory<VD> vertexFactory;
 
     /**
      * Creates map function
      *
-     * @param vertexDataFactory vertex data factory
+     * @param vertexFactory vertex data factory
      */
-    public JsonToVertexMapper(VertexDataFactory<VD> vertexDataFactory) {
-      this.vertexDataFactory = vertexDataFactory;
+    public JsonToVertexMapper(EPGMVertexFactory<VD> vertexFactory) {
+      this.vertexFactory = vertexFactory;
     }
 
     /**
@@ -85,8 +85,7 @@ public class JsonReader extends JsonIO {
       Map<String, Object> properties = getProperties(jsonVertex);
       Set<Long> graphs = getGraphs(jsonVertex);
 
-      return vertexDataFactory.createVertexData(vertexID, label, properties,
-        graphs);
+      return vertexFactory.createVertex(vertexID, label, properties, graphs);
     }
   }
 
@@ -108,21 +107,21 @@ public class JsonReader extends JsonIO {
    *
    * @param <ED> EPGM edge type
    */
-  public static class JsonToEdgeMapper<ED extends EdgeData> extends
+  public static class JsonToEdgeMapper<ED extends EPGMEdge> extends
     JsonToEntityMapper implements MapFunction<String, ED> {
 
     /**
      * Edge data factory.
      */
-    private final EdgeDataFactory<ED> edgeDataFactory;
+    private final EPGMEdgeFactory<ED> edgeFactory;
 
     /**
      * Creates map function.
      *
-     * @param edgeDataFactory edge data factory
+     * @param edgeFactory edge data factory
      */
-    public JsonToEdgeMapper(EdgeDataFactory<ED> edgeDataFactory) {
-      this.edgeDataFactory = edgeDataFactory;
+    public JsonToEdgeMapper(EPGMEdgeFactory<ED> edgeFactory) {
+      this.edgeFactory = edgeFactory;
     }
 
     /**
@@ -142,8 +141,8 @@ public class JsonReader extends JsonIO {
       Map<String, Object> properties = getProperties(jsonEdge);
       Set<Long> graphs = getGraphs(jsonEdge);
 
-      return edgeDataFactory.createEdgeData(edgeID, edgeLabel, sourceID,
-        targetID, properties, graphs);
+      return edgeFactory.createEdge(edgeID, edgeLabel, sourceID, targetID,
+        properties, graphs);
     }
 
     /**
@@ -186,21 +185,21 @@ public class JsonReader extends JsonIO {
    *
    * @param <GD> EPGM graph head type
    */
-  public static class JsonToGraphMapper<GD extends GraphData> extends
+  public static class JsonToGraphMapper<GD extends EPGMGraphHead> extends
     JsonToEntityMapper implements MapFunction<String, GD> {
 
     /**
      * Creates graph data objects
      */
-    private final GraphDataFactory<GD> graphDataFactory;
+    private final EPGMGraphHeadFactory<GD> graphHeadFactory;
 
     /**
      * Creates map function
      *
-     * @param graphDataFactory graph data factory
+     * @param graphHeadFactory graph data factory
      */
-    public JsonToGraphMapper(GraphDataFactory<GD> graphDataFactory) {
-      this.graphDataFactory = graphDataFactory;
+    public JsonToGraphMapper(EPGMGraphHeadFactory<GD> graphHeadFactory) {
+      this.graphHeadFactory = graphHeadFactory;
     }
 
     /**
@@ -217,7 +216,7 @@ public class JsonReader extends JsonIO {
       String label = getLabel(jsonGraph);
       Map<String, Object> properties = getProperties(jsonGraph);
 
-      return graphDataFactory.createGraphData(graphID, label, properties);
+      return graphHeadFactory.createGraphHead(graphID, label, properties);
     }
   }
 }

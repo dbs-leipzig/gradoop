@@ -19,14 +19,14 @@ package org.gradoop.model.impl.functions.filterfunctions;
 
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 
 /**
  * Checks if a vertex is contained in the given graph.
  *
  * @param <VD> EPGM vertex type
  */
-public class VertexInGraphFilter<VD extends VertexData>
+public class VertexInGraphFilter<VD extends EPGMVertex>
   implements FilterFunction<VD> {
 
   /**

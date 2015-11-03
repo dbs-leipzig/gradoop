@@ -34,14 +34,13 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.util.GConstants;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.api.VertexDataFactory;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.util.FlinkConstants;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions
-  .VertexDataToGroupVertexMapper;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions.VertexToGroupVertexMapper;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
   .VertexWithRepresentative;
@@ -69,9 +68,9 @@ import java.util.List;
  * @param <GD> EPGM graph head type
  */
 public class SummarizationGroupWithLists<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   extends Summarization<VD, ED, GD> {
   /**
    * Creates summarization.
@@ -94,7 +93,7 @@ public class SummarizationGroupWithLists<
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
-      new VertexDataToGroupVertexMapper<VD>(getVertexGroupingKey(),
+      new VertexToGroupVertexMapper<VD>(getVertexGroupingKey(),
         useVertexLabels()));
 
     // group vertices by either label or property or both
@@ -140,7 +139,7 @@ public class SummarizationGroupWithLists<
    * Creates a summarized vertex from a group of vertices and a list of
    * vertex identifiers that the summarized vertex represents.
    */
-  private static class VertexGroupSummarizer<VD extends VertexData> implements
+  private static class VertexGroupSummarizer<VD extends EPGMVertex> implements
     GroupReduceFunction<VertexForGrouping, Tuple2<Vertex<Long, VD>,
       List<Long>>>,
     ResultTypeQueryable<Tuple2<Vertex<Long, VD>, List<Long>>> {
@@ -148,7 +147,7 @@ public class SummarizationGroupWithLists<
     /**
      * Vertex data factory
      */
-    private final VertexDataFactory<VD> vertexDataFactory;
+    private final EPGMVertexFactory<VD> vertexFactory;
     /**
      * Vertex property key to store group value
      */
@@ -175,15 +174,15 @@ public class SummarizationGroupWithLists<
      *
      * @param groupPropertyKey  vertex property key to store group value
      * @param useLabel          use vertex label
-     * @param vertexDataFactory vertex data factory
+     * @param vertexFactory vertex data factory
      */
     public VertexGroupSummarizer(String groupPropertyKey, boolean useLabel,
-      VertexDataFactory<VD> vertexDataFactory) {
+      EPGMVertexFactory<VD> vertexFactory) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
       this.useProperty =
         groupPropertyKey != null && !"".equals(groupPropertyKey);
-      this.vertexDataFactory = vertexDataFactory;
+      this.vertexFactory = vertexFactory;
       this.reuseVertex = new Vertex<>();
       this.reuseTuple = new Tuple2<>();
     }
@@ -216,7 +215,7 @@ public class SummarizationGroupWithLists<
         }
       }
       VD vertexData =
-        vertexDataFactory.createVertexData(newVertexID, groupLabel);
+        vertexFactory.createVertex(newVertexID, groupLabel);
       if (useProperty) {
         vertexData.setProperty(groupPropertyKey, groupValue);
       }
@@ -249,7 +248,7 @@ public class SummarizationGroupWithLists<
     getProducedType() {
       return new TupleTypeInfo<>(
         new TupleTypeInfo<>(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
-          TypeExtractor.getForClass(vertexDataFactory.getType())),
+          TypeExtractor.getForClass(vertexFactory.getType())),
         TypeExtractor.getForClass(List.class));
     }
   }
@@ -261,7 +260,7 @@ public class SummarizationGroupWithLists<
    * @param <VD> vertex data type
    */
   @FunctionAnnotation.ForwardedFields("f0->*")
-  private static class SummarizedVertexForwarder<VD extends VertexData>
+  private static class SummarizedVertexForwarder<VD extends EPGMVertex>
     implements
     MapFunction<Tuple2<Vertex<Long, VD>, List<Long>>, Vertex<Long, VD>> {
 
@@ -282,9 +281,8 @@ public class SummarizationGroupWithLists<
    *
    * @param <VD> vertex data type
    */
-  private static class VertexToGroupRepresentativeMapper<VD extends
-    VertexData> implements
-    FlatMapFunction<Tuple2<Vertex<Long, VD>, List<Long>>,
+  private static class VertexToGroupRepresentativeMapper<VD extends EPGMVertex>
+    implements FlatMapFunction<Tuple2<Vertex<Long, VD>, List<Long>>,
       VertexWithRepresentative> {
 
     /**

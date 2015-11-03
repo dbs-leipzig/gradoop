@@ -18,14 +18,14 @@
 package org.gradoop.model.impl.functions.keyselectors;
 
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 
 /**
  * Used for distinction of vertices based on their unique id.
  *
  * @param <VD> EPGM vertex type
  */
-public class VertexKeySelector<VD extends VertexData>
+public class VertexKeySelector<VD extends EPGMVertex>
   implements KeySelector<VD, Long> {
   @Override
   public Long getKey(VD vertex) throws Exception {

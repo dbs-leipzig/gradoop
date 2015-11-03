@@ -19,9 +19,9 @@ package org.gradoop.model.impl.operators.logicalgraph.binary;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 
@@ -36,9 +36,9 @@ import java.util.Iterator;
  * @param <GD> EPGM graph head type
  */
 public abstract class AbstractBinaryGraphToGraphOperator<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   implements BinaryGraphToGraphOperator<VD, ED, GD> {
 
   /**
@@ -71,7 +71,7 @@ public abstract class AbstractBinaryGraphToGraphOperator<
    * in the other graph (preclude graph). If this is the case, the vertex
    * gets returned.
    */
-  protected static class VertexGroupReducer<VD extends VertexData> implements
+  protected static class VertexGroupReducer<VD extends EPGMVertex> implements
     GroupReduceFunction<VD, VD> {
 
     /**
@@ -146,7 +146,7 @@ public abstract class AbstractBinaryGraphToGraphOperator<
    * Used to check if the number of grouped, duplicate edges is equal to a
    * given amount. If yes, reducer returns the edge.
    */
-  protected static class EdgeGroupReducer<ED extends EdgeData> implements
+  protected static class EdgeGroupReducer<ED extends EPGMEdge> implements
     GroupReduceFunction<ED, ED> {
 
     /**

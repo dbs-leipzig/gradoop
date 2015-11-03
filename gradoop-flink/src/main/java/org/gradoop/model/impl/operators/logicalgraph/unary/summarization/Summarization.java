@@ -30,10 +30,10 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.EdgeDataFactory;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
@@ -91,9 +91,9 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @param <GD> EPGM graph head type
  */
 public abstract class Summarization<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   implements UnaryGraphToGraphOperator<VD, ED, GD> {
   /**
    * Used to represent vertices that do not have the vertex grouping property.
@@ -155,10 +155,10 @@ public abstract class Summarization<
       // graphs stays unchanged
       result = graph;
     } else {
-      GD graphData = createNewGraphData();
-      result = LogicalGraph.fromGellyGraph(
-        summarizeInternal(graph.toGellyGraph()),
-        graphData, graph.getConfig());
+      GD graphData = createNewGraphHead();
+      result = LogicalGraph
+        .fromGellyGraph(summarizeInternal(graph.toGellyGraph()), graphData,
+          graph.getConfig());
     }
     return result;
   }
@@ -313,9 +313,9 @@ public abstract class Summarization<
    *
    * @return graph data
    */
-  private GD createNewGraphData() {
+  private GD createNewGraphHead() {
     return config.getGraphHeadFactory()
-      .createGraphData(FlinkConstants.SUMMARIZE_GRAPH_ID);
+      .createGraphHead(FlinkConstants.SUMMARIZE_GRAPH_ID);
   }
 
   /**
@@ -331,14 +331,14 @@ public abstract class Summarization<
    * Creates a summarized edge from a group of edges including an edge
    * grouping value.
    */
-  protected static class EdgeGroupSummarizer<ED extends EdgeData> implements
+  protected static class EdgeGroupSummarizer<ED extends EPGMEdge> implements
     GroupReduceFunction<EdgeGroupItem, Edge<Long, ED>>,
     ResultTypeQueryable<Edge<Long, ED>> {
 
     /**
      * Edge data factory
      */
-    private final EdgeDataFactory<ED> edgeDataFactory;
+    private final EPGMEdgeFactory<ED> edgeFactory;
     /**
      * Edge property key to store group value
      */
@@ -362,15 +362,15 @@ public abstract class Summarization<
      *
      * @param groupPropertyKey edge property key to store group value
      * @param useLabel         use edge label
-     * @param edgeDataFactory  edge data factory
+     * @param edgeFactory  edge data factory
      */
     public EdgeGroupSummarizer(String groupPropertyKey, boolean useLabel,
-      EdgeDataFactory<ED> edgeDataFactory) {
+      EPGMEdgeFactory<ED> edgeFactory) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
       this.useProperty =
         groupPropertyKey != null && !"".equals(groupPropertyKey);
-      this.edgeDataFactory = edgeDataFactory;
+      this.edgeFactory = edgeFactory;
       this.reuseEdge = new Edge<>();
     }
 
@@ -403,9 +403,8 @@ public abstract class Summarization<
         }
       }
 
-      ED newEdgeData = edgeDataFactory
-        .createEdgeData(newEdgeID, edgeLabel, newSourceVertexId,
-          newTargetVertexId);
+      ED newEdgeData = edgeFactory
+        .createEdge(newEdgeID, edgeLabel, newSourceVertexId, newTargetVertexId);
 
       if (useProperty) {
         newEdgeData.setProperty(groupPropertyKey, edgeGroupingValue);
@@ -427,7 +426,7 @@ public abstract class Summarization<
     public TypeInformation<Edge<Long, ED>> getProducedType() {
       return new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
         BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(edgeDataFactory.getType()));
+        TypeExtractor.createTypeInfo(edgeFactory.getType()));
     }
   }
 
@@ -439,7 +438,7 @@ public abstract class Summarization<
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f1->f2") // edge target id
   @FunctionAnnotation.ForwardedFieldsSecond("f1") // edge source id
-  protected static class SourceVertexJoinFunction<ED extends EdgeData>
+  protected static class SourceVertexJoinFunction<ED extends EPGMEdge>
     implements
     JoinFunction<Edge<Long, ED>, VertexWithRepresentative, EdgeGroupItem> {
 

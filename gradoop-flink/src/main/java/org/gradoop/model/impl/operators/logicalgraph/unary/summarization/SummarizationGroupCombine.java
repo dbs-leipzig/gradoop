@@ -26,11 +26,10 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions
-  .VertexDataToGroupVertexMapper;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions.VertexToGroupVertexMapper;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions
   .VertexGroupItemToRepresentativeFilter;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions
@@ -76,9 +75,9 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
  * @param <GD> EPGM graph head type
  */
 public class SummarizationGroupCombine<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   extends Summarization<VD, ED, GD> {
   /**
    * Creates summarization.
@@ -101,7 +100,7 @@ public class SummarizationGroupCombine<
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
-      new VertexDataToGroupVertexMapper<VD>(getVertexGroupingKey(),
+      new VertexToGroupVertexMapper<VD>(getVertexGroupingKey(),
         useVertexLabels()));
 
     // group vertices by either label or property or both

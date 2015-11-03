@@ -19,8 +19,8 @@ package org.gradoop.model.impl.algorithms.epgmlabelpropagation;
 
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.GraphAlgorithm;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
   .LPMessageFunction;
 import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
@@ -43,8 +43,8 @@ import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
  * @param <ED> EPGM edge type
  */
 public class EPGMLabelPropagationAlgorithm<
-  VD extends VertexData,
-  ED extends EdgeData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge>
   implements GraphAlgorithm<Long, VD, ED, Graph<Long, VD, ED>> {
   /**
    * Vertex property key where the resulting label is stored.

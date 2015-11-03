@@ -12,31 +12,31 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.EdgeDataFactory;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.GraphDataFactory;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.api.VertexDataFactory;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultEdgeDataFactory;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultGraphDataFactory;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
-import org.gradoop.model.impl.pojo.DefaultVertexDataFactory;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.EdgePojoFactory;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojoFactory;
+import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.model.impl.pojo.VertexPojoFactory;
 import org.gradoop.storage.api.EPGMStore;
-import org.gradoop.storage.api.PersistentEdgeData;
-import org.gradoop.storage.api.PersistentEdgeDataFactory;
-import org.gradoop.storage.api.PersistentGraphData;
-import org.gradoop.storage.api.PersistentGraphDataFactory;
-import org.gradoop.storage.api.PersistentVertexData;
-import org.gradoop.storage.api.PersistentVertexDataFactory;
-import org.gradoop.storage.impl.hbase.DefaultPersistentEdgeData;
-import org.gradoop.storage.impl.hbase.DefaultPersistentEdgeDataFactory;
-import org.gradoop.storage.impl.hbase.DefaultPersistentGraphData;
-import org.gradoop.storage.impl.hbase.DefaultPersistentGraphDataFactory;
-import org.gradoop.storage.impl.hbase.DefaultPersistentVertexData;
-import org.gradoop.storage.impl.hbase.DefaultPersistentVertexDataFactory;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentEdgeFactory;
+import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.storage.api.PersistentGraphHeadFactory;
+import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.api.PersistentVertexFactory;
+import org.gradoop.storage.impl.hbase.HBaseEdge;
+import org.gradoop.storage.impl.hbase.HBaseEdgeFactory;
+import org.gradoop.storage.impl.hbase.HBaseGraphHead;
+import org.gradoop.storage.impl.hbase.HBaseGraphHeadFactory;
+import org.gradoop.storage.impl.hbase.HBaseVertex;
+import org.gradoop.storage.impl.hbase.HBaseVertexFactory;
 import org.gradoop.storage.impl.hbase.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.HBaseEPGMStoreFactory;
 import org.junit.AfterClass;
@@ -87,8 +87,7 @@ public class HBaseTestBase {
     }
   }
 
-  public static EPGMStore<DefaultVertexData, DefaultEdgeData,
-      DefaultGraphData> createEmptyEPGMStore() {
+  public static EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> createEmptyEPGMStore() {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config);
@@ -101,8 +100,7 @@ public class HBaseTestBase {
    *
    * @return EPGMStore with vertices and edges
    */
-  public static EPGMStore<DefaultVertexData, DefaultEdgeData,
-    DefaultGraphData> openEPGMStore() {
+  public static EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> openEPGMStore() {
     Configuration config = utility.getConfiguration();
 
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,
@@ -169,19 +167,19 @@ public class HBaseTestBase {
     return fileContent;
   }
 
-  public static Collection<PersistentVertexData<DefaultEdgeData>>
-  createPersistentSocialVertexData() {
-    Collection<DefaultVertexData> vertexDataCollection =
-      createVertexDataCollection();
-    List<PersistentVertexData<DefaultEdgeData>> persistentVertexData =
+  public static Collection<PersistentVertex<EdgePojo>>
+  createPersistentSocialVertices() {
+    Collection<VertexPojo> vertexDataCollection =
+      createVertexPojoCollection();
+    List<PersistentVertex<EdgePojo>> persistentVertexData =
       Lists.newArrayListWithExpectedSize(vertexDataCollection.size());
-    PersistentVertexDataFactory<DefaultVertexData, DefaultEdgeData, DefaultPersistentVertexData>
-      vertexDataFactory = new DefaultPersistentVertexDataFactory();
+    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex>
+      vertexDataFactory = new HBaseVertexFactory();
 
 
-    Set<DefaultEdgeData> outEdges = null;
-    Set<DefaultEdgeData> inEdges = null;
-    for (DefaultVertexData vertexData : vertexDataCollection) {
+    Set<EdgePojo> outEdges = null;
+    Set<EdgePojo> inEdges = null;
+    for (VertexPojo vertexData : vertexDataCollection) {
       if (vertexData.getId().equals(VERTEX_PERSON_ALICE.getId())) {
         outEdges = Sets.newHashSet(EDGE_0_KNOWS, EDGE_8_HAS_INTEREST);
         inEdges = Sets
@@ -234,22 +232,22 @@ public class HBaseTestBase {
         inEdges = Sets.newHashSet();
       }
       persistentVertexData
-        .add(vertexDataFactory.createVertexData(vertexData, outEdges, inEdges));
+        .add(vertexDataFactory.createVertex(vertexData, outEdges, inEdges));
     }
     return persistentVertexData;
   }
 
-  public static Collection<PersistentEdgeData<DefaultVertexData>>
-  createPersistentSocialEdgeData() {
-    Collection<DefaultEdgeData> edgeDataCollection = createEdgeDataCollection();
-    List<PersistentEdgeData<DefaultVertexData>> persistentEdgeData =
+  public static Collection<PersistentEdge<VertexPojo>>
+  createPersistentSocialEdges() {
+    Collection<EdgePojo> edgeDataCollection = createEdgePojoCollection();
+    List<PersistentEdge<VertexPojo>> persistentEdgeData =
       Lists.newArrayListWithExpectedSize(edgeDataCollection.size());
-    PersistentEdgeDataFactory<DefaultEdgeData, DefaultVertexData, DefaultPersistentEdgeData>
-      edgeDataFactory = new DefaultPersistentEdgeDataFactory();
+    PersistentEdgeFactory<EdgePojo, VertexPojo, HBaseEdge>
+      edgeDataFactory = new HBaseEdgeFactory();
 
-    DefaultVertexData sourceVertexData = null;
-    DefaultVertexData targetVertexData = null;
-    for (DefaultEdgeData edgeData : edgeDataCollection) {
+    VertexPojo sourceVertexData = null;
+    VertexPojo targetVertexData = null;
+    for (EdgePojo edgeData : edgeDataCollection) {
       if (edgeData.getId().equals(EDGE_0_KNOWS.getId())) {
         sourceVertexData = VERTEX_PERSON_ALICE;
         targetVertexData = VERTEX_PERSON_BOB;
@@ -324,25 +322,25 @@ public class HBaseTestBase {
         targetVertexData = VERTEX_PERSON_DAVE;
       }
       persistentEdgeData.add(edgeDataFactory
-        .createEdgeData(edgeData, sourceVertexData, targetVertexData));
+        .createEdge(edgeData, sourceVertexData, targetVertexData));
     }
 
     return persistentEdgeData;
   }
 
-  public static Collection<PersistentGraphData>
-  createPersistentSocialGraphData() {
-    Collection<DefaultGraphData> graphDataCollection =
-      createGraphDataCollection();
-    List<PersistentGraphData> persistentGraphData =
+  public static Collection<PersistentGraphHead>
+  createPersistentSocialGraphHead() {
+    Collection<GraphHeadPojo> graphDataCollection =
+      createGraphHeadCollection();
+    List<PersistentGraphHead> persistentGraphData =
       Lists.newArrayListWithExpectedSize(graphDataCollection.size());
-    PersistentGraphDataFactory<DefaultGraphData, DefaultPersistentGraphData>
-      graphDataFactory = new DefaultPersistentGraphDataFactory();
+    PersistentGraphHeadFactory<GraphHeadPojo, HBaseGraphHead>
+      graphDataFactory = new HBaseGraphHeadFactory();
 
     Set<Long> vertexIds = null;
     Set<Long> edgeIds = null;
 
-    for (DefaultGraphData graphData : graphDataCollection) {
+    for (GraphHeadPojo graphData : graphDataCollection) {
       if (graphData.getId().equals(communityDatabases.getId())) {
         vertexIds =
           Sets.newHashSet(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB
@@ -387,18 +385,18 @@ public class HBaseTestBase {
             EDGE_19_HAS_MEMBER.getId(), EDGE_20_HAS_MEMBER.getId());
       }
       persistentGraphData
-        .add(graphDataFactory.createGraphData(graphData, vertexIds, edgeIds));
+        .add(graphDataFactory.createGraphHead(graphData, vertexIds, edgeIds));
     }
 
     return persistentGraphData;
   }
 
-  public static Iterable<PersistentGraphData> createPersistentGraphData() {
-    List<PersistentGraphData> persistentGraphData =
+  public static Iterable<PersistentGraphHead> createPersistentGraphHead() {
+    List<PersistentGraphHead> persistentGraphData =
       Lists.newArrayListWithExpectedSize(2);
 
-    GraphDataFactory<DefaultGraphData> graphDataFactory =
-      new DefaultGraphDataFactory();
+    EPGMGraphHeadFactory<GraphHeadPojo> graphHeadFactory =
+      new GraphHeadPojoFactory();
     // graph 0
     Long graphID = 0L;
     String graphLabel = "A";
@@ -412,8 +410,8 @@ public class HBaseTestBase {
     edges.add(2L);
     edges.add(3L);
 
-    persistentGraphData.add(new DefaultPersistentGraphData(
-      graphDataFactory.createGraphData(graphID, graphLabel, graphProperties),
+    persistentGraphData.add(new HBaseGraphHead(
+      graphHeadFactory.createGraphHead(graphID, graphLabel, graphProperties),
       vertices, edges));
 
     // graph 1
@@ -428,25 +426,23 @@ public class HBaseTestBase {
     edges.add(4L);
     edges.add(5L);
 
-    persistentGraphData.add(new DefaultPersistentGraphData(
-      graphDataFactory.createGraphData(graphID, graphLabel, graphProperties),
+    persistentGraphData.add(new HBaseGraphHead(
+      graphHeadFactory.createGraphHead(graphID, graphLabel, graphProperties),
       vertices, edges));
 
     return persistentGraphData;
   }
 
-  public static Iterable<PersistentVertexData<DefaultEdgeData>>
-  createPersistentVertexData() {
-    List<PersistentVertexData<DefaultEdgeData>> persistentVertexData =
+  public static Iterable<PersistentVertex<EdgePojo>> createPersistentVertex() {
+    List<PersistentVertex<EdgePojo>> persistentVertexData =
       Lists.newArrayListWithExpectedSize(2);
 
-    PersistentVertexDataFactory<DefaultVertexData, DefaultEdgeData,
-      DefaultPersistentVertexData>
-      persistentVertexDataFactory = new DefaultPersistentVertexDataFactory();
-    VertexDataFactory<DefaultVertexData> vertexDataFactory =
-      new DefaultVertexDataFactory();
-    EdgeDataFactory<DefaultEdgeData> edgeDataFactory =
-      new DefaultEdgeDataFactory();
+    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex>
+      persistentVertexFactory = new HBaseVertexFactory();
+    EPGMVertexFactory<VertexPojo> vertexFactory =
+      new VertexPojoFactory();
+    EPGMEdgeFactory<EdgePojo> edgeFactory =
+      new EdgePojoFactory();
     // vertex 0
     Long vertexId = 0L;
     String vertexLabel = "A";
@@ -456,16 +452,15 @@ public class HBaseTestBase {
     Set<Long> graphs = Sets.newHashSetWithExpectedSize(2);
     graphs.add(0L);
     graphs.add(1L);
-    Set<DefaultEdgeData> outgoingEdgeData = Sets.newHashSetWithExpectedSize(2);
-    outgoingEdgeData.add(edgeDataFactory.createEdgeData(0L, "a", 0L, 1L));
-    outgoingEdgeData.add(edgeDataFactory.createEdgeData(1L, "b", 0L, 2L));
-    Set<DefaultEdgeData> incomingEdgeData = Sets.newHashSetWithExpectedSize(2);
-    incomingEdgeData.add(edgeDataFactory.createEdgeData(2L, "a", 1L, 0L));
-    incomingEdgeData.add(edgeDataFactory.createEdgeData(3L, "c", 2L, 0L));
+    Set<EdgePojo> outgoingEdgeData = Sets.newHashSetWithExpectedSize(2);
+    outgoingEdgeData.add(edgeFactory.createEdge(0L, "a", 0L, 1L));
+    outgoingEdgeData.add(edgeFactory.createEdge(1L, "b", 0L, 2L));
+    Set<EdgePojo> incomingEdgeData = Sets.newHashSetWithExpectedSize(2);
+    incomingEdgeData.add(edgeFactory.createEdge(2L, "a", 1L, 0L));
+    incomingEdgeData.add(edgeFactory.createEdge(3L, "c", 2L, 0L));
 
-    persistentVertexData.add(persistentVertexDataFactory.createVertexData(
-      vertexDataFactory
-        .createVertexData(vertexId, vertexLabel, vertexProperties, graphs),
+    persistentVertexData.add(persistentVertexFactory.createVertex(vertexFactory
+        .createVertex(vertexId, vertexLabel, vertexProperties, graphs),
       outgoingEdgeData, incomingEdgeData));
 
     // vertex 1
@@ -477,32 +472,29 @@ public class HBaseTestBase {
     graphs.add(1L);
     graphs.add(2L);
     outgoingEdgeData = Sets.newHashSetWithExpectedSize(2);
-    outgoingEdgeData.add(edgeDataFactory.createEdgeData(2L, 1L, 0L));
-    outgoingEdgeData.add(edgeDataFactory.createEdgeData(4L, 1L, 2L));
+    outgoingEdgeData.add(edgeFactory.createEdge(2L, 1L, 0L));
+    outgoingEdgeData.add(edgeFactory.createEdge(4L, 1L, 2L));
     incomingEdgeData = Sets.newHashSetWithExpectedSize(2);
-    incomingEdgeData.add(edgeDataFactory.createEdgeData(0L, 0L, 1L));
-    incomingEdgeData.add(edgeDataFactory.createEdgeData(5L, 2L, 1L));
+    incomingEdgeData.add(edgeFactory.createEdge(0L, 0L, 1L));
+    incomingEdgeData.add(edgeFactory.createEdge(5L, 2L, 1L));
 
-    persistentVertexData.add(persistentVertexDataFactory.createVertexData(
-      vertexDataFactory
-        .createVertexData(vertexId, vertexLabel, vertexProperties, graphs),
+    persistentVertexData.add(persistentVertexFactory.createVertex(vertexFactory
+        .createVertex(vertexId, vertexLabel, vertexProperties, graphs),
       outgoingEdgeData, incomingEdgeData));
 
     return persistentVertexData;
   }
 
-  public static Iterable<PersistentEdgeData<DefaultVertexData>>
-  createPersistentEdgeData() {
-    List<PersistentEdgeData<DefaultVertexData>> persistentEdgeData =
+  public static Iterable<PersistentEdge<VertexPojo>> createPersistentEdge() {
+    List<PersistentEdge<VertexPojo>> persistentEdgeData =
       Lists.newArrayListWithExpectedSize(2);
 
-    PersistentEdgeDataFactory<DefaultEdgeData, DefaultVertexData,
-      DefaultPersistentEdgeData>
-      persistentEdgeDataFactory = new DefaultPersistentEdgeDataFactory();
-    VertexDataFactory<DefaultVertexData> vertexDataFactory =
-      new DefaultVertexDataFactory();
-    EdgeDataFactory<DefaultEdgeData> edgeDataFactory =
-      new DefaultEdgeDataFactory();
+    PersistentEdgeFactory<EdgePojo, VertexPojo, HBaseEdge>
+      persistentEdgeFactory = new HBaseEdgeFactory();
+    EPGMVertexFactory<VertexPojo> vertexFactory =
+      new VertexPojoFactory();
+    EPGMEdgeFactory<EdgePojo> edgeFactory =
+      new EdgePojoFactory();
     // edge 0
     Long edgeId = 0L;
     String edgeLabel = "a";
@@ -512,14 +504,14 @@ public class HBaseTestBase {
     Set<Long> graphs = Sets.newHashSetWithExpectedSize(2);
     graphs.add(0L);
     graphs.add(1L);
-    DefaultVertexData edgeSourceData =
-      vertexDataFactory.createVertexData(0L, "A");
-    DefaultVertexData edgeTargetData =
-      vertexDataFactory.createVertexData(1L, "B");
+    VertexPojo edgeSourceData =
+      vertexFactory.createVertex(0L, "A");
+    VertexPojo edgeTargetData =
+      vertexFactory.createVertex(1L, "B");
 
-    persistentEdgeData.add(persistentEdgeDataFactory.createEdgeData(
-      edgeDataFactory.createEdgeData(edgeId, edgeLabel, edgeSourceData.getId(),
-        edgeTargetData.getId(), edgeProperties, graphs), edgeSourceData,
+    persistentEdgeData.add(persistentEdgeFactory.createEdge(edgeFactory
+        .createEdge(edgeId, edgeLabel, edgeSourceData.getId(),
+          edgeTargetData.getId(), edgeProperties, graphs), edgeSourceData,
       edgeTargetData));
 
     // edge 1
@@ -530,12 +522,12 @@ public class HBaseTestBase {
     graphs = Sets.newHashSetWithExpectedSize(2);
     graphs.add(1L);
     graphs.add(2L);
-    edgeSourceData = vertexDataFactory.createVertexData(0L, "A");
-    edgeTargetData = vertexDataFactory.createVertexData(2L, "C");
+    edgeSourceData = vertexFactory.createVertex(0L, "A");
+    edgeTargetData = vertexFactory.createVertex(2L, "C");
 
-    persistentEdgeData.add(persistentEdgeDataFactory.createEdgeData(
-      edgeDataFactory.createEdgeData(edgeId, edgeLabel, edgeSourceData.getId(),
-        edgeTargetData.getId(), edgeProperties, graphs), edgeSourceData,
+    persistentEdgeData.add(persistentEdgeFactory.createEdge(edgeFactory
+        .createEdge(edgeId, edgeLabel, edgeSourceData.getId(),
+          edgeTargetData.getId(), edgeProperties, graphs), edgeSourceData,
       edgeTargetData));
 
     return persistentEdgeData;
@@ -546,11 +538,10 @@ public class HBaseTestBase {
    *
    * @param graphStore graph store
    */
-  public static void validateGraphData(
-    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphStore) {
+  public static void validateGraphHead(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore) {
     // g0
-    GraphData g = graphStore.readGraphData(0L);
+    EPGMGraphHead g = graphStore.readGraph(0L);
     assertNotNull(g);
     assertEquals("A", g.getLabel());
     List<String> propertyKeys = Lists.newArrayList(g.getPropertyKeys());
@@ -564,7 +555,7 @@ public class HBaseTestBase {
     }
 
     // g1
-    g = graphStore.readGraphData(1L);
+    g = graphStore.readGraph(1L);
     assertNotNull(g);
     assertEquals("A", g.getLabel());
     propertyKeys = Lists.newArrayList(g.getPropertyKeys());
@@ -577,11 +568,10 @@ public class HBaseTestBase {
    *
    * @param graphStore graph store
    */
-  public static void validateVertexData(
-    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphStore) {
+  public static void validateVertex(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore) {
     // vertex 0
-    VertexData v = graphStore.readVertexData(0L);
+    EPGMVertex v = graphStore.readVertex(0L);
     assertNotNull(v);
     assertEquals("A", v.getLabel());
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
@@ -598,7 +588,7 @@ public class HBaseTestBase {
     assertTrue(v.getGraphs().contains(1L));
 
     // vertex 1
-    v = graphStore.readVertexData(1L);
+    v = graphStore.readVertex(1L);
     assertNotNull(v);
     assertEquals("B", v.getLabel());
     propertyKeys = Lists.newArrayList(v.getPropertyKeys());
@@ -614,11 +604,10 @@ public class HBaseTestBase {
    *
    * @param graphStore graph store
    */
-  public static void validateEdgeData(
-    EPGMStore<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
-      graphStore) {
+  public static void validateEdge(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore) {
     // edge 0
-    EdgeData e = graphStore.readEdgeData(0L);
+    EPGMEdge e = graphStore.readEdge(0L);
     assertNotNull(e);
     assertEquals("a", e.getLabel());
     assertEquals(new Long(0L), e.getSourceVertexId());
@@ -638,7 +627,7 @@ public class HBaseTestBase {
     assertTrue(e.getGraphs().contains(1L));
 
     // edge 1
-    e = graphStore.readEdgeData(1L);
+    e = graphStore.readEdge(1L);
     assertNotNull(e);
     assertEquals("b", e.getLabel());
     assertEquals(new Long(0L), e.getSourceVertexId());

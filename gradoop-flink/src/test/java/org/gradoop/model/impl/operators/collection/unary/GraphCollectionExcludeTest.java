@@ -4,12 +4,11 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.FlinkTestBase;
-import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.collection.unary.ExcludeCollection;
-import org.gradoop.model.impl.pojo.DefaultEdgeData;
-import org.gradoop.model.impl.pojo.DefaultGraphData;
-import org.gradoop.model.impl.pojo.DefaultVertexData;
+import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -26,26 +25,25 @@ public class GraphCollectionExcludeTest extends FlinkTestBase {
 
   @Test
   public void overlapCollectionTest() throws Exception {
-    GraphCollection<DefaultVertexData, DefaultEdgeData, DefaultGraphData> coll =
+    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> coll =
       getGraphStore().getCollection().getGraphs(1L, 2L, 3L);
     Long exclusionBase = 1L;
-    LogicalGraph<DefaultVertexData, DefaultEdgeData, DefaultGraphData>
+    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = coll.callForGraph(
-      new ExcludeCollection<DefaultVertexData, DefaultEdgeData,
-              DefaultGraphData>(
+      new ExcludeCollection<VertexPojo, EdgePojo, GraphHeadPojo>(
         1L));
 
-    List<DefaultVertexData> oldVertices = Lists.newArrayList();
-    List<DefaultEdgeData> oldEdges = Lists.newArrayList();
+    List<VertexPojo> oldVertices = Lists.newArrayList();
+    List<EdgePojo> oldEdges = Lists.newArrayList();
     List<Long> oldGraphs = Lists.newArrayList();
-    List<DefaultVertexData> newVertices = Lists.newArrayList();
-    List<DefaultEdgeData> newEdges = Lists.newArrayList();
+    List<VertexPojo> newVertices = Lists.newArrayList();
+    List<EdgePojo> newEdges = Lists.newArrayList();
 
     coll.getVertices().output(new LocalCollectionOutputFormat<>(oldVertices));
     coll.getEdges().output(new LocalCollectionOutputFormat<>(oldEdges));
-    coll.getGraphHeads().map(new MapFunction<DefaultGraphData, Long>() {
+    coll.getGraphHeads().map(new MapFunction<GraphHeadPojo, Long>() {
       @Override
-      public Long map(DefaultGraphData graphData) throws Exception {
+      public Long map(GraphHeadPojo graphData) throws Exception {
         return graphData.getId();
       }
     }).output(new LocalCollectionOutputFormat<>(oldGraphs));
@@ -56,7 +54,7 @@ public class GraphCollectionExcludeTest extends FlinkTestBase {
     getExecutionEnvironment().execute();
 
     assertNotNull("graph was null", newGraph);
-    for (DefaultVertexData vertex : newVertices) {
+    for (VertexPojo vertex : newVertices) {
       assertTrue(vertex.getGraphs().contains(exclusionBase));
       for(Long id : oldGraphs){
         if(!id.equals(exclusionBase)){
@@ -65,7 +63,7 @@ public class GraphCollectionExcludeTest extends FlinkTestBase {
       }
       assertTrue(oldGraphs.containsAll(vertex.getGraphs()));
     }
-    for (DefaultEdgeData edge : newEdges) {
+    for (EdgePojo edge : newEdges) {
       assertTrue(oldEdges.contains(edge));
       assertTrue(edge.getGraphs().contains(exclusionBase));
       for(Long id : oldGraphs){

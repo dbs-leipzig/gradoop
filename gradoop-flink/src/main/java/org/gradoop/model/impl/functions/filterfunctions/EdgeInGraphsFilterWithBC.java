@@ -19,7 +19,7 @@ package org.gradoop.model.impl.functions.filterfunctions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EdgeData;
+import org.gradoop.model.api.EPGMEdge;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @param <ED> EPGM edge type
  */
-public class EdgeInGraphsFilterWithBC<ED extends EdgeData>
+public class EdgeInGraphsFilterWithBC<ED extends EPGMEdge>
   extends RichFilterFunction<ED> {
 
   /**

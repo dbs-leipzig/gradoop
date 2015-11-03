@@ -18,14 +18,14 @@
 package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.GraphData;
+import org.gradoop.model.api.EPGMGraphHead;
 
 /**
  * Maps a graph to its identifier.
  *
  * @param <GD> EPGM graph head type
  */
-public class GraphToIdentifierMapper<GD extends GraphData>
+public class GraphToIdentifierMapper<GD extends EPGMGraphHead>
   implements MapFunction<GD, Long> {
 
   @Override

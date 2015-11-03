@@ -19,7 +19,7 @@ package org.gradoop.model.impl.functions.filterfunctions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @param <VD> EPGM vertex type
  */
-public class VertexInGraphsFilterWithBC<VD extends VertexData>
+public class VertexInGraphsFilterWithBC<VD extends EPGMVertex>
   extends RichFilterFunction<VD> {
 
   /**

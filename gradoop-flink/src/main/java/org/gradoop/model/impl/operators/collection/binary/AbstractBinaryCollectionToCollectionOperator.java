@@ -24,9 +24,9 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 
@@ -41,9 +41,9 @@ import java.util.Iterator;
  * @param <GD> EPGM graph head type
  */
 public abstract class AbstractBinaryCollectionToCollectionOperator<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   implements BinaryCollectionToCollectionOperator<VD, ED, GD> {
 
   /**
@@ -105,8 +105,8 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
    * @param <GD> EPGM graph head type
    * @see Intersect
    */
-  protected static class GraphHeadGroupReducer<GD extends GraphData> implements
-    GroupReduceFunction<GD, GD> {
+  protected static class GraphHeadGroupReducer<GD extends EPGMGraphHead>
+    implements GroupReduceFunction<GD, GD> {
 
     /**
      * User defined expectedGroupSize.
@@ -184,7 +184,7 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
    * @param <GD> graph data type
    * @param <C>  type of second element in tuple
    */
-  protected static class SubgraphTupleKeySelector<GD extends GraphData, C>
+  protected static class SubgraphTupleKeySelector<GD extends EPGMGraphHead, C>
     implements
     KeySelector<Tuple2<GD, C>, Long> {
     /**

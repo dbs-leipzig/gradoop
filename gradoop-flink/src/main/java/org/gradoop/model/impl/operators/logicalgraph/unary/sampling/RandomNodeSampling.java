@@ -18,9 +18,9 @@ package org.gradoop.model.impl.operators.logicalgraph.unary.sampling;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.joinfunctions.EdgeVertexJoinKeepEdge;
@@ -44,8 +44,8 @@ import java.util.Random;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
-  GD extends GraphData> implements
+public class RandomNodeSampling<VD extends EPGMVertex, ED extends EPGMEdge,
+  GD extends EPGMGraphHead> implements
   UnaryGraphToGraphOperator<VD, ED, GD> {
   /**
    * relative amount of nodes in the result graph
@@ -102,7 +102,7 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return LogicalGraph.fromDataSets(newVertices, newEdges,
-      graph.getConfig().getGraphHeadFactory().createGraphData(newGraphID),
+      graph.getConfig().getGraphHeadFactory().createGraphHead(newGraphID),
       graph.getConfig());
   }
 
@@ -120,7 +120,7 @@ public class RandomNodeSampling<VD extends VertexData, ED extends EdgeData,
    *
    * @param <VD> vertex data type
    */
-  private static class VertexRandomFilter<VD extends VertexData>
+  private static class VertexRandomFilter<VD extends EPGMVertex>
     implements FilterFunction<VD> {
     /**
      * Threshold to decide if a vertex needs to be filtered.

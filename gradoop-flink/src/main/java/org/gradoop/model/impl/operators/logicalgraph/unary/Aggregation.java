@@ -17,11 +17,11 @@
 
 package org.gradoop.model.impl.operators.logicalgraph.unary;
 
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
-import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 
 /**
@@ -35,9 +35,9 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
  * @param <O>  output type of aggregate function
  */
 public class Aggregation<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData,
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead,
   O extends Number>
   implements UnaryGraphToGraphOperator<VD, ED, GD> {
 
@@ -73,11 +73,12 @@ public class Aggregation<
     O result = aggregationFunc.execute(graph);
     // copy graph data before updating properties
     GD newGraphData = graph.getConfig().getGraphHeadFactory()
-      .createGraphData(graph.getId(), graph.getLabel());
+      .createGraphHead(graph.getId(), graph.getLabel());
     newGraphData.setProperties(graph.getProperties());
     newGraphData.setProperty(aggregatePropertyKey, result);
-    return LogicalGraph.fromDataSets(graph.getVertices(), graph.getEdges(),
-      newGraphData, graph.getConfig());
+    return LogicalGraph
+      .fromDataSets(graph.getVertices(), graph.getEdges(), newGraphData,
+        graph.getConfig());
   }
 
   /**

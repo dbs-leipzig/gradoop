@@ -19,9 +19,9 @@ package org.gradoop.model.impl.operators.collection.unary;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -45,8 +45,8 @@ import java.util.List;
  * @param <ED> edge data type
  * @param <GD> graph data type
  */
-public class ExcludeCollection<VD extends VertexData, ED extends EdgeData, GD
-  extends GraphData> implements
+public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
+  extends EPGMGraphHead> implements
   UnaryCollectionToGraphOperator<VD, ED, GD> {
   /**
    * ID defining the base graph
@@ -91,7 +91,7 @@ public class ExcludeCollection<VD extends VertexData, ED extends EdgeData, GD
         EdgeInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
     return LogicalGraph.fromDataSets(vertices, edges,
       collection.getConfig().getGraphHeadFactory()
-        .createGraphData(FlinkConstants.EXCLUDE_GRAPH_ID),
+        .createGraphHead(FlinkConstants.EXCLUDE_GRAPH_ID),
       collection.getConfig());
   }
 

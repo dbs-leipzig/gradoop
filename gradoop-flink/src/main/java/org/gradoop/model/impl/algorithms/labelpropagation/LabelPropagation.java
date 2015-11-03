@@ -23,12 +23,12 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .CommunityDiscriminatorFunction;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
@@ -53,9 +53,9 @@ import org.gradoop.model.impl.operators.auxiliary.SplitBy;
  * @see LabelPropagationAlgorithm
  */
 public class LabelPropagation<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   implements UnaryGraphToCollectionOperator<VD, ED, GD> {
   /**
    * Counter to define maximal Iteration for the Algorithm
@@ -111,9 +111,7 @@ public class LabelPropagation<
 
     // create a logical graph from the result
     LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
-      .fromDataSets(labeledVertices,
-        logicalGraph.getEdges(),
-        null,
+      .fromDataSets(labeledVertices, logicalGraph.getEdges(), null,
         logicalGraph.getConfig());
 
     // and split it into a collection according the result

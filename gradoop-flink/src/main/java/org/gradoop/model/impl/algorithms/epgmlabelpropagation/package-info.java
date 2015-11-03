@@ -34,7 +34,7 @@
 
 /**
  * Contains a version of the label propagation algorithm that is
- * executed directly on {@link org.gradoop.model.api.VertexData} and {@link
- * org.gradoop.model.api.EdgeData}.
+ * executed directly on {@link org.gradoop.model.api.EPGMVertex} and {@link
+ * org.gradoop.model.api.EPGMEdge}.
  */
 package org.gradoop.model.impl.algorithms.epgmlabelpropagation;

@@ -20,9 +20,9 @@ package org.gradoop.io.json;
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 
 /**
  * Used to convert vertices, edges and graphs into json documents.
@@ -39,7 +39,7 @@ public class JsonWriter extends JsonIO {
    *
    * @param <VD> EPGM vertex type
    */
-  public static class VertexTextFormatter<VD extends VertexData> extends
+  public static class VertexTextFormatter<VD extends EPGMVertex> extends
     EntityToJsonFormatter implements
     TextOutputFormat.TextFormatter<VD> {
 
@@ -76,7 +76,7 @@ public class JsonWriter extends JsonIO {
    *
    * @param <ED> EPGM edge type
    */
-  public static class EdgeTextFormatter<ED extends EdgeData> extends
+  public static class EdgeTextFormatter<ED extends EPGMEdge> extends
     EntityToJsonFormatter implements
     TextOutputFormat.TextFormatter<ED> {
 
@@ -113,7 +113,7 @@ public class JsonWriter extends JsonIO {
    *
    * @param <GD> EPGM graph head type
    */
-  public static class GraphTextFormatter<GD extends GraphData> extends
+  public static class GraphTextFormatter<GD extends EPGMGraphHead> extends
     EntityToJsonFormatter implements
     TextOutputFormat.TextFormatter<GD> {
 

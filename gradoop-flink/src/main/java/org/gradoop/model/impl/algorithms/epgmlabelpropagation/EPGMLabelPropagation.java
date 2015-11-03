@@ -18,12 +18,12 @@ package org.gradoop.model.impl.algorithms.epgmlabelpropagation;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
-import org.gradoop.model.api.EdgeData;
-import org.gradoop.model.api.GraphData;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .CommunityDiscriminatorFunction;
 import org.gradoop.model.impl.operators.auxiliary.SplitBy;
@@ -41,9 +41,9 @@ import java.io.Serializable;
  * @see EPGMLabelPropagationAlgorithm
  */
 public class EPGMLabelPropagation<
-  VD extends VertexData,
-  ED extends EdgeData,
-  GD extends GraphData>
+  VD extends EPGMVertex,
+  ED extends EPGMEdge,
+  GD extends EPGMGraphHead>
   implements UnaryGraphToCollectionOperator<VD, ED, GD>, Serializable {
   /**
    * serial version uid
@@ -90,8 +90,8 @@ public class EPGMLabelPropagation<
       .run(new EPGMLabelPropagationAlgorithm<VD, ED>(this.maxIterations));
 
     // create a logical graph
-    LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph.fromGellyGraph(graph,
-      null, logicalGraph.getConfig());
+    LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
+      .fromGellyGraph(graph, null, logicalGraph.getConfig());
 
     // and split it into a collection according the result
     return new SplitBy<VD, ED, GD>(

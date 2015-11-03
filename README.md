@@ -133,7 +133,7 @@ EPGMDataBase epgmDB = EPGMDatabase.fromJsonFile(...);
 
 // do some fancy analysis ...
 
-EPGMStore epgmStore = HBaseEPGMStore.createOrOpenEPGMStore(vertexDataTable, edgeDataTable, graphDataTable);
+EPGMStore epgmStore = HBaseEPGMStore.createOrOpenEPGMStore(vertexTable, edgeTable, graphHeadTable);
 epgmDB.writeToHBase(epgmStore);
 epgmStore.close();
 ```
@@ -141,7 +141,7 @@ epgmStore.close();
 You can now read the database from HBase.
 
 ```java
-EPGMStore epgmStore = HBaseEPGMStore.createOrOpenEPGMStore(vertexDataTable, edgeDataTable, graphDataTable);
+EPGMStore epgmStore = HBaseEPGMStore.createOrOpenEPGMStore(vertexTable, edgeTable, graphHeadTable);
 EPGMDatabase epgmDB = EPGMDatabase.fromHBase(epgmStore);
 
 // do some fancy analysis ...

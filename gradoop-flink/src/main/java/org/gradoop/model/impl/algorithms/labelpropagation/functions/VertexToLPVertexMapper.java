@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.VertexData;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 
 /**
@@ -28,7 +28,7 @@ import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
  * @param <VD> EPGM vertex type
  * @see LPVertexValue
  */
-public class VertexToLPVertexMapper<VD extends VertexData>
+public class VertexToLPVertexMapper<VD extends EPGMVertex>
   implements MapFunction<VD, Vertex<Long, LPVertexValue>> {
 
   @Override
