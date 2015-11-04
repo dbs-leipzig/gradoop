@@ -18,8 +18,8 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
-public class graphSplitByTest extends FlinkTestBase {
-  public graphSplitByTest(TestExecutionMode mode) {
+public class LogicalGraphSplitByTest extends FlinkTestBase {
+  public LogicalGraphSplitByTest(TestExecutionMode mode) {
     super(mode);
   }
 

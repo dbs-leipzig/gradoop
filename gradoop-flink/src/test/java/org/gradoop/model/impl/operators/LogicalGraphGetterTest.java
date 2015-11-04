@@ -28,9 +28,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
-public class graphGetterTest extends FlinkTestBase {
+public class LogicalGraphGetterTest extends FlinkTestBase {
 
-  public graphGetterTest(TestExecutionMode mode) {
+  public LogicalGraphGetterTest(TestExecutionMode mode) {
     super(mode);
   }
 

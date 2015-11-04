@@ -7,9 +7,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class graphSummarizeGroupSortTest extends EPGMGraphSummarizeTestBase {
+public class LogicalGraphSummarizeGroupMapTest extends EPGMGraphSummarizeTestBase {
 
-  public graphSummarizeGroupSortTest(TestExecutionMode mode) {
+  public LogicalGraphSummarizeGroupMapTest(TestExecutionMode mode) {
     super(mode);
   }
 
@@ -18,7 +18,7 @@ public class graphSummarizeGroupSortTest extends EPGMGraphSummarizeTestBase {
   getSummarizationImpl(
     String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
     boolean useEdgeLabel) {
-    return new SummarizationGroupSort<>(vertexGroupingKey, edgeGroupingKey,
+    return new SummarizationGroupMap<>(vertexGroupingKey, edgeGroupingKey,
       useVertexLabel, useEdgeLabel);
   }
 }

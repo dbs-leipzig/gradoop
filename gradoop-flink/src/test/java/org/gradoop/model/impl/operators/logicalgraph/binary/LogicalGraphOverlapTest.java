@@ -34,9 +34,9 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class graphOverlapTest extends BinaryGraphOperatorsTestBase {
+public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
-  public graphOverlapTest(TestExecutionMode mode) {
+  public LogicalGraphOverlapTest(TestExecutionMode mode) {
     super(mode);
   }
 

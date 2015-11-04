@@ -36,9 +36,9 @@ import static org.gradoop.GradoopTestBaseUtils.PROPERTY_KEY_SINCE;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
-public class graphProjectionTest extends FlinkTestBase {
+public class LogicalGraphProjectionTest extends FlinkTestBase {
 
-  public graphProjectionTest(TestExecutionMode mode) {
+  public LogicalGraphProjectionTest(TestExecutionMode mode) {
     super(mode);
   }
 

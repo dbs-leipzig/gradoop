@@ -31,9 +31,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
-public class graphAggregateTest extends FlinkTestBase {
+public class LogicalGraphAggregateTest extends FlinkTestBase {
 
-  public graphAggregateTest(TestExecutionMode mode) {
+  public LogicalGraphAggregateTest(TestExecutionMode mode) {
     super(mode);
   }
 

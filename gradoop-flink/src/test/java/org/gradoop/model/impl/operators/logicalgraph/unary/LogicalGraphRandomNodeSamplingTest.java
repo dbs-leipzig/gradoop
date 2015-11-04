@@ -35,8 +35,8 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
-public class graphRandomNodeSamplingTest extends FlinkTestBase {
-  public graphRandomNodeSamplingTest(TestExecutionMode mode) {
+public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
+  public LogicalGraphRandomNodeSamplingTest(TestExecutionMode mode) {
     super(mode);
   }
 

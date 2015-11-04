@@ -24,10 +24,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class graphSummarizeGroupWithListsTest extends
-  EPGMGraphSummarizeTestBase {
+public class LogicalGraphSummarizeGroupCombineTest extends EPGMGraphSummarizeTestBase {
 
-  public graphSummarizeGroupWithListsTest(TestExecutionMode mode) {
+  public LogicalGraphSummarizeGroupCombineTest(TestExecutionMode mode) {
     super(mode);
   }
 
@@ -36,7 +35,7 @@ public class graphSummarizeGroupWithListsTest extends
   getSummarizationImpl(
     String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
     boolean useEdgeLabel) {
-    return new SummarizationGroupWithLists<>(vertexGroupingKey, edgeGroupingKey,
+    return new SummarizationGroupCombine<>(vertexGroupingKey, edgeGroupingKey,
       useVertexLabel, useEdgeLabel);
   }
 }

@@ -18,8 +18,8 @@ import java.util.List;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
-public class graphOverlapSplitByTest extends FlinkTestBase {
-  public graphOverlapSplitByTest(TestExecutionMode mode) {
+public class LogicalGraphOverlapSplitByTest extends FlinkTestBase {
+  public LogicalGraphOverlapSplitByTest(TestExecutionMode mode) {
     super(mode);
   }
 
