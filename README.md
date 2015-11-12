@@ -6,7 +6,7 @@
 for scalable graph analytics. It offers a graph data model which extends the widespread 
 [property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
 by the concept of logical subgraphs and further provides operators that can be applied 
-on single graphs and collections of graphs. The combination of these operators allows
+on single graphIds and collections of graphIds. The combination of these operators allows
 the flexible, declarative definition of graph analytical workflows.
 
 ```java
@@ -30,20 +30,20 @@ as a proof of concept implementation and far from production ready.
 ## Data Model
 
 In the extended property graph model (EPGM), a database consists of multiple 
-property graphs which are called logical graphs. These graphs are 
-application-specific subsets from shared sets of vertices and edges, i.e., may
-have common vertices and edges. Additionally, not only vertices and edges but
-also logical graphs have a type label and can have different properties.
+property graphIds which are called logical graphIds. These graphIds are
+application-specific subsets from shared sets of vertexIds and edgeIds, i.e., may
+have common vertexIds and edgeIds. Additionally, not only vertexIds and edgeIds but
+also logical graphIds have a type label and can have different properties.
 
-Data Model elements (logical graphs, vertices and edges) have a unique identifier
+Data Model elements (logical graphIds, vertexIds and edgeIds) have a unique identifier
 inside their domain, a single label (e.g., User) and a number of key-value 
 properties (e.g, name = Alice). There is no schema involved, meaning each element
 can have arbitrary number of properties even if they have the same label.
 
 ### Graph operators
 
-The EPGM provides operators for both single graphs as well as collections of 
-graphs; operators may also return single graphs or graph collections.
+The EPGM provides operators for both single graphIds as well as collections of
+graphIds; operators may also return single graphIds or graph collections.
 
 Our operator implementations are based on [Apache Flink](http://flink.apache.org/).
 The following table contains an overview (GC = GraphCollection, G = Graph).
@@ -51,15 +51,15 @@ The following table contains an overview (GC = GraphCollection, G = Graph).
 | Operator      | In      | Out | Output description                              | Impl |
 |:--------------|:--------|:----|:------------------------------------------------|:----:|
 | Selection     | GC      | GC  | Graphs that fulfil a predicate function         | Yes  |
-| Distinct      | GC      | GC  | No duplicate graphs                             | No   |
+| Distinct      | GC      | GC  | No duplicate graphIds                             | No   |
 | SortBy        | GC      | GC  | Graphs sorted by graph property                 | No   |
 | Top           | GC      | GC  | The first n elements of the input collection    | No   |
-| Union         | GC x GC | GC  | All graphs from both collections                | Yes  |
-| Intersection  | GC x GC | GC  | Only graphs that exist in both collections      | Yes  |
-| Difference    | GC x GC | GC  | Only graphs that exist in one collection        | Yes  |
-| Combination   | G x G   | G   | Vertices and edges from both graphs             | Yes  |
-| Overlap       | G x G   | G   | Vertices and edges that exist in both graphs    | Yes  |
-| Exclusion     | G x G   | G   | Vertices and edges that exist in only one graph | Yes  |
+| Union         | GC x GC | GC  | All graphIds from both collections                | Yes  |
+| Intersection  | GC x GC | GC  | Only graphIds that exist in both collections      | Yes  |
+| Difference    | GC x GC | GC  | Only graphIds that exist in one collection        | Yes  |
+| Combination   | G x G   | G   | Vertices and edgeIds from both graphIds             | Yes  |
+| Overlap       | G x G   | G   | Vertices and edgeIds that exist in both graphIds    | Yes  |
+| Exclusion     | G x G   | G   | Vertices and edgeIds that exist in only one graph | Yes  |
 | Pattern Match | G       | GC  | Graphs that match a given graph pattern         | No   |
 | Aggregation   | G       | G   | Graph with result of an aggregate function      | Yes  |
 | Projection    | G       | G   | Graph with projected vertex and edge sets       | Yes  |
@@ -85,34 +85,34 @@ The following table contains an overview (GC = GraphCollection, G = Graph).
 
 #### JSON
 
-Gradoop supports JSON as input format for vertices, edges and graphs. Besides the 
+Gradoop supports JSON as input format for vertexIds, edgeIds and graphIds. Besides the
 unique id, each JSON document stores the properties of the specific entity in an 
 embedded document `data`. Meta information, like the obligatory label, is stored
-in a second embedded document `meta`. The meta document of vertices and edges may 
-contain a mapping to the logical graphs they are contained in.
+in a second embedded document `meta`. The meta document of vertexIds and edgeIds may
+contain a mapping to the logical graphIds they are contained in.
 
 Two persons (Alice and Bob) that have three properties each and are contained in 
-two logical graphs (`"graphs":[0,2]`).
+two logical graphIds (`"graphIds":[0,2]`).
 ```
 // content of hdfs:///input/nodes.json
-{"id":0,"data":{"gender":"f","city":"Leipzig","name":"Alice"},"meta":{"label":"Person","graphs":[0,2]}}
-{"id":1,"data":{"gender":"m","city":"Leipzig","name":"Bob"},"meta":{"label":"Person","graphs":[0,2]}}
+{"id":0,"data":{"gender":"f","city":"Leipzig","name":"Alice"},"meta":{"label":"Person","graphIds":[0,2]}}
+{"id":1,"data":{"gender":"m","city":"Leipzig","name":"Bob"},"meta":{"label":"Person","graphIds":[0,2]}}
 ```
 
 Edges are represented in a similar way. Alice and Bob are connected by an edge
 (knows). Edges may have properties (e.g., `"since":2014`) and may also be contained 
-in logical graphs. Additionally, edge JSON documents store the obligatory source and 
+in logical graphIds. Additionally, edge JSON documents store the obligatory source and
 target vertex identifier.
 
 ```
-// content of hdfs:///input/edges.json
-{"id":0,"source":0,"target":1,"data":{"since":2014},"meta":{"label":"knows","graphs":[0,2]}}
+// content of hdfs:///input/edgeIds.json
+{"id":0,"source":0,"target":1,"data":{"since":2014},"meta":{"label":"knows","graphIds":[0,2]}}
 ```
 
 Graphs may also have properties and must have a label (e.g., Community).
 
 ```
-// content of hdfs:///input/graphs.json
+// content of hdfs:///input/graphIds.json
 {"id":0,"data":{"interest":"Databases","vertexCount":3},"meta":{"label":"Community"}}
 {"id":1,"data":{"interest":"Hadoop","vertexCount":3},"meta":{"label":"Community"}}
 {"id":2,"data":{"interest":"Graphs","vertexCount":4},"meta":{"label":"Community"}}
@@ -153,14 +153,14 @@ epgmStore.close()
 
 In this example, we use the `summarize` operator to create a condensed version 
 of our input graph. By summarizing on vertex and edge labels, we compute the schema
-of our graph. Each vertex in the resulting graph represents all vertices with the
-same label (e.g., Person or Group), each edge represents all edges with the same
-label that connect vertices from the same vertex groups.
+of our graph. Each vertex in the resulting graph represents all vertexIds with the
+same label (e.g., Person or Group), each edge represents all edgeIds with the same
+label that connect vertexIds from the same vertex groups.
 
 ```java
 String vertexInputPath = "hdfs:///input/nodes.json";
-String edgeInputPath = "hdfs:///input/edges.json";
-String graphInputPath = "hdfs:///input/graphs.json";
+String edgeInputPath = "hdfs:///input/edgeIds.json";
+String graphInputPath = "hdfs:///input/graphIds.json";
 EPGMDatabase db = EPGMDatabase.fromJsonFile(vertexInputPath, edgeInputPath, graphInputPath, env);
 LogicalGraph schemaGraph = db.getDatabaseGraph().summarizeOnVertexAndEdgeLabels();
 schemaGraph.writeAsJson(vertexOutputPath, edgeOutputPath, graphOutputPath);
@@ -177,7 +177,7 @@ If you want to execute Gradoop on a cluster, you need *Hadoop 2.5.1* and
 
 * run your program (e.g. the included Summarization example)
 
-> ./bin/flink run -c org.gradoop.examples.SummarizationExample ~/gradoop-flink-0.0.2-jar-with-dependencies.jar --vertex-input-path hdfs:///nodes.json --edge-input-path hdfs://edges.json --use-vertex-labels --use-edge-labels
+> ./bin/flink run -c org.gradoop.examples.SummarizationExample ~/gradoop-flink-0.0.2-jar-with-dependencies.jar --vertex-input-path hdfs:///nodes.json --edge-input-path hdfs://edgeIds.json --use-vertex-labels --use-edge-labels
     
 ## Gradoop modules
 
@@ -203,7 +203,7 @@ existing Flink and Gelly operators.
 
 Contains example pipelines showing use cases for Gradoop. 
 
-*   Graph summarization (build structural aggregates of property graphs)
+*   Graph summarization (build structural aggregates of property graphIds)
 
 ### gradoop-checkstyle
 

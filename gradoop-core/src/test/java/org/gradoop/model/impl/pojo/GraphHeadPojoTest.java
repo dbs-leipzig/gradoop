@@ -18,8 +18,12 @@
 package org.gradoop.model.impl.pojo;
 
 import com.google.common.collect.Maps;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIdGenerator;
+import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.util.GradoopConfig;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -32,7 +36,9 @@ import static org.junit.Assert.assertThat;
 public class GraphHeadPojoTest {
   @Test
   public void createWithIDTest() {
-    Long graphID = 0L;
+
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId graphID = idGen.createId();
     EPGMGraphHead g = new GraphHeadPojoFactory().createGraphHead(graphID);
     assertThat(g.getId(), is(graphID));
     assertThat(g.getPropertyCount(), is(0));
@@ -40,8 +46,8 @@ public class GraphHeadPojoTest {
 
   @Test
   public void createDefaultGraphTest() {
-    Long graphID = 0L;
-    String label = "A";
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId graphID = idGen.createId();    String label = "A";
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
     props.put("k2", "v2");
@@ -58,7 +64,9 @@ public class GraphHeadPojoTest {
 
   @Test
   public void createWithMissingLabelTest() {
-    EPGMGraphHead g = new GraphHeadPojoFactory().createGraphHead(0L);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId graphID = idGen.createId();
+    EPGMGraphHead g = new GraphHeadPojoFactory().createGraphHead(graphID);
     assertThat(g.getLabel(), is(GConstants.DEFAULT_GRAPH_LABEL));
   }
 
@@ -69,11 +77,15 @@ public class GraphHeadPojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithEmptyLabelTest() {
-    new GraphHeadPojoFactory().createGraphHead(0L, "");
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId graphID = idGen.createId();
+    new GraphHeadPojoFactory().createGraphHead(graphID, "");
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
-    new GraphHeadPojoFactory().createGraphHead(0L, null);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId graphID = idGen.createId();
+    new GraphHeadPojoFactory().createGraphHead(graphID, null);
   }
 }

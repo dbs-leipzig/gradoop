@@ -16,6 +16,7 @@ import org.gradoop.model.impl.functions.keyselectors
   .EdgeTargetVertexKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Base class for set operations that share common methods to build vertex,
@@ -45,15 +46,15 @@ public abstract class SetOperator<
   @Override
   protected DataSet<VD> computeNewVertices(
     DataSet<GD> newGraphHeads) throws Exception {
-    DataSet<Tuple2<VD, Long>> verticesWithGraphs =
+    DataSet<Tuple2<VD, GradoopId>> verticesWithGraphs =
       firstCollection.getVertices().flatMap(
-        new FlatMapFunction<VD, Tuple2<VD, Long>>() {
+        new FlatMapFunction<VD, Tuple2<VD, GradoopId>>() {
           @Override
           public void flatMap(VD v,
-            Collector<Tuple2<VD, Long>> collector) throws
+            Collector<Tuple2<VD, GradoopId>> collector) throws
             Exception {
-            for (Long graph : v.getGraphIds()) {
-              collector.collect(new Tuple2<>(v, graph));
+            for (GradoopId graphId : v.getGraphIds()) {
+              collector.collect(new Tuple2<>(v, graphId));
             }
           }
         });
@@ -63,9 +64,9 @@ public abstract class SetOperator<
       .where(1)
       .equalTo(new GraphKeySelector<GD>())
       .with(
-        new JoinFunction<Tuple2<VD, Long>, GD, VD>() {
+        new JoinFunction<Tuple2<VD, GradoopId>, GD, VD>() {
           @Override
-          public VD join(Tuple2<VD, Long> vertices,
+          public VD join(Tuple2<VD, GradoopId> vertices,
             GD subgraph) throws Exception {
             return vertices.f0;
           }

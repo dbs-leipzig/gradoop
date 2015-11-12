@@ -23,6 +23,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.epgmlabelpropagation
   .EPGMLabelPropagationAlgorithm;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * JoinFunction over VertexIDs
@@ -30,10 +31,10 @@ import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
  * @param <VD> EPGM vertex type
  */
 public class LPJoin<VD extends EPGMVertex>
-  implements JoinFunction<Vertex<Long, LPVertexValue>, VD, VD> {
+  implements JoinFunction<Vertex<GradoopId, LPVertexValue>, VD, VD> {
 
   @Override
-  public VD join(Vertex<Long, LPVertexValue> lpVertex,
+  public VD join(Vertex<GradoopId, LPVertexValue> lpVertex,
     VD epgmVertex) throws Exception {
     epgmVertex.setProperty(
       EPGMLabelPropagationAlgorithm.CURRENT_VALUE,

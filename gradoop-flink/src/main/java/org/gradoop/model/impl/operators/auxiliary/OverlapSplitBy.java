@@ -25,10 +25,11 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -51,14 +52,14 @@ public class OverlapSplitBy<
   /**
    * Self defined function for graph extraction
    */
-  private final UnaryFunction<VD, List<Long>> function;
+  private final UnaryFunction<VD, List<GradoopId>> function;
 
   /**
    * Constructor
    *
    * @param function self defined function
    */
-  public OverlapSplitBy(UnaryFunction<VD, List<Long>> function) {
+  public OverlapSplitBy(UnaryFunction<VD, List<GradoopId>> function) {
     this.function = function;
   }
 
@@ -108,7 +109,7 @@ public class OverlapSplitBy<
    */
   private DataSet<GD> computeNewSubgraphs(
     LogicalGraph<VD, ED, GD> graph, DataSet<VD> vertices) {
-    DataSet<Tuple1<Long>> newSubgraphIDs =
+    DataSet<Tuple1<GradoopId>> newSubgraphIDs =
       vertices.flatMap(new VertexToGraphIDFlatMapper<>(function)).distinct();
     return newSubgraphIDs.map(new SubgraphMapper<>(graph.getConfig()
       .getGraphHeadFactory()));
@@ -127,16 +128,16 @@ public class OverlapSplitBy<
     DataSet<GD> graphHeads) {
     // construct tuples of the edges with the ids of their source and target
     // vertices
-    DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex =
+    DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> edgeVertexVertex =
       graph.getEdges().map(new EdgeToTupleMapper<ED>());
     // replace the source vertex id by the graph list of this vertex
-    DataSet<Tuple3<Long, List<Long>, Long>> edgeGraphsVertex = edgeVertexVertex
+    DataSet<Tuple3<GradoopId, List<GradoopId>, GradoopId>> edgeGraphsVertex = edgeVertexVertex
         .join(vertices)
         .where(1)
         .equalTo("id")
         .with(new JoinEdgeTupleWithSourceGraphs<VD>());
     // replace the target vertex id by the graph list of this vertex
-    DataSet<Tuple3<Long, List<Long>, List<Long>>> edgeGraphsGraphs =
+    DataSet<Tuple3<GradoopId, List<GradoopId>, List<GradoopId>>> edgeGraphsGraphs =
       edgeGraphsVertex
         .join(vertices)
         .where(2)
@@ -144,17 +145,17 @@ public class OverlapSplitBy<
         .with(new JoinEdgeTupleWithTargetGraphs<VD>());
     // transform the new grpah heads into a single set of long, containing all
     // the identifiers
-    DataSet<List<Long>> newSubgraphIdentifiers = graphHeads
+    DataSet<List<GradoopId>> newSubgraphIdentifiers = graphHeads
       .map(new MapSubgraphIdToSet<GD>())
       .reduce(new ReduceSets());
     // construct new tuples containing the edge, the graphs of its source and
     // target vertex and the list of new graphs
-    DataSet<Tuple4<Long, List<Long>, List<Long>, List<Long>>>
+    DataSet<Tuple4<GradoopId, List<GradoopId>, List<GradoopId>, List<GradoopId>>>
       edgesWithSubgraphs = edgeGraphsGraphs
       .crossWithTiny(newSubgraphIdentifiers).with(new CrossEdgesWithGraphSet());
     // remove all edges which source and target are not in at least one common
     // graph
-    DataSet<Tuple2<Long, List<Long>>> newSubgraphs = edgesWithSubgraphs
+    DataSet<Tuple2<GradoopId, List<GradoopId>>> newSubgraphs = edgesWithSubgraphs
       .flatMap(new CheckEdgesSourceTargetGraphs());
     // join the graph set tuples with the edges, add all new graphs to the
     // edge graph sets
@@ -169,7 +170,7 @@ public class OverlapSplitBy<
    * map the graph ids to subgraphs
    */
   private static class SubgraphMapper<GD extends EPGMGraphHead> implements
-    MapFunction<Tuple1<Long>, GD>,
+    MapFunction<Tuple1<GradoopId>, GD>,
     ResultTypeQueryable<GD> {
     /**
      * EPGMGraphHeadFactory
@@ -189,8 +190,8 @@ public class OverlapSplitBy<
      * {@inheritDoc}
      */
     @Override
-    public GD map(Tuple1<Long> idTuple) throws Exception {
-      Long id = idTuple.f0;
+    public GD map(Tuple1<GradoopId> idTuple) throws Exception {
+      GradoopId id = idTuple.f0;
       return graphHeadFactory.createGraphHead(id, "split graph " + id);
     }
 
@@ -210,11 +211,11 @@ public class OverlapSplitBy<
    */
   private static class VertexToGraphIDFlatMapper<VD extends EPGMVertex>
     implements
-    FlatMapFunction<VD, Tuple1<Long>> {
+    FlatMapFunction<VD, Tuple1<GradoopId>> {
     /**
      * Self defined Function
      */
-    private UnaryFunction<VD, List<Long>> function;
+    private UnaryFunction<VD, List<GradoopId>> function;
 
     /**
      * Constructor
@@ -222,7 +223,7 @@ public class OverlapSplitBy<
      * @param function actual defined Function
      */
     public VertexToGraphIDFlatMapper(
-      UnaryFunction<VD, List<Long>> function) {
+      UnaryFunction<VD, List<GradoopId>> function) {
       this.function = function;
     }
 
@@ -231,9 +232,9 @@ public class OverlapSplitBy<
      */
     @Override
     public void flatMap(VD vertex,
-      Collector<Tuple1<Long>> collector) throws Exception {
-      List<Long> graphIDSet = function.execute(vertex);
-      for (Long id : graphIDSet) {
+      Collector<Tuple1<GradoopId>> collector) throws Exception {
+      List<GradoopId> graphIDSet = function.execute(vertex);
+      for (GradoopId id : graphIDSet) {
         collector.collect(new Tuple1<>(id));
       }
     }
@@ -249,7 +250,7 @@ public class OverlapSplitBy<
     /**
      * Self defined Function
      */
-    private UnaryFunction<VD, List<Long>> function;
+    private UnaryFunction<VD, List<GradoopId>> function;
 
     /**
      * Constructor
@@ -257,7 +258,7 @@ public class OverlapSplitBy<
      * @param function actual defined Function
      */
     public AddNewGraphsToVertexMapper(
-      UnaryFunction<VD, List<Long>> function) {
+      UnaryFunction<VD, List<GradoopId>> function) {
       this.function = function;
     }
 
@@ -266,10 +267,11 @@ public class OverlapSplitBy<
      */
     @Override
     public VD map(VD vertex) throws Exception {
-      List<Long> labelPropIndex = function.execute(vertex);
+      List<GradoopId> labelPropIndex = function.execute(vertex);
       if (vertex.getGraphIds() == null) {
-        vertex.setGraphs(new HashSet<Long>());
+        vertex.setGraphIds(new GradoopIds());
       }
+
       vertex.getGraphIds().addAll(labelPropIndex);
       return vertex;
     }
@@ -280,9 +282,9 @@ public class OverlapSplitBy<
    * target id
    */
   private static class EdgeToTupleMapper<ED extends EPGMEdge> implements
-    MapFunction<ED, Tuple3<Long, Long, Long>> {
+    MapFunction<ED, Tuple3<GradoopId, GradoopId, GradoopId>> {
     @Override
-    public Tuple3<Long, Long, Long> map(ED edge) throws Exception {
+    public Tuple3<GradoopId, GradoopId, GradoopId> map(ED edge) throws Exception {
       return new Tuple3<>(edge.getId(),
         edge.getSourceVertexId(),
         edge.getTargetVertexId());
@@ -294,16 +296,16 @@ public class OverlapSplitBy<
    */
   private static class JoinEdgeTupleWithSourceGraphs<VD extends EPGMVertex>
     implements
-    JoinFunction<Tuple3<Long, Long, Long>, VD, Tuple3<Long,
-      List<Long>, Long>> {
+    JoinFunction<Tuple3<GradoopId, GradoopId, GradoopId>, VD, Tuple3<GradoopId,
+      List<GradoopId>, GradoopId>> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tuple3<Long, List<Long>, Long> join(Tuple3<Long, Long, Long> tuple3,
+    public Tuple3<GradoopId, List<GradoopId>, GradoopId> join(Tuple3<GradoopId, GradoopId, GradoopId> tuple3,
       VD vertex) throws Exception {
       return new Tuple3<>(tuple3.f0,
-        (List<Long>) Lists.newArrayList(vertex.getGraphIds()),
+        (List<GradoopId>) Lists.newArrayList(vertex.getGraphIds()),
         tuple3.f2);
     }
   }
@@ -313,17 +315,17 @@ public class OverlapSplitBy<
    */
   private static class JoinEdgeTupleWithTargetGraphs<VD extends EPGMVertex>
     implements
-    JoinFunction<Tuple3<Long, List<Long>, Long>, VD,
-      Tuple3<Long, List<Long>, List<Long>>> {
+    JoinFunction<Tuple3<GradoopId, List<GradoopId>, GradoopId>, VD,
+      Tuple3<GradoopId, List<GradoopId>, List<GradoopId>>> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tuple3<Long, List<Long>, List<Long>> join(
-      Tuple3<Long, List<Long>, Long> tuple3, VD vertex) throws
+    public Tuple3<GradoopId, List<GradoopId>, List<GradoopId>> join(
+      Tuple3<GradoopId, List<GradoopId>, GradoopId> tuple3, VD vertex) throws
       Exception {
       return new Tuple3<>(tuple3.f0, tuple3.f1,
-        (List<Long>) Lists.newArrayList(vertex.getGraphIds()));
+        (List<GradoopId>) Lists.newArrayList(vertex.getGraphIds()));
     }
   }
 
@@ -332,10 +334,10 @@ public class OverlapSplitBy<
    * the subgraph
    */
   private static class MapSubgraphIdToSet<GD extends EPGMGraphHead> implements
-    MapFunction<GD, List<Long>> {
+    MapFunction<GD, List<GradoopId>> {
     @Override
-    public List<Long> map(GD graphHead) throws Exception {
-      List<Long> id = new ArrayList<>();
+    public List<GradoopId> map(GD graphHead) throws Exception {
+      List<GradoopId> id = new ArrayList<>();
       id.add(graphHead.getId());
       return id;
     }
@@ -344,12 +346,12 @@ public class OverlapSplitBy<
   /**
    * reduce a dataset of sets of longs into a single set of longs
    */
-  private static class ReduceSets implements ReduceFunction<List<Long>> {
+  private static class ReduceSets implements ReduceFunction<List<GradoopId>> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Long> reduce(List<Long> set1, List<Long> set2) throws
+    public List<GradoopId> reduce(List<GradoopId> set1, List<GradoopId> set2) throws
       Exception {
       set1.addAll(set2);
       return set1;
@@ -360,14 +362,14 @@ public class OverlapSplitBy<
    * add the set of subgraphs to the edge tuples
    */
   private static class CrossEdgesWithGraphSet implements
-    CrossFunction<Tuple3<Long, List<Long>, List<Long>>, List<Long>,
-      Tuple4<Long, List<Long>, List<Long>, List<Long>>> {
+    CrossFunction<Tuple3<GradoopId, List<GradoopId>, List<GradoopId>>, List<GradoopId>,
+      Tuple4<GradoopId, List<GradoopId>, List<GradoopId>, List<GradoopId>>> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tuple4<Long, List<Long>, List<Long>, List<Long>> cross(
-      Tuple3<Long, List<Long>, List<Long>> tuple3, List<Long> subgraphs) throws
+    public Tuple4<GradoopId, List<GradoopId>, List<GradoopId>, List<GradoopId>> cross(
+      Tuple3<GradoopId, List<GradoopId>, List<GradoopId>> tuple3, List<GradoopId> subgraphs) throws
       Exception {
       return new Tuple4<>(tuple3.f0, tuple3.f1, tuple3.f2, subgraphs);
     }
@@ -378,20 +380,20 @@ public class OverlapSplitBy<
    * same new subgraphs and to update the edgesList
    */
   private static class CheckEdgesSourceTargetGraphs implements
-    FlatMapFunction<Tuple4<Long, List<Long>, List<Long>, List<Long>>,
-      Tuple2<Long, List<Long>>> {
+    FlatMapFunction<Tuple4<GradoopId, List<GradoopId>, List<GradoopId>, List<GradoopId>>,
+      Tuple2<GradoopId, List<GradoopId>>> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public void flatMap(Tuple4<Long, List<Long>, List<Long>, List<Long>> tuple4,
-      Collector<Tuple2<Long, List<Long>>> collector) throws Exception {
-      List<Long> sourceGraphs = tuple4.f1;
-      List<Long> targetGraphs = tuple4.f2;
-      List<Long> newSubgraphs = tuple4.f3;
+    public void flatMap(Tuple4<GradoopId, List<GradoopId>, List<GradoopId>, List<GradoopId>> tuple4,
+      Collector<Tuple2<GradoopId, List<GradoopId>>> collector) throws Exception {
+      List<GradoopId> sourceGraphs = tuple4.f1;
+      List<GradoopId> targetGraphs = tuple4.f2;
+      List<GradoopId> newSubgraphs = tuple4.f3;
       boolean newGraphAdded = false;
-      List<Long> toBeAddedGraphs = new ArrayList<>();
-      for (Long graph : newSubgraphs) {
+      List<GradoopId> toBeAddedGraphs = new ArrayList<>();
+      for (GradoopId graph : newSubgraphs) {
         if (targetGraphs.contains(graph) && sourceGraphs.contains(graph)) {
           toBeAddedGraphs.add(graph);
           newGraphAdded = true;
@@ -408,12 +410,12 @@ public class OverlapSplitBy<
    */
   @FunctionAnnotation.ForwardedFieldsFirst("*->*")
   private static class JoinEdgeTuplesWithEdges<ED extends EPGMEdge> implements
-    JoinFunction<ED, Tuple2<Long, List<Long>>, ED> {
+    JoinFunction<ED, Tuple2<GradoopId, List<GradoopId>>, ED> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public ED join(ED edge, Tuple2<Long, List<Long>> tuple2) throws Exception {
+    public ED join(ED edge, Tuple2<GradoopId, List<GradoopId>> tuple2) throws Exception {
       return edge;
     }
   }

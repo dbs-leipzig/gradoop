@@ -26,6 +26,7 @@ import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
 import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.FlinkConstants;
 
 /**
@@ -49,7 +50,7 @@ public class Combination<
   @Override
   protected LogicalGraph<VD, ED, GD> executeInternal(
     LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
-    final Long newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
+    final GradoopId newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
 
     // build distinct union of vertex sets and update graph ids at vertices
     // cannot use Gelly union here because of missing argument for KeySelector

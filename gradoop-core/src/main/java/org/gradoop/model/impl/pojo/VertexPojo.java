@@ -18,6 +18,8 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Map;
 import java.util.Set;
@@ -41,8 +43,8 @@ public class VertexPojo extends GraphElementPojo implements EPGMVertex {
    * @param properties key-value-map  (can be {@code null})
    * @param graphs     graphs that contain that vertex (can be {@code null})
    */
-  VertexPojo(final Long id, final String label,
-    final Map<String, Object> properties, final Set<Long> graphs) {
+  VertexPojo(final GradoopId id, final String label,
+    final Map<String, Object> properties, final GradoopIds graphs) {
     super(id, label, properties, graphs);
   }
 

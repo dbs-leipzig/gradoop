@@ -17,14 +17,17 @@
 
 package org.gradoop.storage.impl.hbase;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Writables;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMEdgeFactory;
@@ -103,7 +106,7 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeSourceVertex(Put put, VD vertexData) {
+  public Put writeSourceVertex(Put put, VD vertexData) throws IOException {
     return put.add(CF_META_BYTES, COL_SOURCE_VERTEX_BYTES,
       createVertexIdentifier(vertexData));
   }
@@ -112,15 +115,19 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Long readSourceVertexId(Result res) {
-    return Bytes.toLong(res.getValue(CF_META_BYTES, COL_SOURCE_VERTEX_BYTES));
+  public GradoopId readSourceVertexId(Result res) throws IOException {
+    GradoopId sourceVertexId = new GradoopId();
+    Writables.getWritable(
+      res.getValue(CF_META_BYTES, COL_SOURCE_VERTEX_BYTES), sourceVertexId);
+
+    return sourceVertexId;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Put writeTargetVertex(Put put, VD vertexData) {
+  public Put writeTargetVertex(Put put, VD vertexData) throws IOException {
     return put.add(CF_META_BYTES, COL_TARGET_VERTEX_BYTES,
       createVertexIdentifier(vertexData));
   }
@@ -129,21 +136,26 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Long readTargetVertexId(Result res) {
-    return Bytes.toLong(res.getValue(CF_META_BYTES, COL_TARGET_VERTEX_BYTES));
+  public GradoopId readTargetVertexId(Result res) throws IOException {
+    GradoopId targetVertexId = new GradoopId();
+    Writables.getWritable(
+      res.getValue(CF_META_BYTES, COL_TARGET_VERTEX_BYTES), targetVertexId);
+
+    return targetVertexId;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdge(Put put, PersistentEdge<VD> edgeData) {
+  public Put writeEdge(Put put, PersistentEdge<VD> edgeData) throws
+    IOException {
     LOG.info("Creating Put from: " + edgeData);
     writeLabel(put, edgeData);
     writeSourceVertex(put, edgeData.getSourceVertex());
     writeTargetVertex(put, edgeData.getTargetVertex());
     writeProperties(put, edgeData);
-    writeGraphs(put, edgeData);
+    writeGraphIds(put, edgeData);
     return put;
   }
 
@@ -151,11 +163,11 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public ED readEdge(Result res) {
+  public ED readEdge(Result res) throws IOException {
     return edgeFactory
-      .createEdge(Long.valueOf(Bytes.toString(res.getRow())), readLabel(res),
+      .createEdge(readId(res), readLabel(res),
         readSourceVertexId(res), readTargetVertexId(res), readProperties(res),
-        readGraphs(res));
+        readGraphIds(res));
   }
 
   /**
@@ -174,14 +186,13 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * @param vertex vertex
    * @return byte representation of the vertex identifier
    */
-  private byte[] createVertexIdentifier(final EPGMVertex vertex) {
+  private byte[] createVertexIdentifier(final EPGMVertex vertex) throws
+    IOException {
+    byte[] vertexKeyBytes = Writables.getBytes(vertex.getId());
     byte[] labelBytes = Bytes.toBytes(vertex.getLabel());
-    byte[] vertexKey = new byte[Bytes.SIZEOF_LONG + labelBytes.length];
-    // vertex identifier
-    Bytes.putLong(vertexKey, 0, vertex.getId());
-    // vertex label
-    Bytes
-      .putBytes(vertexKey, Bytes.SIZEOF_LONG, labelBytes, 0, labelBytes.length);
-    return vertexKey;
+
+    ArrayUtils.addAll(vertexKeyBytes,labelBytes);
+
+    return vertexKeyBytes;
   }
 }

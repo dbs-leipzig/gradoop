@@ -21,11 +21,14 @@ import com.google.common.collect.Sets;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.storage.api.GraphElementHandler;
 
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -44,19 +47,14 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public Put writeGraphs(Put put, EPGMGraphElement graphElement) {
-    int graphCount = graphElement.getGraphCount();
-    if (graphCount > 0) {
-      byte[] graphs =
-        new byte[Bytes.SIZEOF_INT + graphCount * Bytes.SIZEOF_LONG];
-      Bytes.putInt(graphs, 0, graphCount);
-      int offset = Bytes.SIZEOF_INT;
-      for (GradoopId graphId : graphElement.getGraphs()) {
-        Bytes.putLong(graphs, offset, graphId);
-        offset += Bytes.SIZEOF_LONG;
-      }
-      put = put.add(CF_META_BYTES, COL_GRAPHS_BYTES, graphs);
+  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) throws
+    IOException {
+
+    if (graphElement.getGraphCount() > 0) {
+      byte[] graphsBytes = Writables.getBytes(graphElement.getGraphIds());
+      put = put.add(CF_META_BYTES, COL_GRAPHS_BYTES, graphsBytes);
     }
+
     return put;
   }
 
@@ -64,18 +62,12 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public Set<GradoopId> readGraphs(Result res) {
+  public GradoopIds readGraphIds(Result res) throws IOException {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
-    Set<GradoopId> result = null;
-    if (graphBytes != null) {
-      int graphCount = Bytes.toInt(graphBytes);
-      result = Sets.newHashSetWithExpectedSize(graphCount);
-      int offset = Bytes.SIZEOF_INT;
-      for (int i = 0; i < graphCount; i++) {
-        result.add(Bytes.toLong(graphBytes, offset));
-        offset += Bytes.SIZEOF_LONG;
-      }
-    }
-    return result;
+    
+    GradoopIds graphIds = null;
+    Writables.getWritable(graphBytes, graphIds);
+
+    return graphIds;
   }
 }

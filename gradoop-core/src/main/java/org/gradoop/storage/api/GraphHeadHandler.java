@@ -22,6 +22,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -41,7 +42,8 @@ public interface GraphHeadHandler<
    * @param graphData graph data containing vertex identifiers
    * @return put with vertices
    */
-  Put writeVertices(final Put put, final PersistentGraphHead graphData);
+  Put writeVertices(final Put put, final PersistentGraphHead graphData) throws
+    IOException;
 
   /**
    * Reads the vertex identifiers from the given result.
@@ -59,7 +61,8 @@ public interface GraphHeadHandler<
    * @param graphData graph data containing edge identifiers
    * @return put with edges
    */
-  Put writeEdges(final Put put, final PersistentGraphHead graphData);
+  Put writeEdges(final Put put, final PersistentGraphHead graphData) throws
+    IOException;
 
   /**
    * Reads the edge identifiers from the given result.
@@ -76,7 +79,8 @@ public interface GraphHeadHandler<
    * @param graphData graph data
    * @return put with graph data
    */
-  Put writeGraphHead(final Put put, final PersistentGraphHead graphData);
+  Put writeGraphHead(final Put put, final PersistentGraphHead graphData) throws
+    IOException;
 
   /**
    * Reads the graph data from the given result.
@@ -84,7 +88,7 @@ public interface GraphHeadHandler<
    * @param res HBase row
    * @return graph entity
    */
-  GD readGraphHead(final Result res);
+  GD readGraphHead(final Result res) throws IOException;
 
   /**
    * Returns the graph data factory used by this handler.

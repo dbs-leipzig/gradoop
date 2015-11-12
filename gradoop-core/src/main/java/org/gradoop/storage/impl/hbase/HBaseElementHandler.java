@@ -21,11 +21,14 @@ import com.google.common.collect.Sets;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Writables;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.storage.api.ElementHandler;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -55,22 +58,24 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public byte[] getRowKey(final Long elementId) {
+  public byte[] getRowKey(final GradoopId elementId) throws IOException {
     if (elementId == null) {
       throw new IllegalArgumentException("elementId must not be null");
     }
-    return Bytes.toBytes(elementId.toString());
+    return Writables.getBytes(elementId);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Long getId(final byte[] rowKey) {
+  public GradoopId getId(final byte[] rowKey) throws IOException {
     if (rowKey == null) {
       throw new IllegalArgumentException("rowKey must not be null");
     }
-    return Long.valueOf(Bytes.toString(rowKey));
+    GradoopId id = new GradoopId();
+    Writables.getWritable(rowKey, id);
+    return id;
   }
 
   /**
@@ -275,5 +280,12 @@ public abstract class HBaseElementHandler implements ElementHandler {
       }
     }
     return o;
+  }
+
+  protected GradoopId readId(Result res) throws IOException {
+    GradoopId id = new GradoopId();
+    Writables.getWritable(res.getRow(),id);
+
+    return id;
   }
 }

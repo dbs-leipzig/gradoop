@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Maps EPGM vertices to a Label Propagation specific representation.
@@ -29,10 +30,10 @@ import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
  * @see LPVertexValue
  */
 public class VertexToLPVertexMapper<VD extends EPGMVertex>
-  implements MapFunction<VD, Vertex<Long, LPVertexValue>> {
+  implements MapFunction<VD, Vertex<GradoopId, LPVertexValue>> {
 
   @Override
-  public Vertex<Long, LPVertexValue> map(VD vertex) throws Exception {
+  public Vertex<GradoopId, LPVertexValue> map(VD vertex) throws Exception {
     return new Vertex<>(vertex.getId(),
       new LPVertexValue(vertex.getId(), vertex.getId()));
   }

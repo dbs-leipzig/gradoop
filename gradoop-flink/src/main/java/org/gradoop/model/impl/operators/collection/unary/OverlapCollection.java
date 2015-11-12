@@ -28,6 +28,7 @@ import org.gradoop.model.impl.functions.filterfunctions
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInAllGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.FlinkConstants;
 
 /**
@@ -48,7 +49,8 @@ public class OverlapCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
   public LogicalGraph<VD, ED, GD> execute(
     GraphCollection<VD, ED, GD> collection) {
     DataSet<GD> graphHeads = collection.getGraphHeads();
-    DataSet<Long> graphIDs = graphHeads.map(new GraphToIdentifierMapper<GD>());
+    DataSet<GradoopId> graphIDs =
+      graphHeads.map(new GraphToIdentifierMapper<GD>());
     DataSet<VD> vertices =
       collection.getVertices().filter(new VertexInAllGraphsFilterWithBC<VD>())
         .withBroadcastSet(graphIDs,

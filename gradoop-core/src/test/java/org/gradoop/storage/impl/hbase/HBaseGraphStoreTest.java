@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import org.gradoop.HBaseTestBase;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -167,14 +169,14 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     // list is not supported by
     final List<String> value = Lists.newArrayList();
 
-    Long vertexID = 0L;
+    GradoopId vertexID = GradoopId.createId(0L);
     final String label = "A";
     final Map<String, Object> properties = new HashMap<>();
     properties.put("k1", value);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);
-    final Set<Long> graphs = Sets.newHashSetWithExpectedSize(0);
+    final GradoopIds graphs = new GradoopIds();
     PersistentVertex<EdgePojo> v = persistentVertexFactory
       .createVertex(
         vertexFactory.createVertex(vertexID, label, properties, graphs),
@@ -210,7 +212,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     final String keyString = "key6";
     final String valueString = "value";
 
-    final Long vertexID = 0L;
+    final GradoopId vertexID = GradoopId.createId(0L);
     final String label = "A";
 
     final Map<String, Object> properties = new HashMap<>();
@@ -223,7 +225,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);
-    final Set<Long> graphs = Sets.newHashSetWithExpectedSize(0);
+    final GradoopIds graphs = new GradoopIds();
 
     // write to store
     graphStore.writeVertex(persistentVertexFactory.createVertex(

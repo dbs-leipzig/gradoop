@@ -19,6 +19,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Given a vertex, the method returns the community id, that vertex is in. This
@@ -28,7 +29,7 @@ import org.gradoop.model.impl.functions.UnaryFunction;
  * @param <VD> EPGM vertex type
  */
 public class CommunityDiscriminatorFunction<VD extends EPGMVertex> implements
-  UnaryFunction<VD, Long> {
+  UnaryFunction<VD, GradoopId> {
 
   /**
    * Property key to retrieve property value.
@@ -45,11 +46,11 @@ public class CommunityDiscriminatorFunction<VD extends EPGMVertex> implements
   }
 
   @Override
-  public Long execute(VD entity) throws Exception {
+  public GradoopId execute(VD entity) throws Exception {
     Object val = entity.getProperty(propertyKey);
 
-    if (val != null && val instanceof Long) {
-      return (Long.class.cast(val) + 1) * -1L;
+    if (val != null && val instanceof GradoopId) {
+      return (GradoopId.class.cast(val) + 1) * -1L;
     } else {
       throw new IllegalArgumentException(
         "non-valid property value for cluster identification");

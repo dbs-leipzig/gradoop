@@ -22,6 +22,9 @@ import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
+
+import java.io.IOException;
 
 /**
  * Responsible for reading and writing edge data from and to HBase.
@@ -42,7 +45,7 @@ public interface EdgeHandler<
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeSourceVertex(final Put put, final VD vertexData);
+  Put writeSourceVertex(final Put put, final VD vertexData) throws IOException;
 
   /**
    * Reads the source vertex identifier from the given {@link Result}.
@@ -50,7 +53,7 @@ public interface EdgeHandler<
    * @param res HBase {@link Result}
    * @return source vertex identifier
    */
-  Long readSourceVertexId(final Result res);
+  GradoopId readSourceVertexId(final Result res) throws IOException;
 
   /**
    * Adds the target vertex data to the given {@link Put} and returns it.
@@ -59,7 +62,7 @@ public interface EdgeHandler<
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeTargetVertex(final Put put, final VD vertexData);
+  Put writeTargetVertex(final Put put, final VD vertexData) throws IOException;
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -67,7 +70,7 @@ public interface EdgeHandler<
    * @param res HBase {@link Result}
    * @return target vertex identifier
    */
-  Long readTargetVertexId(final Result res);
+  GradoopId readTargetVertexId(final Result res) throws IOException;
 
   /**
    * Writes the complete edge data to the given {@link Put} and returns it.
@@ -76,7 +79,8 @@ public interface EdgeHandler<
    * @param edgeData edge data to be written
    * @return put with edge data
    */
-  Put writeEdge(final Put put, final PersistentEdge<VD> edgeData);
+  Put writeEdge(final Put put, final PersistentEdge<VD> edgeData) throws
+    IOException;
 
   /**
    * Reads the edge data from the given {@link Result}.
@@ -84,7 +88,7 @@ public interface EdgeHandler<
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  ED readEdge(final Result res);
+  ED readEdge(final Result res) throws IOException;
 
   /**
    * Returns the edge data factory used by this handler.

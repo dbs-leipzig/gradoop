@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.filterfunctions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Checks if an edge is contained in the given graph.
@@ -31,14 +32,14 @@ public class EdgeInGraphFilter<ED extends EPGMEdge>
   /**
    * Graph identifier
    */
-  private final long graphId;
+  private final GradoopId graphId;
 
   /**
    * Creates a filter
    *
    * @param graphId graphId for containment check
    */
-  public EdgeInGraphFilter(long graphId) {
+  public EdgeInGraphFilter(GradoopId graphId) {
     this.graphId = graphId;
   }
 

@@ -23,6 +23,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.btg.BTG;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +35,12 @@ import java.util.List;
  * @see BTGVertexValue
  */
 public class VertexToBTGVertexMapper<VD extends EPGMVertex>
-  implements MapFunction<VD, Vertex<Long, BTGVertexValue>> {
+  implements MapFunction<VD, Vertex<GradoopId, BTGVertexValue>> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public Vertex<Long, BTGVertexValue> map(VD logicalVertex) throws Exception {
+  public Vertex<GradoopId, BTGVertexValue> map(VD logicalVertex) throws Exception {
     BTGVertexValue btgValue = createNewVertexValue(logicalVertex);
     return new Vertex<>(logicalVertex.getId(), btgValue);
   }

@@ -17,6 +17,8 @@
 
 package org.gradoop.model.impl.pojo;
 
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 
@@ -26,7 +28,8 @@ import java.util.Set;
 /**
  * Factory for creating vertices.
  */
-public class VertexPojoFactory extends ElementPojoFactory implements EPGMVertexFactory<VertexPojo> {
+public class VertexPojoFactory extends ElementPojoFactory
+  implements EPGMVertexFactory<VertexPojo> {
 
   /**
    * serial version uid
@@ -37,7 +40,7 @@ public class VertexPojoFactory extends ElementPojoFactory implements EPGMVertexF
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final Long vertexID) {
+  public VertexPojo createVertex(final GradoopId vertexID) {
     return createVertex(vertexID, GConstants.DEFAULT_VERTEX_LABEL, null, null);
   }
 
@@ -45,7 +48,7 @@ public class VertexPojoFactory extends ElementPojoFactory implements EPGMVertexF
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final Long vertexID, final String label) {
+  public VertexPojo createVertex(final GradoopId vertexID, final String label) {
     return createVertex(vertexID, label, null, null);
   }
 
@@ -53,7 +56,7 @@ public class VertexPojoFactory extends ElementPojoFactory implements EPGMVertexF
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final Long vertexID, final String label,
+  public VertexPojo createVertex(final GradoopId vertexID, final String label,
     Map<String, Object> properties) {
     return createVertex(vertexID, label, properties, null);
   }
@@ -62,8 +65,8 @@ public class VertexPojoFactory extends ElementPojoFactory implements EPGMVertexF
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final Long vertexID, final String label,
-    final Set<Long> graphs) {
+  public VertexPojo createVertex(final GradoopId vertexID, final String label,
+    final GradoopIds graphs) {
     return createVertex(vertexID, label, null, graphs);
   }
 
@@ -71,8 +74,8 @@ public class VertexPojoFactory extends ElementPojoFactory implements EPGMVertexF
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final Long id, final String label,
-    final Map<String, Object> properties, final Set<Long> graphs) {
+  public VertexPojo createVertex(final GradoopId id, final String label,
+    final Map<String, Object> properties, final GradoopIds graphs) {
     checkId(id);
     checkLabel(label);
     return new VertexPojo(id, label, properties, graphs);

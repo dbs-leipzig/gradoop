@@ -18,6 +18,8 @@ import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -337,51 +339,41 @@ public class HBaseTestBase {
     PersistentGraphHeadFactory<GraphHeadPojo, HBaseGraphHead>
       graphDataFactory = new HBaseGraphHeadFactory();
 
-    Set<Long> vertexIds = null;
-    Set<Long> edgeIds = null;
+    GradoopIds vertexIds = null;
+    GradoopIds edgeIds = null;
 
     for (GraphHeadPojo graphData : graphDataCollection) {
       if (graphData.getId().equals(communityDatabases.getId())) {
-        vertexIds =
-          Sets.newHashSet(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB
-
-            .getId(), VERTEX_PERSON_EVE
-
-            .getId());
-        edgeIds = Sets
-          .newHashSet(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_6_KNOWS
+        vertexIds = new GradoopIds(VERTEX_PERSON_ALICE.getId(),
+          VERTEX_PERSON_BOB.getId(), VERTEX_PERSON_EVE.getId());
+        edgeIds = new GradoopIds(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_6_KNOWS
 
             .getId(), EDGE_21_KNOWS.getId());
       } else if (graphData.getId().equals(communityHadoop.getId())) {
         vertexIds =
-          Sets.newHashSet(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE
+          new GradoopIds(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE
 
             .getId(), VERTEX_PERSON_FRANK
 
             .getId());
-        edgeIds = Sets
-          .newHashSet(EDGE_4_KNOWS.getId(), EDGE_5_KNOWS.getId(), EDGE_22_KNOWS
+        edgeIds = new GradoopIds(EDGE_4_KNOWS.getId(), EDGE_5_KNOWS.getId(), EDGE_22_KNOWS
 
             .getId(), EDGE_23_KNOWS.getId());
       } else if (graphData.getId().equals(communityGraphs.getId())) {
-        vertexIds = Sets
-          .newHashSet(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB.getId(),
+        vertexIds = new GradoopIds(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB.getId(),
             VERTEX_PERSON_CAROL
 
               .getId(), VERTEX_PERSON_DAVE
 
               .getId());
-        edgeIds = Sets
-          .newHashSet(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_2_KNOWS
+        edgeIds = new GradoopIds(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_2_KNOWS
 
               .getId(), EDGE_3_KNOWS.getId(), EDGE_4_KNOWS.getId(),
             EDGE_5_KNOWS.getId());
       } else if (graphData.getId().equals(forumGraph.getId())) {
-        vertexIds = Sets
-          .newHashSet(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE.getId(),
+        vertexIds = new GradoopIds(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE.getId(),
             VERTEX_PERSON_FRANK.getId(), VERTEX_FORUM_GPS.getId());
-        edgeIds = Sets
-          .newHashSet(EDGE_4_KNOWS.getId(), EDGE_16_HAS_MODERATOR.getId(),
+        edgeIds = new GradoopIds(EDGE_4_KNOWS.getId(), EDGE_16_HAS_MODERATOR.getId(),
             EDGE_19_HAS_MEMBER.getId(), EDGE_20_HAS_MEMBER.getId());
       }
       persistentGraphData
@@ -398,33 +390,26 @@ public class HBaseTestBase {
     EPGMGraphHeadFactory<GraphHeadPojo> graphHeadFactory =
       new GraphHeadPojoFactory();
     // graph 0
-    Long graphID = 0L;
+    GradoopId graphID = GradoopId.createId(0L);
     String graphLabel = "A";
     Map<String, Object> graphProperties = new HashMap<>();
     graphProperties.put("k1", "v1");
     graphProperties.put("k2", "v2");
-    Set<Long> vertices = Sets.newHashSetWithExpectedSize(2);
-    vertices.add(0L);
-    vertices.add(1L);
-    Set<Long> edges = Sets.newHashSetWithExpectedSize(2);
-    edges.add(2L);
-    edges.add(3L);
 
-    persistentGraphData.add(new HBaseGraphHead(
-      graphHeadFactory.createGraphHead(graphID, graphLabel, graphProperties),
-      vertices, edges));
+    GradoopIds vertices = GradoopIds.createGradoopIds(0L, 1L);
+    GradoopIds edges = GradoopIds.createGradoopIds(2L, 3L);
+
+    persistentGraphData.add(
+      new HBaseGraphHead(graphHeadFactory.createGraphHead(
+        graphID, graphLabel, graphProperties), vertices, edges));
 
     // graph 1
-    graphID = 1L;
+    graphID = GradoopId.createId(1L);
     graphLabel = "A";
     graphProperties = new HashMap<>();
     graphProperties.put("k1", "v1");
-    vertices = Sets.newHashSetWithExpectedSize(2);
-    vertices.add(1L);
-    vertices.add(2L);
-    edges = Sets.newLinkedHashSetWithExpectedSize(2);
-    edges.add(4L);
-    edges.add(5L);
+    vertices = GradoopIds.createGradoopIds(1L, 2L);
+    edges = GradoopIds.createGradoopIds(4L, 5L);
 
     persistentGraphData.add(new HBaseGraphHead(
       graphHeadFactory.createGraphHead(graphID, graphLabel, graphProperties),
@@ -444,39 +429,43 @@ public class HBaseTestBase {
     EPGMEdgeFactory<EdgePojo> edgeFactory =
       new EdgePojoFactory();
     // vertex 0
-    Long vertexId = 0L;
+    GradoopId vertexId = GradoopId.createId(0L);
     String vertexLabel = "A";
     Map<String, Object> vertexProperties = new HashMap<>();
     vertexProperties.put("k1", "v1");
     vertexProperties.put("k2", "v2");
-    Set<Long> graphs = Sets.newHashSetWithExpectedSize(2);
-    graphs.add(0L);
-    graphs.add(1L);
+    GradoopIds graphs = GradoopIds.createGradoopIds(0L, 1L);
     Set<EdgePojo> outgoingEdgeData = Sets.newHashSetWithExpectedSize(2);
-    outgoingEdgeData.add(edgeFactory.createEdge(0L, "a", 0L, 1L));
-    outgoingEdgeData.add(edgeFactory.createEdge(1L, "b", 0L, 2L));
+    outgoingEdgeData.add(edgeFactory.createEdge(GradoopId.createId(0L), "a",
+      GradoopId.createId(0L), GradoopId.createId(1L)));
+    outgoingEdgeData.add(edgeFactory.createEdge(GradoopId.createId(1L), "b",
+      GradoopId.createId(0L), GradoopId.createId(2L)));
     Set<EdgePojo> incomingEdgeData = Sets.newHashSetWithExpectedSize(2);
-    incomingEdgeData.add(edgeFactory.createEdge(2L, "a", 1L, 0L));
-    incomingEdgeData.add(edgeFactory.createEdge(3L, "c", 2L, 0L));
+    incomingEdgeData.add(edgeFactory.createEdge(GradoopId.createId(2L), "a",
+      GradoopId.createId(1L), GradoopId.createId(0L)));
+    incomingEdgeData.add(edgeFactory.createEdge(GradoopId.createId(3L), "c",
+      GradoopId.createId(2L), GradoopId.createId(0L)));
 
     persistentVertexData.add(persistentVertexFactory.createVertex(vertexFactory
         .createVertex(vertexId, vertexLabel, vertexProperties, graphs),
       outgoingEdgeData, incomingEdgeData));
 
     // vertex 1
-    vertexId = 1L;
+    vertexId = GradoopId.createId(1L);
     vertexLabel = "B";
     vertexProperties = new HashMap<>();
     vertexProperties.put("k1", "v1");
-    graphs = Sets.newHashSetWithExpectedSize(2);
-    graphs.add(1L);
-    graphs.add(2L);
+    graphs = GradoopIds.createGradoopIds(1L, 2L);
     outgoingEdgeData = Sets.newHashSetWithExpectedSize(2);
-    outgoingEdgeData.add(edgeFactory.createEdge(2L, 1L, 0L));
-    outgoingEdgeData.add(edgeFactory.createEdge(4L, 1L, 2L));
+    outgoingEdgeData.add(edgeFactory.createEdge(GradoopId.createId(2L),
+      GradoopId.createId(1L), GradoopId.createId(0L)));
+    outgoingEdgeData.add(edgeFactory.createEdge(GradoopId.createId(4L),
+      GradoopId.createId(1L), GradoopId.createId(2L)));
     incomingEdgeData = Sets.newHashSetWithExpectedSize(2);
-    incomingEdgeData.add(edgeFactory.createEdge(0L, 0L, 1L));
-    incomingEdgeData.add(edgeFactory.createEdge(5L, 2L, 1L));
+    incomingEdgeData.add(edgeFactory.createEdge(GradoopId.createId(0L),
+      GradoopId.createId(0L), GradoopId.createId(1L)));
+    incomingEdgeData.add(edgeFactory.createEdge(GradoopId.createId(5L),
+      GradoopId.createId(2L), GradoopId.createId(1L)));
 
     persistentVertexData.add(persistentVertexFactory.createVertex(vertexFactory
         .createVertex(vertexId, vertexLabel, vertexProperties, graphs),
@@ -496,18 +485,16 @@ public class HBaseTestBase {
     EPGMEdgeFactory<EdgePojo> edgeFactory =
       new EdgePojoFactory();
     // edge 0
-    Long edgeId = 0L;
+    GradoopId edgeId = GradoopId.createId(0L);
     String edgeLabel = "a";
     Map<String, Object> edgeProperties = new HashMap<>();
     edgeProperties.put("k1", "v1");
     edgeProperties.put("k2", "v2");
-    Set<Long> graphs = Sets.newHashSetWithExpectedSize(2);
-    graphs.add(0L);
-    graphs.add(1L);
+    GradoopIds graphs = GradoopIds.createGradoopIds(0L, 1L);
     VertexPojo edgeSourceData =
-      vertexFactory.createVertex(0L, "A");
+      vertexFactory.createVertex(GradoopId.createId(0L), "A");
     VertexPojo edgeTargetData =
-      vertexFactory.createVertex(1L, "B");
+      vertexFactory.createVertex(GradoopId.createId(1L), "B");
 
     persistentEdgeData.add(persistentEdgeFactory.createEdge(edgeFactory
         .createEdge(edgeId, edgeLabel, edgeSourceData.getId(),
@@ -515,15 +502,13 @@ public class HBaseTestBase {
       edgeTargetData));
 
     // edge 1
-    edgeId = 1L;
+    edgeId = GradoopId.createId(1L);
     edgeLabel = "b";
     edgeProperties = Maps.newHashMapWithExpectedSize(1);
     edgeProperties.put("k1", "v1");
-    graphs = Sets.newHashSetWithExpectedSize(2);
-    graphs.add(1L);
-    graphs.add(2L);
-    edgeSourceData = vertexFactory.createVertex(0L, "A");
-    edgeTargetData = vertexFactory.createVertex(2L, "C");
+    graphs = GradoopIds.createGradoopIds(1L, 2L);
+    edgeSourceData = vertexFactory.createVertex(GradoopId.createId(0L), "A");
+    edgeTargetData = vertexFactory.createVertex(GradoopId.createId(2L), "C");
 
     persistentEdgeData.add(persistentEdgeFactory.createEdge(edgeFactory
         .createEdge(edgeId, edgeLabel, edgeSourceData.getId(),
@@ -541,7 +526,7 @@ public class HBaseTestBase {
   public static void validateGraphHead(
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore) {
     // g0
-    EPGMGraphHead g = graphStore.readGraph(0L);
+    EPGMGraphHead g = graphStore.readGraph(GradoopId.createId(0L));
     assertNotNull(g);
     assertEquals("A", g.getLabel());
     List<String> propertyKeys = Lists.newArrayList(g.getPropertyKeys());
@@ -555,7 +540,7 @@ public class HBaseTestBase {
     }
 
     // g1
-    g = graphStore.readGraph(1L);
+    g = graphStore.readGraph(GradoopId.createId(1L));
     assertNotNull(g);
     assertEquals("A", g.getLabel());
     propertyKeys = Lists.newArrayList(g.getPropertyKeys());
@@ -571,7 +556,7 @@ public class HBaseTestBase {
   public static void validateVertex(
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore) {
     // vertex 0
-    EPGMVertex v = graphStore.readVertex(0L);
+    EPGMVertex v = graphStore.readVertex(GradoopId.createId(0L));
     assertNotNull(v);
     assertEquals("A", v.getLabel());
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
@@ -584,19 +569,19 @@ public class HBaseTestBase {
       }
     }
     assertEquals(2, v.getGraphCount());
-    assertTrue(v.getGraphIds().contains(0L));
-    assertTrue(v.getGraphIds().contains(1L));
+    assertTrue(v.getGraphIds().contains(GradoopId.createId(0L)));
+    assertTrue(v.getGraphIds().contains(GradoopId.createId(1L)));
 
     // vertex 1
-    v = graphStore.readVertex(1L);
+    v = graphStore.readVertex(GradoopId.createId(1L));
     assertNotNull(v);
     assertEquals("B", v.getLabel());
     propertyKeys = Lists.newArrayList(v.getPropertyKeys());
     assertEquals(1, propertyKeys.size());
     assertEquals("v1", v.getProperty("k1"));
     assertEquals(2, v.getGraphCount());
-    assertTrue(v.getGraphIds().contains(1L));
-    assertTrue(v.getGraphIds().contains(2L));
+    assertTrue(v.getGraphIds().contains(GradoopId.createId(1L)));
+    assertTrue(v.getGraphIds().contains(GradoopId.createId(2L)));
   }
 
   /**
@@ -607,7 +592,7 @@ public class HBaseTestBase {
   public static void validateEdge(
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore) {
     // edge 0
-    EPGMEdge e = graphStore.readEdge(0L);
+    EPGMEdge e = graphStore.readEdge(GradoopId.createId(0L));
     assertNotNull(e);
     assertEquals("a", e.getLabel());
     assertEquals(new Long(0L), e.getSourceVertexId());
@@ -623,22 +608,22 @@ public class HBaseTestBase {
       }
     }
     assertEquals(2, e.getGraphCount());
-    assertTrue(e.getGraphIds().contains(0L));
-    assertTrue(e.getGraphIds().contains(1L));
+    assertTrue(e.getGraphIds().contains(GradoopId.createId(0L)));
+    assertTrue(e.getGraphIds().contains(GradoopId.createId(1L)));
 
     // edge 1
-    e = graphStore.readEdge(1L);
+    e = graphStore.readEdge(GradoopId.createId(1L));
     assertNotNull(e);
     assertEquals("b", e.getLabel());
-    assertEquals(new Long(0L), e.getSourceVertexId());
-    assertEquals(new Long(2L), e.getTargetVertexId());
+    assertEquals(GradoopId.createId(0L), e.getSourceVertexId());
+    assertEquals(GradoopId.createId(2L), e.getTargetVertexId());
     assertEquals(1L, e.getPropertyCount());
     propertyKeys = Lists.newArrayList(e.getPropertyKeys());
     assertEquals(1, propertyKeys.size());
     assertEquals("v1", e.getProperty("k1"));
     assertEquals(2, e.getGraphCount());
-    assertTrue(e.getGraphIds().contains(1L));
-    assertTrue(e.getGraphIds().contains(2L));
+    assertTrue(e.getGraphIds().contains(GradoopId.createId(1L)));
+    assertTrue(e.getGraphIds().contains(GradoopId.createId(2L)));
 
   }
 }

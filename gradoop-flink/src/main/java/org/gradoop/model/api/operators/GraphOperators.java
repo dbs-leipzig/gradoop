@@ -22,6 +22,7 @@ import org.apache.flink.graph.Graph;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Operators that are available at all graph structures.
@@ -56,7 +57,7 @@ public interface GraphOperators<
    * @param vertexID vertex identifier
    * @return outgoing edge data of given vertex
    */
-  DataSet<ED> getOutgoingEdges(final Long vertexID);
+  DataSet<ED> getOutgoingEdges(final GradoopId vertexID);
 
   /**
    * Returns the edge data associated with the incoming edges of the given
@@ -65,14 +66,14 @@ public interface GraphOperators<
    * @param vertexID vertex identifier
    * @return incoming edge data of given vertex
    */
-  DataSet<ED> getIncomingEdges(final Long vertexID);
+  DataSet<ED> getIncomingEdges(final GradoopId vertexID);
 
   /**
    * Transforms the EPGM graph to a Gelly Graph.
    *
    * @return Gelly Graph
    */
-  Graph<Long, VD, ED> toGellyGraph();
+  Graph<GradoopId, VD, ED> toGellyGraph();
 
   /**
    * Returns the number of vertices in that logical graph.

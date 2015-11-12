@@ -1,15 +1,14 @@
 package org.gradoop.model.impl.pojo;
 
-import com.google.common.collect.Sets;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Abstract class representing an EPGM element that is containd in logical
- * graphs (i.e., vertices and edge).
+ * graphIds (i.e., vertices and edge).
  */
 public abstract class GraphElementPojo extends ElementPojo implements
   EPGMGraphElement {
@@ -17,7 +16,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
   /**
    * Set of graph identifiers that element is contained in
    */
-  private Set<GradoopId> graphs;
+  private GradoopIds graphIds;
 
   /**
    * Default constructor.
@@ -30,48 +29,48 @@ public abstract class GraphElementPojo extends ElementPojo implements
    *  @param id         element id
    * @param label      element label
    * @param properties element properties
-   * @param graphs     graphs that element is contained in
+   * @param graphIds     graphIds that element is contained in
    */
   protected GraphElementPojo(GradoopId id, String label,
-    Map<String, Object> properties, Set<GradoopId> graphs) {
+    Map<String, Object> properties, GradoopIds graphIds) {
     super(id, label, properties);
-    this.graphs = graphs;
+    this.graphIds = graphIds;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Set<GradoopId> getGraphIds() {
-    return graphs;
+  public GradoopIds getGraphIds() {
+    return graphIds;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void addGraph(GradoopId graph) {
-    if (graphs == null) {
-      graphs = Sets.newHashSet();
+  public void addGraphId(GradoopId graphId) {
+    if (graphIds == null) {
+      graphIds = new GradoopIds();
     }
-    graphs.add(graph);
+    graphIds.add(graphId);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setGraphs(Set<GradoopId> graphs) {
-    this.graphs = graphs;
+  public void setGraphIds(GradoopIds graphIds) {
+    this.graphIds = graphIds;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void resetGraphs() {
-    if (graphs != null) {
-      graphs.clear();
+  public void resetGraphIds() {
+    if (graphIds != null) {
+      graphIds.clear();
     }
   }
 
@@ -80,7 +79,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
    */
   @Override
   public int getGraphCount() {
-    return (graphs != null) ? graphs.size() : 0;
+    return (graphIds != null) ? graphIds.size() : 0;
   }
 
   /**
@@ -90,7 +89,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
   public String toString() {
     return "EPGMGraphElement{" +
       super.toString() +
-      ", graphs=" + graphs +
+      ", graphIds=" + graphIds +
       '}';
   }
 }

@@ -24,6 +24,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Iterator;
 
@@ -82,12 +83,12 @@ public abstract class AbstractBinaryGraphToGraphOperator<
     /**
      * Graph, a vertex must be part of
      */
-    private Long includedGraphID;
+    private GradoopId includedGraphID;
 
     /**
      * Graph, a vertex must not be part of
      */
-    private Long precludedGraphID;
+    private GradoopId precludedGraphID;
 
     /**
      * Creates group reducer.
@@ -106,8 +107,8 @@ public abstract class AbstractBinaryGraphToGraphOperator<
      * @param includedGraphID  graph, a vertex must be part of
      * @param precludedGraphID graph, a vertex must not be part of
      */
-    public VertexGroupReducer(long amount, Long includedGraphID,
-      Long precludedGraphID) {
+    public VertexGroupReducer(long amount, GradoopId includedGraphID,
+      GradoopId precludedGraphID) {
       this.amount = amount;
       this.includedGraphID = includedGraphID;
       this.precludedGraphID = precludedGraphID;

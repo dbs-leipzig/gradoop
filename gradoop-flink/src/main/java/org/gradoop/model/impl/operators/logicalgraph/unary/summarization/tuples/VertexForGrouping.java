@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Minimalistic representation of a vertex which is used for grouping.
@@ -26,12 +27,12 @@ import org.apache.flink.api.java.tuple.Tuple3;
  * f1: vertex label
  * f2: vertex property value
  */
-public class VertexForGrouping extends Tuple3<Long, String, String> {
-  public Long getVertexId() {
+public class VertexForGrouping extends Tuple3<GradoopId, String, String> {
+  public GradoopId getVertexId() {
     return f0;
   }
 
-  public void setVertexId(Long vertexId) {
+  public void setVertexId(GradoopId vertexId) {
     f0 = vertexId;
   }
 

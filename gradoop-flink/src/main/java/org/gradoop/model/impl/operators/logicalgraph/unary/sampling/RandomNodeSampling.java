@@ -31,6 +31,7 @@ import org.gradoop.model.impl.functions.keyselectors
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
 import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.FlinkConstants;
 
 import java.util.Random;
@@ -84,7 +85,7 @@ public class RandomNodeSampling<VD extends EPGMVertex, ED extends EPGMEdge,
   @Override
   public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) throws
     Exception {
-    final Long newGraphID = FlinkConstants.RANDOM_NODE_SAMPLING_GRAPH_ID;
+    final GradoopId newGraphID = FlinkConstants.RANDOM_NODE_SAMPLING_GRAPH_ID;
 
     DataSet<VD> newVertices = graph.getVertices()
       .filter(new VertexRandomFilter<VD>(sampleSize, randomSeed))

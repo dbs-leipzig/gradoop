@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Edge representation used in grouping edges to summarized edges.
@@ -28,29 +29,30 @@ import org.apache.flink.api.java.tuple.Tuple5;
  * f3: edge group label
  * f4: edge group property value
  */
-public class EdgeGroupItem extends Tuple5<Long, Long, Long, String, String> {
+public class EdgeGroupItem
+  extends Tuple5<GradoopId, GradoopId, GradoopId, String, String> {
 
-  public Long getEdgeId() {
+  public GradoopId getEdgeId() {
     return f0;
   }
 
-  public void setEdgeId(Long edgeId) {
+  public void setEdgeId(GradoopId edgeId) {
     f0 = edgeId;
   }
 
-  public Long getSourceVertexId() {
+  public GradoopId getSourceVertexId() {
     return f1;
   }
 
-  public void setSourceVertexId(Long sourceVertexId) {
+  public void setSourceVertexId(GradoopId sourceVertexId) {
     f1 = sourceVertexId;
   }
 
-  public Long getTargetVertexId() {
+  public GradoopId getTargetVertexId() {
     return f2;
   }
 
-  public void setTargetVertexId(Long targetVertexId) {
+  public void setTargetVertexId(GradoopId targetVertexId) {
     f2 = targetVertexId;
   }
 

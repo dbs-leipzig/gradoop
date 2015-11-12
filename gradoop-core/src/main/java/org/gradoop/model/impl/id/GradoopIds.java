@@ -23,7 +23,9 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -44,6 +46,19 @@ public class GradoopIds implements Iterable<GradoopId>, Writable {
   public GradoopIds() {
     identifiers = Sets.newHashSet();
   }
+
+  GradoopIds(Long[] ids) {
+    for(Long id : ids) {
+      identifiers.add(new GradoopId(id));
+    }
+  }
+
+  public GradoopIds(GradoopId... ids) {
+    for(GradoopId id : ids) {
+      identifiers.add(id);
+    }
+  }
+
 
   /**
    * Adds a GradoopId to the set.
@@ -87,5 +102,29 @@ public class GradoopIds implements Iterable<GradoopId>, Writable {
   @Override
   public Iterator<GradoopId> iterator() {
     return identifiers.iterator();
+  }
+
+  public void clear() {
+    identifiers.clear();
+  }
+
+  public int size() {
+    return identifiers.size();
+  }
+
+  public static GradoopIds createGradoopIds(Long... ids) {
+    return new GradoopIds(ids);
+  }
+
+  public void addAll(Collection<GradoopId> gradoopIds) {
+    identifiers.addAll(gradoopIds);
+  }
+
+  public boolean containsAll(GradoopIds other) {
+    return this.identifiers.containsAll(other.identifiers);
+  }
+
+  public void addAll(GradoopIds gradoopIds) {
+    addAll(gradoopIds.identifiers);
   }
 }

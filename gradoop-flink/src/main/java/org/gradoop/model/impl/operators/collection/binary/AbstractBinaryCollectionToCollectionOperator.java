@@ -29,6 +29,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Iterator;
 
@@ -186,12 +187,12 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
    */
   protected static class SubgraphTupleKeySelector<GD extends EPGMGraphHead, C>
     implements
-    KeySelector<Tuple2<GD, C>, Long> {
+    KeySelector<Tuple2<GD, C>, GradoopId> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Long getKey(Tuple2<GD, C> subgraph) throws
+    public GradoopId getKey(Tuple2<GD, C> subgraph) throws
       Exception {
       return subgraph.f0.getId();
     }

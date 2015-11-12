@@ -25,6 +25,7 @@ import org.gradoop.model.impl.algorithms.labelpropagation.functions
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .LPUpdateFunction;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Implementation of the Label Propagation Algorithm:
@@ -40,8 +41,8 @@ import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
  * The computation will terminate if no new values are assigned.
  */
 public class LabelPropagationAlgorithm
-  implements GraphAlgorithm<Long, LPVertexValue, NullValue,
-    Graph<Long, LPVertexValue, NullValue>> {
+  implements GraphAlgorithm<GradoopId, LPVertexValue, NullValue,
+    Graph<GradoopId, LPVertexValue, NullValue>> {
   /**
    * Counter to define maximal Iteration for the Algorithm
    */
@@ -64,10 +65,10 @@ public class LabelPropagationAlgorithm
    * @throws Exception
    */
   @Override
-  public Graph<Long, LPVertexValue, NullValue> run(
-    Graph<Long, LPVertexValue, NullValue> graph) throws Exception {
+  public Graph<GradoopId, LPVertexValue, NullValue> run(
+    Graph<GradoopId, LPVertexValue, NullValue> graph) throws Exception {
     // initialize vertex values and run the Vertex Centric Iteration
-    Graph<Long, LPVertexValue, NullValue> gellyGraph =
+    Graph<GradoopId, LPVertexValue, NullValue> gellyGraph =
       graph.getUndirected();
     return gellyGraph
       .runVertexCentricIteration(

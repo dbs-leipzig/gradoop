@@ -1,5 +1,7 @@
 package org.gradoop.model.impl.pojo;
 
+import org.gradoop.model.impl.id.GradoopId;
+
 /**
  * Contains methods that are used by all factories.
  */
@@ -9,7 +11,7 @@ public abstract class ElementPojoFactory {
    *
    * @param id identifier
    */
-  protected void checkId(final Long id) {
+  protected void checkId(final GradoopId id) {
     if (id == null) {
       throw new IllegalArgumentException("id must not be null");
     }

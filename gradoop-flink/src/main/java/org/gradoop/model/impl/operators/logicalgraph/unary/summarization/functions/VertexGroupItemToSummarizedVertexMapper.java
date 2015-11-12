@@ -27,6 +27,7 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.FlinkConstants;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.VertexGroupItem;
@@ -41,8 +42,8 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.
 @FunctionAnnotation.ForwardedFields("f0")
 public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
   implements
-  MapFunction<VertexGroupItem, Vertex<Long, VD>>,
-  ResultTypeQueryable<Vertex<Long, VD>> {
+  MapFunction<VertexGroupItem, Vertex<GradoopId, VD>>,
+  ResultTypeQueryable<Vertex<GradoopId, VD>> {
 
   /**
    * Vertex data factory.
@@ -63,7 +64,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
   /**
    * Avoid object instantiations.
    */
-  private final Vertex<Long, VD> reuseVertex;
+  private final Vertex<GradoopId, VD> reuseVertex;
 
   /**
    * Creates map function.
@@ -91,7 +92,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
    * @throws Exception
    */
   @Override
-  public Vertex<Long, VD> map(VertexGroupItem vertexGroupItem) throws
+  public Vertex<GradoopId, VD> map(VertexGroupItem vertexGroupItem) throws
     Exception {
     VD summarizedVertexData =
       vertexFactory.createVertex(vertexGroupItem.getVertexId());
@@ -104,7 +105,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
     }
     summarizedVertexData.setProperty(Summarization.COUNT_PROPERTY_KEY,
       vertexGroupItem.getGroupCount());
-    summarizedVertexData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
+    summarizedVertexData.addGraphId(FlinkConstants.SUMMARIZE_GRAPH_ID);
 
     reuseVertex.setId(vertexGroupItem.getVertexId());
     reuseVertex.setValue(summarizedVertexData);
@@ -116,7 +117,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
    */
   @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<Vertex<Long, VD>> getProducedType() {
+  public TypeInformation<Vertex<GradoopId, VD>> getProducedType() {
     return new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
       TypeExtractor.createTypeInfo(vertexFactory.getType()));
   }

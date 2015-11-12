@@ -19,6 +19,10 @@ package org.gradoop.model.impl.pojo;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIdGenerator;
+import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertex;
 import org.hamcrest.core.Is;
@@ -34,7 +38,8 @@ public class VertexPojoTest {
 
   @Test
   public void createWithIDTest() {
-    Long vertexID = 0L;
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId vertexID = idGen.createId();
     EPGMVertex v = new VertexPojoFactory().createVertex(vertexID);
     assertThat(v.getId(), is(vertexID));
     assertThat(v.getPropertyCount(), is(0));
@@ -43,15 +48,22 @@ public class VertexPojoTest {
 
   @Test
   public void createVertexPojoTest() {
-    Long vertexID = 0L;
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId vertexID = idGen.createId();
     String label = "A";
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
     props.put("k2", "v2");
-    Set<Long> graphs = Sets.newHashSet(0L, 1L);
+
+    GradoopId graphId1 = idGen.createId();
+    GradoopId graphId2 = idGen.createId();
+
+    GradoopIds graphIds = new GradoopIds();
+    graphIds.add(graphId1);
+    graphIds.add(graphId2);
 
     EPGMVertex vertex = new VertexPojoFactory()
-      .createVertex(vertexID, label, props, graphs);
+      .createVertex(vertexID, label, props, graphIds);
 
     assertThat(vertex.getId(), is(vertexID));
     assertEquals(label, vertex.getLabel());
@@ -59,13 +71,15 @@ public class VertexPojoTest {
     assertThat(vertex.getProperty("k1"), Is.<Object>is("v1"));
     assertThat(vertex.getProperty("k2"), Is.<Object>is("v2"));
     assertThat(vertex.getGraphCount(), is(2));
-    assertTrue(vertex.getGraphIds().contains(0L));
-    assertTrue(vertex.getGraphIds().contains(1L));
+    assertTrue(vertex.getGraphIds().contains(graphId1));
+    assertTrue(vertex.getGraphIds().contains(graphId2));
   }
 
   @Test
   public void createWithMissingLabelTest() {
-    EPGMVertex v = new VertexPojoFactory().createVertex(0L);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId vertexID = idGen.createId();
+    EPGMVertex v = new VertexPojoFactory().createVertex(vertexID);
     assertThat(v.getLabel(), is(GConstants.DEFAULT_VERTEX_LABEL));
   }
 
@@ -76,11 +90,15 @@ public class VertexPojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithEmptyLabelTest() {
-    new VertexPojoFactory().createVertex(0L, "");
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId vertexID = idGen.createId();
+    new VertexPojoFactory().createVertex(vertexID, "");
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
-    new VertexPojoFactory().createVertex(0L, null);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId vertexID = idGen.createId();
+    new VertexPojoFactory().createVertex(vertexID, null);
   }
 }

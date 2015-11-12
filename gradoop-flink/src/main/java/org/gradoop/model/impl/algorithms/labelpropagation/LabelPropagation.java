@@ -40,6 +40,7 @@ import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .VertexToLPVertexMapper;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.auxiliary.SplitBy;
 
 /**
@@ -91,13 +92,13 @@ public class LabelPropagation<
   public GraphCollection<VD, ED, GD> execute(
     LogicalGraph<VD, ED, GD> logicalGraph) throws Exception {
     // transform vertices and edges to LP representation
-    DataSet<Vertex<Long, LPVertexValue>> vertices = logicalGraph
+    DataSet<Vertex<GradoopId, LPVertexValue>> vertices = logicalGraph
       .getVertices().map(new VertexToLPVertexMapper<VD>());
-    DataSet<Edge<Long, NullValue>> edges = logicalGraph
+    DataSet<Edge<GradoopId, NullValue>> edges = logicalGraph
       .getEdges().map(new EdgeToLPEdgeMapper<ED>());
 
     // construct gelly graph and execute the algorithm
-    Graph<Long, LPVertexValue, NullValue> graph =
+    Graph<GradoopId, LPVertexValue, NullValue> graph =
       Graph.fromDataSet(vertices, edges, env);
     graph = graph.run(new LabelPropagationAlgorithm(this.maxIterations));
 

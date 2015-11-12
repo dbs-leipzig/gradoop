@@ -27,6 +27,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.GraphOperators;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
@@ -102,7 +103,7 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public DataSet<ED> getOutgoingEdges(final Long vertexID) {
+  public DataSet<ED> getOutgoingEdges(final GradoopId vertexID) {
     return
       this.edges.filter(new FilterFunction<ED>() {
         @Override
@@ -116,7 +117,7 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public DataSet<ED> getIncomingEdges(final Long vertexID) {
+  public DataSet<ED> getIncomingEdges(final GradoopId vertexID) {
     return
       this.edges.filter(new FilterFunction<ED>() {
         @Override
@@ -130,17 +131,17 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public Graph<Long, VD, ED> toGellyGraph() {
+  public Graph<GradoopId, VD, ED> toGellyGraph() {
     return Graph.fromDataSet(getVertices().map(
-      new MapFunction<VD, Vertex<Long, VD>>() {
+      new MapFunction<VD, Vertex<GradoopId, VD>>() {
         @Override
-        public Vertex<Long, VD> map(VD epgmVertex) throws Exception {
+        public Vertex<GradoopId, VD> map(VD epgmVertex) throws Exception {
           return new Vertex<>(epgmVertex.getId(), epgmVertex);
         }
       }).withForwardedFields("*->f1"),
-      getEdges().map(new MapFunction<ED, Edge<Long, ED>>() {
+      getEdges().map(new MapFunction<ED, Edge<GradoopId, ED>>() {
         @Override
-        public Edge<Long, ED> map(ED epgmEdge) throws Exception {
+        public Edge<GradoopId, ED> map(ED epgmEdge) throws Exception {
           return new Edge<>(epgmEdge.getSourceVertexId(),
             epgmEdge.getTargetVertexId(),
             epgmEdge);

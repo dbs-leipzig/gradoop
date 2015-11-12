@@ -23,6 +23,7 @@ import org.apache.flink.graph.Vertex;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -30,6 +31,8 @@ import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.storage.api.VertexHandler;
+
+import java.io.IOException;
 
 /**
  * Contains classes to read an EPGM database from HBase.
@@ -42,7 +45,7 @@ public class HBaseReader {
    * @param <GD> EPGM graph head type
    */
   public static class GraphHeadTableInputFormat<GD extends EPGMGraphHead>
-    extends TableInputFormat<Subgraph<Long, GD>> {
+    extends TableInputFormat<Subgraph<GradoopId, GD>> {
 
     /**
      * Handles reading of persistent graph data.
@@ -88,8 +91,13 @@ public class HBaseReader {
      * {@inheritDoc}
      */
     @Override
-    protected Subgraph<Long, GD> mapResultToTuple(Result result) {
-      GD graphData = graphHeadHandler.readGraphHead(result);
+    protected Subgraph<GradoopId, GD> mapResultToTuple(Result result) {
+      GD graphData = null;
+      try {
+        graphData = graphHeadHandler.readGraphHead(result);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       return new Subgraph<>(graphData.getId(), graphData);
     }
   }
@@ -102,7 +110,7 @@ public class HBaseReader {
    */
   public static class VertexTableInputFormat<VD extends EPGMVertex, ED
     extends EPGMEdge> extends
-    TableInputFormat<Vertex<Long, VD>> {
+    TableInputFormat<Vertex<GradoopId, VD>> {
 
     /**
      * Handles reading of persistent vertex data.
@@ -148,8 +156,13 @@ public class HBaseReader {
      * {@inheritDoc}
      */
     @Override
-    protected Vertex<Long, VD> mapResultToTuple(Result result) {
-      VD vertexData = vertexHandler.readVertex(result);
+    protected Vertex<GradoopId, VD> mapResultToTuple(Result result) {
+      VD vertexData = null;
+      try {
+        vertexData = vertexHandler.readVertex(result);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       return new Vertex<>(vertexData.getId(), vertexData);
     }
   }
@@ -161,7 +174,7 @@ public class HBaseReader {
    */
   public static class EdgeTableInputFormat<ED extends EPGMEdge, VD
     extends EPGMVertex> extends
-    TableInputFormat<Edge<Long, ED>> {
+    TableInputFormat<Edge<GradoopId, ED>> {
 
     /**
      * Handles reading of persistent edge data.
@@ -207,8 +220,13 @@ public class HBaseReader {
      * {@inheritDoc}
      */
     @Override
-    protected Edge<Long, ED> mapResultToTuple(Result result) {
-      ED edgeData = edgeHandler.readEdge(result);
+    protected Edge<GradoopId, ED> mapResultToTuple(Result result) {
+      ED edgeData = null;
+      try {
+        edgeData = edgeHandler.readEdge(result);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       return new Edge<>(edgeData.getSourceVertexId(),
         edgeData.getTargetVertexId(), edgeData);
     }

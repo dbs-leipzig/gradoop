@@ -16,7 +16,6 @@
  */
 package org.gradoop.model.impl.operators.collection.unary;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
@@ -32,9 +31,9 @@ import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInNoneOfGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.util.FlinkConstants;
-
-import java.util.List;
 
 /**
  * Takes a LogicalGraph specified by its id and removes all vertices and
@@ -51,7 +50,7 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
   /**
    * ID defining the base graph
    */
-  private final Long positiveGraphID;
+  private final GradoopId positiveGraphID;
 
   /**
    * Create a new ExcludeCollection
@@ -64,7 +63,7 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
    *                        exclusion is not
    *                        commutative.
    */
-  public ExcludeCollection(Long positiveGraphID) {
+  public ExcludeCollection(GradoopId positiveGraphID) {
     this.positiveGraphID = positiveGraphID;
   }
 
@@ -74,18 +73,18 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
   @Override
   public LogicalGraph<VD, ED, GD> execute(
     GraphCollection<VD, ED, GD> collection) {
-    final List<Long> positiveIDs = Lists.newArrayList(positiveGraphID);
+    final GradoopIds positiveGraphIDs = new GradoopIds(positiveGraphID);
     DataSet<GD> graphHeads = collection.getGraphHeads();
-    DataSet<Long> graphIDs = graphHeads.map(new GraphToIdentifierMapper<GD>());
+    DataSet<GradoopId> graphIDs = graphHeads.map(new GraphToIdentifierMapper<GD>());
     graphIDs =
-      graphIDs.filter(new RemoveLongFromDataSetFilter(positiveGraphID));
+      graphIDs.filter(new RemoveGradoopIdFromDataSetFilter(positiveGraphID));
     DataSet<VD> vertices = collection.getVertices()
-      .filter(new VertexInGraphsFilter<VD>(positiveIDs));
+      .filter(new VertexInGraphsFilter<VD>(positiveGraphIDs));
     vertices = vertices.filter(new VertexInNoneOfGraphsFilterWithBC<VD>())
       .withBroadcastSet(graphIDs,
         VertexInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
     DataSet<ED> edges =
-      collection.getEdges().filter(new EdgeInGraphsFilter<ED>(positiveIDs));
+      collection.getEdges().filter(new EdgeInGraphsFilter<ED>(positiveGraphIDs));
     edges = edges.filter(new EdgeInNoneOfGraphsFilterWithBC<ED>())
       .withBroadcastSet(graphIDs,
         EdgeInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
@@ -103,28 +102,28 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
   /**
    * Filter that removes
    */
-  public static class RemoveLongFromDataSetFilter implements
-    FilterFunction<Long> {
+  public static class RemoveGradoopIdFromDataSetFilter implements
+    FilterFunction<GradoopId> {
     /**
      * Long that shall be removed from the DataSet
      */
-    private Long otherLong;
+    private GradoopId otherId;
 
     /**
      * Creates a filter
      *
-     * @param otherLong Long that shall be removed from the DataSet
+     * @param otherId Long that shall be removed from the DataSet
      */
-    public RemoveLongFromDataSetFilter(Long otherLong) {
-      this.otherLong = otherLong;
+    public RemoveGradoopIdFromDataSetFilter(GradoopId otherId) {
+      this.otherId.equals(otherId);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean filter(Long longInSet) throws Exception {
-      return !longInSet.equals(otherLong);
+    public boolean filter(GradoopId longInSet) throws Exception {
+      return !longInSet.equals(otherId);
     }
   }
 }

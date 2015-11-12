@@ -36,6 +36,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
   .EdgeGroupItem;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
@@ -269,8 +270,8 @@ public abstract class Summarization<
    *                                  and group representative
    * @return summarized edges
    */
-  protected DataSet<Edge<Long, ED>> buildSummarizedEdges(
-    Graph<Long, VD, ED> graph,
+  protected DataSet<Edge<GradoopId, ED>> buildSummarizedEdges(
+    Graph<GradoopId, VD, ED> graph,
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap) {
     // join edges with vertex-group-map on vertex-id == edge-source-id
     DataSet<EdgeGroupItem> edges =
@@ -324,16 +325,16 @@ public abstract class Summarization<
    * @param graph input graph
    * @return summarized output graph
    */
-  protected abstract Graph<Long, VD, ED> summarizeInternal(
-    Graph<Long, VD, ED> graph);
+  protected abstract Graph<GradoopId, VD, ED> summarizeInternal(
+    Graph<GradoopId, VD, ED> graph);
 
   /**
    * Creates a summarized edge from a group of edges including an edge
    * grouping value.
    */
   protected static class EdgeGroupSummarizer<ED extends EPGMEdge> implements
-    GroupReduceFunction<EdgeGroupItem, Edge<Long, ED>>,
-    ResultTypeQueryable<Edge<Long, ED>> {
+    GroupReduceFunction<EdgeGroupItem, Edge<GradoopId, ED>>,
+    ResultTypeQueryable<Edge<GradoopId, ED>> {
 
     /**
      * Edge data factory
@@ -355,7 +356,7 @@ public abstract class Summarization<
     /**
      * Avoid object instantiation in each reduce call.
      */
-    private final Edge<Long, ED> reuseEdge;
+    private final Edge<GradoopId, ED> reuseEdge;
 
     /**
      * Creates group reducer
@@ -379,13 +380,13 @@ public abstract class Summarization<
      */
     @Override
     public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-      Collector<Edge<Long, ED>> collector) throws Exception {
+      Collector<Edge<GradoopId, ED>> collector) throws Exception {
       int edgeCount = 0;
       boolean initialized = false;
       // new edge id will be the first edge id in the group (which is sorted)
-      Long newEdgeID = null;
-      Long newSourceVertexId = null;
-      Long newTargetVertexId = null;
+      GradoopId newEdgeID = null;
+      GradoopId newSourceVertexId = null;
+      GradoopId newTargetVertexId = null;
       String edgeLabel = GConstants.DEFAULT_EDGE_LABEL;
       String edgeGroupingValue = null;
 
@@ -410,7 +411,7 @@ public abstract class Summarization<
         newEdgeData.setProperty(groupPropertyKey, edgeGroupingValue);
       }
       newEdgeData.setProperty(COUNT_PROPERTY_KEY, edgeCount);
-      newEdgeData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
+      newEdgeData.addGraphId(FlinkConstants.SUMMARIZE_GRAPH_ID);
 
       reuseEdge.setSource(newSourceVertexId);
       reuseEdge.setTarget(newTargetVertexId);
@@ -423,7 +424,7 @@ public abstract class Summarization<
      */
     @Override
     @SuppressWarnings("unchecked")
-    public TypeInformation<Edge<Long, ED>> getProducedType() {
+    public TypeInformation<Edge<GradoopId, ED>> getProducedType() {
       return new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
         BasicTypeInfo.LONG_TYPE_INFO,
         TypeExtractor.createTypeInfo(edgeFactory.getType()));
@@ -440,7 +441,7 @@ public abstract class Summarization<
   @FunctionAnnotation.ForwardedFieldsSecond("f1") // edge source id
   protected static class SourceVertexJoinFunction<ED extends EPGMEdge>
     implements
-    JoinFunction<Edge<Long, ED>, VertexWithRepresentative, EdgeGroupItem> {
+    JoinFunction<Edge<GradoopId, ED>, VertexWithRepresentative, EdgeGroupItem> {
 
     /**
      * Vertex property key for grouping
@@ -478,7 +479,7 @@ public abstract class Summarization<
      * {@inheritDoc}
      */
     @Override
-    public EdgeGroupItem join(Edge<Long, ED> e,
+    public EdgeGroupItem join(Edge<GradoopId, ED> e,
       VertexWithRepresentative vertexRepresentative) throws Exception {
       String groupLabel = useLabel ? e.getValue().getLabel() : null;
       String groupPropertyValue = null;

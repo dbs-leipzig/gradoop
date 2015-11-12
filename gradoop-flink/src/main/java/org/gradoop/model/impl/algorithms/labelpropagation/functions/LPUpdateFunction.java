@@ -22,6 +22,7 @@ import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,25 +32,25 @@ import java.util.List;
  * all the incoming messages.
  */
 public class LPUpdateFunction extends
-  VertexUpdateFunction<Long, LPVertexValue, Long> {
+  VertexUpdateFunction<GradoopId, LPVertexValue, GradoopId> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public void updateVertex(Vertex<Long, LPVertexValue> vertex,
-    MessageIterator<Long> msg) throws Exception {
+  public void updateVertex(Vertex<GradoopId, LPVertexValue> vertex,
+    MessageIterator<GradoopId> msg) throws Exception {
     if (getSuperstepNumber() == 1) {
       //Todo: Use Broadcast to set ChangeMax
       vertex.getValue().setChangeMax(20);
       vertex.getValue().setCurrentCommunity(vertex.getId());
       setNewVertexValue(vertex.getValue());
     } else {
-      long currentCommunity = vertex.getValue().getCurrentCommunity();
-      long lastCommunity = vertex.getValue().getLastCommunity();
+      GradoopId currentCommunity = vertex.getValue().getCurrentCommunity();
+      GradoopId lastCommunity = vertex.getValue().getLastCommunity();
       int stabilizationRound = vertex.getValue().getStabilizationCounter();
-      long newCommunity = getNewCommunity(vertex, msg);
-      boolean changed = currentCommunity != newCommunity;
-      boolean lastEqualsNew = lastCommunity == newCommunity;
+      GradoopId newCommunity = getNewCommunity(vertex, msg);
+      boolean changed = ! currentCommunity.equals(newCommunity);
+      boolean lastEqualsNew = lastCommunity.equals(newCommunity);
       if (changed && lastEqualsNew) {
         //Counts the amount of community swaps between 2 communities
         stabilizationRound++;
@@ -62,7 +63,7 @@ public class LPUpdateFunction extends
           setNewVertexValue(vertex.getValue());
         } else {
           vertex.getValue()
-            .setCurrentCommunity(Math.min(currentCommunity, newCommunity));
+            .setCurrentCommunity(minId(currentCommunity, newCommunity));
           vertex.getValue()
             .setLastCommunity(vertex.getValue().getCurrentCommunity());
           setNewVertexValue(vertex.getValue());
@@ -91,17 +92,19 @@ public class LPUpdateFunction extends
    * @param msg    All incoming messages
    * @return the new Value the vertex will become
    */
-  private long getNewCommunity(Vertex<Long, LPVertexValue> vertex,
-    MessageIterator<Long> msg) {
-    long newCommunity;
-    List<Long> allMessages = Lists.newArrayList(msg.iterator());
+  private GradoopId getNewCommunity(Vertex<GradoopId, LPVertexValue> vertex,
+    MessageIterator<GradoopId> msg) {
+    GradoopId newCommunity;
+    List<GradoopId> allMessages = Lists.newArrayList(msg.iterator());
+    GradoopId currentCommunity = vertex.getValue().getCurrentCommunity();
     if (allMessages.isEmpty()) {
       // 1. if no messages are received
-      newCommunity = vertex.getValue().getCurrentCommunity();
+      newCommunity = currentCommunity;
     } else if (allMessages.size() == 1) {
       // 2. if just one message are received
-      newCommunity =
-        Math.min(vertex.getValue().getCurrentCommunity(), allMessages.get(0));
+
+      GradoopId firstMessage = allMessages.get(0);
+      newCommunity = minId(firstMessage, currentCommunity);
     } else {
       // 3. if multiple messages are received
       newCommunity = getMostFrequent(vertex, allMessages);
@@ -116,14 +119,15 @@ public class LPUpdateFunction extends
    * @param allMessages all received messages
    * @return most frequent value below all messages
    */
-  private long getMostFrequent(Vertex<Long, LPVertexValue> vertex,
-    List<Long> allMessages) {
+  private GradoopId getMostFrequent(Vertex<GradoopId, LPVertexValue> vertex,
+    List<GradoopId> allMessages) {
     Collections.sort(allMessages);
-    long newValue;
+    GradoopId newValue;
     int currentCounter = 1;
-    long currentValue = allMessages.get(0);
+    GradoopId firstMessage = allMessages.get(0);
+    GradoopId currentValue = firstMessage;
     int maxCounter = 1;
-    long maxValue = 1;
+    GradoopId maxValue = GradoopId.createId(1L);
     for (int i = 1; i < allMessages.size(); i++) {
       if (currentValue == allMessages.get(i)) {
         currentCounter++;
@@ -140,11 +144,15 @@ public class LPUpdateFunction extends
     if (maxCounter == 1) {
       // to avoid an oscillating state of the calculation we will just use
       // the smaller value
-      newValue =
-        Math.min(vertex.getValue().getCurrentCommunity(), allMessages.get(0));
+      GradoopId currentCommunity = vertex.getValue().getCurrentCommunity();
+      newValue = minId(firstMessage, currentCommunity);
     } else {
       newValue = maxValue;
     }
     return newValue;
+  }
+
+  private GradoopId minId(GradoopId firstId, GradoopId secondId) {
+    return secondId.compareTo(firstId) < 0 ? secondId : firstId;
   }
 }

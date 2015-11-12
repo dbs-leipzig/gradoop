@@ -17,6 +17,8 @@
 
 package org.gradoop.model.impl.algorithms.labelpropagation.pojos;
 
+import org.gradoop.model.impl.id.GradoopId;
+
 /**
  * Custom vertex used by {@link org.gradoop.model.impl.algorithms
  * .labelpropagation.LabelPropagationAlgorithm}.
@@ -25,15 +27,15 @@ public class LPVertexValue {
   /**
    * Vertex ID
    */
-  private long id;
+  private GradoopId id;
   /**
    * Current community ID
    */
-  private long currentCommunity;
+  private GradoopId currentCommunity;
   /**
    * Last community ID
    */
-  private long lastCommunity;
+  private GradoopId lastCommunity;
   /**
    * Stabilization counter
    */
@@ -49,10 +51,10 @@ public class LPVertexValue {
    * @param id    actual vertex id
    * @param value actual vertex value
    */
-  public LPVertexValue(long id, long value) {
+  public LPVertexValue(GradoopId id, GradoopId value) {
     this.id = id;
     this.currentCommunity = value;
-    this.lastCommunity = Long.MAX_VALUE;
+    this.lastCommunity = GradoopId.MAX_VALUE;
     this.stabilizationCounter = 0;
     this.changeMax = 19;
   }
@@ -62,7 +64,7 @@ public class LPVertexValue {
    *
    * @return actual vertex id
    */
-  public long getId() {
+  public GradoopId getId() {
     return id;
   }
 
@@ -71,7 +73,7 @@ public class LPVertexValue {
    *
    * @param id vertex id
    */
-  public void setId(long id) {
+  public void setId(GradoopId id) {
     this.id = id;
   }
 
@@ -80,7 +82,7 @@ public class LPVertexValue {
    *
    * @return current community id
    */
-  public long getCurrentCommunity() {
+  public GradoopId getCurrentCommunity() {
     return currentCommunity;
   }
 
@@ -89,7 +91,7 @@ public class LPVertexValue {
    *
    * @param currentCommunity id of the current community
    */
-  public void setCurrentCommunity(long currentCommunity) {
+  public void setCurrentCommunity(GradoopId currentCommunity) {
     this.currentCommunity = currentCommunity;
   }
 
@@ -98,7 +100,7 @@ public class LPVertexValue {
    *
    * @return last community id
    */
-  public long getLastCommunity() {
+  public GradoopId getLastCommunity() {
     return lastCommunity;
   }
 
@@ -107,7 +109,7 @@ public class LPVertexValue {
    *
    * @param lastCommunity last community id
    */
-  public void setLastCommunity(long lastCommunity) {
+  public void setLastCommunity(GradoopId lastCommunity) {
     this.lastCommunity = lastCommunity;
   }
 

@@ -1,5 +1,8 @@
 package org.gradoop.model.api;
 
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +22,8 @@ public interface EPGMEdgeFactory<T extends EPGMEdge> extends
    * @param targetVertexId target vertex id
    * @return edge data
    */
-  T createEdge(Long id, Long sourceVertexId, Long targetVertexId);
+  T createEdge(
+    GradoopId id, GradoopId sourceVertexId, GradoopId targetVertexId);
 
   /**
    * Creates edge data based on the given parameters.
@@ -30,33 +34,8 @@ public interface EPGMEdgeFactory<T extends EPGMEdge> extends
    * @param label          edge label
    * @return edge data
    */
-  T createEdge(Long id, String label, Long sourceVertexId, Long targetVertexId);
-
-  /**
-   * Creates edge data based on the given parameters.
-   *
-   * @param id             unique edge id
-   * @param label          edge label
-   * @param sourceVertexId source vertex id
-   * @param targetVertexId target vertex id
-   * @param properties     edge properties
-   * @return edge data
-   */
-  T createEdge(Long id, String label, Long sourceVertexId, Long targetVertexId,
-    Map<String, Object> properties);
-
-  /**
-   * Creates edge data based on the given parameters.
-   *
-   * @param id             unique edge id
-   * @param label          edge label
-   * @param sourceVertexId source vertex id
-   * @param targetVertexId target vertex id
-   * @param graphs         graphs, that contain the edge
-   * @return edge data
-   */
-  T createEdge(Long id, String label, Long sourceVertexId, Long targetVertexId,
-    Set<Long> graphs);
+  T createEdge(GradoopId id, String label,
+    GradoopId sourceVertexId, GradoopId targetVertexId);
 
   /**
    * Creates edge data based on the given parameters.
@@ -66,9 +45,36 @@ public interface EPGMEdgeFactory<T extends EPGMEdge> extends
    * @param sourceVertexId source vertex id
    * @param targetVertexId target vertex id
    * @param properties     edge properties
-   * @param graphs         graphs, that contain the edge
    * @return edge data
    */
-  T createEdge(Long id, String label, Long sourceVertexId, Long targetVertexId,
-    Map<String, Object> properties, Set<Long> graphs);
+  T createEdge(GradoopId id, String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, Map<String, Object> properties);
+
+  /**
+   * Creates edge data based on the given parameters.
+   *
+   * @param id             unique edge id
+   * @param label          edge label
+   * @param sourceVertexId source vertex id
+   * @param targetVertexId target vertex id
+   * @param graphIds         graphIds, that contain the edge
+   * @return edge data
+   */
+  T createEdge(GradoopId id, String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, GradoopIds graphIds);
+
+  /**
+   * Creates edge data based on the given parameters.
+   *
+   * @param id             unique edge id
+   * @param label          edge label
+   * @param sourceVertexId source vertex id
+   * @param targetVertexId target vertex id
+   * @param properties     edge properties
+   * @param graphIds         graphIds, that contain the edge
+   * @return edge data
+   */
+  T createEdge(GradoopId id, String label,
+    GradoopId sourceVertexId, GradoopId targetVertexId,
+    Map<String, Object> properties, GradoopIds graphIds);
 }

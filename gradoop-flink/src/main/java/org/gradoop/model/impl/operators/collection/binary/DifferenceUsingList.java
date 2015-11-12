@@ -24,6 +24,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Returns a collection with all logical graphs that are contained in the
@@ -54,7 +55,7 @@ public class DifferenceUsingList<
   @Override
   protected DataSet<VD> computeNewVertices(
     DataSet<GD> newSubgraphs) throws Exception {
-    DataSet<Long> identifiers = newSubgraphs
+    DataSet<GradoopId> identifiers = newSubgraphs
       .map(new GraphToIdentifierMapper<GD>());
 
     return firstCollection.getVertices()

@@ -1,5 +1,7 @@
 package org.gradoop.model.api;
 
+import org.gradoop.model.impl.id.GradoopId;
+
 import java.util.Map;
 
 /**
@@ -16,7 +18,7 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param id graph identifier
    * @return graph data
    */
-  T createGraphHead(Long id);
+  T createGraphHead(GradoopId id);
 
   /**
    * Creates graph data based on the given parameters.
@@ -25,7 +27,7 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param label graph label
    * @return graph data
    */
-  T createGraphHead(Long id, String label);
+  T createGraphHead(GradoopId id, String label);
 
   /**
    * Creates graph data based on the given parameters.
@@ -35,5 +37,5 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param properties graph attributes
    * @return graph data
    */
-  T createGraphHead(Long id, String label, Map<String, Object> properties);
+  T createGraphHead(GradoopId id, String label, Map<String, Object> properties);
 }

@@ -20,14 +20,15 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * KeySelector class for the LP Vertex value
  */
 public class LPKeySelector
-  implements KeySelector<Vertex<Long, LPVertexValue>, Long> {
+  implements KeySelector<Vertex<GradoopId, LPVertexValue>, GradoopId> {
   @Override
-  public Long getKey(Vertex<Long, LPVertexValue> vertex) throws
+  public GradoopId getKey(Vertex<GradoopId, LPVertexValue> vertex) throws
     Exception {
     return vertex.getId();
   }

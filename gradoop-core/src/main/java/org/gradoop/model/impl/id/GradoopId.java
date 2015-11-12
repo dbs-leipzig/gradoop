@@ -38,6 +38,7 @@ public final class GradoopId implements Comparable<GradoopId>,
    * Serial version uid.
    */
   private static final long serialVersionUID = 42L;
+  public static final GradoopId MAX_VALUE = new GradoopId(Long.MAX_VALUE);
 
   /**
    * Long identifier.
@@ -100,5 +101,9 @@ public final class GradoopId implements Comparable<GradoopId>,
   @Override
   public void readFields(DataInput dataInput) throws IOException {
     this.identifier = dataInput.readLong();
+  }
+
+  public static GradoopId createId(Long id) {
+    return new GradoopId(id);
   }
 }

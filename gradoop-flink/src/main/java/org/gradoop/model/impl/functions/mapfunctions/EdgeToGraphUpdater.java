@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Adds a given graph ID to the edge and returns it.
@@ -31,14 +32,14 @@ public class EdgeToGraphUpdater<ED extends EPGMEdge> implements
   /**
    * Graph identifier to add.
    */
-  private final long newGraphID;
+  private final GradoopId newGraphID;
 
   /**
    * Creates map function
    *
    * @param newGraphID graph identifier to add
    */
-  public EdgeToGraphUpdater(final long newGraphID) {
+  public EdgeToGraphUpdater(final GradoopId newGraphID) {
     this.newGraphID = newGraphID;
   }
 
@@ -47,7 +48,7 @@ public class EdgeToGraphUpdater<ED extends EPGMEdge> implements
    */
   @Override
   public ED map(ED e) throws Exception {
-    e.addGraph(newGraphID);
+    e.addGraphId(newGraphID);
     return e;
   }
 }

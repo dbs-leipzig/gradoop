@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Maps a graph to its identifier.
@@ -26,10 +27,10 @@ import org.gradoop.model.api.EPGMGraphHead;
  * @param <GD> EPGM graph head type
  */
 public class GraphToIdentifierMapper<GD extends EPGMGraphHead>
-  implements MapFunction<GD, Long> {
+  implements MapFunction<GD, GradoopId> {
 
   @Override
-  public Long map(GD graphHead) throws Exception {
+  public GradoopId map(GD graphHead) throws Exception {
     return graphHead.getId();
   }
 }

@@ -44,6 +44,8 @@ import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.operators.collection.binary.Difference;
 import org.gradoop.model.impl.operators.collection.binary.DifferenceUsingList;
 import org.gradoop.model.impl.operators.collection.binary.Intersect;
@@ -107,7 +109,7 @@ public class GraphCollection<
    */
   @SuppressWarnings("unchecked")
   @Override
-  public LogicalGraph<VD, ED, GD> getGraph(final Long graphID) throws
+  public LogicalGraph<VD, ED, GD> getGraph(final GradoopId graphID) throws
     Exception {
     // filter vertices and edges based on given graph id
     DataSet<VD> vertices = getVertices()
@@ -115,7 +117,7 @@ public class GraphCollection<
     DataSet<ED> edges = getEdges()
       .filter(new EdgeInGraphFilter<ED>(graphID));
 
-    DataSet<Tuple1<Long>> graphIDDataSet = getConfig()
+    DataSet<Tuple1<GradoopId>> graphIDDataSet = getConfig()
       .getExecutionEnvironment()
       .fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
 
@@ -124,9 +126,9 @@ public class GraphCollection<
       .joinWithTiny(graphIDDataSet)
       .where(new GraphKeySelector<GD>())
       .equalTo(0)
-      .with(new JoinFunction<GD, Tuple1<Long>, GD>() {
+      .with(new JoinFunction<GD, Tuple1<GradoopId>, GD>() {
         @Override
-        public GD join(GD g, Tuple1<Long> gID) throws Exception {
+        public GD join(GD g, Tuple1<GradoopId> gID) throws Exception {
           return g;
         }
       }).first(1).collect();
@@ -139,9 +141,16 @@ public class GraphCollection<
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> getGraphs(final Long... identifiers) throws
+  public GraphCollection<VD, ED, GD> getGraphs(final GradoopId... identifiers) throws
     Exception {
-    return getGraphs(Arrays.asList(identifiers));
+
+    GradoopIds graphIds = new GradoopIds();
+
+    for(GradoopId id : identifiers) {
+      graphIds.add(id);
+    }
+
+    return getGraphs(graphIds);
   }
 
   /**
@@ -149,7 +158,7 @@ public class GraphCollection<
    */
   @Override
   public GraphCollection<VD, ED, GD> getGraphs(
-    final List<Long> identifiers) throws Exception {
+    final GradoopIds identifiers) throws Exception {
 
     DataSet<GD> newGraphHeads =
       this.graphHeads.filter(new FilterFunction<GD>() {
@@ -196,10 +205,10 @@ public class GraphCollection<
       });
 
     // get the identifiers of these subgraphs
-    DataSet<Long> graphIDs =
-      filteredGraphHeads.map(new MapFunction<GD, Long>() {
+    DataSet<GradoopId> graphIDs =
+      filteredGraphHeads.map(new MapFunction<GD, GradoopId>() {
         @Override
-        public Long map(GD g) throws Exception {
+        public GradoopId map(GD g) throws Exception {
           return g.getId();
         }
       });

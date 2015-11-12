@@ -29,6 +29,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions.VertexToGroupVertexMapper;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions
   .VertexGroupItemToRepresentativeFilter;
@@ -96,7 +97,7 @@ public class SummarizationGroupCombine<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
+  protected Graph<GradoopId, VD, ED> summarizeInternal(Graph<GradoopId, VD, ED> graph) {
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
@@ -120,7 +121,7 @@ public class SummarizationGroupCombine<
       unsortedGrouping.reduceGroup(new VertexGroupReduceFunction());
 
     // filter group representative tuples and build final vertices
-    DataSet<Vertex<Long, VD>> summarizedVertices =
+    DataSet<Vertex<GradoopId, VD>> summarizedVertices =
       reduceGroup.filter(new VertexGroupItemToSummarizedVertexFilter()).map(
         new VertexGroupItemToSummarizedVertexMapper<>(config.getVertexFactory(),
           getVertexGroupingKey(), useVertexLabels()));
@@ -131,7 +132,7 @@ public class SummarizationGroupCombine<
         .map(new VertexGroupItemToVertexWithRepresentativeMapper());
 
     // build summarized edges
-    DataSet<Edge<Long, ED>> summarizedEdges =
+    DataSet<Edge<GradoopId, ED>> summarizedEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
     return Graph
@@ -169,7 +170,7 @@ public class SummarizationGroupCombine<
     public void combine(Iterable<VertexForGrouping> vertices,
       Collector<VertexGroupItem> collector) throws Exception {
 
-      Long groupRepresentativeVertexId = null;
+      GradoopId groupRepresentativeVertexId = null;
       Long groupPartitionCount = 0L;
       boolean firstElement = true;
 
@@ -229,7 +230,7 @@ public class SummarizationGroupCombine<
     @Override
     public void reduce(Iterable<VertexGroupItem> vertexGroupItems,
       Collector<VertexGroupItem> collector) throws Exception {
-      Long groupRepresentativeVertexId = null;
+      GradoopId groupRepresentativeVertexId = null;
       Long groupCount = 0L;
       String groupLabel = null;
       String groupPropertyValue = null;

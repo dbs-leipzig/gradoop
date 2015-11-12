@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Adds a given graph ID to the vertex and returns it.
@@ -31,14 +32,14 @@ public class VertexToGraphUpdater<VD extends EPGMVertex> implements
   /**
    * Graph identifier to add.
    */
-  private final long newGraphID;
+  private final GradoopId newGraphID;
 
   /**
    * Creates map function
    *
    * @param newGraphID graph identifier to add to the vertex
    */
-  public VertexToGraphUpdater(final long newGraphID) {
+  public VertexToGraphUpdater(final GradoopId newGraphID) {
     this.newGraphID = newGraphID;
   }
 
@@ -47,7 +48,7 @@ public class VertexToGraphUpdater<VD extends EPGMVertex> implements
    */
   @Override
   public VD map(VD v) throws Exception {
-    v.addGraph(newGraphID);
+    v.addGraphId(newGraphID);
     return v;
   }
 }

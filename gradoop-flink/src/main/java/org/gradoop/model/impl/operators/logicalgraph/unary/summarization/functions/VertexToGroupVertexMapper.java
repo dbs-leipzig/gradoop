@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.VertexForGrouping;
 
@@ -35,7 +36,7 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.
  */
 @FunctionAnnotation.ForwardedFields("f0")
 public class VertexToGroupVertexMapper<VD extends EPGMVertex> implements
-  MapFunction<Vertex<Long, VD>, VertexForGrouping> {
+  MapFunction<Vertex<GradoopId, VD>, VertexForGrouping> {
 
   /**
    * Vertex property key that can be used for grouping.
@@ -71,7 +72,7 @@ public class VertexToGroupVertexMapper<VD extends EPGMVertex> implements
    * {@inheritDoc}
    */
   @Override
-  public VertexForGrouping map(Vertex<Long, VD> vertex) throws Exception {
+  public VertexForGrouping map(Vertex<GradoopId, VD> vertex) throws Exception {
     reuseVertexForGrouping.setVertexId(vertex.getId());
     reuseVertexForGrouping.setGroupLabel(getGroupLabel(vertex.getValue()));
     reuseVertexForGrouping

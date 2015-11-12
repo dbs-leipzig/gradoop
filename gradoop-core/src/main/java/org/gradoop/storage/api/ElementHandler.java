@@ -41,7 +41,7 @@ public interface ElementHandler extends Serializable {
    *                   null}).
    * @return persistent entity identifier
    */
-  byte[] getRowKey(final GradoopId entityData);
+  byte[] getRowKey(final GradoopId entityData) throws IOException;
 
   /**
    * Creates an identifier from a given row key.
@@ -49,7 +49,7 @@ public interface ElementHandler extends Serializable {
    * @param rowKey row key from the graph store (must not be {@code null})
    * @return entity identifier
    */
-  GradoopId getId(final byte[] rowKey);
+  GradoopId getId(final byte[] rowKey) throws IOException;
 
   /**
    * Adds the labels to the given {@link Put} and returns it.

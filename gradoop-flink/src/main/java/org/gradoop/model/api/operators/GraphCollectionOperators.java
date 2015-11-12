@@ -20,6 +20,8 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.util.Order;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.GraphCollection;
@@ -43,7 +45,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return logical graph with given id or {@code null} if not contained
    * @throws Exception
    */
-  LogicalGraph<VD, ED, GD> getGraph(final Long graphID) throws Exception;
+  LogicalGraph<VD, ED, GD> getGraph(final GradoopId graphID) throws Exception;
 
   /**
    * Extracts logical graphs from collection using their identifiers.
@@ -52,7 +54,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return collection containing requested logical graphs
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> getGraphs(final Long... identifiers) throws
+  GraphCollection<VD, ED, GD> getGraphs(final GradoopId... identifiers) throws
     Exception;
 
   /**
@@ -62,7 +64,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return collection containing requested logical graphs
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> getGraphs(List<Long> identifiers) throws
+  GraphCollection<VD, ED, GD> getGraphs(GradoopIds identifiers) throws
     Exception;
 
   /**

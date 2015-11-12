@@ -21,17 +21,18 @@ import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.MessagingFunction;
 import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Distributes the value of the vertex
  */
 public class LPMessageFunction extends
-  MessagingFunction<Long, LPVertexValue, Long, NullValue> {
+  MessagingFunction<GradoopId, LPVertexValue, GradoopId, NullValue> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public void sendMessages(Vertex<Long, LPVertexValue> vertex) throws
+  public void sendMessages(Vertex<GradoopId, LPVertexValue> vertex) throws
     Exception {
     // send current minimum to neighbors
     sendMessageToAllNeighbors(vertex.getValue().getCurrentCommunity());

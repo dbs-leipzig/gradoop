@@ -23,9 +23,11 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Writables;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GConstants;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -106,9 +108,10 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
    * {@inheritDoc}
    */
   @Override
-  public Put writeVertices(final Put put, final PersistentGraphHead graphData) {
-    for (Long vertexId : graphData.getVertices()) {
-      put.add(CF_VERTICES_BYTES, Bytes.toBytes(vertexId), null);
+  public Put writeVertices(final Put put, final PersistentGraphHead graphData) throws
+    IOException {
+    for (GradoopId vertexId : graphData.getVertexIds()) {
+      put.add(CF_VERTICES_BYTES, Writables.getBytes(vertexId), null);
     }
     return put;
   }
@@ -125,9 +128,10 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdges(Put put, PersistentGraphHead graphData) {
-    for (Long edgeId : graphData.getEdges()) {
-      put.add(CF_EDGES_BYTES, Bytes.toBytes(edgeId), null);
+  public Put writeEdges(Put put, PersistentGraphHead graphData) throws
+    IOException {
+    for (GradoopId edgeId : graphData.getEdgeIds()) {
+      put.add(CF_EDGES_BYTES, Writables.getBytes(edgeId), null);
     }
     return put;
   }
@@ -145,7 +149,7 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
    */
   @Override
   public Put writeGraphHead(final Put put, final PersistentGraphHead
-    graphData) {
+    graphData) throws IOException {
     LOG.info("Creating Put from: " + graphData);
     writeLabel(put, graphData);
     writeProperties(put, graphData);
@@ -158,10 +162,9 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
    * {@inheritDoc}
    */
   @Override
-  public GD readGraphHead(final Result res) {
+  public GD readGraphHead(final Result res) throws IOException {
     return graphHeadFactory
-      .createGraphHead(Long.valueOf(Bytes.toString(res.getRow())),
-        readLabel(res), readProperties(res));
+      .createGraphHead(readId(res), readLabel(res), readProperties(res));
   }
 
   /**

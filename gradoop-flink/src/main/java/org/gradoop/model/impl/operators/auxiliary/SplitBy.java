@@ -28,16 +28,17 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.util.GConstants;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
  * Operator used to split a {@link LogicalGraph} into a {@link
  * GraphCollection} with non-overlapping vertex sets. The operator uses a
- * {@link LongFromVertexSelector} to retrieve the logical graph identifier
+ * {@link GradoopIdFromVertexSelector} to retrieve the logical graph identifier
  * from the vertices in the input graph.
  *
  * @param <VD> EPGM vertex type
@@ -56,7 +57,7 @@ public class SplitBy<
   /**
    * Mapping from a vertex to a long value
    */
-  private final UnaryFunction<VD, Long> vertexToLongFunc;
+  private final UnaryFunction<VD, GradoopId> vertexToLongFunc;
 
   /**
    * Creates a split by instance.
@@ -64,7 +65,7 @@ public class SplitBy<
    * @param env              Flink Execution Environment
    * @param vertexToLongFunc Function to select a graph id from a vertex
    */
-  public SplitBy(UnaryFunction<VD, Long> vertexToLongFunc,
+  public SplitBy(UnaryFunction<VD, GradoopId> vertexToLongFunc,
     final ExecutionEnvironment env) {
     this.env = env;
     this.vertexToLongFunc = vertexToLongFunc;
@@ -108,8 +109,8 @@ public class SplitBy<
   private DataSet<GD> computeNewGraphHeads(
     LogicalGraph<VD, ED, GD> graph, DataSet<VD> vertices) {
     // construct a KeySelector using the LongFromVertexFunction
-    KeySelector<VD, Long> propertySelector =
-      new LongFromVertexSelector<>(vertexToLongFunc);
+    KeySelector<VD, GradoopId> propertySelector =
+      new GradoopIdFromVertexSelector<>(vertexToLongFunc);
     // construct the list of subgraphs
     return vertices
       .groupBy(propertySelector)
@@ -133,16 +134,16 @@ public class SplitBy<
     DataSet<GD> graphHeads) {
     // construct tuples of the edges with the ids of their source and target
     // vertices
-    DataSet<Tuple3<Long, Long, Long>> edgeVertexVertex =
+    DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> edgeVertexVertex =
       graph.getEdges().map(new EdgeToTupleMapper<ED>());
     // replace the source vertex id by the graph list of this vertex
-    DataSet<Tuple3<Long, Set<Long>, Long>> edgeGraphsVertex = edgeVertexVertex
+    DataSet<Tuple3<GradoopId, GradoopIds, GradoopId>> edgeGraphsVertex = edgeVertexVertex
       .join(vertices)
       .where(1)
       .equalTo(new VertexKeySelector<VD>())
       .with(new JoinEdgeTupleWithSourceGraphs<VD>());
     // replace the target vertex id by the graph list of this vertex
-    DataSet<Tuple3<Long, Set<Long>, Set<Long>>> edgeGraphsGraphs =
+    DataSet<Tuple3<GradoopId, GradoopIds, GradoopIds>> edgeGraphsGraphs =
       edgeGraphsVertex
         .join(vertices)
         .where(2)
@@ -150,16 +151,16 @@ public class SplitBy<
         .with(new JoinEdgeTupleWithTargetGraphs<VD>());
     // transform the new graph heads into a single set of long, containing all
     // the identifiers
-    DataSet<Set<Long>> newSubgraphIdentifiers =
+    DataSet<GradoopIds> newSubgraphIdentifiers =
       graphHeads.map(new MapSubgraphIdToSet<GD>()).reduce(new ReduceSets());
     // construct new tuples containing the edge, the graphs of its source and
     // target vertex and the list of new graphs
-    DataSet<Tuple4<Long, Set<Long>, Set<Long>, Set<Long>>> edgesWithSubgraphs =
+    DataSet<Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds>> edgesWithSubgraphs =
       edgeGraphsGraphs.crossWithTiny(newSubgraphIdentifiers)
         .with(new CrossEdgesWithGraphSet());
     // remove all edges which source and target are not in at least one common
     // graph
-    DataSet<Tuple2<Long, Set<Long>>> newSubgraphs =
+    DataSet<Tuple2<GradoopId, GradoopIds>> newSubgraphs =
       edgesWithSubgraphs.flatMap(new CheckEdgesSourceTargetGraphs());
     // join the graph set tuples with the edges, add all new graphs to the
     // edge graph sets
@@ -180,20 +181,19 @@ public class SplitBy<
    *
    * @param <VD> vertex data
    */
-  private static class LongFromVertexSelector<VD extends EPGMVertex> implements
-    KeySelector<VD, Long> {
+  private static class GradoopIdFromVertexSelector<VD extends EPGMVertex> implements
+    KeySelector<VD, GradoopId> {
     /**
      * Unary Function
      */
-    private final UnaryFunction<VD, Long> function;
+    private final UnaryFunction<VD, GradoopId> function;
 
     /**
      * Creates a KeySelector instance.
      *
      * @param function Mapping from vertex to long value
      */
-    public LongFromVertexSelector(
-      UnaryFunction<VD, Long> function) {
+    public GradoopIdFromVertexSelector(UnaryFunction<VD, GradoopId> function) {
       this.function = function;
     }
 
@@ -201,7 +201,7 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Long getKey(VD vertex) throws Exception {
+    public GradoopId getKey(VD vertex) throws Exception {
       return function.execute(vertex);
     }
   }
@@ -217,7 +217,7 @@ public class SplitBy<
     /**
      * Mapping from vertex to long value
      */
-    private final UnaryFunction<VD, Long> function;
+    private final UnaryFunction<VD, GradoopId> function;
 
     /**
      * Creates MapFunction instance.
@@ -225,7 +225,7 @@ public class SplitBy<
      * @param function Mapping from vertex to long value
      */
     public AddNewGraphsToVertexMapper(
-      UnaryFunction<VD, Long> function) {
+      UnaryFunction<VD, GradoopId> function) {
       this.function = function;
     }
 
@@ -234,9 +234,9 @@ public class SplitBy<
      */
     @Override
     public VD map(VD vertex) throws Exception {
-      Long labelPropIndex = function.execute(vertex);
+      GradoopId labelPropIndex = function.execute(vertex);
       if (vertex.getGraphIds() == null) {
-        vertex.setGraphs(Sets.newHashSet(labelPropIndex));
+        vertex.setGraphIds(new GradoopIds(labelPropIndex));
       } else {
         vertex.getGraphIds().add(labelPropIndex);
       }
@@ -257,7 +257,7 @@ public class SplitBy<
     /**
      * Mapping from vertex to long value
      */
-    private final UnaryFunction<VD, Long> function;
+    private final UnaryFunction<VD, GradoopId> function;
     /**
      * EPGMGraphHeadFactory to build new EPGMGraphHead
      */
@@ -270,7 +270,7 @@ public class SplitBy<
      * @param graphHeadFactory EPGMGraphHeadFactory to build new EPGMGraphHead
      */
     public SubgraphsFromGroupsReducer(
-      UnaryFunction<VD, Long> function,
+      UnaryFunction<VD, GradoopId> function,
       EPGMGraphHeadFactory<GD> graphHeadFactory) {
       this.function = function;
       this.graphHeadFactory = graphHeadFactory;
@@ -284,7 +284,7 @@ public class SplitBy<
       Collector<GD> collector) throws Exception {
       Iterator<VD> it = iterable.iterator();
       VD vertex = it.next();
-      Long labelPropIndex = function.execute(vertex);
+      GradoopId labelPropIndex = function.execute(vertex);
       collector.collect(graphHeadFactory.createGraphHead(labelPropIndex,
         GConstants.DEFAULT_GRAPH_LABEL));
     }
@@ -308,11 +308,11 @@ public class SplitBy<
    */
   @FunctionAnnotation.ForwardedFields("sourceVertexId->f1;targetVertexId->f2")
   private static class EdgeToTupleMapper<ED extends EPGMEdge> implements
-    MapFunction<ED, Tuple3<Long, Long, Long>> {
+    MapFunction<ED, Tuple3<GradoopId, GradoopId, GradoopId>> {
     /**
      * Reduce object instantiation.
      */
-    private final Tuple3<Long, Long, Long> reuseTuple;
+    private final Tuple3<GradoopId, GradoopId, GradoopId> reuseTuple;
 
     /**
      * Creates MapFunction instance.
@@ -325,7 +325,7 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Tuple3<Long, Long, Long> map(ED edge) throws Exception {
+    public Tuple3<GradoopId, GradoopId, GradoopId> map(ED edge) throws Exception {
       reuseTuple.f0 = edge.getId();
       reuseTuple.f1 = edge.getSourceVertexId();
       reuseTuple.f2 = edge.getTargetVertexId();
@@ -342,12 +342,12 @@ public class SplitBy<
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f2")
   private static class JoinEdgeTupleWithSourceGraphs<VD extends EPGMVertex>
     implements
-    JoinFunction<Tuple3<Long, Long, Long>, VD, Tuple3<Long,
-      Set<Long>, Long>> {
+    JoinFunction<Tuple3<GradoopId, GradoopId, GradoopId>, VD, Tuple3<GradoopId,
+      GradoopIds, GradoopId>> {
     /**
      * Reduce object instantiation
      */
-    private final Tuple3<Long, Set<Long>, Long> reuseTuple;
+    private final Tuple3<GradoopId, GradoopIds, GradoopId> reuseTuple;
 
     /**
      * Create JoinFunction instance.
@@ -360,7 +360,8 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Tuple3<Long, Set<Long>, Long> join(Tuple3<Long, Long, Long> tuple3,
+    public Tuple3<GradoopId, GradoopIds, GradoopId> join(Tuple3<GradoopId, GradoopId,
+      GradoopId> tuple3,
       VD vertex) throws Exception {
       reuseTuple.f0 = tuple3.f0;
       reuseTuple.f1 = vertex.getGraphIds();
@@ -378,12 +379,12 @@ public class SplitBy<
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f1")
   private static class JoinEdgeTupleWithTargetGraphs<VD extends EPGMVertex>
     implements
-    JoinFunction<Tuple3<Long, Set<Long>, Long>, VD,
-      Tuple3<Long, Set<Long>, Set<Long>>> {
+    JoinFunction<Tuple3<GradoopId, GradoopIds, GradoopId>, VD,
+      Tuple3<GradoopId, GradoopIds, GradoopIds>> {
     /**
      * Reduce object instantiations.
      */
-    private final Tuple3<Long, Set<Long>, Set<Long>> reuseTuple;
+    private final Tuple3<GradoopId, GradoopIds, GradoopIds> reuseTuple;
 
     /**
      * Create JoinFunction instance.
@@ -396,8 +397,8 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Tuple3<Long, Set<Long>, Set<Long>> join(
-      Tuple3<Long, Set<Long>, Long> tuple3, VD vertex) throws
+    public Tuple3<GradoopId, GradoopIds, GradoopIds> join(
+      Tuple3<GradoopId, GradoopIds, GradoopId> tuple3, VD vertex) throws
       Exception {
       reuseTuple.f0 = tuple3.f0;
       reuseTuple.f1 = tuple3.f1;
@@ -412,13 +413,13 @@ public class SplitBy<
    * @param <GD> graph data type
    */
   private static class MapSubgraphIdToSet<GD extends EPGMGraphHead> implements
-    MapFunction<GD, Set<Long>> {
+    MapFunction<GD, GradoopIds> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Long> map(GD subgraph) throws Exception {
-      Set<Long> idSet = Sets.newHashSet();
+    public GradoopIds map(GD subgraph) throws Exception {
+      GradoopIds idSet = new GradoopIds();
       idSet.add(subgraph.getId());
       return idSet;
     }
@@ -427,12 +428,12 @@ public class SplitBy<
   /**
    * Union two input sets.
    */
-  private static class ReduceSets implements ReduceFunction<Set<Long>> {
+  private static class ReduceSets implements ReduceFunction<GradoopIds> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Long> reduce(Set<Long> set1, Set<Long> set2) throws Exception {
+    public GradoopIds reduce(GradoopIds set1, GradoopIds set2) throws Exception {
       set1.addAll(set2);
       return set1;
     }
@@ -443,12 +444,12 @@ public class SplitBy<
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f2")
   private static class CrossEdgesWithGraphSet implements
-    CrossFunction<Tuple3<Long, Set<Long>, Set<Long>>, Set<Long>, Tuple4<Long,
-      Set<Long>, Set<Long>, Set<Long>>> {
+    CrossFunction<Tuple3<GradoopId, GradoopIds, GradoopIds>, GradoopIds, Tuple4<GradoopId,
+      GradoopIds, GradoopIds, GradoopIds>> {
     /**
      * Reduce object instantiations.
      */
-    private final Tuple4<Long, Set<Long>, Set<Long>, Set<Long>> reuseTuple;
+    private final Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds> reuseTuple;
 
     /**
      * Create CrossFunction instance.
@@ -461,8 +462,8 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Tuple4<Long, Set<Long>, Set<Long>, Set<Long>> cross(
-      Tuple3<Long, Set<Long>, Set<Long>> tuple3, Set<Long> subgraphs) throws
+    public Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds> cross(
+      Tuple3<GradoopId, GradoopIds, GradoopIds> tuple3, GradoopIds subgraphs) throws
       Exception {
       reuseTuple.f0 = tuple3.f0;
       reuseTuple.f1 = tuple3.f1;
@@ -478,12 +479,12 @@ public class SplitBy<
    */
   @FunctionAnnotation.ForwardedFields("f0")
   private static class CheckEdgesSourceTargetGraphs implements
-    FlatMapFunction<Tuple4<Long, Set<Long>, Set<Long>, Set<Long>>,
-      Tuple2<Long, Set<Long>>> {
+    FlatMapFunction<Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds>,
+      Tuple2<GradoopId, GradoopIds>> {
     /**
      * Reduce object instantiations.
      */
-    private final Tuple2<Long, Set<Long>> reuseTuple;
+    private final Tuple2<GradoopId, GradoopIds> reuseTuple;
 
     /**
      * Creates FlatMapFunction instance.
@@ -496,14 +497,14 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public void flatMap(Tuple4<Long, Set<Long>, Set<Long>, Set<Long>> tuple4,
-      Collector<Tuple2<Long, Set<Long>>> collector) throws Exception {
-      Set<Long> sourceGraphs = tuple4.f1;
-      Set<Long> targetGraphs = tuple4.f2;
-      Set<Long> newSubgraphs = tuple4.f3;
+    public void flatMap(Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds> tuple4,
+      Collector<Tuple2<GradoopId, GradoopIds>> collector) throws Exception {
+      GradoopIds sourceGraphs = tuple4.f1;
+      GradoopIds targetGraphs = tuple4.f2;
+      GradoopIds newSubgraphs = tuple4.f3;
       boolean newGraphAdded = false;
-      Set<Long> toBeAddedGraphs = new HashSet<>();
-      for (Long graph : newSubgraphs) {
+      GradoopIds toBeAddedGraphs = new GradoopIds();
+      for (GradoopId graph : newSubgraphs) {
         if (targetGraphs.contains(graph) && sourceGraphs.contains(graph)) {
           toBeAddedGraphs.add(graph);
           newGraphAdded = true;
@@ -523,13 +524,13 @@ public class SplitBy<
    * @param <ED> edge data type
    */
   private static class JoinEdgeTuplesWithEdges<ED extends EPGMEdge> implements
-    JoinFunction<ED, Tuple2<Long, Set<Long>>, ED> {
+    JoinFunction<ED, Tuple2<GradoopId, GradoopIds>, ED> {
     /**
      * {@inheritDoc}
      */
     @Override
     public ED join(ED edge,
-      Tuple2<Long, Set<Long>> tuple2) throws Exception {
+      Tuple2<GradoopId, GradoopIds> tuple2) throws Exception {
       edge.getGraphIds().addAll(tuple2.f1);
       return edge;
     }

@@ -20,6 +20,7 @@ package org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functi
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.VertexGroupItem;
 
@@ -53,7 +54,7 @@ public class VertexGroupReducer implements
   @Override
   public void reduce(Iterable<VertexForGrouping> groupVertices,
     Collector<VertexGroupItem> collector) throws Exception {
-    Long groupRepresentativeVertexId = null;
+    GradoopId groupRepresentativeVertexId = null;
     long groupCount = 0L;
     String groupLabel = null;
     String groupPropertyValue = null;
@@ -90,7 +91,7 @@ public class VertexGroupReducer implements
    * @param groupPropertyValue  group property value
    * @param groupCount          total group count
    */
-  private void createGroupRepresentativeTuple(Long groupRepresentative,
+  private void createGroupRepresentativeTuple(GradoopId groupRepresentative,
     String groupLabel, String groupPropertyValue, long groupCount) {
     reuseVertexGroupItem.setVertexId(groupRepresentative);
     reuseVertexGroupItem.setGroupLabel(groupLabel);

@@ -133,7 +133,7 @@ public class HBaseVertexHandler<VD extends EPGMVertex, ED extends EPGMEdge>
     writeProperties(put, vertexData);
     writeOutgoingEdges(put, vertexData.getOutgoingEdges());
     writeIncomingEdges(put, vertexData.getIncomingEdges());
-    writeGraphs(put, vertexData);
+    writeGraphIds(put, vertexData);
     return put;
   }
 
@@ -157,10 +157,10 @@ public class HBaseVertexHandler<VD extends EPGMVertex, ED extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public VD readVertex(final Result res) {
+  public VD readVertex(final Result res) throws IOException {
     return vertexFactory
-      .createVertex(Long.valueOf(Bytes.toString(res.getRow())), readLabel(res),
-        readProperties(res), readGraphs(res));
+      .createVertex(readId(res), readLabel(res),
+        readProperties(res), readGraphIds(res));
   }
 
   /**

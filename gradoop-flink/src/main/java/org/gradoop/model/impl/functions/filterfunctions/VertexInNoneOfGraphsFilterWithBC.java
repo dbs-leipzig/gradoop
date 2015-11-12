@@ -19,7 +19,10 @@ package org.gradoop.model.impl.functions.filterfunctions;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,14 +42,22 @@ public class VertexInNoneOfGraphsFilterWithBC<VD extends EPGMVertex> extends
   /**
    * Graph identifiers
    */
-  private List<Long> identifiers;
+  private GradoopIds identifiers;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public void open(Configuration parameters) throws Exception {
-    identifiers = getRuntimeContext().getBroadcastVariable(BC_IDENTIFIERS);
+
+    Collection<Long> longIds =
+      getRuntimeContext().getBroadcastVariable(BC_IDENTIFIERS);
+
+    identifiers = new GradoopIds();
+
+    for(Long longId : longIds) {
+      identifiers.add(GradoopId.createId(longId));
+    }
   }
 
   /**
@@ -56,8 +67,8 @@ public class VertexInNoneOfGraphsFilterWithBC<VD extends EPGMVertex> extends
   public boolean filter(VD vertex) throws Exception {
     boolean vertexInGraph = true;
     if (vertex.getGraphCount() > 0) {
-      for (Long graph : identifiers) {
-        if (vertex.getGraphIds().contains(graph)) {
+      for (GradoopId graphIds : identifiers) {
+        if (vertex.getGraphIds().contains(graphIds)) {
           vertexInGraph = false;
           break;
         }

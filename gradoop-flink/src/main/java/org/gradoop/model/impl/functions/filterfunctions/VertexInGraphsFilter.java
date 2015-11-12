@@ -19,6 +19,8 @@ package org.gradoop.model.impl.functions.filterfunctions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.List;
 
@@ -34,14 +36,14 @@ public class VertexInGraphsFilter<VD extends EPGMVertex>
   /**
    * Graph identifiers
    */
-  private final List<Long> identifiers;
+  private final GradoopIds identifiers;
 
   /**
    * Creates a filter
    *
    * @param identifiers graph identifiers for containment check
    */
-  public VertexInGraphsFilter(List<Long> identifiers) {
+  public VertexInGraphsFilter(GradoopIds identifiers) {
     this.identifiers = identifiers;
   }
 
@@ -52,7 +54,7 @@ public class VertexInGraphsFilter<VD extends EPGMVertex>
   public boolean filter(VD vertex) throws Exception {
     boolean vertexInGraph = false;
     if (vertex.getGraphCount() > 0) {
-      for (Long graph : vertex.getGraphIds()) {
+      for (GradoopId graph : vertex.getGraphIds()) {
         if (identifiers.contains(graph)) {
           vertexInGraph = true;
           break;

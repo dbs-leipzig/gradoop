@@ -89,7 +89,7 @@ public interface VertexHandler<
    * @param res HBase row
    * @return vertex data contained in the given result.
    */
-  VD readVertex(final Result res);
+  VD readVertex(final Result res) throws IOException;
 
   /**
    * Returns the vertex data factory used by this handler.

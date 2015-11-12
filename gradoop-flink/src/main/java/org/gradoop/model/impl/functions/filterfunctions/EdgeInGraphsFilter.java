@@ -19,6 +19,8 @@ package org.gradoop.model.impl.functions.filterfunctions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.List;
 
@@ -34,14 +36,14 @@ public class EdgeInGraphsFilter<ED extends EPGMEdge>
   /**
    * Graph identifiers
    */
-  private final List<Long> identifiers;
+  private final GradoopIds identifiers;
 
   /**
    * Creates a filter
    *
    * @param identifiers graph identifiers for containment check
    */
-  public EdgeInGraphsFilter(List<Long> identifiers) {
+  public EdgeInGraphsFilter(GradoopIds identifiers) {
     this.identifiers = identifiers;
   }
 
@@ -52,8 +54,8 @@ public class EdgeInGraphsFilter<ED extends EPGMEdge>
   public boolean filter(ED edge) throws Exception {
     boolean vertexInGraph = false;
     if (edge.getGraphCount() > 0) {
-      for (Long graph : edge.getGraphIds()) {
-        if (identifiers.contains(graph)) {
+      for (GradoopId graphId : edge.getGraphIds()) {
+        if (identifiers.contains(graphId)) {
           vertexInGraph = true;
           break;
         }

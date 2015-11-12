@@ -221,7 +221,7 @@ public class SummarizationGroupWithLists<
       }
       vertexData
         .setProperty(COUNT_PROPERTY_KEY, (long) groupedVertexIds.size());
-      vertexData.addGraph(FlinkConstants.SUMMARIZE_GRAPH_ID);
+      vertexData.addGraphId(FlinkConstants.SUMMARIZE_GRAPH_ID);
 
       reuseVertex.f0 = newVertexID;
       reuseVertex.f1 = vertexData;

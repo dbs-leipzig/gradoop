@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Vertex representation which is used as output of group reduce.
@@ -28,7 +29,8 @@ import org.apache.flink.api.java.tuple.Tuple5;
  * f3: vertex group property
  * f4: total group count
  */
-public class VertexGroupItem extends Tuple5<Long, Long, String, String, Long> {
+public class VertexGroupItem
+  extends Tuple5<GradoopId, GradoopId, String, String, Long> {
 
   /**
    * Creates a vertex group item.
@@ -37,19 +39,20 @@ public class VertexGroupItem extends Tuple5<Long, Long, String, String, Long> {
     setGroupCount(0L);
   }
 
-  public Long getVertexId() {
+  public GradoopId getVertexId() {
     return f0;
   }
 
-  public void setVertexId(Long vertexId) {
+  public void setVertexId(GradoopId vertexId) {
     f0 = vertexId;
   }
 
-  public Long getGroupRepresentativeVertexId() {
+  public GradoopId getGroupRepresentativeVertexId() {
     return f1;
   }
 
-  public void setGroupRepresentativeVertexId(Long groupRepresentativeVertexId) {
+  public void setGroupRepresentativeVertexId(
+    GradoopId groupRepresentativeVertexId) {
     f1 = groupRepresentativeVertexId;
   }
 

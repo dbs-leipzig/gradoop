@@ -35,6 +35,7 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Combination;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Overlap;
@@ -94,18 +95,18 @@ public class LogicalGraph
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
   LogicalGraph<VD, ED, GD> fromGellyGraph(
-    Graph<Long, VD, ED> graph, GD graphData,
+    Graph<GradoopId, VD, ED> graph, GD graphData,
     GradoopFlinkConfig<VD, ED, GD> config) {
     return fromDataSets(graph.getVertices().map(
-      new MapFunction<Vertex<Long, VD>, VD>() {
+      new MapFunction<Vertex<GradoopId, VD>, VD>() {
         @Override
-        public VD map(Vertex<Long, VD> gellyVertex) throws Exception {
+        public VD map(Vertex<GradoopId, VD> gellyVertex) throws Exception {
           return gellyVertex.getValue();
         }
       }).withForwardedFields("f1->*"),
-      graph.getEdges().map(new MapFunction<Edge<Long, ED>, ED>() {
+      graph.getEdges().map(new MapFunction<Edge<GradoopId, ED>, ED>() {
         @Override
-        public ED map(Edge<Long, ED> gellyEdge) throws Exception {
+        public ED map(Edge<GradoopId, ED> gellyEdge) throws Exception {
           return gellyEdge.getValue();
         }
       }).withForwardedFields("f2->*"),
@@ -384,7 +385,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public Long getId() {
+  public GradoopId getId() {
     return graphHead.getId();
   }
 
@@ -392,7 +393,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public void setId(Long id) {
+  public void setId(GradoopId id) {
     graphHead.setId(id);
   }
 

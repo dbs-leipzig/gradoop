@@ -1,5 +1,8 @@
 package org.gradoop.model.api;
 
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +19,7 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @param id vertex identifier
    * @return vertex data
    */
-  T createVertex(Long id);
+  T createVertex(GradoopId id);
 
   /**
    * Creates vertex data based on the given parameters.
@@ -25,7 +28,7 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @param label vertex label
    * @return vertex data
    */
-  T createVertex(Long id, String label);
+  T createVertex(GradoopId id, String label);
 
   /**
    * Creates vertex data based on the given parameters.
@@ -35,17 +38,17 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @param properties vertex properties
    * @return vertex data
    */
-  T createVertex(Long id, String label, Map<String, Object> properties);
+  T createVertex(GradoopId id, String label, Map<String, Object> properties);
 
   /**
    * Creates vertex data based on the given parameters.
    *
    * @param id     vertex identifier
    * @param label  vertex label
-   * @param graphs graphs, that contain the vertex
+   * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  T createVertex(Long id, String label, Set<Long> graphs);
+  T createVertex(GradoopId id, String label, GradoopIds graphIds);
 
   /**
    * Creates vertex data based on the given parameters.
@@ -53,9 +56,9 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @param id         vertex identifier
    * @param label      vertex labels
    * @param properties vertex properties
-   * @param graphs     graphs, that contain the vertex
+   * @param graphIds     graphIds, that contain the vertex
    * @return vertex data
    */
-  T createVertex(Long id, String label, Map<String, Object> properties,
-    Set<Long> graphs);
+  T createVertex(GradoopId id, String label,
+    Map<String, Object> properties, GradoopIds graphIds);
 }

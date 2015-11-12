@@ -3,6 +3,10 @@ package org.gradoop.model.impl.pojo;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIdGenerator;
+import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -17,9 +21,10 @@ public class EdgePojoTest {
 
   @Test
   public void createWithIDTest() {
-    Long edgeId = 0L;
-    Long sourceId = 23L;
-    Long targetId = 42L;
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId edgeId = idGen.createId();
+    GradoopId sourceId = idGen.createId();
+    GradoopId targetId = idGen.createId();
     EPGMEdge e =
       new EdgePojoFactory().createEdge(edgeId, sourceId, targetId);
     assertThat(e.getId(), is(edgeId));
@@ -31,14 +36,16 @@ public class EdgePojoTest {
 
   @Test
   public void createEdgePojoTest() {
-    Long edgeId = 0L;
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId edgeId = idGen.createId();
+    GradoopId sourceId = idGen.createId();
+    GradoopId targetId = idGen.createId();
+
     String label = "A";
-    Long sourceId = 23L;
-    Long targetId = 42L;
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
     props.put("k2", "v2");
-    Set<Long> graphs = Sets.newHashSet(0L, 1L);
+    GradoopIds graphs = GradoopIds.createGradoopIds(0L, 1L);
 
     EPGMEdge edge = new EdgePojoFactory()
       .createEdge(edgeId, label, sourceId, targetId, props, graphs);
@@ -51,38 +58,60 @@ public class EdgePojoTest {
     assertThat(edge.getProperty("k1"), Is.<Object>is("v1"));
     assertThat(edge.getProperty("k2"), Is.<Object>is("v2"));
     assertThat(edge.getGraphCount(), is(2));
-    assertTrue(edge.getGraphIds().contains(0L));
-    assertTrue(edge.getGraphIds().contains(1L));
+    assertTrue(edge.getGraphIds().contains(GradoopId.createId(0L)));
+    assertTrue(edge.getGraphIds().contains(GradoopId.createId(1L)));
   }
 
   @Test
   public void createWithMissingLabelTest() {
-    EPGMEdge v = new EdgePojoFactory().createEdge(0L, 23L, 42L);
-    assertThat(v.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId edgeId = idGen.createId();
+    GradoopId sourceId = idGen.createId();
+    GradoopId targetId = idGen.createId();
+    EPGMEdge e =
+      new EdgePojoFactory().createEdge(edgeId, sourceId, targetId);
+    assertThat(e.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullIDTest() {
-    new EdgePojoFactory().createEdge(null, 23L, 42L);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId sourceId = idGen.createId();
+    GradoopId targetId = idGen.createId();
+    new EdgePojoFactory().createEdge(null, sourceId, targetId);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullSourceIdTest() {
-    new EdgePojoFactory().createEdge(0L, null, 42L);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId edgeId = idGen.createId();
+    GradoopId targetId = idGen.createId();
+    new EdgePojoFactory().createEdge(edgeId, null, targetId);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullTargetIdTest() {
-    new EdgePojoFactory().createEdge(0L, 23L, null);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId edgeId = idGen.createId();
+    GradoopId sourceId = idGen.createId();
+    new EdgePojoFactory().createEdge(edgeId, sourceId, null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithEmptyLabelTest() {
-    new EdgePojoFactory().createEdge(0L, "", 23L, 42L);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId edgeId = idGen.createId();
+    GradoopId sourceId = idGen.createId();
+    GradoopId targetId = idGen.createId();
+    new EdgePojoFactory().createEdge(edgeId, "", sourceId, targetId);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
-    new EdgePojoFactory().createEdge(0L, null, 23L, 42L);
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId edgeId = idGen.createId();
+    GradoopId sourceId = idGen.createId();
+    GradoopId targetId = idGen.createId();
+    new EdgePojoFactory().createEdge(edgeId, null, sourceId, targetId);
   }
 }
