@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl.id;
 
-import com.sun.istack.NotNull;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
