@@ -24,10 +24,13 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Writables;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
@@ -38,6 +41,7 @@ import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
 import org.gradoop.util.GradoopConfig;
 
+import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.Iterator;
@@ -160,14 +164,14 @@ public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * {@inheritDoc}
    */
   @Override
-  public void writeGraphHead(final PersistentGraphHead graphData) {
-    LOG.info("Writing graph data: " + graphData);
+  public void writeGraphHead(final PersistentGraphHead graphHead) {
+    LOG.info("Writing graph data: " + graphHead);
     try {
       GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();
       // graph id
-      Put put = new Put(graphHeadHandler.getRowKey(graphData.getId()));
+      Put put = new Put(graphHeadHandler.getRowKey(graphHead.getId()));
       // write graph to Put
-      put = graphHeadHandler.writeGraphHead(put, graphData);
+      put = graphHeadHandler.writeGraphHead(put, graphHead);
       // write to table
       graphHeadTable.put(put);
     } catch (RetriesExhaustedWithDetailsException | InterruptedIOException e) {
@@ -217,12 +221,11 @@ public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * {@inheritDoc}
    */
   @Override
-  public GD readGraph(final Long graphId) {
+  public GD readGraph(final GradoopId graphId) {
     GD graphData = null;
     try {
       GraphHeadHandler<GD> graphHeadHandler = config.getGraphHeadHandler();
-      byte[] rowKey = graphHeadHandler.getRowKey(graphId);
-      Result res = graphHeadTable.get(new Get(rowKey));
+      Result res = graphHeadTable.get(new Get(Writables.getBytes(graphId)));
       if (!res.isEmpty()) {
         graphData = graphHeadHandler.readGraphHead(res);
       }

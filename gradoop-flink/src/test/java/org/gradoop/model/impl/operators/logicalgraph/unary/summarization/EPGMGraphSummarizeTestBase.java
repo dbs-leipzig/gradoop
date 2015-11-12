@@ -1986,7 +1986,7 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
       vertex.getProperty(aggregatePropertyKey));
     assertEquals("wrong number of graphs", expectedGraphCount,
       vertex.getGraphCount());
-    assertTrue("wrong graph id", vertex.getGraphs().contains(expectedGraphID));
+    assertTrue("wrong graph id", vertex.getGraphIds().contains(expectedGraphID));
   }
 
   private void testEdge(EPGMEdge edge, String expectedEdgeLabel,
@@ -2011,8 +2011,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
     assertEquals("wrong edge property", expectedCountValue,
       edge.getProperty(aggregatePropertyKey));
     assertEquals("wrong number of graphs", expectedGraphCount,
-      edge.getGraphs().size());
-    assertTrue("wrong graph id", edge.getGraphs().contains(expectedGraphID));
+      edge.getGraphIds().size());
+    assertTrue("wrong graph id", edge.getGraphIds().contains(expectedGraphID));
 
     if (edgeGroupingKey != null && expectedGroupingValue != null) {
       assertEquals("wrong group value", expectedGroupingValue,

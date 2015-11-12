@@ -23,6 +23,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -44,7 +45,7 @@ public interface VertexHandler<
    * @param edges edges to add
    * @return put with edge identifiers
    */
-  Put writeOutgoingEdges(final Put put, final Set<ED> edges);
+  Put writeOutgoingEdges(final Put put, final Set<ED> edges) throws IOException;
 
   /**
    * Adds the given incoming edge data to the given {@link Put} and
@@ -54,7 +55,7 @@ public interface VertexHandler<
    * @param edges edge identifiers to add
    * @return put with edge identifiers
    */
-  Put writeIncomingEdges(final Put put, final Set<ED> edges);
+  Put writeIncomingEdges(final Put put, final Set<ED> edges) throws IOException;
 
   /**
    * Reads the outgoing edge identifiers from the given {@link Result}.
@@ -79,7 +80,8 @@ public interface VertexHandler<
    * @param vertexData vertex data to be written
    * @return put with vertex data
    */
-  Put writeVertex(final Put put, final PersistentVertex<ED> vertexData);
+  Put writeVertex(final Put put, final PersistentVertex<ED> vertexData) throws
+    IOException;
 
   /**
    * Reads the vertex data from the given {@link Result}.

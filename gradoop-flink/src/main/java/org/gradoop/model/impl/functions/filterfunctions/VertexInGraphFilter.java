@@ -49,7 +49,7 @@ public class VertexInGraphFilter<VD extends EPGMVertex>
   @Override
   public boolean filter(VD vertex) throws Exception {
     return (vertex.getGraphCount() > 0) &&
-      vertex.getGraphs().contains(graphId);
+      vertex.getGraphIds().contains(graphId);
   }
 }
 

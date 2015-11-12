@@ -57,7 +57,7 @@ public class EdgeInNoneOfGraphsFilterWithBC<ED extends EPGMEdge> extends
     boolean vertexInGraph = true;
     if (edge.getGraphCount() > 0) {
       for (Long graph : identifiers) {
-        if (edge.getGraphs().contains(graph)) {
+        if (edge.getGraphIds().contains(graph)) {
           vertexInGraph = false;
           break;
         }

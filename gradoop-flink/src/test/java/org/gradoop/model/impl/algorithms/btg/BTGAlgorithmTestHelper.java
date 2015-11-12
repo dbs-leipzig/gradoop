@@ -78,7 +78,7 @@ public class BTGAlgorithmTestHelper {
     List<Vertex<Long, VertexPojo>> graph) {
     Map<Long, List<Long>> result = new HashMap<>();
     for (Vertex<Long, VertexPojo> v : graph) {
-      result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphs()));
+      result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphIds()));
     }
     return result;
   }

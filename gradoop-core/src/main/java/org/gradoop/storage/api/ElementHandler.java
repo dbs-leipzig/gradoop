@@ -22,6 +22,7 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -40,7 +41,7 @@ public interface ElementHandler extends Serializable {
    *                   null}).
    * @return persistent entity identifier
    */
-  byte[] getRowKey(final Long entityData);
+  byte[] getRowKey(final GradoopId entityData);
 
   /**
    * Creates an identifier from a given row key.
@@ -48,7 +49,7 @@ public interface ElementHandler extends Serializable {
    * @param rowKey row key from the graph store (must not be {@code null})
    * @return entity identifier
    */
-  Long getId(final byte[] rowKey);
+  GradoopId getId(final byte[] rowKey);
 
   /**
    * Adds the labels to the given {@link Put} and returns it.

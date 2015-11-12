@@ -18,6 +18,7 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Set;
 
@@ -49,15 +50,15 @@ public abstract class HBaseGraphElement<T extends EPGMGraphElement> extends
    * {@inheritDoc}
    */
   @Override
-  public Set<Long> getGraphs() {
-    return getEpgmElement().getGraphs();
+  public Set<GradoopId> getGraphIds() {
+    return getEpgmElement().getGraphIds();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void addGraph(Long graph) {
+  public void addGraph(GradoopId graph) {
     getEpgmElement().addGraph(graph);
   }
 
@@ -65,7 +66,7 @@ public abstract class HBaseGraphElement<T extends EPGMGraphElement> extends
    * {@inheritDoc}
    */
   @Override
-  public void setGraphs(Set<Long> graphs) {
+  public void setGraphs(Set<GradoopId> graphs) {
     getEpgmElement().setGraphs(graphs);
   }
 

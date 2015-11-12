@@ -235,10 +235,10 @@ public class SplitBy<
     @Override
     public VD map(VD vertex) throws Exception {
       Long labelPropIndex = function.execute(vertex);
-      if (vertex.getGraphs() == null) {
+      if (vertex.getGraphIds() == null) {
         vertex.setGraphs(Sets.newHashSet(labelPropIndex));
       } else {
-        vertex.getGraphs().add(labelPropIndex);
+        vertex.getGraphIds().add(labelPropIndex);
       }
       return vertex;
     }
@@ -363,9 +363,9 @@ public class SplitBy<
     public Tuple3<Long, Set<Long>, Long> join(Tuple3<Long, Long, Long> tuple3,
       VD vertex) throws Exception {
       reuseTuple.f0 = tuple3.f0;
-      reuseTuple.f1 = vertex.getGraphs();
+      reuseTuple.f1 = vertex.getGraphIds();
       reuseTuple.f2 = tuple3.f2;
-      return new Tuple3<>(tuple3.f0, vertex.getGraphs(), tuple3.f2);
+      return new Tuple3<>(tuple3.f0, vertex.getGraphIds(), tuple3.f2);
     }
   }
 
@@ -401,7 +401,7 @@ public class SplitBy<
       Exception {
       reuseTuple.f0 = tuple3.f0;
       reuseTuple.f1 = tuple3.f1;
-      reuseTuple.f2 = vertex.getGraphs();
+      reuseTuple.f2 = vertex.getGraphIds();
       return reuseTuple;
     }
   }
@@ -530,7 +530,7 @@ public class SplitBy<
     @Override
     public ED join(ED edge,
       Tuple2<Long, Set<Long>> tuple2) throws Exception {
-      edge.getGraphs().addAll(tuple2.f1);
+      edge.getGraphIds().addAll(tuple2.f1);
       return edge;
     }
   }

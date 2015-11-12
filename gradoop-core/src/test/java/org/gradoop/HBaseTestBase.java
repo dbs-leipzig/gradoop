@@ -584,8 +584,8 @@ public class HBaseTestBase {
       }
     }
     assertEquals(2, v.getGraphCount());
-    assertTrue(v.getGraphs().contains(0L));
-    assertTrue(v.getGraphs().contains(1L));
+    assertTrue(v.getGraphIds().contains(0L));
+    assertTrue(v.getGraphIds().contains(1L));
 
     // vertex 1
     v = graphStore.readVertex(1L);
@@ -595,8 +595,8 @@ public class HBaseTestBase {
     assertEquals(1, propertyKeys.size());
     assertEquals("v1", v.getProperty("k1"));
     assertEquals(2, v.getGraphCount());
-    assertTrue(v.getGraphs().contains(1L));
-    assertTrue(v.getGraphs().contains(2L));
+    assertTrue(v.getGraphIds().contains(1L));
+    assertTrue(v.getGraphIds().contains(2L));
   }
 
   /**
@@ -623,8 +623,8 @@ public class HBaseTestBase {
       }
     }
     assertEquals(2, e.getGraphCount());
-    assertTrue(e.getGraphs().contains(0L));
-    assertTrue(e.getGraphs().contains(1L));
+    assertTrue(e.getGraphIds().contains(0L));
+    assertTrue(e.getGraphIds().contains(1L));
 
     // edge 1
     e = graphStore.readEdge(1L);
@@ -637,8 +637,8 @@ public class HBaseTestBase {
     assertEquals(1, propertyKeys.size());
     assertEquals("v1", e.getProperty("k1"));
     assertEquals(2, e.getGraphCount());
-    assertTrue(e.getGraphs().contains(1L));
-    assertTrue(e.getGraphs().contains(2L));
+    assertTrue(e.getGraphIds().contains(1L));
+    assertTrue(e.getGraphIds().contains(2L));
 
   }
 }

@@ -55,7 +55,7 @@ public class VertexInAllGraphsFilterWithBC<VD extends EPGMVertex> extends
   @Override
   public boolean filter(VD vertex) throws Exception {
     return vertex.getGraphCount() > 0 &&
-      (vertex.getGraphs().containsAll(identifiers));
+      (vertex.getGraphIds().containsAll(identifiers));
   }
 }
 

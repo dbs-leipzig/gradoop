@@ -18,6 +18,7 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Map;
 
@@ -109,7 +110,7 @@ public abstract class HBaseElement<T extends EPGMElement> implements
    * {@inheritDoc}
    */
   @Override
-  public Long getId() {
+  public GradoopId getId() {
     return epgmElement.getId();
   }
 
@@ -117,7 +118,7 @@ public abstract class HBaseElement<T extends EPGMElement> implements
    * {@inheritDoc}
    */
   @Override
-  public void setId(Long id) {
+  public void setId(GradoopId id) {
     epgmElement.setId(id);
   }
 

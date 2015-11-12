@@ -55,23 +55,23 @@ public class GraphCollectionExcludeTest extends FlinkTestBase {
 
     assertNotNull("graph was null", newGraph);
     for (VertexPojo vertex : newVertices) {
-      assertTrue(vertex.getGraphs().contains(exclusionBase));
+      assertTrue(vertex.getGraphIds().contains(exclusionBase));
       for(Long id : oldGraphs){
         if(!id.equals(exclusionBase)){
-          assertFalse(vertex.getGraphs().contains(id));
+          assertFalse(vertex.getGraphIds().contains(id));
         }
       }
-      assertTrue(oldGraphs.containsAll(vertex.getGraphs()));
+      assertTrue(oldGraphs.containsAll(vertex.getGraphIds()));
     }
     for (EdgePojo edge : newEdges) {
       assertTrue(oldEdges.contains(edge));
-      assertTrue(edge.getGraphs().contains(exclusionBase));
+      assertTrue(edge.getGraphIds().contains(exclusionBase));
       for(Long id : oldGraphs){
         if(!id.equals(exclusionBase)){
-          assertFalse(edge.getGraphs().contains(id));
+          assertFalse(edge.getGraphIds().contains(id));
         }
       }
-      assertTrue(oldGraphs.containsAll(edge.getGraphs()));
+      assertTrue(oldGraphs.containsAll(edge.getGraphIds()));
     }
   }
 }

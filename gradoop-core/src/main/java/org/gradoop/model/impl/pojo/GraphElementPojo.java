@@ -42,7 +42,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
    * {@inheritDoc}
    */
   @Override
-  public Set<GradoopId> getGraphs() {
+  public Set<GradoopId> getGraphIds() {
     return graphs;
   }
 

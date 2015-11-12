@@ -200,7 +200,7 @@ public abstract class JsonIO {
       T entity) throws JSONException {
       JSONObject meta = writeMeta(entity);
       if (entity.getGraphCount() > 0) {
-        meta.put(GRAPHS, writeJsonArray(entity.getGraphs()));
+        meta.put(GRAPHS, writeJsonArray(entity.getGraphIds()));
       }
       return meta;
     }

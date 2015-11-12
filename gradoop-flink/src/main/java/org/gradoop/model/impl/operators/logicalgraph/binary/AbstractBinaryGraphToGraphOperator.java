@@ -129,8 +129,8 @@ public abstract class AbstractBinaryGraphToGraphOperator<
       if (count == amount) {
         if (includedGraphID != null && precludedGraphID != null) {
           assert vertex != null;
-          if (vertex.getGraphs().contains(includedGraphID) &&
-            !vertex.getGraphs().contains(precludedGraphID)) {
+          if (vertex.getGraphIds().contains(includedGraphID) &&
+            !vertex.getGraphIds().contains(precludedGraphID)) {
             collector.collect(vertex);
           }
         } else {

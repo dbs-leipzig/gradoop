@@ -154,7 +154,7 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     getExecutionEnvironment().execute();
 
     for (EPGMVertex v : vertexData) {
-      Set<Long> gIDs = v.getGraphs();
+      Set<Long> gIDs = v.getGraphIds();
       if (v.equals(VERTEX_PERSON_ALICE)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (v.equals(VERTEX_PERSON_BOB)) {
@@ -165,7 +165,7 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     }
 
     for (EPGMEdge e : edgeData) {
-      Set<Long> gIDs = e.getGraphs();
+      Set<Long> gIDs = e.getGraphIds();
       if (e.equals(EDGE_0_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (e.equals(EDGE_1_KNOWS)) {
