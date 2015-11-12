@@ -17,6 +17,8 @@
 
 package org.gradoop.model.api;
 
+import org.gradoop.model.impl.id.GradoopId;
+
 import java.util.Set;
 
 /**
@@ -29,7 +31,7 @@ public interface EPGMGraphElement extends EPGMElement {
    *
    * @return all graphs of that element
    */
-  Set<Long> getGraphs();
+  Set<GradoopId> getGraphs();
 
   /**
    * Adds that element to the given graph. If the element is already an element
@@ -37,14 +39,14 @@ public interface EPGMGraphElement extends EPGMElement {
    *
    * @param graph the graph to be added to
    */
-  void addGraph(Long graph);
+  void addGraph(GradoopId graph);
 
   /**
    * Adds the given graph set to the element.
    *
    * @param graphs the graphs to be added
    */
-  void setGraphs(Set<Long> graphs);
+  void setGraphs(Set<GradoopId> graphs);
 
   /**
    * Resets all graph elements.

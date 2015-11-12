@@ -2,6 +2,7 @@ package org.gradoop.model.impl.pojo;
 
 import com.google.common.collect.Maps;
 import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public abstract class ElementPojo implements EPGMElement {
   /**
    * Entity identifier.
    */
-  protected Long id;
+  protected GradoopId id;
 
   /**
    * Label of that entity.
@@ -33,12 +34,12 @@ public abstract class ElementPojo implements EPGMElement {
   /**
    * Creates an object from the given parameters. Can only be called by
    * inheriting classes.
-   *
-   * @param id         entity identifier
+   *  @param id         entity identifier
    * @param label      label
    * @param properties key-value properties
    */
-  protected ElementPojo(Long id, String label, Map<String, Object> properties) {
+  protected ElementPojo(
+    GradoopId id, String label, Map<String, Object> properties) {
     this.id = id;
     this.label = label;
     this.properties = properties;
@@ -48,7 +49,7 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public Long getId() {
+  public GradoopId getId() {
     return id;
   }
 
@@ -56,7 +57,7 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public void setId(Long id) {
+  public void setId(GradoopId id) {
   }
 
   /**

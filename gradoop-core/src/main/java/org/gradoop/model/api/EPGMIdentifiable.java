@@ -17,6 +17,8 @@
 
 package org.gradoop.model.api;
 
+import org.gradoop.model.impl.id.GradoopId;
+
 /**
  * Describes an identifiable entity.
  */
@@ -26,12 +28,12 @@ public interface EPGMIdentifiable {
    *
    * @return identifier
    */
-  Long getId();
+  GradoopId getId();
 
   /**
    * Sets the identifier of that entity.
    *
    * @param id identifier
    */
-  void setId(Long id);
+  void setId(GradoopId id);
 }

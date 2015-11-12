@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Map;
 import java.util.Set;
@@ -31,12 +32,12 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
   /**
    * Vertex identifier of the source vertex.
    */
-  private Long sourceVertexId;
+  private GradoopId sourceVertexId;
 
   /**
    * Vertex identifier of the target vertex.
    */
-  private Long targetVertexId;
+  private GradoopId targetVertexId;
 
   /**
    * Default constructor is necessary to apply to POJO rules.
@@ -46,16 +47,15 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
 
   /**
    * Creates an edge instance based on the given parameters.
-   *
-   * @param id             the unique id of the edge
+   *  @param id             the unique id of the edge
    * @param label          edge label
    * @param sourceVertexId source vertex id
    * @param targetVertexId target vertex id
    * @param properties     edge properties
    * @param graphs         graphs that edge is contained in
    */
-  EdgePojo(final Long id, final String label, final Long sourceVertexId,
-    final Long targetVertexId, final Map<String, Object> properties,
+  EdgePojo(final Long id, final String label, final GradoopId sourceVertexId,
+    final GradoopId targetVertexId, final Map<String, Object> properties,
     Set<Long> graphs) {
     super(id, label, properties, graphs);
     this.sourceVertexId = sourceVertexId;
@@ -66,15 +66,16 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
    * {@inheritDoc}
    */
   @Override
-  public Long getSourceVertexId() {
+  public GradoopId getSourceVertexId() {
     return sourceVertexId;
   }
 
   /**
    * {@inheritDoc}
+   * @param sourceVertexId
    */
   @Override
-  public void setSourceVertexId(Long sourceVertexId) {
+  public void setSourceVertexId(GradoopId sourceVertexId) {
     this.sourceVertexId = sourceVertexId;
   }
 
@@ -82,15 +83,16 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
    * {@inheritDoc}
    */
   @Override
-  public Long getTargetVertexId() {
+  public GradoopId getTargetVertexId() {
     return targetVertexId;
   }
 
   /**
    * {@inheritDoc}
+   * @param targetVertexId
    */
   @Override
-  public void setTargetVertexId(Long targetVertexId) {
+  public void setTargetVertexId(GradoopId targetVertexId) {
     this.targetVertexId = targetVertexId;
   }
 

@@ -17,6 +17,8 @@
 
 package org.gradoop.model.api;
 
+import org.gradoop.model.impl.id.GradoopId;
+
 /**
  * Describes data assigned to an edge in the EPGM.
  */
@@ -26,26 +28,26 @@ public interface EPGMEdge extends EPGMGraphElement {
    *
    * @return source vertex id
    */
-  Long getSourceVertexId();
+  GradoopId getSourceVertexId();
 
   /**
    * Sets the source vertex identifier.
    *
    * @param sourceVertexId source vertex id
    */
-  void setSourceVertexId(Long sourceVertexId);
+  void setSourceVertexId(GradoopId sourceVertexId);
 
   /**
    * Returns the target vertex identifier.
    *
    * @return target vertex id
    */
-  Long getTargetVertexId();
+  GradoopId getTargetVertexId();
 
   /**
    * Sets the target vertex identifier.
    *
    * @param targetVertexId target vertex id.
    */
-  void setTargetVertexId(Long targetVertexId);
+  void setTargetVertexId(GradoopId targetVertexId);
 }
