@@ -55,6 +55,6 @@ public class EdgeInAllGraphsFilterWithBC<ED extends EPGMEdge> extends
   @Override
   public boolean filter(ED edge) throws Exception {
     return edge.getGraphCount() > 0 &&
-      (edge.getGraphs().containsAll(identifiers));
+      (edge.getGraphIds().containsAll(identifiers));
   }
 }

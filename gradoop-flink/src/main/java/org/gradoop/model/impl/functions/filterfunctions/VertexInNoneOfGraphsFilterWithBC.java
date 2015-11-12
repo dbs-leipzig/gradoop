@@ -57,7 +57,7 @@ public class VertexInNoneOfGraphsFilterWithBC<VD extends EPGMVertex> extends
     boolean vertexInGraph = true;
     if (vertex.getGraphCount() > 0) {
       for (Long graph : identifiers) {
-        if (vertex.getGraphs().contains(graph)) {
+        if (vertex.getGraphIds().contains(graph)) {
           vertexInGraph = false;
           break;
         }

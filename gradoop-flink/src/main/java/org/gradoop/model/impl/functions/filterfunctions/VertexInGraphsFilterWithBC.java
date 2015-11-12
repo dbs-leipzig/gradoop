@@ -59,7 +59,7 @@ public class VertexInGraphsFilterWithBC<VD extends EPGMVertex>
   public boolean filter(VD vertex) throws Exception {
     boolean vertexInGraph = false;
     if (vertex.getGraphCount() > 0) {
-      for (Long graph : vertex.getGraphs()) {
+      for (Long graph : vertex.getGraphIds()) {
         if (identifiers.contains(graph)) {
           vertexInGraph = true;
           break;

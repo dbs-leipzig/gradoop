@@ -18,6 +18,7 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.storage.api.PersistentEdge;
 
@@ -93,15 +94,16 @@ public class HBaseEdge extends
    * {@inheritDoc}
    */
   @Override
-  public Long getSourceVertexId() {
+  public GradoopId getSourceVertexId() {
     return getEpgmElement().getSourceVertexId();
   }
 
   /**
    * {@inheritDoc}
+   * @param sourceVertexId
    */
   @Override
-  public void setSourceVertexId(Long sourceVertexId) {
+  public void setSourceVertexId(GradoopId sourceVertexId) {
     getEpgmElement().setSourceVertexId(sourceVertexId);
   }
 
@@ -109,15 +111,16 @@ public class HBaseEdge extends
    * {@inheritDoc}
    */
   @Override
-  public Long getTargetVertexId() {
+  public GradoopId getTargetVertexId() {
     return getEpgmElement().getTargetVertexId();
   }
 
   /**
    * {@inheritDoc}
+   * @param targetVertexId
    */
   @Override
-  public void setTargetVertexId(Long targetVertexId) {
+  public void setTargetVertexId(GradoopId targetVertexId) {
     getEpgmElement().setTargetVertexId(targetVertexId);
   }
 

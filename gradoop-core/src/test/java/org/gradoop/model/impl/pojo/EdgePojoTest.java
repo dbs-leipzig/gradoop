@@ -51,8 +51,8 @@ public class EdgePojoTest {
     assertThat(edge.getProperty("k1"), Is.<Object>is("v1"));
     assertThat(edge.getProperty("k2"), Is.<Object>is("v2"));
     assertThat(edge.getGraphCount(), is(2));
-    assertTrue(edge.getGraphs().contains(0L));
-    assertTrue(edge.getGraphs().contains(1L));
+    assertTrue(edge.getGraphIds().contains(0L));
+    assertTrue(edge.getGraphIds().contains(1L));
   }
 
   @Test

@@ -188,7 +188,7 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     getExecutionEnvironment().execute();
 
     for (VertexPojo v : vertexData) {
-      Set<Long> gIDs = v.getGraphs();
+      Set<Long> gIDs = v.getGraphIds();
       if (v.equals(GradoopTestBaseUtils.VERTEX_PERSON_ALICE)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (v.equals(GradoopTestBaseUtils.VERTEX_PERSON_BOB)) {
@@ -197,7 +197,7 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     }
 
     for (EdgePojo e : edgeData) {
-      Set<Long> gIDs = e.getGraphs();
+      Set<Long> gIDs = e.getGraphIds();
       if (e.equals(GradoopTestBaseUtils.EDGE_0_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (e.equals(GradoopTestBaseUtils.EDGE_1_KNOWS)) {

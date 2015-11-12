@@ -267,10 +267,10 @@ public class OverlapSplitBy<
     @Override
     public VD map(VD vertex) throws Exception {
       List<Long> labelPropIndex = function.execute(vertex);
-      if (vertex.getGraphs() == null) {
+      if (vertex.getGraphIds() == null) {
         vertex.setGraphs(new HashSet<Long>());
       }
-      vertex.getGraphs().addAll(labelPropIndex);
+      vertex.getGraphIds().addAll(labelPropIndex);
       return vertex;
     }
   }
@@ -303,7 +303,7 @@ public class OverlapSplitBy<
     public Tuple3<Long, List<Long>, Long> join(Tuple3<Long, Long, Long> tuple3,
       VD vertex) throws Exception {
       return new Tuple3<>(tuple3.f0,
-        (List<Long>) Lists.newArrayList(vertex.getGraphs()),
+        (List<Long>) Lists.newArrayList(vertex.getGraphIds()),
         tuple3.f2);
     }
   }
@@ -323,7 +323,7 @@ public class OverlapSplitBy<
       Tuple3<Long, List<Long>, Long> tuple3, VD vertex) throws
       Exception {
       return new Tuple3<>(tuple3.f0, tuple3.f1,
-        (List<Long>) Lists.newArrayList(vertex.getGraphs()));
+        (List<Long>) Lists.newArrayList(vertex.getGraphIds()));
     }
   }
 

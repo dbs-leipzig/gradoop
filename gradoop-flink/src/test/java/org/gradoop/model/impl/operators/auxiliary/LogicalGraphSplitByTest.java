@@ -57,8 +57,8 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
       VertexPojo oldVertex = oldVertices.get(i);
       VertexPojo newVertex = newVertices.get(i);
       assertTrue((oldVertex.getGraphCount() + 1) == newVertex.getGraphCount());
-      assertTrue(newVertex.getGraphs().containsAll(oldVertex.getGraphs()));
-      assertTrue(newVertex.getGraphs().contains(splitFunc.execute(newVertex)));
+      assertTrue(newVertex.getGraphIds().containsAll(oldVertex.getGraphIds()));
+      assertTrue(newVertex.getGraphIds().contains(splitFunc.execute(newVertex)));
     }
   }
 

@@ -31,7 +31,7 @@ public interface EPGMGraphElement extends EPGMElement {
    *
    * @return all graphs of that element
    */
-  Set<GradoopId> getGraphs();
+  Set<GradoopId> getGraphIds();
 
   /**
    * Adds that element to the given graph. If the element is already an element

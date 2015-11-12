@@ -71,11 +71,11 @@ public class GraphCollectionOverlapTest extends FlinkTestBase {
     assertNotNull("graph was null", newGraph);
     for (VertexPojo vertex : newVertices) {
       assertTrue(oldVertices.contains(vertex));
-      assertTrue(oldGraphs.containsAll(vertex.getGraphs()));
+      assertTrue(oldGraphs.containsAll(vertex.getGraphIds()));
     }
     for (EdgePojo edge : newEdges) {
       assertTrue(oldEdges.contains(edge));
-      assertTrue(oldGraphs.containsAll(edge.getGraphs()));
+      assertTrue(oldGraphs.containsAll(edge.getGraphIds()));
     }
   }
 }

@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.storage.api.GraphElementHandler;
@@ -50,7 +51,7 @@ public abstract class HBaseGraphElementHandler extends
         new byte[Bytes.SIZEOF_INT + graphCount * Bytes.SIZEOF_LONG];
       Bytes.putInt(graphs, 0, graphCount);
       int offset = Bytes.SIZEOF_INT;
-      for (Long graphId : graphElement.getGraphs()) {
+      for (GradoopId graphId : graphElement.getGraphs()) {
         Bytes.putLong(graphs, offset, graphId);
         offset += Bytes.SIZEOF_LONG;
       }
@@ -63,9 +64,9 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public Set<Long> readGraphs(Result res) {
+  public Set<GradoopId> readGraphs(Result res) {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
-    Set<Long> result = null;
+    Set<GradoopId> result = null;
     if (graphBytes != null) {
       int graphCount = Bytes.toInt(graphBytes);
       result = Sets.newHashSetWithExpectedSize(graphCount);

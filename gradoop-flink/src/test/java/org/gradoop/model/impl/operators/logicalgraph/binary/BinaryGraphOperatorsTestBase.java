@@ -45,11 +45,11 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
     Collection<EdgePojo> edgeData) {
     for (VertexPojo v : vertexData) {
       assertTrue("vertex is not in new graph",
-        v.getGraphs().contains(newGraphID));
+        v.getGraphIds().contains(newGraphID));
     }
 
     for (EdgePojo e : edgeData) {
-      assertTrue("edge is not in new graph", e.getGraphs().contains
+      assertTrue("edge is not in new graph", e.getGraphIds().contains
         (newGraphID));
     }
   }

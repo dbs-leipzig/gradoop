@@ -20,6 +20,7 @@ package org.gradoop.storage.api;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GradoopConfig;
 
 import java.io.IOException;
@@ -92,7 +93,7 @@ public interface EPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * @return graph data entity or {@code null} if there is no entity with the
    * given {@code graphId}
    */
-  GD readGraph(final Long graphId);
+  GD readGraph(final GradoopId graphId);
 
   /**
    * Reads a vertex data entity from the EPGM store using the given vertex
@@ -102,7 +103,7 @@ public interface EPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * @return vertex data entity or {@code null} if there is no entity with the
    * given {@code vertexId}
    */
-  VD readVertex(final Long vertexId);
+  VD readVertex(final GradoopId vertexId);
 
   /**
    * Reads an edge data entity from the EPGM store using the given edge
@@ -112,7 +113,7 @@ public interface EPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * @return edge data entity or {@code null} if there is no entity with the
    * given {@code edgeId}
    */
-  ED readEdge(final Long edgeId);
+  ED readEdge(final GradoopId edgeId);
 
   /**
    * Reads all vertices from the EPGM store. If EPGM store is empty, {@code

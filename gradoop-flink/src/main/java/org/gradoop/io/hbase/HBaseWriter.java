@@ -252,7 +252,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
           public void flatMap(VD vertex,
             Collector<Tuple2<Long, Long>> collector) throws Exception {
             if (vertex.getGraphCount() > 0) {
-              for (Long graphID : vertex.getGraphs()) {
+              for (Long graphID : vertex.getGraphIds()) {
                 collector.collect(new Tuple2<>(graphID, vertex.getId()));
               }
             }
@@ -267,7 +267,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
           public void flatMap(ED edge,
             Collector<Tuple2<Long, Long>> collector) throws Exception {
             if (edge.getGraphCount() > 0) {
-              for (Long graphId : edge.getGraphs()) {
+              for (Long graphId : edge.getGraphIds()) {
                 collector
                   .collect(new Tuple2<>(graphId, edge.getId()));
               }

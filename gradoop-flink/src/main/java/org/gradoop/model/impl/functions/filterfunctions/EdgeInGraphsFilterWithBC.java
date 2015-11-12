@@ -59,7 +59,7 @@ public class EdgeInGraphsFilterWithBC<ED extends EPGMEdge>
   public boolean filter(ED edge) throws Exception {
     boolean vertexInGraph = false;
     if (edge.getGraphCount() > 0) {
-      for (Long graph : edge.getGraphs()) {
+      for (Long graph : edge.getGraphIds()) {
         if (identifiers.contains(graph)) {
           vertexInGraph = true;
           break;

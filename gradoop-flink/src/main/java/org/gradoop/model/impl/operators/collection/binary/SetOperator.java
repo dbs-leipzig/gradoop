@@ -52,7 +52,7 @@ public abstract class SetOperator<
           public void flatMap(VD v,
             Collector<Tuple2<VD, Long>> collector) throws
             Exception {
-            for (Long graph : v.getGraphs()) {
+            for (Long graph : v.getGraphIds()) {
               collector.collect(new Tuple2<>(v, graph));
             }
           }
