@@ -18,7 +18,6 @@
 package org.gradoop.io.json;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -26,10 +25,11 @@ import org.gradoop.model.api.EPGMAttributed;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMLabeled;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Base class for Json reader and writer.
@@ -93,8 +93,8 @@ public abstract class JsonIO {
      * @return entity identifier
      * @throws JSONException
      */
-    protected Long getID(JSONObject object) throws JSONException {
-      return object.getLong(IDENTIFIER);
+    protected GradoopId getID(JSONObject object) throws JSONException {
+      return GradoopId.fromLongString(object.getString(IDENTIFIER));
     }
 
     /**
@@ -136,10 +136,10 @@ public abstract class JsonIO {
      * @return graph identifiers
      * @throws JSONException
      */
-    protected Set<Long> getGraphs(JSONObject object) throws JSONException {
-      Set<Long> result;
+    protected GradoopIds getGraphs(JSONObject object) throws JSONException {
+      GradoopIds result;
       if (!object.getJSONObject(META).has(GRAPHS)) {
-        result = Sets.newHashSetWithExpectedSize(0);
+        result = new GradoopIds();
       } else {
         result =
           getArrayValues(object.getJSONObject(META).getJSONArray(GRAPHS));
@@ -154,10 +154,11 @@ public abstract class JsonIO {
      * @return long values
      * @throws JSONException
      */
-    protected Set<Long> getArrayValues(JSONArray array) throws JSONException {
-      Set<Long> result = Sets.newHashSetWithExpectedSize(array.length());
+    protected GradoopIds getArrayValues(JSONArray array) throws JSONException {
+      GradoopIds result = new GradoopIds();
+
       for (int i = 0; i < array.length(); i++) {
-        result.add(array.getLong(i));
+        result.add(GradoopId.fromLongString(array.getString(i)));
       }
       return result;
     }
@@ -238,9 +239,9 @@ public abstract class JsonIO {
      * @param values identifier set
      * @return json array containing the identifiers
      */
-    private JSONArray writeJsonArray(final Set<Long> values) {
+    private JSONArray writeJsonArray(final GradoopIds values) {
       JSONArray jsonArray = new JSONArray();
-      for (Long val : values) {
+      for (GradoopId val : values) {
         jsonArray.put(val);
       }
       return jsonArray;

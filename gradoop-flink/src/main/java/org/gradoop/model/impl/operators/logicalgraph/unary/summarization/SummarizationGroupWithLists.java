@@ -37,6 +37,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.util.FlinkConstants;
@@ -89,7 +90,7 @@ public class SummarizationGroupWithLists<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<Long, VD, ED> summarizeInternal(Graph<Long, VD, ED> graph) {
+  protected Graph<GradoopId, VD, ED> summarizeInternal(Graph<GradoopId, VD, ED> graph) {
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
@@ -101,11 +102,11 @@ public class SummarizationGroupWithLists<
       groupVertices(verticesForGrouping);
 
     // create new summarized gelly vertices
-    DataSet<Tuple2<Vertex<Long, VD>, List<Long>>>
+    DataSet<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>>
       newVerticesWithGroupVertexIds =
       buildSummarizedVerticesWithVertexIdList(groupedVertices);
 
-    DataSet<Vertex<Long, VD>> newVertices =
+    DataSet<Vertex<GradoopId, VD>> newVertices =
       newVerticesWithGroupVertexIds.map(new SummarizedVertexForwarder<VD>());
 
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
@@ -113,7 +114,7 @@ public class SummarizationGroupWithLists<
         .flatMap(new VertexToGroupRepresentativeMapper<VD>());
 
     /* build summarized vertices */
-    DataSet<Edge<Long, ED>> newEdges =
+    DataSet<Edge<GradoopId, ED>> newEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
     return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
@@ -127,7 +128,7 @@ public class SummarizationGroupWithLists<
    * @param groupedSortedVertices grouped and sorted vertices
    * @return data set containing summarized vertex and its grouped vertex ids
    */
-  protected DataSet<Tuple2<Vertex<Long, VD>, List<Long>>>
+  protected DataSet<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>>
   buildSummarizedVerticesWithVertexIdList(
     UnsortedGrouping<VertexForGrouping> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(
@@ -140,9 +141,9 @@ public class SummarizationGroupWithLists<
    * vertex identifiers that the summarized vertex represents.
    */
   private static class VertexGroupSummarizer<VD extends EPGMVertex> implements
-    GroupReduceFunction<VertexForGrouping, Tuple2<Vertex<Long, VD>,
-      List<Long>>>,
-    ResultTypeQueryable<Tuple2<Vertex<Long, VD>, List<Long>>> {
+    GroupReduceFunction<VertexForGrouping, Tuple2<Vertex<GradoopId, VD>,
+      List<GradoopId>>>,
+    ResultTypeQueryable<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> {
 
     /**
      * Vertex data factory
@@ -163,11 +164,11 @@ public class SummarizationGroupWithLists<
     /**
      * Avoid object instantiation in each reduce call.
      */
-    private final Vertex<Long, VD> reuseVertex;
+    private final Vertex<GradoopId, VD> reuseVertex;
     /**
      * Avoid object instantiation.
      */
-    private final Tuple2<Vertex<Long, VD>, List<Long>> reuseTuple;
+    private final Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> reuseTuple;
 
     /**
      * Creates group reducer
@@ -192,12 +193,12 @@ public class SummarizationGroupWithLists<
      */
     @Override
     public void reduce(Iterable<VertexForGrouping> vertices,
-      Collector<Tuple2<Vertex<Long, VD>, List<Long>>> collector) throws
+      Collector<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> collector) throws
       Exception {
-      Long newVertexID = 0L;
+      GradoopId newVertexID = GradoopId.fromLong(0L);
       String groupLabel = null;
       String groupValue = null;
-      List<Long> groupedVertexIds = Lists.newArrayList();
+      List<GradoopId> groupedVertexIds = Lists.newArrayList();
       boolean initialized = false;
       for (VertexForGrouping v : vertices) {
         groupedVertexIds.add(v.getVertexId());
@@ -244,7 +245,7 @@ public class SummarizationGroupWithLists<
     }
 
     @Override
-    public TypeInformation<Tuple2<Vertex<Long, VD>, List<Long>>>
+    public TypeInformation<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>>
     getProducedType() {
       return new TupleTypeInfo<>(
         new TupleTypeInfo<>(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
@@ -262,14 +263,14 @@ public class SummarizationGroupWithLists<
   @FunctionAnnotation.ForwardedFields("f0->*")
   private static class SummarizedVertexForwarder<VD extends EPGMVertex>
     implements
-    MapFunction<Tuple2<Vertex<Long, VD>, List<Long>>, Vertex<Long, VD>> {
+    MapFunction<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>, Vertex<GradoopId, VD>> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Vertex<Long, VD> map(
-      Tuple2<Vertex<Long, VD>, List<Long>> vertexListTuple2) throws Exception {
+    public Vertex<GradoopId, VD> map(
+      Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> vertexListTuple2) throws Exception {
       return vertexListTuple2.f0;
     }
   }
@@ -282,7 +283,7 @@ public class SummarizationGroupWithLists<
    * @param <VD> vertex data type
    */
   private static class VertexToGroupRepresentativeMapper<VD extends EPGMVertex>
-    implements FlatMapFunction<Tuple2<Vertex<Long, VD>, List<Long>>,
+    implements FlatMapFunction<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>,
       VertexWithRepresentative> {
 
     /**
@@ -301,9 +302,9 @@ public class SummarizationGroupWithLists<
      * {@inheritDoc}
      */
     @Override
-    public void flatMap(Tuple2<Vertex<Long, VD>, List<Long>> vertexListTuple2,
+    public void flatMap(Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> vertexListTuple2,
       Collector<VertexWithRepresentative> collector) throws Exception {
-      for (Long vertexId : vertexListTuple2.f1) {
+      for (GradoopId vertexId : vertexListTuple2.f1) {
         reuseTuple.setVertexId(vertexId);
         reuseTuple.setGroupRepresentativeVertexId(vertexListTuple2.f0.getId());
         collector.collect(reuseTuple);

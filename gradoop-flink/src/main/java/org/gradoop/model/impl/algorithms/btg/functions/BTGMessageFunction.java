@@ -23,17 +23,18 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGMessage;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * BTG specific messaging function.
  */
 public final class BTGMessageFunction extends
-  MessagingFunction<Long, BTGVertexValue, BTGMessage, NullValue> {
+  MessagingFunction<GradoopId, BTGVertexValue, BTGMessage, NullValue> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public void sendMessages(Vertex<Long, BTGVertexValue> vertex) throws
+  public void sendMessages(Vertex<GradoopId, BTGVertexValue> vertex) throws
     Exception {
     if (vertex.getValue().getVertexType() == BTGVertexType.TRANSACTIONAL) {
       BTGMessage message = new BTGMessage();

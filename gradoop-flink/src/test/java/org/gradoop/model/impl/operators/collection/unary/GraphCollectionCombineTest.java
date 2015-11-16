@@ -7,6 +7,8 @@ package org.gradoop.model.impl.operators.collection.unary;
   import org.gradoop.model.FlinkTestBase;
   import org.gradoop.model.impl.LogicalGraph;
   import org.gradoop.model.impl.GraphCollection;
+  import org.gradoop.model.impl.id.GradoopId;
+  import org.gradoop.model.impl.id.GradoopIds;
   import org.gradoop.model.impl.pojo.EdgePojo;
   import org.gradoop.model.impl.pojo.GraphHeadPojo;
   import org.gradoop.model.impl.pojo.VertexPojo;
@@ -31,7 +33,7 @@ public class GraphCollectionCombineTest extends FlinkTestBase {
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> coll =
       getGraphStore()
         .getCollection()
-        .getGraphs(1L, 2L, 3L);
+        .getGraphs(GradoopIds.fromLongs(1L, 2L, 3L));
 
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = coll.callForGraph(
@@ -40,15 +42,15 @@ public class GraphCollectionCombineTest extends FlinkTestBase {
 
     List<VertexPojo> oldVertices = Lists.newArrayList();
     List<EdgePojo> oldEdges = Lists.newArrayList();
-    List<Long> oldGraphs = Lists.newArrayList();
+    List<GradoopId> oldGraphs = Lists.newArrayList();
     List<VertexPojo> newVertices = Lists.newArrayList();
     List<EdgePojo> newEdges = Lists.newArrayList();
 
     coll.getVertices().output(new LocalCollectionOutputFormat<>(oldVertices));
     coll.getEdges().output(new LocalCollectionOutputFormat<>(oldEdges));
-    coll.getGraphHeads().map(new MapFunction<GraphHeadPojo, Long>() {
+    coll.getGraphHeads().map(new MapFunction<GraphHeadPojo, GradoopId>() {
       @Override
-      public Long map(GraphHeadPojo graphData) throws Exception {
+      public GradoopId map(GraphHeadPojo graphData) throws Exception {
         return graphData.getId();
       }
     }).output(new LocalCollectionOutputFormat<>(oldGraphs));

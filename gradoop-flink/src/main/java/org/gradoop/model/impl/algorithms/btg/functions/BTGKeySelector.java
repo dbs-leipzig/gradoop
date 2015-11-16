@@ -20,14 +20,15 @@ package org.gradoop.model.impl.algorithms.btg.functions;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * KeySelector class for the BTGVertex
  */
 public class BTGKeySelector implements
-  KeySelector<Vertex<Long, BTGVertexValue>, Long> {
+  KeySelector<Vertex<GradoopId, BTGVertexValue>, GradoopId> {
   @Override
-  public Long getKey(Vertex<Long, BTGVertexValue> btgVertex) throws
+  public GradoopId getKey(Vertex<GradoopId, BTGVertexValue> btgVertex) throws
     Exception {
     return btgVertex.getId();
   }

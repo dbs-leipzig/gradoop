@@ -8,6 +8,7 @@ import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
 import java.util.ArrayList;
@@ -36,21 +37,21 @@ public class BTGAlgorithmTestHelper {
    * @param env   actual ExecutionEnvironment
    * @return Gelly Graph based for FlinkBTGComputation
    */
-  public static Graph<Long, BTGVertexValue, NullValue> getGraph(String[] graph,
+  public static Graph<GradoopId, BTGVertexValue, NullValue> getGraph(String[] graph,
     ExecutionEnvironment env) {
-    List<Vertex<Long, BTGVertexValue>> vertices = new ArrayList<>();
-    List<Edge<Long, NullValue>> edges = new ArrayList<>();
+    List<Vertex<GradoopId, BTGVertexValue>> vertices = new ArrayList<>();
+    List<Edge<GradoopId, NullValue>> edges = new ArrayList<>();
     for (String line : graph) {
       String[] lineTokens = LINE_TOKEN_SEPARATOR.split(line);
-      long id = Long.parseLong(lineTokens[0]);
+      GradoopId id = GradoopId.fromLongString(lineTokens[0]);
       String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(lineTokens[1]);
       BTGVertexType vertexClass =
         BTGVertexType.values()[Integer.parseInt(valueTokens[0])];
       Double vertexValue = Double.parseDouble(valueTokens[1]);
-      List<Long> btgIDs =
+      List<GradoopId> btgIDs =
         Lists.newArrayListWithCapacity(valueTokens.length - 1);
       for (int n = 2; n < valueTokens.length; n++) {
-        btgIDs.add(Long.parseLong(valueTokens[n]));
+        btgIDs.add(GradoopId.fromLongString(valueTokens[n]));
       }
       vertices.add(
         new Vertex<>(id, new BTGVertexValue(vertexClass, vertexValue, btgIDs)));
@@ -58,26 +59,26 @@ public class BTGAlgorithmTestHelper {
         (lineTokens.length == 3) ? VALUE_TOKEN_SEPARATOR.split(lineTokens[2]) :
           new String[0];
       for (String edgeToken : edgeTokens) {
-        long tar = Long.parseLong(edgeToken);
+        GradoopId tar = GradoopId.fromLongString(edgeToken);
         edges.add(new Edge<>(id, tar, NullValue.getInstance()));
       }
     }
     return Graph.fromCollection(vertices, edges, env);
   }
 
-  public static Map<Long, List<Long>> parseResultBTGVertices(
-    List<Vertex<Long, BTGVertexValue>> vertices) {
-    Map<Long, List<Long>> result = new HashMap<>();
-    for (Vertex<Long, BTGVertexValue> v : vertices) {
+  public static Map<GradoopId, List<GradoopId>> parseResultBTGVertices(
+    List<Vertex<GradoopId, BTGVertexValue>> vertices) {
+    Map<GradoopId, List<GradoopId>> result = new HashMap<>();
+    for (Vertex<GradoopId, BTGVertexValue> v : vertices) {
       result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphs()));
     }
     return result;
   }
 
-  public static Map<Long, List<Long>> parseResultVertexPojos(
-    List<Vertex<Long, VertexPojo>> graph) {
-    Map<Long, List<Long>> result = new HashMap<>();
-    for (Vertex<Long, VertexPojo> v : graph) {
+  public static Map<GradoopId, List<GradoopId>> parseResultVertexPojos(
+    List<Vertex<GradoopId, VertexPojo>> graph) {
+    Map<GradoopId, List<GradoopId>> result = new HashMap<>();
+    for (Vertex<GradoopId, VertexPojo> v : graph) {
       result.put(v.getId(), Lists.newArrayList(v.getValue().getGraphIds()));
     }
     return result;

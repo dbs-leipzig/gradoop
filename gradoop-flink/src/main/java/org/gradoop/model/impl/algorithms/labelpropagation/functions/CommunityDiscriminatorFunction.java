@@ -50,7 +50,7 @@ public class CommunityDiscriminatorFunction<VD extends EPGMVertex> implements
     Object val = entity.getProperty(propertyKey);
 
     if (val != null && val instanceof GradoopId) {
-      return (GradoopId.class.cast(val) + 1) * -1L;
+      return (GradoopId) val;
     } else {
       throw new IllegalArgumentException(
         "non-valid property value for cluster identification");

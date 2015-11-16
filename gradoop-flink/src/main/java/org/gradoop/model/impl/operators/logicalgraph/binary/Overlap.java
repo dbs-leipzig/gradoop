@@ -26,6 +26,7 @@ import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
 import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.FlinkConstants;
 
 /**
@@ -49,7 +50,7 @@ public class Overlap<
   @Override
   protected LogicalGraph<VD, ED, GD> executeInternal(
     LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
-    final Long newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
+    final GradoopId newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
 
     // union vertex sets, group by vertex id, filter vertices where
     // the group contains two vertices and update them with the new graph id

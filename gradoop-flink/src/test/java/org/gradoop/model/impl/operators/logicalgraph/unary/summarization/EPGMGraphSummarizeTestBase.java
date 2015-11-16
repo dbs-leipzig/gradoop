@@ -22,6 +22,8 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -51,7 +53,7 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexPropertySymmetricGraph() throws Exception {
 
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      inputGraph = getGraphStore().getGraph(2L);
+      inputGraph = getGraphStore().getGraph(GradoopId.fromLong(2L));
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -64,14 +66,14 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 2 summarized vertices:
     // [0,1] __VERTEX__ {city: "Leipzig", count: 2}
-    List<Long> vertexIdsLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3] __VERTEX__ {city: "Dresden", count: 2}
-    List<Long> vertexIdsDresden = Lists.newArrayList(2L, 3L);
+    GradoopIds vertexIdsDresden = GradoopIds.fromLongs(2L, 3L);
 
     assertEquals("wrong number of vertices", 2L, vertices.size());
 
-    Long vertexIdLeipzig = null;
-    Long vertexIdDresden = null;
+    GradoopId vertexIdLeipzig = null;
+    GradoopId vertexIdDresden = null;
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -93,13 +95,13 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 4 summarized sna_edges:
     // [0-1] Leipzig -[__EDGE__]-> Leipzig {count: 2}
-    List<Long> leipzigToLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigToLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
-    List<Long> leipzigToDresdenEdgeIds = Lists.newArrayList(2L);
+    GradoopIds leipzigToDresdenEdgeIds = GradoopIds.fromLongs(2L);
     // [3] Dresden -[__EDGE__]-> Leipzig {count: 1}
-    List<Long> dresdenToLeipzigEdgeIds = Lists.newArrayList(3L);
+    GradoopIds dresdenToLeipzigEdgeIds = GradoopIds.fromLongs(3L);
     // [4-5] Dresden -[__EDGE__]-> Dresden {count: 2}
-    List<Long> dresdenToDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
 
     assertEquals("wrong number of edges", 4L, edges.size());
 
@@ -137,8 +139,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexProperty() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       inputGraph =
-      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
-        .combine(getGraphStore().getGraph(2L));
+      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
+        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -151,16 +153,16 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized vertices:
     // [0,1] __VERTEX__ {city: "Leipzig", count: 2}
-    List<Long> vertexIdsLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] __VERTEX__ {city: "Dresden", count: 3}
-    List<Long> vertexIdsDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] __VERTEX__ {city: "Berlin", count: 1}
-    List<Long> vertexIdsBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsBerlin = GradoopIds.fromLongs(5L);
     assertEquals("wrong number of vertices", 3L, vertices.size());
 
-    Long vertexIdLeipzig = null;
-    Long vertexIdDresden = null;
-    Long vertexIdBerlin = null;
+    GradoopId vertexIdLeipzig = null;
+    GradoopId vertexIdDresden = null;
+    GradoopId vertexIdBerlin = null;
     for (EPGMVertex v : vertices) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
@@ -187,15 +189,15 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 5 summarized sna_edges:
     // [4-5] Dresden -[__EDGE__]-> Dresden {count: 2}
-    List<Long> dresdenToDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6,21] Dresden -[__EDGE__]-> Leipzig {count: 3}
-    List<Long> dresdenToLeipzigEdgeIds = Lists.newArrayList(3L, 6L, 21L);
+    GradoopIds dresdenToLeipzigEdgeIds = GradoopIds.fromLongs(3L, 6L, 21L);
     // [0-1] Leipzig -[__EDGE__]-> Leipzig {count: 2}
-    List<Long> leipzigToLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigToLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
-    List<Long> leipzigToDresdenEdgeIds = Lists.newArrayList(2L);
+    GradoopIds leipzigToDresdenEdgeIds = GradoopIds.fromLongs(2L);
     // [22-23] Berlin -[__EDGE__]-> Dresden {count: 2}
-    List<Long> berlinToDresdenEdgeIds = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinToDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
 
     long expectedEdgeCount = 5L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -238,7 +240,7 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   @Test
   public void testSummarizeOnVertexPropertyWithAbsentValue() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      inputGraph = getGraphStore().getGraph(3L);
+      inputGraph = getGraphStore().getGraph(GradoopId.fromLong(3L));
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -251,11 +253,12 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 2 summarized vertices:
     // [2,3] __VERTEX__ {city: "Dresden", count: 2}
-    List<Long> vertexIdsDresden = Lists.newArrayList(2L, 3L);
+    GradoopIds vertexIdsDresden = GradoopIds.fromLongs(2L, 3L);
     // [10] __VERTEX__ {city: "__DEFAULT_GROUP", count: 1}
-    List<Long> vertexIdsDefault = Lists.newArrayList(10L);
+    GradoopIds vertexIdsDefault = GradoopIds.fromLongs(10L);
     assertEquals("wrong number of vertices", 2L, vertices.size());
-    long vertexIdDresden = 0L, vertexIdDefault = 0L;
+    GradoopId vertexIdDresden = GradoopId.fromLong(0L);
+    GradoopId vertexIdDefault = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -278,9 +281,9 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 2 summarized sna_edges:
     // [16,19,20] Default -[__EDGE__]-> Dresden {count: 3}
-    List<Long> defaultToDresdenEdgeIds = Lists.newArrayList(16L, 19L, 20L);
+    GradoopIds defaultToDresdenEdgeIds = GradoopIds.fromLongs(16L, 19L, 20L);
     // [4] Dresden -[__EDGE__]-> Dresden {count: 1}
-    List<Long> dresdenToDresdenEdgeIds = Lists.newArrayList(4L);
+    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L);
 
     assertEquals("wrong number of edges", 2L, edges.size());
 
@@ -308,8 +311,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexAndEdgeProperty() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       inputGraph =
-      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
-        .combine(getGraphStore().getGraph(2L));
+      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
+        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -323,14 +326,16 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized vertices:
     // [0,1] __VERTEX__ {city: "Leipzig", count: 2}
-    List<Long> vertexIdsLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] __VERTEX__ {city: "Dresden", count: 3}
-    List<Long> vertexIdsDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] __VERTEX__ {city: "Berlin", count: 1}
-    List<Long> vertexIdsBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsBerlin = GradoopIds.fromLongs(5L);
 
     assertEquals("wrong number of vertices", 3L, vertices.size());
-    long vertexIdLeipzig = 0L, vertexIdDresden = 0L, vertexIdBerlin = 0L;
+    GradoopId vertexIdLeipzig = GradoopId.fromLong(0L);
+    GradoopId vertexIdDresden = GradoopId.fromLong(0L);
+    GradoopId vertexIdBerlin = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -361,17 +366,17 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 6 summarized sna_edges:
     // [4-5] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 2}
-    List<Long> dresdenToDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6] Dresden -[__EDGE__]-> Leipzig {since: 2013, count: 2}
-    List<Long> dresdenToLeipzigEdgeIds1 = Lists.newArrayList(3L, 6L);
+    GradoopIds dresdenToLeipzigEdgeIds1 = GradoopIds.fromLongs(3L, 6L);
     // [21] Dresden -[__EDGE__]-> Leipzig {since: 2015, count: 1}
-    List<Long> dresdenToLeipzigEdgeIds2 = Lists.newArrayList(21L);
+    GradoopIds dresdenToLeipzigEdgeIds2 = GradoopIds.fromLongs(21L);
     // [0,1] Leipzig -[__EDGE__]-> Leipzig {since: 2014, count: 2}
-    List<Long> leipzigToLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigToLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[__EDGE__]-> Dresden {since: 2013, count: 1}
-    List<Long> leipzigToDresdenEdgeIds = Lists.newArrayList(2L);
+    GradoopIds leipzigToDresdenEdgeIds = GradoopIds.fromLongs(2L);
     // [22-23] Berlin  -[__EDGE__]-> Dresden {since: 2015, count: 2}
-    List<Long> berlinToDresdenEdgeIds = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinToDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
 
     long expectedEdgeCount = 6L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -420,7 +425,7 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexAndEdgePropertyWithAbsentValues() throws
     Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      inputGraph = getGraphStore().getGraph(3L);
+      inputGraph = getGraphStore().getGraph(GradoopId.fromLong(3L));
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -434,12 +439,13 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 2 summarized vertices:
     // [2,3] __VERTEX__ {city: "Dresden", count: 2}
-    List<Long> vertexIdsDresden = Lists.newArrayList(2L, 3L);
+    GradoopIds vertexIdsDresden = GradoopIds.fromLongs(2L, 3L);
     // [10] __VERTEX__ {city: "__DEFAULT_GROUP", count: 1}
-    List<Long> vertexIdsDefault = Lists.newArrayList(10L);
+    GradoopIds vertexIdsDefault = GradoopIds.fromLongs(10L);
 
     assertEquals("wrong number of vertices", 2L, vertices.size());
-    long vertexIdDresden = 0L, vertexIdDefault = 0L;
+    GradoopId vertexIdDresden = GradoopId.fromLong(0L);
+    GradoopId vertexIdDefault = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -462,11 +468,11 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized sna_edges:
     // [16] Default -[__EDGE__]-> Dresden {since: 2013, count: 1}
-    List<Long> defaultToDresdenEdgeIds1 = Lists.newArrayList(16L);
+    GradoopIds defaultToDresdenEdgeIds1 = GradoopIds.fromLongs(16L);
     // [19-20] Default -[__EDGE__]-> Dresden {since: NULL, count: 2}
-    List<Long> defaultToDresdenEdgeIds2 = Lists.newArrayList(19L, 20L);
+    GradoopIds defaultToDresdenEdgeIds2 = GradoopIds.fromLongs(19L, 20L);
     // [4] Dresden -[__EDGE__]-> Dresden {since: 2014, count: 1}
-    List<Long> dresdenToDresdenEdgeIds = Lists.newArrayList(4L);
+    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L);
 
     assertEquals("wrong number of edges", 3L, edges.size());
 
@@ -509,14 +515,17 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized vertices:
     // [0,1,2,3,4,5] Person {count: 6}
-    List<Long> vertexIdsPerson = Lists.newArrayList(0L, 1L, 2L, 3L, 4L, 5L);
+    GradoopIds vertexIdsPerson = GradoopIds.fromLongs(0L, 1L, 2L, 3L, 4L, 5L);
     // [6,7,8] Tag {count: 3}
-    List<Long> vertexIdsTag = Lists.newArrayList(6L, 7L, 8L);
+    GradoopIds vertexIdsTag = GradoopIds.fromLongs(6L, 7L, 8L);
     // [9,10] Forum {count: 2}
-    List<Long> vertexIdsForum = Lists.newArrayList(9L, 10L);
+    GradoopIds vertexIdsForum = GradoopIds.fromLongs(9L, 10L);
 
     assertEquals("wrong number of vertices", 3L, vertices.size());
-    long vertexIdPerson = 0L, vertexIdTag = 0L, vertexIdForum = 0L;
+    GradoopId vertexIdPerson = GradoopId.fromLong(0L);
+    GradoopId vertexIdTag = GradoopId.fromLong(0L);
+    GradoopId vertexIdForum = GradoopId.fromLong(0L);
+    
     for (EPGMVertex v : vertices) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
@@ -543,15 +552,15 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 4 summarized sna_edges:
     // [0,1,2,3,4,5,6,21,22,23] Person -[__EDGE__]-> Person {count: 10}
-    List<Long> personToPersonEdgeIds =
-      Lists.newArrayList(0L, 1L, 2L, 3L, 4L, 5L, 6L, 21L, 22L, 23L);
+    GradoopIds personToPersonEdgeIds =
+      GradoopIds.fromLongs(0L, 1L, 2L, 3L, 4L, 5L, 6L, 21L, 22L, 23L);
     // [7,8,9,10] Person -[__EDGE__]-> Tag {count: 4}
-    List<Long> personToTagEdgeIds = Lists.newArrayList(7L, 8L, 9L, 10L);
+    GradoopIds personToTagEdgeIds = GradoopIds.fromLongs(7L, 8L, 9L, 10L);
     // [11,12,13,14] Forum -[__EDGE__]-> Tag {count: 4}
-    List<Long> forumToTagEdgeIds = Lists.newArrayList(11L, 12L, 13L, 14L);
+    GradoopIds forumToTagEdgeIds = GradoopIds.fromLongs(11L, 12L, 13L, 14L);
     // [15,16,17,18,19,20] Forum -[__EDGE__]-> Person {count: 6}
-    List<Long> forumToPersonEdgeIds =
-      Lists.newArrayList(15L, 16L, 17L, 18L, 19L, 20L);
+    GradoopIds forumToPersonEdgeIds =
+      GradoopIds.fromLongs(15L, 16L, 17L, 18L, 19L, 20L);
 
     long expectedEdgeCount = 4L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -588,8 +597,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexLabelAndVertexProperty() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       inputGraph =
-      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
-        .combine(getGraphStore().getGraph(2L));
+      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
+        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -602,14 +611,16 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized vertices:
     // [0,1] Person {city: "Leipzig", count: 2}
-    List<Long> vertexIdsPersonLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsPersonLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] Person {city: "Dresden", count: 3}
-    List<Long> vertexIdsPersonDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsPersonDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] Person {city: "Berlin", count: 1}
-    List<Long> vertexIdsPersonBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsPersonBerlin = GradoopIds.fromLongs(5L);
 
     assertEquals("wrong number of vertices", 3L, vertices.size());
-    long vertexIDLeipzig = 0L, vertexIDDresden = 0L, vertexIDBerlin = 0L;
+    GradoopId vertexIDLeipzig = GradoopId.fromLong(0L);
+    GradoopId vertexIDDresden = GradoopId.fromLong(0L);
+    GradoopId vertexIDBerlin = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -638,15 +649,15 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
     // 5 summarized sna_edges:
 
     // [4,5] Dresden -[__EDGE__]-> Dresden {count: 2}
-    List<Long> dresdenToDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6,21] Dresden -[__EDGE__]-> Leipzig {count: 3}
-    List<Long> dresdenToLeipzigEdgeIds = Lists.newArrayList(3L, 6L, 21L);
+    GradoopIds dresdenToLeipzigEdgeIds = GradoopIds.fromLongs(3L, 6L, 21L);
     // [0-1] Leipzig -[__EDGE__]-> Leipzig {count: 2}
-    List<Long> leipzigToLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigToLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
-    List<Long> leipzigToDresdenEdgeIds = Lists.newArrayList(2L);
+    GradoopIds leipzigToDresdenEdgeIds = GradoopIds.fromLongs(2L);
     // [22-23] Berlin  -[__EDGE__]-> Dresden {count: 2}
-    List<Long> berlinToDresdenEdgeIds = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinToDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
 
     long expectedEdgeCount = 5L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -704,19 +715,22 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 5 summarized vertices:
     // [0,1] Person {city: "Leipzig", count: 2}
-    List<Long> vertexIdsPersonLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsPersonLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] Person {city: "Dresden", count: 3}
-    List<Long> vertexIdsPersonDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsPersonDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] Person {city: "Berlin", count: 1}
-    List<Long> vertexIdsPersonBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsPersonBerlin = GradoopIds.fromLongs(5L);
     // [6,7,8] Tag {city: "NULL", count: 3}
-    List<Long> vertexIdsTagNull = Lists.newArrayList(6L, 7L, 8L);
+    GradoopIds vertexIdsTagNull = GradoopIds.fromLongs(6L, 7L, 8L);
     // [9,10] Forum {city: "NULL", count: 2}
-    List<Long> vertexIdsForumNull = Lists.newArrayList(9L, 10L);
+    GradoopIds vertexIdsForumNull = GradoopIds.fromLongs(9L, 10L);
 
     assertEquals("wrong number of vertices", 5L, vertices.size());
-    long vertexIDLeipzig = 0L, vertexIDDresden = 0L, vertexIDBerlin = 0L,
-      vertexIDTag = 0L, vertexIDForum = 0L;
+    GradoopId vertexIDLeipzig = GradoopId.fromLong(0L); 
+    GradoopId vertexIDDresden = GradoopId.fromLong(0L); 
+    GradoopId vertexIDBerlin = GradoopId.fromLong(0L);
+    GradoopId vertexIDTag = GradoopId.fromLong(0L); 
+    GradoopId vertexIDForum = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -725,7 +739,7 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
       if (vertexIdsPersonLeipzig.contains(v.getId())) {
         // [0,1] Person {city: "Leipzig", count: 2}
         vertexIDLeipzig = v.getId();
-        testVertex(v, LABEL_PERSON, vertexGroupingKey, "Leipzig",
+        testVertex(v, LABEL_PERSON,  vertexGroupingKey, "Leipzig",
           aggregatePropertyKey, 2L, 1, FlinkConstants.SUMMARIZE_GRAPH_ID);
       } else if (vertexIdsPersonDresden.contains(v.getId())) {
         // [2,3,4] Person {city: "Dresden", count: 3}
@@ -754,27 +768,27 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 11 summarized sna_edges:
     // [4,5] Dresden -[__EDGE__]-> Dresden {count: 2}
-    List<Long> dresdenToDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6,21] Dresden -[__EDGE__]-> Leipzig {count: 3}
-    List<Long> dresdenToLeipzigEdgeIds = Lists.newArrayList(3L, 6L, 21L);
+    GradoopIds dresdenToLeipzigEdgeIds = GradoopIds.fromLongs(3L, 6L, 21L);
     // [0,1] Leipzig -[__EDGE__]-> Leipzig {count: 2}
-    List<Long> leipzigToLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigToLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
-    List<Long> leipzigToDresdenEdgeIds = Lists.newArrayList(2L);
+    GradoopIds leipzigToDresdenEdgeIds = GradoopIds.fromLongs(2L);
     // [22,23] Berlin  -[__EDGE__]-> Dresden {count: 2}
-    List<Long> berlinToDresdenEdgeIds = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinToDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
     // [16,19,20] Forum -[__EDGE__]-> Dresden {count: 3}
-    List<Long> forumToDresdenEdgeIds = Lists.newArrayList(16L, 19L, 20L);
+    GradoopIds forumToDresdenEdgeIds = GradoopIds.fromLongs(16L, 19L, 20L);
     // [11,12,13,14] Forum -[__EDGE__]-> Tag {count: 4}
-    List<Long> forumToTagEdgeIds = Lists.newArrayList(11L, 12L, 13L, 14L);
+    GradoopIds forumToTagEdgeIds = GradoopIds.fromLongs(11L, 12L, 13L, 14L);
     // [15,17,18] Forum -[__EDGE__]-> Leipzig {count: 3}
-    List<Long> forumToLeipzigEdgeIds = Lists.newArrayList(15L, 17L, 18L);
+    GradoopIds forumToLeipzigEdgeIds = GradoopIds.fromLongs(15L, 17L, 18L);
     // [10] Berlin-[__EDGE__]-> Tag {count: 1}
-    List<Long> berlinToTagEdgeIds = Lists.newArrayList(10L);
+    GradoopIds berlinToTagEdgeIds = GradoopIds.fromLongs(10L);
     // [7,9] Dresden-[__EDGE__]-> Tag {count: 2}
-    List<Long> dresdenToTagEdgeIds = Lists.newArrayList(7L, 9L);
+    GradoopIds dresdenToTagEdgeIds = GradoopIds.fromLongs(7L, 9L);
     // [8] Leipzig-[__EDGE__]-> Tag {count: 1}
-    List<Long> leipzigToTagEdgeIds = Lists.newArrayList(8L);
+    GradoopIds leipzigToTagEdgeIds = GradoopIds.fromLongs(8L);
 
     long expectedEdgeCount = 11L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -844,8 +858,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   public void testSummarizeOnVertexLabelAndEdgeProperty() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       inputGraph =
-      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
-        .combine(getGraphStore().getGraph(2L));
+      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
+        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
 
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
@@ -858,10 +872,10 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 1 summarized vertex
     // [0,1,2,3,4,5] Person {count: 6}
-    List<Long> vertexIdsPerson = Lists.newArrayList(0L, 1L, 2L, 3L, 4L, 5L);
+    GradoopIds vertexIdsPerson = GradoopIds.fromLongs(0L, 1L, 2L, 3L, 4L, 5L);
 
     assertEquals("wrong number of vertices", 1L, vertices.size());
-    long vertexIDPerson = 0L;
+    GradoopId vertexIDPerson = GradoopId.fromLong(0L);
     for (EPGMVertex v : vertices) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
@@ -876,11 +890,11 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized sna_edges:
     // [0,1,4,5] Person -[__EDGE__]-> Person {since: 2014, count: 4}
-    List<Long> personToPersonEdgeIds1 = Lists.newArrayList(0L, 1L, 4L, 5L);
+    GradoopIds personToPersonEdgeIds1 = GradoopIds.fromLongs(0L, 1L, 4L, 5L);
     // [2,3,6] Person -[__EDGE__]-> Person {since: 2013, count: 3}
-    List<Long> personToPersonEdgeIds2 = Lists.newArrayList(2L, 3L, 6L);
+    GradoopIds personToPersonEdgeIds2 = GradoopIds.fromLongs(2L, 3L, 6L);
     // [21,22,23] Person -[__EDGE__]-> Person {since: 2015, count: 3}
-    List<Long> personToPersonEdgeIds3 = Lists.newArrayList(21L, 22L, 23L);
+    GradoopIds personToPersonEdgeIds3 = GradoopIds.fromLongs(21L, 22L, 23L);
     long expectedEdgeCount = 3L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
 
@@ -926,14 +940,16 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized vertices:
     // [0,1,2,3,4,5] Person {count: 6}
-    List<Long> vertexIdsPerson = Lists.newArrayList(0L, 1L, 2L, 3L, 4L, 5L);
+    GradoopIds vertexIdsPerson = GradoopIds.fromLongs(0L, 1L, 2L, 3L, 4L, 5L);
     // [6,7,8,] Tag {count: 3}
-    List<Long> vertexIdsTag = Lists.newArrayList(6L, 7L, 8L);
+    GradoopIds vertexIdsTag = GradoopIds.fromLongs(6L, 7L, 8L);
     // [9,10] Forum {count: 2}
-    List<Long> vertexIdsForum = Lists.newArrayList(9L, 10L);
+    GradoopIds vertexIdsForum = GradoopIds.fromLongs(9L, 10L);
 
     assertEquals("wrong number of vertices", 3L, vertices.size());
-    long vertexIDPerson = 0L, vertexIDTag = 0L, vertexIDForum = 0L;
+    GradoopId vertexIDPerson = GradoopId.fromLong(0L);
+    GradoopId vertexIDTag = GradoopId.fromLong(0L);
+    GradoopId vertexIDForum = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -961,20 +977,20 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 7 summarized sna_edges:
     // [0,1,4,5] Person -[__EDGE__]-> Person {since: 2014, count: 4}
-    List<Long> personToPersonEdgeIds1 = Lists.newArrayList(0L, 1L, 4L, 5L);
+    GradoopIds personToPersonEdgeIds1 = GradoopIds.fromLongs(0L, 1L, 4L, 5L);
     // [2,3,6] Person -[__EDGE__]-> Person {since: 2013, count: 3}
-    List<Long> personToPersonEdgeIds2 = Lists.newArrayList(2L, 3L, 6L);
+    GradoopIds personToPersonEdgeIds2 = GradoopIds.fromLongs(2L, 3L, 6L);
     // [21,22,23] Person -[__EDGE__]-> Person {since: 2015, count: 3}
-    List<Long> personToPersonEdgeIds3 = Lists.newArrayList(21L, 22L, 23L);
+    GradoopIds personToPersonEdgeIds3 = GradoopIds.fromLongs(21L, 22L, 23L);
     // [7,8,9,10] Person -[__EDGE__]-> Tag {since: __NULL, count: 4}
-    List<Long> personToTagEdgeIds = Lists.newArrayList(7L, 8L, 9L, 10L);
+    GradoopIds personToTagEdgeIds = GradoopIds.fromLongs(7L, 8L, 9L, 10L);
     // [11,12,13,14] Forum -[__EDGE__]-> Tag {since: __NULL, count: 4}
-    List<Long> forumToTagEdgeIds = Lists.newArrayList(11L, 12L, 13L, 14L);
+    GradoopIds forumToTagEdgeIds = GradoopIds.fromLongs(11L, 12L, 13L, 14L);
     // [15,17,18,19,20] Forum -[__EDGE__]-> Person {since: __NULL, count: 5}
-    List<Long> forumToPersonEdgeIds1 =
-      Lists.newArrayList(15L, 17L, 18L, 19L, 20L);
+    GradoopIds forumToPersonEdgeIds1 =
+      GradoopIds.fromLongs(15L, 17L, 18L, 19L, 20L);
     // [16] Forum -[__EDGE__]-> Person {since: 2013, count: 1}
-    List<Long> forumToPersonEdgeIds2 = Lists.newArrayList(16L);
+    GradoopIds forumToPersonEdgeIds2 = GradoopIds.fromLongs(16L);
 
     long expectedEdgeCount = 7L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -1030,8 +1046,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
     Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       inputGraph =
-      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
-        .combine(getGraphStore().getGraph(2L));
+      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
+        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -1045,13 +1061,13 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 5 summarized vertices:
     // [0,1] Person {city: "Leipzig", count: 2}
-    List<Long> vertexIdsPersonLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsPersonLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] Person {city: "Dresden", count: 3}
-    List<Long> vertexIdsPersonDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsPersonDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] Person {city: "Berlin", count: 1}
-    List<Long> vertexIdsPersonBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsPersonBerlin = GradoopIds.fromLongs(5L);
     assertEquals("wrong number of vertices", 3L, vertices.size());
-    long vertexIDLeipzig = 0L, vertexIDDresden = 0L, vertexIDBerlin = 0L;
+    GradoopId vertexIDLeipzig = GradoopId.fromLong(0L), vertexIDDresden = GradoopId.fromLong(0L), vertexIDBerlin = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -1079,17 +1095,17 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 6 summarized sna_edges
     // [4,5] Dresden -[__EDGE__]-> Dresden {since: "2014", count: 2}
-    List<Long> dresdenToDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6] Dresden -[__EDGE__]-> Leipzig {since: "2013", count: 2}
-    List<Long> dresdenToLeipzigEdgeIds1 = Lists.newArrayList(3L, 6L);
+    GradoopIds dresdenToLeipzigEdgeIds1 = GradoopIds.fromLongs(3L, 6L);
     // [21] Dresden -[__EDGE__]-> Leipzig {since: "2015", count: 1}
-    List<Long> dresdenToLeipzigEdgeIds2 = Lists.newArrayList(21L);
+    GradoopIds dresdenToLeipzigEdgeIds2 = GradoopIds.fromLongs(21L);
     // [0,1] Leipzig -[__EDGE__]-> Leipzig {since: "2014", count: 2}
-    List<Long> leipzigToLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigToLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] Leipzig -[__EDGE__]-> Dresden {since: "2013", count: 1}
-    List<Long> leipzigToDresdenEdgeIds = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds leipzigToDresdenEdgeIds = GradoopIds.fromLongs(2L, 3L, 4L);
     // [22,23] Berlin  -[__EDGE__]-> Dresden {since: "2015", count: 2}
-    List<Long> berlinToDresdenEdgeIds = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinToDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
     long expectedEdgeCount = 6L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
 
@@ -1147,14 +1163,14 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized vertices:
     // [0,1,2,3,4,5] Person {count: 6}
-    List<Long> vertexIdsPerson = Lists.newArrayList(0L, 1L, 2L, 3L, 4L, 5L);
+    GradoopIds vertexIdsPerson = GradoopIds.fromLongs(0L, 1L, 2L, 3L, 4L, 5L);
     // [6,7,8] Tag {count: 3}
-    List<Long> vertexIdsTag = Lists.newArrayList(6L, 7L, 8L);
+    GradoopIds vertexIdsTag = GradoopIds.fromLongs(6L, 7L, 8L);
     // [9,10] Forum {count: 2}
-    List<Long> vertexIdsForum = Lists.newArrayList(9L, 10L);
+    GradoopIds vertexIdsForum = GradoopIds.fromLongs(9L, 10L);
 
     assertEquals("wrong number of vertices", 3L, vertices.size());
-    long vertexIDPerson = 0L, vertexIDTag = 0L, vertexIDForum = 0L;
+    GradoopId vertexIDPerson = GradoopId.fromLong(0L), vertexIDTag = GradoopId.fromLong(0L), vertexIDForum = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -1182,20 +1198,20 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 5 summarized sna_edges:
     // [0,1,2,3,4,5,6,21,22,23] Person -[knows]-> Person {count: 10}
-    List<Long> knowsEdgeIds =
-      Lists.newArrayList(0L, 1L, 2L, 3L, 4L, 5L, 6L, 21L, 22L, 23L);
+    GradoopIds knowsEdgeIds =
+      GradoopIds.fromLongs(0L, 1L, 2L, 3L, 4L, 5L, 6L, 21L, 22L, 23L);
     assertEquals(10, knowsEdgeIds.size());
     // [7,8,9,10] Person -[hasInterest]-> Tag {count: 4}
-    List<Long> hasInterestEdgeIds = Lists.newArrayList(7L, 8L, 9L, 10L);
+    GradoopIds hasInterestEdgeIds = GradoopIds.fromLongs(7L, 8L, 9L, 10L);
     assertEquals(4, hasInterestEdgeIds.size());
     // [11,12,13,14] Forum -[hasTag]-> Tag {count: 4}
-    List<Long> hasTagEdgeIds = Lists.newArrayList(11L, 12L, 13L, 14L);
+    GradoopIds hasTagEdgeIds = GradoopIds.fromLongs(11L, 12L, 13L, 14L);
     assertEquals(4, hasTagEdgeIds.size());
     // [15,16] Forum -[hasModerator]-> Person {count: 2}
-    List<Long> hasModeratorEdgeIds = Lists.newArrayList(15L, 16L);
+    GradoopIds hasModeratorEdgeIds = GradoopIds.fromLongs(15L, 16L);
     assertEquals(2, hasModeratorEdgeIds.size());
     // [17,18,19,20] Forum -[hasMember]-> Person {count: 4}
-    List<Long> hasMemberEdgeIds = Lists.newArrayList(17L, 18L, 19L, 20L);
+    GradoopIds hasMemberEdgeIds = GradoopIds.fromLongs(17L, 18L, 19L, 20L);
     assertEquals(4, hasMemberEdgeIds.size());
 
     long expectedEdgeCount = 5L;
@@ -1236,8 +1252,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
     Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       inputGraph =
-      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
-        .combine(getGraphStore().getGraph(2L));
+      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
+        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
 
     final String vertexGroupingKey = "city";
     final String aggregatePropertyKey = "count";
@@ -1250,13 +1266,13 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 5 summarized vertices:
     // [0,1] Person {city: "Leipzig", count: 2}
-    List<Long> vertexIdsPersonLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsPersonLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] Person {city: "Dresden", count: 3}
-    List<Long> vertexIdsPersonDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsPersonDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] Person {city: "Berlin", count: 1}
-    List<Long> vertexIdsPersonBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsPersonBerlin = GradoopIds.fromLongs(5L);
     assertEquals("wrong number of vertices", 3L, vertices.size());
-    long vertexIDLeipzig = 0L, vertexIDDresden = 0L, vertexIDBerlin = 0L;
+    GradoopId vertexIDLeipzig = GradoopId.fromLong(0L), vertexIDDresden = GradoopId.fromLong(0L), vertexIDBerlin = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -1284,15 +1300,15 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 5 summarized sna_edges
     // [4,5] Dresden -[knows]-> Dresden {count: 2}
-    List<Long> dresdenKnowsDresdenEdgeEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenKnowsDresdenEdgeEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6,21] Dresden -[knows]-> Leipzig {count: 3}
-    List<Long> dresdenKnowsLeipzig = Lists.newArrayList(3L, 6L, 21L);
+    GradoopIds dresdenKnowsLeipzig = GradoopIds.fromLongs(3L, 6L, 21L);
     // [0,1] Leipzig -[knows]-> Leipzig {count: 2}
-    List<Long> leipzigKnowsLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigKnowsLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[knows]-> Dresden {count: 1}
-    List<Long> leipzigKnowsDresden = Lists.newArrayList(2L);
+    GradoopIds leipzigKnowsDresden = GradoopIds.fromLongs(2L);
     // [22,23] Berlin  -[knows]-> Dresden {count: 2}
-    List<Long> berlinKnowsDresden = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinKnowsDresden = GradoopIds.fromLongs(22L, 23L);
 
     long expectedEdgeCount = 5L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -1345,18 +1361,18 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 5 summarized vertices:
     // [0,1] Person {city: "Leipzig", count: 2}
-    List<Long> vertexIdsPersonLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsPersonLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] Person {city: "Dresden", count: 3}
-    List<Long> vertexIdsPersonDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsPersonDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] Person {city: "Berlin", count: 1}
-    List<Long> vertexIdsPersonBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsPersonBerlin = GradoopIds.fromLongs(5L);
     // [6,7,8] Tag {city: "NULL", count: 3}
-    List<Long> vertexIdsTagNull = Lists.newArrayList(6L, 7L, 8L);
+    GradoopIds vertexIdsTagNull = GradoopIds.fromLongs(6L, 7L, 8L);
     // [9,10] Forum {city: "NULL", count: 2}
-    List<Long> vertexIdsForumNull = Lists.newArrayList(9L, 10L);
+    GradoopIds vertexIdsForumNull = GradoopIds.fromLongs(9L, 10L);
     assertEquals("wrong number of vertices", 5L, vertices.size());
-    long vertexIDLeipzig = 0L, vertexIDDresden = 0L, vertexIDBerlin = 0L,
-      vertexIDTag = 0L, vertexIDForum = 0L;
+    GradoopId vertexIDLeipzig = GradoopId.fromLong(0L), vertexIDDresden = GradoopId.fromLong(0L), vertexIDBerlin = GradoopId.fromLong(0L),
+      vertexIDTag = GradoopId.fromLong(0L), vertexIDForum = GradoopId.fromLong(0L);
 
     for (EPGMVertex v : vertices) {
       // check vertex id
@@ -1394,31 +1410,31 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 13 summarized sna_edges:
     // [4,5] Dresden -[knows]-> Dresden {count: 2}
-    List<Long> dresdenKnowsDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenKnowsDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6,21] Dresden -[knows]-> Leipzig {count: 3}
-    List<Long> dresdenKnowsLeipzigEdgeIds = Lists.newArrayList(3L, 6L, 21L);
+    GradoopIds dresdenKnowsLeipzigEdgeIds = GradoopIds.fromLongs(3L, 6L, 21L);
     // [0,1] Leipzig -[knows]-> Leipzig {count: 2}
-    List<Long> leipzigKnowsLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigKnowsLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[knows]-> Dresden {count: 1}
-    List<Long> leipzigKnowsDresdenEdgeIds = Lists.newArrayList(2L);
+    GradoopIds leipzigKnowsDresdenEdgeIds = GradoopIds.fromLongs(2L);
     // [22,23] Berlin -[knows]-> Dresden {count: 2}
-    List<Long> berlinKnowsDresdenEdgeIds = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinKnowsDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
     // [16] Forum -[hasModerator]-> Dresden {count: 1}
-    List<Long> forumHasModeratorDresdenEdgeIds = Lists.newArrayList(16L);
+    GradoopIds forumHasModeratorDresdenEdgeIds = GradoopIds.fromLongs(16L);
     // [19,20] Forum -[hasMember]-> Dresden {count: 2}
-    List<Long> forumHasMemberDresdenEdgeIds = Lists.newArrayList(19L, 20L);
+    GradoopIds forumHasMemberDresdenEdgeIds = GradoopIds.fromLongs(19L, 20L);
     // [11,12,13,14] Forum -[hasTag]-> Tag {count: 4}
-    List<Long> forumHasTagTagEdgeIds = Lists.newArrayList(11L, 12L, 13L, 14L);
+    GradoopIds forumHasTagTagEdgeIds = GradoopIds.fromLongs(11L, 12L, 13L, 14L);
     // [15] Forum -[hasModerator]-> Leipzig {count: 1}
-    List<Long> forumHasModeratorLeipzigEdgeIds = Lists.newArrayList(15L);
+    GradoopIds forumHasModeratorLeipzigEdgeIds = GradoopIds.fromLongs(15L);
     // [17,18] Forum -[hasMember]-> Leipzig {count: 2}
-    List<Long> forumHasMemberLeipzigEdgeIds = Lists.newArrayList(17L, 18L);
+    GradoopIds forumHasMemberLeipzigEdgeIds = GradoopIds.fromLongs(17L, 18L);
     // [10] Berlin -[hasInterest]-> Tag {count: 1}
-    List<Long> berlinHasInterestTagEdgeIds = Lists.newArrayList(10L);
+    GradoopIds berlinHasInterestTagEdgeIds = GradoopIds.fromLongs(10L);
     // [7,9] Dresden -[hasInterest]-> Tag {count: 2}
-    List<Long> dresdenHasInterestTagEdgeIds = Lists.newArrayList(7L, 9L);
+    GradoopIds dresdenHasInterestTagEdgeIds = GradoopIds.fromLongs(7L, 9L);
     // [8] Leipzig -[hasInterest]-> Tag {count: 1}
-    List<Long> leipzigHasInterestTagEdgeIds = Lists.newArrayList(8L);
+    GradoopIds leipzigHasInterestTagEdgeIds = GradoopIds.fromLongs(8L);
     long expectedEdgeCount = 13L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
 
@@ -1489,8 +1505,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
     Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       inputGraph =
-      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
-        .combine(getGraphStore().getGraph(2L));
+      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
+        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
 
     final String edgeGroupingKey = "since";
     final String aggregatePropertyKey = "count";
@@ -1503,10 +1519,10 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 1 summarized vertex
     // [0,1,2,3,4,5] Person {count: 6}
-    List<Long> vertexIdsPerson = Lists.newArrayList(0L, 1L, 2L, 3L, 4L, 5L);
+    GradoopIds vertexIdsPerson = GradoopIds.fromLongs(0L, 1L, 2L, 3L, 4L, 5L);
 
     assertEquals("wrong number of vertices", 1L, vertices.size());
-    long vertexIDPerson = 0L;
+    GradoopId vertexIDPerson = GradoopId.fromLong(0L);
     for (EPGMVertex v : vertices) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
@@ -1522,11 +1538,11 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized sna_edges:
     // [0,1,4,5] Person -[knows]-> Person {since: 2014, count: 4}
-    List<Long> personKnowsPersonEdgeIds1 = Lists.newArrayList(0L, 1L, 4L, 5L);
+    GradoopIds personKnowsPersonEdgeIds1 = GradoopIds.fromLongs(0L, 1L, 4L, 5L);
     // [2,3,6] Person -[knows]-> Person {since: 2013, count: 3}
-    List<Long> personKnowsPersonEdgeIds2 = Lists.newArrayList(2L, 3L, 6L);
+    GradoopIds personKnowsPersonEdgeIds2 = GradoopIds.fromLongs(2L, 3L, 6L);
     // [21,22,23] Person -[knows]-> Person {since: 2015, count: 3}
-    List<Long> personKnowsPersonEdgeIds3 = Lists.newArrayList(21L, 22L, 23L);
+    GradoopIds personKnowsPersonEdgeIds3 = GradoopIds.fromLongs(21L, 22L, 23L);
     long expectedEdgeCount = 3L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
 
@@ -1573,14 +1589,14 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized vertices:
     // [0,1,2,3,4,5] Person {count: 6}
-    List<Long> vertexIdsPerson = Lists.newArrayList(0L, 1L, 2L, 3L, 4L, 5L);
+    GradoopIds vertexIdsPerson = GradoopIds.fromLongs(0L, 1L, 2L, 3L, 4L, 5L);
     // [6,7,8] Tag {count: 3}
-    List<Long> vertexIdsTag = Lists.newArrayList(6L, 7L, 8L);
+    GradoopIds vertexIdsTag = GradoopIds.fromLongs(6L, 7L, 8L);
     // [9,10] Forum {count: 2}
-    List<Long> vertexIdsForum = Lists.newArrayList(9L, 10L);
+    GradoopIds vertexIdsForum = GradoopIds.fromLongs(9L, 10L);
     assertEquals("wrong number of vertices", 3L, vertices.size());
 
-    long vertexIDPerson = 0L, vertexIDTag = 0L, vertexIDForum = 0L;
+    GradoopId vertexIDPerson = GradoopId.fromLong(0L), vertexIDTag = GradoopId.fromLong(0L), vertexIDForum = GradoopId.fromLong(0L);
     for (EPGMVertex v : vertices) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
@@ -1607,23 +1623,23 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 8 summarized sna_edges:
     // [0,1,4,5] Person -[knows]-> Person {since: 2014, count: 4}
-    List<Long> personKnowsPersonEdgeIds1 = Lists.newArrayList(0L, 1L, 4L, 5L);
+    GradoopIds personKnowsPersonEdgeIds1 = GradoopIds.fromLongs(0L, 1L, 4L, 5L);
     // [2,3,6] Person -[knows]-> Person {since: 2013, count: 3}
-    List<Long> personKnowsPersonEdgeIds2 = Lists.newArrayList(2L, 3L, 6L);
+    GradoopIds personKnowsPersonEdgeIds2 = GradoopIds.fromLongs(2L, 3L, 6L);
     // [21,22,23] Person -[knows]-> Person {since: 2015, count: 3}
-    List<Long> personKnowsPersonEdgeIds3 = Lists.newArrayList(21L, 22L, 23L);
+    GradoopIds personKnowsPersonEdgeIds3 = GradoopIds.fromLongs(21L, 22L, 23L);
     // [7,8,9,10] Person -[hasInterest]-> Tag {since: __NULL, count: 4}
-    List<Long> personHasInterestTagEdgeIds =
-      Lists.newArrayList(7L, 8L, 9L, 10L);
+    GradoopIds personHasInterestTagEdgeIds =
+      GradoopIds.fromLongs(7L, 8L, 9L, 10L);
     // [11,12,13,14] Forum -[hasTag]-> Tag {since: __NULL, count: 4}
-    List<Long> forumHasTagTagEdgeIds = Lists.newArrayList(11L, 12L, 13L, 14L);
+    GradoopIds forumHasTagTagEdgeIds = GradoopIds.fromLongs(11L, 12L, 13L, 14L);
     // [15] Forum -[hasModerator]-> Person {since: __NULL, count: 1}
-    List<Long> forumHasModeratorPersonEdgeIds1 = Lists.newArrayList(15L);
+    GradoopIds forumHasModeratorPersonEdgeIds1 = GradoopIds.fromLongs(15L);
     // [16] Forum -[hasModerator]-> Person {since: 2013, count: 1}
-    List<Long> forumHasModeratorPersonEdgeIds2 = Lists.newArrayList(16L);
+    GradoopIds forumHasModeratorPersonEdgeIds2 = GradoopIds.fromLongs(16L);
     // [17,18,19,20] Forum -[hasMember]-> Person {since: __NULL, count: 4}
-    List<Long> forumHasMemberPersonEdgeIds =
-      Lists.newArrayList(17L, 18L, 19L, 20L);
+    GradoopIds forumHasMemberPersonEdgeIds =
+      GradoopIds.fromLongs(17L, 18L, 19L, 20L);
     long expectedEdgeCount = 8L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
 
@@ -1682,8 +1698,8 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
     Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       inputGraph =
-      getGraphStore().getGraph(0L).combine(getGraphStore().getGraph(1L))
-        .combine(getGraphStore().getGraph(2L));
+      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
+        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
 
     final String vertexGroupingKey = "city";
     final String edgeGroupingKey = "since";
@@ -1698,14 +1714,14 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 3 summarized vertices:
     // [0,1] Person {city: "Leipzig", count: 2}
-    List<Long> vertexIdsPersonLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsPersonLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] Person {city: "Dresden", count: 3}
-    List<Long> vertexIdsPersonDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsPersonDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] Person {city: "Berlin", count: 1}
-    List<Long> vertexIdsPersonBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsPersonBerlin = GradoopIds.fromLongs(5L);
     assertEquals("wrong number of vertices", 3L, vertices.size());
 
-    long vertexIDLeipzig = 0L, vertexIDDresden = 0L, vertexIDBerlin = 0L;
+    GradoopId vertexIDLeipzig = GradoopId.fromLong(0L), vertexIDDresden = GradoopId.fromLong(0L), vertexIDBerlin = GradoopId.fromLong(0L);
     for (EPGMVertex v : vertices) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
@@ -1732,17 +1748,17 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 6 summarized sna_edges
     // [4,5] Dresden -[knows]-> Dresden {since: 2014, count: 2}
-    List<Long> dresdenKnowsDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenKnowsDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6] Dresden -[knows]-> Leipzig {since: 2013, count: 2}
-    List<Long> dresdenKnowsLeipzigEdgeIds1 = Lists.newArrayList(3L, 6L);
+    GradoopIds dresdenKnowsLeipzigEdgeIds1 = GradoopIds.fromLongs(3L, 6L);
     // [21] Dresden -[knows]-> Leipzig {since: 2015, count: 1}
-    List<Long> dresdenKnowsLeipzigEdgeIds2 = Lists.newArrayList(21L);
+    GradoopIds dresdenKnowsLeipzigEdgeIds2 = GradoopIds.fromLongs(21L);
     // [0,1] Leipzig -[knows]-> Leipzig {since: 2014, count: 2}
-    List<Long> leipzigKnowsLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigKnowsLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[knows]-> Dresden {since: 2013, count: 1}
-    List<Long> leipzigKnowsDresdenEdgeIds = Lists.newArrayList(2L);
+    GradoopIds leipzigKnowsDresdenEdgeIds = GradoopIds.fromLongs(2L);
     // [22,23] Berlin -[knows]-> Dresden {since: 2015, count: 2}
-    List<Long> berlinKnowsDresdenEdgeIds = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinKnowsDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
 
     long expectedEdgeCount = 6L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -1807,19 +1823,19 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 5 summarized vertices:
     // [0,1] Person {city: "Leipzig", count: 2}
-    List<Long> vertexIdsPersonLeipzig = Lists.newArrayList(0L, 1L);
+    GradoopIds vertexIdsPersonLeipzig = GradoopIds.fromLongs(0L, 1L);
     // [2,3,4] Person {city: "Dresden", count: 3}
-    List<Long> vertexIdsPersonDresden = Lists.newArrayList(2L, 3L, 4L);
+    GradoopIds vertexIdsPersonDresden = GradoopIds.fromLongs(2L, 3L, 4L);
     // [5] Person {city: "Berlin", count: 1}
-    List<Long> vertexIdsPersonBerlin = Lists.newArrayList(5L);
+    GradoopIds vertexIdsPersonBerlin = GradoopIds.fromLongs(5L);
     // [6,7,8] Tag {city: "NULL", count: 3}
-    List<Long> vertexIdsTagNull = Lists.newArrayList(6L, 7L, 8L);
+    GradoopIds vertexIdsTagNull = GradoopIds.fromLongs(6L, 7L, 8L);
     // [9,10] Forum {city: "NULL", count: 2}
-    List<Long> vertexIdsForumNull = Lists.newArrayList(9L, 10L);
+    GradoopIds vertexIdsForumNull = GradoopIds.fromLongs(9L, 10L);
     assertEquals("wrong number of vertices", 5L, vertices.size());
 
-    long vertexIDLeipzig = 0L, vertexIDDresden = 0L, vertexIDBerlin = 0L,
-      vertexIDTag = 0L, vertexIDForum = 0L;
+    GradoopId vertexIDLeipzig = GradoopId.fromLong(0L), vertexIDDresden = GradoopId.fromLong(0L), vertexIDBerlin = GradoopId.fromLong(0L),
+      vertexIDTag = GradoopId.fromLong(0L), vertexIDForum = GradoopId.fromLong(0L);
     for (EPGMVertex v : vertices) {
       // check vertex id
       assertNotNull("vertex id must not be null", v.getId());
@@ -1856,33 +1872,33 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
     // 14 summarized sna_edges:
     // [4,5] Dresden -[knows]-> Dresden {since: 2014, count: 2}
-    List<Long> dresdenKnowsDresdenEdgeIds = Lists.newArrayList(4L, 5L);
+    GradoopIds dresdenKnowsDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
     // [3,6] Dresden -[knows]-> Leipzig {since: 2013, count: 2}
-    List<Long> dresdenKnowsLeipzigEdgeIds1 = Lists.newArrayList(3L, 6L);
+    GradoopIds dresdenKnowsLeipzigEdgeIds1 = GradoopIds.fromLongs(3L, 6L);
     // [21] Dresden -[knows]-> Leipzig {since: 2015, count: 1}
-    List<Long> dresdenKnowsLeipzigEdgeIds2 = Lists.newArrayList(21L);
+    GradoopIds dresdenKnowsLeipzigEdgeIds2 = GradoopIds.fromLongs(21L);
     // [0,1] Leipzig -[knows]-> Leipzig {since: 2014, count: 2}
-    List<Long> leipzigKnowsLeipzigEdgeIds = Lists.newArrayList(0L, 1L);
+    GradoopIds leipzigKnowsLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
     // [2] Leipzig -[knows]-> Dresden {since: 2013, count: 1}
-    List<Long> leipzigKnowsDresdenEdgeIds = Lists.newArrayList(2L);
+    GradoopIds leipzigKnowsDresdenEdgeIds = GradoopIds.fromLongs(2L);
     // [22,23] Berlin -[knows]-> Dresden {since: 2015, count: 2}
-    List<Long> berlinKnowsDresdenEdgeIds = Lists.newArrayList(22L, 23L);
+    GradoopIds berlinKnowsDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
     // [16] Forum -[hasModerator]-> Dresden {since: 2013, count: 1}
-    List<Long> forumHasModeratorDresdenEdgeIds = Lists.newArrayList(16L);
+    GradoopIds forumHasModeratorDresdenEdgeIds = GradoopIds.fromLongs(16L);
     // [19,20] Forum -[hasMember]-> Dresden {since: NULL, count: 2}
-    List<Long> forumHasMemberDresdenEdgeIds = Lists.newArrayList(19L, 20L);
+    GradoopIds forumHasMemberDresdenEdgeIds = GradoopIds.fromLongs(19L, 20L);
     // [11,12,13,14] Forum -[hasTag]-> Tag {since: NULL, count: 4}
-    List<Long> forumHasTagTagEdgeIds = Lists.newArrayList(11L, 12L, 13L, 14L);
+    GradoopIds forumHasTagTagEdgeIds = GradoopIds.fromLongs(11L, 12L, 13L, 14L);
     // [15] Forum -[hasModerator]-> Leipzig {since: NULL, count: 1}
-    List<Long> forumHasModeratorLeipzigEdgeIds = Lists.newArrayList(15L);
+    GradoopIds forumHasModeratorLeipzigEdgeIds = GradoopIds.fromLongs(15L);
     // [17,18] Forum -[hasMember]-> Leipzig {since: NULL, count: 2}
-    List<Long> forumHasMemberLeipzigEdgeIds = Lists.newArrayList(17L, 18L);
+    GradoopIds forumHasMemberLeipzigEdgeIds = GradoopIds.fromLongs(17L, 18L);
     // [10] Berlin -[hasInterest]-> Tag {since: NULL, count: 1}
-    List<Long> berlinHasInterestTagEdgeIds = Lists.newArrayList(10L);
+    GradoopIds berlinHasInterestTagEdgeIds = GradoopIds.fromLongs(10L);
     // [7,9] Dresden -[hasInterest]-> Tag {since: NULL, count: 2}
-    List<Long> dresdenHasInterestTagEdgeIds = Lists.newArrayList(7L, 9L);
+    GradoopIds dresdenHasInterestTagEdgeIds = GradoopIds.fromLongs(7L, 9L);
     // [8] Leipzig -[hasInterest]-> Tag {since: NULL, count: 1}
-    List<Long> leipzigHasInterestTagEdgeIds = Lists.newArrayList(8L);
+    GradoopIds leipzigHasInterestTagEdgeIds = GradoopIds.fromLongs(8L);
 
     long expectedEdgeCount = 14L;
     assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
@@ -1968,7 +1984,7 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
 
   private void testVertex(EPGMVertex vertex, String expectedVertexLabel,
     String aggregatePropertyKey, Long expectedCountValue,
-    int expectedGraphCount, Long expectedGraphID) {
+    int expectedGraphCount, GradoopId expectedGraphID) {
     testVertex(vertex, expectedVertexLabel, null, null, aggregatePropertyKey,
       expectedCountValue, expectedGraphCount, expectedGraphID);
   }
@@ -1976,7 +1992,7 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   private void testVertex(EPGMVertex vertex, String expectedVertexLabel,
     String vertexGroupingKey, String expectedVertexGroupingValue,
     String aggregatePropertyKey, Long expectedCountValue,
-    int expectedGraphCount, Long expectedGraphID) {
+    int expectedGraphCount, GradoopId expectedGraphID) {
     assertEquals("wrong vertex label", expectedVertexLabel, vertex.getLabel());
     if (vertexGroupingKey != null && expectedVertexGroupingValue != null) {
       assertEquals("wrong property value", expectedVertexGroupingValue,
@@ -1990,19 +2006,19 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   }
 
   private void testEdge(EPGMEdge edge, String expectedEdgeLabel,
-    Long expectedSourceVertex, Long expectedTargetVertex,
+    GradoopId expectedSourceVertex, GradoopId expectedTargetVertex,
     String aggregatePropertyKey, Integer expectedCountValue,
-    int expectedGraphCount, Long expectedGraphID) {
+    int expectedGraphCount, GradoopId expectedGraphID) {
     testEdge(edge, expectedEdgeLabel, expectedSourceVertex,
       expectedTargetVertex, null, null, aggregatePropertyKey,
       expectedCountValue, expectedGraphCount, expectedGraphID);
   }
 
   private void testEdge(EPGMEdge edge, String expectedEdgeLabel,
-    Long expectedSourceVertex, Long expectedTargetVertex,
+    GradoopId expectedSourceVertex, GradoopId expectedTargetVertex,
     String edgeGroupingKey, String expectedGroupingValue,
     String aggregatePropertyKey, Integer expectedCountValue,
-    int expectedGraphCount, Long expectedGraphID) {
+    int expectedGraphCount, GradoopId expectedGraphID) {
     assertEquals("wrong edge label", expectedEdgeLabel, edge.getLabel());
     assertEquals("wrong source vertex", expectedSourceVertex,
       edge.getSourceVertexId());
@@ -2021,8 +2037,7 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
   }
 
   private class SummarizationRunner {
-    private LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      inputGraph;
+    private LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> inputGraph;
     private String vertexGroupingKey;
     private final boolean useVertexLabels;
     private final String edgeGroupingKey;

@@ -103,7 +103,16 @@ public final class GradoopId implements Comparable<GradoopId>,
     this.identifier = dataInput.readLong();
   }
 
-  public static GradoopId createId(Long id) {
+  public static GradoopId fromLong(Long id) {
     return new GradoopId(id);
+  }
+
+  public static GradoopId fromLongString(String string) {
+    return GradoopId.fromLong(Long.valueOf(string));
+  }
+
+  public static GradoopId min(GradoopId firstValue, GradoopId currentValue) {
+    return firstValue.compareTo(currentValue) <= 0 ?
+      firstValue : currentValue;
   }
 }

@@ -22,6 +22,7 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.btg.BTG;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * JoinFunction over VertexIDs
@@ -30,9 +31,9 @@ import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
  */
 public class BTGJoin<VD extends EPGMVertex>
   implements JoinFunction<
-  Vertex<Long, BTGVertexValue>, VD, VD> {
+  Vertex<GradoopId, BTGVertexValue>, VD, VD> {
   @Override
-  public VD join(Vertex<Long, BTGVertexValue> btgVertex, VD epVertex)
+  public VD join(Vertex<GradoopId, BTGVertexValue> btgVertex, VD epVertex)
       throws Exception {
     epVertex.setProperty(BTG.VERTEX_TYPE_PROPERTYKEY,
       btgVertex.getValue().getVertexType());

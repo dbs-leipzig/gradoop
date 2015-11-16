@@ -7,6 +7,7 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.algorithms.labelpropagation
   .LabelPropagationTestHelper;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
@@ -62,10 +63,10 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
   public void testConnectedGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, VertexPojo, EdgePojo> epGraph =
+    Graph<GradoopId, VertexPojo, EdgePojo> epGraph =
       LabelPropagationTestHelper
         .getEPGraph(getConnectedGraphWithVertexValues(), env);
-    DataSet<Vertex<Long, VertexPojo>> labeledGraph = epGraph.run(
+    DataSet<Vertex<GradoopId, VertexPojo>> labeledGraph = epGraph.run(
       new EPGMLabelPropagationAlgorithm<VertexPojo, EdgePojo>(
         maxIteration)).getVertices();
     validateConnectedGraphResult(parseResult(labeledGraph.collect()));
@@ -75,10 +76,10 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
   public void testBipartiteGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, VertexPojo, EdgePojo> gellyGraph =
+    Graph<GradoopId, VertexPojo, EdgePojo> gellyGraph =
       LabelPropagationTestHelper
         .getEPGraph(getCompleteBipartiteGraphWithVertexValue(), env);
-    DataSet<Vertex<Long, VertexPojo>> labeledGraph = gellyGraph.run(
+    DataSet<Vertex<GradoopId, VertexPojo>> labeledGraph = gellyGraph.run(
       new EPGMLabelPropagationAlgorithm<VertexPojo, EdgePojo>(
         maxIteration)).getVertices();
     validateCompleteBipartiteGraphResult(parseResult(labeledGraph.collect()));
@@ -88,59 +89,83 @@ public class EPGMLabelPropagationGellyTest extends FlinkTestBase {
   public void testLoopGraphWithVertexValues() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, VertexPojo, EdgePojo> gellyGraph =
+    Graph<GradoopId, VertexPojo, EdgePojo> gellyGraph =
       LabelPropagationTestHelper
         .getEPGraph(getLoopGraphWithVertexValues(), env);
-    DataSet<Vertex<Long, VertexPojo>> labeledGraph = gellyGraph.run(
+    DataSet<Vertex<GradoopId, VertexPojo>> labeledGraph = gellyGraph.run(
       new EPGMLabelPropagationAlgorithm<VertexPojo, EdgePojo>(
         maxIteration)).getVertices();
     validateLoopGraphResult(parseResult(labeledGraph.collect()));
   }
 
-  private Map<Long, Long> parseResult(
-    List<Vertex<Long, VertexPojo>> graph) {
-    Map<Long, Long> result = new HashMap<>();
-    for (Vertex<Long, VertexPojo> v : graph) {
-      result.put(v.getId(), (Long) v.getValue()
+  private Map<GradoopId, GradoopId> parseResult(
+    List<Vertex<GradoopId, VertexPojo>> graph) {
+    Map<GradoopId, GradoopId> result = new HashMap<>();
+    for (Vertex<GradoopId, VertexPojo> v : graph) {
+      result.put(v.getId(), (GradoopId) v.getValue()
         .getProperty(EPGMLabelPropagationAlgorithm.CURRENT_VALUE));
     }
     return result;
   }
 
-  private void validateConnectedGraphResult(Map<Long, Long> vertexIDWithValue) {
+  private void validateConnectedGraphResult(Map<GradoopId, GradoopId> vertexIDWithValue) {
     assertEquals(12, vertexIDWithValue.size());
-    assertEquals(0, vertexIDWithValue.get(0L).longValue());
-    assertEquals(0, vertexIDWithValue.get(1L).longValue());
-    assertEquals(0, vertexIDWithValue.get(2L).longValue());
-    assertEquals(0, vertexIDWithValue.get(3L).longValue());
-    assertEquals(4, vertexIDWithValue.get(4L).longValue());
-    assertEquals(4, vertexIDWithValue.get(5L).longValue());
-    assertEquals(4, vertexIDWithValue.get(6L).longValue());
-    assertEquals(4, vertexIDWithValue.get(7L).longValue());
-    assertEquals(8, vertexIDWithValue.get(8L).longValue());
-    assertEquals(8, vertexIDWithValue.get(9L).longValue());
-    assertEquals(8, vertexIDWithValue.get(10L).longValue());
-    assertEquals(8, vertexIDWithValue.get(11L).longValue());
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(0L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(1L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(2L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(3L)));
+    assertEquals(GradoopId.fromLong(4L),
+      vertexIDWithValue.get(GradoopId.fromLong(4L)));
+    assertEquals(GradoopId.fromLong(4L),
+      vertexIDWithValue.get(GradoopId.fromLong(5L)));
+    assertEquals(GradoopId.fromLong(4L),
+      vertexIDWithValue.get(GradoopId.fromLong(6L)));
+    assertEquals(GradoopId.fromLong(4L),
+      vertexIDWithValue.get(GradoopId.fromLong(7L)));
+    assertEquals(GradoopId.fromLong(8L),
+      vertexIDWithValue.get(GradoopId.fromLong(8L)));
+    assertEquals(GradoopId.fromLong(8L),
+      vertexIDWithValue.get(GradoopId.fromLong(9L)));
+    assertEquals(GradoopId.fromLong(8L),
+      vertexIDWithValue.get(GradoopId.fromLong(10L)));
+    assertEquals(GradoopId.fromLong(8L),
+      vertexIDWithValue.get(GradoopId.fromLong(11L)));
   }
 
   private void validateCompleteBipartiteGraphResult(
-    Map<Long, Long> vertexIDWithValue) {
+    Map<GradoopId, GradoopId> vertexIDWithValue) {
     assertEquals(8, vertexIDWithValue.size());
-    assertEquals(0, vertexIDWithValue.get(0L).longValue());
-    assertEquals(0, vertexIDWithValue.get(1L).longValue());
-    assertEquals(0, vertexIDWithValue.get(2L).longValue());
-    assertEquals(0, vertexIDWithValue.get(3L).longValue());
-    assertEquals(0, vertexIDWithValue.get(4L).longValue());
-    assertEquals(0, vertexIDWithValue.get(5L).longValue());
-    assertEquals(0, vertexIDWithValue.get(6L).longValue());
-    assertEquals(0, vertexIDWithValue.get(7L).longValue());
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(0L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(1L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(2L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(3L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(4L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(5L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(6L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(7L)));
   }
 
-  private void validateLoopGraphResult(Map<Long, Long> vertexIDWithValue) {
+  private void validateLoopGraphResult(Map<GradoopId, GradoopId> vertexIDWithValue) {
     assertEquals(4, vertexIDWithValue.size());
-    assertEquals(0, vertexIDWithValue.get(0L).longValue());
-    assertEquals(0, vertexIDWithValue.get(1L).longValue());
-    assertEquals(0, vertexIDWithValue.get(2L).longValue());
-    assertEquals(0, vertexIDWithValue.get(3L).longValue());
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(0L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(1L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(2L)));
+    assertEquals(GradoopId.fromLong(0L),
+      vertexIDWithValue.get(GradoopId.fromLong(3L)));
   }
 }

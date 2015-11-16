@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.operators.collection.binary;
 
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -28,9 +29,9 @@ public class GraphCollectionDifferenceTest extends
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection1 = graphColl.getGraphs(0L, 1L, 2L);
+      collection1 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 1L, 2L));
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection2 = graphColl.getGraphs(0L);
+      collection2 = graphColl.getGraphs(GradoopIds.fromLongs(0L));
 
     GraphCollection differenceColl = collection1.difference(collection2);
 
@@ -52,9 +53,9 @@ public class GraphCollectionDifferenceTest extends
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection1 = graphColl.getGraphs(0L, 1L);
+      collection1 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 1L));
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection2 = graphColl.getGraphs(2L, 3L);
+      collection2 = graphColl.getGraphs(GradoopIds.fromLongs(2L, 3L));
 
     GraphCollection differenceColl = collection1.difference(collection2);
 
@@ -76,9 +77,9 @@ public class GraphCollectionDifferenceTest extends
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection1 = graphColl.getGraphs(0L, 1L);
+      collection1 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 1L));
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection2 = graphColl.getGraphs(0L, 1L);
+      collection2 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 1L));
 
     GraphCollection differenceColl = collection1.difference(collection2);
 

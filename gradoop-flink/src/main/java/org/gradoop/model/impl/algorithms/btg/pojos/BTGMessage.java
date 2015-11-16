@@ -1,5 +1,7 @@
 package org.gradoop.model.impl.algorithms.btg.pojos;
 
+import org.gradoop.model.impl.id.GradoopId;
+
 /**
  * Custom message format for
  * {@link org.gradoop.model.impl.algorithms.btg.BTGAlgorithm}.
@@ -11,18 +13,18 @@ public class BTGMessage {
   /**
    * vertex ID of the message sender
    */
-  private long senderID;
+  private GradoopId senderID;
   /**
    * message value
    */
-  private long btgID;
+  private GradoopId btgID;
 
   /**
    * Returns the vertex ID of the message sender
    *
    * @return vertex ID of the sender
    */
-  public long getSenderID() {
+  public GradoopId getSenderID() {
     return this.senderID;
   }
 
@@ -31,7 +33,7 @@ public class BTGMessage {
    *
    * @param senderID sender's vertex ID
    */
-  public void setSenderID(long senderID) {
+  public void setSenderID(GradoopId senderID) {
     this.senderID = senderID;
   }
 
@@ -40,7 +42,7 @@ public class BTGMessage {
    *
    * @return value of the message
    */
-  public long getBtgID() {
+  public GradoopId getBtgID() {
     return this.btgID;
   }
 
@@ -49,7 +51,7 @@ public class BTGMessage {
    *
    * @param btgID value of the message
    */
-  public void setBtgID(long btgID) {
+  public void setBtgID(GradoopId btgID) {
     this.btgID = btgID;
   }
 }

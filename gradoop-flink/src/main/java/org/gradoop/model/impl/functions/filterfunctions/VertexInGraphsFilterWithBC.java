@@ -20,6 +20,7 @@ package org.gradoop.model.impl.functions.filterfunctions;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class VertexInGraphsFilterWithBC<VD extends EPGMVertex>
   /**
    * Graph identifiers
    */
-  private List<Long> identifiers;
+  private List<GradoopId> identifiers;
 
   /**
    * {@inheritDoc}
@@ -59,7 +60,7 @@ public class VertexInGraphsFilterWithBC<VD extends EPGMVertex>
   public boolean filter(VD vertex) throws Exception {
     boolean vertexInGraph = false;
     if (vertex.getGraphCount() > 0) {
-      for (Long graph : vertex.getGraphIds()) {
+      for (GradoopId graph : vertex.getGraphIds()) {
         if (identifiers.contains(graph)) {
           vertexInGraph = true;
           break;

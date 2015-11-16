@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.pojo;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdGenerator;
@@ -12,7 +11,6 @@ import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import java.util.Map;
-import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -45,7 +43,7 @@ public class EdgePojoTest {
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
     props.put("k2", "v2");
-    GradoopIds graphs = GradoopIds.createGradoopIds(0L, 1L);
+    GradoopIds graphs = GradoopIds.fromLongs(0L, 1L);
 
     EPGMEdge edge = new EdgePojoFactory()
       .createEdge(edgeId, label, sourceId, targetId, props, graphs);
@@ -58,8 +56,8 @@ public class EdgePojoTest {
     assertThat(edge.getProperty("k1"), Is.<Object>is("v1"));
     assertThat(edge.getProperty("k2"), Is.<Object>is("v2"));
     assertThat(edge.getGraphCount(), is(2));
-    assertTrue(edge.getGraphIds().contains(GradoopId.createId(0L)));
-    assertTrue(edge.getGraphIds().contains(GradoopId.createId(1L)));
+    assertTrue(edge.getGraphIds().contains(GradoopId.fromLong(0L)));
+    assertTrue(edge.getGraphIds().contains(GradoopId.fromLong(1L)));
   }
 
   @Test

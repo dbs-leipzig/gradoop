@@ -21,6 +21,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -45,7 +46,7 @@ public class LogicalGraphProjectionTest extends FlinkTestBase {
   @Test
   public void projectionTest() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      forumGraph = getGraphStore().getGraph(3L);
+      forumGraph = getGraphStore().getGraph(GradoopId.fromLong(3L));
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = forumGraph.project(new VertexLabelProjectionFunction(),
       new EdgePropertyProjectionFunction());
@@ -99,7 +100,7 @@ public class LogicalGraphProjectionTest extends FlinkTestBase {
     @Override
     public int compare(VertexPojo vertex1,
       VertexPojo vertex2) {
-      return Long.compare(vertex1.getId(), vertex2.getId());
+      return vertex1.getId().compareTo(vertex2.getId());
     }
   }
 
@@ -108,8 +109,7 @@ public class LogicalGraphProjectionTest extends FlinkTestBase {
     @Override
     public int compare(EdgePojo edge1,
       EdgePojo edge2) {
-      return Long
-        .compare(edge1.getId(), edge2.getId());
+      return edge1.getId().compareTo(edge2.getId());
     }
   }
 

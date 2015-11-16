@@ -56,7 +56,7 @@ public class VertexToBTGVertexMapper<VD extends EPGMVertex>
       (String) vertex.getProperty(BTG.VERTEX_TYPE_PROPERTYKEY))];
     double value = Double.parseDouble(
       (String) vertex.getProperty(BTG.VERTEX_VALUE_PROPERTYKEY));
-    List<Long> btgIDs = getBTGIDs(
+    List<GradoopId> btgIDs = getBTGIDs(
       (String) vertex.getProperty(BTG.VERTEX_BTGIDS_PROPERTYKEY));
     return new BTGVertexValue(type, value, btgIDs);
   }
@@ -67,14 +67,14 @@ public class VertexToBTGVertexMapper<VD extends EPGMVertex>
    * @param btgIDs String of BTGIDs
    * @return List of BTGIDs
    */
-  private static List<Long> getBTGIDs(String btgIDs) {
+  private static List<GradoopId> getBTGIDs(String btgIDs) {
     if (btgIDs.length() == 0) {
       return new ArrayList<>();
     } else {
-      List<Long> btgList = new ArrayList<>();
+      List<GradoopId> btgList = new ArrayList<>();
       String[] btgIDArray = btgIDs.split(",");
-      for (String aBtgIDArray : btgIDArray) {
-        btgList.add(Long.parseLong(aBtgIDArray));
+      for (String btgId : btgIDArray) {
+        btgList.add(GradoopId.fromLongString(btgId));
       }
       return btgList;
     }

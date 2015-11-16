@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.filterfunctions;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class EdgeInAllGraphsFilterWithBC<ED extends EPGMEdge> extends
   /**
    * Graph identifiers
    */
-  private List<Long> identifiers;
+  private List<GradoopId> identifiers;
 
   /**
    * {@inheritDoc}

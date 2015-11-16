@@ -17,13 +17,13 @@
 
 package org.gradoop.model.impl.algorithms.btg.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGMessage;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.List;
 
@@ -31,12 +31,12 @@ import java.util.List;
  * BTG specific vertex update function.
  */
 public final class BTGUpdateFunction extends
-  VertexUpdateFunction<Long, BTGVertexValue, BTGMessage> {
+  VertexUpdateFunction<GradoopId, BTGVertexValue, BTGMessage> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public void updateVertex(Vertex<Long, BTGVertexValue> vertex,
+  public void updateVertex(Vertex<GradoopId, BTGVertexValue> vertex,
     MessageIterator<BTGMessage>
       messages) throws
     Exception {
@@ -44,9 +44,9 @@ public final class BTGUpdateFunction extends
       processMasterVertex(vertex, messages);
     } else if (vertex.getValue().getVertexType() ==
       BTGVertexType.TRANSACTIONAL) {
-      long currentMinValue = getCurrentMinValue(vertex);
-      long newMinValue = getNewMinValue(messages, currentMinValue);
-      boolean changed = currentMinValue != newMinValue;
+      GradoopId currentMinValue = getCurrentMinValue(vertex);
+      GradoopId newMinValue = getNewMinValue(messages, currentMinValue);
+      boolean changed = !currentMinValue.equals(newMinValue);
       if (getSuperstepNumber() == 1 || changed) {
         processTransactionalVertex(vertex, newMinValue);
       }
@@ -59,7 +59,7 @@ public final class BTGUpdateFunction extends
    * @param vertex   The current vertex
    * @param messages All incoming messages
    */
-  private void processMasterVertex(Vertex<Long, BTGVertexValue> vertex,
+  private void processMasterVertex(Vertex<GradoopId, BTGVertexValue> vertex,
     MessageIterator<BTGMessage>
       messages) {
     BTGVertexValue vertexValue = vertex.getValue();
@@ -83,8 +83,8 @@ public final class BTGUpdateFunction extends
    * @param vertex   The current vertex
    * @param minValue All incoming messages
    */
-  private void processTransactionalVertex(Vertex<Long, BTGVertexValue> vertex,
-    long minValue) {
+  private void processTransactionalVertex(Vertex<GradoopId, BTGVertexValue> vertex,
+    GradoopId minValue) {
     vertex.getValue().removeLastBtgID();
     vertex.getValue().addGraph(minValue);
     setNewVertexValue(vertex.getValue());
@@ -98,12 +98,12 @@ public final class BTGUpdateFunction extends
    * @param currentMinValue The current minimum value
    * @return The new (maybe unchanged) minimum value
    */
-  private long getNewMinValue(MessageIterator<BTGMessage> messages,
-    long currentMinValue) {
-    long newMinValue = currentMinValue;
+  private GradoopId getNewMinValue(MessageIterator<BTGMessage> messages,
+    GradoopId currentMinValue) {
+    GradoopId newMinValue = currentMinValue;
     if (getSuperstepNumber() > 1) {
       for (BTGMessage message : messages) {
-        if (message.getBtgID() < newMinValue) {
+        if (message.getBtgID().compareTo(newMinValue) < 0) {
           newMinValue = message.getBtgID();
         }
       }
@@ -119,8 +119,8 @@ public final class BTGUpdateFunction extends
    * @param vertex The current vertex
    * @return The minimum BTG ID that vertex knows.
    */
-  private long getCurrentMinValue(Vertex<Long, BTGVertexValue> vertex) {
-    List<Long> btgIDs = Lists.newArrayList(vertex.getValue().getGraphs());
+  private GradoopId getCurrentMinValue(Vertex<GradoopId, BTGVertexValue> vertex) {
+    List<GradoopId> btgIDs = vertex.getValue().getGraphs();
     return (btgIDs.size() > 0) ? btgIDs.get(btgIDs.size() - 1) :
       vertex.getId();
   }

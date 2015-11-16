@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.logicalgraph.unary.sampling.RandomNodeSampling;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -57,7 +58,7 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
     newGraph.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
     getExecutionEnvironment().execute();
     assertNotNull("graph was null", newGraph);
-    Set<Long> newVertexIDs = new HashSet<>();
+    Set<GradoopId> newVertexIDs = new HashSet<>();
     for (VertexPojo vertex : newVertices) {
       assertTrue(dbVertices.contains(vertex));
       newVertexIDs.add(vertex.getId());
@@ -93,7 +94,7 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
     newGraph.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
     getExecutionEnvironment().execute();
     assertNotNull("graph was null", newGraph);
-    Set<Long> newVertexIDs = new HashSet<>();
+    Set<GradoopId> newVertexIDs = new HashSet<>();
     for (VertexPojo vertex : newVertices) {
       assertTrue(dbVertices.contains(vertex));
       newVertexIDs.add(vertex.getId());

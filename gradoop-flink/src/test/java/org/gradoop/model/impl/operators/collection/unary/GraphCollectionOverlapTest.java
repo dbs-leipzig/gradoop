@@ -22,6 +22,8 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -43,22 +45,23 @@ public class GraphCollectionOverlapTest extends FlinkTestBase {
   @Test
   public void overlapCollectionTest() throws Exception {
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> coll =
-      getGraphStore().getCollection().getGraphs(1L, 2L, 3L);
+      getGraphStore().getCollection().getGraphs(GradoopIds.fromLongs(1L, 2L,
+        3L));
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = coll.callForGraph(
       new OverlapCollection<VertexPojo, EdgePojo, GraphHeadPojo>());
 
     List<VertexPojo> oldVertices = Lists.newArrayList();
     List<EdgePojo> oldEdges = Lists.newArrayList();
-    List<Long> oldGraphs = Lists.newArrayList();
+    List<GradoopId> oldGraphs = Lists.newArrayList();
     List<VertexPojo> newVertices = Lists.newArrayList();
     List<EdgePojo> newEdges = Lists.newArrayList();
 
     coll.getVertices().output(new LocalCollectionOutputFormat<>(oldVertices));
     coll.getEdges().output(new LocalCollectionOutputFormat<>(oldEdges));
-    coll.getGraphHeads().map(new MapFunction<GraphHeadPojo, Long>() {
+    coll.getGraphHeads().map(new MapFunction<GraphHeadPojo, GradoopId>() {
       @Override
-      public Long map(GraphHeadPojo graphData) throws Exception {
+      public GradoopId map(GraphHeadPojo graphData) throws Exception {
         return graphData.getId();
       }
     }).output(new LocalCollectionOutputFormat<>(oldGraphs));
@@ -71,11 +74,11 @@ public class GraphCollectionOverlapTest extends FlinkTestBase {
     assertNotNull("graph was null", newGraph);
     for (VertexPojo vertex : newVertices) {
       assertTrue(oldVertices.contains(vertex));
-      assertTrue(oldGraphs.containsAll(vertex.getGraphIds()));
+      assertTrue(oldGraphs.containsAll(vertex.getGraphIds().toCollection()));
     }
     for (EdgePojo edge : newEdges) {
       assertTrue(oldEdges.contains(edge));
-      assertTrue(oldGraphs.containsAll(edge.getGraphIds()));
+      assertTrue(oldGraphs.containsAll(edge.getGraphIds().toCollection()));
     }
   }
 }

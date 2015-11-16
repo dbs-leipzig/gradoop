@@ -19,6 +19,7 @@ package org.gradoop.model.impl.algorithms.btg.functions;
 
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ import java.util.List;
  * @param <VD> EPGM vertex type
  */
 public class LongListFromPropertyFunction<VD extends EPGMVertex>
-  implements UnaryFunction<VD, List<Long>> {
+  implements UnaryFunction<VD, List<GradoopId>> {
   /**
    * String propertyKey
    */
@@ -49,7 +50,7 @@ public class LongListFromPropertyFunction<VD extends EPGMVertex>
    */
   @SuppressWarnings("unchecked")
   @Override
-  public List<Long> execute(VD vertex) throws Exception {
-    return (List<Long>) vertex.getProperty(propertyKey);
+  public List<GradoopId> execute(VD vertex) throws Exception {
+    return (List<GradoopId>) vertex.getProperty(propertyKey);
   }
 }

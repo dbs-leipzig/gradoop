@@ -23,7 +23,6 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Checks if a vertex is contained in all of the given logical
@@ -54,7 +53,7 @@ public class VertexInAllGraphsFilterWithBC<VD extends EPGMVertex> extends
       (BC_IDENTIFIERS);
 
     for(Long longId : longIds) {
-      identifiers.add(GradoopId.createId(longId));
+      identifiers.add(GradoopId.fromLong(longId));
     }
 
   }

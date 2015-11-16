@@ -26,9 +26,10 @@ import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Used to convert json documents into vertices, edges and graphs.
@@ -80,10 +81,10 @@ public class JsonReader extends JsonIO {
     @Override
     public VD map(String s) throws Exception {
       JSONObject jsonVertex = new JSONObject(s);
-      Long vertexID = getID(jsonVertex);
+      GradoopId vertexID = getID(jsonVertex);
       String label = getLabel(jsonVertex);
       Map<String, Object> properties = getProperties(jsonVertex);
-      Set<Long> graphs = getGraphs(jsonVertex);
+      GradoopIds graphs = getGraphs(jsonVertex);
 
       return vertexFactory.createVertex(vertexID, label, properties, graphs);
     }
@@ -134,12 +135,12 @@ public class JsonReader extends JsonIO {
     @Override
     public ED map(String s) throws Exception {
       JSONObject jsonEdge = new JSONObject(s);
-      Long edgeID = getID(jsonEdge);
+      GradoopId edgeID = getID(jsonEdge);
       String edgeLabel = getLabel(jsonEdge);
-      Long sourceID = getSourceVertexID(jsonEdge);
-      Long targetID = getTargetVertexID(jsonEdge);
+      GradoopId sourceID = getSourceVertexID(jsonEdge);
+      GradoopId targetID = getTargetVertexID(jsonEdge);
       Map<String, Object> properties = getProperties(jsonEdge);
-      Set<Long> graphs = getGraphs(jsonEdge);
+      GradoopIds graphs = getGraphs(jsonEdge);
 
       return edgeFactory.createEdge(edgeID, edgeLabel, sourceID, targetID,
         properties, graphs);
@@ -152,8 +153,8 @@ public class JsonReader extends JsonIO {
      * @return source vertex identifier
      * @throws JSONException
      */
-    private Long getSourceVertexID(JSONObject jsonEdge) throws JSONException {
-      return jsonEdge.getLong(EDGE_SOURCE);
+    private GradoopId getSourceVertexID(JSONObject jsonEdge) throws JSONException {
+      return GradoopId.fromLongString(jsonEdge.getString(EDGE_SOURCE));
     }
 
     /**
@@ -163,8 +164,8 @@ public class JsonReader extends JsonIO {
      * @return target vertex identifier
      * @throws JSONException
      */
-    private Long getTargetVertexID(JSONObject jsonEdge) throws JSONException {
-      return jsonEdge.getLong(EDGE_TARGET);
+    private GradoopId getTargetVertexID(JSONObject jsonEdge) throws JSONException {
+      return GradoopId.fromLongString(jsonEdge.getString(EDGE_TARGET));
     }
   }
 
@@ -212,7 +213,7 @@ public class JsonReader extends JsonIO {
     @Override
     public GD map(String s) throws Exception {
       JSONObject jsonGraph = new JSONObject(s);
-      Long graphID = getID(jsonGraph);
+      GradoopId graphID = getID(jsonGraph);
       String label = getLabel(jsonGraph);
       Map<String, Object> properties = getProperties(jsonGraph);
 

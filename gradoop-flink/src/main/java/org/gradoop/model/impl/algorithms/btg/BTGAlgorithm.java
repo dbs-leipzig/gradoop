@@ -6,6 +6,7 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.algorithms.btg.functions.BTGMessageFunction;
 import org.gradoop.model.impl.algorithms.btg.functions.BTGUpdateFunction;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Graph-BSP Implementation of the Business Transaction Graph (BTG) Extraction
@@ -32,8 +33,8 @@ import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
  * BTG ids the master data node is involved in.
  */
 public class BTGAlgorithm implements
-  GraphAlgorithm<Long, BTGVertexValue, NullValue,
-    Graph<Long, BTGVertexValue, NullValue>> {
+  GraphAlgorithm<GradoopId, BTGVertexValue, NullValue,
+    Graph<GradoopId, BTGVertexValue, NullValue>> {
   /**
    * Max Iteration counter for the Algorithm
    */
@@ -52,9 +53,9 @@ public class BTGAlgorithm implements
    * {@inheritDoc}
    */
   @Override
-  public Graph<Long, BTGVertexValue, NullValue> run(
-    Graph<Long, BTGVertexValue, NullValue> graph) throws Exception {
-    Graph<Long, BTGVertexValue, NullValue> undirectedGraph =
+  public Graph<GradoopId, BTGVertexValue, NullValue> run(
+    Graph<GradoopId, BTGVertexValue, NullValue> graph) throws Exception {
+    Graph<GradoopId, BTGVertexValue, NullValue> undirectedGraph =
       graph.getUndirected();
     // initialize vertex values and run the Vertex Centric Iteration
     return undirectedGraph.runVertexCentricIteration(

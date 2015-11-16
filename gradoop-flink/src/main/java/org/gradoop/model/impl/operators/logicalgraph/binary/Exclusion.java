@@ -30,6 +30,7 @@ import org.gradoop.model.impl.functions.keyselectors
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
 import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.FlinkConstants;
 
 /**
@@ -53,7 +54,7 @@ public class Exclusion<
   @Override
   protected LogicalGraph<VD, ED, GD> executeInternal(
     LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
-    final Long newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
+    final GradoopId newGraphID = FlinkConstants.EXCLUDE_GRAPH_ID;
 
     // union vertex sets, group by vertex id, filter vertices where the group
     // contains exactly one vertex which belongs to the graph, the operator is

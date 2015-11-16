@@ -35,6 +35,7 @@ import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -412,51 +413,51 @@ public class EPGMDatabase<
 
     GradoopConfig<VD, ED, GD> conf = epgmStore.getConfig();
     // used for type hinting when loading vertex data
-    TypeInformation<Vertex<Long, VD>> vertexTypeInfo =
+    TypeInformation<Vertex<GradoopId, VD>> vertexTypeInfo =
       new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
         TypeExtractor.createTypeInfo(
           epgmStore.getConfig().getVertexFactory().getType()));
     // used for type hinting when loading edge data
-    TypeInformation<Edge<Long, ED>> edgeTypeInfo =
+    TypeInformation<Edge<GradoopId, ED>> edgeTypeInfo =
       new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
         BasicTypeInfo.LONG_TYPE_INFO, TypeExtractor.createTypeInfo(
           conf.getEdgeHandler().getEdgeFactory().getType()));
     // used for type hinting when loading graph data
-    TypeInformation<Subgraph<Long, GD>> graphTypeInfo =
+    TypeInformation<Subgraph<GradoopId, GD>> graphTypeInfo =
       new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
         TypeExtractor.createTypeInfo(
           conf.getGraphHeadHandler().getGraphHeadFactory().getType()));
 
-    DataSet<Vertex<Long, VD>> vertexDataSet = env.createInput(
+    DataSet<Vertex<GradoopId, VD>> vertexDataSet = env.createInput(
       new HBaseReader.VertexTableInputFormat<>(
         conf.getVertexHandler(), epgmStore.getVertexTableName()),
       vertexTypeInfo);
 
-    DataSet<Edge<Long, ED>> edgeDataSet = env.createInput(
+    DataSet<Edge<GradoopId, ED>> edgeDataSet = env.createInput(
       new HBaseReader.EdgeTableInputFormat<>(conf.getEdgeHandler(),
         epgmStore.getEdgeTableName()), edgeTypeInfo);
 
-    DataSet<Subgraph<Long, GD>> subgraphDataSet = env.createInput(
+    DataSet<Subgraph<GradoopId, GD>> subgraphDataSet = env.createInput(
       new HBaseReader.GraphHeadTableInputFormat<>(
         conf.getGraphHeadHandler(), epgmStore.getGraphHeadName()),
       graphTypeInfo);
 
     return new EPGMDatabase<>(
-      vertexDataSet.map(new MapFunction<Vertex<Long, VD>, VD>() {
+      vertexDataSet.map(new MapFunction<Vertex<GradoopId, VD>, VD>() {
         @Override
-        public VD map(Vertex<Long, VD> longVDVertex) throws Exception {
+        public VD map(Vertex<GradoopId, VD> longVDVertex) throws Exception {
           return longVDVertex.getValue();
         }
       }).withForwardedFields("f1->*"),
-      edgeDataSet.map(new MapFunction<Edge<Long, ED>, ED>() {
+      edgeDataSet.map(new MapFunction<Edge<GradoopId, ED>, ED>() {
         @Override
-        public ED map(Edge<Long, ED> longEDEdge) throws Exception {
+        public ED map(Edge<GradoopId, ED> longEDEdge) throws Exception {
           return longEDEdge.getValue();
         }
       }).withForwardedFields("f2->*"),
-      subgraphDataSet.map(new MapFunction<Subgraph<Long, GD>, GD>() {
+      subgraphDataSet.map(new MapFunction<Subgraph<GradoopId, GD>, GD>() {
         @Override
-        public GD map(Subgraph<Long, GD> longGDSubgraph) throws Exception {
+        public GD map(Subgraph<GradoopId, GD> longGDSubgraph) throws Exception {
           return longGDSubgraph.getValue();
         }
       }).withForwardedFields("f1->*"),
@@ -482,7 +483,7 @@ public class EPGMDatabase<
    * @return logical graph or {@code null} if graph does not exist
    * @throws Exception
    */
-  public LogicalGraph<VD, ED, GD> getGraph(Long graphID) throws Exception {
+  public LogicalGraph<VD, ED, GD> getGraph(GradoopId graphID) throws Exception {
     return database.getGraph(graphID);
   }
 

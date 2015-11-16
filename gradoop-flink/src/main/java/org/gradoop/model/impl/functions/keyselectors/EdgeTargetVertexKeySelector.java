@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.keyselectors;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Used to select the target vertex id of an edge.
@@ -26,9 +27,9 @@ import org.gradoop.model.api.EPGMEdge;
  * @param <ED> EPGM edge type
  */
 public class EdgeTargetVertexKeySelector<ED extends EPGMEdge>
-  implements KeySelector<ED, Long> {
+  implements KeySelector<ED, GradoopId> {
   @Override
-  public Long getKey(ED edge) throws Exception {
+  public GradoopId getKey(ED edge) throws Exception {
     return edge.getTargetVertexId();
   }
 }

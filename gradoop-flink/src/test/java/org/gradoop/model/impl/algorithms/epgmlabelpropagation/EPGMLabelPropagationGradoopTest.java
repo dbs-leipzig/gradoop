@@ -2,6 +2,7 @@ package org.gradoop.model.impl.algorithms.epgmlabelpropagation;
 
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -28,20 +29,20 @@ public class EPGMLabelPropagationGradoopTest extends FlinkTestBase {
   @Test
   public void testLabelPropagationWithCallByPropertyKey() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      inputGraph = getGraphStore().getGraph(2L);
+      inputGraph = getGraphStore().getGraph(GradoopId.fromLong(2L));
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       labeledGraphCollection = inputGraph.callForCollection(
       new EPGMLabelPropagation<VertexPojo, EdgePojo, GraphHeadPojo>(2, propertyKey, getExecutionEnvironment()));
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> sub1 =
-      labeledGraphCollection.getGraph(-2L);
+      labeledGraphCollection.getGraph(GradoopId.fromLong(-2L));
     assertEquals("Sub graph has no edge", 0L, sub1.getEdgeCount());
     assertEquals("sub graph has two vertices", 2L, sub1.getVertexCount());
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> sub2 =
-      labeledGraphCollection.getGraph(-1L);
+      labeledGraphCollection.getGraph(GradoopId.fromLong(-1L));
     assertEquals("Sub graph has no edge", 0L, sub2.getEdgeCount());
     assertEquals("sub graph has two vertices", 1L, sub2.getVertexCount());
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> sub3 =
-      labeledGraphCollection.getGraph(-3L);
+      labeledGraphCollection.getGraph(GradoopId.fromLong(-3L));
     assertEquals("Sub graph has no edge", 0L, sub3.getEdgeCount());
     assertEquals("sub graph has two vertices", 1L, sub3.getVertexCount());
     assertNotNull("graph collection is null", labeledGraphCollection);

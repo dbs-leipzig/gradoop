@@ -6,6 +6,7 @@ import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -26,8 +27,8 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
   @Test
   public void testSplitBy() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      inputGraph = getGraphStore().getGraph(0L);
-    UnaryFunction<VertexPojo, Long> splitFunc = new SplitByIdOddOrEven();
+      inputGraph = getGraphStore().getGraph(GradoopId.fromLong(0L));
+    UnaryFunction<VertexPojo, GradoopId> splitFunc = new SplitByIdOddOrEven();
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       labeledGraphCollection = inputGraph.callForCollection(
@@ -63,11 +64,12 @@ public class LogicalGraphSplitByTest extends FlinkTestBase {
   }
 
   private static class SplitByIdOddOrEven implements
-    UnaryFunction<VertexPojo, Long> {
+    UnaryFunction<VertexPojo, GradoopId> {
     @Override
-    public Long execute(VertexPojo entity) throws
+    public GradoopId execute(VertexPojo entity) throws
       Exception {
-      return (entity.getId() % 2) - 2;
+      // TODO return (entity.getId() % 2) - 2;
+      return new GradoopId();
     }
   }
 }

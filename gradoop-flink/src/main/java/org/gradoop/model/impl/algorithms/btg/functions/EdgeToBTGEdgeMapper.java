@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.types.NullValue;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Maps EPGM edges to a BTG specific representation.
@@ -28,9 +29,9 @@ import org.gradoop.model.api.EPGMEdge;
  * @param <ED> EPGM edge type
  */
 public class EdgeToBTGEdgeMapper<ED extends EPGMEdge> implements
-  MapFunction<ED, Edge<Long, NullValue>> {
+  MapFunction<ED, Edge<GradoopId, NullValue>> {
   @Override
-  public Edge<Long, NullValue> map(ED edge) throws Exception {
+  public Edge<GradoopId, NullValue> map(ED edge) throws Exception {
     return new Edge<>(edge.getSourceVertexId(), edge.getTargetVertexId(),
       NullValue.getInstance());
   }

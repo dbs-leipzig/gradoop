@@ -26,6 +26,7 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .CommunityDiscriminatorFunction;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.auxiliary.SplitBy;
 
 import java.io.Serializable;
@@ -83,7 +84,7 @@ public class EPGMLabelPropagation<
   public GraphCollection<VD, ED, GD> execute(
     LogicalGraph<VD, ED, GD> logicalGraph) throws Exception {
     // construct a gelly graph
-    Graph<Long, VD, ED> graph = logicalGraph.toGellyGraph();
+    Graph<GradoopId, VD, ED> graph = logicalGraph.toGellyGraph();
 
     // run the label propagation algorithm
     graph = graph

@@ -22,6 +22,8 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -30,7 +32,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Collection;
-import java.util.Set;
+
 
 import static org.gradoop.GradoopTestBaseUtils.*;
 import static org.junit.Assert.*;
@@ -45,8 +47,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testSameGraph() throws Exception {
     // "0, 0, 0, 0"
-    Long firstGraph = 0L;
-    Long secondGraph = 0L;
+    GradoopId firstGraph = GradoopId.fromLong(0L);
+    GradoopId secondGraph = GradoopId.fromLong(0L);
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -63,8 +65,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testOverlappingGraphs() throws Exception {
     // "0, 2, 1, 0"
-    Long firstGraph = 0L;
-    Long secondGraph = 2L;
+    GradoopId firstGraph = GradoopId.fromLong(0L);
+    GradoopId secondGraph = GradoopId.fromLong(2L);
     long expectedVertexCount = 1L;
     long expectedEdgeCount = 0L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -81,8 +83,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testOverlappingSwitchedGraphs() throws Exception {
     // "2, 0, 2, 2"
-    Long firstGraph = 2L;
-    Long secondGraph = 0L;
+    GradoopId firstGraph = GradoopId.fromLong(2L);
+    GradoopId secondGraph = GradoopId.fromLong(0L);
     long expectedVertexCount = 2L;
     long expectedEdgeCount = 2L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -99,8 +101,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testNonOverlappingGraphs() throws Exception {
     // "0, 1, 3, 4"
-    Long firstGraph = 0L;
-    Long secondGraph = 1L;
+    GradoopId firstGraph = GradoopId.fromLong(0L);
+    GradoopId secondGraph = GradoopId.fromLong(1L);
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -117,8 +119,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testNonOverlappingSwitchedGraphs() throws Exception {
     // "1, 0, 3, 4"
-    Long firstGraph = 1L;
-    Long secondGraph = 0L;
+    GradoopId firstGraph = GradoopId.fromLong(1L);
+    GradoopId secondGraph = GradoopId.fromLong(0L);
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -135,9 +137,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testAssignment() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      databaseCommunity = getGraphStore().getGraph(0L);
+      databaseCommunity = getGraphStore().getGraph(GradoopId.fromLong(0L));
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      hadoopCommunity = getGraphStore().getGraph(1L);
+      hadoopCommunity = getGraphStore().getGraph(GradoopId.fromLong(1L));
 
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = databaseCommunity.exclude(hadoopCommunity);
@@ -154,7 +156,7 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     getExecutionEnvironment().execute();
 
     for (EPGMVertex v : vertexData) {
-      Set<Long> gIDs = v.getGraphIds();
+      GradoopIds gIDs = v.getGraphIds();
       if (v.equals(VERTEX_PERSON_ALICE)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (v.equals(VERTEX_PERSON_BOB)) {
@@ -165,7 +167,7 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     }
 
     for (EPGMEdge e : edgeData) {
-      Set<Long> gIDs = e.getGraphIds();
+      GradoopIds gIDs = e.getGraphIds();
       if (e.equals(EDGE_0_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (e.equals(EDGE_1_KNOWS)) {

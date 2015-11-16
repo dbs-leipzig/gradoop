@@ -169,7 +169,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     // list is not supported by
     final List<String> value = Lists.newArrayList();
 
-    GradoopId vertexID = GradoopId.createId(0L);
+    GradoopId vertexID = GradoopId.fromLong(0L);
     final String label = "A";
     final Map<String, Object> properties = new HashMap<>();
     properties.put("k1", value);
@@ -212,7 +212,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     final String keyString = "key6";
     final String valueString = "value";
 
-    final GradoopId vertexID = GradoopId.createId(0L);
+    final GradoopId vertexID = GradoopId.fromLong(0L);
     final String label = "A";
 
     final Map<String, Object> properties = new HashMap<>();

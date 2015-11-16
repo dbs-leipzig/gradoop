@@ -25,6 +25,7 @@ import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
   .LPMessageFunction;
 import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
   .LPUpdateFunction;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Implementation of the Label Propagation Algorithm:
@@ -45,7 +46,7 @@ import org.gradoop.model.impl.algorithms.epgmlabelpropagation.functions
 public class EPGMLabelPropagationAlgorithm<
   VD extends EPGMVertex,
   ED extends EPGMEdge>
-  implements GraphAlgorithm<Long, VD, ED, Graph<Long, VD, ED>> {
+  implements GraphAlgorithm<GradoopId, VD, ED, Graph<GradoopId, VD, ED>> {
   /**
    * Vertex property key where the resulting label is stored.
    */
@@ -84,9 +85,9 @@ public class EPGMLabelPropagationAlgorithm<
    * @throws Exception
    */
   @Override
-  public Graph<Long, VD, ED> run(Graph<Long, VD, ED> graph) throws Exception {
+  public Graph<GradoopId, VD, ED> run(Graph<GradoopId, VD, ED> graph) throws Exception {
     // initialize vertex values and run the Vertex Centric Iteration
-    Graph<Long, VD, ED> epGraph = graph.getUndirected();
+    Graph<GradoopId, VD, ED> epGraph = graph.getUndirected();
     return epGraph
       .runVertexCentricIteration(
         new LPUpdateFunction<VD>(),

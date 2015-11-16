@@ -7,6 +7,7 @@ import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
+import org.gradoop.model.impl.id.GradoopId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,9 +45,9 @@ public class BTGGellyTest extends FlinkTestBase {
   public void testConnectedIIG() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, BTGVertexValue, NullValue> gellyGraph =
+    Graph<GradoopId, BTGVertexValue, NullValue> gellyGraph =
       BTGAlgorithmTestHelper.getGraph(getConnectedIIG(), env);
-    DataSet<Vertex<Long, BTGVertexValue>> btgGraph =
+    DataSet<Vertex<GradoopId, BTGVertexValue>> btgGraph =
       gellyGraph.run(new BTGAlgorithm(maxIteration)).getVertices();
     validateConnectedIIGResult(
       BTGAlgorithmTestHelper.parseResultBTGVertices(btgGraph.collect()));
@@ -56,90 +57,90 @@ public class BTGGellyTest extends FlinkTestBase {
   public void testDisconnectedIIG() throws Exception {
     int maxIteration = 100;
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    Graph<Long, BTGVertexValue, NullValue> gellyGraph =
+    Graph<GradoopId, BTGVertexValue, NullValue> gellyGraph =
       BTGAlgorithmTestHelper.getGraph(getDisconnectedIIG(), env);
-    DataSet<Vertex<Long, BTGVertexValue>> btgGraph =
+    DataSet<Vertex<GradoopId, BTGVertexValue>> btgGraph =
       gellyGraph.run(new BTGAlgorithm(maxIteration)).getVertices();
     validateDisconnectedIIGResult(
       BTGAlgorithmTestHelper.parseResultBTGVertices(btgGraph.collect()));
   }
 
-  private void validateConnectedIIGResult(Map<Long, List<Long>> btgIDs) {
+  private void validateConnectedIIGResult(Map<GradoopId, List<GradoopId>> btgIDs) {
     assertEquals(16, btgIDs.size());
     // master data nodes BTG 1 and 2
-    assertEquals(2, btgIDs.get(0L).size());
-    assertTrue(btgIDs.get(0L).contains(4L));
-    assertTrue(btgIDs.get(0L).contains(9L));
-    assertEquals(2, btgIDs.get(1L).size());
-    assertTrue(btgIDs.get(1L).contains(4L));
-    assertTrue(btgIDs.get(1L).contains(9L));
-    assertEquals(2, btgIDs.get(2L).size());
-    assertTrue(btgIDs.get(2L).contains(4L));
-    assertTrue(btgIDs.get(2L).contains(9L));
-    assertEquals(2, btgIDs.get(3L).size());
-    assertTrue(btgIDs.get(3L).contains(4L));
-    assertTrue(btgIDs.get(3L).contains(9L));
+    assertEquals(2, btgIDs.get(GradoopId.fromLong(0L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(0L)).contains(GradoopId.fromLong(4L)));
+    assertTrue(btgIDs.get(GradoopId.fromLong(0L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(2, btgIDs.get(GradoopId.fromLong(1L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(1L)).contains(GradoopId.fromLong(4L)));
+    assertTrue(btgIDs.get(GradoopId.fromLong(1L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(2, btgIDs.get(GradoopId.fromLong(2L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(2L)).contains(GradoopId.fromLong(4L)));
+    assertTrue(btgIDs.get(GradoopId.fromLong(2L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(2, btgIDs.get(GradoopId.fromLong(3L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(3L)).contains(GradoopId.fromLong(4L)));
+    assertTrue(btgIDs.get(GradoopId.fromLong(3L)).contains(GradoopId.fromLong(9L)));
     // transactional data nodes BTG 1
-    assertEquals(1, btgIDs.get(4L).size());
-    assertTrue(btgIDs.get(4L).contains(4L));
-    assertEquals(1, btgIDs.get(5L).size());
-    assertTrue(btgIDs.get(5L).contains(4L));
-    assertEquals(1, btgIDs.get(6L).size());
-    assertTrue(btgIDs.get(6L).contains(4L));
-    assertEquals(1, btgIDs.get(7L).size());
-    assertTrue(btgIDs.get(7L).contains(4L));
-    assertEquals(1, btgIDs.get(8L).size());
-    assertTrue(btgIDs.get(8L).contains(4L));
-    assertEquals(1, btgIDs.get(9L).size());
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(4L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(4L)).contains(GradoopId.fromLong(4L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(5L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(5L)).contains(GradoopId.fromLong(4L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(6L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(6L)).contains(GradoopId.fromLong(4L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(7L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(7L)).contains(GradoopId.fromLong(4L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(8L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(8L)).contains(GradoopId.fromLong(4L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(9L)).size());
     // transactional data nodes BTG 2
-    assertTrue(btgIDs.get(9L).contains(9L));
-    assertEquals(1, btgIDs.get(10L).size());
-    assertTrue(btgIDs.get(10L).contains(9L));
-    assertEquals(1, btgIDs.get(11L).size());
-    assertTrue(btgIDs.get(11L).contains(9L));
-    assertEquals(1, btgIDs.get(12L).size());
-    assertTrue(btgIDs.get(12L).contains(9L));
-    assertEquals(1, btgIDs.get(13L).size());
-    assertTrue(btgIDs.get(13L).contains(9L));
-    assertEquals(1, btgIDs.get(14L).size());
-    assertTrue(btgIDs.get(14L).contains(9L));
-    assertEquals(1, btgIDs.get(15L).size());
-    assertTrue(btgIDs.get(15L).contains(9L));
+    assertTrue(btgIDs.get(GradoopId.fromLong(9L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(10L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(10L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(11L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(11L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(12L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(12L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(13L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(13L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(14L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(14L)).contains(GradoopId.fromLong(9L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(15L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(15L)).contains(GradoopId.fromLong(9L)));
   }
 
-  private void validateDisconnectedIIGResult(Map<Long, List<Long>> btgIDs) {
+  private void validateDisconnectedIIGResult(Map<GradoopId, List<GradoopId>> btgIDs) {
     assertEquals(14, btgIDs.size());
     // master data nodes BTG 1
-    assertEquals(1, btgIDs.get(0L).size());
-    assertTrue(btgIDs.get(0L).contains(6L));
-    assertEquals(1, btgIDs.get(1L).size());
-    assertTrue(btgIDs.get(1L).contains(6L));
-    assertEquals(1, btgIDs.get(2L).size());
-    assertTrue(btgIDs.get(2L).contains(6L));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(0L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(0L)).contains(GradoopId.fromLong(6L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(1L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(1L)).contains(GradoopId.fromLong(6L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(2L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(2L)).contains(GradoopId.fromLong(6L)));
     // master data nodes BTG 2
-    assertEquals(1, btgIDs.get(3L).size());
-    assertTrue(btgIDs.get(3L).contains(10L));
-    assertEquals(1, btgIDs.get(4L).size());
-    assertTrue(btgIDs.get(4L).contains(10L));
-    assertEquals(1, btgIDs.get(5L).size());
-    assertTrue(btgIDs.get(5L).contains(10L));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(3L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(3L)).contains(GradoopId.fromLong(10L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(4L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(4L)).contains(GradoopId.fromLong(10L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(5L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(5L)).contains(GradoopId.fromLong(10L)));
     // transactional data nodes BTG 1
-    assertEquals(1, btgIDs.get(6L).size());
-    assertTrue(btgIDs.get(6L).contains(6L));
-    assertEquals(1, btgIDs.get(7L).size());
-    assertTrue(btgIDs.get(7L).contains(6L));
-    assertEquals(1, btgIDs.get(8L).size());
-    assertTrue(btgIDs.get(8L).contains(6L));
-    assertEquals(1, btgIDs.get(9L).size());
-    assertTrue(btgIDs.get(9L).contains(6L));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(6L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(6L)).contains(GradoopId.fromLong(6L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(7L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(7L)).contains(GradoopId.fromLong(6L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(8L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(8L)).contains(GradoopId.fromLong(6L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(9L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(9L)).contains(GradoopId.fromLong(6L)));
     // transactional data nodes BTG 2
-    assertEquals(1, btgIDs.get(10L).size());
-    assertTrue(btgIDs.get(10L).contains(10L));
-    assertEquals(1, btgIDs.get(11L).size());
-    assertTrue(btgIDs.get(11L).contains(10L));
-    assertEquals(1, btgIDs.get(12L).size());
-    assertTrue(btgIDs.get(12L).contains(10L));
-    assertEquals(1, btgIDs.get(13L).size());
-    assertTrue(btgIDs.get(13L).contains(10L));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(10L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(10L)).contains(GradoopId.fromLong(10L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(11L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(11L)).contains(GradoopId.fromLong(10L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(12L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(12L)).contains(GradoopId.fromLong(10L)));
+    assertEquals(1, btgIDs.get(GradoopId.fromLong(13L)).size());
+    assertTrue(btgIDs.get(GradoopId.fromLong(13L)).contains(GradoopId.fromLong(10L)));
   }
 }

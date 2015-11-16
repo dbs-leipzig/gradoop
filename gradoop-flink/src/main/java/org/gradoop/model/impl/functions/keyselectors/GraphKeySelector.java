@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.keyselectors;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Returns the unique graph identifier.
@@ -26,9 +27,9 @@ import org.gradoop.model.api.EPGMGraphHead;
  * @param <GD> EPGM graph head type
  */
 public class GraphKeySelector<GD extends EPGMGraphHead>
-  implements KeySelector<GD, Long> {
+  implements KeySelector<GD, GradoopId> {
   @Override
-  public Long getKey(GD graph) throws Exception {
+  public GradoopId getKey(GD graph) throws Exception {
     return graph.getId();
   }
 }

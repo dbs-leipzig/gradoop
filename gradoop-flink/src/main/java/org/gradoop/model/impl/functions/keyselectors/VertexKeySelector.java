@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.keyselectors;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Used for distinction of vertices based on their unique id.
@@ -26,9 +27,9 @@ import org.gradoop.model.api.EPGMVertex;
  * @param <VD> EPGM vertex type
  */
 public class VertexKeySelector<VD extends EPGMVertex>
-  implements KeySelector<VD, Long> {
+  implements KeySelector<VD, GradoopId> {
   @Override
-  public Long getKey(VD vertex) throws Exception {
+  public GradoopId getKey(VD vertex) throws Exception {
     return vertex.getId();
   }
 }

@@ -19,6 +19,7 @@ import org.gradoop.model.impl.algorithms.btg.functions
 import org.gradoop.model.impl.algorithms.btg.functions.VertexToBTGVertexMapper;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy;
 
 /**
@@ -65,11 +66,11 @@ public class BTG<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGrap
   @Override
   public GraphCollection<VD, ED, GD> execute(
     final LogicalGraph<VD, ED, GD> graph) throws Exception {
-    DataSet<Vertex<Long, BTGVertexValue>> vertices =
+    DataSet<Vertex<GradoopId, BTGVertexValue>> vertices =
       graph.getVertices().map(new VertexToBTGVertexMapper<VD>());
-    DataSet<Edge<Long, NullValue>> edges =
+    DataSet<Edge<GradoopId, NullValue>> edges =
       graph.getEdges().map(new EdgeToBTGEdgeMapper<ED>());
-    Graph<Long, BTGVertexValue, NullValue> btgGraph =
+    Graph<GradoopId, BTGVertexValue, NullValue> btgGraph =
       Graph.fromDataSet(vertices, edges, graph.getConfig()
         .getExecutionEnvironment());
     btgGraph = btgGraph.run(new BTGAlgorithm(this.maxIterations));

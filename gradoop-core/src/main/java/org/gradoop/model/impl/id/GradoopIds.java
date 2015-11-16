@@ -112,7 +112,7 @@ public class GradoopIds implements Iterable<GradoopId>, Writable {
     return identifiers.size();
   }
 
-  public static GradoopIds createGradoopIds(Long... ids) {
+  public static GradoopIds fromLongs(Long... ids) {
     return new GradoopIds(ids);
   }
 
@@ -126,5 +126,17 @@ public class GradoopIds implements Iterable<GradoopId>, Writable {
 
   public void addAll(GradoopIds gradoopIds) {
     addAll(gradoopIds.identifiers);
+  }
+
+  public boolean isEmpty() {
+    return this.identifiers.isEmpty();
+  }
+
+  public boolean containsAll(Collection<GradoopId> identifiers) {
+    return identifiers.containsAll(identifiers);
+  }
+
+  public Collection<GradoopId> toCollection() {
+    return identifiers;
   }
 }

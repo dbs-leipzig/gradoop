@@ -31,38 +31,38 @@ public class FlinkConstants {
   /**
    * Identifier of the database graph.
    */
-  public static final GradoopId DATABASE_GRAPH_ID = GradoopId.createId(-1L);
+  public static final GradoopId DATABASE_GRAPH_ID = GradoopId.fromLong(-1L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link Combination}.
    */
-  public static final GradoopId COMBINE_GRAPH_ID = GradoopId.createId(-2L);
+  public static final GradoopId COMBINE_GRAPH_ID = GradoopId.fromLong(-2L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link Overlap}.
    */
-  public static final GradoopId OVERLAP_GRAPH_ID = GradoopId.createId(-3L);
+  public static final GradoopId OVERLAP_GRAPH_ID = GradoopId.fromLong(-3L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link Exclusion}.
    */
-  public static final GradoopId EXCLUDE_GRAPH_ID = GradoopId.createId(-4L);
+  public static final GradoopId EXCLUDE_GRAPH_ID = GradoopId.fromLong(-4L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link Summarization}.
    */
-  public static final GradoopId SUMMARIZE_GRAPH_ID = GradoopId.createId(-5L);
+  public static final GradoopId SUMMARIZE_GRAPH_ID = GradoopId.fromLong(-5L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link RandomNodeSampling}.
    */
   public static final GradoopId RANDOM_NODE_SAMPLING_GRAPH_ID =
-    GradoopId.createId(-6L);
+    GradoopId.fromLong(-6L);
 }
 
 

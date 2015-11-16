@@ -3,11 +3,11 @@ package org.gradoop.model.impl.algorithms.btg.pojos;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Custom vertex used by
@@ -25,14 +25,14 @@ public class BTGVertexValue {
   /**
    * The list of BTGs that vertex belongs to.
    */
-  private List<Long> btgIDs;
+  private List<GradoopId> btgIDs;
   /**
    * Stores the minimum vertex ID per message sender. This is only used by
    * vertices of type {@link BTGVertexType} MASTER, so it is only
    * initialized
    * when needed.
    */
-  private Map<Long, Long> neighborMinimumBTGIds;
+  private Map<GradoopId, GradoopId> neighborMinimumBTGIds;
 
   /**
    * Initializes an IIGVertex based on the given parameters.
@@ -42,7 +42,7 @@ public class BTGVertexValue {
    * @param btgIDs      A list of BTGs that vertex belongs to
    */
   public BTGVertexValue(BTGVertexType vertexType, Double vertexValue,
-    List<Long> btgIDs) {
+    List<GradoopId> btgIDs) {
     this.vertexType = vertexType;
     this.vertexValue = vertexValue;
     this.btgIDs = btgIDs;
@@ -80,7 +80,7 @@ public class BTGVertexValue {
    *
    * @return list of BTGs containing that vertex.
    */
-  public Iterable<Long> getGraphs() {
+  public List<GradoopId> getGraphs() {
     return this.btgIDs;
   }
 
@@ -89,7 +89,7 @@ public class BTGVertexValue {
    *
    * @param graph BTG ID to be added
    */
-  public void addGraph(Long graph) {
+  public void addGraph(GradoopId graph) {
     if (this.btgIDs.isEmpty()) {
       resetGraphs();
     }
@@ -101,11 +101,11 @@ public class BTGVertexValue {
    *
    * @param graphs BTG IDs to be added
    */
-  public void addGraphs(Iterable<Long> graphs) {
+  public void addGraphs(Iterable<GradoopId> graphs) {
     if (this.btgIDs.isEmpty()) {
       resetGraphs();
     }
-    for (Long btg : graphs) {
+    for (GradoopId btg : graphs) {
       this.btgIDs.add(btg);
     }
   }
@@ -132,7 +132,7 @@ public class BTGVertexValue {
    *
    * @return last added BTG ID
    */
-  public Long getLastGraph() {
+  public GradoopId getLastGraph() {
     if (this.btgIDs.size() > 0) {
       return btgIDs.get(btgIDs.size() - 1);
     }
@@ -158,13 +158,13 @@ public class BTGVertexValue {
    * @param vertexID vertex id of a neighbour node
    * @param btgID    BTG id associated with the neighbour node
    */
-  public void updateNeighbourBtgID(Long vertexID, Long btgID) {
+  public void updateNeighbourBtgID(GradoopId vertexID, GradoopId btgID) {
     if (neighborMinimumBTGIds == null) {
       initNeighbourMinimBTGIDMap();
     }
     if (!neighborMinimumBTGIds.containsKey(vertexID) ||
       (neighborMinimumBTGIds.containsKey(vertexID) &&
-        neighborMinimumBTGIds.get(vertexID) > btgID)) {
+        neighborMinimumBTGIds.get(vertexID).compareTo(btgID) > 0)) {
       neighborMinimumBTGIds.put(vertexID, btgID);
     }
   }
@@ -176,8 +176,8 @@ public class BTGVertexValue {
    */
   public void updateBtgIDs() {
     if (this.neighborMinimumBTGIds != null) {
-      Set<Long> newBtgIDs = new HashSet<>();
-      for (Map.Entry<Long, Long> e : this.neighborMinimumBTGIds.entrySet()) {
+      GradoopIds newBtgIDs = new GradoopIds();
+      for (Map.Entry<GradoopId, GradoopId> e : this.neighborMinimumBTGIds.entrySet()) {
         newBtgIDs.add(e.getValue());
       }
       this.btgIDs = Lists.newArrayList(newBtgIDs);

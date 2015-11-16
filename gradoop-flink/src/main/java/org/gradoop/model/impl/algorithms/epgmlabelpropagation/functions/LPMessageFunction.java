@@ -21,6 +21,7 @@ import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.MessagingFunction;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 
 import static org.gradoop.model.impl.algorithms.epgmlabelpropagation
   .EPGMLabelPropagationAlgorithm.CURRENT_VALUE;
@@ -34,15 +35,15 @@ import static org.gradoop.model.impl.algorithms.epgmlabelpropagation
 public class LPMessageFunction<
   VD extends EPGMVertex,
   ED extends EPGMEdge>
-  extends MessagingFunction<Long, VD, Long, ED> {
+  extends MessagingFunction<GradoopId, VD, GradoopId, ED> {
   @Override
-  public void sendMessages(Vertex<Long, VD> vertex) throws Exception {
+  public void sendMessages(Vertex<GradoopId, VD> vertex) throws Exception {
     // send current minimum to neighbors
     if (getSuperstepNumber() == 1) {
-      sendMessageToAllNeighbors(0L);
+      GradoopId.fromLong(0L);
     } else {
-      sendMessageToAllNeighbors(
-        (Long) vertex.getValue().getProperty(CURRENT_VALUE));
+      sendMessageToAllNeighbors(GradoopId
+          .fromLongString((String) vertex.getValue().getProperty(CURRENT_VALUE)));
     }
   }
 }

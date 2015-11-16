@@ -2,6 +2,7 @@ package org.gradoop.model.impl.operators.logicalgraph.binary;
 
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -22,7 +23,7 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
     long expectedVertexCount, long expectedEdgeCount) throws Exception {
     assertNotNull("resulting graph was null", resultGraph);
 
-    long newGraphID = resultGraph.getId();
+    GradoopId newGraphID = resultGraph.getId();
 
     assertEquals("wrong number of vertices", expectedVertexCount,
       resultGraph.getVertexCount());
@@ -40,7 +41,7 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
     checkGraphContainment(newGraphID, vertexData, edgeData);
   }
 
-  protected void checkGraphContainment(long newGraphID,
+  protected void checkGraphContainment(GradoopId newGraphID,
     Collection<VertexPojo> vertexData,
     Collection<EdgePojo> edgeData) {
     for (VertexPojo v : vertexData) {
