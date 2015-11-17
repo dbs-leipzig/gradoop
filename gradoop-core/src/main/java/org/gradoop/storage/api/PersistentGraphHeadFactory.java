@@ -4,7 +4,6 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopIds;
 
 import java.io.Serializable;
-import java.util.Set;
 
 /**
  * Base interface for creating persistent graph data from transient graph data.
@@ -24,5 +23,6 @@ public interface PersistentGraphHeadFactory<IGD extends EPGMGraphHead, OGD
    * @param edges          edges contained in that graph
    * @return graph data
    */
-  OGD createGraphHead(IGD inputGraphData, GradoopIds vertices, GradoopIds edges);
+  OGD createGraphHead(
+    IGD inputGraphData, GradoopIds vertices, GradoopIds edges);
 }

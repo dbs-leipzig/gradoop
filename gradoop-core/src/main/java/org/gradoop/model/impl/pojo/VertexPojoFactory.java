@@ -23,7 +23,6 @@ import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Factory for creating vertices.

@@ -163,11 +163,17 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public ED readEdge(Result res) throws IOException {
-    return edgeFactory
-      .createEdge(readId(res), readLabel(res),
-        readSourceVertexId(res), readTargetVertexId(res), readProperties(res),
-        readGraphIds(res));
+  public ED readEdge(Result res) {
+    ED edge = null;
+    try {
+      edge = edgeFactory
+        .createEdge(readId(res), readLabel(res), readSourceVertexId(res),
+          readTargetVertexId(res), readProperties(res), readGraphIds(res));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return edge;
   }
 
   /**
@@ -191,7 +197,7 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
     byte[] vertexKeyBytes = Writables.getBytes(vertex.getId());
     byte[] labelBytes = Bytes.toBytes(vertex.getLabel());
 
-    ArrayUtils.addAll(vertexKeyBytes,labelBytes);
+    ArrayUtils.addAll(vertexKeyBytes, labelBytes);
 
     return vertexKeyBytes;
   }

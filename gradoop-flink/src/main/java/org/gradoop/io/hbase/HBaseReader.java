@@ -32,8 +32,6 @@ import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.storage.api.VertexHandler;
 
-import java.io.IOException;
-
 /**
  * Contains classes to read an EPGM database from HBase.
  */
@@ -92,12 +90,7 @@ public class HBaseReader {
      */
     @Override
     protected Subgraph<GradoopId, GD> mapResultToTuple(Result result) {
-      GD graphData = null;
-      try {
-        graphData = graphHeadHandler.readGraphHead(result);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      GD graphData = graphHeadHandler.readGraphHead(result);
       return new Subgraph<>(graphData.getId(), graphData);
     }
   }
@@ -157,12 +150,7 @@ public class HBaseReader {
      */
     @Override
     protected Vertex<GradoopId, VD> mapResultToTuple(Result result) {
-      VD vertexData = null;
-      try {
-        vertexData = vertexHandler.readVertex(result);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      VD vertexData = vertexHandler.readVertex(result);
       return new Vertex<>(vertexData.getId(), vertexData);
     }
   }
@@ -221,12 +209,7 @@ public class HBaseReader {
      */
     @Override
     protected Edge<GradoopId, ED> mapResultToTuple(Result result) {
-      ED edgeData = null;
-      try {
-        edgeData = edgeHandler.readEdge(result);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      ED edgeData = edgeHandler.readEdge(result);
       return new Edge<>(edgeData.getSourceVertexId(),
         edgeData.getTargetVertexId(), edgeData);
     }

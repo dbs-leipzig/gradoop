@@ -73,9 +73,11 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
   @Override
   public LogicalGraph<VD, ED, GD> execute(
     GraphCollection<VD, ED, GD> collection) {
-    final GradoopIds positiveGraphIDs = new GradoopIds(positiveGraphID);
+    final GradoopIds positiveGraphIDs =
+      GradoopIds.fromExisting(positiveGraphID);
     DataSet<GD> graphHeads = collection.getGraphHeads();
-    DataSet<GradoopId> graphIDs = graphHeads.map(new GraphToIdentifierMapper<GD>());
+    DataSet<GradoopId> graphIDs = graphHeads.map(
+      new GraphToIdentifierMapper<GD>());
     graphIDs =
       graphIDs.filter(new RemoveGradoopIdFromDataSetFilter(positiveGraphID));
     DataSet<VD> vertices = collection.getVertices()
@@ -84,7 +86,8 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
       .withBroadcastSet(graphIDs,
         VertexInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
     DataSet<ED> edges =
-      collection.getEdges().filter(new EdgeInGraphsFilter<ED>(positiveGraphIDs));
+      collection.getEdges().filter(
+        new EdgeInGraphsFilter<ED>(positiveGraphIDs));
     edges = edges.filter(new EdgeInNoneOfGraphsFilterWithBC<ED>())
       .withBroadcastSet(graphIDs,
         EdgeInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
@@ -115,7 +118,7 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
      * @param otherId Long that shall be removed from the DataSet
      */
     public RemoveGradoopIdFromDataSetFilter(GradoopId otherId) {
-      this.otherId.equals(otherId);
+      this.otherId = otherId;
     }
 
     /**

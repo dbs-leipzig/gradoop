@@ -23,9 +23,9 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIds implements Iterable<GradoopId>, Writable {
+public class GradoopIds implements Iterable<GradoopId>, Writable, Serializable {
 
   /**
    * Holds the identifiers.
@@ -47,18 +47,35 @@ public class GradoopIds implements Iterable<GradoopId>, Writable {
     identifiers = Sets.newHashSet();
   }
 
-  GradoopIds(Long[] ids) {
-    for(Long id : ids) {
-      identifiers.add(new GradoopId(id));
+  /**
+   * constructor from multiple given ids
+   * @param ids given ids
+   * @return gradoop ids
+   */
+  public static GradoopIds fromExisting(GradoopId... ids) {
+    GradoopIds gradoopIds = new GradoopIds();
+
+    for (GradoopId id : ids) {
+      gradoopIds.add(id);
     }
+
+    return gradoopIds;
   }
 
-  public GradoopIds(GradoopId... ids) {
-    for(GradoopId id : ids) {
-      identifiers.add(id);
-    }
-  }
+  /**
+   * factory method to create gradoop ids from given numbers
+   * @param ids numbers
+   * @return gradoop ids
+   */
+  public static GradoopIds fromLongs(Long... ids) {
+    GradoopIds gradoopIds = new GradoopIds();
 
+    for (Long id : ids) {
+      gradoopIds.add(GradoopId.fromLong(id));
+    }
+
+    return gradoopIds;
+  }
 
   /**
    * Adds a GradoopId to the set.
@@ -77,6 +94,58 @@ public class GradoopIds implements Iterable<GradoopId>, Writable {
    */
   public boolean contains(GradoopId identifier) {
     return identifiers.contains(identifier);
+  }
+
+  /**
+   * adds existing gradoop ids
+   * @param gradoopIds ids to add
+   */
+  public void addAll(Collection<GradoopId> gradoopIds) {
+    identifiers.addAll(gradoopIds);
+  }
+
+  /**
+   * adds existing gradoop ids
+   * @param gradoopIds ids to add
+   */
+  public void addAll(GradoopIds gradoopIds) {
+    addAll(gradoopIds.identifiers);
+  }
+
+  /**
+   * checks, if all gradoop ids are contained
+   * @param other gradoop ids
+   * @return true, if all contained
+   */
+  public boolean containsAll(GradoopIds other) {
+    return this.identifiers.containsAll(other.identifiers);
+  }
+
+  /**
+   * checks, if all ids of a collection are contained
+   * @param identifiers id collection
+   * @return true, if all contained
+   */
+  public boolean containsAll(Collection<GradoopId> identifiers) {
+    return this.identifiers.containsAll(identifiers);
+  }
+
+
+
+  /**
+   * checks if empty
+   * @return true, if empty
+   */
+  public boolean isEmpty() {
+    return this.identifiers.isEmpty();
+  }
+
+  /**
+   * returns the contained identifiers as a collection
+   * @return collection of identifiers
+   */
+  public Collection<GradoopId> toCollection() {
+    return identifiers;
   }
 
   @Override
@@ -104,39 +173,18 @@ public class GradoopIds implements Iterable<GradoopId>, Writable {
     return identifiers.iterator();
   }
 
+  /**
+   * drops all contained gradoop ids
+   */
   public void clear() {
     identifiers.clear();
   }
 
+  /**
+   * returns the number of contained gradoop ids
+   * @return size
+   */
   public int size() {
     return identifiers.size();
-  }
-
-  public static GradoopIds fromLongs(Long... ids) {
-    return new GradoopIds(ids);
-  }
-
-  public void addAll(Collection<GradoopId> gradoopIds) {
-    identifiers.addAll(gradoopIds);
-  }
-
-  public boolean containsAll(GradoopIds other) {
-    return this.identifiers.containsAll(other.identifiers);
-  }
-
-  public void addAll(GradoopIds gradoopIds) {
-    addAll(gradoopIds.identifiers);
-  }
-
-  public boolean isEmpty() {
-    return this.identifiers.isEmpty();
-  }
-
-  public boolean containsAll(Collection<GradoopId> identifiers) {
-    return identifiers.containsAll(identifiers);
-  }
-
-  public Collection<GradoopId> toCollection() {
-    return identifiers;
   }
 }

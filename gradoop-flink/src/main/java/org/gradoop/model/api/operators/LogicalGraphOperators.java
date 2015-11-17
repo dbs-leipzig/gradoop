@@ -335,11 +335,4 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    */
   void writeAsJson(final String vertexFile, final String edgeFile,
     final String graphFile) throws Exception;
-
-  /**
-   * Prints the logical graph to system out.
-   *
-   * @throws Exception
-   */
-  void print() throws Exception;
 }

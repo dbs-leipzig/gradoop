@@ -88,7 +88,7 @@ public interface GraphHeadHandler<
    * @param res HBase row
    * @return graph entity
    */
-  GD readGraphHead(final Result res) throws IOException;
+  GD readGraphHead(final Result res);
 
   /**
    * Returns the graph data factory used by this handler.

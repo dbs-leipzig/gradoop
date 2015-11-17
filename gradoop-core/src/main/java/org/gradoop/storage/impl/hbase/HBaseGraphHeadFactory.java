@@ -22,8 +22,6 @@ import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.storage.api.PersistentGraphHeadFactory;
 
-import java.util.Set;
-
 /**
  * Default factory for creating persistent graph data representation.
  */

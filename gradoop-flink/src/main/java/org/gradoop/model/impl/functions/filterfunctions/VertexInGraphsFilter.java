@@ -22,8 +22,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 
-import java.util.List;
-
 /**
  * Checks if a vertex is contained in at least one of the given logical
  * graphs.

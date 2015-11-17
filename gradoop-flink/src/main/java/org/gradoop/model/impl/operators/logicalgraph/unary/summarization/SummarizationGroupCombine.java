@@ -97,7 +97,9 @@ public class SummarizationGroupCombine<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, VD, ED> summarizeInternal(Graph<GradoopId, VD, ED> graph) {
+  protected Graph<GradoopId, VD, ED> summarizeInternal(
+    Graph<GradoopId, VD, ED> graph) {
+
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(

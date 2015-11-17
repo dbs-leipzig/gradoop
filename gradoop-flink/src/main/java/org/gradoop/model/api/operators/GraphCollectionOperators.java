@@ -26,8 +26,6 @@ import org.gradoop.util.Order;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.GraphCollection;
 
-import java.util.List;
-
 /**
  * Describes all operators that can be applied on a collection of logical
  * graphs in the EPGM.

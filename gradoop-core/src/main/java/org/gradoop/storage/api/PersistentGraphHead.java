@@ -21,8 +21,6 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 
-import java.util.Set;
-
 /**
  * Representation of vertex data on the storage level. We additionally store
  * vertices and edges contained in the graph for faster graph retrieval.

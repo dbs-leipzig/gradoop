@@ -167,7 +167,8 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
         .coGroup(vertexToIncomingEdges)
         .where(new KeySelector<Tuple2<VD, Set<ED>>, GradoopId>() {
           @Override
-          public GradoopId getKey(Tuple2<VD, Set<ED>> vdSetTuple2) throws Exception {
+          public GradoopId getKey(Tuple2<VD, Set<ED>> vdSetTuple2
+          ) throws Exception {
             return vdSetTuple2.f0.getId();
           }
         })
@@ -251,7 +252,9 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
         .flatMap(new FlatMapFunction<VD, Tuple2<GradoopId, GradoopId>>() {
           @Override
           public void flatMap(VD vertex,
-            Collector<Tuple2<GradoopId, GradoopId>> collector) throws Exception {
+            Collector<Tuple2<GradoopId, GradoopId>> collector
+          ) throws Exception {
+
             if (vertex.getGraphCount() > 0) {
               for (GradoopId graphID : vertex.getGraphIds()) {
                 collector.collect(new Tuple2<>(graphID, vertex.getId()));
@@ -266,7 +269,9 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
         .flatMap(new FlatMapFunction<ED, Tuple2<GradoopId, GradoopId>>() {
           @Override
           public void flatMap(ED edge,
-            Collector<Tuple2<GradoopId, GradoopId>> collector) throws Exception {
+            Collector<Tuple2<GradoopId, GradoopId>> collector
+          ) throws Exception {
+
             if (edge.getGraphCount() > 0) {
               for (GradoopId graphId : edge.getGraphIds()) {
                 collector
@@ -278,32 +283,39 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
 
     // co-group (graph-id, vertex-id) and (graph-id, edge-id) tuples to
     // (graph-id, {vertex-id}, {edge-id}) triples
-    DataSet<Tuple3<GradoopId, GradoopIds, GradoopIds>> graphToVertexIdsAndEdgeIds =
-      graphIdToVertexId
+    DataSet<Tuple3<GradoopId, GradoopIds, GradoopIds>>
+      graphToVertexIdsAndEdgeIds = graphIdToVertexId
         .coGroup(graphIdToEdgeId)
         .where(0)
         .equalTo(0)
         .with(
-          new CoGroupFunction<Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>,
+          new CoGroupFunction<Tuple2<GradoopId, GradoopId>,
+            Tuple2<GradoopId, GradoopId>,
             Tuple3<GradoopId, GradoopIds, GradoopIds>>() {
 
             @Override
-            public void coGroup(Iterable<Tuple2<GradoopId, GradoopId>> graphToVertexIds,
-              Iterable<Tuple2<GradoopId, GradoopId>> graphToEdgeIds,
-              Collector<Tuple3<GradoopId, GradoopIds, GradoopIds>> collector) throws
-              Exception {
+            public void coGroup(Iterable<Tuple2<GradoopId, GradoopId>>
+              graphToVertexIds, Iterable<Tuple2<GradoopId, GradoopId>>
+              graphToEdgeIds, Collector
+              <Tuple3<GradoopId, GradoopIds, GradoopIds>> collector
+            ) throws Exception {
+
               GradoopIds vertexIds = new GradoopIds();
               GradoopIds edgeIds = new GradoopIds();
               GradoopId graphId = null;
               boolean initialized = false;
-              for (Tuple2<GradoopId, GradoopId> graphToVertexTuple : graphToVertexIds) {
+              for (Tuple2<GradoopId, GradoopId>
+                graphToVertexTuple : graphToVertexIds) {
+
                 if (!initialized) {
                   graphId = graphToVertexTuple.f0;
                   initialized = true;
                 }
                 vertexIds.add(graphToVertexTuple.f1);
               }
-              for (Tuple2<GradoopId, GradoopId> graphToEdgeTuple : graphToEdgeIds) {
+              for (Tuple2<GradoopId, GradoopId>
+                graphToEdgeTuple : graphToEdgeIds) {
+
                 edgeIds.add(graphToEdgeTuple.f1);
               }
               collector.collect(new Tuple3<>(graphId, vertexIds, edgeIds));
@@ -427,8 +439,8 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * @param <PGD> EPGM persistent graph head type
    */
   public static class PersistentGraphHeadJoinFunction<GD extends EPGMGraphHead,
-    PGD extends PersistentGraphHead> implements
-    JoinFunction<Tuple3<GradoopId, GradoopIds, GradoopIds>, GD, PersistentGraphHead> {
+    PGD extends PersistentGraphHead> implements JoinFunction
+    <Tuple3<GradoopId, GradoopIds, GradoopIds>, GD, PersistentGraphHead> {
 
     /**
      * Persistent graph data factory.

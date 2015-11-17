@@ -41,7 +41,7 @@ public class VertexInAllGraphsFilterWithBC<VD extends EPGMVertex> extends
   /**
    * Graph identifiers
    */
-  private GradoopIds identifiers;
+  private final GradoopIds identifiers = new GradoopIds();
 
   /**
    * {@inheritDoc}
@@ -52,7 +52,7 @@ public class VertexInAllGraphsFilterWithBC<VD extends EPGMVertex> extends
     Collection<Long> longIds = getRuntimeContext().getBroadcastVariable
       (BC_IDENTIFIERS);
 
-    for(Long longId : longIds) {
+    for (Long longId : longIds) {
       identifiers.add(GradoopId.fromLong(longId));
     }
 

@@ -35,10 +35,14 @@ public final class GradoopId implements Comparable<GradoopId>,
   WritableComparable<GradoopId>, Serializable {
 
   /**
+   * maximum id
+   */
+  public static final GradoopId MAX_VALUE = new GradoopId(Long.MAX_VALUE);
+
+  /**
    * Serial version uid.
    */
   private static final long serialVersionUID = 42L;
-  public static final GradoopId MAX_VALUE = new GradoopId(Long.MAX_VALUE);
 
   /**
    * Long identifier.
@@ -103,16 +107,32 @@ public final class GradoopId implements Comparable<GradoopId>,
     this.identifier = dataInput.readLong();
   }
 
+  /**
+   * factory method to create from a long value
+   * @param id long
+   * @return new id
+   */
   public static GradoopId fromLong(Long id) {
     return new GradoopId(id);
   }
 
+  /**
+   * factory method to create from a string representing a long value
+   * @param string long string
+   * @return new id
+   */
   public static GradoopId fromLongString(String string) {
     return GradoopId.fromLong(Long.valueOf(string));
   }
 
-  public static GradoopId min(GradoopId firstValue, GradoopId currentValue) {
-    return firstValue.compareTo(currentValue) <= 0 ?
-      firstValue : currentValue;
+  /**
+   * returns the smaller one of two given ids
+   * @param firstId first id
+   * @param secondId second id
+   * @return smaller id
+   */
+  public static GradoopId min(GradoopId firstId, GradoopId secondId) {
+    return firstId.compareTo(secondId) <= 0 ?
+      firstId : secondId;
   }
 }

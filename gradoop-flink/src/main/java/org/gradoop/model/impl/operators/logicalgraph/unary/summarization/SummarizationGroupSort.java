@@ -69,7 +69,9 @@ public class SummarizationGroupSort<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, VD, ED> summarizeInternal(Graph<GradoopId, VD, ED> graph) {
+  protected Graph<GradoopId, VD, ED> summarizeInternal(
+    Graph<GradoopId, VD, ED> graph) {
+
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices()
       // map vertices to a compact representation
       .map(new VertexToGroupVertexMapper<VD>(

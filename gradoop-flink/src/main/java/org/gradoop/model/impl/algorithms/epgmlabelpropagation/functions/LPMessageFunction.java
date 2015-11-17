@@ -42,8 +42,8 @@ public class LPMessageFunction<
     if (getSuperstepNumber() == 1) {
       GradoopId.fromLong(0L);
     } else {
-      sendMessageToAllNeighbors(GradoopId
-          .fromLongString((String) vertex.getValue().getProperty(CURRENT_VALUE)));
+      sendMessageToAllNeighbors(GradoopId.fromLongString(
+        (String) vertex.getValue().getProperty(CURRENT_VALUE)));
     }
   }
 }

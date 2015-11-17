@@ -85,7 +85,9 @@ public class EPGMLabelPropagationAlgorithm<
    * @throws Exception
    */
   @Override
-  public Graph<GradoopId, VD, ED> run(Graph<GradoopId, VD, ED> graph) throws Exception {
+  public Graph<GradoopId, VD, ED> run(Graph<GradoopId, VD, ED> graph
+  ) throws Exception {
+
     // initialize vertex values and run the Vertex Centric Iteration
     Graph<GradoopId, VD, ED> epGraph = graph.getUndirected();
     return epGraph

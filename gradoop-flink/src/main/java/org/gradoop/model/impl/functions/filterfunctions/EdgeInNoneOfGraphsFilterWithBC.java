@@ -54,7 +54,7 @@ public class EdgeInNoneOfGraphsFilterWithBC<ED extends EPGMEdge> extends
 
     identifiers = new GradoopIds();
 
-    for(Long longId : longList) {
+    for (Long longId : longList) {
       identifiers.add(GradoopId.fromLong(longId));
     }
 

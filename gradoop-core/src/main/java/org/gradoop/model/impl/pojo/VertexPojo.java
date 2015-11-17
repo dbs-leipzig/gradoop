@@ -22,7 +22,6 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Transient representation of a vertex.

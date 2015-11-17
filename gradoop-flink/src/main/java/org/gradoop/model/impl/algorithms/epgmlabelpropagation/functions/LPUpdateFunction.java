@@ -58,7 +58,8 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     } else {
       GradoopId currentCommunity =
         (GradoopId) vertex.getValue().getProperty(CURRENT_VALUE);
-      GradoopId lastCommunity = (GradoopId) vertex.getValue().getProperty(LAST_VALUE);
+      GradoopId lastCommunity =
+        (GradoopId) vertex.getValue().getProperty(LAST_VALUE);
       int stabilizationRound =
         (int) vertex.getValue().getProperty(STABILIZATION_COUNTER);
       GradoopId newCommunity = getNewCommunity(vertex, msg);
@@ -118,7 +119,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     } else if (allMessages.size() == 1) {
       // 2. if just one message are received
       GradoopId firstCommunity = allMessages.get(0);
-      newCommunity = GradoopId.min(currentCommunity,firstCommunity);
+      newCommunity = GradoopId.min(currentCommunity, firstCommunity);
     } else {
       // 3. if multiple messages are received
       newCommunity = getMostFrequent(vertex, allMessages);
@@ -126,6 +127,11 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     return newCommunity;
   }
 
+  /**
+   * extracts gradoop if representing the current community from vertex property
+   * @param vertex vertex
+   * @return community id
+   */
   private GradoopId readCurrentCommunity(Vertex<GradoopId, VD> vertex) {
     return GradoopId
       .fromLongString((String) vertex.getValue().getProperty(CURRENT_VALUE));
@@ -164,7 +170,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
       // to avoid an oscillating state of the calculation we will just use
       // the smaller value
       currentValue = readCurrentCommunity(vertex);
-      newValue = GradoopId.min(firstValue,currentValue);
+      newValue = GradoopId.min(firstValue, currentValue);
     } else {
       newValue = maxValue;
     }

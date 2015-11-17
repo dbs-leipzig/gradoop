@@ -344,36 +344,35 @@ public class HBaseTestBase {
 
     for (GraphHeadPojo graphData : graphDataCollection) {
       if (graphData.getId().equals(communityDatabases.getId())) {
-        vertexIds = new GradoopIds(VERTEX_PERSON_ALICE.getId(),
+        vertexIds = GradoopIds.fromExisting(VERTEX_PERSON_ALICE.getId(),
           VERTEX_PERSON_BOB.getId(), VERTEX_PERSON_EVE.getId());
-        edgeIds = new GradoopIds(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_6_KNOWS
-
-            .getId(), EDGE_21_KNOWS.getId());
+        edgeIds = GradoopIds.fromExisting(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(),
+          EDGE_6_KNOWS.getId(), EDGE_21_KNOWS.getId());
       } else if (graphData.getId().equals(communityHadoop.getId())) {
         vertexIds =
-          new GradoopIds(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE
+          GradoopIds.fromExisting(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE
 
             .getId(), VERTEX_PERSON_FRANK
 
             .getId());
-        edgeIds = new GradoopIds(EDGE_4_KNOWS.getId(), EDGE_5_KNOWS.getId(), EDGE_22_KNOWS
+        edgeIds = GradoopIds.fromExisting(EDGE_4_KNOWS.getId(), EDGE_5_KNOWS.getId(), EDGE_22_KNOWS
 
             .getId(), EDGE_23_KNOWS.getId());
       } else if (graphData.getId().equals(communityGraphs.getId())) {
-        vertexIds = new GradoopIds(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB.getId(),
+        vertexIds = GradoopIds.fromExisting(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB.getId(),
             VERTEX_PERSON_CAROL
 
               .getId(), VERTEX_PERSON_DAVE
 
               .getId());
-        edgeIds = new GradoopIds(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_2_KNOWS
+        edgeIds = GradoopIds.fromExisting(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_2_KNOWS
 
               .getId(), EDGE_3_KNOWS.getId(), EDGE_4_KNOWS.getId(),
             EDGE_5_KNOWS.getId());
       } else if (graphData.getId().equals(forumGraph.getId())) {
-        vertexIds = new GradoopIds(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE.getId(),
+        vertexIds = GradoopIds.fromExisting(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE.getId(),
             VERTEX_PERSON_FRANK.getId(), VERTEX_FORUM_GPS.getId());
-        edgeIds = new GradoopIds(EDGE_4_KNOWS.getId(), EDGE_16_HAS_MODERATOR.getId(),
+        edgeIds = GradoopIds.fromExisting(EDGE_4_KNOWS.getId(), EDGE_16_HAS_MODERATOR.getId(),
             EDGE_19_HAS_MEMBER.getId(), EDGE_20_HAS_MEMBER.getId());
       }
       persistentGraphData
@@ -595,8 +594,8 @@ public class HBaseTestBase {
     EPGMEdge e = graphStore.readEdge(GradoopId.fromLong(0L));
     assertNotNull(e);
     assertEquals("a", e.getLabel());
-    assertEquals(new Long(0L), e.getSourceVertexId());
-    assertEquals(new Long(1L), e.getTargetVertexId());
+    assertEquals(GradoopId.fromLong(0L), e.getSourceVertexId());
+    assertEquals(GradoopId.fromLong(1L), e.getTargetVertexId());
     assertEquals(2L, e.getPropertyCount());
     List<String> propertyKeys = Lists.newArrayList(e.getPropertyKeys());
     assertEquals(2, propertyKeys.size());

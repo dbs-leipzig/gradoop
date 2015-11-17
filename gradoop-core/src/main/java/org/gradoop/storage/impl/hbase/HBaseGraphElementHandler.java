@@ -17,19 +17,16 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import com.google.common.collect.Sets;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.storage.api.GraphElementHandler;
 
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * Handler class for entities that are contained in logical graphs (i.e.,
@@ -64,9 +61,12 @@ public abstract class HBaseGraphElementHandler extends
   @Override
   public GradoopIds readGraphIds(Result res) throws IOException {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
-    
-    GradoopIds graphIds = null;
-    Writables.getWritable(graphBytes, graphIds);
+
+    GradoopIds graphIds = new GradoopIds();
+
+    if (graphBytes != null) {
+      Writables.getWritable(graphBytes, graphIds);
+    }
 
     return graphIds;
   }

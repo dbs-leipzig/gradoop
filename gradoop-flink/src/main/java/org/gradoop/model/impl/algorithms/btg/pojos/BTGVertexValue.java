@@ -177,7 +177,9 @@ public class BTGVertexValue {
   public void updateBtgIDs() {
     if (this.neighborMinimumBTGIds != null) {
       GradoopIds newBtgIDs = new GradoopIds();
-      for (Map.Entry<GradoopId, GradoopId> e : this.neighborMinimumBTGIds.entrySet()) {
+      for (Map.Entry<GradoopId, GradoopId>
+        e : this.neighborMinimumBTGIds.entrySet()) {
+
         newBtgIDs.add(e.getValue());
       }
       this.btgIDs = Lists.newArrayList(newBtgIDs);

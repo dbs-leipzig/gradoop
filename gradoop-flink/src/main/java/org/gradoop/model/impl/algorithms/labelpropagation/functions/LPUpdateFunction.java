@@ -63,7 +63,7 @@ public class LPUpdateFunction extends
           setNewVertexValue(vertex.getValue());
         } else {
           vertex.getValue()
-            .setCurrentCommunity(minId(currentCommunity, newCommunity));
+            .setCurrentCommunity(GradoopId.min(currentCommunity, newCommunity));
           vertex.getValue()
             .setLastCommunity(vertex.getValue().getCurrentCommunity());
           setNewVertexValue(vertex.getValue());
@@ -104,7 +104,7 @@ public class LPUpdateFunction extends
       // 2. if just one message are received
 
       GradoopId firstMessage = allMessages.get(0);
-      newCommunity = minId(firstMessage, currentCommunity);
+      newCommunity = GradoopId.min(firstMessage, currentCommunity);
     } else {
       // 3. if multiple messages are received
       newCommunity = getMostFrequent(vertex, allMessages);
@@ -145,14 +145,10 @@ public class LPUpdateFunction extends
       // to avoid an oscillating state of the calculation we will just use
       // the smaller value
       GradoopId currentCommunity = vertex.getValue().getCurrentCommunity();
-      newValue = minId(firstMessage, currentCommunity);
+      newValue = GradoopId.min(firstMessage, currentCommunity);
     } else {
       newValue = maxValue;
     }
     return newValue;
-  }
-
-  private GradoopId minId(GradoopId firstId, GradoopId secondId) {
-    return secondId.compareTo(firstId) < 0 ? secondId : firstId;
   }
 }

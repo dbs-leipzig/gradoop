@@ -83,8 +83,9 @@ public final class BTGUpdateFunction extends
    * @param vertex   The current vertex
    * @param minValue All incoming messages
    */
-  private void processTransactionalVertex(Vertex<GradoopId, BTGVertexValue> vertex,
-    GradoopId minValue) {
+  private void processTransactionalVertex(
+    Vertex<GradoopId, BTGVertexValue> vertex, GradoopId minValue) {
+
     vertex.getValue().removeLastBtgID();
     vertex.getValue().addGraph(minValue);
     setNewVertexValue(vertex.getValue());
@@ -119,7 +120,9 @@ public final class BTGUpdateFunction extends
    * @param vertex The current vertex
    * @return The minimum BTG ID that vertex knows.
    */
-  private GradoopId getCurrentMinValue(Vertex<GradoopId, BTGVertexValue> vertex) {
+  private GradoopId getCurrentMinValue(
+    Vertex<GradoopId, BTGVertexValue> vertex) {
+
     List<GradoopId> btgIDs = vertex.getValue().getGraphs();
     return (btgIDs.size() > 0) ? btgIDs.get(btgIDs.size() - 1) :
       vertex.getId();

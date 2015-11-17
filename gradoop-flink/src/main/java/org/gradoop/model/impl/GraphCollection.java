@@ -54,7 +54,6 @@ import org.gradoop.model.impl.operators.collection.binary.Union;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -141,12 +140,12 @@ public class GraphCollection<
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> getGraphs(final GradoopId... identifiers) throws
-    Exception {
+  public GraphCollection<VD, ED, GD>
+  getGraphs(final GradoopId... identifiers) throws Exception {
 
     GradoopIds graphIds = new GradoopIds();
 
-    for(GradoopId id : identifiers) {
+    for (GradoopId id : identifiers) {
       graphIds.add(id);
     }
 

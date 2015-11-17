@@ -406,15 +406,7 @@ public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
      */
     @Override
     public GD next() {
-      GD val = null;
-      if (result != null) {
-        try {
-          val = config.getGraphHeadHandler().readGraphHead(result);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        result = null;
-      }
+      GD val = config.getGraphHeadHandler().readGraphHead(result);
       return val;
     }
 
@@ -455,12 +447,12 @@ public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
      */
     @Override
     public boolean hasNext() {
+      boolean hasNext = false;
       if (it.hasNext()) {
         result = it.next();
-        return true;
-      } else {
-        return false;
+        hasNext = result != null;
       }
+      return hasNext;
     }
 
     /**
@@ -468,15 +460,7 @@ public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
      */
     @Override
     public VD next() {
-      VD val = null;
-      if (result != null) {
-        try {
-          val = config.getVertexHandler().readVertex(result);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        result = null;
-      }
+      VD val = config.getVertexHandler().readVertex(result);
       return val;
     }
 
@@ -517,12 +501,12 @@ public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
      */
     @Override
     public boolean hasNext() {
+      boolean hasNext = false;
       if (it.hasNext()) {
         result = it.next();
-        return true;
-      } else {
-        return false;
+        hasNext = result != null;
       }
+      return hasNext;
     }
 
     /**
@@ -530,15 +514,7 @@ public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
      */
     @Override
     public ED next() {
-      ED val = null;
-      if (result != null) {
-        try {
-          val = config.getEdgeHandler().readEdge(result);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        result = null;
-      }
+      ED val = config.getEdgeHandler().readEdge(result);
       return val;
     }
 

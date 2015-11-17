@@ -153,7 +153,9 @@ public class JsonReader extends JsonIO {
      * @return source vertex identifier
      * @throws JSONException
      */
-    private GradoopId getSourceVertexID(JSONObject jsonEdge) throws JSONException {
+    private GradoopId getSourceVertexID(JSONObject jsonEdge
+    ) throws JSONException {
+
       return GradoopId.fromLongString(jsonEdge.getString(EDGE_SOURCE));
     }
 
@@ -164,7 +166,9 @@ public class JsonReader extends JsonIO {
      * @return target vertex identifier
      * @throws JSONException
      */
-    private GradoopId getTargetVertexID(JSONObject jsonEdge) throws JSONException {
+    private GradoopId getTargetVertexID(JSONObject jsonEdge
+    ) throws JSONException {
+
       return GradoopId.fromLongString(jsonEdge.getString(EDGE_TARGET));
     }
   }

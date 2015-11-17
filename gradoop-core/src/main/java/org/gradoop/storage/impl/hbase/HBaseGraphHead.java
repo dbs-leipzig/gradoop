@@ -81,7 +81,7 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
     if (vertexIds != null) {
       vertexIds.add(vertexID);
     } else {
-      vertexIds = new GradoopIds(vertexID);
+      vertexIds = GradoopIds.fromExisting(vertexID);
     }
   }
 
@@ -117,7 +117,7 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
     if (edgeIds != null) {
       edgeIds.add(edgeID);
     } else {
-      edgeIds = new GradoopIds(edgeID);
+      edgeIds = GradoopIds.fromExisting(edgeID);
     }
   }
 

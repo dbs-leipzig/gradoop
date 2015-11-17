@@ -88,7 +88,7 @@ public interface EdgeHandler<
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  ED readEdge(final Result res) throws IOException;
+  ED readEdge(final Result res);
 
   /**
    * Returns the edge data factory used by this handler.

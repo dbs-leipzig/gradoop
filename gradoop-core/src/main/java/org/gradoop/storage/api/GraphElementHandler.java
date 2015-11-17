@@ -23,7 +23,6 @@ import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopIds;
 
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * Responsible for reading and writing graph element entity data from and to

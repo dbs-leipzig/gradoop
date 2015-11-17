@@ -22,7 +22,6 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Default transient representation of edge data that is a POJO and can thus be
@@ -53,12 +52,17 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
    * @param sourceVertexId source vertex id
    * @param targetVertexId target vertex id
    * @param properties     edge properties
-   * @param graphs         graphs that edge is contained in
+   * @param graphIds         graphs that edge is contained in
    */
-  EdgePojo(final GradoopId id, final String label, final GradoopId sourceVertexId,
-    final GradoopId targetVertexId, final Map<String, Object> properties,
-    GradoopIds graphs) {
-    super(id, label, properties, graphs);
+  EdgePojo(
+    final GradoopId id,
+    final String label,
+    final GradoopId sourceVertexId,
+    final GradoopId targetVertexId,
+    final Map<String, Object> properties,
+    GradoopIds graphIds) {
+
+    super(id, label, properties, graphIds);
     this.sourceVertexId = sourceVertexId;
     this.targetVertexId = targetVertexId;
   }

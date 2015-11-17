@@ -138,12 +138,7 @@ public class SummarizationExample implements ProgramDescription {
       graphDatabase.getDatabaseGraph().callForGraph(summarization);
 
     if (summarizedGraph != null) {
-      if (cmd.hasOption(OPTION_OUTPUT_PATH)) {
-        writeOutputFiles(summarizedGraph,
-          cmd.getOptionValue(OPTION_OUTPUT_PATH));
-      } else {
-        summarizedGraph.print();
-      }
+      writeOutputFiles(summarizedGraph, cmd.getOptionValue(OPTION_OUTPUT_PATH));
     } else {
       System.err.println("wrong parameter constellation");
     }

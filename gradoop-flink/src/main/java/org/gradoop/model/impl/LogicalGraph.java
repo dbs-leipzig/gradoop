@@ -429,25 +429,4 @@ public class LogicalGraph
     getConfig().getExecutionEnvironment().execute();
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void print() throws Exception {
-    final StringBuilder sb =
-      new StringBuilder(String.format("LogicalGraph{%n"));
-    sb.append(
-      String.format("%-10d %s %n", graphHead.getId(), graphHead.toString()));
-    sb.append(String.format("Vertices:%n"));
-    for (VD v : this.getVertices().collect()) {
-      sb.append(String.format("%-10d %s %n", v.getId(), v));
-    }
-    sb.append(String.format("Edges:%n"));
-    for (ED e : this.getEdges().collect()) {
-      sb.append(String.format("%-10d %s %n", e.getId(), e));
-    }
-    sb.append('}');
-
-    System.out.println(sb);
-  }
 }

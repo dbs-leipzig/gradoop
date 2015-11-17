@@ -54,7 +54,7 @@ public class VertexInNoneOfGraphsFilterWithBC<VD extends EPGMVertex> extends
 
     identifiers = new GradoopIds();
 
-    for(Long longId : longIds) {
+    for (Long longId : longIds) {
       identifiers.add(GradoopId.fromLong(longId));
     }
   }

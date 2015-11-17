@@ -108,8 +108,9 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
    * {@inheritDoc}
    */
   @Override
-  public Put writeVertices(final Put put, final PersistentGraphHead graphData) throws
-    IOException {
+  public Put writeVertices(
+    final Put put, final PersistentGraphHead graphData) throws IOException {
+
     for (GradoopId vertexId : graphData.getVertexIds()) {
       put.add(CF_VERTICES_BYTES, Writables.getBytes(vertexId), null);
     }
@@ -162,9 +163,15 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
    * {@inheritDoc}
    */
   @Override
-  public GD readGraphHead(final Result res) throws IOException {
-    return graphHeadFactory
-      .createGraphHead(readId(res), readLabel(res), readProperties(res));
+  public GD readGraphHead(final Result res) {
+    GD graphHead = null;
+    try {
+      graphHead = graphHeadFactory
+        .createGraphHead(readId(res), readLabel(res), readProperties(res));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return graphHead;
   }
 
   /**

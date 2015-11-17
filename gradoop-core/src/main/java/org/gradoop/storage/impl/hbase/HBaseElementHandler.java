@@ -282,9 +282,15 @@ public abstract class HBaseElementHandler implements ElementHandler {
     return o;
   }
 
+  /**
+   * deserializes a gradoop id from hbase key
+   * @param res hbase row
+   * @return gradoop od
+   * @throws IOException
+   */
   protected GradoopId readId(Result res) throws IOException {
     GradoopId id = new GradoopId();
-    Writables.getWritable(res.getRow(),id);
+    Writables.getWritable(res.getRow(), id);
 
     return id;
   }

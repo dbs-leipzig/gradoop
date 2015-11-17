@@ -1,6 +1,5 @@
 package org.gradoop.model.impl.operators.auxiliary;
 
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -137,11 +136,12 @@ public class SplitBy<
     DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> edgeVertexVertex =
       graph.getEdges().map(new EdgeToTupleMapper<ED>());
     // replace the source vertex id by the graph list of this vertex
-    DataSet<Tuple3<GradoopId, GradoopIds, GradoopId>> edgeGraphsVertex = edgeVertexVertex
-      .join(vertices)
-      .where(1)
-      .equalTo(new VertexKeySelector<VD>())
-      .with(new JoinEdgeTupleWithSourceGraphs<VD>());
+    DataSet<Tuple3<GradoopId, GradoopIds, GradoopId>> edgeGraphsVertex =
+      edgeVertexVertex
+        .join(vertices)
+        .where(1)
+        .equalTo(new VertexKeySelector<VD>())
+        .with(new JoinEdgeTupleWithSourceGraphs<VD>());
     // replace the target vertex id by the graph list of this vertex
     DataSet<Tuple3<GradoopId, GradoopIds, GradoopIds>> edgeGraphsGraphs =
       edgeGraphsVertex
@@ -155,7 +155,8 @@ public class SplitBy<
       graphHeads.map(new MapSubgraphIdToSet<GD>()).reduce(new ReduceSets());
     // construct new tuples containing the edge, the graphs of its source and
     // target vertex and the list of new graphs
-    DataSet<Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds>> edgesWithSubgraphs =
+    DataSet<Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds>>
+      edgesWithSubgraphs =
       edgeGraphsGraphs.crossWithTiny(newSubgraphIdentifiers)
         .with(new CrossEdgesWithGraphSet());
     // remove all edges which source and target are not in at least one common
@@ -181,8 +182,8 @@ public class SplitBy<
    *
    * @param <VD> vertex data
    */
-  private static class GradoopIdFromVertexSelector<VD extends EPGMVertex> implements
-    KeySelector<VD, GradoopId> {
+  private static class GradoopIdFromVertexSelector<VD extends EPGMVertex>
+    implements KeySelector<VD, GradoopId> {
     /**
      * Unary Function
      */
@@ -236,7 +237,7 @@ public class SplitBy<
     public VD map(VD vertex) throws Exception {
       GradoopId labelPropIndex = function.execute(vertex);
       if (vertex.getGraphIds() == null) {
-        vertex.setGraphIds(new GradoopIds(labelPropIndex));
+        vertex.setGraphIds(GradoopIds.fromExisting(labelPropIndex));
       } else {
         vertex.getGraphIds().add(labelPropIndex);
       }
@@ -325,7 +326,9 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Tuple3<GradoopId, GradoopId, GradoopId> map(ED edge) throws Exception {
+    public Tuple3<GradoopId, GradoopId, GradoopId>
+    map(ED edge) throws Exception {
+
       reuseTuple.f0 = edge.getId();
       reuseTuple.f1 = edge.getSourceVertexId();
       reuseTuple.f2 = edge.getTargetVertexId();
@@ -360,9 +363,10 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Tuple3<GradoopId, GradoopIds, GradoopId> join(Tuple3<GradoopId, GradoopId,
-      GradoopId> tuple3,
-      VD vertex) throws Exception {
+    public Tuple3<GradoopId, GradoopIds, GradoopId> join(
+      Tuple3<GradoopId, GradoopId, GradoopId> tuple3, VD vertex
+    ) throws Exception {
+
       reuseTuple.f0 = tuple3.f0;
       reuseTuple.f1 = vertex.getGraphIds();
       reuseTuple.f2 = tuple3.f2;
@@ -433,7 +437,9 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public GradoopIds reduce(GradoopIds set1, GradoopIds set2) throws Exception {
+    public GradoopIds
+    reduce(GradoopIds set1, GradoopIds set2) throws Exception {
+
       set1.addAll(set2);
       return set1;
     }
@@ -443,13 +449,14 @@ public class SplitBy<
    * Cross the edge tuples with a set containing the ids of the new graphs.
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f2")
-  private static class CrossEdgesWithGraphSet implements
-    CrossFunction<Tuple3<GradoopId, GradoopIds, GradoopIds>, GradoopIds, Tuple4<GradoopId,
+  private static class CrossEdgesWithGraphSet implements CrossFunction
+    <Tuple3<GradoopId, GradoopIds, GradoopIds>, GradoopIds, Tuple4<GradoopId,
       GradoopIds, GradoopIds, GradoopIds>> {
     /**
      * Reduce object instantiations.
      */
-    private final Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds> reuseTuple;
+    private final
+    Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds> reuseTuple;
 
     /**
      * Create CrossFunction instance.
@@ -462,9 +469,10 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds> cross(
-      Tuple3<GradoopId, GradoopIds, GradoopIds> tuple3, GradoopIds subgraphs) throws
-      Exception {
+    public Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds>
+    cross(Tuple3<GradoopId, GradoopIds, GradoopIds> tuple3, GradoopIds subgraphs
+    ) throws Exception {
+
       reuseTuple.f0 = tuple3.f0;
       reuseTuple.f1 = tuple3.f1;
       reuseTuple.f2 = tuple3.f2;
@@ -497,8 +505,10 @@ public class SplitBy<
      * {@inheritDoc}
      */
     @Override
-    public void flatMap(Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds> tuple4,
+    public void
+    flatMap(Tuple4<GradoopId, GradoopIds, GradoopIds, GradoopIds> tuple4,
       Collector<Tuple2<GradoopId, GradoopIds>> collector) throws Exception {
+
       GradoopIds sourceGraphs = tuple4.f1;
       GradoopIds targetGraphs = tuple4.f2;
       GradoopIds newSubgraphs = tuple4.f3;

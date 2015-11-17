@@ -20,8 +20,6 @@ package org.gradoop.model.api;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 
-import java.util.Set;
-
 /**
  * A graph element is part of a logical graph. An element can be part of more
  * than one logical graph. This applies to vertices and edges in the EPGM.
@@ -35,8 +33,8 @@ public interface EPGMGraphElement extends EPGMElement {
   GradoopIds getGraphIds();
 
   /**
-   * Adds that element to the given graphId. If the element is already an element
-   * of the given graphId, nothing happens.
+   * Adds that element to the given graphId. If the element is already an
+   * element of the given graphId, nothing happens.
    *
    * @param graphId the graphId to be added to
    */

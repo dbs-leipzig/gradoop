@@ -108,8 +108,9 @@ public class HBaseVertexHandler<VD extends EPGMVertex, ED extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeOutgoingEdges(final Put put, final Set<ED> outgoingEdgeData) throws
-    IOException {
+  public Put writeOutgoingEdges(
+    final Put put, final Set<ED> outgoingEdgeData) throws IOException {
+
     return writeEdges(put, CF_OUT_EDGES_BYTES, outgoingEdgeData, true);
   }
 
@@ -117,8 +118,9 @@ public class HBaseVertexHandler<VD extends EPGMVertex, ED extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeIncomingEdges(final Put put, final Set<ED> incomingEdgeData) throws
-    IOException {
+  public Put writeIncomingEdges(
+    final Put put, final Set<ED> incomingEdgeData) throws IOException {
+
     return writeEdges(put, CF_IN_EDGES_BYTES, incomingEdgeData, false);
   }
 
@@ -126,8 +128,9 @@ public class HBaseVertexHandler<VD extends EPGMVertex, ED extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeVertex(final Put put, final PersistentVertex<ED> vertexData) throws
-    IOException {
+  public Put writeVertex(
+    final Put put, final PersistentVertex<ED> vertexData) throws IOException {
+
     LOG.info("Creating Put from: " + vertexData);
     writeLabel(put, vertexData);
     writeProperties(put, vertexData);
@@ -157,10 +160,15 @@ public class HBaseVertexHandler<VD extends EPGMVertex, ED extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public VD readVertex(final Result res) throws IOException {
-    return vertexFactory
-      .createVertex(readId(res), readLabel(res),
-        readProperties(res), readGraphIds(res));
+  public VD readVertex(final Result res) {
+    VD vertex = null;
+    try {
+      vertex = vertexFactory.createVertex(
+        readId(res), readLabel(res), readProperties(res), readGraphIds(res));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return vertex;
   }
 
   /**

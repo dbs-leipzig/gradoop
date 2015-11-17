@@ -40,7 +40,9 @@ public class VertexToBTGVertexMapper<VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Vertex<GradoopId, BTGVertexValue> map(VD logicalVertex) throws Exception {
+  public Vertex<GradoopId, BTGVertexValue> map(VD logicalVertex
+  ) throws Exception {
+
     BTGVertexValue btgValue = createNewVertexValue(logicalVertex);
     return new Vertex<>(logicalVertex.getId(), btgValue);
   }

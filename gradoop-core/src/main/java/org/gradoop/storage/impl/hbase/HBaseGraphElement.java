@@ -21,8 +21,6 @@ import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 
-import java.util.Set;
-
 /**
  * Wraps an EPGM graph element data entity.
  *

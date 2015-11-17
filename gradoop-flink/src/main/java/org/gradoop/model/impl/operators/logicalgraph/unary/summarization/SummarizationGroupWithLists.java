@@ -90,7 +90,9 @@ public class SummarizationGroupWithLists<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, VD, ED> summarizeInternal(Graph<GradoopId, VD, ED> graph) {
+  protected Graph<GradoopId, VD, ED> summarizeInternal(
+    Graph<GradoopId, VD, ED> graph) {
+
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
@@ -193,8 +195,9 @@ public class SummarizationGroupWithLists<
      */
     @Override
     public void reduce(Iterable<VertexForGrouping> vertices,
-      Collector<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> collector) throws
-      Exception {
+      Collector<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> collector
+    ) throws Exception {
+
       GradoopId newVertexID = GradoopId.fromLong(0L);
       String groupLabel = null;
       String groupValue = null;
@@ -262,15 +265,17 @@ public class SummarizationGroupWithLists<
    */
   @FunctionAnnotation.ForwardedFields("f0->*")
   private static class SummarizedVertexForwarder<VD extends EPGMVertex>
-    implements
-    MapFunction<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>, Vertex<GradoopId, VD>> {
+    implements MapFunction
+    <Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>, Vertex<GradoopId, VD>> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Vertex<GradoopId, VD> map(
-      Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> vertexListTuple2) throws Exception {
+      Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> vertexListTuple2
+    ) throws Exception {
+
       return vertexListTuple2.f0;
     }
   }
@@ -302,8 +307,10 @@ public class SummarizationGroupWithLists<
      * {@inheritDoc}
      */
     @Override
-    public void flatMap(Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> vertexListTuple2,
+    public void flatMap(
+      Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> vertexListTuple2,
       Collector<VertexWithRepresentative> collector) throws Exception {
+
       for (GradoopId vertexId : vertexListTuple2.f1) {
         reuseTuple.setVertexId(vertexId);
         reuseTuple.setGroupRepresentativeVertexId(vertexListTuple2.f0.getId());

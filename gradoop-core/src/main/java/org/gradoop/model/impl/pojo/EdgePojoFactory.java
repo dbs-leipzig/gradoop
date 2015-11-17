@@ -23,7 +23,6 @@ import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMEdgeFactory;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Factory for creating default edge data.
@@ -59,10 +58,15 @@ public class EdgePojoFactory extends ElementPojoFactory implements
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(GradoopId id, String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, Map<String, Object> properties) {
-    return createEdge(id, label, sourceVertexId, targetVertexId, properties,
-      null);
+  public EdgePojo createEdge(
+    GradoopId id,
+    String label,
+    GradoopId sourceVertexId,
+    GradoopId targetVertexId,
+    Map<String, Object> properties) {
+
+    return
+      createEdge(id, label, sourceVertexId, targetVertexId, properties, null);
   }
 
   /**

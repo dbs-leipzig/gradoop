@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.List;
 
@@ -43,14 +44,21 @@ public class EdgeInGraphsFilterWithBC<ED extends EPGMEdge>
   /**
    * Graph identifiers
    */
-  private List<Long> identifiers;
+  private GradoopIds identifiers;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public void open(Configuration parameters) throws Exception {
-    identifiers = getRuntimeContext().getBroadcastVariable(BC_IDENTIFIERS);
+    List<Long> longList = getRuntimeContext().getBroadcastVariable
+      (BC_IDENTIFIERS);
+
+    identifiers = new GradoopIds();
+
+    for (Long longId : longList) {
+      identifiers.add(GradoopId.fromLong(longId));
+    }
   }
 
   /**

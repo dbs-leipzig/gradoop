@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains all interfaces and classes related to identifiers and their creation.
+ * Contains all interfaces and classes related to identifiers and their
+ * creation.
  */
 package org.gradoop.model.impl.id;
