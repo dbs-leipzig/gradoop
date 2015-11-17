@@ -49,13 +49,13 @@ public class VertexInNoneOfGraphsFilterWithBC<VD extends EPGMVertex> extends
   @Override
   public void open(Configuration parameters) throws Exception {
 
-    Collection<Long> longIds =
+    Collection<GradoopId> gradoopIds =
       getRuntimeContext().getBroadcastVariable(BC_IDENTIFIERS);
 
     identifiers = new GradoopIds();
 
-    for (Long longId : longIds) {
-      identifiers.add(GradoopId.fromLong(longId));
+    for (GradoopId gradoopId : gradoopIds) {
+      identifiers.add(gradoopId);
     }
   }
 

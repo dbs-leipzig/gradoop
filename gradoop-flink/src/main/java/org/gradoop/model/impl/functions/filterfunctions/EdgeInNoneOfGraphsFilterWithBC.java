@@ -49,13 +49,13 @@ public class EdgeInNoneOfGraphsFilterWithBC<ED extends EPGMEdge> extends
   @Override
   public void open(Configuration parameters) throws Exception {
 
-    List<Long> longList =
+    List<GradoopId> gradoopIds =
       getRuntimeContext().getBroadcastVariable(BC_IDENTIFIERS);
 
     identifiers = new GradoopIds();
 
-    for (Long longId : longList) {
-      identifiers.add(GradoopId.fromLong(longId));
+    for (GradoopId gradoopId : gradoopIds) {
+      identifiers.add(gradoopId);
     }
 
   }
