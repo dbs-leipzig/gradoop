@@ -144,8 +144,8 @@ public class EqualByElementDataTest extends EqualityTestBase {
     String asciiGraphs = "ref[({x=1})-[{x=2}]->({x=3})];" +
       "dup[({x=1})-[{x=2}]->({x=3})];" +
       "eDir[({x=1})<-[{x=2}]-({x=3})];" +
-      "vLabel[({y=1})-[{x=2}]->({x=3})];" +
-      "eLabel[({x=1})-{y=2}->({x=3})];" +
+      "vKey[({y=1})-[{x=2}]->({x=3})];" +
+      "eKey[({x=1})-{y=2}->({x=3})];" +
       "vValue[({x=0})-[{x=2}]->({x=3})];" +
       "eValue[({x=1})-[{x=0}]->({x=3})];";
 
@@ -161,11 +161,11 @@ public class EqualByElementDataTest extends EqualityTestBase {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> eDir =
       loader.getLogicalGraphByVariable("eDir");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> vLabel =
-      loader.getLogicalGraphByVariable("vLabel");
+    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> vKey =
+      loader.getLogicalGraphByVariable("vKey");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> eLabel =
-      loader.getLogicalGraphByVariable("eLabel");
+    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> eKey =
+      loader.getLogicalGraphByVariable("eKey");
 
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> vValue =
       loader.getLogicalGraphByVariable("vValue");
@@ -175,8 +175,8 @@ public class EqualByElementDataTest extends EqualityTestBase {
 
     collectAndAssertEquals(new EqualByElementData().execute(ref, dup));
     collectAndAssertNotEquals(new EqualByElementData().execute(ref, eDir));
-    collectAndAssertNotEquals(new EqualByElementData().execute(ref, vLabel));
-    collectAndAssertNotEquals(new EqualByElementData().execute(ref, eLabel));
+    collectAndAssertNotEquals(new EqualByElementData().execute(ref, vKey));
+    collectAndAssertNotEquals(new EqualByElementData().execute(ref, eKey));
     collectAndAssertNotEquals(new EqualByElementData().execute(ref, vValue));
     collectAndAssertNotEquals(new EqualByElementData().execute(ref, eValue));
   }
