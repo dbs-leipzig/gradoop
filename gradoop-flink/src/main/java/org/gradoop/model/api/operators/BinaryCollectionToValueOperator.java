@@ -15,7 +15,7 @@ import org.gradoop.model.impl.GraphCollection;
  * @param <T> value type
  */
 public interface BinaryCollectionToValueOperator
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead, T>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge, T>
   extends Operator {
   /**
    * Executes the operator.

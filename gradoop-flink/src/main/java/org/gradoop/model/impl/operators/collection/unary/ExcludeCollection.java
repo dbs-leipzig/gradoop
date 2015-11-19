@@ -24,13 +24,13 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .EdgeInNoneOfGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInNoneOfGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.util.FlinkConstants;
@@ -77,7 +77,7 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
       GradoopIds.fromExisting(positiveGraphID);
     DataSet<GD> graphHeads = collection.getGraphHeads();
     DataSet<GradoopId> graphIDs = graphHeads.map(
-      new GraphToIdentifierMapper<GD>());
+      new ElementIdOnly<GD>());
     graphIDs =
       graphIDs.filter(new RemoveGradoopIdFromDataSetFilter(positiveGraphID));
     DataSet<VD> vertices = collection.getVertices()

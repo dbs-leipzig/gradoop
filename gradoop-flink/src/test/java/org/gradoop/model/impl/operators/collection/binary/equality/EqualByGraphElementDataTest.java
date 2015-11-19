@@ -1,13 +1,11 @@
 package org.gradoop.model.impl.operators.collection.binary.equality;
 
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.operators.EqualityTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
-import org.gradoop.util.GradoopFlinkConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -42,10 +40,7 @@ public class EqualByGraphElementDataTest extends EqualityTestBase {
       "g5[(x)<--();(x)-->();(x)-->()]";
 
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
-      new FlinkAsciiGraphLoader<>(
-        GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
-
-    loader.readDatabaseFromString(asciiGraphs);
+      getLoaderFromString(asciiGraphs);
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c12 =
       loader.getGraphCollectionByVariables("g1", "g2");
@@ -101,8 +96,8 @@ public class EqualByGraphElementDataTest extends EqualityTestBase {
       //         -->  <
       "g5[(x)-->(y);(x)-->(y);(x)-->(y);(y)-->(y)];";
 
-    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader();
-    loader.readDatabaseFromString(asciiGraphs);
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getLoaderFromString(asciiGraphs);
 
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c12 =
@@ -145,8 +140,8 @@ public class EqualByGraphElementDataTest extends EqualityTestBase {
       "eb1[(:Eve)-[:knows]->(:Bob)];" +
       "ab1el[(:Alice)-[:likes]->(:Bob)];";
 
-    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader();
-    loader.readDatabaseFromString(asciiGraphs);
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getLoaderFromString(asciiGraphs);
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> ref =
       loader.getGraphCollectionByVariables("ab1", "ad1");
@@ -185,8 +180,8 @@ public class EqualByGraphElementDataTest extends EqualityTestBase {
       "p123vValue[({x=7})-[{x=2}]->({x=3})];" +
       "p123eValue[({x=1})-[{x=7}]->({x=3})];";
 
-    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader();
-    loader.readDatabaseFromString(asciiGraphs);
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getLoaderFromString(asciiGraphs);
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> ref =
       loader.getGraphCollectionByVariables("p123a", "p023a");

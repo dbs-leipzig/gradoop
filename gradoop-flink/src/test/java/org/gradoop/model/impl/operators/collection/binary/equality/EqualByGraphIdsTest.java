@@ -1,19 +1,21 @@
 package org.gradoop.model.impl.operators.collection.binary.equality;
 
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.operators.collection.binary.equality
-  .EqualByGraphIds;
 import org.gradoop.model.impl.operators.EqualityTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-/**
- * Created by peet on 17.11.15.
- */
+@RunWith(Parameterized.class)
 public class EqualByGraphIdsTest extends EqualityTestBase {
+
+  public EqualByGraphIdsTest(TestExecutionMode mode) {
+    super(mode);
+  }
 
   @Test
   public void testExecute(){
@@ -21,8 +23,8 @@ public class EqualByGraphIdsTest extends EqualityTestBase {
     String asciiGraphs =
       "g1[(a)-b->(c)];g2[(a)-b->(c)];g3[(a)-b->(c)]";
 
-    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader();
-    loader.readDatabaseFromString(asciiGraphs);
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getLoaderFromString(asciiGraphs);
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c1
       = loader.getGraphCollectionByVariables("g1","g2");

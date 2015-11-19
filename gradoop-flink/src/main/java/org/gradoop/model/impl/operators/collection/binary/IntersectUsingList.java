@@ -21,9 +21,9 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -47,7 +47,7 @@ public class IntersectUsingList<
   protected DataSet<VD> computeNewVertices(
     DataSet<GD> newSubgraphs) throws Exception {
     DataSet<GradoopId> identifiers = secondCollection.getGraphHeads()
-      .map(new GraphToIdentifierMapper<GD>());
+      .map(new ElementIdOnly<GD>());
 
     DataSet<VD> vertices = firstCollection.getVertices();
     return vertices.filter(new VertexInGraphsFilterWithBC<VD>())

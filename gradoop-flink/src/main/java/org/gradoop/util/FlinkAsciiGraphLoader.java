@@ -5,9 +5,6 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 
 public class FlinkAsciiGraphLoader<
   V extends EPGMVertex,
@@ -27,12 +24,12 @@ public class FlinkAsciiGraphLoader<
 
   }
 
-  public LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+  public LogicalGraph<V, E, G>
   getLogicalGraphByVariable(String variable) {
     return null;
   }
 
-  public GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+  public GraphCollection<V, E, G>
   getGraphCollectionByVariables(String... variables) {
     return null;
   }

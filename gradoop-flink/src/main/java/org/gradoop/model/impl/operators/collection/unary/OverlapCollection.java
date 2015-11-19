@@ -23,11 +23,11 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.functions.filterfunctions
   .EdgeInAllGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInAllGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.mapfunctions.GraphToIdentifierMapper;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.FlinkConstants;
 
@@ -50,7 +50,7 @@ public class OverlapCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
     GraphCollection<VD, ED, GD> collection) {
     DataSet<GD> graphHeads = collection.getGraphHeads();
     DataSet<GradoopId> graphIDs =
-      graphHeads.map(new GraphToIdentifierMapper<GD>());
+      graphHeads.map(new ElementIdOnly<GD>());
     DataSet<VD> vertices =
       collection.getVertices().filter(new VertexInAllGraphsFilterWithBC<VD>())
         .withBroadcastSet(graphIDs,

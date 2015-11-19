@@ -7,11 +7,16 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-/**
- * Created by peet on 19.11.15.
- */
+@RunWith(Parameterized.class)
 public class EqualByGraphElementIdsTest extends EqualityTestBase {
+
+  public EqualByGraphElementIdsTest(TestExecutionMode mode) {
+    super(mode);
+  }
+
 
   @Test
   public void testExecute() throws Exception {
@@ -20,8 +25,8 @@ public class EqualByGraphElementIdsTest extends EqualityTestBase {
     String asciiGraphs =
       "g1[(a)-b->(c)];g2[(a)-b->(c)];g3[(d)-b->(c)];g4[(a)-e->(c)]";
 
-    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader();
-    loader.readDatabaseFromString(asciiGraphs);
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getLoaderFromString(asciiGraphs);
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c1
       = loader.getGraphCollectionByVariables("g1","g3");
