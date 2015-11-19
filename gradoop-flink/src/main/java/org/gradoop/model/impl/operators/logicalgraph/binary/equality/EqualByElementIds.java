@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.collection.binary.equality;
+package org.gradoop.model.impl.operators.logicalgraph.binary.equality;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
