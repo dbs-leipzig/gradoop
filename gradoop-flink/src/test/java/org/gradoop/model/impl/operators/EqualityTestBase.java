@@ -1,15 +1,20 @@
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.test.util.FlinkTestBase$class;
+import org.apache.flink.test.util.MultipleProgramsTestBase;
+import org.gradoop.model.FlinkTestBase;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by peet on 19.11.15.
- */
-public class EqualityTestBase {
+public class EqualityTestBase extends FlinkTestBase {
+
+  public EqualityTestBase(TestExecutionMode mode) {
+    super(mode);
+  }
+
   protected void collectAndAssertEquals(DataSet<Boolean> result) {
 
     List<Boolean> collectedResult = collectAndAssertSizeOne(result);

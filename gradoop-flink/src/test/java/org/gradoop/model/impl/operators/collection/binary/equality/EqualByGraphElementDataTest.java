@@ -1,21 +1,26 @@
 package org.gradoop.model.impl.operators.collection.binary.equality;
 
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.operators.EqualityTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.util.GradoopFlinkConfig;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-/**
- * Created by peet on 19.11.15.
- */
+@RunWith(Parameterized.class)
 public class EqualByGraphElementDataTest extends EqualityTestBase {
+
+  public EqualByGraphElementDataTest(TestExecutionMode mode) {
+    super(mode);
+  }
 
   @Test
   public void testBasicStructuralEquality() {
-
     String asciiGraphs = "" +
       //                      -->()
       // g1,g2,g6,g7 : ()<--()
@@ -36,7 +41,10 @@ public class EqualByGraphElementDataTest extends EqualityTestBase {
       //             -->()
       "g5[(x)<--();(x)-->();(x)-->()]";
 
-    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader();
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      new FlinkAsciiGraphLoader<>(
+        GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
+
     loader.readDatabaseFromString(asciiGraphs);
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c12 =
