@@ -24,6 +24,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -48,7 +49,8 @@ public class GradoopIds implements Iterable<GradoopId>, Writable, Serializable {
   }
 
   /**
-   * constructor from multiple given ids
+   * Creates a new instance from multiple GradoopIDs.
+   *
    * @param ids given ids
    * @return gradoop ids
    */
@@ -63,17 +65,27 @@ public class GradoopIds implements Iterable<GradoopId>, Writable, Serializable {
   }
 
   /**
-   * factory method to create gradoop ids from given numbers
+   * A Factory method to create gradoop ids from given numbers.
+   *
    * @param ids numbers
    * @return gradoop ids
    */
   public static GradoopIds fromLongs(Long... ids) {
+    return fromLongs(Arrays.asList(ids));
+  }
+
+  /**
+   * A Factory method to create gradoop ids from given collection.
+   *
+   * @param ids collection containing long identifiers
+   * @return gradoop ids
+   */
+  public static GradoopIds fromLongs(Collection<Long> ids) {
     GradoopIds gradoopIds = new GradoopIds();
 
     for (Long id : ids) {
       gradoopIds.add(GradoopId.fromLong(id));
     }
-
     return gradoopIds;
   }
 
@@ -98,6 +110,7 @@ public class GradoopIds implements Iterable<GradoopId>, Writable, Serializable {
 
   /**
    * adds existing gradoop ids
+   *
    * @param gradoopIds ids to add
    */
   public void addAll(Collection<GradoopId> gradoopIds) {

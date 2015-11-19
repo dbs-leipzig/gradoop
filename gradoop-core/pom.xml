@@ -60,6 +60,12 @@
             <artifactId>hbase-server</artifactId>
         </dependency>
 
+        <!-- Others -->
+        <dependency>
+            <groupId>org.s1ck</groupId>
+            <artifactId>gdl</artifactId>
+        </dependency>
+
         <!-- Testing -->
 
         <!-- HBase -->

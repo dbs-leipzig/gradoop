@@ -79,8 +79,8 @@ public class SplitBy<
     DataSet<VD> vertices = computeNewVertices(graph);
     DataSet<GD> graphHeads = computeNewGraphHeads(graph, vertices);
     DataSet<ED> edges = computeNewEdges(graph, vertices, graphHeads);
-    return new GraphCollection<>(vertices, edges, graphHeads,
-      graph.getConfig());
+    return GraphCollection.fromDataSets(vertices,
+      edges, graphHeads, graph.getConfig());
   }
 
   /**

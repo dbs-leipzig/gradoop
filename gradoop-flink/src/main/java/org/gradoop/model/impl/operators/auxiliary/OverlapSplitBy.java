@@ -81,7 +81,7 @@ public class OverlapSplitBy<
     // construct tuples containing the edge, source and target vertex ids
     DataSet<ED> edges =
       computeNewEdges(graph, vertices, subgraphs);
-    return new GraphCollection<>(vertices, edges, subgraphs,
+    return GraphCollection.fromDataSets(vertices, edges, subgraphs,
       graph.getConfig());
   }
 

@@ -48,7 +48,7 @@ public class EqualityTestBase extends org.gradoop.model.FlinkTestBase {
       new FlinkAsciiGraphLoader<>(
         GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
 
-    loader.readDatabaseFromString(asciiGraphs);
+    loader.initDatabaseFromString(asciiGraphs);
     return loader;
   }
 

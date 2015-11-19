@@ -64,6 +64,7 @@
         <project.build.targetJdk>1.7</project.build.targetJdk>
 
         <dep.flink.version>0.10-SNAPSHOT</dep.flink.version>
+        <dep.gdl.version>0.1</dep.gdl.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
         <dep.junit.version>4.11</dep.junit.version>
         <dep.junitparams.version>1.0.4</dep.junitparams.version>
@@ -243,6 +244,12 @@
             </dependency>
 
             <!-- Others -->
+            <dependency>
+                <groupId>org.s1ck</groupId>
+                <artifactId>gdl</artifactId>
+                <version>${dep.gdl.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>

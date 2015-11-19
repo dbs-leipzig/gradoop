@@ -95,7 +95,8 @@ public class EPGMDatabase<
     DataSet<ED> edges, DataSet<GD> graphHeads,
     GradoopFlinkConfig<VD, ED, GD> config) {
     this.config = config;
-    this.database = new GraphCollection<>(vertices, edges, graphHeads, config);
+    this.database = GraphCollection.fromDataSets(vertices,
+      edges, graphHeads, config);
     this.databaseData = config.getGraphHeadHandler().getGraphHeadFactory()
       .createGraphHead(FlinkConstants.DATABASE_GRAPH_ID);
   }
@@ -510,7 +511,7 @@ public class EPGMDatabase<
         }
       });
 
-    return new GraphCollection<>(newVertices, newEdges,
-      database.getGraphHeads(), config);
+    return GraphCollection.fromDataSets(newVertices,
+      newEdges, database.getGraphHeads(), config);
   }
 }

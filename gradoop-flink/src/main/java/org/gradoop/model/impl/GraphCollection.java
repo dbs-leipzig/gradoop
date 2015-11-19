@@ -54,6 +54,7 @@ import org.gradoop.model.impl.operators.collection.binary.Union;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -85,12 +86,60 @@ public class GraphCollection<
    * @param graphHeads  graph heads
    * @param config      Gradoop Flink configuration
    */
-  public GraphCollection(DataSet<VD> vertices,
+  private GraphCollection(DataSet<VD> vertices,
     DataSet<ED> edges,
     DataSet<GD> graphHeads,
     GradoopFlinkConfig<VD, ED, GD> config) {
     super(vertices, edges, config);
     this.graphHeads = graphHeads;
+  }
+
+  /**
+   * Creates a graph collection from the given arguments.
+   *
+   * @param vertices    Vertex DataSet
+   * @param edges       Edge DataSet
+   * @param graphHeads  GraphHead DataSet
+   * @param config      Gradoop Flink configuration
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
+   * @param <G>         EPGM graph head graph head type
+   * @return Graph collection
+   */
+  public static
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+  GraphCollection<V, E, G>
+  fromDataSets(DataSet<V> vertices,
+    DataSet<E> edges,
+    DataSet<G> graphHeads,
+    GradoopFlinkConfig<V, E, G> config) {
+    return new GraphCollection<>(vertices, edges, graphHeads, config);
+  }
+
+  /**
+   *
+   * @param vertices    Vertex collection
+   * @param edges       Edge collection
+   * @param graphHeads  Graph Head collection
+   * @param config      Gradoop Flink configuration
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
+   * @param <G>         EPGM graph type
+   * @return Graph collection
+   */
+  public static
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+  GraphCollection<V, E, G>
+  fromCollections(Collection<V> vertices,
+    Collection<E> edges,
+    Collection<G> graphHeads,
+    GradoopFlinkConfig<V, E, G> config) {
+    return fromDataSets(
+      config.getExecutionEnvironment().fromCollection(vertices),
+      config.getExecutionEnvironment().fromCollection(edges),
+      config.getExecutionEnvironment().fromCollection(graphHeads),
+      config
+    );
   }
 
   /**

@@ -46,6 +46,7 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization
   .SummarizationGroupCombine;
 import org.gradoop.util.GradoopFlinkConfig;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -117,25 +118,51 @@ public class LogicalGraph
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param vertices  Vertex DataSet
-   * @param edges     Edge DataSet
-   * @param graphData graph data associated with the logical graph
-   * @param config    Gradoop Flink configuration
-   * @param <VD>      EPGM vertex type
-   * @param <ED>      EPGM edge type
-   * @param <GD>      EPGM graph head graph head type
-   * @return logical graph
+   * @param vertices    Vertex DataSet
+   * @param edges       Edge DataSet
+   * @param graphHeads  graph head associated with the logical graph
+   * @param config      Gradoop Flink configuration
+   * @param <VD>        EPGM vertex type
+   * @param <ED>        EPGM edge type
+   * @param <GD>        EPGM graph head graph head type
+   * @return Logical graph
    */
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
   LogicalGraph<VD, ED, GD> fromDataSets(DataSet<VD> vertices,
     DataSet<ED> edges,
-    GD graphData,
+    GD graphHeads,
     GradoopFlinkConfig<VD, ED, GD> config) {
     return new LogicalGraph<>(vertices,
       edges,
-      graphData,
+      graphHeads,
       config);
+  }
+
+  /**
+   * Creates a logical graph from the given arguments.
+   *
+   * @param vertices    Vertex collection
+   * @param edges       Edge collection
+   * @param graphHead   Graph head associated with the logical graph
+   * @param config      Gradoop Flink configuration
+   * @param <VD>        EPGM vertex type
+   * @param <ED>        EPGM edge type
+   * @param <GD>        EPGM graph type
+   * @return Logical graph
+   */
+  public static
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  LogicalGraph<VD, ED, GD> fromCollections(Collection<VD> vertices,
+    Collection<ED> edges,
+    GD graphHead,
+    GradoopFlinkConfig<VD, ED, GD> config) {
+    return fromDataSets(
+      config.getExecutionEnvironment().fromCollection(vertices),
+      config.getExecutionEnvironment().fromCollection(edges),
+      graphHead,
+      config
+    );
   }
 
 

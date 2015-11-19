@@ -19,9 +19,8 @@ public class EqualByGraphIdsTest extends EqualityTestBase {
 
   @Test
   public void testExecute(){
-
     String asciiGraphs =
-      "g1[(a)-b->(c)];g2[(a)-b->(c)];g3[(a)-b->(c)]";
+      "g1[(a)-[b]->(c)];g2[(a)-[b]->(c)];g3[(a)-[b]->(c)]";
 
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
@@ -35,7 +34,11 @@ public class EqualByGraphIdsTest extends EqualityTestBase {
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c3
       = loader.getGraphCollectionByVariables("g1","g3");
 
-    collectAndAssertEquals(new EqualByGraphIds().execute(c1, c2));
-    collectAndAssertNotEquals(new EqualByGraphIds().execute(c1, c3));
+    collectAndAssertEquals(
+      new EqualByGraphIds<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .execute(c1, c2));
+    collectAndAssertNotEquals(
+      new EqualByGraphIds<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .execute(c1, c3));
   }
 }
