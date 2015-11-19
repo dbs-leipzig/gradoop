@@ -12,9 +12,10 @@ import org.gradoop.model.impl.LogicalGraph;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  * @param <G> EPGM graph head type
+ * @param <T> value type
  */
-public interface BinaryGraphToBooleanOperator
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+public interface BinaryGraphToValueOperator
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead, T>
   extends Operator {
 
   /**
@@ -24,7 +25,7 @@ public interface BinaryGraphToBooleanOperator
    * @param secondGraph second input graph
    * @return operator result
    */
-  DataSet<Boolean> execute(
+  DataSet<T> execute(
     LogicalGraph<V, E, G> firstGraph,
     LogicalGraph<V, E, G> secondGraph
   );
