@@ -224,7 +224,7 @@ public class AsciiGraphLoader<
   public Collection<V> getVerticesByGraphIds(GradoopIds graphIds) {
     Collection<V> result = Sets.newHashSetWithExpectedSize(graphIds.size());
     for (V vertex : vertices.values()) {
-      if (vertex.getGraphIds().containsAll(graphIds)) {
+      if (vertex.getGraphIds().containsAny(graphIds)) {
         result.add(vertex);
       }
     }
@@ -285,7 +285,7 @@ public class AsciiGraphLoader<
   public Collection<E> getEdgesByGraphIds(GradoopIds graphIds) {
     Collection<E> result = Sets.newHashSetWithExpectedSize(graphIds.size());
     for (E edge : edges.values()) {
-      if (edge.getGraphIds().containsAll(graphIds)) {
+      if (edge.getGraphIds().containsAny(graphIds)) {
         result.add(edge);
       }
     }

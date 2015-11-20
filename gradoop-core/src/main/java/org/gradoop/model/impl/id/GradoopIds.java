@@ -128,11 +128,11 @@ public class GradoopIds implements Iterable<GradoopId>,
 
   /**
    * checks, if all gradoop ids are contained
-   * @param other gradoop ids
+   * @param others gradoop ids
    * @return true, if all contained
    */
-  public boolean containsAll(GradoopIds other) {
-    return this.identifiers.containsAll(other.identifiers);
+  public boolean containsAll(GradoopIds others) {
+    return this.identifiers.containsAll(others.identifiers);
   }
 
   /**
@@ -144,6 +144,32 @@ public class GradoopIds implements Iterable<GradoopId>,
     return this.identifiers.containsAll(identifiers);
   }
 
+  /**
+   * Checks, if any of the given ids is contained
+   * @param others id collection
+   * @return true, if any id is contained
+   */
+  public boolean containsAny(GradoopIds others) {
+    boolean result = false;
+    for (GradoopId id : others) {
+      if (this.identifiers.contains(id)) {
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Checks, if any of the given ids is contained
+   * @param identifiers id collection
+   * @return true, if any id is contained
+   */
+  public boolean containsAny(Collection<GradoopId> identifiers) {
+    GradoopIds ids = new GradoopIds();
+    ids.addAll(identifiers);
+    return containsAny(ids);
+  }
 
 
   /**
