@@ -1,7 +1,6 @@
-package org.gradoop.model.impl.operators.collection.binary.equality.functions;
+package org.gradoop.model.impl.operators.equality.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.impl.id.GradoopId;

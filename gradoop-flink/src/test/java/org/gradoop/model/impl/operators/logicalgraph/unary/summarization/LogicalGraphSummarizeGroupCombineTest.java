@@ -15,7 +15,7 @@
 // * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
 // */
 //
-//package org.gradoop.model.impl.operators.logicalgraph.unary.summarization;
+//package org.gradoop.model.impl.operators.collection.unary.summarization;
 //
 //import org.gradoop.model.impl.pojo.EdgePojo;
 //import org.gradoop.model.impl.pojo.GraphHeadPojo;

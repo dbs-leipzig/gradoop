@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.collection.binary.equality;
+package org.gradoop.model.impl.operators.equality.collection;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;

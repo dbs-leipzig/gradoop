@@ -1,8 +1,8 @@
-package org.gradoop.model.impl.operators.collection.binary.equality.functions;
+package org.gradoop.model.impl.operators.equality;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.AggregateOperator;
-import org.apache.flink.api.java.operators.CrossOperator;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
@@ -10,6 +10,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.Equals;
+import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.counting.ToCountableTuple2;
 import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.id.GradoopId;
@@ -17,9 +18,9 @@ import org.gradoop.model.impl.id.GradoopId;
 /**
  * Created by peet on 19.11.15.
  */
-public class EqualityHelper {
+public abstract class EqualityBase {
 
-  public static
+  public
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   AggregateOperator<Tuple2<GradoopId, Long>> getIdsWithCount(
     GraphCollection<V, E, G> graphCollection
@@ -33,9 +34,26 @@ public class EqualityHelper {
       .sum(1);
   }
 
-  public static CrossOperator<Tuple1<Long>, Tuple1<Long>, Boolean>
+  public DataSet<Boolean>
   checkCountEqualsCount(
     DataSet<Tuple1<Long>> firstCount, DataSet<Tuple1<Long>> matchingIdCount) {
-    return matchingIdCount.cross(firstCount).with(new Equals<Tuple1<Long>>());
+
+    DataSet<Boolean> resultSet =
+      matchingIdCount.cross(firstCount).with(new Equals<Tuple1<Long>>());
+
+    resultSet = ensureBooleanSetIsNotEmpty(resultSet);
+
+    return resultSet;
+  }
+
+  private DataSet<Boolean> ensureBooleanSetIsNotEmpty(
+    DataSet<Boolean> resultSet) {
+    resultSet = resultSet
+      .union(
+        resultSet
+          .getExecutionEnvironment()
+          .fromCollection(Lists.newArrayList(false))
+      ).reduce(new Or());
+    return resultSet;
   }
 }

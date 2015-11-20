@@ -1,7 +1,9 @@
-package org.gradoop.model.impl.operators.logicalgraph.binary.equality;
+package org.gradoop.model.impl.operators.equality;
 
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.EqualityTestBase;
+import org.gradoop.model.impl.operators.equality.logicalgraph
+  .EqualByElementData;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;

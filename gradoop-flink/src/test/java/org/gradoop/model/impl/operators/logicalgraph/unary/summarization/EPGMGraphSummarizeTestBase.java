@@ -15,7 +15,7 @@
 // * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
 // */
 //
-//package org.gradoop.model.impl.operators.logicalgraph.unary.summarization;
+//package org.gradoop.model.impl.operators.collection.unary.summarization;
 //
 //import com.google.common.collect.Lists;
 //import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
@@ -35,7 +35,7 @@
 //import java.util.List;
 //
 //import static org.gradoop.GradoopTestBaseUtils.*;
-//import static org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization
+//import static org.gradoop.model.impl.operators.collection.unary.summarization.Summarization
 //  .NULL_VALUE;
 //import static org.junit.Assert.*;
 //

@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.collection.binary.equality.functions;
+package org.gradoop.model.impl.operators.equality.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
