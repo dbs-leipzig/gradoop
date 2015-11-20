@@ -122,7 +122,11 @@ public class AsciiGraphLoader<
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   AsciiGraphLoader<V, E, G> fromString(String asciiGraph,
     GradoopConfig<V, E, G> config) {
-    return new AsciiGraphLoader<>(GDLHandler.initFromString(asciiGraph),
+    return new AsciiGraphLoader<>(new GDLHandler.Builder()
+      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .buildFromString(asciiGraph),
       config);
   }
 
@@ -141,7 +145,11 @@ public class AsciiGraphLoader<
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   AsciiGraphLoader<V, E, G> fromFile(String fileName,
     GradoopConfig<V, E, G> config) throws IOException {
-    return new AsciiGraphLoader<>(GDLHandler.initFromFile(fileName), config);
+    return new AsciiGraphLoader<>(new GDLHandler.Builder()
+      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .buildFromFile(fileName), config);
   }
 
   // ---------------------------------------------------------------------------
@@ -199,6 +207,16 @@ public class AsciiGraphLoader<
   }
 
   /**
+   * Returns vertex by its given variable.
+   *
+   * @param variable variable used in GDL script
+   * @return vertex or {@code null} if not present
+   */
+  public V getVertexByVariable(String variable) {
+    return vertexCache.get(variable);
+  }
+
+  /**
    * Returns vertices by their given variables.
    *
    * @param variables variables used in GDL script
@@ -207,7 +225,7 @@ public class AsciiGraphLoader<
   public Collection<V> getVerticesByVariables(String... variables) {
     Collection<V> vertices = Sets.newHashSetWithExpectedSize(variables.length);
     for (String variable : variables) {
-      V vertex = vertexCache.get(variable);
+      V vertex = getVertexByVariable(variable);
       if (vertex != null) {
         vertices.add(vertex);
       }
@@ -257,6 +275,16 @@ public class AsciiGraphLoader<
    */
   public Collection<E> getEdges() {
     return new ImmutableSet.Builder<E>().addAll(edges.values()).build();
+  }
+
+  /**
+   * Returns edge by its given variable.
+   *
+   * @param variable variable used in GDL script
+   * @return edge or {@code null} if not present
+   */
+  public E getEdgeByVariable(String variable) {
+    return edgeCache.get(variable);
   }
 
   /**

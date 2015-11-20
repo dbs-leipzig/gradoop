@@ -30,8 +30,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class GraphHeadPojoTest {
   @Test
@@ -88,4 +87,36 @@ public class GraphHeadPojoTest {
     GradoopId graphID = idGen.createId();
     new GraphHeadPojoFactory().createGraphHead(graphID, null);
   }
+
+  @Test
+  public void equalsTest() {
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId graphID1 = idGen.createId();
+    GradoopId graphID2 = idGen.createId();
+
+    GraphHeadPojo graphHead1 = new GraphHeadPojoFactory().createGraphHead(graphID1);
+    GraphHeadPojo graphHead2 = new GraphHeadPojoFactory().createGraphHead(graphID1);
+    GraphHeadPojo graphHead3 = new GraphHeadPojoFactory().createGraphHead(graphID2);
+
+    assertEquals("Graph heads were not equal", graphHead1, graphHead1);
+    assertEquals("Graph heads were not equal", graphHead1, graphHead2);
+    assertNotEquals("Graph heads were equal", graphHead1, graphHead3);
+  }
+
+  @Test
+  public void testHashCode() {
+    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopId graphID1 = idGen.createId();
+    GradoopId graphID2 = idGen.createId();
+
+    GraphHeadPojo graphHead1 = new GraphHeadPojoFactory().createGraphHead(graphID1);
+    GraphHeadPojo graphHead2 = new GraphHeadPojoFactory().createGraphHead(graphID1);
+    GraphHeadPojo graphHead3 = new GraphHeadPojoFactory().createGraphHead(graphID2);
+
+    assertTrue("Graph heads have different hash",
+      graphHead1.hashCode() == graphHead2.hashCode());
+    assertFalse("Graph heads have same hash",
+      graphHead1.hashCode() == graphHead3.hashCode());
+  }
+
 }
