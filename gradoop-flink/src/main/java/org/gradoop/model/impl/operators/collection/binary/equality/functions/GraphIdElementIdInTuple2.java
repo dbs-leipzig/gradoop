@@ -17,7 +17,7 @@ public class GraphIdElementIdInTuple2<E extends EPGMGraphElement>
     GradoopId elementId = element.getId();
 
     for(GradoopId graphId : element.getGraphIds()) {
-      collector.collect(new Tuple2<>(elementId, graphId));
+      collector.collect(new Tuple2<>(graphId, elementId));
     }
 
   }

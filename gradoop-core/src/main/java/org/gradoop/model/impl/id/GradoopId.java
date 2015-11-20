@@ -74,14 +74,15 @@ public final class GradoopId implements Comparable<GradoopId>,
 
   @Override
   public boolean equals(Object o) {
+    boolean equals = false;
+
     if (this == o) {
-      return true;
+      equals = true;
+    } else if (o instanceof GradoopId) {
+      equals = this.identifier.equals(((GradoopId) o).identifier);
     }
-    if (!(o instanceof GradoopId)) {
-      return false;
-    }
-    GradoopId gradoopId = (GradoopId) o;
-    return Objects.equals(identifier, gradoopId.identifier);
+
+    return equals;
   }
 
   @Override

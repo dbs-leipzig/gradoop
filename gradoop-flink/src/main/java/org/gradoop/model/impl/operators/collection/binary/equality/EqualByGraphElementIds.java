@@ -60,14 +60,16 @@ public class EqualByGraphElementIds
     DataSet<Tuple2<GradoopId, Long>> firstGraphIdOccurrences =
       EqualityHelper.getIdsWithCount(graphCollection);
 
-    DataSet<Tuple2<GradoopId,GradoopIds>> firstGraphIdVertexIds =
+
+
+    DataSet<Tuple2<GradoopId,GradoopIds>> vertexIdsByGraphId =
       getElementIdsByGraphId(graphCollection.getVertices());
 
-    DataSet<Tuple2<GradoopId,GradoopIds>> firstGraphIdEdgeIds =
+    DataSet<Tuple2<GradoopId,GradoopIds>> edgeIdsByGraphId =
       getElementIdsByGraphId(graphCollection.getEdges());
 
-    return firstGraphIdVertexIds
-      .join(firstGraphIdEdgeIds)
+    return vertexIdsByGraphId
+      .join(edgeIdsByGraphId)
       .where(0).equalTo(0)
       .with(new GraphIdVertexIdsEdgeIdsTriple())
       .join(firstGraphIdOccurrences)

@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.id;
 
 import com.google.common.collect.Sets;
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -34,7 +34,8 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIds implements Iterable<GradoopId>, Writable, Serializable {
+public class GradoopIds implements Iterable<GradoopId>,
+  WritableComparable<GradoopIds>, Serializable {
 
   /**
    * Holds the identifiers.
@@ -199,5 +200,26 @@ public class GradoopIds implements Iterable<GradoopId>, Writable, Serializable {
    */
   public int size() {
     return identifiers.size();
+  }
+
+  @Override
+  public int compareTo(GradoopIds other) {
+
+    int comparison = this.identifiers.size() - other.identifiers.size();
+
+    if(comparison == 0) {
+      Iterator<GradoopId> thisIterator = this.identifiers.iterator();
+      Iterator<GradoopId> otherIterator = other.identifiers.iterator();
+
+      while (comparison == 0 && thisIterator.hasNext()) {
+        comparison = thisIterator.next().compareTo(otherIterator.next());
+      }
+    }
+    return comparison;
+  }
+
+  @Override
+  public String toString(){
+    return identifiers.toString();
   }
 }

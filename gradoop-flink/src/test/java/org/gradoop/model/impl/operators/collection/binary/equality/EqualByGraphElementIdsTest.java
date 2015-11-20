@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.operators.collection.binary.equality;
 
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.EqualityTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -23,7 +24,7 @@ public class EqualByGraphElementIdsTest extends EqualityTestBase {
 
     // 4 graphs : 1-2 of same elements, 1-3 different vertex, 1-4 different edge
     String asciiGraphs =
-      "g1[(a)-b->(c)];g2[(a)-b->(c)];g3[(d)-b->(c)];g4[(a)-e->(c)]";
+      "g1[(a)-[b]->(c)];g2[(a)-[b]->(c)];g3[(d)-[b]->(c)];g4[(a)-[e]->(c)]";
 
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);

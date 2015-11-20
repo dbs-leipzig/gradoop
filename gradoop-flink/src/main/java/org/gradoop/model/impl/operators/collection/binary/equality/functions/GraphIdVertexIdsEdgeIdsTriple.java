@@ -7,8 +7,8 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
 
-@FunctionAnnotation.ForwardedFieldsFirst("f0->f0,f1->f1")
-@FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
+//@FunctionAnnotation.ForwardedFieldsFirst("f0,f1")
+//@FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
 public class GraphIdVertexIdsEdgeIdsTriple implements
   JoinFunction<Tuple2<GradoopId,GradoopIds>,Tuple2<GradoopId,GradoopIds>,
     Tuple3<GradoopId,GradoopIds,GradoopIds>> {
