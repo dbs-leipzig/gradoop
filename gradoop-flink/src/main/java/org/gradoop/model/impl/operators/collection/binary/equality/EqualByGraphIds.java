@@ -2,6 +2,7 @@ package org.gradoop.model.impl.operators.collection.binary.equality;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.AggregateOperator;
+import org.apache.flink.api.java.operators.CrossOperator;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
@@ -14,6 +15,8 @@ import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.counting.OneInTuple1;
 import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.collection.binary.equality.functions
+  .EqualityHelper;
 
 /**
  * Created by peet on 17.11.15.
@@ -27,37 +30,27 @@ public class EqualByGraphIds
     GraphCollection<V, E, G> firstCollection,
     GraphCollection<V, E, G> secondCollection) {
 
-    DataSet<Tuple2<GradoopId, Long>> firstIdsWithCount =
-      getIdsWithCount(firstCollection);
+    DataSet<Tuple2<GradoopId, Long>> firstGraphIdsWithCount =
+      EqualityHelper.getIdsWithCount(firstCollection);
 
-    DataSet<Tuple2<GradoopId, Long>> secondIdsWithCount =
-      getIdsWithCount(secondCollection);
+    DataSet<Tuple2<GradoopId, Long>> secondGraphIdsWithCount =
+      EqualityHelper.getIdsWithCount(secondCollection);
 
-    DataSet<Tuple1<Long>> distinctFirstIdCount = firstIdsWithCount
+    DataSet<Tuple1<Long>> distinctFirstIdCount = firstGraphIdsWithCount
       .map(new OneInTuple1<Tuple2<GradoopId, Long>>())
       .sum(0);
 
-    DataSet<Tuple1<Long>> matchingIdCount = firstIdsWithCount
-      .join(secondIdsWithCount)
+    DataSet<Tuple1<Long>> matchingIdCount = firstGraphIdsWithCount
+      .join(secondGraphIdsWithCount)
       .where(0, 1).equalTo(0, 1)
       .with(new OneInTuple1<Tuple2<GradoopId,Long>>())
       .sum(0);
 
-    return matchingIdCount
-      .cross(distinctFirstIdCount)
-      .with(new Equals<Tuple1<Long>>());
+    return EqualityHelper.checkCountEqualsCount(
+      distinctFirstIdCount, matchingIdCount);
   }
 
-  private AggregateOperator<Tuple2<GradoopId, Long>> getIdsWithCount(
-    GraphCollection<V, E, G> graphCollection) {
 
-    return graphCollection
-      .getGraphHeads()
-      .map(new ElementIdOnly<G>())
-      .map(new ToCountableTuple2<GradoopId>())
-      .groupBy(0)
-      .sum(1);
-  }
 
   @Override
   public String getName() {

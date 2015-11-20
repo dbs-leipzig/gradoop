@@ -29,12 +29,15 @@ public class EqualByGraphElementIdsTest extends EqualityTestBase {
       getLoaderFromString(asciiGraphs);
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c1
-      = loader.getGraphCollectionByVariables("g1","g3");
+      = loader.getGraphCollectionByVariables("g1", "g3");
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c2
       = loader.getGraphCollectionByVariables("g2", "g3");
 
-    collectAndAssertEquals(new EqualByGraphIds().execute(c1, c2));
+    EqualByGraphElementIds<GraphHeadPojo, VertexPojo, EdgePojo> equals
+      = new EqualByGraphElementIds<>();
+
+    collectAndAssertEquals(equals.execute(c1, c2));
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c3
       = loader.getGraphCollectionByVariables("g1","g2");
@@ -45,7 +48,7 @@ public class EqualByGraphElementIdsTest extends EqualityTestBase {
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c5
       = loader.getGraphCollectionByVariables("g1","g4");
 
-    collectAndAssertNotEquals(new EqualByGraphIds().execute(c3, c4));
-    collectAndAssertNotEquals(new EqualByGraphIds().execute(c3, c5));
+    collectAndAssertNotEquals(equals.execute(c3, c4));
+    collectAndAssertNotEquals(equals.execute(c3, c5));
   }
 }
