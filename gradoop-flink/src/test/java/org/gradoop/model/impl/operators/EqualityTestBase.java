@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -11,18 +12,20 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class EqualityTestBase extends org.gradoop.model.FlinkTestBase {
+public class EqualityTestBase extends FlinkTestBase {
 
   public EqualityTestBase(TestExecutionMode mode) {
     super(mode);
   }
 
+  @Override
   protected void collectAndAssertEquals(DataSet<Boolean> result) {
 
     List<Boolean> collectedResult = collectAndAssertSizeOne(result);
     assertTrue("expected equality", collectedResult.get(0));
   }
 
+  @Override
   protected void collectAndAssertNotEquals(DataSet<Boolean> result) {
 
     List<Boolean> collectedResult = collectAndAssertSizeOne(result);
@@ -40,16 +43,4 @@ public class EqualityTestBase extends org.gradoop.model.FlinkTestBase {
     assertEquals("only one boolean result expected", 1, collectedResult.size());
     return collectedResult;
   }
-
-  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
-  getLoaderFromString(
-    String asciiGraphs) {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
-      new FlinkAsciiGraphLoader<>(
-        GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
-
-    loader.initDatabaseFromString(asciiGraphs);
-    return loader;
-  }
-
 }
