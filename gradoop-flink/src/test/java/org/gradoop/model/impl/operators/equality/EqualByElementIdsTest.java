@@ -23,7 +23,7 @@ public class EqualByElementIdsTest extends EqualityTestBase {
 
     // 4 graphs : 1-2 of same elements, 1-3 different vertex, 1-4 different edge
     String asciiGraphs =
-      "g1[(a)-b->(c)];g2[(a)-b->(c)];g3[(d)-b->(c)];g4[(a)-e->(c)]";
+      "g1[(a)-[b]->(c)];g2[(a)-[b]->(c)];g3[(d)-[b]->(c)];g4[(a)-[e]->(c)]";
 
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
@@ -41,8 +41,11 @@ public class EqualByElementIdsTest extends EqualityTestBase {
       loader.getLogicalGraphByVariable("g4");
 
 
-    collectAndAssertEquals(new EqualByElementIds().execute(g1, g2));
-    collectAndAssertNotEquals(new EqualByElementIds().execute(g1, g3));
-    collectAndAssertNotEquals(new EqualByElementIds().execute(g1, g4));
+    EqualByElementIds<GraphHeadPojo, VertexPojo, EdgePojo> equals =
+      new EqualByElementIds<>();
+
+    collectAndAssertEquals(equals.execute(g1, g2));
+    collectAndAssertNotEquals(equals.execute(g1, g3));
+    collectAndAssertNotEquals(equals.execute(g1, g4));
   }
 }
