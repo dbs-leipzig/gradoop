@@ -46,15 +46,6 @@ public class EqualByGraphElementIds
       .map(new OneInTuple1<Tuple3<GradoopIds, GradoopIds, Long>>())
       .sum(0);
 
-    try {
-      System.out.println("first");
-      firstGraphsWithCount.print();
-      System.out.println("second");
-      secondGraphsWithCount.print();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     DataSet<Tuple1<Long>> matchingIdCount = firstGraphsWithCount
       .join(secondGraphsWithCount)
       .where(0, 1, 2).equalTo(0, 1, 2)

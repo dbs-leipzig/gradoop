@@ -17,6 +17,7 @@
 
 package org.gradoop.model;
 
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
@@ -28,12 +29,17 @@ import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.util.GradoopFlinkConfig;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Used for tests that require a Flink cluster up and running.
@@ -122,4 +128,24 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
     MultipleProgramsTestBase.cluster = cluster;
   }
 
+  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getLoaderFromString(
+    String asciiGraphs) {
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      new FlinkAsciiGraphLoader<>(
+        GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
+
+    loader.initDatabaseFromString(asciiGraphs);
+    return loader;
+  }
+
+  protected void collectAndAssertEquals(DataSet<Boolean> result) throws
+    Exception {
+    assertTrue("expected equality", result.collect().get(0));
+  }
+
+  protected void collectAndAssertNotEquals(DataSet<Boolean> result) throws
+    Exception {
+    assertFalse("expected inequality", result.collect().get(0));
+  }
 }
