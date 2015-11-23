@@ -42,29 +42,29 @@ public class EqualByElementData
 
     DataSet<EdgeDataLabel> edgeLabels = graph.getEdges()
       .map(new EdgeDataLabeler<E>())
-      .groupBy(0, 1)
+      .groupBy(1, 2)
       .reduceGroup(new SortAndConcatLabels<EdgeDataLabel>());
 
     DataSet<DataLabel> outgoingEdgeLabels = edgeLabels
       .join(vertexLabels)
-      .where(1).equalTo(0)
+      .where(2).equalTo(1)
       .with(new TargetVertexLabelAppender())
-      .groupBy(0)
+      .groupBy(1)
       .reduceGroup(new SortAndConcatLabels<DataLabel>());
 
     DataSet<DataLabel> incomingEdgeLabels = edgeLabels
       .join(vertexLabels)
-      .where(0).equalTo(0)
+      .where(1).equalTo(1)
       .with(new SourceVertexLabelAppender())
-      .groupBy(0)
+      .groupBy(1)
       .reduceGroup(new SortAndConcatLabels<DataLabel>());
 
     return vertexLabels
       .leftOuterJoin(outgoingEdgeLabels)
-      .where(0).equalTo(0)
+      .where(1).equalTo(1)
       .with(new LabelAppender())
       .leftOuterJoin(incomingEdgeLabels)
-      .where(0).equalTo(0)
+      .where(1).equalTo(1)
       .with(new LabelAppender())
       .reduceGroup(new SortAndConcatLabels<DataLabel>());
   }

@@ -1,11 +1,13 @@
 package org.gradoop.model.impl.functions.bool;
 
 import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 
 /**
  * Created by peet on 19.11.15.
  */
-public class Equals<T> implements CrossFunction<T, T, Boolean> {
+public class Equals<T>
+  implements CrossFunction<T, T, Boolean>{
 
   @Override
   public Boolean cross(T left, T right) throws Exception {

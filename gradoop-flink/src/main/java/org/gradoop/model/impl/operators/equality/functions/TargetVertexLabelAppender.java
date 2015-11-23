@@ -16,7 +16,7 @@ public class TargetVertexLabelAppender
     EdgeDataLabel edgeLabel, DataLabel targetVertexLabel
   ) throws Exception {
 
-    return new DataLabel(
+    return new DataLabel(edgeLabel.getGraphId(),
       edgeLabel.getSourceVertexId(), label(edgeLabel, targetVertexLabel)
     );
   }
