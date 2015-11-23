@@ -46,7 +46,7 @@ public abstract class EqualityBase {
     return resultSet;
   }
 
-  private DataSet<Boolean> ensureBooleanSetIsNotEmpty(
+  protected DataSet<Boolean> ensureBooleanSetIsNotEmpty(
     DataSet<Boolean> resultSet) {
     resultSet = resultSet
       .union(
