@@ -26,6 +26,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Graph;
@@ -149,7 +150,8 @@ public class AsciiGraphLoader<
       .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
-      .buildFromFile(fileName), config);
+      .buildFromFile(fileName),
+      config);
   }
 
   // ---------------------------------------------------------------------------
@@ -428,8 +430,9 @@ public class AsciiGraphLoader<
    * @return EPGM GraphHead
    */
   private G initGraphHead(Graph g) {
-    GradoopId graphId = GradoopId.fromLong(g.getId());
-    return config.getGraphHeadFactory().createGraphHead(graphId,
+    GradoopId graphId = GradoopIds.fromLong(g.getId());
+    return config.getGraphHeadFactory().createGraphHead(
+      graphId,
       g.getLabel(),
       g.getProperties());
   }
@@ -441,7 +444,7 @@ public class AsciiGraphLoader<
    * @return EPGM Vertex
    */
   private V initVertex(Vertex v) {
-    GradoopId vertexId = GradoopId.fromLong(v.getId());
+    GradoopId vertexId = GradoopIds.fromLong(v.getId());
     GradoopIdSet graphIds = GradoopIdSet.fromLongs(v.getGraphs());
     return config.getVertexFactory().createVertex(vertexId,
       v.getLabel(),
@@ -456,9 +459,9 @@ public class AsciiGraphLoader<
    * @return EPGM edge
    */
   private E initEdge(Edge e) {
-    GradoopId edgeId = GradoopId.fromLong(e.getId());
-    GradoopId sourceVertexId = GradoopId.fromLong(e.getSourceVertexId());
-    GradoopId targetVertexId = GradoopId.fromLong(e.getTargetVertexId());
+    GradoopId edgeId = GradoopIds.fromLong(e.getId());
+    GradoopId sourceVertexId = GradoopIds.fromLong(e.getSourceVertexId());
+    GradoopId targetVertexId = GradoopIds.fromLong(e.getTargetVertexId());
     GradoopIdSet graphIds = GradoopIdSet.fromLongs(e.getGraphs());
     return config.getEdgeFactory().createEdge(edgeId,
       e.getLabel(),
@@ -475,7 +478,7 @@ public class AsciiGraphLoader<
    * @param g graph from GDL loader
    */
   private void updateGraphCache(String variable, Graph g) {
-    GradoopId graphId = GradoopId.fromLong(g.getId());
+    GradoopId graphId = GradoopIds.fromLong(g.getId());
     graphHeadCache.put(variable, graphHeads.get(graphId));
   }
 
@@ -486,7 +489,7 @@ public class AsciiGraphLoader<
    * @param v vertex from GDL loader
    */
   private void updateVertexCache(String variable, Vertex v) {
-    GradoopId vertexId = GradoopId.fromLong(v.getId());
+    GradoopId vertexId = GradoopIds.fromLong(v.getId());
     vertexCache.put(variable, vertices.get(vertexId));
   }
 
@@ -497,7 +500,7 @@ public class AsciiGraphLoader<
    * @param e edge from GDL loader
    */
   private void updateEdgeCache(String variable, Edge e) {
-    GradoopId edgeId = GradoopId.fromLong(e.getId());
+    GradoopId edgeId = GradoopIds.fromLong(e.getId());
     edgeCache.put(variable, edges.get(edgeId));
   }
 }

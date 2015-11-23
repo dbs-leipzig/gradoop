@@ -86,7 +86,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
     GradoopIdSet gradoopIdSet = new GradoopIdSet();
 
     for (Long id : ids) {
-      gradoopIdSet.add(GradoopId.fromLong(id));
+      gradoopIdSet.add(GradoopIds.fromLong(id));
     }
     return gradoopIdSet;
   }

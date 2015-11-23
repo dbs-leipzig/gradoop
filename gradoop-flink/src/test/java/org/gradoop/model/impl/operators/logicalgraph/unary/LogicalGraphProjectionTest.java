@@ -21,7 +21,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -46,7 +46,7 @@ public class LogicalGraphProjectionTest extends FlinkTestBase {
   @Test
   public void projectionTest() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      forumGraph = getGraphStore().getGraph(GradoopId.fromLong(3L));
+      forumGraph = getGraphStore().getGraph(GradoopIds.fromLong(3L));
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = forumGraph.project(new VertexLabelProjectionFunction(),
       new EdgePropertyProjectionFunction());

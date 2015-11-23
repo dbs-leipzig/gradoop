@@ -17,123 +17,98 @@
 
 package org.gradoop.model.impl.id;
 
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.Arrays;
 
 /**
  * Primary key for an EPGM entity. A GradoopId uniquely identifies an entity
- * across the whole graph.
+ * inside its domain, i.e. a graph is unique among all graphs, a vertex among
+ * all vertices and an edge among all edges.
  *
  * @see org.gradoop.model.api.EPGMIdentifiable
  */
-public final class GradoopId implements Comparable<GradoopId>,
+public class GradoopId implements Comparable<GradoopId>,
   WritableComparable<GradoopId>, Serializable {
 
   /**
-   * maximum id
+   * ID length in Byte
    */
-  public static final GradoopId MAX_VALUE = new GradoopId(Long.MAX_VALUE);
+  private static final int ID_LENGTH = 13;
 
   /**
-   * Serial version uid.
+   * Stores the ID
+   *
+   * Byte 0 - 1:  Context
+   * Byte 1 - 5:  Creator ID
+   * Byte 5 - 13: Sequence number
    */
-  private static final long serialVersionUID = 42L;
+  private byte[] content = new byte[ID_LENGTH];
 
   /**
-   * Long identifier.
-   */
-  private Long identifier;
-
-  /**
-   * Default constructor for serialization.
+   * Empty constructor is necessary for (de-)serialization
    */
   public GradoopId() {
   }
 
   /**
-   * Initializes a GradoopId from the given parameter.
+   * Creates a new Gradoop ID.
    *
-   * @param identifier long identifier
+   * @param sequence  sequence number
+   * @param creatorId creator id
+   * @param context   creation context
    */
-  GradoopId(Long identifier) {
-    if (identifier == null) {
-      throw new IllegalArgumentException("Identifier must not be null.");
-    }
-    this.identifier = identifier;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(identifier);
+  GradoopId(long sequence, int creatorId, Context context) {
+    Bytes.putByte(content, 0, (byte) context.ordinal());
+    Bytes.putInt(content, 1, creatorId);
+    Bytes.putLong(content, 5, sequence);
   }
 
   @Override
   public boolean equals(Object o) {
-    boolean equals = false;
-
     if (this == o) {
-      equals = true;
-    } else if (o instanceof GradoopId) {
-      equals = this.identifier.equals(((GradoopId) o).identifier);
+      return true;
     }
-
-    return equals;
+    if (!(o instanceof GradoopId)) {
+      return false;
+    }
+    GradoopId that = (GradoopId) o;
+    return Arrays.equals(content, that.content);
   }
 
   @Override
-  public String toString() {
-    return identifier.toString();
+  public int hashCode() {
+    return Arrays.hashCode(content);
   }
 
   @Override
-  public int compareTo(GradoopId otherId) {
-    if (this == otherId) {
-      return 0;
-    }
-    return this.identifier.compareTo(otherId.identifier);
+  public int compareTo(GradoopId o) {
+    return Bytes.compareTo(this.content, o.content);
   }
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeLong(identifier);
+    dataOutput.write(content);
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    this.identifier = dataInput.readLong();
+    dataInput.readFully(content);
   }
 
-  /**
-   * factory method to create from a long value
-   * @param id long
-   * @return new id
-   */
-  public static GradoopId fromLong(Long id) {
-    return new GradoopId(id);
-  }
-
-  /**
-   * factory method to create from a string representing a long value
-   * @param string long string
-   * @return new id
-   */
-  public static GradoopId fromLongString(String string) {
-    return GradoopId.fromLong(Long.valueOf(string));
-  }
-
-  /**
-   * returns the smaller one of two given ids
-   * @param firstId first id
-   * @param secondId second id
-   * @return smaller id
-   */
-  public static GradoopId min(GradoopId firstId, GradoopId secondId) {
-    return firstId.compareTo(secondId) <= 0 ?
-      firstId : secondId;
+  @Override
+  public String toString() {
+    Context context = Context.values()[(int) content[0]];
+    int creator = Bytes.toInt(content, 1);
+    long sequence = Bytes.toLong(content, 5);
+    return String.format("[%s-%s-%s]",
+      Long.toHexString(sequence),
+      Integer.toHexString(creator),
+      context);
   }
 }

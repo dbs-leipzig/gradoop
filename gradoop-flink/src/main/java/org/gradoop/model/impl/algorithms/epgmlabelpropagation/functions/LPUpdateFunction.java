@@ -23,6 +23,7 @@ import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +51,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     MessageIterator<GradoopId> msg) throws Exception {
     if (getSuperstepNumber() == 1) {
       vertex.getValue().setProperty(CURRENT_VALUE, vertex.getId());
-      vertex.getValue().setProperty(LAST_VALUE, GradoopId.MAX_VALUE);
+      vertex.getValue().setProperty(LAST_VALUE, GradoopIds.MAX_VALUE);
       vertex.getValue().setProperty(STABILIZATION_COUNTER, 0);
       //Todo: Use Broadcast to set ChangeMax
       vertex.getValue().setProperty(STABILIZATION_MAX, 20);
@@ -79,7 +80,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
           setNewVertexValue(vertex.getValue());
         } else {
           vertex.getValue().setProperty(CURRENT_VALUE,
-            GradoopId.min(currentCommunity, newCommunity));
+            GradoopIds.min(currentCommunity, newCommunity));
           vertex.getValue().setProperty(LAST_VALUE,
             vertex.getValue().getProperty(CURRENT_VALUE));
           setNewVertexValue(vertex.getValue());
@@ -119,7 +120,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     } else if (allMessages.size() == 1) {
       // 2. if just one message are received
       GradoopId firstCommunity = allMessages.get(0);
-      newCommunity = GradoopId.min(currentCommunity, firstCommunity);
+      newCommunity = GradoopIds.min(currentCommunity, firstCommunity);
     } else {
       // 3. if multiple messages are received
       newCommunity = getMostFrequent(vertex, allMessages);
@@ -133,7 +134,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
    * @return community id
    */
   private GradoopId readCurrentCommunity(Vertex<GradoopId, VD> vertex) {
-    return GradoopId
+    return GradoopIds
       .fromLongString((String) vertex.getValue().getProperty(CURRENT_VALUE));
   }
 
@@ -152,7 +153,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     GradoopId firstValue = allMessages.get(0);
     GradoopId currentValue = firstValue;
     int maxCounter = 1;
-    GradoopId maxValue = GradoopId.fromLong(1L);
+    GradoopId maxValue = GradoopIds.fromLong(1L);
     for (int i = 1; i < allMessages.size(); i++) {
       if (currentValue == allMessages.get(i)) {
         currentCounter++;
@@ -170,7 +171,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
       // to avoid an oscillating state of the calculation we will just use
       // the smaller value
       currentValue = readCurrentCommunity(vertex);
-      newValue = GradoopId.min(firstValue, currentValue);
+      newValue = GradoopIds.min(firstValue, currentValue);
     } else {
       newValue = maxValue;
     }

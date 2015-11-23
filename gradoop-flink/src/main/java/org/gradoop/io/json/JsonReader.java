@@ -28,6 +28,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Map;
 
@@ -156,7 +157,7 @@ public class JsonReader extends JsonIO {
     private GradoopId getSourceVertexID(JSONObject jsonEdge
     ) throws JSONException {
 
-      return GradoopId.fromLongString(jsonEdge.getString(EDGE_SOURCE));
+      return GradoopIds.fromLongString(jsonEdge.getString(EDGE_SOURCE));
     }
 
     /**
@@ -169,7 +170,7 @@ public class JsonReader extends JsonIO {
     private GradoopId getTargetVertexID(JSONObject jsonEdge
     ) throws JSONException {
 
-      return GradoopId.fromLongString(jsonEdge.getString(EDGE_TARGET));
+      return GradoopIds.fromLongString(jsonEdge.getString(EDGE_TARGET));
     }
   }
 

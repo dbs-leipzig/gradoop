@@ -23,6 +23,7 @@ import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +64,7 @@ public class LPUpdateFunction extends
           setNewVertexValue(vertex.getValue());
         } else {
           vertex.getValue()
-            .setCurrentCommunity(GradoopId.min(currentCommunity, newCommunity));
+            .setCurrentCommunity(GradoopIds.min(currentCommunity, newCommunity));
           vertex.getValue()
             .setLastCommunity(vertex.getValue().getCurrentCommunity());
           setNewVertexValue(vertex.getValue());
@@ -104,7 +105,7 @@ public class LPUpdateFunction extends
       // 2. if just one message are received
 
       GradoopId firstMessage = allMessages.get(0);
-      newCommunity = GradoopId.min(firstMessage, currentCommunity);
+      newCommunity = GradoopIds.min(firstMessage, currentCommunity);
     } else {
       // 3. if multiple messages are received
       newCommunity = getMostFrequent(vertex, allMessages);
@@ -127,7 +128,7 @@ public class LPUpdateFunction extends
     GradoopId firstMessage = allMessages.get(0);
     GradoopId currentValue = firstMessage;
     int maxCounter = 1;
-    GradoopId maxValue = GradoopId.fromLong(1L);
+    GradoopId maxValue = GradoopIds.fromLong(1L);
     for (int i = 1; i < allMessages.size(); i++) {
       if (currentValue == allMessages.get(i)) {
         currentCounter++;
@@ -145,7 +146,7 @@ public class LPUpdateFunction extends
       // to avoid an oscillating state of the calculation we will just use
       // the smaller value
       GradoopId currentCommunity = vertex.getValue().getCurrentCommunity();
-      newValue = GradoopId.min(firstMessage, currentCommunity);
+      newValue = GradoopIds.min(firstMessage, currentCommunity);
     } else {
       newValue = maxValue;
     }

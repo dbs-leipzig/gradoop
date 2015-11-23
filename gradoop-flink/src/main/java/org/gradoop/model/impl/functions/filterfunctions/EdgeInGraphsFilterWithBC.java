@@ -22,6 +22,7 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class EdgeInGraphsFilterWithBC<ED extends EPGMEdge>
     identifiers = new GradoopIdSet();
 
     for (Long longId : longList) {
-      identifiers.add(GradoopId.fromLong(longId));
+      identifiers.add(GradoopIds.fromLong(longId));
     }
   }
 

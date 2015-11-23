@@ -24,6 +24,7 @@ import org.gradoop.model.impl.algorithms.btg.BTG;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class VertexToBTGVertexMapper<VD extends EPGMVertex>
       List<GradoopId> btgList = new ArrayList<>();
       String[] btgIDArray = btgIDs.split(",");
       for (String btgId : btgIDArray) {
-        btgList.add(GradoopId.fromLongString(btgId));
+        btgList.add(GradoopIds.fromLongString(btgId));
       }
       return btgList;
     }

@@ -1,30 +1,31 @@
 package org.gradoop.model.impl.id;
 
-import org.junit.Assert;
+import org.gradoop.model.impl.id.Context;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class SequenceIdGeneratorTest {
 
-  @Test(expected = IllegalArgumentException.class)
-  public void illegalArgumentTest() {
-    new SequenceIdGenerator(null);
-  }
-
   @Test
-  public void createSequenceTest() {
-    SequenceIdGenerator generator = new SequenceIdGenerator();
+  public void testCreateSequence() {
+    SequenceIdGenerator generator =
+      new SequenceIdGenerator(0, Context.TEST);
 
     for (long id = 0L; id < 10L; id++) {
-      Assert.assertEquals(generator.createId(), new GradoopId(id));
+      assertEquals(generator.createId(), new GradoopId(id, 0, Context.TEST));
     }
   }
 
   @Test
-  public void createSequenceWithOffsetTest() {
-    SequenceIdGenerator generator = new SequenceIdGenerator(10L);
+  public void testCreateSequenceWithOffset() {
+    SequenceIdGenerator generator =
+      new SequenceIdGenerator(10L, 0, Context.TEST);
 
     for (long id = 10L; id < 20L; id++) {
-      Assert.assertEquals(generator.createId(), new GradoopId(id));
+      assertEquals(generator.createId(), new GradoopId(id, 0, Context.TEST));
     }
   }
 }

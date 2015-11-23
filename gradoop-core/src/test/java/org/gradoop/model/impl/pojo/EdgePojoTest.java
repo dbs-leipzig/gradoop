@@ -2,9 +2,11 @@ package org.gradoop.model.impl.pojo;
 
 import com.google.common.collect.Maps;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.impl.id.Context;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIdGenerator;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.id.GradoopIdGenerator;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.hamcrest.core.Is;
@@ -19,7 +21,7 @@ public class EdgePojoTest {
 
   @Test
   public void createWithIDTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
@@ -34,7 +36,7 @@ public class EdgePojoTest {
 
   @Test
   public void createEdgePojoTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
@@ -56,13 +58,13 @@ public class EdgePojoTest {
     assertThat(edge.getProperty("k1"), Is.<Object>is("v1"));
     assertThat(edge.getProperty("k2"), Is.<Object>is("v2"));
     assertThat(edge.getGraphCount(), is(2));
-    assertTrue(edge.getGraphIds().contains(GradoopId.fromLong(0L)));
-    assertTrue(edge.getGraphIds().contains(GradoopId.fromLong(1L)));
+    assertTrue(edge.getGraphIds().contains(GradoopIds.fromLong(0L)));
+    assertTrue(edge.getGraphIds().contains(GradoopIds.fromLong(1L)));
   }
 
   @Test
   public void createWithMissingLabelTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
@@ -73,7 +75,7 @@ public class EdgePojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullIDTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
     new EdgePojoFactory().createEdge(null, sourceId, targetId);
@@ -81,7 +83,7 @@ public class EdgePojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullSourceIdTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
     GradoopId edgeId = idGen.createId();
     GradoopId targetId = idGen.createId();
     new EdgePojoFactory().createEdge(edgeId, null, targetId);
@@ -89,7 +91,7 @@ public class EdgePojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullTargetIdTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
     new EdgePojoFactory().createEdge(edgeId, sourceId, null);
@@ -97,7 +99,7 @@ public class EdgePojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithEmptyLabelTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
@@ -106,7 +108,7 @@ public class EdgePojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator();
+    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();

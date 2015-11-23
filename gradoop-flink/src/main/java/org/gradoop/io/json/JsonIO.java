@@ -27,6 +27,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMLabeled;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.id.GradoopIds;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -94,7 +95,7 @@ public abstract class JsonIO {
      * @throws JSONException
      */
     protected GradoopId getID(JSONObject object) throws JSONException {
-      return GradoopId.fromLongString(object.getString(IDENTIFIER));
+      return GradoopIds.fromLongString(object.getString(IDENTIFIER));
     }
 
     /**
@@ -158,7 +159,7 @@ public abstract class JsonIO {
       GradoopIdSet result = new GradoopIdSet();
 
       for (int i = 0; i < array.length(); i++) {
-        result.add(GradoopId.fromLongString(array.getString(i)));
+        result.add(GradoopIds.fromLongString(array.getString(i)));
       }
       return result;
     }

@@ -18,8 +18,8 @@
 package org.gradoop.util;
 
 import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;

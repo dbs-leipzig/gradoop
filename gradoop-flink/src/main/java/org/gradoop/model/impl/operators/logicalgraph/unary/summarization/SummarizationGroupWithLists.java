@@ -38,6 +38,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.util.FlinkConstants;
@@ -198,7 +199,7 @@ public class SummarizationGroupWithLists<
       Collector<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> collector
     ) throws Exception {
 
-      GradoopId newVertexID = GradoopId.fromLong(0L);
+      GradoopId newVertexID = GradoopIds.fromLong(0L);
       String groupLabel = null;
       String groupValue = null;
       List<GradoopId> groupedVertexIds = Lists.newArrayList();

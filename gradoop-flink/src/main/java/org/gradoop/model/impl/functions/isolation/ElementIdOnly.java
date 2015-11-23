@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.functions.isolation;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
 

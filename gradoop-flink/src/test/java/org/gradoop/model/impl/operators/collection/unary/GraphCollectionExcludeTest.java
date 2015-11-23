@@ -7,6 +7,7 @@ import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -28,13 +29,13 @@ public class GraphCollectionExcludeTest extends FlinkTestBase {
   public void overlapCollectionTest() throws Exception {
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> coll =
       getGraphStore().getCollection().getGraphs(
-        GradoopId.fromLong(1L),
-        GradoopId.fromLong(2L),
-        GradoopId.fromLong(3L));
-    GradoopId exclusionBase = GradoopId.fromLong(1L);
+        GradoopIds.fromLong(1L),
+        GradoopIds.fromLong(2L),
+        GradoopIds.fromLong(3L));
+    GradoopId exclusionBase = GradoopIds.fromLong(1L);
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = coll.callForGraph(
-      new ExcludeCollection<VertexPojo, EdgePojo, GraphHeadPojo>(GradoopId
+      new ExcludeCollection<VertexPojo, EdgePojo, GraphHeadPojo>(GradoopIds
         .fromLong(1L)));
 
     List<VertexPojo> oldVertices = Lists.newArrayList();

@@ -7,6 +7,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -169,7 +170,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     // list is not supported by
     final List<String> value = Lists.newArrayList();
 
-    GradoopId vertexID = GradoopId.fromLong(0L);
+    GradoopId vertexID = GradoopIds.fromLong(0L);
     final String label = "A";
     final Map<String, Object> properties = new HashMap<>();
     properties.put("k1", value);
@@ -212,7 +213,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     final String keyString = "key6";
     final String valueString = "value";
 
-    final GradoopId vertexID = GradoopId.fromLong(0L);
+    final GradoopId vertexID = GradoopIds.fromLong(0L);
     final String label = "A";
 
     final Map<String, Object> properties = new HashMap<>();

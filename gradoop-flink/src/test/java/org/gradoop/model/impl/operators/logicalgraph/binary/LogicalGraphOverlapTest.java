@@ -23,6 +23,7 @@ import org.gradoop.GradoopTestBaseUtils;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -43,8 +44,8 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-    GradoopId firstGraph = GradoopId.fromLong(0L);
-    GradoopId secondGraph = GradoopId.fromLong(0L);
+    GradoopId firstGraph = GradoopIds.fromLong(0L);
+    GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
 
@@ -61,8 +62,8 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testOverlappingGraphs() throws Exception {
-    GradoopId firstGraph = GradoopId.fromLong(0L);
-    GradoopId secondGraph = GradoopId.fromLong(2L);
+    GradoopId firstGraph = GradoopIds.fromLong(0L);
+    GradoopId secondGraph = GradoopIds.fromLong(2L);
     long expectedVertexCount = 2L;
     long expectedEdgeCount = 2L;
 
@@ -79,8 +80,8 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testOverlappingSwitchedGraphs() throws Exception {
-    GradoopId firstGraph = GradoopId.fromLong(2L);
-    GradoopId secondGraph = GradoopId.fromLong(0L);
+    GradoopId firstGraph = GradoopIds.fromLong(2L);
+    GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 2L;
     long expectedEdgeCount = 2L;
 
@@ -97,8 +98,8 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testNonOverlappingGraphs() throws Exception {
-    GradoopId firstGraph = GradoopId.fromLong(0L);
-    GradoopId secondGraph = GradoopId.fromLong(1L);
+    GradoopId firstGraph = GradoopIds.fromLong(0L);
+    GradoopId secondGraph = GradoopIds.fromLong(1L);
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
 
@@ -115,8 +116,8 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testNonOverlappingSwitchedGraphs() throws Exception {
-    GradoopId firstGraph = GradoopId.fromLong(1L);
-    GradoopId secondGraph = GradoopId.fromLong(0L);
+    GradoopId firstGraph = GradoopIds.fromLong(1L);
+    GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
 
@@ -133,8 +134,8 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testOverlappingVertexSetGraphs() throws Exception {
-    GradoopId firstGraph = GradoopId.fromLong(3L);
-    GradoopId secondGraph = GradoopId.fromLong(1L);
+    GradoopId firstGraph = GradoopIds.fromLong(3L);
+    GradoopId secondGraph = GradoopIds.fromLong(1L);
     long expectedVertexCount = 2L;
     long expectedEdgeCount = 1L;
 
@@ -151,8 +152,8 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testOverlappingVertexSetSwitchedGraphs() throws Exception {
-    GradoopId firstGraph = GradoopId.fromLong(1L);
-    GradoopId secondGraph = GradoopId.fromLong(3L);
+    GradoopId firstGraph = GradoopIds.fromLong(1L);
+    GradoopId secondGraph = GradoopIds.fromLong(3L);
     long expectedVertexCount = 2L;
     long expectedEdgeCount = 1L;
 
@@ -170,9 +171,9 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testAssignment() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      databaseCommunity = getGraphStore().getGraph(GradoopId.fromLong(0L));
+      databaseCommunity = getGraphStore().getGraph(GradoopIds.fromLong(0L));
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      graphCommunity = getGraphStore().getGraph(GradoopId.fromLong(2L));
+      graphCommunity = getGraphStore().getGraph(GradoopIds.fromLong(2L));
 
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = graphCommunity.overlap(databaseCommunity);

@@ -9,6 +9,7 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class BTGAlgorithmTestHelper {
     List<Edge<GradoopId, NullValue>> edges = new ArrayList<>();
     for (String line : graph) {
       String[] lineTokens = LINE_TOKEN_SEPARATOR.split(line);
-      GradoopId id = GradoopId.fromLongString(lineTokens[0]);
+      GradoopId id = GradoopIds.fromLongString(lineTokens[0]);
       String[] valueTokens = VALUE_TOKEN_SEPARATOR.split(lineTokens[1]);
       BTGVertexType vertexClass =
         BTGVertexType.values()[Integer.parseInt(valueTokens[0])];
@@ -51,7 +52,7 @@ public class BTGAlgorithmTestHelper {
       List<GradoopId> btgIDs =
         Lists.newArrayListWithCapacity(valueTokens.length - 1);
       for (int n = 2; n < valueTokens.length; n++) {
-        btgIDs.add(GradoopId.fromLongString(valueTokens[n]));
+        btgIDs.add(GradoopIds.fromLongString(valueTokens[n]));
       }
       vertices.add(
         new Vertex<>(id, new BTGVertexValue(vertexClass, vertexValue, btgIDs)));
@@ -59,7 +60,7 @@ public class BTGAlgorithmTestHelper {
         (lineTokens.length == 3) ? VALUE_TOKEN_SEPARATOR.split(lineTokens[2]) :
           new String[0];
       for (String edgeToken : edgeTokens) {
-        GradoopId tar = GradoopId.fromLongString(edgeToken);
+        GradoopId tar = GradoopIds.fromLongString(edgeToken);
         edges.add(new Edge<>(id, tar, NullValue.getInstance()));
       }
     }

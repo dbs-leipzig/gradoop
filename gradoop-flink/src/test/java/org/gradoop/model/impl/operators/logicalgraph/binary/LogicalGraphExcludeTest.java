@@ -24,6 +24,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -47,8 +48,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testSameGraph() throws Exception {
     // "0, 0, 0, 0"
-    GradoopId firstGraph = GradoopId.fromLong(0L);
-    GradoopId secondGraph = GradoopId.fromLong(0L);
+    GradoopId firstGraph = GradoopIds.fromLong(0L);
+    GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -65,8 +66,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testOverlappingGraphs() throws Exception {
     // "0, 2, 1, 0"
-    GradoopId firstGraph = GradoopId.fromLong(0L);
-    GradoopId secondGraph = GradoopId.fromLong(2L);
+    GradoopId firstGraph = GradoopIds.fromLong(0L);
+    GradoopId secondGraph = GradoopIds.fromLong(2L);
     long expectedVertexCount = 1L;
     long expectedEdgeCount = 0L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -83,8 +84,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testOverlappingSwitchedGraphs() throws Exception {
     // "2, 0, 2, 2"
-    GradoopId firstGraph = GradoopId.fromLong(2L);
-    GradoopId secondGraph = GradoopId.fromLong(0L);
+    GradoopId firstGraph = GradoopIds.fromLong(2L);
+    GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 2L;
     long expectedEdgeCount = 2L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -101,8 +102,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testNonOverlappingGraphs() throws Exception {
     // "0, 1, 3, 4"
-    GradoopId firstGraph = GradoopId.fromLong(0L);
-    GradoopId secondGraph = GradoopId.fromLong(1L);
+    GradoopId firstGraph = GradoopIds.fromLong(0L);
+    GradoopId secondGraph = GradoopIds.fromLong(1L);
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -119,8 +120,8 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testNonOverlappingSwitchedGraphs() throws Exception {
     // "1, 0, 3, 4"
-    GradoopId firstGraph = GradoopId.fromLong(1L);
-    GradoopId secondGraph = GradoopId.fromLong(0L);
+    GradoopId firstGraph = GradoopIds.fromLong(1L);
+    GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
@@ -137,9 +138,9 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
   @Test
   public void testAssignment() throws Exception {
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      databaseCommunity = getGraphStore().getGraph(GradoopId.fromLong(0L));
+      databaseCommunity = getGraphStore().getGraph(GradoopIds.fromLong(0L));
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-      hadoopCommunity = getGraphStore().getGraph(GradoopId.fromLong(1L));
+      hadoopCommunity = getGraphStore().getGraph(GradoopIds.fromLong(1L));
 
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = databaseCommunity.exclude(hadoopCommunity);
