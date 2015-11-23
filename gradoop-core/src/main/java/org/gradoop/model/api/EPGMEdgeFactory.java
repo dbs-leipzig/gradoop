@@ -1,7 +1,7 @@
 package org.gradoop.model.api;
 
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.util.Map;
 
@@ -60,7 +60,7 @@ public interface EPGMEdgeFactory<T extends EPGMEdge> extends
    * @return edge data
    */
   T createEdge(GradoopId id, String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, GradoopIds graphIds);
+    GradoopId targetVertexId, GradoopIdSet graphIds);
 
   /**
    * Creates edge data based on the given parameters.
@@ -75,5 +75,5 @@ public interface EPGMEdgeFactory<T extends EPGMEdge> extends
    */
   T createEdge(GradoopId id, String label,
     GradoopId sourceVertexId, GradoopId targetVertexId,
-    Map<String, Object> properties, GradoopIds graphIds);
+    Map<String, Object> properties, GradoopIdSet graphIds);
 }

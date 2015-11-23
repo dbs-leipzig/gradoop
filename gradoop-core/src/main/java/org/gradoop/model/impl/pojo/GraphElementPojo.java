@@ -2,7 +2,7 @@ package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
   /**
    * Set of graph identifiers that element is contained in
    */
-  private GradoopIds graphIds;
+  private GradoopIdSet graphIds;
 
   /**
    * Default constructor.
@@ -32,7 +32,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
    * @param graphIds     graphIds that element is contained in
    */
   protected GraphElementPojo(GradoopId id, String label,
-    Map<String, Object> properties, GradoopIds graphIds) {
+    Map<String, Object> properties, GradoopIdSet graphIds) {
     super(id, label, properties);
     this.graphIds = graphIds;
   }
@@ -41,7 +41,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
    * {@inheritDoc}
    */
   @Override
-  public GradoopIds getGraphIds() {
+  public GradoopIdSet getGraphIds() {
     return graphIds;
   }
 
@@ -51,7 +51,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
   @Override
   public void addGraphId(GradoopId graphId) {
     if (graphIds == null) {
-      graphIds = new GradoopIds();
+      graphIds = new GradoopIdSet();
     }
     graphIds.add(graphId);
   }
@@ -60,7 +60,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
    * {@inheritDoc}
    */
   @Override
-  public void setGraphIds(GradoopIds graphIds) {
+  public void setGraphIds(GradoopIdSet graphIds) {
     this.graphIds = graphIds;
   }
 

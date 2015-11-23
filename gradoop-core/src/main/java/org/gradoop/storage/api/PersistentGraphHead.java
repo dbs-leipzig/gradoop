@@ -19,7 +19,7 @@ package org.gradoop.storage.api;
 
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
  * Representation of vertex data on the storage level. We additionally store
@@ -31,14 +31,14 @@ public interface PersistentGraphHead extends EPGMGraphHead {
    *
    * @return vertex ids that are contained in that graph
    */
-  GradoopIds getVertexIds();
+  GradoopIdSet getVertexIds();
 
   /**
    * Sets the vertices that are contained in that graph.
    *
    * @param vertices vertex ids
    */
-  void setVertexIds(GradoopIds vertices);
+  void setVertexIds(GradoopIdSet vertices);
 
   /**
    * Adds a vertex identifier to the graph data.
@@ -59,14 +59,14 @@ public interface PersistentGraphHead extends EPGMGraphHead {
    *
    * @return edge ids that are contained in that graph
    */
-  GradoopIds getEdgeIds();
+  GradoopIdSet getEdgeIds();
 
   /**
    * Sets the edges that are contained in that graph.
    *
    * @param edges edge ids
    */
-  void setEdgeIds(GradoopIds edges);
+  void setEdgeIds(GradoopIdSet edges);
 
   /**
    * Adds an edge identifier to the graph data.

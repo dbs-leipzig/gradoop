@@ -22,7 +22,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.GradoopTestBaseUtils;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -31,7 +31,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Collection;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -190,7 +189,7 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     getExecutionEnvironment().execute();
 
     for (VertexPojo v : vertexData) {
-      GradoopIds gIDs = v.getGraphIds();
+      GradoopIdSet gIDs = v.getGraphIds();
       if (v.equals(GradoopTestBaseUtils.VERTEX_PERSON_ALICE)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (v.equals(GradoopTestBaseUtils.VERTEX_PERSON_BOB)) {
@@ -199,7 +198,7 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     }
 
     for (EdgePojo e : edgeData) {
-      GradoopIds gIDs = e.getGraphIds();
+      GradoopIdSet gIDs = e.getGraphIds();
       if (e.equals(GradoopTestBaseUtils.EDGE_0_KNOWS)) {
         assertEquals("wrong number of graphs", 3, gIDs.size());
       } else if (e.equals(GradoopTestBaseUtils.EDGE_1_KNOWS)) {

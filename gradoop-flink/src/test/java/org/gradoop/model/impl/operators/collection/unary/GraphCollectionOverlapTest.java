@@ -23,7 +23,7 @@ import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -45,7 +45,7 @@ public class GraphCollectionOverlapTest extends FlinkTestBase {
   @Test
   public void overlapCollectionTest() throws Exception {
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> coll =
-      getGraphStore().getCollection().getGraphs(GradoopIds.fromLongs(1L, 2L,
+      getGraphStore().getCollection().getGraphs(GradoopIdSet.fromLongs(1L, 2L,
         3L));
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraph = coll.callForGraph(

@@ -18,10 +18,9 @@
 package org.gradoop.model.impl.pojo;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdGenerator;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertex;
@@ -29,7 +28,6 @@ import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import java.util.Map;
-import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -58,7 +56,7 @@ public class VertexPojoTest {
     GradoopId graphId1 = idGen.createId();
     GradoopId graphId2 = idGen.createId();
 
-    GradoopIds graphIds = new GradoopIds();
+    GradoopIdSet graphIds = new GradoopIdSet();
     graphIds.add(graphId1);
     graphIds.add(graphId2);
 

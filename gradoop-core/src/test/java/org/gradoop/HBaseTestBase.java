@@ -19,7 +19,7 @@ import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -339,40 +339,45 @@ public class HBaseTestBase {
     PersistentGraphHeadFactory<GraphHeadPojo, HBaseGraphHead>
       graphDataFactory = new HBaseGraphHeadFactory();
 
-    GradoopIds vertexIds = null;
-    GradoopIds edgeIds = null;
+    GradoopIdSet vertexIds = null;
+    GradoopIdSet edgeIds = null;
 
     for (GraphHeadPojo graphData : graphDataCollection) {
       if (graphData.getId().equals(communityDatabases.getId())) {
-        vertexIds = GradoopIds.fromExisting(VERTEX_PERSON_ALICE.getId(),
+        vertexIds = GradoopIdSet.fromExisting(VERTEX_PERSON_ALICE.getId(),
           VERTEX_PERSON_BOB.getId(), VERTEX_PERSON_EVE.getId());
-        edgeIds = GradoopIds.fromExisting(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(),
+        edgeIds = GradoopIdSet.fromExisting(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(),
           EDGE_6_KNOWS.getId(), EDGE_21_KNOWS.getId());
       } else if (graphData.getId().equals(communityHadoop.getId())) {
         vertexIds =
-          GradoopIds.fromExisting(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE
+          GradoopIdSet
+            .fromExisting(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE
 
             .getId(), VERTEX_PERSON_FRANK
 
             .getId());
-        edgeIds = GradoopIds.fromExisting(EDGE_4_KNOWS.getId(), EDGE_5_KNOWS.getId(), EDGE_22_KNOWS
+        edgeIds = GradoopIdSet.fromExisting(EDGE_4_KNOWS.getId(), EDGE_5_KNOWS.getId(), EDGE_22_KNOWS
 
             .getId(), EDGE_23_KNOWS.getId());
       } else if (graphData.getId().equals(communityGraphs.getId())) {
-        vertexIds = GradoopIds.fromExisting(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB.getId(),
+        vertexIds = GradoopIdSet
+          .fromExisting(VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB.getId(),
             VERTEX_PERSON_CAROL
 
               .getId(), VERTEX_PERSON_DAVE
 
               .getId());
-        edgeIds = GradoopIds.fromExisting(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_2_KNOWS
+        edgeIds = GradoopIdSet
+          .fromExisting(EDGE_0_KNOWS.getId(), EDGE_1_KNOWS.getId(), EDGE_2_KNOWS
 
               .getId(), EDGE_3_KNOWS.getId(), EDGE_4_KNOWS.getId(),
             EDGE_5_KNOWS.getId());
       } else if (graphData.getId().equals(forumGraph.getId())) {
-        vertexIds = GradoopIds.fromExisting(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE.getId(),
+        vertexIds = GradoopIdSet
+          .fromExisting(VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE.getId(),
             VERTEX_PERSON_FRANK.getId(), VERTEX_FORUM_GPS.getId());
-        edgeIds = GradoopIds.fromExisting(EDGE_4_KNOWS.getId(), EDGE_16_HAS_MODERATOR.getId(),
+        edgeIds = GradoopIdSet
+          .fromExisting(EDGE_4_KNOWS.getId(), EDGE_16_HAS_MODERATOR.getId(),
             EDGE_19_HAS_MEMBER.getId(), EDGE_20_HAS_MEMBER.getId());
       }
       persistentGraphData
@@ -395,8 +400,8 @@ public class HBaseTestBase {
     graphProperties.put("k1", "v1");
     graphProperties.put("k2", "v2");
 
-    GradoopIds vertices = GradoopIds.fromLongs(0L, 1L);
-    GradoopIds edges = GradoopIds.fromLongs(2L, 3L);
+    GradoopIdSet vertices = GradoopIdSet.fromLongs(0L, 1L);
+    GradoopIdSet edges = GradoopIdSet.fromLongs(2L, 3L);
 
     persistentGraphData.add(
       new HBaseGraphHead(graphHeadFactory.createGraphHead(
@@ -407,8 +412,8 @@ public class HBaseTestBase {
     graphLabel = "A";
     graphProperties = new HashMap<>();
     graphProperties.put("k1", "v1");
-    vertices = GradoopIds.fromLongs(1L, 2L);
-    edges = GradoopIds.fromLongs(4L, 5L);
+    vertices = GradoopIdSet.fromLongs(1L, 2L);
+    edges = GradoopIdSet.fromLongs(4L, 5L);
 
     persistentGraphData.add(new HBaseGraphHead(
       graphHeadFactory.createGraphHead(graphID, graphLabel, graphProperties),
@@ -433,7 +438,7 @@ public class HBaseTestBase {
     Map<String, Object> vertexProperties = new HashMap<>();
     vertexProperties.put("k1", "v1");
     vertexProperties.put("k2", "v2");
-    GradoopIds graphs = GradoopIds.fromLongs(0L, 1L);
+    GradoopIdSet graphs = GradoopIdSet.fromLongs(0L, 1L);
     Set<EdgePojo> outgoingEdgeData = Sets.newHashSetWithExpectedSize(2);
     outgoingEdgeData.add(edgeFactory.createEdge(GradoopId.fromLong(0L), "a",
       GradoopId.fromLong(0L), GradoopId.fromLong(1L)));
@@ -454,7 +459,7 @@ public class HBaseTestBase {
     vertexLabel = "B";
     vertexProperties = new HashMap<>();
     vertexProperties.put("k1", "v1");
-    graphs = GradoopIds.fromLongs(1L, 2L);
+    graphs = GradoopIdSet.fromLongs(1L, 2L);
     outgoingEdgeData = Sets.newHashSetWithExpectedSize(2);
     outgoingEdgeData.add(edgeFactory.createEdge(GradoopId.fromLong(2L),
       GradoopId.fromLong(1L), GradoopId.fromLong(0L)));
@@ -489,7 +494,7 @@ public class HBaseTestBase {
     Map<String, Object> edgeProperties = new HashMap<>();
     edgeProperties.put("k1", "v1");
     edgeProperties.put("k2", "v2");
-    GradoopIds graphs = GradoopIds.fromLongs(0L, 1L);
+    GradoopIdSet graphs = GradoopIdSet.fromLongs(0L, 1L);
     VertexPojo edgeSourceData =
       vertexFactory.createVertex(GradoopId.fromLong(0L), "A");
     VertexPojo edgeTargetData =
@@ -505,7 +510,7 @@ public class HBaseTestBase {
     edgeLabel = "b";
     edgeProperties = Maps.newHashMapWithExpectedSize(1);
     edgeProperties.put("k1", "v1");
-    graphs = GradoopIds.fromLongs(1L, 2L);
+    graphs = GradoopIdSet.fromLongs(1L, 2L);
     edgeSourceData = vertexFactory.createVertex(GradoopId.fromLong(0L), "A");
     edgeTargetData = vertexFactory.createVertex(GradoopId.fromLong(2L), "C");
 

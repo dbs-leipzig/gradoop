@@ -26,7 +26,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -270,7 +270,7 @@ public class OverlapSplitBy<
     public VD map(VD vertex) throws Exception {
       List<GradoopId> labelPropIndex = function.execute(vertex);
       if (vertex.getGraphIds() == null) {
-        vertex.setGraphIds(new GradoopIds());
+        vertex.setGraphIds(new GradoopIdSet());
       }
 
       vertex.getGraphIds().addAll(labelPropIndex);

@@ -6,7 +6,7 @@ import org.gradoop.HBaseTestBase;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -176,7 +176,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);
-    final GradoopIds graphs = new GradoopIds();
+    final GradoopIdSet graphs = new GradoopIdSet();
     PersistentVertex<EdgePojo> v = persistentVertexFactory
       .createVertex(
         vertexFactory.createVertex(vertexID, label, properties, graphs),
@@ -225,7 +225,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);
-    final GradoopIds graphs = new GradoopIds();
+    final GradoopIdSet graphs = new GradoopIdSet();
 
     // write to store
     graphStore.writeVertex(persistentVertexFactory.createVertex(

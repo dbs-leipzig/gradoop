@@ -32,7 +32,7 @@ import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInNoneOfGraphsFilterWithBC;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.FlinkConstants;
 
 /**
@@ -73,8 +73,8 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
   @Override
   public LogicalGraph<VD, ED, GD> execute(
     GraphCollection<VD, ED, GD> collection) {
-    final GradoopIds positiveGraphIDs =
-      GradoopIds.fromExisting(positiveGraphID);
+    final GradoopIdSet positiveGraphIDs =
+      GradoopIdSet.fromExisting(positiveGraphID);
     DataSet<GD> graphHeads = collection.getGraphHeads();
     DataSet<GradoopId> graphIDs = graphHeads.map(
       new ElementIdOnly<GD>());

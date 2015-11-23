@@ -1,7 +1,7 @@
 package org.gradoop.model.impl.operators.collection.binary;
 
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -25,9 +25,9 @@ public class GraphCollectionIntersectTest extends
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection1 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 1L, 2L));
+      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L, 2L));
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection2 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 1L));
+      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       intersectColl = collection1.intersect(collection2);
@@ -48,9 +48,9 @@ public class GraphCollectionIntersectTest extends
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection1 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 2L, 3L));
+      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection2 = graphColl.getGraphs(GradoopIds.fromLongs(1L, 2L, 3L));
+      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(1L, 2L, 3L));
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       intersectColl = collection1.intersect(collection2);
@@ -71,9 +71,9 @@ public class GraphCollectionIntersectTest extends
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection1 = graphColl.getGraphs(GradoopIds.fromLongs(0L));
+      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L));
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection2 = graphColl.getGraphs(GradoopIds.fromLongs(1L));
+      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(1L));
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       intersectColl = collection1.intersect(collection2);
@@ -95,9 +95,9 @@ public class GraphCollectionIntersectTest extends
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       graphColl = getGraphStore().getCollection();
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection1 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 2L, 3L));
+      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
-      collection2 = graphColl.getGraphs(GradoopIds.fromLongs(0L, 2L, 3L));
+      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
 
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
       intersectColl = collection1.intersect(collection2);

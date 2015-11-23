@@ -18,7 +18,7 @@
 package org.gradoop.model.api;
 
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
  * A graph element is part of a logical graph. An element can be part of more
@@ -30,7 +30,7 @@ public interface EPGMGraphElement extends EPGMElement {
    *
    * @return all graphs of that element
    */
-  GradoopIds getGraphIds();
+  GradoopIdSet getGraphIds();
 
   /**
    * Adds that element to the given graphId. If the element is already an
@@ -45,7 +45,7 @@ public interface EPGMGraphElement extends EPGMElement {
    *
    * @param graphIds the graphIds to be added
    */
-  void setGraphIds(GradoopIds graphIds);
+  void setGraphIds(GradoopIdSet graphIds);
 
   /**
    * Resets all graph elements.

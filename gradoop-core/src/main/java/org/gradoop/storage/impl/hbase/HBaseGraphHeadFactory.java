@@ -18,7 +18,7 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.apache.log4j.Logger;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.storage.api.PersistentGraphHeadFactory;
 
@@ -43,7 +43,7 @@ public class HBaseGraphHeadFactory implements
    */
   @Override
   public HBaseGraphHead createGraphHead(GraphHeadPojo inputGraphData,
-    GradoopIds vertices, GradoopIds edges) {
+    GradoopIdSet vertices, GradoopIdSet edges) {
     HBaseGraphHead defaultPersistentGraphData =
       new HBaseGraphHead(inputGraphData, vertices, edges);
     LOG.info("Created persistent graph data: " + defaultPersistentGraphData);

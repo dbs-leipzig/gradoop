@@ -1,14 +1,12 @@
 package org.gradoop.util;
 
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
-import org.s1ck.gdl.model.Vertex;
 
 import java.util.Collection;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -135,13 +133,13 @@ public class AsciiGraphLoaderTest {
     GraphHeadPojo h = asciiGraphLoader.getGraphHeadByVariable("h");
 
     Collection<VertexPojo> vertexPojosG = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIds.fromExisting(g.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
     Collection<VertexPojo> vertexPojosH = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIds.fromExisting(h.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
     Collection<VertexPojo> vertexPojosGH = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIds.fromExisting(g.getId(), h.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
     VertexPojo a = asciiGraphLoader.getVertexByVariable("a");
     VertexPojo b = asciiGraphLoader.getVertexByVariable("b");
@@ -238,13 +236,13 @@ public class AsciiGraphLoaderTest {
     GraphHeadPojo h = asciiGraphLoader.getGraphHeadByVariable("h");
 
     Collection<EdgePojo> edgePojosG = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIds.fromExisting(g.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
     Collection<EdgePojo> edgePojosH = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIds.fromExisting(h.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
     Collection<EdgePojo> edgePojosGH = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIds.fromExisting(g.getId(), h.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
     EdgePojo a = asciiGraphLoader.getEdgeByVariable("a");
     EdgePojo b = asciiGraphLoader.getEdgeByVariable("b");

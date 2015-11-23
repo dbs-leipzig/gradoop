@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.gradoop.model.impl.algorithms.btg.utils.BTGVertexType;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.util.List;
 import java.util.Map;
@@ -176,7 +176,7 @@ public class BTGVertexValue {
    */
   public void updateBtgIDs() {
     if (this.neighborMinimumBTGIds != null) {
-      GradoopIds newBtgIDs = new GradoopIds();
+      GradoopIdSet newBtgIDs = new GradoopIdSet();
       for (Map.Entry<GradoopId, GradoopId>
         e : this.neighborMinimumBTGIds.entrySet()) {
 

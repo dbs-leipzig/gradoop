@@ -45,7 +45,7 @@ import org.gradoop.model.impl.functions.filterfunctions
   .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.collection.binary.Difference;
 import org.gradoop.model.impl.operators.collection.binary.DifferenceUsingList;
 import org.gradoop.model.impl.operators.collection.binary.Intersect;
@@ -192,7 +192,7 @@ public class GraphCollection<
   public GraphCollection<VD, ED, GD>
   getGraphs(final GradoopId... identifiers) throws Exception {
 
-    GradoopIds graphIds = new GradoopIds();
+    GradoopIdSet graphIds = new GradoopIdSet();
 
     for (GradoopId id : identifiers) {
       graphIds.add(id);
@@ -206,7 +206,7 @@ public class GraphCollection<
    */
   @Override
   public GraphCollection<VD, ED, GD> getGraphs(
-    final GradoopIds identifiers) throws Exception {
+    final GradoopIdSet identifiers) throws Exception {
 
     DataSet<GD> newGraphHeads =
       this.graphHeads.filter(new FilterFunction<GD>() {

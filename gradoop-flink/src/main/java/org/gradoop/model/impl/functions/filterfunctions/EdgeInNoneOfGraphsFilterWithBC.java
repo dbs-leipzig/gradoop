@@ -20,7 +20,7 @@ import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class EdgeInNoneOfGraphsFilterWithBC<ED extends EPGMEdge> extends
   /**
    * Graph identifiers
    */
-  private GradoopIds identifiers;
+  private GradoopIdSet identifiers;
 
   /**
    * {@inheritDoc}
@@ -52,7 +52,7 @@ public class EdgeInNoneOfGraphsFilterWithBC<ED extends EPGMEdge> extends
     List<GradoopId> gradoopIds =
       getRuntimeContext().getBroadcastVariable(BC_IDENTIFIERS);
 
-    identifiers = new GradoopIds();
+    identifiers = new GradoopIdSet();
 
     for (GradoopId gradoopId : gradoopIds) {
       identifiers.add(gradoopId);

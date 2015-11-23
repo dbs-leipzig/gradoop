@@ -20,7 +20,7 @@ import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.util.Collection;
 
@@ -41,7 +41,7 @@ public class VertexInAllGraphsFilterWithBC<VD extends EPGMVertex> extends
   /**
    * Graph identifiers
    */
-  private final GradoopIds identifiers = new GradoopIds();
+  private final GradoopIdSet identifiers = new GradoopIdSet();
 
   /**
    * {@inheritDoc}

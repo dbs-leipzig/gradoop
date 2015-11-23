@@ -19,7 +19,7 @@ package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.util.Map;
 
@@ -60,7 +60,7 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
     final GradoopId sourceVertexId,
     final GradoopId targetVertexId,
     final Map<String, Object> properties,
-    GradoopIds graphIds) {
+    GradoopIdSet graphIds) {
 
     super(id, label, properties, graphIds);
     this.sourceVertexId = sourceVertexId;

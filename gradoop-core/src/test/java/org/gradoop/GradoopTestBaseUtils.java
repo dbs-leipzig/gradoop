@@ -19,7 +19,7 @@ package org.gradoop;
 
 import com.google.common.collect.Lists;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -116,7 +116,7 @@ public abstract class GradoopTestBaseUtils {
     properties.put(PROPERTY_KEY_CITY, "Leipzig");
     VERTEX_PERSON_ALICE = vertexDataFactory
       .createVertex(GradoopId.fromLong(0L), LABEL_PERSON, properties,
-        GradoopIds.fromLongs(0L, 2L));
+        GradoopIdSet.fromLongs(0L, 2L));
     // Person:Bob (1L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Bob");
@@ -124,7 +124,7 @@ public abstract class GradoopTestBaseUtils {
     properties.put(PROPERTY_KEY_CITY, "Leipzig");
     VERTEX_PERSON_BOB = vertexDataFactory
       .createVertex(GradoopId.fromLong(1L), LABEL_PERSON, properties,
-        GradoopIds.fromLongs(0L, 2L));
+        GradoopIdSet.fromLongs(0L, 2L));
     // Person:Carol (2L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Carol");
@@ -132,7 +132,7 @@ public abstract class GradoopTestBaseUtils {
     properties.put(PROPERTY_KEY_CITY, "Dresden");
     VERTEX_PERSON_CAROL = vertexDataFactory
       .createVertex(GradoopId.fromLong(2L), LABEL_PERSON, properties,
-        GradoopIds.fromLongs(1L, 2L, 3L));
+        GradoopIdSet.fromLongs(1L, 2L, 3L));
     // Person:Dave (3L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Dave");
@@ -140,7 +140,7 @@ public abstract class GradoopTestBaseUtils {
     properties.put(PROPERTY_KEY_CITY, "Dresden");
     VERTEX_PERSON_DAVE = vertexDataFactory
       .createVertex(GradoopId.fromLong(3L), LABEL_PERSON, properties,
-        GradoopIds.fromLongs(1L, 2L, 3L));
+        GradoopIdSet.fromLongs(1L, 2L, 3L));
     // Person:Eve (4L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Eve");
@@ -149,7 +149,7 @@ public abstract class GradoopTestBaseUtils {
     properties.put(PROPERTY_KEY_SPEAKS, "English");
     VERTEX_PERSON_EVE = vertexDataFactory
       .createVertex(GradoopId.fromLong(4L), LABEL_PERSON, properties,
-        GradoopIds.fromLongs(0L));
+        GradoopIdSet.fromLongs(0L));
     // Person:Frank (5L)
     properties = new HashMap<>();
     properties.put(PROPERTY_KEY_NAME, "Frank");
@@ -158,7 +158,7 @@ public abstract class GradoopTestBaseUtils {
     properties.put(PROPERTY_KEY_LOC_IP, "127.0.0.1");
     VERTEX_PERSON_FRANK = vertexDataFactory
       .createVertex(GradoopId.fromLong(5L), LABEL_PERSON, properties,
-        GradoopIds.fromLongs(1L));
+        GradoopIdSet.fromLongs(1L));
 
     // Tag:Databases (6L)
     properties = new HashMap<>();
@@ -186,7 +186,7 @@ public abstract class GradoopTestBaseUtils {
     properties.put(PROPERTY_KEY_TITLE, "Graph Processing");
     VERTEX_FORUM_GPS = vertexDataFactory
       .createVertex(GradoopId.fromLong(10L), LABEL_FORUM, properties,
-        GradoopIds.fromLongs(3L));
+        GradoopIdSet.fromLongs(3L));
 
     return Lists
       .newArrayList(VERTEX_PERSON_ALICE, VERTEX_PERSON_BOB, VERTEX_PERSON_CAROL,
@@ -207,7 +207,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_0_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(0L), LABEL_KNOWS,
         VERTEX_PERSON_ALICE.getId(), VERTEX_PERSON_BOB.getId(), properties,
-        GradoopIds.fromLongs(0L, 2L));
+        GradoopIdSet.fromLongs(0L, 2L));
     edges.add(EDGE_0_KNOWS);
     // Person:Bob-[knows]->Person:Alice (1L)
     properties = new HashMap<>();
@@ -215,7 +215,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_1_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(1L), LABEL_KNOWS,
         VERTEX_PERSON_BOB.getId(), VERTEX_PERSON_ALICE.getId(), properties,
-        GradoopIds.fromLongs(0L, 2L));
+        GradoopIdSet.fromLongs(0L, 2L));
     edges.add(EDGE_1_KNOWS);
     // Person:Bob-[knows]->Person:Carol (2L)
     properties = new HashMap<>();
@@ -223,7 +223,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_2_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(2L), LABEL_KNOWS,
         VERTEX_PERSON_BOB.getId(), VERTEX_PERSON_CAROL.getId(), properties,
-        GradoopIds.fromLongs(2L));
+        GradoopIdSet.fromLongs(2L));
     edges.add(EDGE_2_KNOWS);
     // Person:Carol-[knows]->Person:Bob (3L)
     properties = new HashMap<>();
@@ -231,7 +231,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_3_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(3L), LABEL_KNOWS,
         VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_BOB.getId(), properties,
-        GradoopIds.fromLongs(2L));
+        GradoopIdSet.fromLongs(2L));
     edges.add(EDGE_3_KNOWS);
     // Person:Carol-[knows]->Person:Dave (4L)
     properties = new HashMap<>();
@@ -239,7 +239,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_4_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(4L), LABEL_KNOWS,
         VERTEX_PERSON_CAROL.getId(), VERTEX_PERSON_DAVE.getId(), properties,
-        GradoopIds.fromLongs(1L, 2L, 3L));
+        GradoopIdSet.fromLongs(1L, 2L, 3L));
     edges.add(EDGE_4_KNOWS);
     // Person:Dave-[knows]->Person:Carol (5L)
     properties = new HashMap<>();
@@ -247,7 +247,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_5_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(5L), LABEL_KNOWS,
         VERTEX_PERSON_DAVE.getId(), VERTEX_PERSON_CAROL.getId(), properties,
-        GradoopIds.fromLongs(1L, 2L));
+        GradoopIdSet.fromLongs(1L, 2L));
     edges.add(EDGE_5_KNOWS);
     // Person:Eve-[knows]->Person:Alice (6L)
     properties = new HashMap<>();
@@ -255,7 +255,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_6_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(6L), LABEL_KNOWS,
         VERTEX_PERSON_EVE.getId(), VERTEX_PERSON_ALICE.getId(), properties,
-        GradoopIds.fromLongs(0L));
+        GradoopIdSet.fromLongs(0L));
     edges.add(EDGE_6_KNOWS);
     // Person:Eve-[knows]->Person:Bob (21L)
     properties = new HashMap<>();
@@ -263,7 +263,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_21_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(21L), LABEL_KNOWS,
         VERTEX_PERSON_EVE.getId(), VERTEX_PERSON_BOB.getId(), properties,
-        GradoopIds.fromLongs(0L));
+        GradoopIdSet.fromLongs(0L));
     edges.add(EDGE_21_KNOWS);
     // Person:Frank-[knows]->Person:Carol (22L)
     properties = new HashMap<>();
@@ -271,7 +271,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_22_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(22L), LABEL_KNOWS,
         VERTEX_PERSON_FRANK.getId(), VERTEX_PERSON_CAROL.getId(), properties,
-        GradoopIds.fromLongs(1L));
+        GradoopIdSet.fromLongs(1L));
     edges.add(EDGE_22_KNOWS);
     // Person:Frank-[knows]->Person:Dave (23L)
     properties = new HashMap<>();
@@ -279,7 +279,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_23_KNOWS = edgeDataFactory
       .createEdge(GradoopId.fromLong(23L), LABEL_KNOWS,
         VERTEX_PERSON_FRANK.getId(), VERTEX_PERSON_DAVE.getId(), properties,
-        GradoopIds.fromLongs(1L));
+        GradoopIdSet.fromLongs(1L));
     edges.add(EDGE_23_KNOWS);
     // Person:Eve-[hasInterest]->Tag:Databases (7L)
     EDGE_7_HAS_INTEREST = edgeDataFactory
@@ -332,7 +332,7 @@ public abstract class GradoopTestBaseUtils {
     EDGE_16_HAS_MODERATOR = edgeDataFactory
       .createEdge(GradoopId.fromLong(16L), LABEL_HAS_MODERATOR,
         VERTEX_FORUM_GPS.getId(), VERTEX_PERSON_DAVE.getId(), properties,
-        GradoopIds.fromLongs(3L));
+        GradoopIdSet.fromLongs(3L));
     edges.add(EDGE_16_HAS_MODERATOR);
     // Forum:Graph Databases-[hasMember]->Person:Alice (17L)
     EDGE_17_HAS_MEMBER = edgeDataFactory
@@ -348,13 +348,13 @@ public abstract class GradoopTestBaseUtils {
     EDGE_19_HAS_MEMBER = edgeDataFactory
       .createEdge(GradoopId.fromLong(19L), LABEL_HAS_MEMBER,
         VERTEX_FORUM_GPS.getId(), VERTEX_PERSON_CAROL.getId(),
-        GradoopIds.fromLongs(3L));
+        GradoopIdSet.fromLongs(3L));
     edges.add(EDGE_19_HAS_MEMBER);
     // Forum:Graph Processing-[hasMember]->Person:Dave (20L)
     EDGE_20_HAS_MEMBER = edgeDataFactory
       .createEdge(GradoopId.fromLong(20L), LABEL_HAS_MEMBER,
         VERTEX_FORUM_GPS.getId(), VERTEX_PERSON_DAVE.getId(),
-        GradoopIds.fromLongs(3L));
+        GradoopIdSet.fromLongs(3L));
     edges.add(EDGE_20_HAS_MEMBER);
 
     return edges;

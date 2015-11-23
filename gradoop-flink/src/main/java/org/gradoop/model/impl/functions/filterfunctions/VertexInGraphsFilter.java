@@ -20,7 +20,7 @@ package org.gradoop.model.impl.functions.filterfunctions;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
  * Checks if a vertex is contained in at least one of the given logical
@@ -34,14 +34,14 @@ public class VertexInGraphsFilter<VD extends EPGMVertex>
   /**
    * Graph identifiers
    */
-  private final GradoopIds identifiers;
+  private final GradoopIdSet identifiers;
 
   /**
    * Creates a filter
    *
    * @param identifiers graph identifiers for containment check
    */
-  public VertexInGraphsFilter(GradoopIds identifiers) {
+  public VertexInGraphsFilter(GradoopIdSet identifiers) {
     this.identifiers = identifiers;
   }
 

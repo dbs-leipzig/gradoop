@@ -19,7 +19,7 @@ package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.api.PersistentGraphHead;
 
 /**
@@ -30,12 +30,12 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
   /**
    * Vertex identifiers contained in that logical graph.
    */
-  private GradoopIds vertexIds;
+  private GradoopIdSet vertexIds;
 
   /**
    * Edge identifiers contained in that logical graph.
    */
-  private GradoopIds edgeIds;
+  private GradoopIdSet edgeIds;
 
   /**
    * Default constructor.
@@ -50,8 +50,8 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
    * @param vertexIds  vertexIds contained in that graph
    * @param edgeIds     edgeIds contained in that graph
    */
-  public HBaseGraphHead(EPGMGraphHead graphHead, GradoopIds vertexIds,
-    GradoopIds edgeIds) {
+  public HBaseGraphHead(EPGMGraphHead graphHead, GradoopIdSet vertexIds,
+    GradoopIdSet edgeIds) {
     super(graphHead);
     this.vertexIds = vertexIds;
     this.edgeIds = edgeIds;
@@ -61,7 +61,7 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
    * {@inheritDoc}
    */
   @Override
-  public GradoopIds getVertexIds() {
+  public GradoopIdSet getVertexIds() {
     return vertexIds;
   }
 
@@ -69,7 +69,7 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
    * {@inheritDoc}
    */
   @Override
-  public void setVertexIds(GradoopIds vertices) {
+  public void setVertexIds(GradoopIdSet vertices) {
     this.vertexIds = vertices;
   }
 
@@ -81,7 +81,7 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
     if (vertexIds != null) {
       vertexIds.add(vertexID);
     } else {
-      vertexIds = GradoopIds.fromExisting(vertexID);
+      vertexIds = GradoopIdSet.fromExisting(vertexID);
     }
   }
 
@@ -97,7 +97,7 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
    * {@inheritDoc}
    */
   @Override
-  public GradoopIds getEdgeIds() {
+  public GradoopIdSet getEdgeIds() {
     return edgeIds;
   }
 
@@ -105,7 +105,7 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
    * {@inheritDoc}
    */
   @Override
-  public void setEdgeIds(GradoopIds edgeIds) {
+  public void setEdgeIds(GradoopIdSet edgeIds) {
     this.edgeIds = edgeIds;
   }
 
@@ -117,7 +117,7 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
     if (edgeIds != null) {
       edgeIds.add(edgeID);
     } else {
-      edgeIds = GradoopIds.fromExisting(edgeID);
+      edgeIds = GradoopIdSet.fromExisting(edgeID);
     }
   }
 

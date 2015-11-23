@@ -4,18 +4,18 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 //@FunctionAnnotation.ForwardedFieldsFirst("f0,f1")
 //@FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
 public class GraphIdVertexIdsEdgeIdsTriple implements
-  JoinFunction<Tuple2<GradoopId,GradoopIds>,Tuple2<GradoopId,GradoopIds>,
-    Tuple3<GradoopId,GradoopIds,GradoopIds>> {
+  JoinFunction<Tuple2<GradoopId,GradoopIdSet>,Tuple2<GradoopId,GradoopIdSet>,
+    Tuple3<GradoopId,GradoopIdSet,GradoopIdSet>> {
 
   @Override
-  public Tuple3<GradoopId, GradoopIds, GradoopIds> join(
-    Tuple2<GradoopId, GradoopIds> graphIdVertexIds,
-    Tuple2<GradoopId, GradoopIds> graphIdEdgeIds) {
+  public Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> join(
+    Tuple2<GradoopId, GradoopIdSet> graphIdVertexIds,
+    Tuple2<GradoopId, GradoopIdSet> graphIdEdgeIds) {
 
     return new Tuple3<>(
       graphIdVertexIds.f0,

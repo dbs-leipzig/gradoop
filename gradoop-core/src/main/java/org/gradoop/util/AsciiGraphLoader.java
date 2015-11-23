@@ -25,7 +25,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Graph;
@@ -239,7 +239,7 @@ public class AsciiGraphLoader<
    * @param graphIds graph identifiers
    * @return vertices that are contained in the graphs
    */
-  public Collection<V> getVerticesByGraphIds(GradoopIds graphIds) {
+  public Collection<V> getVerticesByGraphIds(GradoopIdSet graphIds) {
     Collection<V> result = Sets.newHashSetWithExpectedSize(graphIds.size());
     for (V vertex : vertices.values()) {
       if (vertex.getGraphIds().containsAny(graphIds)) {
@@ -256,7 +256,7 @@ public class AsciiGraphLoader<
    * @return vertices that are contained in the graphs
    */
   public Collection<V> getVerticesByGraphVariables(String... graphVariables) {
-    GradoopIds graphIds = new GradoopIds();
+    GradoopIdSet graphIds = new GradoopIdSet();
     Collection<G> graphHeads = getGraphHeadsByVariables(graphVariables);
     for (G graphHead : graphHeads) {
       graphIds.add(graphHead.getId());
@@ -310,7 +310,7 @@ public class AsciiGraphLoader<
    * @param graphIds Graph identifiers
    * @return edges
    */
-  public Collection<E> getEdgesByGraphIds(GradoopIds graphIds) {
+  public Collection<E> getEdgesByGraphIds(GradoopIdSet graphIds) {
     Collection<E> result = Sets.newHashSetWithExpectedSize(graphIds.size());
     for (E edge : edges.values()) {
       if (edge.getGraphIds().containsAny(graphIds)) {
@@ -327,7 +327,7 @@ public class AsciiGraphLoader<
    * @return edges
    */
   public Collection<E> getEdgesByGraphVariables(String... variables) {
-    GradoopIds graphIds = new GradoopIds();
+    GradoopIdSet graphIds = new GradoopIdSet();
     Collection<G> graphHeads = getGraphHeadsByVariables(variables);
     for (G graphHead : graphHeads) {
       graphIds.add(graphHead.getId());
@@ -442,7 +442,7 @@ public class AsciiGraphLoader<
    */
   private V initVertex(Vertex v) {
     GradoopId vertexId = GradoopId.fromLong(v.getId());
-    GradoopIds graphIds = GradoopIds.fromLongs(v.getGraphs());
+    GradoopIdSet graphIds = GradoopIdSet.fromLongs(v.getGraphs());
     return config.getVertexFactory().createVertex(vertexId,
       v.getLabel(),
       v.getProperties(),
@@ -459,7 +459,7 @@ public class AsciiGraphLoader<
     GradoopId edgeId = GradoopId.fromLong(e.getId());
     GradoopId sourceVertexId = GradoopId.fromLong(e.getSourceVertexId());
     GradoopId targetVertexId = GradoopId.fromLong(e.getTargetVertexId());
-    GradoopIds graphIds = GradoopIds.fromLongs(e.getGraphs());
+    GradoopIdSet graphIds = GradoopIdSet.fromLongs(e.getGraphs());
     return config.getEdgeFactory().createEdge(edgeId,
       e.getLabel(),
       sourceVertexId,

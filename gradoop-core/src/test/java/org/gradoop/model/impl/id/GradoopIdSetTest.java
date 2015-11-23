@@ -14,13 +14,13 @@ import java.util.NoSuchElementException;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-public class GradoopIdsTest{
+public class GradoopIdSetTest {
 
   @Test
   public void testAdd() throws Exception {
     GradoopId id1 = GradoopId.fromLong(23L);
     GradoopId id2 = GradoopId.fromLong(42L);
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
 
     assertThat(ids.size(), is(0));
 
@@ -43,7 +43,7 @@ public class GradoopIdsTest{
     GradoopId id1 = new GradoopId(23L);
     GradoopId id2 = new GradoopId(42L);
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     ids.add(id1);
 
     assertThat(ids.size(), is(1));
@@ -57,7 +57,7 @@ public class GradoopIdsTest{
     GradoopId id2 = new GradoopId(42L);
     GradoopId id3 = new GradoopId(84L);
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Lists.newArrayList(id1, id2));
 
     assertThat(ids.size(), is(2));
@@ -70,11 +70,11 @@ public class GradoopIdsTest{
   public void testAddAll1() throws Exception {
     GradoopId id1 = new GradoopId(23L);
     GradoopId id2 = new GradoopId(42L);
-    GradoopIds ids1 = new GradoopIds();
+    GradoopIdSet ids1 = new GradoopIdSet();
     ids1.add(id1);
     ids1.add(id2);
 
-    GradoopIds ids2 = new GradoopIds();
+    GradoopIdSet ids2 = new GradoopIdSet();
     ids2.addAll(ids1);
 
     assertThat(ids2.size(), is(2));
@@ -88,7 +88,7 @@ public class GradoopIdsTest{
     GradoopId id2 = new GradoopId(42L);
     GradoopId id3 = new GradoopId(84L);
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Lists.newArrayList(id1, id2));
 
     assertTrue(ids.containsAll(Lists.newArrayList(id1)));
@@ -104,14 +104,14 @@ public class GradoopIdsTest{
     GradoopId id2 = new GradoopId(42L);
     GradoopId id3 = new GradoopId(84L);
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Lists.newArrayList(id1, id2));
 
-    assertTrue(ids.containsAll(GradoopIds.fromExisting(id1)));
-    assertTrue(ids.containsAll(GradoopIds.fromExisting(id2)));
-    assertTrue(ids.containsAll(GradoopIds.fromExisting(id1, id2)));
-    assertFalse(ids.containsAll(GradoopIds.fromExisting(id3)));
-    assertFalse(ids.containsAll(GradoopIds.fromExisting(id1, id3)));
+    assertTrue(ids.containsAll(GradoopIdSet.fromExisting(id1)));
+    assertTrue(ids.containsAll(GradoopIdSet.fromExisting(id2)));
+    assertTrue(ids.containsAll(GradoopIdSet.fromExisting(id1, id2)));
+    assertFalse(ids.containsAll(GradoopIdSet.fromExisting(id3)));
+    assertFalse(ids.containsAll(GradoopIdSet.fromExisting(id1, id3)));
   }
 
   @Test
@@ -120,7 +120,7 @@ public class GradoopIdsTest{
     GradoopId id2 = new GradoopId(42L);
     GradoopId id3 = new GradoopId(84L);
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Lists.newArrayList(id1, id2));
 
     assertTrue(ids.containsAny(Lists.newArrayList(id1)));
@@ -136,20 +136,20 @@ public class GradoopIdsTest{
     GradoopId id2 = new GradoopId(42L);
     GradoopId id3 = new GradoopId(84L);
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Lists.newArrayList(id1, id2));
 
-    assertTrue(ids.containsAny(GradoopIds.fromExisting(id1)));
-    assertTrue(ids.containsAny(GradoopIds.fromExisting(id2)));
-    assertTrue(ids.containsAny(GradoopIds.fromExisting(id1, id2)));
-    assertFalse(ids.containsAny(GradoopIds.fromExisting(id3)));
-    assertTrue(ids.containsAny(GradoopIds.fromExisting(id1, id3)));
+    assertTrue(ids.containsAny(GradoopIdSet.fromExisting(id1)));
+    assertTrue(ids.containsAny(GradoopIdSet.fromExisting(id2)));
+    assertTrue(ids.containsAny(GradoopIdSet.fromExisting(id1, id2)));
+    assertFalse(ids.containsAny(GradoopIdSet.fromExisting(id3)));
+    assertTrue(ids.containsAny(GradoopIdSet.fromExisting(id1, id3)));
   }
 
   @Test
   public void testIsEmpty() throws Exception {
-    GradoopIds ids1 = GradoopIds.fromExisting(new GradoopId(23L));
-    GradoopIds ids2 = new GradoopIds();
+    GradoopIdSet ids1 = GradoopIdSet.fromExisting(new GradoopId(23L));
+    GradoopIdSet ids2 = new GradoopIdSet();
 
     assertFalse(ids1.isEmpty());
     assertTrue(ids2.isEmpty());
@@ -160,7 +160,7 @@ public class GradoopIdsTest{
     GradoopId id1 = new GradoopId(23L);
     GradoopId id2 = new GradoopId(42L);
 
-    GradoopIds ids = GradoopIds.fromExisting(id1, id2);
+    GradoopIdSet ids = GradoopIdSet.fromExisting(id1, id2);
 
     Collection<GradoopId> coll = ids.toCollection();
 
@@ -174,7 +174,7 @@ public class GradoopIdsTest{
     GradoopId id1 = new GradoopId(23L);
     GradoopId id2 = new GradoopId(42L);
 
-    GradoopIds idsWrite = GradoopIds.fromExisting(id1, id2);
+    GradoopIdSet idsWrite = GradoopIdSet.fromExisting(id1, id2);
 
     // write to byte[]
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -182,7 +182,7 @@ public class GradoopIdsTest{
     idsWrite.write(dataOut);
 
     // read from byte[]
-    GradoopIds idsRead = new GradoopIds();
+    GradoopIdSet idsRead = new GradoopIdSet();
     ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
     DataInputStream dataIn = new DataInputStream(in);
     idsRead.readFields(dataIn);
@@ -197,7 +197,7 @@ public class GradoopIdsTest{
     GradoopId id1 = new GradoopId(23L);
     GradoopId id2 = new GradoopId(42L);
 
-    GradoopIds ids = GradoopIds.fromExisting(id1, id2);
+    GradoopIdSet ids = GradoopIdSet.fromExisting(id1, id2);
 
     Iterator<GradoopId> idsIterator = ids.iterator();
 
@@ -210,7 +210,7 @@ public class GradoopIdsTest{
 
   @Test(expected = NoSuchElementException.class)
   public void testIterator1() throws Exception {
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
 
     Iterator<GradoopId> idsIterator = ids.iterator();
 
@@ -223,7 +223,7 @@ public class GradoopIdsTest{
     GradoopId id1 = new GradoopId(23L);
     GradoopId id2 = new GradoopId(42L);
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     ids.add(id1);
     ids.add(id2);
 
@@ -239,7 +239,7 @@ public class GradoopIdsTest{
     GradoopId id1 = new GradoopId(23L);
     GradoopId id2 = new GradoopId(42L);
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     assertThat(ids.size(), is(0));
     ids.add(id1);
     assertThat(ids.size(), is(1));
@@ -254,7 +254,7 @@ public class GradoopIdsTest{
     Long id1 = 23L;
     Long id2 = 42L;
     Long id3 = 84L;
-    GradoopIds ids = GradoopIds.fromLongs(id1, id2, id3);
+    GradoopIdSet ids = GradoopIdSet.fromLongs(id1, id2, id3);
     assertThat(ids.size(), is(3));
     assertTrue(ids.contains(new GradoopId(id1)));
     assertTrue(ids.contains(new GradoopId(id2)));
@@ -266,7 +266,7 @@ public class GradoopIdsTest{
     Long id1 = 23L;
     Long id2 = 42L;
     Long id3 = 84L;
-    GradoopIds ids = GradoopIds.fromLongs(
+    GradoopIdSet ids = GradoopIdSet.fromLongs(
       Lists.newArrayList(id1, id2, id3));
     assertThat(ids.size(), is(3));
     assertTrue(ids.contains(new GradoopId(id1)));
@@ -276,7 +276,7 @@ public class GradoopIdsTest{
 
   @Test
   public void testFromExisting() {
-    GradoopIds ids = GradoopIds.fromExisting(
+    GradoopIdSet ids = GradoopIdSet.fromExisting(
       GradoopId.fromLong(0L),
       GradoopId.fromLong(1L),
       GradoopId.fromLong(2L)

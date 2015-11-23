@@ -15,7 +15,7 @@ import org.gradoop.model.impl.functions.LeftSideOnly;
 import org.gradoop.model.impl.functions.counting.OneInTuple1;
 import org.gradoop.model.impl.functions.isolation.ElementIdInTuple1;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
 import org.gradoop.model.impl.operators.equality.functions
   .GraphIdElementIdInTuple2;
@@ -36,14 +36,14 @@ public class EqualByGraphElementIds
   public DataSet<Boolean> execute(GraphCollection<V, E, G> firstCollection,
     GraphCollection<V, E, G> secondCollection) {
 
-    DataSet<Tuple3<GradoopIds, GradoopIds, Long>> firstGraphsWithCount =
+    DataSet<Tuple3<GradoopIdSet, GradoopIdSet, Long>> firstGraphsWithCount =
       getGraphElementIdsWithCount(firstCollection);
 
-    DataSet<Tuple3<GradoopIds, GradoopIds, Long>> secondGraphsWithCount =
+    DataSet<Tuple3<GradoopIdSet, GradoopIdSet, Long>> secondGraphsWithCount =
       getGraphElementIdsWithCount(secondCollection);
 
     DataSet<Tuple1<Long>> distinctFirstGraphCount = firstGraphsWithCount
-      .map(new OneInTuple1<Tuple3<GradoopIds, GradoopIds, Long>>())
+      .map(new OneInTuple1<Tuple3<GradoopIdSet, GradoopIdSet, Long>>())
       .sum(0);
 
     try {
@@ -58,7 +58,7 @@ public class EqualByGraphElementIds
     DataSet<Tuple1<Long>> matchingIdCount = firstGraphsWithCount
       .join(secondGraphsWithCount)
       .where(0, 1, 2).equalTo(0, 1, 2)
-      .with(new OneInTuple1<Tuple3<GradoopIds, GradoopIds, Long>>())
+      .with(new OneInTuple1<Tuple3<GradoopIdSet, GradoopIdSet, Long>>())
       .sum(0);
 
     return checkCountEqualsCount(distinctFirstGraphCount, matchingIdCount);
@@ -66,7 +66,7 @@ public class EqualByGraphElementIds
 
 
 
-  private DataSet<Tuple3<GradoopIds, GradoopIds, Long>>
+  private DataSet<Tuple3<GradoopIdSet, GradoopIdSet, Long>>
   getGraphElementIdsWithCount(GraphCollection<V, E, G> graphCollection) {
 
     DataSet<Tuple2<GradoopId, Long>> firstGraphIdOccurrences =
@@ -75,11 +75,11 @@ public class EqualByGraphElementIds
     DataSet<Tuple1<GradoopId>> graphIds = graphCollection.getGraphHeads()
       .map(new ElementIdInTuple1<G>());
 
-    DataSet<Tuple2<GradoopId,GradoopIds>> vertexIdsByGraphId =
+    DataSet<Tuple2<GradoopId,GradoopIdSet>> vertexIdsByGraphId =
       getElementIdsByGraphId(
         graphIds, graphCollection.getVertices());
 
-    DataSet<Tuple2<GradoopId,GradoopIds>> edgeIdsByGraphId =
+    DataSet<Tuple2<GradoopId,GradoopIdSet>> edgeIdsByGraphId =
       getElementIdsByGraphId(
         graphIds, graphCollection.getEdges());
 
@@ -95,7 +95,7 @@ public class EqualByGraphElementIds
   }
 
   private <T extends EPGMGraphElement> GroupReduceOperator
-    <Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopIds>>
+    <Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopIdSet>>
   getElementIdsByGraphId(
     DataSet<Tuple1<GradoopId>> graphIds, DataSet<T> elements) {
     return elements

@@ -1,7 +1,7 @@
 package org.gradoop.model.api;
 
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  T createVertex(GradoopId id, String label, GradoopIds graphIds);
+  T createVertex(GradoopId id, String label, GradoopIdSet graphIds);
 
   /**
    * Creates vertex data based on the given parameters.
@@ -59,5 +59,5 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @return vertex data
    */
   T createVertex(GradoopId id, String label,
-    Map<String, Object> properties, GradoopIds graphIds);
+    Map<String, Object> properties, GradoopIdSet graphIds);
 }

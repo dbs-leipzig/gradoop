@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMEdgeFactory;
 
@@ -75,7 +75,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
   @Override
   public EdgePojo createEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
-    GradoopIds graphs) {
+    GradoopIdSet graphs) {
     return createEdge(id, label, sourceVertexId, targetVertexId, null, graphs);
   }
 
@@ -85,7 +85,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
   @Override
   public EdgePojo createEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
-    final Map<String, Object> properties, GradoopIds graphIds) {
+    final Map<String, Object> properties, GradoopIdSet graphIds) {
     checkId(id);
     checkLabel(label);
     checkId(sourceVertexId);

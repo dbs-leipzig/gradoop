@@ -35,8 +35,8 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIds implements Iterable<GradoopId>,
-  WritableComparable<GradoopIds>, Serializable {
+public class GradoopIdSet implements Iterable<GradoopId>,
+  WritableComparable<GradoopIdSet>, Serializable {
 
   /**
    * Holds the identifiers.
@@ -46,7 +46,7 @@ public class GradoopIds implements Iterable<GradoopId>,
   /**
    * Creates a new instance.
    */
-  public GradoopIds() {
+  public GradoopIdSet() {
     identifiers = Sets.newHashSet();
   }
 
@@ -56,14 +56,14 @@ public class GradoopIds implements Iterable<GradoopId>,
    * @param ids given ids
    * @return gradoop ids
    */
-  public static GradoopIds fromExisting(GradoopId... ids) {
-    GradoopIds gradoopIds = new GradoopIds();
+  public static GradoopIdSet fromExisting(GradoopId... ids) {
+    GradoopIdSet gradoopIdSet = new GradoopIdSet();
 
     for (GradoopId id : ids) {
-      gradoopIds.add(id);
+      gradoopIdSet.add(id);
     }
 
-    return gradoopIds;
+    return gradoopIdSet;
   }
 
   /**
@@ -72,7 +72,7 @@ public class GradoopIds implements Iterable<GradoopId>,
    * @param ids numbers
    * @return gradoop ids
    */
-  public static GradoopIds fromLongs(Long... ids) {
+  public static GradoopIdSet fromLongs(Long... ids) {
     return fromLongs(Arrays.asList(ids));
   }
 
@@ -82,13 +82,13 @@ public class GradoopIds implements Iterable<GradoopId>,
    * @param ids collection containing long identifiers
    * @return gradoop ids
    */
-  public static GradoopIds fromLongs(Collection<Long> ids) {
-    GradoopIds gradoopIds = new GradoopIds();
+  public static GradoopIdSet fromLongs(Collection<Long> ids) {
+    GradoopIdSet gradoopIdSet = new GradoopIdSet();
 
     for (Long id : ids) {
-      gradoopIds.add(GradoopId.fromLong(id));
+      gradoopIdSet.add(GradoopId.fromLong(id));
     }
-    return gradoopIds;
+    return gradoopIdSet;
   }
 
   /**
@@ -121,10 +121,10 @@ public class GradoopIds implements Iterable<GradoopId>,
 
   /**
    * adds existing gradoop ids
-   * @param gradoopIds ids to add
+   * @param gradoopIdSet ids to add
    */
-  public void addAll(GradoopIds gradoopIds) {
-    addAll(gradoopIds.identifiers);
+  public void addAll(GradoopIdSet gradoopIdSet) {
+    addAll(gradoopIdSet.identifiers);
   }
 
   /**
@@ -132,7 +132,7 @@ public class GradoopIds implements Iterable<GradoopId>,
    * @param others gradoop ids
    * @return true, if all contained
    */
-  public boolean containsAll(GradoopIds others) {
+  public boolean containsAll(GradoopIdSet others) {
     return this.identifiers.containsAll(others.identifiers);
   }
 
@@ -150,7 +150,7 @@ public class GradoopIds implements Iterable<GradoopId>,
    * @param others id collection
    * @return true, if any id is contained
    */
-  public boolean containsAny(GradoopIds others) {
+  public boolean containsAny(GradoopIdSet others) {
     boolean result = false;
     for (GradoopId id : others) {
       if (this.identifiers.contains(id)) {
@@ -167,7 +167,7 @@ public class GradoopIds implements Iterable<GradoopId>,
    * @return true, if any id is contained
    */
   public boolean containsAny(Collection<GradoopId> identifiers) {
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(identifiers);
     return containsAny(ids);
   }
@@ -230,7 +230,7 @@ public class GradoopIds implements Iterable<GradoopId>,
   }
 
   @Override
-  public int compareTo(GradoopIds other) {
+  public int compareTo(GradoopIdSet other) {
 
     int comparison = this.identifiers.size() - other.identifiers.size();
 
@@ -249,8 +249,8 @@ public class GradoopIds implements Iterable<GradoopId>,
   public boolean equals(Object other) {
     boolean equals = this == other;
 
-    if (!equals && other instanceof GradoopIds) {
-      GradoopIds otherIds = (GradoopIds) other;
+    if (!equals && other instanceof GradoopIdSet) {
+      GradoopIdSet otherIds = (GradoopIdSet) other;
 
       equals = this.size() == otherIds.size();
 

@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdGenerator;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.hamcrest.core.Is;
@@ -43,7 +43,7 @@ public class EdgePojoTest {
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
     props.put("k2", "v2");
-    GradoopIds graphs = GradoopIds.fromLongs(0L, 1L);
+    GradoopIdSet graphs = GradoopIdSet.fromLongs(0L, 1L);
 
     EPGMEdge edge = new EdgePojoFactory()
       .createEdge(edgeId, label, sourceId, targetId, props, graphs);

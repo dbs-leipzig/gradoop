@@ -45,7 +45,7 @@ import org.gradoop.model.impl.functions.keyselectors
   .EdgeTargetVertexKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.storage.api.PersistentEdge;
@@ -283,7 +283,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
 
     // co-group (graph-id, vertex-id) and (graph-id, edge-id) tuples to
     // (graph-id, {vertex-id}, {edge-id}) triples
-    DataSet<Tuple3<GradoopId, GradoopIds, GradoopIds>>
+    DataSet<Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>>
       graphToVertexIdsAndEdgeIds = graphIdToVertexId
         .coGroup(graphIdToEdgeId)
         .where(0)
@@ -291,17 +291,17 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
         .with(
           new CoGroupFunction<Tuple2<GradoopId, GradoopId>,
             Tuple2<GradoopId, GradoopId>,
-            Tuple3<GradoopId, GradoopIds, GradoopIds>>() {
+            Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>>() {
 
             @Override
             public void coGroup(Iterable<Tuple2<GradoopId, GradoopId>>
               graphToVertexIds, Iterable<Tuple2<GradoopId, GradoopId>>
               graphToEdgeIds, Collector
-              <Tuple3<GradoopId, GradoopIds, GradoopIds>> collector
+              <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>> collector
             ) throws Exception {
 
-              GradoopIds vertexIds = new GradoopIds();
-              GradoopIds edgeIds = new GradoopIds();
+              GradoopIdSet vertexIds = new GradoopIdSet();
+              GradoopIdSet edgeIds = new GradoopIdSet();
               GradoopId graphId = null;
               boolean initialized = false;
               for (Tuple2<GradoopId, GradoopId>
@@ -440,7 +440,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
    */
   public static class PersistentGraphHeadJoinFunction<GD extends EPGMGraphHead,
     PGD extends PersistentGraphHead> implements JoinFunction
-    <Tuple3<GradoopId, GradoopIds, GradoopIds>, GD, PersistentGraphHead> {
+    <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, GD, PersistentGraphHead> {
 
     /**
      * Persistent graph data factory.
@@ -462,7 +462,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
      */
     @Override
     public PersistentGraphHead join(
-      Tuple3<GradoopId, GradoopIds, GradoopIds> longSetSetTuple3,
+      Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> longSetSetTuple3,
       GD graphHead) throws Exception {
       return graphHeadFactory.createGraphHead(graphHead, longSetSetTuple3.f1,
         longSetSetTuple3.f2);

@@ -26,7 +26,7 @@ import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMLabeled;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -136,10 +136,10 @@ public abstract class JsonIO {
      * @return graph identifiers
      * @throws JSONException
      */
-    protected GradoopIds getGraphs(JSONObject object) throws JSONException {
-      GradoopIds result;
+    protected GradoopIdSet getGraphs(JSONObject object) throws JSONException {
+      GradoopIdSet result;
       if (!object.getJSONObject(META).has(GRAPHS)) {
-        result = new GradoopIds();
+        result = new GradoopIdSet();
       } else {
         result =
           getArrayValues(object.getJSONObject(META).getJSONArray(GRAPHS));
@@ -154,8 +154,8 @@ public abstract class JsonIO {
      * @return long values
      * @throws JSONException
      */
-    protected GradoopIds getArrayValues(JSONArray array) throws JSONException {
-      GradoopIds result = new GradoopIds();
+    protected GradoopIdSet getArrayValues(JSONArray array) throws JSONException {
+      GradoopIdSet result = new GradoopIdSet();
 
       for (int i = 0; i < array.length(); i++) {
         result.add(GradoopId.fromLongString(array.getString(i)));
@@ -239,7 +239,7 @@ public abstract class JsonIO {
      * @param values identifier set
      * @return json array containing the identifiers
      */
-    private JSONArray writeJsonArray(final GradoopIds values) {
+    private JSONArray writeJsonArray(final GradoopIdSet values) {
       JSONArray jsonArray = new JSONArray();
       for (GradoopId val : values) {
         jsonArray.put(val);

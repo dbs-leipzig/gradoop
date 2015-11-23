@@ -21,7 +21,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.Order;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.GraphCollection;
@@ -62,7 +62,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return collection containing requested logical graphs
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> getGraphs(GradoopIds identifiers) throws
+  GraphCollection<VD, ED, GD> getGraphs(GradoopIdSet identifiers) throws
     Exception;
 
   /**
