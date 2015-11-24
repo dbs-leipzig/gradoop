@@ -129,7 +129,7 @@ public class GradoopId implements Comparable<GradoopId>,
    */
   public static GradoopId fromString(String string) {
 
-    string = string.substring(1,string.length()-1);
+    string = string.substring(1, string.length() - 1);
 
     String[] parts = string.split("-");
 
