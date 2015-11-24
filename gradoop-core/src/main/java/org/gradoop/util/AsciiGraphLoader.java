@@ -47,15 +47,13 @@ import java.util.Map;
  *
  * @see <a href="https://github.com/s1ck/gdl">GDL on GitHub</a>
  */
-public class AsciiGraphLoader<
-  V extends EPGMVertex,
-  E extends EPGMEdge,
-  G extends EPGMGraphHead> {
+public class AsciiGraphLoader
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
    * Gradoop configuration
    */
-  private final GradoopConfig<V, E, G> config;
+  private final GradoopConfig<G, V, E> config;
 
   /**
    * Used to parse GDL scripts.
@@ -101,7 +99,7 @@ public class AsciiGraphLoader<
    * @param config Gradoop configuration
    */
   private AsciiGraphLoader(GDLHandler gdlHandler,
-    GradoopConfig<V, E, G> config) {
+    GradoopConfig<G, V, E> config) {
     this.gdlHandler = gdlHandler;
     this.config = config;
 
@@ -130,8 +128,8 @@ public class AsciiGraphLoader<
    */
   public static
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
-  AsciiGraphLoader<V, E, G> fromString(String asciiGraph,
-    GradoopConfig<V, E, G> config) {
+  AsciiGraphLoader<G, V, E> fromString(String asciiGraph,
+    GradoopConfig<G, V, E> config) {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
@@ -153,8 +151,8 @@ public class AsciiGraphLoader<
    */
   public static
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
-  AsciiGraphLoader<V, E, G> fromFile(String fileName,
-    GradoopConfig<V, E, G> config) throws IOException {
+  AsciiGraphLoader<G, V, E> fromFile(String fileName,
+    GradoopConfig<G, V, E> config) throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)

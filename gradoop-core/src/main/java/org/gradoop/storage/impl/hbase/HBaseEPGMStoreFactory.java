@@ -66,7 +66,7 @@ public class HBaseEPGMStoreFactory {
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
   EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
-    final Configuration config, final GradoopConfig<VD, ED, GD> gradoopConfig) {
+    final Configuration config, final GradoopConfig<GD, VD, ED> gradoopConfig) {
     return createOrOpenEPGMStore(config, GradoopHBaseConfig.createConfig(
       gradoopConfig,
       GConstants.DEFAULT_TABLE_VERTICES,
@@ -89,7 +89,7 @@ public class HBaseEPGMStoreFactory {
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
   EPGMStore<VD, ED, GD> createOrOpenEPGMStore(
-    final Configuration config, final GradoopConfig<VD, ED, GD> gradoopConfig,
+    final Configuration config, final GradoopConfig<GD, VD, ED> gradoopConfig,
     final String prefix) {
     return createOrOpenEPGMStore(config, GradoopHBaseConfig.createConfig(
       gradoopConfig,

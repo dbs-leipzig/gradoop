@@ -272,7 +272,7 @@ public class EPGMDatabase<
 
     HBaseWriter<VD, ED, GD> hBaseWriter = new HBaseWriter<>();
 
-    GradoopConfig<VD, ED, GD> conf = epgmStore.getConfig();
+    GradoopConfig<GD, VD, ED> conf = epgmStore.getConfig();
     // transform graph data to persistent graph data and write it
     hBaseWriter.writeGraphHeads(this, conf.getGraphHeadHandler(),
       persistentGraphHeadFactory, epgmStore.getGraphHeadName());
@@ -412,7 +412,7 @@ public class EPGMDatabase<
   EPGMDatabase<VD, ED, GD> fromHBase(
     EPGMStore<VD, ED, GD> epgmStore, ExecutionEnvironment env) {
 
-    GradoopConfig<VD, ED, GD> conf = epgmStore.getConfig();
+    GradoopConfig<GD, VD, ED> conf = epgmStore.getConfig();
     // used for type hinting when loading vertex data
     TypeInformation<Vertex<GradoopId, VD>> vertexTypeInfo =
       new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,

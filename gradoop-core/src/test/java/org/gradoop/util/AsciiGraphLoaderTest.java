@@ -12,12 +12,12 @@ import static org.junit.Assert.*;
 
 public class AsciiGraphLoaderTest {
 
-  private GradoopConfig<VertexPojo, EdgePojo, GraphHeadPojo> config =
+  private GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
     GradoopConfig.getDefaultConfig();
 
   @Test
   public void testFromString() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
@@ -27,7 +27,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testFromFile() throws Exception {
     String file = getClass().getResource("/data/example.gdl").getFile();
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromFile(file, config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
@@ -36,7 +36,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetGraphHeads() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()]", config);
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
@@ -50,7 +50,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetGraphHeadByVariable() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()];h[()]", config);
 
     validateCollections(asciiGraphLoader, 2, 2, 0);
@@ -65,7 +65,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetGraphHeadsByVariables() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()];h[()]", config);
 
     Collection<GraphHeadPojo> graphHeadPojos = asciiGraphLoader
@@ -76,7 +76,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVertices() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()]", config);
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
@@ -90,7 +90,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVertexByVariable() {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("(a)", config);
 
     validateCollections(asciiGraphLoader, 0, 1, 0);
@@ -104,7 +104,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVerticesByVariables() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("[(a);(b);(a)]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 0);
@@ -123,7 +123,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVerticesByGraphIds() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[(a);(b)];h[(a);(c)]", config);
 
     validateCollections(asciiGraphLoader, 2, 3, 0);
@@ -159,7 +159,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVerticesByGraphVariables() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[(a);(b)];h[(a);(c)]", config);
 
     validateCollections(asciiGraphLoader, 2, 3, 0);
@@ -192,7 +192,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetEdges() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
@@ -206,7 +206,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetEdgesByVariables() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-[e]->()<-[f]-()]", config);
 
     validateCollections(asciiGraphLoader, 1, 3, 2);
@@ -225,7 +225,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetEdgesByGraphIds() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()];h[()-[c]->()-[d]->()]",
         config);
 
@@ -264,7 +264,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetEdgesByGraphVariables() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()];h[()-[c]->()-[d]->()]",
         config);
 
@@ -300,7 +300,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetGraphHeadCache() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()];h[()];[()]",
         config);
 
@@ -319,7 +319,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVertexCache() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("(a);(b);()",
         config);
 
@@ -338,7 +338,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetEdgeCache() throws Exception {
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader =
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("()-[e]->()<-[f]-()-->()",
         config);
 
@@ -356,7 +356,7 @@ public class AsciiGraphLoaderTest {
   }
 
   private void validateCollections(
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader,
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader,
     int expectedGraphHeadCount,
     int expectedVertexCount,
     int expectedEdgeCount) {
@@ -369,7 +369,7 @@ public class AsciiGraphLoaderTest {
   }
 
   private void validateCaches(
-    AsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> asciiGraphLoader,
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader,
     int expectedGraphHeadCacheCount,
     int expectedVertexCacheCount,
     int expectedEdgeCacheCount) {

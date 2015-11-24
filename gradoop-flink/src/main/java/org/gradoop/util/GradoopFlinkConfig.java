@@ -45,7 +45,7 @@ public class GradoopFlinkConfig<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
   GD extends EPGMGraphHead>
-  extends GradoopConfig<VD, ED, GD> {
+  extends GradoopConfig<GD, VD, ED> {
 
   /**
    * Flink execution environment.
@@ -78,7 +78,7 @@ public class GradoopFlinkConfig<
    * @param gradoopConfig         Gradoop configuration
    * @param executionEnvironment  Flink execution environment
    */
-  private GradoopFlinkConfig(GradoopConfig<VD, ED, GD> gradoopConfig,
+  private GradoopFlinkConfig(GradoopConfig<GD, VD, ED> gradoopConfig,
     ExecutionEnvironment executionEnvironment) {
     this(gradoopConfig.getVertexHandler(),
       gradoopConfig.getEdgeHandler(),
@@ -118,7 +118,7 @@ public class GradoopFlinkConfig<
    */
   public static <VD extends EPGMVertex, ED extends EPGMEdge,
     GD extends EPGMGraphHead> GradoopFlinkConfig<VD, ED, GD> createConfig(
-    GradoopConfig<VD, ED, GD> config, ExecutionEnvironment environment) {
+    GradoopConfig<GD, VD, ED> config, ExecutionEnvironment environment) {
     return new GradoopFlinkConfig<>(config, environment);
   }
 

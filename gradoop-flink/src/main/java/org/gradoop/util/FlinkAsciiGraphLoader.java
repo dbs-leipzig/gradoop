@@ -32,7 +32,7 @@ public class FlinkAsciiGraphLoader<
   /**
    * AsciiGraphLoader to create graph, vertex and edge collections.
    */
-  private AsciiGraphLoader<V, E, G> loader;
+  private AsciiGraphLoader<G, V, E> loader;
 
   /**
    * Creates a new FlinkAsciiGraphLoader instance.

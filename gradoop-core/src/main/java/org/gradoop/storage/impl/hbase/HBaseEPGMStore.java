@@ -127,7 +127,7 @@ public class HBaseEPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * {@inheritDoc}
    */
   @Override
-  public GradoopConfig<VD, ED, GD> getConfig() {
+  public GradoopConfig<GD, VD, ED> getConfig() {
     return config;
   }
 

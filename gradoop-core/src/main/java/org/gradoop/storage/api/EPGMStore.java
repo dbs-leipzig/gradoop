@@ -41,7 +41,7 @@ public interface EPGMStore<VD extends EPGMVertex, ED extends EPGMEdge, GD
    *
    * @return Gradoop Configuration
    */
-  GradoopConfig<VD, ED, GD> getConfig();
+  GradoopConfig<GD, VD, ED> getConfig();
 
   /**
    * Returns the HBase table name where vertex data is stored.

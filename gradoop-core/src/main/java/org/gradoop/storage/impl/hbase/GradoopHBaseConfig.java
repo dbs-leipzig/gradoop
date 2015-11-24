@@ -43,7 +43,7 @@ import org.gradoop.util.GradoopConfig;
 public class GradoopHBaseConfig<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
-  GD extends EPGMGraphHead> extends GradoopConfig<VD, ED, GD> {
+  GD extends EPGMGraphHead> extends GradoopConfig<GD, VD, ED> {
 
   /**
    * Vertex table name.
@@ -103,7 +103,7 @@ public class GradoopHBaseConfig<
    * @param edgeTableName   edge table name
    * @param graphTableName  graph table name
    */
-  private GradoopHBaseConfig(GradoopConfig<VD, ED, GD> config,
+  private GradoopHBaseConfig(GradoopConfig<GD, VD, ED> config,
     String vertexTableName,
     String edgeTableName,
     String graphTableName) {
@@ -146,7 +146,7 @@ public class GradoopHBaseConfig<
    */
   public static <VD extends EPGMVertex, ED extends EPGMEdge,
     GD extends EPGMGraphHead> GradoopHBaseConfig<VD, ED, GD> createConfig(
-    GradoopConfig<VD, ED, GD> gradoopConfig, String vertexTableName,
+    GradoopConfig<GD, VD, ED> gradoopConfig, String vertexTableName,
     String edgeTableName, String graphTableName) {
     return new GradoopHBaseConfig<>(gradoopConfig, vertexTableName,
       edgeTableName, graphTableName);

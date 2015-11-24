@@ -43,10 +43,8 @@ import org.gradoop.storage.impl.hbase.HBaseVertexHandler;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class GradoopConfig<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead> {
+public class GradoopConfig
+  <GD extends EPGMGraphHead, VD extends EPGMVertex, ED extends EPGMEdge> {
 
   /**
    * Vertex handler.
@@ -91,7 +89,7 @@ public class GradoopConfig<
    *
    * @return Default Gradoop configuration.
    */
-  public static GradoopConfig<VertexPojo, EdgePojo, GraphHeadPojo>
+  public static GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo>
   getDefaultConfig() {
     VertexHandler<VertexPojo, EdgePojo> vertexHandler =
       new HBaseVertexHandler<>(new VertexPojoFactory());
@@ -116,7 +114,7 @@ public class GradoopConfig<
    * @return Gradoop HBase configuration
    */
   public static <VD extends EPGMVertex, ED extends EPGMEdge,
-    GD extends EPGMGraphHead> GradoopConfig<VD, ED, GD> createConfig(
+    GD extends EPGMGraphHead> GradoopConfig<GD, VD, ED> createConfig(
     VertexHandler<VD, ED> vertexHandler,
     EdgeHandler<ED, VD> edgeHandler,
     GraphHeadHandler<GD> graphHeadHandler) {

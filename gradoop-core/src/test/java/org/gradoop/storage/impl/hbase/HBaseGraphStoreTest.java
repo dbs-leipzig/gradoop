@@ -3,11 +3,16 @@ package org.gradoop.storage.impl.hbase;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.HBaseTestBase;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.generators.TestSequenceIdGenerator;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -18,6 +23,8 @@ import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.PersistentVertexFactory;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.util.AsciiGraphLoader;
+import org.gradoop.util.GradoopConfig;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -28,7 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class HBaseGraphStoreTest extends HBaseTestBase {
 
@@ -41,24 +49,25 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore =
       createEmptyEPGMStore();
 
-    for (PersistentVertex<EdgePojo> v : createPersistentVertex()) {
-      graphStore.writeVertex(v);
-    }
-    for (PersistentEdge<VertexPojo> e : createPersistentEdge()) {
-      graphStore.writeEdge(e);
-    }
-    for (PersistentGraphHead g : createPersistentGraphHead()) {
-      graphStore.writeGraphHead(g);
-    }
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getMinimalFullFeaturedGraphLoader();
+
+    GraphHeadPojo graphHead = loader.getGraphHeads().iterator().next();
+    VertexPojo vertex = loader.getVertices().iterator().next();
+    EdgePojo edge = loader.getEdges().iterator().next();
+
+    writeGraphHead(graphStore, graphHead, vertex, edge);
+    writeVertex(graphStore, vertex, edge);
+    writeEdge(graphStore, vertex, edge);
 
     // re-open
     graphStore.close();
     graphStore = openEPGMStore();
 
     // validate
-    validateGraphHead(graphStore);
-    validateVertex(graphStore);
-    validateEdge(graphStore);
+    validateGraphHead(graphStore, graphHead);
+    validateVertex(graphStore, vertex);
+    validateEdge(graphStore, edge);
     graphStore.close();
   }
 
@@ -72,24 +81,24 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
       createEmptyEPGMStore();
     graphStore.setAutoFlush(false);
 
-    // store some data
-    for (PersistentGraphHead g : createPersistentGraphHead()) {
-      graphStore.writeGraphHead(g);
-    }
-    for (PersistentVertex<EdgePojo> v : createPersistentVertex()) {
-      graphStore.writeVertex(v);
-    }
-    for (PersistentEdge<VertexPojo> e : createPersistentEdge()) {
-      graphStore.writeEdge(e);
-    }
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getMinimalFullFeaturedGraphLoader();
+
+    GraphHeadPojo graphHead = loader.getGraphHeads().iterator().next();
+    VertexPojo vertex = loader.getVertices().iterator().next();
+    EdgePojo edge = loader.getEdges().iterator().next();
+
+    writeGraphHead(graphStore, graphHead, vertex, edge);
+    writeVertex(graphStore, vertex, edge);
+    writeEdge(graphStore, vertex, edge);
 
     // flush changes
     graphStore.flush();
 
     // validate
-    validateGraphHead(graphStore);
-    validateVertex(graphStore);
-    validateEdge(graphStore);
+    validateGraphHead(graphStore, graphHead);
+    validateVertex(graphStore, vertex);
+    validateEdge(graphStore, edge);
 
     graphStore.close();
   }
@@ -107,21 +116,21 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore =
       createEmptyEPGMStore();
 
-    Collection<PersistentVertex<EdgePojo>> persistentVertexData =
-      createPersistentSocialVertices();
-    Collection<PersistentEdge<VertexPojo>> persistentEdgeData =
-      createPersistentSocialEdges();
-    Collection<PersistentGraphHead> persistentGraphData =
-      createPersistentSocialGraphHead();
+    Collection<PersistentVertex<EdgePojo>> persistentVertices =
+      getSocialPersistentVertices();
+    Collection<PersistentEdge<VertexPojo>> persistentEdges =
+      getSocialPersistentEdges();
+    Collection<PersistentGraphHead> persistentGraphHeads =
+      getSocialPersistentGraphHeads();
 
     // store some data
-    for (PersistentGraphHead g : persistentGraphData) {
+    for (PersistentGraphHead g : persistentGraphHeads) {
       graphStore.writeGraphHead(g);
     }
-    for (PersistentVertex<EdgePojo> v : persistentVertexData) {
+    for (PersistentVertex<EdgePojo> v : persistentVertices) {
       graphStore.writeVertex(v);
     }
-    for (PersistentEdge<VertexPojo> e : persistentEdgeData) {
+    for (PersistentEdge<VertexPojo> e : persistentEdges) {
       graphStore.writeEdge(e);
     }
 
@@ -133,7 +142,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
          graphStore.getGraphSpace(); graphDataIterator.hasNext(); ) {
       cnt++;
     }
-    assertEquals("wrong graph count", persistentGraphData.size(), cnt);
+    assertEquals("wrong graph count", persistentGraphHeads.size(), cnt);
 
     // check vertex count
     cnt = 0;
@@ -141,7 +150,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
          graphStore.getVertexSpace(); vertexDataIterator.hasNext(); ) {
       cnt++;
     }
-    assertEquals("wrong vertex count", persistentVertexData.size(), cnt);
+    assertEquals("wrong vertex count", persistentVertices.size(), cnt);
 
     // check edge count
     cnt = 0;
@@ -149,7 +158,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
          graphStore.getEdgeSpace(); edgeDataIterator.hasNext(); ) {
       cnt++;
     }
-    assertEquals("wrong edge count", persistentEdgeData.size(), cnt);
+    assertEquals("wrong edge count", persistentEdges.size(), cnt);
 
     graphStore.close();
   }
@@ -170,7 +179,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     // list is not supported by
     final List<String> value = Lists.newArrayList();
 
-    GradoopId vertexID = GradoopIds.fromLong(0L);
+    GradoopId vertexID = new TestSequenceIdGenerator().createId();
     final String label = "A";
     final Map<String, Object> properties = new HashMap<>();
     properties.put("k1", value);
@@ -213,7 +222,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
     final String keyString = "key6";
     final String valueString = "value";
 
-    final GradoopId vertexID = GradoopIds.fromLong(0L);
+    final GradoopId vertexID = new TestSequenceIdGenerator().createId();
     final String label = "A";
 
     final Map<String, Object> properties = new HashMap<>();
@@ -262,5 +271,149 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
         break;
       }
     }
+  }
+
+  private AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    getMinimalFullFeaturedGraphLoader() {
+    String asciiGraph = ":G{k=\"v\"}[(v:V{k=\"v\"});(v)-[:e]->(v)]";
+
+    GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config = GradoopConfig
+      .getDefaultConfig();
+
+    return AsciiGraphLoader.fromString(asciiGraph, config);
+  }
+
+  private void writeGraphHead(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
+    GraphHeadPojo graphHead, VertexPojo vertex, EdgePojo edge) {
+    graphStore.writeGraphHead(
+      new HBaseGraphHeadFactory().createGraphHead(
+        graphHead,
+        GradoopIdSet.fromExisting(vertex.getId()),
+        GradoopIdSet.fromExisting(edge.getId())
+      )
+    );
+  }
+
+  private void writeVertex(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
+    VertexPojo vertex, EdgePojo edge) {
+    graphStore.writeVertex(
+      new HBaseVertexFactory().createVertex(
+        vertex,
+        Sets.newHashSet(edge),
+        Sets.newHashSet(edge)
+      )
+    );
+  }
+
+  private void writeEdge(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
+    VertexPojo vertex, EdgePojo edge) {
+    graphStore.writeEdge(
+      new HBaseEdgeFactory()
+        .createEdge(
+          edge,
+          vertex,
+          vertex
+        )
+    );
+  }
+
+  public void validateGraphHead(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
+    GraphHeadPojo originalGraphHead) {
+
+    EPGMGraphHead loadedGraphHead = graphStore
+      .readGraph(originalGraphHead.getId());
+
+    validateIdLabelAndProperties(originalGraphHead, loadedGraphHead);
+  }
+
+  public void validateVertex(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
+    VertexPojo originalVertex) {
+
+    EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
+
+    validateIdLabelAndProperties(originalVertex, loadedVertex);
+    validateGraphContainment(originalVertex, loadedVertex);
+  }
+
+  public void validateEdge(
+    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
+    EdgePojo originalEdge) {
+
+    EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());
+
+    validateIdLabelAndProperties(originalEdge, loadedEdge);
+    validateGraphContainment(originalEdge, loadedEdge);
+
+    assertTrue(
+      "source vertex mismatch",
+      originalEdge.getSourceVertexId().equals(
+        loadedEdge.getSourceVertexId())
+    );
+
+    assertTrue(
+      "target vertex mismatch",
+      originalEdge.getTargetVertexId().equals(
+        loadedEdge.getTargetVertexId()
+      )
+    );
+  }
+
+  private void validateIdLabelAndProperties(EPGMElement originalElement,
+    EPGMElement loadedElement) {
+
+    assertNotNull("loading results to NULL", loadedElement);
+
+    assertEquals(
+      "id mismatch",
+      originalElement.getId(),
+      loadedElement.getId()
+    );
+
+    assertEquals(
+      "label mismatch",
+      originalElement.getLabel(),
+      loadedElement.getLabel()
+    );
+
+    Iterator<String> originalKeys =
+      originalElement.getPropertyKeys().iterator();
+
+    Iterator<String> loadedKeys =
+      loadedElement.getPropertyKeys().iterator();
+
+    while (originalKeys.hasNext() && loadedKeys.hasNext()) {
+      String originalKey = originalKeys.next();
+      String loadedKey = loadedKeys.next();
+      assertEquals(
+        "property key mismatch",
+        originalKey,
+        loadedKey
+      );
+      assertEquals(
+        "property value mismatch",
+        originalElement.getProperty(originalKey),
+        loadedElement.getProperty(loadedKey)
+      );
+    }
+
+    assertFalse(
+      "property count mismatch",
+      originalKeys.hasNext() || loadedKeys.hasNext()
+    );
+  }
+
+  private void validateGraphContainment(
+    EPGMGraphElement originalGraphElement,
+    EPGMGraphElement loadedGraphElement) {
+    assertTrue(
+      "graph containment mismatch",
+      originalGraphElement.getGraphIds()
+        .equals(loadedGraphElement.getGraphIds())
+    );
   }
 }
