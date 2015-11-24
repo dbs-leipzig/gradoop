@@ -3,6 +3,7 @@ package org.gradoop.util;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 
@@ -100,5 +101,11 @@ public class FlinkAsciiGraphLoader<
     Collection<E> edges = loader.getEdgesByGraphVariables(variables);
 
     return GraphCollection.fromCollections(vertices, edges, graphHeads, config);
+  }
+
+  @SuppressWarnings("unchecked")
+  public EPGMDatabase<V, E, G> getDatabase() {
+    return EPGMDatabase
+      .fromCollection(loader.getVertices(), loader.getEdges(), config);
   }
 }

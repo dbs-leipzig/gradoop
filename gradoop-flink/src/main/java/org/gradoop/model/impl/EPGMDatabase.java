@@ -36,6 +36,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.ImportIdGenerator;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -201,16 +202,21 @@ public class EPGMDatabase<
       TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType());
 
     // read vertex, edge and graph data
+    ImportIdGenerator idGenerator = new ImportIdGenerator();
+
     DataSet<VD> vertices = env.readTextFile(vertexFile)
-      .map(new JsonReader.JsonToVertexMapper<>(config.getVertexFactory()))
+      .map(new JsonReader.JsonToVertexMapper<>(
+        config.getVertexFactory(), idGenerator))
       .returns(vertexTypeInfo);
     DataSet<ED> edges = env.readTextFile(edgeFile)
-      .map(new JsonReader.JsonToEdgeMapper<>(config.getEdgeFactory()))
+      .map(new JsonReader.JsonToEdgeMapper<>(
+        config.getEdgeFactory(), idGenerator))
       .returns(edgeTypeInfo);
     DataSet<GD> graphHeads;
     if (graphFile != null) {
       graphHeads = env.readTextFile(graphFile)
-        .map(new JsonReader.JsonToGraphMapper<>(config.getGraphHeadFactory()))
+        .map(new JsonReader.JsonToGraphMapper<>(
+          config.getGraphHeadFactory(), idGenerator))
         .returns(graphTypeInfo);
     } else {
       graphHeads = env.fromCollection(Lists.newArrayList(

@@ -45,7 +45,8 @@ public class EPGMDatabaseJSONTest extends FlinkTestBase {
 
   @Test
   public void testGetDatabaseGraph() throws Exception {
-    LogicalGraph dbGraph = getGraphStore().getDatabaseGraph();
+    LogicalGraph dbGraph = getSocialNetworkLoader()
+      .getDatabase().getDatabaseGraph();
 
     assertNotNull("database graph was null", dbGraph);
     assertEquals("vertex set has the wrong size", 11,
@@ -82,17 +83,24 @@ public class EPGMDatabaseJSONTest extends FlinkTestBase {
     final String edgeFile = tmpDir + "/edges.json";
     final String graphFile = tmpDir + "/graphs.json";
 
-    getGraphStore().writeAsJson(vertexFile, edgeFile, graphFile);
+    getSocialNetworkLoader().getDatabase()
+      .writeAsJson(vertexFile, edgeFile, graphFile);
 
     EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
       newGraphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
       ExecutionEnvironment.getExecutionEnvironment());
 
-    assertEquals(getGraphStore().getDatabaseGraph().getVertexCount(),
-      newGraphStore.getDatabaseGraph().getVertexCount());
-    assertEquals(getGraphStore().getDatabaseGraph().getEdgeCount(),
-      newGraphStore.getDatabaseGraph().getEdgeCount());
-    assertEquals(getGraphStore().getCollection().getGraphCount(),
-      newGraphStore.getCollection().getGraphCount());
+    assertEquals(
+      getSocialNetworkLoader().getDatabase().getDatabaseGraph().getVertexCount(),
+      newGraphStore.getDatabaseGraph().getVertexCount()
+    );
+    assertEquals(
+      getSocialNetworkLoader().getDatabase().getDatabaseGraph().getEdgeCount(),
+      newGraphStore.getDatabaseGraph().getEdgeCount()
+    );
+    assertEquals(
+      getSocialNetworkLoader().getDatabase().getCollection().getGraphCount(),
+      newGraphStore.getCollection().getGraphCount()
+    );
   }
 }
