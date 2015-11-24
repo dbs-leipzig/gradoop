@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.id.generators;
 
 import org.gradoop.model.impl.id.Context;
+import org.gradoop.model.impl.id.ReuseIdGenerator;
 
 public class TestReuseIdGenerator extends ReuseIdGenerator {
 

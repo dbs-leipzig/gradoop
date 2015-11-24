@@ -32,20 +32,18 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.id.generators;
+package org.gradoop.model.impl.id;
 
 import org.gradoop.model.impl.id.Context;
 
-/**
- * Creates GradoopIds using the current time in milliseconds as sequence number.
- */
-public class TimestampIdGenerator extends SequenceIdGenerator {
+public abstract class GradoopIdGeneratorBase {
 
-  public TimestampIdGenerator(int creatorId) {
-    this(creatorId, Context.RUNTIME);
-  }
+  protected final int creatorId;
 
-  public TimestampIdGenerator(int creatorId, Context context) {
-    super(System.currentTimeMillis(), creatorId, context);
+  protected final Context context;
+
+  protected GradoopIdGeneratorBase(int creatorId, Context context) {
+    this.creatorId = creatorId;
+    this.context = context;
   }
 }

@@ -63,22 +63,13 @@ public class GradoopId implements Comparable<GradoopId>,
    * @param creatorId       creator id
    * @param context         creation context
    */
-  private GradoopId(long sequenceNumber, int creatorId, Context context) {
+  GradoopId(long sequenceNumber, int creatorId, Context context) {
     Bytes.putByte(content, 0, (byte) context.ordinal());
     Bytes.putInt(content, 1, creatorId);
     Bytes.putLong(content, 5, sequenceNumber);
   }
 
-  public static GradoopId createImportId(long sequenceNumber, int creatorId) {
-    return new GradoopId(sequenceNumber, creatorId, Context.IMPORT);
-  }
-
-  public static GradoopId createRuntimeId(long sequenceNumber, int creatorId) {
-    return new GradoopId(sequenceNumber, creatorId, Context.RUNTIME);
-  }
-
-  public static GradoopId create(long sequenceNumber, int creatorId,
-    Context context) {
+  static GradoopId create(long sequenceNumber, int creatorId, Context context) {
     return new GradoopId(sequenceNumber, creatorId, context);
   }
 

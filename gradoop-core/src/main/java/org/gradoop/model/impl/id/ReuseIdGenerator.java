@@ -15,10 +15,7 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.id.generators;
-
-import org.gradoop.model.impl.id.Context;
-import org.gradoop.model.impl.id.GradoopId;
+package org.gradoop.model.impl.id;
 
 public abstract class ReuseIdGenerator extends GradoopIdGeneratorBase {
 

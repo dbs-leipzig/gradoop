@@ -275,7 +275,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
 
   private AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
     getMinimalFullFeaturedGraphLoader() {
-    String asciiGraph = ":G{k=\"v\"}[(v:V{k=\"v\"});(v)-[:e]->(v)]";
+    String asciiGraph = ":G{k=\"v\"}[(v:V{k=\"v\"});(v)-[:e{k=\"v\"}]->(v)]";
 
     GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config = GradoopConfig
       .getDefaultConfig();
@@ -310,6 +310,7 @@ public class HBaseGraphStoreTest extends HBaseTestBase {
   private void writeEdge(
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
     VertexPojo vertex, EdgePojo edge) {
+
     graphStore.writeEdge(
       new HBaseEdgeFactory()
         .createEdge(

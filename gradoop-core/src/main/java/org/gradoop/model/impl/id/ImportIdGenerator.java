@@ -15,25 +15,15 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.id.generators;
+package org.gradoop.model.impl.id;
 
-import org.gradoop.model.impl.id.Context;
-import org.gradoop.model.impl.id.GradoopId;
+public class ImportIdGenerator extends ReuseIdGenerator {
 
-public class SequenceIdGenerator extends GradoopIdGeneratorBase {
-
-  private long offset;
-
-  public SequenceIdGenerator(int creatorId, Context context) {
-    this(0L, creatorId, context);
+  public ImportIdGenerator() {
+    this(Context.IMPORT);
   }
 
-  public SequenceIdGenerator(long offset, int creatorId, Context context) {
-    super(creatorId, context);
-    this.offset = offset;
-  }
-
-  public GradoopId createId() {
-    return GradoopId.create(offset++, creatorId, context);
+  public ImportIdGenerator(Context context) {
+    super((int) System.currentTimeMillis() / 1000, context);
   }
 }

@@ -38,15 +38,16 @@ public class EdgePojoTest {
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
+    GradoopIdSet graphIds = GradoopIdSet
+      .fromExisting(idGen.createId(), idGen.createId());
 
     String label = "A";
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
     props.put("k2", "v2");
-    GradoopIdSet graphs = GradoopIdSet.fromLongs(0L, 1L);
 
     EPGMEdge edge = new EdgePojoFactory()
-      .createEdge(edgeId, label, sourceId, targetId, props, graphs);
+      .createEdge(edgeId, label, sourceId, targetId, props, graphIds);
 
     assertThat(edge.getId(), is(edgeId));
     assertEquals(label, edge.getLabel());
@@ -56,8 +57,10 @@ public class EdgePojoTest {
     assertThat(edge.getProperty("k1"), Is.<Object>is("v1"));
     assertThat(edge.getProperty("k2"), Is.<Object>is("v2"));
     assertThat(edge.getGraphCount(), is(2));
-    assertTrue(edge.getGraphIds().contains(GradoopIds.fromLong(0L)));
-    assertTrue(edge.getGraphIds().contains(GradoopIds.fromLong(1L)));
+
+    for(GradoopId graphId : graphIds) {
+      assertTrue(edge.getGraphIds().contains(graphId));
+    }
   }
 
   @Test

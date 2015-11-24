@@ -1,6 +1,5 @@
 package org.gradoop.model.impl.id;
 
-import org.gradoop.model.impl.id.generators.SequenceIdGenerator;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

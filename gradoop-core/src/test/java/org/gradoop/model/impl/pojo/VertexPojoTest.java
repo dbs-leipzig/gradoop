@@ -18,10 +18,9 @@
 package org.gradoop.model.impl.pojo;
 
 import com.google.common.collect.Maps;
-import org.gradoop.model.impl.id.Context;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.generators.SequenceIdGenerator;
+import org.gradoop.model.impl.id.generators.TestSequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertex;
 import org.hamcrest.core.Is;
@@ -36,7 +35,7 @@ public class VertexPojoTest {
 
   @Test
   public void createWithIDTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
+    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();
     EPGMVertex v = new VertexPojoFactory().createVertex(vertexID);
     assertThat(v.getId(), is(vertexID));
@@ -46,7 +45,7 @@ public class VertexPojoTest {
 
   @Test
   public void createVertexPojoTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
+    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();
     String label = "A";
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
@@ -75,7 +74,7 @@ public class VertexPojoTest {
 
   @Test
   public void createWithMissingLabelTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
+    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();
     EPGMVertex v = new VertexPojoFactory().createVertex(vertexID);
     assertThat(v.getLabel(), is(GConstants.DEFAULT_VERTEX_LABEL));
@@ -88,14 +87,14 @@ public class VertexPojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithEmptyLabelTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
+    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();
     new VertexPojoFactory().createVertex(vertexID, "");
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
-    GradoopIdGenerator idGen = new SequenceIdGenerator(0, Context.TEST);
+    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();
     new VertexPojoFactory().createVertex(vertexID, null);
   }

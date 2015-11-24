@@ -94,10 +94,12 @@ public class HBaseTestBase {
   private static AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
   getSocialNetworkLoader() throws
     IOException {
-    GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config = GradoopConfig
-      .getDefaultConfig();
+    GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
+      GradoopConfig.getDefaultConfig();
 
-    return AsciiGraphLoader.fromFile("/data/social_network.gdl", config);
+    return AsciiGraphLoader.fromFile(
+      HBaseTestBase.class.getResource("/data/social_network.gdl").getFile(),
+      config);
   }
 
   // PersistentGraphHead
