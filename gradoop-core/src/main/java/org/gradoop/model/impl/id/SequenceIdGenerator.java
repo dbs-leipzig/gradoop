@@ -17,20 +17,44 @@
 
 package org.gradoop.model.impl.id;
 
+/**
+ * Generation Gradoop IDs sequentially during workflow execution
+ */
 public class SequenceIdGenerator extends GradoopIdGeneratorBase {
 
-  private long offset;
+  /**
+   * Current sequence number, increased with every generated id.
+   */
+  private long currentSequenceNumber;
 
+  /**
+   * Convenient constructor, starting at sequence number ZERO.
+   *
+   * @param creatorId worker-thread identifier
+   * @param context generation context
+   */
   public SequenceIdGenerator(int creatorId, Context context) {
     this(0L, creatorId, context);
   }
 
+  /**
+   * Constructor.
+   *
+   * @param offset initial sequence number
+   * @param creatorId worker-thread identifier
+   * @param context generation context
+   */
   public SequenceIdGenerator(long offset, int creatorId, Context context) {
     super(creatorId, context);
-    this.offset = offset;
+    this.currentSequenceNumber = offset;
   }
 
+  /**
+   * Returns a new Gradoop ID and increases the current sequent number.
+   *
+   * @return new Gradoop ID
+   */
   public GradoopId createId() {
-    return GradoopId.create(offset++, creatorId, context);
+    return new GradoopId(currentSequenceNumber++, creatorId, context);
   }
 }

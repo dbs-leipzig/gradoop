@@ -17,13 +17,29 @@
 
 package org.gradoop.model.impl.id;
 
+/**
+ * Superclass of Gradoop ID generators, which reuse integrity of existing
+ * identifiers.
+ */
 public abstract class ReuseIdGenerator extends GradoopIdGeneratorBase {
 
+  /**
+   * Constructor.
+   *
+   * @param creatorId identifier of ID generation session
+   * @param context generation context
+   */
   public ReuseIdGenerator(int creatorId, Context context) {
     super(creatorId, context);
   }
 
+  /**
+   * Returns a new Gradoop ID based on a given existing identifier.
+   *
+   * @param reuseId existing identifier
+   * @return new Gradoop ID
+   */
   public GradoopId createId(long reuseId) {
-    return GradoopId.create(reuseId, creatorId, context);
+    return new GradoopId(reuseId, creatorId, context);
   }
 }

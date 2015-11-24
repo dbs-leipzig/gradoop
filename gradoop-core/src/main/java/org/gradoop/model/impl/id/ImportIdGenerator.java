@@ -17,12 +17,23 @@
 
 package org.gradoop.model.impl.id;
 
+/**
+ * Generates Gradoop IDs based on existing identifiers in data imports.
+ */
 public class ImportIdGenerator extends ReuseIdGenerator {
 
+  /**
+   * Default constructor; sets context to IMPORT.
+   */
   public ImportIdGenerator() {
     this(Context.IMPORT);
   }
 
+  /**
+   * Master constructor; sets initialization timestamp as import identifier.
+   *
+   * @param context generation context
+   */
   public ImportIdGenerator(Context context) {
     super((int) System.currentTimeMillis() / 1000, context);
   }

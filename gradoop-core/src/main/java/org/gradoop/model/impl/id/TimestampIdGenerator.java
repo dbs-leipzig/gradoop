@@ -39,10 +39,21 @@ package org.gradoop.model.impl.id;
  */
 public class TimestampIdGenerator extends SequenceIdGenerator {
 
+  /**
+   * Convenient constructor setting context fixed to RUNTIME.
+   *
+   * @param creatorId worker thread id
+   */
   public TimestampIdGenerator(int creatorId) {
     this(creatorId, Context.RUNTIME);
   }
 
+  /**
+   * Constructor
+   *
+   * @param creatorId worker thread id
+   * @param context generation context
+   */
   public TimestampIdGenerator(int creatorId, Context context) {
     super(System.currentTimeMillis(), creatorId, context);
   }

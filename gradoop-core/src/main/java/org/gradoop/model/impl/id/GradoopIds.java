@@ -31,11 +31,7 @@ public class GradoopIds {
    * @return smaller GradoopId or first if equal
    */
   public static GradoopId min(GradoopId id1, GradoopId id2) {
-    int compare = id1.compareTo(id2);
-    return (compare == 0)
-      ? id1
-      : compare == -1
-        ? id1
-        : id2;
+    int comparison = id1.compareTo(id2);
+    return comparison == 0 ? id1 : (comparison == -1 ? id1 : id2);
   }
 }

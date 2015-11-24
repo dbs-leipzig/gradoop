@@ -25,7 +25,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -209,7 +208,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
 
     int comparison = this.identifiers.size() - other.identifiers.size();
 
-    if(comparison == 0) {
+    if (comparison == 0) {
       Iterator<GradoopId> thisIterator = this.identifiers.iterator();
       Iterator<GradoopId> otherIterator = other.identifiers.iterator();
 
@@ -229,7 +228,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
 
       equals = this.size() == otherIds.size();
 
-      if(equals) {
+      if (equals) {
         Iterator<GradoopId> thisIterator = this.identifiers.iterator();
         Iterator<GradoopId> otherIterator = otherIds.identifiers.iterator();
 
@@ -246,7 +245,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
 
-    for(GradoopId gradoopId : identifiers) {
+    for (GradoopId gradoopId : identifiers) {
       builder.append(gradoopId.hashCode());
     }
 
@@ -254,7 +253,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
   }
 
   @Override
-  public String toString(){
+  public String toString() {
     return identifiers.toString();
   }
 }

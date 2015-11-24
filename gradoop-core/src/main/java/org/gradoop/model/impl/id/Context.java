@@ -17,8 +17,20 @@
 
 package org.gradoop.model.impl.id;
 
+/**
+ * Enum describing the context of Gradoop ID generation.
+ */
 public enum Context {
+  /**
+   * generated sequentially during workflow execution
+   */
   RUNTIME,
+  /**
+   * generated based on identifiers provided by data sources
+   */
   IMPORT,
+  /**
+   * generated for testing
+   */
   TEST
 }
