@@ -115,9 +115,22 @@ public class GradoopId implements Comparable<GradoopId>,
 
   @Override
   public String toString() {
-    return String.format("[%s-%s-%s]",
+    return String.format("<%s-%s-%s>",
       Long.toHexString(getSequenceNumber()),
       Integer.toHexString(getCreatorId()),
       getContext());
+  }
+
+  public static GradoopId fromString(String string) {
+
+    string = string.substring(1,string.length()-1);
+
+    String[] parts = string.split("-");
+
+    return new GradoopId(
+      Long.valueOf(parts[0], 16),
+      Integer.valueOf(parts[1], 16),
+      Context.valueOf(parts[2])
+    );
   }
 }

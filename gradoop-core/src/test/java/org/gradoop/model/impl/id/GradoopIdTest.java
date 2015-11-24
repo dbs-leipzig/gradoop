@@ -76,4 +76,14 @@ public class GradoopIdTest {
 
     assertEquals(id1, id2);
   }
+
+  @Test
+  public void testToFromString() {
+    GradoopId originalId = new GradoopId(47L, 11, Context.RUNTIME);
+    GradoopId toFromStringId = GradoopId.fromString(originalId.toString());
+    assertTrue(
+      "reconstruction from string failed",
+      originalId.equals(toFromStringId)
+    );
+  }
 }
