@@ -22,8 +22,11 @@ import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.Context;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.ReuseIdGenerator;
+import org.gradoop.model.impl.id.SequenceIdGenerator;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +54,9 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     MessageIterator<GradoopId> msg) throws Exception {
     if (getSuperstepNumber() == 1) {
       vertex.getValue().setProperty(CURRENT_VALUE, vertex.getId());
-      vertex.getValue().setProperty(LAST_VALUE, GradoopIds.MAX_VALUE);
+      vertex.getValue().setProperty(LAST_VALUE, new SequenceIdGenerator(
+        Long.MAX_VALUE, Integer.MAX_VALUE, Context.RUNTIME
+      ).createId().toString());
       vertex.getValue().setProperty(STABILIZATION_COUNTER, 0);
       //Todo: Use Broadcast to set ChangeMax
       vertex.getValue().setProperty(STABILIZATION_MAX, 20);
@@ -134,8 +139,8 @@ public class LPUpdateFunction<VD extends EPGMVertex>
    * @return community id
    */
   private GradoopId readCurrentCommunity(Vertex<GradoopId, VD> vertex) {
-    return GradoopIds
-      .fromLongString((String) vertex.getValue().getProperty(CURRENT_VALUE));
+    return GradoopId.fromString(
+      (String) vertex.getValue().getProperty(CURRENT_VALUE));
   }
 
   /**
@@ -153,7 +158,9 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     GradoopId firstValue = allMessages.get(0);
     GradoopId currentValue = firstValue;
     int maxCounter = 1;
-    GradoopId maxValue = GradoopIds.MAX_VALUE;
+    GradoopId maxValue = new SequenceIdGenerator(
+      Long.MAX_VALUE, Integer.MAX_VALUE, Context.RUNTIME
+    ).createId();
     for (int i = 1; i < allMessages.size(); i++) {
       if (currentValue == allMessages.get(i)) {
         currentCounter++;

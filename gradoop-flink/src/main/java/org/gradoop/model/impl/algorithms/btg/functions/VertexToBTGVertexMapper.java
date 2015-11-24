@@ -77,7 +77,7 @@ public class VertexToBTGVertexMapper<VD extends EPGMVertex>
       List<GradoopId> btgList = new ArrayList<>();
       String[] btgIDArray = btgIDs.split(",");
       for (String btgId : btgIDArray) {
-        btgList.add(GradoopIds.fromLongString(btgId));
+        btgList.add(GradoopId.fromString(btgId));
       }
       return btgList;
     }

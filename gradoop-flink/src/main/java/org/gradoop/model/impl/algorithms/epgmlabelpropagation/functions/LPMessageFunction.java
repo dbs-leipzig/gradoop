@@ -40,10 +40,8 @@ public class LPMessageFunction<
   @Override
   public void sendMessages(Vertex<GradoopId, VD> vertex) throws Exception {
     // send current minimum to neighbors
-    if (getSuperstepNumber() == 1) {
-      GradoopIds.fromLong(0L);
-    } else {
-      sendMessageToAllNeighbors(GradoopIds.fromLongString(
+    if (getSuperstepNumber() != 1) {
+      sendMessageToAllNeighbors(GradoopId.fromString(
         (String) vertex.getValue().getProperty(CURRENT_VALUE)));
     }
   }

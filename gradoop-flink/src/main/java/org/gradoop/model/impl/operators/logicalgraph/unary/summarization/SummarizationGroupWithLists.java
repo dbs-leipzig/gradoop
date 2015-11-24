@@ -19,8 +19,8 @@ package org.gradoop.model.impl.operators.logicalgraph.unary.summarization;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichGroupReduceFunction;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
@@ -38,7 +38,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.TimestampIdGenerator;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.util.FlinkConstants;
@@ -143,10 +143,11 @@ public class SummarizationGroupWithLists<
    * Creates a summarized vertex from a group of vertices and a list of
    * vertex identifiers that the summarized vertex represents.
    */
-  private static class VertexGroupSummarizer<VD extends EPGMVertex> implements
-    GroupReduceFunction<VertexForGrouping, Tuple2<Vertex<GradoopId, VD>,
-      List<GradoopId>>>,
-    ResultTypeQueryable<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> {
+  private static class VertexGroupSummarizer<VD extends EPGMVertex> extends
+    RichGroupReduceFunction<VertexForGrouping, Tuple2<Vertex<GradoopId, VD>,
+          List<GradoopId>>>
+    implements ResultTypeQueryable<Tuple2<Vertex<GradoopId, VD>,
+      List<GradoopId>>> {
 
     /**
      * Vertex data factory
@@ -199,7 +200,9 @@ public class SummarizationGroupWithLists<
       Collector<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> collector
     ) throws Exception {
 
-      GradoopId newVertexID = GradoopIds.fromLong(0L);
+      GradoopId newVertexID = new TimestampIdGenerator(
+        getRuntimeContext().getIndexOfThisSubtask()).createId();
+
       String groupLabel = null;
       String groupValue = null;
       List<GradoopId> groupedVertexIds = Lists.newArrayList();

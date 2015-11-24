@@ -22,8 +22,10 @@ import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
+import org.gradoop.model.impl.id.Context;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.SequenceIdGenerator;
 
 import java.util.Collections;
 import java.util.List;
@@ -128,7 +130,9 @@ public class LPUpdateFunction extends
     GradoopId firstMessage = allMessages.get(0);
     GradoopId currentValue = firstMessage;
     int maxCounter = 1;
-    GradoopId maxValue = GradoopIds.MAX_VALUE;
+    GradoopId maxValue = new SequenceIdGenerator(
+      Long.MAX_VALUE, Integer.MAX_VALUE, Context.RUNTIME
+    ).createId();
     for (int i = 1; i < allMessages.size(); i++) {
       if (currentValue == allMessages.get(i)) {
         currentCounter++;

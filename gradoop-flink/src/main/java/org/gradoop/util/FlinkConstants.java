@@ -19,6 +19,8 @@ package org.gradoop.util;
 
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.ImportIdGenerator;
+import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Combination;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Overlap;
@@ -29,41 +31,48 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summari
  * Constants required by operator implementations in Flink.
  */
 public class FlinkConstants {
+
+  
   /**
    * Identifier of the database graph.
    */
-  public static final GradoopId DATABASE_GRAPH_ID = GradoopIds.fromLong(-1L);
+  public static final GradoopId DATABASE_GRAPH_ID = 
+    new ImportIdGenerator().createId(-1L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link Combination}.
    */
-  public static final GradoopId COMBINE_GRAPH_ID = GradoopIds.fromLong(-2L);
+  public static final GradoopId COMBINE_GRAPH_ID =
+    new ImportIdGenerator().createId(-2L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link Overlap}.
    */
-  public static final GradoopId OVERLAP_GRAPH_ID = GradoopIds.fromLong(-3L);
+  public static final GradoopId OVERLAP_GRAPH_ID =
+    new ImportIdGenerator().createId(-3L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link Exclusion}.
    */
-  public static final GradoopId EXCLUDE_GRAPH_ID = GradoopIds.fromLong(-4L);
+  public static final GradoopId EXCLUDE_GRAPH_ID =
+    new ImportIdGenerator().createId(-4L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link Summarization}.
    */
-  public static final GradoopId SUMMARIZE_GRAPH_ID = GradoopIds.fromLong(-5L);
+  public static final GradoopId SUMMARIZE_GRAPH_ID =
+    new ImportIdGenerator().createId(-5L);
 
   /**
    * Temporary identifier of a graph created by
    * {@link RandomNodeSampling}.
    */
   public static final GradoopId RANDOM_NODE_SAMPLING_GRAPH_ID =
-    GradoopIds.fromLong(-6L);
+    new ImportIdGenerator().createId(-6L);
 }
 
 

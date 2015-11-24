@@ -17,8 +17,12 @@
 
 package org.gradoop.model.impl.algorithms.labelpropagation.pojos;
 
+import org.gradoop.model.impl.id.Context;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.ImportIdGenerator;
+import org.gradoop.model.impl.id.ReuseIdGenerator;
+import org.gradoop.model.impl.id.SequenceIdGenerator;
 
 /**
  * Custom vertex used by {@link org.gradoop.model.impl.algorithms
@@ -55,7 +59,8 @@ public class LPVertexValue {
   public LPVertexValue(GradoopId id, GradoopId value) {
     this.id = id;
     this.currentCommunity = value;
-    this.lastCommunity = GradoopIds.MAX_VALUE;
+    this.lastCommunity = new SequenceIdGenerator(
+      Long.MAX_VALUE, Integer.MAX_VALUE, Context.RUNTIME).createId();
     this.stabilizationCounter = 0;
     this.changeMax = 19;
   }

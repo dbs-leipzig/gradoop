@@ -95,7 +95,7 @@ public abstract class JsonIO {
      * @throws JSONException
      */
     protected GradoopId getID(JSONObject object) throws JSONException {
-      return GradoopIds.fromLongString(object.getString(IDENTIFIER));
+      return GradoopId.fromString(object.getString(IDENTIFIER));
     }
 
     /**
@@ -159,7 +159,7 @@ public abstract class JsonIO {
       GradoopIdSet result = new GradoopIdSet();
 
       for (int i = 0; i < array.length(); i++) {
-        result.add(GradoopIds.fromLongString(array.getString(i)));
+        result.add(GradoopId.fromString(array.getString(i)));
       }
       return result;
     }
