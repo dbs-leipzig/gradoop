@@ -24,20 +24,18 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.StreamingMode;
 import org.apache.flink.test.util.ForkableFlinkMiniCluster;
 import org.apache.flink.test.util.MultipleProgramsTestBase;
-import org.gradoop.GradoopTestBaseUtils;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -46,15 +44,48 @@ import static org.junit.Assert.*;
  */
 public class FlinkTestBase extends MultipleProgramsTestBase {
 
-  private EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
-    graphStore;
-
   private ExecutionEnvironment env;
+
+  private GradoopFlinkConfig<VertexPojo, EdgePojo, GraphHeadPojo> config;
 
   public FlinkTestBase(TestExecutionMode mode) {
     super(mode);
     this.env = ExecutionEnvironment.getExecutionEnvironment();
-    this.graphStore = createSocialGraph();
+    this.config = GradoopFlinkConfig.createDefaultConfig(env);
+  }
+
+  protected ExecutionEnvironment getExecutionEnvironment() {
+    return env;
+  }
+
+  /**
+   * Returns an uninitialized loader with the test config.
+   *
+   * @return uninitialized Flink Ascii graph loader
+   */
+  private FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getNewLoader() {
+    return new FlinkAsciiGraphLoader<>(config);
+  }
+
+  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getLoaderFromString(String asciiString) {
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+      loader = getNewLoader();
+    loader.initDatabaseFromString(asciiString);
+    return loader;
+  }
+
+  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getLoaderFromFile(
+    String fileName) throws IOException {
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+      loader = getNewLoader();
+
+
+    String file = getClass().getResource(fileName).getFile();
+    loader.initDatabaseFromFile(file);
+    return loader;
   }
 
   /**
@@ -65,19 +96,10 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
    *
    * @return graph store containing a simple social network for tests.
    */
-  protected EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> createSocialGraph() {
-    return EPGMDatabase
-      .fromCollection(GradoopTestBaseUtils.createVertexPojoCollection(),
-        GradoopTestBaseUtils.createEdgePojoCollection(),
-        GradoopTestBaseUtils.createGraphHeadCollection(), env);
-  }
-
-  protected EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> getGraphStore() {
-    return graphStore;
-  }
-
-  protected ExecutionEnvironment getExecutionEnvironment() {
-    return env;
+  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getSocialNetworkLoader() throws
+    IOException {
+    return getLoaderFromFile("/data/social_network.gdl");
   }
 
   /**
@@ -128,16 +150,7 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
     MultipleProgramsTestBase.cluster = cluster;
   }
 
-  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
-  getLoaderFromString(
-    String asciiGraphs) {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
-      new FlinkAsciiGraphLoader<>(
-        GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
 
-    loader.initDatabaseFromString(asciiGraphs);
-    return loader;
-  }
 
   protected void collectAndAssertEquals(DataSet<Boolean> result) throws
     Exception {

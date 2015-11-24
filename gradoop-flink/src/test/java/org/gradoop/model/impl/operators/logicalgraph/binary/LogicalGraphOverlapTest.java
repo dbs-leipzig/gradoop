@@ -18,15 +18,20 @@
 package org.gradoop.model.impl.operators.logicalgraph.binary;
 
 import com.google.common.collect.Lists;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.GradoopTestBaseUtils;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.operators.equality.logicalgraph.EqualByElementIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.util.GradoopConfig;
+import org.gradoop.util.GradoopFlinkConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,20 +49,23 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-    GradoopId firstGraph = GradoopIds.fromLong(0L);
-    GradoopId secondGraph = GradoopIds.fromLong(0L);
-    long expectedVertexCount = 3L;
-    long expectedEdgeCount = 4L;
+
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+      flinkAsciiGraphLoader = getSocialNetworkLoader();
 
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
-      getGraphStore().getGraph(firstGraph);
+      flinkAsciiGraphLoader.getLogicalGraphByVariable("g0");
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> second =
-      getGraphStore().getGraph(secondGraph);
+      flinkAsciiGraphLoader.getLogicalGraphByVariable("g0");
 
     LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> result =
       first.overlap(second);
 
-    performTest(result, expectedVertexCount, expectedEdgeCount);
+    EqualByElementIds<GraphHeadPojo, VertexPojo, EdgePojo> equals =
+      new EqualByElementIds<>();
+
+    collectAndAssertEquals(equals.execute(first, result));
+    collectAndAssertEquals(equals.execute(second, result));
   }
 
   @Test

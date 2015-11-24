@@ -59,14 +59,39 @@ public class GradoopId implements Comparable<GradoopId>,
   /**
    * Creates a new Gradoop ID.
    *
-   * @param sequence  sequence number
-   * @param creatorId creator id
-   * @param context   creation context
+   * @param sequenceNumber  sequence number
+   * @param creatorId       creator id
+   * @param context         creation context
    */
-  GradoopId(long sequence, int creatorId, Context context) {
+  private GradoopId(long sequenceNumber, int creatorId, Context context) {
     Bytes.putByte(content, 0, (byte) context.ordinal());
     Bytes.putInt(content, 1, creatorId);
-    Bytes.putLong(content, 5, sequence);
+    Bytes.putLong(content, 5, sequenceNumber);
+  }
+
+  public static GradoopId createImportId(long sequenceNumber, int creatorId) {
+    return new GradoopId(sequenceNumber, creatorId, Context.IMPORT);
+  }
+
+  public static GradoopId createRuntimeId(long sequenceNumber, int creatorId) {
+    return new GradoopId(sequenceNumber, creatorId, Context.RUNTIME);
+  }
+
+  public static GradoopId create(long sequenceNumber, int creatorId,
+    Context context) {
+    return new GradoopId(sequenceNumber, creatorId, context);
+  }
+
+  public long getSequenceNumber() {
+    return Bytes.toLong(content, 5);
+  }
+
+  public int getCreatorId() {
+    return Bytes.toInt(content, 1);
+  }
+
+  public Context getContext() {
+    return Context.values()[(int) content[0]];
   }
 
   @Override
@@ -103,12 +128,9 @@ public class GradoopId implements Comparable<GradoopId>,
 
   @Override
   public String toString() {
-    Context context = Context.values()[(int) content[0]];
-    int creator = Bytes.toInt(content, 1);
-    long sequence = Bytes.toLong(content, 5);
     return String.format("[%s-%s-%s]",
-      Long.toHexString(sequence),
-      Integer.toHexString(creator),
-      context);
+      Long.toHexString(getSequenceNumber()),
+      Integer.toHexString(getCreatorId()),
+      getContext());
   }
 }

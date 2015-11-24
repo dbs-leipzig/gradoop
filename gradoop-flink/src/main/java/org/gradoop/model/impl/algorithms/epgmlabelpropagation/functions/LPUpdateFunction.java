@@ -153,7 +153,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
     GradoopId firstValue = allMessages.get(0);
     GradoopId currentValue = firstValue;
     int maxCounter = 1;
-    GradoopId maxValue = GradoopIds.fromLong(1L);
+    GradoopId maxValue = GradoopIds.MAX_VALUE;
     for (int i = 1; i < allMessages.size(); i++) {
       if (currentValue == allMessages.get(i)) {
         currentCounter++;

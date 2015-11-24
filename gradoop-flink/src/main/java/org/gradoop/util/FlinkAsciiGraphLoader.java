@@ -64,7 +64,7 @@ public class FlinkAsciiGraphLoader<
    * @param fileName GDL file name (must not be {@code null})
    * @throws IOException
    */
-  public void readDatabaseFromFile(String fileName) throws IOException {
+  public void initDatabaseFromFile(String fileName) throws IOException {
     if (fileName == null) {
       throw new IllegalArgumentException("FileName must not be null.");
     }

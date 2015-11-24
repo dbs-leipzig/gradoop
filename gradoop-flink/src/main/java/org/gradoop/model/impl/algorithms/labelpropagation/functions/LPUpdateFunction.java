@@ -128,7 +128,7 @@ public class LPUpdateFunction extends
     GradoopId firstMessage = allMessages.get(0);
     GradoopId currentValue = firstMessage;
     int maxCounter = 1;
-    GradoopId maxValue = GradoopIds.fromLong(1L);
+    GradoopId maxValue = GradoopIds.MAX_VALUE;
     for (int i = 1; i < allMessages.size(); i++) {
       if (currentValue == allMessages.get(i)) {
         currentCounter++;

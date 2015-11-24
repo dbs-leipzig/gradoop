@@ -26,10 +26,12 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.id.generators.ImportIdGenerator;
+import org.gradoop.model.impl.id.generators.ReuseIdGenerator;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Graph;
+import org.s1ck.gdl.model.GraphElement;
 import org.s1ck.gdl.model.Vertex;
 
 import java.io.IOException;
@@ -88,6 +90,11 @@ public class AsciiGraphLoader<
   private final Map<String, E> edgeCache;
 
   /**
+   * Used to create GradoopIds from existing identifiers.
+   */
+  private final ReuseIdGenerator idGenerator;
+
+  /**
    * Creates a new AsciiGraphLoader.
    *
    * @param gdlHandler GDL Handler
@@ -105,6 +112,8 @@ public class AsciiGraphLoader<
     this.graphHeadCache = Maps.newHashMap();
     this.vertexCache = Maps.newHashMap();
     this.edgeCache = Maps.newHashMap();
+
+    this.idGenerator = new ImportIdGenerator();
 
     init();
   }
@@ -430,9 +439,8 @@ public class AsciiGraphLoader<
    * @return EPGM GraphHead
    */
   private G initGraphHead(Graph g) {
-    GradoopId graphId = GradoopIds.fromLong(g.getId());
     return config.getGraphHeadFactory().createGraphHead(
-      graphId,
+      idGenerator.createId(g.getId()),
       g.getLabel(),
       g.getProperties());
   }
@@ -444,12 +452,11 @@ public class AsciiGraphLoader<
    * @return EPGM Vertex
    */
   private V initVertex(Vertex v) {
-    GradoopId vertexId = GradoopIds.fromLong(v.getId());
-    GradoopIdSet graphIds = GradoopIdSet.fromLongs(v.getGraphs());
-    return config.getVertexFactory().createVertex(vertexId,
+    return config.getVertexFactory().createVertex(
+      idGenerator.createId(v.getId()),
       v.getLabel(),
       v.getProperties(),
-      graphIds);
+      createGradoopIdSet(v));
   }
 
   /**
@@ -459,16 +466,13 @@ public class AsciiGraphLoader<
    * @return EPGM edge
    */
   private E initEdge(Edge e) {
-    GradoopId edgeId = GradoopIds.fromLong(e.getId());
-    GradoopId sourceVertexId = GradoopIds.fromLong(e.getSourceVertexId());
-    GradoopId targetVertexId = GradoopIds.fromLong(e.getTargetVertexId());
-    GradoopIdSet graphIds = GradoopIdSet.fromLongs(e.getGraphs());
-    return config.getEdgeFactory().createEdge(edgeId,
+    return config.getEdgeFactory().createEdge(
+      idGenerator.createId(e.getId()),
       e.getLabel(),
-      sourceVertexId,
-      targetVertexId,
+      idGenerator.createId(e.getSourceVertexId()),
+      idGenerator.createId(e.getTargetVertexId()),
       e.getProperties(),
-      graphIds);
+      createGradoopIdSet(e));
   }
 
   /**
@@ -478,8 +482,8 @@ public class AsciiGraphLoader<
    * @param g graph from GDL loader
    */
   private void updateGraphCache(String variable, Graph g) {
-    GradoopId graphId = GradoopIds.fromLong(g.getId());
-    graphHeadCache.put(variable, graphHeads.get(graphId));
+    graphHeadCache.put(
+      variable, graphHeads.get(idGenerator.createId(g.getId())));
   }
 
   /**
@@ -489,8 +493,7 @@ public class AsciiGraphLoader<
    * @param v vertex from GDL loader
    */
   private void updateVertexCache(String variable, Vertex v) {
-    GradoopId vertexId = GradoopIds.fromLong(v.getId());
-    vertexCache.put(variable, vertices.get(vertexId));
+    vertexCache.put(variable, vertices.get(idGenerator.createId(v.getId())));
   }
 
   /**
@@ -500,7 +503,21 @@ public class AsciiGraphLoader<
    * @param e edge from GDL loader
    */
   private void updateEdgeCache(String variable, Edge e) {
-    GradoopId edgeId = GradoopIds.fromLong(e.getId());
-    edgeCache.put(variable, edges.get(edgeId));
+    edgeCache.put(variable, edges.get(idGenerator.createId(e.getId())));
+  }
+
+  /**
+   * Creates a {@code GradoopIDSet} from the long identifiers stored at the
+   * given graph element.
+   *
+   * @param e graph element
+   * @return GradoopIDSet for the given element
+   */
+  private GradoopIdSet createGradoopIdSet(GraphElement e) {
+    GradoopIdSet result = new GradoopIdSet();
+    for (Long graphId : e.getGraphs()) {
+      result.add(idGenerator.createId(graphId));
+    }
+    return result;
   }
 }

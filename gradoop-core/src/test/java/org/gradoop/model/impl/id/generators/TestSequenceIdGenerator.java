@@ -1,0 +1,13 @@
+package org.gradoop.model.impl.id.generators;
+
+import org.gradoop.model.impl.id.Context;
+
+/**
+ * Convenient class to create GradoopId instances during unit testing.
+ */
+public class TestSequenceIdGenerator extends SequenceIdGenerator {
+
+  public TestSequenceIdGenerator() {
+    super(0, Context.TEST);
+  }
+}

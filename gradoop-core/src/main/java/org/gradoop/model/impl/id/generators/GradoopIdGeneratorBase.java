@@ -32,32 +32,18 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.id;
+package org.gradoop.model.impl.id.generators;
 
-import java.util.concurrent.atomic.AtomicLong;
+import org.gradoop.model.impl.id.Context;
 
-public class SequenceIdGenerator implements GradoopIdGenerator {
-  /**
-   * Thread-safe offset to create new identifiers from.
-   */
-  private final AtomicLong offset;
+public abstract class GradoopIdGeneratorBase {
 
-  private final int creatorId;
+  protected final int creatorId;
 
-  private final Context context;
+  protected final Context context;
 
-  public SequenceIdGenerator(int creatorId, Context context) {
-    this(0L, creatorId, context);
-  }
-
-  public SequenceIdGenerator(long offset, int creatorId, Context context) {
-    this.offset = new AtomicLong(offset);
+  protected GradoopIdGeneratorBase(int creatorId, Context context) {
     this.creatorId = creatorId;
     this.context = context;
-  }
-
-  @Override
-  public GradoopId createId() {
-    return new GradoopId(offset.getAndIncrement(), creatorId, context);
   }
 }

@@ -67,31 +67,6 @@ public class GradoopIdSet implements Iterable<GradoopId>,
   }
 
   /**
-   * A Factory method to create gradoop ids from given numbers.
-   *
-   * @param ids numbers
-   * @return gradoop ids
-   */
-  public static GradoopIdSet fromLongs(Long... ids) {
-    return fromLongs(Arrays.asList(ids));
-  }
-
-  /**
-   * A Factory method to create gradoop ids from given collection.
-   *
-   * @param ids collection containing long identifiers
-   * @return gradoop ids
-   */
-  public static GradoopIdSet fromLongs(Collection<Long> ids) {
-    GradoopIdSet gradoopIdSet = new GradoopIdSet();
-
-    for (Long id : ids) {
-      gradoopIdSet.add(GradoopIds.fromLong(id));
-    }
-    return gradoopIdSet;
-  }
-
-  /**
    * Adds a GradoopId to the set.
    *
    * @param identifier gradoop identifier

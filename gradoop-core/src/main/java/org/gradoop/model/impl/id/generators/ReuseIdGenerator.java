@@ -15,27 +15,18 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.id;
+package org.gradoop.model.impl.id.generators;
 
-/**
- * Static helper functions for GradoopIds
- */
-public class GradoopIds {
+import org.gradoop.model.impl.id.Context;
+import org.gradoop.model.impl.id.GradoopId;
 
-  /**
-   * Compares the given GradoopIds and returns the smaller one. It both are
-   * equal, the first argument is returned.
-   *
-   * @param id1 first GradoopID
-   * @param id2 second GradoopID
-   * @return smaller GradoopId or first if equal
-   */
-  public static GradoopId min(GradoopId id1, GradoopId id2) {
-    int compare = id1.compareTo(id2);
-    return (compare == 0)
-      ? id1
-      : compare == -1
-        ? id1
-        : id2;
+public abstract class ReuseIdGenerator extends GradoopIdGeneratorBase {
+
+  public ReuseIdGenerator(int creatorId, Context context) {
+    super(creatorId, context);
+  }
+
+  public GradoopId createId(long reuseId) {
+    return GradoopId.create(reuseId, creatorId, context);
   }
 }
