@@ -121,6 +121,12 @@ public class GradoopId implements Comparable<GradoopId>,
       getContext());
   }
 
+  /**
+   * Returns the Gradoop ID represented by a string.
+   *
+   * @param string string representation
+   * @return Gradoop ID
+   */
   public static GradoopId fromString(String string) {
 
     string = string.substring(1,string.length()-1);
