@@ -24,7 +24,7 @@ public class EPGMDatabaseTest extends FlinkTestBase {
 
   @Test
   public void testGetExistingGraph() throws Exception {
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g =
       getGraphStore().getGraph(GradoopIds.fromLong(0L));
     assertNotNull("graph was null", g);
     assertEquals("vertex set has the wrong size", 3L, g.getVertices().count());

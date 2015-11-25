@@ -17,24 +17,22 @@
 
 package org.gradoop.model.impl.operators.logicalgraph.binary;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
@@ -45,137 +43,107 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-    // "0, 0, 0, 0"
-    GradoopId firstGraph = GradoopIds.fromLong(0L);
-    GradoopId secondGraph = GradoopIds.fromLong(0L);
-    long expectedVertexCount = 0L;
-    long expectedEdgeCount = 0L;
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
-      getGraphStore().getGraph(firstGraph);
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
-      getGraphStore().getGraph(secondGraph);
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      first.exclude(second);
+    loader.appendToDatabaseFromString("res[]");
 
-    performTest(result, expectedVertexCount, expectedEdgeCount);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+      .getLogicalGraphByVariable("g0");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
+      .getLogicalGraphByVariable("res");
+
+    assertTrue("exclusion of same graph failed",
+      res.equalsByElementIdsCollected(g0.exclude(g0)));
   }
 
   @Test
   public void testOverlappingGraphs() throws Exception {
-    // "0, 2, 1, 0"
-    GradoopId firstGraph = GradoopIds.fromLong(0L);
-    GradoopId secondGraph = GradoopIds.fromLong(2L);
-    long expectedVertexCount = 1L;
-    long expectedEdgeCount = 0L;
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
-      getGraphStore().getGraph(firstGraph);
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
-      getGraphStore().getGraph(secondGraph);
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      first.exclude(second);
+    loader.appendToDatabaseFromString("res1[(eve)];" +
+      "res2[(carol)-[ckd]->(dave)-[dkc]->(carol)");
 
-    performTest(result, expectedVertexCount, expectedEdgeCount);
-  }
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+      .getLogicalGraphByVariable("g0");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
+      .getLogicalGraphByVariable("g2");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res1 = loader
+      .getLogicalGraphByVariable("res1");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res2 = loader
+      .getLogicalGraphByVariable("res2");
 
-  @Test
-  public void testOverlappingSwitchedGraphs() throws Exception {
-    // "2, 0, 2, 2"
-    GradoopId firstGraph = GradoopIds.fromLong(2L);
-    GradoopId secondGraph = GradoopIds.fromLong(0L);
-    long expectedVertexCount = 2L;
-    long expectedEdgeCount = 2L;
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
-      getGraphStore().getGraph(firstGraph);
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
-      getGraphStore().getGraph(secondGraph);
-
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      first.exclude(second);
-
-    performTest(result, expectedVertexCount, expectedEdgeCount);
+    assertTrue("excluding overlapping graphs failed",
+      res1.equalsByElementIdsCollected(g0.exclude(g2)));
+    assertTrue("excluding switched overlapping graphs failed",
+      res2.equalsByElementIdsCollected(g2.exclude(g0)));
   }
 
   @Test
   public void testNonOverlappingGraphs() throws Exception {
-    // "0, 1, 3, 4"
-    GradoopId firstGraph = GradoopIds.fromLong(0L);
-    GradoopId secondGraph = GradoopIds.fromLong(1L);
-    long expectedVertexCount = 3L;
-    long expectedEdgeCount = 4L;
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
-      getGraphStore().getGraph(firstGraph);
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
-      getGraphStore().getGraph(secondGraph);
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      first.exclude(second);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+      .getLogicalGraphByVariable("g0");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 = loader
+      .getLogicalGraphByVariable("g1");
 
-    performTest(result, expectedVertexCount, expectedEdgeCount);
+    assertTrue("excluding non overlapping graphs failed",
+      g0.equalsByElementIdsCollected(g0.exclude(g1)));
+    assertTrue("excluding switched non overlapping graphs failed",
+      g1.equalsByElementIdsCollected(g1.exclude(g0)));
   }
 
   @Test
-  public void testNonOverlappingSwitchedGraphs() throws Exception {
-    // "1, 0, 3, 4"
-    GradoopId firstGraph = GradoopIds.fromLong(1L);
-    GradoopId secondGraph = GradoopIds.fromLong(0L);
-    long expectedVertexCount = 3L;
-    long expectedEdgeCount = 4L;
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
-      getGraphStore().getGraph(firstGraph);
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
-      getGraphStore().getGraph(secondGraph);
+  public void testGraphContainment() throws Exception {
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      first.exclude(second);
-
-    performTest(result, expectedVertexCount, expectedEdgeCount);
-  }
-
-  @Test
-  public void testAssignment() throws Exception {
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      databaseCommunity = getGraphStore().getGraph(GradoopIds.fromLong(0L));
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      hadoopCommunity = getGraphStore().getGraph(GradoopIds.fromLong(1L));
-
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      newGraph = databaseCommunity.exclude(hadoopCommunity);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+      .getLogicalGraphByVariable("g0");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
+      .getLogicalGraphByVariable("g2");
 
     // use collections as data sink
-    Collection<VertexPojo> vertexData = Lists.newArrayList();
-    Collection<EdgePojo> edgeData = Lists.newArrayList();
+    Collection<VertexPojo> vertices0 = new HashSet<>();
+    Collection<EdgePojo> edges0 = new HashSet<>();
+    Collection<VertexPojo> vertices2 = new HashSet<>();
+    Collection<EdgePojo> edges2 = new HashSet<>();
+    Collection<VertexPojo> resVertices = new HashSet<>();
+    Collection<EdgePojo> resEdges = new HashSet<>();
 
-    newGraph.getVertices()
-      .output(new LocalCollectionOutputFormat<>(vertexData));
-    newGraph.getEdges()
-      .output(new LocalCollectionOutputFormat<>(edgeData));
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = g2.exclude(g0);
+
+    g0.getVertices().output(new LocalCollectionOutputFormat<>(vertices0));
+    g0.getEdges().output(new LocalCollectionOutputFormat<>(edges0));
+    g2.getVertices().output(new LocalCollectionOutputFormat<>(vertices2));
+    g2.getEdges().output(new LocalCollectionOutputFormat<>(edges2));
+    res.getVertices().output(new LocalCollectionOutputFormat<>(resVertices));
+    res.getEdges().output(new LocalCollectionOutputFormat<>(resEdges));
 
     getExecutionEnvironment().execute();
 
-    for (EPGMVertex v : vertexData) {
-      GradoopIdSet gIDs = v.getGraphIds();
-      if (v.equals(VERTEX_PERSON_ALICE)) {
-        assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (v.equals(VERTEX_PERSON_BOB)) {
-        assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (v.equals(VERTEX_PERSON_EVE)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
+    Set<EPGMGraphElement> inVertices = new HashSet<>();
+    for(VertexPojo vertex : vertices2) {
+      if (!vertices0.contains(vertex)) {
+        inVertices.add(vertex);
+      }
+    }
+    Set<EPGMGraphElement> inEdges = new HashSet<>();
+    for(EdgePojo edge : edges2) {
+      if (!edges0.contains(edge)) {
+        inVertices.add(edge);
       }
     }
 
-    for (EPGMEdge e : edgeData) {
-      GradoopIdSet gIDs = e.getGraphIds();
-      if (e.equals(EDGE_0_KNOWS)) {
-        assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (e.equals(EDGE_1_KNOWS)) {
-        assertEquals("wrong number of graphs", 3, gIDs.size());
-      } else if (e.equals(EDGE_6_KNOWS)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
-      } else if (e.equals(EDGE_21_KNOWS)) {
-        assertEquals("wrong number of graphs", 2, gIDs.size());
-      }
-    }
+    Set<EPGMGraphElement> outVertices = new HashSet<>();
+    inVertices.addAll(outVertices);
+    Set<EPGMGraphElement> outEdges = new HashSet<>();
+    inEdges.addAll(resEdges);
+
+    checkElementMatches(inVertices, outVertices);
+    checkElementMatches(inEdges, outEdges);
   }
 }

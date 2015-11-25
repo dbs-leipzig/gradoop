@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.logicalgraph.binary;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -29,8 +30,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
@@ -59,7 +60,7 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("g01[" +
+    loader.appendToDatabaseFromString("res[" +
       "(alice)-[akb]->(bob);" +
       "(bob)-[bka]->(alice);" +
       "(bob)-[bkc]->(carol);" +
@@ -74,13 +75,13 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g01 = loader
-      .getLogicalGraphByVariable("g01");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
+      .getLogicalGraphByVariable("res");
 
     assertTrue("combining overlapping graphs failed",
-      g01.equalsByElementIdsCollected(g0.combine(g2)));
+      res.equalsByElementIdsCollected(g0.combine(g2)));
     assertTrue("combining switched overlapping graphs failed",
-      g01.equalsByElementIdsCollected(g2.combine(g0)));
+      res.equalsByElementIdsCollected(g2.combine(g0)));
   }
 
   @Test
@@ -88,7 +89,7 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("g01[" +
+    loader.appendToDatabaseFromString("res[" +
       "(alice)-[akb]->(bob);" +
       "(bob)-[bka]->(alice);" +
       "(eve)-[eka]->(alice);" +
@@ -96,20 +97,20 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
       "(carol)-[ckb]->(dave);" +
       "(dave)-[dkc]->(carol);" +
       "(frank)-[fkc]->(carol);" +
-      "(frank)-[fkd]->(dave);"
+      "(frank)-[fkd]->(dave)]"
     );
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 = loader
       .getLogicalGraphByVariable("g1");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g01 = loader
-      .getLogicalGraphByVariable("g01");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
+      .getLogicalGraphByVariable("res");
 
     assertTrue("combining non overlapping graphs failed",
-      g01.equalsByElementIdsCollected(g0.combine(g1)));
+      res.equalsByElementIdsCollected(g0.combine(g1)));
     assertTrue("combining switched non overlapping graphs failed",
-      g01.equalsByElementIdsCollected(g1.combine(g0)));
+      res.equalsByElementIdsCollected(g1.combine(g0)));
   }
 
   @Test
@@ -119,61 +120,41 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 = loader
-      .getLogicalGraphByVariable("g1");
-
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g01 = g0.combine(g1);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
+      .getLogicalGraphByVariable("g2");
 
     // use collections as data sink
     Collection<VertexPojo> vertices0 = new HashSet<>();
     Collection<EdgePojo> edges0 = new HashSet<>();
-    Collection<VertexPojo> vertices1 = new HashSet<>();
-    Collection<EdgePojo> edges1 = new HashSet<>();
-    Collection<VertexPojo> vertices01 = new HashSet<>();
-    Collection<EdgePojo> edges01 = new HashSet<>();
+    Collection<VertexPojo> vertices2 = new HashSet<>();
+    Collection<EdgePojo> edges2 = new HashSet<>();
+    Collection<VertexPojo> resVertices = new HashSet<>();
+    Collection<EdgePojo> resEdges = new HashSet<>();
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = g0.combine(g2);
 
     g0.getVertices().output(new LocalCollectionOutputFormat<>(vertices0));
     g0.getEdges().output(new LocalCollectionOutputFormat<>(edges0));
-    g1.getVertices().output(new LocalCollectionOutputFormat<>(vertices1));
-    g1.getEdges().output(new LocalCollectionOutputFormat<>(edges1));
-    g01.getVertices().output(new LocalCollectionOutputFormat<>(vertices01));
-    g01.getEdges().output(new LocalCollectionOutputFormat<>(edges01));
+    g2.getVertices().output(new LocalCollectionOutputFormat<>(vertices2));
+    g2.getEdges().output(new LocalCollectionOutputFormat<>(edges2));
+    res.getVertices().output(new LocalCollectionOutputFormat<>(resVertices));
+    res.getEdges().output(new LocalCollectionOutputFormat<>(resEdges));
 
     getExecutionEnvironment().execute();
 
-    vertices0.addAll(vertices1);
-    edges0.addAll(edges1);
+    Set<EPGMGraphElement> inVertices = new HashSet<>();
+    inVertices.addAll(vertices0);
+    inVertices.addAll(vertices2);
+    Set<EPGMGraphElement> inEdges = new HashSet<>();
+    inEdges.addAll(edges0);
+    inEdges.addAll(edges2);
 
-    for(VertexPojo combinationVertex : vertices01) {
-      boolean match = false;
+    Set<EPGMGraphElement> outVertices = new HashSet<>();
+    inVertices.addAll(outVertices);
+    Set<EPGMGraphElement> outEdges = new HashSet<>();
+    inEdges.addAll(resEdges);
 
-      for(VertexPojo originalVertex : vertices0) {
-        if (combinationVertex.getId().equals(originalVertex.getId())) {
-          assertEquals(
-            "wrong number of graphs for vertex",
-            originalVertex.getGraphCount() + 1,
-            combinationVertex.getGraphCount()
-          );
-          break;
-        }
-      }
-      assertTrue("expected vertex not found",match);
-    }
-
-    for(EdgePojo combinationEdge : edges01) {
-      boolean match = false;
-
-      for(EdgePojo originalEdge : edges0) {
-        if (combinationEdge.getId().equals(originalEdge.getId())) {
-          assertEquals(
-            "wrong number of graphs for edge",
-            originalEdge.getGraphCount() + 1,
-            combinationEdge.getGraphCount()
-          );
-          break;
-        }
-      }
-      assertTrue("expected vertex not found",match);
-    }
+    checkElementMatches(inVertices, outVertices);
+    checkElementMatches(inEdges, outEdges);
   }
 }
