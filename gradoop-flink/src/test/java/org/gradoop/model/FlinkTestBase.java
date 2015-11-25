@@ -24,6 +24,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.StreamingMode;
 import org.apache.flink.test.util.ForkableFlinkMiniCluster;
 import org.apache.flink.test.util.MultipleProgramsTestBase;
+import org.gradoop.GradoopTestUtils;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -99,7 +100,7 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
   protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
   getSocialNetworkLoader() throws
     IOException {
-    return getLoaderFromFile("/data/social_network.gdl");
+    return getLoaderFromFile(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
   }
 
   /**
@@ -149,8 +150,6 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
 
     MultipleProgramsTestBase.cluster = cluster;
   }
-
-
 
   protected void collectAndAssertEquals(DataSet<Boolean> result) throws
     Exception {

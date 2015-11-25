@@ -40,7 +40,7 @@ import java.util.Set;
 /**
  * Used for tests that need a HBase cluster to run.
  */
-public class HBaseTestBase {
+public class GradoopHBaseTestBase {
 
   protected static HBaseTestingUtility utility;
 
@@ -90,23 +90,11 @@ public class HBaseTestBase {
       GradoopHBaseConfig.getDefaultConfig());
   }
 
-
-  private static AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
-  getSocialNetworkLoader() throws
-    IOException {
-    GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
-      GradoopConfig.getDefaultConfig();
-
-    return AsciiGraphLoader.fromFile(
-      HBaseTestBase.class.getResource("/data/social_network.gdl").getFile(),
-      config);
-  }
-
   // PersistentGraphHead
 
   public static Collection<PersistentGraphHead>
   getSocialPersistentGraphHeads() throws IOException {
-    return getPersistentGraphHeads(getSocialNetworkLoader());
+    return getPersistentGraphHeads(GradoopTestUtils.getSocialNetworkLoader());
   }
 
   private static Collection<PersistentGraphHead> getPersistentGraphHeads(
@@ -145,7 +133,7 @@ public class HBaseTestBase {
 
   public static Collection<PersistentVertex<EdgePojo>>
   getSocialPersistentVertices() throws IOException {
-    return getPersistentVertices(getSocialNetworkLoader());
+    return getPersistentVertices(GradoopTestUtils.getSocialNetworkLoader());
   }
 
   private static List<PersistentVertex<EdgePojo>> getPersistentVertices(
@@ -177,7 +165,7 @@ public class HBaseTestBase {
 
   public static Collection<PersistentEdge<VertexPojo>>
   getSocialPersistentEdges() throws IOException {
-    return getPersistentEdges(getSocialNetworkLoader());
+    return getPersistentEdges(GradoopTestUtils.getSocialNetworkLoader());
   }
 
   private static List<PersistentEdge<VertexPojo>> getPersistentEdges(

@@ -1,7 +1,7 @@
 package org.gradoop.io.hbase;
 
 import org.apache.flink.test.util.MultipleProgramsTestBase;
-import org.gradoop.HBaseTestBase;
+import org.gradoop.GradoopHBaseTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -22,7 +22,7 @@ public class FlinkHBaseTestBase extends MultipleProgramsTestBase {
   @BeforeClass
   public static void setup() throws Exception {
     MultipleProgramsTestBase.setup();
-    HBaseTestBase.setUp();
+    GradoopHBaseTestBase.setUp();
   }
 
   /**
@@ -33,6 +33,6 @@ public class FlinkHBaseTestBase extends MultipleProgramsTestBase {
   @AfterClass
   public static void teardown() throws Exception {
     MultipleProgramsTestBase.teardown();
-    HBaseTestBase.tearDown();
+    GradoopHBaseTestBase.tearDown();
   }
 }
