@@ -17,10 +17,7 @@
 
 package org.gradoop.model.impl.operators.logicalgraph.binary;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -30,11 +27,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
@@ -45,7 +42,6 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
@@ -63,7 +59,7 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("res[" +
+    loader.appendToDatabaseFromString("g01[" +
       "(alice)-[akb]->(bob);" +
       "(bob)-[bka]->(alice);" +
       "(bob)-[bkc]->(carol);" +
@@ -78,13 +74,13 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
-      .getLogicalGraphByVariable("res");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g01 = loader
+      .getLogicalGraphByVariable("g01");
 
     assertTrue("combining overlapping graphs failed",
-      res.equalsByElementIdsCollected(g0.combine(g2)));
+      g01.equalsByElementIdsCollected(g0.combine(g2)));
     assertTrue("combining switched overlapping graphs failed",
-      res.equalsByElementIdsCollected(g2.combine(g0)));
+      g01.equalsByElementIdsCollected(g2.combine(g0)));
   }
 
   @Test
@@ -92,7 +88,7 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("res[" +
+    loader.appendToDatabaseFromString("g01[" +
       "(alice)-[akb]->(bob);" +
       "(bob)-[bka]->(alice);" +
       "(eve)-[eka]->(alice);" +
@@ -107,13 +103,13 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 = loader
       .getLogicalGraphByVariable("g1");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
-      .getLogicalGraphByVariable("res");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g01 = loader
+      .getLogicalGraphByVariable("g01");
 
     assertTrue("combining non overlapping graphs failed",
-      res.equalsByElementIdsCollected(g0.combine(g1)));
+      g01.equalsByElementIdsCollected(g0.combine(g1)));
     assertTrue("combining switched non overlapping graphs failed",
-      res.equalsByElementIdsCollected(g1.combine(g0)));
+      g01.equalsByElementIdsCollected(g1.combine(g0)));
   }
 
   @Test
