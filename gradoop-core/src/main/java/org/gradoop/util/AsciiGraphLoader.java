@@ -161,6 +161,19 @@ public class AsciiGraphLoader
       config);
   }
 
+  /**
+   * Appends the given ASCII GDL to the graph handled by that loader.
+   *
+   * Variables that were previously used, can be reused in the given script and
+   * refer to the same entities.
+   *
+   * @param asciiGraph GDL string
+   */
+  public void appendFromString(String asciiGraph) {
+    this.gdlHandler.append(asciiGraph);
+    init();
+  }
+
   // ---------------------------------------------------------------------------
   //  Graph methods
   // ---------------------------------------------------------------------------
@@ -191,15 +204,15 @@ public class AsciiGraphLoader
    * @return graphHeads that are assigned to the given variables
    */
   public Collection<G> getGraphHeadsByVariables(String... variables) {
-    Collection<G> graphHeads =
+    Collection<G> result =
       Sets.newHashSetWithExpectedSize(variables.length);
     for (String variable : variables) {
       G graphHead = getGraphHeadByVariable(variable);
       if (graphHead != null) {
-        graphHeads.add(graphHead);
+        result.add(graphHead);
       }
     }
-    return graphHeads;
+    return result;
   }
 
   // ---------------------------------------------------------------------------
@@ -232,14 +245,14 @@ public class AsciiGraphLoader
    * @return vertices
    */
   public Collection<V> getVerticesByVariables(String... variables) {
-    Collection<V> vertices = Sets.newHashSetWithExpectedSize(variables.length);
+    Collection<V> result = Sets.newHashSetWithExpectedSize(variables.length);
     for (String variable : variables) {
       V vertex = getVertexByVariable(variable);
       if (vertex != null) {
-        vertices.add(vertex);
+        result.add(vertex);
       }
     }
-    return vertices;
+    return result;
   }
 
   /**
@@ -266,8 +279,7 @@ public class AsciiGraphLoader
    */
   public Collection<V> getVerticesByGraphVariables(String... graphVariables) {
     GradoopIdSet graphIds = new GradoopIdSet();
-    Collection<G> graphHeads = getGraphHeadsByVariables(graphVariables);
-    for (G graphHead : graphHeads) {
+    for (G graphHead : getGraphHeadsByVariables(graphVariables)) {
       graphIds.add(graphHead.getId());
     }
     return getVerticesByGraphIds(graphIds);
@@ -303,14 +315,14 @@ public class AsciiGraphLoader
    * @return edges
    */
   public Collection<E> getEdgesByVariables(String... variables) {
-    Collection<E> edges = Sets.newHashSetWithExpectedSize(variables.length);
+    Collection<E> result = Sets.newHashSetWithExpectedSize(variables.length);
     for (String variable : variables) {
       E edge = edgeCache.get(variable);
       if (edge != null) {
-        edges.add(edge);
+        result.add(edge);
       }
     }
-    return edges;
+    return result;
   }
 
   /**
@@ -337,8 +349,7 @@ public class AsciiGraphLoader
    */
   public Collection<E> getEdgesByGraphVariables(String... variables) {
     GradoopIdSet graphIds = new GradoopIdSet();
-    Collection<G> graphHeads = getGraphHeadsByVariables(variables);
-    for (G graphHead : graphHeads) {
+    for (G graphHead : getGraphHeadsByVariables(variables)) {
       graphIds.add(graphHead.getId());
     }
     return getEdgesByGraphIds(graphIds);

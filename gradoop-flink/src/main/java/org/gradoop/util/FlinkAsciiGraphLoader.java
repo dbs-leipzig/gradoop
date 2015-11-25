@@ -9,6 +9,7 @@ import org.gradoop.model.impl.LogicalGraph;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.IllegalFormatCodePointException;
 
 /**
  * Used the {@link AsciiGraphLoader} to generate instances of
@@ -57,6 +58,24 @@ public class FlinkAsciiGraphLoader<
       throw new IllegalArgumentException("AsciiGraph must not be null");
     }
     loader = AsciiGraphLoader.fromString(asciiGraphs, config);
+  }
+
+  /**
+   * Appends the given ASCII GDL String to the database.
+   *
+   * Variables previously used can be reused as their refer to the same objects.
+   *
+   * @param asciiGraph GDL string (must not be {@code null})
+   */
+  public void appendToDatabaseFromString(String asciiGraph) {
+    if (asciiGraph == null) {
+      throw new IllegalArgumentException("AsciiGraph must not be null");
+    }
+    if (loader != null) {
+      loader.appendFromString(asciiGraph);
+    } else {
+      initDatabaseFromString(asciiGraph);
+    }
   }
 
   /**

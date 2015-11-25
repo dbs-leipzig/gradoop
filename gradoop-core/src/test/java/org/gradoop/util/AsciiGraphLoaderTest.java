@@ -355,6 +355,69 @@ public class AsciiGraphLoaderTest {
     assertEquals("Edges were not equal", f, fCache);
   }
 
+  @Test
+  public void testUpdateFromString() {
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+      AsciiGraphLoader.fromString("[()-->()]",
+        config);
+
+    validateCollections(asciiGraphLoader, 1, 2, 1);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
+
+    asciiGraphLoader.appendFromString("[()-->()]");
+    validateCollections(asciiGraphLoader, 2, 4, 2);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
+  }
+
+  @Test
+  public void testUpdateFromString2() {
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+      AsciiGraphLoader.fromString("[()-->()]",
+        config);
+
+    validateCollections(asciiGraphLoader, 1, 2, 1);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
+
+    asciiGraphLoader.appendFromString("()-->()");
+    validateCollections(asciiGraphLoader, 1, 4, 2);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
+  }
+
+  @Test
+  public void testUpdateFromStringWithVariables() {
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+      AsciiGraphLoader.fromString("[(a)-->(b)]",
+        config);
+
+    validateCollections(asciiGraphLoader, 1, 2, 1);
+    validateCaches(asciiGraphLoader, 0, 2, 0);
+
+    asciiGraphLoader.appendFromString("[(a)-->()]");
+    validateCollections(asciiGraphLoader, 2, 3, 2);
+    validateCaches(asciiGraphLoader, 0, 2, 0);
+  }
+
+  @Test
+  public void testUpdateFromStringWithVariables2() {
+    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+      AsciiGraphLoader.fromString("g[(a)-[e]->(b)]",
+        config);
+
+    validateCollections(asciiGraphLoader, 1, 2, 1);
+    validateCaches(asciiGraphLoader, 1, 2, 1);
+
+    asciiGraphLoader.appendFromString("g[(a)-[f]->(c)]");
+    validateCollections(asciiGraphLoader, 1, 3, 2);
+    validateCaches(asciiGraphLoader, 1, 3, 2);
+
+    GraphHeadPojo g = asciiGraphLoader.getGraphHeadByVariable("g");
+    VertexPojo c = asciiGraphLoader.getVertexByVariable("c");
+    EdgePojo f = asciiGraphLoader.getEdgeByVariable("f");
+
+    assertTrue("Vertex not in graph", c.getGraphIds().contains(g.getId()));
+    assertTrue("Edge not in graph", f.getGraphIds().contains(g.getId()));
+  }
+
   private void validateCollections(
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader,
     int expectedGraphHeadCount,
