@@ -31,8 +31,8 @@ import org.gradoop.util.FlinkConstants;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class CombineCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
-  extends EPGMGraphHead> implements
+public class CombineCollection<GD
+  extends EPGMGraphHead, VD extends EPGMVertex, ED extends EPGMEdge> implements
   UnaryCollectionToGraphOperator<VD, ED, GD> {
   @Override
   public LogicalGraph<GD, VD, ED> execute(
