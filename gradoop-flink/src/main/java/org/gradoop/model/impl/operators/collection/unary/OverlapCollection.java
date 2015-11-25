@@ -39,8 +39,8 @@ import org.gradoop.util.FlinkConstants;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class OverlapCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
-  extends EPGMGraphHead> implements
+public class OverlapCollection<GD
+  extends EPGMGraphHead, VD extends EPGMVertex, ED extends EPGMEdge> implements
   UnaryCollectionToGraphOperator<VD, ED, GD> {
   /**
    * {@inheritDoc}
