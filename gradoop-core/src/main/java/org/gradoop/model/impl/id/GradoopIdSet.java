@@ -229,11 +229,11 @@ public class GradoopIdSet implements Iterable<GradoopId>,
       equals = this.size() == otherIds.size();
 
       if (equals) {
-        Iterator<GradoopId> thisIterator = this.identifiers.iterator();
-        Iterator<GradoopId> otherIterator = otherIds.identifiers.iterator();
-
-        while (equals && thisIterator.hasNext()) {
-          equals = thisIterator.next().equals(otherIterator.next());
+        for (GradoopId gradoopId : identifiers) {
+          if (!otherIds.identifiers.contains(gradoopId)) {
+            equals = false;
+            break;
+          }
         }
       }
     }

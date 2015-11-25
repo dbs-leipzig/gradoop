@@ -23,12 +23,14 @@ package org.gradoop.model.impl.id;
 public abstract class GradoopIdGeneratorBase {
 
   /**
-   * worker thread or import identifier
+   * worker task or import identifier
    */
   protected final int creatorId;
 
   /**
-   * ID generation context (RUNTIME, IMPORT, TEST)
+   * ID generation context (i.e. RUNTIME, IMPORT, TEST)
+   *
+   * @see Context
    */
   protected final Context context;
 
@@ -36,7 +38,7 @@ public abstract class GradoopIdGeneratorBase {
    * Constructor.
    *
    * @param creatorId worker thread or import identifier
-   * @param context generation context
+   * @param context   generation context
    */
   protected GradoopIdGeneratorBase(int creatorId, Context context) {
     this.creatorId = creatorId;

@@ -32,6 +32,8 @@ public class ImportIdGenerator extends ReuseIdGenerator {
   /**
    * Master constructor; sets initialization timestamp as import identifier.
    *
+   * The time granularity is seconds since Unix epoch.
+   *
    * @param context generation context
    */
   public ImportIdGenerator(Context context) {

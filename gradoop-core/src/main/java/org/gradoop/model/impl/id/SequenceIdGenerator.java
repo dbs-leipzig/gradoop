@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.id;
 
 /**
- * Generation Gradoop IDs sequentially during workflow execution
+ * Generates Gradoop IDs sequentially during workflow execution
  */
 public class SequenceIdGenerator extends GradoopIdGeneratorBase {
 
