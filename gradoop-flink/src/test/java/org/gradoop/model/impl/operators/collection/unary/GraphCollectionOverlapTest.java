@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.model.impl.operators.collection.unary;
 
-import org.gradoop.model.FlinkTestBase;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -26,9 +24,6 @@ import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class GraphCollectionOverlapTest extends GraphCollectionReduceTest {

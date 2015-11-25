@@ -10,10 +10,7 @@ import org.gradoop.util.FlinkAsciiGraphLoader;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by peet on 25.11.15.
- */
-public class GraphCollectionReduceTest extends FlinkTestBase {
+public abstract class GraphCollectionReduceTest extends FlinkTestBase {
   public GraphCollectionReduceTest(TestExecutionMode mode) {
     super(mode);
   }
