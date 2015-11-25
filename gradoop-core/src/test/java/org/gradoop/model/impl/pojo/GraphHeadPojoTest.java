@@ -73,13 +73,6 @@ public class GraphHeadPojoTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createWithEmptyLabelTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId graphID = idGen.createId();
-    new GraphHeadPojoFactory().createGraphHead(graphID, "");
-  }
-
-  @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId graphID = idGen.createId();

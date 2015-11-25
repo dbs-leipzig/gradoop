@@ -99,15 +99,6 @@ public class EdgePojoTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createWithEmptyLabelTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId edgeId = idGen.createId();
-    GradoopId sourceId = idGen.createId();
-    GradoopId targetId = idGen.createId();
-    new EdgePojoFactory().createEdge(edgeId, "", sourceId, targetId);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId edgeId = idGen.createId();
