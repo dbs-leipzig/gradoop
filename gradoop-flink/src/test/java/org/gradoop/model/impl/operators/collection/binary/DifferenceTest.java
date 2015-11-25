@@ -13,10 +13,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
-public class GraphCollectionDifferenceTest extends
+public class DifferenceTest extends
   BinaryCollectionOperatorsTestBase {
 
-  public GraphCollectionDifferenceTest(TestExecutionMode mode) {
+  public DifferenceTest(TestExecutionMode mode) {
     super(mode);
   }
 
@@ -26,11 +26,11 @@ public class GraphCollectionDifferenceTest extends
     long expectedCollectionSize = 2L;
     long expectedVertexCount = 5L;
     long expectedEdgeCount = 8L;
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L, 2L));
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L));
 
     GraphCollection differenceColl = collection1.difference(collection2);
@@ -50,11 +50,11 @@ public class GraphCollectionDifferenceTest extends
     long expectedCollectionSize = 2L;
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 8L;
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(2L, 3L));
 
     GraphCollection differenceColl = collection1.difference(collection2);
@@ -74,11 +74,11 @@ public class GraphCollectionDifferenceTest extends
     long expectedCollectionSize = 0L;
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
 
     GraphCollection differenceColl = collection1.difference(collection2);

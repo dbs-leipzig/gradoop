@@ -16,6 +16,7 @@
  */
 package org.gradoop.model.api.operators;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -30,11 +31,12 @@ import org.gradoop.model.impl.GraphCollection;
  * Describes all operators that can be applied on a collection of logical
  * graphs in the EPGM.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead> {
+public interface GraphCollectionOperators
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
    * Returns logical graph from collection using the given identifier.
@@ -43,7 +45,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return logical graph with given id or {@code null} if not contained
    * @throws Exception
    */
-  LogicalGraph<GD, VD, ED> getGraph(final GradoopId graphID) throws Exception;
+  LogicalGraph<G, V, E> getGraph(final GradoopId graphID) throws Exception;
 
   /**
    * Extracts logical graphs from collection using their identifiers.
@@ -52,7 +54,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return collection containing requested logical graphs
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> getGraphs(final GradoopId... identifiers) throws
+  GraphCollection<G, V, E> getGraphs(final GradoopId... identifiers) throws
     Exception;
 
   /**
@@ -62,7 +64,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return collection containing requested logical graphs
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> getGraphs(GradoopIdSet identifiers) throws
+  GraphCollection<G, V, E> getGraphs(GradoopIdSet identifiers) throws
     Exception;
 
   /**
@@ -80,7 +82,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return collection with logical graphs that fulfil the predicate
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> filter(Predicate<GD> predicateFunction) throws
+  GraphCollection<G, V, E> filter(Predicate<G> predicateFunction) throws
     Exception;
 
   /*
@@ -95,8 +97,8 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return logical graphs that fulfil the predicate
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> select(
-    Predicate<LogicalGraph<GD, VD, ED>> predicateFunction) throws Exception;
+  GraphCollection<G, V, E> select(
+    Predicate<LogicalGraph<G, V, E>> predicateFunction) throws Exception;
 
   /**
    * Returns a collection with all logical graphs from two input collections.
@@ -106,8 +108,8 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return union of both collections
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> union(
-    GraphCollection<VD, ED, GD> otherCollection) throws Exception;
+  GraphCollection<G, V, E> union(
+    GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**
    * Returns a collection with all logical graphs that exist in both input
@@ -117,8 +119,8 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return intersection of both collections
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> intersect(
-    GraphCollection<VD, ED, GD> otherCollection) throws Exception;
+  GraphCollection<G, V, E> intersect(
+    GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**
    * Returns a collection with all logical graphs that exist in both input
@@ -131,8 +133,8 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return intersection of both collections
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> intersectWithSmall(
-    GraphCollection<VD, ED, GD> otherCollection) throws Exception;
+  GraphCollection<G, V, E> intersectWithSmall(
+    GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**
    * Returns a collection with all logical graphs that are contained in that
@@ -143,8 +145,8 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return difference between that and the other collection
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> difference(
-    GraphCollection<VD, ED, GD> otherCollection) throws Exception;
+  GraphCollection<G, V, E> difference(
+    GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**
    * Returns a collection with all logical graphs that are contained in that
@@ -158,8 +160,8 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return difference between that and the other collection
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> differenceWithSmallResult(
-    GraphCollection<VD, ED, GD> otherCollection) throws Exception;
+  GraphCollection<G, V, E> differenceWithSmallResult(
+    GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**
    * Returns a distinct collection of logical graphs. Graph equality is based on
@@ -167,7 +169,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    *
    * @return distinct graph collection
    */
-  GraphCollection<VD, ED, GD> distinct();
+  GraphCollection<G, V, E> distinct();
 
   /**
    * Returns a graph collection that is sorted by a given graph property key.
@@ -176,7 +178,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @param order       ascending, descending
    * @return ordered collection
    */
-  GraphCollection<VD, ED, GD> sortBy(String propertyKey, Order order);
+  GraphCollection<G, V, E> sortBy(String propertyKey, Order order);
 
   /**
    * Returns the first {@code limit} logical graphs contained in that
@@ -185,7 +187,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @param limit number of graphs to return from collection
    * @return part of graph collection
    */
-  GraphCollection<VD, ED, GD> top(int limit);
+  GraphCollection<G, V, E> top(int limit);
 
   /*
   auxiliary operators
@@ -198,7 +200,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @param op unary graph to graph operator
    * @return collection with resulting logical graphs
    */
-  GraphCollection<VD, ED, GD> apply(UnaryGraphToGraphOperator<VD, ED, GD> op);
+  GraphCollection<G, V, E> apply(UnaryGraphToGraphOperator<V, E, G> op);
 
   /**
    * Applies binary graph to graph operator (e.g., combine) on each pair of
@@ -207,7 +209,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @param op binary graph to graph operator
    * @return logical graph
    */
-  LogicalGraph<GD, VD, ED> reduce(BinaryGraphToGraphOperator<VD, ED, GD> op);
+  LogicalGraph<G, V, E> reduce(BinaryGraphToGraphOperator<V, E, G> op);
 
   /**
    * Calls the given unary collection to collection operator for the collection.
@@ -215,8 +217,8 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @param op unary collection to collection operator
    * @return result of given operator
    */
-  GraphCollection<VD, ED, GD> callForCollection(
-    UnaryCollectionToCollectionOperator<VD, ED, GD> op);
+  GraphCollection<G, V, E> callForCollection(
+    UnaryCollectionToCollectionOperator<V, E, G> op);
 
   /**
    * Calls the given binary collection to collection operator using that
@@ -227,9 +229,9 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return result of given operator
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> callForCollection(
-    BinaryCollectionToCollectionOperator<VD, ED, GD> op,
-    GraphCollection<VD, ED, GD> otherCollection) throws Exception;
+  GraphCollection<G, V, E> callForCollection(
+    BinaryCollectionToCollectionOperator<V, E, G> op,
+    GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**
    * Calls the given unary collection to graph operator for the collection.
@@ -237,8 +239,8 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @param op unary collection to graph operator
    * @return result of given operator
    */
-  LogicalGraph<GD, VD, ED> callForGraph(
-    UnaryCollectionToGraphOperator<VD, ED, GD> op);
+  LogicalGraph<G, V, E> callForGraph(
+    UnaryCollectionToGraphOperator<V, E, G> op);
 
   /**
    * Writes the graph collection into three separate JSON files. {@code
@@ -257,4 +259,44 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    */
   void writeAsJson(final String vertexFile, final String edgeFile,
     final String graphFile) throws Exception;
+
+  /**
+   * Checks, if another collection contains the same graphs as this graph
+   * (by id).
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by graph ids
+   */
+  DataSet<Boolean> equalsByGraphIds(GraphCollection<G, V, E> other);
+
+  /**
+   * Convenience method for collected result of
+   * {@link #equalsByGraphIds(GraphCollection)}
+   *
+   * @param other other graph
+   * @return true, if equal by graph ids
+   * @throws Exception
+   */
+  Boolean equalsByGraphIdsCollected(GraphCollection<G, V, E> other) throws
+    Exception;
+
+  /**
+   * Checks, if another collection contains the same graphs as this graph
+   * (by vertex and edge ids).
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by element ids
+   */
+  DataSet<Boolean> equalsByGraphElementIds(GraphCollection<G, V, E> other);
+
+  /**
+   * Convenience method for collected result of
+   * {@link #equalsByGraphElementIds(GraphCollection)}
+   *
+   * @param other other graph
+   * @return true, if equal by element ids
+   * @throws Exception
+   */
+  Boolean equalsByGraphElementIdsCollected(GraphCollection<G, V, E> other) throws
+    Exception;
 }

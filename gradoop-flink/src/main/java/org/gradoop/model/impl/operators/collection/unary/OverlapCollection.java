@@ -47,7 +47,7 @@ public class OverlapCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
    */
   @Override
   public LogicalGraph<GD, VD, ED> execute(
-    GraphCollection<VD, ED, GD> collection) {
+    GraphCollection<GD, VD, ED> collection) {
     DataSet<GD> graphHeads = collection.getGraphHeads();
     DataSet<GradoopId> graphIDs =
       graphHeads.map(new ElementIdOnly<GD>());

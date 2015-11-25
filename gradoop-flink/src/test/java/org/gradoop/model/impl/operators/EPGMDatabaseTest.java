@@ -40,10 +40,10 @@ public class EPGMDatabaseTest extends FlinkTestBase {
 
   @Test
   public void testGetGraphs() throws Exception {
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphs = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L, 2L));
 
     assertNotNull("graph collection is null", graphs);
@@ -54,7 +54,7 @@ public class EPGMDatabaseTest extends FlinkTestBase {
 
   @Test
   public void testGetCollection() throws Exception {
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
 
     assertNotNull("graph collection was null", graphColl);

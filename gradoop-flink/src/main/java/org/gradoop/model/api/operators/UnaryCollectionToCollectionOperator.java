@@ -38,5 +38,5 @@ public interface UnaryCollectionToCollectionOperator<VD extends EPGMVertex,
    * @param collection input collection
    * @return operator result
    */
-  GraphCollection<VD, ED, GD> execute(GraphCollection<VD, ED, GD> collection);
+  GraphCollection<GD, VD, ED> execute(GraphCollection<GD, VD, ED> collection);
 }

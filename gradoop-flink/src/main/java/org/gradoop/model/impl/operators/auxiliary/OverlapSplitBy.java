@@ -71,7 +71,7 @@ public class OverlapSplitBy<
    * @return a GraphCollection containing the newly created EPGraphs
    */
   @Override
-  public GraphCollection<VD, ED, GD> execute(
+  public GraphCollection<GD, VD, ED> execute(
     LogicalGraph<GD, VD, ED> graph) {
     // add all new subgraphs to the graph sets of the vertices
     DataSet<VD> vertices = computeNewVertices(graph);

@@ -51,7 +51,7 @@ public interface LogicalGraphOperators
    *                      pattern
    * @return logical graphs that match the given graph pattern
    */
-  GraphCollection<V, E, G> match(String graphPattern,
+  GraphCollection<G, V, E> match(String graphPattern,
     Predicate<LogicalGraph> predicateFunc);
 
   /**
@@ -318,7 +318,7 @@ public interface LogicalGraphOperators
    * @param operator unary graph to collection operator
    * @return result of given operator
    */
-  GraphCollection<V, E, G> callForCollection(
+  GraphCollection<G, V, E> callForCollection(
     UnaryGraphToCollectionOperator<V, E, G> operator) throws Exception;
 
   /**

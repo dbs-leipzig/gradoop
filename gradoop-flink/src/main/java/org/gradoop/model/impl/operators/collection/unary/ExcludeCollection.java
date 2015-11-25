@@ -72,7 +72,7 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
    */
   @Override
   public LogicalGraph<GD, VD, ED> execute(
-    GraphCollection<VD, ED, GD> collection) {
+    GraphCollection<GD, VD, ED> collection) {
     final GradoopIdSet positiveGraphIDs =
       GradoopIdSet.fromExisting(positiveGraphID);
     DataSet<GD> graphHeads = collection.getGraphHeads();

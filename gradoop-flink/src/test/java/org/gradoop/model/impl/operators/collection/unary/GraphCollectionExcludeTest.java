@@ -27,7 +27,7 @@ public class GraphCollectionExcludeTest extends FlinkTestBase {
 
   @Test
   public void overlapCollectionTest() throws Exception {
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> coll =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> coll =
       getGraphStore().getCollection().getGraphs(
         GradoopIds.fromLong(1L),
         GradoopIds.fromLong(2L),

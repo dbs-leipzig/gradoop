@@ -33,8 +33,8 @@ public class EqualByGraphElementIds
   implements BinaryCollectionToValueOperator<G, V, E, Boolean> {
 
   @Override
-  public DataSet<Boolean> execute(GraphCollection<V, E, G> firstCollection,
-    GraphCollection<V, E, G> secondCollection) {
+  public DataSet<Boolean> execute(GraphCollection<G, V, E> firstCollection,
+    GraphCollection<G, V, E> secondCollection) {
 
     DataSet<Tuple3<GradoopIdSet, GradoopIdSet, Long>> firstGraphsWithCount =
       getGraphElementIdsWithCount(firstCollection);
@@ -58,7 +58,7 @@ public class EqualByGraphElementIds
 
 
   private DataSet<Tuple3<GradoopIdSet, GradoopIdSet, Long>>
-  getGraphElementIdsWithCount(GraphCollection<V, E, G> graphCollection) {
+  getGraphElementIdsWithCount(GraphCollection<G, V, E> graphCollection) {
 
     DataSet<Tuple2<GradoopId, Long>> firstGraphIdOccurrences =
       getIdsWithCount(graphCollection);

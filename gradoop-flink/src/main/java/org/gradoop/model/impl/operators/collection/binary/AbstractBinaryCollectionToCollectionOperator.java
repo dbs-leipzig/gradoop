@@ -50,19 +50,19 @@ public abstract class AbstractBinaryCollectionToCollectionOperator<
   /**
    * First input collection.
    */
-  protected GraphCollection<VD, ED, GD> firstCollection;
+  protected GraphCollection<GD, VD, ED> firstCollection;
   /**
    * Second input collection.
    */
-  protected GraphCollection<VD, ED, GD> secondCollection;
+  protected GraphCollection<GD, VD, ED> secondCollection;
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> execute(
-    GraphCollection<VD, ED, GD> firstCollection,
-    GraphCollection<VD, ED, GD> secondCollection) throws Exception {
+  public GraphCollection<GD, VD, ED> execute(
+    GraphCollection<GD, VD, ED> firstCollection,
+    GraphCollection<GD, VD, ED> secondCollection) throws Exception {
 
     // do some init stuff for the actual operator
     this.firstCollection = firstCollection;

@@ -81,7 +81,7 @@ public class EPGMLabelPropagation<
    * {@inheritDoc }
    */
   @Override
-  public GraphCollection<VD, ED, GD> execute(
+  public GraphCollection<GD, VD, ED> execute(
     LogicalGraph<GD, VD, ED> logicalGraph) throws Exception {
     // construct a gelly graph
     Graph<GradoopId, VD, ED> graph = logicalGraph.toGellyGraph();

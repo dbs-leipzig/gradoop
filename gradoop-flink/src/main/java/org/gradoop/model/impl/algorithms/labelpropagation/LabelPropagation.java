@@ -89,7 +89,7 @@ public class LabelPropagation<
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> execute(
+  public GraphCollection<GD, VD, ED> execute(
     LogicalGraph<GD, VD, ED> logicalGraph) throws Exception {
     // transform vertices and edges to LP representation
     DataSet<Vertex<GradoopId, LPVertexValue>> vertices = logicalGraph

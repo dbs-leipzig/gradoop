@@ -34,16 +34,16 @@ public class EqualByGraphElementIdsTest extends EqualityTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c1
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c1
       = loader.getGraphCollectionByVariables("g1", "g3");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c2
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c2
       = loader.getGraphCollectionByVariables("g2", "g3");
 
     EqualByGraphElementIds<GraphHeadPojo, VertexPojo, EdgePojo> equals
       = new EqualByGraphElementIds<>();
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c5
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c5
       = loader.getGraphCollectionByVariables("g1","g4");
 
     collectAndAssertEquals(equals.execute(c1, c2));

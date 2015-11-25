@@ -23,7 +23,7 @@ public abstract class EqualityBase {
   public
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   AggregateOperator<Tuple2<GradoopId, Long>> getIdsWithCount(
-    GraphCollection<V, E, G> graphCollection
+    GraphCollection<G, V, E> graphCollection
   ) {
 
     return graphCollection

@@ -64,7 +64,7 @@ public class BTG<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGrap
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> execute(
+  public GraphCollection<GD, VD, ED> execute(
     final LogicalGraph<GD, VD, ED> graph) throws Exception {
     DataSet<Vertex<GradoopId, BTGVertexValue>> vertices =
       graph.getVertices().map(new VertexToBTGVertexMapper<VD>());

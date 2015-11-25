@@ -22,8 +22,8 @@ public class EqualByGraphIds
 
   @Override
   public DataSet<Boolean> execute(
-    GraphCollection<V, E, G> firstCollection,
-    GraphCollection<V, E, G> secondCollection) {
+    GraphCollection<G, V, E> firstCollection,
+    GraphCollection<G, V, E> secondCollection) {
 
     DataSet<Tuple2<GradoopId, Long>> firstGraphIdsWithCount =
       getIdsWithCount(firstCollection);

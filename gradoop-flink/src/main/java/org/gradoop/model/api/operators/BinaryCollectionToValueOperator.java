@@ -25,7 +25,7 @@ public interface BinaryCollectionToValueOperator
    * @return operator result
    */
   DataSet<T> execute(
-    GraphCollection<V, E, G> firstCollection,
-    GraphCollection<V, E, G> secondCollection
+    GraphCollection<G, V, E> firstCollection,
+    GraphCollection<G, V, E> secondCollection
   );
 }

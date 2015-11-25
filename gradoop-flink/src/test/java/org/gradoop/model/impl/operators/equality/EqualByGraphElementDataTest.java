@@ -45,16 +45,16 @@ public class EqualByGraphElementDataTest
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c12 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c12 =
       loader.getGraphCollectionByVariables("g1", "g2");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c67 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c67 =
       loader.getGraphCollectionByVariables("g6", "g7");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c126 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c126 =
       loader.getGraphCollectionByVariables("g1", "g2", "g6");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c167 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c167 =
       loader.getGraphCollectionByVariables("g1", "g6", "g7");
 
     EqualByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
@@ -108,16 +108,16 @@ public class EqualByGraphElementDataTest
       getLoaderFromString(asciiGraphs);
 
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c12 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c12 =
       loader.getGraphCollectionByVariables("g1", "g2");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c67 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c67 =
       loader.getGraphCollectionByVariables("g6", "g7");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c126 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c126 =
       loader.getGraphCollectionByVariables("g1", "g2", "g6");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c167 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c167 =
       loader.getGraphCollectionByVariables("g1", "g6", "g7");
 
 
@@ -158,19 +158,19 @@ public class EqualByGraphElementDataTest
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> ref =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> ref =
       loader.getGraphCollectionByVariables("ab1", "ad1");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> dup =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> dup =
       loader.getGraphCollectionByVariables("ab2", "ad2");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> eDir =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eDir =
       loader.getGraphCollectionByVariables("ba1", "ad1");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> vLabel =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> vLabel =
       loader.getGraphCollectionByVariables("eb1", "ad1");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> eLabel =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eLabel =
       loader.getGraphCollectionByVariables("ab1el", "ad1");
 
     EqualByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
@@ -198,25 +198,25 @@ public class EqualByGraphElementDataTest
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> ref =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> ref =
       loader.getGraphCollectionByVariables("p123a", "p023a");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> dup =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> dup =
       loader.getGraphCollectionByVariables("p123b", "p023b");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> eDir =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eDir =
       loader.getGraphCollectionByVariables("p123eDir", "p023a");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> vKey =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> vKey =
       loader.getGraphCollectionByVariables("p123vKey", "p023a");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> eKey =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eKey =
       loader.getGraphCollectionByVariables("p123eKey", "p023a");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> vValue =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> vValue =
       loader.getGraphCollectionByVariables("vValue", "p023a");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> eValue =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eValue =
       loader.getGraphCollectionByVariables("p123eValue", "p023a");
 
     EqualByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals

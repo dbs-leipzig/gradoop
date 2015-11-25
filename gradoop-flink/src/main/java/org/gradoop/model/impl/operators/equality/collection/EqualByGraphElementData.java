@@ -33,8 +33,8 @@ public class EqualByGraphElementData
   implements BinaryCollectionToValueOperator<G, V, E, Boolean> {
 
   @Override
-  public DataSet<Boolean> execute(GraphCollection<V, E, G> firstCollection,
-    GraphCollection<V, E, G> secondCollection) {
+  public DataSet<Boolean> execute(GraphCollection<G, V, E> firstCollection,
+    GraphCollection<G, V, E> secondCollection) {
 
     DataSet<Tuple2<String, Long>> firstGraphLabels =
       labelGraphs(firstCollection);
@@ -55,7 +55,7 @@ public class EqualByGraphElementData
   }
 
   private DataSet<Tuple2<String, Long>> labelGraphs(
-    GraphCollection<V, E, G> collection) {
+    GraphCollection<G, V, E> collection) {
 
     DataSet<DataLabel> graphHeadLabels = collection.getGraphHeads()
       .map(new GraphHeadDataLabeler<G>());

@@ -43,7 +43,7 @@ public interface BinaryCollectionToCollectionOperator<VD extends EPGMVertex,
    * @return operator result
    * @throws Exception
    */
-  GraphCollection<VD, ED, GD> execute(
-    GraphCollection<VD, ED, GD> firstCollection,
-    GraphCollection<VD, ED, GD> secondCollection) throws Exception;
+  GraphCollection<GD, VD, ED> execute(
+    GraphCollection<GD, VD, ED> firstCollection,
+    GraphCollection<GD, VD, ED> secondCollection) throws Exception;
 }

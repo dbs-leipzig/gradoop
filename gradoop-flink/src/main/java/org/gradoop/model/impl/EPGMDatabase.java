@@ -77,7 +77,7 @@ public class EPGMDatabase<
   /**
    * Database graph representing the vertex and edge space.
    */
-  private GraphCollection<VD, ED, GD> database;
+  private GraphCollection<GD, VD, ED> database;
 
   /**
    * Graph data associated with that logical graph.
@@ -499,7 +499,7 @@ public class EPGMDatabase<
    *
    * @return collection of all logical graphs
    */
-  public GraphCollection<VD, ED, GD> getCollection() {
+  public GraphCollection<GD, VD, ED> getCollection() {
     DataSet<VD> newVertices =
       database.getVertices()
         .filter(new FilterFunction<VD>() {

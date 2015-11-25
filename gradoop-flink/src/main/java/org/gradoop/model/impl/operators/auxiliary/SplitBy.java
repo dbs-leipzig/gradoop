@@ -74,7 +74,7 @@ public class SplitBy<
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> execute(
+  public GraphCollection<GD, VD, ED> execute(
     LogicalGraph<GD, VD, ED> graph) {
     DataSet<VD> vertices = computeNewVertices(graph);
     DataSet<GD> graphHeads = computeNewGraphHeads(graph, vertices);

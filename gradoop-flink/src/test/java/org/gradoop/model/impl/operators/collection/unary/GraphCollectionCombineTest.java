@@ -30,7 +30,7 @@ public class GraphCollectionCombineTest extends FlinkTestBase {
 
   @Test
   public void combineCollectionTest() throws Exception {
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> coll =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> coll =
       getGraphStore()
         .getCollection()
         .getGraphs(GradoopIdSet.fromLongs(1L, 2L, 3L));

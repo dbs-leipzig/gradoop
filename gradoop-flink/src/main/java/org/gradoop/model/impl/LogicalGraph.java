@@ -60,7 +60,7 @@ import java.util.Map;
  */
 public class LogicalGraph
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends AbstractGraph<V, E, G>
+  extends AbstractGraph<G, V, E>
   implements LogicalGraphOperators<G, V, E>,
   EPGMIdentifiable, EPGMAttributed, EPGMLabeled {
 
@@ -171,7 +171,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<V, E, G> match(String graphPattern,
+  public GraphCollection<G, V, E> match(String graphPattern,
     Predicate<LogicalGraph> predicateFunc) {
     throw new NotImplementedException();
   }
@@ -348,7 +348,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<V, E, G> callForCollection(
+  public GraphCollection<G, V, E> callForCollection(
     UnaryGraphToCollectionOperator<V, E, G> operator) throws Exception {
     return operator.execute(this);
   }
@@ -489,19 +489,5 @@ public class LogicalGraph
   public Boolean equalsByElementDataCollected(
     LogicalGraph<G, V, E> other) throws Exception {
     return collectEquals(equalsByElementData(other));
-  }
-
-  /**
-   * Collects a boolean dataset and extracts its first member.
-   *
-   * @param booleanDataSet boolean dataset
-   * @return first member
-   * @throws Exception
-   */
-  private Boolean collectEquals(DataSet<Boolean> booleanDataSet) throws
-    Exception {
-    return booleanDataSet
-      .collect()
-      .get(0);
   }
 }

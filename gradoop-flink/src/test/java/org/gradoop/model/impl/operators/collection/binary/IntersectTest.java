@@ -10,10 +10,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class GraphCollectionIntersectTest extends
+public class IntersectTest extends
   BinaryCollectionOperatorsTestBase {
 
-  public GraphCollectionIntersectTest(TestExecutionMode mode) {
+  public IntersectTest(TestExecutionMode mode) {
     super(mode);
   }
 
@@ -22,14 +22,14 @@ public class GraphCollectionIntersectTest extends
     long expectedCollectionSize = 2L;
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 10L;
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L, 2L));
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       intersectColl = collection1.intersect(collection2);
 
     performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
@@ -45,14 +45,14 @@ public class GraphCollectionIntersectTest extends
     long expectedCollectionSize = 2L;
     long expectedVertexCount = 5L;
     long expectedEdgeCount = 9L;
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(1L, 2L, 3L));
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       intersectColl = collection1.intersect(collection2);
 
     performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
@@ -68,14 +68,14 @@ public class GraphCollectionIntersectTest extends
     long expectedCollectionSize = 0L;
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L));
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(1L));
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       intersectColl = collection1.intersect(collection2);
 
     performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
@@ -92,14 +92,14 @@ public class GraphCollectionIntersectTest extends
     long expectedCollectionSize = 3L;
     long expectedVertexCount = 6L;
     long expectedEdgeCount = 11L;
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       graphColl = getGraphStore().getCollection();
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo>
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       intersectColl = collection1.intersect(collection2);
 
     performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,

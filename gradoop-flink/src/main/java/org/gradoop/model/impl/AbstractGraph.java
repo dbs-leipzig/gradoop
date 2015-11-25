@@ -33,31 +33,29 @@ import org.gradoop.util.GradoopFlinkConfig;
 /**
  * Base class for graph representations.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <V> vertex data type
+ * @param <E> edge data type
+ * @param <G> graph data type
  * @see LogicalGraph
  * @see GraphCollection
  */
-public abstract class AbstractGraph<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  implements GraphOperators<VD, ED> {
+public abstract class AbstractGraph
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements GraphOperators<V, E> {
 
   /**
    * Gradoop Flink configuration.
    */
-  private final GradoopFlinkConfig<VD, ED, GD> config;
+  private final GradoopFlinkConfig<V, E, G> config;
 
   /**
    * DataSet containing vertices associated with that graph.
    */
-  private final DataSet<VD> vertices;
+  private final DataSet<V> vertices;
   /**
    * DataSet containing edges associated with that graph.
    */
-  private final DataSet<ED> edges;
+  private final DataSet<E> edges;
 
   /**
    * Creates a new graph instance.
@@ -66,9 +64,9 @@ public abstract class AbstractGraph<
    * @param edges     edge data set
    * @param config    Gradoop Flink configuration
    */
-  protected AbstractGraph(DataSet<VD> vertices,
-    DataSet<ED> edges,
-    GradoopFlinkConfig<VD, ED, GD> config) {
+  protected AbstractGraph(DataSet<V> vertices,
+    DataSet<E> edges,
+    GradoopFlinkConfig<V, E, G> config) {
     this.vertices = vertices;
     this.edges = edges;
     this.config = config;
@@ -79,7 +77,7 @@ public abstract class AbstractGraph<
    *
    * @return Gradoop Flink configuration
    */
-  public GradoopFlinkConfig<VD, ED, GD> getConfig() {
+  public GradoopFlinkConfig<V, E, G> getConfig() {
     return config;
   }
 
@@ -87,7 +85,7 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public DataSet<VD> getVertices() {
+  public DataSet<V> getVertices() {
     return vertices;
   }
 
@@ -95,7 +93,7 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public DataSet<ED> getEdges() {
+  public DataSet<E> getEdges() {
     return edges;
   }
 
@@ -103,11 +101,11 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public DataSet<ED> getOutgoingEdges(final GradoopId vertexID) {
+  public DataSet<E> getOutgoingEdges(final GradoopId vertexID) {
     return
-      this.edges.filter(new FilterFunction<ED>() {
+      this.edges.filter(new FilterFunction<E>() {
         @Override
-        public boolean filter(ED edge) throws Exception {
+        public boolean filter(E edge) throws Exception {
           return edge.getSourceVertexId().equals(vertexID);
         }
       });
@@ -117,11 +115,11 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public DataSet<ED> getIncomingEdges(final GradoopId vertexID) {
+  public DataSet<E> getIncomingEdges(final GradoopId vertexID) {
     return
-      this.edges.filter(new FilterFunction<ED>() {
+      this.edges.filter(new FilterFunction<E>() {
         @Override
-        public boolean filter(ED edge) throws Exception {
+        public boolean filter(E edge) throws Exception {
           return edge.getTargetVertexId().equals(vertexID);
         }
       });
@@ -131,17 +129,17 @@ public abstract class AbstractGraph<
    * {@inheritDoc}
    */
   @Override
-  public Graph<GradoopId, VD, ED> toGellyGraph() {
+  public Graph<GradoopId, V, E> toGellyGraph() {
     return Graph.fromDataSet(getVertices().map(
-      new MapFunction<VD, Vertex<GradoopId, VD>>() {
+      new MapFunction<V, Vertex<GradoopId, V>>() {
         @Override
-        public Vertex<GradoopId, VD> map(VD epgmVertex) throws Exception {
+        public Vertex<GradoopId, V> map(V epgmVertex) throws Exception {
           return new Vertex<>(epgmVertex.getId(), epgmVertex);
         }
       }).withForwardedFields("*->f1"),
-      getEdges().map(new MapFunction<ED, Edge<GradoopId, ED>>() {
+      getEdges().map(new MapFunction<E, Edge<GradoopId, E>>() {
         @Override
-        public Edge<GradoopId, ED> map(ED epgmEdge) throws Exception {
+        public Edge<GradoopId, E> map(E epgmEdge) throws Exception {
           return new Edge<>(epgmEdge.getSourceVertexId(),
             epgmEdge.getTargetVertexId(),
             epgmEdge);
@@ -164,5 +162,19 @@ public abstract class AbstractGraph<
   @Override
   public long getEdgeCount() throws Exception {
     return edges.count();
+  }
+
+  /**
+   * Collects a boolean dataset and extracts its first member.
+   *
+   * @param booleanDataSet boolean dataset
+   * @return first member
+   * @throws Exception
+   */
+  protected Boolean collectEquals(DataSet<Boolean> booleanDataSet) throws
+    Exception {
+    return booleanDataSet
+      .collect()
+      .get(0);
   }
 }
