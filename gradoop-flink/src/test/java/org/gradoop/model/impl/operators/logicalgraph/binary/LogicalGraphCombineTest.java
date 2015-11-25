@@ -46,13 +46,13 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graph = loader
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> combination = graph
-      .combine(graph);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> combination = g0
+      .combine(g0);
 
     assertTrue("combining same graph failed",
-      graph.equalsByElementIdsCollected(combination));
+      g0.equalsByElementIdsCollected(combination));
   }
 
   @Test
@@ -60,7 +60,7 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("res[" +
+    loader.appendToDatabaseFromString("expected[" +
       "(alice)-[akb]->(bob);" +
       "(bob)-[bka]->(alice);" +
       "(bob)-[bkc]->(carol);" +
@@ -75,13 +75,13 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
-      .getLogicalGraphByVariable("res");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("expected");
 
     assertTrue("combining overlapping graphs failed",
-      res.equalsByElementIdsCollected(g0.combine(g2)));
+      expected.equalsByElementIdsCollected(g0.combine(g2)));
     assertTrue("combining switched overlapping graphs failed",
-      res.equalsByElementIdsCollected(g2.combine(g0)));
+      expected.equalsByElementIdsCollected(g2.combine(g0)));
   }
 
   @Test
@@ -89,7 +89,7 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("res[" +
+    loader.appendToDatabaseFromString("expected[" +
       "(alice)-[akb]->(bob);" +
       "(bob)-[bka]->(alice);" +
       "(eve)-[eka]->(alice);" +
@@ -104,13 +104,13 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 = loader
       .getLogicalGraphByVariable("g1");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
-      .getLogicalGraphByVariable("res");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("expected");
 
     assertTrue("combining non overlapping graphs failed",
-      res.equalsByElementIdsCollected(g0.combine(g1)));
+      expected.equalsByElementIdsCollected(g0.combine(g1)));
     assertTrue("combining switched non overlapping graphs failed",
-      res.equalsByElementIdsCollected(g1.combine(g0)));
+      expected.equalsByElementIdsCollected(g1.combine(g0)));
   }
 
   @Test
@@ -131,14 +131,14 @@ public class LogicalGraphCombineTest extends BinaryGraphOperatorsTestBase {
     Collection<VertexPojo> resVertices = new HashSet<>();
     Collection<EdgePojo> resEdges = new HashSet<>();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = g0.combine(g2);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = g0.combine(g2);
 
     g0.getVertices().output(new LocalCollectionOutputFormat<>(vertices0));
     g0.getEdges().output(new LocalCollectionOutputFormat<>(edges0));
     g2.getVertices().output(new LocalCollectionOutputFormat<>(vertices2));
     g2.getEdges().output(new LocalCollectionOutputFormat<>(edges2));
-    res.getVertices().output(new LocalCollectionOutputFormat<>(resVertices));
-    res.getEdges().output(new LocalCollectionOutputFormat<>(resEdges));
+    expected.getVertices().output(new LocalCollectionOutputFormat<>(resVertices));
+    expected.getEdges().output(new LocalCollectionOutputFormat<>(resEdges));
 
     getExecutionEnvironment().execute();
 

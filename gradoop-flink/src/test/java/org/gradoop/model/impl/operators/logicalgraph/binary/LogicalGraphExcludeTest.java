@@ -46,15 +46,15 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("res[]");
+    loader.appendToDatabaseFromString("expected[]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
-      .getLogicalGraphByVariable("res");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("expected");
 
     assertTrue("exclusion of same graph failed",
-      res.equalsByElementIdsCollected(g0.exclude(g0)));
+      expected.equalsByElementIdsCollected(g0.exclude(g0)));
   }
 
   @Test
@@ -62,22 +62,23 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("res1[(eve)];" +
-      "res2[(carol)-[ckd]->(dave)-[dkc]->(carol)");
+    loader.appendToDatabaseFromString(
+      "expected1[(eve)];" +
+      "expected2[(carol)-[ckd]->(dave)-[dkc]->(carol)");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res1 = loader
-      .getLogicalGraphByVariable("res1");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res2 = loader
-      .getLogicalGraphByVariable("res2");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected1 = loader
+      .getLogicalGraphByVariable("expected1");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected2 = loader
+      .getLogicalGraphByVariable("expected2");
 
     assertTrue("excluding overlapping graphs failed",
-      res1.equalsByElementIdsCollected(g0.exclude(g2)));
+      expected1.equalsByElementIdsCollected(g0.exclude(g2)));
     assertTrue("excluding switched overlapping graphs failed",
-      res2.equalsByElementIdsCollected(g2.exclude(g0)));
+      expected2.equalsByElementIdsCollected(g2.exclude(g0)));
   }
 
   @Test

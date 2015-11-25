@@ -60,20 +60,20 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString(
-      "res[(alice)-[akb]->(bob)-[bka]->(alice)]" 
+      "expected[(alice)-[akb]->(bob)-[bka]->(alice)]"
     );
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
-      .getLogicalGraphByVariable("res");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("expected");
 
     assertTrue("combining overlapping graphs failed",
-      res.equalsByElementIdsCollected(g0.overlap(g2)));
+      expected.equalsByElementIdsCollected(g0.overlap(g2)));
     assertTrue("combining switched overlapping graphs failed",
-      res.equalsByElementIdsCollected(g2.overlap(g0)));
+      expected.equalsByElementIdsCollected(g2.overlap(g0)));
   }
 
   @Test
@@ -81,19 +81,19 @@ public class LogicalGraphOverlapTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("res[]");
+    loader.appendToDatabaseFromString("expected[]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 = loader
       .getLogicalGraphByVariable("g1");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = loader
-      .getLogicalGraphByVariable("res");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("expected");
 
     assertTrue("overlap non overlapping graphs failed",
-      res.equalsByElementIdsCollected(g0.overlap(g1)));
+      expected.equalsByElementIdsCollected(g0.overlap(g1)));
     assertTrue("overlap switched non overlapping graphs failed",
-      res.equalsByElementIdsCollected(g1.overlap(g0)));
+      expected.equalsByElementIdsCollected(g1.overlap(g0)));
   }
 
   @Test

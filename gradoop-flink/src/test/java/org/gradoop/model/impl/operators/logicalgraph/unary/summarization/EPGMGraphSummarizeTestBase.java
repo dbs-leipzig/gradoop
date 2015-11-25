@@ -44,6 +44,11 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getSocialNetworkLoader();
 
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("g2");
+
+    final String vertexGroupingKey = "city";
+
     loader.appendToDatabaseFromString("expected[" +
       "(leipzig {city=\"Leipzig\",count=2});" +
       "(dresden {city=\"Dresden\",count=2});" +
@@ -52,118 +57,43 @@ public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
       "(dresden)-[{count=2}]->(dresden);" +
       "(dresden)-[{count=1}]->(leipzig)]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
-      .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
-      .getLogicalGraphByVariable("expected");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationRunner(input, vertexGroupingKey, false, null, false)
+        .run();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      new SummarizationRunner(g2, "city", false, null, false).run();
-
-    assertTrue(result.equalsByElementDataCollected(expected));
+    assertTrue(output.equalsByElementDataCollected(
+      loader.getLogicalGraphByVariable("expected")));
   }
 
-//  @Test
-//  public void testSummarizeOnVertexProperty() throws Exception {
-//    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-//      inputGraph =
-//      getGraphStore().getGraph(GradoopId.fromLong(0L)).combine(getGraphStore().getGraph(GradoopId.fromLong(1L)))
-//        .combine(getGraphStore().getGraph(GradoopId.fromLong(2L)));
-//
-//    final String vertexGroupingKey = "city";
-//    final String aggregatePropertyKey = "count";
-//
-//    SummarizationRunner summarizationRunner =
-//      new SummarizationRunner(inputGraph, vertexGroupingKey, false, null, false)
-//        .run();
-//    List<VertexPojo> vertices = summarizationRunner.getVertices();
-//    List<EdgePojo> edges = summarizationRunner.getEdges();
-//
-//    // 3 summarized vertices:
-//    // [0,1] __VERTEX__ {city: "Leipzig", count: 2}
-//    GradoopIds vertexIdsLeipzig = GradoopIds.fromLongs(0L, 1L);
-//    // [2,3,4] __VERTEX__ {city: "Dresden", count: 3}
-//    GradoopIds vertexIdsDresden = GradoopIds.fromLongs(2L, 3L, 4L);
-//    // [5] __VERTEX__ {city: "Berlin", count: 1}
-//    GradoopIds vertexIdsBerlin = GradoopIds.fromLongs(5L);
-//    assertEquals("wrong number of vertices", 3L, vertices.size());
-//
-//    GradoopId vertexIdLeipzig = null;
-//    GradoopId vertexIdDresden = null;
-//    GradoopId vertexIdBerlin = null;
-//    for (EPGMVertex v : vertices) {
-//      // check vertex id
-//      assertNotNull("vertex id must not be null", v.getId());
-//
-//      if (vertexIdsLeipzig.contains(v.getId())) {
-//        vertexIdLeipzig = v.getId();
-//        testVertex(v, GConstants.DEFAULT_VERTEX_LABEL, vertexGroupingKey,
-//          "Leipzig", aggregatePropertyKey, 2L, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (vertexIdsDresden.contains(v.getId())) {
-//        vertexIdDresden = v.getId();
-//        testVertex(v, GConstants.DEFAULT_VERTEX_LABEL, vertexGroupingKey,
-//          "Dresden", aggregatePropertyKey, 3L, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (vertexIdsBerlin.contains(v.getId())) {
-//        vertexIdBerlin = v.getId();
-//        testVertex(v, GConstants.DEFAULT_VERTEX_LABEL, vertexGroupingKey,
-//          "Berlin", aggregatePropertyKey, 1L, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else {
-//        assertTrue("unexpected vertex", false);
-//      }
-//    }
-//
-//    // 5 summarized sna_edges:
-//    // [4-5] Dresden -[__EDGE__]-> Dresden {count: 2}
-//    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
-//    // [3,6,21] Dresden -[__EDGE__]-> Leipzig {count: 3}
-//    GradoopIds dresdenToLeipzigEdgeIds = GradoopIds.fromLongs(3L, 6L, 21L);
-//    // [0-1] Leipzig -[__EDGE__]-> Leipzig {count: 2}
-//    GradoopIds leipzigToLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
-//    // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
-//    GradoopIds leipzigToDresdenEdgeIds = GradoopIds.fromLongs(2L);
-//    // [22-23] Berlin -[__EDGE__]-> Dresden {count: 2}
-//    GradoopIds berlinToDresdenEdgeIds = GradoopIds.fromLongs(22L, 23L);
-//
-//    long expectedEdgeCount = 5L;
-//    assertEquals("wrong number of edges", expectedEdgeCount, edges.size());
-//
-//    for (EPGMEdge e : edges) {
-//      // check edge id
-//      assertNotNull("edge id must not be null", e.getId());
-//
-//      if (dresdenToDresdenEdgeIds.contains(e.getId())) {
-//        // [4-5] Dresden -[__EDGE__]-> Dresden {count: 2}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdDresden,
-//          vertexIdDresden, aggregatePropertyKey, 2, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (dresdenToLeipzigEdgeIds.contains(e.getId())) {
-//        // [3,6,21] Dresden -[__EDGE__]-> Leipzig {count: 3}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdDresden,
-//          vertexIdLeipzig, aggregatePropertyKey, 3, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (leipzigToLeipzigEdgeIds.contains(e.getId())) {
-//        // [0-1] Leipzig -[__EDGE__]-> Leipzig {count: 2}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdLeipzig,
-//          vertexIdLeipzig, aggregatePropertyKey, 2, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (leipzigToDresdenEdgeIds.contains(e.getId())) {
-//        // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdLeipzig,
-//          vertexIdDresden, aggregatePropertyKey, 1, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (berlinToDresdenEdgeIds.contains(e.getId())) {
-//        // [22-23] Berlin -[__EDGE__]-> Dresden {count: 2}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdBerlin,
-//          vertexIdDresden, aggregatePropertyKey, 2, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else {
-//        assertTrue("unexpected edge: " + e.getId(), false);
-//      }
-//    }
-//  }
+  @Test
+  public void testSummarizeOnVertexProperty() throws Exception {
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("g0")
+      .combine(loader.getLogicalGraphByVariable("g1"))
+      .combine(loader.getLogicalGraphByVariable("g2"));
+
+    final String vertexGroupingKey = "city";
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(leipzig {city=\"Leipzig\",count=2});" +
+      "(dresden {city=\"Dresden\",count=3});" +
+      "(berlin {city=\"Berlin\",count=1});" +
+      "(dresden)-[{count=2}]->(dresden);" +
+      "(dresden)-[{count=3}]->(leipzig)" +
+      "(leipzig)-[{count=2}]->(leipzig);" +
+      "(leipzig)-[{count=1}]->(dresden);" +
+      "(berlin)-[{count=2}]->(dresden)]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationRunner(input, vertexGroupingKey, false, null, false)
+        .run();
+
+    assertTrue(output.equalsByElementDataCollected(
+      loader.getLogicalGraphByVariable("expected")));
+  }
 //
 //  @Test
 //  public void testSummarizeOnVertexPropertyWithAbsentValue() throws Exception {
