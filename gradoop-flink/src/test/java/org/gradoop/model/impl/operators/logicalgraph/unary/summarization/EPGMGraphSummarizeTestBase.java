@@ -1,140 +1,68 @@
-///*
-// * This file is part of Gradoop.
-// *
-// * Gradoop is free software: you can redistribute it and/or modify
-// * it under the terms of the GNU General Public License as published by
-// * the Free Software Foundation, either version 3 of the License, or
-// * (at your option) any later version.
-// *
-// * Gradoop is distributed in the hope that it will be useful,
-// * but WITHOUT ANY WARRANTY; without even the implied warranty of
-// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// * GNU General Public License for more details.
-// *
-// * You should have received a copy of the GNU General Public License
-// * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
-// */
-//
-//package org.gradoop.model.impl.operators.collection.unary.summarization;
-//
-//import com.google.common.collect.Lists;
-//import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-//import org.gradoop.model.api.EPGMEdge;
-//import org.gradoop.model.api.EPGMVertex;
-//import org.gradoop.model.impl.LogicalGraph;
-//import org.gradoop.model.impl.id.GradoopId;
-//import org.gradoop.model.impl.id.GradoopIds;
-//import org.gradoop.model.impl.pojo.EdgePojo;
-//import org.gradoop.model.impl.pojo.GraphHeadPojo;
-//import org.gradoop.model.impl.pojo.VertexPojo;
-//import org.gradoop.util.GConstants;
-//import org.gradoop.model.FlinkTestBase;
-//import org.gradoop.util.FlinkConstants;
-//import org.junit.Test;
-//
-//import java.util.List;
-//
-//import static org.gradoop.GradoopTestBaseUtils.*;
-//import static org.gradoop.model.impl.operators.collection.unary.summarization.Summarization
-//  .NULL_VALUE;
-//import static org.junit.Assert.*;
-//
-//public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
-//
-//  public EPGMGraphSummarizeTestBase(TestExecutionMode mode) {
-//    super(mode);
-//  }
-//
-//  public abstract Summarization<VertexPojo, EdgePojo, GraphHeadPojo> getSummarizationImpl(
-//    String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
-//    boolean useEdgeLabel);
-//
-//  @Test
-//  public void testSummarizeOnVertexPropertySymmetricGraph() throws Exception {
-//
-//    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-//      inputGraph = getGraphStore().getGraph(GradoopId.fromLong(2L));
-//
-//    final String vertexGroupingKey = "city";
-//    final String aggregatePropertyKey = "count";
-//
-//    SummarizationRunner summarizationRunner =
-//      new SummarizationRunner(inputGraph, vertexGroupingKey, false, null, false)
-//        .invoke();
-//    List<VertexPojo> vertices = summarizationRunner.getVertices();
-//    List<EdgePojo> edges = summarizationRunner.getEdges();
-//
-//    // 2 summarized vertices:
-//    // [0,1] __VERTEX__ {city: "Leipzig", count: 2}
-//    GradoopIds vertexIdsLeipzig = GradoopIds.fromLongs(0L, 1L);
-//    // [2,3] __VERTEX__ {city: "Dresden", count: 2}
-//    GradoopIds vertexIdsDresden = GradoopIds.fromLongs(2L, 3L);
-//
-//    assertEquals("wrong number of vertices", 2L, vertices.size());
-//
-//    GradoopId vertexIdLeipzig = null;
-//    GradoopId vertexIdDresden = null;
-//
-//    for (EPGMVertex v : vertices) {
-//      // check vertex id
-//      assertNotNull("vertex id must not be null", v.getId());
-//      if (vertexIdsLeipzig.contains(v.getId())) {
-//        vertexIdLeipzig = v.getId();
-//        testVertex(v, GConstants.DEFAULT_VERTEX_LABEL, vertexGroupingKey,
-//          "Leipzig", aggregatePropertyKey, 2L, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (vertexIdsDresden.contains(v.getId())) {
-//        vertexIdDresden = v.getId();
-//        testVertex(v, GConstants.DEFAULT_VERTEX_LABEL, vertexGroupingKey,
-//          "Dresden", aggregatePropertyKey, 2L, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else {
-//        assertTrue("unexpected vertex", false);
-//      }
-//    }
-//
-//    // 4 summarized sna_edges:
-//    // [0-1] Leipzig -[__EDGE__]-> Leipzig {count: 2}
-//    GradoopIds leipzigToLeipzigEdgeIds = GradoopIds.fromLongs(0L, 1L);
-//    // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
-//    GradoopIds leipzigToDresdenEdgeIds = GradoopIds.fromLongs(2L);
-//    // [3] Dresden -[__EDGE__]-> Leipzig {count: 1}
-//    GradoopIds dresdenToLeipzigEdgeIds = GradoopIds.fromLongs(3L);
-//    // [4-5] Dresden -[__EDGE__]-> Dresden {count: 2}
-//    GradoopIds dresdenToDresdenEdgeIds = GradoopIds.fromLongs(4L, 5L);
-//
-//    assertEquals("wrong number of edges", 4L, edges.size());
-//
-//    for (EPGMEdge e : edges) {
-//      // check edge id
-//      assertNotNull("edge id must not be null", e.getId());
-//
-//      if (leipzigToLeipzigEdgeIds.contains(e.getId())) {
-//        // [0-1] Leipzig -[__EDGE__]-> Leipzig {count: 2}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdLeipzig,
-//          vertexIdLeipzig, aggregatePropertyKey, 2, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (leipzigToDresdenEdgeIds.contains(e.getId())) {
-//        // [2] Leipzig -[__EDGE__]-> Dresden {count: 1}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdLeipzig,
-//          vertexIdDresden, aggregatePropertyKey, 1, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (dresdenToLeipzigEdgeIds.contains(e.getId())) {
-//        // [3] Dresden -[__EDGE__]-> Leipzig {count: 1}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdDresden,
-//          vertexIdLeipzig, aggregatePropertyKey, 1, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else if (dresdenToDresdenEdgeIds.contains(e.getId())) {
-//        // [4-5] Dresden -[__EDGE__]-> Dresden {count: 2}
-//        testEdge(e, GConstants.DEFAULT_EDGE_LABEL, vertexIdDresden,
-//          vertexIdDresden, aggregatePropertyKey, 2, 1,
-//          FlinkConstants.SUMMARIZE_GRAPH_ID);
-//      } else {
-//        assertTrue("unexpected edge: " + e.getId(), false);
-//      }
-//    }
-//  }
-//
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.gradoop.model.impl.operators.logicalgraph.unary.summarization;
+
+import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+
+public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
+
+  public EPGMGraphSummarizeTestBase(TestExecutionMode mode) {
+    super(mode);
+  }
+
+  public abstract Summarization<VertexPojo, EdgePojo, GraphHeadPojo> getSummarizationImpl(
+    String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
+    boolean useEdgeLabel);
+
+  @Test
+  public void testSummarizeOnVertexPropertySymmetricGraph() throws Exception {
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(leipzig {city=\"Leipzig\",count=2});" +
+      "(dresden {city=\"Dresden\",count=2});" +
+      "(leipzig)-[{count=2}]->(leipzig);" +
+      "(leipzig)-[{count=1}]->(dresden);" +
+      "(dresden)-[{count=2}]->(dresden);" +
+      "(dresden)-[{count=1}]->(leipzig)]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
+      .getLogicalGraphByVariable("g2");
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("expected");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      new SummarizationRunner(g2, "city", false, null, false).run();
+
+    assertTrue(result.equalsByElementDataCollected(expected));
+  }
+
 //  @Test
 //  public void testSummarizeOnVertexProperty() throws Exception {
 //    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
@@ -147,7 +75,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, false, null, false)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -247,7 +175,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, false, null, false)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -320,7 +248,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, false,
-//        edgeGroupingKey, false).invoke();
+//        edgeGroupingKey, false).run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -433,7 +361,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, false,
-//        edgeGroupingKey, false).invoke();
+//        edgeGroupingKey, false).run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -509,7 +437,7 @@
 //    final String aggregatePropertyKey = "count";
 //
 //    SummarizationRunner summarizationRunner =
-//      new SummarizationRunner(inputGraph, null, true, null, false).invoke();
+//      new SummarizationRunner(inputGraph, null, true, null, false).run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -605,7 +533,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, true, null, false)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -709,7 +637,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, true, null, false)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -866,7 +794,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, null, true, edgeGroupingKey, false)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -934,7 +862,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, null, true, edgeGroupingKey, false)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -1055,7 +983,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, true,
-//        edgeGroupingKey, false).invoke();
+//        edgeGroupingKey, false).run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -1157,7 +1085,7 @@
 //    final String aggregatePropertyKey = "count";
 //
 //    SummarizationRunner summarizationRunner =
-//      new SummarizationRunner(inputGraph, null, true, null, true).invoke();
+//      new SummarizationRunner(inputGraph, null, true, null, true).run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -1260,7 +1188,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, true, null, true)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -1355,7 +1283,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, true, null, true)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -1513,7 +1441,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, null, true, edgeGroupingKey, true)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -1583,7 +1511,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, null, true, edgeGroupingKey, true)
-//        .invoke();
+//        .run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -1707,7 +1635,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, true,
-//        edgeGroupingKey, true).invoke();
+//        edgeGroupingKey, true).run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -1817,7 +1745,7 @@
 //
 //    SummarizationRunner summarizationRunner =
 //      new SummarizationRunner(inputGraph, vertexGroupingKey, true,
-//        edgeGroupingKey, true).invoke();
+//        edgeGroupingKey, true).run();
 //    List<VertexPojo> vertices = summarizationRunner.getVertices();
 //    List<EdgePojo> edges = summarizationRunner.getEdges();
 //
@@ -2035,57 +1963,43 @@
 //        edge.getProperty(edgeGroupingKey));
 //    }
 //  }
-//
-//  private class SummarizationRunner {
-//    private LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> inputGraph;
-//    private String vertexGroupingKey;
-//    private final boolean useVertexLabels;
-//    private final String edgeGroupingKey;
-//    private final boolean useEdgeLabels;
-//    private List<VertexPojo> vertices;
-//    private List<EdgePojo> edges;
-//
-//    public SummarizationRunner(
-//      LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-//        inputGraph,
-//      String vertexGroupingKey, boolean useVertexLabels, String edgeGroupingKey,
-//      boolean useEdgeLabels) {
-//      this.inputGraph = inputGraph;
-//      this.vertexGroupingKey = vertexGroupingKey;
-//      this.useVertexLabels = useVertexLabels;
-//      this.edgeGroupingKey = edgeGroupingKey;
-//      this.useEdgeLabels = useEdgeLabels;
-//    }
-//
-//    public List<VertexPojo> getVertices() {
-//      return vertices;
-//    }
-//
-//    public List<EdgePojo> getEdges() {
-//      return edges;
-//    }
-//
-//    public SummarizationRunner invoke() throws Exception {
-//      Summarization<VertexPojo, EdgePojo, GraphHeadPojo>
-//        summarization = getSummarizationImpl(vertexGroupingKey, useVertexLabels,
-//        edgeGroupingKey, useEdgeLabels);
-//
-//      LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
-//        summarizedGraph = summarization.execute(inputGraph);
-//
-//      vertices = Lists.newArrayList();
-//      edges = Lists.newArrayList();
-//
-//      // use collections as data sink
-//      summarizedGraph.getVertices()
-//        .output(new LocalCollectionOutputFormat<>(vertices));
-//      summarizedGraph.getEdges()
-//        .output(new LocalCollectionOutputFormat<>(edges));
-//
-//      // execute the job
-//      getExecutionEnvironment().execute();
-//
-//      return this;
-//    }
-//  }
-//}
+
+  private class SummarizationRunner {
+    private LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph;
+    private String vertexGroupingKey;
+    private final boolean useVertexLabels;
+    private final String edgeGroupingKey;
+    private final boolean useEdgeLabels;
+    private List<VertexPojo> vertices;
+    private List<EdgePojo> edges;
+
+    public SummarizationRunner(
+      LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
+        inputGraph,
+      String vertexGroupingKey, boolean useVertexLabels, String edgeGroupingKey,
+      boolean useEdgeLabels) {
+      this.inputGraph = inputGraph;
+      this.vertexGroupingKey = vertexGroupingKey;
+      this.useVertexLabels = useVertexLabels;
+      this.edgeGroupingKey = edgeGroupingKey;
+      this.useEdgeLabels = useEdgeLabels;
+    }
+
+    public List<VertexPojo> getVertices() {
+      return vertices;
+    }
+
+    public List<EdgePojo> getEdges() {
+      return edges;
+    }
+
+    public LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> run()
+      throws Exception {
+      Summarization<VertexPojo, EdgePojo, GraphHeadPojo>
+        summarization = getSummarizationImpl(vertexGroupingKey, useVertexLabels,
+        edgeGroupingKey, useEdgeLabels);
+
+      return summarization.execute(inputGraph);
+    }
+  }
+}

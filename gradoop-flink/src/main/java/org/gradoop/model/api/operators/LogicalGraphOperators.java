@@ -357,4 +357,24 @@ public interface LogicalGraphOperators
    */
   Boolean equalsByElementIdsCollected(LogicalGraph<G, V, E> other) throws
     Exception;
+
+  /**
+   * Checks, if another logical graph contains vertices and edges with the same
+   * attached data (i.e. label and properties) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by element data
+   */
+  DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other);
+
+  /**
+   * Convenience method for collected result of
+   * {@link #equalsByElementData(LogicalGraph)}
+   *
+   * @param other other graph
+   * @return true, if equal by element data
+   * @throws Exception
+   */
+  Boolean equalsByElementDataCollected(LogicalGraph<G, V, E> other) throws
+    Exception;
 }

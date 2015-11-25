@@ -36,6 +36,7 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.equality.logicalgraph.EqualByElementData;
 import org.gradoop.model.impl.operators.equality.logicalgraph.EqualByElementIds;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Combination;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion;
@@ -43,8 +44,7 @@ import org.gradoop.model.impl.operators.logicalgraph.binary.Overlap;
 import org.gradoop.model.impl.operators.logicalgraph.unary.Aggregation;
 import org.gradoop.model.impl.operators.logicalgraph.unary.Projection;
 import org.gradoop.model.impl.operators.logicalgraph.unary.sampling.RandomNodeSampling;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization
-  .SummarizationGroupCombine;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.SummarizationGroupCombine;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Collection;
@@ -472,6 +472,23 @@ public class LogicalGraph
   public Boolean equalsByElementIdsCollected(LogicalGraph<G, V, E> other) throws
     Exception {
     return collectEquals(equalsByElementIds(other));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
+    return new EqualByElementData<G, V, E>().execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Boolean equalsByElementDataCollected(
+    LogicalGraph<G, V, E> other) throws Exception {
+    return collectEquals(equalsByElementData(other));
   }
 
   /**

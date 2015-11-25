@@ -86,13 +86,6 @@ public class VertexPojoTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createWithEmptyLabelTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId vertexID = idGen.createId();
-    new VertexPojoFactory().createVertex(vertexID, "");
-  }
-
-  @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();

@@ -18,13 +18,13 @@ public abstract class ElementPojoFactory {
   }
 
   /**
-   * Checks if {@code label} is valid (not null or empty).
+   * Checks if {@code label} is valid (i.e. not {@code null}).
    *
    * @param label edge label
    */
   protected void checkLabel(String label) {
-    if (label == null || "".equals(label)) {
-      throw new IllegalArgumentException("label must not be null or empty");
+    if (label == null) {
+      throw new IllegalArgumentException("label must not be null");
     }
   }
 }

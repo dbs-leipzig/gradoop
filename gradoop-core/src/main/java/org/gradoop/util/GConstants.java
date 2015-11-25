@@ -37,15 +37,15 @@ public final class GConstants {
   /**
    * Default label for unlabeled vertices.
    */
-  public static final String DEFAULT_VERTEX_LABEL = "?";
+  public static final String DEFAULT_VERTEX_LABEL = "";
   /**
    * Default label for unlabeled graphs.
    */
-  public static final String DEFAULT_GRAPH_LABEL = "?";
+  public static final String DEFAULT_GRAPH_LABEL = "";
   /**
    * Default label for unlabeled edges.
    */
-  public static final String DEFAULT_EDGE_LABEL = "?";
+  public static final String DEFAULT_EDGE_LABEL = "";
 
   /**
    * Column family name for label.
