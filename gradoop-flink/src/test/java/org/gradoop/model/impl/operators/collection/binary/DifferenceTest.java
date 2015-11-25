@@ -5,6 +5,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -22,73 +23,61 @@ public class DifferenceTest extends
 
   @Test
   public void testOverlappingCollections() throws Exception {
-    // 0 1 2, 0, 2, 5, 8
-    long expectedCollectionSize = 2L;
-    long expectedVertexCount = 5L;
-    long expectedEdgeCount = 8L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L, 2L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L));
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    GraphCollection differenceColl = collection1.difference(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col02 =
+      loader.getGraphCollectionByVariables("g0", "g2");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      differenceColl);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col12 =
+      loader.getGraphCollectionByVariables("g1", "g2");
 
-    differenceColl = collection1.differenceWithSmallResult(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
+      loader.getGraphCollectionByVariables("g0");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      differenceColl);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      col02.difference(col12);
+    checkAssertions(expectation, result, "");
+
+    result = col02.differenceWithSmallResult(col12);
+    checkAssertions(expectation, result, "small");
   }
 
   @Test
   public void testNonOverlappingCollections() throws Exception {
-    // "0 1, 2 3, 2, 6, 8"
-    long expectedCollectionSize = 2L;
-    long expectedVertexCount = 6L;
-    long expectedEdgeCount = 8L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(2L, 3L));
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    GraphCollection differenceColl = collection1.difference(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col01 =
+      loader.getGraphCollectionByVariables("g0", "g1");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      differenceColl);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col23 =
+      loader.getGraphCollectionByVariables("g2", "g3");
 
-    differenceColl = collection1.differenceWithSmallResult(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      col01.difference(col23);
+    checkAssertions(col01, result, "non");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      differenceColl);
+    result = col01.differenceWithSmallResult(col23);
+    checkAssertions(col01, result, "small non");
   }
 
   @Test
   public void testTotalOverlappingCollections() throws Exception {
-    // "0 1, 0 1, 0, 0, 0"
-    long expectedCollectionSize = 0L;
-    long expectedVertexCount = 0L;
-    long expectedEdgeCount = 0L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    GraphCollection differenceColl = collection1.difference(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col01 =
+      loader.getGraphCollectionByVariables("g0", "g1");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      differenceColl);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
+      GraphCollection.createEmptyCollection(config);
 
-    differenceColl = collection1.differenceWithSmallResult(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      col01.difference(col01);
+    checkAssertions(expectation, result, "total");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      differenceColl);
+    result = col01.differenceWithSmallResult(col01);
+    checkAssertions(expectation, result, "small total");
   }
 }

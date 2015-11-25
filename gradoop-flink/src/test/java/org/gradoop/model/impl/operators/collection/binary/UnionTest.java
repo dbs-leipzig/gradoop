@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.operators.collection.binary;
 
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -37,47 +36,40 @@ public class UnionTest extends
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
       loader.getGraphCollectionByVariables("g0", "g1", "g2");
 
-    assertTrue("wrong graph ids after union of overlapping collections",
-      result.equalsByGraphIdsCollected(expectation));
-    assertTrue("wrong graph element ids after union of overlapping collections",
-      result.equalsByGraphElementIdsCollected(expectation));
+    checkAssertions(expectation, result, "");
   }
 
   @Test
   public void testNonOverlappingCollections() throws Exception {
-    long expectedCollectionSize = 4L;
-    long expectedVertexCount = 7L;
-    long expectedEdgeCount = 13L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(2L, 3L));
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      unionColl = collection1.union(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col01 =
+      loader.getGraphCollectionByVariables("g0", "g1");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      unionColl);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col23 =
+      loader.getGraphCollectionByVariables("g2", "g3");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      col01.union(col23);
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
+      loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+
+    checkAssertions(expectation, result, "non");
   }
 
   @Test
   public void testTotalOverlappingCollections() throws Exception {
-    long expectedCollectionSize = 1L;
-    long expectedVertexCount = 3L;
-    long expectedEdgeCount = 4L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L));
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      unionColl = collection1.union(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
+      loader.getGraphCollectionByVariables("g0", "g1");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      unionColl);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      expectation.union(expectation);
+
+    checkAssertions(expectation, result, "total");
   }
 }

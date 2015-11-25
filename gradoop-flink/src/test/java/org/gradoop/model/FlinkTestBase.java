@@ -47,7 +47,7 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
 
   private ExecutionEnvironment env;
 
-  private GradoopFlinkConfig<VertexPojo, EdgePojo, GraphHeadPojo> config;
+  protected GradoopFlinkConfig<VertexPojo, EdgePojo, GraphHeadPojo> config;
 
   public FlinkTestBase(TestExecutionMode mode) {
     super(mode);

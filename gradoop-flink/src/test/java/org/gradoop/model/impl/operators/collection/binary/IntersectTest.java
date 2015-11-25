@@ -1,10 +1,10 @@
 package org.gradoop.model.impl.operators.collection.binary;
 
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -19,94 +19,63 @@ public class IntersectTest extends
 
   @Test
   public void testOverlappingCollections() throws Exception {
-    long expectedCollectionSize = 2L;
-    long expectedVertexCount = 6L;
-    long expectedEdgeCount = 10L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L, 2L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L));
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      intersectColl = collection1.intersect(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col02 =
+      loader.getGraphCollectionByVariables("g0", "g2");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      intersectColl);
-    intersectColl = collection1.intersectWithSmall(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col12 =
+      loader.getGraphCollectionByVariables("g1", "g2");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      intersectColl);
-  }
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
+      loader.getGraphCollectionByVariables("g2");
 
-  @Test
-  public void testOverlappingCollections2() throws Exception {
-    long expectedCollectionSize = 2L;
-    long expectedVertexCount = 5L;
-    long expectedEdgeCount = 9L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(1L, 2L, 3L));
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      col02.intersect(col12);
+    checkAssertions(expectation, result, "");
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      intersectColl = collection1.intersect(collection2);
-
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      intersectColl);
-    intersectColl = collection1.intersectWithSmall(collection2);
-
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      intersectColl);
+    result = col02.intersectWithSmallResult(col12);
+    checkAssertions(expectation, result, "small");
   }
 
   @Test
   public void testNonOverlappingCollections() throws Exception {
-    long expectedCollectionSize = 0L;
-    long expectedVertexCount = 0L;
-    long expectedEdgeCount = 0L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(1L));
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      intersectColl = collection1.intersect(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col01 =
+      loader.getGraphCollectionByVariables("g0", "g1");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      intersectColl);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col23 =
+      loader.getGraphCollectionByVariables("g2", "g3");
 
-    intersectColl = collection1.intersectWithSmall(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
+      GraphCollection.createEmptyCollection(config);
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      intersectColl);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      col01.intersect(col23);
+    checkAssertions(expectation, result, "non");
+
+    result = col01.intersectWithSmallResult(col23);
+    checkAssertions(expectation, result, "small non");
   }
 
   @Test
   public void testTotalOverlappingCollections() throws Exception {
-    long expectedCollectionSize = 3L;
-    long expectedVertexCount = 6L;
-    long expectedEdgeCount = 11L;
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection1 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      collection2 = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 2L, 3L));
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      intersectColl = collection1.intersect(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
+      loader.getGraphCollectionByVariables("g0", "g1");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      intersectColl);
-    intersectColl = collection1.intersectWithSmall(collection2);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      expectation.intersect(expectation);
+    checkAssertions(expectation, result, "total");
 
-    performTest(expectedCollectionSize, expectedVertexCount, expectedEdgeCount,
-      intersectColl);
+    result = expectation.intersectWithSmallResult(expectation);
+    checkAssertions(expectation, result, "small total");
   }
+
+
 }

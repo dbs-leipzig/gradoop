@@ -2,9 +2,13 @@ package org.gradoop.model.impl.operators.collection.binary;
 
 import org.gradoop.model.FlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BinaryCollectionOperatorsTestBase extends FlinkTestBase {
 
@@ -24,4 +28,15 @@ public class BinaryCollectionOperatorsTestBase extends FlinkTestBase {
       differenceColl.getEdgeCount());
   }
 
+  protected void checkAssertions(
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation,
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result,
+    String attribute) throws Exception {
+    assertTrue(
+      "wrong graph ids for " + attribute + " overlapping collections",
+      result.equalsByGraphIdsCollected(expectation));
+    assertTrue(
+      "wrong graph element ids for" + attribute + " overlapping collections",
+      result.equalsByGraphElementIdsCollected(expectation));
+  }
 }

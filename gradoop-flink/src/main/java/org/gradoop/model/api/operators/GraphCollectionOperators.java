@@ -133,7 +133,7 @@ public interface GraphCollectionOperators
    * @return intersection of both collections
    * @throws Exception
    */
-  GraphCollection<G, V, E> intersectWithSmall(
+  GraphCollection<G, V, E> intersectWithSmallResult(
     GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**
