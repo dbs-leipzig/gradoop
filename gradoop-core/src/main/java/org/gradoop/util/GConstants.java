@@ -117,28 +117,4 @@ public final class GConstants {
    * {@code <property-type>} for {@link java.lang.String}
    */
   public static final byte TYPE_STRING = 0x05;
-  /**
-   * Key for the vertex id.
-   */
-  public static final String GRADOOP_VERTEX_ID_PROPERTY = "gradoop_vertex_id";
-  /**
-   * Key for graphs.
-   */
-  public static final String GRAPHS = "gradoop_graphs";
-
-  /**
-   * Configuration key to define a custom vertex handler.
-   */
-  public static final String VERTEX_HANDLER_CLASS = "gradoop.io.vertexhandler";
-
-  /**
-   * Row counter path within Map Reduce Row Counter job.
-   */
-  public static final String ROW_COUNTER_MAPRED_JOB =
-    "org.apache.hadoop.hbase.mapreduce.RowCounter$RowCounterMapper$Counters";
-
-  /**
-   * Row counter property within Map Reduce Row Counter job.
-   */
-  public static final String ROW_COUNTER_PROPERTY = "ROWS";
 }
