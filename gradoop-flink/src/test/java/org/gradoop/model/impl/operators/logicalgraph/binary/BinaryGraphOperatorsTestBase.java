@@ -18,7 +18,7 @@ public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
   }
 
   protected void performTest(
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       resultGraph,
     long expectedVertexCount, long expectedEdgeCount) throws Exception {
     assertNotNull("resulting graph was null", resultGraph);

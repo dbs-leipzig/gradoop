@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.operators.equality.logicalgraph;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -11,7 +10,6 @@ import org.gradoop.model.impl.functions.ToGradoopIds;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
 
@@ -23,8 +21,8 @@ public class EqualByElementIds
   extends EqualityBase implements BinaryGraphToValueOperator<V, E, G, Boolean> {
 
   @Override
-  public DataSet<Boolean> execute(LogicalGraph<V, E, G> firstGraph,
-    LogicalGraph<V, E, G> secondGraph) {
+  public DataSet<Boolean> execute(LogicalGraph<G, V, E> firstGraph,
+    LogicalGraph<G, V, E> secondGraph) {
 
     DataSet<GradoopIdSet> firstGraphVertexIds = firstGraph.getVertices()
       .map(new ElementIdOnly<V>())

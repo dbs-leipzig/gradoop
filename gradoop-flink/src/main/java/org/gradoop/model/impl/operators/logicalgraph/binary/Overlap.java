@@ -48,8 +48,8 @@ public class Overlap<
    * {@inheritDoc}
    */
   @Override
-  protected LogicalGraph<VD, ED, GD> executeInternal(
-    LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
+  protected LogicalGraph<GD, VD, ED> executeInternal(
+    LogicalGraph<GD, VD, ED> firstGraph, LogicalGraph<GD, VD, ED> secondGraph) {
     final GradoopId newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
 
     // union vertex sets, group by vertex id, filter vertices where

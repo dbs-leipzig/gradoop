@@ -83,7 +83,7 @@ public class RandomNodeSampling<VD extends EPGMVertex, ED extends EPGMEdge,
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) throws
+  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) throws
     Exception {
     final GradoopId newGraphID = FlinkConstants.RANDOM_NODE_SAMPLING_GRAPH_ID;
 

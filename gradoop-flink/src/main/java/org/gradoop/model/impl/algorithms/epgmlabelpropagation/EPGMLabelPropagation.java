@@ -82,7 +82,7 @@ public class EPGMLabelPropagation<
    */
   @Override
   public GraphCollection<VD, ED, GD> execute(
-    LogicalGraph<VD, ED, GD> logicalGraph) throws Exception {
+    LogicalGraph<GD, VD, ED> logicalGraph) throws Exception {
     // construct a gelly graph
     Graph<GradoopId, VD, ED> graph = logicalGraph.toGellyGraph();
 
@@ -91,7 +91,7 @@ public class EPGMLabelPropagation<
       .run(new EPGMLabelPropagationAlgorithm<VD, ED>(this.maxIterations));
 
     // create a logical graph
-    LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
+    LogicalGraph<GD, VD, ED> labeledGraph = LogicalGraph
       .fromGellyGraph(graph, null, logicalGraph.getConfig());
 
     // and split it into a collection according the result

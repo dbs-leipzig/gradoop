@@ -67,7 +67,7 @@ public class EPGMDatabaseJSONTest extends FlinkTestBase {
       graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
       ExecutionEnvironment.getExecutionEnvironment());
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       databaseGraph = graphStore.getDatabaseGraph();
 
     assertEquals("Wrong vertex count", 11, databaseGraph.getVertexCount());

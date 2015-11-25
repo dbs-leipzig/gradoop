@@ -42,19 +42,19 @@ public class EqualByElementDataTest extends EqualityTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g1 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 =
       loader.getLogicalGraphByVariable("g1");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g2 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 =
       loader.getLogicalGraphByVariable("g2");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g3 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g3 =
       loader.getLogicalGraphByVariable("g3");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g4 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g4 =
       loader.getLogicalGraphByVariable("g4");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g5 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g5 =
       loader.getLogicalGraphByVariable("g5");
 
     EqualByElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
@@ -91,19 +91,19 @@ public class EqualByElementDataTest extends EqualityTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g1 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 =
       loader.getLogicalGraphByVariable("g1");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g2 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 =
       loader.getLogicalGraphByVariable("g2");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g3 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g3 =
       loader.getLogicalGraphByVariable("g3");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g4 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g4 =
       loader.getLogicalGraphByVariable("g4");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> g5 =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g5 =
       loader.getLogicalGraphByVariable("g5");
 
     EqualByElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
@@ -127,19 +127,19 @@ public class EqualByElementDataTest extends EqualityTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> ref =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> ref =
       loader.getLogicalGraphByVariable("ref");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> dup =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dup =
       loader.getLogicalGraphByVariable("dup");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> eDir =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> eDir =
       loader.getLogicalGraphByVariable("eDir");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> vLabel =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> vLabel =
       loader.getLogicalGraphByVariable("vLabel");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> eLabel =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> eLabel =
       loader.getLogicalGraphByVariable("eLabel");
 
     EqualByElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
@@ -166,25 +166,25 @@ public class EqualByElementDataTest extends EqualityTestBase {
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> ref =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> ref =
       loader.getLogicalGraphByVariable("ref");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> dup =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dup =
       loader.getLogicalGraphByVariable("dup");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> eDir =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> eDir =
       loader.getLogicalGraphByVariable("eDir");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> vKey =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> vKey =
       loader.getLogicalGraphByVariable("vKey");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> eKey =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> eKey =
       loader.getLogicalGraphByVariable("eKey");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> vValue =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> vValue =
       loader.getLogicalGraphByVariable("vValue");
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> eValue =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> eValue =
       loader.getLogicalGraphByVariable("eValue");
 
     EqualByElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals

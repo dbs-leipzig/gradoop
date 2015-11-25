@@ -81,7 +81,7 @@ public class Projection<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
+  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) {
     DataSet<VD> vertices = graph.getVertices()
       .map(new ProjectionVerticesMapper<>(getVertexFunc()));
     DataSet<ED> edges = graph.getEdges()

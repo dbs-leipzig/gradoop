@@ -157,7 +157,7 @@ public class GraphCollection<
    */
   @SuppressWarnings("unchecked")
   @Override
-  public LogicalGraph<VD, ED, GD> getGraph(final GradoopId graphID) throws
+  public LogicalGraph<GD, VD, ED> getGraph(final GradoopId graphID) throws
     Exception {
     // filter vertices and edges based on given graph id
     DataSet<VD> vertices = getVertices()
@@ -278,7 +278,7 @@ public class GraphCollection<
    */
   @Override
   public GraphCollection<VD, ED, GD> select(
-    Predicate<LogicalGraph<VD, ED, GD>> predicateFunction) throws Exception {
+    Predicate<LogicalGraph<GD, VD, ED>> predicateFunction) throws Exception {
     throw new NotImplementedException();
   }
 
@@ -366,7 +366,7 @@ public class GraphCollection<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> reduce(
+  public LogicalGraph<GD, VD, ED> reduce(
     BinaryGraphToGraphOperator<VD, ED, GD> op) {
     throw new NotImplementedException();
   }
@@ -394,7 +394,7 @@ public class GraphCollection<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> callForGraph(
+  public LogicalGraph<GD, VD, ED> callForGraph(
     UnaryCollectionToGraphOperator<VD, ED, GD> op) {
     return op.execute(this);
   }

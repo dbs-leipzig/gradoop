@@ -90,7 +90,7 @@ public class LabelPropagation<
    */
   @Override
   public GraphCollection<VD, ED, GD> execute(
-    LogicalGraph<VD, ED, GD> logicalGraph) throws Exception {
+    LogicalGraph<GD, VD, ED> logicalGraph) throws Exception {
     // transform vertices and edges to LP representation
     DataSet<Vertex<GradoopId, LPVertexValue>> vertices = logicalGraph
       .getVertices().map(new VertexToLPVertexMapper<VD>());
@@ -111,7 +111,7 @@ public class LabelPropagation<
         .with(new LPJoin<VD>());
 
     // create a logical graph from the result
-    LogicalGraph<VD, ED, GD> labeledGraph = LogicalGraph
+    LogicalGraph<GD, VD, ED> labeledGraph = LogicalGraph
       .fromDataSets(labeledVertices, logicalGraph.getEdges(), null,
         logicalGraph.getConfig());
 

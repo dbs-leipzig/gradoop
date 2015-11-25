@@ -35,7 +35,7 @@ public class GraphCollectionCombineTest extends FlinkTestBase {
         .getCollection()
         .getGraphs(GradoopIdSet.fromLongs(1L, 2L, 3L));
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = coll.callForGraph(
       new CombineCollection<VertexPojo, EdgePojo, GraphHeadPojo>());
 

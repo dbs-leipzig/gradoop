@@ -87,7 +87,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
     final PersistentVertexFactory<VD, ED, PVD> persistentVertexFactory,
     final String vertexDataTableName) throws Exception {
 
-    final LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
+    final LogicalGraph<GD, VD, ED> graph = epgmDatabase.getDatabaseGraph();
 
     // group edges by source vertex id (vertex-id, [out-edge-data])
     DataSet<Tuple2<GradoopId, Set<ED>>> vertexToOutgoingEdges = graph.getEdges()
@@ -203,7 +203,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
     final PersistentEdgeFactory<ED, VD, PED> persistentEdgeFactory,
     final String edgeDataTableName) throws IOException {
 
-    LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
+    LogicalGraph<GD, VD, ED> graph = epgmDatabase.getDatabaseGraph();
 
     DataSet<PersistentEdge<VD>> persistentEdgeDataSet = graph.getVertices()
       // join vertex with edges on edge source vertex id
@@ -244,7 +244,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
     final GraphHeadHandler<GD> graphHeadHandler,
     final PersistentGraphHeadFactory<GD, PGD> persistentGraphHeadFactory,
     final String graphDataTableName) throws IOException {
-    final LogicalGraph<VD, ED, GD> graph = epgmDatabase.getDatabaseGraph();
+    final LogicalGraph<GD, VD, ED> graph = epgmDatabase.getDatabaseGraph();
 
     // build (graph-id, vertex-id) tuples from vertices
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdToVertexId =

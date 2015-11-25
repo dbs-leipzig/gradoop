@@ -72,7 +72,7 @@ public class OverlapSplitBy<
    */
   @Override
   public GraphCollection<VD, ED, GD> execute(
-    LogicalGraph<VD, ED, GD> graph) {
+    LogicalGraph<GD, VD, ED> graph) {
     // add all new subgraphs to the graph sets of the vertices
     DataSet<VD> vertices = computeNewVertices(graph);
     // construct the new subgraph objects
@@ -94,7 +94,7 @@ public class OverlapSplitBy<
    * in its graph set
    */
   private DataSet<VD> computeNewVertices(
-    LogicalGraph<VD, ED, GD> graph) {
+    LogicalGraph<GD, VD, ED> graph) {
     // add the new graphs to the vertices graph lists
     return graph.getVertices()
       .map(new AddNewGraphsToVertexMapper<>(function));
@@ -108,7 +108,7 @@ public class OverlapSplitBy<
    * @return a DataSet containing all newly created subgraphs
    */
   private DataSet<GD> computeNewSubgraphs(
-    LogicalGraph<VD, ED, GD> graph, DataSet<VD> vertices) {
+    LogicalGraph<GD, VD, ED> graph, DataSet<VD> vertices) {
     DataSet<Tuple1<GradoopId>> newSubgraphIDs =
       vertices.flatMap(new VertexToGraphIDFlatMapper<>(function)).distinct();
     return newSubgraphIDs.map(new SubgraphMapper<>(graph.getConfig()
@@ -124,7 +124,7 @@ public class OverlapSplitBy<
    * @return all edges between all subgraphs
    */
   private DataSet<ED> computeNewEdges(
-    LogicalGraph<VD, ED, GD> graph, DataSet<VD> vertices,
+    LogicalGraph<GD, VD, ED> graph, DataSet<VD> vertices,
     DataSet<GD> graphHeads) {
     // construct tuples of the edges with the ids of their source and target
     // vertices

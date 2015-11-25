@@ -43,9 +43,9 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
 
   @Test
   public void randomNodeSamplingTest() throws Exception {
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> dbGraph =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dbGraph =
       getGraphStore().getDatabaseGraph();
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = dbGraph.sampleRandomNodes(0.272f);
     List<VertexPojo> dbVertices = Lists.newArrayList();
     List<EdgePojo> dbEdges = Lists.newArrayList();
@@ -77,9 +77,9 @@ public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
 
   @Test
   public void randomNodeSamplingTestWithSeed() throws Exception {
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> dbGraph =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dbGraph =
       getGraphStore().getDatabaseGraph();
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = dbGraph.callForGraph(
       new RandomNodeSampling<VertexPojo, EdgePojo, GraphHeadPojo>(
         0.272f, -4181668494294894490L));

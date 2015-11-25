@@ -48,8 +48,8 @@ public class Combination<
    * {@inheritDoc}
    */
   @Override
-  protected LogicalGraph<VD, ED, GD> executeInternal(
-    LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph) {
+  protected LogicalGraph<GD, VD, ED> executeInternal(
+    LogicalGraph<GD, VD, ED> firstGraph, LogicalGraph<GD, VD, ED> secondGraph) {
     final GradoopId newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
 
     // build distinct union of vertex sets and update graph ids at vertices

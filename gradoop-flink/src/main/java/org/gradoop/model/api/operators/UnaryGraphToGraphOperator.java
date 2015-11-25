@@ -38,6 +38,6 @@ public interface UnaryGraphToGraphOperator<VD extends EPGMVertex, ED extends EPG
    * @return operator result
    * @throws Exception
    */
-  LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) throws
+  LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) throws
     Exception;
 }

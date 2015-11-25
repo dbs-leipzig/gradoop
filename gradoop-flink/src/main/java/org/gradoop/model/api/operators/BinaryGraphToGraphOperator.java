@@ -41,6 +41,6 @@ public interface BinaryGraphToGraphOperator<VD extends EPGMVertex, ED extends EP
    * @param secondGraph second input graph
    * @return operator result
    */
-  LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> firstGraph,
-    LogicalGraph<VD, ED, GD> secondGraph);
+  LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> firstGraph,
+    LogicalGraph<GD, VD, ED> secondGraph);
 }

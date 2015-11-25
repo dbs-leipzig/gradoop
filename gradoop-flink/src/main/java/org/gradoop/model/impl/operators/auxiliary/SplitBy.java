@@ -75,7 +75,7 @@ public class SplitBy<
    */
   @Override
   public GraphCollection<VD, ED, GD> execute(
-    LogicalGraph<VD, ED, GD> graph) {
+    LogicalGraph<GD, VD, ED> graph) {
     DataSet<VD> vertices = computeNewVertices(graph);
     DataSet<GD> graphHeads = computeNewGraphHeads(graph, vertices);
     DataSet<ED> edges = computeNewEdges(graph, vertices, graphHeads);
@@ -92,7 +92,7 @@ public class SplitBy<
    * in its graph set
    */
   private DataSet<VD> computeNewVertices(
-    LogicalGraph<VD, ED, GD> graph) {
+    LogicalGraph<GD, VD, ED> graph) {
     // add the new graphs to the vertices graph lists
     return graph.getVertices()
       .map(new AddNewGraphsToVertexMapper<>(vertexToLongFunc));
@@ -106,7 +106,7 @@ public class SplitBy<
    * @return a DataSet containing all newly created subgraphs
    */
   private DataSet<GD> computeNewGraphHeads(
-    LogicalGraph<VD, ED, GD> graph, DataSet<VD> vertices) {
+    LogicalGraph<GD, VD, ED> graph, DataSet<VD> vertices) {
     // construct a KeySelector using the LongFromVertexFunction
     KeySelector<VD, GradoopId> propertySelector =
       new GradoopIdFromVertexSelector<>(vertexToLongFunc);
@@ -128,7 +128,7 @@ public class SplitBy<
    * @return a DataSet containing all newly created edges, each edge has a
    * new graph in its graph set
    */
-  private DataSet<ED> computeNewEdges(LogicalGraph<VD, ED, GD> graph,
+  private DataSet<ED> computeNewEdges(LogicalGraph<GD, VD, ED> graph,
     DataSet<VD> vertices,
     DataSet<GD> graphHeads) {
     // construct tuples of the edges with the ids of their source and target

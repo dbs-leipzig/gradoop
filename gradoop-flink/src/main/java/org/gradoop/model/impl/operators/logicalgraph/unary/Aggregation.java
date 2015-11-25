@@ -48,7 +48,7 @@ public class Aggregation<
   /**
    * User defined aggregate function.
    */
-  private final UnaryFunction<LogicalGraph<VD, ED, GD>, O> aggregationFunc;
+  private final UnaryFunction<LogicalGraph<GD, VD, ED>, O> aggregationFunc;
 
   /**
    * Creates new aggregation.
@@ -59,7 +59,7 @@ public class Aggregation<
    *                             called on the input graph
    */
   public Aggregation(final String aggregatePropertyKey,
-    UnaryFunction<LogicalGraph<VD, ED, GD>, O> aggregationFunc) {
+    UnaryFunction<LogicalGraph<GD, VD, ED>, O> aggregationFunc) {
     this.aggregatePropertyKey = aggregatePropertyKey;
     this.aggregationFunc = aggregationFunc;
   }
@@ -68,7 +68,7 @@ public class Aggregation<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) throws
+  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) throws
     Exception {
     O result = aggregationFunc.execute(graph);
     // copy graph data before updating properties

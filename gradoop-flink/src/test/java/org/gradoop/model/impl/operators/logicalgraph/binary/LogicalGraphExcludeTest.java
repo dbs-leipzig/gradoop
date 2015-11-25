@@ -34,8 +34,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.Collection;
 
-
-import static org.gradoop.GradoopTestBaseUtils.*;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
@@ -52,12 +50,12 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 0L;
     long expectedEdgeCount = 0L;
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
       getGraphStore().getGraph(firstGraph);
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> second =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
       getGraphStore().getGraph(secondGraph);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> result =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
       first.exclude(second);
 
     performTest(result, expectedVertexCount, expectedEdgeCount);
@@ -70,12 +68,12 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     GradoopId secondGraph = GradoopIds.fromLong(2L);
     long expectedVertexCount = 1L;
     long expectedEdgeCount = 0L;
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
       getGraphStore().getGraph(firstGraph);
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> second =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
       getGraphStore().getGraph(secondGraph);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> result =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
       first.exclude(second);
 
     performTest(result, expectedVertexCount, expectedEdgeCount);
@@ -88,12 +86,12 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 2L;
     long expectedEdgeCount = 2L;
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
       getGraphStore().getGraph(firstGraph);
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> second =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
       getGraphStore().getGraph(secondGraph);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> result =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
       first.exclude(second);
 
     performTest(result, expectedVertexCount, expectedEdgeCount);
@@ -106,12 +104,12 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     GradoopId secondGraph = GradoopIds.fromLong(1L);
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
       getGraphStore().getGraph(firstGraph);
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> second =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
       getGraphStore().getGraph(secondGraph);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> result =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
       first.exclude(second);
 
     performTest(result, expectedVertexCount, expectedEdgeCount);
@@ -124,12 +122,12 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
     GradoopId secondGraph = GradoopIds.fromLong(0L);
     long expectedVertexCount = 3L;
     long expectedEdgeCount = 4L;
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> first =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> first =
       getGraphStore().getGraph(firstGraph);
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> second =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> second =
       getGraphStore().getGraph(secondGraph);
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo> result =
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
       first.exclude(second);
 
     performTest(result, expectedVertexCount, expectedEdgeCount);
@@ -137,12 +135,12 @@ public class LogicalGraphExcludeTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testAssignment() throws Exception {
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       databaseCommunity = getGraphStore().getGraph(GradoopIds.fromLong(0L));
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       hadoopCommunity = getGraphStore().getGraph(GradoopIds.fromLong(1L));
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = databaseCommunity.exclude(hadoopCommunity);
 
     // use collections as data sink

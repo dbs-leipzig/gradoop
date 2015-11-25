@@ -47,7 +47,7 @@ public class GraphCollectionOverlapTest extends FlinkTestBase {
     GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> coll =
       getGraphStore().getCollection().getGraphs(GradoopIdSet.fromLongs(1L, 2L,
         3L));
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = coll.callForGraph(
       new OverlapCollection<VertexPojo, EdgePojo, GraphHeadPojo>());
 

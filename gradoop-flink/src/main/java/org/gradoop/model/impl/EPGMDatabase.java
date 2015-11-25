@@ -477,7 +477,7 @@ public class EPGMDatabase<
    *
    * @return logical graph of vertex and edge space
    */
-  public LogicalGraph<VD, ED, GD> getDatabaseGraph() {
+  public LogicalGraph<GD, VD, ED> getDatabaseGraph() {
     return LogicalGraph
       .fromDataSets(database.getVertices(), database.getEdges(), databaseData,
         config);
@@ -490,7 +490,7 @@ public class EPGMDatabase<
    * @return logical graph or {@code null} if graph does not exist
    * @throws Exception
    */
-  public LogicalGraph<VD, ED, GD> getGraph(GradoopId graphID) throws Exception {
+  public LogicalGraph<GD, VD, ED> getGraph(GradoopId graphID) throws Exception {
     return database.getGraph(graphID);
   }
 

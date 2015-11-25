@@ -9,7 +9,6 @@ import org.gradoop.model.impl.LogicalGraph;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.IllegalFormatCodePointException;
 
 /**
  * Used the {@link AsciiGraphLoader} to generate instances of
@@ -98,7 +97,7 @@ public class FlinkAsciiGraphLoader<
    * @param variable graph variable used in GDL script
    * @return LogicalGraph
    */
-  public LogicalGraph<V, E, G> getLogicalGraphByVariable(String variable) {
+  public LogicalGraph<G, V, E> getLogicalGraphByVariable(String variable) {
     G graphHead = loader.getGraphHeadByVariable(variable);
     Collection<V> vertices = loader.getVerticesByGraphVariables(variable);
     Collection<E> edges = loader.getEdgesByGraphVariables(variable);
@@ -126,5 +125,13 @@ public class FlinkAsciiGraphLoader<
   public EPGMDatabase<V, E, G> getDatabase() {
     return EPGMDatabase
       .fromCollection(loader.getVertices(), loader.getEdges(), config);
+  }
+
+  public EPGMVertex getVertexByVariable(String variable) {
+    return loader.getVertexByVariable(variable);
+  }
+
+  public EPGMEdge getEdgeByVariable(String variable) {
+    return loader.getEdgeByVariable(variable);
   }
 }

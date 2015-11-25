@@ -35,7 +35,7 @@ public class CombineCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
   extends EPGMGraphHead> implements
   UnaryCollectionToGraphOperator<VD, ED, GD> {
   @Override
-  public LogicalGraph<VD, ED, GD> execute(
+  public LogicalGraph<GD, VD, ED> execute(
     GraphCollection<VD, ED, GD> collection) {
     return LogicalGraph
       .fromDataSets(collection.getVertices(), collection.getEdges(),

@@ -146,8 +146,8 @@ public abstract class Summarization<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> graph) {
-    LogicalGraph<VD, ED, GD> result;
+  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) {
+    LogicalGraph<GD, VD, ED> result;
 
     config = graph.getConfig();
 

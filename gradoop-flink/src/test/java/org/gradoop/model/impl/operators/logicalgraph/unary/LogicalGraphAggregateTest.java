@@ -41,23 +41,23 @@ public class LogicalGraphAggregateTest extends FlinkTestBase {
   @Test
   public void aggregateEdgeCountTest() throws Exception {
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       forumGraph = getGraphStore().getGraph(GradoopIds.fromLong(3L));
     final String aggPropertyKey = "eCount";
 
-    UnaryFunction<LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>, Long>
+    UnaryFunction<LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>, Long>
       aggregateFunc =
-      new UnaryFunction<LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>, Long>() {
+      new UnaryFunction<LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>, Long>() {
         @Override
         public Long execute(
-          LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+          LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
             entity) throws
           Exception {
           return entity.getEdges().count();
         }
       };
 
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = forumGraph.aggregate(aggPropertyKey, aggregateFunc);
 
     assertNotNull("graph was null", newGraph);

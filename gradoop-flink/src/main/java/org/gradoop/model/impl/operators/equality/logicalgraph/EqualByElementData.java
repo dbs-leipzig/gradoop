@@ -22,8 +22,8 @@ public class EqualByElementData
   extends EqualityBase implements BinaryGraphToValueOperator<V, E, G, Boolean> {
 
   @Override
-  public DataSet<Boolean> execute(LogicalGraph<V, E, G> firstGraph,
-    LogicalGraph<V, E, G> secondGraph) {
+  public DataSet<Boolean> execute(LogicalGraph<G, V, E> firstGraph,
+    LogicalGraph<G, V, E> secondGraph) {
 
     DataSet<DataLabel> firstGraphLabel = labelGraph(firstGraph);
     DataSet<DataLabel> secondGraphLabel = labelGraph(secondGraph);
@@ -35,7 +35,7 @@ public class EqualByElementData
     );
     }
 
-  private DataSet<DataLabel> labelGraph(LogicalGraph<V, E, G> graph) {
+  private DataSet<DataLabel> labelGraph(LogicalGraph<G, V, E> graph) {
 
     DataSet<DataLabel> vertexLabels = graph.getVertices()
       .map(new VertexDataLabeler<V>());

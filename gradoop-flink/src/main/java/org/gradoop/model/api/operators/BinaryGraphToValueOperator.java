@@ -26,7 +26,7 @@ public interface BinaryGraphToValueOperator
    * @return operator result
    */
   DataSet<T> execute(
-    LogicalGraph<V, E, G> firstGraph,
-    LogicalGraph<V, E, G> secondGraph
+    LogicalGraph<G, V, E> firstGraph,
+    LogicalGraph<G, V, E> secondGraph
   );
 }

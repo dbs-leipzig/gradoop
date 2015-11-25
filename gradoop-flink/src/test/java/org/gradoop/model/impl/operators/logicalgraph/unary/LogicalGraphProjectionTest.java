@@ -45,9 +45,9 @@ public class LogicalGraphProjectionTest extends FlinkTestBase {
 
   @Test
   public void projectionTest() throws Exception {
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       forumGraph = getGraphStore().getGraph(GradoopIds.fromLong(3L));
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = forumGraph.project(new VertexLabelProjectionFunction(),
       new EdgePropertyProjectionFunction());
 

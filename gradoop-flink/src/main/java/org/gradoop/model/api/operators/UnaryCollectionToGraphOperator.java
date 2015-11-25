@@ -39,5 +39,5 @@ public interface UnaryCollectionToGraphOperator<VD extends EPGMVertex, ED
    * @param collection input collection
    * @return operator result
    */
-  LogicalGraph<VD, ED, GD> execute(GraphCollection<VD, ED, GD> collection);
+  LogicalGraph<GD, VD, ED> execute(GraphCollection<VD, ED, GD> collection);
 }

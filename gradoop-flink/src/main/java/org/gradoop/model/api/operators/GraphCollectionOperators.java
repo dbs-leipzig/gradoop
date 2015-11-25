@@ -43,7 +43,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @return logical graph with given id or {@code null} if not contained
    * @throws Exception
    */
-  LogicalGraph<VD, ED, GD> getGraph(final GradoopId graphID) throws Exception;
+  LogicalGraph<GD, VD, ED> getGraph(final GradoopId graphID) throws Exception;
 
   /**
    * Extracts logical graphs from collection using their identifiers.
@@ -96,7 +96,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @throws Exception
    */
   GraphCollection<VD, ED, GD> select(
-    Predicate<LogicalGraph<VD, ED, GD>> predicateFunction) throws Exception;
+    Predicate<LogicalGraph<GD, VD, ED>> predicateFunction) throws Exception;
 
   /**
    * Returns a collection with all logical graphs from two input collections.
@@ -207,7 +207,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @param op binary graph to graph operator
    * @return logical graph
    */
-  LogicalGraph<VD, ED, GD> reduce(BinaryGraphToGraphOperator<VD, ED, GD> op);
+  LogicalGraph<GD, VD, ED> reduce(BinaryGraphToGraphOperator<VD, ED, GD> op);
 
   /**
    * Calls the given unary collection to collection operator for the collection.
@@ -237,7 +237,7 @@ public interface GraphCollectionOperators<VD extends EPGMVertex, ED extends EPGM
    * @param op unary collection to graph operator
    * @return result of given operator
    */
-  LogicalGraph<VD, ED, GD> callForGraph(
+  LogicalGraph<GD, VD, ED> callForGraph(
     UnaryCollectionToGraphOperator<VD, ED, GD> op);
 
   /**

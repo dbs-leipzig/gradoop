@@ -16,6 +16,7 @@
  */
 package org.gradoop.model.api.operators;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -29,11 +30,12 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summari
  * Describes all operators that can be applied on a single logical graph in the
  * EPGM.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead> {
+public interface LogicalGraphOperators
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
   /*
   unary operators take one graph as input and return a single graph or a
@@ -49,7 +51,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    *                      pattern
    * @return logical graphs that match the given graph pattern
    */
-  GraphCollection<VD, ED, GD> match(String graphPattern,
+  GraphCollection<V, E, G> match(String graphPattern,
     Predicate<LogicalGraph> predicateFunc);
 
   /**
@@ -60,8 +62,8 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @param edgeFunction   edge data projection function
    * @return projected logical graph
    */
-  LogicalGraph<VD, ED, GD> project(UnaryFunction<VD, VD> vertexFunction,
-    UnaryFunction<ED, ED> edgeFunction) throws Exception;
+  LogicalGraph<G, V, E> project(UnaryFunction<V, V> vertexFunction,
+    UnaryFunction<E, E> edgeFunction) throws Exception;
 
   /**
    * Applies the given aggregate function to the logical graph and stores the
@@ -74,8 +76,8 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @return logical graph with additional property storing the aggregate
    * @throws Exception
    */
-  <O extends Number> LogicalGraph<VD, ED, GD> aggregate(String propertyKey,
-    UnaryFunction<LogicalGraph<VD, ED, GD>, O> aggregateFunc) throws Exception;
+  <O extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
+    UnaryFunction<LogicalGraph<G, V, E>, O> aggregateFunc) throws Exception;
 
   /**
    * Creates a new graph from a randomly chosen subset of nodes and their
@@ -85,7 +87,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @return logical graph with random nodes and their associated edges
    * @throws Exception
    */
-  LogicalGraph<VD, ED, GD> sampleRandomNodes(Float sampleSize) throws Exception;
+  LogicalGraph<G, V, E> sampleRandomNodes(Float sampleSize) throws Exception;
 
   /* Summarization */
 
@@ -102,7 +104,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarize(String vertexGroupingKey) throws Exception;
+  LogicalGraph<G, V, E> summarize(String vertexGroupingKey) throws Exception;
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -118,7 +120,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarize(String vertexGroupingKey,
+  LogicalGraph<G, V, E> summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception;
 
   /**
@@ -131,7 +133,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarizeOnVertexLabel() throws Exception;
+  LogicalGraph<G, V, E> summarizeOnVertexLabel() throws Exception;
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -146,7 +148,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarizeOnVertexLabelAndVertexProperty(
+  LogicalGraph<G, V, E> summarizeOnVertexLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception;
 
   /**
@@ -162,7 +164,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarizeOnVertexLabelAndEdgeProperty(
+  LogicalGraph<G, V, E> summarizeOnVertexLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception;
 
   /**
@@ -180,7 +182,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarizeOnVertexLabel(String vertexGroupingKey,
+  LogicalGraph<G, V, E> summarizeOnVertexLabel(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception;
 
   /**
@@ -194,7 +196,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel() throws Exception;
+  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel() throws Exception;
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -209,7 +211,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndVertexProperty(
+  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception;
 
   /**
@@ -226,7 +228,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception;
 
   /**
@@ -243,7 +245,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel(
+  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception;
 
   /*
@@ -259,7 +261,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @return logical graph containing all vertices and edges of the
    * input graphs
    */
-  LogicalGraph<VD, ED, GD> combine(LogicalGraph<VD, ED, GD> otherGraph);
+  LogicalGraph<G, V, E> combine(LogicalGraph<G, V, E> otherGraph);
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
@@ -270,7 +272,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @return logical graph that contains all vertices and edges that exist in
    * both input graphs
    */
-  LogicalGraph<VD, ED, GD> overlap(LogicalGraph<VD, ED, GD> otherGraph);
+  LogicalGraph<G, V, E> overlap(LogicalGraph<G, V, E> otherGraph);
 
   /**
    * Creates a new logical graph containing only vertices and edges that
@@ -281,7 +283,7 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @return logical that contains only vertices and edges that are not in
    * the other graph
    */
-  LogicalGraph<VD, ED, GD> exclude(LogicalGraph<VD, ED, GD> otherGraph);
+  LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph);
 
   /*
   auxiliary operators
@@ -294,8 +296,8 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @return result of given operator
    * @throws Exception
    */
-  LogicalGraph<VD, ED, GD> callForGraph(
-    UnaryGraphToGraphOperator<VD, ED, GD> operator) throws Exception;
+  LogicalGraph<G, V, E> callForGraph(
+    UnaryGraphToGraphOperator<V, E, G> operator) throws Exception;
 
   /**
    * Creates a logical graph from that graph and the input graph using the
@@ -305,9 +307,9 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @param otherGraph other graph
    * @return result of given operator
    */
-  LogicalGraph<VD, ED, GD> callForGraph(
-    BinaryGraphToGraphOperator<VD, ED, GD> operator,
-    LogicalGraph<VD, ED, GD> otherGraph);
+  LogicalGraph<G, V, E> callForGraph(
+    BinaryGraphToGraphOperator<V, E, G> operator,
+    LogicalGraph<G, V, E> otherGraph);
 
   /**
    * Creates a graph collection from that grpah using the given unary graph
@@ -316,8 +318,8 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    * @param operator unary graph to collection operator
    * @return result of given operator
    */
-  GraphCollection<VD, ED, GD> callForCollection(
-    UnaryGraphToCollectionOperator<VD, ED, GD> operator) throws Exception;
+  GraphCollection<V, E, G> callForCollection(
+    UnaryGraphToCollectionOperator<V, E, G> operator) throws Exception;
 
   /**
    * Writes the logical graph into three separate JSON files. {@code
@@ -335,4 +337,24 @@ public interface LogicalGraphOperators<VD extends EPGMVertex, ED extends EPGMEdg
    */
   void writeAsJson(final String vertexFile, final String edgeFile,
     final String graphFile) throws Exception;
+
+  /**
+   * Checks, if another logical graph contains exactly the same vertices and
+   * edges (by id) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by element ids
+   */
+  DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other);
+
+  /**
+   * Convenience method for collected result of
+   * {@link #equalsByElementIds(LogicalGraph)}
+   *
+   * @param other other graph
+   * @return true, if equal by element ids
+   * @throws Exception
+   */
+  Boolean equalsByElementIdsCollected(LogicalGraph<G, V, E> other) throws
+    Exception;
 }

@@ -36,6 +36,7 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.equality.logicalgraph.EqualByElementIds;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Combination;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Overlap;
@@ -53,20 +54,20 @@ import java.util.Map;
  * Represents a logical graph inside the EPGM. Holds the graph data (label,
  * properties) and offers unary, binary and auxiliary operators.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
 public class LogicalGraph
-  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  extends AbstractGraph<VD, ED, GD>
-  implements LogicalGraphOperators<VD, ED, GD>,
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends AbstractGraph<V, E, G>
+  implements LogicalGraphOperators<G, V, E>,
   EPGMIdentifiable, EPGMAttributed, EPGMLabeled {
 
   /**
    * Graph data associated with that logical graph.
    */
-  private final GD graphHead;
+  private final G graphHead;
 
   /**
    * Creates a new logical graph based on the given parameters.
@@ -76,8 +77,8 @@ public class LogicalGraph
    * @param graphHead graph data associated with that logical graph
    * @param config    Gradoop Flink configuration
    */
-  private LogicalGraph(DataSet<VD> vertices, DataSet<ED> edges, GD graphHead,
-    GradoopFlinkConfig<VD, ED, GD> config) {
+  private LogicalGraph(DataSet<V> vertices, DataSet<E> edges, G graphHead,
+    GradoopFlinkConfig<V, E, G> config) {
     super(vertices, edges, config);
     this.graphHead = graphHead;
   }
@@ -95,7 +96,7 @@ public class LogicalGraph
    */
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  LogicalGraph<VD, ED, GD> fromGellyGraph(
+  LogicalGraph<GD, VD, ED> fromGellyGraph(
     Graph<GradoopId, VD, ED> graph, GD graphData,
     GradoopFlinkConfig<VD, ED, GD> config) {
     return fromDataSets(graph.getVertices().map(
@@ -129,7 +130,7 @@ public class LogicalGraph
    */
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  LogicalGraph<VD, ED, GD> fromDataSets(DataSet<VD> vertices,
+  LogicalGraph<GD, VD, ED> fromDataSets(DataSet<VD> vertices,
     DataSet<ED> edges,
     GD graphHeads,
     GradoopFlinkConfig<VD, ED, GD> config) {
@@ -153,7 +154,7 @@ public class LogicalGraph
    */
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  LogicalGraph<VD, ED, GD> fromCollections(Collection<VD> vertices,
+  LogicalGraph<GD, VD, ED> fromCollections(Collection<VD> vertices,
     Collection<ED> edges,
     GD graphHead,
     GradoopFlinkConfig<VD, ED, GD> config) {
@@ -170,7 +171,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> match(String graphPattern,
+  public GraphCollection<V, E, G> match(String graphPattern,
     Predicate<LogicalGraph> predicateFunc) {
     throw new NotImplementedException();
   }
@@ -179,19 +180,19 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> project(UnaryFunction<VD, VD> vertexFunction,
-    UnaryFunction<ED, ED> edgeFunction) throws Exception {
+  public LogicalGraph<G, V, E> project(UnaryFunction<V, V> vertexFunction,
+    UnaryFunction<E, E> edgeFunction) throws Exception {
     return callForGraph(
-      new Projection<VD, ED, GD>(vertexFunction, edgeFunction));
+      new Projection<V, E, G>(vertexFunction, edgeFunction));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public <O extends Number> LogicalGraph<VD, ED, GD> aggregate(
+  public <O extends Number> LogicalGraph<G, V, E> aggregate(
     String propertyKey,
-    UnaryFunction<LogicalGraph<VD, ED, GD>, O> aggregateFunc) throws Exception {
+    UnaryFunction<LogicalGraph<G, V, E>, O> aggregateFunc) throws Exception {
     return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
 
@@ -199,16 +200,16 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> sampleRandomNodes(Float
+  public LogicalGraph<G, V, E> sampleRandomNodes(Float
     sampleSize) throws Exception {
-    return callForGraph(new RandomNodeSampling<VD, ED, GD>(sampleSize));
+    return callForGraph(new RandomNodeSampling<V, E, G>(sampleSize));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarize(String vertexGroupingKey) throws
+  public LogicalGraph<G, V, E> summarize(String vertexGroupingKey) throws
     Exception {
     return summarize(vertexGroupingKey, null);
   }
@@ -217,10 +218,10 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarize(String vertexGroupingKey,
+  public LogicalGraph<G, V, E> summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+      new SummarizationGroupCombine<V, E, G>(vertexGroupingKey,
         edgeGroupingKey, false, false));
   }
 
@@ -228,7 +229,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarizeOnVertexLabel() throws Exception {
+  public LogicalGraph<G, V, E> summarizeOnVertexLabel() throws Exception {
     return summarizeOnVertexLabel(null, null);
   }
 
@@ -236,7 +237,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarizeOnVertexLabelAndVertexProperty(
+  public LogicalGraph<G, V, E> summarizeOnVertexLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception {
     return summarizeOnVertexLabel(vertexGroupingKey, null);
   }
@@ -245,7 +246,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarizeOnVertexLabelAndEdgeProperty(
+  public LogicalGraph<G, V, E> summarizeOnVertexLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception {
     return summarizeOnVertexLabel(null, edgeGroupingKey);
   }
@@ -254,10 +255,10 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarizeOnVertexLabel(
+  public LogicalGraph<G, V, E> summarizeOnVertexLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+      new SummarizationGroupCombine<V, E, G>(vertexGroupingKey,
         edgeGroupingKey, true, false));
   }
 
@@ -265,7 +266,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel() throws
+  public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel() throws
     Exception {
     return summarizeOnVertexAndEdgeLabel(null, null);
   }
@@ -274,7 +275,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD>
+  public LogicalGraph<G, V, E>
   summarizeOnVertexAndEdgeLabelAndVertexProperty(
     String vertexGroupingKey) throws Exception {
     return summarizeOnVertexAndEdgeLabel(vertexGroupingKey, null);
@@ -284,7 +285,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+  public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
     String edgeGroupingKey) throws Exception {
     return summarizeOnVertexAndEdgeLabel(null, edgeGroupingKey);
   }
@@ -293,10 +294,10 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> summarizeOnVertexAndEdgeLabel(
+  public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<VD, ED, GD>(vertexGroupingKey,
+      new SummarizationGroupCombine<V, E, G>(vertexGroupingKey,
         edgeGroupingKey, true, true));
   }
 
@@ -304,32 +305,32 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> combine(LogicalGraph<VD, ED, GD> otherGraph) {
-    return callForGraph(new Combination<VD, ED, GD>(), otherGraph);
+  public LogicalGraph<G, V, E> combine(LogicalGraph<G, V, E> otherGraph) {
+    return callForGraph(new Combination<V, E, G>(), otherGraph);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> overlap(LogicalGraph<VD, ED, GD> otherGraph) {
-    return callForGraph(new Overlap<VD, ED, GD>(), otherGraph);
+  public LogicalGraph<G, V, E> overlap(LogicalGraph<G, V, E> otherGraph) {
+    return callForGraph(new Overlap<V, E, G>(), otherGraph);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> exclude(LogicalGraph<VD, ED, GD> otherGraph) {
-    return callForGraph(new Exclusion<VD, ED, GD>(), otherGraph);
+  public LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph) {
+    return callForGraph(new Exclusion<V, E, G>(), otherGraph);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> callForGraph(
-    UnaryGraphToGraphOperator<VD, ED, GD> operator) throws Exception {
+  public LogicalGraph<G, V, E> callForGraph(
+    UnaryGraphToGraphOperator<V, E, G> operator) throws Exception {
     return operator.execute(this);
   }
 
@@ -337,9 +338,9 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> callForGraph(
-    BinaryGraphToGraphOperator<VD, ED, GD> operator,
-    LogicalGraph<VD, ED, GD> otherGraph) {
+  public LogicalGraph<G, V, E> callForGraph(
+    BinaryGraphToGraphOperator<V, E, G> operator,
+    LogicalGraph<G, V, E> otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
@@ -347,8 +348,8 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<VD, ED, GD> callForCollection(
-    UnaryGraphToCollectionOperator<VD, ED, GD> operator) throws Exception {
+  public GraphCollection<V, E, G> callForCollection(
+    UnaryGraphToCollectionOperator<V, E, G> operator) throws Exception {
     return operator.execute(this);
   }
 
@@ -448,12 +449,42 @@ public class LogicalGraph
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {
     getVertices().writeAsFormattedText(vertexFile,
-      new JsonWriter.VertexTextFormatter<VD>());
+      new JsonWriter.VertexTextFormatter<V>());
     getEdges().writeAsFormattedText(edgeFile,
-      new JsonWriter.EdgeTextFormatter<ED>());
+      new JsonWriter.EdgeTextFormatter<E>());
     getConfig().getExecutionEnvironment().fromElements(graphHead)
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<G>());
     getConfig().getExecutionEnvironment().execute();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other) {
+    return new EqualByElementIds<G, V, E>().execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Boolean equalsByElementIdsCollected(LogicalGraph<G, V, E> other) throws
+    Exception {
+    return collectEquals(equalsByElementIds(other));
+  }
+
+  /**
+   * Collects a boolean dataset and extracts its first member.
+   *
+   * @param booleanDataSet boolean dataset
+   * @return first member
+   * @throws Exception
+   */
+  private Boolean collectEquals(DataSet<Boolean> booleanDataSet) throws
+    Exception {
+    return booleanDataSet
+      .collect()
+      .get(0);
+  }
 }

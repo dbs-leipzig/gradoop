@@ -33,7 +33,7 @@ public class GraphCollectionExcludeTest extends FlinkTestBase {
         GradoopIds.fromLong(2L),
         GradoopIds.fromLong(3L));
     GradoopId exclusionBase = GradoopIds.fromLong(1L);
-    LogicalGraph<VertexPojo, EdgePojo, GraphHeadPojo>
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = coll.callForGraph(
       new ExcludeCollection<VertexPojo, EdgePojo, GraphHeadPojo>(GradoopIds
         .fromLong(1L)));

@@ -46,8 +46,8 @@ public abstract class AbstractBinaryGraphToGraphOperator<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<VD, ED, GD> execute(LogicalGraph<VD, ED, GD> firstGraph,
-    LogicalGraph<VD, ED, GD> secondGraph) {
+  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> firstGraph,
+    LogicalGraph<GD, VD, ED> secondGraph) {
     return executeInternal(firstGraph, secondGraph);
   }
 
@@ -58,8 +58,8 @@ public abstract class AbstractBinaryGraphToGraphOperator<
    * @param secondGraph second input graph
    * @return operator result
    */
-  protected abstract LogicalGraph<VD, ED, GD> executeInternal(
-    LogicalGraph<VD, ED, GD> firstGraph, LogicalGraph<VD, ED, GD> secondGraph);
+  protected abstract LogicalGraph<GD, VD, ED> executeInternal(
+    LogicalGraph<GD, VD, ED> firstGraph, LogicalGraph<GD, VD, ED> secondGraph);
 
   /**
    * Used for {@link Overlap} and {@link Exclusion}.
