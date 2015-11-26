@@ -84,5 +84,11 @@ public interface EPGMAttributed {
    */
   int getPropertyCount();
 
+  /**
+   * Returns true, if the element has a property with the given property key.
+   *
+   * @param key property key
+   * @return true, if element has property with given key
+   */
   Boolean hasProperty(String key);
 }

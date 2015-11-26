@@ -26,7 +26,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testFromFile() throws Exception {
-    String file = getClass().getResource("/data/example.gdl").getFile();
+    String file = getClass().getResource("/data/gdl/example.gdl").getFile();
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromFile(file, config);
 

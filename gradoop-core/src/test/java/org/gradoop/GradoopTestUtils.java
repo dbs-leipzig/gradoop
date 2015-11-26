@@ -39,7 +39,8 @@ import static org.junit.Assert.*;
 
 public class GradoopTestUtils {
 
-  public static final String SOCIAL_NETWORK_GDL_FILE = "/data/social_network.gdl";
+  public static final String SOCIAL_NETWORK_GDL_FILE =
+    "/data/gdl/social_network.gdl";
 
   /**
    * Creates a social network as a basis for tests.

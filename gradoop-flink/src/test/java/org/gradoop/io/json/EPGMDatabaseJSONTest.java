@@ -57,11 +57,11 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
   @Test
   public void testFromJsonFile() throws Exception {
     String vertexFile =
-      EPGMDatabaseJSONTest.class.getResource("/data/sna_nodes").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/json/sna/nodes.json").getFile();
     String edgeFile =
-      EPGMDatabaseJSONTest.class.getResource("/data/sna_edges").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/json/sna/edges.json").getFile();
     String graphFile =
-      EPGMDatabaseJSONTest.class.getResource("/data/sna_graphs").getFile();
+      EPGMDatabaseJSONTest.class.getResource("/data/json/sna/graphs.json").getFile();
 
     EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
       graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,

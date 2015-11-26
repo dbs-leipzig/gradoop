@@ -1,4 +1,4 @@
-//package org.gradoop.model.impl.algorithms.btg;
+//package org.gradoop.model.impl.algorithms.data.json.btg;
 //
 //import org.apache.flink.api.java.ExecutionEnvironment;
 //import org.apache.flink.test.util.MultipleProgramsTestBase;
@@ -32,8 +32,8 @@
 //
 //  @Test
 //  public void testFromJsonFile() throws Exception {
-//    String vertexFile = BTGGradoopTest.class.getResource("/btg/btg_nodes").getFile();
-//    String edgeFile = BTGGradoopTest.class.getResource("/btg/btg_edges").getFile();
+//    String vertexFile = BTGGradoopTest.class.getResource("/data.json.btg/btg_nodes").getFile();
+//    String edgeFile = BTGGradoopTest.class.getResource("/data.json.btg/btg_edges").getFile();
 //    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 //    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
 //      graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, env);

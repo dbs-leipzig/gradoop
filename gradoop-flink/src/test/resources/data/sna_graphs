@@ -1,4 +1,0 @@
-{"id":0,"data":{"interest":"Databases","vertexCount":3},"meta":{"label":"Community","vertexIds":[0,1,4],"edgeIds":[0,1,6,21]}}
-{"id":1,"data":{"interest":"Hadoop","vertexCount":3},"meta":{"label":"Community","vertexIds":[2,3,5],"edgeIds":[4,5,22,23]}}
-{"id":2,"data":{"interest":"Graphs","vertexCount":4},"meta":{"label":"Community","vertexIds":[0,1,2,],"edgeIds":[0,1,6,21]}}
-{"id":3,"data":{},"meta":{"label":"Forum","vertexIds":[2,3,10],"edgeIds":[4,5,16,19,20]}}

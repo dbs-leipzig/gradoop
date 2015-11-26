@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.id;
 
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -33,7 +34,7 @@ import java.util.UUID;
  * @see org.gradoop.model.api.EPGMIdentifiable
  */
 public class GradoopId implements Comparable<GradoopId>,
-  WritableComparable<GradoopId>, Serializable {
+  WritableComparable<GradoopId>, Writable, Serializable {
 
   /**
    * Highest possible Gradoop Id.
