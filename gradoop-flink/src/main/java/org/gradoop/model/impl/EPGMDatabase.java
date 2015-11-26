@@ -479,7 +479,7 @@ public class EPGMDatabase<
    */
   public LogicalGraph<GD, VD, ED> getDatabaseGraph() {
     return LogicalGraph
-      .fromDataSets(database.getVertices(), database.getEdges(), databaseData,
+      .fromDataSets(databaseData, database.getVertices(), database.getEdges(),
         config);
   }
 

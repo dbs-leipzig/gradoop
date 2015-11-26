@@ -23,45 +23,48 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.functions.filterfunctions
   .EdgeInAllGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInAllGraphsFilterWithBC;
+import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.FlinkConstants;
 
 /**
  * Intersects all subgraphs of a GraphCollection and returns the result
  * as new logical graph.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public class OverlapCollection<GD
-  extends EPGMGraphHead, VD extends EPGMVertex, ED extends EPGMEdge> implements
-  UnaryCollectionToGraphOperator<VD, ED, GD> {
+public class OverlapCollection
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryCollectionToGraphOperator<G, V, E>{
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<GD, VD, ED> execute(
-    GraphCollection<GD, VD, ED> collection) {
-    DataSet<GD> graphHeads = collection.getGraphHeads();
-    DataSet<GradoopId> graphIDs =
-      graphHeads.map(new ElementIdOnly<GD>());
-    DataSet<VD> vertices =
-      collection.getVertices().filter(new VertexInAllGraphsFilterWithBC<VD>())
-        .withBroadcastSet(graphIDs,
-          VertexInAllGraphsFilterWithBC.BC_IDENTIFIERS);
-    DataSet<ED> edges =
-      collection.getEdges().filter(new EdgeInAllGraphsFilterWithBC<ED>())
-        .withBroadcastSet(graphIDs, EdgeInAllGraphsFilterWithBC.BC_IDENTIFIERS);
-    return LogicalGraph.fromDataSets(vertices, edges,
-      collection.getConfig().getGraphHeadFactory()
-        .createGraphHead(FlinkConstants.OVERLAP_GRAPH_ID),
-      collection.getConfig());
+  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
+
+    DataSet<G> graphHeads = collection.getGraphHeads();
+
+    DataSet<GradoopId> graphIDs = graphHeads.map(new ElementIdOnly<G>());
+
+    DataSet<V> vertices = collection.getVertices()
+      .filter(new VertexInAllGraphsFilterWithBC<V>())
+      .withBroadcastSet(graphIDs, VertexInAllGraphsFilterWithBC.BC_IDENTIFIERS);
+
+    DataSet<E> edges = collection.getEdges()
+      .filter(new EdgeInAllGraphsFilterWithBC<E>())
+      .withBroadcastSet(graphIDs, EdgeInAllGraphsFilterWithBC.BC_IDENTIFIERS);
+
+    return LogicalGraph.fromDataSets(
+      vertices,
+      edges,
+      collection.getConfig()
+    );
   }
 
   @Override

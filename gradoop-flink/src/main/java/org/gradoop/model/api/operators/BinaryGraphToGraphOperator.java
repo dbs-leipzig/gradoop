@@ -32,7 +32,7 @@ import org.gradoop.model.impl.LogicalGraph;
  * @see org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion
  * @see org.gradoop.model.impl.operators.logicalgraph.binary.Overlap
  */
-public interface BinaryGraphToGraphOperator<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead> extends
+public interface BinaryGraphToGraphOperator<GD extends EPGMGraphHead, VD extends EPGMVertex, ED extends EPGMEdge> extends
   Operator {
   /**
    * Executes the operator.

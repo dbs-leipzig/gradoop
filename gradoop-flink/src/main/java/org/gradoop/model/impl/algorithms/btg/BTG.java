@@ -81,8 +81,7 @@ public class BTG<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGrap
         .with(new BTGJoin<VD>());
     // create new graph
     LogicalGraph<GD, VD, ED> btgEPGraph = LogicalGraph
-      .fromDataSets(btgLabeledVertices, graph.getEdges(), null,
-        graph.getConfig());
+      .fromDataSets(null, btgLabeledVertices, graph.getEdges(), graph.getConfig());
 
     // create collection from result and return
     return new OverlapSplitBy<VD, ED, GD>(

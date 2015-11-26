@@ -42,7 +42,7 @@ public class Overlap<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
   GD extends EPGMGraphHead>
-  extends AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
+  extends AbstractBinaryGraphToGraphOperator<GD, VD, ED> {
 
   /**
    * {@inheritDoc}
@@ -66,9 +66,8 @@ public class Overlap<
       .reduceGroup(new EdgeGroupReducer<ED>(2L))
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromDataSets(newVertexSet, newEdgeSet,
-      firstGraph.getConfig().getGraphHeadFactory().createGraphHead(newGraphID),
-      firstGraph.getConfig());
+    return LogicalGraph.fromDataSets(
+      newVertexSet, newEdgeSet, firstGraph.getConfig());
   }
 
   /**

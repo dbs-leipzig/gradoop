@@ -49,6 +49,11 @@ public abstract class AbstractGraph
   private final GradoopFlinkConfig<V, E, G> config;
 
   /**
+   * Graph data associated with the logical graphs in that collection.
+   */
+  protected final DataSet<G> graphHeads;
+
+  /**
    * DataSet containing vertices associated with that graph.
    */
   private final DataSet<V> vertices;
@@ -60,13 +65,14 @@ public abstract class AbstractGraph
   /**
    * Creates a new graph instance.
    *
+   * @param graphHeads
    * @param vertices  vertex data set
    * @param edges     edge data set
    * @param config    Gradoop Flink configuration
    */
-  protected AbstractGraph(DataSet<V> vertices,
-    DataSet<E> edges,
-    GradoopFlinkConfig<V, E, G> config) {
+  protected AbstractGraph(DataSet<G> graphHeads, DataSet<V> vertices,
+    DataSet<E> edges, GradoopFlinkConfig<V, E, G> config) {
+    this.graphHeads = graphHeads;
     this.vertices = vertices;
     this.edges = edges;
     this.config = config;

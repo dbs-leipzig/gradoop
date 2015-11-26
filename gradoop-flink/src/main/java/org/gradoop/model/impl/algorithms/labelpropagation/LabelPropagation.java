@@ -112,8 +112,7 @@ public class LabelPropagation<
 
     // create a logical graph from the result
     LogicalGraph<GD, VD, ED> labeledGraph = LogicalGraph
-      .fromDataSets(labeledVertices, logicalGraph.getEdges(), null,
-        logicalGraph.getConfig());
+      .fromDataSets(null, labeledVertices, logicalGraph.getEdges(), logicalGraph.getConfig());
 
     // and split it into a collection according the result
     return new SplitBy<VD, ED, GD>(

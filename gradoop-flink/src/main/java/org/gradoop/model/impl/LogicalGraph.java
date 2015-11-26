@@ -16,6 +16,7 @@
  */
 package org.gradoop.model.impl;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
@@ -24,7 +25,6 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
@@ -49,7 +49,6 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Represents a logical graph inside the EPGM. Holds the graph data (label,
@@ -62,25 +61,20 @@ import java.util.Map;
 public class LogicalGraph
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends AbstractGraph<G, V, E>
-  implements LogicalGraphOperators<G, V, E>, EPGMElement {
-
-  /**
-   * Graph data associated with that logical graph.
-   */
-  private final G graphHead;
+  implements LogicalGraphOperators<G, V, E> {
 
   /**
    * Creates a new logical graph based on the given parameters.
-   *
+   *  @param graphHead graph data associated with that logical graph
    * @param vertices  vertex data set
    * @param edges     edge data set
-   * @param graphHead graph data associated with that logical graph
    * @param config    Gradoop Flink configuration
    */
-  private LogicalGraph(DataSet<V> vertices, DataSet<E> edges, G graphHead,
+  private LogicalGraph(
+    DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges,
     GradoopFlinkConfig<V, E, G> config) {
-    super(vertices, edges, config);
-    this.graphHead = graphHead;
+
+    super(graphHead, vertices, edges, config);
   }
 
   /**
@@ -89,83 +83,114 @@ public class LogicalGraph
    * @param graph     Flink Gelly graph
    * @param graphData Graph head associated with the logical graph
    * @param config    Gradoop Flink configuration
-   * @param <VD>      vertex data type
-   * @param <ED>      edge data type
-   * @param <GD>      graph data type
+   * @param <V>      vertex data type
+   * @param <E>      edge data type
+   * @param <G>      graph data type
    * @return logical graph
    */
   public static
-  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  LogicalGraph<GD, VD, ED> fromGellyGraph(
-    Graph<GradoopId, VD, ED> graph, GD graphData,
-    GradoopFlinkConfig<VD, ED, GD> config) {
-    return fromDataSets(graph.getVertices().map(
-      new MapFunction<Vertex<GradoopId, VD>, VD>() {
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+  LogicalGraph<G, V, E> fromGellyGraph(
+
+    Graph<GradoopId, V, E> graph, G graphData,
+    GradoopFlinkConfig<V, E, G> config) {
+
+    Collection<G> graphHead = Lists.newArrayList(graphData);
+
+    return fromDataSets(
+      config.getExecutionEnvironment().fromCollection(graphHead),
+      graph.getVertices().map(new MapFunction<Vertex<GradoopId, V>, V>() {
         @Override
-        public VD map(Vertex<GradoopId, VD> gellyVertex) throws Exception {
+        public V map(Vertex<GradoopId, V> gellyVertex) throws Exception {
           return gellyVertex.getValue();
         }
       }).withForwardedFields("f1->*"),
-      graph.getEdges().map(new MapFunction<Edge<GradoopId, ED>, ED>() {
+      graph.getEdges().map(new MapFunction<Edge<GradoopId, E>, E>() {
         @Override
-        public ED map(Edge<GradoopId, ED> gellyEdge) throws Exception {
+        public E map(Edge<GradoopId, E> gellyEdge) throws Exception {
           return gellyEdge.getValue();
         }
-      }).withForwardedFields("f2->*"),
-      graphData,
-      config);
+      }).withForwardedFields("f2->*"), config);
   }
 
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
-   * @param graphHeads  graph head associated with the logical graph
-   * @param config      Gradoop Flink configuration
    * @param <VD>        EPGM vertex type
    * @param <ED>        EPGM edge type
    * @param <GD>        EPGM graph head graph head type
+   * @param vertices    Vertex DataSet
+   * @param edges       Edge DataSet
+   * @param config      Gradoop Flink configuration
    * @return Logical graph
    */
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  LogicalGraph<GD, VD, ED> fromDataSets(DataSet<VD> vertices,
-    DataSet<ED> edges,
-    GD graphHeads,
+  LogicalGraph<GD, VD, ED> fromDataSets(
+    DataSet<GD> graphHead, DataSet<VD> vertices, DataSet<ED> edges,
     GradoopFlinkConfig<VD, ED, GD> config) {
-    return new LogicalGraph<>(vertices,
-      edges,
-      graphHeads,
-      config);
+    return new LogicalGraph<>(graphHead, vertices, edges, config);
   }
 
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
-   * @param graphHead   Graph head associated with the logical graph
+   * @param <V>        EPGM vertex type
+   * @param <E>        EPGM edge type
+   * @param <G>        EPGM graph head graph head type
+   * @param vertices    Vertex DataSet
+   * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
-   * @param <VD>        EPGM vertex type
-   * @param <ED>        EPGM edge type
-   * @param <GD>        EPGM graph type
    * @return Logical graph
    */
   public static
-  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  LogicalGraph<GD, VD, ED> fromCollections(Collection<VD> vertices,
-    Collection<ED> edges,
-    GD graphHead,
-    GradoopFlinkConfig<VD, ED, GD> config) {
-    return fromDataSets(
-      config.getExecutionEnvironment().fromCollection(vertices),
-      config.getExecutionEnvironment().fromCollection(edges),
-      graphHead,
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+  LogicalGraph<G, V, E> fromDataSets(
+    DataSet<V> vertices, DataSet<E> edges,
+    GradoopFlinkConfig<V, E, G> config) {
+
+    G graphHead = config
+      .getGraphHeadFactory()
+      .createGraphHead();
+
+    Collection<G> graphHeadCol = Lists.newArrayList(graphHead);
+
+    DataSet<G> graphHeadSet = config.getExecutionEnvironment()
+      .fromCollection(graphHeadCol);
+
+    return new LogicalGraph<>(
+      graphHeadSet,
+      vertices,
+      edges,
       config
     );
   }
 
+
+  /**
+   * Creates a logical graph from the given arguments.
+   *
+   * @param <V>        EPGM vertex type
+   * @param <E>        EPGM edge type
+   * @param <G>        EPGM graph type
+   * @param graphHead   Graph head associated with the logical graph
+   * @param vertices    Vertex collection
+   * @param edges       Edge collection
+   * @param config      Gradoop Flink configuration
+   * @return Logical graph
+   */
+  public static
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+  LogicalGraph<G, V, E> fromCollections(
+    Collection<G> graphHead, Collection<V> vertices, Collection<E> edges,
+    GradoopFlinkConfig<V, E, G> config) {
+    return fromDataSets(
+      config.getExecutionEnvironment().fromCollection(graphHead),
+      config.getExecutionEnvironment().fromCollection(vertices),
+      config.getExecutionEnvironment().fromCollection(edges),
+      config
+    );
+  }
 
   /**
    * {@inheritDoc}
@@ -339,7 +364,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> callForGraph(
-    BinaryGraphToGraphOperator<V, E, G> operator,
+    BinaryGraphToGraphOperator<G, V, E> operator,
     LogicalGraph<G, V, E> otherGraph) {
     return operator.execute(this, otherGraph);
   }
@@ -353,93 +378,84 @@ public class LogicalGraph
     return operator.execute(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Map<String, Object> getProperties() {
-    return graphHead.getProperties();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Iterable<String> getPropertyKeys() {
-    return graphHead.getPropertyKeys();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Object getProperty(String key) {
-    return graphHead.getProperty(key);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <T> T getProperty(String key, Class<T> type) {
-    return graphHead.getProperty(key, type);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setProperties(Map<String, Object> properties) {
-    graphHead.setProperties(properties);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setProperty(String key, Object value) {
-    graphHead.setProperty(key, value);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public int getPropertyCount() {
-    return graphHead.getPropertyCount();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public GradoopId getId() {
-    return graphHead.getId();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setId(GradoopId id) {
-    graphHead.setId(id);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getLabel() {
-    return graphHead.getLabel();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setLabel(String label) {
-    graphHead.setLabel(label);
-  }
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public Map<String, Object> getProperties() {
+//    return graphHead.getProperties();
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  @Override
+//  public Iterable<String> getPropertyKeys() {
+//    return graphHead.getPropertyKeys();
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public Object getProperty(String key) {
+//    return graphHead.getProperty(key);
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  @Override
+//  public <T> T getProperty(String key, Class<T> type) {
+//    return graphHead.getProperty(key, type);
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public void setProperties(Map<String, Object> properties) {
+//    graphHead.setProperties(properties);
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public void setProperty(String key, Object value) {
+//    graphHead.setProperty(key, value);
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public int getPropertyCount() {
+//    return graphHead.getPropertyCount();
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public GradoopId getId() {
+//    return graphHead.getId();
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public void setId(GradoopId id) {
+//    graphHead.setId(id);
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public String getLabel() {
+//    return graphHead.getLabel();
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  public void setLabel(String label) {
+//    graphHead.setLabel(label);
+//  }
 
   /**
    * {@inheritDoc}
@@ -448,12 +464,16 @@ public class LogicalGraph
   @Override
   public void writeAsJson(String vertexFile, String edgeFile,
     String graphFile) throws Exception {
+
     getVertices().writeAsFormattedText(vertexFile,
       new JsonWriter.VertexTextFormatter<V>());
+
     getEdges().writeAsFormattedText(edgeFile,
       new JsonWriter.EdgeTextFormatter<E>());
-    getConfig().getExecutionEnvironment().fromElements(graphHead)
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<G>());
+
+    getGraphHead().writeAsFormattedText(graphFile,
+      new JsonWriter.GraphTextFormatter<G>());
+
     getConfig().getExecutionEnvironment().execute();
   }
 
@@ -489,5 +509,9 @@ public class LogicalGraph
   public Boolean equalsByElementDataCollected(
     LogicalGraph<G, V, E> other) throws Exception {
     return collectEquals(equalsByElementData(other));
+  }
+
+  public DataSet<G> getGraphHead() {
+    return this.graphHeads;
   }
 }

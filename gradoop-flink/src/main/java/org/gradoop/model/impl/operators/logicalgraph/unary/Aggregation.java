@@ -77,8 +77,7 @@ public class Aggregation<
     newGraphData.setProperties(graph.getProperties());
     newGraphData.setProperty(aggregatePropertyKey, result);
     return LogicalGraph
-      .fromDataSets(graph.getVertices(), graph.getEdges(), newGraphData,
-        graph.getConfig());
+      .fromDataSets(newGraphData, graph.getVertices(), graph.getEdges(), graph.getConfig());
   }
 
   /**

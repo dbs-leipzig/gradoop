@@ -102,9 +102,9 @@ public class RandomNodeSampling<VD extends EPGMVertex, ED extends EPGMEdge,
       .with(new EdgeVertexJoinKeepEdge<VD, ED>())
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromDataSets(newVertices, newEdges,
+    return LogicalGraph.fromDataSets(
       graph.getConfig().getGraphHeadFactory().createGraphHead(newGraphID),
-      graph.getConfig());
+      newVertices, newEdges, graph.getConfig());
   }
 
   /**

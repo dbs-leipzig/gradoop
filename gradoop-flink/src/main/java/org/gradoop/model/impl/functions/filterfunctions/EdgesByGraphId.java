@@ -17,18 +17,17 @@
 
 package org.gradoop.model.impl.functions.filterfunctions;
 
-
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Checks if a vertex is contained in the given graph.
+ * Checks if an edge is contained in the given graph.
  *
- * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
  */
-public class VertexInGraphFilter<VD extends EPGMVertex>
-  implements FilterFunction<VD> {
+public class EdgesByGraphId<ED extends EPGMEdge>
+  implements FilterFunction<ED> {
 
   /**
    * Graph identifier
@@ -40,7 +39,7 @@ public class VertexInGraphFilter<VD extends EPGMVertex>
    *
    * @param graphId graphId for containment check
    */
-  public VertexInGraphFilter(GradoopId graphId) {
+  public EdgesByGraphId(GradoopId graphId) {
     this.graphId = graphId;
   }
 
@@ -48,9 +47,9 @@ public class VertexInGraphFilter<VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public boolean filter(VD vertex) throws Exception {
-    return (vertex.getGraphCount() > 0) &&
-      vertex.getGraphIds().contains(graphId);
+  public boolean filter(ED edge) throws Exception {
+    return (edge.getGraphCount() > 0) &&
+      edge.getGraphIds().contains(graphId);
   }
 }
 

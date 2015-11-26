@@ -24,29 +24,28 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .EdgeInNoneOfGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInNoneOfGraphsFilterWithBC;
+import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.util.FlinkConstants;
 
 /**
  * Takes a LogicalGraph specified by its id and removes all vertices and
  * edges, that are contained in other graphs of this collection. The result
  * is returned.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
- * @param <GD> graph data type
+ * @param <V> vertex data type
+ * @param <E> edge data type
+ * @param <G> graph data type
  */
-public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
-  extends EPGMGraphHead> implements
-  UnaryCollectionToGraphOperator<VD, ED, GD> {
+public class ExcludeCollection
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryCollectionToGraphOperator<G, V, E>{
   /**
    * ID defining the base graph
    */
@@ -71,30 +70,40 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<GD, VD, ED> execute(
-    GraphCollection<GD, VD, ED> collection) {
+  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
+
     final GradoopIdSet positiveGraphIDs =
       GradoopIdSet.fromExisting(positiveGraphID);
-    DataSet<GD> graphHeads = collection.getGraphHeads();
-    DataSet<GradoopId> graphIDs = graphHeads.map(
-      new ElementIdOnly<GD>());
-    graphIDs =
-      graphIDs.filter(new RemoveGradoopIdFromDataSetFilter(positiveGraphID));
-    DataSet<VD> vertices = collection.getVertices()
-      .filter(new VertexInGraphsFilter<VD>(positiveGraphIDs));
-    vertices = vertices.filter(new VertexInNoneOfGraphsFilterWithBC<VD>())
-      .withBroadcastSet(graphIDs,
-        VertexInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
-    DataSet<ED> edges =
-      collection.getEdges().filter(
-        new EdgeInGraphsFilter<ED>(positiveGraphIDs));
-    edges = edges.filter(new EdgeInNoneOfGraphsFilterWithBC<ED>())
-      .withBroadcastSet(graphIDs,
-        EdgeInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
-    return LogicalGraph.fromDataSets(vertices, edges,
-      collection.getConfig().getGraphHeadFactory()
-        .createGraphHead(FlinkConstants.EXCLUDE_GRAPH_ID),
-      collection.getConfig());
+
+    DataSet<G> graphHeads = collection.getGraphHeads();
+
+    DataSet<GradoopId> graphIDs = graphHeads
+      .map(new ElementIdOnly<G>());
+
+    graphIDs = graphIDs
+      .filter(new RemoveGradoopIdFromDataSetFilter(positiveGraphID));
+
+    DataSet<V> vertices = collection.getVertices()
+      .filter(new VertexInGraphsFilter<V>(positiveGraphIDs));
+
+    vertices = vertices
+      .filter(new VertexInNoneOfGraphsFilterWithBC<V>())
+      .withBroadcastSet(
+        graphIDs, VertexInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
+
+    DataSet<E> edges = collection.getEdges()
+      .filter(new EdgeInGraphsFilter<E>(positiveGraphIDs));
+
+    edges = edges
+      .filter(new EdgeInNoneOfGraphsFilterWithBC<E>())
+      .withBroadcastSet(
+        graphIDs, EdgeInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
+
+    return LogicalGraph.fromDataSets(
+      vertices,
+      edges,
+      collection.getConfig()
+    );
   }
 
   @Override

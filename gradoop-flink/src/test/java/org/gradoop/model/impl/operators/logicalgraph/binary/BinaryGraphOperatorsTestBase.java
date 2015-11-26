@@ -19,54 +19,6 @@ public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
     super(mode);
   }
 
-  protected void performTest(
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      resultGraph,
-    long expectedVertexCount, long expectedEdgeCount) throws Exception {
-    assertNotNull("resulting graph was null", resultGraph);
-
-    GradoopId newGraphID = resultGraph.getId();
-
-    assertEquals("wrong number of vertices", expectedVertexCount,
-      resultGraph.getVertexCount());
-    assertEquals("wrong number of edges", expectedEdgeCount,
-      resultGraph.getEdgeCount());
-
-    Collection<VertexPojo> vertexData = resultGraph.getVertices()
-      .collect();
-    Collection<EdgePojo> edgeData = resultGraph.getEdges()
-      .collect();
-
-    checkVertexAndEdgeCount(expectedVertexCount, expectedEdgeCount, vertexData,
-      edgeData);
-
-    checkGraphContainment(newGraphID, vertexData, edgeData);
-  }
-
-  protected void checkGraphContainment(GradoopId newGraphID,
-    Collection<VertexPojo> vertexData,
-    Collection<EdgePojo> edgeData) {
-    for (VertexPojo v : vertexData) {
-      assertTrue("vertex is not in new graph",
-        v.getGraphIds().contains(newGraphID));
-    }
-
-    for (EdgePojo e : edgeData) {
-      assertTrue("edge is not in new graph", e.getGraphIds().contains
-        (newGraphID));
-    }
-  }
-
-  protected void checkVertexAndEdgeCount(long expectedVertexCount,
-    long expectedEdgeCount,
-    Collection<VertexPojo> vertexData,
-    Collection<EdgePojo> edgeData) {
-    assertEquals("wrong number of vertex values", expectedVertexCount,
-      vertexData.size());
-    assertEquals("wrong number of edge values", expectedEdgeCount,
-      edgeData.size());
-  }
-
   protected void checkElementMatches(Set<EPGMGraphElement> inElements,
     Set<EPGMGraphElement> outElements) {
     for(EPGMGraphElement outElement : outElements) {

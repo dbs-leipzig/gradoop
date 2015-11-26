@@ -308,7 +308,7 @@ public interface LogicalGraphOperators
    * @return result of given operator
    */
   LogicalGraph<G, V, E> callForGraph(
-    BinaryGraphToGraphOperator<V, E, G> operator,
+    BinaryGraphToGraphOperator<G, V, E> operator,
     LogicalGraph<G, V, E> otherGraph);
 
   /**

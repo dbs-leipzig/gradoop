@@ -19,8 +19,8 @@ package org.gradoop.model.impl.operators.logicalgraph.binary;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
@@ -32,22 +32,20 @@ import java.util.Iterator;
  * Abstract operator implementation which can be used with binary graph to
  * graph operators.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public abstract class AbstractBinaryGraphToGraphOperator<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  implements BinaryGraphToGraphOperator<VD, ED, GD> {
+public abstract class AbstractBinaryGraphToGraphOperator
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements BinaryGraphToGraphOperator<G, V, E> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> firstGraph,
-    LogicalGraph<GD, VD, ED> secondGraph) {
+  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> firstGraph,
+    LogicalGraph<G, V, E> secondGraph) {
     return executeInternal(firstGraph, secondGraph);
   }
 
@@ -58,8 +56,8 @@ public abstract class AbstractBinaryGraphToGraphOperator<
    * @param secondGraph second input graph
    * @return operator result
    */
-  protected abstract LogicalGraph<GD, VD, ED> executeInternal(
-    LogicalGraph<GD, VD, ED> firstGraph, LogicalGraph<GD, VD, ED> secondGraph);
+  protected abstract LogicalGraph<G, V, E> executeInternal(
+    LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph);
 
   /**
    * Used for {@link Overlap} and {@link Exclusion}.

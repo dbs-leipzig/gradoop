@@ -22,26 +22,26 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.util.FlinkConstants;
 
 /**
  * Combines all logical graphs of a GraphCollection into a single LogicalGraph.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public class CombineCollection<GD
-  extends EPGMGraphHead, VD extends EPGMVertex, ED extends EPGMEdge> implements
-  UnaryCollectionToGraphOperator<VD, ED, GD> {
+public class CombineCollection
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryCollectionToGraphOperator<G, V, E>{
+
   @Override
-  public LogicalGraph<GD, VD, ED> execute(
-    GraphCollection<GD, VD, ED> collection) {
-    return LogicalGraph
-      .fromDataSets(collection.getVertices(), collection.getEdges(),
-        collection.getConfig().getGraphHeadFactory()
-          .createGraphHead(FlinkConstants.COMBINE_GRAPH_ID),
-        collection.getConfig());
+  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
+
+    return LogicalGraph.fromDataSets(
+        collection.getVertices(),
+        collection.getEdges(),
+        collection.getConfig()
+      );
   }
 
   @Override

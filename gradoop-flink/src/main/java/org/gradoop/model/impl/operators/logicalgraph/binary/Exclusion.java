@@ -46,7 +46,7 @@ public class Exclusion<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
   GD extends EPGMGraphHead>
-  extends AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
+  extends AbstractBinaryGraphToGraphOperator<GD, VD, ED> {
 
   /**
    * {@inheritDoc}
@@ -86,9 +86,8 @@ public class Exclusion<
       .equalTo(new VertexKeySelector<VD>()).with(joinFunc)
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromDataSets(newVertexSet, newEdgeSet,
-      firstGraph.getConfig().getGraphHeadFactory().createGraphHead(newGraphID),
-      firstGraph.getConfig());
+    return LogicalGraph.fromDataSets(
+      newVertexSet, newEdgeSet, firstGraph.getConfig());
   }
 
   /**

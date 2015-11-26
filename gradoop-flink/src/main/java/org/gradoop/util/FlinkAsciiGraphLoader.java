@@ -102,7 +102,7 @@ public class FlinkAsciiGraphLoader<
     Collection<V> vertices = loader.getVerticesByGraphVariables(variable);
     Collection<E> edges = loader.getEdgesByGraphVariables(variable);
 
-    return LogicalGraph.fromCollections(vertices, edges, graphHead, config);
+    return LogicalGraph.fromCollections(graphHead, vertices, edges, config);
   }
 
   /**

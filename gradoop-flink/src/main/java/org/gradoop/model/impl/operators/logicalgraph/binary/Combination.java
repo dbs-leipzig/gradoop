@@ -38,11 +38,9 @@ import org.gradoop.util.FlinkConstants;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class Combination<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends AbstractBinaryGraphToGraphOperator<VD, ED, GD> {
+public class Combination
+  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
+  extends AbstractBinaryGraphToGraphOperator<GD, VD, ED> {
 
   /**
    * {@inheritDoc}
@@ -50,6 +48,7 @@ public class Combination<
   @Override
   protected LogicalGraph<GD, VD, ED> executeInternal(
     LogicalGraph<GD, VD, ED> firstGraph, LogicalGraph<GD, VD, ED> secondGraph) {
+
     final GradoopId newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
 
     // build distinct union of vertex sets and update graph ids at vertices
@@ -64,9 +63,8 @@ public class Combination<
       .distinct(new EdgeKeySelector<ED>())
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
-    return LogicalGraph.fromDataSets(newVertexSet, newEdgeSet,
-      firstGraph.getConfig().getGraphHeadFactory().createGraphHead(newGraphID),
-      firstGraph.getConfig());
+    return LogicalGraph.fromDataSets(
+      newVertexSet, newEdgeSet, firstGraph.getConfig());
   }
 
   /**

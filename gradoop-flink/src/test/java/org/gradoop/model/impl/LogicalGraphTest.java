@@ -18,11 +18,9 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
-import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.GradoopTestUtils;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -65,7 +63,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     GraphHeadPojo inputGraphHead = loader.getGraphHeadByVariable("g0");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> outputGraph =
-      LogicalGraph.fromCollections(inputV, inputE, inputGraphHead, getConfig());
+      LogicalGraph.fromCollections(inputGraphHead, inputV, inputE, getConfig());
 
     Collection<VertexPojo> outputV = Lists.newArrayList();
     Collection<EdgePojo> outputE = Lists.newArrayList();

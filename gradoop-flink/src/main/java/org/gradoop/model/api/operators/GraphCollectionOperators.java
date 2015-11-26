@@ -209,7 +209,7 @@ public interface GraphCollectionOperators
    * @param op binary graph to graph operator
    * @return logical graph
    */
-  LogicalGraph<G, V, E> reduce(BinaryGraphToGraphOperator<V, E, G> op);
+  LogicalGraph<G, V, E> reduce(BinaryGraphToGraphOperator<G, V, E> op);
 
   /**
    * Calls the given unary collection to collection operator for the collection.
@@ -240,7 +240,7 @@ public interface GraphCollectionOperators
    * @return result of given operator
    */
   LogicalGraph<G, V, E> callForGraph(
-    UnaryCollectionToGraphOperator<V, E, G> op);
+    UnaryCollectionToGraphOperator<G, V, E> op);
 
   /**
    * Writes the graph collection into three separate JSON files. {@code

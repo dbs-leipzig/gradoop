@@ -24,7 +24,6 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -38,18 +37,18 @@ import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.filterfunctions.AlwaysFalseFilter;
-import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphFilter;
+import org.gradoop.model.impl.functions.filterfunctions.EdgesByGraphId;
 import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .EdgeInGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphFilter;
+import org.gradoop.model.impl.functions.filterfunctions.GraphHeadByGraphID;
+import org.gradoop.model.impl.functions.filterfunctions.VerticesByGraphId;
 import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.model.impl.id.TimestampIdGenerator;
 import org.gradoop.model.impl.operators.collection.binary.Difference;
 import org.gradoop.model.impl.operators.collection.binary.DifferenceUsingList;
@@ -59,9 +58,6 @@ import org.gradoop.model.impl.operators.collection.binary.Union;
 import org.gradoop.model.impl.operators.equality.collection
   .EqualByGraphElementIds;
 import org.gradoop.model.impl.operators.equality.collection.EqualByGraphIds;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
@@ -84,11 +80,6 @@ public class GraphCollection
   implements GraphCollectionOperators<G, V, E> {
 
   /**
-   * Graph data associated with the logical graphs in that collection.
-   */
-  private DataSet<G> graphHeads;
-
-  /**
    * Creates a graph collection from the given arguments.
    *
    * @param vertices    vertices
@@ -100,8 +91,7 @@ public class GraphCollection
     DataSet<E> edges,
     DataSet<G> graphHeads,
     GradoopFlinkConfig<V, E, G> config) {
-    super(vertices, edges, config);
-    this.graphHeads = graphHeads;
+    super(graphHeads, vertices, edges, config);
   }
 
   /**
@@ -140,7 +130,8 @@ public class GraphCollection
   public static
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   GraphCollection<G, V, E>
-  fromCollections(Collection<V> vertices,
+  fromCollections(
+    Collection<V> vertices,
     Collection<E> edges,
     Collection<G> graphHeads,
     GradoopFlinkConfig<V, E, G> config) {
@@ -196,10 +187,13 @@ public class GraphCollection
   public LogicalGraph<G, V, E> getGraph(final GradoopId graphID) throws
     Exception {
     // filter vertices and edges based on given graph id
+    DataSet<G> graphHead = getGraphHeads()
+      .filter(new GraphHeadByGraphID<G>(graphID));
+
     DataSet<V> vertices = getVertices()
-      .filter(new VertexInGraphFilter<V>(graphID));
+      .filter(new VerticesByGraphId<V>(graphID));
     DataSet<E> edges = getEdges()
-      .filter(new EdgeInGraphFilter<E>(graphID));
+      .filter(new EdgesByGraphId<E>(graphID));
 
     DataSet<Tuple1<GradoopId>> graphIDDataSet = getConfig()
       .getExecutionEnvironment()
@@ -218,7 +212,7 @@ public class GraphCollection
       }).first(1).collect();
 
     return (graphData.size() > 0) ? LogicalGraph
-      .fromDataSets(vertices, edges, graphData.get(0), getConfig()) : null;
+      .fromDataSets(graphHead, vertices, edges, getConfig()) : null;
   }
 
   /**
@@ -403,7 +397,7 @@ public class GraphCollection
    */
   @Override
   public LogicalGraph<G, V, E> reduce(
-    BinaryGraphToGraphOperator<V, E, G> op) {
+    BinaryGraphToGraphOperator<G, V, E> op) {
     throw new NotImplementedException();
   }
 
@@ -431,7 +425,7 @@ public class GraphCollection
    */
   @Override
   public LogicalGraph<G, V, E> callForGraph(
-    UnaryCollectionToGraphOperator<V, E, G> op) {
+    UnaryCollectionToGraphOperator<G, V, E> op) {
     return op.execute(this);
   }
 
