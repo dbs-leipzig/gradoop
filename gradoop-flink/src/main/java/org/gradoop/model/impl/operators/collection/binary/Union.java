@@ -21,9 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
 
 /**
  * Returns a collection with all logical graphs from two input collections.
@@ -47,7 +45,7 @@ public class Union<
     DataSet<GD> newGraphHeads) throws Exception {
     return firstCollection.getVertices()
       .union(secondCollection.getVertices())
-      .distinct(new VertexKeySelector<VD>());
+      .distinct(new Id<VD>());
   }
 
   /**
@@ -57,7 +55,7 @@ public class Union<
   protected DataSet<GD> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
       .union(secondCollection.getGraphHeads())
-      .distinct(new GraphKeySelector<GD>());
+      .distinct(new Id<GD>());
   }
 
   /**
@@ -67,7 +65,7 @@ public class Union<
   protected DataSet<ED> computeNewEdges(DataSet<VD> newVertices) {
     return firstCollection.getEdges()
       .union(secondCollection.getEdges())
-      .distinct(new EdgeKeySelector<ED>());
+      .distinct(new Id<ED>());
   }
 
   /**

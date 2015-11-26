@@ -4,7 +4,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
 
-public class ElementClone<EL extends EPGMElement>
+public class Clone<EL extends EPGMElement>
   implements MapFunction<EL, EL>{
 
   @Override

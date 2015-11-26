@@ -15,7 +15,7 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.keyselectors;
+package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.model.api.EPGMEdge;
@@ -26,7 +26,7 @@ import org.gradoop.model.impl.id.GradoopId;
  *
  * @param <ED> EPGM edge type
  */
-public class EdgeTargetVertexKeySelector<ED extends EPGMEdge>
+public class TargetId<ED extends EPGMEdge>
   implements KeySelector<ED, GradoopId> {
   @Override
   public GradoopId getKey(ED edge) throws Exception {

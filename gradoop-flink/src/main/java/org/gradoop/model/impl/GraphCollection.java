@@ -37,6 +37,7 @@ import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.bool.False;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment
   .AbstractBroadcastGraphsContainmentFilter;
 
@@ -45,7 +46,6 @@ import org.gradoop.model.impl.functions.graphcontainment.InGraphs;
 import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
 import org.gradoop.model.impl.functions.epgm.ById;
 
-import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.collection.binary.Difference;
@@ -200,7 +200,7 @@ public class GraphCollection
     // get graph data based on graph id
     List<G> graphData = this.graphHeads
       .joinWithTiny(graphIDDataSet)
-      .where(new GraphKeySelector<G>())
+      .where(new Id<G>())
       .equalTo(0)
       .with(new JoinFunction<G, Tuple1<GradoopId>, G>() {
         @Override

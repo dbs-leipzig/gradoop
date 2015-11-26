@@ -24,8 +24,7 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.GConstants;
@@ -132,14 +131,14 @@ public class SplitBy<
       edgeVertexVertex
         .join(vertices)
         .where(1)
-        .equalTo(new VertexKeySelector<VD>())
+        .equalTo(new Id<VD>())
         .with(new JoinEdgeTupleWithSourceGraphs<VD>());
     // replace the target vertex id by the graph list of this vertex
     DataSet<Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>> edgeGraphsGraphs =
       edgeGraphsVertex
         .join(vertices)
         .where(2)
-        .equalTo(new VertexKeySelector<VD>())
+        .equalTo(new Id<VD>())
         .with(new JoinEdgeTupleWithTargetGraphs<VD>());
     // transform the new graph heads into a single set of long, containing all
     // the identifiers
@@ -159,7 +158,7 @@ public class SplitBy<
     // edge graph sets
     return graph.getEdges()
       .join(newSubgraphs)
-      .where(new EdgeKeySelector<ED>())
+      .where(new Id<ED>())
       .equalTo(0)
       .with(new JoinEdgeTuplesWithEdges<ED>());
   }

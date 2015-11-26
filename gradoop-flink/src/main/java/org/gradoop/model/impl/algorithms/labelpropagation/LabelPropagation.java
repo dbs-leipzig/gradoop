@@ -39,7 +39,7 @@ import org.gradoop.model.impl.algorithms.labelpropagation.functions
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .VertexToLPVertexMapper;
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
-import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.auxiliary.SplitBy;
 
@@ -107,7 +107,7 @@ public class LabelPropagation<
       graph.getVertices()
         .join(logicalGraph.getVertices())
         .where(new LPKeySelector())
-        .equalTo(new VertexKeySelector<VD>())
+        .equalTo(new Id<VD>())
         .with(new LPJoin<VD>());
 
     // create a logical graph from the result

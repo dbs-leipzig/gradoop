@@ -7,12 +7,8 @@ import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Collection;
 
-/**
- * Created by peet on 26.11.15.
- */
 public abstract class AbstractBroadcastGraphsContainmentFilter
-  <GE extends EPGMGraphElement>
-  extends RichFilterFunction<GE>{
+  <GE extends EPGMGraphElement> extends RichFilterFunction<GE>{
 
   public static final String GRAPH_IDS = "graphIds";
   protected Collection<GradoopId> graphIds;

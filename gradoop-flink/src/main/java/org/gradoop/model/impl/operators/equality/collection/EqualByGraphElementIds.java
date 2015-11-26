@@ -11,9 +11,9 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.functions.join.LeftSideOnly;
+import org.gradoop.model.impl.functions.join.LeftSide;
 import org.gradoop.model.impl.functions.counting.Tuple1With1L;
-import org.gradoop.model.impl.functions.epgm.Tuple1WithElementId;
+import org.gradoop.model.impl.functions.epgm.Tuple1WithId;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
@@ -64,7 +64,7 @@ public class EqualByGraphElementIds
       getIdsWithCount(graphCollection);
 
     DataSet<Tuple1<GradoopId>> graphIds = graphCollection.getGraphHeads()
-      .map(new Tuple1WithElementId<G>());
+      .map(new Tuple1WithId<G>());
 
     DataSet<Tuple2<GradoopId,GradoopIdSet>> vertexIdsByGraphId =
       getElementIdsByGraphId(
@@ -93,8 +93,8 @@ public class EqualByGraphElementIds
       .flatMap(new GraphIdElementIdInTuple2<T>())
       .join(graphIds)
       .where(0).equalTo(0)
-      .with(new LeftSideOnly<Tuple2<GradoopId, GradoopId>,
-      Tuple1<GradoopId>>())
+      .with(new LeftSide<Tuple2<GradoopId, GradoopId>,
+            Tuple1<GradoopId>>())
       .groupBy(0)
       .reduceGroup(new GraphIdElementIdsInTuple2());
   }

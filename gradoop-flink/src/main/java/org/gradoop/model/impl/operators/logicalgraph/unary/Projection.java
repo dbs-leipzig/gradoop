@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.functions.epgm.ElementClone;
+import org.gradoop.model.impl.functions.epgm.Clone;
 
 /**
  * Creates a projected version of the logical graph using the user defined
@@ -83,7 +83,7 @@ public class Projection
 
     return LogicalGraph.fromDataSets(
       graph.getGraphHead()
-        .map(new ElementClone<G>()),
+        .map(new Clone<G>()),
       graph.getVertices()
         .map(new VertexProjection<>(getVertexFunc())),
       graph.getEdges()

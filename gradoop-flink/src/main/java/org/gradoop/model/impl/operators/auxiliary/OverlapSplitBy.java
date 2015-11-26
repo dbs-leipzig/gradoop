@@ -24,7 +24,7 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
@@ -162,7 +162,7 @@ public class OverlapSplitBy<
     // edge graph sets
     return graph.getEdges()
       .join(newSubgraphs)
-      .where(new EdgeKeySelector<ED>())
+      .where(new Id<ED>())
       .equalTo(0)
       .with(new JoinEdgeTuplesWithEdges<ED>());
   }

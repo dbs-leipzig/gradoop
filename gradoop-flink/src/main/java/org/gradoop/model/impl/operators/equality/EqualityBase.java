@@ -12,7 +12,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.counting.Tuple2WithObjectAnd1L;
-import org.gradoop.model.impl.functions.epgm.ElementId;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -28,7 +28,7 @@ public abstract class EqualityBase {
 
     return graphCollection
       .getGraphHeads()
-      .map(new ElementId<G>())
+      .map(new Id<G>())
       .map(new Tuple2WithObjectAnd1L<GradoopId>())
       .groupBy(0)
       .sum(1);

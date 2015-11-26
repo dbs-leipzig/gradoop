@@ -8,7 +8,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.functions.join.LeftSideOnly;
+import org.gradoop.model.impl.functions.join.LeftSide;
 import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
 import org.gradoop.model.impl.operators.equality.functions
@@ -64,7 +64,7 @@ public class EqualByGraphElementData
       .flatMap(new VertexDataLabeler<V>())
       .join(graphHeadLabels)
       .where(0).equalTo(1)
-      .with(new LeftSideOnly<DataLabel, DataLabel>());
+      .with(new LeftSide<DataLabel, DataLabel>());
 
     DataSet<EdgeDataLabel> edgeLabels = collection.getEdges()
       .flatMap(new EdgeDataLabeler<E>())

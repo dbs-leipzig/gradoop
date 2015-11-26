@@ -39,11 +39,9 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.keyselectors
-  .EdgeSourceVertexKeySelector;
-import org.gradoop.model.impl.functions.keyselectors
-  .EdgeTargetVertexKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.epgm.SourceId;
+import org.gradoop.model.impl.functions.epgm.TargetId;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.api.EdgeHandler;
@@ -91,7 +89,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
 
     // group edges by source vertex id (vertex-id, [out-edge-data])
     DataSet<Tuple2<GradoopId, Set<ED>>> vertexToOutgoingEdges = graph.getEdges()
-      .groupBy(new EdgeSourceVertexKeySelector<ED>())
+      .groupBy(new SourceId<ED>())
       .reduceGroup(new GroupReduceFunction<ED, Tuple2<GradoopId, Set<ED>>>() {
         @Override
         public void reduce(Iterable<ED> edgeIterable,
@@ -112,7 +110,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
 
     // group edges by target vertex id (vertex-id, [in-edge-data])
     DataSet<Tuple2<GradoopId, Set<ED>>> vertexToIncomingEdges = graph.getEdges()
-      .groupBy(new EdgeTargetVertexKeySelector<ED>())
+      .groupBy(new TargetId<ED>())
       .reduceGroup(new GroupReduceFunction<ED, Tuple2<GradoopId, Set<ED>>>() {
         @Override
         public void reduce(Iterable<ED> edgeIterable,
@@ -208,12 +206,12 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
     DataSet<PersistentEdge<VD>> persistentEdgeDataSet = graph.getVertices()
       // join vertex with edges on edge source vertex id
       .join(graph.getEdges())
-      .where(new VertexKeySelector<VD>())
-      .equalTo(new EdgeSourceVertexKeySelector<ED>())
+      .where(new Id<VD>())
+      .equalTo(new SourceId<ED>())
       // join result with vertices on edge target vertex id
       .join(graph.getVertices())
       .where("f1.targetVertexId")
-      .equalTo(new VertexKeySelector<VD>())
+      .equalTo(new Id<VD>())
       // ((source-vertex-data, edge-data), target-vertex-data)
       .with(new PersistentEdgeJoinFunction<>(persistentEdgeFactory));
 

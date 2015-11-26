@@ -4,9 +4,6 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
-/**
- * Created by peet on 26.11.15.
- */
 public class InGraphs<EL extends EPGMGraphElement>
   implements FilterFunction<EL> {
 

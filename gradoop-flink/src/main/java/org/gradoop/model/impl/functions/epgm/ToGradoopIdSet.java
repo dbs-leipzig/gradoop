@@ -5,7 +5,6 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
-
 public class ToGradoopIdSet
   implements GroupReduceFunction<GradoopId, GradoopIdSet> {
 
@@ -22,6 +21,5 @@ public class ToGradoopIdSet
     }
 
     collector.collect(ids);
-
   }
 }

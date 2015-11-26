@@ -4,7 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
 
 /**
  * Returns a collection with all logical graphs that exist in both input
@@ -32,7 +32,7 @@ public class Intersect<
   protected DataSet<GD> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
       .union(secondCollection.getGraphHeads())
-      .groupBy(new GraphKeySelector<GD>())
+      .groupBy(new Id<GD>())
       .reduceGroup(new GraphHeadGroupReducer<GD>(2));
   }
 

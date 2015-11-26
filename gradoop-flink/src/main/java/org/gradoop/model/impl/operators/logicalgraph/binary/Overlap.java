@@ -22,7 +22,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.ElementId;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
@@ -50,7 +50,7 @@ public class Overlap<
 
     DataSet<GradoopId> graphIds = firstGraph.getGraphHead()
       .union(secondGraph.getGraphHead())
-      .map(new ElementId<G>());
+      .map(new Id<G>());
 
     DataSet<V> newVertexSet = firstGraph.getVertices()
       .filter(new InGraphsBroadcast<V>())

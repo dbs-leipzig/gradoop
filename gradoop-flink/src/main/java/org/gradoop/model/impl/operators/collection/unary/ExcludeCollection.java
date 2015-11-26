@@ -24,7 +24,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.ElementId;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment
   .AbstractBroadcastGraphsContainmentFilter;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
@@ -72,7 +72,7 @@ public class ExcludeCollection
     DataSet<G> graphHeads = collection.getGraphHeads();
 
     DataSet<GradoopId> graphIDs = graphHeads
-      .map(new ElementId<G>());
+      .map(new Id<G>());
 
     graphIDs = graphIDs
       .filter(new RemoveGradoopIdFromDataSetFilter(positiveGraphID));

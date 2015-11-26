@@ -5,7 +5,7 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
 
-public class Tuple1WithElementId<EL extends EPGMElement>
+public class Tuple1WithId<EL extends EPGMElement>
   implements MapFunction<EL, Tuple1<GradoopId>> {
 
   @Override

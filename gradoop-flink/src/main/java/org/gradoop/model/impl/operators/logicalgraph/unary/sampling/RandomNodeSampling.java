@@ -23,10 +23,10 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.join.EdgeVertexJoinKeepEdge;
-import org.gradoop.model.impl.functions.keyselectors.EdgeSourceVertexKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.EdgeTargetVertexKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.join.LeftSide;
+import org.gradoop.model.impl.functions.epgm.SourceId;
+import org.gradoop.model.impl.functions.epgm.TargetId;
 
 import java.util.Random;
 
@@ -85,13 +85,13 @@ public class RandomNodeSampling
 
     DataSet<E> newEdges = graph.getEdges()
       .join(newVertices)
-      .where(new EdgeSourceVertexKeySelector<E>())
-      .equalTo(new VertexKeySelector<V>())
-      .with(new EdgeVertexJoinKeepEdge<V, E>())
+      .where(new SourceId<E>())
+      .equalTo(new Id<V>())
+      .with(new LeftSide<E, V>())
       .join(newVertices)
-      .where(new EdgeTargetVertexKeySelector<E>())
-      .equalTo(new VertexKeySelector<V>())
-      .with(new EdgeVertexJoinKeepEdge<V, E>());
+      .where(new TargetId<E>())
+      .equalTo(new Id<V>())
+      .with(new LeftSide<E, V>());
 
     return LogicalGraph.fromDataSets(
       newVertices, newEdges, graph.getConfig());

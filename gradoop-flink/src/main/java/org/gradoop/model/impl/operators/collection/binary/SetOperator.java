@@ -8,14 +8,10 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.join.EdgeVertexJoinKeepEdge;
-import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
-import org.gradoop.model.impl.functions.keyselectors
-  .EdgeSourceVertexKeySelector;
-import org.gradoop.model.impl.functions.keyselectors
-  .EdgeTargetVertexKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.join.LeftSide;
+import org.gradoop.model.impl.functions.epgm.SourceId;
+import org.gradoop.model.impl.functions.epgm.TargetId;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -62,7 +58,7 @@ public abstract class SetOperator<
     return verticesWithGraphs
       .join(newGraphHeads)
       .where(1)
-      .equalTo(new GraphKeySelector<GD>())
+      .equalTo(new Id<GD>())
       .with(
         new JoinFunction<Tuple2<VD, GradoopId>, GD, VD>() {
           @Override
@@ -71,7 +67,7 @@ public abstract class SetOperator<
             return vertices.f0;
           }
         })
-      .distinct(new VertexKeySelector<VD>());
+      .distinct(new Id<VD>());
   }
 
   /**
@@ -86,13 +82,13 @@ public abstract class SetOperator<
   @Override
   protected DataSet<ED> computeNewEdges(DataSet<VD> newVertices) {
     return firstCollection.getEdges().join(newVertices)
-      .where(new EdgeSourceVertexKeySelector<ED>())
-      .equalTo(new VertexKeySelector<VD>())
-      .with(new EdgeVertexJoinKeepEdge<VD, ED>())
+      .where(new SourceId<ED>())
+      .equalTo(new Id<VD>())
+      .with(new LeftSide<ED, VD>())
       .join(newVertices)
-      .where(new EdgeTargetVertexKeySelector<ED>())
-      .equalTo(new VertexKeySelector<VD>())
-      .with(new EdgeVertexJoinKeepEdge<VD, ED>())
-      .distinct(new EdgeKeySelector<ED>());
+      .where(new TargetId<ED>())
+      .equalTo(new Id<VD>())
+      .with(new LeftSide<ED, VD>())
+      .distinct(new Id<ED>());
   }
 }

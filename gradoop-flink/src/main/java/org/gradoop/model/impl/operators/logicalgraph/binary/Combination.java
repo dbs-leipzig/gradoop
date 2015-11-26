@@ -22,8 +22,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
+import org.gradoop.model.impl.functions.epgm.Id;
 
 /**
  * Creates a new logical graph by combining the vertex and edge sets of two
@@ -49,11 +48,11 @@ public class Combination
     // cannot use Gelly union here because of missing argument for KeySelector
     DataSet<VD> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
-      .distinct(new VertexKeySelector<VD>());
+      .distinct(new Id<VD>());
 
     DataSet<ED> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
-      .distinct(new EdgeKeySelector<ED>());
+      .distinct(new Id<ED>());
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

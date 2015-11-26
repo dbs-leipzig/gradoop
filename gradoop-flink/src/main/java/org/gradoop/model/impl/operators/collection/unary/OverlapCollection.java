@@ -26,7 +26,7 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.graphcontainment
   .AbstractBroadcastGraphsContainmentFilter;
 import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
-import org.gradoop.model.impl.functions.epgm.ElementId;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -49,7 +49,7 @@ public class OverlapCollection
 
     DataSet<G> graphHeads = collection.getGraphHeads();
 
-    DataSet<GradoopId> graphIDs = graphHeads.map(new ElementId<G>());
+    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<G>());
 
     DataSet<V> vertices = collection.getVertices()
       .filter(new InGraphsBroadcast<V>())

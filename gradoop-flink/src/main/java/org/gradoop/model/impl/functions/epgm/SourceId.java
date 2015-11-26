@@ -15,21 +15,21 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.keyselectors;
+package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Used for distinction of vertices based on their unique id.
+ * Used to select the source vertex id of an edge.
  *
- * @param <VD> EPGM vertex type
+ * @param <ED> EPGM edge type
  */
-public class VertexKeySelector<VD extends EPGMVertex>
-  implements KeySelector<VD, GradoopId> {
+public class SourceId<ED extends EPGMEdge>
+  implements KeySelector<ED, GradoopId> {
   @Override
-  public GradoopId getKey(VD vertex) throws Exception {
-    return vertex.getId();
+  public GradoopId getKey(ED e) throws Exception {
+    return e.getSourceVertexId();
   }
 }
