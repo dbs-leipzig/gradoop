@@ -44,56 +44,50 @@ public class LogicalGraphRandomNodeSamplingTest extends GradoopFlinkTestBase {
   @Test
   public void randomNodeSamplingTest() throws Exception {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dbGraph =
-      getGraphStore().getDatabaseGraph();
+      getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = dbGraph.sampleRandomNodes(0.272f);
-    List<VertexPojo> dbVertices = Lists.newArrayList();
-    List<EdgePojo> dbEdges = Lists.newArrayList();
-    List<VertexPojo> newVertices = Lists.newArrayList();
-    List<EdgePojo> newEdges = Lists.newArrayList();
-    dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
-    dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
-    newGraph.getVertices()
-      .output(new LocalCollectionOutputFormat<>(newVertices));
-    newGraph.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
-    getExecutionEnvironment().execute();
-    assertNotNull("graph was null", newGraph);
-    Set<GradoopId> newVertexIDs = new HashSet<>();
-    for (VertexPojo vertex : newVertices) {
-      assertTrue(dbVertices.contains(vertex));
-      newVertexIDs.add(vertex.getId());
-    }
-    for (EdgePojo edge : newEdges) {
-      assertTrue(dbEdges.contains(edge));
-      assertTrue(newVertexIDs.contains(edge.getSourceVertexId()));
-      assertTrue(newVertexIDs.contains(edge.getTargetVertexId()));
-    }
-    dbEdges.removeAll(newEdges);
-    for (EdgePojo edge : dbEdges) {
-      assertFalse(newVertexIDs.contains(edge.getSourceVertexId()) &&
-        newVertexIDs.contains(edge.getTargetVertexId()));
-    }
+
+    validateResult(dbGraph, newGraph);
   }
 
   @Test
   public void randomNodeSamplingTestWithSeed() throws Exception {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dbGraph =
-      getGraphStore().getDatabaseGraph();
+      getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = dbGraph.callForGraph(
       new RandomNodeSampling<GraphHeadPojo, VertexPojo, EdgePojo>(
         0.272f, -4181668494294894490L));
+
+    validateResult(dbGraph, newGraph);
+  }
+
+  private void validateResult(
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input,
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output)
+    throws Exception {
     List<VertexPojo> dbVertices = Lists.newArrayList();
     List<EdgePojo> dbEdges = Lists.newArrayList();
     List<VertexPojo> newVertices = Lists.newArrayList();
     List<EdgePojo> newEdges = Lists.newArrayList();
-    dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
-    dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
-    newGraph.getVertices()
+
+    input.getVertices()
+      .output(new LocalCollectionOutputFormat<>(dbVertices));
+    input.getEdges()
+      .output(new LocalCollectionOutputFormat<>(dbEdges));
+
+    output.getVertices()
       .output(new LocalCollectionOutputFormat<>(newVertices));
-    newGraph.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
+    output.getEdges()
+      .output(new LocalCollectionOutputFormat<>(newEdges));
+
     getExecutionEnvironment().execute();
-    assertNotNull("graph was null", newGraph);
+
+    assertNotNull("graph was null", output);
+
     Set<GradoopId> newVertexIDs = new HashSet<>();
     for (VertexPojo vertex : newVertices) {
       assertTrue(dbVertices.contains(vertex));
@@ -106,7 +100,8 @@ public class LogicalGraphRandomNodeSamplingTest extends GradoopFlinkTestBase {
     }
     dbEdges.removeAll(newEdges);
     for (EdgePojo edge : dbEdges) {
-      assertFalse(newVertexIDs.contains(edge.getSourceVertexId()) &&
+      assertFalse(
+        newVertexIDs.contains(edge.getSourceVertexId()) &&
         newVertexIDs.contains(edge.getTargetVertexId()));
     }
   }
