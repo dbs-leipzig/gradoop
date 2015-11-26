@@ -193,6 +193,28 @@ public class LogicalGraph
   }
 
   /**
+   * Creates a logical graph from the given arguments.
+   *
+   * @param <V>        EPGM vertex type
+   * @param <E>        EPGM edge type
+   * @param <G>        EPGM graph type
+   * @param graphHead   Graph head associated with the logical graph
+   * @param vertices    Vertex collection
+   * @param edges       Edge collection
+   * @param config      Gradoop Flink configuration
+   * @return Logical graph
+   */
+  public static
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+  LogicalGraph<G, V, E> fromCollections(
+    G graphHead, Collection<V> vertices, Collection<E> edges,
+    GradoopFlinkConfig<V, E, G> config) {
+
+    return fromCollections(
+      Lists.newArrayList(graphHead), vertices, edges, config);
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -208,7 +230,7 @@ public class LogicalGraph
   public LogicalGraph<G, V, E> project(UnaryFunction<V, V> vertexFunction,
     UnaryFunction<E, E> edgeFunction) throws Exception {
     return callForGraph(
-      new Projection<V, E, G>(vertexFunction, edgeFunction));
+      new Projection<G, V, E>(vertexFunction, edgeFunction));
   }
 
   /**
@@ -227,7 +249,7 @@ public class LogicalGraph
   @Override
   public LogicalGraph<G, V, E> sampleRandomNodes(Float
     sampleSize) throws Exception {
-    return callForGraph(new RandomNodeSampling<V, E, G>(sampleSize));
+    return callForGraph(new RandomNodeSampling<G, V, E>(sampleSize));
   }
 
   /**

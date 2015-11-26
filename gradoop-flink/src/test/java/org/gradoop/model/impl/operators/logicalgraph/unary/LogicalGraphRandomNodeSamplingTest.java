@@ -81,7 +81,7 @@ public class LogicalGraphRandomNodeSamplingTest extends GradoopFlinkTestBase {
       getGraphStore().getDatabaseGraph();
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraph = dbGraph.callForGraph(
-      new RandomNodeSampling<VertexPojo, EdgePojo, GraphHeadPojo>(
+      new RandomNodeSampling<GraphHeadPojo, VertexPojo, EdgePojo>(
         0.272f, -4181668494294894490L));
     List<VertexPojo> dbVertices = Lists.newArrayList();
     List<EdgePojo> dbEdges = Lists.newArrayList();

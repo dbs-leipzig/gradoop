@@ -1,18 +1,25 @@
 package org.gradoop.model.impl.operators;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.bool.Equals;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static org.gradoop.GradoopTestBaseUtils.LABEL_COMMUNITY;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
@@ -24,45 +31,93 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetExistingGraph() throws Exception {
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g =
-      getGraphStore().getGraph(GradoopIds.fromLong(0L));
-    assertNotNull("graph was null", g);
-    assertEquals("vertex set has the wrong size", 3L, g.getVertices().count());
-    assertEquals("edge set has the wrong size", 4L, g.getEdges().count());
-    assertEquals("wrong label", LABEL_COMMUNITY, g.getLabel());
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
+
+    String graphVariable = "g0";
+
+    EPGMGraphHead g = loader.getGraphHeadByVariable(graphVariable);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphFromLoader =
+      loader.getLogicalGraphByVariable(graphVariable);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphFromDB =
+      loader.getDatabase().getGraph(g.getId());
+
+    // head <> head
+    collectAndAssertEquals(graphFromLoader.getGraphHead()
+      .cross(graphFromDB.getGraphHead())
+      .with(new Equals<GraphHeadPojo>())
+    );
+
+    // elements <> elements
+    collectAndAssertEquals(graphFromLoader.equalsByElementIds(graphFromDB));
   }
 
   @Test
   public void testNonExistingGraph() throws Exception {
-    assertNull("graph was not null", getGraphStore().getGraph(GradoopIds
-      .fromLong(4L)));
+    assertNull(
+      "graph was not null",
+      getSocialNetworkLoader().getDatabase().getGraph(new GradoopId())
+    );
   }
 
   @Test
   public void testGetGraphs() throws Exception {
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
+
+    String[] graphVariables = {"g0", "g1", "g2"};
+
+    GradoopId[] graphIds = new GradoopId[3];
+
+    for(String graphVariable : graphVariables) {
+      GradoopId graphId = loader.getGraphHeadByVariable(graphVariable).getId();
+      ArrayUtils.add(graphIds, graphId);
+    }
+
+    GradoopIdSet graphIdSet = GradoopIdSet.fromExisting(graphIds);
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collectionFromLoader =
+      loader.getGraphCollectionByVariables(graphVariables);
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphs = graphColl.getGraphs(GradoopIdSet.fromLongs(0L, 1L, 2L));
+      collectionFromDbViaArray =
+    loader.getDatabase().getCollection().getGraphs(graphIds);
 
-    assertNotNull("graph collection is null", graphs);
-    assertEquals("wrong number of graphs", 3L, graphs.getGraphCount());
-    assertEquals("wrong number of vertices", 6L, graphs.getVertexCount());
-    assertEquals("wrong number of edges", 10L, graphs.getEdgeCount());
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+      collectionFromDbViaSet =
+      loader.getDatabase().getCollection().getGraphs(graphIdSet);
+
+    // heads <> heads
+    collectAndAssertEquals(
+      collectionFromLoader.equalsByGraphIds(collectionFromDbViaArray));
+    collectAndAssertEquals(
+      collectionFromLoader.equalsByGraphIds(collectionFromDbViaSet));
+
+    // elements <> elements
+    collectAndAssertEquals(
+      collectionFromLoader.equalsByGraphElementIds(collectionFromDbViaArray));
+    collectAndAssertEquals(
+      collectionFromLoader.equalsByGraphElementIds(collectionFromDbViaSet));
   }
 
   @Test
   public void testGetCollection() throws Exception {
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphColl = getGraphStore().getCollection();
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getSocialNetworkLoader();
 
-    assertNotNull("graph collection was null", graphColl);
-    assertEquals("graph collection has wrong size", 4L,
-      graphColl.getGraphCount());
-    assertEquals("graph collection has wrong vertex count", 7L,
-      graphColl.getVertexCount());
-    assertEquals("graph collection has wrong edge count", 13L,
-      graphColl.getEdgeCount());
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collectionFromLoader =
+      loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collectionFromDb =
+      loader.getDatabase().getCollection();
+
+    // heads <> heads
+    collectAndAssertEquals(
+      collectionFromLoader.equalsByGraphIds(collectionFromDb));
+
+    // elements <> elements
+    collectAndAssertEquals(
+      collectionFromLoader.equalsByGraphElementIds(collectionFromDb));
   }
 }

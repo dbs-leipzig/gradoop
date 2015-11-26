@@ -41,13 +41,13 @@ import java.util.Random;
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public class RandomNodeSampling<VD extends EPGMVertex, ED extends EPGMEdge,
-  GD extends EPGMGraphHead> implements
-  UnaryGraphToGraphOperator<VD, ED, GD> {
+public class RandomNodeSampling
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryGraphToGraphOperator<V, E, G> {
   /**
    * relative amount of nodes in the result graph
    */
@@ -83,27 +83,26 @@ public class RandomNodeSampling<VD extends EPGMVertex, ED extends EPGMEdge,
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) throws
+  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
     Exception {
     final GradoopId newGraphID = FlinkConstants.RANDOM_NODE_SAMPLING_GRAPH_ID;
 
-    DataSet<VD> newVertices = graph.getVertices()
-      .filter(new VertexRandomFilter<VD>(sampleSize, randomSeed))
-      .map(new VertexToGraphUpdater<VD>(newGraphID));
+    DataSet<V> newVertices = graph.getVertices()
+      .filter(new VertexRandomFilter<V>(sampleSize, randomSeed))
+      .map(new VertexToGraphUpdater<V>(newGraphID));
 
-    DataSet<ED> newEdges = graph.getEdges()
+    DataSet<E> newEdges = graph.getEdges()
       .join(newVertices)
-      .where(new EdgeSourceVertexKeySelector<ED>())
-      .equalTo(new VertexKeySelector<VD>())
-      .with(new EdgeVertexJoinKeepEdge<VD, ED>())
+      .where(new EdgeSourceVertexKeySelector<E>())
+      .equalTo(new VertexKeySelector<V>())
+      .with(new EdgeVertexJoinKeepEdge<V, E>())
       .join(newVertices)
-      .where(new EdgeTargetVertexKeySelector<ED>())
-      .equalTo(new VertexKeySelector<VD>())
-      .with(new EdgeVertexJoinKeepEdge<VD, ED>())
-      .map(new EdgeToGraphUpdater<ED>(newGraphID));
+      .where(new EdgeTargetVertexKeySelector<E>())
+      .equalTo(new VertexKeySelector<V>())
+      .with(new EdgeVertexJoinKeepEdge<V, E>())
+      .map(new EdgeToGraphUpdater<E>(newGraphID));
 
     return LogicalGraph.fromDataSets(
-      graph.getConfig().getGraphHeadFactory().createGraphHead(newGraphID),
       newVertices, newEdges, graph.getConfig());
   }
 

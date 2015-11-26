@@ -22,49 +22,42 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
-import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
-import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
-import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.FlinkConstants;
+import org.gradoop.model.impl.functions.filterfunctions.ElementInGraphs;
 
 /**
  * Creates a new logical graph containing the overlapping vertex and edge
  * sets of two input graphs. Vertex and edge equality is based on their
  * respective identifiers.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
 public class Overlap<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends AbstractBinaryGraphToGraphOperator<GD, VD, ED> {
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  G extends EPGMGraphHead>
+  extends AbstractBinaryGraphToGraphOperator<G, V, E> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected LogicalGraph<GD, VD, ED> executeInternal(
-    LogicalGraph<GD, VD, ED> firstGraph, LogicalGraph<GD, VD, ED> secondGraph) {
-    final GradoopId newGraphID = FlinkConstants.OVERLAP_GRAPH_ID;
+  protected LogicalGraph<G, V, E> executeInternal(
+    LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
-    // union vertex sets, group by vertex id, filter vertices where
-    // the group contains two vertices and update them with the new graph id
-    DataSet<VD> newVertexSet = firstGraph.getVertices()
-      .union(secondGraph.getVertices())
-      .groupBy(new VertexKeySelector<VD>())
-      .reduceGroup(new VertexGroupReducer<VD>(2L))
-      .map(new VertexToGraphUpdater<VD>(newGraphID));
+    DataSet<G> graphHeads = firstGraph.getGraphHead()
+      .union(secondGraph.getGraphHead());
 
-    DataSet<ED> newEdgeSet = firstGraph.getEdges()
-      .union(secondGraph.getEdges())
-      .groupBy(new EdgeKeySelector<ED>())
-      .reduceGroup(new EdgeGroupReducer<ED>(2L))
-      .map(new EdgeToGraphUpdater<ED>(newGraphID));
+    DataSet<V> newVertexSet = firstGraph.getVertices()
+      .filter(new ElementInGraphs<G, V>())
+      .withBroadcastSet(
+        graphHeads, ElementInGraphs.GRAPH_HEADS);
+
+    DataSet<E> newEdgeSet = firstGraph.getEdges()
+      .filter(new ElementInGraphs<G, E>())
+      .withBroadcastSet(
+        graphHeads, ElementInGraphs.GRAPH_HEADS);
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

@@ -24,28 +24,27 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.functions.mapfunctions.ElementClone;
 
 /**
  * Creates a projected version of the logical graph using the user defined
  * vertex and edge data projection functions.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public class Projection<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  implements UnaryGraphToGraphOperator<VD, ED, GD> {
+public class Projection
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryGraphToGraphOperator<V, E, G> {
   /**
    * Vertex projection function.
    */
-  private final UnaryFunction<VD, VD> vertexFunc;
+  private final UnaryFunction<V, V> vertexFunc;
   /**
    * Edge projection function.
    */
-  private final UnaryFunction<ED, ED> edgeFunc;
+  private final UnaryFunction<E, E> edgeFunc;
 
   /**
    * Creates new projection.
@@ -53,8 +52,8 @@ public class Projection<
    * @param vertexFunc vertex projection function
    * @param edgeFunc   edge projection function
    */
-  public Projection(UnaryFunction<VD, VD> vertexFunc,
-    UnaryFunction<ED, ED> edgeFunc) {
+  public Projection(UnaryFunction<V, V> vertexFunc,
+    UnaryFunction<E, E> edgeFunc) {
     this.vertexFunc = vertexFunc;
     this.edgeFunc = edgeFunc;
   }
@@ -64,7 +63,7 @@ public class Projection<
    *
    * @return unary vertex to vertex function
    */
-  protected UnaryFunction<VD, VD> getVertexFunc() {
+  protected UnaryFunction<V, V> getVertexFunc() {
     return this.vertexFunc;
   }
 
@@ -73,7 +72,7 @@ public class Projection<
    *
    * @return unary vertex to vertex function
    */
-  protected UnaryFunction<ED, ED> getEdgeFunc() {
+  protected UnaryFunction<E, E> getEdgeFunc() {
     return this.edgeFunc;
   }
 
@@ -81,14 +80,16 @@ public class Projection<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) {
-    DataSet<VD> vertices = graph.getVertices()
-      .map(new ProjectionVerticesMapper<>(getVertexFunc()));
-    DataSet<ED> edges = graph.getEdges()
-      .map(new ProjectionEdgesMapper<>(getEdgeFunc()));
-    return LogicalGraph.fromDataSets(graph.getConfig().getGraphHeadFactory()
-      .createGraphHead(graph.getId(), graph.getLabel(),
-        graph.getProperties()), vertices, edges, graph.getConfig());
+  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+
+    return LogicalGraph.fromDataSets(
+      graph.getGraphHead()
+        .map(new ElementClone<G>()),
+      graph.getVertices()
+        .map(new VertexProjection<>(getVertexFunc())),
+      graph.getEdges()
+        .map(new EdgeProjection<>(getEdgeFunc())),
+      graph.getConfig());
   }
 
   /**
@@ -96,7 +97,7 @@ public class Projection<
    *
    * @param <VD> vertex data type
    */
-  private static class ProjectionVerticesMapper<VD extends EPGMVertex>
+  private static class VertexProjection<VD extends EPGMVertex>
     implements
     MapFunction<VD, VD> {
     /**
@@ -109,7 +110,7 @@ public class Projection<
      *
      * @param vertexFunc the vertex projection function
      */
-    public ProjectionVerticesMapper(UnaryFunction<VD, VD> vertexFunc) {
+    public VertexProjection(UnaryFunction<VD, VD> vertexFunc) {
       this.vertexFunc = vertexFunc;
     }
 
@@ -124,7 +125,7 @@ public class Projection<
    *
    * @param <ED> edge data type
    */
-  private static class ProjectionEdgesMapper<ED extends EPGMEdge> implements
+  private static class EdgeProjection<ED extends EPGMEdge> implements
     MapFunction<ED, ED> {
     /**
      * Edge to edge function
@@ -136,7 +137,7 @@ public class Projection<
      *
      * @param edgeFunc the edge projection function
      */
-    public ProjectionEdgesMapper(UnaryFunction<ED, ED> edgeFunc) {
+    public EdgeProjection(UnaryFunction<ED, ED> edgeFunc) {
       this.edgeFunc = edgeFunc;
     }
 

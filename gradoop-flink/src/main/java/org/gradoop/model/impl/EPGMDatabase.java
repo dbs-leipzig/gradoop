@@ -60,29 +60,27 @@ import java.util.Collection;
 /**
  * Enables the access an EPGM instance.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public class EPGMDatabase<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead> {
+public class EPGMDatabase
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
    * Gradoop Flink configuration.
    */
-  private final GradoopFlinkConfig<VD, ED, GD> config;
+  private final GradoopFlinkConfig<V, E, G> config;
 
   /**
    * Database graph representing the vertex and edge space.
    */
-  private GraphCollection<GD, VD, ED> database;
+  private GraphCollection<G, V, E> database;
 
   /**
    * Graph data associated with that logical graph.
    */
-  private final GD databaseData;
+  private final G databaseData;
 
   /**
    * Creates a new EPGM database from the given arguments.
@@ -92,9 +90,9 @@ public class EPGMDatabase<
    * @param graphHeads  graph data set
    * @param config      Gradoop Flink Configuration
    */
-  private EPGMDatabase(DataSet<VD> vertices,
-    DataSet<ED> edges, DataSet<GD> graphHeads,
-    GradoopFlinkConfig<VD, ED, GD> config) {
+  private EPGMDatabase(DataSet<V> vertices,
+    DataSet<E> edges, DataSet<G> graphHeads,
+    GradoopFlinkConfig<V, E, G> config) {
     this.config = config;
     this.database = GraphCollection.fromDataSets(vertices,
       edges, graphHeads, config);
@@ -117,7 +115,7 @@ public class EPGMDatabase<
    * @see GraphHeadPojoFactory
    */
   @SuppressWarnings("unchecked")
-  public static EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> fromJsonFile(
+  public static EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> fromJsonFile(
     String vertexFile, String edgeFile, ExecutionEnvironment env) {
     return fromJsonFile(vertexFile, edgeFile,
       GradoopFlinkConfig.createDefaultConfig(env));
@@ -158,7 +156,7 @@ public class EPGMDatabase<
    * @see GraphHeadPojoFactory
    */
   @SuppressWarnings("unchecked")
-  public static EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> fromJsonFile(
+  public static EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> fromJsonFile(
     String vertexFile, String edgeFile, String graphFile,
     ExecutionEnvironment env) {
     return fromJsonFile(vertexFile, edgeFile, graphFile,
@@ -245,11 +243,11 @@ public class EPGMDatabase<
     final String graphFile) throws Exception {
     getDatabaseGraph().getVertices()
       .writeAsFormattedText(vertexFile,
-        new JsonWriter.VertexTextFormatter<VD>());
+        new JsonWriter.VertexTextFormatter<V>());
     getDatabaseGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<ED>());
+      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<E>());
     getCollection().getGraphHeads()
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<GD>());
+      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<G>());
     config.getExecutionEnvironment().execute();
   }
 
@@ -267,18 +265,18 @@ public class EPGMDatabase<
    * @param <PGD>                       persistent graph data type
    * @throws Exception
    */
-  public <PVD extends PersistentVertex<ED>, PED
-    extends PersistentEdge<VD>, PGD extends PersistentGraphHead>
+  public <PVD extends PersistentVertex<E>, PED
+    extends PersistentEdge<V>, PGD extends PersistentGraphHead>
   void writeToHBase(
-    EPGMStore<VD, ED, GD> epgmStore,
-    final PersistentVertexFactory<VD, ED, PVD> persistentVertexFactory,
-    final PersistentEdgeFactory<ED, VD, PED> persistentEdgeFactory,
-    final PersistentGraphHeadFactory<GD, PGD> persistentGraphHeadFactory) throws
+    EPGMStore<V, E, G> epgmStore,
+    final PersistentVertexFactory<V, E, PVD> persistentVertexFactory,
+    final PersistentEdgeFactory<E, V, PED> persistentEdgeFactory,
+    final PersistentGraphHeadFactory<G, PGD> persistentGraphHeadFactory) throws
     Exception {
 
-    HBaseWriter<VD, ED, GD> hBaseWriter = new HBaseWriter<>();
+    HBaseWriter<V, E, G> hBaseWriter = new HBaseWriter<>();
 
-    GradoopConfig<GD, VD, ED> conf = epgmStore.getConfig();
+    GradoopConfig<G, V, E> conf = epgmStore.getConfig();
     // transform graph data to persistent graph data and write it
     hBaseWriter.writeGraphHeads(this, conf.getGraphHeadHandler(),
       persistentGraphHeadFactory, epgmStore.getGraphHeadName());
@@ -309,7 +307,7 @@ public class EPGMDatabase<
    * @see GraphHeadPojoFactory
    */
   @SuppressWarnings("unchecked")
-  public static EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
+  public static EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
   fromCollection(
     Collection<VertexPojo> vertexDataCollection,
     Collection<EdgePojo> edgeDataCollection, ExecutionEnvironment env) {
@@ -353,7 +351,7 @@ public class EPGMDatabase<
    * @see GraphHeadPojoFactory
    */
   @SuppressWarnings("unchecked")
-  public static EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
+  public static EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
   fromCollection(
     Collection<VertexPojo> vertexDataCollection,
     Collection<EdgePojo> edgeDataCollection,
@@ -415,7 +413,7 @@ public class EPGMDatabase<
   @SuppressWarnings("unchecked")
   public static
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  EPGMDatabase<VD, ED, GD> fromHBase(
+  EPGMDatabase<GD, VD, ED> fromHBase(
     EPGMStore<VD, ED, GD> epgmStore, ExecutionEnvironment env) {
 
     GradoopConfig<GD, VD, ED> conf = epgmStore.getConfig();
@@ -477,10 +475,9 @@ public class EPGMDatabase<
    *
    * @return logical graph of vertex and edge space
    */
-  public LogicalGraph<GD, VD, ED> getDatabaseGraph() {
+  public LogicalGraph<G, V, E> getDatabaseGraph() {
     return LogicalGraph
-      .fromDataSets(databaseData, database.getVertices(), database.getEdges(),
-        config);
+      .fromDataSets(database.getVertices(), database.getEdges(), config);
   }
 
   /**
@@ -490,7 +487,7 @@ public class EPGMDatabase<
    * @return logical graph or {@code null} if graph does not exist
    * @throws Exception
    */
-  public LogicalGraph<GD, VD, ED> getGraph(GradoopId graphID) throws Exception {
+  public LogicalGraph<G, V, E> getGraph(GradoopId graphID) throws Exception {
     return database.getGraph(graphID);
   }
 
@@ -499,20 +496,20 @@ public class EPGMDatabase<
    *
    * @return collection of all logical graphs
    */
-  public GraphCollection<GD, VD, ED> getCollection() {
-    DataSet<VD> newVertices =
+  public GraphCollection<G, V, E> getCollection() {
+    DataSet<V> newVertices =
       database.getVertices()
-        .filter(new FilterFunction<VD>() {
+        .filter(new FilterFunction<V>() {
           @Override
-          public boolean filter(VD vertex) throws
+          public boolean filter(V vertex) throws
             Exception {
             return vertex.getGraphCount() > 0;
           }
         });
-    DataSet<ED> newEdges = database.getEdges()
-      .filter(new FilterFunction<ED>() {
+    DataSet<E> newEdges = database.getEdges()
+      .filter(new FilterFunction<E>() {
         @Override
-        public boolean filter(ED longEDEdge) throws Exception {
+        public boolean filter(E longEDEdge) throws Exception {
           return longEDEdge.getGraphCount() > 0;
         }
       });

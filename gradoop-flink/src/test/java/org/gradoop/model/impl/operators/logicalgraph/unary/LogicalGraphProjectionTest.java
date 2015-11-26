@@ -19,12 +19,15 @@ package org.gradoop.model.impl.operators.logicalgraph.unary;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,7 +36,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.gradoop.GradoopTestBaseUtils.PROPERTY_KEY_SINCE;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
@@ -45,91 +47,45 @@ public class LogicalGraphProjectionTest extends GradoopFlinkTestBase {
 
   @Test
   public void projectionTest() throws Exception {
+
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+      getLoaderFromString("" +
+        "org:Ga{k=0}[(:Va{k=0})-[:ea{k=0}]->(:Va{k=0})];" +
+        "exp:Ga{k=0}[(:Vb{k=1})-[:eb{k=1}]->(:Vb{k=1})]"
+      );
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> original = loader
+      .getLogicalGraphByVariable("org");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expectation = loader
+      .getLogicalGraphByVariable("exp");
+
+
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      forumGraph = getGraphStore().getGraph(GradoopIds.fromLong(3L));
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      newGraph = forumGraph.project(new VertexLabelProjectionFunction(),
-      new EdgePropertyProjectionFunction());
+      result = original.project(
+      new TestProjection<VertexPojo>(),
+      new TestProjection<EdgePojo>()
+    );
 
-    List<VertexPojo> oldVertices = Lists.newArrayList();
-    List<EdgePojo> oldEdges = Lists.newArrayList();
-    List<VertexPojo> newVertices = Lists.newArrayList();
-    List<EdgePojo> newEdges = Lists.newArrayList();
+    collectAndAssertEquals(result.equalsByElementData(expectation));
+    collectAndAssertNotEquals(
+      result.getGraphHead()
+        .cross(original.getGraphHead())
+        .with(new Equals<GraphHeadPojo>())
+    );
 
-    forumGraph.getVertices().output(
-      new LocalCollectionOutputFormat<>(oldVertices));
-    forumGraph.getEdges().output(
-      new LocalCollectionOutputFormat<>(oldEdges));
-    newGraph.getVertices().output(
-      new LocalCollectionOutputFormat<>(newVertices));
-    newGraph.getEdges().output(
-      new LocalCollectionOutputFormat<>(newEdges));
 
-    getExecutionEnvironment().execute();
-
-    Collections.sort(oldVertices, new VertexComparator());
-    Collections.sort(newVertices, new VertexComparator());
-    Collections.sort(oldEdges, new EdgeComparator());
-    Collections.sort(newEdges, new EdgeComparator());
-
-    assertNotNull("graph was null", newGraph);
-    assertEquals(oldVertices.size(), newVertices.size());
-    assertEquals(oldEdges.size(), newEdges.size());
-    assertEquals(forumGraph.getLabel(), newGraph.getLabel());
-    assertEquals(forumGraph.getProperties(), newGraph.getProperties());
-
-    for (int i = 0; i < newVertices.size(); i++) {
-      VertexPojo oldVertex = oldVertices.get(i);
-      VertexPojo newVertex = newVertices.get(i);
-      assertEquals(oldVertex.getId(), newVertex.getId());
-      assertEquals(oldVertex.getProperties(), newVertex.getProperties());
-      assertEquals(newVertex.getLabel(), "test_label");
-    }
-    for (int i = 0; i < newEdges.size(); i++) {
-      EdgePojo oldEdge = oldEdges.get(i);
-      EdgePojo newEdge = newEdges.get(i);
-      assertEquals(oldEdge.getId(), newEdge.getId());
-      assertEquals(oldEdge.getLabel(), newEdge.getLabel());
-      assertEquals(newEdge.getProperties().get("test_property"), "test_value");
-      assertNull(newEdge.getProperties().get(PROPERTY_KEY_SINCE));
-    }
   }
 
-  private static class VertexComparator
-    implements Comparator<VertexPojo> {
-    @Override
-    public int compare(VertexPojo vertex1,
-      VertexPojo vertex2) {
-      return vertex1.getId().compareTo(vertex2.getId());
-    }
-  }
+  private class TestProjection<GE extends EPGMGraphElement>
+    implements UnaryFunction<GE, GE> {
 
-  private static class EdgeComparator
-    implements Comparator<EdgePojo> {
     @Override
-    public int compare(EdgePojo edge1,
-      EdgePojo edge2) {
-      return edge1.getId().compareTo(edge2.getId());
-    }
-  }
+    public GE execute(GE element) throws Exception {
+      element.setLabel(element.getLabel().replace('a', 'b'));
+      element.setProperty("k", 1);
 
-  private static class VertexLabelProjectionFunction implements
-    UnaryFunction<VertexPojo, VertexPojo> {
-    @Override
-    public VertexPojo execute(VertexPojo vertexData) throws
-      Exception {
-      vertexData.setLabel("test_label");
-      return vertexData;
-    }
-  }
-
-  private static class EdgePropertyProjectionFunction implements
-    UnaryFunction<EdgePojo, EdgePojo> {
-    @Override
-    public EdgePojo execute(EdgePojo edgeData) throws Exception {
-      edgeData.setProperty("test_property", "test_value");
-      edgeData.getProperties().remove(PROPERTY_KEY_SINCE);
-      return edgeData;
+      return element;
     }
   }
 }

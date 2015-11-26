@@ -63,7 +63,7 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
     String graphFile =
       EPGMDatabaseJSONTest.class.getResource("/data/sna_graphs").getFile();
 
-    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
+    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
       graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
       ExecutionEnvironment.getExecutionEnvironment());
 
@@ -86,7 +86,7 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
     getSocialNetworkLoader().getDatabase()
       .writeAsJson(vertexFile, edgeFile, graphFile);
 
-    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
+    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
       ExecutionEnvironment.getExecutionEnvironment());
 

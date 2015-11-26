@@ -82,7 +82,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * @throws Exception
    */
   public <PVD extends PersistentVertex<ED>> void writeVertices(
-    final EPGMDatabase<VD, ED, GD> epgmDatabase,
+    final EPGMDatabase<GD, VD, ED> epgmDatabase,
     final VertexHandler<VD, ED> vertexHandler,
     final PersistentVertexFactory<VD, ED, PVD> persistentVertexFactory,
     final String vertexDataTableName) throws Exception {
@@ -198,7 +198,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * @throws IOException
    */
   public <PED extends PersistentEdge<VD>> void writeEdges(
-    final EPGMDatabase<VD, ED, GD> epgmDatabase,
+    final EPGMDatabase<GD, VD, ED> epgmDatabase,
     final EdgeHandler<ED, VD> edgeHandler,
     final PersistentEdgeFactory<ED, VD, PED> persistentEdgeFactory,
     final String edgeDataTableName) throws IOException {
@@ -240,7 +240,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
    * @throws IOException
    */
   public <PGD extends PersistentGraphHead> void writeGraphHeads(
-    final EPGMDatabase<VD, ED, GD> epgmDatabase,
+    final EPGMDatabase<GD, VD, ED> epgmDatabase,
     final GraphHeadHandler<GD> graphHeadHandler,
     final PersistentGraphHeadFactory<GD, PGD> persistentGraphHeadFactory,
     final String graphDataTableName) throws IOException {

@@ -149,11 +149,16 @@ public class FlinkAsciiGraphLoader<
    * @return EPGM database
    */
   @SuppressWarnings("unchecked")
-  public EPGMDatabase<V, E, G> getDatabase() {
+  public EPGMDatabase<G, V, E> getDatabase() {
     return EPGMDatabase
       .fromCollection(loader.getVertices(),
         loader.getEdges(),
         loader.getGraphHeads(),
         config);
+  }
+
+
+  public G getGraphHeadByVariable(String variable) {
+    return loader.getGraphHeadByVariable(variable);
   }
 }

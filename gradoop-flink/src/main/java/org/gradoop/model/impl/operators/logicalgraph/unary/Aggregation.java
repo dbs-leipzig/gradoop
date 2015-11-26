@@ -17,29 +17,31 @@
 
 package org.gradoop.model.impl.operators.logicalgraph.unary;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.PropertySetter;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
+
+import java.util.Collection;
 
 /**
  * Takes a logical graph and a user defined aggregate function as input. The
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
- * @param <O>  output type of aggregate function
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
+ * @param <N>  output type of aggregate function
  */
-public class Aggregation<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead,
-  O extends Number>
-  implements UnaryGraphToGraphOperator<VD, ED, GD> {
+public class Aggregation<N extends Number,
+  G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryGraphToGraphOperator<V, E, G> {
 
   /**
    * Used to store aggregate result.
@@ -48,7 +50,7 @@ public class Aggregation<
   /**
    * User defined aggregate function.
    */
-  private final UnaryFunction<LogicalGraph<GD, VD, ED>, O> aggregationFunc;
+  private final UnaryFunction<LogicalGraph<G, V, E>, N> aggregationFunc;
 
   /**
    * Creates new aggregation.
@@ -59,7 +61,7 @@ public class Aggregation<
    *                             called on the input graph
    */
   public Aggregation(final String aggregatePropertyKey,
-    UnaryFunction<LogicalGraph<GD, VD, ED>, O> aggregationFunc) {
+    UnaryFunction<LogicalGraph<G, V, E>, N> aggregationFunc) {
     this.aggregatePropertyKey = aggregatePropertyKey;
     this.aggregationFunc = aggregationFunc;
   }
@@ -68,16 +70,15 @@ public class Aggregation<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) throws
+  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
     Exception {
-    O result = aggregationFunc.execute(graph);
-    // copy graph data before updating properties
-    GD newGraphData = graph.getConfig().getGraphHeadFactory()
-      .initGraphHead(graph.getId(), graph.getLabel());
-    newGraphData.setProperties(graph.getProperties());
-    newGraphData.setProperty(aggregatePropertyKey, result);
-    return LogicalGraph
-      .fromDataSets(newGraphData, graph.getVertices(), graph.getEdges(), graph.getConfig());
+    return LogicalGraph.fromDataSets(
+        graph.getGraphHead()
+          .map(new PropertySetter<G>(
+            aggregatePropertyKey, aggregationFunc.execute(graph))),
+        graph.getVertices(),
+        graph.getEdges(),
+        graph.getConfig());
   }
 
   /**
