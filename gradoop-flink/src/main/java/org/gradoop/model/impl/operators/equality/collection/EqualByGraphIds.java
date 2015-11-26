@@ -8,7 +8,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.functions.counting.OneInTuple1;
+import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
 
@@ -32,13 +32,13 @@ public class EqualByGraphIds
       getIdsWithCount(secondCollection);
 
     DataSet<Tuple1<Long>> distinctFirstIdCount = firstGraphIdsWithCount
-      .map(new OneInTuple1<Tuple2<GradoopId, Long>>())
+      .map(new Tuple1With1L<Tuple2<GradoopId, Long>>())
       .sum(0);
 
     DataSet<Tuple1<Long>> matchingIdCount = firstGraphIdsWithCount
       .join(secondGraphIdsWithCount)
       .where(0, 1).equalTo(0, 1)
-      .with(new OneInTuple1<Tuple2<GradoopId,Long>>())
+      .with(new Tuple1With1L<Tuple2<GradoopId,Long>>())
       .sum(0);
 
     return checkCountEqualsCount(distinctFirstIdCount, matchingIdCount);

@@ -24,6 +24,8 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.operators.logicalgraph.unary.aggregation
+  .AggregateFunction;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
 
 /**
@@ -72,12 +74,12 @@ public interface LogicalGraphOperators
    *
    * @param propertyKey   used to store result of aggregate func
    * @param aggregateFunc computes an aggregate on the logical graph
-   * @param <O>           output type of the aggregate function
+   * @param <N>           output type of the aggregate function
    * @return logical graph with additional property storing the aggregate
    * @throws Exception
    */
-  <O extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
-    UnaryFunction<LogicalGraph<G, V, E>, O> aggregateFunc) throws Exception;
+  <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
+    AggregateFunction<N, G, V, E> aggregateFunc) throws Exception;
 
   /**
    * Creates a new graph from a randomly chosen subset of nodes and their

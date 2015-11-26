@@ -19,8 +19,10 @@ package org.gradoop.model.impl.operators.logicalgraph.unary;
 
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.id.GradoopIds;
+import org.gradoop.model.impl.operators.logicalgraph.unary.aggregation
+  .EdgeCount;
+import org.gradoop.model.impl.operators.logicalgraph.unary.aggregation
+  .VertexCount;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -29,43 +31,36 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class LogicalGraphAggregateTest extends GradoopFlinkTestBase {
+
+  public static final String EDGE_COUNT = "edgeCount";
+  public static final String VERTEX_COUNT = "vertexCount";
 
   public LogicalGraphAggregateTest(TestExecutionMode mode) {
     super(mode);
   }
 
   @Test
-  public void aggregateEdgeCountTest() throws Exception {
+  public void testVertexAndEdgeCount() throws Exception {
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      forumGraph = getGraphStore().getGraph(GradoopIds.fromLong(3L));
-    final String aggPropertyKey = "eCount";
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graph =
+      getLoaderFromString("[()-->()<--()]").getDatabase().getDatabaseGraph();
 
-    UnaryFunction<LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>, Long>
-      aggregateFunc =
-      new UnaryFunction<LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>, Long>() {
-        @Override
-        public Long execute(
-          LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-            entity) throws
-          Exception {
-          return entity.getEdges().count();
-        }
-      };
+    graph = graph
+      .aggregate(VERTEX_COUNT,
+        new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>())
+      .aggregate(EDGE_COUNT,
+        new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>()
+      );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      newGraph = forumGraph.aggregate(aggPropertyKey, aggregateFunc);
+    GraphHeadPojo graphHead = graph.getGraphHead().collect().get(0);
 
-    assertNotNull("graph was null", newGraph);
-    assertEquals("wrong property count", 1, newGraph.getPropertyCount());
-    assertEquals("wrong property value", 4L,
-      newGraph.getProperty(aggPropertyKey));
-
-    // original graph needs to be unchanged
-    assertEquals("wrong property count", 0L, forumGraph.getPropertyCount());
+    assertTrue("vertex count not set", graphHead.hasProperty(VERTEX_COUNT));
+    assertTrue("edge count not set", graphHead.hasProperty(EDGE_COUNT));
+    assertEquals("wrong vertex count", 3L, graphHead.getProperty(VERTEX_COUNT));
+    assertEquals("wrong edge count", 2L, graphHead.getProperty(EDGE_COUNT));
   }
 }

@@ -9,7 +9,7 @@ import org.apache.flink.api.java.tuple.Tuple1;
  *
  * @param <T> type of something
  */
-public class OneInTuple1<T>
+public class Tuple1With1L<T>
   implements JoinFunction<T, T, Tuple1<Long>>, MapFunction<T, Tuple1<Long>> {
 
   @Override

@@ -36,7 +36,7 @@ import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
-import org.gradoop.model.impl.functions.filterfunctions.AlwaysFalseFilter;
+import org.gradoop.model.impl.functions.filterfunctions.False;
 import org.gradoop.model.impl.functions.filterfunctions.EdgesByGraphId;
 import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
@@ -141,7 +141,7 @@ public class GraphCollection
     if(vertices.isEmpty()) {
       graphHeads.add(config.getGraphHeadFactory().createGraphHead());
       graphHeadSet = env.fromCollection(graphHeads)
-        .filter(new AlwaysFalseFilter<G>());
+        .filter(new False<G>());
     } else {
       graphHeadSet =  env.fromCollection(graphHeads);
     }
@@ -150,7 +150,7 @@ public class GraphCollection
     if(vertices.isEmpty()) {
       vertices.add(config.getVertexFactory().createVertex());
       vertexSet = env.fromCollection(vertices)
-        .filter(new AlwaysFalseFilter<V>());
+        .filter(new False<V>());
     } else {
       vertexSet = env.fromCollection(vertices);
     }
@@ -160,7 +160,7 @@ public class GraphCollection
     if(vertices.isEmpty()) {
       edges.add(config.getEdgeFactory().createEdge(dummyId, dummyId));
       edgeSet = env.fromCollection(edges)
-        .filter(new AlwaysFalseFilter<E>());
+        .filter(new False<E>());
     } else {
       edgeSet = env.fromCollection(edges);
     }

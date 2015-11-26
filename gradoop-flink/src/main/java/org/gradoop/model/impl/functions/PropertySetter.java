@@ -1,17 +1,28 @@
 package org.gradoop.model.impl.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMElement;
 
 public class PropertySetter<EL extends EPGMElement>
-  implements MapFunction<EL, EL> {
+  extends RichMapFunction<EL, EL> {
 
-  private final String key;
-  private final Object value;
+  public static final String KEY = "key";
+  public static final String VALUE = "value";
 
-  public PropertySetter(String key, Object value) {
+  private String key;
+  private Object value;
+
+  public PropertySetter(String key) {
     this.key = key;
-    this.value = value;
+  }
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+
+    this.value = getRuntimeContext()
+      .getBroadcastVariable(VALUE).get(0);
   }
 
   @Override

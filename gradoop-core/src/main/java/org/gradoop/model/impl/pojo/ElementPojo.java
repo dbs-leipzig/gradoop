@@ -142,6 +142,14 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
+  public Boolean hasProperty(String key) {
+    return getProperties() != null && getProperties().containsKey(key);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

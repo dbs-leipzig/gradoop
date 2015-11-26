@@ -9,7 +9,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.LeftSideOnly;
-import org.gradoop.model.impl.functions.counting.OneInTuple1;
+import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
 import org.gradoop.model.impl.operators.equality.functions
   .CanonicalLabelWithCount;
@@ -42,13 +42,13 @@ public class EqualByGraphElementData
       labelGraphs(secondCollection);
 
     DataSet<Tuple1<Long>> distinctFirstGraphCount = firstGraphLabels
-      .map(new OneInTuple1<Tuple2<String, Long>>())
+      .map(new Tuple1With1L<Tuple2<String, Long>>())
       .sum(0);
 
     DataSet<Tuple1<Long>> matchingIdCount = firstGraphLabels
       .join(secondGraphLabels)
       .where(0, 1).equalTo(0, 1)
-      .with(new OneInTuple1<Tuple2<String, Long>>())
+      .with(new Tuple1With1L<Tuple2<String, Long>>())
       .sum(0);
 
     return checkCountEqualsCount(distinctFirstGraphCount, matchingIdCount);

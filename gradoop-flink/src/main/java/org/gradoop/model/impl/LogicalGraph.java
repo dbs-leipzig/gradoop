@@ -41,7 +41,9 @@ import org.gradoop.model.impl.operators.equality.logicalgraph.EqualByElementIds;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Combination;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Overlap;
-import org.gradoop.model.impl.operators.logicalgraph.unary.Aggregation;
+import org.gradoop.model.impl.operators.logicalgraph.unary.aggregation
+  .AggregateFunction;
+import org.gradoop.model.impl.operators.logicalgraph.unary.aggregation.Aggregation;
 import org.gradoop.model.impl.operators.logicalgraph.unary.Projection;
 import org.gradoop.model.impl.operators.logicalgraph.unary.sampling
   .RandomNodeSampling;
@@ -238,9 +240,9 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public <O extends Number> LogicalGraph<G, V, E> aggregate(
-    String propertyKey,
-    UnaryFunction<LogicalGraph<G, V, E>, O> aggregateFunc) throws Exception {
+  public <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
+    AggregateFunction<N, G, V, E> aggregateFunc) throws Exception {
+
     return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
 

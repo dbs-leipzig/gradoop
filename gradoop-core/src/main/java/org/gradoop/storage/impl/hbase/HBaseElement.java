@@ -102,6 +102,14 @@ public abstract class HBaseElement<T extends EPGMElement> implements
    * {@inheritDoc}
    */
   @Override
+  public Boolean hasProperty(String key) {
+    return getProperties() != null && getProperties().containsKey(key);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public int getPropertyCount() {
     return epgmElement.getPropertyCount();
   }
@@ -166,4 +174,6 @@ public abstract class HBaseElement<T extends EPGMElement> implements
     sb.append('}');
     return sb.toString();
   }
+
+
 }

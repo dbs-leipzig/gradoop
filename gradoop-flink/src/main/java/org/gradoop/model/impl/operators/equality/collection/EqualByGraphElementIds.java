@@ -12,8 +12,8 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.LeftSideOnly;
-import org.gradoop.model.impl.functions.counting.OneInTuple1;
-import org.gradoop.model.impl.functions.isolation.ElementIdInTuple1;
+import org.gradoop.model.impl.functions.counting.Tuple1With1L;
+import org.gradoop.model.impl.functions.isolation.Tuple1WithElementId;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
@@ -43,13 +43,13 @@ public class EqualByGraphElementIds
       getGraphElementIdsWithCount(secondCollection);
 
     DataSet<Tuple1<Long>> distinctFirstGraphCount = firstGraphsWithCount
-      .map(new OneInTuple1<Tuple3<GradoopIdSet, GradoopIdSet, Long>>())
+      .map(new Tuple1With1L<Tuple3<GradoopIdSet, GradoopIdSet, Long>>())
       .sum(0);
 
     DataSet<Tuple1<Long>> matchingIdCount = firstGraphsWithCount
       .join(secondGraphsWithCount)
       .where(0, 1, 2).equalTo(0, 1, 2)
-      .with(new OneInTuple1<Tuple3<GradoopIdSet, GradoopIdSet, Long>>())
+      .with(new Tuple1With1L<Tuple3<GradoopIdSet, GradoopIdSet, Long>>())
       .sum(0);
 
     return checkCountEqualsCount(distinctFirstGraphCount, matchingIdCount);
@@ -64,7 +64,7 @@ public class EqualByGraphElementIds
       getIdsWithCount(graphCollection);
 
     DataSet<Tuple1<GradoopId>> graphIds = graphCollection.getGraphHeads()
-      .map(new ElementIdInTuple1<G>());
+      .map(new Tuple1WithElementId<G>());
 
     DataSet<Tuple2<GradoopId,GradoopIdSet>> vertexIdsByGraphId =
       getElementIdsByGraphId(

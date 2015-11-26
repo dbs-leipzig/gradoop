@@ -83,4 +83,6 @@ public interface EPGMAttributed {
    * @return number or properties
    */
   int getPropertyCount();
+
+  Boolean hasProperty(String key);
 }

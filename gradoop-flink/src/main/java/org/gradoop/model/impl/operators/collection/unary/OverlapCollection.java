@@ -27,7 +27,7 @@ import org.gradoop.model.impl.functions.filterfunctions
   .EdgeInAllGraphsFilterWithBC;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInAllGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
+import org.gradoop.model.impl.functions.isolation.ElementId;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -50,7 +50,7 @@ public class OverlapCollection
 
     DataSet<G> graphHeads = collection.getGraphHeads();
 
-    DataSet<GradoopId> graphIDs = graphHeads.map(new ElementIdOnly<G>());
+    DataSet<GradoopId> graphIDs = graphHeads.map(new ElementId<G>());
 
     DataSet<V> vertices = collection.getVertices()
       .filter(new VertexInAllGraphsFilterWithBC<V>())

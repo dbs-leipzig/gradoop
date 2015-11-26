@@ -30,7 +30,7 @@ import org.gradoop.model.impl.functions.filterfunctions
 import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInNoneOfGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
+import org.gradoop.model.impl.functions.isolation.ElementId;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
@@ -78,7 +78,7 @@ public class ExcludeCollection
     DataSet<G> graphHeads = collection.getGraphHeads();
 
     DataSet<GradoopId> graphIDs = graphHeads
-      .map(new ElementIdOnly<G>());
+      .map(new ElementId<G>());
 
     graphIDs = graphIDs
       .filter(new RemoveGradoopIdFromDataSetFilter(positiveGraphID));

@@ -15,19 +15,15 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.logicalgraph.unary;
+package org.gradoop.model.impl.operators.logicalgraph.unary.aggregation;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.PropertySetter;
-import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
-
-import java.util.Collection;
 
 /**
  * Takes a logical graph and a user defined aggregate function as input. The
@@ -50,7 +46,7 @@ public class Aggregation<N extends Number,
   /**
    * User defined aggregate function.
    */
-  private final UnaryFunction<LogicalGraph<G, V, E>, N> aggregationFunc;
+  private final AggregateFunction<N, G, V, E> aggregationFunc;
 
   /**
    * Creates new aggregation.
@@ -61,7 +57,7 @@ public class Aggregation<N extends Number,
    *                             called on the input graph
    */
   public Aggregation(final String aggregatePropertyKey,
-    UnaryFunction<LogicalGraph<G, V, E>, N> aggregationFunc) {
+    AggregateFunction<N, G, V, E> aggregationFunc) {
     this.aggregatePropertyKey = aggregatePropertyKey;
     this.aggregationFunc = aggregationFunc;
   }
@@ -72,10 +68,15 @@ public class Aggregation<N extends Number,
   @Override
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
     Exception {
+
+    DataSet<N> aggregateValue = aggregationFunc.execute(graph);
+
+    DataSet<G> graphHead = graph.getGraphHead()
+      .map(new PropertySetter<G>(aggregatePropertyKey))
+      .withBroadcastSet(aggregateValue, PropertySetter.VALUE);
+
     return LogicalGraph.fromDataSets(
-        graph.getGraphHead()
-          .map(new PropertySetter<G>(
-            aggregatePropertyKey, aggregationFunc.execute(graph))),
+        graphHead,
         graph.getVertices(),
         graph.getEdges(),
         graph.getConfig());

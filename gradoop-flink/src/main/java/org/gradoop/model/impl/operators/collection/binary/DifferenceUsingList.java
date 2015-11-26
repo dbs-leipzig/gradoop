@@ -21,7 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.isolation.ElementIdOnly;
+import org.gradoop.model.impl.functions.isolation.ElementId;
 import org.gradoop.model.impl.functions.filterfunctions
   .VertexInGraphsFilterWithBC;
 import org.gradoop.model.impl.id.GradoopId;
@@ -56,7 +56,7 @@ public class DifferenceUsingList<
   protected DataSet<VD> computeNewVertices(
     DataSet<GD> newSubgraphs) throws Exception {
     DataSet<GradoopId> identifiers = newSubgraphs
-      .map(new ElementIdOnly<GD>());
+      .map(new ElementId<GD>());
 
     return firstCollection.getVertices()
       .filter(new VertexInGraphsFilterWithBC<VD>())
