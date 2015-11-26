@@ -24,15 +24,9 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.joinfunctions.EdgeVertexJoinKeepEdge;
-import org.gradoop.model.impl.functions.keyselectors
-  .EdgeSourceVertexKeySelector;
-import org.gradoop.model.impl.functions.keyselectors
-  .EdgeTargetVertexKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.EdgeSourceVertexKeySelector;
+import org.gradoop.model.impl.functions.keyselectors.EdgeTargetVertexKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
-import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
-import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.FlinkConstants;
 
 import java.util.Random;
 
@@ -85,11 +79,9 @@ public class RandomNodeSampling
   @Override
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
     Exception {
-    final GradoopId newGraphID = FlinkConstants.RANDOM_NODE_SAMPLING_GRAPH_ID;
 
     DataSet<V> newVertices = graph.getVertices()
-      .filter(new VertexRandomFilter<V>(sampleSize, randomSeed))
-      .map(new VertexToGraphUpdater<V>(newGraphID));
+      .filter(new VertexRandomFilter<V>(sampleSize, randomSeed));
 
     DataSet<E> newEdges = graph.getEdges()
       .join(newVertices)
@@ -99,8 +91,7 @@ public class RandomNodeSampling
       .join(newVertices)
       .where(new EdgeTargetVertexKeySelector<E>())
       .equalTo(new VertexKeySelector<V>())
-      .with(new EdgeVertexJoinKeepEdge<V, E>())
-      .map(new EdgeToGraphUpdater<E>(newGraphID));
+      .with(new EdgeVertexJoinKeepEdge<V, E>());
 
     return LogicalGraph.fromDataSets(
       newVertices, newEdges, graph.getConfig());

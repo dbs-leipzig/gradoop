@@ -18,37 +18,41 @@
 package org.gradoop.model.impl.functions.mapfunctions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Adds a given graph ID to the edge and returns it.
+ * Adds the given graph head identifier to the graph element.
  *
- * @param <ED> EPGM edge type
+ * @param <G>   EPGM graph head type
+ * @param <GE>  EPGM graph element type
  */
-public class EdgeToGraphUpdater<ED extends EPGMEdge> implements
-  MapFunction<ED, ED> {
+public class GraphContainmentUpdater<
+  G extends EPGMGraphHead,
+  GE extends EPGMGraphElement>
+  implements MapFunction<GE, GE> {
 
   /**
-   * Graph identifier to add.
+   * Graph head identifier which gets added to the graph element.
    */
-  private final GradoopId newGraphID;
+  private final GradoopId graphHeadId;
 
   /**
-   * Creates map function
+   * Creates a new GraphContainmentUpdater
    *
-   * @param newGraphID graph identifier to add
+   * @param graphHead graph head used for updating
    */
-  public EdgeToGraphUpdater(final GradoopId newGraphID) {
-    this.newGraphID = newGraphID;
+  public GraphContainmentUpdater(G graphHead) {
+    this.graphHeadId = graphHead.getId();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public ED map(ED e) throws Exception {
-    e.addGraphId(newGraphID);
-    return e;
+  public GE map(GE graphElement) throws Exception {
+    graphElement.addGraphId(graphHeadId);
+    return graphElement;
   }
 }

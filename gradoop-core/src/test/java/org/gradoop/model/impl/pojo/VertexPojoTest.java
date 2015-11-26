@@ -18,11 +18,10 @@
 package org.gradoop.model.impl.pojo;
 
 import com.google.common.collect.Maps;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.generators.TestSequenceIdGenerator;
 import org.gradoop.util.GConstants;
-import org.gradoop.model.api.EPGMVertex;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -35,8 +34,7 @@ public class VertexPojoTest {
 
   @Test
   public void createWithIDTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId vertexID = idGen.createId();
+    GradoopId vertexID = GradoopId.get();
     EPGMVertex v = new VertexPojoFactory().initVertex(vertexID);
     assertThat(v.getId(), is(vertexID));
     assertThat(v.getPropertyCount(), is(0));
@@ -45,15 +43,14 @@ public class VertexPojoTest {
 
   @Test
   public void createVertexPojoTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId vertexID = idGen.createId();
+    GradoopId vertexID = GradoopId.get();
     String label = "A";
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
     props.put("k2", "v2");
 
-    GradoopId graphId1 = idGen.createId();
-    GradoopId graphId2 = idGen.createId();
+    GradoopId graphId1 = GradoopId.get();
+    GradoopId graphId2 = GradoopId.get();
 
     GradoopIdSet graphIds = new GradoopIdSet();
     graphIds.add(graphId1);
@@ -74,8 +71,7 @@ public class VertexPojoTest {
 
   @Test
   public void createWithMissingLabelTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId vertexID = idGen.createId();
+    GradoopId vertexID = GradoopId.get();
     EPGMVertex v = new VertexPojoFactory().initVertex(vertexID);
     assertThat(v.getLabel(), is(GConstants.DEFAULT_VERTEX_LABEL));
   }
@@ -87,8 +83,7 @@ public class VertexPojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId vertexID = idGen.createId();
+    GradoopId vertexID = GradoopId.get();
     new VertexPojoFactory().initVertex(vertexID, null);
   }
 }

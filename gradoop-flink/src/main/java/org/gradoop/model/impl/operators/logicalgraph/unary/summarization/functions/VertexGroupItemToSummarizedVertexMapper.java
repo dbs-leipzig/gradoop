@@ -28,7 +28,6 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.FlinkConstants;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.VertexGroupItem;
 
@@ -95,7 +94,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
   public Vertex<GradoopId, VD> map(VertexGroupItem vertexGroupItem) throws
     Exception {
     VD summarizedVertexData =
-      vertexFactory.initVertex(vertexGroupItem.getVertexId());
+      vertexFactory.createVertex();
     if (useLabel) {
       summarizedVertexData.setLabel(vertexGroupItem.getGroupLabel());
     }
@@ -105,7 +104,6 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
     }
     summarizedVertexData.setProperty(Summarization.COUNT_PROPERTY_KEY,
       vertexGroupItem.getGroupCount());
-    summarizedVertexData.addGraphId(FlinkConstants.SUMMARIZE_GRAPH_ID);
 
     reuseVertex.setId(vertexGroupItem.getVertexId());
     reuseVertex.setValue(summarizedVertexData);

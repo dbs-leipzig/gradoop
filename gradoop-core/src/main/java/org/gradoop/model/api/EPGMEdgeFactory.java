@@ -131,7 +131,7 @@ public interface EPGMEdgeFactory<T extends EPGMEdge> extends
    * @param graphIds         graphIds, that contain the edge
    * @return edge data
    */
-  T initEdge(String label,
+  T createEdge(String label,
     GradoopId sourceVertexId,
     GradoopId targetVertexId,
     Map<String, Object> properties,

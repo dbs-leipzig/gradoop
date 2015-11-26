@@ -38,10 +38,8 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.TimestampIdGenerator;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
-import org.gradoop.util.FlinkConstants;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.functions.VertexToGroupVertexMapper;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
@@ -197,12 +195,8 @@ public class SummarizationGroupWithLists<
      */
     @Override
     public void reduce(Iterable<VertexForGrouping> vertices,
-      Collector<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> collector
-    ) throws Exception {
-
-      GradoopId newVertexID = new TimestampIdGenerator(
-        getRuntimeContext().getIndexOfThisSubtask()).createId();
-
+      Collector<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> collector)
+      throws Exception {
       String groupLabel = null;
       String groupValue = null;
       List<GradoopId> groupedVertexIds = Lists.newArrayList();
@@ -210,8 +204,6 @@ public class SummarizationGroupWithLists<
       for (VertexForGrouping v : vertices) {
         groupedVertexIds.add(v.getVertexId());
         if (!initialized) {
-          // will be the minimum vertex id in the group
-          newVertexID = v.getVertexId();
           // get label if necessary
           groupLabel =
             useLabel ? v.getGroupLabel() : GConstants.DEFAULT_VERTEX_LABEL;
@@ -223,15 +215,14 @@ public class SummarizationGroupWithLists<
         }
       }
       VD vertexData =
-        vertexFactory.initVertex(newVertexID, groupLabel);
+        vertexFactory.createVertex(groupLabel);
       if (useProperty) {
         vertexData.setProperty(groupPropertyKey, groupValue);
       }
       vertexData
         .setProperty(COUNT_PROPERTY_KEY, (long) groupedVertexIds.size());
-      vertexData.addGraphId(FlinkConstants.SUMMARIZE_GRAPH_ID);
 
-      reuseVertex.f0 = newVertexID;
+      reuseVertex.f0 = vertexData.getId();
       reuseVertex.f1 = vertexData;
 
       reuseTuple.f0 = reuseVertex;

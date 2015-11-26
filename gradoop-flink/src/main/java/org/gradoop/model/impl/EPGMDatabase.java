@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
@@ -36,12 +35,11 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.ImportIdGenerator;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojoFactory;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
 import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.storage.api.EPGMStore;
@@ -51,7 +49,6 @@ import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.PersistentVertexFactory;
-import org.gradoop.util.FlinkConstants;
 import org.gradoop.util.GradoopConfig;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -78,11 +75,6 @@ public class EPGMDatabase
   private GraphCollection<G, V, E> database;
 
   /**
-   * Graph data associated with that logical graph.
-   */
-  private final G databaseData;
-
-  /**
    * Creates a new EPGM database from the given arguments.
    *
    * @param vertices    vertex data set
@@ -96,8 +88,6 @@ public class EPGMDatabase
     this.config = config;
     this.database = GraphCollection.fromDataSets(vertices,
       edges, graphHeads, config);
-    this.databaseData = config.getGraphHeadHandler().getGraphHeadFactory()
-      .initGraphHead(FlinkConstants.DATABASE_GRAPH_ID);
   }
 
   /**
@@ -200,26 +190,21 @@ public class EPGMDatabase
       TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType());
 
     // read vertex, edge and graph data
-    ImportIdGenerator idGenerator = new ImportIdGenerator();
 
     DataSet<VD> vertices = env.readTextFile(vertexFile)
-      .map(new JsonReader.JsonToVertexMapper<>(
-        config.getVertexFactory(), idGenerator))
+      .map(new JsonReader.JsonToVertexMapper<>(config.getVertexFactory()))
       .returns(vertexTypeInfo);
     DataSet<ED> edges = env.readTextFile(edgeFile)
-      .map(new JsonReader.JsonToEdgeMapper<>(
-        config.getEdgeFactory(), idGenerator))
+      .map(new JsonReader.JsonToEdgeMapper<>(config.getEdgeFactory()))
       .returns(edgeTypeInfo);
     DataSet<GD> graphHeads;
     if (graphFile != null) {
       graphHeads = env.readTextFile(graphFile)
-        .map(new JsonReader.JsonToGraphMapper<>(
-          config.getGraphHeadFactory(), idGenerator))
+        .map(new JsonReader.JsonToGraphMapper<>(config.getGraphHeadFactory()))
         .returns(graphTypeInfo);
     } else {
-      graphHeads = env.fromCollection(Lists.newArrayList(
-        config.getGraphHeadFactory()
-          .initGraphHead(FlinkConstants.DATABASE_GRAPH_ID)));
+      graphHeads = env.fromElements(
+        config.getGraphHeadFactory().createGraphHead());
     }
 
     return new EPGMDatabase<>(vertices, edges, graphHeads, config);
@@ -392,9 +377,8 @@ public class EPGMDatabase
     if (graphDataCollection != null) {
       graphHeads = env.fromCollection(graphDataCollection);
     } else {
-      graphHeads = env.fromCollection(Lists.newArrayList(
-        config.getGraphHeadFactory()
-          .initGraphHead(FlinkConstants.DATABASE_GRAPH_ID)));
+      graphHeads = env.fromElements(
+        config.getGraphHeadFactory().createGraphHead());
     }
 
     return new EPGMDatabase<>(vertices, edges, graphHeads, config);

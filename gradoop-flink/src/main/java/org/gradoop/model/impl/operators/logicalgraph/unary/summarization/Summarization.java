@@ -45,7 +45,6 @@ import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
   .VertexGroupItem;
 import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.tuples
   .VertexWithRepresentative;
-import org.gradoop.util.FlinkConstants;
 import org.gradoop.util.GConstants;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -156,9 +155,9 @@ public abstract class Summarization<
       // graphs stays unchanged
       result = graph;
     } else {
-      GD graphData = createNewGraphHead();
       result = LogicalGraph
-        .fromGellyGraph(summarizeInternal(graph.toGellyGraph()), graphData,
+        .fromGellyGraph(
+          summarizeInternal(graph.toGellyGraph()),
           graph.getConfig());
     }
     return result;
@@ -310,16 +309,6 @@ public abstract class Summarization<
   }
 
   /**
-   * Creates new graph data for the resulting logical graph.
-   *
-   * @return graph data
-   */
-  private GD createNewGraphHead() {
-    return config.getGraphHeadFactory()
-      .initGraphHead(FlinkConstants.SUMMARIZE_GRAPH_ID);
-  }
-
-  /**
    * Overridden by concrete implementations.
    *
    * @param graph input graph
@@ -384,7 +373,6 @@ public abstract class Summarization<
       int edgeCount = 0;
       boolean initialized = false;
       // new edge id will be the first edge id in the group (which is sorted)
-      GradoopId newEdgeID = null;
       GradoopId newSourceVertexId = null;
       GradoopId newTargetVertexId = null;
       String edgeLabel = GConstants.DEFAULT_EDGE_LABEL;
@@ -393,7 +381,6 @@ public abstract class Summarization<
       for (EdgeGroupItem e : edgeGroupItems) {
         edgeCount++;
         if (!initialized) {
-          newEdgeID = e.getEdgeId();
           newSourceVertexId = e.getSourceVertexId();
           newTargetVertexId = e.getTargetVertexId();
           if (useLabel) {
@@ -404,14 +391,13 @@ public abstract class Summarization<
         }
       }
 
-      ED newEdgeData = edgeFactory
-        .initEdge(newEdgeID, edgeLabel, newSourceVertexId, newTargetVertexId);
+      ED newEdgeData = edgeFactory.createEdge(
+        edgeLabel, newSourceVertexId, newTargetVertexId);
 
       if (useProperty) {
         newEdgeData.setProperty(groupPropertyKey, edgeGroupingValue);
       }
       newEdgeData.setProperty(COUNT_PROPERTY_KEY, edgeCount);
-      newEdgeData.addGraphId(FlinkConstants.SUMMARIZE_GRAPH_ID);
 
       reuseEdge.setSource(newSourceVertexId);
       reuseEdge.setTarget(newTargetVertexId);

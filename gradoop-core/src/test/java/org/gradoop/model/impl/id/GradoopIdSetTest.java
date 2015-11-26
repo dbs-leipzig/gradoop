@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.id;
 
 import com.google.common.collect.Lists;
-import org.gradoop.model.impl.id.generators.TestSequenceIdGenerator;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -19,9 +18,8 @@ public class GradoopIdSetTest {
 
   @Test
   public void testAdd() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
 
     GradoopIdSet ids = new GradoopIdSet();
 
@@ -43,9 +41,8 @@ public class GradoopIdSetTest {
 
   @Test
   public void testContains() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
 
     GradoopIdSet ids = new GradoopIdSet();
     ids.add(id1);
@@ -57,10 +54,9 @@ public class GradoopIdSetTest {
 
   @Test
   public void testAddAll() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
-    GradoopId id3 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
+    GradoopId id3 = GradoopId.get();
 
     GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Lists.newArrayList(id1, id2));
@@ -73,9 +69,8 @@ public class GradoopIdSetTest {
 
   @Test
   public void testAddAll1() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
     GradoopIdSet ids1 = new GradoopIdSet();
     ids1.add(id1);
     ids1.add(id2);
@@ -90,10 +85,9 @@ public class GradoopIdSetTest {
 
   @Test
   public void testContainsAll() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
-    GradoopId id3 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
+    GradoopId id3 = GradoopId.get();
 
     GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Lists.newArrayList(id1, id2));
@@ -107,10 +101,9 @@ public class GradoopIdSetTest {
 
   @Test
   public void testContainsAll1() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
-    GradoopId id3 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
+    GradoopId id3 = GradoopId.get();
 
 
     GradoopIdSet ids = new GradoopIdSet();
@@ -125,10 +118,9 @@ public class GradoopIdSetTest {
 
   @Test
   public void testContainsAny() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
-    GradoopId id3 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
+    GradoopId id3 = GradoopId.get();
 
 
     GradoopIdSet ids = new GradoopIdSet();
@@ -143,10 +135,9 @@ public class GradoopIdSetTest {
 
   @Test
   public void testContainsAny1() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
-    GradoopId id3 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
+    GradoopId id3 = GradoopId.get();
 
     GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Lists.newArrayList(id1, id2));
@@ -160,8 +151,7 @@ public class GradoopIdSetTest {
 
   @Test
   public void testIsEmpty() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopIdSet ids1 = GradoopIdSet.fromExisting(idGen.createId());
+    GradoopIdSet ids1 = GradoopIdSet.fromExisting(GradoopId.get());
     GradoopIdSet ids2 = new GradoopIdSet();
 
     assertFalse(ids1.isEmpty());
@@ -170,9 +160,8 @@ public class GradoopIdSetTest {
 
   @Test
   public void testToCollection() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(id1, id2);
 
@@ -185,9 +174,8 @@ public class GradoopIdSetTest {
 
   @Test
   public void testWriteAndReadFields() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
 
     GradoopIdSet idsWrite = GradoopIdSet.fromExisting(id1, id2);
 
@@ -209,9 +197,8 @@ public class GradoopIdSetTest {
 
   @Test
   public void testIterator() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(id1, id2);
 
@@ -236,9 +223,8 @@ public class GradoopIdSetTest {
 
   @Test
   public void testClear() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
 
     GradoopIdSet ids = new GradoopIdSet();
     ids.add(id1);
@@ -253,9 +239,8 @@ public class GradoopIdSetTest {
 
   @Test
   public void testSize() throws Exception {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
 
     GradoopIdSet ids = new GradoopIdSet();
     assertThat(ids.size(), is(0));
@@ -269,10 +254,9 @@ public class GradoopIdSetTest {
 
   @Test
   public void testFromExisting() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId id1 = idGen.createId();
-    GradoopId id2 = idGen.createId();
-    GradoopId id3 = idGen.createId();
+    GradoopId id1 = GradoopId.get();
+    GradoopId id2 = GradoopId.get();
+    GradoopId id3 = GradoopId.get();
     GradoopIdSet ids = GradoopIdSet.fromExisting(id1, id2, id3);
     assertThat(ids.size(), is(3));
   }

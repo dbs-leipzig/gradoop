@@ -26,8 +26,6 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.ImportIdGenerator;
-import org.gradoop.model.impl.id.ReuseIdGenerator;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Graph;
@@ -65,14 +63,25 @@ public class AsciiGraphLoader
    */
   private final Map<GradoopId, G> graphHeads;
   /**
+   * Mapping between GDL ids and Gradoop IDs.
+   */
+  private final Map<Long, GradoopId> graphHeadIds;
+  /**
    * Stores all vertices contained in the GDL script.
    */
   private final Map<GradoopId, V> vertices;
   /**
+   * Mapping between GDL ids and Gradoop IDs.
+   */
+  private final Map<Long, GradoopId> vertexIds;
+  /**
    * Stores all edges contained in the GDL script.
    */
   private final Map<GradoopId, E> edges;
-
+  /**
+   * Mapping between GDL ids and Gradoop IDs.
+   */
+  private final Map<Long, GradoopId> edgeIds;
 
   /**
    * Stores graphs that are assigned to a variable.
@@ -88,11 +97,6 @@ public class AsciiGraphLoader
   private final Map<String, E> edgeCache;
 
   /**
-   * Used to create GradoopIds from existing identifiers.
-   */
-  private final ReuseIdGenerator idGenerator;
-
-  /**
    * Creates a new AsciiGraphLoader.
    *
    * @param gdlHandler GDL Handler
@@ -103,15 +107,17 @@ public class AsciiGraphLoader
     this.gdlHandler = gdlHandler;
     this.config = config;
 
-    this.graphHeads = Maps.newHashMap();
-    this.vertices = Maps.newHashMap();
-    this.edges = Maps.newHashMap();
+    this.graphHeads     = Maps.newHashMap();
+    this.vertices       = Maps.newHashMap();
+    this.edges          = Maps.newHashMap();
+
+    this.graphHeadIds   = Maps.newHashMap();
+    this.vertexIds      = Maps.newHashMap();
+    this.edgeIds        = Maps.newHashMap();
 
     this.graphHeadCache = Maps.newHashMap();
-    this.vertexCache = Maps.newHashMap();
-    this.edgeCache = Maps.newHashMap();
-
-    this.idGenerator = new ImportIdGenerator();
+    this.vertexCache    = Maps.newHashMap();
+    this.edgeCache      = Maps.newHashMap();
 
     init();
   }
@@ -404,8 +410,9 @@ public class AsciiGraphLoader
    */
   private void initGraphHeads() {
     for (Graph g : gdlHandler.getGraphs()) {
-      G graphHead = initGraphHead(g);
-      graphHeads.put(graphHead.getId(), graphHead);
+      if (!graphHeadIds.containsKey(g.getId())) {
+        initGraphHead(g);
+      }
     }
 
     for (Map.Entry<String, Graph> e : gdlHandler.getGraphCache().entrySet()) {
@@ -418,8 +425,9 @@ public class AsciiGraphLoader
    */
   private void initVertices() {
     for (Vertex v : gdlHandler.getVertices()) {
-      V vertex = initVertex(v);
-      vertices.put(vertex.getId(), vertex);
+      if (!vertexIds.containsKey(v.getId())) {
+        initVertex(v);
+      }
     }
 
     for (Map.Entry<String, Vertex> e : gdlHandler.getVertexCache().entrySet()) {
@@ -432,8 +440,9 @@ public class AsciiGraphLoader
    */
   private void initEdges() {
     for (Edge e : gdlHandler.getEdges()) {
-      E edge = initEdge(e);
-      edges.put(edge.getId(), edge);
+      if (!edgeIds.containsKey(e.getId())) {
+        initEdge(e);
+      }
     }
 
     for (Map.Entry<String, Edge> e : gdlHandler.getEdgeCache().entrySet()) {
@@ -448,10 +457,12 @@ public class AsciiGraphLoader
    * @return EPGM GraphHead
    */
   private G initGraphHead(Graph g) {
-    return config.getGraphHeadFactory().initGraphHead(
-      idGenerator.createId(g.getId()),
+    G graphHead = config.getGraphHeadFactory().createGraphHead(
       g.getLabel(),
       g.getProperties());
+    graphHeadIds.put(g.getId(), graphHead.getId());
+    graphHeads.put(graphHead.getId(), graphHead);
+    return graphHead;
   }
 
   /**
@@ -461,11 +472,13 @@ public class AsciiGraphLoader
    * @return EPGM Vertex
    */
   private V initVertex(Vertex v) {
-    return config.getVertexFactory().initVertex(
-      idGenerator.createId(v.getId()),
+    V vertex = config.getVertexFactory().createVertex(
       v.getLabel(),
       v.getProperties(),
       createGradoopIdSet(v));
+    vertexIds.put(v.getId(), vertex.getId());
+    vertices.put(vertex.getId(), vertex);
+    return vertex;
   }
 
   /**
@@ -475,13 +488,15 @@ public class AsciiGraphLoader
    * @return EPGM edge
    */
   private E initEdge(Edge e) {
-    return config.getEdgeFactory().initEdge(
-      idGenerator.createId(e.getId()),
-      e.getLabel(),
-      idGenerator.createId(e.getSourceVertexId()),
-      idGenerator.createId(e.getTargetVertexId()),
-      e.getProperties(),
-      createGradoopIdSet(e));
+    E edge = config.getEdgeFactory().createEdge(
+        e.getLabel(),
+        vertexIds.get(e.getSourceVertexId()),
+        vertexIds.get(e.getTargetVertexId()),
+        e.getProperties(),
+        createGradoopIdSet(e));
+    edgeIds.put(e.getId(), edge.getId());
+    edges.put(edge.getId(), edge);
+    return edge;
   }
 
   /**
@@ -492,7 +507,7 @@ public class AsciiGraphLoader
    */
   private void updateGraphCache(String variable, Graph g) {
     graphHeadCache.put(
-      variable, graphHeads.get(idGenerator.createId(g.getId())));
+      variable, graphHeads.get(graphHeadIds.get(g.getId())));
   }
 
   /**
@@ -502,7 +517,7 @@ public class AsciiGraphLoader
    * @param v vertex from GDL loader
    */
   private void updateVertexCache(String variable, Vertex v) {
-    vertexCache.put(variable, vertices.get(idGenerator.createId(v.getId())));
+    vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));
   }
 
   /**
@@ -512,7 +527,7 @@ public class AsciiGraphLoader
    * @param e edge from GDL loader
    */
   private void updateEdgeCache(String variable, Edge e) {
-    edgeCache.put(variable, edges.get(idGenerator.createId(e.getId())));
+    edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));
   }
 
   /**
@@ -525,7 +540,7 @@ public class AsciiGraphLoader
   private GradoopIdSet createGradoopIdSet(GraphElement e) {
     GradoopIdSet result = new GradoopIdSet();
     for (Long graphId : e.getGraphs()) {
-      result.add(idGenerator.createId(graphId));
+      result.add(graphHeadIds.get(graphId));
     }
     return result;
   }

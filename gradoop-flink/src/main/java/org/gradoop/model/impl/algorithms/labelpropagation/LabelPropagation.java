@@ -112,12 +112,14 @@ public class LabelPropagation<
 
     // create a logical graph from the result
     LogicalGraph<GD, VD, ED> labeledGraph = LogicalGraph
-      .fromDataSets(null, labeledVertices, logicalGraph.getEdges(), logicalGraph.getConfig());
+      .fromDataSets(labeledVertices,
+        logicalGraph.getEdges(),
+        logicalGraph.getConfig());
 
     // and split it into a collection according the result
     return new SplitBy<VD, ED, GD>(
-      new CommunityDiscriminatorFunction<VD>(propertyKey),
-      env).execute(labeledGraph);
+      new CommunityDiscriminatorFunction<VD>(propertyKey))
+      .execute(labeledGraph);
   }
 
   /**

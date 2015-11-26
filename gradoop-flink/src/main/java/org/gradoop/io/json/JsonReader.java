@@ -21,14 +21,13 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.ImportIdGenerator;
 
 import java.util.Map;
 
@@ -62,19 +61,14 @@ public class JsonReader extends JsonIO {
      * Creates vertex data objects.
      */
     private final EPGMVertexFactory<VD> vertexFactory;
-    private final ImportIdGenerator idGenerator;
 
     /**
      * Creates map function
      *
      * @param vertexFactory vertex data factory
-     * @param idGenerator
      */
-    public JsonToVertexMapper(EPGMVertexFactory<VD> vertexFactory,
-      ImportIdGenerator idGenerator) {
-      super(idGenerator);
+    public JsonToVertexMapper(EPGMVertexFactory<VD> vertexFactory) {
       this.vertexFactory = vertexFactory;
-      this.idGenerator = idGenerator;
     }
 
     /**
@@ -121,19 +115,14 @@ public class JsonReader extends JsonIO {
      * Edge data factory.
      */
     private final EPGMEdgeFactory<ED> edgeFactory;
-    private final ImportIdGenerator idGenerator;
 
     /**
      * Creates map function.
      *
      * @param edgeFactory edge data factory
-     * @param idGenerator
      */
-    public JsonToEdgeMapper(EPGMEdgeFactory<ED> edgeFactory,
-      ImportIdGenerator idGenerator) {
-      super(idGenerator);
+    public JsonToEdgeMapper(EPGMEdgeFactory<ED> edgeFactory) {
       this.edgeFactory = edgeFactory;
-      this.idGenerator = idGenerator;
     }
 
     /**
@@ -167,7 +156,7 @@ public class JsonReader extends JsonIO {
     private GradoopId getSourceVertexID(JSONObject jsonEdge
     ) throws JSONException {
 
-      return idGenerator.createId(jsonEdge.getLong(EDGE_SOURCE));
+      return GradoopId.fromString(jsonEdge.getString(EDGE_SOURCE));
     }
 
     /**
@@ -180,7 +169,7 @@ public class JsonReader extends JsonIO {
     private GradoopId getTargetVertexID(JSONObject jsonEdge
     ) throws JSONException {
 
-      return idGenerator.createId(jsonEdge.getLong(EDGE_TARGET));
+      return GradoopId.fromString(jsonEdge.getString(EDGE_TARGET));
     }
   }
 
@@ -214,10 +203,7 @@ public class JsonReader extends JsonIO {
      *
      * @param graphHeadFactory graph data factory
      */
-    public JsonToGraphMapper(EPGMGraphHeadFactory<GD> graphHeadFactory,
-      ImportIdGenerator idGenerator) {
-
-      super(idGenerator);
+    public JsonToGraphMapper(EPGMGraphHeadFactory<GD> graphHeadFactory) {
       this.graphHeadFactory = graphHeadFactory;
     }
 

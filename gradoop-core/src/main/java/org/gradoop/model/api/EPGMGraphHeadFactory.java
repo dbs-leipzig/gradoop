@@ -52,7 +52,7 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param properties graph attributes
    * @return graph data
    */
-  T initGraphHead(String label,
+  T createGraphHead(String label,
     Map<String, Object> properties);
 
   /**

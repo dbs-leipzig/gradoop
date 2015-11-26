@@ -92,12 +92,11 @@ public class EPGMLabelPropagation<
 
     // create a logical graph
     LogicalGraph<GD, VD, ED> labeledGraph = LogicalGraph
-      .fromGellyGraph(graph, null, logicalGraph.getConfig());
+      .fromGellyGraph(graph, logicalGraph.getConfig());
 
     // and split it into a collection according the result
     return new SplitBy<VD, ED, GD>(
-      new CommunityDiscriminatorFunction<VD>(propertyKey),
-      env)
+      new CommunityDiscriminatorFunction<VD>(propertyKey))
       .execute(labeledGraph);
   }
 

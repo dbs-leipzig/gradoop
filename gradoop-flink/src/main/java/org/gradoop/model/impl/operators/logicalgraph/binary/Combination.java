@@ -24,10 +24,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
-import org.gradoop.model.impl.functions.mapfunctions.EdgeToGraphUpdater;
-import org.gradoop.model.impl.functions.mapfunctions.VertexToGraphUpdater;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.FlinkConstants;
 
 /**
  * Creates a new logical graph by combining the vertex and edge sets of two
@@ -49,19 +45,15 @@ public class Combination
   protected LogicalGraph<GD, VD, ED> executeInternal(
     LogicalGraph<GD, VD, ED> firstGraph, LogicalGraph<GD, VD, ED> secondGraph) {
 
-    final GradoopId newGraphID = FlinkConstants.COMBINE_GRAPH_ID;
-
     // build distinct union of vertex sets and update graph ids at vertices
     // cannot use Gelly union here because of missing argument for KeySelector
     DataSet<VD> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
-      .distinct(new VertexKeySelector<VD>())
-      .map(new VertexToGraphUpdater<VD>(newGraphID));
+      .distinct(new VertexKeySelector<VD>());
 
     DataSet<ED> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
-      .distinct(new EdgeKeySelector<ED>())
-      .map(new EdgeToGraphUpdater<ED>(newGraphID));
+      .distinct(new EdgeKeySelector<ED>());
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

@@ -69,7 +69,7 @@ public class GraphHeadPojoFactory extends ElementPojoFactory implements EPGMGrap
    * {@inheritDoc}
    */
   @Override
-  public GraphHeadPojo initGraphHead(String label,
+  public GraphHeadPojo createGraphHead(String label,
     Map<String, Object> properties) {
     return initGraphHead(GradoopId.get(), label, properties);
   }

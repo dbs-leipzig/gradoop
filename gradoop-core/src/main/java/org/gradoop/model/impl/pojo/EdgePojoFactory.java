@@ -121,7 +121,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo initEdge(String label, GradoopId sourceVertexId,
+  public EdgePojo createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, Map<String, Object> properties,
     GradoopIdSet graphIds) {
     return initEdge(GradoopId.get(),

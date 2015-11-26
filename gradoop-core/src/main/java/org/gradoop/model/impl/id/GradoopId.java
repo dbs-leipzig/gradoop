@@ -17,14 +17,13 @@
 
 package org.gradoop.model.impl.id;
 
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * Primary key for an EPGM entity. A GradoopId uniquely identifies an entity
@@ -37,36 +36,36 @@ public class GradoopId implements Comparable<GradoopId>,
   WritableComparable<GradoopId>, Serializable {
 
   /**
-   * ID length in Byte
+   * Highest possible Gradoop Id.
    */
-  private static final int ID_LENGTH = 13;
+  public static final GradoopId MAX_VALUE =
+    new GradoopId(new UUID(Long.MAX_VALUE, Long.MAX_VALUE));
 
   /**
-   * Stores the ID
-   *
-   * Byte 0 - 1:  Context
-   * Byte 1 - 5:  Creator ID
-   * Byte 5 - 13: Sequence number
+   * Lowest possible Gradoop Id.
    */
-  private byte[] content = new byte[ID_LENGTH];
+  public static final GradoopId MIN_VALUE =
+    new GradoopId(new UUID(Long.MIN_VALUE, Long.MIN_VALUE));
 
   /**
-   * Empty constructor is necessary for (de-)serialization
+   * 128-bit UUID
+   */
+  private UUID uuid;
+
+  /**
+   * Create a new UUID.
    */
   public GradoopId() {
+    uuid = UUID.randomUUID();
   }
 
   /**
-   * Creates a new Gradoop ID.
+   * Create GradoopId from existing UUID.
    *
-   * @param sequenceNumber  sequence number
-   * @param creatorId       creator id
-   * @param context         creation context
+   * @param uuid UUID
    */
-  GradoopId(long sequenceNumber, int creatorId, Context context) {
-    Bytes.putByte(content, 0, (byte) context.ordinal());
-    Bytes.putInt(content, 1, creatorId);
-    Bytes.putLong(content, 5, sequenceNumber);
+  GradoopId(UUID uuid) {
+    this.uuid = uuid;
   }
 
   /**
@@ -78,16 +77,14 @@ public class GradoopId implements Comparable<GradoopId>,
     return new GradoopId();
   }
 
-  public long getSequenceNumber() {
-    return Bytes.toLong(content, 5);
-  }
-
-  public int getCreatorId() {
-    return Bytes.toInt(content, 1);
-  }
-
-  public Context getContext() {
-    return Context.values()[(int) content[0]];
+  /**
+   * Returns the Gradoop ID represented by a string.
+   *
+   * @param string string representation
+   * @return Gradoop ID
+   */
+  public static GradoopId fromString(String string) {
+    return new GradoopId(UUID.fromString(string));
   }
 
   @Override
@@ -99,53 +96,35 @@ public class GradoopId implements Comparable<GradoopId>,
       return false;
     }
     GradoopId that = (GradoopId) o;
-    return Arrays.equals(content, that.content);
+    return this.uuid.equals(that.uuid);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(content);
+    return uuid.hashCode();
   }
 
   @Override
   public int compareTo(GradoopId o) {
-    return Bytes.compareTo(this.content, o.content);
+    return this.uuid.compareTo(o.uuid);
   }
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.write(content);
+    dataOutput.writeLong(uuid.getMostSignificantBits());
+    dataOutput.writeLong(uuid.getLeastSignificantBits());
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    dataInput.readFully(content);
+    long mostSignificantBits = dataInput.readLong();
+    long leastSignificantBits = dataInput.readLong();
+
+    this.uuid = new UUID(mostSignificantBits, leastSignificantBits);
   }
 
   @Override
   public String toString() {
-    return String.format("<%s-%s-%s>",
-      Long.toHexString(getSequenceNumber()),
-      Integer.toHexString(getCreatorId()),
-      getContext());
-  }
-
-  /**
-   * Returns the Gradoop ID represented by a string.
-   *
-   * @param string string representation
-   * @return Gradoop ID
-   */
-  public static GradoopId fromString(String string) {
-
-    string = string.substring(1, string.length() - 1);
-
-    String[] parts = string.split("-");
-
-    return new GradoopId(
-      Long.valueOf(parts[0], 16),
-      Integer.valueOf(parts[1], 16),
-      Context.valueOf(parts[2])
-    );
+    return uuid.toString();
   }
 }

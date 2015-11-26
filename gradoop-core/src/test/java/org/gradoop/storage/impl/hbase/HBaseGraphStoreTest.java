@@ -25,7 +25,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.generators.TestSequenceIdGenerator;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -46,10 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentEdges;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentGraphHeads;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentVertices;
 import static org.gradoop.GradoopTestUtils.*;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -195,7 +192,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     // list is not supported by
     final List<String> value = Lists.newArrayList();
 
-    GradoopId vertexID = new TestSequenceIdGenerator().createId();
+    GradoopId vertexID = GradoopId.get();
     final String label = "A";
     final Map<String, Object> properties = new HashMap<>();
     properties.put("k1", value);
@@ -238,7 +235,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     final String keyString = "key6";
     final String valueString = "value";
 
-    final GradoopId vertexID = new TestSequenceIdGenerator().createId();
+    final GradoopId vertexID = GradoopId.get();
     final String label = "A";
 
     final Map<String, Object> properties = new HashMap<>();

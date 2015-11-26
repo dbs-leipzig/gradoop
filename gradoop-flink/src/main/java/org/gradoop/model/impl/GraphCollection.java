@@ -49,7 +49,6 @@ import org.gradoop.model.impl.functions.filterfunctions
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.TimestampIdGenerator;
 import org.gradoop.model.impl.operators.collection.binary.Difference;
 import org.gradoop.model.impl.operators.collection.binary.DifferenceUsingList;
 import org.gradoop.model.impl.operators.collection.binary.Intersect;
@@ -137,11 +136,10 @@ public class GraphCollection
     GradoopFlinkConfig<V, E, G> config) {
 
     ExecutionEnvironment env = config.getExecutionEnvironment();
-    GradoopId dummyId = new TimestampIdGenerator(0).createId();
 
     DataSet<G> graphHeadSet;
     if(vertices.isEmpty()) {
-      graphHeads.add(config.getGraphHeadFactory().initGraphHead(dummyId));
+      graphHeads.add(config.getGraphHeadFactory().createGraphHead());
       graphHeadSet = env.fromCollection(graphHeads)
         .filter(new AlwaysFalseFilter<G>());
     } else {
@@ -150,16 +148,17 @@ public class GraphCollection
 
     DataSet<V> vertexSet;
     if(vertices.isEmpty()) {
-      vertices.add(config.getVertexFactory().initVertex(dummyId));
+      vertices.add(config.getVertexFactory().createVertex());
       vertexSet = env.fromCollection(vertices)
         .filter(new AlwaysFalseFilter<V>());
     } else {
       vertexSet = env.fromCollection(vertices);
     }
 
+    GradoopId dummyId = GradoopId.get();
     DataSet<E> edgeSet;
     if(vertices.isEmpty()) {
-      edges.add(config.getEdgeFactory().initEdge(dummyId, dummyId, dummyId));
+      edges.add(config.getEdgeFactory().createEdge(dummyId, dummyId));
       edgeSet = env.fromCollection(edges)
         .filter(new AlwaysFalseFilter<E>());
     } else {

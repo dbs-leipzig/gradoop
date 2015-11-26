@@ -8,7 +8,6 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -22,8 +21,8 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;
@@ -50,10 +49,6 @@ public class SplitBy<
   GD extends EPGMGraphHead>
   implements UnaryGraphToCollectionOperator<VD, ED, GD> {
   /**
-   * Flink execution environment
-   */
-  private ExecutionEnvironment env;
-  /**
    * Mapping from a vertex to a long value
    */
   private final UnaryFunction<VD, GradoopId> vertexToLongFunc;
@@ -61,12 +56,9 @@ public class SplitBy<
   /**
    * Creates a split by instance.
    *
-   * @param env              Flink Execution Environment
    * @param vertexToLongFunc Function to select a graph id from a vertex
    */
-  public SplitBy(UnaryFunction<VD, GradoopId> vertexToLongFunc,
-    final ExecutionEnvironment env) {
-    this.env = env;
+  public SplitBy(UnaryFunction<VD, GradoopId> vertexToLongFunc) {
     this.vertexToLongFunc = vertexToLongFunc;
   }
 

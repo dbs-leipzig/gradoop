@@ -20,7 +20,6 @@ package org.gradoop.model.impl.pojo;
 import com.google.common.collect.Maps;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.generators.TestSequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -33,8 +32,7 @@ import static org.junit.Assert.*;
 public class GraphHeadPojoTest {
   @Test
   public void createWithIDTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId graphID = idGen.createId();
+    GradoopId graphID = GradoopId.get();
     EPGMGraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
     assertThat(g.getId(), is(graphID));
     assertThat(g.getPropertyCount(), is(0));
@@ -42,8 +40,7 @@ public class GraphHeadPojoTest {
 
   @Test
   public void createDefaultGraphTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId graphID = idGen.createId();
+    GradoopId graphID = GradoopId.get();
     String label = "A";
     Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
     props.put("k1", "v1");
@@ -61,8 +58,7 @@ public class GraphHeadPojoTest {
 
   @Test
   public void createWithMissingLabelTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId graphID = idGen.createId();
+    GradoopId graphID = GradoopId.get();
     EPGMGraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
     assertThat(g.getLabel(), is(GConstants.DEFAULT_GRAPH_LABEL));
   }
@@ -74,16 +70,14 @@ public class GraphHeadPojoTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId graphID = idGen.createId();
+    GradoopId graphID = GradoopId.get();
     new GraphHeadPojoFactory().initGraphHead(graphID, null);
   }
 
   @Test
   public void equalsTest() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId graphID1 = idGen.createId();
-    GradoopId graphID2 = idGen.createId();
+    GradoopId graphID1 = GradoopId.get();
+    GradoopId graphID2 = GradoopId.get();
 
     GraphHeadPojo graphHead1 = new GraphHeadPojoFactory().initGraphHead(graphID1);
     GraphHeadPojo graphHead2 = new GraphHeadPojoFactory().initGraphHead(graphID1);
@@ -96,9 +90,8 @@ public class GraphHeadPojoTest {
 
   @Test
   public void testHashCode() {
-    TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
-    GradoopId graphID1 = idGen.createId();
-    GradoopId graphID2 = idGen.createId();
+    GradoopId graphID1 = GradoopId.get();
+    GradoopId graphID2 = GradoopId.get();
 
     GraphHeadPojo graphHead1 = new GraphHeadPojoFactory().initGraphHead(graphID1);
     GraphHeadPojo graphHead2 = new GraphHeadPojoFactory().initGraphHead(graphID1);

@@ -33,6 +33,7 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.functions.mapfunctions.GraphContainmentUpdater;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.equality.logicalgraph
   .EqualByElementData;
@@ -81,7 +82,6 @@ public class LogicalGraph
    * Creates a logical graph from the given arguments.
    *
    * @param graph     Flink Gelly graph
-   * @param graphData Graph head associated with the logical graph
    * @param config    Gradoop Flink configuration
    * @param <V>      vertex data type
    * @param <E>      edge data type
@@ -91,14 +91,10 @@ public class LogicalGraph
   public static
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   LogicalGraph<G, V, E> fromGellyGraph(
-
-    Graph<GradoopId, V, E> graph, G graphData,
+    Graph<GradoopId, V, E> graph,
     GradoopFlinkConfig<V, E, G> config) {
 
-    Collection<G> graphHead = Lists.newArrayList(graphData);
-
     return fromDataSets(
-      config.getExecutionEnvironment().fromCollection(graphHead),
       graph.getVertices().map(new MapFunction<Vertex<GradoopId, V>, V>() {
         @Override
         public V map(Vertex<GradoopId, V> gellyVertex) throws Exception {
@@ -133,11 +129,14 @@ public class LogicalGraph
   }
 
   /**
-   * Creates a logical graph from the given arguments.
+   * Creates a logical graph from the given argument.
    *
-   * @param <V>        EPGM vertex type
-   * @param <E>        EPGM edge type
-   * @param <G>        EPGM graph head graph head type
+   * The method creates a new graph head element and assigns the vertices and
+   * edges to that graph.
+   *
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
+   * @param <G>         EPGM graph head graph head type
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
@@ -153,10 +152,12 @@ public class LogicalGraph
       .getGraphHeadFactory()
       .createGraphHead();
 
-    Collection<G> graphHeadCol = Lists.newArrayList(graphHead);
-
     DataSet<G> graphHeadSet = config.getExecutionEnvironment()
-      .fromCollection(graphHeadCol);
+      .fromElements(graphHead);
+
+    // update vertices and edges with new graph head id
+    vertices = vertices.map(new GraphContainmentUpdater<G, V>(graphHead));
+    edges = edges.map(new GraphContainmentUpdater<G, E>(graphHead));
 
     return new LogicalGraph<>(
       graphHeadSet,
