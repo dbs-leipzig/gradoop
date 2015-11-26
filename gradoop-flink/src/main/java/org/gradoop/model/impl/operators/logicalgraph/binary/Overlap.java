@@ -22,7 +22,9 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.filterfunctions.ElementInGraphs;
+import org.gradoop.model.impl.functions.epgm.ElementId;
+import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Creates a new logical graph containing the overlapping vertex and edge
@@ -46,18 +48,19 @@ public class Overlap<
   protected LogicalGraph<G, V, E> executeInternal(
     LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
-    DataSet<G> graphHeads = firstGraph.getGraphHead()
-      .union(secondGraph.getGraphHead());
+    DataSet<GradoopId> graphIds = firstGraph.getGraphHead()
+      .union(secondGraph.getGraphHead())
+      .map(new ElementId<G>());
 
     DataSet<V> newVertexSet = firstGraph.getVertices()
-      .filter(new ElementInGraphs<G, V>())
+      .filter(new InGraphsBroadcast<V>())
       .withBroadcastSet(
-        graphHeads, ElementInGraphs.GRAPH_HEADS);
+        graphIds, InGraphsBroadcast.GRAPH_IDS);
 
     DataSet<E> newEdgeSet = firstGraph.getEdges()
-      .filter(new ElementInGraphs<G, E>())
+      .filter(new InGraphsBroadcast<E>())
       .withBroadcastSet(
-        graphHeads, ElementInGraphs.GRAPH_HEADS);
+        graphIds, InGraphsBroadcast.GRAPH_IDS);
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

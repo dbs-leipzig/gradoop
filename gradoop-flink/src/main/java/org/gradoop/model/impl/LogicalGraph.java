@@ -33,7 +33,7 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.functions.mapfunctions.GraphContainmentUpdater;
+import org.gradoop.model.impl.functions.graphcontainment.GraphContainmentUpdater;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.equality.logicalgraph
   .EqualByElementData;
@@ -407,7 +407,7 @@ public class LogicalGraph
 //   * {@inheritDoc}
 //   */
 //  public Map<String, Object> getProperties() {
-//    return graphHead.getProperties();
+//    return graphId.getProperties();
 //  }
 //
 //  /**
@@ -415,14 +415,14 @@ public class LogicalGraph
 //   */
 //  @Override
 //  public Iterable<String> getPropertyKeys() {
-//    return graphHead.getPropertyKeys();
+//    return graphId.getPropertyKeys();
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  public Object getProperty(String key) {
-//    return graphHead.getProperty(key);
+//    return graphId.getProperty(key);
 //  }
 //
 //  /**
@@ -430,56 +430,56 @@ public class LogicalGraph
 //   */
 //  @Override
 //  public <T> T getProperty(String key, Class<T> type) {
-//    return graphHead.getProperty(key, type);
+//    return graphId.getProperty(key, type);
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  public void setProperties(Map<String, Object> properties) {
-//    graphHead.setProperties(properties);
+//    graphId.setProperties(properties);
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  public void setProperty(String key, Object value) {
-//    graphHead.setProperty(key, value);
+//    graphId.setProperty(key, value);
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  public int getPropertyCount() {
-//    return graphHead.getPropertyCount();
+//    return graphId.getPropertyCount();
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  public GradoopId getId() {
-//    return graphHead.getId();
+//    return graphId.getId();
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  public void setId(GradoopId id) {
-//    graphHead.setId(id);
+//    graphId.setId(id);
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  public String getLabel() {
-//    return graphHead.getLabel();
+//    return graphId.getLabel();
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  public void setLabel(String label) {
-//    graphHead.setLabel(label);
+//    graphId.setLabel(label);
 //  }
 
   /**

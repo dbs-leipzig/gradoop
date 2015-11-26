@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.functions.joinfunctions;
+package org.gradoop.model.impl.functions.join;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;

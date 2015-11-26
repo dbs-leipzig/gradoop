@@ -15,7 +15,7 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.mapfunctions;
+package org.gradoop.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMGraphElement;
@@ -28,9 +28,8 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <G>   EPGM graph head type
  * @param <GE>  EPGM graph element type
  */
-public class GraphContainmentUpdater<
-  G extends EPGMGraphHead,
-  GE extends EPGMGraphElement>
+public class GraphContainmentUpdater
+  <G extends EPGMGraphHead, GE extends EPGMGraphElement>
   implements MapFunction<GE, GE> {
 
   /**

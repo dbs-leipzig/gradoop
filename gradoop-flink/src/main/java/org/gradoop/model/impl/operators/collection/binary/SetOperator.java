@@ -8,7 +8,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.joinfunctions.EdgeVertexJoinKeepEdge;
+import org.gradoop.model.impl.functions.join.EdgeVertexJoinKeepEdge;
 import org.gradoop.model.impl.functions.keyselectors.EdgeKeySelector;
 import org.gradoop.model.impl.functions.keyselectors
   .EdgeSourceVertexKeySelector;

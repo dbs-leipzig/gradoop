@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains join function implementations that are globally used.
+ * Contains filter function implementations that are globally used.
  */
-package org.gradoop.model.impl.functions.joinfunctions;
+package org.gradoop.model.impl.functions.graphcontainment;

@@ -8,7 +8,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.functions.LeftSideOnly;
+import org.gradoop.model.impl.functions.join.LeftSideOnly;
 import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
 import org.gradoop.model.impl.operators.equality.functions

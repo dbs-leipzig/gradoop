@@ -22,7 +22,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.filterfunctions.ElementNotInGraph;
+import org.gradoop.model.impl.functions.graphcontainment.NotInGraphBroadcast;
 
 /**
  * Creates a new logical graph containing only vertices and edges that
@@ -47,14 +47,14 @@ public class Exclusion<
     LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
     DataSet<V> newVertexSet = firstGraph.getVertices()
-      .filter(new ElementNotInGraph<G, V>())
+      .filter(new NotInGraphBroadcast<V>())
       .withBroadcastSet(
-        secondGraph.getGraphHead(), ElementNotInGraph.GRAPH_HEAD);
+        secondGraph.getGraphHead(), NotInGraphBroadcast.GRAPH_ID);
 
     DataSet<E> newEdgeSet = firstGraph.getEdges()
-      .filter(new ElementNotInGraph<G, E>())
+      .filter(new NotInGraphBroadcast<E>())
       .withBroadcastSet(
-        secondGraph.getGraphHead(), ElementNotInGraph.GRAPH_HEAD);
+        secondGraph.getGraphHead(), NotInGraphBroadcast.GRAPH_ID);
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

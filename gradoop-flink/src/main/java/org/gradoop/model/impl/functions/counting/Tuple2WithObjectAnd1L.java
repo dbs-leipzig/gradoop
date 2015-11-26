@@ -3,7 +3,7 @@ package org.gradoop.model.impl.functions.counting;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 
-public class ToCountableTuple2<T>
+public class Tuple2WithObjectAnd1L<T>
   implements MapFunction<T, Tuple2<T, Long>> {
 
 

@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.functions.filterfunctions;
+package org.gradoop.model.impl.functions.bool;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 

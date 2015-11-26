@@ -21,9 +21,10 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.isolation.ElementId;
-import org.gradoop.model.impl.functions.filterfunctions
-  .VertexInGraphsFilterWithBC;
+import org.gradoop.model.impl.functions.epgm.ElementId;
+import org.gradoop.model.impl.functions.graphcontainment
+  .AbstractBroadcastGraphsContainmentFilter;
+import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -59,8 +60,9 @@ public class DifferenceUsingList<
       .map(new ElementId<GD>());
 
     return firstCollection.getVertices()
-      .filter(new VertexInGraphsFilterWithBC<VD>())
-      .withBroadcastSet(identifiers, VertexInGraphsFilterWithBC.BC_IDENTIFIERS);
+      .filter(new InGraphsBroadcast<VD>())
+      .withBroadcastSet(identifiers,
+        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
   }
 
   /**

@@ -23,11 +23,10 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.filterfunctions
-  .EdgeInAllGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.filterfunctions
-  .VertexInAllGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.isolation.ElementId;
+import org.gradoop.model.impl.functions.graphcontainment
+  .AbstractBroadcastGraphsContainmentFilter;
+import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
+import org.gradoop.model.impl.functions.epgm.ElementId;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -53,12 +52,14 @@ public class OverlapCollection
     DataSet<GradoopId> graphIDs = graphHeads.map(new ElementId<G>());
 
     DataSet<V> vertices = collection.getVertices()
-      .filter(new VertexInAllGraphsFilterWithBC<V>())
-      .withBroadcastSet(graphIDs, VertexInAllGraphsFilterWithBC.BC_IDENTIFIERS);
+      .filter(new InGraphsBroadcast<V>())
+      .withBroadcastSet(graphIDs,
+        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
 
     DataSet<E> edges = collection.getEdges()
-      .filter(new EdgeInAllGraphsFilterWithBC<E>())
-      .withBroadcastSet(graphIDs, EdgeInAllGraphsFilterWithBC.BC_IDENTIFIERS);
+      .filter(new InGraphsBroadcast<E>())
+      .withBroadcastSet(graphIDs,
+        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
 
     return LogicalGraph.fromDataSets(
       vertices,

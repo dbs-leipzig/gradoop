@@ -6,10 +6,10 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToValueOperator;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.ToGradoopIds;
+import org.gradoop.model.impl.functions.epgm.ToGradoopIdSet;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
-import org.gradoop.model.impl.functions.isolation.ElementId;
+import org.gradoop.model.impl.functions.epgm.ElementId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.equality.EqualityBase;
 
@@ -26,19 +26,19 @@ public class EqualByElementIds
 
     DataSet<GradoopIdSet> firstGraphVertexIds = firstGraph.getVertices()
       .map(new ElementId<V>())
-      .reduceGroup(new ToGradoopIds());
+      .reduceGroup(new ToGradoopIdSet());
 
     DataSet<GradoopIdSet> secondGraphVertexIds = secondGraph.getVertices()
       .map(new ElementId<V>())
-      .reduceGroup(new ToGradoopIds());
+      .reduceGroup(new ToGradoopIdSet());
 
     DataSet<GradoopIdSet> firstGraphEdgeIds = firstGraph.getEdges()
       .map(new ElementId<E>())
-      .reduceGroup(new ToGradoopIds());
+      .reduceGroup(new ToGradoopIdSet());
 
     DataSet<GradoopIdSet> secondGraphEdgeIds = secondGraph.getEdges()
       .map(new ElementId<E>())
-      .reduceGroup(new ToGradoopIds());
+      .reduceGroup(new ToGradoopIdSet());
 
     DataSet<Boolean> equalVertices = firstGraphVertexIds
       .cross(secondGraphVertexIds)

@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.functions.isolation;
+package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMElement;

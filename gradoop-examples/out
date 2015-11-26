@@ -481,7 +481,7 @@ HostSet(
 2015-05-26 21:57:01,635 INFO  [RS:0;localhost:35298] procedure.RegionServerProcedureManagerHost (RegionServerProcedureManagerHost.java:initialize(45)) - Procedure online-snapshot is initialized
 2015-05-26 21:57:01,635 INFO  [M:0;localhost:42626] zookeeper.RecoverableZooKeeper (RecoverableZooKeeper.java:createNonSequential(531)) - Node /hbase/online-snapshot/abort already exists and this is not a retry
 2015-05-26 21:57:01,635 INFO  [M:0;localhost:42626] procedure.ZKProcedureUtil (ZKProcedureUtil.java:clearChildZNodes(271)) - Clearing all procedure znodes: /hbase/online-snapshot/acquired /hbase/online-snapshot/reached /hbase/online-snapshot/abort
-2015-05-26 21:57:01,639 INFO  [RS:0;localhost:35298] regionserver.MemStoreFlusher (MemStoreFlusher.java:<init>(119)) - globalMemStoreLimit=699.8 M, globalMemStoreLimitLowMark=664.8 M, maxHeap=1.7 G
+2015-05-26 21:57:01,639 INFO  [RS:0;localhost:35298] regionserver.MemStoreFlusher (MemStoreFlusher.java:<init>(119)) - globalMemStoreLimit=699.8 M, globalMemStoreLimitLowMark=664.8 M, maxHeap=1.7 EL
 2015-05-26 21:57:01,639 INFO  [IPC Server handler 1 on 33097] FSNamesystem.audit (FSNamesystem.java:logAuditEvent(6725)) - allowed=true	ugi=s1ck (auth:SIMPLE)	ip=/127.0.0.1	cmd=getfileinfo	src=/user/s1ck/hbase/.hbase-snapshot/.tmp	dst=null	perm=null
 2015-05-26 21:57:01,643 INFO  [RS:0;localhost:35298] regionserver.HRegionServer (HRegionServer.java:<init>(1488)) - CompactionChecker runs every 10sec
 2015-05-26 21:57:01,648 INFO  [RS:0;localhost:35298] regionserver.HRegionServer (HRegionServer.java:reportForDuty(2145)) - reportForDuty to master=localhost,42626,1432670220684 with port=35298, startcode=1432670220902

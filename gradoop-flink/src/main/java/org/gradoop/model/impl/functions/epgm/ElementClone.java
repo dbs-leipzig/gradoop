@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.functions.mapfunctions;
+package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMElement;
@@ -9,7 +9,7 @@ public class ElementClone<EL extends EPGMElement>
 
   @Override
   public EL map(EL el) throws Exception {
-    el.setId(new GradoopId());
+    el.setId(GradoopId.get());
     return el;
   }
 }

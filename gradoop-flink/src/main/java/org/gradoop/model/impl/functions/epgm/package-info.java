@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains unary function implementations that are globally used.
+ * Contains map function implementations that are globally used.
  */
-package org.gradoop.model.impl.functions.unaryfunctions;
+package org.gradoop.model.impl.functions.epgm;

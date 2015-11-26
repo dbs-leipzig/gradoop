@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.PropertySetter;
+import org.gradoop.model.impl.functions.epgm.PropertySetter;
 
 /**
  * Takes a logical graph and a user defined aggregate function as input. The

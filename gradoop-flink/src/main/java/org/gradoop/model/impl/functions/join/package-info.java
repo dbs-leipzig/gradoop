@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains map function implementations that are globally used.
+ * Contains join function implementations that are globally used.
  */
-package org.gradoop.model.impl.functions.mapfunctions;
+package org.gradoop.model.impl.functions.join;

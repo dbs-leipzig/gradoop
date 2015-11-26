@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.functions;
+package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
@@ -6,7 +6,7 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
 
-public class ToGradoopIds
+public class ToGradoopIdSet
   implements GroupReduceFunction<GradoopId, GradoopIdSet> {
 
   @Override

@@ -26,8 +26,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.io.json.JsonWriter;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
@@ -36,16 +36,15 @@ import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
-import org.gradoop.model.impl.functions.filterfunctions.False;
-import org.gradoop.model.impl.functions.filterfunctions.EdgesByGraphId;
-import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
-import org.gradoop.model.impl.functions.filterfunctions
-  .EdgeInGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.filterfunctions.GraphHeadByGraphID;
-import org.gradoop.model.impl.functions.filterfunctions.VerticesByGraphId;
-import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
-import org.gradoop.model.impl.functions.filterfunctions
-  .VertexInGraphsFilterWithBC;
+import org.gradoop.model.impl.functions.bool.False;
+import org.gradoop.model.impl.functions.graphcontainment
+  .AbstractBroadcastGraphsContainmentFilter;
+
+import org.gradoop.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.model.impl.functions.graphcontainment.InGraphs;
+import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
+import org.gradoop.model.impl.functions.epgm.ById;
+
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
@@ -187,12 +186,12 @@ public class GraphCollection
     Exception {
     // filter vertices and edges based on given graph id
     DataSet<G> graphHead = getGraphHeads()
-      .filter(new GraphHeadByGraphID<G>(graphID));
+      .filter(new ById<G>(graphID));
 
     DataSet<V> vertices = getVertices()
-      .filter(new VerticesByGraphId<V>(graphID));
+      .filter(new InGraph<V>(graphID));
     DataSet<E> edges = getEdges()
-      .filter(new EdgesByGraphId<E>(graphID));
+      .filter(new InGraph<E>(graphID));
 
     DataSet<Tuple1<GradoopId>> graphIDDataSet = getConfig()
       .getExecutionEnvironment()
@@ -249,11 +248,11 @@ public class GraphCollection
 
     // build new vertex set
     DataSet<V> vertices = getVertices()
-      .filter(new VertexInGraphsFilter<V>(identifiers));
+      .filter(new InGraphs<V>(identifiers));
 
     // build new edge set
     DataSet<E> edges = getEdges()
-      .filter(new EdgeInGraphsFilter<E>(identifiers));
+      .filter(new InGraphs<E>(identifiers));
 
     return new GraphCollection<>(vertices, edges, newGraphHeads, getConfig());
   }
@@ -292,11 +291,14 @@ public class GraphCollection
 
     // use graph ids to filter vertices from the actual graph structure
     DataSet<V> vertices = getVertices()
-      .filter(new VertexInGraphsFilterWithBC<V>())
-      .withBroadcastSet(graphIDs, VertexInGraphsFilterWithBC.BC_IDENTIFIERS);
+      .filter(new InGraphsBroadcast<V>())
+      .withBroadcastSet(graphIDs,
+        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+
     DataSet<E> edges = getEdges()
-      .filter(new EdgeInGraphsFilterWithBC<E>())
-      .withBroadcastSet(graphIDs, EdgeInGraphsFilterWithBC.BC_IDENTIFIERS);
+      .filter(new InGraphsBroadcast<E>())
+      .withBroadcastSet(graphIDs,
+        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
 
     return new GraphCollection<>(vertices, edges, filteredGraphHeads,
       getConfig());

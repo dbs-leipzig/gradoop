@@ -24,15 +24,12 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.filterfunctions.EdgeInGraphsFilter;
-import org.gradoop.model.impl.functions.filterfunctions
-  .EdgeInNoneOfGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.filterfunctions.VertexInGraphsFilter;
-import org.gradoop.model.impl.functions.filterfunctions
-  .VertexInNoneOfGraphsFilterWithBC;
-import org.gradoop.model.impl.functions.isolation.ElementId;
+import org.gradoop.model.impl.functions.epgm.ElementId;
+import org.gradoop.model.impl.functions.graphcontainment
+  .AbstractBroadcastGraphsContainmentFilter;
+import org.gradoop.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
  * Takes a LogicalGraph specified by its id and removes all vertices and
@@ -72,9 +69,6 @@ public class ExcludeCollection
   @Override
   public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
 
-    final GradoopIdSet positiveGraphIDs =
-      GradoopIdSet.fromExisting(positiveGraphID);
-
     DataSet<G> graphHeads = collection.getGraphHeads();
 
     DataSet<GradoopId> graphIDs = graphHeads
@@ -84,20 +78,20 @@ public class ExcludeCollection
       .filter(new RemoveGradoopIdFromDataSetFilter(positiveGraphID));
 
     DataSet<V> vertices = collection.getVertices()
-      .filter(new VertexInGraphsFilter<V>(positiveGraphIDs));
+      .filter(new InGraph<V>(positiveGraphID));
 
     vertices = vertices
-      .filter(new VertexInNoneOfGraphsFilterWithBC<V>())
+      .filter(new NotInGraphsBroadcast<V>())
       .withBroadcastSet(
-        graphIDs, VertexInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
+        graphIDs, AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
 
     DataSet<E> edges = collection.getEdges()
-      .filter(new EdgeInGraphsFilter<E>(positiveGraphIDs));
+      .filter(new InGraph<E>(positiveGraphID));
 
     edges = edges
-      .filter(new EdgeInNoneOfGraphsFilterWithBC<E>())
+      .filter(new NotInGraphsBroadcast<E>())
       .withBroadcastSet(
-        graphIDs, EdgeInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
+        graphIDs, AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
 
     return LogicalGraph.fromDataSets(
       vertices,

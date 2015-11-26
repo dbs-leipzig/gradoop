@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.joinfunctions.EdgeVertexJoinKeepEdge;
+import org.gradoop.model.impl.functions.join.EdgeVertexJoinKeepEdge;
 import org.gradoop.model.impl.functions.keyselectors.EdgeSourceVertexKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.EdgeTargetVertexKeySelector;
 import org.gradoop.model.impl.functions.keyselectors.VertexKeySelector;

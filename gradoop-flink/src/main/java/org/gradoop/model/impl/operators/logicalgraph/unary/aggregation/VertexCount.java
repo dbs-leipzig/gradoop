@@ -5,7 +5,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.ExtractValueOfTuple1;
+import org.gradoop.model.impl.functions.tuple.ValueOfTuple1;
 import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 
 public class VertexCount
@@ -18,6 +18,6 @@ public class VertexCount
       .getVertices()
       .map(new Tuple1With1L<V>())
       .sum(0)
-      .map(new ExtractValueOfTuple1<Long>());
+      .map(new ValueOfTuple1<Long>());
   }
 }

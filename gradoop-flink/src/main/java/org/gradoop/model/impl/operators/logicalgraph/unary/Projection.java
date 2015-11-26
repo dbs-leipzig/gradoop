@@ -17,14 +17,13 @@
 package org.gradoop.model.impl.operators.logicalgraph.unary;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.functions.mapfunctions.ElementClone;
+import org.gradoop.model.impl.functions.epgm.ElementClone;
 
 /**
  * Creates a projected version of the logical graph using the user defined
