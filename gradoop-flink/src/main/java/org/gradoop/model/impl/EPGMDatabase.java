@@ -99,7 +99,7 @@ public class EPGMDatabase<
     this.database = GraphCollection.fromDataSets(vertices,
       edges, graphHeads, config);
     this.databaseData = config.getGraphHeadHandler().getGraphHeadFactory()
-      .createGraphHead(FlinkConstants.DATABASE_GRAPH_ID);
+      .initGraphHead(FlinkConstants.DATABASE_GRAPH_ID);
   }
 
   /**
@@ -221,7 +221,7 @@ public class EPGMDatabase<
     } else {
       graphHeads = env.fromCollection(Lists.newArrayList(
         config.getGraphHeadFactory()
-          .createGraphHead(FlinkConstants.DATABASE_GRAPH_ID)));
+          .initGraphHead(FlinkConstants.DATABASE_GRAPH_ID)));
     }
 
     return new EPGMDatabase<>(vertices, edges, graphHeads, config);
@@ -396,7 +396,7 @@ public class EPGMDatabase<
     } else {
       graphHeads = env.fromCollection(Lists.newArrayList(
         config.getGraphHeadFactory()
-          .createGraphHead(FlinkConstants.DATABASE_GRAPH_ID)));
+          .initGraphHead(FlinkConstants.DATABASE_GRAPH_ID)));
     }
 
     return new EPGMDatabase<>(vertices, edges, graphHeads, config);

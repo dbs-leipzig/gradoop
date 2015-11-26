@@ -6,51 +6,103 @@ import org.gradoop.model.impl.id.GradoopIdSet;
 import java.util.Map;
 
 /**
- * Creates {@link EPGMVertex} objects of a given type.
+ * Initializes {@link EPGMVertex} objects of a given type.
  *
  * @param <T> vertex data type
  */
 public interface EPGMVertexFactory<T extends EPGMVertex> extends
   EPGMElementFactory<T> {
   /**
-   * Creates vertex data based on the given parameters.
+   * Initializes a new vertex based on the given parameters.
+   *
+   * @return vertex data
+   */
+  T createVertex();
+
+  /**
+   * Initializes a vertex based on the given parameters.
    *
    * @param id vertex identifier
    * @return vertex data
    */
-  T createVertex(GradoopId id);
+  T initVertex(GradoopId id);
 
   /**
-   * Creates vertex data based on the given parameters.
+   * Creates a new vertex based on the given parameters.
+   *
+   * @param label vertex label
+   * @return vertex data
+   */
+  T createVertex(String label);
+
+  /**
+   * Initializes a vertex based on the given parameters.
    *
    * @param id    vertex identifier
    * @param label vertex label
    * @return vertex data
    */
-  T createVertex(GradoopId id, String label);
+  T initVertex(GradoopId id,
+    String label);
 
   /**
-   * Creates vertex data based on the given parameters.
+   * Creates a new vertex based on the given parameters.
+   *
+   * @param label      vertex labels
+   * @param properties vertex properties
+   * @return vertex data
+   */
+  T createVertex(String label,
+    Map<String, Object> properties);
+
+  /**
+   * Initializes a vertex based on the given parameters.
    *
    * @param id         vertex identifier
    * @param label      vertex labels
    * @param properties vertex properties
    * @return vertex data
    */
-  T createVertex(GradoopId id, String label, Map<String, Object> properties);
+  T initVertex(GradoopId id,
+    String label,
+    Map<String, Object> properties);
 
   /**
-   * Creates vertex data based on the given parameters.
+   * Creates a new vertex based on the given parameters.
+   *
+   * @param label  vertex label
+   * @param graphIds graphIds, that contain the vertex
+   * @return vertex data
+   */
+  T createVertex(String label,
+    GradoopIdSet graphIds);
+
+  /**
+   * Initializes a vertex based on the given parameters.
    *
    * @param id     vertex identifier
    * @param label  vertex label
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  T createVertex(GradoopId id, String label, GradoopIdSet graphIds);
+  T initVertex(GradoopId id,
+    String label,
+    GradoopIdSet graphIds);
 
   /**
-   * Creates vertex data based on the given parameters.
+   * Creates a new vertex based on the given parameters.
+   *
+   * @param label      vertex labels
+   * @param properties vertex properties
+   * @param graphIds     graphIds, that contain the vertex
+   * @return vertex data
+   */
+  T createVertex(String label,
+    Map<String, Object> properties,
+    GradoopIdSet graphIds);
+
+  /**
+   * Initializes a vertex based on the given parameters.
    *
    * @param id         vertex identifier
    * @param label      vertex labels
@@ -58,6 +110,8 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @param graphIds     graphIds, that contain the vertex
    * @return vertex data
    */
-  T createVertex(GradoopId id, String label,
-    Map<String, Object> properties, GradoopIdSet graphIds);
+  T initVertex(GradoopId id,
+    String label,
+    Map<String, Object> properties,
+    GradoopIdSet graphIds);
 }

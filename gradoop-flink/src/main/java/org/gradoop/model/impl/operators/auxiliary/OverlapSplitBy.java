@@ -193,7 +193,7 @@ public class OverlapSplitBy<
     @Override
     public GD map(Tuple1<GradoopId> idTuple) throws Exception {
       GradoopId id = idTuple.f0;
-      return graphHeadFactory.createGraphHead(id, "split graph " + id);
+      return graphHeadFactory.initGraphHead(id, "split graph " + id);
     }
 
     /**

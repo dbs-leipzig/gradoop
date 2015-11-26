@@ -163,7 +163,7 @@ public class HBaseVertexHandler<VD extends EPGMVertex, ED extends EPGMEdge>
   public VD readVertex(final Result res) {
     VD vertex = null;
     try {
-      vertex = vertexFactory.createVertex(
+      vertex = vertexFactory.initVertex(
         readId(res), readLabel(res), readProperties(res), readGraphIds(res));
     } catch (IOException e) {
       e.printStackTrace();

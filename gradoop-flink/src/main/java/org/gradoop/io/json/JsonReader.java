@@ -92,7 +92,7 @@ public class JsonReader extends JsonIO {
       Map<String, Object> properties = getProperties(jsonVertex);
       GradoopIdSet graphs = getGraphs(jsonVertex);
 
-      return vertexFactory.createVertex(vertexID, label, properties, graphs);
+      return vertexFactory.initVertex(vertexID, label, properties, graphs);
     }
   }
 
@@ -153,7 +153,7 @@ public class JsonReader extends JsonIO {
       Map<String, Object> properties = getProperties(jsonEdge);
       GradoopIdSet graphs = getGraphs(jsonEdge);
 
-      return edgeFactory.createEdge(edgeID, edgeLabel, sourceID, targetID,
+      return edgeFactory.initEdge(edgeID, edgeLabel, sourceID, targetID,
         properties, graphs);
     }
 
@@ -235,7 +235,7 @@ public class JsonReader extends JsonIO {
       String label = getLabel(jsonGraph);
       Map<String, Object> properties = getProperties(jsonGraph);
 
-      return graphHeadFactory.createGraphHead(graphID, label, properties);
+      return graphHeadFactory.initGraphHead(graphID, label, properties);
     }
   }
 }

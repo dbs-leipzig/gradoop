@@ -223,7 +223,7 @@ public class SummarizationGroupWithLists<
         }
       }
       VD vertexData =
-        vertexFactory.createVertex(newVertexID, groupLabel);
+        vertexFactory.initVertex(newVertexID, groupLabel);
       if (useProperty) {
         vertexData.setProperty(groupPropertyKey, groupValue);
       }

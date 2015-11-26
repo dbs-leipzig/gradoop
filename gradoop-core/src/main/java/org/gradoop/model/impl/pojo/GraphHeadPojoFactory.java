@@ -37,23 +37,48 @@ public class GraphHeadPojoFactory extends ElementPojoFactory implements EPGMGrap
    * {@inheritDoc}
    */
   @Override
-  public GraphHeadPojo createGraphHead(final GradoopId id) {
-    return createGraphHead(id, GConstants.DEFAULT_GRAPH_LABEL, null);
+  public GraphHeadPojo createGraphHead() {
+    return initGraphHead(GradoopId.get());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphHeadPojo createGraphHead(final GradoopId id, final String label) {
-    return createGraphHead(id, label, null);
+  public GraphHeadPojo initGraphHead(final GradoopId id) {
+    return initGraphHead(id, GConstants.DEFAULT_GRAPH_LABEL, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphHeadPojo createGraphHead(final GradoopId id, final String label,
+  public GraphHeadPojo createGraphHead(String label) {
+    return initGraphHead(GradoopId.get(), label);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphHeadPojo initGraphHead(final GradoopId id, final String label) {
+    return initGraphHead(id, label, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphHeadPojo initGraphHead(String label,
+    Map<String, Object> properties) {
+    return initGraphHead(GradoopId.get(), label, properties);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphHeadPojo initGraphHead(final GradoopId id, final String label,
     Map<String, Object> properties) {
     checkId(id);
     checkLabel(label);

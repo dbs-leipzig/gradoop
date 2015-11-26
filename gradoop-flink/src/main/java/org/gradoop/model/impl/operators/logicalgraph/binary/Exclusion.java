@@ -87,7 +87,7 @@ public class Exclusion<
       .map(new EdgeToGraphUpdater<ED>(newGraphID));
 
     return LogicalGraph.fromDataSets(newVertexSet, newEdgeSet,
-      firstGraph.getConfig().getGraphHeadFactory().createGraphHead(newGraphID),
+      firstGraph.getConfig().getGraphHeadFactory().initGraphHead(newGraphID),
       firstGraph.getConfig());
   }
 

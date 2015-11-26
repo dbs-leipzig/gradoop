@@ -88,7 +88,7 @@ public class Projection<
       .map(new ProjectionEdgesMapper<>(getEdgeFunc()));
     return LogicalGraph.fromDataSets(vertices, edges,
       graph.getConfig().getGraphHeadFactory()
-        .createGraphHead(graph.getId(), graph.getLabel(),
+        .initGraphHead(graph.getId(), graph.getLabel(),
           graph.getProperties()), graph.getConfig());
   }
 

@@ -205,7 +205,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     final GradoopIdSet graphs = new GradoopIdSet();
     PersistentVertex<EdgePojo> v = persistentVertexFactory
       .createVertex(
-        vertexFactory.createVertex(vertexID, label, properties, graphs),
+        vertexFactory.initVertex(vertexID, label, properties, graphs),
         outEdges, inEdges);
 
     graphStore.writeVertex(v);
@@ -255,7 +255,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     // write to store
     graphStore.writeVertex(persistentVertexFactory.createVertex(
-      vertexFactory.createVertex(vertexID, label, properties, graphs), outEdges,
+      vertexFactory.initVertex(vertexID, label, properties, graphs), outEdges,
       inEdges));
 
     graphStore.flush();

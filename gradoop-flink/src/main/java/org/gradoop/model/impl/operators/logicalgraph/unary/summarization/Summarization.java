@@ -316,7 +316,7 @@ public abstract class Summarization<
    */
   private GD createNewGraphHead() {
     return config.getGraphHeadFactory()
-      .createGraphHead(FlinkConstants.SUMMARIZE_GRAPH_ID);
+      .initGraphHead(FlinkConstants.SUMMARIZE_GRAPH_ID);
   }
 
   /**
@@ -405,7 +405,7 @@ public abstract class Summarization<
       }
 
       ED newEdgeData = edgeFactory
-        .createEdge(newEdgeID, edgeLabel, newSourceVertexId, newTargetVertexId);
+        .initEdge(newEdgeID, edgeLabel, newSourceVertexId, newTargetVertexId);
 
       if (useProperty) {
         newEdgeData.setProperty(groupPropertyKey, edgeGroupingValue);

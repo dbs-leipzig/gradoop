@@ -40,7 +40,7 @@ public class CombineCollection<GD
     return LogicalGraph
       .fromDataSets(collection.getVertices(), collection.getEdges(),
         collection.getConfig().getGraphHeadFactory()
-          .createGraphHead(FlinkConstants.COMBINE_GRAPH_ID),
+          .initGraphHead(FlinkConstants.COMBINE_GRAPH_ID),
         collection.getConfig());
   }
 

@@ -39,41 +39,82 @@ public class VertexPojoFactory extends ElementPojoFactory
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final GradoopId vertexID) {
-    return createVertex(vertexID, GConstants.DEFAULT_VERTEX_LABEL, null, null);
+  public VertexPojo createVertex() {
+    return initVertex(GradoopId.get());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final GradoopId vertexID, final String label) {
-    return createVertex(vertexID, label, null, null);
+  public VertexPojo initVertex(final GradoopId vertexID) {
+    return initVertex(vertexID, GConstants.DEFAULT_VERTEX_LABEL, null, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final GradoopId vertexID, final String label,
+  public VertexPojo createVertex(String label) {
+    return initVertex(GradoopId.get(), label);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public VertexPojo initVertex(final GradoopId vertexID, final String label) {
+    return initVertex(vertexID, label, null, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public VertexPojo createVertex(String label, Map<String, Object> properties) {
+    return initVertex(GradoopId.get(), label, properties);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public VertexPojo initVertex(final GradoopId vertexID, final String label,
     Map<String, Object> properties) {
-    return createVertex(vertexID, label, properties, null);
+    return initVertex(vertexID, label, properties, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final GradoopId vertexID, final String label,
+  public VertexPojo createVertex(String label, GradoopIdSet graphIds) {
+    return initVertex(GradoopId.get(), label, graphIds);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public VertexPojo initVertex(final GradoopId vertexID, final String label,
     final GradoopIdSet graphs) {
-    return createVertex(vertexID, label, null, graphs);
+    return initVertex(vertexID, label, null, graphs);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(final GradoopId id, final String label,
+  public VertexPojo createVertex(String label, Map<String, Object> properties,
+    GradoopIdSet graphIds) {
+    return initVertex(GradoopId.get(), label, properties, graphIds);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public VertexPojo initVertex(final GradoopId id, final String label,
     final Map<String, Object> properties, final GradoopIdSet graphs) {
     checkId(id);
     checkLabel(label);

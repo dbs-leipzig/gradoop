@@ -37,7 +37,7 @@ public class VertexPojoTest {
   public void createWithIDTest() {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();
-    EPGMVertex v = new VertexPojoFactory().createVertex(vertexID);
+    EPGMVertex v = new VertexPojoFactory().initVertex(vertexID);
     assertThat(v.getId(), is(vertexID));
     assertThat(v.getPropertyCount(), is(0));
     assertThat(v.getGraphCount(), is(0));
@@ -60,7 +60,7 @@ public class VertexPojoTest {
     graphIds.add(graphId2);
 
     EPGMVertex vertex = new VertexPojoFactory()
-      .createVertex(vertexID, label, props, graphIds);
+      .initVertex(vertexID, label, props, graphIds);
 
     assertThat(vertex.getId(), is(vertexID));
     assertEquals(label, vertex.getLabel());
@@ -76,19 +76,19 @@ public class VertexPojoTest {
   public void createWithMissingLabelTest() {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();
-    EPGMVertex v = new VertexPojoFactory().createVertex(vertexID);
+    EPGMVertex v = new VertexPojoFactory().initVertex(vertexID);
     assertThat(v.getLabel(), is(GConstants.DEFAULT_VERTEX_LABEL));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullIDTest() {
-    new VertexPojoFactory().createVertex(null);
+    new VertexPojoFactory().initVertex(null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createWithNullLabelTest() {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId vertexID = idGen.createId();
-    new VertexPojoFactory().createVertex(vertexID, null);
+    new VertexPojoFactory().initVertex(vertexID, null);
   }
 }

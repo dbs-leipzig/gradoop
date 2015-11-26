@@ -60,7 +60,7 @@ public class OverlapCollection<GD
         .withBroadcastSet(graphIDs, EdgeInAllGraphsFilterWithBC.BC_IDENTIFIERS);
     return LogicalGraph.fromDataSets(vertices, edges,
       collection.getConfig().getGraphHeadFactory()
-        .createGraphHead(FlinkConstants.OVERLAP_GRAPH_ID),
+        .initGraphHead(FlinkConstants.OVERLAP_GRAPH_ID),
       collection.getConfig());
   }
 

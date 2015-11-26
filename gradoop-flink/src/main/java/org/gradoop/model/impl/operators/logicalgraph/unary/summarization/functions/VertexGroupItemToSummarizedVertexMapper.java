@@ -95,7 +95,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
   public Vertex<GradoopId, VD> map(VertexGroupItem vertexGroupItem) throws
     Exception {
     VD summarizedVertexData =
-      vertexFactory.createVertex(vertexGroupItem.getVertexId());
+      vertexFactory.initVertex(vertexGroupItem.getVertexId());
     if (useLabel) {
       summarizedVertexData.setLabel(vertexGroupItem.getGroupLabel());
     }

@@ -24,7 +24,6 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -49,7 +48,6 @@ import org.gradoop.model.impl.functions.filterfunctions
 import org.gradoop.model.impl.functions.keyselectors.GraphKeySelector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.SequenceIdGenerator;
 import org.gradoop.model.impl.id.TimestampIdGenerator;
 import org.gradoop.model.impl.operators.collection.binary.Difference;
 import org.gradoop.model.impl.operators.collection.binary.DifferenceUsingList;
@@ -59,9 +57,6 @@ import org.gradoop.model.impl.operators.collection.binary.Union;
 import org.gradoop.model.impl.operators.equality.collection
   .EqualByGraphElementIds;
 import org.gradoop.model.impl.operators.equality.collection.EqualByGraphIds;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
@@ -150,7 +145,7 @@ public class GraphCollection
 
     DataSet<G> graphHeadSet;
     if(vertices.isEmpty()) {
-      graphHeads.add(config.getGraphHeadFactory().createGraphHead(dummyId));
+      graphHeads.add(config.getGraphHeadFactory().initGraphHead(dummyId));
       graphHeadSet = env.fromCollection(graphHeads)
         .filter(new AlwaysFalseFilter<G>());
     } else {
@@ -159,7 +154,7 @@ public class GraphCollection
 
     DataSet<V> vertexSet;
     if(vertices.isEmpty()) {
-      vertices.add(config.getVertexFactory().createVertex(dummyId));
+      vertices.add(config.getVertexFactory().initVertex(dummyId));
       vertexSet = env.fromCollection(vertices)
         .filter(new AlwaysFalseFilter<V>());
     } else {
@@ -168,7 +163,7 @@ public class GraphCollection
 
     DataSet<E> edgeSet;
     if(vertices.isEmpty()) {
-      edges.add(config.getEdgeFactory().createEdge(dummyId, dummyId, dummyId));
+      edges.add(config.getEdgeFactory().initEdge(dummyId, dummyId, dummyId));
       edgeSet = env.fromCollection(edges)
         .filter(new AlwaysFalseFilter<E>());
     } else {

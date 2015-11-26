@@ -93,7 +93,7 @@ public class ExcludeCollection<VD extends EPGMVertex, ED extends EPGMEdge, GD
         EdgeInNoneOfGraphsFilterWithBC.BC_IDENTIFIERS);
     return LogicalGraph.fromDataSets(vertices, edges,
       collection.getConfig().getGraphHeadFactory()
-        .createGraphHead(FlinkConstants.EXCLUDE_GRAPH_ID),
+        .initGraphHead(FlinkConstants.EXCLUDE_GRAPH_ID),
       collection.getConfig());
   }
 
