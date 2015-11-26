@@ -65,15 +65,20 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> outputGraph =
       LogicalGraph.fromCollections(inputGraphHead, inputV, inputE, getConfig());
 
+    List<GraphHeadPojo> outputG = Lists.newArrayList();
     Collection<VertexPojo> outputV = Lists.newArrayList();
     Collection<EdgePojo> outputE = Lists.newArrayList();
 
-    outputGraph.getVertices().output(new LocalCollectionOutputFormat<>(outputV));
-    outputGraph.getEdges().output(new LocalCollectionOutputFormat<>(outputE));
+    outputGraph.getGraphHead().output(
+      new LocalCollectionOutputFormat<>(outputG));
+    outputGraph.getVertices().output(
+      new LocalCollectionOutputFormat<>(outputV));
+    outputGraph.getEdges().output(
+      new LocalCollectionOutputFormat<>(outputE));
 
     validateEPGMElementCollections(inputV, outputV);
     validateEPGMElementCollections(inputE, outputE);
-    validateEPGMElements(inputGraphHead, outputGraph);
+    validateEPGMElements(inputGraphHead, outputG.get(0));
   }
 
   @Test
