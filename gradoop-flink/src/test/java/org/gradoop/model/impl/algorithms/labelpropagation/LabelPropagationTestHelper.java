@@ -68,10 +68,10 @@ public class LabelPropagationTestHelper {
     props.put(EPGMLabelPropagationAlgorithm.LAST_VALUE, GradoopIds.MAX_VALUE);
     props.put(EPGMLabelPropagationAlgorithm.STABILIZATION_COUNTER, 0);
     props.put(EPGMLabelPropagationAlgorithm.STABILIZATION_MAX, 20);
-    return new VertexPojoFactory().createVertex(id, " ", props);
+    return new VertexPojoFactory().initVertex(id, " ", props);
   }
 
   private static EdgePojo getEPFlinkEdgeValue(GradoopId id, GradoopId tar) {
-    return new EdgePojoFactory().createEdge(id, " ", id, tar);
+    return new EdgePojoFactory().initEdge(id, " ", id, tar);
   }
 }

@@ -39,9 +39,18 @@ public class EdgePojoFactory extends ElementPojoFactory implements
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(final GradoopId id, final GradoopId sourceVertexId,
+  public EdgePojo createEdge(GradoopId sourceVertexId,
+    GradoopId targetVertexId) {
+    return initEdge(GradoopId.get(), sourceVertexId, targetVertexId);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public EdgePojo initEdge(final GradoopId id, final GradoopId sourceVertexId,
     final GradoopId targetVertexId) {
-    return createEdge(id, GConstants.DEFAULT_EDGE_LABEL, sourceVertexId,
+    return initEdge(id, GConstants.DEFAULT_EDGE_LABEL, sourceVertexId,
       targetVertexId);
   }
 
@@ -49,16 +58,35 @@ public class EdgePojoFactory extends ElementPojoFactory implements
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(final GradoopId id, final String label,
-    final GradoopId sourceVertexId, final GradoopId targetVertexId) {
-    return createEdge(id, label, sourceVertexId, targetVertexId, null, null);
+  public EdgePojo createEdge(String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId) {
+    return initEdge(GradoopId.get(), label, sourceVertexId, targetVertexId);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(
+  public EdgePojo initEdge(final GradoopId id, final String label,
+    final GradoopId sourceVertexId, final GradoopId targetVertexId) {
+    return initEdge(id, label, sourceVertexId, targetVertexId, null, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public EdgePojo createEdge(String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, Map<String, Object> properties) {
+    return initEdge(GradoopId.get(),
+      label, sourceVertexId, targetVertexId, properties);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public EdgePojo initEdge(
     GradoopId id,
     String label,
     GradoopId sourceVertexId,
@@ -66,24 +94,45 @@ public class EdgePojoFactory extends ElementPojoFactory implements
     Map<String, Object> properties) {
 
     return
-      createEdge(id, label, sourceVertexId, targetVertexId, properties, null);
+      initEdge(id, label, sourceVertexId, targetVertexId, properties, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(final GradoopId id, final String label,
+  public EdgePojo createEdge(String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, GradoopIdSet graphIds) {
+    return initEdge(GradoopId.get(),
+      label, sourceVertexId, targetVertexId, graphIds);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public EdgePojo initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
     GradoopIdSet graphs) {
-    return createEdge(id, label, sourceVertexId, targetVertexId, null, graphs);
+    return initEdge(id, label, sourceVertexId, targetVertexId, null, graphs);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(final GradoopId id, final String label,
+  public EdgePojo initEdge(String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, Map<String, Object> properties,
+    GradoopIdSet graphIds) {
+    return initEdge(GradoopId.get(),
+      label, sourceVertexId, targetVertexId, properties, graphIds);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public EdgePojo initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
     final Map<String, Object> properties, GradoopIdSet graphIds) {
     checkId(id);

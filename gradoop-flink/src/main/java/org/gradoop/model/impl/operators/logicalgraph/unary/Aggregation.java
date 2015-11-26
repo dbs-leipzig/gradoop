@@ -73,7 +73,7 @@ public class Aggregation<
     O result = aggregationFunc.execute(graph);
     // copy graph data before updating properties
     GD newGraphData = graph.getConfig().getGraphHeadFactory()
-      .createGraphHead(graph.getId(), graph.getLabel());
+      .initGraphHead(graph.getId(), graph.getLabel());
     newGraphData.setProperties(graph.getProperties());
     newGraphData.setProperty(aggregatePropertyKey, result);
     return LogicalGraph

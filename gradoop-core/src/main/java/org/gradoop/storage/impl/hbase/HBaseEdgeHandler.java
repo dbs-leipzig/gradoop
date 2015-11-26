@@ -167,7 +167,7 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
     ED edge = null;
     try {
       edge = edgeFactory
-        .createEdge(readId(res), readLabel(res), readSourceVertexId(res),
+        .initEdge(readId(res), readLabel(res), readSourceVertexId(res),
           readTargetVertexId(res), readProperties(res), readGraphIds(res));
     } catch (IOException e) {
       e.printStackTrace();

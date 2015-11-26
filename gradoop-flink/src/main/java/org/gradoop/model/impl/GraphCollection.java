@@ -141,7 +141,7 @@ public class GraphCollection
 
     DataSet<G> graphHeadSet;
     if(vertices.isEmpty()) {
-      graphHeads.add(config.getGraphHeadFactory().createGraphHead(dummyId));
+      graphHeads.add(config.getGraphHeadFactory().initGraphHead(dummyId));
       graphHeadSet = env.fromCollection(graphHeads)
         .filter(new AlwaysFalseFilter<G>());
     } else {
@@ -150,7 +150,7 @@ public class GraphCollection
 
     DataSet<V> vertexSet;
     if(vertices.isEmpty()) {
-      vertices.add(config.getVertexFactory().createVertex(dummyId));
+      vertices.add(config.getVertexFactory().initVertex(dummyId));
       vertexSet = env.fromCollection(vertices)
         .filter(new AlwaysFalseFilter<V>());
     } else {
@@ -159,7 +159,7 @@ public class GraphCollection
 
     DataSet<E> edgeSet;
     if(vertices.isEmpty()) {
-      edges.add(config.getEdgeFactory().createEdge(dummyId, dummyId, dummyId));
+      edges.add(config.getEdgeFactory().initEdge(dummyId, dummyId, dummyId));
       edgeSet = env.fromCollection(edges)
         .filter(new AlwaysFalseFilter<E>());
     } else {

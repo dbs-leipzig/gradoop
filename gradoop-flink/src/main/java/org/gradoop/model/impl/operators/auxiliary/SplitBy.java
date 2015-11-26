@@ -286,7 +286,7 @@ public class SplitBy<
       Iterator<VD> it = iterable.iterator();
       VD vertex = it.next();
       GradoopId labelPropIndex = function.execute(vertex);
-      collector.collect(graphHeadFactory.createGraphHead(labelPropIndex,
+      collector.collect(graphHeadFactory.initGraphHead(labelPropIndex,
         GConstants.DEFAULT_GRAPH_LABEL));
     }
 

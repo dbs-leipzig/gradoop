@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.id.GradoopIds;
 import org.gradoop.model.impl.id.generators.TestSequenceIdGenerator;
 import org.gradoop.util.GConstants;
 import org.hamcrest.core.Is;
@@ -24,7 +23,7 @@ public class EdgePojoTest {
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
     EPGMEdge e =
-      new EdgePojoFactory().createEdge(edgeId, sourceId, targetId);
+      new EdgePojoFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getId(), is(edgeId));
     assertThat(e.getSourceVertexId(), is(sourceId));
     assertThat(e.getTargetVertexId(), is(targetId));
@@ -47,7 +46,7 @@ public class EdgePojoTest {
     props.put("k2", "v2");
 
     EPGMEdge edge = new EdgePojoFactory()
-      .createEdge(edgeId, label, sourceId, targetId, props, graphIds);
+      .initEdge(edgeId, label, sourceId, targetId, props, graphIds);
 
     assertThat(edge.getId(), is(edgeId));
     assertEquals(label, edge.getLabel());
@@ -70,7 +69,7 @@ public class EdgePojoTest {
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
     EPGMEdge e =
-      new EdgePojoFactory().createEdge(edgeId, sourceId, targetId);
+      new EdgePojoFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
   }
 
@@ -79,7 +78,7 @@ public class EdgePojoTest {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
-    new EdgePojoFactory().createEdge(null, sourceId, targetId);
+    new EdgePojoFactory().initEdge(null, sourceId, targetId);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -87,7 +86,7 @@ public class EdgePojoTest {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId edgeId = idGen.createId();
     GradoopId targetId = idGen.createId();
-    new EdgePojoFactory().createEdge(edgeId, null, targetId);
+    new EdgePojoFactory().initEdge(edgeId, null, targetId);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -95,7 +94,7 @@ public class EdgePojoTest {
     TestSequenceIdGenerator idGen = new TestSequenceIdGenerator();
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
-    new EdgePojoFactory().createEdge(edgeId, sourceId, null);
+    new EdgePojoFactory().initEdge(edgeId, sourceId, null);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -104,6 +103,6 @@ public class EdgePojoTest {
     GradoopId edgeId = idGen.createId();
     GradoopId sourceId = idGen.createId();
     GradoopId targetId = idGen.createId();
-    new EdgePojoFactory().createEdge(edgeId, null, sourceId, targetId);
+    new EdgePojoFactory().initEdge(edgeId, null, sourceId, targetId);
   }
 }

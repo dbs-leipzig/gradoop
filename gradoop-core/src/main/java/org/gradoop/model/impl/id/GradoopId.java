@@ -69,6 +69,15 @@ public class GradoopId implements Comparable<GradoopId>,
     Bytes.putLong(content, 5, sequenceNumber);
   }
 
+  /**
+   * Returns a new GradoopId
+   *
+   * @return new GradoopId
+   */
+  public static GradoopId get() {
+    return new GradoopId();
+  }
+
   public long getSequenceNumber() {
     return Bytes.toLong(content, 5);
   }

@@ -448,7 +448,7 @@ public class AsciiGraphLoader
    * @return EPGM GraphHead
    */
   private G initGraphHead(Graph g) {
-    return config.getGraphHeadFactory().createGraphHead(
+    return config.getGraphHeadFactory().initGraphHead(
       idGenerator.createId(g.getId()),
       g.getLabel(),
       g.getProperties());
@@ -461,7 +461,7 @@ public class AsciiGraphLoader
    * @return EPGM Vertex
    */
   private V initVertex(Vertex v) {
-    return config.getVertexFactory().createVertex(
+    return config.getVertexFactory().initVertex(
       idGenerator.createId(v.getId()),
       v.getLabel(),
       v.getProperties(),
@@ -475,7 +475,7 @@ public class AsciiGraphLoader
    * @return EPGM edge
    */
   private E initEdge(Edge e) {
-    return config.getEdgeFactory().createEdge(
+    return config.getEdgeFactory().initEdge(
       idGenerator.createId(e.getId()),
       e.getLabel(),
       idGenerator.createId(e.getSourceVertexId()),

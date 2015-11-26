@@ -167,7 +167,7 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
     GD graphHead = null;
     try {
       graphHead = graphHeadFactory
-        .createGraphHead(readId(res), readLabel(res), readProperties(res));
+        .initGraphHead(readId(res), readLabel(res), readProperties(res));
     } catch (IOException e) {
       e.printStackTrace();
     }
