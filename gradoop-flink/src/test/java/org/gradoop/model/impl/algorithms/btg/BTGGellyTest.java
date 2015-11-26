@@ -5,7 +5,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIds;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
-public class BTGGellyTest extends FlinkTestBase {
+public class BTGGellyTest extends GradoopFlinkTestBase {
   public BTGGellyTest(TestExecutionMode mode) {
     super(mode);
   }

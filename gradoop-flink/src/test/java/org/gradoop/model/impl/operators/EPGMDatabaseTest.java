@@ -1,6 +1,6 @@
 package org.gradoop.model.impl.operators;
 
-import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopIdSet;
@@ -16,7 +16,7 @@ import static org.gradoop.GradoopTestBaseUtils.LABEL_COMMUNITY;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
-public class EPGMDatabaseTest extends FlinkTestBase {
+public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   public EPGMDatabaseTest(TestExecutionMode mode) {
     super(mode);

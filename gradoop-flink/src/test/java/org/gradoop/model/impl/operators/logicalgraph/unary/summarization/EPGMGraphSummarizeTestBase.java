@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.operators.logicalgraph.unary.summarization;
 
-import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -30,7 +30,7 @@ import static org.gradoop.model.impl.operators.logicalgraph.unary
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("Duplicates")
-public abstract class EPGMGraphSummarizeTestBase extends FlinkTestBase {
+public abstract class EPGMGraphSummarizeTestBase extends GradoopFlinkTestBase {
 
   public EPGMGraphSummarizeTestBase(TestExecutionMode mode) {
     super(mode);

@@ -18,7 +18,7 @@ package org.gradoop.model.impl.operators.logicalgraph.unary;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopIds;
@@ -37,7 +37,7 @@ import static org.gradoop.GradoopTestBaseUtils.PROPERTY_KEY_SINCE;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
-public class LogicalGraphProjectionTest extends FlinkTestBase {
+public class LogicalGraphProjectionTest extends GradoopFlinkTestBase {
 
   public LogicalGraphProjectionTest(TestExecutionMode mode) {
     super(mode);

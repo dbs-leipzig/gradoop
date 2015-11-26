@@ -153,25 +153,25 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     graphStore.flush();
 
     // graph heads
-    validateEPGMElements(
+    validateEPGMElementCollections(
       graphHeads,
       Lists.newArrayList(graphStore.getGraphSpace())
     );
     // vertices
-    validateEPGMElements(
+    validateEPGMElementCollections(
       vertices,
       Lists.newArrayList(graphStore.getVertexSpace())
     );
-    validateEPGMGraphElements(
+    validateEPGMGraphElementCollections(
       vertices,
       Lists.newArrayList(graphStore.getVertexSpace())
     );
     // edges
-    validateEPGMElements(
+    validateEPGMElementCollections(
       edges,
       Lists.newArrayList(graphStore.getEdgeSpace())
     );
-    validateEPGMGraphElements(
+    validateEPGMGraphElementCollections(
       edges,
       Lists.newArrayList(graphStore.getEdgeSpace())
     );
@@ -342,7 +342,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     EPGMGraphHead loadedGraphHead = graphStore
       .readGraph(originalGraphHead.getId());
 
-    validateIdLabelAndProperties(originalGraphHead, loadedGraphHead);
+    validateEPGMElements(originalGraphHead, loadedGraphHead);
   }
 
   private void validateVertex(
@@ -351,8 +351,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
 
-    validateIdLabelAndProperties(originalVertex, loadedVertex);
-    validateGraphContainment(originalVertex, loadedVertex);
+    validateEPGMElements(originalVertex, loadedVertex);
+    validateEPGMGraphElements(originalVertex, loadedVertex);
   }
 
   private void validateEdge(
@@ -361,8 +361,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());
 
-    validateIdLabelAndProperties(originalEdge, loadedEdge);
-    validateGraphContainment(originalEdge, loadedEdge);
+    validateEPGMElements(originalEdge, loadedEdge);
+    validateEPGMGraphElements(originalEdge, loadedEdge);
 
     assertTrue(
       "source vertex mismatch",

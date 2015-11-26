@@ -1,6 +1,6 @@
 package org.gradoop.model.impl.operators.logicalgraph.binary;
 
-import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class BinaryGraphOperatorsTestBase extends FlinkTestBase {
+public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
 
   public BinaryGraphOperatorsTestBase(TestExecutionMode mode) {
     super(mode);

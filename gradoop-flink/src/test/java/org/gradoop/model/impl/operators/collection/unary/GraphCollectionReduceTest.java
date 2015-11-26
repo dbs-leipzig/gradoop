@@ -1,6 +1,6 @@
 package org.gradoop.model.impl.operators.collection.unary;
 
-import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -10,7 +10,7 @@ import org.gradoop.util.FlinkAsciiGraphLoader;
 
 import static org.junit.Assert.assertTrue;
 
-public abstract class GraphCollectionReduceTest extends FlinkTestBase {
+public abstract class GraphCollectionReduceTest extends GradoopFlinkTestBase {
   public GraphCollectionReduceTest(TestExecutionMode mode) {
     super(mode);
   }

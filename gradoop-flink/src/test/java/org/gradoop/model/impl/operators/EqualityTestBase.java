@@ -1,18 +1,13 @@
 package org.gradoop.model.impl.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.FlinkTestBase;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.FlinkAsciiGraphLoader;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.model.GradoopFlinkTestBase;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class EqualityTestBase extends FlinkTestBase {
+public class EqualityTestBase extends GradoopFlinkTestBase {
 
   public EqualityTestBase(TestExecutionMode mode) {
     super(mode);

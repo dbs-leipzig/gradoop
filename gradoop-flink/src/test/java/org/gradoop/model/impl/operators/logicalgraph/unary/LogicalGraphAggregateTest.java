@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.operators.logicalgraph.unary;
 
-import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopIds;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
-public class LogicalGraphAggregateTest extends FlinkTestBase {
+public class LogicalGraphAggregateTest extends GradoopFlinkTestBase {
 
   public LogicalGraphAggregateTest(TestExecutionMode mode) {
     super(mode);

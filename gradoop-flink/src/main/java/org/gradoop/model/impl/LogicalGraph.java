@@ -23,11 +23,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.json.JsonWriter;
-import org.gradoop.model.api.EPGMAttributed;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMIdentifiable;
-import org.gradoop.model.api.EPGMLabeled;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
@@ -36,15 +34,18 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.equality.logicalgraph.EqualByElementData;
+import org.gradoop.model.impl.operators.equality.logicalgraph
+  .EqualByElementData;
 import org.gradoop.model.impl.operators.equality.logicalgraph.EqualByElementIds;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Combination;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Exclusion;
 import org.gradoop.model.impl.operators.logicalgraph.binary.Overlap;
 import org.gradoop.model.impl.operators.logicalgraph.unary.Aggregation;
 import org.gradoop.model.impl.operators.logicalgraph.unary.Projection;
-import org.gradoop.model.impl.operators.logicalgraph.unary.sampling.RandomNodeSampling;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.SummarizationGroupCombine;
+import org.gradoop.model.impl.operators.logicalgraph.unary.sampling
+  .RandomNodeSampling;
+import org.gradoop.model.impl.operators.logicalgraph.unary.summarization
+  .SummarizationGroupCombine;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Collection;
@@ -61,8 +62,7 @@ import java.util.Map;
 public class LogicalGraph
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends AbstractGraph<G, V, E>
-  implements LogicalGraphOperators<G, V, E>,
-  EPGMIdentifiable, EPGMAttributed, EPGMLabeled {
+  implements LogicalGraphOperators<G, V, E>, EPGMElement {
 
   /**
    * Graph data associated with that logical graph.

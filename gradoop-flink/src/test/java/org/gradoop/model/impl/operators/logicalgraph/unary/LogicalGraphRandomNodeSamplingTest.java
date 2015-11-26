@@ -18,7 +18,7 @@ package org.gradoop.model.impl.operators.logicalgraph.unary;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.model.FlinkTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.logicalgraph.unary.sampling.RandomNodeSampling;
@@ -36,7 +36,7 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
-public class LogicalGraphRandomNodeSamplingTest extends FlinkTestBase {
+public class LogicalGraphRandomNodeSamplingTest extends GradoopFlinkTestBase {
   public LogicalGraphRandomNodeSamplingTest(TestExecutionMode mode) {
     super(mode);
   }

@@ -66,7 +66,7 @@ public class GradoopTestUtils {
    * @param collection1 first collection
    * @param collection2 second collection
    */
-  public static void validateEPGMElements(
+  public static void validateEPGMElementCollections(
     Collection<? extends EPGMElement> collection1,
     Collection<? extends EPGMElement> collection2) {
     assertNotNull("first collection was null", collection1);
@@ -82,7 +82,7 @@ public class GradoopTestUtils {
     Iterator<? extends EPGMElement> it2 = list2.iterator();
 
     while(it1.hasNext()) {
-      validateIdLabelAndProperties(
+      validateEPGMElements(
         it1.next(),
         it2.next());
     }
@@ -97,7 +97,7 @@ public class GradoopTestUtils {
    * @param collection1 first collection
    * @param collection2 second collection
    */
-  public static void validateEPGMGraphElements(
+  public static void validateEPGMGraphElementCollections(
     Collection<? extends EPGMGraphElement> collection1,
     Collection<? extends EPGMGraphElement> collection2) {
     assertNotNull("first collection was null", collection1);
@@ -113,7 +113,7 @@ public class GradoopTestUtils {
     Iterator<? extends EPGMGraphElement> it2 = list2.iterator();
 
     while(it1.hasNext()) {
-      validateGraphContainment(
+      validateEPGMGraphElements(
         it1.next(),
         it2.next());
     }
@@ -128,7 +128,7 @@ public class GradoopTestUtils {
    * @param element1 first element
    * @param element2 second element
    */
-  public static void validateIdLabelAndProperties(EPGMElement element1,
+  public static void validateEPGMElements(EPGMElement element1,
     EPGMElement element2) {
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
@@ -169,7 +169,7 @@ public class GradoopTestUtils {
    * @param element1 first element
    * @param element2 second element
    */
-  public static void validateGraphContainment(
+  public static void validateEPGMGraphElements(
     EPGMGraphElement element1,
     EPGMGraphElement element2) {
     assertNotNull("first element was null", element1);

@@ -43,65 +43,21 @@ import static org.junit.Assert.*;
 /**
  * Used for tests that require a Flink cluster up and running.
  */
-public class FlinkTestBase extends MultipleProgramsTestBase {
+public class GradoopFlinkTestBase extends MultipleProgramsTestBase {
 
+  /**
+   * Flink Execution Environment
+   */
   private ExecutionEnvironment env;
 
+  /**
+   * Gradoop Flink configuration
+   */
   protected GradoopFlinkConfig<VertexPojo, EdgePojo, GraphHeadPojo> config;
 
-  public FlinkTestBase(TestExecutionMode mode) {
-    super(mode);
-    this.env = ExecutionEnvironment.getExecutionEnvironment();
-    this.config = GradoopFlinkConfig.createDefaultConfig(env);
-  }
-
-  protected ExecutionEnvironment getExecutionEnvironment() {
-    return env;
-  }
-
-  /**
-   * Returns an uninitialized loader with the test config.
-   *
-   * @return uninitialized Flink Ascii graph loader
-   */
-  private FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
-  getNewLoader() {
-    return new FlinkAsciiGraphLoader<>(config);
-  }
-
-  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
-  getLoaderFromString(String asciiString) {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
-      loader = getNewLoader();
-    loader.initDatabaseFromString(asciiString);
-    return loader;
-  }
-
-  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
-  getLoaderFromFile(
-    String fileName) throws IOException {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
-      loader = getNewLoader();
-
-
-    String file = getClass().getResource(fileName).getFile();
-    loader.initDatabaseFromFile(file);
-    return loader;
-  }
-
-  /**
-   * Creates a social network as a basis for tests.
-   * <p/>
-   * An image of the network can be found in
-   * gradoop/dev-support/social-network.pdf
-   *
-   * @return graph store containing a simple social network for tests.
-   */
-  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
-  getSocialNetworkLoader() throws
-    IOException {
-    return getLoaderFromFile(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
-  }
+  //----------------------------------------------------------------------------
+  // Cluster related
+  //----------------------------------------------------------------------------
 
   /**
    * Custom test cluster start routine,
@@ -150,6 +106,83 @@ public class FlinkTestBase extends MultipleProgramsTestBase {
 
     MultipleProgramsTestBase.cluster = cluster;
   }
+
+  public GradoopFlinkTestBase(TestExecutionMode mode) {
+    super(mode);
+    this.env = ExecutionEnvironment.getExecutionEnvironment();
+    this.config = GradoopFlinkConfig.createDefaultConfig(env);
+  }
+
+  /**
+   * Returns the execution environment for the tests
+   *
+   * @return Flink execution environment
+   */
+  protected ExecutionEnvironment getExecutionEnvironment() {
+    return env;
+  }
+
+  /**
+   * Returns the default configuration for the test
+   *
+   * @return Gradoop Flink configuration
+   */
+  protected GradoopFlinkConfig<VertexPojo, EdgePojo, GraphHeadPojo>
+  getConfig() {
+    return config;
+  }
+
+  //----------------------------------------------------------------------------
+  // Data generation
+  //----------------------------------------------------------------------------
+
+  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getLoaderFromString(String asciiString) {
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+      loader = getNewLoader();
+    loader.initDatabaseFromString(asciiString);
+    return loader;
+  }
+
+  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getLoaderFromFile(
+    String fileName) throws IOException {
+    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+      loader = getNewLoader();
+
+
+    String file = getClass().getResource(fileName).getFile();
+    loader.initDatabaseFromFile(file);
+    return loader;
+  }
+
+  /**
+   * Creates a social network as a basis for tests.
+   * <p/>
+   * An image of the network can be found in
+   * gradoop/dev-support/social-network.pdf
+   *
+   * @return graph store containing a simple social network for tests.
+   */
+  protected FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getSocialNetworkLoader() throws
+    IOException {
+    return getLoaderFromFile(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
+  }
+
+  /**
+   * Returns an uninitialized loader with the test config.
+   *
+   * @return uninitialized Flink Ascii graph loader
+   */
+  private FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+  getNewLoader() {
+    return new FlinkAsciiGraphLoader<>(config);
+  }
+
+  //----------------------------------------------------------------------------
+  // Test helper
+  //----------------------------------------------------------------------------
 
   protected void collectAndAssertEquals(DataSet<Boolean> result) throws
     Exception {

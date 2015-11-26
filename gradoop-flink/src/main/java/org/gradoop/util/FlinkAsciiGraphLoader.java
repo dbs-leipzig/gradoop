@@ -121,17 +121,39 @@ public class FlinkAsciiGraphLoader<
     return GraphCollection.fromCollections(vertices, edges, graphHeads, config);
   }
 
-  @SuppressWarnings("unchecked")
-  public EPGMDatabase<V, E, G> getDatabase() {
-    return EPGMDatabase
-      .fromCollection(loader.getVertices(), loader.getEdges(), config);
-  }
-
-  public EPGMVertex getVertexByVariable(String variable) {
+  /**
+   * Returns the vertex which is identified by the given variable. If the
+   * variable cannot be found, the method returns {@code null}.
+   *
+   * @param variable vertex variable
+   * @return vertex or {@code null} if variable is not used
+   */
+  public V getVertexByVariable(String variable) {
     return loader.getVertexByVariable(variable);
   }
 
-  public EPGMEdge getEdgeByVariable(String variable) {
+  /**
+   * Returns the edge which is identified by the given variable. If the
+   * variable cannot be found, the method returns {@code null}.
+   *
+   * @param variable edge variable
+   * @return edge or {@code null} if variable is not used
+   */
+  public E getEdgeByVariable(String variable) {
     return loader.getEdgeByVariable(variable);
+  }
+
+  /**
+   * Returns the complete database represented by the loader.
+   *
+   * @return EPGM database
+   */
+  @SuppressWarnings("unchecked")
+  public EPGMDatabase<V, E, G> getDatabase() {
+    return EPGMDatabase
+      .fromCollection(loader.getVertices(),
+        loader.getEdges(),
+        loader.getGraphHeads(),
+        config);
   }
 }
