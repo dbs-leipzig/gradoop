@@ -1,13 +1,26 @@
+/*
+ * This file is part of gradoop.
+ *
+ * gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.gradoop.GradoopHBaseTestBase;
 import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMIdentifiable;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
@@ -28,16 +41,17 @@ import org.gradoop.util.GradoopConfig;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentEdges;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentGraphHeads;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentVertices;
+import static org.gradoop.GradoopTestUtils.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
@@ -105,7 +119,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   /**
-   * Stores some data and iterates over it. Checks correct amount.
+   * Stores social network data, loads it again and checks for element data
+   * equality.
    *
    * @throws InterruptedException
    * @throws IOException
@@ -162,56 +177,6 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     );
 
     graphStore.close();
-  }
-
-  private void validateEPGMElements(
-    Collection<? extends EPGMElement> referenceElements,
-    Collection<? extends EPGMElement> testElements) {
-    List<? extends EPGMElement> referenceList =
-      Lists.newArrayList(referenceElements);
-    List<? extends EPGMElement> testList =
-      Lists.newArrayList(testElements);
-
-    Collections.sort(referenceList, comparator);
-    Collections.sort(testList, comparator);
-
-    Iterator<? extends EPGMElement> referenceIterator =
-      referenceList.iterator();
-    Iterator<? extends EPGMElement> testIterator =
-      testList.iterator();
-
-    while(referenceIterator.hasNext()) {
-      validateIdLabelAndProperties(
-        referenceIterator.next(),
-        testIterator.next());
-    }
-    assertFalse(referenceIterator.hasNext());
-    assertFalse(testIterator.hasNext());
-  }
-
-  private void validateEPGMGraphElements(
-    Collection<? extends EPGMGraphElement> referenceElements,
-    Collection<? extends EPGMGraphElement> testElements) {
-    List<? extends EPGMGraphElement> referenceList =
-      Lists.newArrayList(referenceElements);
-    List<? extends EPGMGraphElement> testList =
-      Lists.newArrayList(testElements);
-
-    Collections.sort(referenceList, comparator);
-    Collections.sort(testList, comparator);
-
-    Iterator<? extends EPGMGraphElement> referenceIterator =
-      referenceList.iterator();
-    Iterator<? extends EPGMGraphElement> testIterator =
-      testList.iterator();
-
-    while(referenceIterator.hasNext()) {
-      validateGraphContainment(
-        referenceIterator.next(),
-        testIterator.next());
-    }
-    assertFalse(referenceIterator.hasNext());
-    assertFalse(testIterator.hasNext());
   }
 
   /**
@@ -370,7 +335,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     );
   }
 
-  public void validateGraphHead(
+  private void validateGraphHead(
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
     GraphHeadPojo originalGraphHead) {
 
@@ -380,7 +345,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     validateIdLabelAndProperties(originalGraphHead, loadedGraphHead);
   }
 
-  public void validateVertex(
+  private void validateVertex(
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
     VertexPojo originalVertex) {
 
@@ -390,7 +355,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     validateGraphContainment(originalVertex, loadedVertex);
   }
 
-  public void validateEdge(
+  private void validateEdge(
     EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> graphStore,
     EdgePojo originalEdge) {
 
@@ -413,71 +378,4 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     );
   }
 
-  private void validateIdLabelAndProperties(EPGMElement originalElement,
-    EPGMElement loadedElement) {
-
-    assertNotNull("loading results to NULL", loadedElement);
-
-    assertEquals(
-      "id mismatch",
-      originalElement.getId(),
-      loadedElement.getId()
-    );
-
-    assertEquals(
-      "label mismatch",
-      originalElement.getLabel(),
-      loadedElement.getLabel()
-    );
-
-    if (originalElement.getPropertyCount() == 0) {
-      assertEquals("property count mismatch",
-        originalElement.getPropertyCount(),
-        loadedElement.getPropertyCount());
-    } else {
-
-      List<String> originalKeys = Lists.newArrayList(
-        originalElement.getPropertyKeys());
-      Collections.sort(originalKeys);
-
-      List<String> loadedKeys = Lists.newArrayList(
-        loadedElement.getPropertyKeys());
-      Collections.sort(loadedKeys);
-
-      Iterator<String> originalKeysIt = originalKeys.iterator();
-
-      Iterator<String> loadedKeysIt = loadedKeys.iterator();
-
-      while (originalKeysIt.hasNext() && loadedKeysIt.hasNext()) {
-        String originalKey = originalKeysIt.next();
-        String loadedKey = loadedKeysIt.next();
-        assertEquals("property key mismatch", originalKey, loadedKey);
-        assertEquals("property value mismatch",
-          originalElement.getProperty(originalKey),
-          loadedElement.getProperty(loadedKey));
-      }
-      assertFalse(
-        "property count mismatch",
-        originalKeysIt.hasNext() || loadedKeysIt.hasNext()
-      );
-    }
-  }
-
-  private void validateGraphContainment(
-    EPGMGraphElement originalGraphElement,
-    EPGMGraphElement loadedGraphElement) {
-    assertTrue(
-      "graph containment mismatch",
-      originalGraphElement.getGraphIds()
-        .equals(loadedGraphElement.getGraphIds())
-    );
-  }
-
-  private Comparator<EPGMIdentifiable> comparator =
-    new Comparator<EPGMIdentifiable>() {
-    @Override
-    public int compare(EPGMIdentifiable o1, EPGMIdentifiable o2) {
-      return o1.getId().compareTo(o2.getId());
-    }
-  };
 }

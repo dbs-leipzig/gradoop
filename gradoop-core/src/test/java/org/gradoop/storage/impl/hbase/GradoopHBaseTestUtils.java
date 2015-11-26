@@ -1,14 +1,11 @@
-package org.gradoop;
+package org.gradoop.storage.impl.hbase;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HBaseTestingUtility;
+import org.gradoop.GradoopTestUtils;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentEdgeFactory;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -21,12 +18,7 @@ import org.gradoop.storage.impl.hbase.HBaseGraphHead;
 import org.gradoop.storage.impl.hbase.HBaseGraphHeadFactory;
 import org.gradoop.storage.impl.hbase.HBaseVertex;
 import org.gradoop.storage.impl.hbase.HBaseVertexFactory;
-import org.gradoop.storage.impl.hbase.GradoopHBaseConfig;
-import org.gradoop.storage.impl.hbase.HBaseEPGMStoreFactory;
 import org.gradoop.util.AsciiGraphLoader;
-import org.gradoop.util.GradoopConfig;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,64 +30,53 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Used for tests that need a HBase cluster to run.
+ * Test Utils for handling persistent EPGM data.
  */
-public class GradoopHBaseTestBase {
+public class GradoopHBaseTestUtils {
 
-  protected static HBaseTestingUtility utility;
-
-  /**
-   * Starts the mini cluster for all tests.
-   *
-   * @throws Exception
-   */
-  @BeforeClass
-  public static void setUp() throws Exception {
-    if (utility == null) {
-      utility = new HBaseTestingUtility(HBaseConfiguration.create());
-      utility.startMiniCluster().waitForActiveAndReadyMaster();
-    }
-  }
+  //----------------------------------------------------------------------------
+  // Data generation
+  //----------------------------------------------------------------------------
 
   /**
-   * Stops the test cluster after the test.
+   * Creates a collection of persistent graph heads according to the social
+   * network test graph in gradoop/dev-support/social-network.pdf.
    *
-   * @throws Exception
+   * @return collection of persistent graph heads
+   * @throws IOException
    */
-  @AfterClass
-  public static void tearDown() throws Exception {
-    if (utility != null) {
-      utility.shutdownMiniCluster();
-    }
-  }
-
-  public static EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo>
-  createEmptyEPGMStore() {
-    Configuration config = utility.getConfiguration();
-
-    HBaseEPGMStoreFactory.deleteEPGMStore(config);
-    return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,
-      GradoopHBaseConfig.getDefaultConfig());
-  }
-
-  /**
-   * Open EPGMStore for test purposes.
-   *
-   * @return EPGMStore with vertices and edges
-   */
-  public static EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> openEPGMStore() {
-    Configuration config = utility.getConfiguration();
-
-    return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,
-      GradoopHBaseConfig.getDefaultConfig());
-  }
-
-  // PersistentGraphHead
-
   public static Collection<PersistentGraphHead>
   getSocialPersistentGraphHeads() throws IOException {
     return getPersistentGraphHeads(GradoopTestUtils.getSocialNetworkLoader());
   }
+
+  /**
+   * Creates a collection of persistent vertices according to the social
+   * network test graph in gradoop/dev-support/social-network.pdf.
+   *
+   * @return collection of persistent vertices
+   * @throws IOException
+   */
+  public static Collection<PersistentVertex<EdgePojo>>
+  getSocialPersistentVertices() throws IOException {
+    return getPersistentVertices(GradoopTestUtils.getSocialNetworkLoader());
+  }
+
+  /**
+   * Creates a collection of persistent edges according to the social
+   * network test graph in gradoop/dev-support/social-network.pdf.
+   *
+   * @return collection of persistent edges
+   * @throws IOException
+   */
+  public static Collection<PersistentEdge<VertexPojo>>
+  getSocialPersistentEdges() throws IOException {
+    return getPersistentEdges(GradoopTestUtils.getSocialNetworkLoader());
+  }
+
+  //----------------------------------------------------------------------------
+  // Helper methods
+  //----------------------------------------------------------------------------
 
   private static Collection<PersistentGraphHead> getPersistentGraphHeads(
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) {
@@ -129,13 +110,6 @@ public class GradoopHBaseTestBase {
     return persistentGraphData;
   }
 
-  // PersistentVertex
-
-  public static Collection<PersistentVertex<EdgePojo>>
-  getSocialPersistentVertices() throws IOException {
-    return getPersistentVertices(GradoopTestUtils.getSocialNetworkLoader());
-  }
-
   private static List<PersistentVertex<EdgePojo>> getPersistentVertices(
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) {
     PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex>
@@ -159,13 +133,6 @@ public class GradoopHBaseTestBase {
       persistentVertexData.add(
         vertexDataFactory.createVertex(vertex, outEdges, inEdges));
     } return persistentVertexData;
-  }
-
-  // PersistentEdge
-
-  public static Collection<PersistentEdge<VertexPojo>>
-  getSocialPersistentEdges() throws IOException {
-    return getPersistentEdges(GradoopTestUtils.getSocialNetworkLoader());
   }
 
   private static List<PersistentEdge<VertexPojo>> getPersistentEdges(
@@ -192,6 +159,4 @@ public class GradoopHBaseTestBase {
     }
     return persistentEdgeData;
   }
-
-
 }

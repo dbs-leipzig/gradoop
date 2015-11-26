@@ -1,7 +1,7 @@
 package org.gradoop.io.hbase;
 
 import org.apache.flink.test.util.MultipleProgramsTestBase;
-import org.gradoop.GradoopHBaseTestBase;
+import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
