@@ -19,15 +19,12 @@ package org.gradoop.model.impl.operators.sampling;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,11 +32,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-@RunWith(Parameterized.class)
 public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
-  public RandomNodeSamplingTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void randomNodeSamplingTest() throws Exception {

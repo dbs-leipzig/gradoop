@@ -18,7 +18,7 @@ package org.gradoop.model.impl.operators.projection;
 
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.api.UnaryFunction;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -26,15 +26,8 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ProjectionTest extends GradoopFlinkTestBase {
-
-  public ProjectionTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void projectionTest() throws Exception {

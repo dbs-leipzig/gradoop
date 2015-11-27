@@ -1,6 +1,6 @@
 package org.gradoop.io.hbase;
 
-import org.apache.flink.test.util.MultipleProgramsTestBase;
+import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -8,11 +8,7 @@ import org.junit.BeforeClass;
 /**
  * Used for tests that require a HBase and Flink cluster up and running.
  */
-public class FlinkHBaseTestBase extends MultipleProgramsTestBase {
-
-  public FlinkHBaseTestBase(TestExecutionMode mode) {
-    super(mode);
-  }
+public class FlinkHBaseTestBase {
 
   /**
    * Start Flink and HBase cluster.
@@ -21,7 +17,7 @@ public class FlinkHBaseTestBase extends MultipleProgramsTestBase {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    MultipleProgramsTestBase.setup();
+    GradoopFlinkTestBase.setup();
     GradoopHBaseTestBase.setUp();
   }
 
@@ -32,7 +28,7 @@ public class FlinkHBaseTestBase extends MultipleProgramsTestBase {
    */
   @AfterClass
   public static void teardown() throws Exception {
-    MultipleProgramsTestBase.teardown();
+    GradoopFlinkTestBase.tearDown();
     GradoopHBaseTestBase.tearDown();
   }
 }

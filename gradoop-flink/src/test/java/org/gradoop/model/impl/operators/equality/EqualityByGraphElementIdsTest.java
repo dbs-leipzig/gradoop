@@ -1,22 +1,13 @@
 package org.gradoop.model.impl.operators.equality;
 
-import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-
-@RunWith(Parameterized.class)
 public class EqualityByGraphElementIdsTest extends EqualityTestBase {
-
-  public EqualityByGraphElementIdsTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void testExecute() throws Exception {

@@ -7,7 +7,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
-import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 import org.gradoop.model.impl.id.GradoopId;
 

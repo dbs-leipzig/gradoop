@@ -1,8 +1,8 @@
 package org.gradoop.model.impl.operators.base;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.model.GraphCollection;
-import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.overlap.ReduceOverlap;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -12,9 +12,6 @@ import org.gradoop.util.FlinkAsciiGraphLoader;
 import static org.junit.Assert.assertTrue;
 
 public abstract class ReduceTestBase extends GradoopFlinkTestBase {
-  public ReduceTestBase(TestExecutionMode mode) {
-    super(mode);
-  }
 
   protected void checkExpectationsEqualResults(
     FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader) throws

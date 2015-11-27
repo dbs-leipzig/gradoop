@@ -5,7 +5,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToValueOperator;
-import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.ToGradoopIdSet;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;

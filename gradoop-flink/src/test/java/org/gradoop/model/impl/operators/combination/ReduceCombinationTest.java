@@ -23,14 +23,8 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ReduceCombinationTest extends ReduceTestBase {
-  public ReduceCombinationTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void combineCollectionTest() throws Exception {

@@ -19,7 +19,7 @@ package org.gradoop.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.base.BinaryGraphOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -35,12 +35,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
-@RunWith(Parameterized.class)
 public class OverlapTest extends BinaryGraphOperatorsTestBase {
-
-  public OverlapTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void testSameGraph() throws Exception {

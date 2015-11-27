@@ -23,14 +23,8 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ReduceOverlapTest extends ReduceTestBase {
-  public ReduceOverlapTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void overlapCollectionTest() throws Exception {

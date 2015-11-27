@@ -20,16 +20,9 @@ package org.gradoop.model.impl.operators.summarization;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class SummarizationGroupCombineTest extends
   SummarizationTestBase {
-
-  public SummarizationGroupCombineTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Override
   public Summarization<VertexPojo, EdgePojo, GraphHeadPojo>

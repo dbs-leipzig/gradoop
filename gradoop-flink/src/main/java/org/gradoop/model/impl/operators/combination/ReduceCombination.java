@@ -20,8 +20,8 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.model.impl.model.LogicalGraph;
-import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
 
 /**
  * Combines all logical graphs of a GraphCollection into a single LogicalGraph.

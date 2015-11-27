@@ -20,12 +20,12 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.Order;
 import org.gradoop.model.impl.functions.api.Predicate;
-import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.GraphCollection;
 
 /**
  * Describes all operators that can be applied on a collection of logical

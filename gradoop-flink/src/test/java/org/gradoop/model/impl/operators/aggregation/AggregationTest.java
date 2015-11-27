@@ -18,28 +18,21 @@
 package org.gradoop.model.impl.operators.aggregation;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.aggregation.functions.EdgeCount;
 import org.gradoop.model.impl.operators.aggregation.functions.VertexCount;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(Parameterized.class)
 public class AggregationTest extends GradoopFlinkTestBase {
 
   public static final String EDGE_COUNT = "edgeCount";
   public static final String VERTEX_COUNT = "vertexCount";
-
-  public AggregationTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void testVertexAndEdgeCount() throws Exception {

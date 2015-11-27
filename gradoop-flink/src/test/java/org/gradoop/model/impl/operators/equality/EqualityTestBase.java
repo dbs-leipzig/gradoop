@@ -9,10 +9,6 @@ import static org.junit.Assert.*;
 
 public class EqualityTestBase extends GradoopFlinkTestBase {
 
-  public EqualityTestBase(TestExecutionMode mode) {
-    super(mode);
-  }
-
   @Override
   protected void collectAndAssertEquals(DataSet<Boolean> result) {
 

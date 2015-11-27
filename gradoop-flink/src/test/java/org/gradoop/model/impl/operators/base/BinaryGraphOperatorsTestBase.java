@@ -9,10 +9,6 @@ import static org.junit.Assert.*;
 
 public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
 
-  public BinaryGraphOperatorsTestBase(TestExecutionMode mode) {
-    super(mode);
-  }
-
   protected void checkElementMatches(Set<EPGMGraphElement> inElements,
     Set<EPGMGraphElement> outElements) {
     for(EPGMGraphElement outElement : outElements) {

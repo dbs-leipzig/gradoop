@@ -28,7 +28,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
-import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.intersection.Intersection;
 
@@ -189,6 +189,13 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
   protected static class SubgraphTupleKeySelector<GD extends EPGMGraphHead, C>
     implements
     KeySelector<Tuple2<GD, C>, GradoopId> {
+
+    /**
+     * Empty constructor for initialization in inheriting classes.
+     */
+    public SubgraphTupleKeySelector() {
+    }
+
     /**
      * {@inheritDoc}
      */

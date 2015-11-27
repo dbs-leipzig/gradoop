@@ -1,21 +1,14 @@
 package org.gradoop.model.impl.operators.intersection;
 
-import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.operators.base.BinaryCollectionOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ReduceIntersectionTest extends BinaryCollectionOperatorsTestBase {
-
-  public ReduceIntersectionTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void testOverlappingCollections() throws Exception {

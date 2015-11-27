@@ -18,8 +18,7 @@
 package org.gradoop.model.impl.operators.summarization;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.model.LogicalGraph;
-import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -32,11 +31,8 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings("Duplicates")
 public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
-  public SummarizationTestBase(TestExecutionMode mode) {
-    super(mode);
-  }
-
-  public abstract Summarization<VertexPojo, EdgePojo, GraphHeadPojo> getSummarizationImpl(
+  public abstract Summarization<VertexPojo, EdgePojo, GraphHeadPojo>
+  getSummarizationImpl(
     String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
     boolean useEdgeLabel);
 

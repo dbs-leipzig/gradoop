@@ -19,15 +19,13 @@ package org.gradoop.model.impl.operators.combination;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.base.BinaryGraphOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,12 +33,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
-@RunWith(Parameterized.class)
 public class CombinationTest extends BinaryGraphOperatorsTestBase {
-
-  public CombinationTest(TestExecutionMode mode) {
-    super(mode);
-  }
 
   @Test
   public void testSameGraph() throws Exception {

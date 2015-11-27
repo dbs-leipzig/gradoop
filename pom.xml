@@ -15,9 +15,10 @@
     <inceptionYear>2014</inceptionYear>
 
     <modules>
-        <module>gradoop-core</module>
-        <module>gradoop-flink</module>
         <module>gradoop-examples</module>
+        <module>gradoop-algorithms</module>
+        <module>gradoop-flink</module>
+        <module>gradoop-core</module>
         <module>gradoop-checkstyle</module>
     </modules>
 
@@ -264,6 +265,22 @@
                 <artifactId>gradoop-core</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <artifactId>gradoop-flink</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Flink -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-test-utils</artifactId>
+                <version>${dep.flink.version}</version>
                 <scope>test</scope>
             </dependency>
 
