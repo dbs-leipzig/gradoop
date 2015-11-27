@@ -99,7 +99,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
           boolean initialized = false;
           for (ED edge : edgeIterable) {
             if (!initialized) {
-              vertexId = edge.getSourceVertexId();
+              vertexId = edge.getSourceId();
               initialized = true;
             }
             outgoingEdgeData.add(edge);
@@ -120,7 +120,7 @@ public class HBaseWriter<VD extends EPGMVertex, ED extends EPGMEdge, GD
           boolean initialized = false;
           for (ED edge : edgeIterable) {
             if (!initialized) {
-              vertexId = edge.getTargetVertexId();
+              vertexId = edge.getTargetId();
               initialized = true;
             }
             outgoingEdgeData.add(edge);

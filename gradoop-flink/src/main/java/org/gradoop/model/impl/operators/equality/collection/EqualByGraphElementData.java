@@ -17,9 +17,8 @@ import org.gradoop.model.impl.operators.equality.functions.EdgeDataLabeler;
 import org.gradoop.model.impl.operators.equality.functions.GraphHeadDataLabeler;
 import org.gradoop.model.impl.operators.equality.functions.LabelAppender;
 import org.gradoop.model.impl.operators.equality.functions.SortAndConcatLabels;
-import org.gradoop.model.impl.operators.equality.functions
-  .SourceVertexLabelAppender;
-import org.gradoop.model.impl.operators.equality.functions.TargetVertexLabelAppender;
+import org.gradoop.model.impl.operators.equality.functions.SourceLabelAppender;
+import org.gradoop.model.impl.operators.equality.functions.TargetLabelAppender;
 import org.gradoop.model.impl.operators.equality.functions.VertexDataLabeler;
 import org.gradoop.model.impl.operators.equality.tuples.DataLabel;
 import org.gradoop.model.impl.operators.equality.tuples.EdgeDataLabel;
@@ -74,14 +73,14 @@ public class EqualByGraphElementData
     DataSet<DataLabel> outgoingEdgeLabels = edgeLabels
       .join(vertexLabels)
       .where(0, 2).equalTo(0, 1)
-      .with(new TargetVertexLabelAppender())
+      .with(new TargetLabelAppender())
       .groupBy(0, 1)
       .reduceGroup(new SortAndConcatLabels<DataLabel>());
 
     DataSet<DataLabel> incomingEdgeLabels = edgeLabels
       .join(vertexLabels)
       .where(0, 1).equalTo(0, 1)
-      .with(new SourceVertexLabelAppender())
+      .with(new SourceLabelAppender())
       .groupBy(0, 1)
       .reduceGroup(new SortAndConcatLabels<DataLabel>());
 

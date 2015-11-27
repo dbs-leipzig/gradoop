@@ -12,12 +12,6 @@ import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.PersistentVertexFactory;
-import org.gradoop.storage.impl.hbase.HBaseEdge;
-import org.gradoop.storage.impl.hbase.HBaseEdgeFactory;
-import org.gradoop.storage.impl.hbase.HBaseGraphHead;
-import org.gradoop.storage.impl.hbase.HBaseGraphHeadFactory;
-import org.gradoop.storage.impl.hbase.HBaseVertex;
-import org.gradoop.storage.impl.hbase.HBaseVertexFactory;
 import org.gradoop.util.AsciiGraphLoader;
 
 import java.io.IOException;
@@ -123,10 +117,10 @@ public class GradoopHBaseTestUtils {
       Set<EdgePojo> inEdges = new HashSet<>();
 
       for(EdgePojo edge : loader.getEdges()) {
-        if(edge.getSourceVertexId().equals(vertex.getId())) {
+        if(edge.getSourceId().equals(vertex.getId())) {
           outEdges.add(edge);
         }
-        if(edge.getTargetVertexId().equals(vertex.getId())) {
+        if(edge.getTargetId().equals(vertex.getId())) {
           inEdges.add(edge);
         }
       }
@@ -152,8 +146,8 @@ public class GradoopHBaseTestUtils {
       persistentEdgeData.add(
         edgeDataFactory.createEdge(
           edge,
-          vertexById.get(edge.getSourceVertexId()),
-          vertexById.get(edge.getTargetVertexId())
+          vertexById.get(edge.getSourceId()),
+          vertexById.get(edge.getTargetId())
         )
       );
     }

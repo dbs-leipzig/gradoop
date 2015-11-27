@@ -95,14 +95,14 @@ public class LogicalGraphRandomNodeSamplingTest extends GradoopFlinkTestBase {
     }
     for (EdgePojo edge : newEdges) {
       assertTrue(dbEdges.contains(edge));
-      assertTrue(newVertexIDs.contains(edge.getSourceVertexId()));
-      assertTrue(newVertexIDs.contains(edge.getTargetVertexId()));
+      assertTrue(newVertexIDs.contains(edge.getSourceId()));
+      assertTrue(newVertexIDs.contains(edge.getTargetId()));
     }
     dbEdges.removeAll(newEdges);
     for (EdgePojo edge : dbEdges) {
       assertFalse(
-        newVertexIDs.contains(edge.getSourceVertexId()) &&
-        newVertexIDs.contains(edge.getTargetVertexId()));
+        newVertexIDs.contains(edge.getSourceId()) &&
+        newVertexIDs.contains(edge.getTargetId()));
     }
   }
 }

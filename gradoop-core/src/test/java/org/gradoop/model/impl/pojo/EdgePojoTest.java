@@ -23,8 +23,8 @@ public class EdgePojoTest {
     EPGMEdge e =
       new EdgePojoFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getId(), is(edgeId));
-    assertThat(e.getSourceVertexId(), is(sourceId));
-    assertThat(e.getTargetVertexId(), is(targetId));
+    assertThat(e.getSourceId(), is(sourceId));
+    assertThat(e.getTargetId(), is(targetId));
     assertThat(e.getPropertyCount(), is(0));
     assertThat(e.getGraphCount(), is(0));
   }
@@ -47,8 +47,8 @@ public class EdgePojoTest {
 
     assertThat(edge.getId(), is(edgeId));
     assertEquals(label, edge.getLabel());
-    assertThat(edge.getSourceVertexId(), is(sourceId));
-    assertThat(edge.getTargetVertexId(), is(targetId));
+    assertThat(edge.getSourceId(), is(sourceId));
+    assertThat(edge.getTargetId(), is(targetId));
     assertThat(edge.getPropertyCount(), is(2));
     assertThat(edge.getProperty("k1"), Is.<Object>is("v1"));
     assertThat(edge.getProperty("k2"), Is.<Object>is("v2"));

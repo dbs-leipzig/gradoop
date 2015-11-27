@@ -31,12 +31,12 @@ public class HBaseEdge extends
   /**
    * Vertex data associated with the source vertex.
    */
-  private VertexPojo sourceVertex;
+  private VertexPojo source;
 
   /**
    * Vertex data associated with the target vertex.
    */
-  private VertexPojo targetVertex;
+  private VertexPojo target;
 
   /**
    * Default constructor.
@@ -48,80 +48,80 @@ public class HBaseEdge extends
    * Creates persistent edge data.
    *
    * @param edge         encapsulated edge data
-   * @param sourceVertex source vertex data containing id and label
-   * @param targetVertex target vertex data containing id and label
+   * @param source source vertex data containing id and label
+   * @param target target vertex data containing id and label
    */
-  public HBaseEdge(EPGMEdge edge, VertexPojo sourceVertex,
-    VertexPojo targetVertex) {
+  public HBaseEdge(EPGMEdge edge, VertexPojo source,
+    VertexPojo target) {
     super(edge);
-    this.sourceVertex = sourceVertex;
-    this.targetVertex = targetVertex;
+    this.source = source;
+    this.target = target;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo getSourceVertex() {
-    return sourceVertex;
+  public VertexPojo getSource() {
+    return source;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setSourceVertex(VertexPojo sourceVertex) {
-    this.sourceVertex = sourceVertex;
+  public void setSource(VertexPojo sourceVertex) {
+    this.source = sourceVertex;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo getTargetVertex() {
-    return targetVertex;
+  public VertexPojo getTarget() {
+    return target;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setTargetVertex(VertexPojo targetVertex) {
-    this.targetVertex = targetVertex;
+  public void setTarget(VertexPojo targetVertex) {
+    this.target = targetVertex;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GradoopId getSourceVertexId() {
-    return getEpgmElement().getSourceVertexId();
+  public GradoopId getSourceId() {
+    return getEpgmElement().getSourceId();
   }
 
   /**
    * {@inheritDoc}
-   * @param sourceVertexId
+   * @param sourceId
    */
   @Override
-  public void setSourceVertexId(GradoopId sourceVertexId) {
-    getEpgmElement().setSourceVertexId(sourceVertexId);
+  public void setSourceId(GradoopId sourceId) {
+    getEpgmElement().setSourceId(sourceId);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GradoopId getTargetVertexId() {
-    return getEpgmElement().getTargetVertexId();
+  public GradoopId getTargetId() {
+    return getEpgmElement().getTargetId();
   }
 
   /**
    * {@inheritDoc}
-   * @param targetVertexId
+   * @param targetId
    */
   @Override
-  public void setTargetVertexId(GradoopId targetVertexId) {
-    getEpgmElement().setTargetVertexId(targetVertexId);
+  public void setTargetId(GradoopId targetId) {
+    getEpgmElement().setTargetId(targetId);
   }
 
   /**
@@ -131,8 +131,8 @@ public class HBaseEdge extends
   public String toString() {
     final StringBuilder sb = new StringBuilder("HBaseEdge{");
     sb.append("super=").append(super.toString());
-    sb.append(", sourceVertex=").append(sourceVertex);
-    sb.append(", targetVertex=").append(targetVertex);
+    sb.append(", source=").append(source);
+    sb.append(", target=").append(target);
     sb.append('}');
     return sb.toString();
   }

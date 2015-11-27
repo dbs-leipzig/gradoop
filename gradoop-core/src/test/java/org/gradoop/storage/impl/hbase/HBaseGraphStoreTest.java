@@ -363,14 +363,14 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     assertTrue(
       "source vertex mismatch",
-      originalEdge.getSourceVertexId().equals(
-        loadedEdge.getSourceVertexId())
+      originalEdge.getSourceId().equals(
+        loadedEdge.getSourceId())
     );
 
     assertTrue(
       "target vertex mismatch",
-      originalEdge.getTargetVertexId().equals(
-        loadedEdge.getTargetVertexId()
+      originalEdge.getTargetId().equals(
+        loadedEdge.getTargetId()
       )
     );
   }

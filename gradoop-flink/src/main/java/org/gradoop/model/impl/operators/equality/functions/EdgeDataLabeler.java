@@ -33,7 +33,7 @@ public class EdgeDataLabeler<E extends EPGMEdge>
   private EdgeDataLabel initDataLabel(E edge) {
     String canonicalLabel = edge.getLabel() + label(edge.getProperties()) ;
 
-    return new EdgeDataLabel(edge.getSourceVertexId(), edge.getTargetVertexId(),
+    return new EdgeDataLabel(edge.getSourceId(), edge.getTargetId(),
       canonicalLabel);
   }
 }

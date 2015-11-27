@@ -30,6 +30,6 @@ public class SourceId<ED extends EPGMEdge>
   implements KeySelector<ED, GradoopId> {
   @Override
   public GradoopId getKey(ED e) throws Exception {
-    return e.getSourceVertexId();
+    return e.getSourceId();
   }
 }

@@ -27,19 +27,19 @@ public class EdgeDataLabel
     this.f0 = graphId;
   }
 
-  public GradoopId getSourceVertexId() {
+  public GradoopId getSourceId() {
     return this.f1;
   }
 
-  public void setSourceVertexId(GradoopId id) {
+  public void setSourceId(GradoopId id) {
     this.f1 = id;
   }
 
-  public GradoopId getTargetVertexId() {
+  public GradoopId getTargetId() {
     return this.f2;
   }
 
-  public void setTargetVertexId(GradoopId id) {
+  public void setTargetId(GradoopId id) {
     this.f2 = id;
   }
 

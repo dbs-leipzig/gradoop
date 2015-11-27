@@ -137,8 +137,8 @@ public class JsonReader extends JsonIO {
       JSONObject jsonEdge = new JSONObject(s);
       GradoopId edgeID = getID(jsonEdge);
       String edgeLabel = getLabel(jsonEdge);
-      GradoopId sourceID = getSourceVertexID(jsonEdge);
-      GradoopId targetID = getTargetVertexID(jsonEdge);
+      GradoopId sourceID = getSourceId(jsonEdge);
+      GradoopId targetID = getTargetId(jsonEdge);
       Map<String, Object> properties = getProperties(jsonEdge);
       GradoopIdSet graphs = getGraphs(jsonEdge);
 
@@ -153,7 +153,7 @@ public class JsonReader extends JsonIO {
      * @return source vertex identifier
      * @throws JSONException
      */
-    private GradoopId getSourceVertexID(JSONObject jsonEdge
+    private GradoopId getSourceId(JSONObject jsonEdge
     ) throws JSONException {
 
       return GradoopId.fromString(jsonEdge.getString(EDGE_SOURCE));
@@ -166,7 +166,7 @@ public class JsonReader extends JsonIO {
      * @return target vertex identifier
      * @throws JSONException
      */
-    private GradoopId getTargetVertexID(JSONObject jsonEdge
+    private GradoopId getTargetId(JSONObject jsonEdge
     ) throws JSONException {
 
       return GradoopId.fromString(jsonEdge.getString(EDGE_TARGET));

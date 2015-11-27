@@ -30,11 +30,11 @@ import java.io.IOException;
  * Responsible for reading and writing edge data from and to HBase.
  *
  * @param <ED>  EPGM edge type
- * @param <VD>  EPGM vertex type
+ * @param <V>  EPGM vertex type
  */
 public interface EdgeHandler<
   ED extends EPGMEdge,
-  VD extends EPGMVertex>
+  V extends EPGMVertex>
   extends
   GraphElementHandler {
 
@@ -45,7 +45,7 @@ public interface EdgeHandler<
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeSourceVertex(final Put put, final VD vertexData) throws IOException;
+  Put writeSource(final Put put, final V vertexData) throws IOException;
 
   /**
    * Reads the source vertex identifier from the given {@link Result}.
@@ -53,7 +53,7 @@ public interface EdgeHandler<
    * @param res HBase {@link Result}
    * @return source vertex identifier
    */
-  GradoopId readSourceVertexId(final Result res) throws IOException;
+  GradoopId readSourceId(final Result res) throws IOException;
 
   /**
    * Adds the target vertex data to the given {@link Put} and returns it.
@@ -62,7 +62,7 @@ public interface EdgeHandler<
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeTargetVertex(final Put put, final VD vertexData) throws IOException;
+  Put writeTarget(final Put put, final V vertexData) throws IOException;
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -70,7 +70,7 @@ public interface EdgeHandler<
    * @param res HBase {@link Result}
    * @return target vertex identifier
    */
-  GradoopId readTargetVertexId(final Result res) throws IOException;
+  GradoopId readTargetId(final Result res) throws IOException;
 
   /**
    * Writes the complete edge data to the given {@link Put} and returns it.
@@ -79,7 +79,7 @@ public interface EdgeHandler<
    * @param edgeData edge data to be written
    * @return put with edge data
    */
-  Put writeEdge(final Put put, final PersistentEdge<VD> edgeData) throws
+  Put writeEdge(final Put put, final PersistentEdge<V> edgeData) throws
     IOException;
 
   /**

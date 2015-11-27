@@ -30,6 +30,6 @@ public class TargetId<ED extends EPGMEdge>
   implements KeySelector<ED, GradoopId> {
   @Override
   public GradoopId getKey(ED edge) throws Exception {
-    return edge.getTargetVertexId();
+    return edge.getTargetId();
   }
 }

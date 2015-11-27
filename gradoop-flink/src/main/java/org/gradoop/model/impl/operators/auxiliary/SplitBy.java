@@ -321,8 +321,8 @@ public class SplitBy<
     map(ED edge) throws Exception {
 
       reuseTuple.f0 = edge.getId();
-      reuseTuple.f1 = edge.getSourceVertexId();
-      reuseTuple.f2 = edge.getTargetVertexId();
+      reuseTuple.f1 = edge.getSourceId();
+      reuseTuple.f2 = edge.getTargetId();
       return reuseTuple;
     }
   }

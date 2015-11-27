@@ -289,8 +289,8 @@ public class OverlapSplitBy<
     map(ED edge) throws Exception {
 
       return new Tuple3<>(edge.getId(),
-        edge.getSourceVertexId(),
-        edge.getTargetVertexId());
+        edge.getSourceId(),
+        edge.getTargetId());
     }
   }
 

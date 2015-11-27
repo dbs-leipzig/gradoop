@@ -28,26 +28,26 @@ public interface EPGMEdge extends EPGMGraphElement {
    *
    * @return source vertex id
    */
-  GradoopId getSourceVertexId();
+  GradoopId getSourceId();
 
   /**
    * Sets the source vertex identifier.
    *
-   * @param sourceVertexId source vertex id
+   * @param sourceId source vertex id
    */
-  void setSourceVertexId(GradoopId sourceVertexId);
+  void setSourceId(GradoopId sourceId);
 
   /**
    * Returns the target vertex identifier.
    *
    * @return target vertex id
    */
-  GradoopId getTargetVertexId();
+  GradoopId getTargetId();
 
   /**
    * Sets the target vertex identifier.
    *
-   * @param targetVertexId target vertex id.
+   * @param targetId target vertex id.
    */
-  void setTargetVertexId(GradoopId targetVertexId);
+  void setTargetId(GradoopId targetId);
 }

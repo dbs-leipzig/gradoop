@@ -32,7 +32,7 @@ public class EdgeToBTGEdgeMapper<ED extends EPGMEdge> implements
   MapFunction<ED, Edge<GradoopId, NullValue>> {
   @Override
   public Edge<GradoopId, NullValue> map(ED edge) throws Exception {
-    return new Edge<>(edge.getSourceVertexId(), edge.getTargetVertexId(),
+    return new Edge<>(edge.getSourceId(), edge.getTargetId(),
       NullValue.getInstance());
   }
 }

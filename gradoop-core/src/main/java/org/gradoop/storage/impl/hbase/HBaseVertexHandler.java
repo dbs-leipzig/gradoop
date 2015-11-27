@@ -238,7 +238,7 @@ public class HBaseVertexHandler<VD extends EPGMVertex, ED extends EPGMEdge>
 
     // extend by source or vertex id
     byte[] otherVertexIdBytes = Writables.getBytes(
-      isOutgoing ? edge.getTargetVertexId() : edge.getSourceVertexId());
+      isOutgoing ? edge.getTargetId() : edge.getSourceId());
     ArrayUtils.addAll(edgeIdentifier, otherVertexIdBytes);
 
     // extend by label

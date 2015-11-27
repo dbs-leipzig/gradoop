@@ -40,19 +40,19 @@ public class EdgeGroupItem
     f0 = edgeId;
   }
 
-  public GradoopId getSourceVertexId() {
+  public GradoopId getSourceId() {
     return f1;
   }
 
-  public void setSourceVertexId(GradoopId sourceVertexId) {
+  public void setSourceId(GradoopId sourceVertexId) {
     f1 = sourceVertexId;
   }
 
-  public GradoopId getTargetVertexId() {
+  public GradoopId getTargetId() {
     return f2;
   }
 
-  public void setTargetVertexId(GradoopId targetVertexId) {
+  public void setTargetId(GradoopId targetVertexId) {
     f2 = targetVertexId;
   }
 

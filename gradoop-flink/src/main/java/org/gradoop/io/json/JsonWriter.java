@@ -91,8 +91,8 @@ public class JsonWriter extends JsonIO {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, e.getId());
-        json.put(EDGE_SOURCE, e.getSourceVertexId());
-        json.put(EDGE_TARGET, e.getTargetVertexId());
+        json.put(EDGE_SOURCE, e.getSourceId());
+        json.put(EDGE_TARGET, e.getTargetId());
         json.put(DATA, writeProperties(e));
         json.put(META, writeGraphElementMeta(e));
       } catch (JSONException ex) {

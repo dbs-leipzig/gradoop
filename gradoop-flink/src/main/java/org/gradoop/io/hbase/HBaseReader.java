@@ -210,8 +210,8 @@ public class HBaseReader {
     @Override
     protected Edge<GradoopId, ED> mapResultToTuple(Result result) {
       ED edgeData = edgeHandler.readEdge(result);
-      return new Edge<>(edgeData.getSourceVertexId(),
-        edgeData.getTargetVertexId(), edgeData);
+      return new Edge<>(edgeData.getSourceId(),
+        edgeData.getTargetId(), edgeData);
     }
   }
 }

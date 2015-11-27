@@ -112,7 +112,7 @@ public abstract class AbstractGraph
       this.edges.filter(new FilterFunction<E>() {
         @Override
         public boolean filter(E edge) throws Exception {
-          return edge.getSourceVertexId().equals(vertexID);
+          return edge.getSourceId().equals(vertexID);
         }
       });
   }
@@ -126,7 +126,7 @@ public abstract class AbstractGraph
       this.edges.filter(new FilterFunction<E>() {
         @Override
         public boolean filter(E edge) throws Exception {
-          return edge.getTargetVertexId().equals(vertexID);
+          return edge.getTargetId().equals(vertexID);
         }
       });
   }
@@ -146,8 +146,8 @@ public abstract class AbstractGraph
       getEdges().map(new MapFunction<E, Edge<GradoopId, E>>() {
         @Override
         public Edge<GradoopId, E> map(E epgmEdge) throws Exception {
-          return new Edge<>(epgmEdge.getSourceVertexId(),
-            epgmEdge.getTargetVertexId(),
+          return new Edge<>(epgmEdge.getSourceId(),
+            epgmEdge.getTargetId(),
             epgmEdge);
         }
       }).withForwardedFields("*->f2"),

@@ -276,11 +276,11 @@ public abstract class Summarization<
     DataSet<EdgeGroupItem> edges =
       graph.getEdges().join(vertexToRepresentativeMap).where(0).equalTo(0)
         // project edges to necessary information
-        .with(new SourceVertexJoinFunction<ED>(getEdgeGroupingKey(),
+        .with(new SourceJoin<ED>(getEdgeGroupingKey(),
           useEdgeLabels()))
           // join result with vertex-group-map on edge-target-id == vertex-id
         .join(vertexToRepresentativeMap).where(2).equalTo(0)
-        .with(new TargetVertexJoinFunction());
+        .with(new TargetJoin());
 
     return groupEdges(edges).reduceGroup(
       new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
@@ -381,8 +381,8 @@ public abstract class Summarization<
       for (EdgeGroupItem e : edgeGroupItems) {
         edgeCount++;
         if (!initialized) {
-          newSourceVertexId = e.getSourceVertexId();
-          newTargetVertexId = e.getTargetVertexId();
+          newSourceVertexId = e.getSourceId();
+          newTargetVertexId = e.getTargetId();
           if (useLabel) {
             edgeLabel = e.getGroupLabel();
           }
@@ -425,9 +425,9 @@ public abstract class Summarization<
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f1->f2") // edge target id
   @FunctionAnnotation.ForwardedFieldsSecond("f1") // edge source id
-  protected static class SourceVertexJoinFunction<ED extends EPGMEdge>
+  protected static class SourceJoin<E extends EPGMEdge>
     implements
-    JoinFunction<Edge<GradoopId, ED>, VertexWithRepresentative, EdgeGroupItem> {
+    JoinFunction<Edge<GradoopId, E>, VertexWithRepresentative, EdgeGroupItem> {
 
     /**
      * Vertex property key for grouping
@@ -453,7 +453,7 @@ public abstract class Summarization<
      * @param groupPropertyKey vertex property key for grouping
      * @param useLabel         true, if vertex label shall be used
      */
-    public SourceVertexJoinFunction(String groupPropertyKey, boolean useLabel) {
+    public SourceJoin(String groupPropertyKey, boolean useLabel) {
       this.groupPropertyKey = groupPropertyKey;
       this.useLabel = useLabel;
       this.reuseEdgeGroupItem = new EdgeGroupItem();
@@ -465,7 +465,7 @@ public abstract class Summarization<
      * {@inheritDoc}
      */
     @Override
-    public EdgeGroupItem join(Edge<GradoopId, ED> e,
+    public EdgeGroupItem join(Edge<GradoopId, E> e,
       VertexWithRepresentative vertexRepresentative) throws Exception {
       String groupLabel = useLabel ? e.getValue().getLabel() : null;
       String groupPropertyValue = null;
@@ -479,9 +479,9 @@ public abstract class Summarization<
         groupPropertyValue = NULL_VALUE;
       }
       reuseEdgeGroupItem.setEdgeId(e.getValue().getId());
-      reuseEdgeGroupItem.setSourceVertexId(
+      reuseEdgeGroupItem.setSourceId(
         vertexRepresentative.getGroupRepresentativeVertexId());
-      reuseEdgeGroupItem.setTargetVertexId(e.getTarget());
+      reuseEdgeGroupItem.setTargetId(e.getTarget());
       reuseEdgeGroupItem.setGroupLabel(groupLabel);
       reuseEdgeGroupItem.setGroupPropertyValue(groupPropertyValue);
 
@@ -495,7 +495,7 @@ public abstract class Summarization<
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3;f4")
   @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
-  protected static class TargetVertexJoinFunction implements
+  protected static class TargetJoin implements
     JoinFunction<EdgeGroupItem, VertexWithRepresentative, EdgeGroupItem> {
 
     /**

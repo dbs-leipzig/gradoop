@@ -82,11 +82,11 @@ public final class GConstants {
   /**
    * Column identifier for source vertex identifier.
    */
-  public static final String COL_SOURCE_VERTEX = "s";
+  public static final String COL_SOURCE = "s";
   /**
    * Column identifier for target vertex identifier.s
    */
-  public static final String COL_TARGET_VERTEX = "t";
+  public static final String COL_TARGET = "t";
 
   /**
    * Default cache size for scans in HBase.
