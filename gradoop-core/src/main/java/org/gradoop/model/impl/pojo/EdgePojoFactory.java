@@ -19,10 +19,9 @@ package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.properties.Properties;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMEdgeFactory;
-
-import java.util.Map;
 
 /**
  * Factory for creating default edge data.
@@ -77,7 +76,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
    */
   @Override
   public EdgePojo createEdge(String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, Map<String, Object> properties) {
+    GradoopId targetVertexId, Properties properties) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, properties);
   }
@@ -91,7 +90,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
     String label,
     GradoopId sourceVertexId,
     GradoopId targetVertexId,
-    Map<String, Object> properties) {
+    Properties properties) {
 
     return
       initEdge(id, label, sourceVertexId, targetVertexId, properties, null);
@@ -122,7 +121,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
    */
   @Override
   public EdgePojo createEdge(String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, Map<String, Object> properties,
+    GradoopId targetVertexId, Properties properties,
     GradoopIdSet graphIds) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, properties, graphIds);
@@ -134,7 +133,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
   @Override
   public EdgePojo initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
-    final Map<String, Object> properties, GradoopIdSet graphIds) {
+    final Properties properties, GradoopIdSet graphIds) {
     checkId(id);
     checkLabel(label);
     checkId(sourceVertexId);
