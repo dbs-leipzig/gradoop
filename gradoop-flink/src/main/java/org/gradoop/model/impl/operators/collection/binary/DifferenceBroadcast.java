@@ -22,8 +22,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.graphcontainment
-  .AbstractBroadcastGraphsContainmentFilter;
+import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
@@ -39,7 +38,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class DifferenceUsingList<
+public class DifferenceBroadcast<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
   GD extends EPGMGraphHead>
@@ -62,7 +61,7 @@ public class DifferenceUsingList<
     return firstCollection.getVertices()
       .filter(new InGraphsBroadcast<VD>())
       .withBroadcastSet(identifiers,
-        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+        GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
 
   /**
@@ -70,6 +69,6 @@ public class DifferenceUsingList<
    */
   @Override
   public String getName() {
-    return DifferenceUsingList.class.getName();
+    return DifferenceBroadcast.class.getName();
   }
 }

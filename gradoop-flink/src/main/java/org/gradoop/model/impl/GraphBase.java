@@ -39,7 +39,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @see LogicalGraph
  * @see GraphCollection
  */
-public abstract class AbstractGraph
+public abstract class GraphBase
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements GraphOperators<V, E> {
 
@@ -70,7 +70,7 @@ public abstract class AbstractGraph
    * @param edges     edge data set
    * @param config    Gradoop Flink configuration
    */
-  protected AbstractGraph(DataSet<G> graphHeads, DataSet<V> vertices,
+  protected GraphBase(DataSet<G> graphHeads, DataSet<V> vertices,
     DataSet<E> edges, GradoopFlinkConfig<V, E, G> config) {
     this.graphHeads = graphHeads;
     this.vertices = vertices;

@@ -38,8 +38,7 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.Predicate;
 import org.gradoop.model.impl.functions.bool.False;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.graphcontainment
-  .AbstractBroadcastGraphsContainmentFilter;
+import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.functions.graphcontainment.InGraphs;
@@ -49,9 +48,9 @@ import org.gradoop.model.impl.functions.epgm.ById;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.collection.binary.Difference;
-import org.gradoop.model.impl.operators.collection.binary.DifferenceUsingList;
+import org.gradoop.model.impl.operators.collection.binary.DifferenceBroadcast;
 import org.gradoop.model.impl.operators.collection.binary.Intersect;
-import org.gradoop.model.impl.operators.collection.binary.IntersectUsingList;
+import org.gradoop.model.impl.operators.collection.binary.IntersectBroadcast;
 import org.gradoop.model.impl.operators.collection.binary.Union;
 import org.gradoop.model.impl.operators.equality.collection
   .EqualByGraphElementIds;
@@ -74,7 +73,7 @@ import java.util.List;
  */
 public class GraphCollection
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends AbstractGraph<G, V, E>
+  extends GraphBase<G, V, E>
   implements GraphCollectionOperators<G, V, E> {
 
   /**
@@ -293,12 +292,12 @@ public class GraphCollection
     DataSet<V> vertices = getVertices()
       .filter(new InGraphsBroadcast<V>())
       .withBroadcastSet(graphIDs,
-        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+        GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     DataSet<E> edges = getEdges()
       .filter(new InGraphsBroadcast<E>())
       .withBroadcastSet(graphIDs,
-        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+        GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return new GraphCollection<>(vertices, edges, filteredGraphHeads,
       getConfig());
@@ -337,7 +336,7 @@ public class GraphCollection
   @Override
   public GraphCollection<G, V, E> intersectWithSmallResult(
     GraphCollection<G, V, E> otherCollection) throws Exception {
-    return callForCollection(new IntersectUsingList<V, E, G>(),
+    return callForCollection(new IntersectBroadcast<V, E, G>(),
       otherCollection);
   }
 
@@ -356,7 +355,7 @@ public class GraphCollection
   @Override
   public GraphCollection<G, V, E> differenceWithSmallResult(
     GraphCollection<G, V, E> otherCollection) throws Exception {
-    return callForCollection(new DifferenceUsingList<V, E, G>(),
+    return callForCollection(new DifferenceBroadcast<V, E, G>(),
       otherCollection);
   }
 

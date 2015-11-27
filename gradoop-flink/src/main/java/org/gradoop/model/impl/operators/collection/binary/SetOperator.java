@@ -29,7 +29,7 @@ public abstract class SetOperator<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
   GD extends EPGMGraphHead>
-  extends AbstractBinaryCollectionToCollectionOperator<VD, ED, GD> {
+  extends BinaryCollectionToCollectionOperatorBase<VD, ED, GD> {
 
   /**
    * Computes new vertices based on the new subgraphs. For each vertex, each

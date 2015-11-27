@@ -23,8 +23,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.graphcontainment
-  .AbstractBroadcastGraphsContainmentFilter;
+import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
@@ -54,12 +53,12 @@ public class OverlapCollection
     DataSet<V> vertices = collection.getVertices()
       .filter(new InGraphsBroadcast<V>())
       .withBroadcastSet(graphIDs,
-        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+        GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     DataSet<E> edges = collection.getEdges()
       .filter(new InGraphsBroadcast<E>())
       .withBroadcastSet(graphIDs,
-        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+        GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return LogicalGraph.fromDataSets(
       vertices,

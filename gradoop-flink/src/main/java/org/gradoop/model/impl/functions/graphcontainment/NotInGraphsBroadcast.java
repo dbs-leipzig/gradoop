@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.functions.graphcontainment;
 
 import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -9,7 +8,7 @@ import org.gradoop.model.impl.id.GradoopId;
  */
 public class NotInGraphsBroadcast
   <GE extends EPGMGraphElement>
-  extends AbstractBroadcastGraphsContainmentFilter<GE> {
+  extends GraphsContainmentFilterBroadcast<GE> {
 
   @Override
   public boolean filter(GE element) throws Exception {

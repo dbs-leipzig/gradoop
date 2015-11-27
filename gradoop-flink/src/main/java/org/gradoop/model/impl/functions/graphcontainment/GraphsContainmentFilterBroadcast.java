@@ -5,16 +5,17 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 
-public abstract class AbstractBroadcastGraphContainmentFilter
-  <GE extends EPGMGraphElement> extends RichFilterFunction<GE> {
+import java.util.Collection;
 
-  public static final String GRAPH_ID = "graphId";
-  protected GradoopId graphId;
+public abstract class GraphsContainmentFilterBroadcast
+  <GE extends EPGMGraphElement> extends RichFilterFunction<GE>{
+
+  public static final String GRAPH_IDS = "graphIds";
+  protected Collection<GradoopId> graphIds;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    graphId = getRuntimeContext()
-      .<GradoopId>getBroadcastVariable(GRAPH_ID).get(0);
+    graphIds = getRuntimeContext().getBroadcastVariable(GRAPH_IDS);
   }
 }

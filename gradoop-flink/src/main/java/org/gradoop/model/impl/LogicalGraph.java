@@ -63,7 +63,7 @@ import java.util.Collection;
  */
 public class LogicalGraph
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends AbstractGraph<G, V, E>
+  extends GraphBase<G, V, E>
   implements LogicalGraphOperators<G, V, E> {
 
   /**

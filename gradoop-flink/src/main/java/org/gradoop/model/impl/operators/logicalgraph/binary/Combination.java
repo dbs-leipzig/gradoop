@@ -35,7 +35,7 @@ import org.gradoop.model.impl.functions.epgm.Id;
  */
 public class Combination
   <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  extends AbstractBinaryGraphToGraphOperator<GD, VD, ED> {
+  extends BinaryGraphToGraphOperatorBase<GD, VD, ED> {
 
   /**
    * {@inheritDoc}

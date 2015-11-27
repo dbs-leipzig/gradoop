@@ -22,8 +22,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.graphcontainment
-  .AbstractBroadcastGraphsContainmentFilter;
+import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
@@ -38,7 +37,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public class IntersectUsingList<
+public class IntersectBroadcast<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
   GD extends EPGMGraphHead>
@@ -53,11 +52,11 @@ public class IntersectUsingList<
     DataSet<VD> vertices = firstCollection.getVertices();
     return vertices.filter(new InGraphsBroadcast<VD>())
       .withBroadcastSet(identifiers,
-        AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+        GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
 
   @Override
   public String getName() {
-    return IntersectUsingList.class.getName();
+    return IntersectBroadcast.class.getName();
   }
 }

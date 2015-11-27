@@ -39,7 +39,7 @@ public class Overlap<
   V extends EPGMVertex,
   E extends EPGMEdge,
   G extends EPGMGraphHead>
-  extends AbstractBinaryGraphToGraphOperator<G, V, E> {
+  extends BinaryGraphToGraphOperatorBase<G, V, E> {
 
   /**
    * {@inheritDoc}

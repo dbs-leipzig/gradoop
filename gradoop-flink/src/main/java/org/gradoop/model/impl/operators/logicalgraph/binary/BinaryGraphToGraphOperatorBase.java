@@ -36,7 +36,7 @@ import java.util.Iterator;
  * @param <E> EPGM edge type
  * @param <G> EPGM graph head type
  */
-public abstract class AbstractBinaryGraphToGraphOperator
+public abstract class BinaryGraphToGraphOperatorBase
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements BinaryGraphToGraphOperator<G, V, E> {
 

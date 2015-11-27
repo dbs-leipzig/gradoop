@@ -13,7 +13,7 @@ import org.gradoop.model.impl.functions.epgm.Id;
  * @param <VD> EPGM vertex type
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
- * @see IntersectUsingList
+ * @see IntersectBroadcast
  */
 public class Intersect<
   VD extends EPGMVertex,

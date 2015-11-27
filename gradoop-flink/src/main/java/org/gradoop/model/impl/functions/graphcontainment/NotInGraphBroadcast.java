@@ -3,7 +3,7 @@ package org.gradoop.model.impl.functions.graphcontainment;
 import org.gradoop.model.api.EPGMGraphElement;
 
 public class NotInGraphBroadcast<GE extends EPGMGraphElement>
-  extends AbstractBroadcastGraphContainmentFilter<GE> {
+  extends GraphContainmentFilterBroadcast<GE> {
 
   @Override
   public boolean filter(GE element) throws Exception {

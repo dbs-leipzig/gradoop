@@ -18,7 +18,7 @@ import java.util.Iterator;
  * @param <VD> EPGM vertex type
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
- * @see DifferenceUsingList
+ * @see DifferenceBroadcast
  */
 public class Difference<
   VD extends EPGMVertex,

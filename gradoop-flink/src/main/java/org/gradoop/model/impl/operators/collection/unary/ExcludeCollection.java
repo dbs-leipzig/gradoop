@@ -25,8 +25,7 @@ import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.graphcontainment
-  .AbstractBroadcastGraphsContainmentFilter;
+import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
@@ -83,7 +82,7 @@ public class ExcludeCollection
     vertices = vertices
       .filter(new NotInGraphsBroadcast<V>())
       .withBroadcastSet(
-        graphIDs, AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+        graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     DataSet<E> edges = collection.getEdges()
       .filter(new InGraph<E>(positiveGraphID));
@@ -91,7 +90,7 @@ public class ExcludeCollection
     edges = edges
       .filter(new NotInGraphsBroadcast<E>())
       .withBroadcastSet(
-        graphIDs, AbstractBroadcastGraphsContainmentFilter.GRAPH_IDS);
+        graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return LogicalGraph.fromDataSets(
       vertices,

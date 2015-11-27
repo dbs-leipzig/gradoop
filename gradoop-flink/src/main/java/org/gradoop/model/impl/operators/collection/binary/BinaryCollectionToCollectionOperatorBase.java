@@ -41,7 +41,7 @@ import java.util.Iterator;
  * @param <ED> EPGM edge type
  * @param <GD> EPGM graph head type
  */
-public abstract class AbstractBinaryCollectionToCollectionOperator<
+public abstract class BinaryCollectionToCollectionOperatorBase<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
   GD extends EPGMGraphHead>
