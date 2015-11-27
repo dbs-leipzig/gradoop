@@ -105,10 +105,8 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
    */
   @Override
   public String toString() {
-    return "EdgePojo{" +
-      super.toString() +
-      ", sourceId=" + sourceId +
-      ", targetId=" + targetId +
-      '}';
+    return "(" + sourceId + ")-["
+      + super.toString() +
+      "]->(" + targetId + ")";
   }
 }

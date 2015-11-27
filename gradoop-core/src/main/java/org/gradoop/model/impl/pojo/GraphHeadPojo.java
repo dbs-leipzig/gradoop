@@ -46,8 +46,6 @@ public class GraphHeadPojo extends ElementPojo implements EPGMGraphHead {
 
   @Override
   public String toString() {
-    return "GraphHeadPojo{" +
-      super.toString() +
-      '}';
+    return super.toString() + "[]";
   }
 }

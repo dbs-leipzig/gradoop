@@ -164,10 +164,6 @@ public abstract class ElementPojo implements EPGMElement {
 
   @Override
   public String toString() {
-    return "EPGMElement{" +
-      "id=" + id +
-      ", label='" + label + '\'' +
-      ", properties=" + properties +
-      '}';
+    return id + ":" + label + "{" + properties + "}";
   }
 }

@@ -86,9 +86,9 @@ public class SummarizationExample implements ProgramDescription {
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Path to write output files to");
     OPTIONS.addOption(OPTION_VERTEX_GROUPING_KEY, "vertex-grouping-key", true,
-      "Property key to group vertices on.");
+      "EPGMProperty key to group vertices on.");
     OPTIONS.addOption(OPTION_EDGE_GROUPING_KEY, "edge-grouping-key", true,
-      "Property key to group edges on.");
+      "EPGMProperty key to group edges on.");
     OPTIONS.addOption(OPTION_USE_VERTEX_LABELS, "use-vertex-labels", false,
       "Summarize on vertex labels");
     OPTIONS.addOption(OPTION_USE_EDGE_LABELS, "use-edge-labels", false,

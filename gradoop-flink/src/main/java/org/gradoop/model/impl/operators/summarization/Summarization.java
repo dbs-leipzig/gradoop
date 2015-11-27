@@ -100,7 +100,7 @@ public abstract class Summarization<
    */
   public static final String NULL_VALUE = "__NULL";
   /**
-   * Property key to store the number of summarized entities in a group.
+   * EPGMProperty key to store the number of summarized entities in a group.
    */
   public static final String COUNT_PROPERTY_KEY = "count";
 

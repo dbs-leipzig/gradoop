@@ -34,7 +34,7 @@ public class CommunityDiscriminatorFunction<VD extends EPGMVertex> implements
   UnaryFunction<VD, GradoopId> {
 
   /**
-   * Property key to retrieve property value.
+   * EPGMProperty key to retrieve property value.
    */
   private final String propertyKey;
 

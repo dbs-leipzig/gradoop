@@ -48,8 +48,6 @@ public class VertexPojo extends GraphElementPojo implements EPGMVertex {
 
   @Override
   public String toString() {
-    return "VertexPojo{" +
-      super.toString() +
-      '}';
+    return "(" + super.toString() + ')';
   }
 }
