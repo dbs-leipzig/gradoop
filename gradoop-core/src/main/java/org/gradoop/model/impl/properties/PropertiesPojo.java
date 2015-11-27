@@ -39,7 +39,7 @@ public class PropertiesPojo implements Properties {
   }
 
   @Override
-  public boolean hasProperty(String key) {
+  public boolean hasKey(String key) {
     return false;
   }
 

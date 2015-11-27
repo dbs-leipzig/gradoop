@@ -17,9 +17,9 @@
 
 package org.gradoop.model.api;
 
+import org.gradoop.model.impl.properties.Properties;
 import org.gradoop.model.impl.properties.Property;
 
-import java.util.Properties;
 
 /**
  * Used to describe entities that store a set of properties, where each property
@@ -32,7 +32,7 @@ public interface EPGMAttributed {
    *
    * @return properties
    */
-  Properties getProperties();
+  org.gradoop.model.impl.properties.Properties getProperties();
 
   /**
    * Returns all property keys of that entity or {@code null} it that entity has

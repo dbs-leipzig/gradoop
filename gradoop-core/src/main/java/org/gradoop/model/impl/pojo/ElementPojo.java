@@ -1,10 +1,10 @@
 package org.gradoop.model.impl.pojo;
 
-import com.google.common.collect.Maps;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
-
-import java.util.Map;
+import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.impl.properties.PropertiesPojo;
+import org.gradoop.model.impl.properties.Property;
 
 /**
  * Abstract base class for graphs, vertices and edges.
@@ -23,7 +23,7 @@ public abstract class ElementPojo implements EPGMElement {
   /**
    * Internal property storage
    */
-  protected Map<String, Object> properties;
+  protected Properties properties;
 
   /**
    * Default constructor.
@@ -39,7 +39,7 @@ public abstract class ElementPojo implements EPGMElement {
    * @param properties key-value properties
    */
   protected ElementPojo(
-    GradoopId id, String label, Map<String, Object> properties) {
+    GradoopId id, String label, Properties properties) {
     this.id = id;
     this.label = label;
     this.properties = properties;
@@ -80,7 +80,7 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public Map<String, Object> getProperties() {
+  public Properties getProperties() {
     return properties;
   }
 
@@ -89,30 +89,22 @@ public abstract class ElementPojo implements EPGMElement {
    */
   @Override
   public Iterable<String> getPropertyKeys() {
-    return (properties != null) ? properties.keySet() : null;
+    return (properties != null) ? properties.getKeys() : null;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Object getProperty(String key) {
-    return (properties != null) ? properties.get(key) : null;
+  public Property getProperty(String key) {
+    return (properties != null) ? properties.getProperty(key) : null;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public <T> T getProperty(String key, Class<T> type) {
-    return type.cast(getProperty(key));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setProperties(Map<String, Object> properties) {
+  public void setProperties(Properties properties) {
     this.properties = properties;
   }
 
@@ -120,17 +112,14 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public void setProperty(String key, Object value) {
-    if (key == null || "".equals(key)) {
-      throw new IllegalArgumentException("key must not be null or empty");
-    }
-    if (value == null) {
-      throw new IllegalArgumentException("value must not be null");
+  public void setProperty(Property property) {
+    if (property == null) {
+      throw new IllegalArgumentException("property must not be null or empty");
     }
     if (this.properties == null) {
-      this.properties = Maps.newHashMap();
+      this.properties = new PropertiesPojo();
     }
-    this.properties.put(key, value);
+    this.properties.setProperty(property);
   }
 
   @Override
@@ -143,7 +132,7 @@ public abstract class ElementPojo implements EPGMElement {
    */
   @Override
   public Boolean hasProperty(String key) {
-    return getProperties() != null && getProperties().containsKey(key);
+    return getProperties() != null && getProperties().hasKey(key);
   }
 
   /**

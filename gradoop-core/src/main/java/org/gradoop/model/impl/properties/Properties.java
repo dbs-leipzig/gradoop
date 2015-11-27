@@ -19,7 +19,7 @@ package org.gradoop.model.impl.properties;
 
 public interface Properties extends Iterable<Property>, Comparable<Properties> {
 
-  boolean hasProperty(String key);
+  boolean hasKey(String key);
 
   Property getProperty(String key);
 

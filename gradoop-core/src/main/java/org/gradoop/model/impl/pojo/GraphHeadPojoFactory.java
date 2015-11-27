@@ -19,6 +19,7 @@ package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.Properties;
 import org.gradoop.util.GConstants;
 
 import java.util.Map;
@@ -70,7 +71,7 @@ public class GraphHeadPojoFactory extends ElementPojoFactory implements EPGMGrap
    */
   @Override
   public GraphHeadPojo createGraphHead(String label,
-    Map<String, Object> properties) {
+    Properties properties) {
     return initGraphHead(GradoopId.get(), label, properties);
   }
 
@@ -79,7 +80,7 @@ public class GraphHeadPojoFactory extends ElementPojoFactory implements EPGMGrap
    */
   @Override
   public GraphHeadPojo initGraphHead(final GradoopId id, final String label,
-    Map<String, Object> properties) {
+    Properties properties) {
     checkId(id);
     checkLabel(label);
     return new GraphHeadPojo(id, label, properties);
