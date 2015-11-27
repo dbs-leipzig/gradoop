@@ -17,21 +17,91 @@
 
 package org.gradoop.model.impl.properties;
 
-public interface Property extends Comparable<Property> {
+import org.gradoop.model.api.EPGMProperty;
 
-  String getKey();
+import java.math.BigDecimal;
+import java.util.Date;
 
-  boolean hasKey(String key);
+public class Property implements EPGMProperty {
 
-  Object getValue();
+  private String key;
 
-  void setValue(Object value);
+  private Integer intValue;
 
-  Integer getIntValue();
+  private long longValue;
 
-  void setIntValue(Integer value);
+  private float floatValue;
+
+  private double doubleValue;
+
+  private boolean booleanValue;
+
+  private String stringValue;
+
+  private Date dateTimeValue;
+
+  private BigDecimal bigDecimalValue;
+
+  public Property() {
+  }
+
+  Property(String key, int value) {
+    this.key = key;
+    this.intValue = value;
+  }
+
+  Property(String key, long value) {
+    this.key = key;
+    this.longValue = value;
+  }
 
   // ...
 
+  public static EPGMProperty createProperty(String key, Integer value) {
+    return new Property(key, value);
+  }
 
+  public static EPGMProperty createProperty(String key, Long value) {
+    return new Property(key, value);
+  }
+
+  // ...
+
+  @Override
+  public String getKey() {
+    return null;
+  }
+
+  @Override
+  public boolean hasKey(String key) {
+    return false;
+  }
+
+  @Override
+  public Object getValue() {
+    return null;
+  }
+
+  @Override
+  public void setValue(Object value) {
+    if (value instanceof Integer) {
+      this.intValue = (Integer) value;
+    }
+    // ...
+  }
+
+  @Override
+  public Integer getIntValue() {
+    return null;
+  }
+
+  @Override
+  public void setIntValue(Integer value) {
+
+  }
+
+  @Override
+  public int compareTo(EPGMProperty o) {
+    return 0;
+  }
 }

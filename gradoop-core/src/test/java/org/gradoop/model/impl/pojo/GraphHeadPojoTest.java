@@ -17,14 +17,13 @@
 
 package org.gradoop.model.impl.pojo;
 
-import com.google.common.collect.Maps;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.api.EPGMProperties;
+import org.gradoop.model.impl.properties.Properties;
 import org.gradoop.util.GConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
-
-import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -42,9 +41,9 @@ public class GraphHeadPojoTest {
   public void createDefaultGraphTest() {
     GradoopId graphID = GradoopId.get();
     String label = "A";
-    Map<String, Object> props = Maps.newHashMapWithExpectedSize(2);
-    props.put("k1", "v1");
-    props.put("k2", "v2");
+    EPGMProperties props = new Properties();
+    props.set("k1", "v1");
+    props.set("k2", "v2");
 
     EPGMGraphHead graphHead =
       new GraphHeadPojoFactory().initGraphHead(graphID, label, props);

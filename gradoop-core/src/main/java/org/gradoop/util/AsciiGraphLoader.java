@@ -26,6 +26,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.properties.Properties;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Graph;
@@ -458,8 +459,7 @@ public class AsciiGraphLoader
    */
   private G initGraphHead(Graph g) {
     G graphHead = config.getGraphHeadFactory().createGraphHead(
-      g.getLabel(),
-      g.getProperties());
+      g.getLabel(), Properties.createfromMap(g.getProperties()));
     graphHeadIds.put(g.getId(), graphHead.getId());
     graphHeads.put(graphHead.getId(), graphHead);
     return graphHead;
@@ -474,7 +474,7 @@ public class AsciiGraphLoader
   private V initVertex(Vertex v) {
     V vertex = config.getVertexFactory().createVertex(
       v.getLabel(),
-      v.getProperties(),
+      Properties.createfromMap(v.getProperties()),
       createGradoopIdSet(v));
     vertexIds.put(v.getId(), vertex.getId());
     vertices.put(vertex.getId(), vertex);
@@ -492,7 +492,7 @@ public class AsciiGraphLoader
         e.getLabel(),
         vertexIds.get(e.getSourceVertexId()),
         vertexIds.get(e.getTargetVertexId()),
-        e.getProperties(),
+        Properties.createfromMap(e.getProperties()),
         createGradoopIdSet(e));
     edgeIds.put(e.getId(), edge.getId());
     edges.put(edge.getId(), edge);

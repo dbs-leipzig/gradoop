@@ -23,13 +23,16 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.api.EPGMProperties;
+import org.gradoop.model.impl.properties.Properties;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.storage.api.ElementHandler;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 
@@ -122,13 +125,18 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Map<String, Object> readProperties(final Result res) {
-    Map<String, Object> properties = new HashMap<>();
+  public EPGMProperties readProperties(final Result res) {
+
+    EPGMProperties properties = new Properties();
+
     for (Map.Entry<byte[], byte[]> propertyColumn : res
       .getFamilyMap(CF_PROPERTIES_BYTES).entrySet()) {
-      properties.put(Bytes.toString(propertyColumn.getKey()),
-        decodeValueFromBytes(propertyColumn.getValue()));
+      properties.set(
+        Bytes.toString(propertyColumn.getKey()),
+        decodeValueFromBytes(propertyColumn.getValue())
+      );
     }
+
     return properties;
   }
 
@@ -177,40 +185,6 @@ public abstract class HBaseElementHandler implements ElementHandler {
   }
 
   /**
-   * Parses an object from a string based on a given type.
-   *
-   * @param type  object type (must be supported by Gradoop)
-   * @param value value as string
-   * @return decoded object
-   */
-  protected Object decodeValueFromString(final byte type, final String value) {
-    Object o;
-    switch (type) {
-    case GConstants.TYPE_BOOLEAN:
-      o = Boolean.parseBoolean(value);
-      break;
-    case GConstants.TYPE_INTEGER:
-      o = Integer.parseInt(value);
-      break;
-    case GConstants.TYPE_LONG:
-      o = Long.parseLong(value);
-      break;
-    case GConstants.TYPE_FLOAT:
-      o = Float.parseFloat(value);
-      break;
-    case GConstants.TYPE_DOUBLE:
-      o = Double.parseDouble(value);
-      break;
-    case GConstants.TYPE_STRING:
-      o = value;
-      break;
-    default:
-      throw new UnsupportedTypeException(value.getClass() + " not supported");
-    }
-    return o;
-  }
-
-  /**
    * Encodes a given value to a byte array with integrated type information.
    *
    * @param value value do encode
@@ -236,8 +210,14 @@ public abstract class HBaseElementHandler implements ElementHandler {
       decodedValue = Bytes
         .add(new byte[]{GConstants.TYPE_DOUBLE}, Bytes.toBytes((Double) value));
     } else if (valueClass.equals(String.class)) {
-      decodedValue = Bytes
-        .add(new byte[]{GConstants.TYPE_STRING}, Bytes.toBytes((String) value));
+      decodedValue = Bytes.add(new byte[] {GConstants.TYPE_STRING},
+        Bytes.toBytes((String) value));
+    } else if (valueClass.equals(BigDecimal.class)) {
+        decodedValue = Bytes.add(new byte[]{GConstants.TYPE_DECIMAL},
+          Bytes.toBytes((BigDecimal) value));
+    } else if (valueClass.equals(BigDecimal.class)) {
+      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_DATE},
+        Bytes.toBytes(((DateTime) value).getMillis()));
     } else {
       throw new UnsupportedTypeException(valueClass + " not supported");
     }
@@ -271,8 +251,14 @@ public abstract class HBaseElementHandler implements ElementHandler {
       case GConstants.TYPE_DOUBLE:
         o = Bytes.toDouble(value);
         break;
+      case GConstants.TYPE_DECIMAL:
+        o = Bytes.toBigDecimal(value);
+        break;
       case GConstants.TYPE_STRING:
         o = Bytes.toString(value);
+        break;
+      case GConstants.TYPE_DATE:
+        o = new DateTime(Bytes.toLong(value));
         break;
       default:
         throw new UnsupportedTypeException(

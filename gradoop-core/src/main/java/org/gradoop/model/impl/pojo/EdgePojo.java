@@ -20,7 +20,7 @@ package org.gradoop.model.impl.pojo;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.api.EPGMProperties;
 
 /**
  * Default transient representation of edge data that is a POJO and can thus be
@@ -58,7 +58,7 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
     final String label,
     final GradoopId sourceId,
     final GradoopId targetId,
-    final Properties properties,
+    final EPGMProperties properties,
     GradoopIdSet graphIds) {
 
     super(id, label, properties, graphIds);

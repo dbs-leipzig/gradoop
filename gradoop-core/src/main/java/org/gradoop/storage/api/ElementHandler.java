@@ -23,10 +23,10 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.api.EPGMProperties;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Handles writing and reading label and properties of an EPGM entity,
@@ -93,7 +93,7 @@ public interface ElementHandler extends Serializable {
    * @param res row result
    * @return all properties contained in the row
    */
-  Map<String, Object> readProperties(final Result res);
+  EPGMProperties readProperties(final Result res);
 
   /**
    * Creates table based on the given table descriptor.

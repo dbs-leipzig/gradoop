@@ -19,9 +19,7 @@ package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.Properties;
-
-import java.util.Map;
+import org.gradoop.model.api.EPGMProperties;
 
 /**
  * Transient representation of a graph.
@@ -42,7 +40,7 @@ public class GraphHeadPojo extends ElementPojo implements EPGMGraphHead {
    * @param properties key-value-map
    */
   GraphHeadPojo(final GradoopId id, final String label,
-    final Properties properties) {
+    final EPGMProperties properties) {
     super(id, label, properties);
   }
 

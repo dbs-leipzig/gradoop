@@ -19,11 +19,9 @@ package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.api.EPGMProperties;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
-
-import java.util.Map;
 
 /**
  * Factory for creating vertices.
@@ -72,7 +70,7 @@ public class VertexPojoFactory extends ElementPojoFactory
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(String label, Properties properties) {
+  public VertexPojo createVertex(String label, EPGMProperties properties) {
     return initVertex(GradoopId.get(), label, properties);
   }
 
@@ -81,7 +79,7 @@ public class VertexPojoFactory extends ElementPojoFactory
    */
   @Override
   public VertexPojo initVertex(final GradoopId vertexID, final String label,
-    Properties properties) {
+    EPGMProperties properties) {
     return initVertex(vertexID, label, properties, null);
   }
 
@@ -106,7 +104,7 @@ public class VertexPojoFactory extends ElementPojoFactory
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(String label, Properties properties,
+  public VertexPojo createVertex(String label, EPGMProperties properties,
     GradoopIdSet graphIds) {
     return initVertex(GradoopId.get(), label, properties, graphIds);
   }
@@ -116,7 +114,7 @@ public class VertexPojoFactory extends ElementPojoFactory
    */
   @Override
   public VertexPojo initVertex(final GradoopId id, final String label,
-    final Properties properties, final GradoopIdSet graphs) {
+    final EPGMProperties properties, final GradoopIdSet graphs) {
     checkId(id);
     checkLabel(label);
     return new VertexPojo(id, label, properties, graphs);

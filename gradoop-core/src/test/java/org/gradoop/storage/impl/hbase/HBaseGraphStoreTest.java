@@ -29,6 +29,8 @@ import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
+import org.gradoop.model.api.EPGMProperties;
+import org.gradoop.model.impl.properties.Properties;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -40,9 +42,7 @@ import org.gradoop.util.GradoopConfig;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.gradoop.GradoopTestUtils.*;
@@ -194,15 +194,15 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
-    final Map<String, Object> properties = new HashMap<>();
-    properties.put("k1", value);
+    EPGMProperties props = new Properties();
+    props.set("k1", value);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);
     final GradoopIdSet graphs = new GradoopIdSet();
     PersistentVertex<EdgePojo> v = persistentVertexFactory
       .createVertex(
-        vertexFactory.initVertex(vertexID, label, properties, graphs),
+        vertexFactory.initVertex(vertexID, label, props, graphs),
         outEdges, inEdges);
 
     graphStore.writeVertex(v);
@@ -238,13 +238,13 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     final GradoopId vertexID = GradoopId.get();
     final String label = "A";
 
-    final Map<String, Object> properties = new HashMap<>();
-    properties.put(keyBoolean, valueBoolean);
-    properties.put(keyInteger, valueInteger);
-    properties.put(keyLong, valueLong);
-    properties.put(keyFloat, valueFloat);
-    properties.put(keyDouble, valueDouble);
-    properties.put(keyString, valueString);
+    EPGMProperties props = new Properties();
+    props.set(keyBoolean, valueBoolean);
+    props.set(keyInteger, valueInteger);
+    props.set(keyLong, valueLong);
+    props.set(keyFloat, valueFloat);
+    props.set(keyDouble, valueDouble);
+    props.set(keyString, valueString);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);
@@ -252,7 +252,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     // write to store
     graphStore.writeVertex(persistentVertexFactory.createVertex(
-      vertexFactory.initVertex(vertexID, label, properties, graphs), outEdges,
+      vertexFactory.initVertex(vertexID, label, props, graphs), outEdges,
       inEdges));
 
     graphStore.flush();

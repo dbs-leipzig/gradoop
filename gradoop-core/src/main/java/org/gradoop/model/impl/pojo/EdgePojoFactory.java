@@ -19,7 +19,7 @@ package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.api.EPGMProperties;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMEdgeFactory;
 
@@ -76,7 +76,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
    */
   @Override
   public EdgePojo createEdge(String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, Properties properties) {
+    GradoopId targetVertexId, EPGMProperties properties) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, properties);
   }
@@ -90,7 +90,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
     String label,
     GradoopId sourceVertexId,
     GradoopId targetVertexId,
-    Properties properties) {
+    EPGMProperties properties) {
 
     return
       initEdge(id, label, sourceVertexId, targetVertexId, properties, null);
@@ -121,7 +121,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
    */
   @Override
   public EdgePojo createEdge(String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, Properties properties,
+    GradoopId targetVertexId, EPGMProperties properties,
     GradoopIdSet graphIds) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, properties, graphIds);
@@ -133,7 +133,7 @@ public class EdgePojoFactory extends ElementPojoFactory implements
   @Override
   public EdgePojo initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
-    final Properties properties, GradoopIdSet graphIds) {
+    final EPGMProperties properties, GradoopIdSet graphIds) {
     checkId(id);
     checkLabel(label);
     checkId(sourceVertexId);

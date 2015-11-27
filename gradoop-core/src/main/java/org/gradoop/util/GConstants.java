@@ -117,4 +117,12 @@ public final class GConstants {
    * {@code <property-type>} for {@link java.lang.String}
    */
   public static final byte TYPE_STRING = 0x05;
+  /**
+   * {@code <property-type>} for {@link java.math.BigDecimal}
+   */
+  public static final byte TYPE_DECIMAL = 0x06;
+  /**
+   * {@code <property-type>} for {@link java.util.Date}
+   */
+  public static final byte TYPE_DATE = 0x07;
 }

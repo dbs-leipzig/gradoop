@@ -17,9 +17,6 @@
 
 package org.gradoop.model.api;
 
-import org.gradoop.model.impl.properties.Properties;
-import org.gradoop.model.impl.properties.Property;
-
 
 /**
  * Used to describe entities that store a set of properties, where each property
@@ -32,7 +29,7 @@ public interface EPGMAttributed {
    *
    * @return properties
    */
-  org.gradoop.model.impl.properties.Properties getProperties();
+  EPGMProperties getProperties();
 
   /**
    * Returns all property keys of that entity or {@code null} it that entity has
@@ -49,14 +46,14 @@ public interface EPGMAttributed {
    * @param key property key
    * @return property value or {@code null} if {@code key} does not exist
    */
-  Property getProperty(String key);
+  EPGMProperty getProperty(String key);
 
   /**
    * Sets the given properties as new properties.
    *
    * @param properties new properties
    */
-  void setProperties(Properties properties);
+  void setProperties(EPGMProperties properties);
 
   /**
    * Adds a given property to that entity. If {@code key} does not exist, it
@@ -64,7 +61,7 @@ public interface EPGMAttributed {
    * given value.
    *
    */
-  void setProperty(Property property);
+  void setProperty(EPGMProperty property);
 
   /**
    * Returns the number of properties stored at that entity.

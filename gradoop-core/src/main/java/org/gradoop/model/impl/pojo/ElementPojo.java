@@ -2,9 +2,9 @@ package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.api.EPGMProperties;
+import org.gradoop.model.api.EPGMProperty;
 import org.gradoop.model.impl.properties.Properties;
-import org.gradoop.model.impl.properties.PropertiesPojo;
-import org.gradoop.model.impl.properties.Property;
 
 /**
  * Abstract base class for graphs, vertices and edges.
@@ -23,7 +23,7 @@ public abstract class ElementPojo implements EPGMElement {
   /**
    * Internal property storage
    */
-  protected Properties properties;
+  protected EPGMProperties properties;
 
   /**
    * Default constructor.
@@ -39,7 +39,7 @@ public abstract class ElementPojo implements EPGMElement {
    * @param properties key-value properties
    */
   protected ElementPojo(
-    GradoopId id, String label, Properties properties) {
+    GradoopId id, String label, EPGMProperties properties) {
     this.id = id;
     this.label = label;
     this.properties = properties;
@@ -80,7 +80,7 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public Properties getProperties() {
+  public EPGMProperties getProperties() {
     return properties;
   }
 
@@ -96,15 +96,15 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public Property getProperty(String key) {
-    return (properties != null) ? properties.getProperty(key) : null;
+  public EPGMProperty getProperty(String key) {
+    return (properties != null) ? properties.get(key) : null;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setProperties(Properties properties) {
+  public void setProperties(EPGMProperties properties) {
     this.properties = properties;
   }
 
@@ -112,14 +112,14 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public void setProperty(Property property) {
+  public void setProperty(EPGMProperty property) {
     if (property == null) {
       throw new IllegalArgumentException("property must not be null or empty");
     }
     if (this.properties == null) {
-      this.properties = new PropertiesPojo();
+      this.properties = new Properties();
     }
-    this.properties.setProperty(property);
+    this.properties.set(property);
   }
 
   @Override

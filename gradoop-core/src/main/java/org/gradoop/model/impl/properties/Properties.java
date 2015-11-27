@@ -17,24 +17,87 @@
 
 package org.gradoop.model.impl.properties;
 
-public interface Properties extends Iterable<Property>, Comparable<Properties> {
+import com.google.common.collect.Lists;
+import org.gradoop.model.api.EPGMProperties;
+import org.gradoop.model.api.EPGMProperty;
 
-  boolean hasKey(String key);
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-  Property getProperty(String key);
+public class Properties implements EPGMProperties {
 
-  void setProperty(Property property);
+  private List<Property> properties;
 
-  void setProperty(String key, Object value);
+  public Properties() {
+    properties = Lists.newArrayList();
+  }
 
-  void setProperty(String key, Integer value);
+  public List<Property> getProperties() {
+    return properties;
+  }
 
-  // ...
+  public void setProperties(List<Property> properties) {
+    this.properties = properties;
+  }
 
-  Iterable<String> getKeys();
+  @Override
+  public boolean hasKey(String key) {
+    return false;
+  }
 
-  int size();
+  @Override
+  public EPGMProperty get(String key) {
+    return null;
+  }
 
-  boolean isEmpty();
+  @Override
+  public void set(EPGMProperty property) {
 
+  }
+
+  @Override
+  public void set(String key, Object value) {
+
+  }
+
+  @Override
+  public void set(String key, Integer value) {
+
+  }
+
+  @Override
+  public Iterable<String> getKeys() {
+    return null;
+  }
+
+  @Override
+  public int size() {
+    return 0;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
+  }
+
+  @Override
+  public int compareTo(EPGMProperties o) {
+    return 0;
+  }
+
+  @Override
+  public Iterator<EPGMProperty> iterator() {
+    return null;
+  }
+
+  public static EPGMProperties createfromMap(Map<String, Object> map) {
+    EPGMProperties properties = new Properties();
+
+    for(Map.Entry<String, Object> entry : map.entrySet()) {
+      properties.set(entry.getKey(), entry.getValue());
+    }
+
+    return properties;
+  }
 }

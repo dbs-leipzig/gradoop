@@ -3,7 +3,7 @@ package org.gradoop.model.impl.pojo;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.api.EPGMProperties;
 
 /**
  * Abstract class representing an EPGM element that is containd in logical
@@ -31,7 +31,7 @@ public abstract class GraphElementPojo extends ElementPojo implements
    * @param graphIds     graphIds that element is contained in
    */
   protected GraphElementPojo(GradoopId id, String label,
-    Properties properties, GradoopIdSet graphIds) {
+    EPGMProperties properties, GradoopIdSet graphIds) {
     super(id, label, properties);
     this.graphIds = graphIds;
   }
