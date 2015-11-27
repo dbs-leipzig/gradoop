@@ -17,7 +17,9 @@
 
 package org.gradoop.model.api;
 
-import java.util.Map;
+import org.gradoop.model.impl.properties.Property;
+
+import java.util.Properties;
 
 /**
  * Used to describe entities that store a set of properties, where each property
@@ -30,7 +32,7 @@ public interface EPGMAttributed {
    *
    * @return properties
    */
-  Map<String, Object> getProperties();
+  Properties getProperties();
 
   /**
    * Returns all property keys of that entity or {@code null} it that entity has
@@ -47,35 +49,22 @@ public interface EPGMAttributed {
    * @param key property key
    * @return property value or {@code null} if {@code key} does not exist
    */
-  Object getProperty(String key);
-
-  /**
-   * Returns the value referenced by the given key or {@code null} if the key
-   * does not exist.
-   *
-   * @param key  property key
-   * @param type property value class
-   * @param <T>  property type
-   * @return property value or {@code null} if {@code key} does not exist
-   */
-  <T> T getProperty(String key, Class<T> type);
+  Property getProperty(String key);
 
   /**
    * Sets the given properties as new properties.
    *
    * @param properties new properties
    */
-  void setProperties(Map<String, Object> properties);
+  void setProperties(Properties properties);
 
   /**
    * Adds a given property to that entity. If {@code key} does not exist, it
    * will be created, if it exists, the value will be overwritten by the
    * given value.
    *
-   * @param key   property key
-   * @param value property value
    */
-  void setProperty(String key, Object value);
+  void setProperty(Property property);
 
   /**
    * Returns the number of properties stored at that entity.
