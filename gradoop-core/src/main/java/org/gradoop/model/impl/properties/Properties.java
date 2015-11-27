@@ -20,20 +20,22 @@ package org.gradoop.model.impl.properties;
 import com.google.common.collect.Lists;
 import org.gradoop.model.api.EPGMProperties;
 import org.gradoop.model.api.EPGMProperty;
+import org.gradoop.model.api.EPGMPropertyValue;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class Properties implements EPGMProperties {
 
-  private List<Property> properties;
+  private Collection<Property> properties;
 
   public Properties() {
     properties = Lists.newArrayList();
   }
 
-  public List<Property> getProperties() {
+  public Collection<Property> getProperties() {
     return properties;
   }
 
@@ -41,14 +43,27 @@ public class Properties implements EPGMProperties {
     this.properties = properties;
   }
 
+  /**
+   * TODO key cache, value cache
+   *
+   * @param key
+   * @return
+   */
   @Override
   public boolean hasKey(String key) {
-    return false;
+    return get(key) != null;
   }
 
   @Override
-  public EPGMProperty get(String key) {
-    return null;
+  public EPGMPropertyValue get(String key) {
+    EPGMPropertyValue result = null;
+    for (Property property : properties) {
+      if (property.getKey().equals(key)) {
+        result = property.getValue();
+        break;
+      }
+    }
+    return result;
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.EPGMPropertyValue;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.api.EPGMProperties;
 import org.gradoop.model.api.EPGMProperty;
@@ -96,7 +97,7 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public EPGMProperty getProperty(String key) {
+  public EPGMPropertyValue getProperty(String key) {
     return (properties != null) ? properties.get(key) : null;
   }
 

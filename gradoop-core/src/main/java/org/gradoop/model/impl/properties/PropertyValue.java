@@ -15,26 +15,34 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
+package org.gradoop.model.impl.properties;
 
-public interface EPGMProperties extends Iterable<EPGMProperty>, Comparable<EPGMProperties> {
+import org.gradoop.model.api.EPGMPropertyValue;
 
-  boolean hasKey(String key);
+public class PropertyValue implements EPGMPropertyValue {
 
-  EPGMPropertyValue get(String key);
 
-  void set(EPGMProperty property);
+  public static PropertyValue create(Object value) {
+    return null;
+  }
 
-  void set(String key, Object value);
+  @Override
+  public Object get() {
+    return null;
+  }
 
-  void set(String key, Integer value);
+  @Override
+  public void set(Object value) {
 
-  // ...
+  }
 
-  Iterable<String> getKeys();
+  @Override
+  public Integer getInt() {
+    return null;
+  }
 
-  int size();
+  @Override
+  public void setInt(Integer value) {
 
-  boolean isEmpty();
-
+  }
 }

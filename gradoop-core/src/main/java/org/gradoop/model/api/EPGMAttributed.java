@@ -17,7 +17,6 @@
 
 package org.gradoop.model.api;
 
-
 /**
  * Used to describe entities that store a set of properties, where each property
  * is defined by a property key and a property value.
@@ -46,7 +45,7 @@ public interface EPGMAttributed {
    * @param key property key
    * @return property value or {@code null} if {@code key} does not exist
    */
-  EPGMProperty getProperty(String key);
+  EPGMPropertyValue getProperty(String key);
 
   /**
    * Sets the given properties as new properties.

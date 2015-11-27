@@ -215,7 +215,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
     } else if (valueClass.equals(BigDecimal.class)) {
         decodedValue = Bytes.add(new byte[]{GConstants.TYPE_DECIMAL},
           Bytes.toBytes((BigDecimal) value));
-    } else if (valueClass.equals(BigDecimal.class)) {
+    } else if (valueClass.equals(DateTime.class)) {
       decodedValue = Bytes.add(new byte[]{GConstants.TYPE_DATE},
         Bytes.toBytes(((DateTime) value).getMillis()));
     } else {

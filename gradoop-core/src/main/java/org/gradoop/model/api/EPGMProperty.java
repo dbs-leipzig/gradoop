@@ -21,17 +21,6 @@ public interface EPGMProperty extends Comparable<EPGMProperty> {
 
   String getKey();
 
-  boolean hasKey(String key);
-
-  Object getValue();
-
-  void setValue(Object value);
-
-  Integer getIntValue();
-
-  void setIntValue(Integer value);
-
-  // ...
-
+  EPGMPropertyValue getValue();
 
 }

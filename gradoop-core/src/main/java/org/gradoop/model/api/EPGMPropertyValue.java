@@ -17,24 +17,15 @@
 
 package org.gradoop.model.api;
 
-public interface EPGMProperties extends Iterable<EPGMProperty>, Comparable<EPGMProperties> {
+public interface EPGMPropertyValue {
 
-  boolean hasKey(String key);
+  Object get();
 
-  EPGMPropertyValue get(String key);
+  void set(Object value);
 
-  void set(EPGMProperty property);
+  Integer getInt();
 
-  void set(String key, Object value);
-
-  void set(String key, Integer value);
+  void setInt(Integer value);
 
   // ...
-
-  Iterable<String> getKeys();
-
-  int size();
-
-  boolean isEmpty();
-
 }
