@@ -4,7 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.model.GraphCollection;
 
 /**
  * Creates a (usually 1-element) Boolean dataset based on two input graphs.

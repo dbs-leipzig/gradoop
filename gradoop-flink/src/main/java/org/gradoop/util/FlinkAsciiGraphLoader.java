@@ -3,9 +3,9 @@ package org.gradoop.util;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.EPGMDatabase;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.model.EPGMDatabase;
+import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.model.LogicalGraph;
 
 import java.io.IOException;
 import java.util.Collection;

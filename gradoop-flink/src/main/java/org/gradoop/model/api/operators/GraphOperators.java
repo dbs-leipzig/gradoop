@@ -21,8 +21,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.model.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.model.GraphCollection;
 
 /**
  * Operators that are available at all graph structures.
@@ -30,7 +31,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <VD> EPGM vertex type
  * @param <ED> EPGM edge type
  * @see LogicalGraph
- * @see org.gradoop.model.impl.GraphCollection
+ * @see GraphCollection
  */
 public interface GraphOperators<
   VD extends EPGMVertex,

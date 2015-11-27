@@ -21,8 +21,8 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.functions.api.UnaryFunction;
 import org.gradoop.model.impl.functions.epgm.Clone;
 
 /**

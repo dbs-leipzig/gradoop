@@ -18,13 +18,15 @@
 package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.functions.api.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.split.Split;
+import org.gradoop.model.impl.operators.split.SplitWithOverlap;
 
 /**
  * Given a vertex, the method returns the community id, that vertex is in. This
- * is used by {@link org.gradoop.model.impl.operators.auxiliary.SplitBy} and
- * {@link org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy}.
+ * is used by {@link Split} and
+ * {@link SplitWithOverlap}.
  *
  * @param <VD> EPGM vertex type
  */

@@ -20,13 +20,11 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.functions.Predicate;
-import org.gradoop.model.impl.functions.UnaryFunction;
-import org.gradoop.model.impl.operators.logicalgraph.unary.aggregation
-  .AggregateFunction;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
+import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.functions.api.Predicate;
+import org.gradoop.model.impl.functions.api.UnaryFunction;
+import org.gradoop.model.impl.operators.summarization.Summarization;
 
 /**
  * Describes all operators that can be applied on a single logical graph in the
@@ -288,7 +286,7 @@ public interface LogicalGraphOperators
   LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph);
 
   /*
-  auxiliary operators
+  split operators
    */
 
   /**

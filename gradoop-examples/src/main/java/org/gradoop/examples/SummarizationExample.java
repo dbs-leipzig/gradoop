@@ -25,13 +25,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.EPGMDatabase;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.Summarization;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.SummarizationGroupCombine;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.SummarizationGroupMap;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization.SummarizationGroupSort;
-import org.gradoop.model.impl.operators.logicalgraph.unary.summarization
+import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.model.EPGMDatabase;
+import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupCombine;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupMap;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupSort;
+import org.gradoop.model.impl.operators.summarization
   .SummarizationGroupWithLists;
 
 /**

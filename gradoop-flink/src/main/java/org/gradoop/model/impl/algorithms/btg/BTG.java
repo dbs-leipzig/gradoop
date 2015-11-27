@@ -9,8 +9,8 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.model.GraphCollection;
+import org.gradoop.model.impl.model.LogicalGraph;
 import org.gradoop.model.impl.algorithms.btg.functions.BTGJoin;
 import org.gradoop.model.impl.algorithms.btg.functions.BTGKeySelector;
 import org.gradoop.model.impl.algorithms.btg.functions.EdgeToBTGEdgeMapper;
@@ -20,7 +20,7 @@ import org.gradoop.model.impl.algorithms.btg.functions.VertexToBTGVertexMapper;
 import org.gradoop.model.impl.algorithms.btg.pojos.BTGVertexValue;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.auxiliary.OverlapSplitBy;
+import org.gradoop.model.impl.operators.split.SplitWithOverlap;
 
 /**
  * BTG Graph to Collection Operator.
@@ -84,7 +84,7 @@ public class BTG<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGrap
       .fromDataSets(null, btgLabeledVertices, graph.getEdges(), graph.getConfig());
 
     // create collection from result and return
-    return new OverlapSplitBy<VD, ED, GD>(
+    return new SplitWithOverlap<GD, VD, ED>(
       new LongListFromPropertyFunction<VD>(VERTEX_BTGIDS_PROPERTYKEY))
       .execute(btgEPGraph);
   }

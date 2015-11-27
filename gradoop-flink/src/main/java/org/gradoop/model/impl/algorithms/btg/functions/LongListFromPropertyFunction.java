@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.algorithms.btg.functions;
 
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.UnaryFunction;
+import org.gradoop.model.impl.functions.api.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.List;

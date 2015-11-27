@@ -27,8 +27,8 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.model.LogicalGraph;
+import org.gradoop.model.impl.model.GraphCollection;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
   .CommunityDiscriminatorFunction;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions
@@ -41,7 +41,7 @@ import org.gradoop.model.impl.algorithms.labelpropagation.functions
 import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.auxiliary.SplitBy;
+import org.gradoop.model.impl.operators.split.Split;
 
 /**
  * LabelPropagation Graph to Collection Operator.
@@ -117,7 +117,7 @@ public class LabelPropagation<
         logicalGraph.getConfig());
 
     // and split it into a collection according the result
-    return new SplitBy<VD, ED, GD>(
+    return new Split<GD, VD, ED>(
       new CommunityDiscriminatorFunction<VD>(propertyKey))
       .execute(labeledGraph);
   }

@@ -19,8 +19,8 @@ package org.gradoop.io.json;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.EPGMDatabase;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.model.EPGMDatabase;
+import org.gradoop.model.impl.model.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
