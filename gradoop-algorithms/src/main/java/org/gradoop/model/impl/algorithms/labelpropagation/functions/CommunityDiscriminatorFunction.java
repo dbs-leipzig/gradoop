@@ -49,7 +49,7 @@ public class CommunityDiscriminatorFunction<VD extends EPGMVertex> implements
 
   @Override
   public GradoopId execute(VD entity) throws Exception {
-    Object val = entity.getProperty(propertyKey);
+    Object val = entity.getPropertyValue(propertyKey);
 
     if (val != null && val instanceof GradoopId) {
       return (GradoopId) val;

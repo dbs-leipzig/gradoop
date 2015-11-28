@@ -20,30 +20,47 @@ package org.gradoop.model.impl.properties;
 import org.gradoop.model.api.EPGMProperty;
 import org.gradoop.model.api.EPGMPropertyValue;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Default property implementation.
+ */
 public class Property implements EPGMProperty {
 
+  /**
+   * Property key
+   */
   private String key;
 
+  /**
+   * Property value
+   */
   private EPGMPropertyValue value;
 
+  /**
+   * Creates a new property.
+   */
   public Property() {
   }
 
+  /**
+   * Creates a new property from the given arguments.
+   *
+   * @param key   property key
+   * @param value property value
+   */
   Property(String key, EPGMPropertyValue value) {
+    checkNotNull(key, "Property key was null");
+    checkNotNull(value, "Property value was null");
+    checkArgument(!key.isEmpty(), "Property key was empty");
     this.key = key;
     this.value = value;
   }
-
-  // ...
-
-  public static EPGMProperty createProperty(String key, Object value) {
-    return new Property(key, PropertyValue.create(value));
-  }
-
-  // ...
 
   @Override
   public String getKey() {
@@ -51,15 +68,58 @@ public class Property implements EPGMProperty {
   }
 
   @Override
+  public void setKey(String key) {
+    checkNotNull(key, "Property key was null");
+    checkArgument(!key.isEmpty(), "Property key was empty");
+    this.key = key;
+  }
+
+  @Override
   public EPGMPropertyValue getValue() {
     return value;
   }
 
+  @Override
+  public void setValue(EPGMPropertyValue value) {
+    this.value = checkNotNull(value, "Property value was null");
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    Property property = (Property) o;
+
+    return key.equals(property.key) && value.equals(property.value);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = key.hashCode();
+    result = 31 * result + value.hashCode();
+    return result;
+  }
 
   @Override
   public int compareTo(EPGMProperty o) {
-    return 0;
+    return this.getKey().compareTo(o.getKey());
   }
 
+  @Override
+  public void write(DataOutput dataOutput) throws IOException {
+    dataOutput.writeUTF(key);
+    value.write(dataOutput);
+  }
 
+  @Override
+  public void readFields(DataInput dataInput) throws IOException {
+    key = dataInput.readUTF();
+    value = new PropertyValue();
+    value.readFields(dataInput);
+  }
 }

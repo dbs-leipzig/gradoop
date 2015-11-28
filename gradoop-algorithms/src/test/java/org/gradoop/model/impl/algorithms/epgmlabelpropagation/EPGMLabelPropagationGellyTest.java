@@ -103,7 +103,7 @@ package org.gradoop.model.impl.algorithms.epgmlabelpropagation;//package org.gra
 //    Map<GradoopId, GradoopId> result = new HashMap<>();
 //    for (Vertex<GradoopId, VertexPojo> v : graph) {
 //      result.put(v.getId(), (GradoopId) v.getValue()
-//        .getProperty(EPGMLabelPropagationAlgorithm.CURRENT_VALUE));
+//        .getPropertyValue(EPGMLabelPropagationAlgorithm.CURRENT_VALUE));
 //    }
 //    return result;
 //  }

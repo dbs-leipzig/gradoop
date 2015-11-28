@@ -155,8 +155,8 @@ public class GradoopTestUtils {
         String key2 = it2.next();
         assertEquals("property key mismatch", key1, key2);
         assertEquals("property value mismatch",
-          element1.getProperty(key1),
-          element2.getProperty(key2));
+          element1.getPropertyValue(key1),
+          element2.getPropertyValue(key2));
       }
       assertFalse("too many properties in first element", it1.hasNext());
       assertFalse("too many properties in second element", it2.hasNext());

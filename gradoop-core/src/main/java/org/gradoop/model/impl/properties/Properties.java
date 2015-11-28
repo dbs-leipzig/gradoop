@@ -22,32 +22,62 @@ import org.gradoop.model.api.EPGMProperties;
 import org.gradoop.model.api.EPGMProperty;
 import org.gradoop.model.api.EPGMPropertyValue;
 
-import java.util.Collection;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Default implementation for a property collection.
+ */
 public class Properties implements EPGMProperties {
 
-  private Collection<Property> properties;
+  /**
+   * Internal representation
+   */
+  private List<EPGMProperty> properties;
 
+  /**
+   * Default constructor
+   */
   public Properties() {
     properties = Lists.newArrayList();
   }
 
-  public Collection<Property> getProperties() {
+  /**
+   * Creates a new property collection from a given map.
+   *
+   * If map is {@code null} an empty properties instance will be returned.
+   *
+   * @param map key value map
+   * @return Properties
+   */
+  public static EPGMProperties createFromMap(Map<String, Object> map) {
+    EPGMProperties properties = new Properties();
+
+    if (map != null) {
+      for (Map.Entry<String, Object> entry : map.entrySet()) {
+        properties.set(entry.getKey(), PropertyValue.create(entry.getValue()));
+      }
+    }
+
     return properties;
   }
 
-  public void setProperties(List<Property> properties) {
-    this.properties = properties;
+  @Override
+  public Iterable<String> getKeys() {
+    List<String> keys = Lists.newArrayListWithCapacity(size());
+    for (EPGMProperty property : properties) {
+      keys.add(property.getKey());
+    }
+    return keys;
   }
 
   /**
    * TODO key cache, value cache
    *
-   * @param key
-   * @return
    */
   @Override
   public boolean hasKey(String key) {
@@ -57,7 +87,7 @@ public class Properties implements EPGMProperties {
   @Override
   public EPGMPropertyValue get(String key) {
     EPGMPropertyValue result = null;
-    for (Property property : properties) {
+    for (EPGMProperty property : properties) {
       if (property.getKey().equals(key)) {
         result = property.getValue();
         break;
@@ -68,32 +98,38 @@ public class Properties implements EPGMProperties {
 
   @Override
   public void set(EPGMProperty property) {
+    int index = 0;
+    for (EPGMProperty epgmProperty : properties) {
+      if (epgmProperty.getKey().equals(property.getKey())) {
+        break;
+      }
+      index++;
+    }
+    if (index >= size()) {
+      properties.add(property);
+    } else {
+      properties.set(index, property);
+    }
+  }
 
+  @Override
+  public void set(String key, EPGMPropertyValue value) {
+    set(new Property(key, value));
   }
 
   @Override
   public void set(String key, Object value) {
-
-  }
-
-  @Override
-  public void set(String key, Integer value) {
-
-  }
-
-  @Override
-  public Iterable<String> getKeys() {
-    return null;
+    set(key, PropertyValue.create(value));
   }
 
   @Override
   public int size() {
-    return 0;
+    return properties.size();
   }
 
   @Override
   public boolean isEmpty() {
-    return false;
+    return size() == 0;
   }
 
   @Override
@@ -103,16 +139,25 @@ public class Properties implements EPGMProperties {
 
   @Override
   public Iterator<EPGMProperty> iterator() {
-    return null;
+    return properties.iterator();
   }
 
-  public static EPGMProperties createfromMap(Map<String, Object> map) {
-    EPGMProperties properties = new Properties();
-
-    for(Map.Entry<String, Object> entry : map.entrySet()) {
-      properties.set(entry.getKey(), entry.getValue());
+  @Override
+  public void write(DataOutput dataOutput) throws IOException {
+    dataOutput.writeInt(properties.size());
+    for (EPGMProperty property : properties) {
+      property.write(dataOutput);
     }
+  }
 
-    return properties;
+  @Override
+  public void readFields(DataInput dataInput) throws IOException {
+    int propertyCount = dataInput.readInt();
+    properties = Lists.newArrayListWithCapacity(propertyCount);
+    for (int i = 0; i < propertyCount; i++) {
+      EPGMProperty p = new Property();
+      p.readFields(dataInput);
+      properties.add(p);
+    }
   }
 }

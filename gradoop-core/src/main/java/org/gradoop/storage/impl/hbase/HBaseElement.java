@@ -71,8 +71,8 @@ public abstract class HBaseElement<T extends EPGMElement> implements
    * {@inheritDoc}
    */
   @Override
-  public EPGMPropertyValue getProperty(String key) {
-    return epgmElement.getProperty(key);
+  public EPGMPropertyValue getPropertyValue(String key) {
+    return epgmElement.getPropertyValue(key);
   }
 
   /**
@@ -89,6 +89,22 @@ public abstract class HBaseElement<T extends EPGMElement> implements
   @Override
   public void setProperty(EPGMProperty property) {
     epgmElement.setProperty(property);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setProperty(String key, EPGMPropertyValue value) {
+    epgmElement.setProperty(key, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setProperty(String key, Object value) {
+    epgmElement.setProperty(key, value);
   }
 
   /**

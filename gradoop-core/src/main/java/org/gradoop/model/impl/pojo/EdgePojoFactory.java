@@ -24,10 +24,11 @@ import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMEdgeFactory;
 
 /**
- * Factory for creating default edge data.
+ * Factory for creating edge POJOs.
  */
-public class EdgePojoFactory extends ElementPojoFactory implements
-  EPGMEdgeFactory<EdgePojo> {
+public class EdgePojoFactory
+  extends ElementPojoFactory
+  implements EPGMEdgeFactory<EdgePojo> {
 
   /**
    * serial version uid

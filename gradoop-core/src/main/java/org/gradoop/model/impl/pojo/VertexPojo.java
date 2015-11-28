@@ -23,7 +23,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.api.EPGMProperties;
 
 /**
- * Transient representation of a vertex.
+ * POJO Implementation of an EPGM vertex.
  */
 public class VertexPojo extends GraphElementPojo implements EPGMVertex {
 

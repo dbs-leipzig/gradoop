@@ -52,11 +52,11 @@ public class LPUpdateFunction<VD extends EPGMVertex>
       setNewVertexValue(vertex.getValue());
     } else {
       GradoopId currentCommunity =
-        (GradoopId) vertex.getValue().getProperty(CURRENT_VALUE);
+        (GradoopId) vertex.getValue().getPropertyValue(CURRENT_VALUE);
       GradoopId lastCommunity =
-        (GradoopId) vertex.getValue().getProperty(LAST_VALUE);
+        (GradoopId) vertex.getValue().getPropertyValue(LAST_VALUE);
       int stabilizationRound =
-        (int) vertex.getValue().getProperty(STABILIZATION_COUNTER);
+        (int) vertex.getValue().getPropertyValue(STABILIZATION_COUNTER);
       GradoopId newCommunity = getNewCommunity(vertex, msg);
       boolean changed = !currentCommunity.equals(newCommunity);
       boolean lastEqualsNew = lastCommunity.equals(newCommunity);
@@ -67,7 +67,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
         vertex.getValue()
           .setProperty(STABILIZATION_COUNTER, stabilizationRound);
         boolean maximalChanges = stabilizationRound <=
-          (int) vertex.getValue().getProperty(STABILIZATION_MAX);
+          (int) vertex.getValue().getPropertyValue(STABILIZATION_MAX);
         if (maximalChanges) {
           vertex.getValue().setProperty(LAST_VALUE, currentCommunity);
           vertex.getValue().setProperty(CURRENT_VALUE, newCommunity);
@@ -76,7 +76,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
           vertex.getValue().setProperty(CURRENT_VALUE,
             GradoopIds.min(currentCommunity, newCommunity));
           vertex.getValue().setProperty(LAST_VALUE,
-            vertex.getValue().getProperty(CURRENT_VALUE));
+            vertex.getValue().getPropertyValue(CURRENT_VALUE));
           setNewVertexValue(vertex.getValue());
         }
       }
@@ -129,7 +129,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
    */
   private GradoopId readCurrentCommunity(Vertex<GradoopId, VD> vertex) {
     return GradoopId.fromString(
-      (String) vertex.getValue().getProperty(CURRENT_VALUE));
+      (String) vertex.getValue().getPropertyValue(CURRENT_VALUE));
   }
 
   /**

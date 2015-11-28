@@ -471,10 +471,10 @@ public abstract class Summarization<
       String groupPropertyValue = null;
 
       boolean hasProperty =
-        useProperty && (e.getValue().getProperty(groupPropertyKey) != null);
+        useProperty && (e.getValue().getPropertyValue(groupPropertyKey) != null);
       if (useProperty && hasProperty) {
         groupPropertyValue =
-          e.getValue().getProperty(groupPropertyKey).toString();
+          e.getValue().getPropertyValue(groupPropertyKey).toString();
       } else if (useProperty) {
         groupPropertyValue = NULL_VALUE;
       }

@@ -459,7 +459,7 @@ public class AsciiGraphLoader
    */
   private G initGraphHead(Graph g) {
     G graphHead = config.getGraphHeadFactory().createGraphHead(
-      g.getLabel(), Properties.createfromMap(g.getProperties()));
+      g.getLabel(), Properties.createFromMap(g.getProperties()));
     graphHeadIds.put(g.getId(), graphHead.getId());
     graphHeads.put(graphHead.getId(), graphHead);
     return graphHead;
@@ -474,7 +474,7 @@ public class AsciiGraphLoader
   private V initVertex(Vertex v) {
     V vertex = config.getVertexFactory().createVertex(
       v.getLabel(),
-      Properties.createfromMap(v.getProperties()),
+      Properties.createFromMap(v.getProperties()),
       createGradoopIdSet(v));
     vertexIds.put(v.getId(), vertex.getId());
     vertices.put(vertex.getId(), vertex);
@@ -492,7 +492,7 @@ public class AsciiGraphLoader
         e.getLabel(),
         vertexIds.get(e.getSourceVertexId()),
         vertexIds.get(e.getTargetVertexId()),
-        Properties.createfromMap(e.getProperties()),
+        Properties.createFromMap(e.getProperties()),
         createGradoopIdSet(e));
     edgeIds.put(e.getId(), edge.getId());
     edges.put(edge.getId(), edge);

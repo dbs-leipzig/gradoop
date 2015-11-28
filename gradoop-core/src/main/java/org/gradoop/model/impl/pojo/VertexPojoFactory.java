@@ -24,9 +24,10 @@ import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 
 /**
- * Factory for creating vertices.
+ * Factory for creating vertex POJOs.
  */
-public class VertexPojoFactory extends ElementPojoFactory
+public class VertexPojoFactory
+  extends ElementPojoFactory
   implements EPGMVertexFactory<VertexPojo> {
 
   /**

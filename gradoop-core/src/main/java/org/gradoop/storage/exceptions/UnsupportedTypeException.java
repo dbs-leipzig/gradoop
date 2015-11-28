@@ -30,4 +30,13 @@ public class UnsupportedTypeException extends RuntimeException {
   public UnsupportedTypeException(String message) {
     super(message);
   }
+
+  /**
+   * Creates a new exception with information about the given class.
+   *
+   * @param clazz unsupported class
+   */
+  public UnsupportedTypeException(Class clazz) {
+    super(String.format("Unsupported type: %s", clazz.getCanonicalName()));
+  }
 }

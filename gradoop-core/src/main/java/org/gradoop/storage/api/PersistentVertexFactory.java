@@ -22,10 +22,11 @@ public interface PersistentVertexFactory<VD extends EPGMVertex, ED
    * Creates vertex data based on the given parameters.
    *
    * @param inputVertexData input vertex data
-   * @param outgoingEdgeIds outgoing edge identifiers
-   * @param incomingEdgeIds incoming edge identifiers
+   * @param outgoingEdges outgoing edge identifiers
+   * @param incomingEdges incoming edge identifiers
    * @return persistent vertex data
    */
-  PVD createVertex(VD inputVertexData, Set<ED> outgoingEdgeIds,
-    Set<ED> incomingEdgeIds);
+  PVD createVertex(VD inputVertexData,
+    Set<ED> outgoingEdges,
+    Set<ED> incomingEdges);
 }

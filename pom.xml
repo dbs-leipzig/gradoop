@@ -72,6 +72,7 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>1.10.19</dep.mockito.version>
+        <dep.pig.version>0.15.0</dep.pig.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
 
@@ -249,6 +250,12 @@
                 <groupId>org.s1ck</groupId>
                 <artifactId>gdl</artifactId>
                 <version>${dep.gdl.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.pig</groupId>
+                <artifactId>pig</artifactId>
+                <version>${dep.pig.version}</version>
             </dependency>
 
             <dependency>

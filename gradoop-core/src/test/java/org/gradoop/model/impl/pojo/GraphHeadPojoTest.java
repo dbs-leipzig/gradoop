@@ -51,8 +51,8 @@ public class GraphHeadPojoTest {
     assertThat(graphHead.getId(), is(graphID));
     assertEquals(label, graphHead.getLabel());
     assertThat(graphHead.getPropertyCount(), is(2));
-    assertThat(graphHead.getProperty("k1"), Is.<Object>is("v1"));
-    assertThat(graphHead.getProperty("k2"), Is.<Object>is("v2"));
+    assertThat(graphHead.getPropertyValue("k1").getString(), Is.<Object>is("v1"));
+    assertThat(graphHead.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
   }
 
   @Test

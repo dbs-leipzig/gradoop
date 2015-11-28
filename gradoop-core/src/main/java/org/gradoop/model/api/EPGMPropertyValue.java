@@ -17,15 +17,79 @@
 
 package org.gradoop.model.api;
 
-public interface EPGMPropertyValue {
+import org.apache.hadoop.io.WritableComparable;
+import org.joda.time.DateTime;
 
-  Object get();
+import java.math.BigDecimal;
 
-  void set(Object value);
+public interface EPGMPropertyValue
+  extends WritableComparable<EPGMPropertyValue> {
 
-  Integer getInt();
+  // generic
+
+  void setObject(Object value);
+
+  // boolean
+
+  boolean isBoolean();
+
+  boolean getBoolean();
+
+  void setBoolean(Boolean value);
+
+  // int
+
+  boolean isInt();
+
+  int getInt();
 
   void setInt(Integer value);
 
-  // ...
+  // long
+
+  boolean isLong();
+
+  long getLong();
+
+  void setLong(Long value);
+
+  // float
+
+  boolean isFloat();
+
+  float getFloat();
+
+  void setFloat(Float value);
+
+  // double
+
+  boolean isDouble();
+
+  double getDouble();
+
+  void setDouble(Double value);
+
+  // string
+
+  boolean isString();
+
+  String getString();
+
+  void setString(String value);
+
+  // big decimal
+
+  boolean isBigDecimal();
+
+  BigDecimal getBigDecimal();
+
+  void setBigDecimal(BigDecimal value);
+
+  // DateTime
+
+  boolean isDateTime();
+
+  DateTime getDateTime();
+
+  void setDateTime(DateTime value);
 }

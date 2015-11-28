@@ -92,37 +92,4 @@ public final class GConstants {
    * Default cache size for scans in HBase.
    */
   public static final int HBASE_DEFAULT_SCAN_CACHE_SIZE = 500;
-
-  /**
-   * {@code <property-type>} for {@link java.lang.Boolean}
-   */
-  public static final byte TYPE_BOOLEAN = 0x00;
-  /**
-   * {@code <property-type>} for {@link java.lang.Integer}
-   */
-  public static final byte TYPE_INTEGER = 0x01;
-  /**
-   * {@code <property-type>} for {@link java.lang.Long}
-   */
-  public static final byte TYPE_LONG = 0x02;
-  /**
-   * {@code <property-type>} for {@link java.lang.Float}
-   */
-  public static final byte TYPE_FLOAT = 0x03;
-  /**
-   * {@code <property-type>} for {@link java.lang.Double}
-   */
-  public static final byte TYPE_DOUBLE = 0x04;
-  /**
-   * {@code <property-type>} for {@link java.lang.String}
-   */
-  public static final byte TYPE_STRING = 0x05;
-  /**
-   * {@code <property-type>} for {@link java.math.BigDecimal}
-   */
-  public static final byte TYPE_DECIMAL = 0x06;
-  /**
-   * {@code <property-type>} for {@link java.util.Date}
-   */
-  public static final byte TYPE_DATE = 0x07;
 }

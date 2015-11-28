@@ -61,8 +61,8 @@ public class VertexPojoTest {
     assertThat(vertex.getId(), is(vertexID));
     assertEquals(label, vertex.getLabel());
     assertThat(vertex.getPropertyCount(), is(2));
-    assertThat(vertex.getProperty("k1"), Is.<Object>is("v1"));
-    assertThat(vertex.getProperty("k2"), Is.<Object>is("v2"));
+    assertThat(vertex.getPropertyValue("k1").getString(), Is.<Object>is("v1"));
+    assertThat(vertex.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
     assertThat(vertex.getGraphCount(), is(2));
     assertTrue(vertex.getGraphIds().contains(graphId1));
     assertTrue(vertex.getGraphIds().contains(graphId2));

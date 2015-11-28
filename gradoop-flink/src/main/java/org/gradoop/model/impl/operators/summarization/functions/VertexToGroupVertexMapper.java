@@ -100,10 +100,10 @@ public class VertexToGroupVertexMapper<VD extends EPGMVertex> implements
    * @return property value, default value or {@code null}
    */
   private String getGroupPropertyValue(VD vertexData) {
-    boolean hasProperty = vertexData.getProperty(groupPropertyKey) != null;
+    boolean hasProperty = vertexData.getPropertyValue(groupPropertyKey) != null;
     String returnValue = null;
     if (useProperty && hasProperty) {
-      returnValue = vertexData.getProperty(groupPropertyKey).toString();
+      returnValue = vertexData.getPropertyValue(groupPropertyKey).toString();
     } else if (useProperty) {
       returnValue = Summarization.NULL_VALUE;
     }

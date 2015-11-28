@@ -436,16 +436,16 @@ public class LogicalGraph
 //  /**
 //   * {@inheritDoc}
 //   */
-//  public Object getProperty(String key) {
-//    return graphId.getProperty(key);
+//  public Object getPropertyValue(String key) {
+//    return graphId.getPropertyValue(key);
 //  }
 //
 //  /**
 //   * {@inheritDoc}
 //   */
 //  @Override
-//  public <T> T getProperty(String key, Class<T> type) {
-//    return graphId.getProperty(key, type);
+//  public <T> T getPropertyValue(String key, Class<T> type) {
+//    return graphId.getPropertyValue(key, type);
 //  }
 //
 //  /**

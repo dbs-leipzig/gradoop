@@ -6,11 +6,12 @@ import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.api.EPGMProperties;
 
 /**
- * Abstract class representing an EPGM element that is containd in logical
- * graphIds (i.e., vertices and edge).
+ * Abstract class representing an EPGM element that is contained in a logical
+ * graph (i.e. vertices and edges).
  */
-public abstract class GraphElementPojo extends ElementPojo implements
-  EPGMGraphElement {
+public abstract class GraphElementPojo
+  extends ElementPojo
+  implements EPGMGraphElement {
 
   /**
    * Set of graph identifiers that element is contained in

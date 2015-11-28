@@ -23,9 +23,11 @@ import org.gradoop.model.api.EPGMProperties;
 import org.gradoop.util.GConstants;
 
 /**
- * Factory for creating graph data.
+ * Factory for creating graph head POJOs.
  */
-public class GraphHeadPojoFactory extends ElementPojoFactory implements EPGMGraphHeadFactory<GraphHeadPojo> {
+public class GraphHeadPojoFactory
+  extends ElementPojoFactory
+  implements EPGMGraphHeadFactory<GraphHeadPojo> {
 
   /**
    * serial version uid

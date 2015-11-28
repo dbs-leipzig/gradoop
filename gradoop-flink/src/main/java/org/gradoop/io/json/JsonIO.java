@@ -175,7 +175,7 @@ public abstract class JsonIO {
       JSONObject data = new JSONObject();
       if (entity.getPropertyCount() > 0) {
         for (String propertyKey : entity.getPropertyKeys()) {
-          data.put(propertyKey, entity.getProperty(propertyKey));
+          data.put(propertyKey, entity.getPropertyValue(propertyKey));
         }
       }
       return data;

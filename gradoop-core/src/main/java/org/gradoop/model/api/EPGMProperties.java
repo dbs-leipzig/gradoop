@@ -17,21 +17,43 @@
 
 package org.gradoop.model.api;
 
-public interface EPGMProperties extends Iterable<EPGMProperty>, Comparable<EPGMProperties> {
+import org.apache.hadoop.io.WritableComparable;
 
+/**
+ * Represents a collection of properties.
+ *
+ * Properties are ordered by their insertion order.
+ */
+public interface EPGMProperties
+  extends Iterable<EPGMProperty>, WritableComparable<EPGMProperties> {
+
+  /**
+   * Returns property keys in insertion order.
+   *
+   * @return property keys
+   */
+  Iterable<String> getKeys();
+
+  /**
+   * Checks if a property with a given key is contained in the properties.
+   *
+   * @param key property key
+   * @return true, if there is a property with the given key
+   */
   boolean hasKey(String key);
 
+  /**
+   *
+   * @param key
+   * @return
+   */
   EPGMPropertyValue get(String key);
 
   void set(EPGMProperty property);
 
+  void set(String key, EPGMPropertyValue value);
+
   void set(String key, Object value);
-
-  void set(String key, Integer value);
-
-  // ...
-
-  Iterable<String> getKeys();
 
   int size();
 

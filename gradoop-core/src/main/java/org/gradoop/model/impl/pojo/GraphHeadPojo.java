@@ -22,7 +22,7 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.api.EPGMProperties;
 
 /**
- * Transient representation of a graph.
+ * POJO Implementation of an EPGM graph head.
  */
 public class GraphHeadPojo extends ElementPojo implements EPGMGraphHead {
 

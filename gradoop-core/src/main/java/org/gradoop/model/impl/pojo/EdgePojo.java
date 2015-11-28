@@ -23,8 +23,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.api.EPGMProperties;
 
 /**
- * Default transient representation of edge data that is a POJO and can thus be
- * used with Apache Flink.
+ * POJO Implementation of an EPGM edge.
  */
 public class EdgePojo extends GraphElementPojo implements EPGMEdge {
 

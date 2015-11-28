@@ -39,9 +39,11 @@ import org.gradoop.storage.api.PersistentVertexFactory;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.gradoop.util.AsciiGraphLoader;
 import org.gradoop.util.GradoopConfig;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -221,19 +223,25 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     EPGMVertexFactory<VertexPojo> vertexFactory =
       new VertexPojoFactory();
 
-    final int propertyCount = 6;
+    final int propertyCount = 7;
     final String keyBoolean = "key1";
-    final boolean valueBoolean = true;
+    final Boolean valueBoolean = true;
     final String keyInteger = "key2";
-    final int valueInteger = 23;
+    final Integer valueInteger = 23;
     final String keyLong = "key3";
-    final long valueLong = 42L;
+    final Long valueLong = 42L;
     final String keyFloat = "key4";
-    final float valueFloat = 13.37f;
+    final Float valueFloat = 13.37f;
     final String keyDouble = "key5";
-    final double valueDouble = 3.14d;
+    final Double valueDouble = 3.14d;
     final String keyString = "key6";
     final String valueString = "value";
+    final String keyBigDecimal = "key7";
+    final BigDecimal valueBigDecimal = new BigDecimal(10L);
+
+    // TODO: fails because of wrong ISOCHRONOLOGY after serializing
+//    final String keyDateTime = "key8";
+//    final DateTime valueDateTime = new DateTime();
 
     final GradoopId vertexID = GradoopId.get();
     final String label = "A";
@@ -245,6 +253,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     props.set(keyFloat, valueFloat);
     props.set(keyDouble, valueDouble);
     props.set(keyString, valueString);
+    props.set(keyBigDecimal, valueBigDecimal);
+//    props.set(keyDateTime, valueDateTime);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);
@@ -265,23 +275,37 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     for (String propertyKey : propertyKeys) {
       switch (propertyKey) {
       case keyBoolean:
-        assertEquals(valueBoolean, v.getProperty(propertyKey));
+        assertTrue(v.getPropertyValue(propertyKey).isBoolean());
+        assertEquals(valueBoolean, v.getPropertyValue(propertyKey).getBoolean());
         break;
       case keyInteger:
-        assertEquals(valueInteger, v.getProperty(keyInteger));
+        assertTrue(v.getPropertyValue(propertyKey).isInt());
+        assertEquals((int) valueInteger, v.getPropertyValue(propertyKey).getInt());
         break;
       case keyLong:
-        assertEquals(valueLong, v.getProperty(keyLong));
+        assertTrue(v.getPropertyValue(propertyKey).isLong());
+        assertEquals((long) valueLong, v.getPropertyValue(propertyKey).getLong());
         break;
       case keyFloat:
-        assertEquals(valueFloat, v.getProperty(keyFloat));
+        assertTrue(v.getPropertyValue(propertyKey).isFloat());
+        assertEquals(valueFloat, v.getPropertyValue(propertyKey).getFloat(), 0);
         break;
       case keyDouble:
-        assertEquals(valueDouble, v.getProperty(keyDouble));
+        assertTrue(v.getPropertyValue(propertyKey).isDouble());
+        assertEquals(valueDouble, v.getPropertyValue(propertyKey).getDouble(), 0);
         break;
       case keyString:
-        assertEquals(valueString, v.getProperty(keyString));
+        assertTrue(v.getPropertyValue(propertyKey).isString());
+        assertEquals(valueString, v.getPropertyValue(propertyKey).getString());
         break;
+      case keyBigDecimal:
+        assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
+        assertEquals(valueBigDecimal, v.getPropertyValue(propertyKey).getBigDecimal());
+        break;
+//      case keyDateTime:
+//        assertTrue(v.getPropertyValue(propertyKey).isDateTime());
+//        assertEquals(valueDateTime, v.getPropertyValue(propertyKey).getDateTime());
+//        break;
       }
     }
   }

@@ -1,11 +1,13 @@
 package org.gradoop.model.impl.pojo;
 
+import com.google.common.base.Preconditions;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.api.EPGMPropertyValue;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.api.EPGMProperties;
 import org.gradoop.model.api.EPGMProperty;
 import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Abstract base class for graphs, vertices and edges.
@@ -97,7 +99,7 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public EPGMPropertyValue getProperty(String key) {
+  public EPGMPropertyValue getPropertyValue(String key) {
     return (properties != null) ? properties.get(key) : null;
   }
 
@@ -114,13 +116,27 @@ public abstract class ElementPojo implements EPGMElement {
    */
   @Override
   public void setProperty(EPGMProperty property) {
-    if (property == null) {
-      throw new IllegalArgumentException("property must not be null or empty");
-    }
-    if (this.properties == null) {
-      this.properties = new Properties();
-    }
+    Preconditions.checkNotNull(property, "Property was null");
+    initProperties();
     this.properties.set(property);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setProperty(String key, Object value) {
+    initProperties();
+    this.properties.set(key, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setProperty(String key, EPGMPropertyValue value) {
+    initProperties();
+    this.properties.set(key, value);
   }
 
   @Override
@@ -166,5 +182,14 @@ public abstract class ElementPojo implements EPGMElement {
   @Override
   public String toString() {
     return id + ":" + label + "{" + properties + "}";
+  }
+
+  /**
+   * Initializes the internal properties field if necessary.
+   */
+  private void initProperties() {
+    if (this.properties == null) {
+      this.properties = new Properties();
+    }
   }
 }

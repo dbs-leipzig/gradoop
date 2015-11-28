@@ -17,10 +17,41 @@
 
 package org.gradoop.model.api;
 
-public interface EPGMProperty extends Comparable<EPGMProperty> {
+import org.apache.hadoop.io.WritableComparable;
 
+/**
+ * A single property in the EPGM model. A property consists of a property key
+ * and a property value. A given property key does not enforce specific value
+ * type.
+ */
+public interface EPGMProperty extends WritableComparable<EPGMProperty> {
+
+  /**
+   * Returns the property key.
+   *
+   * @return property key
+   */
   String getKey();
 
+  /**
+   * Sets the property key.
+   *
+   * @param key property key (must not be {@code null})
+   */
+  void setKey(String key);
+
+  /**
+   * Returns the property value.
+   *
+   * @return property value
+   */
   EPGMPropertyValue getValue();
+
+  /**
+   * Sets the property value.
+   *
+   * @param propertyValue property value  (must not be {@code null})
+   */
+  void setValue(EPGMPropertyValue propertyValue);
 
 }

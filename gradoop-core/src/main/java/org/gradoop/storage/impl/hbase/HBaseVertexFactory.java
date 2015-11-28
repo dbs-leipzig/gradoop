@@ -45,10 +45,9 @@ public class HBaseVertexFactory implements
    */
   @Override
   public HBaseVertex createVertex(VertexPojo inputVertexData,
-    Set<EdgePojo> outgoingEdgeIds, Set<EdgePojo> incomingEdgeIds) {
+    Set<EdgePojo> outgoingEdges, Set<EdgePojo> incomingEdges) {
     HBaseVertex defaultPersistentVertexData =
-      new HBaseVertex(inputVertexData, outgoingEdgeIds,
-        incomingEdgeIds);
+      new HBaseVertex(inputVertexData, outgoingEdges, incomingEdges);
     LOG.info("Created persistent vertex data: " + defaultPersistentVertexData);
     return defaultPersistentVertexData;
   }

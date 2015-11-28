@@ -51,6 +51,6 @@ public class LongListFromPropertyFunction<VD extends EPGMVertex>
   @SuppressWarnings("unchecked")
   @Override
   public List<GradoopId> execute(VD vertex) throws Exception {
-    return (List<GradoopId>) vertex.getProperty(propertyKey);
+    return (List<GradoopId>) vertex.getPropertyValue(propertyKey);
   }
 }

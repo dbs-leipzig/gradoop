@@ -22,17 +22,16 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.api.EPGMProperties;
-import org.gradoop.model.impl.properties.Properties;
-import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.EPGMProperties;
+import org.gradoop.model.api.EPGMProperty;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.storage.api.ElementHandler;
-import org.gradoop.storage.exceptions.UnsupportedTypeException;
-import org.joda.time.DateTime;
+import org.gradoop.util.GConstants;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 
@@ -94,9 +93,11 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeProperty(final Put put, final String key,
-    final Object value) {
-    put.add(CF_PROPERTIES_BYTES, Bytes.toBytes(key), encodeValueToBytes(value));
+  public Put writeProperty(final Put put, EPGMProperty property)
+    throws IOException {
+    put.add(CF_PROPERTIES_BYTES,
+      Bytes.toBytes(property.getKey()),
+      Writables.getBytes(property.getValue()));
     return put;
   }
 
@@ -104,10 +105,11 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeProperties(final Put put, final EPGMElement entity) {
+  public Put writeProperties(final Put put, final EPGMElement entity)
+    throws IOException {
     if (entity.getPropertyCount() > 0) {
-      for (String key : entity.getPropertyKeys()) {
-        writeProperty(put, key, entity.getProperty(key));
+      for (EPGMProperty property : entity.getProperties()) {
+        writeProperty(put, property);
       }
     }
     return put;
@@ -125,16 +127,14 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public EPGMProperties readProperties(final Result res) {
-
+  public EPGMProperties readProperties(final Result res) throws IOException {
     EPGMProperties properties = new Properties();
 
     for (Map.Entry<byte[], byte[]> propertyColumn : res
       .getFamilyMap(CF_PROPERTIES_BYTES).entrySet()) {
-      properties.set(
-        Bytes.toString(propertyColumn.getKey()),
-        decodeValueFromBytes(propertyColumn.getValue())
-      );
+        properties.set(
+          readPropertyKey(propertyColumn.getKey()),
+          readPropertyValue(propertyColumn.getValue()));
     }
 
     return properties;
@@ -158,120 +158,32 @@ public abstract class HBaseElementHandler implements ElementHandler {
   }
 
   /**
-   * Returns the type of a given object if it's supported.
+   * Reads the property key from the given byte array.
    *
-   * @param o object
-   * @return type of object
+   * @param encKey encoded property key
+   * @return property key
    */
-  protected byte getType(final Object o) {
-    Class<?> valueClass = o.getClass();
-    byte type;
-    if (valueClass.equals(Boolean.class)) {
-      type = GConstants.TYPE_BOOLEAN;
-    } else if (valueClass.equals(Integer.class)) {
-      type = GConstants.TYPE_INTEGER;
-    } else if (valueClass.equals(Long.class)) {
-      type = GConstants.TYPE_LONG;
-    } else if (valueClass.equals(Long.class)) {
-      type = GConstants.TYPE_FLOAT;
-    } else if (valueClass.equals(Double.class)) {
-      type = GConstants.TYPE_DOUBLE;
-    } else if (valueClass.equals(String.class)) {
-      type = GConstants.TYPE_STRING;
-    } else {
-      throw new UnsupportedTypeException(valueClass + " not supported");
-    }
-    return type;
-  }
-
-  /**
-   * Encodes a given value to a byte array with integrated type information.
-   *
-   * @param value value do encode
-   * @return encoded value as byte array
-   */
-  protected byte[] encodeValueToBytes(final Object value) throws
-    UnsupportedTypeException {
-    Class<?> valueClass = value.getClass();
-    byte[] decodedValue;
-    if (valueClass.equals(Boolean.class)) {
-      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_BOOLEAN},
-        Bytes.toBytes((Boolean) value));
-    } else if (valueClass.equals(Integer.class)) {
-      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_INTEGER},
-        Bytes.toBytes((Integer) value));
-    } else if (valueClass.equals(Long.class)) {
-      decodedValue = Bytes
-        .add(new byte[]{GConstants.TYPE_LONG}, Bytes.toBytes((Long) value));
-    } else if (valueClass.equals(Float.class)) {
-      decodedValue = Bytes
-        .add(new byte[]{GConstants.TYPE_FLOAT}, Bytes.toBytes((Float) value));
-    } else if (valueClass.equals(Double.class)) {
-      decodedValue = Bytes
-        .add(new byte[]{GConstants.TYPE_DOUBLE}, Bytes.toBytes((Double) value));
-    } else if (valueClass.equals(String.class)) {
-      decodedValue = Bytes.add(new byte[] {GConstants.TYPE_STRING},
-        Bytes.toBytes((String) value));
-    } else if (valueClass.equals(BigDecimal.class)) {
-        decodedValue = Bytes.add(new byte[]{GConstants.TYPE_DECIMAL},
-          Bytes.toBytes((BigDecimal) value));
-    } else if (valueClass.equals(DateTime.class)) {
-      decodedValue = Bytes.add(new byte[]{GConstants.TYPE_DATE},
-        Bytes.toBytes(((DateTime) value).getMillis()));
-    } else {
-      throw new UnsupportedTypeException(valueClass + " not supported");
-    }
-    return decodedValue;
+  protected String readPropertyKey(final byte[] encKey) {
+    return Bytes.toString(encKey);
   }
 
   /**
    * Decodes a value from a given byte array.
    *
-   * @param encValue encoded value with type information
-   * @return decoded value
+   * @param encValue encoded property value
+   * @return property value
    */
-  protected Object decodeValueFromBytes(final byte[] encValue) {
-    Object o = null;
-    if (encValue.length > 0) {
-      byte type = encValue[0];
-      byte[] value = Bytes.tail(encValue, encValue.length - 1);
-      switch (type) {
-      case GConstants.TYPE_BOOLEAN:
-        o = Bytes.toBoolean(value);
-        break;
-      case GConstants.TYPE_INTEGER:
-        o = Bytes.toInt(value);
-        break;
-      case GConstants.TYPE_LONG:
-        o = Bytes.toLong(value);
-        break;
-      case GConstants.TYPE_FLOAT:
-        o = Bytes.toFloat(value);
-        break;
-      case GConstants.TYPE_DOUBLE:
-        o = Bytes.toDouble(value);
-        break;
-      case GConstants.TYPE_DECIMAL:
-        o = Bytes.toBigDecimal(value);
-        break;
-      case GConstants.TYPE_STRING:
-        o = Bytes.toString(value);
-        break;
-      case GConstants.TYPE_DATE:
-        o = new DateTime(Bytes.toLong(value));
-        break;
-      default:
-        throw new UnsupportedTypeException(
-          "Type code " + type + " not supported");
-      }
-    }
-    return o;
+  protected PropertyValue readPropertyValue(final byte[] encValue) throws
+    IOException {
+    PropertyValue p = new PropertyValue();
+    Writables.getWritable(encValue, p);
+    return p;
   }
 
   /**
-   * deserializes a gradoop id from hbase key
-   * @param res hbase row
-   * @return gradoop od
+   * Deserializes a gradoop id from HBase row key
+   * @param res HBase row
+   * @return gradoop id
    * @throws IOException
    */
   protected GradoopId readId(Result res) throws IOException {

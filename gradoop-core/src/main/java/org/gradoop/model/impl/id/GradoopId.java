@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Primary key for an EPGM entity. A GradoopId uniquely identifies an entity
  * inside its domain, i.e. a graph is unique among all graphs, a vertex among
@@ -66,7 +69,7 @@ public class GradoopId implements Comparable<GradoopId>,
    * @param uuid UUID
    */
   GradoopId(UUID uuid) {
-    this.uuid = uuid;
+    this.uuid = checkNotNull(uuid, "UUID was null");
   }
 
   /**
@@ -85,6 +88,8 @@ public class GradoopId implements Comparable<GradoopId>,
    * @return Gradoop ID
    */
   public static GradoopId fromString(String string) {
+    checkNotNull(string, "ID string was null");
+    checkArgument(!string.isEmpty(), "ID string was empty");
     return new GradoopId(UUID.fromString(string));
   }
 
