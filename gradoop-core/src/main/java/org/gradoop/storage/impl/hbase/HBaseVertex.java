@@ -30,29 +30,23 @@ public class HBaseVertex extends
   HBaseGraphElement<EPGMVertex> implements PersistentVertex<EdgePojo> {
 
   /**
-   * Edge data of outgoing edges.
+   * Outgoing edge set
    */
   private Set<EdgePojo> outgoingEdges;
 
   /**
-   * Edge data of incoming edges.
+   * Incoming edge set
    */
   private Set<EdgePojo> incomingEdges;
 
   /**
-   * Default constructor.
-   */
-  public HBaseVertex() {
-  }
-
-  /**
    * Creates persistent vertex data.
    *
-   * @param vertex       encapsulated vertex data
-   * @param incomingEdges incoming edge data
-   * @param outgoingEdges outgoing edge data
+   * @param vertex        vertex
+   * @param incomingEdges incoming edge
+   * @param outgoingEdges outgoing edge
    */
-  public HBaseVertex(EPGMVertex vertex, Set<EdgePojo> outgoingEdges,
+  HBaseVertex(EPGMVertex vertex, Set<EdgePojo> outgoingEdges,
     Set<EdgePojo> incomingEdges) {
     super(vertex);
     this.outgoingEdges = outgoingEdges;

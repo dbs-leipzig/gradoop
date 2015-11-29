@@ -86,15 +86,15 @@ import org.gradoop.util.GradoopFlinkConfig;
  * In addition to vertex properties, summarization is also possible on edge
  * properties, vertex- and edge labels as well as combinations of those.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public abstract class Summarization<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  implements UnaryGraphToGraphOperator<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  implements UnaryGraphToGraphOperator<G, V, E> {
   /**
    * Used to represent vertices that do not have the vertex grouping property.
    */
@@ -107,7 +107,7 @@ public abstract class Summarization<
   /**
    * Gradoop Flink configuration.
    */
-  protected GradoopFlinkConfig<VD, ED, GD> config;
+  protected GradoopFlinkConfig<G, V, E> config;
   /**
    * Used to summarize vertices.
    */
@@ -145,8 +145,8 @@ public abstract class Summarization<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) {
-    LogicalGraph<GD, VD, ED> result;
+  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+    LogicalGraph<G, V, E> result;
 
     config = graph.getConfig();
 
@@ -269,14 +269,14 @@ public abstract class Summarization<
    *                                  and group representative
    * @return summarized edges
    */
-  protected DataSet<Edge<GradoopId, ED>> buildSummarizedEdges(
-    Graph<GradoopId, VD, ED> graph,
+  protected DataSet<Edge<GradoopId, E>> buildSummarizedEdges(
+    Graph<GradoopId, V, E> graph,
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap) {
     // join edges with vertex-group-map on vertex-id == edge-source-id
     DataSet<EdgeGroupItem> edges =
       graph.getEdges().join(vertexToRepresentativeMap).where(0).equalTo(0)
         // project edges to necessary information
-        .with(new SourceJoin<ED>(getEdgeGroupingKey(),
+        .with(new SourceJoin<E>(getEdgeGroupingKey(),
           useEdgeLabels()))
           // join result with vertex-group-map on edge-target-id == vertex-id
         .join(vertexToRepresentativeMap).where(2).equalTo(0)
@@ -314,8 +314,8 @@ public abstract class Summarization<
    * @param graph input graph
    * @return summarized output graph
    */
-  protected abstract Graph<GradoopId, VD, ED> summarizeInternal(
-    Graph<GradoopId, VD, ED> graph);
+  protected abstract Graph<GradoopId, V, E> summarizeInternal(
+    Graph<GradoopId, V, E> graph);
 
   /**
    * Creates a summarized edge from a group of edges including an edge

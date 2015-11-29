@@ -33,13 +33,15 @@ public class GraphHeadPojo extends ElementPojo implements EPGMGraphHead {
   }
 
   /**
-   * Creates a graph based on the given parameters.
+   * Creates a graph head based on the given parameters.
    *
    * @param id         graph identifier
-   * @param label      labels of that graph
-   * @param properties key-value-map
+   * @param label      graph label
+   * @param properties graph properties
    */
-  GraphHeadPojo(final GradoopId id, final String label,
+  GraphHeadPojo(
+    final GradoopId id,
+    final String label,
     final EPGMPropertyList properties) {
     super(id, label, properties);
   }

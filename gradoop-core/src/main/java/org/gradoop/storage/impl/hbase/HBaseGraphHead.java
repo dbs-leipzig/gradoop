@@ -25,7 +25,9 @@ import org.gradoop.storage.api.PersistentGraphHead;
 /**
  * Represents a persistent vertex data object.
  */
-public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements PersistentGraphHead {
+public class HBaseGraphHead
+  extends HBaseElement<EPGMGraphHead>
+  implements PersistentGraphHead {
 
   /**
    * Vertex identifiers contained in that logical graph.
@@ -38,19 +40,13 @@ public class HBaseGraphHead extends HBaseElement<EPGMGraphHead> implements Persi
   private GradoopIdSet edgeIds;
 
   /**
-   * Default constructor.
-   */
-  public HBaseGraphHead() {
-  }
-
-  /**
    * Creates  persistent graph data.
    *
    * @param graphHead encapsulated graph data
    * @param vertexIds  vertexIds contained in that graph
    * @param edgeIds     edgeIds contained in that graph
    */
-  public HBaseGraphHead(EPGMGraphHead graphHead, GradoopIdSet vertexIds,
+  HBaseGraphHead(EPGMGraphHead graphHead, GradoopIdSet vertexIds,
     GradoopIdSet edgeIds) {
     super(graphHead);
     this.vertexIds = vertexIds;

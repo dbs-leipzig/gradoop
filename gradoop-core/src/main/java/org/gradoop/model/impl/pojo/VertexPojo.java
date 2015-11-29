@@ -36,13 +36,16 @@ public class VertexPojo extends GraphElementPojo implements EPGMVertex {
   /**
    * Creates a vertex based on the given parameters.
    *
-   * @param id         vertex id
-   * @param label      label (cannot be {@code null})
-   * @param properties key-value-map  (can be {@code null})
-   * @param graphs     graphs that contain that vertex (can be {@code null})
+   * @param id         vertex identifier
+   * @param label      vertex label
+   * @param properties vertex properties
+   * @param graphs     graphs that vertex is contained in
    */
-  VertexPojo(final GradoopId id, final String label,
-    final EPGMPropertyList properties, final GradoopIdSet graphs) {
+  VertexPojo(
+    final GradoopId id,
+    final String label,
+    final EPGMPropertyList properties,
+    final GradoopIdSet graphs) {
     super(id, label, properties, graphs);
   }
 

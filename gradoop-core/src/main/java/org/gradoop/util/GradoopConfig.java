@@ -39,36 +39,38 @@ import org.gradoop.storage.impl.hbase.HBaseVertexHandler;
 /**
  * Basic Gradoop Configuration.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class GradoopConfig
-  <GD extends EPGMGraphHead, VD extends EPGMVertex, ED extends EPGMEdge> {
+public class GradoopConfig<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge> {
 
-  /**
-   * Vertex handler.
-   */
-  private final VertexHandler<VD, ED> vertexHandler;
-  /**
-   * Edge handler.
-   */
-  private final EdgeHandler<ED, VD> edgeHandler;
   /**
    * Graph head handler.
    */
-  private final GraphHeadHandler<GD> graphHeadHandler;
+  private final GraphHeadHandler<G> graphHeadHandler;
+  /**
+   * Vertex handler.
+   */
+  private final VertexHandler<V, E> vertexHandler;
+  /**
+   * Edge handler.
+   */
+  private final EdgeHandler<V, E> edgeHandler;
 
   /**
    * Creates a new Configuration.
    *
+   * @param graphHeadHandler  graph head handler
    * @param vertexHandler     vertex handler
    * @param edgeHandler       edge handler
-   * @param graphHeadHandler  graph head handler
    */
-  protected GradoopConfig(VertexHandler<VD, ED> vertexHandler,
-    EdgeHandler<ED, VD> edgeHandler,
-    GraphHeadHandler<GD> graphHeadHandler) {
+  protected GradoopConfig(GraphHeadHandler<G> graphHeadHandler,
+    VertexHandler<V, E> vertexHandler,
+    EdgeHandler<V, E> edgeHandler) {
     if (vertexHandler == null) {
       throw new IllegalArgumentException("Vertex handler must not be null");
     }
@@ -93,55 +95,56 @@ public class GradoopConfig
   getDefaultConfig() {
     VertexHandler<VertexPojo, EdgePojo> vertexHandler =
       new HBaseVertexHandler<>(new VertexPojoFactory());
-    EdgeHandler<EdgePojo, VertexPojo> edgeHandler =
+    EdgeHandler<VertexPojo, EdgePojo> edgeHandler =
       new HBaseEdgeHandler<>(new EdgePojoFactory());
     GraphHeadHandler<GraphHeadPojo> graphHeadHandler =
       new HBaseGraphHeadHandler<>(new GraphHeadPojoFactory());
-    return new GradoopConfig<>(vertexHandler, edgeHandler,
-      graphHeadHandler);
+    return new GradoopConfig<>(graphHeadHandler, vertexHandler, edgeHandler);
   }
 
   /**
    * Creates a Gradoop configuration based on the given arguments.
    *
+   * @param graphHeadHandler  EPGM graph head handler
    * @param vertexHandler     EPGM vertex handler
    * @param edgeHandler       EPGM edge handler
-   * @param graphHeadHandler  EPGM graph head handler
-   * @param <VD>              EPGM vertex type
-   * @param <ED>              EPGM edge type
-   * @param <GD>              EPGM graph head type
+   * @param <G>               EPGM graph head type
+   * @param <V>               EPGM vertex type
+   * @param <E>               EPGM edge type
    *
    * @return Gradoop HBase configuration
    */
-  public static <VD extends EPGMVertex, ED extends EPGMEdge,
-    GD extends EPGMGraphHead> GradoopConfig<GD, VD, ED> createConfig(
-    VertexHandler<VD, ED> vertexHandler,
-    EdgeHandler<ED, VD> edgeHandler,
-    GraphHeadHandler<GD> graphHeadHandler) {
-    return new GradoopConfig<>(vertexHandler, edgeHandler, graphHeadHandler);
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> GradoopConfig<G, V, E> createConfig(
+    GraphHeadHandler<G> graphHeadHandler,
+    VertexHandler<V, E> vertexHandler,
+    EdgeHandler<V, E> edgeHandler) {
+    return new GradoopConfig<>(graphHeadHandler, vertexHandler, edgeHandler);
   }
 
-  public VertexHandler<VD, ED> getVertexHandler() {
-    return vertexHandler;
-  }
-
-  public EdgeHandler<ED, VD> getEdgeHandler() {
-    return edgeHandler;
-  }
-
-  public GraphHeadHandler<GD> getGraphHeadHandler() {
+  public GraphHeadHandler<G> getGraphHeadHandler() {
     return graphHeadHandler;
   }
 
-  public EPGMVertexFactory<VD> getVertexFactory() {
+  public VertexHandler<V, E> getVertexHandler() {
+    return vertexHandler;
+  }
+
+  public EdgeHandler<V, E> getEdgeHandler() {
+    return edgeHandler;
+  }
+
+  public EPGMGraphHeadFactory<G> getGraphHeadFactory() {
+    return graphHeadHandler.getGraphHeadFactory();
+  }
+
+  public EPGMVertexFactory<V> getVertexFactory() {
     return vertexHandler.getVertexFactory();
   }
 
-  public EPGMEdgeFactory<ED> getEdgeFactory() {
+  public EPGMEdgeFactory<E> getEdgeFactory() {
     return edgeHandler.getEdgeFactory();
-  }
-
-  public EPGMGraphHeadFactory<GD> getGraphHeadFactory() {
-    return graphHeadHandler.getGraphHeadFactory();
   }
 }

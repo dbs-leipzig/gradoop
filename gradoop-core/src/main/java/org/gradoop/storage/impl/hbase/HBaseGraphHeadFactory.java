@@ -17,10 +17,11 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import org.apache.log4j.Logger;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.storage.api.PersistentGraphHeadFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default factory for creating persistent graph data representation.
@@ -28,11 +29,6 @@ import org.gradoop.storage.api.PersistentGraphHeadFactory;
 public class HBaseGraphHeadFactory implements
   PersistentGraphHeadFactory<GraphHeadPojo, HBaseGraphHead> {
 
-  /**
-   * Logger
-   */
-  private static final Logger LOG =
-    Logger.getLogger(HBaseGraphHeadFactory.class);
   /**
    * serial version uid
    */
@@ -42,11 +38,11 @@ public class HBaseGraphHeadFactory implements
    * {@inheritDoc}
    */
   @Override
-  public HBaseGraphHead createGraphHead(GraphHeadPojo inputGraphData,
+  public HBaseGraphHead createGraphHead(GraphHeadPojo inputGraphHead,
     GradoopIdSet vertices, GradoopIdSet edges) {
-    HBaseGraphHead defaultPersistentGraphData =
-      new HBaseGraphHead(inputGraphData, vertices, edges);
-    LOG.info("Created persistent graph data: " + defaultPersistentGraphData);
-    return defaultPersistentGraphData;
+    checkNotNull(inputGraphHead, "GraphHead was null");
+    checkNotNull(vertices, "Vertex identifiers were null");
+    checkNotNull(edges, "Edge identifiers were null");
+    return new HBaseGraphHead(inputGraphHead, vertices, edges);
   }
 }

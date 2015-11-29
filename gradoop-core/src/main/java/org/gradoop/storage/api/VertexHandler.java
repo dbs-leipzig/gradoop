@@ -29,12 +29,12 @@ import java.util.Set;
 /**
  * Responsible for reading and writing vertex data from and to HBase.
  *
- * @param <VD> vertex data type
- * @param <ED> edge data type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public interface VertexHandler<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge>
+  V extends EPGMVertex,
+  E extends EPGMEdge>
   extends GraphElementHandler {
 
   /**
@@ -45,7 +45,7 @@ public interface VertexHandler<
    * @param edges edges to add
    * @return put with edge identifiers
    */
-  Put writeOutgoingEdges(final Put put, final Set<ED> edges) throws IOException;
+  Put writeOutgoingEdges(final Put put, final Set<E> edges) throws IOException;
 
   /**
    * Adds the given incoming edge data to the given {@link Put} and
@@ -55,7 +55,7 @@ public interface VertexHandler<
    * @param edges edge identifiers to add
    * @return put with edge identifiers
    */
-  Put writeIncomingEdges(final Put put, final Set<ED> edges) throws IOException;
+  Put writeIncomingEdges(final Put put, final Set<E> edges) throws IOException;
 
   /**
    * Reads the outgoing edge identifiers from the given {@link Result}.
@@ -80,7 +80,7 @@ public interface VertexHandler<
    * @param vertexData vertex data to be written
    * @return put with vertex data
    */
-  Put writeVertex(final Put put, final PersistentVertex<ED> vertexData) throws
+  Put writeVertex(final Put put, final PersistentVertex<E> vertexData) throws
     IOException;
 
   /**
@@ -89,12 +89,12 @@ public interface VertexHandler<
    * @param res HBase row
    * @return vertex data contained in the given result.
    */
-  VD readVertex(final Result res);
+  V readVertex(final Result res);
 
   /**
    * Returns the vertex data factory used by this handler.
    *
    * @return vertex data factory
    */
-  EPGMVertexFactory<VD> getVertexFactory();
+  EPGMVertexFactory<V> getVertexFactory();
 }

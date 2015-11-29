@@ -26,13 +26,13 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * VertexHandler is responsible for reading and writing EPG graphs from and to
- * HBase.
+ * This class is responsible for reading and writing EPGM graph heads from
+ * and to HBase.
  *
- * @param <GD> graph data type
+ * @param <G> EPGM graph head type
  */
 public interface GraphHeadHandler<
-  GD extends EPGMGraphHead>
+  G extends EPGMGraphHead>
   extends ElementHandler {
   /**
    * Adds all vertex identifiers of the given graph to the given {@link Put}
@@ -88,12 +88,12 @@ public interface GraphHeadHandler<
    * @param res HBase row
    * @return graph entity
    */
-  GD readGraphHead(final Result res);
+  G readGraphHead(final Result res);
 
   /**
    * Returns the graph data factory used by this handler.
    *
    * @return graph data factory
    */
-  EPGMGraphHeadFactory<GD> getGraphHeadFactory();
+  EPGMGraphHeadFactory<G> getGraphHeadFactory();
 }

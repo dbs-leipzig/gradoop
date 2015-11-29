@@ -75,12 +75,12 @@ public class VertexPojoTest {
     assertThat(v.getLabel(), is(GConstants.DEFAULT_VERTEX_LABEL));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void createWithNullIDTest() {
     new VertexPojoFactory().initVertex(null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId vertexID = GradoopId.get();
     new VertexPojoFactory().initVertex(vertexID, null);

@@ -14,21 +14,21 @@ import java.util.Collection;
  * Used the {@link AsciiGraphLoader} to generate instances of
  * {@link LogicalGraph} and {@link GraphCollection} from GDL.
  *
+ * @param <G> EPM graph type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPM graph type
  *
  * @see <a href="https://github.com/s1ck/gdl">GDL on GitHub</a>
  */
 public class FlinkAsciiGraphLoader<
+  G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge,
-  G extends EPGMGraphHead> {
+  E extends EPGMEdge> {
 
   /**
    * Gradoop Flink configuration
    */
-  private final GradoopFlinkConfig<V, E, G> config;
+  private final GradoopFlinkConfig<G, V, E> config;
 
   /**
    * AsciiGraphLoader to create graph, vertex and edge collections.
@@ -40,7 +40,7 @@ public class FlinkAsciiGraphLoader<
    *
    * @param config Gradoop Flink configuration
    */
-  public FlinkAsciiGraphLoader(GradoopFlinkConfig<V, E, G> config) {
+  public FlinkAsciiGraphLoader(GradoopFlinkConfig<G, V, E> config) {
     if (config == null) {
       throw new IllegalArgumentException("Config must not be null.");
     }
@@ -118,7 +118,7 @@ public class FlinkAsciiGraphLoader<
     Collection<V> vertices = loader.getVerticesByGraphVariables(variables);
     Collection<E> edges = loader.getEdgesByGraphVariables(variables);
 
-    return GraphCollection.fromCollections(vertices, edges, graphHeads, config);
+    return GraphCollection.fromCollections(graphHeads, vertices, edges, config);
   }
 
   /**
@@ -151,9 +151,9 @@ public class FlinkAsciiGraphLoader<
   @SuppressWarnings("unchecked")
   public EPGMDatabase<G, V, E> getDatabase() {
     return EPGMDatabase
-      .fromCollection(loader.getVertices(),
+      .fromCollection(loader.getGraphHeads(),
+        loader.getVertices(),
         loader.getEdges(),
-        loader.getGraphHeads(),
         config);
   }
 

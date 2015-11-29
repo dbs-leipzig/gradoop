@@ -17,6 +17,7 @@
 
 package org.gradoop.storage.impl.hbase;
 
+import com.google.common.base.Preconditions;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -25,33 +26,29 @@ import org.gradoop.storage.api.PersistentEdge;
 /**
  * Represents a persistent edge data object.
  */
-public class HBaseEdge extends
-  HBaseGraphElement<EPGMEdge> implements PersistentEdge<VertexPojo> {
+public class HBaseEdge
+  extends HBaseGraphElement<EPGMEdge>
+  implements PersistentEdge<VertexPojo> {
 
   /**
-   * Vertex data associated with the source vertex.
+   * Source vertex
    */
   private VertexPojo source;
 
   /**
-   * Vertex data associated with the target vertex.
+   * Target vertex.
    */
   private VertexPojo target;
 
   /**
-   * Default constructor.
-   */
-  public HBaseEdge() {
-  }
-
-  /**
-   * Creates persistent edge data.
+   * Creates persistent edge.
    *
-   * @param edge         encapsulated edge data
-   * @param source source vertex data containing id and label
-   * @param target target vertex data containing id and label
+   * @param edge    edge
+   * @param source  source vertex
+   * @param target  target vertex
    */
-  public HBaseEdge(EPGMEdge edge, VertexPojo source,
+  HBaseEdge(EPGMEdge edge,
+    VertexPojo source,
     VertexPojo target) {
     super(edge);
     this.source = source;

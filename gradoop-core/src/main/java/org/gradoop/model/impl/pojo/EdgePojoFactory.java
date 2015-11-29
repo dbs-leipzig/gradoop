@@ -17,18 +17,18 @@
 
 package org.gradoop.model.impl.pojo;
 
+import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.GConstants;
-import org.gradoop.model.api.EPGMEdgeFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Factory for creating edge POJOs.
  */
-public class EdgePojoFactory
-  extends ElementPojoFactory
-  implements EPGMEdgeFactory<EdgePojo> {
+public class EdgePojoFactory implements EPGMEdgeFactory<EdgePojo> {
 
   /**
    * serial version uid
@@ -135,11 +135,10 @@ public class EdgePojoFactory
   public EdgePojo initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
     final EPGMPropertyList properties, GradoopIdSet graphIds) {
-    checkId(id);
-    checkLabel(label);
-    checkId(sourceVertexId);
-    checkId(targetVertexId);
-
+    checkNotNull(id, "Identifier was null");
+    checkNotNull(label, "Label was null");
+    checkNotNull(sourceVertexId, "Source vertex id was null");
+    checkNotNull(targetVertexId, "Target vertex id was null");
     return new EdgePojo(id, label, sourceVertexId, targetVertexId,
       properties, graphIds);
   }

@@ -28,16 +28,18 @@ import org.gradoop.model.impl.operators.union.Union;
 /**
  * Creates a {@link GraphCollection} based on two input collections.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  * @see Union
  * @see Intersection
  * @see Difference
  */
-public interface BinaryCollectionToCollectionOperator<VD extends EPGMVertex,
-  ED extends EPGMEdge, GD extends EPGMGraphHead> extends
-  Operator {
+public interface BinaryCollectionToCollectionOperator<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends Operator {
   /**
    * Executes the operator.
    *
@@ -46,7 +48,7 @@ public interface BinaryCollectionToCollectionOperator<VD extends EPGMVertex,
    * @return operator result
    * @throws Exception
    */
-  GraphCollection<GD, VD, ED> execute(
-    GraphCollection<GD, VD, ED> firstCollection,
-    GraphCollection<GD, VD, ED> secondCollection) throws Exception;
+  GraphCollection<G, V, E> execute(
+    GraphCollection<G, V, E> firstCollection,
+    GraphCollection<G, V, E> secondCollection) throws Exception;
 }

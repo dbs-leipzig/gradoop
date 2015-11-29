@@ -48,20 +48,16 @@ import java.util.Set;
  * |         | "Community" | v1  | v2 |   |   |   |   |   |   |
  * |---------|-------------|----------|-----------|---|---|---|
  *
- * @param <GD> graph data type
+ * @param <G> EPGM graph head type
  */
-public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
-  HBaseElementHandler implements GraphHeadHandler<GD> {
+public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
+  extends HBaseElementHandler
+  implements GraphHeadHandler<G> {
 
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
-  /**
-   * Class logger.
-   */
-  private static Logger LOG = Logger.getLogger(HBaseGraphHeadHandler.class);
 
   /**
    * Byte array representation of the vertices column family.
@@ -78,14 +74,14 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
   /**
    * Creates graph data objects from the rows.
    */
-  private final EPGMGraphHeadFactory<GD> graphHeadFactory;
+  private final EPGMGraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Creates a graph handler.
    *
    * @param graphHeadFactory used to create runtime graph data objects
    */
-  public HBaseGraphHeadHandler(EPGMGraphHeadFactory<GD> graphHeadFactory) {
+  public HBaseGraphHeadHandler(EPGMGraphHeadFactory<G> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -95,7 +91,6 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
   @Override
   public void createTable(final HBaseAdmin admin,
     final HTableDescriptor tableDescriptor) throws IOException {
-    LOG.info("Creating table " + tableDescriptor.getNameAsString());
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_VERTICES));
@@ -151,7 +146,6 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
   @Override
   public Put writeGraphHead(final Put put, final PersistentGraphHead
     graphData) throws IOException {
-    LOG.info("Creating Put from: " + graphData);
     writeLabel(put, graphData);
     writeProperties(put, graphData);
     writeVertices(put, graphData);
@@ -163,8 +157,8 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
    * {@inheritDoc}
    */
   @Override
-  public GD readGraphHead(final Result res) {
-    GD graphHead = null;
+  public G readGraphHead(final Result res) {
+    G graphHead = null;
     try {
       graphHead = graphHeadFactory
         .initGraphHead(readId(res), readLabel(res), readProperties(res));
@@ -178,7 +172,7 @@ public class HBaseGraphHeadHandler<GD extends EPGMGraphHead> extends
    * {@inheritDoc}
    */
   @Override
-  public EPGMGraphHeadFactory<GD> getGraphHeadFactory() {
+  public EPGMGraphHeadFactory<G> getGraphHeadFactory() {
     return graphHeadFactory;
   }
 }

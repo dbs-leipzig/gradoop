@@ -18,8 +18,8 @@
 package org.gradoop.util;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
@@ -37,15 +37,15 @@ import org.gradoop.storage.impl.hbase.HBaseVertexHandler;
 /**
  * Configuration for Gradoop running on Flink.
  *
- * @param <VD>  EPGM vertex type
- * @param <ED>  EPGM edge type
- * @param <GD>  EPGM graph head type
+ * @param <G>  EPGM graph head type
+ * @param <V>  EPGM vertex type
+ * @param <E>  EPGM edge type
  */
 public class GradoopFlinkConfig<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends GradoopConfig<GD, VD, ED> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends GradoopConfig<G, V, E> {
 
   /**
    * Flink execution environment.
@@ -55,16 +55,16 @@ public class GradoopFlinkConfig<
   /**
    * Creates a new Configuration.
    *
-   * @param vertexHandler     vertex handler
-   * @param edgeHandler       edge handler
    * @param graphHeadHandler      graph head handler
+   * @param vertexHandler         vertex handler
+   * @param edgeHandler           edge handler
    * @param executionEnvironment  Flink execution environment
    */
-  private GradoopFlinkConfig(VertexHandler<VD, ED> vertexHandler,
-    EdgeHandler<ED, VD> edgeHandler,
-    GraphHeadHandler<GD> graphHeadHandler,
+  private GradoopFlinkConfig(GraphHeadHandler<G> graphHeadHandler,
+    VertexHandler<V, E> vertexHandler,
+    EdgeHandler<V, E> edgeHandler,
     ExecutionEnvironment executionEnvironment) {
-    super(vertexHandler, edgeHandler, graphHeadHandler);
+    super(graphHeadHandler, vertexHandler, edgeHandler);
     if (executionEnvironment == null) {
       throw new IllegalArgumentException(
         "Execution environment must not be null");
@@ -78,11 +78,11 @@ public class GradoopFlinkConfig<
    * @param gradoopConfig         Gradoop configuration
    * @param executionEnvironment  Flink execution environment
    */
-  private GradoopFlinkConfig(GradoopConfig<GD, VD, ED> gradoopConfig,
+  private GradoopFlinkConfig(GradoopConfig<G, V, E> gradoopConfig,
     ExecutionEnvironment executionEnvironment) {
-    this(gradoopConfig.getVertexHandler(),
+    this(gradoopConfig.getGraphHeadHandler(),
+      gradoopConfig.getVertexHandler(),
       gradoopConfig.getEdgeHandler(),
-      gradoopConfig.getGraphHeadHandler(),
       executionEnvironment);
   }
 
@@ -93,15 +93,15 @@ public class GradoopFlinkConfig<
    *
    * @return Gradoop Flink configuration
    */
-  public static GradoopFlinkConfig<VertexPojo, EdgePojo, GraphHeadPojo>
+  public static GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo>
   createDefaultConfig(ExecutionEnvironment env) {
     HBaseVertexHandler<VertexPojo, EdgePojo> vertexHandler =
       new HBaseVertexHandler<>(new VertexPojoFactory());
-    HBaseEdgeHandler<EdgePojo, VertexPojo> edgeHandler =
+    HBaseEdgeHandler<VertexPojo, EdgePojo> edgeHandler =
       new HBaseEdgeHandler<>(new EdgePojoFactory());
     HBaseGraphHeadHandler<GraphHeadPojo> graphHandler =
       new HBaseGraphHeadHandler<>(new GraphHeadPojoFactory());
-    return new GradoopFlinkConfig<>(vertexHandler, edgeHandler, graphHandler,
+    return new GradoopFlinkConfig<>(graphHandler, vertexHandler, edgeHandler,
       env);
   }
 
@@ -110,15 +110,17 @@ public class GradoopFlinkConfig<
    *
    * @param config      Gradoop configuration
    * @param environment Flink execution environment
-   * @param <VD>        EPGM vertex type
-   * @param <ED>        EPGM edge type
-   * @param <GD>        EPGM graph head type
+   * @param <G>         EPGM graph head type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
    *
    * @return Gradoop Flink configuration
    */
-  public static <VD extends EPGMVertex, ED extends EPGMEdge,
-    GD extends EPGMGraphHead> GradoopFlinkConfig<VD, ED, GD> createConfig(
-    GradoopConfig<GD, VD, ED> config, ExecutionEnvironment environment) {
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> GradoopFlinkConfig<G, V, E> createConfig(
+    GradoopConfig<G, V, E> config, ExecutionEnvironment environment) {
     return new GradoopFlinkConfig<>(config, environment);
   }
 

@@ -11,16 +11,16 @@ import org.gradoop.model.impl.operators.base.SetOperatorBase;
  * Returns a collection with all logical graphs that exist in both input
  * collections. Graph equality is based on their identifiers.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  * @see IntersectionBroadcast
  */
 public class Intersection<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends SetOperatorBase<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends SetOperatorBase<G, V, E> {
 
   /**
    * Computes new subgraphs by grouping both graph collections by graph
@@ -30,11 +30,11 @@ public class Intersection<
    * @return subgraph dataset of the resulting collection
    */
   @Override
-  protected DataSet<GD> computeNewGraphHeads() {
+  protected DataSet<G> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
       .union(secondCollection.getGraphHeads())
-      .groupBy(new Id<GD>())
-      .reduceGroup(new GraphHeadGroupReducer<GD>(2));
+      .groupBy(new Id<G>())
+      .reduceGroup(new GraphHeadGroupReducer<G>(2));
   }
 
   /**

@@ -31,14 +31,17 @@ import org.gradoop.model.impl.functions.epgm.PropertySetter;
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
- * @param <N>  output type of aggregate function
+ * @param <N> output type of aggregate function
  */
-public class Aggregation<N extends Number,
-  G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryGraphToGraphOperator<V, E, G> {
+public class Aggregation<
+  N extends Number,
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  implements UnaryGraphToGraphOperator<G, V, E> {
 
   /**
    * Used to store aggregate result.

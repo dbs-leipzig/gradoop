@@ -5,17 +5,17 @@ import org.gradoop.model.impl.id.GradoopId;
 /**
  * Initializes {@link EPGMGraphHead} objects of a given type.
  *
- * @param <T> graph data type
+ * @param <G> EPGM graph head type
  */
-public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
-  EPGMElementFactory<T> {
+public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
+  extends EPGMElementFactory<G> {
 
   /**
    * Creates a new graph head based.
    *
    * @return graph data
    */
-  T createGraphHead();
+  G createGraphHead();
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -23,7 +23,7 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param id graph identifier
    * @return graph data
    */
-  T initGraphHead(GradoopId id);
+  G initGraphHead(GradoopId id);
 
   /**
    * Creates a new graph head based on the given parameters.
@@ -31,7 +31,7 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param label graph label
    * @return graph data
    */
-  T createGraphHead(String label);
+  G createGraphHead(String label);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -40,7 +40,7 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param label graph label
    * @return graph data
    */
-  T initGraphHead(GradoopId id, String label);
+  G initGraphHead(GradoopId id, String label);
 
   /**
    * Creates a new graph head based on the given parameters.
@@ -49,7 +49,7 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param properties graph attributes
    * @return graph data
    */
-  T createGraphHead(String label, EPGMPropertyList properties);
+  G createGraphHead(String label, EPGMPropertyList properties);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -59,5 +59,5 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param properties graph attributes
    * @return graph data
    */
-  T initGraphHead(GradoopId id, String label, EPGMPropertyList properties);
+  G initGraphHead(GradoopId id, String label, EPGMPropertyList properties);
 }

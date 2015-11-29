@@ -29,12 +29,12 @@ import java.io.IOException;
 /**
  * Responsible for reading and writing edge data from and to HBase.
  *
- * @param <ED>  EPGM edge type
- * @param <V>  EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <V> EPGM vertex type
  */
 public interface EdgeHandler<
-  ED extends EPGMEdge,
-  V extends EPGMVertex>
+  V extends EPGMVertex,
+  E extends EPGMEdge>
   extends
   GraphElementHandler {
 
@@ -88,12 +88,12 @@ public interface EdgeHandler<
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  ED readEdge(final Result res);
+  E readEdge(final Result res);
 
   /**
    * Returns the edge data factory used by this handler.
    *
    * @return edge data factory
    */
-  EPGMEdgeFactory<ED> getEdgeFactory();
+  EPGMEdgeFactory<E> getEdgeFactory();
 }

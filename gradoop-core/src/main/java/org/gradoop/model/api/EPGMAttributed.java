@@ -18,8 +18,7 @@
 package org.gradoop.model.api;
 
 /**
- * Used to describe entities that store a set of properties, where each property
- * is defined by a property key and a property value.
+ * Used to describe entities that can have properties.
  */
 public interface EPGMAttributed {
 
@@ -97,5 +96,5 @@ public interface EPGMAttributed {
    * @param key property key
    * @return true, if element has property with given key
    */
-  Boolean hasProperty(String key);
+  boolean hasProperty(String key);
 }

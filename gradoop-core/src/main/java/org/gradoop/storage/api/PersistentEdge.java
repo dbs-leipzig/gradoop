@@ -21,10 +21,10 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 
 /**
- * Representation of edge data on the storage level. We additionally store
+ * Representation of an edge on the storage level. We additionally store
  * vertex label information which enables filter mechanisms during loading.
  *
- * @param <V> vertex data type (used to create persistent vertex identifiers)
+ * @param <V> EPGM vertex type
  */
 public interface PersistentEdge<V extends EPGMVertex> extends EPGMEdge {
 

@@ -42,15 +42,15 @@ import org.gradoop.model.impl.operators.summarization.tuples
  * 5) group edges on source/target vertex and possibly edge label / property
  * 6) build summarized edges
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class SummarizationGroupSort<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends Summarization<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends Summarization<G, V, E> {
 
   /**
    * Creates summarization.
@@ -69,12 +69,12 @@ public class SummarizationGroupSort<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, VD, ED> summarizeInternal(
-    Graph<GradoopId, VD, ED> graph) {
+  protected Graph<GradoopId, V, E> summarizeInternal(
+    Graph<GradoopId, V, E> graph) {
 
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices()
       // map vertices to a compact representation
-      .map(new VertexToGroupVertexMapper<VD>(
+      .map(new VertexToGroupVertexMapper<V>(
         getVertexGroupingKey(), useVertexLabels()));
 
     // sort group by vertex id ascending
@@ -86,7 +86,7 @@ public class SummarizationGroupSort<
         // create vertex group items
         .reduceGroup(new VertexGroupReducer());
 
-    DataSet<Vertex<GradoopId, VD>> summarizedVertices = sortedGroupedVertices
+    DataSet<Vertex<GradoopId, V>> summarizedVertices = sortedGroupedVertices
       // filter group representative tuples
       .filter(new VertexGroupItemToSummarizedVertexFilter())
         // build summarized vertex
@@ -101,7 +101,7 @@ public class SummarizationGroupSort<
         .map(new VertexGroupItemToVertexWithRepresentativeMapper());
 
     // build summarized edges
-    DataSet<Edge<GradoopId, ED>> summarizedEdges =
+    DataSet<Edge<GradoopId, E>> summarizedEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
     return Graph

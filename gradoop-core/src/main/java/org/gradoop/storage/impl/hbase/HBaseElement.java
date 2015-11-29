@@ -18,29 +18,25 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.api.EPGMProperty;
+import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.api.EPGMPropertyValue;
 import org.gradoop.model.impl.id.GradoopId;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Wraps EPGM data entity.
  *
  * @param <T> entity type
  */
-public abstract class HBaseElement<T extends EPGMElement> implements
-  EPGMElement {
+public abstract class HBaseElement<T extends EPGMElement>
+  implements EPGMElement {
 
   /**
    * Encapsulated EPGM element.
    */
   private T epgmElement;
-
-  /**
-   * Default constructor.
-   */
-  protected HBaseElement() {
-  }
 
   /**
    * Creates an persistent EPGM element.
@@ -111,7 +107,7 @@ public abstract class HBaseElement<T extends EPGMElement> implements
    * {@inheritDoc}
    */
   @Override
-  public Boolean hasProperty(String key) {
+  public boolean hasProperty(String key) {
     return getProperties() != null && getProperties().containsKey(key);
   }
 

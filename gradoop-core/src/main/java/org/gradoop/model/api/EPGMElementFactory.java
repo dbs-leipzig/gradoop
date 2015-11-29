@@ -3,7 +3,7 @@ package org.gradoop.model.api;
 import java.io.Serializable;
 
 /**
- * Base interface for all element factories.
+ * Base interface for all EPGM element factories.
  *
  * @param <T> Type of the element object.
  */

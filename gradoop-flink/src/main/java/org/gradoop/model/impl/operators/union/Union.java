@@ -28,45 +28,45 @@ import org.gradoop.model.impl.operators.base.SetOperatorBase;
  * Returns a collection with all logical graphs from two input collections.
  * Graph equality is based on their identifiers.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class Union<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends SetOperatorBase<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends SetOperatorBase<G, V, E> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<VD> computeNewVertices(
-    DataSet<GD> newGraphHeads) throws Exception {
+  protected DataSet<V> computeNewVertices(
+    DataSet<G> newGraphHeads) throws Exception {
     return firstCollection.getVertices()
       .union(secondCollection.getVertices())
-      .distinct(new Id<VD>());
+      .distinct(new Id<V>());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<GD> computeNewGraphHeads() {
+  protected DataSet<G> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
       .union(secondCollection.getGraphHeads())
-      .distinct(new Id<GD>());
+      .distinct(new Id<G>());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<ED> computeNewEdges(DataSet<VD> newVertices) {
+  protected DataSet<E> computeNewEdges(DataSet<V> newVertices) {
     return firstCollection.getEdges()
       .union(secondCollection.getEdges())
-      .distinct(new Id<ED>());
+      .distinct(new Id<E>());
   }
 
   /**

@@ -68,28 +68,28 @@ public class EdgePojoTest {
     assertThat(e.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void createWithNullIDTest() {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     new EdgePojoFactory().initEdge(null, sourceId, targetId);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void createWithNullSourceIdTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     new EdgePojoFactory().initEdge(edgeId, null, targetId);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void createWithNullTargetIdTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     new EdgePojoFactory().initEdge(edgeId, sourceId, null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();

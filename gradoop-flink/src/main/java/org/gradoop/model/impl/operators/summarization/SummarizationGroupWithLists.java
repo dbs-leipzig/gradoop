@@ -63,15 +63,15 @@ import java.util.List;
  * 5) group edges on source/target vertex and possibly edge label / property
  * 6) build summarized edges
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
 public class SummarizationGroupWithLists<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends Summarization<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends Summarization<G, V, E> {
   /**
    * Creates summarization.
    *
@@ -89,13 +89,13 @@ public class SummarizationGroupWithLists<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, VD, ED> summarizeInternal(
-    Graph<GradoopId, VD, ED> graph) {
+  protected Graph<GradoopId, V, E> summarizeInternal(
+    Graph<GradoopId, V, E> graph) {
 
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
-      new VertexToGroupVertexMapper<VD>(getVertexGroupingKey(),
+      new VertexToGroupVertexMapper<V>(getVertexGroupingKey(),
         useVertexLabels()));
 
     // group vertices by either label or property or both
@@ -103,19 +103,19 @@ public class SummarizationGroupWithLists<
       groupVertices(verticesForGrouping);
 
     // create new summarized gelly vertices
-    DataSet<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>>
+    DataSet<Tuple2<Vertex<GradoopId, V>, List<GradoopId>>>
       newVerticesWithGroupVertexIds =
       buildSummarizedVerticesWithVertexIdList(groupedVertices);
 
-    DataSet<Vertex<GradoopId, VD>> newVertices =
-      newVerticesWithGroupVertexIds.map(new SummarizedVertexForwarder<VD>());
+    DataSet<Vertex<GradoopId, V>> newVertices =
+      newVerticesWithGroupVertexIds.map(new SummarizedVertexForwarder<V>());
 
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
       newVerticesWithGroupVertexIds
-        .flatMap(new VertexToGroupRepresentativeMapper<VD>());
+        .flatMap(new VertexToGroupRepresentativeMapper<V>());
 
     /* build summarized vertices */
-    DataSet<Edge<GradoopId, ED>> newEdges =
+    DataSet<Edge<GradoopId, E>> newEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
     return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
@@ -129,7 +129,7 @@ public class SummarizationGroupWithLists<
    * @param groupedSortedVertices grouped and sorted vertices
    * @return data set containing summarized vertex and its grouped vertex ids
    */
-  protected DataSet<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>>
+  protected DataSet<Tuple2<Vertex<GradoopId, V>, List<GradoopId>>>
   buildSummarizedVerticesWithVertexIdList(
     UnsortedGrouping<VertexForGrouping> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(

@@ -18,8 +18,12 @@
 package org.gradoop.model.api;
 
 /**
- * Base interface for all elements in the EPGM model (i.e., logical graphs,
- * vertices and edges).
+ * Base interface for all elements in the EPGM.
+ *
+ * @see EPGMGraphHead
+ * @see EPGMVertex
+ * @see EPGMEdge
  */
-public interface EPGMElement extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed {
+public interface EPGMElement
+  extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed {
 }

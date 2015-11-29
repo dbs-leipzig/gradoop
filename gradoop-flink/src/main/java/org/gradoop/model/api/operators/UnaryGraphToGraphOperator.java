@@ -25,12 +25,14 @@ import org.gradoop.model.impl.LogicalGraph;
 /**
  * Creates a {@link LogicalGraph} based on one input {@link LogicalGraph}.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public interface UnaryGraphToGraphOperator<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead> extends
-  Operator {
+public interface UnaryGraphToGraphOperator<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge> extends Operator {
   /**
    * Executes the operator.
    *
@@ -38,6 +40,6 @@ public interface UnaryGraphToGraphOperator<VD extends EPGMVertex, ED extends EPG
    * @return operator result
    * @throws Exception
    */
-  LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) throws
+  LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
     Exception;
 }

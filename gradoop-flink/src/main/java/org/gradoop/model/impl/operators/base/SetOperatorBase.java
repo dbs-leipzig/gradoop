@@ -21,18 +21,18 @@ import org.gradoop.model.impl.operators.union.Union;
  * Base class for set operations that share common methods to build vertex,
  * edge and data sets.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  * @see Difference
  * @see Intersection
  * @see Union
  */
 public abstract class SetOperatorBase<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends BinaryCollectionToCollectionOperatorBase<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends BinaryCollectionToCollectionOperatorBase<G, V, E> {
 
   /**
    * Computes new vertices based on the new subgraphs. For each vertex, each
@@ -43,14 +43,14 @@ public abstract class SetOperatorBase<
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<VD> computeNewVertices(
-    DataSet<GD> newGraphHeads) throws Exception {
-    DataSet<Tuple2<VD, GradoopId>> verticesWithGraphs =
+  protected DataSet<V> computeNewVertices(
+    DataSet<G> newGraphHeads) throws Exception {
+    DataSet<Tuple2<V, GradoopId>> verticesWithGraphs =
       firstCollection.getVertices().flatMap(
-        new FlatMapFunction<VD, Tuple2<VD, GradoopId>>() {
+        new FlatMapFunction<V, Tuple2<V, GradoopId>>() {
           @Override
-          public void flatMap(VD v,
-            Collector<Tuple2<VD, GradoopId>> collector) throws
+          public void flatMap(V v,
+            Collector<Tuple2<V, GradoopId>> collector) throws
             Exception {
             for (GradoopId graphId : v.getGraphIds()) {
               collector.collect(new Tuple2<>(v, graphId));
@@ -61,16 +61,16 @@ public abstract class SetOperatorBase<
     return verticesWithGraphs
       .join(newGraphHeads)
       .where(1)
-      .equalTo(new Id<GD>())
+      .equalTo(new Id<G>())
       .with(
-        new JoinFunction<Tuple2<VD, GradoopId>, GD, VD>() {
+        new JoinFunction<Tuple2<V, GradoopId>, G, V>() {
           @Override
-          public VD join(Tuple2<VD, GradoopId> vertices,
-            GD subgraph) throws Exception {
+          public V join(Tuple2<V, GradoopId> vertices,
+            G subgraph) throws Exception {
             return vertices.f0;
           }
         })
-      .distinct(new Id<VD>());
+      .distinct(new Id<V>());
   }
 
   /**
@@ -83,15 +83,15 @@ public abstract class SetOperatorBase<
    * @see Intersection
    */
   @Override
-  protected DataSet<ED> computeNewEdges(DataSet<VD> newVertices) {
+  protected DataSet<E> computeNewEdges(DataSet<V> newVertices) {
     return firstCollection.getEdges().join(newVertices)
-      .where(new SourceId<ED>())
-      .equalTo(new Id<VD>())
-      .with(new LeftSide<ED, VD>())
+      .where(new SourceId<E>())
+      .equalTo(new Id<V>())
+      .with(new LeftSide<E, V>())
       .join(newVertices)
-      .where(new TargetId<ED>())
-      .equalTo(new Id<VD>())
-      .with(new LeftSide<ED, VD>())
-      .distinct(new Id<ED>());
+      .where(new TargetId<E>())
+      .equalTo(new Id<V>())
+      .with(new LeftSide<E, V>())
+      .distinct(new Id<E>());
   }
 }

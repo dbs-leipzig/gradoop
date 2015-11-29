@@ -25,14 +25,13 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
-import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.storage.api.PersistentEdge;
-import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.EdgeHandler;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.util.GConstants;
 
 import java.io.IOException;
 
@@ -49,21 +48,19 @@ import java.io.IOException;
  * |         | "knows"  | <Person.0> | <Person.1> | [0,1]  | 2014  |
  * |---------|----------|------------|------------|--------|-------|
  *
- * @param <ED> edge data type
- * @param <VD> vertex data type (used to create persistent vertex identifiers)
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
-  extends HBaseGraphElementHandler implements EdgeHandler<ED, VD> {
+public class HBaseEdgeHandler<
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends HBaseGraphElementHandler
+  implements EdgeHandler<V, E> {
 
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
-  /**
-   * Logger
-   */
-  private static Logger LOG = Logger.getLogger(HBaseEdgeHandler.class);
 
   /**
    * Byte array representation of the source vertex column identifier.
@@ -79,14 +76,14 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
   /**
    * Creates edge data objects from the rows.
    */
-  private final EPGMEdgeFactory<ED> edgeFactory;
+  private final EPGMEdgeFactory<E> edgeFactory;
 
   /**
    * Creates an edge data handler.
    *
    * @param edgeFactory edge data factory
    */
-  public HBaseEdgeHandler(EPGMEdgeFactory<ED> edgeFactory) {
+  public HBaseEdgeHandler(EPGMEdgeFactory<E> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
@@ -96,7 +93,6 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
   @Override
   public void createTable(final HBaseAdmin admin,
     final HTableDescriptor tableDescriptor) throws IOException {
-    LOG.info("Creating table " + tableDescriptor.getNameAsString());
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
     admin.createTable(tableDescriptor);
@@ -106,7 +102,7 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeSource(Put put, VD vertexData) throws IOException {
+  public Put writeSource(Put put, V vertexData) throws IOException {
     return put.add(CF_META_BYTES, COL_SOURCE_BYTES,
       createVertexIdentifier(vertexData));
   }
@@ -127,7 +123,7 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeTarget(Put put, VD vertexData) throws IOException {
+  public Put writeTarget(Put put, V vertexData) throws IOException {
     return put.add(CF_META_BYTES, COL_TARGET_BYTES,
       createVertexIdentifier(vertexData));
   }
@@ -148,9 +144,8 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdge(Put put, PersistentEdge<VD> edgeData) throws
+  public Put writeEdge(Put put, PersistentEdge<V> edgeData) throws
     IOException {
-    LOG.info("Creating Put from: " + edgeData);
     writeLabel(put, edgeData);
     writeSource(put, edgeData.getSource());
     writeTarget(put, edgeData.getTarget());
@@ -163,8 +158,8 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public ED readEdge(Result res) {
-    ED edge = null;
+  public E readEdge(Result res) {
+    E edge = null;
     try {
       edge = edgeFactory
         .initEdge(readId(res), readLabel(res), readSourceId(res),
@@ -180,7 +175,7 @@ public class HBaseEdgeHandler<ED extends EPGMEdge, VD extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public EPGMEdgeFactory<ED> getEdgeFactory() {
+  public EPGMEdgeFactory<E> getEdgeFactory() {
     return edgeFactory;
   }
 

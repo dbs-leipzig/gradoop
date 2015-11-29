@@ -34,15 +34,15 @@ import org.gradoop.model.impl.id.GradoopId;
  * This operator implementation requires that a list of subgraph identifiers
  * in the resulting graph collections fits into the workers main memory.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class DifferenceBroadcast<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends Difference<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends Difference<G, V, E> {
 
   /**
    * Computes the resulting vertices by collecting a list of resulting
@@ -53,13 +53,13 @@ public class DifferenceBroadcast<
    * @throws Exception
    */
   @Override
-  protected DataSet<VD> computeNewVertices(
-    DataSet<GD> newSubgraphs) throws Exception {
+  protected DataSet<V> computeNewVertices(
+    DataSet<G> newSubgraphs) throws Exception {
     DataSet<GradoopId> identifiers = newSubgraphs
-      .map(new Id<GD>());
+      .map(new Id<G>());
 
     return firstCollection.getVertices()
-      .filter(new InGraphsBroadcast<VD>())
+      .filter(new InGraphsBroadcast<V>())
       .withBroadcastSet(identifiers,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }

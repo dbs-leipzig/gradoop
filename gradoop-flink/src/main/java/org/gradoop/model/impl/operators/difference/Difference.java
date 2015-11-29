@@ -16,16 +16,16 @@ import java.util.Iterator;
  * first input collection but not in the second.
  * Graph equality is based on their respective identifiers.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  * @see DifferenceBroadcast
  */
 public class Difference<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends SetOperatorBase<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends SetOperatorBase<G, V, E> {
 
   /**
    * Computes the subgraph dataset for the resulting collection.
@@ -33,25 +33,25 @@ public class Difference<
    * @return subgraph dataset of the resulting collection
    */
   @Override
-  protected DataSet<GD> computeNewGraphHeads() {
+  protected DataSet<G> computeNewGraphHeads() {
     // assign 1L to each subgraph in the first collection
-    DataSet<Tuple2<GD, Long>> thisGraphs = firstCollection.getGraphHeads()
-      .map(new Tuple2LongMapper<GD>(1L));
+    DataSet<Tuple2<G, Long>> thisGraphs = firstCollection.getGraphHeads()
+      .map(new Tuple2LongMapper<G>(1L));
     // assign 2L to each subgraph in the second collection
-    DataSet<Tuple2<GD, Long>> otherGraphs = secondCollection.getGraphHeads()
-      .map(new Tuple2LongMapper<GD>(2L));
+    DataSet<Tuple2<G, Long>> otherGraphs = secondCollection.getGraphHeads()
+      .map(new Tuple2LongMapper<G>(2L));
 
     // union the subgraphs, group them by their identifier and check that
     // there is no graph in the group that belongs to the second collection
     return thisGraphs.union(otherGraphs)
-      .groupBy(new SubgraphTupleKeySelector<GD, Long>()).reduceGroup(
-        new GroupReduceFunction<Tuple2<GD, Long>, GD>() {
+      .groupBy(new SubgraphTupleKeySelector<G, Long>()).reduceGroup(
+        new GroupReduceFunction<Tuple2<G, Long>, G>() {
           @Override
           public void reduce(
-            Iterable<Tuple2<GD, Long>> iterable,
-            Collector<GD> collector) throws Exception {
-            Iterator<Tuple2<GD, Long>> it = iterable.iterator();
-            Tuple2<GD, Long> graphHeadWithLong = null;
+            Iterable<Tuple2<G, Long>> iterable,
+            Collector<G> collector) throws Exception {
+            Iterator<Tuple2<G, Long>> it = iterable.iterator();
+            Tuple2<G, Long> graphHeadWithLong = null;
             boolean inOtherCollection = false;
             while (it.hasNext()) {
               graphHeadWithLong = it.next();

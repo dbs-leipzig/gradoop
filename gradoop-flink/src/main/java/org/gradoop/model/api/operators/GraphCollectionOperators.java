@@ -31,9 +31,9 @@ import org.gradoop.model.impl.GraphCollection;
  * Describes all operators that can be applied on a collection of logical
  * graphs in the EPGM.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
 public interface GraphCollectionOperators
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
@@ -84,10 +84,6 @@ public interface GraphCollectionOperators
    */
   GraphCollection<G, V, E> filter(Predicate<G> predicateFunction) throws
     Exception;
-
-  /*
-  collection operators
-   */
 
   /**
    * Returns a collection with logical graphs that fulfil the given predicate
@@ -189,10 +185,6 @@ public interface GraphCollectionOperators
    */
   GraphCollection<G, V, E> top(int limit);
 
-  /*
-  split operators
-   */
-
   /**
    * Applies a given unary graph to graph operator (e.g., summarize) on each
    * logical graph in the graph collection.
@@ -200,7 +192,7 @@ public interface GraphCollectionOperators
    * @param op unary graph to graph operator
    * @return collection with resulting logical graphs
    */
-  GraphCollection<G, V, E> apply(UnaryGraphToGraphOperator<V, E, G> op);
+  GraphCollection<G, V, E> apply(UnaryGraphToGraphOperator<G,V, E> op);
 
   /**
    * Applies binary graph to graph operator (e.g., combine) on each pair of
@@ -230,7 +222,7 @@ public interface GraphCollectionOperators
    * @throws Exception
    */
   GraphCollection<G, V, E> callForCollection(
-    BinaryCollectionToCollectionOperator<V, E, G> op,
+    BinaryCollectionToCollectionOperator<G, V, E> op,
     GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**

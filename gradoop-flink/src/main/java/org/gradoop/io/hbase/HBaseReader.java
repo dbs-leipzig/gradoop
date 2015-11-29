@@ -158,16 +158,18 @@ public class HBaseReader {
   /**
    * Reads edge data from HBase.
    *
-   * @param <ED> EPGM edge type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
    */
-  public static class EdgeTableInputFormat<ED extends EPGMEdge, VD
-    extends EPGMVertex> extends
-    TableInputFormat<Edge<GradoopId, ED>> {
+  public static class EdgeTableInputFormat<
+    V extends EPGMVertex,
+    E extends EPGMEdge>
+    extends TableInputFormat<Edge<GradoopId, E>> {
 
     /**
      * Handles reading of persistent edge data.
      */
-    private final EdgeHandler<ED, VD> edgeHandler;
+    private final EdgeHandler<V, E> edgeHandler;
 
     /**
      * Table to read from.
@@ -180,7 +182,7 @@ public class HBaseReader {
      * @param edgeHandler   edge data handler
      * @param edgeTableName edge data table name
      */
-    public EdgeTableInputFormat(EdgeHandler<ED, VD> edgeHandler,
+    public EdgeTableInputFormat(EdgeHandler<V, E> edgeHandler,
       String edgeTableName) {
       this.edgeHandler = edgeHandler;
       this.edgeTableName = edgeTableName;
@@ -208,8 +210,8 @@ public class HBaseReader {
      * {@inheritDoc}
      */
     @Override
-    protected Edge<GradoopId, ED> mapResultToTuple(Result result) {
-      ED edgeData = edgeHandler.readEdge(result);
+    protected Edge<GradoopId, E> mapResultToTuple(Result result) {
+      E edgeData = edgeHandler.readEdge(result);
       return new Edge<>(edgeData.getSourceId(),
         edgeData.getTargetId(), edgeData);
     }

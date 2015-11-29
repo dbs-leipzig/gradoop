@@ -35,13 +35,15 @@ import java.util.Random;
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
-public class RandomNodeSampling
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryGraphToGraphOperator<V, E, G> {
+public class RandomNodeSampling<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  implements UnaryGraphToGraphOperator<G, V, E> {
   /**
    * relative amount of nodes in the result graph
    */

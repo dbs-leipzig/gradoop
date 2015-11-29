@@ -50,20 +50,22 @@ import org.gradoop.util.GradoopFlinkConfig;
 /**
  * Base class for graph representations.
  *
+ * @param <G> graph data type
  * @param <V> vertex data type
  * @param <E> edge data type
- * @param <G> graph data type
  * @see LogicalGraph
  * @see GraphCollection
  */
-public abstract class GraphBase
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+public abstract class GraphBase<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
   implements GraphOperators<V, E> {
 
   /**
    * Gradoop Flink configuration.
    */
-  private final GradoopFlinkConfig<V, E, G> config;
+  private final GradoopFlinkConfig<G, V, E> config;
 
   /**
    * Graph data associated with the logical graphs in that collection.
@@ -82,13 +84,13 @@ public abstract class GraphBase
   /**
    * Creates a new graph instance.
    *
-   * @param graphHeads
-   * @param vertices  vertex data set
-   * @param edges     edge data set
-   * @param config    Gradoop Flink configuration
+   * @param graphHeads  graph head data set
+   * @param vertices    vertex data set
+   * @param edges       edge data set
+   * @param config      Gradoop Flink configuration
    */
   protected GraphBase(DataSet<G> graphHeads, DataSet<V> vertices,
-    DataSet<E> edges, GradoopFlinkConfig<V, E, G> config) {
+    DataSet<E> edges, GradoopFlinkConfig<G, V, E> config) {
     this.graphHeads = graphHeads;
     this.vertices = vertices;
     this.edges = edges;
@@ -100,7 +102,7 @@ public abstract class GraphBase
    *
    * @return Gradoop Flink configuration
    */
-  public GradoopFlinkConfig<V, E, G> getConfig() {
+  public GradoopFlinkConfig<G, V, E> getConfig() {
     return config;
   }
 

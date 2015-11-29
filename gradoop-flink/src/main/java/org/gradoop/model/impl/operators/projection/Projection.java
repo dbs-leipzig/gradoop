@@ -46,13 +46,15 @@ import org.gradoop.model.impl.functions.epgm.Clone;
  * Creates a projected version of the logical graph using the user defined
  * vertex and edge data projection functions.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
-public class Projection
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryGraphToGraphOperator<V, E, G> {
+public class Projection<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  implements UnaryGraphToGraphOperator<G, V, E> {
   /**
    * Vertex projection function.
    */

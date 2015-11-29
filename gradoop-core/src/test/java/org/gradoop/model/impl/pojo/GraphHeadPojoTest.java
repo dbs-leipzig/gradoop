@@ -62,12 +62,12 @@ public class GraphHeadPojoTest {
     assertThat(g.getLabel(), is(GConstants.DEFAULT_GRAPH_LABEL));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void createWithNullIDTest() {
     new GraphHeadPojoFactory().initGraphHead(null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId graphID = GradoopId.get();
     new GraphHeadPojoFactory().initGraphHead(graphID, null);

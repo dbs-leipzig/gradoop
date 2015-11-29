@@ -38,40 +38,40 @@ import java.util.Iterator;
  * Abstract operator implementation which can be used with binary collection
  * to collection operators.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
 public abstract class BinaryCollectionToCollectionOperatorBase<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  implements BinaryCollectionToCollectionOperator<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  implements BinaryCollectionToCollectionOperator<G, V, E> {
 
   /**
    * First input collection.
    */
-  protected GraphCollection<GD, VD, ED> firstCollection;
+  protected GraphCollection<G, V, E> firstCollection;
   /**
    * Second input collection.
    */
-  protected GraphCollection<GD, VD, ED> secondCollection;
+  protected GraphCollection<G, V, E> secondCollection;
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<GD, VD, ED> execute(
-    GraphCollection<GD, VD, ED> firstCollection,
-    GraphCollection<GD, VD, ED> secondCollection) throws Exception {
+  public GraphCollection<G, V, E> execute(
+    GraphCollection<G, V, E> firstCollection,
+    GraphCollection<G, V, E> secondCollection) throws Exception {
 
     // do some init stuff for the actual operator
     this.firstCollection = firstCollection;
     this.secondCollection = secondCollection;
 
-    final DataSet<GD> newGraphHeads = computeNewGraphHeads();
-    final DataSet<VD> newVertices = computeNewVertices(newGraphHeads);
-    final DataSet<ED> newEdges = computeNewEdges(newVertices);
+    final DataSet<G> newGraphHeads = computeNewGraphHeads();
+    final DataSet<V> newVertices = computeNewVertices(newGraphHeads);
+    final DataSet<E> newEdges = computeNewEdges(newVertices);
 
     return GraphCollection.fromDataSets(newVertices,
       newEdges, newGraphHeads, firstCollection.getConfig());
@@ -83,15 +83,15 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
    * @param newGraphHeads new graph heads
    * @return vertex set of the resulting graph collection
    */
-  protected abstract DataSet<VD> computeNewVertices(
-    DataSet<GD> newGraphHeads) throws Exception;
+  protected abstract DataSet<V> computeNewVertices(
+    DataSet<G> newGraphHeads) throws Exception;
 
   /**
    * Overridden by inheriting classes.
    *
    * @return subgraph dataset of the resulting collection
    */
-  protected abstract DataSet<GD> computeNewGraphHeads();
+  protected abstract DataSet<G> computeNewGraphHeads();
 
   /**
    * Overridden by inheriting classes.
@@ -99,7 +99,7 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
    * @param newVertices vertex set of the resulting graph collection
    * @return edges set only connect vertices in {@code newVertices}
    */
-  protected abstract DataSet<ED> computeNewEdges(DataSet<VD> newVertices);
+  protected abstract DataSet<E> computeNewEdges(DataSet<V> newVertices);
 
   /**
    * Checks if the number of grouped elements equals a given expected size.

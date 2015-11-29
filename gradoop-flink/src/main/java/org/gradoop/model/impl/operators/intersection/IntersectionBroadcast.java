@@ -33,24 +33,24 @@ import org.gradoop.model.impl.id.GradoopId;
  * This operator implementation requires that a list of subgraph identifiers
  * in the resulting graph collections fits into the workers main memory.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class IntersectionBroadcast<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends Intersection<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends Intersection<G, V, E> {
 
   @Override
-  protected DataSet<VD> computeNewVertices(
-    DataSet<GD> newSubgraphs) throws Exception {
+  protected DataSet<V> computeNewVertices(
+    DataSet<G> newSubgraphs) throws Exception {
     DataSet<GradoopId> identifiers = secondCollection.getGraphHeads()
-      .map(new Id<GD>());
+      .map(new Id<G>());
 
-    DataSet<VD> vertices = firstCollection.getVertices();
-    return vertices.filter(new InGraphsBroadcast<VD>())
+    DataSet<V> vertices = firstCollection.getVertices();
+    return vertices.filter(new InGraphsBroadcast<V>())
       .withBroadcastSet(identifiers,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }

@@ -297,7 +297,7 @@ public interface LogicalGraphOperators
    * @throws Exception
    */
   LogicalGraph<G, V, E> callForGraph(
-    UnaryGraphToGraphOperator<V, E, G> operator) throws Exception;
+    UnaryGraphToGraphOperator<G, V, E> operator) throws Exception;
 
   /**
    * Creates a logical graph from that graph and the input graph using the

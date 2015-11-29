@@ -45,12 +45,13 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
 
   /**
    * Creates an edge instance based on the given parameters.
-   *  @param id             the unique id of the edge
-   * @param label          edge label
-   * @param sourceId source vertex id
-   * @param targetId target vertex id
-   * @param properties     edge properties
-   * @param graphIds         graphs that edge is contained in
+   *
+   * @param id          edge identifier
+   * @param label       edge label
+   * @param sourceId    source vertex id
+   * @param targetId    target vertex id
+   * @param properties  edge properties
+   * @param graphIds    graphs that edge is contained in
    */
   EdgePojo(
     final GradoopId id,
@@ -59,7 +60,6 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
     final GradoopId targetId,
     final EPGMPropertyList properties,
     GradoopIdSet graphIds) {
-
     super(id, label, properties, graphIds);
     this.sourceId = sourceId;
     this.targetId = targetId;

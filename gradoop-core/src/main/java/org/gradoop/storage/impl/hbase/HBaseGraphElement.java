@@ -30,12 +30,6 @@ public abstract class HBaseGraphElement<T extends EPGMGraphElement> extends
   HBaseElement<T> implements EPGMGraphElement {
 
   /**
-   * Default constructor.
-   */
-  protected HBaseGraphElement() {
-  }
-
-  /**
    * Creates an EPGM graph element.
    *
    * @param epgmGraphElement encapsulated graph element

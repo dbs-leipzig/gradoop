@@ -22,17 +22,17 @@ package org.gradoop.util;
  */
 public final class GConstants {
   /**
-   * Default HBase table name for vertex data.
+   * Default HBase table name for graph heads.
    */
-  public static final String DEFAULT_TABLE_VERTICES = "vertex_data";
+  public static final String DEFAULT_TABLE_GRAPHS = "graph_heads";
   /**
-   * Default HBase table name for edge data.
+   * Default HBase table name for vertices.
    */
-  public static final String DEFAULT_TABLE_EDGES = "edge_data";
+  public static final String DEFAULT_TABLE_VERTICES = "vertices";
   /**
-   * Default HBase table name for graph data.
+   * Default HBase table name for edges.
    */
-  public static final String DEFAULT_TABLE_GRAPHS = "graph_data";
+  public static final String DEFAULT_TABLE_EDGES = "edges";
 
   /**
    * Default label for unlabeled vertices.

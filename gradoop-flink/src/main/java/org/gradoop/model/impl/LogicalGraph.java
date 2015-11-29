@@ -1,21 +1,4 @@
 /*
- * This file is part of gradoop.
- *
- * gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
  * This file is part of Gradoop.
  *
  * Gradoop is free software: you can redistribute it and/or modify
@@ -31,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
@@ -44,6 +28,7 @@ import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.operators.AggregateFunction;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
@@ -52,29 +37,25 @@ import org.gradoop.model.impl.functions.api.Predicate;
 import org.gradoop.model.impl.functions.api.UnaryFunction;
 import org.gradoop.model.impl.functions.graphcontainment.GraphContainmentUpdater;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.aggregation.Aggregation;
+import org.gradoop.model.impl.operators.combination.Combination;
 import org.gradoop.model.impl.operators.equality.EqualityByElementData;
 import org.gradoop.model.impl.operators.equality.EqualityByElementIds;
-import org.gradoop.model.impl.operators.combination.Combination;
 import org.gradoop.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.model.impl.operators.overlap.Overlap;
-import org.gradoop.model.api.operators.AggregateFunction;
-import org.gradoop.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.model.impl.operators.projection.Projection;
-import org.gradoop.model.impl.operators.sampling
-  .RandomNodeSampling;
-import org.gradoop.model.impl.operators.summarization
-  .SummarizationGroupCombine;
+import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupCombine;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Collection;
 
 /**
- * Represents a logical graph inside the EPGM. Holds the graph data (label,
- * properties) and offers unary, binary and split operators.
+ * Represents a logical graph inside the EPGM.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
 public class LogicalGraph
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
@@ -83,14 +64,15 @@ public class LogicalGraph
 
   /**
    * Creates a new logical graph based on the given parameters.
-   *  @param graphHead graph data associated with that logical graph
+   *
+   * @param graphHead graph head data set associated with that graph
    * @param vertices  vertex data set
    * @param edges     edge data set
    * @param config    Gradoop Flink configuration
    */
   private LogicalGraph(
     DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges,
-    GradoopFlinkConfig<V, E, G> config) {
+    GradoopFlinkConfig<G, V, E> config) {
 
     super(graphHead, vertices, edges, config);
   }
@@ -100,16 +82,17 @@ public class LogicalGraph
    *
    * @param graph     Flink Gelly graph
    * @param config    Gradoop Flink configuration
-   * @param <V>      vertex data type
-   * @param <E>      edge data type
-   * @param <G>      graph data type
-   * @return logical graph
+   * @param <G>      EPGM graph head type
+   * @param <V>      EPGM vertex type
+   * @param <E>      EPGM edge type
+   * @return Logical Graph
    */
-  public static
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
-  LogicalGraph<G, V, E> fromGellyGraph(
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> LogicalGraph<G, V, E> fromGellyGraph(
     Graph<GradoopId, V, E> graph,
-    GradoopFlinkConfig<V, E, G> config) {
+    GradoopFlinkConfig<G, V, E> config) {
 
     return fromDataSets(
       graph.getVertices().map(new MapFunction<Vertex<GradoopId, V>, V>() {
@@ -129,19 +112,21 @@ public class LogicalGraph
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param <VD>        EPGM vertex type
-   * @param <ED>        EPGM edge type
-   * @param <GD>        EPGM graph head graph head type
+   * @param <G>         EPGM graph head graph head type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
+   * @param graphHead   GraphHead DataSet
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
    * @return Logical graph
    */
-  public static
-  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  LogicalGraph<GD, VD, ED> fromDataSets(
-    DataSet<GD> graphHead, DataSet<VD> vertices, DataSet<ED> edges,
-    GradoopFlinkConfig<VD, ED, GD> config) {
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> LogicalGraph<G, V, E> fromDataSets(
+    DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges,
+    GradoopFlinkConfig<G, V, E> config) {
     return new LogicalGraph<>(graphHead, vertices, edges, config);
   }
 
@@ -151,19 +136,20 @@ public class LogicalGraph
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
    *
+   * @param <G>         EPGM graph head graph head type
    * @param <V>         EPGM vertex type
    * @param <E>         EPGM edge type
-   * @param <G>         EPGM graph head graph head type
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
    * @return Logical graph
    */
-  public static
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
-  LogicalGraph<G, V, E> fromDataSets(
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> LogicalGraph<G, V, E> fromDataSets(
     DataSet<V> vertices, DataSet<E> edges,
-    GradoopFlinkConfig<V, E, G> config) {
+    GradoopFlinkConfig<G, V, E> config) {
 
     G graphHead = config
       .getGraphHeadFactory()
@@ -188,20 +174,20 @@ public class LogicalGraph
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param <V>        EPGM vertex type
-   * @param <E>        EPGM edge type
-   * @param <G>        EPGM graph type
-   * @param graphHead   Graph head associated with the logical graph
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
-   * @param config      Gradoop Flink configuration
+   * @param <G>       EPGM graph type
+   * @param <V>       EPGM vertex type
+   * @param <E>       EPGM edge type
+   * @param graphHead Graph head associated with the logical graph
+   * @param vertices  Vertex collection
+   * @param edges     Edge collection
+   * @param config    Gradoop Flink configuration
    * @return Logical graph
    */
   public static
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   LogicalGraph<G, V, E> fromCollections(
     Collection<G> graphHead, Collection<V> vertices, Collection<E> edges,
-    GradoopFlinkConfig<V, E, G> config) {
+    GradoopFlinkConfig<G, V, E> config) {
     return fromDataSets(
       config.getExecutionEnvironment().fromCollection(graphHead),
       config.getExecutionEnvironment().fromCollection(vertices),
@@ -213,9 +199,9 @@ public class LogicalGraph
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param <V>        EPGM vertex type
-   * @param <E>        EPGM edge type
-   * @param <G>        EPGM graph type
+   * @param <G>         EPGM graph type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
    * @param graphHead   Graph head associated with the logical graph
    * @param vertices    Vertex collection
    * @param edges       Edge collection
@@ -226,7 +212,7 @@ public class LogicalGraph
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   LogicalGraph<G, V, E> fromCollections(
     G graphHead, Collection<V> vertices, Collection<E> edges,
-    GradoopFlinkConfig<V, E, G> config) {
+    GradoopFlinkConfig<G, V, E> config) {
 
     return fromCollections(
       Lists.newArrayList(graphHead), vertices, edges, config);
@@ -286,7 +272,7 @@ public class LogicalGraph
   public LogicalGraph<G, V, E> summarize(String vertexGroupingKey,
     String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<V, E, G>(vertexGroupingKey,
+      new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
         edgeGroupingKey, false, false));
   }
 
@@ -323,7 +309,7 @@ public class LogicalGraph
   public LogicalGraph<G, V, E> summarizeOnVertexLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<V, E, G>(vertexGroupingKey,
+      new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
         edgeGroupingKey, true, false));
   }
 
@@ -362,7 +348,7 @@ public class LogicalGraph
   public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception {
     return callForGraph(
-      new SummarizationGroupCombine<V, E, G>(vertexGroupingKey,
+      new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
         edgeGroupingKey, true, true));
   }
 
@@ -395,7 +381,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> callForGraph(
-    UnaryGraphToGraphOperator<V, E, G> operator) throws Exception {
+    UnaryGraphToGraphOperator<G, V, E> operator) throws Exception {
     return operator.execute(this);
   }
 

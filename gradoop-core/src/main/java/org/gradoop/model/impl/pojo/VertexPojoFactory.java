@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.pojo;
 
+import com.google.common.base.Preconditions;
 import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
@@ -26,9 +27,7 @@ import org.gradoop.model.api.EPGMVertexFactory;
 /**
  * Factory for creating vertex POJOs.
  */
-public class VertexPojoFactory
-  extends ElementPojoFactory
-  implements EPGMVertexFactory<VertexPojo> {
+public class VertexPojoFactory implements EPGMVertexFactory<VertexPojo> {
 
   /**
    * serial version uid
@@ -116,8 +115,8 @@ public class VertexPojoFactory
   @Override
   public VertexPojo initVertex(final GradoopId id, final String label,
     final EPGMPropertyList properties, final GradoopIdSet graphs) {
-    checkId(id);
-    checkLabel(label);
+    Preconditions.checkNotNull(id, "Identifier was null");
+    Preconditions.checkNotNull(label, "Label was null");
     return new VertexPojo(id, label, properties, graphs);
   }
 

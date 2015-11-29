@@ -8,20 +8,23 @@ import java.io.Serializable;
 /**
  * Base interface for creating persistent edge data from transient edge data.
  *
- * @param <ED>  input edge data type
- * @param <VD>  input vertex data type
- * @param <PED> output persistent edge data type
+ * @param <E>  input edge data type
+ * @param <V>  input vertex data type
+ * @param <PE> output persistent edge data type
  */
-public interface PersistentEdgeFactory<ED extends EPGMEdge, VD extends EPGMVertex, PED extends PersistentEdge<VD>> extends
-  Serializable {
+public interface PersistentEdgeFactory<
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  PE extends PersistentEdge<V>>
+  extends Serializable {
 
   /**
    * Creates persistent edge data based on the given parameters.
    *
-   * @param inputEdgeData    transient edge data
-   * @param sourceVertexData source vertex data
-   * @param targetVertexData target vertex data
-   * @return edge data
+   * @param inputEdge    edge
+   * @param sourceVertex source vertex
+   * @param targetVertex target vertex
+   * @return persistent edge
    */
-  PED createEdge(ED inputEdgeData, VD sourceVertexData, VD targetVertexData);
+  PE createEdge(E inputEdge, V sourceVertex, V targetVertex);
 }

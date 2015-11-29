@@ -75,7 +75,7 @@ public class GradoopHBaseTestBase {
    *
    * @return empty HBase graph store
    */
-  public static EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo>
+  public static EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo>
   createEmptyEPGMStore() {
     Configuration config = utility.getConfiguration();
 
@@ -90,7 +90,7 @@ public class GradoopHBaseTestBase {
    *
    * @return EPGMStore with vertices and edges
    */
-  public static EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> openEPGMStore() {
+  public static EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> openEPGMStore() {
     Configuration config = utility.getConfiguration();
 
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,

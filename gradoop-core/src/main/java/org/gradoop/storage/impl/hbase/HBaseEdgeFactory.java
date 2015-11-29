@@ -17,22 +17,18 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import org.apache.log4j.Logger;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.storage.api.PersistentEdgeFactory;
 
-/**
- * Default factory for creating persistent edge data representation.
- */
-public class HBaseEdgeFactory implements
-  PersistentEdgeFactory<EdgePojo, VertexPojo, HBaseEdge> {
+import static com.google.common.base.Preconditions.checkNotNull;
 
-  /**
-   * Logger
-   */
-  private static final Logger LOG =
-    Logger.getLogger(HBaseVertexFactory.class);
+/**
+ * Default factory for creating persistent edge representations.
+ */
+public class HBaseEdgeFactory
+  implements PersistentEdgeFactory<VertexPojo, EdgePojo, HBaseEdge> {
+
   /**
    * serial version uid
    */
@@ -42,12 +38,11 @@ public class HBaseEdgeFactory implements
    * {@inheritDoc}
    */
   @Override
-  public HBaseEdge createEdge(EdgePojo inputEdgeData,
-    VertexPojo sourceVertexData, VertexPojo targetVertexData) {
-    HBaseEdge defaultPersistentEdgeData =
-      new HBaseEdge(inputEdgeData, sourceVertexData,
-        targetVertexData);
-    LOG.info("Created persistent edge data: " + defaultPersistentEdgeData);
-    return defaultPersistentEdgeData;
+  public HBaseEdge createEdge(EdgePojo inputEdge,
+    VertexPojo sourceVertex, VertexPojo targetVertex) {
+    checkNotNull(inputEdge, "Edge was null");
+    checkNotNull(sourceVertex, "Source vertex was null");
+    checkNotNull(targetVertex, "Target vertex was null");
+    return new HBaseEdge(inputEdge, sourceVertex, targetVertex);
   }
 }

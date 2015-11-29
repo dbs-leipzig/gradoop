@@ -71,15 +71,15 @@ import org.gradoop.model.impl.operators.summarization.tuples
  * 8) group edges on source/target vertex and possibly edge label / property
  * 9) build summarized edges
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class SummarizationGroupCombine<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  extends Summarization<VD, ED, GD> {
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
+  extends Summarization<G, V, E> {
   /**
    * Creates summarization.
    *
@@ -97,13 +97,13 @@ public class SummarizationGroupCombine<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, VD, ED> summarizeInternal(
-    Graph<GradoopId, VD, ED> graph) {
+  protected Graph<GradoopId, V, E> summarizeInternal(
+    Graph<GradoopId, V, E> graph) {
 
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
-      new VertexToGroupVertexMapper<VD>(getVertexGroupingKey(),
+      new VertexToGroupVertexMapper<V>(getVertexGroupingKey(),
         useVertexLabels()));
 
     // group vertices by either label or property or both
@@ -123,7 +123,7 @@ public class SummarizationGroupCombine<
       unsortedGrouping.reduceGroup(new VertexGroupReduceFunction());
 
     // filter group representative tuples and build final vertices
-    DataSet<Vertex<GradoopId, VD>> summarizedVertices =
+    DataSet<Vertex<GradoopId, V>> summarizedVertices =
       reduceGroup.filter(new VertexGroupItemToSummarizedVertexFilter()).map(
         new VertexGroupItemToSummarizedVertexMapper<>(config.getVertexFactory(),
           getVertexGroupingKey(), useVertexLabels()));
@@ -134,7 +134,7 @@ public class SummarizationGroupCombine<
         .map(new VertexGroupItemToVertexWithRepresentativeMapper());
 
     // build summarized edges
-    DataSet<Edge<GradoopId, ED>> summarizedEdges =
+    DataSet<Edge<GradoopId, E>> summarizedEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
     return Graph
