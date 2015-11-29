@@ -18,7 +18,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetExistingGraph() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     String graphVariable = "g0";
@@ -50,7 +50,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetGraphs() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     String[] graphVariables = {"g0", "g1", "g2"};
@@ -90,7 +90,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetCollection() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collectionFromLoader =

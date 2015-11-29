@@ -6,9 +6,6 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
-/**
- * Created by peet on 19.11.15.
- */
 public class GraphIdElementIdsInTuple2 implements GroupReduceFunction
   <Tuple2<GradoopId,GradoopId>,Tuple2<GradoopId,GradoopIdSet>>{
 

@@ -32,7 +32,7 @@ public class EqualityByGraphElementDataTest
       //             -[:e]->(:V)
       "g5:G[(x:V)<-[:e]-(:V);(x:V)-[:e]->(:V);(x:V)-[:e]->(:V)]";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c12 =
@@ -54,13 +54,13 @@ public class EqualityByGraphElementDataTest
     collectAndAssertEquals(equals.execute(c126, c167));
 
     /* TODO: uncomment after NPE@COLLECTION bug fix
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c36 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c36 =
       loader.getGraphCollectionByVariables("g3", "g6");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c46 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c46 =
       loader.getGraphCollectionByVariables("g4", "g6");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c56 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c56 =
       loader.getGraphCollectionByVariables("g5", "g6");
 
     collectAndAssertNotEquals(equals.execute(c12, c167));
@@ -94,7 +94,7 @@ public class EqualityByGraphElementDataTest
       //         -[:e]->  <
       "g5:G[(x:V)-[:e]->(y);(x:V)-[:e]->(y);(x:V)-[:e]->(y);(y)-[:e]->(y)];";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
 
@@ -119,13 +119,13 @@ public class EqualityByGraphElementDataTest
     collectAndAssertEquals(equals.execute(c126, c167));
 
     /* TODO: uncomment after NPE@COLLECTION bug fix
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c36 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c36 =
       loader.getGraphCollectionByVariables("g3", "g6");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c46 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c46 =
       loader.getGraphCollectionByVariables("g4", "g6");
 
-    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c56 =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c56 =
       loader.getGraphCollectionByVariables("g5", "g6");
 
     collectAndAssertNotEquals(equals.execute(c12, c167));
@@ -145,7 +145,7 @@ public class EqualityByGraphElementDataTest
       "eb1[(:Eve)-[:knows]->(:Bob)];" +
       "ab1el[(:Alice)-[:likes]->(:Bob)];";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> ref =
@@ -185,7 +185,7 @@ public class EqualityByGraphElementDataTest
       "p123vValue[({x=7})-[{x=2}]->({x=3})];" +
       "p123eValue[({x=1})-[{x=7}]->({x=3})];";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> ref =

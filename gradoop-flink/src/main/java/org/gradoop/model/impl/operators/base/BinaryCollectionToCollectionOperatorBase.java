@@ -38,9 +38,9 @@ import java.util.Iterator;
  * Abstract operator implementation which can be used with binary collection
  * to collection operators.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
 public abstract class BinaryCollectionToCollectionOperatorBase<
   G extends EPGMGraphHead,

@@ -3,9 +3,6 @@ package org.gradoop.model.impl.operators.equality.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.model.impl.operators.equality.tuples.DataLabel;
 
-/**
- * Created by peet on 23.11.15.
- */
 public class LabelAppender
   implements JoinFunction<DataLabel, DataLabel, DataLabel>{
 

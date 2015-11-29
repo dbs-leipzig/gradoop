@@ -6,14 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by peet on 23.11.15.
- */
 public abstract class ElementBaseLabeler {
 
   protected String label(Map<String, Object> properties) {
-
-
 
     StringBuilder builder = new StringBuilder("{");
 

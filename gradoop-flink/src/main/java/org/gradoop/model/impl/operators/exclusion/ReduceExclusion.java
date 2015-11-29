@@ -35,12 +35,14 @@ import org.gradoop.model.impl.id.GradoopId;
  * edges, that are contained in other graphs of this collection. The result
  * is returned.
  *
+ * @param <G> graph data type
  * @param <V> vertex data type
  * @param <E> edge data type
- * @param <G> graph data type
  */
-public class ReduceExclusion
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+public class ReduceExclusion<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
   implements UnaryCollectionToGraphOperator<G, V, E>{
   /**
    * ID defining the base graph

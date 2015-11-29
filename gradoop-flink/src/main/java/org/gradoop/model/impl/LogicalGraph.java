@@ -357,7 +357,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> combine(LogicalGraph<G, V, E> otherGraph) {
-    return callForGraph(new Combination<V, E, G>(), otherGraph);
+    return callForGraph(new Combination<G, V, E>(), otherGraph);
   }
 
   /**
@@ -365,7 +365,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> overlap(LogicalGraph<G, V, E> otherGraph) {
-    return callForGraph(new Overlap<V, E, G>(), otherGraph);
+    return callForGraph(new Overlap<G, V, E>(), otherGraph);
   }
 
   /**
@@ -373,7 +373,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph) {
-    return callForGraph(new Exclusion<V, E, G>(), otherGraph);
+    return callForGraph(new Exclusion<G, V, E>(), otherGraph);
   }
 
   /**

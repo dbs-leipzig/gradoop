@@ -24,7 +24,7 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 public class SummarizationGroupSortTest extends SummarizationTestBase {
 
   @Override
-  public Summarization<VertexPojo, EdgePojo, GraphHeadPojo>
+  public Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
   getSummarizationImpl(
     String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
     boolean useEdgeLabel) {

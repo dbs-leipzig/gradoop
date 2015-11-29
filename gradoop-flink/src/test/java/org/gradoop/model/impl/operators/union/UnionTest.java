@@ -12,7 +12,7 @@ public class UnionTest extends BinaryCollectionOperatorsTestBase {
 
   @Test
   public void testOverlappingCollections() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col02 =
@@ -32,7 +32,7 @@ public class UnionTest extends BinaryCollectionOperatorsTestBase {
 
   @Test
   public void testNonOverlappingCollections() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col01 =
@@ -52,7 +52,7 @@ public class UnionTest extends BinaryCollectionOperatorsTestBase {
 
   @Test
   public void testTotalOverlappingCollections() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =

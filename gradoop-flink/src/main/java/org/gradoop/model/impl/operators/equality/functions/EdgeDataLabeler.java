@@ -7,9 +7,6 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.equality.tuples.EdgeDataLabel;
 
-/**
- * Created by peet on 23.11.15.
- */
 public class EdgeDataLabeler<E extends EPGMEdge>
   extends ElementBaseLabeler
   implements MapFunction<E, EdgeDataLabel>, FlatMapFunction<E, EdgeDataLabel> {

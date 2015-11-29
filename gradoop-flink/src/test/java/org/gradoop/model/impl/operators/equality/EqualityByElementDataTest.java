@@ -29,7 +29,7 @@ public class EqualityByElementDataTest extends EqualityTestBase {
       //             -->()
       "g5[(x)<--();(x)-->();(x)-->()]";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 =
@@ -78,7 +78,7 @@ public class EqualityByElementDataTest extends EqualityTestBase {
       //         -->  <
       "g5[(x)-->(y);(x)-->(y);(x)-->(y);(y)-->(y)];";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 =
@@ -114,7 +114,7 @@ public class EqualityByElementDataTest extends EqualityTestBase {
       "vLabel[(:Alice)-[:knows]->(:Dave)];" +
       "eLabel[(:Alice)-[:likes]->(:Bob)];";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> ref =
@@ -153,7 +153,7 @@ public class EqualityByElementDataTest extends EqualityTestBase {
       "vValue[(:V{x=0})-[:e{x=2}]->(:V{x=3})];" +
       "eValue[(:V{x=1})-[:e{x=0}]->(:V{x=3})];";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> ref =

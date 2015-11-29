@@ -16,7 +16,7 @@ public class EqualityByElementIdsTest extends EqualityTestBase {
     String asciiGraphs =
       "g1[(a)-[b]->(c)];g2[(a)-[b]->(c)];g3[(d)-[b]->(c)];g4[(a)-[e]->(c)]";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 =

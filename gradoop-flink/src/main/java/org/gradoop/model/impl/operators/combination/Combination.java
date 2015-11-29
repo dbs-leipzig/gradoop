@@ -30,30 +30,31 @@ import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
  * input graphs. Vertex and edge equality is based on their
  * respective identifiers.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class Combination
-  <VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead>
-  extends BinaryGraphToGraphOperatorBase<GD, VD, ED> {
+public class Combination<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge> extends BinaryGraphToGraphOperatorBase<G, V, E> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected LogicalGraph<GD, VD, ED> executeInternal(
-    LogicalGraph<GD, VD, ED> firstGraph, LogicalGraph<GD, VD, ED> secondGraph) {
+  protected LogicalGraph<G, V, E> executeInternal(
+    LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
     // build distinct union of vertex sets and update graph ids at vertices
     // cannot use Gelly union here because of missing argument for KeySelector
-    DataSet<VD> newVertexSet = firstGraph.getVertices()
+    DataSet<V> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
-      .distinct(new Id<VD>());
+      .distinct(new Id<V>());
 
-    DataSet<ED> newEdgeSet = firstGraph.getEdges()
+    DataSet<E> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
-      .distinct(new Id<ED>());
+      .distinct(new Id<E>());
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

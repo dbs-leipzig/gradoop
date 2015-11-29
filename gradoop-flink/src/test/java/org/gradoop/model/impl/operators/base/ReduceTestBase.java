@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class ReduceTestBase extends GradoopFlinkTestBase {
 
   protected void checkExpectationsEqualResults(
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader) throws
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) throws
     Exception {
     // overlap
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col13 =

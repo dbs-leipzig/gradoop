@@ -34,12 +34,14 @@ import java.util.Iterator;
  * Abstract operator implementation which can be used with binary graph to
  * graph operators.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
-public abstract class BinaryGraphToGraphOperatorBase
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+public abstract class BinaryGraphToGraphOperatorBase<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
   implements BinaryGraphToGraphOperator<G, V, E> {
 
   /**

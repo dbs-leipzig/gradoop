@@ -26,8 +26,6 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,7 +37,7 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graph = loader
@@ -52,7 +50,7 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
   }
 
   public void testOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString(
@@ -74,7 +72,7 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testNonOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[]");
@@ -94,7 +92,7 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testGraphContainment() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader

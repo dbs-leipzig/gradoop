@@ -37,7 +37,7 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[]");
@@ -53,7 +53,7 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString(
@@ -77,7 +77,7 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testNonOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
@@ -93,7 +93,7 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
 
   @Test
   public void testGraphContainment() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader

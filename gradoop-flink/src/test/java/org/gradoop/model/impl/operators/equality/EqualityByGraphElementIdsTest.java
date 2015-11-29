@@ -19,7 +19,7 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
       "g3[(d:A)-[e:b]->(c:C)];" +
       "g4[(a:A)-[f:b]->(c:C)]";
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c1
@@ -39,10 +39,10 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
     collectAndAssertNotEquals(equals.execute(c1, c5));
 
     // TODO: uncomment after NPE in collection mode bug fix
-//    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c3
+//    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c3
 //      = loader.getGraphCollectionByVariables("g1","g2");
 //
-//    GraphCollection<VertexPojo, EdgePojo, GraphHeadPojo> c4
+//    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c4
 //      = loader.getGraphCollectionByVariables("g3","g4");
 //
 //    collectAndAssertNotEquals(equals.execute(c3, c4));

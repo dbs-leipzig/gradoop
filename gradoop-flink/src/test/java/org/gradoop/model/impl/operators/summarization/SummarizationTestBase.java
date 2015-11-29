@@ -31,14 +31,14 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings("Duplicates")
 public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
-  public abstract Summarization<VertexPojo, EdgePojo, GraphHeadPojo>
+  public abstract Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
   getSummarizationImpl(
     String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
     boolean useEdgeLabel);
 
   @Test
   public void testSummarizeOnVertexPropertySymmetricGraph() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -65,7 +65,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSummarizeOnVertexProperty() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -96,7 +96,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSummarizeOnVertexPropertyWithAbsentValue() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader.getLogicalGraphByVariable("g3");
@@ -120,7 +120,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSummarizeOnVertexAndEdgeProperty() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -154,7 +154,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   @Test
   public void testSummarizeOnVertexAndEdgePropertyWithAbsentValues() throws
     Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -181,7 +181,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSummarizeOnVertexLabel() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -206,7 +206,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSummarizeOnVertexLabelAndVertexProperty() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -238,7 +238,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   @Test
   public void testSummarizeOnVertexLabelAndVertexPropertyWithAbsentValue()
     throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -275,7 +275,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSummarizeOnVertexLabelAndEdgeProperty() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -303,7 +303,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   @Test
   public void testSummarizeOnVertexLabelAndEdgePropertyWithAbsentValue() throws
     Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -334,7 +334,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   @Test
   public void testSummarizeOnVertexLabelAndVertexAndEdgeProperty() throws
     Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -367,7 +367,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSummarizeOnVertexAndEdgeLabel() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -394,7 +394,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   @Test
   public void testSummarizeOnVertexAndEdgeLabelAndVertexProperty() throws
     Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -426,7 +426,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   public void
   testSummarizeOnVertexAndEdgeLabelAndVertexPropertyWithAbsentValue() throws
     Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -465,7 +465,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   @Test
   public void testSummarizeOnVertexAndEdgeLabelAndEdgeProperty() throws
     Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -492,7 +492,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   @Test
   public void testSummarizeOnVertexAndEdgeLabelAndEdgePropertyWithAbsentValue()
     throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -525,7 +525,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   @Test
   public void testSummarizeOnVertexAndEdgeLabelAndVertexAndEdgeProperty() throws
     Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -561,7 +561,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   testSummarizeOnVertexAndEdgeLabelAndVertexAndEdgePropertyWithAbsentValue()
     throws
     Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
@@ -621,7 +621,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     public LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> run()
       throws Exception {
-      Summarization<VertexPojo, EdgePojo, GraphHeadPojo>
+      Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
         summarization = getSummarizationImpl(vertexGroupingKey, useVertexLabels,
         edgeGroupingKey, useEdgeLabels);
 

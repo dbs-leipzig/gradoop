@@ -30,14 +30,14 @@ import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
  * exist in the first input graph but not in the second input graph. Vertex and
  * edge equality is based on their respective identifiers.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
 public class Exclusion<
+  G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge,
-  G extends EPGMGraphHead>
+  E extends EPGMEdge>
   extends BinaryGraphToGraphOperatorBase<G, V, E> {
 
   /**

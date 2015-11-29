@@ -14,7 +14,7 @@ import java.util.Collection;
  * Used the {@link AsciiGraphLoader} to generate instances of
  * {@link LogicalGraph} and {@link GraphCollection} from GDL.
  *
- * @param <G> EPM graph type
+ * @param <G> EPGM graph type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  *

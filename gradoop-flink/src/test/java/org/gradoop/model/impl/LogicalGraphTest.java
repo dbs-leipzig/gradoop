@@ -180,7 +180,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
   private void testOutgoingAndIncomingEdges(String graphVariable,
     String vertexVariable, String[] edgeVariables, boolean testOutgoing)
     throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo>
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 =

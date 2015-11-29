@@ -51,7 +51,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
     assertTrue("vertex count not set", graphHead.hasProperty(VERTEX_COUNT));
     assertTrue("edge count not set", graphHead.hasProperty(EDGE_COUNT));
-    assertEquals("wrong vertex count", 3L, graphHead.getPropertyValue(VERTEX_COUNT));
-    assertEquals("wrong edge count", 2L, graphHead.getPropertyValue(EDGE_COUNT));
+    assertEquals("wrong vertex count", 3L, graphHead.getPropertyValue(VERTEX_COUNT).getLong());
+    assertEquals("wrong edge count", 2L, graphHead.getPropertyValue(EDGE_COUNT).getLong());
   }
 }

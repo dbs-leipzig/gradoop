@@ -26,12 +26,14 @@ import org.gradoop.model.impl.GraphCollection;
 /**
  * Combines all logical graphs of a GraphCollection into a single LogicalGraph.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
-public class ReduceCombination
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+public class ReduceCombination<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge>
   implements UnaryCollectionToGraphOperator<G, V, E>{
 
   @Override

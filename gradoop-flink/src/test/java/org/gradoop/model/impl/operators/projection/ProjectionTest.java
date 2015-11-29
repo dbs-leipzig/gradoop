@@ -32,7 +32,7 @@ public class ProjectionTest extends GradoopFlinkTestBase {
   @Test
   public void projectionTest() throws Exception {
 
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "org:Ga{k=0}[(:Va{k=0})-[:ea{k=0}]->(:Va{k=0})];" +
         "exp:Ga{k=0}[(:Vb{k=1})-[:eb{k=1}]->(:Vb{k=1})]"
