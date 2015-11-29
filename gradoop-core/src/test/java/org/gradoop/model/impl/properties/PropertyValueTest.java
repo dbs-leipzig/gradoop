@@ -1,18 +1,16 @@
 package org.gradoop.model.impl.properties;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.gradoop.model.api.EPGMPropertyValue;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import static org.gradoop.GradoopTestUtils.*;
+import static org.gradoop.model.impl.properties.PropertyValue.create;
 import static org.junit.Assert.*;
 
 public class PropertyValueTest {
@@ -20,76 +18,76 @@ public class PropertyValueTest {
   @Test
   public void testCreate() throws Exception {
     // boolean
-    EPGMPropertyValue p = PropertyValue.create(true);
+    EPGMPropertyValue p = create(BOOL_VAL_1);
     assertTrue(p.isBoolean());
-    assertEquals(true, p.getBoolean());
+    assertEquals(BOOL_VAL_1, p.getBoolean());
     // int
-    p = PropertyValue.create(10);
+    p = create(INT_VAL_2);
     assertTrue(p.isInt());
-    assertEquals(10, p.getInt());
+    assertEquals(INT_VAL_2, p.getInt());
     // long
-    p = PropertyValue.create(10L);
+    p = create(LONG_VAL_3);
     assertTrue(p.isLong());
-    assertEquals(10L, p.getLong());
+    assertEquals(LONG_VAL_3, p.getLong());
     // float
-    p = PropertyValue.create(10f);
+    p = create(FLOAT_VAL_4);
     assertTrue(p.isFloat());
-    assertEquals(10f, p.getFloat(), 0);
+    assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
     // double
-    p = PropertyValue.create(10.);
+    p = create(DOUBLE_VAL_5);
     assertTrue(p.isDouble());
-    assertEquals(10., p.getDouble(), 0);
+    assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
     // String
-    p = PropertyValue.create("10");
+    p = create(STRING_VAL_6);
     assertTrue(p.isString());
-    assertEquals("10", p.getString());
+    assertEquals(STRING_VAL_6, p.getString());
     // BigDecimal
-    p = PropertyValue.create(new BigDecimal(10L));
+    p = create(BIG_DECIMAL_VAL_7);
     assertTrue(p.isBigDecimal());
-    assertEquals(new BigDecimal(10L), p.getBigDecimal());
+    assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
     // DateTime
-    DateTime now = DateTime.now();
-    p = PropertyValue.create(now);
-    assertTrue(p.isDateTime());
-    assertEquals(now, p.getDateTime());
+    // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
+//    p = create(DATETIME_VAL_8);
+//    assertTrue(p.isDateTime());
+//    assertEquals(DATETIME_VAL_8, p.getDateTime());
   }
 
   @Test
-  public void testSetObject() throws Exception {
+  public void testSetAndGetObject() throws Exception {
     EPGMPropertyValue p = new PropertyValue();
 
-    p.setObject(true);
+    p.setObject(BOOL_VAL_1);
     assertTrue(p.isBoolean());
-    assertEquals(true, p.getBoolean());
+    assertEquals(BOOL_VAL_1, p.getObject());
     // int
-    p.setObject(10);
+    p.setObject(INT_VAL_2);
     assertTrue(p.isInt());
-    assertEquals(10, p.getInt());
+    assertEquals(INT_VAL_2, p.getObject());
     // long
-    p.setObject(10L);
+    p.setObject(LONG_VAL_3);
     assertTrue(p.isLong());
-    assertEquals(10L, p.getLong());
+    assertEquals(LONG_VAL_3, p.getObject());
     // float
-    p.setObject(10f);
+    p.setObject(FLOAT_VAL_4);
     assertTrue(p.isFloat());
-    assertEquals(10f, p.getFloat(), 0);
+    assertEquals(FLOAT_VAL_4, p.getObject());
     // double
-    p.setObject(10.);
+    p.setObject(DOUBLE_VAL_5);
     assertTrue(p.isDouble());
-    assertEquals(10., p.getDouble(), 0);
+    assertEquals(DOUBLE_VAL_5, p.getObject());
     // String
-    p.setObject("10");
+    p.setObject(STRING_VAL_6);
     assertTrue(p.isString());
-    assertEquals("10", p.getString());
+    assertEquals(STRING_VAL_6, p.getObject());
     // BigDecimal
-    p.setObject(new BigDecimal(10L));
+    p.setObject(BIG_DECIMAL_VAL_7);
     assertTrue(p.isBigDecimal());
-    assertEquals(new BigDecimal(10L), p.getBigDecimal());
-    // DateTime
-    DateTime now = DateTime.now();
-    p.setObject(now);
-    assertTrue(p.isDateTime());
-    assertEquals(now, p.getDateTime());
+    assertEquals(BIG_DECIMAL_VAL_7, p.getObject());
+    // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
+//    // DateTime
+//    p.setObject(DATETIME_VAL_8);
+//    assertTrue(p.isDateTime());
+//    assertEquals(DATETIME_VAL_8, p.getObject());
   }
 
   @Test(expected = NullPointerException.class)
@@ -119,22 +117,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetBoolean() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(true);
-    assertEquals(true, p.getBoolean());
+    EPGMPropertyValue p = new PropertyValue(BOOL_VAL_1);
+    assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
   @Test
   public void testSetBoolean() throws Exception {
     EPGMPropertyValue p = new PropertyValue();
-    p.setBoolean(true);
-    assertEquals(true, p.getBoolean());
-    p.setBoolean(false);
-    assertEquals(false, p.getBoolean());
+    p.setBoolean(BOOL_VAL_1);
+    assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
   @Test
   public void testIsInt() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(10);
+    EPGMPropertyValue p = new PropertyValue(INT_VAL_2);
     assertFalse(p.isBoolean());
     assertTrue(p.isInt());
     assertFalse(p.isLong());
@@ -147,20 +143,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetInt() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(10);
-    assertEquals(10, p.getInt());
+    EPGMPropertyValue p = new PropertyValue(INT_VAL_2);
+    assertEquals(INT_VAL_2, p.getInt());
   }
 
   @Test
   public void testSetInt() throws Exception {
     EPGMPropertyValue p = new PropertyValue();
-    p.setInt(10);
-    assertEquals(10, p.getInt());
+    p.setInt(INT_VAL_2);
+    assertEquals(INT_VAL_2, p.getInt());
   }
 
   @Test
   public void testIsLong() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(10L);
+    EPGMPropertyValue p = new PropertyValue(LONG_VAL_3);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertTrue(p.isLong());
@@ -173,20 +169,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetLong() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(10L);
-    assertEquals(10L, p.getLong());
+    EPGMPropertyValue p = new PropertyValue(LONG_VAL_3);
+    assertEquals(LONG_VAL_3, p.getLong());
   }
 
   @Test
   public void testSetLong() throws Exception {
     EPGMPropertyValue p = new PropertyValue();
-    p.setLong(10L);
-    assertEquals(10, p.getLong());
+    p.setLong(LONG_VAL_3);
+    assertEquals(LONG_VAL_3, p.getLong());
   }
 
   @Test
   public void testIsFloat() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(10f);
+    EPGMPropertyValue p = new PropertyValue(FLOAT_VAL_4);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -199,20 +195,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetFloat() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(10f);
-    assertEquals(10f, p.getFloat(), 0);
+    EPGMPropertyValue p = new PropertyValue(FLOAT_VAL_4);
+    assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
   @Test
   public void testSetFloat() throws Exception {
     EPGMPropertyValue p = new PropertyValue();
-    p.setFloat(10f);
-    assertEquals(10f, p.getFloat(), 0);
+    p.setFloat(FLOAT_VAL_4);
+    assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
   @Test
   public void testIsDouble() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(10.);
+    EPGMPropertyValue p = new PropertyValue(DOUBLE_VAL_5);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -225,20 +221,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetDouble() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(10.);
-    assertEquals(10., p.getDouble(), 0);
+    EPGMPropertyValue p = new PropertyValue(DOUBLE_VAL_5);
+    assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
   @Test
   public void testSetDouble() throws Exception {
     EPGMPropertyValue p = new PropertyValue();
-    p.setDouble(10.);
-    assertEquals(10., p.getDouble(), 0);
+    p.setDouble(DOUBLE_VAL_5);
+    assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
   @Test
   public void testIsString() throws Exception {
-    EPGMPropertyValue p = new PropertyValue("10");
+    EPGMPropertyValue p = new PropertyValue(STRING_VAL_6);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -251,20 +247,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetString() throws Exception {
-    EPGMPropertyValue p = new PropertyValue("10");
-    assertEquals("10", p.getString());
+    EPGMPropertyValue p = new PropertyValue(STRING_VAL_6);
+    assertEquals(STRING_VAL_6, p.getString());
   }
 
   @Test
   public void testSetString() throws Exception {
     EPGMPropertyValue p = new PropertyValue();
-    p.setString("10");
-    assertEquals("10", p.getString());
+    p.setString(STRING_VAL_6);
+    assertEquals(STRING_VAL_6, p.getString());
   }
 
   @Test
   public void testIsBigDecimal() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(new BigDecimal(10L));
+    EPGMPropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -277,73 +273,68 @@ public class PropertyValueTest {
 
   @Test
   public void testGetBigDecimal() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(new BigDecimal(10L));
-    assertEquals(new BigDecimal(10L), p.getBigDecimal());
+    EPGMPropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
+    assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 
   @Test
   public void testSetBigDecimal() throws Exception {
     EPGMPropertyValue p = new PropertyValue();
-    p.setBigDecimal(new BigDecimal(10L));
-    assertEquals(new BigDecimal(10L), p.getBigDecimal());
+    p.setBigDecimal(BIG_DECIMAL_VAL_7);
+    assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 
-  @Test
-  public void testIsDateTime() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(DateTime.now());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertTrue(p.isDateTime());
-  }
+  // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
 
-  @Test
-  public void testGetDateTime() throws Exception {
-    DateTime now = DateTime.now();
-    EPGMPropertyValue p = new PropertyValue(now);
-    assertEquals(now, p.getDateTime());
-  }
-
-  @Test
-  public void testSetDateTime() throws Exception {
-    DateTime now = DateTime.now();
-    EPGMPropertyValue p = new PropertyValue();
-    p.setDateTime(now);
-    assertEquals(now, p.getDateTime());
-  }
+//  @Test
+//  public void testIsDateTime() throws Exception {
+//    EPGMPropertyValue p = new PropertyValue(DATETIME_VAL_8);
+//    assertFalse(p.isBoolean());
+//    assertFalse(p.isInt());
+//    assertFalse(p.isLong());
+//    assertFalse(p.isFloat());
+//    assertFalse(p.isDouble());
+//    assertFalse(p.isString());
+//    assertFalse(p.isBigDecimal());
+//    assertTrue(p.isDateTime());
+//  }
+//
+//  @Test
+//  public void testGetDateTime() throws Exception {
+//    EPGMPropertyValue p = new PropertyValue(DATETIME_VAL_8);
+//    assertEquals(DATETIME_VAL_8, p.getDateTime());
+//  }
+//
+//  @Test
+//  public void testSetDateTime() throws Exception {
+//    EPGMPropertyValue p = new PropertyValue();
+//    p.setDateTime(DATETIME_VAL_8);
+//    assertEquals(DATETIME_VAL_8, p.getDateTime());
+//  }
 
   @Test
   public void testEqualsAndHashCode() throws Exception {
-    validateEqualsAndHashCode(PropertyValue.create(true),
-      PropertyValue.create(true), PropertyValue.create(false));
+    validateEqualsAndHashCode(create(true), create(true), create(false));
 
-    validateEqualsAndHashCode(PropertyValue.create(10),
-      PropertyValue.create(10), PropertyValue.create(11));
+    validateEqualsAndHashCode(create(10), create(10), create(11));
 
-    validateEqualsAndHashCode(PropertyValue.create(10L),
-      PropertyValue.create(10L), PropertyValue.create(11L));
+    validateEqualsAndHashCode(create(10L), create(10L), create(11L));
 
-    validateEqualsAndHashCode(PropertyValue.create(10F),
-      PropertyValue.create(10F), PropertyValue.create(11F));
+    validateEqualsAndHashCode(create(10F), create(10F), create(11F));
 
-    // breaks for Double because of
+    // TODO: breaks for Double because of
     // https://issues.apache.org/jira/browse/HADOOP-12217
+//    validateEqualsAndHashCode(create(10.), create(10.), create(11.));
 
-    validateEqualsAndHashCode(PropertyValue.create("10"),
-      PropertyValue.create("10"), PropertyValue.create("11"));
+    validateEqualsAndHashCode(create("10"), create("10"), create("11"));
 
-    validateEqualsAndHashCode(PropertyValue.create(new BigDecimal(10)),
-      PropertyValue.create(new BigDecimal(10)),
-      PropertyValue.create(new BigDecimal(11)));
+    validateEqualsAndHashCode(create(new BigDecimal(10)),
+      create(new BigDecimal(10)),
+      create(new BigDecimal(11)));
 
     DateTime now1 = new DateTime("2015-11-28T16:27:29.840+01:00");
     DateTime now2 = new DateTime("2015-11-28T16:27:30.840+01:00");
-    validateEqualsAndHashCode(PropertyValue.create(now1),
-      PropertyValue.create(now1), PropertyValue.create(now2));
+    validateEqualsAndHashCode(create(now1), create(now1), create(now2));
   }
 
   /**
@@ -362,78 +353,61 @@ public class PropertyValueTest {
 
   @Test
   public void testCompareTo() throws Exception {
-    validateCompareTo(PropertyValue.create(false), PropertyValue.create(false),
-      PropertyValue.create(true));
+    validateCompareTo(create(false), create(false),
+      create(true));
 
-    validateCompareTo(PropertyValue.create(10), PropertyValue.create(10),
-      PropertyValue.create(11));
+    validateCompareTo(create(10), create(10),
+      create(11));
 
-    validateCompareTo(PropertyValue.create(10L), PropertyValue.create(10L),
-      PropertyValue.create(11L));
+    validateCompareTo(create(10L), create(10L),
+      create(11L));
 
-    validateCompareTo(PropertyValue.create(10F), PropertyValue.create(10F),
-      PropertyValue.create(11F));
+    validateCompareTo(create(10F), create(10F),
+      create(11F));
 
-    validateCompareTo(PropertyValue.create(10.), PropertyValue.create(10.),
-      PropertyValue.create(11.));
+    validateCompareTo(create(10.), create(10.),
+      create(11.));
 
-    validateCompareTo(PropertyValue.create("10"), PropertyValue.create("10"),
-      PropertyValue.create("11"));
+    validateCompareTo(create("10"), create("10"),
+      create("11"));
 
-    validateCompareTo(PropertyValue.create(new BigDecimal(10)),
-      PropertyValue.create(new BigDecimal(10)),
-      PropertyValue.create(new BigDecimal(11)));
+    validateCompareTo(create(new BigDecimal(10)),
+      create(new BigDecimal(10)),
+      create(new BigDecimal(11)));
 
     DateTime now1 = new DateTime("2015-11-28T16:27:29.840+01:00");
     DateTime now2 = new DateTime("2015-11-28T16:27:30.840+01:00");
-    validateCompareTo(PropertyValue.create(now1), PropertyValue.create(now1),
-      PropertyValue.create(now2));
+    validateCompareTo(create(now1), create(now1),
+      create(now2));
   }
 
   @Test
   public void testWriteAndReadFields() throws IOException {
-    PropertyValue p = PropertyValue.create(true);
-    assertEquals(p, writeAndReadFields(p));
+    PropertyValue p = create(BOOL_VAL_1);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
-    p = PropertyValue.create(10);
-    assertEquals(p, writeAndReadFields(p));
+    p = create(INT_VAL_2);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
-    p = PropertyValue.create(10L);
-    assertEquals(p, writeAndReadFields(p));
+    p = create(LONG_VAL_3);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
-    p = PropertyValue.create(10f);
-    assertEquals(p, writeAndReadFields(p));
+    p = create(FLOAT_VAL_4);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
-    p = PropertyValue.create(10.);
-    assertEquals(p, writeAndReadFields(p));
+    p = create(DOUBLE_VAL_5);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
-    p = PropertyValue.create("10");
-    assertEquals(p, writeAndReadFields(p));
+    p = create(STRING_VAL_6);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
-    p = PropertyValue.create(new BigDecimal(10L));
-    assertEquals(p, writeAndReadFields(p));
+    p = create(BIG_DECIMAL_VAL_7);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
     // TODO: fails because of wrong ISOCHRONOLOGY after serializing
-//    p = PropertyValue.create(new DateTime());
-//    assertEquals(p, writeAndReadFields(p));
+//    p = PropertyValue.create(DATETIME_VAL_8);
+//    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
-
-  private PropertyValue writeAndReadFields(PropertyValue pIn) throws
-    IOException {
-    // write to byte[]
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    DataOutputStream dataOut = new DataOutputStream(out);
-    pIn.write(dataOut);
-
-    // read from byte[]
-    PropertyValue pOut = new PropertyValue();
-    ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-    DataInputStream dataIn = new DataInputStream(in);
-    pOut.readFields(dataIn);
-
-    return pOut;
-  }
-
   /**
    * Assumes that p1 == p2 < p3
    */

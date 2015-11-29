@@ -44,38 +44,30 @@ public class PropertyValue
   implements EPGMPropertyValue {
 
   /**
-   * Creates a new Property Value from the given object.
-   *
-   * If the given object type is not supported, an
-   * {@link UnsupportedTypeException} will be thrown.
-   *
-   * @param value value with supported type
-   * @return property value
-   */
-  public static PropertyValue create(Object value) {
-    return new PropertyValue(value);
-  }
-
-  /**
    * Supported classes. Must implement {@link WritableComparable}.
    *
    * Note that the order is necessary to correctly deserialize objects.
    */
-  private static Class[] CLASSES = {
-    BooleanWritable.class,
-    IntWritable.class,
-    LongWritable.class,
-    FloatWritable.class,
-    DoubleWritable.class,
-    Text.class,
-    BigDecimalWritable.class,
-    DateTimeWritable.class
-  };
+  private static Class<? extends WritableComparable>[] TYPES;
+
+  static {
+    //noinspection unchecked
+    TYPES = (Class<? extends WritableComparable>[]) new Class[] {
+      BooleanWritable.class,
+      IntWritable.class,
+      LongWritable.class,
+      FloatWritable.class,
+      DoubleWritable.class,
+      Text.class,
+      BigDecimalWritable.class,
+      DateTimeWritable.class
+    };
+  }
 
   /**
    * Default constructor.
    */
-  public PropertyValue() {}
+  public PropertyValue() { }
 
   /**
    * Creates a new property value from the given value.
@@ -89,6 +81,19 @@ public class PropertyValue
     setObject(value);
   }
 
+  /**
+   * Creates a new Property Value from the given object.
+   *
+   * If the given object type is not supported, an
+   * {@link UnsupportedTypeException} will be thrown.
+   *
+   * @param value value with supported type
+   * @return property value
+   */
+  public static PropertyValue create(Object value) {
+    return new PropertyValue(value);
+  }
+
   @Override
   public void setObject(Object value) {
     checkNotNull(value, "Property value was null");
@@ -99,9 +104,9 @@ public class PropertyValue
     } else if (value instanceof Long) {
       setLong((Long) value);
     } else if (value instanceof Float) {
-      setFloat((Float)value);
+      setFloat((Float) value);
     } else if (value instanceof Double) {
-      setDouble((Double)value);
+      setDouble((Double) value);
     } else if (value instanceof String) {
       setString((String) value);
     } else if (value instanceof BigDecimal) {
@@ -114,18 +119,24 @@ public class PropertyValue
   }
 
   @Override
+  public Object getObject() {
+    return isBoolean() ? getBoolean() :
+      isInt() ? getInt() :
+        isLong() ? getLong() :
+          isFloat() ? getFloat() :
+            isDouble() ? getDouble() :
+              isString() ? getString() :
+                isBigDecimal() ? getBigDecimal() :
+                  getDateTime();
+  }
+
+  //----------------------------------------------------------------------------
+  // Type checking
+  //----------------------------------------------------------------------------
+
+  @Override
   public boolean isBoolean() {
     return get() instanceof BooleanWritable;
-  }
-
-  @Override
-  public boolean getBoolean() {
-    return ((BooleanWritable) get()).get();
-  }
-
-  @Override
-  public void setBoolean(Boolean value) {
-    set(new BooleanWritable(value));
   }
 
   @Override
@@ -134,28 +145,8 @@ public class PropertyValue
   }
 
   @Override
-  public int getInt() {
-    return ((IntWritable) get()).get();
-  }
-
-  @Override
-  public void setInt(Integer value) {
-    set(new IntWritable(value));
-  }
-
-  @Override
   public boolean isLong() {
     return get() instanceof LongWritable;
-  }
-
-  @Override
-  public long getLong() {
-    return ((LongWritable) get()).get();
-  }
-
-  @Override
-  public void setLong(Long value) {
-    set(new LongWritable(value));
   }
 
   @Override
@@ -164,28 +155,8 @@ public class PropertyValue
   }
 
   @Override
-  public float getFloat() {
-    return ((FloatWritable) get()).get();
-  }
-
-  @Override
-  public void setFloat(Float value) {
-    set(new FloatWritable(value));
-  }
-
-  @Override
   public boolean isDouble() {
     return get() instanceof DoubleWritable;
-  }
-
-  @Override
-  public double getDouble() {
-    return ((DoubleWritable) get()).get();
-  }
-
-  @Override
-  public void setDouble(Double value) {
-    set(new DoubleWritable(value));
   }
 
   @Override
@@ -194,18 +165,47 @@ public class PropertyValue
   }
 
   @Override
-  public String getString() {
-    return get().toString();
-  }
-
-  @Override
-  public void setString(String value) {
-    set(new Text(value));
-  }
-
-  @Override
   public boolean isBigDecimal() {
     return get() instanceof BigDecimalWritable;
+  }
+
+  @Override
+  public boolean isDateTime() {
+    return get() instanceof DateTimeWritable;
+  }
+
+  //----------------------------------------------------------------------------
+  // Getter
+  //----------------------------------------------------------------------------
+
+  @Override
+  public boolean getBoolean() {
+    return ((BooleanWritable) get()).get();
+  }
+
+  @Override
+  public int getInt() {
+    return ((IntWritable) get()).get();
+  }
+
+  @Override
+  public long getLong() {
+    return ((LongWritable) get()).get();
+  }
+
+  @Override
+  public float getFloat() {
+    return ((FloatWritable) get()).get();
+  }
+
+  @Override
+  public double getDouble() {
+    return ((DoubleWritable) get()).get();
+  }
+
+  @Override
+  public String getString() {
+    return get().toString();
   }
 
   @Override
@@ -214,24 +214,57 @@ public class PropertyValue
   }
 
   @Override
-  public void setBigDecimal(BigDecimal value) {
-    set(new BigDecimalWritable(value));
-  }
-
-  @Override
-  public boolean isDateTime() {
-    return get() instanceof DateTimeWritable;
-  }
-
-  @Override
   public DateTime getDateTime() {
     return ((DateTimeWritable) get()).get();
+  }
+
+  //----------------------------------------------------------------------------
+  // Getter
+  //----------------------------------------------------------------------------
+
+  @Override
+  public void setBoolean(boolean value) {
+    set(new BooleanWritable(value));
+  }
+
+  @Override
+  public void setInt(int value) {
+    set(new IntWritable(value));
+  }
+
+  @Override
+  public void setLong(long value) {
+    set(new LongWritable(value));
+  }
+
+  @Override
+  public void setFloat(float value) {
+    set(new FloatWritable(value));
+  }
+
+  @Override
+  public void setDouble(double value) {
+    set(new DoubleWritable(value));
+  }
+
+  @Override
+  public void setString(String value) {
+    set(new Text(value));
+  }
+
+  @Override
+  public void setBigDecimal(BigDecimal value) {
+    set(new BigDecimalWritable(value));
   }
 
   @Override
   public void setDateTime(DateTime value) {
     set(new DateTimeWritable(value));
   }
+
+  //----------------------------------------------------------------------------
+  // Util
+  //----------------------------------------------------------------------------
 
   @Override
   public int hashCode() {
@@ -256,33 +289,40 @@ public class PropertyValue
   public int compareTo(EPGMPropertyValue o) {
     int res;
     if (o instanceof PropertyValue) {
-      // use the comparison methods of the Writable implementations
-      res = ((WritableComparable) this.get())
-        .compareTo(((PropertyValue) o).get());
+      // use the compare method of the WritableComparable implementations
+      res = ((WritableComparable) this.get()).compareTo(
+        ((PropertyValue) o).get());
     } else {
       res = (isBoolean() && o.isBoolean()) ?
-        Boolean.compare(getBoolean(), o.getBoolean())
-        : (isInt() && o.isInt()) ?
-        Integer.compare(getInt(), o.getInt())
-        : (isLong() && o.isLong()) ?
-        Long.compare(getLong(), o.getLong())
-        : (isFloat() && o.isFloat()) ?
-        Float.compare(getFloat(), o.getFloat())
-        : (isDouble() && o.isDouble()) ?
-        Double.compare(getDouble(), o.getDouble())
-        : (isString() && o.isString()) ?
-        getString().compareTo(o.getString())
-        : (isBigDecimal() && o.isBigDecimal()) ?
-        getBigDecimal().compareTo(o.getBigDecimal())
-        : (isDateTime() && o.isDateTime()) ?
-        getDateTime().compareTo(o.getDateTime()) : 2;
+        Boolean.compare(getBoolean(), o.getBoolean()) :
+        (isInt() && o.isInt()) ?
+          Integer.compare(getInt(), o.getInt()) :
+          (isLong() && o.isLong()) ?
+            Long.compare(getLong(), o.getLong()) :
+            (isFloat() && o.isFloat()) ?
+              Float.compare(getFloat(), o.getFloat()) :
+              (isDouble() && o.isDouble()) ?
+                Double.compare(getDouble(), o.getDouble()) :
+                (isString() && o.isString()) ?
+                  getString().compareTo(o.getString()) :
+                  (isBigDecimal() && o.isBigDecimal()) ?
+                    getBigDecimal().compareTo(o.getBigDecimal()) :
+                    (isDateTime() && o.isDateTime()) ?
+                      getDateTime().compareTo(o.getDateTime()) : 2;
 
       if (res == 2) {
         throw new IllegalArgumentException(String.format(
-          "Incompatible wrapped types %s and %s", getClass(), o.getClass()));
+          "Incompatible wrapped types: %s and %s",
+          getObject().getClass(),
+          o.getObject().getClass()));
       }
     }
     return res;
+  }
+
+  @Override
+  public String toString() {
+    return getObject().toString();
   }
 
   /**
@@ -290,6 +330,7 @@ public class PropertyValue
    */
   @Override
   protected Class<? extends WritableComparable>[] getTypes() {
-    return CLASSES;
+    return TYPES;
+
   }
 }

@@ -49,7 +49,7 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param properties graph attributes
    * @return graph data
    */
-  T createGraphHead(String label, EPGMProperties properties);
+  T createGraphHead(String label, EPGMPropertyList properties);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -59,5 +59,5 @@ public interface EPGMGraphHeadFactory<T extends EPGMGraphHead> extends
    * @param properties graph attributes
    * @return graph data
    */
-  T initGraphHead(GradoopId id, String label, EPGMProperties properties);
+  T initGraphHead(GradoopId id, String label, EPGMPropertyList properties);
 }

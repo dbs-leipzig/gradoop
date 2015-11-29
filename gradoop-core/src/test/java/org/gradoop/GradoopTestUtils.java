@@ -18,22 +18,33 @@
 package org.gradoop;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.commons.collections.functors.ExceptionClosure;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.hadoop.io.Writable;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.api.EPGMIdentifiable;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;
 import org.gradoop.util.AsciiGraphLoader;
 import org.gradoop.util.GradoopConfig;
+import org.joda.time.DateTime;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -41,6 +52,44 @@ public class GradoopTestUtils {
 
   public static final String SOCIAL_NETWORK_GDL_FILE =
     "/data/gdl/social_network.gdl";
+
+  /**
+   * Contains values of all supported property types
+   */
+  public static Map<String, Object> SUPPORTED_PROPERTIES;
+
+  public static final String KEY_1 = "key1";
+  public static final String KEY_2 = "key2";
+  public static final String KEY_3 = "key3";
+  public static final String KEY_4 = "key4";
+  public static final String KEY_5 = "key5";
+  public static final String KEY_6 = "key6";
+  public static final String KEY_7 = "key7";
+  // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
+//  public static final String KEY_8 = "key8";
+
+  public static final boolean     BOOL_VAL_1        = true;
+  public static final int         INT_VAL_2         = 23;
+  public static final long        LONG_VAL_3        = 23L;
+  public static final float       FLOAT_VAL_4       = 2.3f;
+  public static final double      DOUBLE_VAL_5      = 2.3;
+  public static final String      STRING_VAL_6      = "23";
+  public static final BigDecimal  BIG_DECIMAL_VAL_7 = new BigDecimal(23);
+  // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
+//  public static final DateTime    DATETIME_VAL_8    = new DateTime(42);
+
+  static {
+    SUPPORTED_PROPERTIES = Maps.newTreeMap();
+    SUPPORTED_PROPERTIES.put(KEY_1, BOOL_VAL_1);
+    SUPPORTED_PROPERTIES.put(KEY_2, INT_VAL_2);
+    SUPPORTED_PROPERTIES.put(KEY_3, LONG_VAL_3);
+    SUPPORTED_PROPERTIES.put(KEY_4, FLOAT_VAL_4);
+    SUPPORTED_PROPERTIES.put(KEY_5, DOUBLE_VAL_5);
+    SUPPORTED_PROPERTIES.put(KEY_6, STRING_VAL_6);
+    SUPPORTED_PROPERTIES.put(KEY_7, BIG_DECIMAL_VAL_7);
+    // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
+//    SUPPORTED_PROPERTIES.put(KEY_8, DATETIME_VAL_8);
+  }
 
   /**
    * Creates a social network as a basis for tests.
@@ -179,6 +228,31 @@ public class GradoopTestUtils {
       "graph containment mismatch",
       element1.getGraphIds().equals(element2.getGraphIds())
     );
+  }
+
+  public static <T extends Writable> T writeAndReadFields(Class<T> clazz, T in)
+    throws IOException {
+    // write to byte[]
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    DataOutputStream dataOut = new DataOutputStream(outputStream);
+    in.write(dataOut);
+    dataOut.flush();
+
+    T out;
+    try {
+      out = clazz.newInstance();
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new IOException("Cannot initialize the class: " + clazz);
+    }
+
+    // read from byte[]
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(
+      outputStream.toByteArray());
+    DataInputStream dataIn = new DataInputStream(inputStream);
+    out.readFields(dataIn);
+
+    return out;
   }
 
   /**

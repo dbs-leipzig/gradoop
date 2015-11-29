@@ -18,9 +18,9 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.api.EPGMProperties;
 
 /**
  * POJO Implementation of an EPGM edge.
@@ -57,7 +57,7 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
     final String label,
     final GradoopId sourceId,
     final GradoopId targetId,
-    final EPGMProperties properties,
+    final EPGMPropertyList properties,
     GradoopIdSet graphIds) {
 
     super(id, label, properties, graphIds);
@@ -104,8 +104,7 @@ public class EdgePojo extends GraphElementPojo implements EPGMEdge {
    */
   @Override
   public String toString() {
-    return "(" + sourceId + ")-["
-      + super.toString() +
-      "]->(" + targetId + ")";
+    return String.format("(%s)-[%s]->(%s)",
+      sourceId, super.toString(), targetId);
   }
 }

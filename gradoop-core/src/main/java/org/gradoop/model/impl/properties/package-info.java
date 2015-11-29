@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains all classes for id handling in Gradoop.
+ * Contains classes for property handling in Gradoop.
  */
-package org.gradoop.model.impl.id;
+package org.gradoop.model.impl.properties;

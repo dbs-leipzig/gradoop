@@ -2,12 +2,11 @@ package org.gradoop.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
 import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.api.EPGMPropertyValue;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.api.EPGMProperties;
 import org.gradoop.model.api.EPGMProperty;
-import org.gradoop.model.impl.properties.Properties;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.model.impl.properties.PropertyList;
 
 /**
  * Abstract base class for graphs, vertices and edges.
@@ -26,7 +25,7 @@ public abstract class ElementPojo implements EPGMElement {
   /**
    * Internal property storage
    */
-  protected EPGMProperties properties;
+  protected EPGMPropertyList properties;
 
   /**
    * Default constructor.
@@ -42,7 +41,7 @@ public abstract class ElementPojo implements EPGMElement {
    * @param properties key-value properties
    */
   protected ElementPojo(
-    GradoopId id, String label, EPGMProperties properties) {
+    GradoopId id, String label, EPGMPropertyList properties) {
     this.id = id;
     this.label = label;
     this.properties = properties;
@@ -83,7 +82,7 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public EPGMProperties getProperties() {
+  public EPGMPropertyList getProperties() {
     return properties;
   }
 
@@ -107,7 +106,7 @@ public abstract class ElementPojo implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public void setProperties(EPGMProperties properties) {
+  public void setProperties(EPGMPropertyList properties) {
     this.properties = properties;
   }
 
@@ -149,7 +148,7 @@ public abstract class ElementPojo implements EPGMElement {
    */
   @Override
   public Boolean hasProperty(String key) {
-    return getProperties() != null && getProperties().hasKey(key);
+    return getProperties() != null && getProperties().containsKey(key);
   }
 
   /**
@@ -181,7 +180,7 @@ public abstract class ElementPojo implements EPGMElement {
 
   @Override
   public String toString() {
-    return id + ":" + label + "{" + properties + "}";
+    return String.format("%s :%s %s", id, label, properties);
   }
 
   /**
@@ -189,7 +188,7 @@ public abstract class ElementPojo implements EPGMElement {
    */
   private void initProperties() {
     if (this.properties == null) {
-      this.properties = new Properties();
+      this.properties = new PropertyList();
     }
   }
 }

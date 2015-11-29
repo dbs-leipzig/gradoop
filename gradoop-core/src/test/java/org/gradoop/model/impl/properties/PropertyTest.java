@@ -1,13 +1,9 @@
 package org.gradoop.model.impl.properties;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.gradoop.model.api.EPGMProperty;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-
+import static org.gradoop.GradoopTestUtils.writeAndReadFields;
 import static org.junit.Assert.*;
 
 public class PropertyTest {
@@ -110,16 +106,7 @@ public class PropertyTest {
   public void testWriteAndReadFields() throws Exception {
     Property p1 = new Property("key", PropertyValue.create(10));
 
-    // write to byte[]
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    DataOutputStream dataOut = new DataOutputStream(out);
-    p1.write(dataOut);
-
-    // read from byte[]
-    Property p2 = new Property();
-    ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-    DataInputStream dataIn = new DataInputStream(in);
-    p2.readFields(dataIn);
+    Property p2 = writeAndReadFields(Property.class, p1);
 
     assertEquals(p1, p2);
   }

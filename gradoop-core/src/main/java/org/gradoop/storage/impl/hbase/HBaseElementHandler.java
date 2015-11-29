@@ -23,10 +23,10 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMProperties;
+import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.api.EPGMProperty;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.storage.api.ElementHandler;
 import org.gradoop.util.GConstants;
@@ -94,7 +94,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    */
   @Override
   public Put writeProperty(final Put put, EPGMProperty property)
-    throws IOException {
+      throws IOException {
     put.add(CF_PROPERTIES_BYTES,
       Bytes.toBytes(property.getKey()),
       Writables.getBytes(property.getValue()));
@@ -106,7 +106,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    */
   @Override
   public Put writeProperties(final Put put, final EPGMElement entity)
-    throws IOException {
+      throws IOException {
     if (entity.getPropertyCount() > 0) {
       for (EPGMProperty property : entity.getProperties()) {
         writeProperty(put, property);
@@ -127,16 +127,14 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public EPGMProperties readProperties(final Result res) throws IOException {
-    EPGMProperties properties = new Properties();
-
-    for (Map.Entry<byte[], byte[]> propertyColumn : res
-      .getFamilyMap(CF_PROPERTIES_BYTES).entrySet()) {
-        properties.set(
-          readPropertyKey(propertyColumn.getKey()),
-          readPropertyValue(propertyColumn.getValue()));
+  public EPGMPropertyList readProperties(final Result res) throws IOException {
+    EPGMPropertyList properties = new PropertyList();
+    Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
+    for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
+      properties.set(
+        readPropertyKey(propertyColumn.getKey()),
+        readPropertyValue(propertyColumn.getValue()));
     }
-
     return properties;
   }
 

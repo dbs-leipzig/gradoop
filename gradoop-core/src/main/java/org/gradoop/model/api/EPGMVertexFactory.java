@@ -51,7 +51,7 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @return vertex data
    */
   T createVertex(String label,
-    EPGMProperties properties);
+    EPGMPropertyList properties);
 
   /**
    * Initializes a vertex based on the given parameters.
@@ -63,7 +63,7 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    */
   T initVertex(GradoopId id,
     String label,
-    EPGMProperties properties);
+    EPGMPropertyList properties);
 
   /**
    * Creates a new vertex based on the given parameters.
@@ -96,7 +96,7 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    * @return vertex data
    */
   T createVertex(String label,
-    EPGMProperties properties,
+    EPGMPropertyList properties,
     GradoopIdSet graphIds);
 
   /**
@@ -110,6 +110,6 @@ public interface EPGMVertexFactory<T extends EPGMVertex> extends
    */
   T initVertex(GradoopId id,
     String label,
-    EPGMProperties properties,
+    EPGMPropertyList properties,
     GradoopIdSet graphIds);
 }

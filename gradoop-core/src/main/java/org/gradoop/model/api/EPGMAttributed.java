@@ -28,7 +28,7 @@ public interface EPGMAttributed {
    *
    * @return properties
    */
-  EPGMProperties getProperties();
+  EPGMPropertyList getProperties();
 
   /**
    * Returns all property keys of that entity or {@code null} it that entity has
@@ -52,12 +52,12 @@ public interface EPGMAttributed {
    *
    * @param properties new properties
    */
-  void setProperties(EPGMProperties properties);
+  void setProperties(EPGMPropertyList properties);
 
   /**
-   * Adds a given property to that entity. If {@code key} does not exist, it
-   * will be created, if it exists, the value will be overwritten by the
-   * given value.
+   * Adds a given property to that entity. If a property with the same key
+   * does not exist, a new property will be created. Otherwise, the existing
+   * property value will be overwritten by the given value.
    *
    * @param property property
    *
@@ -65,15 +65,23 @@ public interface EPGMAttributed {
   void setProperty(EPGMProperty property);
 
   /**
-   * SAdds a given property to that entity. If {@code key} does not exist, it
-   * will be created, if it exists, the value will be overwritten by the
-   * given value.
+   * Adds a given property to that entity. If {@code key} does not exist, a new
+   * property will be created. Otherwise, the existing property value will be
+   * overwritten by the given value.
    *
-   * @param key property key
+   * @param key   property key
    * @param value property value
    */
   void setProperty(String key, EPGMPropertyValue value);
 
+  /**
+   * Adds a given property to that entity. If {@code key} does not exist, a new
+   * property will be created. Otherwise, the existing property value will be
+   * overwritten by the given value.
+   *
+   * @param key   property key
+   * @param value property value
+   */
   void setProperty(String key, Object value);
 
   /**

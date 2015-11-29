@@ -21,8 +21,8 @@ import org.apache.hadoop.io.WritableComparable;
 
 /**
  * A single property in the EPGM model. A property consists of a property key
- * and a property value. A given property key does not enforce specific value
- * type.
+ * and a property value, whereas a given property key does not enforce specific
+ * value type.
  */
 public interface EPGMProperty extends WritableComparable<EPGMProperty> {
 

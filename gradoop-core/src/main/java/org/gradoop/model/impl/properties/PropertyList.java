@@ -18,7 +18,8 @@
 package org.gradoop.model.impl.properties;
 
 import com.google.common.collect.Lists;
-import org.gradoop.model.api.EPGMProperties;
+import org.apache.commons.lang.StringUtils;
+import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.api.EPGMProperty;
 import org.gradoop.model.api.EPGMPropertyValue;
 
@@ -30,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Default implementation for a property collection.
+ * Default List implementation for a property collection.
  */
-public class Properties implements EPGMProperties {
+public class PropertyList implements EPGMPropertyList {
 
   /**
    * Internal representation
@@ -42,7 +43,7 @@ public class Properties implements EPGMProperties {
   /**
    * Default constructor
    */
-  public Properties() {
+  public PropertyList() {
     properties = Lists.newArrayList();
   }
 
@@ -52,10 +53,10 @@ public class Properties implements EPGMProperties {
    * If map is {@code null} an empty properties instance will be returned.
    *
    * @param map key value map
-   * @return Properties
+   * @return PropertyList
    */
-  public static EPGMProperties createFromMap(Map<String, Object> map) {
-    EPGMProperties properties = new Properties();
+  public static PropertyList createFromMap(Map<String, Object> map) {
+    PropertyList properties = new PropertyList();
 
     if (map != null) {
       for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -75,12 +76,8 @@ public class Properties implements EPGMProperties {
     return keys;
   }
 
-  /**
-   * TODO key cache, value cache
-   *
-   */
   @Override
-  public boolean hasKey(String key) {
+  public boolean containsKey(String key) {
     return get(key) != null;
   }
 
@@ -114,7 +111,7 @@ public class Properties implements EPGMProperties {
 
   @Override
   public void set(String key, EPGMPropertyValue value) {
-    set(new Property(key, value));
+    set(Property.create(key, value));
   }
 
   @Override
@@ -132,9 +129,38 @@ public class Properties implements EPGMProperties {
     return size() == 0;
   }
 
+  /**
+   * Two properties collections are considered equal, if they contain the
+   * same properties in the same order.
+   *
+   * @param o other properties collection
+   * @return  true, iff the two property collections contain the same elements
+   *          in the same order
+   */
   @Override
-  public int compareTo(EPGMProperties o) {
-    return 0;
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    PropertyList that = (PropertyList) o;
+
+    return !(properties != null ? !properties.equals(that.properties) :
+      that.properties != null);
+  }
+
+  /**
+   * Two properties collections have identical hash codes, if they contain the
+   * same properties in the same order.
+   *
+   * @return hash code
+   */
+  @Override
+  public int hashCode() {
+    return properties != null ? properties.hashCode() : 0;
   }
 
   @Override
@@ -159,5 +185,10 @@ public class Properties implements EPGMProperties {
       p.readFields(dataInput);
       properties.add(p);
     }
+  }
+
+  @Override
+  public String toString() {
+    return String.format("{%s}", StringUtils.join(properties, ", "));
   }
 }

@@ -62,6 +62,29 @@ public class Property implements EPGMProperty {
     this.value = value;
   }
 
+  /**
+   * Creates a new property from the given arguments.
+   *
+   * @param key   property key
+   * @param value property value
+   * @return property
+   */
+  public static Property create(String key, EPGMPropertyValue value) {
+    return new Property(key, value);
+  }
+
+  /**
+   * Creates a new property from the given arguments. Note that the given
+   * value type must be supported by {@link PropertyValue}.
+   *
+   * @param key   property key
+   * @param value property value
+   * @return property
+   */
+  public static Property create(String key, Object value) {
+    return new Property(key, PropertyValue.create(value));
+  }
+
   @Override
   public String getKey() {
     return key;
@@ -121,5 +144,10 @@ public class Property implements EPGMProperty {
     key = dataInput.readUTF();
     value = new PropertyValue();
     value.readFields(dataInput);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s = %s", key, value);
   }
 }

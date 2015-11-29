@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
@@ -29,8 +30,7 @@ import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
-import org.gradoop.model.api.EPGMProperties;
-import org.gradoop.model.impl.properties.Properties;
+import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -39,11 +39,9 @@ import org.gradoop.storage.api.PersistentVertexFactory;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.gradoop.util.AsciiGraphLoader;
 import org.gradoop.util.GradoopConfig;
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -196,7 +194,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
-    EPGMProperties props = new Properties();
+    EPGMPropertyList props = new PropertyList();
     props.set("k1", value);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
@@ -223,38 +221,10 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     EPGMVertexFactory<VertexPojo> vertexFactory =
       new VertexPojoFactory();
 
-    final int propertyCount = 7;
-    final String keyBoolean = "key1";
-    final Boolean valueBoolean = true;
-    final String keyInteger = "key2";
-    final Integer valueInteger = 23;
-    final String keyLong = "key3";
-    final Long valueLong = 42L;
-    final String keyFloat = "key4";
-    final Float valueFloat = 13.37f;
-    final String keyDouble = "key5";
-    final Double valueDouble = 3.14d;
-    final String keyString = "key6";
-    final String valueString = "value";
-    final String keyBigDecimal = "key7";
-    final BigDecimal valueBigDecimal = new BigDecimal(10L);
-
-    // TODO: fails because of wrong ISOCHRONOLOGY after serializing
-//    final String keyDateTime = "key8";
-//    final DateTime valueDateTime = new DateTime();
-
     final GradoopId vertexID = GradoopId.get();
     final String label = "A";
 
-    EPGMProperties props = new Properties();
-    props.set(keyBoolean, valueBoolean);
-    props.set(keyInteger, valueInteger);
-    props.set(keyLong, valueLong);
-    props.set(keyFloat, valueFloat);
-    props.set(keyDouble, valueDouble);
-    props.set(keyString, valueString);
-    props.set(keyBigDecimal, valueBigDecimal);
-//    props.set(keyDateTime, valueDateTime);
+    EPGMPropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);
@@ -262,7 +232,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     // write to store
     graphStore.writeVertex(persistentVertexFactory.createVertex(
-      vertexFactory.initVertex(vertexID, label, props, graphs), outEdges,
+      vertexFactory.initVertex(vertexID, label, properties, graphs), outEdges,
       inEdges));
 
     graphStore.flush();
@@ -270,41 +240,42 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     // read from store
     EPGMVertex v = graphStore.readVertex(vertexID);
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
-    assertEquals(propertyCount, propertyKeys.size());
+    assertEquals(properties.size(), propertyKeys.size());
 
     for (String propertyKey : propertyKeys) {
       switch (propertyKey) {
-      case keyBoolean:
+      case KEY_1:
         assertTrue(v.getPropertyValue(propertyKey).isBoolean());
-        assertEquals(valueBoolean, v.getPropertyValue(propertyKey).getBoolean());
+        assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
         break;
-      case keyInteger:
+      case KEY_2:
         assertTrue(v.getPropertyValue(propertyKey).isInt());
-        assertEquals((int) valueInteger, v.getPropertyValue(propertyKey).getInt());
+        assertEquals(INT_VAL_2, v.getPropertyValue(propertyKey).getInt());
         break;
-      case keyLong:
+      case KEY_3:
         assertTrue(v.getPropertyValue(propertyKey).isLong());
-        assertEquals((long) valueLong, v.getPropertyValue(propertyKey).getLong());
+        assertEquals(LONG_VAL_3, v.getPropertyValue(propertyKey).getLong());
         break;
-      case keyFloat:
+      case KEY_4:
         assertTrue(v.getPropertyValue(propertyKey).isFloat());
-        assertEquals(valueFloat, v.getPropertyValue(propertyKey).getFloat(), 0);
+        assertEquals(FLOAT_VAL_4, v.getPropertyValue(propertyKey).getFloat(), 0);
         break;
-      case keyDouble:
+      case KEY_5:
         assertTrue(v.getPropertyValue(propertyKey).isDouble());
-        assertEquals(valueDouble, v.getPropertyValue(propertyKey).getDouble(), 0);
+        assertEquals(DOUBLE_VAL_5, v.getPropertyValue(propertyKey).getDouble(), 0);
         break;
-      case keyString:
+      case KEY_6:
         assertTrue(v.getPropertyValue(propertyKey).isString());
-        assertEquals(valueString, v.getPropertyValue(propertyKey).getString());
+        assertEquals(STRING_VAL_6, v.getPropertyValue(propertyKey).getString());
         break;
-      case keyBigDecimal:
+      case KEY_7:
         assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
-        assertEquals(valueBigDecimal, v.getPropertyValue(propertyKey).getBigDecimal());
+        assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
         break;
-//      case keyDateTime:
+      // TODO: fails because of wrong ISOCHRONOLOGY after deserializing
+//      case KEY_8:
 //        assertTrue(v.getPropertyValue(propertyKey).isDateTime());
-//        assertEquals(valueDateTime, v.getPropertyValue(propertyKey).getDateTime());
+//        assertEquals(DATETIME_VAL_8, v.getPropertyValue(propertyKey).getDateTime());
 //        break;
       }
     }
