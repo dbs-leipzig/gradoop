@@ -92,4 +92,8 @@ public final class GConstants {
    * Default cache size for scans in HBase.
    */
   public static final int HBASE_DEFAULT_SCAN_CACHE_SIZE = 500;
+  /**
+   * Default label of an EPGM database graph.
+   */
+  public static final String DB_GRAPH_LABEL = "_DB";
 }
