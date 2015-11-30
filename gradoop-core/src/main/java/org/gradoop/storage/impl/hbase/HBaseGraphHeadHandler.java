@@ -24,13 +24,12 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
-import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.GConstants;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.util.GConstants;
 
 import java.io.IOException;
 import java.util.Set;

@@ -53,14 +53,14 @@ public class PropertyValue
   static {
     //noinspection unchecked
     TYPES = (Class<? extends WritableComparable>[]) new Class[] {
-      BooleanWritable.class,
-      IntWritable.class,
-      LongWritable.class,
-      FloatWritable.class,
-      DoubleWritable.class,
-      Text.class,
-      BigDecimalWritable.class,
-      DateTimeWritable.class
+        BooleanWritable.class,
+        IntWritable.class,
+        LongWritable.class,
+        FloatWritable.class,
+        DoubleWritable.class,
+        Text.class,
+        BigDecimalWritable.class,
+        DateTimeWritable.class
     };
   }
 
@@ -373,37 +373,7 @@ public class PropertyValue
   @SuppressWarnings("unchecked")
   @Override
   public int compareTo(PropertyValue o) {
-    int res;
-    if (o instanceof PropertyValue) {
-      // use the compare method of the WritableComparable implementations
-      res = ((WritableComparable) this.get()).compareTo(
-        ((PropertyValue) o).get());
-    } else {
-      res = (isBoolean() && o.isBoolean()) ?
-        Boolean.compare(getBoolean(), o.getBoolean()) :
-        (isInt() && o.isInt()) ?
-          Integer.compare(getInt(), o.getInt()) :
-          (isLong() && o.isLong()) ?
-            Long.compare(getLong(), o.getLong()) :
-            (isFloat() && o.isFloat()) ?
-              Float.compare(getFloat(), o.getFloat()) :
-              (isDouble() && o.isDouble()) ?
-                Double.compare(getDouble(), o.getDouble()) :
-                (isString() && o.isString()) ?
-                  getString().compareTo(o.getString()) :
-                  (isBigDecimal() && o.isBigDecimal()) ?
-                    getBigDecimal().compareTo(o.getBigDecimal()) :
-                    (isDateTime() && o.isDateTime()) ?
-                      getDateTime().compareTo(o.getDateTime()) : 2;
-
-      if (res == 2) {
-        throw new IllegalArgumentException(String.format(
-          "Incompatible wrapped types: %s and %s",
-          getObject().getClass(),
-          o.getObject().getClass()));
-      }
-    }
-    return res;
+    return ((WritableComparable) this.get()).compareTo(o.get());
   }
 
   @Override
@@ -417,6 +387,5 @@ public class PropertyValue
   @Override
   protected Class<? extends WritableComparable>[] getTypes() {
     return TYPES;
-
   }
 }

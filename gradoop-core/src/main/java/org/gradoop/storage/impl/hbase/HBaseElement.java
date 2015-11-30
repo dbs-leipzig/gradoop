@@ -23,8 +23,6 @@ import org.gradoop.model.impl.properties.Property;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.model.impl.properties.PropertyValue;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Wraps EPGM data entity.
  *

@@ -54,13 +54,27 @@ public class GradoopId implements Comparable<GradoopId>,
   /**
    * 128-bit UUID
    */
-  private UUID uuid;
+//  private UUID uuid;
+
+  /**
+   * TODO: Replace with {@link UUID} when
+   * https://issues.apache.org/jira/browse/FLINK-3088 is fixed
+   */
+
+  /**
+   * Most significant bits of a 128-bit UUID
+   */
+  private long mostSigBits;
+
+  /**
+   * Least significant bits of a 128-bit UUID
+   */
+  private long leastSigBits;
 
   /**
    * Create a new UUID.
    */
   public GradoopId() {
-    uuid = UUID.randomUUID();
   }
 
   /**
@@ -69,7 +83,9 @@ public class GradoopId implements Comparable<GradoopId>,
    * @param uuid UUID
    */
   GradoopId(UUID uuid) {
-    this.uuid = checkNotNull(uuid, "UUID was null");
+    checkNotNull(uuid, "UUID was null");
+    this.mostSigBits = uuid.getMostSignificantBits();
+    this.leastSigBits = uuid.getLeastSignificantBits();
   }
 
   /**
@@ -78,7 +94,7 @@ public class GradoopId implements Comparable<GradoopId>,
    * @return new GradoopId
    */
   public static GradoopId get() {
-    return new GradoopId();
+    return new GradoopId(UUID.randomUUID());
   }
 
   /**
@@ -102,35 +118,39 @@ public class GradoopId implements Comparable<GradoopId>,
       return false;
     }
     GradoopId that = (GradoopId) o;
-    return this.uuid.equals(that.uuid);
+    return mostSigBits == that.mostSigBits &&
+      leastSigBits == that.leastSigBits;
   }
 
   @Override
   public int hashCode() {
-    return uuid.hashCode();
+    long hilo = mostSigBits ^ leastSigBits;
+    return ((int) (hilo >> 32)) ^ (int) hilo;
   }
 
   @Override
   public int compareTo(GradoopId o) {
-    return this.uuid.compareTo(o.uuid);
+    return this.mostSigBits < o.mostSigBits ? -1 :
+      this.mostSigBits > o.mostSigBits ? 1 :
+        this.leastSigBits < o.leastSigBits ? -1 :
+          this.leastSigBits > o.leastSigBits ? 1 :
+            0;
   }
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeLong(uuid.getMostSignificantBits());
-    dataOutput.writeLong(uuid.getLeastSignificantBits());
+    dataOutput.writeLong(mostSigBits);
+    dataOutput.writeLong(leastSigBits);
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    long mostSignificantBits = dataInput.readLong();
-    long leastSignificantBits = dataInput.readLong();
-
-    this.uuid = new UUID(mostSignificantBits, leastSignificantBits);
+    this.mostSigBits = dataInput.readLong();
+    this.leastSigBits = dataInput.readLong();
   }
 
   @Override
   public String toString() {
-    return uuid.toString();
+    return new UUID(mostSigBits, leastSigBits).toString();
   }
 }
