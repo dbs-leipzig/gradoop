@@ -23,7 +23,8 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
-import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -49,10 +50,10 @@ public class IntersectionBroadcast<
     DataSet<GradoopId> identifiers = secondCollection.getGraphHeads()
       .map(new Id<G>());
 
-    DataSet<V> vertices = firstCollection.getVertices();
-    return vertices.filter(new InGraphsBroadcast<V>())
-      .withBroadcastSet(identifiers,
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
+    return firstCollection.getVertices()
+      .filter(new InAnyGraphBroadcast<V>())
+      .withBroadcastSet(
+        identifiers, GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
 
   @Override

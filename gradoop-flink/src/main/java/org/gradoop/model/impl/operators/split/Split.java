@@ -68,8 +68,8 @@ public class Split
     DataSet<V> vertices = computeNewVertices(graph);
     DataSet<G> graphHeads = computeNewGraphHeads(graph, vertices);
     DataSet<E> edges = computeNewEdges(graph, vertices, graphHeads);
-    return GraphCollection.fromDataSets(vertices,
-      edges, graphHeads, graph.getConfig());
+    return GraphCollection.fromDataSets(graphHeads, vertices,
+      edges, graph.getConfig());
   }
 
   /**

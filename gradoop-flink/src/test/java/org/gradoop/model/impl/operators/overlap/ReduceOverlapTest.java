@@ -31,12 +31,13 @@ public class ReduceOverlapTest extends ReduceTestBase {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
-        "g3[(c)-[e3]->(d)];g4[(a)-[e4]->(b)];" +
+        "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)];" +
         "exp12[(b)];" +
         "exp13[];" +
         "exp14[(a)-[e1]->(b)]"
       );
 
-    checkExpectationsEqualResults(loader);
+    checkExpectationsEqualResults(
+      loader, new ReduceOverlap<GraphHeadPojo, VertexPojo, EdgePojo>());
   }
 }

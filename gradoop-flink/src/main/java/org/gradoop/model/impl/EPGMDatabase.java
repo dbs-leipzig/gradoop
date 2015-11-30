@@ -108,8 +108,8 @@ public class EPGMDatabase<
     DataSet<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
     this.config = config;
-    this.database = GraphCollection.fromDataSets(vertices,
-      edges, graphHeads, config);
+    this.database = GraphCollection.fromDataSets(graphHeads, vertices,
+      edges, config);
     graphHead = config.getExecutionEnvironment().fromElements(
       config.getGraphHeadFactory().createGraphHead(GConstants.DB_GRAPH_LABEL));
   }
@@ -535,7 +535,7 @@ public class EPGMDatabase<
         }
       });
 
-    return GraphCollection.fromDataSets(newVertices,
-      newEdges, database.getGraphHeads(), config);
+    return GraphCollection.fromDataSets(database.getGraphHeads(), newVertices,
+      newEdges, config);
   }
 }

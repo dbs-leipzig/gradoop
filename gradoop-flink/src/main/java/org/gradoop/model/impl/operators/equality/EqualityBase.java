@@ -9,6 +9,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.counting.Tuple2WithObjectAnd1L;
@@ -52,8 +53,8 @@ public abstract class EqualityBase {
       .union(
         resultSet
           .getExecutionEnvironment()
-          .fromCollection(Lists.newArrayList(false))
-      ).reduce(new Or());
+          .fromCollection(Lists.newArrayList(true))
+      ).reduce(new And());
     return resultSet;
   }
 }

@@ -47,9 +47,10 @@ public class EqualityByElementIds
       .cross(secondGraphEdgeIds)
       .with(new Equals<GradoopIdSet>());
 
-    return equalVertices
+    return ensureBooleanSetIsNotEmpty(equalVertices
       .cross(equalEdges)
-      .with(new And());
+      .with(new And())
+    );
   }
 
   @Override

@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.exclusion;
 
 import org.gradoop.model.impl.operators.base.ReduceTestBase;
+import org.gradoop.model.impl.operators.overlap.ReduceOverlap;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -36,6 +37,7 @@ public class ReduceExclusionTest extends ReduceTestBase {
         "exp13[(a)-[e1]->(b)];" +
         "exp14[]");
 
-    checkExpectationsEqualResults(loader);
+    checkExpectationsEqualResults(
+      loader, new ReduceOverlap<GraphHeadPojo, VertexPojo, EdgePojo>());
   }
 }

@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
 
@@ -54,14 +54,14 @@ public class Overlap<
       .map(new Id<G>());
 
     DataSet<V> newVertexSet = firstGraph.getVertices()
-      .filter(new InGraphsBroadcast<V>())
+      .filter(new InAllGraphsBroadcast<V>())
       .withBroadcastSet(
-        graphIds, InGraphsBroadcast.GRAPH_IDS);
+        graphIds, InAllGraphsBroadcast.GRAPH_IDS);
 
     DataSet<E> newEdgeSet = firstGraph.getEdges()
-      .filter(new InGraphsBroadcast<E>())
+      .filter(new InAllGraphsBroadcast<E>())
       .withBroadcastSet(
-        graphIds, InGraphsBroadcast.GRAPH_IDS);
+        graphIds, InAllGraphsBroadcast.GRAPH_IDS);
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

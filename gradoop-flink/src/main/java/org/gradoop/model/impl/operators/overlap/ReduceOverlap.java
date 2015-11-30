@@ -24,7 +24,7 @@ import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
-import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
 
@@ -53,12 +53,12 @@ public class ReduceOverlap<
     DataSet<GradoopId> graphIDs = graphHeads.map(new Id<G>());
 
     DataSet<V> vertices = collection.getVertices()
-      .filter(new InGraphsBroadcast<V>())
+      .filter(new InAllGraphsBroadcast<V>())
       .withBroadcastSet(graphIDs,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     DataSet<E> edges = collection.getEdges()
-      .filter(new InGraphsBroadcast<E>())
+      .filter(new InAllGraphsBroadcast<E>())
       .withBroadcastSet(graphIDs,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
 

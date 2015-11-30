@@ -53,13 +53,13 @@ import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.api.Predicate;
-import org.gradoop.model.impl.functions.bool.False;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 
+
+import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
+import org.gradoop.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
-import org.gradoop.model.impl.functions.graphcontainment.InGraphs;
-import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
 import org.gradoop.model.impl.functions.epgm.ById;
 
 import org.gradoop.model.impl.id.GradoopId;
@@ -133,24 +133,22 @@ public class GraphCollection<
   /**
    * Creates a graph collection from the given arguments.
    *
+   * @param <G>         EPGM graph head type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
    * @param graphHeads  GraphHead DataSet
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
-   * @param <G>         EPGM graph head type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
    * @return Graph collection
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge>
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+
   GraphCollection<G, V, E>
-  fromDataSets(DataSet<V> vertices,
-    DataSet<E> edges,
-    DataSet<G> graphHeads,
+  fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
+
     return new GraphCollection<>(graphHeads, vertices, edges, config);
   }
 
@@ -166,45 +164,21 @@ public class GraphCollection<
    * @param <E>         EPGM edge type
    * @return Graph collection
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge>
-  GraphCollection<G, V, E>
-  fromCollections(
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+
+  GraphCollection<G, V, E> fromCollections(
     Collection<G> graphHeads,
     Collection<V> vertices,
     Collection<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
 
-    ExecutionEnvironment env = config.getExecutionEnvironment();
-
-    DataSet<G> graphHeadSet;
-    if(graphHeads.isEmpty()) {
-      graphHeads.add(config.getGraphHeadFactory().createGraphHead());
-      graphHeadSet = env.fromCollection(graphHeads).filter(new False<G>());
-    } else {
-      graphHeadSet =  env.fromCollection(graphHeads);
-    }
-
-    DataSet<V> vertexSet;
-    if(vertices.isEmpty()) {
-      vertices.add(config.getVertexFactory().createVertex());
-      vertexSet = env.fromCollection(vertices).filter(new False<V>());
-    } else {
-      vertexSet = env.fromCollection(vertices);
-    }
-
-    GradoopId dummyId = GradoopId.get();
-    DataSet<E> edgeSet;
-    if(edges.isEmpty()) {
-      edges.add(config.getEdgeFactory().createEdge(dummyId, dummyId));
-      edgeSet = env.fromCollection(edges).filter(new False<E>());
-    } else {
-      edgeSet = env.fromCollection(edges);
-    }
-
-    return fromDataSets(vertexSet, edgeSet, graphHeadSet, config);
+    return fromDataSets(
+      createGraphHeadDataSet(graphHeads, config),
+      createVertexDataSet(vertices, config),
+      createEdgeDataSet(edges, config),
+      config
+    );
   }
 
   /**
@@ -288,11 +262,11 @@ public class GraphCollection<
 
     // build new vertex set
     DataSet<V> vertices = getVertices()
-      .filter(new InGraphs<V>(identifiers));
+      .filter(new InAnyGraph<V>(identifiers));
 
     // build new edge set
     DataSet<E> edges = getEdges()
-      .filter(new InGraphs<E>(identifiers));
+      .filter(new InAnyGraph<E>(identifiers));
 
     return new GraphCollection<>(newGraphHeads, vertices, edges, getConfig());
   }
@@ -331,12 +305,12 @@ public class GraphCollection<
 
     // use graph ids to filter vertices from the actual graph structure
     DataSet<V> vertices = getVertices()
-      .filter(new InGraphsBroadcast<V>())
+      .filter(new InAnyGraphBroadcast<V>())
       .withBroadcastSet(graphIDs,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     DataSet<E> edges = getEdges()
-      .filter(new InGraphsBroadcast<E>())
+      .filter(new InAnyGraphBroadcast<E>())
       .withBroadcastSet(graphIDs,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
 

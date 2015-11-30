@@ -48,6 +48,7 @@ public class ReduceIntersectionTest extends BinaryCollectionOperatorsTestBase {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
       col01.intersect(col23);
+
     checkAssertions(expectation, result, "non");
 
     result = col01.intersectWithSmallResult(col23);

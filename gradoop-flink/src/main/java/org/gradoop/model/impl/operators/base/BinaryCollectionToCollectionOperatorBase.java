@@ -73,8 +73,8 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
     final DataSet<V> newVertices = computeNewVertices(newGraphHeads);
     final DataSet<E> newEdges = computeNewEdges(newVertices);
 
-    return GraphCollection.fromDataSets(newVertices,
-      newEdges, newGraphHeads, firstCollection.getConfig());
+    return GraphCollection.fromDataSets(newGraphHeads, newVertices,
+      newEdges, firstCollection.getConfig());
   }
 
   /**

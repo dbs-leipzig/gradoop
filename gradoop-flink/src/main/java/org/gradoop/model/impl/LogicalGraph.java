@@ -208,14 +208,23 @@ public class LogicalGraph
    * @param config      Gradoop Flink configuration
    * @return Logical graph
    */
+  @SuppressWarnings("unchecked")
   public static
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   LogicalGraph<G, V, E> fromCollections(
-    G graphHead, Collection<V> vertices, Collection<E> edges,
+    G graphHead,
+    Collection<V> vertices,
+    Collection<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
 
-    return fromCollections(
-      Lists.newArrayList(graphHead), vertices, edges, config);
+    Collection<G> graphHeads = Lists.newArrayList(graphHead);
+
+    return fromDataSets(
+      createGraphHeadDataSet(graphHeads, config),
+      createVertexDataSet(vertices, config),
+      createEdgeDataSet(edges, config),
+      config
+    );
   }
 
   /**

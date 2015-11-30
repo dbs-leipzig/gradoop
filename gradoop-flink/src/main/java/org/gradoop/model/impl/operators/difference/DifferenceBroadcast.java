@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
-import org.gradoop.model.impl.functions.graphcontainment.InGraphsBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -59,7 +59,7 @@ public class DifferenceBroadcast<
       .map(new Id<G>());
 
     return firstCollection.getVertices()
-      .filter(new InGraphsBroadcast<V>())
+      .filter(new InAllGraphsBroadcast<V>())
       .withBroadcastSet(identifiers,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }

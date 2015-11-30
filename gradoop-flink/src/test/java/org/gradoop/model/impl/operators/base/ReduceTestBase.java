@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.operators.base;
 
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.overlap.ReduceOverlap;
@@ -14,8 +15,9 @@ import static org.junit.Assert.assertTrue;
 public abstract class ReduceTestBase extends GradoopFlinkTestBase {
 
   protected void checkExpectationsEqualResults(
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) throws
-    Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader,
+    UnaryCollectionToGraphOperator<GraphHeadPojo, VertexPojo, EdgePojo> operator
+  ) throws Exception {
     // overlap
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> col13 =
       loader.getGraphCollectionByVariables("g1", "g3");
@@ -37,14 +39,11 @@ public abstract class ReduceTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> exp14 =
       loader.getLogicalGraphByVariable("exp14");
 
-    ReduceOverlap<GraphHeadPojo, VertexPojo, EdgePojo> overlap =
-      new ReduceOverlap<>();
-
     assertTrue("partial overlap failed",
-      overlap.execute(col13).equalsByElementDataCollected(exp13));
+      operator.execute(col13).equalsByElementDataCollected(exp13));
     assertTrue("without overlap failed",
-      overlap.execute(col12).equalsByElementDataCollected(exp12));
+      operator.execute(col12).equalsByElementDataCollected(exp12));
     assertTrue("with full overlap failed",
-      overlap.execute(col14).equalsByElementDataCollected(exp14));
+      operator.execute(col14).equalsByElementDataCollected(exp14));
   }
 }

@@ -34,10 +34,9 @@ import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class Combination<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> extends BinaryGraphToGraphOperatorBase<G, V, E> {
+public class Combination
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends BinaryGraphToGraphOperatorBase<G, V, E> {
 
   /**
    * {@inheritDoc}

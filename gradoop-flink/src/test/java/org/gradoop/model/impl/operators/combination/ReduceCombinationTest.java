@@ -32,13 +32,13 @@ public class ReduceCombinationTest extends ReduceTestBase {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
-        "g3[(c)-[e3]->(d)];g4[(a)-[e4]->(b)];" +
+        "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)];" +
         "exp12[(a)-[e1]->(b)-[e2]->(c)];" +
         "exp13[(a)-[e1]->(b);(c)-[e3]->(d)];" +
         "exp14[(a)-[e1]->(b)]"
       );
 
-    checkExpectationsEqualResults(loader);
-
+    checkExpectationsEqualResults(
+      loader, new ReduceCombination<GraphHeadPojo, VertexPojo, EdgePojo>());
   }
 }

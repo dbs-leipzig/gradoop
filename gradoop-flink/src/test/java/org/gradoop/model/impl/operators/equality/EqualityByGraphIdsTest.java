@@ -33,4 +33,29 @@ public class EqualityByGraphIdsTest extends EqualityTestBase {
       new EqualityByGraphIds<GraphHeadPojo, VertexPojo, EdgePojo>()
         .execute(c1, c3));
   }
+
+  @Test
+  public void testEmpty(){
+    String asciiGraphs =
+      "g1[];g2[];g3[()-->()]";
+
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(asciiGraphs);
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c1
+      = loader.getGraphCollectionByVariables("g1","g2");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c2
+      = loader.getGraphCollectionByVariables("g1", "g2");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c3
+      = loader.getGraphCollectionByVariables("g1","g3");
+
+    collectAndAssertEquals(
+      new EqualityByGraphIds<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .execute(c1, c2));
+    collectAndAssertNotEquals(
+      new EqualityByGraphIds<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .execute(c1, c3));
+  }
 }
