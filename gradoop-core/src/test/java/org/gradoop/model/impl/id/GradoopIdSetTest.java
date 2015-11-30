@@ -7,8 +7,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.hamcrest.core.Is.is;
@@ -71,16 +74,16 @@ public class GradoopIdSetTest {
   public void testAddAll1() throws Exception {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
-    GradoopIdSet ids1 = new GradoopIdSet();
-    ids1.add(id1);
-    ids1.add(id2);
+    GradoopIdSet set1 = new GradoopIdSet();
+    set1.add(id1);
+    set1.add(id2);
 
-    GradoopIdSet ids2 = new GradoopIdSet();
-    ids2.addAll(ids1);
+    GradoopIdSet set2 = new GradoopIdSet();
+    set2.addAll(set1);
 
-    assertThat(ids2.size(), is(2));
-    assertTrue(ids2.contains(id1));
-    assertTrue(ids2.contains(id2));
+    assertThat(set2.size(), is(2));
+    assertTrue(set2.contains(id1));
+    assertTrue(set2.contains(id2));
   }
 
   @Test
@@ -151,11 +154,11 @@ public class GradoopIdSetTest {
 
   @Test
   public void testIsEmpty() throws Exception {
-    GradoopIdSet ids1 = GradoopIdSet.fromExisting(GradoopId.get());
-    GradoopIdSet ids2 = new GradoopIdSet();
+    GradoopIdSet set1 = GradoopIdSet.fromExisting(GradoopId.get());
+    GradoopIdSet set2 = new GradoopIdSet();
 
-    assertFalse(ids1.isEmpty());
-    assertTrue(ids2.isEmpty());
+    assertFalse(set1.isEmpty());
+    assertTrue(set2.isEmpty());
   }
 
   @Test
@@ -259,5 +262,39 @@ public class GradoopIdSetTest {
     GradoopId id3 = GradoopId.get();
     GradoopIdSet ids = GradoopIdSet.fromExisting(id1, id2, id3);
     assertThat(ids.size(), is(3));
+  }
+
+  @Test
+  public void testEquals(){
+    
+    int idCount = 100;
+    List<GradoopId> ids = Lists.newArrayListWithCapacity(idCount);
+
+    for(int i = 0; i < idCount; i++) {
+      ids.add(GradoopId.get());
+    }
+
+    GradoopIdSet set1 = GradoopIdSet.fromExisting(
+      ids.toArray(new GradoopId[idCount]));
+
+    GradoopIdSet set2 = GradoopIdSet.fromExisting(
+      ids.toArray(new GradoopId[idCount]));
+
+    Collections.shuffle(ids);
+
+    GradoopIdSet set3 = GradoopIdSet.fromExisting(
+      ids.toArray(new GradoopId[idCount]));
+
+    assertTrue("equals failed for same object", set1.equals(set1));
+    assertTrue("equals failed for same ids in same order", set1.equals(set2));
+    assertTrue("equals failed for same ids in different order", set1.equals
+      (set3));
+
+    assertTrue("hashCode failed for same object",
+      set1.hashCode() == set1.hashCode());
+    assertTrue("hashCode failed for same ids in same order",
+      set1.hashCode() == set2.hashCode());
+    assertTrue("hashCode failed for same ids in different order",
+      set1.hashCode() == set3.hashCode());
   }
 }
