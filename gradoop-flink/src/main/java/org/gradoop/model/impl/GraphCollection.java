@@ -180,7 +180,7 @@ public class GraphCollection<
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
     DataSet<G> graphHeadSet;
-    if(vertices.isEmpty()) {
+    if(graphHeads.isEmpty()) {
       graphHeads.add(config.getGraphHeadFactory().createGraphHead());
       graphHeadSet = env.fromCollection(graphHeads).filter(new False<G>());
     } else {
@@ -197,7 +197,7 @@ public class GraphCollection<
 
     GradoopId dummyId = GradoopId.get();
     DataSet<E> edgeSet;
-    if(vertices.isEmpty()) {
+    if(edges.isEmpty()) {
       edges.add(config.getEdgeFactory().createEdge(dummyId, dummyId));
       edgeSet = env.fromCollection(edges).filter(new False<E>());
     } else {
