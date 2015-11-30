@@ -182,7 +182,7 @@ public abstract class ElementPojo implements EPGMElement {
   public String toString() {
     return String.format("%s%s%s{%s}",
       id,
-      label == null || label == "" ? "" : ":",
+      label == null || label.equals("") ? "" : ":",
       label,
       properties);
   }
