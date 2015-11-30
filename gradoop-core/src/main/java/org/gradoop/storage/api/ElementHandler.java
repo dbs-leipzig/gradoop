@@ -22,9 +22,9 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMProperty;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.Property;
+import org.gradoop.model.impl.properties.PropertyList;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -68,7 +68,7 @@ public interface ElementHandler extends Serializable {
    * @param property property
    * @return put with property
    */
-  Put writeProperty(final Put put, final EPGMProperty property) throws
+  Put writeProperty(final Put put, final Property property) throws
     IOException;
 
   /**
@@ -96,7 +96,7 @@ public interface ElementHandler extends Serializable {
    * @param res row result
    * @return all properties contained in the row
    */
-  EPGMPropertyList readProperties(final Result res) throws IOException;
+  PropertyList readProperties(final Result res) throws IOException;
 
   /**
    * Creates table based on the given table descriptor.

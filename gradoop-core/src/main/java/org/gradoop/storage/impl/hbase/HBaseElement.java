@@ -18,10 +18,10 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMProperty;
-import org.gradoop.model.api.EPGMPropertyList;
-import org.gradoop.model.api.EPGMPropertyValue;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.Property;
+import org.gradoop.model.impl.properties.PropertyList;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,7 +51,7 @@ public abstract class HBaseElement<T extends EPGMElement>
    * {@inheritDoc}
    */
   @Override
-  public EPGMPropertyList getProperties() {
+  public PropertyList getProperties() {
     return epgmElement.getProperties();
   }
 
@@ -67,7 +67,7 @@ public abstract class HBaseElement<T extends EPGMElement>
    * {@inheritDoc}
    */
   @Override
-  public EPGMPropertyValue getPropertyValue(String key) {
+  public PropertyValue getPropertyValue(String key) {
     return epgmElement.getPropertyValue(key);
   }
 
@@ -75,7 +75,7 @@ public abstract class HBaseElement<T extends EPGMElement>
    * {@inheritDoc}
    */
   @Override
-  public void setProperties(EPGMPropertyList properties) {
+  public void setProperties(PropertyList properties) {
     epgmElement.setProperties(properties);
   }
 
@@ -83,7 +83,7 @@ public abstract class HBaseElement<T extends EPGMElement>
    * {@inheritDoc}
    */
   @Override
-  public void setProperty(EPGMProperty property) {
+  public void setProperty(Property property) {
     epgmElement.setProperty(property);
   }
 
@@ -91,7 +91,7 @@ public abstract class HBaseElement<T extends EPGMElement>
    * {@inheritDoc}
    */
   @Override
-  public void setProperty(String key, EPGMPropertyValue value) {
+  public void setProperty(String key, PropertyValue value) {
     epgmElement.setProperty(key, value);
   }
 

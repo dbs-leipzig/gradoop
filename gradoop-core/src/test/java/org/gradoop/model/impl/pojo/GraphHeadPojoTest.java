@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
@@ -41,7 +40,7 @@ public class GraphHeadPojoTest {
   public void createDefaultGraphTest() {
     GradoopId graphID = GradoopId.get();
     String label = "A";
-    EPGMPropertyList props = new PropertyList();
+    PropertyList props = new PropertyList();
     props.set("k1", "v1");
     props.set("k2", "v2");
 

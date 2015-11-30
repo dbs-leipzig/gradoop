@@ -17,7 +17,6 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import com.google.common.base.Preconditions;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.VertexPojo;

@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl.pojo;
 
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
@@ -44,7 +43,7 @@ public class VertexPojoTest {
   public void createVertexPojoTest() {
     GradoopId vertexID = GradoopId.get();
     String label = "A";
-    EPGMPropertyList props = new PropertyList();
+    PropertyList props = new PropertyList();
     props.set("k1", "v1");
     props.set("k2", "v2");
 

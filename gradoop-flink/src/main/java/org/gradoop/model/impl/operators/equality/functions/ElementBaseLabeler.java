@@ -1,22 +1,21 @@
 package org.gradoop.model.impl.operators.equality.functions;
 
 import com.google.common.collect.Lists;
+import org.gradoop.model.impl.properties.PropertyList;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public abstract class ElementBaseLabeler {
 
-  protected String label(Map<String, Object> properties) {
+  protected String label(PropertyList properties) {
 
     StringBuilder builder = new StringBuilder("{");
 
     if (properties != null) {
 
-      List<String> keys = Lists.newArrayList(properties.keySet());
+      List<String> keys = Lists.newArrayList(properties.getKeys());
       Collections.sort(keys);
-
 
       boolean first = true;
 
@@ -28,7 +27,7 @@ public abstract class ElementBaseLabeler {
           first = false;
         }
 
-        Object value = properties.get(key);
+        Object value = properties.get(key).getObject();
 
         builder.append(key).append("=");
 

@@ -54,12 +54,12 @@ public class VertexToBTGVertexMapper<VD extends EPGMVertex>
    * @return BTGVertexValue
    */
   private BTGVertexValue createNewVertexValue(VD vertex) {
-    BTGVertexType type = BTGVertexType.values()[Integer.parseInt(
-      (String) vertex.getPropertyValue(BTG.VERTEX_TYPE_PROPERTYKEY))];
-    double value = Double.parseDouble(
-      (String) vertex.getPropertyValue(BTG.VERTEX_VALUE_PROPERTYKEY));
-    List<GradoopId> btgIDs = getBTGIDs(
-      (String) vertex.getPropertyValue(BTG.VERTEX_BTGIDS_PROPERTYKEY));
+    BTGVertexType type = BTGVertexType.values()[vertex
+      .getPropertyValue(BTG.VERTEX_TYPE_PROPERTYKEY).getInt()];
+    double value = vertex
+      .getPropertyValue(BTG.VERTEX_VALUE_PROPERTYKEY).getDouble();
+    List<GradoopId> btgIDs = getBTGIDs(vertex
+      .getPropertyValue(BTG.VERTEX_BTGIDS_PROPERTYKEY).getString());
     return new BTGVertexValue(type, value, btgIDs);
   }
 

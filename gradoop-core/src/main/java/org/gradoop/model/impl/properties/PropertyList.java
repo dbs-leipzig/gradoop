@@ -19,9 +19,7 @@ package org.gradoop.model.impl.properties;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
-import org.gradoop.model.api.EPGMPropertyList;
-import org.gradoop.model.api.EPGMProperty;
-import org.gradoop.model.api.EPGMPropertyValue;
+import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -31,14 +29,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Default List implementation for a property collection.
+ * Represents a list of properties.
+ *
+ * Properties inside property lists are ordered by their insertion order. A
+ * property list cannot contain two properties with the same key.
+ *
+ * Two property lists are considered equal, if they contain the same
+ * properties in the same order.
+ *
  */
-public class PropertyList implements EPGMPropertyList {
+public class PropertyList implements Iterable<Property>, Writable {
 
   /**
    * Internal representation
    */
-  private List<EPGMProperty> properties;
+  private List<Property> properties;
 
   /**
    * Default constructor
@@ -67,24 +72,39 @@ public class PropertyList implements EPGMPropertyList {
     return properties;
   }
 
-  @Override
+  /**
+   * Returns property keys in insertion order.
+   *
+   * @return property keys
+   */
   public Iterable<String> getKeys() {
     List<String> keys = Lists.newArrayListWithCapacity(size());
-    for (EPGMProperty property : properties) {
+    for (Property property : properties) {
       keys.add(property.getKey());
     }
     return keys;
   }
 
-  @Override
+  /**
+   * Checks if a property with the given key is contained in the properties.
+   *
+   * @param key property key
+   * @return true, if there is a property with the given key
+   */
   public boolean containsKey(String key) {
     return get(key) != null;
   }
 
-  @Override
-  public EPGMPropertyValue get(String key) {
-    EPGMPropertyValue result = null;
-    for (EPGMProperty property : properties) {
+  /**
+   * Returns the value to the given key of {@code null} if the value does not
+   * exist.
+   *
+   * @param key property key
+   * @return propert value or {@code null} if key does not exist
+   */
+  public PropertyValue get(String key) {
+    PropertyValue result = null;
+    for (Property property : properties) {
       if (property.getKey().equals(key)) {
         result = property.getValue();
         break;
@@ -93,10 +113,15 @@ public class PropertyList implements EPGMPropertyList {
     return result;
   }
 
-  @Override
-  public void set(EPGMProperty property) {
+  /**
+   * Sets the given property. If a property with the same property key already
+   * exists, it will be replaced by the given property.
+   *
+   * @param property property
+   */
+  public void set(Property property) {
     int index = 0;
-    for (EPGMProperty epgmProperty : properties) {
+    for (Property epgmProperty : properties) {
       if (epgmProperty.getKey().equals(property.getKey())) {
         break;
       }
@@ -109,22 +134,42 @@ public class PropertyList implements EPGMPropertyList {
     }
   }
 
-  @Override
-  public void set(String key, EPGMPropertyValue value) {
+  /**
+   * Sets the given property. If a property with the same property key already
+   * exists, it will be replaced by the given property.
+   *
+   * @param key   property key
+   * @param value property value
+   */
+  public void set(String key, PropertyValue value) {
     set(Property.create(key, value));
   }
 
-  @Override
+  /**
+   * Sets the given property. If a property with the same property key already
+   * exists, it will be replaced by the given property.
+   *
+   * @param key   property key
+   * @param value property value
+   */
   public void set(String key, Object value) {
     set(key, PropertyValue.create(value));
   }
 
-  @Override
+  /**
+   * Returns the number of properties.
+   *
+   * @return number of properties
+   */
   public int size() {
     return properties.size();
   }
 
-  @Override
+  /**
+   * True, if the properties collection does not store any properties.
+   *
+   * @return true if collection is empty, false otherwise
+   */
   public boolean isEmpty() {
     return size() == 0;
   }
@@ -164,14 +209,14 @@ public class PropertyList implements EPGMPropertyList {
   }
 
   @Override
-  public Iterator<EPGMProperty> iterator() {
+  public Iterator<Property> iterator() {
     return properties.iterator();
   }
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
     dataOutput.writeInt(properties.size());
-    for (EPGMProperty property : properties) {
+    for (Property property : properties) {
       property.write(dataOutput);
     }
   }
@@ -181,7 +226,7 @@ public class PropertyList implements EPGMPropertyList {
     int propertyCount = dataInput.readInt();
     properties = Lists.newArrayListWithCapacity(propertyCount);
     for (int i = 0; i < propertyCount; i++) {
-      EPGMProperty p = new Property();
+      Property p = new Property();
       p.readFields(dataInput);
       properties.add(p);
     }

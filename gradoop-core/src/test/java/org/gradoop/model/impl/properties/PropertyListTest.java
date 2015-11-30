@@ -1,8 +1,6 @@
 package org.gradoop.model.impl.properties;
 
 import com.google.common.collect.Lists;
-import org.gradoop.model.api.EPGMPropertyList;
-import org.gradoop.model.api.EPGMProperty;
 import org.junit.Test;
 
 import java.util.List;
@@ -16,7 +14,7 @@ public class PropertyListTest {
 
   @Test
   public void testCreateFromMap() throws Exception {
-    EPGMPropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    PropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
 
     assertEquals(SUPPORTED_PROPERTIES.size(), properties.size());
 
@@ -29,7 +27,7 @@ public class PropertyListTest {
 
   @Test
   public void testGetKeys() throws Exception {
-    EPGMPropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    PropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
 
     List<String> keyList = Lists.newArrayList(properties.getKeys());
 
@@ -41,7 +39,7 @@ public class PropertyListTest {
 
   @Test
   public void testContainsKey() throws Exception {
-    EPGMPropertyList properties = new PropertyList();
+    PropertyList properties = new PropertyList();
 
     assertFalse("unexpected key found", properties.containsKey(KEY_1));
     properties.set(KEY_1, BOOL_VAL_1);
@@ -51,7 +49,7 @@ public class PropertyListTest {
 
   @Test
   public void testGet() throws Exception {
-    EPGMPropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    PropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
 
     assertNotNull("property was null", properties.get(KEY_1));
     assertEquals("wrong property", BOOL_VAL_1, properties.get(KEY_1).getBoolean());
@@ -60,7 +58,7 @@ public class PropertyListTest {
 
   @Test
   public void testSet() throws Exception {
-    EPGMPropertyList properties = new PropertyList();
+    PropertyList properties = new PropertyList();
 
     properties.set(Property.create(KEY_1, BOOL_VAL_1));
     assertEquals(BOOL_VAL_1, properties.get(KEY_1).getObject());
@@ -72,7 +70,7 @@ public class PropertyListTest {
 
   @Test
   public void testSet1() throws Exception {
-    EPGMPropertyList properties = new PropertyList();
+    PropertyList properties = new PropertyList();
 
     properties.set(KEY_1, PropertyValue.create(BOOL_VAL_1));
     assertEquals(BOOL_VAL_1, properties.get(KEY_1).getObject());
@@ -84,7 +82,7 @@ public class PropertyListTest {
 
   @Test
   public void testSet2() throws Exception {
-    EPGMPropertyList properties = new PropertyList();
+    PropertyList properties = new PropertyList();
 
     properties.set(KEY_1, BOOL_VAL_1);
     assertEquals(BOOL_VAL_1, properties.get(KEY_1).getObject());
@@ -96,7 +94,7 @@ public class PropertyListTest {
 
   @Test
   public void testSize() throws Exception {
-    EPGMPropertyList properties = new PropertyList();
+    PropertyList properties = new PropertyList();
     assertEquals("wrong size", 0, properties.size());
     properties.set(KEY_1, BOOL_VAL_1);
     assertEquals("wrong size", 1, properties.size());
@@ -109,7 +107,7 @@ public class PropertyListTest {
 
   @Test
   public void testIsEmpty() throws Exception {
-    EPGMPropertyList properties = new PropertyList();
+    PropertyList properties = new PropertyList();
     assertTrue("properties was not empty", properties.isEmpty());
     properties.set(KEY_1, BOOL_VAL_1);
     assertFalse("properties was empty", properties.isEmpty());
@@ -117,9 +115,9 @@ public class PropertyListTest {
 
   @Test
   public void testEqualsAndHashCode() throws Exception {
-    EPGMPropertyList properties1 = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
-    EPGMPropertyList properties2 = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
-    EPGMPropertyList properties3 = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    PropertyList properties1 = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    PropertyList properties2 = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    PropertyList properties3 = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
     // override property
     properties3.set(KEY_1, INT_VAL_2);
 
@@ -146,9 +144,9 @@ public class PropertyListTest {
 
   @Test
   public void testIterator() throws Exception {
-    EPGMPropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    PropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
 
-    for (EPGMProperty property : properties) {
+    for (Property property : properties) {
       assertTrue(SUPPORTED_PROPERTIES.containsKey(property.getKey()));
       assertEquals(SUPPORTED_PROPERTIES.get(property.getKey()),
         property.getValue().getObject());

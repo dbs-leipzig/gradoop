@@ -17,6 +17,10 @@
 
 package org.gradoop.model.api;
 
+import org.gradoop.model.impl.properties.Property;
+import org.gradoop.model.impl.properties.PropertyList;
+import org.gradoop.model.impl.properties.PropertyValue;
+
 /**
  * Used to describe entities that can have properties.
  */
@@ -27,7 +31,7 @@ public interface EPGMAttributed {
    *
    * @return properties
    */
-  EPGMPropertyList getProperties();
+  PropertyList getProperties();
 
   /**
    * Returns all property keys of that entity or {@code null} it that entity has
@@ -44,14 +48,14 @@ public interface EPGMAttributed {
    * @param key property key
    * @return property value or {@code null} if {@code key} does not exist
    */
-  EPGMPropertyValue getPropertyValue(String key);
+  PropertyValue getPropertyValue(String key);
 
   /**
    * Sets the given properties as new properties.
    *
    * @param properties new properties
    */
-  void setProperties(EPGMPropertyList properties);
+  void setProperties(PropertyList properties);
 
   /**
    * Adds a given property to that entity. If a property with the same key
@@ -61,7 +65,7 @@ public interface EPGMAttributed {
    * @param property property
    *
    */
-  void setProperty(EPGMProperty property);
+  void setProperty(Property property);
 
   /**
    * Adds a given property to that entity. If {@code key} does not exist, a new
@@ -71,7 +75,7 @@ public interface EPGMAttributed {
    * @param key   property key
    * @param value property value
    */
-  void setProperty(String key, EPGMPropertyValue value);
+  void setProperty(String key, PropertyValue value);
 
   /**
    * Adds a given property to that entity. If {@code key} does not exist, a new

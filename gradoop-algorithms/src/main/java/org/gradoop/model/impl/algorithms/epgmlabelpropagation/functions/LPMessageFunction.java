@@ -41,7 +41,7 @@ public class LPMessageFunction<
     // send current minimum to neighbors
     if (getSuperstepNumber() != 1) {
       sendMessageToAllNeighbors(GradoopId.fromString(
-        (String) vertex.getValue().getPropertyValue(CURRENT_VALUE)));
+        vertex.getValue().getPropertyValue(CURRENT_VALUE).getString()));
     }
   }
 }

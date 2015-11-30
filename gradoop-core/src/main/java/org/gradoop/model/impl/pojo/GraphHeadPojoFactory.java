@@ -20,7 +20,7 @@ package org.gradoop.model.impl.pojo;
 import com.google.common.base.Preconditions;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.api.EPGMPropertyList;
+import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
 
 /**
@@ -70,8 +70,7 @@ public class GraphHeadPojoFactory
    * {@inheritDoc}
    */
   @Override
-  public GraphHeadPojo createGraphHead(String label,
-    EPGMPropertyList properties) {
+  public GraphHeadPojo createGraphHead(String label, PropertyList properties) {
     return initGraphHead(GradoopId.get(), label, properties);
   }
 
@@ -80,7 +79,7 @@ public class GraphHeadPojoFactory
    */
   @Override
   public GraphHeadPojo initGraphHead(final GradoopId id, final String label,
-    EPGMPropertyList properties) {
+    PropertyList properties) {
     Preconditions.checkNotNull(id, "Identifier was null");
     Preconditions.checkNotNull(label, "Label was null");
     return new GraphHeadPojo(id, label, properties);

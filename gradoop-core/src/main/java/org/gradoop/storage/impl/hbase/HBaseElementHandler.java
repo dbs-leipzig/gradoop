@@ -23,9 +23,8 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMPropertyList;
-import org.gradoop.model.api.EPGMProperty;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.Property;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.storage.api.ElementHandler;
@@ -93,7 +92,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeProperty(final Put put, EPGMProperty property)
+  public Put writeProperty(final Put put, Property property)
       throws IOException {
     put.add(CF_PROPERTIES_BYTES,
       Bytes.toBytes(property.getKey()),
@@ -108,7 +107,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
   public Put writeProperties(final Put put, final EPGMElement entity)
       throws IOException {
     if (entity.getPropertyCount() > 0) {
-      for (EPGMProperty property : entity.getProperties()) {
+      for (Property property : entity.getProperties()) {
         writeProperty(put, property);
       }
     }
@@ -127,8 +126,8 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public EPGMPropertyList readProperties(final Result res) throws IOException {
-    EPGMPropertyList properties = new PropertyList();
+  public PropertyList readProperties(final Result res) throws IOException {
+    PropertyList properties = new PropertyList();
     Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
     for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
       properties.set(
@@ -179,7 +178,8 @@ public abstract class HBaseElementHandler implements ElementHandler {
   }
 
   /**
-   * Deserializes a gradoop id from HBase row key
+   * Deserializes a gradoop id from HBase row key.
+   *
    * @param res HBase row
    * @return gradoop id
    * @throws IOException

@@ -1,6 +1,5 @@
 package org.gradoop.model.impl.properties;
 
-import org.gradoop.model.api.EPGMProperty;
 import org.junit.Test;
 
 import static org.gradoop.GradoopTestUtils.writeAndReadFields;
@@ -10,13 +9,13 @@ public class PropertyTest {
 
   @Test
   public void testGetKey() throws Exception {
-    EPGMProperty property = new Property("key", PropertyValue.create(10));
+    Property property = new Property("key", PropertyValue.create(10));
     assertEquals("key", property.getKey());
   }
 
   @Test
   public void testSetKey() throws Exception {
-    EPGMProperty property = new Property("key", PropertyValue.create(10));
+    Property property = new Property("key", PropertyValue.create(10));
     property.setKey("newKey");
     assertEquals("newKey", property.getKey());
   }
@@ -28,7 +27,7 @@ public class PropertyTest {
 
   @Test(expected = NullPointerException.class)
   public void testSetKeyNull2() {
-    EPGMProperty property = new Property("key", PropertyValue.create(10));
+    Property property = new Property("key", PropertyValue.create(10));
     property.setKey(null);
   }
 
@@ -39,28 +38,28 @@ public class PropertyTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testSetKeyEmpty2() {
-    EPGMProperty property = new Property("key", PropertyValue.create(10));
+    Property property = new Property("key", PropertyValue.create(10));
     property.setKey("");
   }
 
   @Test
   public void testGetValue() throws Exception {
     PropertyValue propertyValue = PropertyValue.create(10);
-    EPGMProperty p = new Property("key", propertyValue);
+    Property p = new Property("key", propertyValue);
     assertEquals(propertyValue, p.getValue());
   }
 
   @Test
   public void testSetValue() throws Exception {
     PropertyValue propertyValue = PropertyValue.create(10);
-    EPGMProperty p = new Property("key", PropertyValue.create(11));
+    Property p = new Property("key", PropertyValue.create(11));
     p.setValue(propertyValue);
     assertEquals(propertyValue, p.getValue());
   }
 
   @Test (expected = NullPointerException.class)
   public void testSetValueNull() {
-    EPGMProperty p = new Property("key", PropertyValue.create(11));
+    Property p = new Property("key", PropertyValue.create(11));
     p.setValue(null);
   }
 

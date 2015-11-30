@@ -28,8 +28,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-
-import java.util.Map;
+import org.gradoop.model.impl.properties.PropertyList;
 
 /**
  * Used to convert json documents into vertices, edges and graphs.
@@ -83,7 +82,8 @@ public class JsonReader extends JsonIO {
       JSONObject jsonVertex = new JSONObject(s);
       GradoopId vertexID = getID(jsonVertex);
       String label = getLabel(jsonVertex);
-      Map<String, Object> properties = getProperties(jsonVertex);
+      PropertyList properties = PropertyList.createFromMap(
+        getProperties(jsonVertex));
       GradoopIdSet graphs = getGraphs(jsonVertex);
 
       return vertexFactory.initVertex(vertexID, label, properties, graphs);
@@ -139,7 +139,8 @@ public class JsonReader extends JsonIO {
       String edgeLabel = getLabel(jsonEdge);
       GradoopId sourceID = getSourceId(jsonEdge);
       GradoopId targetID = getTargetId(jsonEdge);
-      Map<String, Object> properties = getProperties(jsonEdge);
+      PropertyList properties = PropertyList.createFromMap(
+        getProperties(jsonEdge));
       GradoopIdSet graphs = getGraphs(jsonEdge);
 
       return edgeFactory.initEdge(edgeID, edgeLabel, sourceID, targetID,
@@ -219,7 +220,8 @@ public class JsonReader extends JsonIO {
       JSONObject jsonGraph = new JSONObject(s);
       GradoopId graphID = getID(jsonGraph);
       String label = getLabel(jsonGraph);
-      Map<String, Object> properties = getProperties(jsonGraph);
+      PropertyList properties = PropertyList.createFromMap(
+        getProperties(jsonGraph));
 
       return graphHeadFactory.initGraphHead(graphID, label, properties);
     }

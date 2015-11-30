@@ -27,7 +27,6 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.pig.backend.hadoop.BigDecimalWritable;
 import org.apache.pig.backend.hadoop.DateTimeWritable;
-import org.gradoop.model.api.EPGMPropertyValue;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.joda.time.DateTime;
 
@@ -36,12 +35,13 @@ import java.math.BigDecimal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A property value wraps a {@link WritableComparable} for the specific type.
- * Comparison, equality, and de/serialization are delegated to the Writable.
+ * Represents a single property value in the EPGM.
+ *
+ * A property value wraps a value that implements a supported data type.
  */
 public class PropertyValue
   extends GenericWritable
-  implements EPGMPropertyValue {
+  implements WritableComparable<PropertyValue> {
 
   /**
    * Supported classes. Must implement {@link WritableComparable}.
@@ -94,7 +94,173 @@ public class PropertyValue
     return new PropertyValue(value);
   }
 
-  @Override
+  //----------------------------------------------------------------------------
+  // Type checking
+  //----------------------------------------------------------------------------
+
+  /**
+   * True, if the wrapped value is of type {@code boolean}.
+   *
+   * @return true, if {@code boolean} value
+   */
+  public boolean isBoolean() {
+    return get() instanceof BooleanWritable;
+  }
+  /**
+   * True, if the wrapped value is of type {@code int}.
+   *
+   * @return true, if {@code int} value
+   */
+  public boolean isInt() {
+    return get() instanceof IntWritable;
+  }
+  /**
+   * True, if the wrapped value is of type {@code long}.
+   *
+   * @return true, if {@code long} value
+   */
+  public boolean isLong() {
+    return get() instanceof LongWritable;
+  }
+  /**
+   * True, if the wrapped value is of type {@code float}.
+   *
+   * @return true, if {@code float} value
+   */
+  public boolean isFloat() {
+    return get() instanceof FloatWritable;
+  }
+  /**
+   * True, if the wrapped value is of type {@code double}.
+   *
+   * @return true, if {@code double} value
+   */
+  public boolean isDouble() {
+    return get() instanceof DoubleWritable;
+  }
+  /**
+   * True, if the wrapped value is of type {@code String}.
+   *
+   * @return true, if {@code String} value
+   */
+  public boolean isString() {
+    return get() instanceof Text;
+  }
+  /**
+   * True, if the wrapped value is of type {@code BigDecimal}.
+   *
+   * @return true, if {@code BigDecimal} value
+   * @see BigDecimal
+   */
+  public boolean isBigDecimal() {
+    return get() instanceof BigDecimalWritable;
+  }
+  /**
+   * True, if the wrapped value is of type {@code DateTime}.
+   *
+   * @return true, if {@code DateTime} value
+   * @see DateTime
+   */
+  public boolean isDateTime() {
+    return get() instanceof DateTimeWritable;
+  }
+
+  //----------------------------------------------------------------------------
+  // Getter
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns the wrapped value as object.
+   *
+   * @return value
+   */
+  public Object getObject() {
+    return isBoolean() ? getBoolean() :
+      isInt() ? getInt() :
+        isLong() ? getLong() :
+          isFloat() ? getFloat() :
+            isDouble() ? getDouble() :
+              isString() ? getString() :
+                isBigDecimal() ? getBigDecimal() :
+                  getDateTime();
+  }
+  /**
+   * Returns the wrapped value as {@code boolean}.
+   *
+   * @return {@code boolean} value
+   */
+  public boolean getBoolean() {
+    return ((BooleanWritable) get()).get();
+  }
+  /**
+   * Returns the wrapped value as {@code int}.
+   *
+   * @return {@code int} value
+   */
+  public int getInt() {
+    return ((IntWritable) get()).get();
+  }
+  /**
+   * Returns the wrapped value as {@code long}.
+   *
+   * @return {@code long} value
+   */
+  public long getLong() {
+    return ((LongWritable) get()).get();
+  }
+  /**
+   * Returns the wrapped value as {@code float}.
+   *
+   * @return {@code float} value
+   */
+  public float getFloat() {
+    return ((FloatWritable) get()).get();
+  }
+  /**
+   * Returns the wrapped value as {@code double}.
+   *
+   * @return {@code double} value
+   */
+  public double getDouble() {
+    return ((DoubleWritable) get()).get();
+  }
+  /**
+   * Returns the wrapped value as {@code String}.
+   *
+   * @return {@code String} value
+   */
+  public String getString() {
+    return get().toString();
+  }
+  /**
+   * Returns the wrapped value as {@code BigDecimal}.
+   *
+   * @return {@code BigDecimal} value
+   * @see BigDecimal
+   */
+  public BigDecimal getBigDecimal() {
+    return ((BigDecimalWritable) get()).get();
+  }
+  /**
+   * Returns the wrapped value as {@code DateTime}.
+   *
+   * @return {@code DateTime} value
+   * @see DateTime
+   */
+  public DateTime getDateTime() {
+    return ((DateTimeWritable) get()).get();
+  }
+
+  //----------------------------------------------------------------------------
+  // Setter
+  //----------------------------------------------------------------------------
+
+  /**
+   * Sets the given value as internal value if it has a supported type.
+   *
+   * @param value value
+   * @throws UnsupportedTypeException
+   */
   public void setObject(Object value) {
     checkNotNull(value, "Property value was null");
     if (value instanceof Boolean) {
@@ -117,147 +283,67 @@ public class PropertyValue
       throw new UnsupportedTypeException(value.getClass());
     }
   }
-
-  @Override
-  public Object getObject() {
-    return isBoolean() ? getBoolean() :
-      isInt() ? getInt() :
-        isLong() ? getLong() :
-          isFloat() ? getFloat() :
-            isDouble() ? getDouble() :
-              isString() ? getString() :
-                isBigDecimal() ? getBigDecimal() :
-                  getDateTime();
-  }
-
-  //----------------------------------------------------------------------------
-  // Type checking
-  //----------------------------------------------------------------------------
-
-  @Override
-  public boolean isBoolean() {
-    return get() instanceof BooleanWritable;
-  }
-
-  @Override
-  public boolean isInt() {
-    return get() instanceof IntWritable;
-  }
-
-  @Override
-  public boolean isLong() {
-    return get() instanceof LongWritable;
-  }
-
-  @Override
-  public boolean isFloat() {
-    return get() instanceof FloatWritable;
-  }
-
-  @Override
-  public boolean isDouble() {
-    return get() instanceof DoubleWritable;
-  }
-
-  @Override
-  public boolean isString() {
-    return get() instanceof Text;
-  }
-
-  @Override
-  public boolean isBigDecimal() {
-    return get() instanceof BigDecimalWritable;
-  }
-
-  @Override
-  public boolean isDateTime() {
-    return get() instanceof DateTimeWritable;
-  }
-
-  //----------------------------------------------------------------------------
-  // Getter
-  //----------------------------------------------------------------------------
-
-  @Override
-  public boolean getBoolean() {
-    return ((BooleanWritable) get()).get();
-  }
-
-  @Override
-  public int getInt() {
-    return ((IntWritable) get()).get();
-  }
-
-  @Override
-  public long getLong() {
-    return ((LongWritable) get()).get();
-  }
-
-  @Override
-  public float getFloat() {
-    return ((FloatWritable) get()).get();
-  }
-
-  @Override
-  public double getDouble() {
-    return ((DoubleWritable) get()).get();
-  }
-
-  @Override
-  public String getString() {
-    return get().toString();
-  }
-
-  @Override
-  public BigDecimal getBigDecimal() {
-    return ((BigDecimalWritable) get()).get();
-  }
-
-  @Override
-  public DateTime getDateTime() {
-    return ((DateTimeWritable) get()).get();
-  }
-
-  //----------------------------------------------------------------------------
-  // Getter
-  //----------------------------------------------------------------------------
-
-  @Override
+  /**
+   * Sets the wrapped value as {@code boolean} value.
+   *
+   * @param value value
+   */
   public void setBoolean(boolean value) {
     set(new BooleanWritable(value));
   }
-
-  @Override
+  /**
+   * Sets the wrapped value as {@code int} value.
+   *
+   * @param value value
+   */
   public void setInt(int value) {
     set(new IntWritable(value));
   }
-
-  @Override
+  /**
+   * Sets the wrapped value as {@code long} value.
+   *
+   * @param value value
+   */
   public void setLong(long value) {
     set(new LongWritable(value));
   }
-
-  @Override
+  /**
+   * Sets the wrapped value as {@code float} value.
+   *
+   * @param value value
+   */
   public void setFloat(float value) {
     set(new FloatWritable(value));
   }
-
-  @Override
+  /**
+   * Sets the wrapped value as {@code double} value.
+   *
+   * @param value value
+   */
   public void setDouble(double value) {
     set(new DoubleWritable(value));
   }
-
-  @Override
+  /**
+   * Sets the wrapped value as {@code String} value.
+   *
+   * @param value value
+   */
   public void setString(String value) {
     set(new Text(value));
   }
-
-  @Override
+  /**
+   * Sets the wrapped value as {@code BigDecimal} value.
+   *
+   * @param value value
+   */
   public void setBigDecimal(BigDecimal value) {
     set(new BigDecimalWritable(value));
   }
-
-  @Override
+  /**
+   * Sets the wrapped value as {@code DateTime} value.
+   *
+   * @param value value
+   */
   public void setDateTime(DateTime value) {
     set(new DateTimeWritable(value));
   }
@@ -286,7 +372,7 @@ public class PropertyValue
 
   @SuppressWarnings("unchecked")
   @Override
-  public int compareTo(EPGMPropertyValue o) {
+  public int compareTo(PropertyValue o) {
     int res;
     if (o instanceof PropertyValue) {
       // use the compare method of the WritableComparable implementations

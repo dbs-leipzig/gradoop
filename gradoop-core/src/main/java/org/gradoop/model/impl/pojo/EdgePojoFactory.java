@@ -18,9 +18,9 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -77,7 +77,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory<EdgePojo> {
    */
   @Override
   public EdgePojo createEdge(String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, EPGMPropertyList properties) {
+    GradoopId targetVertexId, PropertyList properties) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, properties);
   }
@@ -91,7 +91,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory<EdgePojo> {
     String label,
     GradoopId sourceVertexId,
     GradoopId targetVertexId,
-    EPGMPropertyList properties) {
+    PropertyList properties) {
 
     return
       initEdge(id, label, sourceVertexId, targetVertexId, properties, null);
@@ -122,7 +122,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory<EdgePojo> {
    */
   @Override
   public EdgePojo createEdge(String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, EPGMPropertyList properties,
+    GradoopId targetVertexId, PropertyList properties,
     GradoopIdSet graphIds) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, properties, graphIds);
@@ -134,7 +134,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory<EdgePojo> {
   @Override
   public EdgePojo initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
-    final EPGMPropertyList properties, GradoopIdSet graphIds) {
+    final PropertyList properties, GradoopIdSet graphIds) {
     checkNotNull(id, "Identifier was null");
     checkNotNull(label, "Label was null");
     checkNotNull(sourceVertexId, "Source vertex id was null");

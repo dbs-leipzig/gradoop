@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -37,7 +36,7 @@ public class EdgePojoTest {
       .fromExisting(GradoopId.get(), GradoopId.get());
 
     String label = "A";
-    EPGMPropertyList props = new PropertyList();
+    PropertyList props = new PropertyList();
     props.set("k1", "v1");
     props.set("k2", "v2");
 

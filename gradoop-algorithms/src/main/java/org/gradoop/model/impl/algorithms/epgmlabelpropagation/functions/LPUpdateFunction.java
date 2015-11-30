@@ -51,12 +51,12 @@ public class LPUpdateFunction<VD extends EPGMVertex>
       vertex.getValue().setProperty(STABILIZATION_MAX, 20);
       setNewVertexValue(vertex.getValue());
     } else {
-      GradoopId currentCommunity =
-        (GradoopId) vertex.getValue().getPropertyValue(CURRENT_VALUE);
-      GradoopId lastCommunity =
-        (GradoopId) vertex.getValue().getPropertyValue(LAST_VALUE);
-      int stabilizationRound =
-        (int) vertex.getValue().getPropertyValue(STABILIZATION_COUNTER);
+      GradoopId currentCommunity = GradoopId.fromString(
+        vertex.getValue().getPropertyValue(CURRENT_VALUE).getString());
+      GradoopId lastCommunity = GradoopId.fromString(
+        vertex.getValue().getPropertyValue(LAST_VALUE).getString());
+      int stabilizationRound = vertex.getValue()
+        .getPropertyValue(STABILIZATION_COUNTER).getInt();
       GradoopId newCommunity = getNewCommunity(vertex, msg);
       boolean changed = !currentCommunity.equals(newCommunity);
       boolean lastEqualsNew = lastCommunity.equals(newCommunity);
@@ -67,7 +67,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
         vertex.getValue()
           .setProperty(STABILIZATION_COUNTER, stabilizationRound);
         boolean maximalChanges = stabilizationRound <=
-          (int) vertex.getValue().getPropertyValue(STABILIZATION_MAX);
+          vertex.getValue().getPropertyValue(STABILIZATION_MAX).getInt();
         if (maximalChanges) {
           vertex.getValue().setProperty(LAST_VALUE, currentCommunity);
           vertex.getValue().setProperty(CURRENT_VALUE, newCommunity);
@@ -129,7 +129,7 @@ public class LPUpdateFunction<VD extends EPGMVertex>
    */
   private GradoopId readCurrentCommunity(Vertex<GradoopId, VD> vertex) {
     return GradoopId.fromString(
-      (String) vertex.getValue().getPropertyValue(CURRENT_VALUE));
+      vertex.getValue().getPropertyValue(CURRENT_VALUE).getString());
   }
 
   /**

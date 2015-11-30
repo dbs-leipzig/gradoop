@@ -18,8 +18,8 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.PropertyList;
 
 /**
  * POJO Implementation of an EPGM graph head.
@@ -42,7 +42,7 @@ public class GraphHeadPojo extends ElementPojo implements EPGMGraphHead {
   GraphHeadPojo(
     final GradoopId id,
     final String label,
-    final EPGMPropertyList properties) {
+    final PropertyList properties) {
     super(id, label, properties);
   }
 

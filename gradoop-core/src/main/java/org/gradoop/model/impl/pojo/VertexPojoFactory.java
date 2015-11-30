@@ -18,9 +18,9 @@
 package org.gradoop.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 
@@ -70,7 +70,7 @@ public class VertexPojoFactory implements EPGMVertexFactory<VertexPojo> {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(String label, EPGMPropertyList properties) {
+  public VertexPojo createVertex(String label, PropertyList properties) {
     return initVertex(GradoopId.get(), label, properties);
   }
 
@@ -79,7 +79,7 @@ public class VertexPojoFactory implements EPGMVertexFactory<VertexPojo> {
    */
   @Override
   public VertexPojo initVertex(final GradoopId vertexID, final String label,
-    EPGMPropertyList properties) {
+    PropertyList properties) {
     return initVertex(vertexID, label, properties, null);
   }
 
@@ -104,7 +104,7 @@ public class VertexPojoFactory implements EPGMVertexFactory<VertexPojo> {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(String label, EPGMPropertyList properties,
+  public VertexPojo createVertex(String label, PropertyList properties,
     GradoopIdSet graphIds) {
     return initVertex(GradoopId.get(), label, properties, graphIds);
   }
@@ -114,7 +114,7 @@ public class VertexPojoFactory implements EPGMVertexFactory<VertexPojo> {
    */
   @Override
   public VertexPojo initVertex(final GradoopId id, final String label,
-    final EPGMPropertyList properties, final GradoopIdSet graphs) {
+    final PropertyList properties, final GradoopIdSet graphs) {
     Preconditions.checkNotNull(id, "Identifier was null");
     Preconditions.checkNotNull(label, "Label was null");
     return new VertexPojo(id, label, properties, graphs);

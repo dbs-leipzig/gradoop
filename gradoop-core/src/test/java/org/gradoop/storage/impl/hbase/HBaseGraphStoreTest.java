@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
@@ -194,7 +193,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
-    EPGMPropertyList props = new PropertyList();
+    PropertyList props = new PropertyList();
     props.set("k1", value);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
@@ -224,7 +223,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     final GradoopId vertexID = GradoopId.get();
     final String label = "A";
 
-    EPGMPropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    PropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<EdgePojo> inEdges = Sets.newHashSetWithExpectedSize(0);

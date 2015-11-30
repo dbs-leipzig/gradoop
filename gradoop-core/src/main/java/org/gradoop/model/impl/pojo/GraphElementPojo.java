@@ -1,9 +1,9 @@
 package org.gradoop.model.impl.pojo;
 
 import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.api.EPGMPropertyList;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.properties.PropertyList;
 
 /**
  * Abstract class representing an EPGM element that is contained in a logical
@@ -32,7 +32,7 @@ public abstract class GraphElementPojo
    * @param graphIds     graphIds that element is contained in
    */
   protected GraphElementPojo(GradoopId id, String label,
-    EPGMPropertyList properties, GradoopIdSet graphIds) {
+    PropertyList properties, GradoopIdSet graphIds) {
     super(id, label, properties);
     this.graphIds = graphIds;
   }
@@ -87,9 +87,6 @@ public abstract class GraphElementPojo
    */
   @Override
   public String toString() {
-    return "EPGMGraphElement{" +
-      super.toString() +
-      ", graphIds=" + graphIds +
-      '}';
+    return String.format("%s, graphIds=%s", super.toString(), graphIds);
   }
 }

@@ -28,7 +28,7 @@ public class ReduceExclusionTest extends ReduceTestBase {
 
   @Test
   public void overlapCollectionTest() throws Exception {
-    FlinkAsciiGraphLoader<VertexPojo, EdgePojo, GraphHeadPojo> loader =
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
         "g3[(c)-[e3]->(d)];g4[(a)-[e4]->(b)];" +

@@ -2,6 +2,7 @@ package org.gradoop.model.api;
 
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.properties.PropertyList;
 
 /**
  * Initializes {@link EPGMEdge} objects of a given type.
@@ -71,7 +72,7 @@ public interface EPGMEdgeFactory<E extends EPGMEdge>
   E createEdge(String label,
     GradoopId sourceVertexId,
     GradoopId targetVertexId,
-    EPGMPropertyList properties);
+    PropertyList properties);
 
   /**
    * Initializes an edge based on the given parameters.
@@ -87,7 +88,7 @@ public interface EPGMEdgeFactory<E extends EPGMEdge>
     String label,
     GradoopId sourceVertexId,
     GradoopId targetVertexId,
-    EPGMPropertyList properties);
+    PropertyList properties);
 
   /**
    * Creates a new edge based on the given parameters.
@@ -132,7 +133,7 @@ public interface EPGMEdgeFactory<E extends EPGMEdge>
   E createEdge(String label,
     GradoopId sourceVertexId,
     GradoopId targetVertexId,
-    EPGMPropertyList properties,
+    PropertyList properties,
     GradoopIdSet graphIds);
 
   /**
@@ -150,6 +151,6 @@ public interface EPGMEdgeFactory<E extends EPGMEdge>
     String label,
     GradoopId sourceVertexId,
     GradoopId targetVertexId,
-    EPGMPropertyList properties,
+    PropertyList properties,
     GradoopIdSet graphIds);
 }

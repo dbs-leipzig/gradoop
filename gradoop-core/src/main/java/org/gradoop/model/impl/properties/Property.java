@@ -17,8 +17,7 @@
 
 package org.gradoop.model.impl.properties;
 
-import org.gradoop.model.api.EPGMProperty;
-import org.gradoop.model.api.EPGMPropertyValue;
+import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -28,9 +27,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Default property implementation.
+ * A single property in the EPGM model. A property consists of a property key
+ * and a property value, whereas a given property key does not enforce specific
+ * value type.
  */
-public class Property implements EPGMProperty {
+public class Property implements WritableComparable<Property> {
 
   /**
    * Property key
@@ -40,7 +41,7 @@ public class Property implements EPGMProperty {
   /**
    * Property value
    */
-  private EPGMPropertyValue value;
+  private PropertyValue value;
 
   /**
    * Creates a new property.
@@ -54,7 +55,7 @@ public class Property implements EPGMProperty {
    * @param key   property key
    * @param value property value
    */
-  Property(String key, EPGMPropertyValue value) {
+  Property(String key, PropertyValue value) {
     checkNotNull(key, "Property key was null");
     checkNotNull(value, "Property value was null");
     checkArgument(!key.isEmpty(), "Property key was empty");
@@ -69,7 +70,7 @@ public class Property implements EPGMProperty {
    * @param value property value
    * @return property
    */
-  public static Property create(String key, EPGMPropertyValue value) {
+  public static Property create(String key, PropertyValue value) {
     return new Property(key, value);
   }
 
@@ -85,25 +86,41 @@ public class Property implements EPGMProperty {
     return new Property(key, PropertyValue.create(value));
   }
 
-  @Override
+  /**
+   * Returns the property key.
+   *
+   * @return property key
+   */
   public String getKey() {
     return key;
   }
 
-  @Override
+  /**
+   * Sets the property key.
+   *
+   * @param key property key (must not be {@code null})
+   */
   public void setKey(String key) {
     checkNotNull(key, "Property key was null");
     checkArgument(!key.isEmpty(), "Property key was empty");
     this.key = key;
   }
 
-  @Override
-  public EPGMPropertyValue getValue() {
+  /**
+   * Returns the property value.
+   *
+   * @return property value
+   */
+  public PropertyValue getValue() {
     return value;
   }
 
-  @Override
-  public void setValue(EPGMPropertyValue value) {
+  /**
+   * Sets the property value.
+   *
+   * @param value property value  (must not be {@code null})
+   */
+  public void setValue(PropertyValue value) {
     this.value = checkNotNull(value, "Property value was null");
   }
 
@@ -129,7 +146,7 @@ public class Property implements EPGMProperty {
   }
 
   @Override
-  public int compareTo(EPGMProperty o) {
+  public int compareTo(Property o) {
     return this.getKey().compareTo(o.getKey());
   }
 
@@ -148,6 +165,6 @@ public class Property implements EPGMProperty {
 
   @Override
   public String toString() {
-    return String.format("%s = %s", key, value);
+    return String.format("%s=%s", key, value);
   }
 }

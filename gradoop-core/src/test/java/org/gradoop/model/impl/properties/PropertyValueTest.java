@@ -1,6 +1,5 @@
 package org.gradoop.model.impl.properties;
 
-import org.gradoop.model.api.EPGMPropertyValue;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -18,7 +17,7 @@ public class PropertyValueTest {
   @Test
   public void testCreate() throws Exception {
     // boolean
-    EPGMPropertyValue p = create(BOOL_VAL_1);
+    PropertyValue p = create(BOOL_VAL_1);
     assertTrue(p.isBoolean());
     assertEquals(BOOL_VAL_1, p.getBoolean());
     // int
@@ -54,7 +53,7 @@ public class PropertyValueTest {
 
   @Test
   public void testSetAndGetObject() throws Exception {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
 
     p.setObject(BOOL_VAL_1);
     assertTrue(p.isBoolean());
@@ -92,19 +91,19 @@ public class PropertyValueTest {
 
   @Test(expected = NullPointerException.class)
   public void testSetObjectNull() {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setObject(null);
   }
 
   @Test(expected = UnsupportedTypeException.class)
   public void testSetObjectWithUnsupportedType() {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setObject(new ArrayList<>());
   }
 
   @Test
   public void testIsBoolean() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(true);
+    PropertyValue p = new PropertyValue(true);
     assertTrue(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -117,20 +116,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetBoolean() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(BOOL_VAL_1);
+    PropertyValue p = new PropertyValue(BOOL_VAL_1);
     assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
   @Test
   public void testSetBoolean() throws Exception {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setBoolean(BOOL_VAL_1);
     assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
   @Test
   public void testIsInt() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(INT_VAL_2);
+    PropertyValue p = new PropertyValue(INT_VAL_2);
     assertFalse(p.isBoolean());
     assertTrue(p.isInt());
     assertFalse(p.isLong());
@@ -143,20 +142,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetInt() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(INT_VAL_2);
+    PropertyValue p = new PropertyValue(INT_VAL_2);
     assertEquals(INT_VAL_2, p.getInt());
   }
 
   @Test
   public void testSetInt() throws Exception {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setInt(INT_VAL_2);
     assertEquals(INT_VAL_2, p.getInt());
   }
 
   @Test
   public void testIsLong() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(LONG_VAL_3);
+    PropertyValue p = new PropertyValue(LONG_VAL_3);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertTrue(p.isLong());
@@ -169,20 +168,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetLong() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(LONG_VAL_3);
+    PropertyValue p = new PropertyValue(LONG_VAL_3);
     assertEquals(LONG_VAL_3, p.getLong());
   }
 
   @Test
   public void testSetLong() throws Exception {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setLong(LONG_VAL_3);
     assertEquals(LONG_VAL_3, p.getLong());
   }
 
   @Test
   public void testIsFloat() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(FLOAT_VAL_4);
+    PropertyValue p = new PropertyValue(FLOAT_VAL_4);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -195,20 +194,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetFloat() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(FLOAT_VAL_4);
+    PropertyValue p = new PropertyValue(FLOAT_VAL_4);
     assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
   @Test
   public void testSetFloat() throws Exception {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setFloat(FLOAT_VAL_4);
     assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
   @Test
   public void testIsDouble() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(DOUBLE_VAL_5);
+    PropertyValue p = new PropertyValue(DOUBLE_VAL_5);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -221,20 +220,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetDouble() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(DOUBLE_VAL_5);
+    PropertyValue p = new PropertyValue(DOUBLE_VAL_5);
     assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
   @Test
   public void testSetDouble() throws Exception {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setDouble(DOUBLE_VAL_5);
     assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
   @Test
   public void testIsString() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(STRING_VAL_6);
+    PropertyValue p = new PropertyValue(STRING_VAL_6);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -247,20 +246,20 @@ public class PropertyValueTest {
 
   @Test
   public void testGetString() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(STRING_VAL_6);
+    PropertyValue p = new PropertyValue(STRING_VAL_6);
     assertEquals(STRING_VAL_6, p.getString());
   }
 
   @Test
   public void testSetString() throws Exception {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setString(STRING_VAL_6);
     assertEquals(STRING_VAL_6, p.getString());
   }
 
   @Test
   public void testIsBigDecimal() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
+    PropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -273,13 +272,13 @@ public class PropertyValueTest {
 
   @Test
   public void testGetBigDecimal() throws Exception {
-    EPGMPropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
+    PropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 
   @Test
   public void testSetBigDecimal() throws Exception {
-    EPGMPropertyValue p = new PropertyValue();
+    PropertyValue p = new PropertyValue();
     p.setBigDecimal(BIG_DECIMAL_VAL_7);
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
@@ -288,7 +287,7 @@ public class PropertyValueTest {
 
 //  @Test
 //  public void testIsDateTime() throws Exception {
-//    EPGMPropertyValue p = new PropertyValue(DATETIME_VAL_8);
+//    PropertyValue p = new PropertyValue(DATETIME_VAL_8);
 //    assertFalse(p.isBoolean());
 //    assertFalse(p.isInt());
 //    assertFalse(p.isLong());
@@ -301,13 +300,13 @@ public class PropertyValueTest {
 //
 //  @Test
 //  public void testGetDateTime() throws Exception {
-//    EPGMPropertyValue p = new PropertyValue(DATETIME_VAL_8);
+//    PropertyValue p = new PropertyValue(DATETIME_VAL_8);
 //    assertEquals(DATETIME_VAL_8, p.getDateTime());
 //  }
 //
 //  @Test
 //  public void testSetDateTime() throws Exception {
-//    EPGMPropertyValue p = new PropertyValue();
+//    PropertyValue p = new PropertyValue();
 //    p.setDateTime(DATETIME_VAL_8);
 //    assertEquals(DATETIME_VAL_8, p.getDateTime());
 //  }
