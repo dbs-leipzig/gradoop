@@ -234,6 +234,6 @@ public class PropertyList implements Iterable<Property>, Writable {
 
   @Override
   public String toString() {
-    return String.format("{%s}", StringUtils.join(properties, ", "));
+    return StringUtils.join(properties, ",");
   }
 }

@@ -87,6 +87,6 @@ public abstract class GraphElementPojo
    */
   @Override
   public String toString() {
-    return String.format("%s, graphIds=%s", super.toString(), graphIds);
+    return String.format("%s @ %s", super.toString(), graphIds);
   }
 }

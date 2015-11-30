@@ -180,8 +180,9 @@ public abstract class ElementPojo implements EPGMElement {
 
   @Override
   public String toString() {
-    return String.format("id=%s, label=\"%s\", properties=%s",
+    return String.format("%s%s%s{%s}",
       id,
+      label == null || label == "" ? "" : ":",
       label,
       properties);
   }
