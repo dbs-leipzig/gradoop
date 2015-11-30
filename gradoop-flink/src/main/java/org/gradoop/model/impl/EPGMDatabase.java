@@ -66,6 +66,7 @@ import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.PersistentVertexFactory;
+import org.gradoop.util.GConstants;
 import org.gradoop.util.GradoopConfig;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -92,6 +93,7 @@ public class EPGMDatabase<
    * Database graph representing the vertex and edge space.
    */
   private GraphCollection<G, V, E> database;
+  private final DataSet<G> graphHead;
 
   /**
    * Creates a new EPGM database from the given arguments.
@@ -108,6 +110,8 @@ public class EPGMDatabase<
     this.config = config;
     this.database = GraphCollection.fromDataSets(vertices,
       edges, graphHeads, config);
+    graphHead = config.getExecutionEnvironment().fromElements(
+      config.getGraphHeadFactory().createGraphHead(GConstants.DB_GRAPH_LABEL));
   }
 
   /**
@@ -491,8 +495,10 @@ public class EPGMDatabase<
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph<G, V, E> getDatabaseGraph() {
+
     return LogicalGraph
-      .fromDataSets(database.getVertices(), database.getEdges(), config);
+      .fromDataSets(graphHead, database.getVertices(), database.getEdges(),
+        config);
   }
 
   /**
