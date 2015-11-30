@@ -70,6 +70,8 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     outputGraph.getEdges().output(
       new LocalCollectionOutputFormat<>(outputE));
 
+    getExecutionEnvironment().execute();
+
     validateEPGMElementCollections(inputV, outputV);
     validateEPGMElementCollections(inputE, outputE);
     validateEPGMElements(inputGraphHead, outputG.get(0));

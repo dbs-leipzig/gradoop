@@ -24,16 +24,16 @@
 
 // logical graphs
 g0:Community {interest = "Databases", vertexCount = 3} [
-    (eve)-[:knows {since = 2013}]->(alice)-[akb:knows {since = 2014}]->(bob)
-    (eve)-[:knows {since = 2014}]->(bob)-[bka:knows {since = 2014}]->(alice)
+    (eve)-[eka:knows {since = 2013}]->(alice)-[akb:knows {since = 2014}]->(bob)
+    (eve)-[ekb:knows {since = 2014}]->(bob)-[bka:knows {since = 2014}]->(alice)
 ]
 g1:Community {interest = "Hadoop", vertexCount = 3} [
-    (frank)-[:knows {since = 2015}]->(carol)-[ckd:knows {since = 2014}]->(dave)
-    (frank)-[:knows {since = 2015}]->(dave)-[dkc:knows {since = 2014}]->(carol)
+    (frank)-[fkc:knows {since = 2015}]->(carol)-[ckd:knows {since = 2014}]->(dave)
+    (frank)-[fkd:knows {since = 2015}]->(dave)-[dkc:knows {since = 2014}]->(carol)
 ]
 g2:Community {interest = "Graphs", vertexCount = 4} [
-    (alice)-[akb]->(bob)-[:knows {since = 2013}]->(carol)-[ckd]->(dave)
-    (alice)<-[bka]-(bob)<-[:knows {since = 2013}]-(carol)<-[dkc]-(dave)
+    (alice)-[akb]->(bob)-[bkc:knows {since = 2013}]->(carol)-[ckd]->(dave)
+    (alice)<-[bka]-(bob)<-[ckb:knows {since = 2013}]-(carol)<-[dkc]-(dave)
 ]
 g3:Forum [
     (gps)-[:hasModerator]->(dave)
