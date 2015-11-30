@@ -225,7 +225,8 @@ public class GradoopTestUtils {
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
     assertTrue(
-      "graph containment mismatch",
+      String.format("graph containment mismatch. expected: %s actual: %s",
+        element1.getGraphIds(), element2.getGraphIds()),
       element1.getGraphIds().equals(element2.getGraphIds())
     );
   }

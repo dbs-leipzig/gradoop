@@ -52,7 +52,6 @@ public abstract class GradoopFlinkTestBase {
   protected static final int DEFAULT_PARALLELISM = 4;
 
   protected static ForkableFlinkMiniCluster cluster = null;
-  private static File logDir;
 
   /**
    * Flink Execution Environment
@@ -103,7 +102,7 @@ public abstract class GradoopFlinkTestBase {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    logDir = File.createTempFile("TestBaseUtils-logdir", (String)null);
+    File logDir = File.createTempFile("TestBaseUtils-logdir", (String) null);
     Assert.assertTrue("Unable to delete temp file", logDir.delete());
     Assert.assertTrue("Unable to create temp directory", logDir.mkdir());
 

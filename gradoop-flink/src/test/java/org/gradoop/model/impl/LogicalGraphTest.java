@@ -19,6 +19,7 @@ package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.apache.flink.graph.Vertex;
 import org.gradoop.GradoopTestUtils;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.EPGMVertex;
@@ -34,6 +35,8 @@ import java.util.List;
 
 import static org.gradoop.GradoopTestUtils.validateEPGMElementCollections;
 import static org.gradoop.GradoopTestUtils.validateEPGMElements;
+import static org.gradoop.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.junit.Assert.assertEquals;
 
 public class LogicalGraphTest extends GradoopFlinkTestBase {
 
@@ -73,63 +76,23 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
 
     validateEPGMElementCollections(inputV, outputV);
+    validateEPGMGraphElementCollections(inputV, outputV);
     validateEPGMElementCollections(inputE, outputE);
+    validateEPGMGraphElementCollections(inputE, outputE);
     validateEPGMElements(inputGraphHead, outputG.get(0));
   }
 
   @Test
-  public void testGetProperties() throws Exception {
+  public void testGetGraphHead() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getSocialNetworkLoader();
 
-  }
+    GraphHeadPojo inputGraphHead = loader.getGraphHeadByVariable("g0");
 
-  @Test
-  public void testGetPropertyKeys() throws Exception {
+    GraphHeadPojo outputGraphHead = loader.getLogicalGraphByVariable("g0")
+      .getGraphHead().collect().get(0);
 
-  }
-
-  @Test
-  public void testGetProperty() throws Exception {
-
-  }
-
-  @Test
-  public void testGetProperty1() throws Exception {
-
-  }
-
-  @Test
-  public void testSetProperties() throws Exception {
-
-  }
-
-  @Test
-  public void testSetProperty() throws Exception {
-
-  }
-
-  @Test
-  public void testGetPropertyCount() throws Exception {
-
-  }
-
-  @Test
-  public void testGetId() throws Exception {
-
-  }
-
-  @Test
-  public void testSetId() throws Exception {
-
-  }
-
-  @Test
-  public void testGetLabel() throws Exception {
-
-  }
-
-  @Test
-  public void testSetLabel() throws Exception {
-
+    assertEquals("GraphHeads were not equal", inputGraphHead, outputGraphHead);
   }
 
   @Test
@@ -139,7 +102,19 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetVertices() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getSocialNetworkLoader();
 
+    Collection<VertexPojo> inputVertices = loader.getVertices();
+
+    List<VertexPojo> outputVertices = loader
+      .getDatabase()
+      .getDatabaseGraph()
+      .getVertices()
+      .collect();
+
+    validateEPGMElementCollections(inputVertices, outputVertices);
+    validateEPGMGraphElementCollections(inputVertices, outputVertices);
   }
 
   @Test

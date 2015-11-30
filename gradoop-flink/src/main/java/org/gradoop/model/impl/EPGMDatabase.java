@@ -101,8 +101,9 @@ public class EPGMDatabase<
    * @param graphHeads  graph data set
    * @param config      Gradoop Flink Configuration
    */
-  private EPGMDatabase(DataSet<V> vertices,
-    DataSet<E> edges, DataSet<G> graphHeads,
+  private EPGMDatabase(DataSet<G> graphHeads,
+    DataSet<V> vertices,
+    DataSet<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
     this.config = config;
     this.database = GraphCollection.fromDataSets(vertices,
@@ -145,8 +146,7 @@ public class EPGMDatabase<
   public static <
     G extends EPGMGraphHead,
     V extends EPGMVertex,
-    E extends EPGMEdge>
-  EPGMDatabase fromJsonFile(
+    E extends EPGMEdge> EPGMDatabase fromJsonFile(
     String vertexFile, String edgeFile, GradoopFlinkConfig<G, V, E> config) {
     return fromJsonFile(vertexFile, edgeFile, null, config);
   }
@@ -233,7 +233,7 @@ public class EPGMDatabase<
         config.getGraphHeadFactory().createGraphHead());
     }
 
-    return new EPGMDatabase<>(vertices, edges, graphHeads, config);
+    return new EPGMDatabase<>(graphHeads, vertices, edges, config);
   }
 
   /**
@@ -271,9 +271,10 @@ public class EPGMDatabase<
    * @param persistentVertexFactory     persistent vertex data factory
    * @param persistentEdgeFactory       persistent edge data factory
    * @param persistentGraphHeadFactory  persistent graph data factory
+   * @param <PG>                        persistent graph head type
    * @param <PV>                        persistent vertex type
    * @param <PE>                        persistent edge type
-   * @param <PG>                        persistent graph head type
+   *
    * @throws Exception
    */
   public <
@@ -410,7 +411,7 @@ public class EPGMDatabase<
         config.getGraphHeadFactory().createGraphHead());
     }
 
-    return new EPGMDatabase<>(vertices, edges, graphHeads, config);
+    return new EPGMDatabase<>(graphHeads, vertices, edges, config);
   }
 
   /**
@@ -418,9 +419,9 @@ public class EPGMDatabase<
    *
    * @param epgmStore EPGM store
    * @param env       Flink execution environment
-   * @param <G>      graph data type
-   * @param <V>      vertex data type
-   * @param <E>      edge data type
+   * @param <G>       graph data type
+   * @param <V>       vertex data type
+   * @param <E>       edge data type
    * @return EPGM database
    */
   @SuppressWarnings("unchecked")
@@ -462,6 +463,12 @@ public class EPGMDatabase<
       graphTypeInfo);
 
     return new EPGMDatabase<>(
+      subgraphDataSet.map(new MapFunction<Subgraph<GradoopId, G>, G>() {
+        @Override
+        public G map(Subgraph<GradoopId, G> longGDSubgraph) throws Exception {
+          return longGDSubgraph.getValue();
+        }
+      }).withForwardedFields("f1->*"),
       vertexDataSet.map(new MapFunction<Vertex<GradoopId, V>, V>() {
         @Override
         public V map(Vertex<GradoopId, V> longVDVertex) throws Exception {
@@ -474,12 +481,6 @@ public class EPGMDatabase<
           return longEDEdge.getValue();
         }
       }).withForwardedFields("f2->*"),
-      subgraphDataSet.map(new MapFunction<Subgraph<GradoopId, G>, G>() {
-        @Override
-        public G map(Subgraph<GradoopId, G> longGDSubgraph) throws Exception {
-          return longGDSubgraph.getValue();
-        }
-      }).withForwardedFields("f1->*"),
       GradoopFlinkConfig.createConfig(conf, env));
   }
 

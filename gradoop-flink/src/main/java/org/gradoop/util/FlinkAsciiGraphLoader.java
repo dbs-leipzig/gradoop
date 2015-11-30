@@ -122,6 +122,34 @@ public class FlinkAsciiGraphLoader<
   }
 
   /**
+   * Returns all GraphHeads contained in the ASCII graph.
+   *
+   * @return graphHeads
+   */
+  public Collection<G> getGraphHeads() {
+    return loader.getGraphHeads();
+  }
+
+  /**
+   * Returns GraphHead by given variable.
+   *
+   * @param variable variable used in GDL script
+   * @return graphHead or {@code null} if graph is not cached
+   */
+  public G getGraphHeadByVariable(String variable) {
+    return loader.getGraphHeadByVariable(variable);
+  }
+
+  /**
+   * Returns all vertices contained in the ASCII graph.
+   *
+   * @return vertices
+   */
+  public Collection<V> getVertices() {
+    return loader.getVertices();
+  }
+
+  /**
    * Returns the vertex which is identified by the given variable. If the
    * variable cannot be found, the method returns {@code null}.
    *
@@ -130,6 +158,15 @@ public class FlinkAsciiGraphLoader<
    */
   public V getVertexByVariable(String variable) {
     return loader.getVertexByVariable(variable);
+  }
+
+  /**
+   * Returns all edges contained in the ASCII graph.
+   *
+   * @return edges
+   */
+  public Collection<E> getEdges() {
+    return loader.getEdges();
   }
 
   /**
@@ -155,10 +192,5 @@ public class FlinkAsciiGraphLoader<
         loader.getVertices(),
         loader.getEdges(),
         config);
-  }
-
-
-  public G getGraphHeadByVariable(String variable) {
-    return loader.getGraphHeadByVariable(variable);
   }
 }
