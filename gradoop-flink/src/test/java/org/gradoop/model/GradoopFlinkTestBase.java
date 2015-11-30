@@ -19,6 +19,7 @@ package org.gradoop.model;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.StreamingMode;
 import org.apache.flink.test.util.ForkableFlinkMiniCluster;
 import org.apache.flink.test.util.TestBaseUtils;
@@ -30,10 +31,14 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertFalse;
@@ -47,6 +52,7 @@ public abstract class GradoopFlinkTestBase {
   protected static final int DEFAULT_PARALLELISM = 4;
 
   protected static ForkableFlinkMiniCluster cluster = null;
+  private static File logDir;
 
   /**
    * Flink Execution Environment
@@ -90,17 +96,35 @@ public abstract class GradoopFlinkTestBase {
    * Custom test cluster start routine,
    * workaround to set TASK_MANAGER_MEMORY_SIZE.
    *
+   * TODO: remove, when future issue is fixed
+   * {@see http://mail-archives.apache.org/mod_mbox/flink-dev/201511.mbox/%3CCAC27z=PmPMeaiNkrkoxNFzoR26BOOMaVMghkh1KLJFW4oxmUmw@mail.gmail.com%3E}
+   *
    * @throws Exception
    */
   @BeforeClass
   public static void setup() throws Exception {
-    cluster = TestBaseUtils.startCluster(
-      1,
-      DEFAULT_PARALLELISM,
-      StreamingMode.BATCH_ONLY,
-      false,
-      false,
-      true);
+    logDir = File.createTempFile("TestBaseUtils-logdir", (String)null);
+    Assert.assertTrue("Unable to delete temp file", logDir.delete());
+    Assert.assertTrue("Unable to create temp directory", logDir.mkdir());
+
+    Files.createFile((new File(logDir, "jobmanager.out")).toPath());
+    Path logFile =  Files
+      .createFile((new File(logDir, "jobmanager.log")).toPath());
+
+    Configuration config = new Configuration();
+
+    config.setInteger("local.number-taskmanager", 1);
+    config.setInteger("taskmanager.numberOfTaskSlots", DEFAULT_PARALLELISM);
+    config.setBoolean("local.start-webserver", false);
+    config.setLong("taskmanager.memory.size", 128L);
+    config.setBoolean("fs.overwrite-files", true);
+    config.setString("akka.ask.timeout", "1000s");
+    config.setString("akka.startup-timeout", "60 s");
+    config.setInteger("jobmanager.web.port", 8081);
+    config.setString("jobmanager.web.log.path", logFile.toString());
+    cluster =
+      new ForkableFlinkMiniCluster(config, true, StreamingMode.BATCH_ONLY);
+    cluster.start();
   }
 
   @AfterClass
