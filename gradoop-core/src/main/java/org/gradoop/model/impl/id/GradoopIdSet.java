@@ -45,7 +45,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
    * Creates a new instance.
    */
   public GradoopIdSet() {
-    identifiers = Sets.newHashSet();
+    identifiers = Sets.newTreeSet();
   }
 
   /**
@@ -173,7 +173,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
   @Override
   public void readFields(DataInput dataInput) throws IOException {
     int count = dataInput.readInt();
-    identifiers = Sets.newHashSetWithExpectedSize(count);
+    identifiers = Sets.newTreeSet();
 
     for (int i = 0; i < count; i++) {
       GradoopId id = new GradoopId();
