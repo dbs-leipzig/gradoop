@@ -15,8 +15,13 @@ public class PropertyValueTest {
 
   @Test
   public void testCreate() throws Exception {
+    // null
+    PropertyValue p = create(null);
+    assertTrue(p.isNull());
+    assertNull(p.getObject());
+
     // boolean
-    PropertyValue p = create(BOOL_VAL_1);
+    p = create(BOOL_VAL_1);
     assertTrue(p.isBoolean());
     assertEquals(BOOL_VAL_1, p.getBoolean());
     // int
@@ -49,6 +54,10 @@ public class PropertyValueTest {
   public void testSetAndGetObject() throws Exception {
     PropertyValue p = new PropertyValue();
 
+    p.setObject(null);
+    assertTrue(p.isNull());
+    assertNull(p.getObject());
+
     p.setObject(BOOL_VAL_1);
     assertTrue(p.isBoolean());
     assertEquals(BOOL_VAL_1, p.getObject());
@@ -76,17 +85,6 @@ public class PropertyValueTest {
     p.setObject(BIG_DECIMAL_VAL_7);
     assertTrue(p.isBigDecimal());
     assertEquals(BIG_DECIMAL_VAL_7, p.getObject());
-    // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
-//    // DateTime
-//    p.setObject(DATETIME_VAL_8);
-//    assertTrue(p.isDateTime());
-//    assertEquals(DATETIME_VAL_8, p.getObject());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testSetObjectNull() {
-    PropertyValue p = new PropertyValue();
-    p.setObject(null);
   }
 
   @Test(expected = UnsupportedTypeException.class)
@@ -96,8 +94,22 @@ public class PropertyValueTest {
   }
 
   @Test
+  public void testIsNull() throws Exception {
+    PropertyValue p = new PropertyValue(null);
+    assertTrue(p.isNull());
+    assertFalse(p.isBoolean());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+  }
+
+  @Test
   public void testIsBoolean() throws Exception {
     PropertyValue p = new PropertyValue(true);
+    assertFalse(p.isNull());
     assertTrue(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -123,6 +135,7 @@ public class PropertyValueTest {
   @Test
   public void testIsInt() throws Exception {
     PropertyValue p = new PropertyValue(INT_VAL_2);
+    assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertTrue(p.isInt());
     assertFalse(p.isLong());
@@ -148,6 +161,7 @@ public class PropertyValueTest {
   @Test
   public void testIsLong() throws Exception {
     PropertyValue p = new PropertyValue(LONG_VAL_3);
+    assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertTrue(p.isLong());
@@ -173,6 +187,7 @@ public class PropertyValueTest {
   @Test
   public void testIsFloat() throws Exception {
     PropertyValue p = new PropertyValue(FLOAT_VAL_4);
+    assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -198,6 +213,7 @@ public class PropertyValueTest {
   @Test
   public void testIsDouble() throws Exception {
     PropertyValue p = new PropertyValue(DOUBLE_VAL_5);
+    assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -223,6 +239,7 @@ public class PropertyValueTest {
   @Test
   public void testIsString() throws Exception {
     PropertyValue p = new PropertyValue(STRING_VAL_6);
+    assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -248,6 +265,7 @@ public class PropertyValueTest {
   @Test
   public void testIsBigDecimal() throws Exception {
     PropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
+    assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
@@ -272,6 +290,8 @@ public class PropertyValueTest {
 
   @Test
   public void testEqualsAndHashCode() throws Exception {
+    validateEqualsAndHashCode(create(null), create(null), create(false));
+
     validateEqualsAndHashCode(create(true), create(true), create(false));
 
     validateEqualsAndHashCode(create(10), create(10), create(11));
@@ -305,6 +325,9 @@ public class PropertyValueTest {
 
   @Test
   public void testCompareTo() throws Exception {
+    validateCompareTo(create(null), create(null),
+      create(true));
+
     validateCompareTo(create(false), create(false),
       create(true));
 
@@ -330,7 +353,10 @@ public class PropertyValueTest {
 
   @Test
   public void testWriteAndReadFields() throws IOException {
-    PropertyValue p = create(BOOL_VAL_1);
+    PropertyValue p = create(NULL_VAL_0);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(BOOL_VAL_1);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
     p = create(INT_VAL_2);

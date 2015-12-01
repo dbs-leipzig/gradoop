@@ -20,14 +20,13 @@ package org.gradoop.model.impl.properties;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.util.GConstants;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a single property value in the EPGM.
@@ -36,6 +35,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class PropertyValue implements WritableComparable<PropertyValue> {
 
+  /**
+   * Represents a property value that is {@code null}.
+   */
+  public static final PropertyValue NULL_VALUE = new PropertyValue(null);
+
+  /**
+   * {@code <property-type>} for empty property value (i.e. {@code null})
+   */
+  private static final transient byte TYPE_NULL         = 0x00;
   /**
    * {@code <property-type>} for {@link java.lang.Boolean}
    */
@@ -109,6 +117,15 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
   //----------------------------------------------------------------------------
 
   /**
+   * True, if the value represents {@code null}.
+   *
+   * @return true, if {@code null} value
+   */
+  public boolean isNull() {
+    return rawBytes[0] == TYPE_NULL;
+  }
+
+  /**
    * True, if the wrapped value is of type {@code boolean}.
    *
    * @return true, if {@code boolean} value
@@ -173,7 +190,7 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
   /**
    * Returns the wrapped value as object.
    *
-   * @return value
+   * @return value or {@code null} if the value is empty
    */
   public Object getObject() {
     return isBoolean() ? getBoolean() :
@@ -182,7 +199,8 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
           isFloat() ? getFloat() :
             isDouble() ? getDouble() :
               isString() ? getString() :
-                getBigDecimal();
+                isBigDecimal() ? getBigDecimal() :
+                  null;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -253,8 +271,9 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
    * @throws UnsupportedTypeException
    */
   public void setObject(Object value) {
-    checkNotNull(value, "Property value was null");
-    if (value instanceof Boolean) {
+    if (value == null) {
+      rawBytes = new byte[] {TYPE_NULL};
+    } else if (value instanceof Boolean) {
       setBoolean((Boolean) value);
     } else if (value instanceof Integer) {
       setInt((Integer) value);
@@ -385,7 +404,11 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
 
   @Override
   public String toString() {
-    return isString() ? String.format("\"%s\"", getObject().toString()) :
-      getObject().toString();
+    return
+      getObject() != null ?
+        isString() ?
+          String.format("\"%s\"", getString()) :
+          getObject().toString() :
+        GConstants.NULL_STRING;
   }
 }

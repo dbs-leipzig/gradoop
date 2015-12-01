@@ -48,6 +48,11 @@ public final class GConstants {
   public static final String DEFAULT_EDGE_LABEL = "";
 
   /**
+   * String representation of {@code null}.
+   */
+  public static final String NULL_STRING = "NULL";
+
+  /**
    * Column family name for label.
    */
   public static final String CF_META = "m";

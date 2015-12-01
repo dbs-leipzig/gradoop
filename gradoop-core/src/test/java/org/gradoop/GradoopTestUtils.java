@@ -55,6 +55,7 @@ public class GradoopTestUtils {
    */
   public static Map<String, Object> SUPPORTED_PROPERTIES;
 
+  public static final String KEY_0 = "key0";
   public static final String KEY_1 = "key1";
   public static final String KEY_2 = "key2";
   public static final String KEY_3 = "key3";
@@ -63,6 +64,7 @@ public class GradoopTestUtils {
   public static final String KEY_6 = "key6";
   public static final String KEY_7 = "key7";
 
+  public static final Object      NULL_VAL_0        = null;
   public static final boolean     BOOL_VAL_1        = true;
   public static final int         INT_VAL_2         = 23;
   public static final long        LONG_VAL_3        = 23L;
@@ -73,6 +75,7 @@ public class GradoopTestUtils {
 
   static {
     SUPPORTED_PROPERTIES = Maps.newTreeMap();
+    SUPPORTED_PROPERTIES.put(KEY_0, NULL_VAL_0);
     SUPPORTED_PROPERTIES.put(KEY_1, BOOL_VAL_1);
     SUPPORTED_PROPERTIES.put(KEY_2, INT_VAL_2);
     SUPPORTED_PROPERTIES.put(KEY_3, LONG_VAL_3);
