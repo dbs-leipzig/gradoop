@@ -18,11 +18,14 @@
 package org.gradoop.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.MapOperator;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.NotInGraphBroadcast;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
 
 /**
@@ -47,15 +50,17 @@ public class Exclusion<
   protected LogicalGraph<G, V, E> executeInternal(
     LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
+    DataSet<GradoopId> graphId = secondGraph
+      .getGraphHead()
+      .map(new Id<G>());
+
     DataSet<V> newVertexSet = firstGraph.getVertices()
       .filter(new NotInGraphBroadcast<V>())
-      .withBroadcastSet(
-        secondGraph.getGraphHead(), NotInGraphBroadcast.GRAPH_ID);
+      .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID);
 
     DataSet<E> newEdgeSet = firstGraph.getEdges()
       .filter(new NotInGraphBroadcast<E>())
-      .withBroadcastSet(
-        secondGraph.getGraphHead(), NotInGraphBroadcast.GRAPH_ID);
+      .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID);
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());
