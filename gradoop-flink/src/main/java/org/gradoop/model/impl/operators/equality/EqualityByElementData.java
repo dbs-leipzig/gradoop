@@ -16,6 +16,14 @@ import org.gradoop.model.impl.operators.equality.functions.VertexDataLabeler;
 import org.gradoop.model.impl.operators.equality.tuples.EdgeDataLabel;
 import org.gradoop.model.impl.operators.equality.tuples.DataLabel;
 
+/**
+ * Two graph are equal,
+ * if there exists an isomorphism based on element label and property equality.
+ *
+ * @param <G> graph head type
+ * @param <V> vertex type
+ * @param <E> edge type
+ */
 public class EqualityByElementData
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends EqualityBase implements BinaryGraphToValueOperator<V, E, G, Boolean> {
@@ -32,8 +40,14 @@ public class EqualityByElementData
         .cross(secondGraphLabel)
         .with(new Equals<DataLabel>())
     );
-    }
+  }
 
+  /**
+   * Returns an 1-element dataset representing the canonical label of a graph.
+   *
+   * @param graph input graph
+   * @return canonical label
+   */
   private DataSet<DataLabel> labelGraph(LogicalGraph<G, V, E> graph) {
 
     DataSet<DataLabel> vertexLabels = graph.getVertices()
@@ -71,5 +85,5 @@ public class EqualityByElementData
   @Override
   public String getName() {
     return this.getClass().getSimpleName();
-    }
+  }
 }

@@ -6,11 +6,14 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
+/**
+ * (graphId, vertexIds) x (graphId, edgeIds) => (graphId, vertexIds, edgeIds)
+ */
 //@FunctionAnnotation.ForwardedFieldsFirst("f0,f1")
 //@FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
 public class GraphIdVertexIdsEdgeIdsTriple implements
-  JoinFunction<Tuple2<GradoopId,GradoopIdSet>,Tuple2<GradoopId,GradoopIdSet>,
-    Tuple3<GradoopId,GradoopIdSet,GradoopIdSet>> {
+  JoinFunction<Tuple2<GradoopId, GradoopIdSet>, Tuple2<GradoopId, GradoopIdSet>,
+    Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>> {
 
   @Override
   public Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> join(

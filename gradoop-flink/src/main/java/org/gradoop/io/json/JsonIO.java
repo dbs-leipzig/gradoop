@@ -148,7 +148,9 @@ public abstract class JsonIO {
      * @return long values
      * @throws JSONException
      */
-    protected GradoopIdSet getArrayValues(JSONArray array) throws JSONException {
+    protected GradoopIdSet getArrayValues(JSONArray array) throws
+      JSONException {
+
       GradoopIdSet result = new GradoopIdSet();
 
       for (int i = 0; i < array.length(); i++) {

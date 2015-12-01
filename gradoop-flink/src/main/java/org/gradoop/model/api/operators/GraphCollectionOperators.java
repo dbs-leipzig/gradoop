@@ -192,7 +192,7 @@ public interface GraphCollectionOperators
    * @param op unary graph to graph operator
    * @return collection with resulting logical graphs
    */
-  GraphCollection<G, V, E> apply(UnaryGraphToGraphOperator<G,V, E> op);
+  GraphCollection<G, V, E> apply(UnaryGraphToGraphOperator<G, V, E> op);
 
   /**
    * Applies binary graph to graph operator (e.g., combine) on each pair of
@@ -289,6 +289,6 @@ public interface GraphCollectionOperators
    * @return true, if equal by element ids
    * @throws Exception
    */
-  Boolean equalsByGraphElementIdsCollected(GraphCollection<G, V, E> other) throws
-    Exception;
+  Boolean equalsByGraphElementIdsCollected(
+    GraphCollection<G, V, E> other) throws Exception;
 }

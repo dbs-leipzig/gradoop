@@ -4,6 +4,9 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.model.impl.operators.equality.tuples.EdgeDataLabel;
 import org.gradoop.model.impl.operators.equality.tuples.DataLabel;
 
+/**
+ * "edgeLabel","targetLabel" => "edgeLabel[targetLabel]"
+ */
 public class TargetLabelAppender
   extends VertexLabelAppender
   implements JoinFunction<EdgeDataLabel, DataLabel, DataLabel> {
@@ -14,7 +17,7 @@ public class TargetLabelAppender
   ) throws Exception {
 
     return new DataLabel(edgeLabel.getGraphId(),
-      edgeLabel.getSourceId(), label(edgeLabel, targetLabel)
+      edgeLabel.getSourceId(), label(targetLabel, edgeLabel)
     );
   }
 }

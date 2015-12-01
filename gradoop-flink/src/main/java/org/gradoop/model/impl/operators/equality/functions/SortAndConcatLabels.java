@@ -9,6 +9,11 @@ import org.gradoop.model.api.EPGMLabeled;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * "Z", "A", "M" => "AMZ"
+ *
+ * @param <L> labeled type
+ */
 public class SortAndConcatLabels<L extends EPGMLabeled>
   implements GroupReduceFunction<L, L> {
   @Override
@@ -17,10 +22,10 @@ public class SortAndConcatLabels<L extends EPGMLabeled>
 
     List<L> fatLabels = Lists.newArrayList(iterable);
 
-    if(!fatLabels.isEmpty()) {
+    if (!fatLabels.isEmpty()) {
       List<String> labels = Lists.newArrayList();
 
-      for(L fatLabel : fatLabels) {
+      for (L fatLabel : fatLabels) {
         labels.add(fatLabel.getLabel());
       }
 

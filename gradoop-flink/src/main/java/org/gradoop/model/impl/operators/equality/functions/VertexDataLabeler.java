@@ -7,6 +7,12 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.equality.tuples.DataLabel;
 
+/**
+ * Maps a Vertex to a single data label (map) or a set of data labels with
+ * one for each graph the vertex is contained in (flatmap).
+ *
+ * @param <V> vertex type
+ */
 public class VertexDataLabeler<V extends EPGMVertex>
   extends ElementBaseLabeler
   implements MapFunction<V, DataLabel>, FlatMapFunction<V, DataLabel> {
@@ -22,12 +28,18 @@ public class VertexDataLabeler<V extends EPGMVertex>
 
     DataLabel dataLabel = initDataLabel(vertex);
 
-    for(GradoopId graphId : vertex.getGraphIds()) {
+    for (GradoopId graphId : vertex.getGraphIds()) {
       dataLabel.setGraphId(graphId);
       collector.collect(dataLabel);
     }
   }
 
+  /**
+   * DRY
+   *
+   * @param vertex vertex
+   * @return data label
+   */
   private DataLabel initDataLabel(V vertex) {
     String canonicalLabel = vertex.getLabel() + label(vertex.getProperties());
 

@@ -10,8 +10,7 @@ import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.join.LeftSide;
 import org.gradoop.model.impl.functions.counting.Tuple1With1L;
-import org.gradoop.model.impl.operators.equality.functions
-  .CanonicalLabelWithCount;
+import org.gradoop.model.impl.operators.equality.functions.DataLabelWithCount;
 import org.gradoop.model.impl.operators.equality.functions.EdgeDataLabeler;
 import org.gradoop.model.impl.operators.equality.functions.GraphHeadDataLabeler;
 import org.gradoop.model.impl.operators.equality.functions.LabelAppender;
@@ -23,7 +22,13 @@ import org.gradoop.model.impl.operators.equality.tuples.DataLabel;
 import org.gradoop.model.impl.operators.equality.tuples.EdgeDataLabel;
 
 /**
- * Created by peet on 19.11.15.
+ * Two collections are equal,
+ * if there exists an 1:1 mapping between graphs, where for each pair
+ * there exists an isomorphism based on element label and property equality.
+ *
+ * @param <G> graph head type
+ * @param <V> vertex type
+ * @param <E> edge type
  */
 public class EqualityByGraphElementData
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
@@ -52,6 +57,13 @@ public class EqualityByGraphElementData
     return checkCountEqualsCount(distinctFirstGraphCount, matchingIdCount);
   }
 
+  /**
+   * Returns a dataset containing canonical labels for all graphs of an input
+   * collection.
+   *
+   * @param collection input collection
+   * @return canonical labels
+   */
   private DataSet<Tuple2<String, Long>> labelGraphs(
     GraphCollection<G, V, E> collection) {
 
@@ -97,7 +109,7 @@ public class EqualityByGraphElementData
       .join(graphDataLabels)
       .where(1).equalTo(0)
       .with(new LabelAppender())
-      .map(new CanonicalLabelWithCount())
+      .map(new DataLabelWithCount())
       .groupBy(0)
       .sum(1);
   }

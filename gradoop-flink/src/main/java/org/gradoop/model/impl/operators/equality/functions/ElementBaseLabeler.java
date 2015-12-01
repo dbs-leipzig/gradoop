@@ -6,8 +6,17 @@ import org.gradoop.model.impl.properties.PropertyList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Superclass of EPGM element labelers.
+ */
 public abstract class ElementBaseLabeler {
 
+  /**
+   * Create a canonical label for properties.
+   *
+   * @param properties element properties
+   * @return canonical label
+   */
   protected String label(PropertyList properties) {
 
     StringBuilder builder = new StringBuilder("{");
@@ -19,9 +28,9 @@ public abstract class ElementBaseLabeler {
 
       boolean first = true;
 
-      for(String key : keys) {
+      for (String key : keys) {
 
-        if(!first) {
+        if (!first) {
           builder.append(",");
         } else {
           first = false;
@@ -31,7 +40,7 @@ public abstract class ElementBaseLabeler {
 
         builder.append(key).append("=");
 
-        if(value instanceof String) {
+        if (value instanceof String) {
           builder.append('"').append(value.toString()).append('"');
         } else {
           builder.append(value);

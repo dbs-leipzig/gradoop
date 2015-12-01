@@ -11,16 +11,24 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
-import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.counting.Tuple2WithObjectAnd1L;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Created by peet on 19.11.15.
+ * Superclass of all equality operators.
  */
 public abstract class EqualityBase {
 
+  /**
+   * collection => (graphId, count)
+   *
+   * @param graphCollection input collection
+   * @param <G> graph head type
+   * @param <V> vertex type
+   * @param <E> edge type
+   * @return graph id count
+   */
   public
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   AggregateOperator<Tuple2<GradoopId, Long>> getIdsWithCount(
@@ -35,26 +43,39 @@ public abstract class EqualityBase {
       .sum(1);
   }
 
+  /**
+   * (count1) == (count2)
+   *
+   * @param firstCount first count
+   * @param secondCount second count
+   * @return true, if equal
+   */
   public DataSet<Boolean>
   checkCountEqualsCount(
-    DataSet<Tuple1<Long>> firstCount, DataSet<Tuple1<Long>> matchingIdCount) {
+    DataSet<Tuple1<Long>> firstCount, DataSet<Tuple1<Long>> secondCount) {
 
     DataSet<Boolean> resultSet =
-      matchingIdCount.cross(firstCount).with(new Equals<Tuple1<Long>>());
+      secondCount.cross(firstCount).with(new Equals<Tuple1<Long>>());
 
     resultSet = ensureBooleanSetIsNotEmpty(resultSet);
 
     return resultSet;
   }
 
+  /**
+   * Ensures that a boolean dataset is not empty.
+   *
+   * @param resultSet empty or non-empty boolean dataset
+   * @return non-empty boolean dataset
+   */
   protected DataSet<Boolean> ensureBooleanSetIsNotEmpty(
     DataSet<Boolean> resultSet) {
+
     resultSet = resultSet
       .union(
         resultSet
           .getExecutionEnvironment()
-          .fromCollection(Lists.newArrayList(true))
-      ).reduce(new And());
+          .fromCollection(Lists.newArrayList(true))).reduce(new And());
     return resultSet;
   }
 }

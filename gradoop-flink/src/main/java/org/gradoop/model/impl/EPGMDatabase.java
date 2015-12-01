@@ -93,6 +93,10 @@ public class EPGMDatabase<
    * Database graph representing the vertex and edge space.
    */
   private GraphCollection<G, V, E> database;
+
+  /**
+   * Graph head representing the database graph.
+   */
   private final DataSet<G> graphHead;
 
   /**

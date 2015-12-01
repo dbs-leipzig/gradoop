@@ -4,18 +4,32 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.model.api.EPGMLabeled;
 import org.gradoop.model.impl.id.GradoopId;
 
+/**
+ * This tuple represents an edge, where label and properties are aggregated
+ * into a single string label.
+ */
 public class EdgeDataLabel
   extends Tuple4<GradoopId, GradoopId, GradoopId, String>
   implements EPGMLabeled {
 
-  public EdgeDataLabel(){
+  /**
+   * Default constructor.
+   */
+  public EdgeDataLabel() {
   }
 
+  /**
+   * Constructor with initial values.
+   *
+   * @param sourceId source vertex id
+   * @param targetId target vertex id
+   * @param label edge label
+   */
   public EdgeDataLabel(
-    GradoopId sourceVertexId, GradoopId targetVertexId, String label) {
+    GradoopId sourceId, GradoopId targetId, String label) {
     this.f0 = new GradoopId();
-    this.f1 = sourceVertexId;
-    this.f2 = targetVertexId;
+    this.f1 = sourceId;
+    this.f2 = targetId;
     this.f3 = label;
   }
 

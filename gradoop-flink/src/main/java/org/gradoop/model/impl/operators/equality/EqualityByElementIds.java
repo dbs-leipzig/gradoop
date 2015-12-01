@@ -13,7 +13,12 @@ import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
- * Created by peet on 17.11.15.
+ * Tow graphs are equal,
+ * if vertex and edge sets contain the same elements by id.
+ *
+ * @param <G> graph head type
+ * @param <V> vertex type
+ * @param <E> edge type
  */
 public class EqualityByElementIds
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
@@ -47,9 +52,10 @@ public class EqualityByElementIds
       .cross(secondGraphEdgeIds)
       .with(new Equals<GradoopIdSet>());
 
-    return ensureBooleanSetIsNotEmpty(equalVertices
-      .cross(equalEdges)
-      .with(new And())
+    return ensureBooleanSetIsNotEmpty(
+      equalVertices
+        .cross(equalEdges)
+        .with(new And())
     );
   }
 

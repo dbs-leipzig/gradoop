@@ -6,8 +6,12 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
+/**
+ * (graphId,ElementId1),..,(graphId,ElementIdn) =>
+ * (graphId,(ElementId1,..,ElementIdn)
+ */
 public class GraphIdElementIdsInTuple2 implements GroupReduceFunction
-  <Tuple2<GradoopId,GradoopId>,Tuple2<GradoopId,GradoopIdSet>>{
+  <Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopIdSet>> {
 
   @Override
   public void reduce(Iterable<Tuple2<GradoopId, GradoopId>> iterable,
@@ -18,8 +22,8 @@ public class GraphIdElementIdsInTuple2 implements GroupReduceFunction
     GradoopId graphId = null;
     GradoopIdSet elementIds = null;
 
-    for(Tuple2<GradoopId, GradoopId> graphIdElementId : iterable) {
-      if(first) {
+    for (Tuple2<GradoopId, GradoopId> graphIdElementId : iterable) {
+      if (first) {
         first = false;
         graphId = graphIdElementId.f0;
         elementIds = GradoopIdSet.fromExisting(graphIdElementId.f1);

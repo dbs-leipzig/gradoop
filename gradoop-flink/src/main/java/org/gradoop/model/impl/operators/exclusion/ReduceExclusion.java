@@ -39,11 +39,10 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <V> vertex data type
  * @param <E> edge data type
  */
-public class ReduceExclusion<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  implements UnaryCollectionToGraphOperator<G, V, E>{
+public class ReduceExclusion
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryCollectionToGraphOperator<G, V, E> {
+
   /**
    * ID defining the base graph
    */

@@ -29,7 +29,7 @@
 [INFO] Surefire report directory: /home/s1ck/Devel/gradoop/gradoop-examples/target/surefire-reports
 
 -------------------------------------------------------
- T E S T S
+ EL E S EL S
 -------------------------------------------------------
 Running org.gradoop.biiig.examples.BTGAnalysisDriverTest
 2015-05-26 21:56:57,599 INFO  [main] Configuration.deprecation (Configuration.java:warnOnceIfDeprecated(840)) - hadoop.native.lib is deprecated. Instead, use io.native.lib.available

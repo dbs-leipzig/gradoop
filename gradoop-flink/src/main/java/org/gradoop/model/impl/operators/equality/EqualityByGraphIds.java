@@ -12,7 +12,12 @@ import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Created by peet on 17.11.15.
+ * Two graph collections are equal,
+ * if they contain the same graphs by id.
+ *
+ * @param <G> graph type
+ * @param <V> vertex type
+ * @param <E> edge type
  */
 public class EqualityByGraphIds
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
@@ -37,13 +42,11 @@ public class EqualityByGraphIds
     DataSet<Tuple1<Long>> matchingIdCount = firstGraphIdsWithCount
       .join(secondGraphIdsWithCount)
       .where(0, 1).equalTo(0, 1)
-      .with(new Tuple1With1L<Tuple2<GradoopId,Long>>())
+      .with(new Tuple1With1L<Tuple2<GradoopId, Long>>())
       .sum(0);
 
     return checkCountEqualsCount(distinctFirstIdCount, matchingIdCount);
   }
-
-
 
   @Override
   public String getName() {

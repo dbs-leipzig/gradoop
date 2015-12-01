@@ -4,18 +4,38 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.api.EPGMLabeled;
 import org.gradoop.model.impl.id.GradoopId;
 
+/**
+ * This tuple represents an graph or vertex, where label, properties (and
+ * recursively graph elements) are aggregated into a single string label.
+ */
 public class DataLabel extends Tuple3<GradoopId, GradoopId, String>
-  implements EPGMLabeled{
+  implements EPGMLabeled {
 
-  public DataLabel(){
+  /**
+   * Default constructor.
+   */
+  public DataLabel() {
   }
 
+  /**
+   * constructor for graph heads
+   *
+   * @param id graph id
+   * @param label graph label
+   */
   public DataLabel(GradoopId id, String label) {
-    this.f0 = new GradoopId();
+    this.f0 = GradoopId.get(); // dummy id to prevent Flink RTE
     this.f1 = id;
     this.f2 = label;
   }
 
+  /**
+   * constructor for vertices
+   *
+   * @param graphId graph id
+   * @param vertexId vertex id
+   * @param label vertex label
+   */
   public DataLabel(GradoopId graphId, GradoopId vertexId, String label) {
     this.f0 = graphId;
     this.f1 = vertexId;
@@ -46,12 +66,11 @@ public class DataLabel extends Tuple3<GradoopId, GradoopId, String>
     this.f2 = label;
   }
 
-
   @Override
   public boolean equals(Object o) {
     boolean equals = o instanceof DataLabel;
 
-    if(equals) {
+    if (equals) {
       equals = this.getLabel().equals(((DataLabel) o).getLabel());
     }
 
@@ -59,7 +78,7 @@ public class DataLabel extends Tuple3<GradoopId, GradoopId, String>
   }
 
   @Override
-  public int hashCode(){
+  public int hashCode() {
     return this.getLabel().hashCode();
   }
 

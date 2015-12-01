@@ -40,7 +40,7 @@ public class ReduceOverlap<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge>
-  implements UnaryCollectionToGraphOperator<G, V, E>{
+  implements UnaryCollectionToGraphOperator<G, V, E> {
 
   /**
    * {@inheritDoc}

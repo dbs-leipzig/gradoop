@@ -25,7 +25,14 @@ import org.gradoop.model.impl.operators.equality.functions
 import org.gradoop.model.impl.operators.equality.functions
   .VertexIdsEdgeIdsCountTriple;
 
-
+/**
+ * Two graph collections are equal,
+ * if there exists an 1:1 mapping if graphs by vertex and edge id equality.
+ *
+ * @param <G> graph type
+ * @param <V> vertex type
+ * @param <E> edge type
+ */
 public class EqualityByGraphElementIds
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends EqualityBase
@@ -54,8 +61,13 @@ public class EqualityByGraphElementIds
     return checkCountEqualsCount(distinctFirstGraphCount, matchingIdCount);
   }
 
-
-
+  /**
+   * Count occurrences of a combination of vertex and edge ids in a graph
+   * collection.
+   *
+   * @param graphCollection input
+   * @return count of vertex and edge id combinations
+   */
   private DataSet<Tuple3<GradoopIdSet, GradoopIdSet, Long>>
   getGraphElementIdsWithCount(GraphCollection<G, V, E> graphCollection) {
 
@@ -65,11 +77,11 @@ public class EqualityByGraphElementIds
     DataSet<Tuple1<GradoopId>> graphIds = graphCollection.getGraphHeads()
       .map(new Tuple1WithId<G>());
 
-    DataSet<Tuple2<GradoopId,GradoopIdSet>> vertexIdsByGraphId =
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdsByGraphId =
       getElementIdsByGraphId(
         graphIds, graphCollection.getVertices());
 
-    DataSet<Tuple2<GradoopId,GradoopIdSet>> edgeIdsByGraphId =
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> edgeIdsByGraphId =
       getElementIdsByGraphId(
         graphIds, graphCollection.getEdges());
 
@@ -84,12 +96,21 @@ public class EqualityByGraphElementIds
       .sum(2);
   }
 
-  private <T extends EPGMGraphElement> GroupReduceOperator
+  /**
+   * Returns a pair of graph id and vertex or edge ids for each graph id in a
+   * given data set.
+   *
+   * @param graphIds graph ids
+   * @param elements vertices or edges
+   * @param <GE> vertex or edge type
+   * @return element ids per graph id pair
+   */
+  private <GE extends EPGMGraphElement> GroupReduceOperator
     <Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopIdSet>>
   getElementIdsByGraphId(
-    DataSet<Tuple1<GradoopId>> graphIds, DataSet<T> elements) {
+    DataSet<Tuple1<GradoopId>> graphIds, DataSet<GE> elements) {
     return elements
-      .flatMap(new GraphIdElementIdInTuple2<T>())
+      .flatMap(new GraphIdElementIdInTuple2<GE>())
       .join(graphIds)
       .where(0).equalTo(0)
       .with(new LeftSide<Tuple2<GradoopId, GradoopId>,

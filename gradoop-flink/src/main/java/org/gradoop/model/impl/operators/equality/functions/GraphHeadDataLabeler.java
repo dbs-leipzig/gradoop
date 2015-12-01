@@ -4,6 +4,11 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.operators.equality.tuples.DataLabel;
 
+/**
+ * graph head => data label
+ *
+ * @param <G> graph head type
+ */
 public class GraphHeadDataLabeler<G extends EPGMGraphHead>
   extends ElementBaseLabeler
   implements MapFunction<G, DataLabel> {
@@ -13,5 +18,6 @@ public class GraphHeadDataLabeler<G extends EPGMGraphHead>
     String canonicalLabel =
       graphHead.getLabel() + label(graphHead.getProperties());
 
-    return new DataLabel(graphHead.getId(), canonicalLabel);  }
+    return new DataLabel(graphHead.getId(), canonicalLabel);
+  }
 }

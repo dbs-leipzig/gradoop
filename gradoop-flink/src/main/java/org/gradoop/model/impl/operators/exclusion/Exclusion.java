@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.MapOperator;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
