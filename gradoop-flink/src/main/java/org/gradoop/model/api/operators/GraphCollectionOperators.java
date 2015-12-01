@@ -291,4 +291,6 @@ public interface GraphCollectionOperators
    */
   Boolean equalsByGraphElementIdsCollected(
     GraphCollection<G, V, E> other) throws Exception;
+
+  DataSet<Boolean> isEmpty();
 }

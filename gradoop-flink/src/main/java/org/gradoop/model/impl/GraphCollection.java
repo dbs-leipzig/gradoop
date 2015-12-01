@@ -52,6 +52,9 @@ import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.api.functions.Predicate;
+import org.gradoop.model.impl.functions.bool.Not;
+import org.gradoop.model.impl.functions.bool.Or;
+import org.gradoop.model.impl.functions.bool.True;
 import org.gradoop.model.impl.functions.epgm.ById;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
@@ -488,5 +491,15 @@ public class GraphCollection<
   public Boolean equalsByGraphElementIdsCollected(
     GraphCollection<G, V, E> other) throws Exception {
     return collectEquals(equalsByGraphElementIds(other));
+  }
+
+  @Override
+  public DataSet<Boolean> isEmpty() {
+    return getGraphHeads()
+      .map(new True<G>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
+      .map(new Not());
   }
 }

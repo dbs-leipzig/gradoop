@@ -54,6 +54,12 @@ public class EqualityByElementDataTest extends EqualityTestBase {
     collectAndAssertNotEquals(equals.execute(g1, g3));
     collectAndAssertNotEquals(equals.execute(g1, g4));
     collectAndAssertNotEquals(equals.execute(g1, g5));
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> emptyGraph =
+      LogicalGraph.createEmptyGraph(getConfig());
+
+    collectAndAssertEquals(equals.execute(emptyGraph, emptyGraph));
+    collectAndAssertNotEquals(equals.execute(g1, emptyGraph));
   }
 
   @Test

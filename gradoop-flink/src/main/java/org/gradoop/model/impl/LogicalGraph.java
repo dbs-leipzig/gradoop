@@ -28,13 +28,16 @@ import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.operators.AggregateFunction;
+import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.api.functions.Predicate;
 import org.gradoop.model.api.functions.UnaryFunction;
+import org.gradoop.model.impl.functions.bool.Not;
+import org.gradoop.model.impl.functions.bool.Or;
+import org.gradoop.model.impl.functions.bool.True;
 import org.gradoop.model.impl.functions.graphcontainment.GraphContainmentUpdater;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
@@ -48,6 +51,7 @@ import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
 import org.gradoop.model.impl.operators.summarization.SummarizationGroupCombine;
 import org.gradoop.util.GradoopFlinkConfig;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -189,9 +193,9 @@ public class LogicalGraph
     Collection<G> graphHead, Collection<V> vertices, Collection<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
     return fromDataSets(
-      config.getExecutionEnvironment().fromCollection(graphHead),
-      config.getExecutionEnvironment().fromCollection(vertices),
-      config.getExecutionEnvironment().fromCollection(edges),
+      createGraphHeadDataSet(graphHead, config),
+      createVertexDataSet(vertices, config),
+      createEdgeDataSet(edges, config),
       config
     );
   }
@@ -225,6 +229,25 @@ public class LogicalGraph
       createEdgeDataSet(edges, config),
       config
     );
+  }
+
+  /**
+   * Creates an empty graph collection.
+   *
+   * @param config  Gradoop Flink configuration
+   * @param <G>     EPGM graph head type
+   * @param <V>     EPGM vertex type
+   * @param <E>     EPGM edge type
+   * @return empty graph collection
+   */
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  LogicalGraph<G, V, E> createEmptyGraph(GradoopFlinkConfig<G, V, E> config) {
+    Collection<G> graphHead = new ArrayList<>();
+    Collection<V> vertices = new ArrayList<>();
+    Collection<E> edges = new ArrayList<>();
+
+    return fromCollections(graphHead, vertices, edges, config);
   }
 
   /**
@@ -413,85 +436,6 @@ public class LogicalGraph
     return operator.execute(this);
   }
 
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public Map<String, Object> getProperties() {
-//    return graphId.getProperties();
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  @Override
-//  public Iterable<String> getPropertyKeys() {
-//    return graphId.getPropertyKeys();
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public Object getPropertyValue(String key) {
-//    return graphId.getPropertyValue(key);
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  @Override
-//  public <T> T getPropertyValue(String key, Class<T> type) {
-//    return graphId.getPropertyValue(key, type);
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public void setProperties(Map<String, Object> properties) {
-//    graphId.setProperties(properties);
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public void setProperty(String key, Object value) {
-//    graphId.setProperty(key, value);
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public int getPropertyCount() {
-//    return graphId.getPropertyCount();
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public GradoopId getId() {
-//    return graphId.getId();
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public void setId(GradoopId id) {
-//    graphId.setId(id);
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public String getLabel() {
-//    return graphId.getLabel();
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  public void setLabel(String label) {
-//    graphId.setLabel(label);
-//  }
-
   /**
    * {@inheritDoc}
    */
@@ -548,5 +492,15 @@ public class LogicalGraph
 
   public DataSet<G> getGraphHead() {
     return this.graphHeads;
+  }
+
+  @Override
+  public DataSet<Boolean> isEmpty() {
+    return getVertices()
+      .map(new True<V>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
+      .map(new Not());
   }
 }

@@ -53,7 +53,6 @@ public class EqualityByGraphElementDataTest
     collectAndAssertEquals(equals.execute(c12, c67));
     collectAndAssertEquals(equals.execute(c126, c167));
 
-    /* TODO: uncomment after NPE@COLLECTION bug fix
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c36 =
       loader.getGraphCollectionByVariables("g3", "g6");
 
@@ -66,7 +65,13 @@ public class EqualityByGraphElementDataTest
     collectAndAssertNotEquals(equals.execute(c12, c167));
     collectAndAssertNotEquals(equals.execute(c12, c36));
     collectAndAssertNotEquals(equals.execute(c12, c46));
-    collectAndAssertNotEquals(equals.execute(c12, c56));*/
+    collectAndAssertNotEquals(equals.execute(c12, c56));
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> emptyCollection =
+      GraphCollection.createEmptyCollection(getConfig());
+
+    collectAndAssertEquals(equals.execute(emptyCollection, emptyCollection));
+    collectAndAssertNotEquals(equals.execute(c12, emptyCollection));
   }
 
   @Test
@@ -118,7 +123,6 @@ public class EqualityByGraphElementDataTest
     collectAndAssertEquals(equals.execute(c12, c67));
     collectAndAssertEquals(equals.execute(c126, c167));
 
-    /* TODO: uncomment after NPE@COLLECTION bug fix
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c36 =
       loader.getGraphCollectionByVariables("g3", "g6");
 
@@ -131,7 +135,7 @@ public class EqualityByGraphElementDataTest
     collectAndAssertNotEquals(equals.execute(c12, c167));
     collectAndAssertNotEquals(equals.execute(c12, c36));
     collectAndAssertNotEquals(equals.execute(c12, c46));
-    collectAndAssertNotEquals(equals.execute(c12, c56));*/
+    collectAndAssertNotEquals(equals.execute(c12, c56));
   }
 
   @Test

@@ -8,6 +8,9 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.functions.bool.And;
+import org.gradoop.model.impl.functions.bool.Equals;
+import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 import org.gradoop.model.impl.id.GradoopId;
 
@@ -21,7 +24,7 @@ import org.gradoop.model.impl.id.GradoopId;
  */
 public class EqualityByGraphIds
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends EqualityBase
+  extends EqualityBase<G, V, E>
   implements BinaryCollectionToValueOperator<G, V, E, Boolean> {
 
   @Override
@@ -45,7 +48,10 @@ public class EqualityByGraphIds
       .with(new Tuple1With1L<Tuple2<GradoopId, Long>>())
       .sum(0);
 
-    return checkCountEqualsCount(distinctFirstIdCount, matchingIdCount);
+    return Or.union(
+      And.cross(firstCollection.isEmpty(), secondCollection.isEmpty()),
+      Equals.cross(distinctFirstIdCount, matchingIdCount)
+    );
   }
 
   @Override

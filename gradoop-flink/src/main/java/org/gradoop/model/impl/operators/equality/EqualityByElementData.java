@@ -1,12 +1,15 @@
 package org.gradoop.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.CrossOperator;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToValueOperator;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
+import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.operators.equality.functions.LabelAppender;
 import org.gradoop.model.impl.operators.equality.functions.SortAndConcatLabels;
 import org.gradoop.model.impl.operators.equality.functions.SourceLabelAppender;
@@ -35,10 +38,9 @@ public class EqualityByElementData
     DataSet<DataLabel> firstGraphLabel = labelGraph(firstGraph);
     DataSet<DataLabel> secondGraphLabel = labelGraph(secondGraph);
 
-    return ensureBooleanSetIsNotEmpty(
-      firstGraphLabel
-        .cross(secondGraphLabel)
-        .with(new Equals<DataLabel>())
+    return Or.union(
+      And.cross(firstGraph.isEmpty(), secondGraph.isEmpty()),
+      Equals.cross(firstGraphLabel, secondGraphLabel)
     );
   }
 

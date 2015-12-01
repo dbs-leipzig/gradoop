@@ -20,6 +20,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.api.functions.Predicate;
@@ -377,4 +378,6 @@ public interface LogicalGraphOperators
    */
   Boolean equalsByElementDataCollected(LogicalGraph<G, V, E> other) throws
     Exception;
+
+  DataSet<Boolean> isEmpty();
 }

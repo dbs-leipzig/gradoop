@@ -1,4 +1,4 @@
-package org.gradoop.model.api.operators;
+package org.gradoop.model.api.functions;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;

@@ -17,14 +17,31 @@
 
 package org.gradoop.model.impl.functions.bool;
 
+import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.api.java.DataSet;
 
 /**
  * Logical or as Flink function.
  */
-public class Or implements ReduceFunction<Boolean> {
+public class Or implements ReduceFunction<Boolean>,
+  CrossFunction<Boolean, Boolean, Boolean> {
   @Override
   public Boolean reduce(Boolean first, Boolean second) throws Exception {
     return first || second;
   }
+
+  @Override
+  public Boolean cross(Boolean first, Boolean second) throws Exception {
+    return first || second;
+  }
+
+  public static DataSet<Boolean> union(DataSet<Boolean> a, DataSet<Boolean> b) {
+    return a.union(b).reduce(new Or());
+  }
+
+  public static DataSet<Boolean> cross(DataSet<Boolean> a, DataSet<Boolean> b) {
+    return a.cross(b).with(new Or());
+  }
+
 }

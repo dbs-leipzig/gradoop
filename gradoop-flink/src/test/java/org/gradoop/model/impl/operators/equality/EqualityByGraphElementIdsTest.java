@@ -12,6 +12,9 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
   @Test
   public void testExecute() throws Exception {
 
+    EqualityByGraphElementIds<GraphHeadPojo, VertexPojo, EdgePojo> equals
+      = new EqualityByGraphElementIds<>();
+
     // 4 graphs : 1-2 of same elements, 1-3 different vertex, 1-4 different edge
     String asciiGraphs = "" +
       "g1[(a:A)-[b:b]->(c:C)];" +
@@ -28,9 +31,6 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c2
       = loader.getGraphCollectionByVariables("g2", "g3");
 
-    EqualityByGraphElementIds<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementIds<>();
-
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c5
       = loader.getGraphCollectionByVariables("g1","g4");
 
@@ -38,13 +38,18 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
 
     collectAndAssertNotEquals(equals.execute(c1, c5));
 
-    // TODO: uncomment after NPE in collection mode bug fix
-//    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c3
-//      = loader.getGraphCollectionByVariables("g1","g2");
-//
-//    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c4
-//      = loader.getGraphCollectionByVariables("g3","g4");
-//
-//    collectAndAssertNotEquals(equals.execute(c3, c4));
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c3
+      = loader.getGraphCollectionByVariables("g1","g2");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c4
+      = loader.getGraphCollectionByVariables("g3","g4");
+
+    collectAndAssertNotEquals(equals.execute(c3, c4));
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> emptyCollection =
+      GraphCollection.createEmptyCollection(getConfig());
+
+    collectAndAssertEquals(equals.execute(emptyCollection, emptyCollection));
+    collectAndAssertNotEquals(equals.execute(c1, emptyCollection));
   }
 }

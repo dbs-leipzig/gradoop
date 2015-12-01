@@ -38,5 +38,11 @@ public class EqualityByElementIdsTest extends EqualityTestBase {
     collectAndAssertEquals(equals.execute(g1, g2));
     collectAndAssertNotEquals(equals.execute(g1, g3));
     collectAndAssertNotEquals(equals.execute(g1, g4));
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> emptyGraph =
+      LogicalGraph.createEmptyGraph(getConfig());
+
+    collectAndAssertEquals(equals.execute(emptyGraph, emptyGraph));
+    collectAndAssertNotEquals(equals.execute(g1, emptyGraph));
   }
 }
