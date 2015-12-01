@@ -2,8 +2,12 @@ package org.gradoop.model.impl.functions.graphcontainment;
 
 import org.gradoop.model.api.EPGMGraphElement;
 
-public class InAnyGraphBroadcast
-  <GE extends EPGMGraphElement>
+/**
+ * True, if an element is contained in any of a set of given graphs.
+ *
+ * @param <GE> element type
+ */
+public class InAnyGraphBroadcast<GE extends EPGMGraphElement>
   extends GraphsContainmentFilterBroadcast<GE> {
 
   @Override

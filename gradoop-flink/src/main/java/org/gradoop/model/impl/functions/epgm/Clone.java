@@ -4,8 +4,12 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
 
-public class Clone<EL extends EPGMElement>
-  implements MapFunction<EL, EL>{
+/**
+ * Clones an element by replacing its id but keeping label and properties.
+ *
+ * @param <EL> element type
+ */
+public class Clone<EL extends EPGMElement> implements MapFunction<EL, EL> {
 
   @Override
   public EL map(EL el) throws Exception {

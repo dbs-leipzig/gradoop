@@ -4,10 +4,11 @@ import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Created by peet on 26.11.15.
+ * True, if an element is not contained in any of a given set of graphs.
+ *
+ * @param <GE> element type
  */
-public class NotInGraphsBroadcast
-  <GE extends EPGMGraphElement>
+public class NotInGraphsBroadcast<GE extends EPGMGraphElement>
   extends GraphsContainmentFilterBroadcast<GE> {
 
   @Override
@@ -15,9 +16,9 @@ public class NotInGraphsBroadcast
 
     boolean contained = false;
 
-    for(GradoopId graphID : graphIds) {
+    for (GradoopId graphID : graphIds) {
       contained = element.getGraphIds().contains(graphID);
-      if(contained) {
+      if (contained) {
         break;
       }
     }

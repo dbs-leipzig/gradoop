@@ -4,17 +4,30 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
-public class InAllGraphs<EL extends EPGMGraphElement>
-  implements FilterFunction<EL> {
+/**
+ * True, if an element is contained in all of a set of given graphs.
+ *
+ * @param <GE> element type
+ */
+public class InAllGraphs<GE extends EPGMGraphElement>
+  implements FilterFunction<GE> {
 
+  /**
+   * graph ids
+   */
   private final GradoopIdSet graphIds;
 
+  /**
+   * constructor
+   *
+   * @param graphIds graph ids
+   */
   public InAllGraphs(GradoopIdSet graphIds) {
     this.graphIds = graphIds;
   }
 
   @Override
-  public boolean filter(EL element) throws Exception {
+  public boolean filter(GE element) throws Exception {
     return element.getGraphIds().containsAll(this.graphIds);
   }
 }

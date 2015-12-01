@@ -5,10 +5,22 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 
+/**
+ * Superclass of single graph containment filters using broadcast variables.
+ *
+ * @param <GE> graph element type
+ */
 public abstract class GraphContainmentFilterBroadcast
   <GE extends EPGMGraphElement> extends RichFilterFunction<GE> {
 
+  /**
+   * constant string for "graph id"
+   */
   public static final String GRAPH_ID = "graphId";
+
+  /**
+   * graph id
+   */
   protected GradoopId graphId;
 
   @Override

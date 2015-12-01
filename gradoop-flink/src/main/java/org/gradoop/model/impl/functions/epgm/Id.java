@@ -5,6 +5,11 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
 
+/**
+ * element => elementId
+ *
+ * @param <EL> element type
+ */
 public class Id<EL extends EPGMElement>
   implements MapFunction<EL, GradoopId>, KeySelector<EL, GradoopId> {
 

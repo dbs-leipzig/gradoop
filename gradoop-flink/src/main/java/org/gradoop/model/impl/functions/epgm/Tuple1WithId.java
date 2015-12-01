@@ -5,6 +5,11 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
 
+/**
+ * element => (elementId)
+ *
+ * @param <EL> element type
+ */
 public class Tuple1WithId<EL extends EPGMElement>
   implements MapFunction<EL, Tuple1<GradoopId>> {
 

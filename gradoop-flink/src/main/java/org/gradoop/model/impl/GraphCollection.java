@@ -40,7 +40,6 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
@@ -53,24 +52,21 @@ import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.api.Predicate;
+import org.gradoop.model.impl.functions.epgm.ById;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
-
-
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
-import org.gradoop.model.impl.functions.epgm.ById;
-
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.model.impl.operators.equality.EqualityByGraphElementIds;
+import org.gradoop.model.impl.operators.equality.EqualityByGraphIds;
 import org.gradoop.model.impl.operators.intersection.Intersection;
 import org.gradoop.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.model.impl.operators.union.Union;
-import org.gradoop.model.impl.operators.equality.EqualityByGraphElementIds;
-import org.gradoop.model.impl.operators.equality.EqualityByGraphIds;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 

@@ -7,10 +7,22 @@ import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Collection;
 
+/**
+ * Superclass of multi graph containment filters using broadcast variables.
+ *
+ * @param <GE> graph element type
+ */
 public abstract class GraphsContainmentFilterBroadcast
-  <GE extends EPGMGraphElement> extends RichFilterFunction<GE>{
+  <GE extends EPGMGraphElement> extends RichFilterFunction<GE> {
 
+  /**
+   * constant string for "graph ids"
+   */
   public static final String GRAPH_IDS = "graphIds";
+
+  /**
+   * graph ids
+   */
   protected Collection<GradoopId> graphIds;
 
   @Override
