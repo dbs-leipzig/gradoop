@@ -36,7 +36,7 @@ g2:Community {interest = "Graphs", vertexCount = 4} [
     (alice)<-[bka]-(bob)<-[ckb:knows {since = 2013}]-(carol)<-[dkc]-(dave)
 ]
 g3:Forum [
-    (gps)-[:hasModerator]->(dave)
+    (gps)-[:hasModerator {since = 2013}]->(dave)
     (gps)-[:hasMember]->(dave)
     (gps)-[:hasMember]->(carol)-[ckd]->(dave)
 ]
