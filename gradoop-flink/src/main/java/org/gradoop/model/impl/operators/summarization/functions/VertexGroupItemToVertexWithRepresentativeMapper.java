@@ -26,7 +26,7 @@ import org.gradoop.model.impl.operators.summarization.tuples
 /**
  * Maps a {@link VertexGroupItem} to a {@link VertexWithRepresentative}.
  */
-@FunctionAnnotation.ForwardedFields("f0;f1")
+//@FunctionAnnotation.ForwardedFields("f0;f1")
 public class VertexGroupItemToVertexWithRepresentativeMapper implements
   MapFunction<VertexGroupItem, VertexWithRepresentative> {
 

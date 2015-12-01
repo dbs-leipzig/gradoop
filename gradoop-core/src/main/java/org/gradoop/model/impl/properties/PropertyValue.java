@@ -17,20 +17,15 @@
 
 package org.gradoop.model.impl.properties;
 
-import org.apache.hadoop.io.BooleanWritable;
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.FloatWritable;
-import org.apache.hadoop.io.GenericWritable;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
-import org.apache.pig.backend.hadoop.BigDecimalWritable;
-import org.apache.pig.backend.hadoop.DateTimeWritable;
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
-import org.joda.time.DateTime;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,30 +34,45 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * A property value wraps a value that implements a supported data type.
  */
-public class PropertyValue
-  extends GenericWritable
-  implements WritableComparable<PropertyValue> {
+public class PropertyValue implements WritableComparable<PropertyValue> {
 
   /**
-   * Supported classes. Must implement {@link WritableComparable}.
-   *
-   * Note that the order is necessary to correctly deserialize objects.
+   * {@code <property-type>} for {@link java.lang.Boolean}
    */
-  private static Class<? extends WritableComparable>[] TYPES;
+  private static final transient byte TYPE_BOOLEAN      = 0x01;
+  /**
+   * {@code <property-type>} for {@link java.lang.Integer}
+   */
+  private static final transient byte TYPE_INTEGER      = 0x02;
+  /**
+   * {@code <property-type>} for {@link java.lang.Long}
+   */
+  private static final transient byte TYPE_LONG         = 0x03;
+  /**
+   * {@code <property-type>} for {@link java.lang.Float}
+   */
+  private static final transient byte TYPE_FLOAT        = 0x04;
+  /**
+   * {@code <property-type>} for {@link java.lang.Double}
+   */
+  private static final transient byte TYPE_DOUBLE       = 0x05;
+  /**
+   * {@code <property-type>} for {@link java.lang.String}
+   */
+  private static final transient byte TYPE_STRING       = 0x06;
+  /**
+   * {@code <property-type>} for {@link java.lang.String}
+   */
+  private static final transient byte TYPE_BIG_DECIMAL  = 0x07;
+  /**
+   * Value offset in byte
+   */
+  private static final transient byte OFFSET            = 0x01;
 
-  static {
-    //noinspection unchecked
-    TYPES = (Class<? extends WritableComparable>[]) new Class[] {
-        BooleanWritable.class,
-        IntWritable.class,
-        LongWritable.class,
-        FloatWritable.class,
-        DoubleWritable.class,
-        Text.class,
-        BigDecimalWritable.class,
-        DateTimeWritable.class
-    };
-  }
+  /**
+   * Stores the type and the value
+    */
+  private byte[] rawBytes;
 
   /**
    * Default constructor.
@@ -104,7 +114,7 @@ public class PropertyValue
    * @return true, if {@code boolean} value
    */
   public boolean isBoolean() {
-    return get() instanceof BooleanWritable;
+    return rawBytes[0] == TYPE_BOOLEAN;
   }
   /**
    * True, if the wrapped value is of type {@code int}.
@@ -112,7 +122,7 @@ public class PropertyValue
    * @return true, if {@code int} value
    */
   public boolean isInt() {
-    return get() instanceof IntWritable;
+    return rawBytes[0] == TYPE_INTEGER;
   }
   /**
    * True, if the wrapped value is of type {@code long}.
@@ -120,7 +130,7 @@ public class PropertyValue
    * @return true, if {@code long} value
    */
   public boolean isLong() {
-    return get() instanceof LongWritable;
+    return rawBytes[0] == TYPE_LONG;
   }
   /**
    * True, if the wrapped value is of type {@code float}.
@@ -128,7 +138,7 @@ public class PropertyValue
    * @return true, if {@code float} value
    */
   public boolean isFloat() {
-    return get() instanceof FloatWritable;
+    return rawBytes[0] == TYPE_FLOAT;
   }
   /**
    * True, if the wrapped value is of type {@code double}.
@@ -136,7 +146,7 @@ public class PropertyValue
    * @return true, if {@code double} value
    */
   public boolean isDouble() {
-    return get() instanceof DoubleWritable;
+    return rawBytes[0] == TYPE_DOUBLE;
   }
   /**
    * True, if the wrapped value is of type {@code String}.
@@ -144,7 +154,7 @@ public class PropertyValue
    * @return true, if {@code String} value
    */
   public boolean isString() {
-    return get() instanceof Text;
+    return rawBytes[0] == TYPE_STRING;
   }
   /**
    * True, if the wrapped value is of type {@code BigDecimal}.
@@ -153,16 +163,7 @@ public class PropertyValue
    * @see BigDecimal
    */
   public boolean isBigDecimal() {
-    return get() instanceof BigDecimalWritable;
-  }
-  /**
-   * True, if the wrapped value is of type {@code DateTime}.
-   *
-   * @return true, if {@code DateTime} value
-   * @see DateTime
-   */
-  public boolean isDateTime() {
-    return get() instanceof DateTimeWritable;
+    return rawBytes[0] == TYPE_BIG_DECIMAL;
   }
 
   //----------------------------------------------------------------------------
@@ -181,8 +182,7 @@ public class PropertyValue
           isFloat() ? getFloat() :
             isDouble() ? getDouble() :
               isString() ? getString() :
-                isBigDecimal() ? getBigDecimal() :
-                  getDateTime();
+                getBigDecimal();
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -190,7 +190,7 @@ public class PropertyValue
    * @return {@code boolean} value
    */
   public boolean getBoolean() {
-    return ((BooleanWritable) get()).get();
+    return rawBytes[1] == -1;
   }
   /**
    * Returns the wrapped value as {@code int}.
@@ -198,7 +198,7 @@ public class PropertyValue
    * @return {@code int} value
    */
   public int getInt() {
-    return ((IntWritable) get()).get();
+    return Bytes.toInt(rawBytes, OFFSET);
   }
   /**
    * Returns the wrapped value as {@code long}.
@@ -206,7 +206,7 @@ public class PropertyValue
    * @return {@code long} value
    */
   public long getLong() {
-    return ((LongWritable) get()).get();
+    return Bytes.toLong(rawBytes, OFFSET);
   }
   /**
    * Returns the wrapped value as {@code float}.
@@ -214,7 +214,7 @@ public class PropertyValue
    * @return {@code float} value
    */
   public float getFloat() {
-    return ((FloatWritable) get()).get();
+    return Bytes.toFloat(rawBytes, OFFSET);
   }
   /**
    * Returns the wrapped value as {@code double}.
@@ -222,7 +222,7 @@ public class PropertyValue
    * @return {@code double} value
    */
   public double getDouble() {
-    return ((DoubleWritable) get()).get();
+    return Bytes.toDouble(rawBytes, OFFSET);
   }
   /**
    * Returns the wrapped value as {@code String}.
@@ -230,7 +230,7 @@ public class PropertyValue
    * @return {@code String} value
    */
   public String getString() {
-    return get().toString();
+    return Bytes.toString(rawBytes, OFFSET, rawBytes.length - OFFSET);
   }
   /**
    * Returns the wrapped value as {@code BigDecimal}.
@@ -239,16 +239,7 @@ public class PropertyValue
    * @see BigDecimal
    */
   public BigDecimal getBigDecimal() {
-    return ((BigDecimalWritable) get()).get();
-  }
-  /**
-   * Returns the wrapped value as {@code DateTime}.
-   *
-   * @return {@code DateTime} value
-   * @see DateTime
-   */
-  public DateTime getDateTime() {
-    return ((DateTimeWritable) get()).get();
+    return Bytes.toBigDecimal(rawBytes, OFFSET, rawBytes.length - OFFSET);
   }
 
   //----------------------------------------------------------------------------
@@ -277,8 +268,6 @@ public class PropertyValue
       setString((String) value);
     } else if (value instanceof BigDecimal) {
       setBigDecimal((BigDecimal) value);
-    } else if (value instanceof DateTime) {
-      setDateTime((DateTime) value);
     } else {
       throw new UnsupportedTypeException(value.getClass());
     }
@@ -286,66 +275,74 @@ public class PropertyValue
   /**
    * Sets the wrapped value as {@code boolean} value.
    *
-   * @param value value
+   * @param booleanValue value
    */
-  public void setBoolean(boolean value) {
-    set(new BooleanWritable(value));
+  public void setBoolean(boolean booleanValue) {
+    rawBytes = new byte[OFFSET + Bytes.SIZEOF_BOOLEAN];
+    rawBytes[0] = TYPE_BOOLEAN;
+    Bytes.putByte(rawBytes, OFFSET, (byte) (booleanValue ? -1 : 0));
   }
   /**
    * Sets the wrapped value as {@code int} value.
    *
-   * @param value value
+   * @param intValue intValue
    */
-  public void setInt(int value) {
-    set(new IntWritable(value));
+  public void setInt(int intValue) {
+    rawBytes = new byte[OFFSET + Bytes.SIZEOF_INT];
+    rawBytes[0] = TYPE_INTEGER;
+    Bytes.putInt(rawBytes, OFFSET, intValue);
   }
   /**
    * Sets the wrapped value as {@code long} value.
    *
-   * @param value value
+   * @param longValue value
    */
-  public void setLong(long value) {
-    set(new LongWritable(value));
+  public void setLong(long longValue) {
+    rawBytes = new byte[OFFSET + Bytes.SIZEOF_LONG];
+    rawBytes[0] = TYPE_LONG;
+    Bytes.putLong(rawBytes, OFFSET, longValue);
   }
   /**
    * Sets the wrapped value as {@code float} value.
    *
-   * @param value value
+   * @param floatValue value
    */
-  public void setFloat(float value) {
-    set(new FloatWritable(value));
+  public void setFloat(float floatValue) {
+    rawBytes = new byte[OFFSET + Bytes.SIZEOF_FLOAT];
+    rawBytes[0] = TYPE_FLOAT;
+    Bytes.putFloat(rawBytes, OFFSET, floatValue);
   }
   /**
    * Sets the wrapped value as {@code double} value.
    *
-   * @param value value
+   * @param doubleValue value
    */
-  public void setDouble(double value) {
-    set(new DoubleWritable(value));
+  public void setDouble(double doubleValue) {
+    rawBytes = new byte[OFFSET + Bytes.SIZEOF_DOUBLE];
+    rawBytes[0] = TYPE_DOUBLE;
+    Bytes.putDouble(rawBytes, OFFSET, doubleValue);
   }
   /**
    * Sets the wrapped value as {@code String} value.
    *
-   * @param value value
+   * @param stringValue value
    */
-  public void setString(String value) {
-    set(new Text(value));
+  public void setString(String stringValue) {
+    byte[] valueBytes = Bytes.toBytes(stringValue);
+    rawBytes = new byte[OFFSET + valueBytes.length];
+    rawBytes[0] = TYPE_STRING;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
   /**
    * Sets the wrapped value as {@code BigDecimal} value.
    *
-   * @param value value
+   * @param bigDecimalValue value
    */
-  public void setBigDecimal(BigDecimal value) {
-    set(new BigDecimalWritable(value));
-  }
-  /**
-   * Sets the wrapped value as {@code DateTime} value.
-   *
-   * @param value value
-   */
-  public void setDateTime(DateTime value) {
-    set(new DateTimeWritable(value));
+  public void setBigDecimal(BigDecimal bigDecimalValue) {
+    byte[] valueBytes = Bytes.toBytes(bigDecimalValue);
+    rawBytes = new byte[OFFSET + valueBytes.length];
+    rawBytes[0] = TYPE_BIG_DECIMAL;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
 
   //----------------------------------------------------------------------------
@@ -353,40 +350,42 @@ public class PropertyValue
   //----------------------------------------------------------------------------
 
   @Override
-  public int hashCode() {
-    return get().hashCode();
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (!(o instanceof PropertyValue)) {
       return false;
     }
     PropertyValue that = (PropertyValue) o;
-
-    return this.get().equals(that.get());
+    return Arrays.equals(rawBytes, that.rawBytes);
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(rawBytes);
+  }
+
   @Override
   public int compareTo(PropertyValue o) {
-    return ((WritableComparable) this.get()).compareTo(o.get());
+    return Bytes.compareTo(rawBytes, o.rawBytes);
+  }
+
+  @Override
+  public void write(DataOutput dataOutput) throws IOException {
+    dataOutput.writeInt(rawBytes.length);
+    dataOutput.write(rawBytes);
+  }
+
+  @Override
+  public void readFields(DataInput dataInput) throws IOException {
+    rawBytes = new byte[dataInput.readInt()];
+    dataInput.readFully(rawBytes);
   }
 
   @Override
   public String toString() {
     return isString() ? String.format("\"%s\"", getObject().toString()) :
       getObject().toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected Class<? extends WritableComparable>[] getTypes() {
-    return TYPES;
   }
 }

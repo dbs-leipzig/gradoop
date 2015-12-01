@@ -38,11 +38,11 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
  *
  * @param <VD> EPGM vertex type
  */
-@FunctionAnnotation.ForwardedFields("f0")
+//@FunctionAnnotation.ForwardedFields("f0")
 public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
   implements
-  MapFunction<VertexGroupItem, Vertex<GradoopId, VD>>,
-  ResultTypeQueryable<Vertex<GradoopId, VD>> {
+  MapFunction<VertexGroupItem, VD>,
+  ResultTypeQueryable<VD> {
 
   /**
    * Vertex data factory.
@@ -60,10 +60,6 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
    * True, if the vertex property shall be considered.
    */
   private final boolean useProperty;
-  /**
-   * Avoid object instantiations.
-   */
-  private final Vertex<GradoopId, VD> reuseVertex;
 
   /**
    * Creates map function.
@@ -79,7 +75,6 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
     this.groupPropertyKey = groupPropertyKey;
     this.useLabel = useLabel;
     useProperty = groupPropertyKey != null && !"".equals(groupPropertyKey);
-    reuseVertex = new Vertex<>();
   }
 
   /**
@@ -91,23 +86,22 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
    * @throws Exception
    */
   @Override
-  public Vertex<GradoopId, VD> map(VertexGroupItem vertexGroupItem) throws
+  public VD map(VertexGroupItem vertexGroupItem) throws
     Exception {
-    VD summarizedVertexData =
-      vertexFactory.createVertex();
+    VD summarizedVertexData = vertexFactory.initVertex(
+      vertexGroupItem.getGroupRepresentativeVertexId());
     if (useLabel) {
       summarizedVertexData.setLabel(vertexGroupItem.getGroupLabel());
     }
     if (useProperty) {
-      summarizedVertexData
-        .setProperty(groupPropertyKey, vertexGroupItem.getGroupPropertyValue());
+      summarizedVertexData.setProperty(
+        groupPropertyKey, vertexGroupItem.getGroupPropertyValue());
     }
-    summarizedVertexData.setProperty(Summarization.COUNT_PROPERTY_KEY,
+    summarizedVertexData.setProperty(
+      Summarization.COUNT_PROPERTY_KEY,
       vertexGroupItem.getGroupCount());
 
-    reuseVertex.setId(vertexGroupItem.getVertexId());
-    reuseVertex.setValue(summarizedVertexData);
-    return reuseVertex;
+    return summarizedVertexData;
   }
 
   /**
@@ -115,8 +109,8 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
    */
   @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<Vertex<GradoopId, VD>> getProducedType() {
-    return new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
-      TypeExtractor.createTypeInfo(vertexFactory.getType()));
+  public TypeInformation<VD> getProducedType() {
+    return (TypeInformation<VD>)
+      TypeExtractor.createTypeInfo(vertexFactory.getType());
   }
 }

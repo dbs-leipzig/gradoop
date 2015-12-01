@@ -29,6 +29,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
 import org.gradoop.model.impl.operators.summarization.functions
@@ -97,8 +98,8 @@ public class SummarizationGroupCombine<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, V, E> summarizeInternal(
-    Graph<GradoopId, V, E> graph) {
+  protected LogicalGraph<G, V, E> summarizeInternal(
+    LogicalGraph<G, V, E> graph) {
 
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
@@ -123,7 +124,7 @@ public class SummarizationGroupCombine<
       unsortedGrouping.reduceGroup(new VertexGroupReduceFunction());
 
     // filter group representative tuples and build final vertices
-    DataSet<Vertex<GradoopId, V>> summarizedVertices =
+    DataSet<V> summarizedVertices =
       reduceGroup.filter(new VertexGroupItemToSummarizedVertexFilter()).map(
         new VertexGroupItemToSummarizedVertexMapper<>(config.getVertexFactory(),
           getVertexGroupingKey(), useVertexLabels()));
@@ -134,11 +135,11 @@ public class SummarizationGroupCombine<
         .map(new VertexGroupItemToVertexWithRepresentativeMapper());
 
     // build summarized edges
-    DataSet<Edge<GradoopId, E>> summarizedEdges =
-      buildSummarizedEdges(graph, vertexToRepresentativeMap);
+    DataSet<E> summarizedEdges = buildSummarizedEdges(
+      graph, vertexToRepresentativeMap);
 
-    return Graph
-      .fromDataSet(summarizedVertices, summarizedEdges, graph.getContext());
+    return LogicalGraph.fromDataSets(
+      summarizedVertices, summarizedEdges, graph.getConfig());
   }
 
   /**

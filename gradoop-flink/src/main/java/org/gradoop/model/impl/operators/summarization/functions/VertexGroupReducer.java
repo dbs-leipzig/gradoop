@@ -33,7 +33,7 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
  * vertex id of the group representative, the group label, the group
  * property value and the total number of group elements.
  */
-@FunctionAnnotation.ForwardedFields("f0;f1->f2;f2->f3")
+//@FunctionAnnotation.ForwardedFields("f0;f1->f2;f2->f3")
 public class VertexGroupReducer implements
   GroupReduceFunction<VertexForGrouping, VertexGroupItem> {
   /**
@@ -54,7 +54,8 @@ public class VertexGroupReducer implements
   @Override
   public void reduce(Iterable<VertexForGrouping> groupVertices,
     Collector<VertexGroupItem> collector) throws Exception {
-    GradoopId groupRepresentativeVertexId = null;
+    // create new identifier for summarized vertex
+    GradoopId groupRepresentativeVertexId = GradoopId.get();
     long groupCount = 0L;
     String groupLabel = null;
     String groupPropertyValue = null;
@@ -62,16 +63,14 @@ public class VertexGroupReducer implements
 
     for (VertexForGrouping vertexForGrouping : groupVertices) {
       if (firstElement) {
-        // take final group representative vertex id from first tuple
-        groupRepresentativeVertexId = vertexForGrouping.getVertexId();
         groupLabel = vertexForGrouping.getGroupLabel();
         groupPropertyValue = vertexForGrouping.getGroupPropertyValue();
         firstElement = false;
       }
       // no need to set group label / property value for those tuples
       reuseVertexGroupItem.setVertexId(vertexForGrouping.getVertexId());
-      reuseVertexGroupItem
-        .setGroupRepresentativeVertexId(groupRepresentativeVertexId);
+      reuseVertexGroupItem.setGroupRepresentativeVertexId(
+        groupRepresentativeVertexId);
       collector.collect(reuseVertexGroupItem);
       groupCount++;
     }

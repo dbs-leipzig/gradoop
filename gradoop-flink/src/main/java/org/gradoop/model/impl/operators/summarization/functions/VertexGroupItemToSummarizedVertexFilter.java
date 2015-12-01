@@ -25,7 +25,7 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
  * Filter those tuples which are used to create new summarized vertices.
  * Those tuples have a group count > 0.
  */
-@FunctionAnnotation.ForwardedFields("*->*")
+//@FunctionAnnotation.ForwardedFields("*->*")
 public class VertexGroupItemToSummarizedVertexFilter implements
   FilterFunction<VertexGroupItem> {
 

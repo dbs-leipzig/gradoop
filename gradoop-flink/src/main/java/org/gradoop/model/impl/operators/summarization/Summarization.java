@@ -19,16 +19,12 @@ package org.gradoop.model.impl.operators.summarization;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
@@ -36,15 +32,15 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.epgm.SourceId;
+import org.gradoop.model.impl.functions.epgm.TargetId;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .EdgeGroupItem;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .VertexForGrouping;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .VertexGroupItem;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .VertexWithRepresentative;
+import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
+
+import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.GConstants;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -151,14 +147,12 @@ public abstract class Summarization<
     config = graph.getConfig();
 
     if (!useVertexProperty() &&
-      !useEdgeProperty() && !useVertexLabels() && !useEdgeLabels()) {
-      // graphs stays unchanged
+      !useEdgeProperty() &&
+      !useVertexLabels() &&
+      !useEdgeLabels()) {
       result = graph;
     } else {
-      result = LogicalGraph
-        .fromGellyGraph(
-          summarizeInternal(graph.toGellyGraph()),
-          graph.getConfig());
+      result = summarizeInternal(graph);
     }
     return result;
   }
@@ -269,22 +263,23 @@ public abstract class Summarization<
    *                                  and group representative
    * @return summarized edges
    */
-  protected DataSet<Edge<GradoopId, E>> buildSummarizedEdges(
-    Graph<GradoopId, V, E> graph,
+  protected DataSet<E> buildSummarizedEdges(
+    LogicalGraph<G, V, E> graph,
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap) {
+
     // join edges with vertex-group-map on vertex-id == edge-source-id
-    DataSet<EdgeGroupItem> edges =
-      graph.getEdges().join(vertexToRepresentativeMap).where(0).equalTo(0)
-        // project edges to necessary information
-        .with(new SourceJoin<E>(getEdgeGroupingKey(),
-          useEdgeLabels()))
-          // join result with vertex-group-map on edge-target-id == vertex-id
-        .join(vertexToRepresentativeMap).where(2).equalTo(0)
-        .with(new TargetJoin());
+    DataSet<EdgeGroupItem> edges = graph.getEdges()
+      .join(vertexToRepresentativeMap)
+      .where(new SourceId<E>()).equalTo(0)
+      // project edges to necessary information
+      .with(new SourceJoin<E>(getEdgeGroupingKey(), useEdgeLabels()))
+      // join result with vertex-group-map on edge-target-id == vertex-id
+      .join(vertexToRepresentativeMap).where(2).equalTo(0)
+      .with(new TargetJoin());
 
     return groupEdges(edges).reduceGroup(
       new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
-        config.getEdgeFactory())).withForwardedFields("f0");
+        config.getEdgeFactory()));
   }
 
   /**
@@ -314,16 +309,17 @@ public abstract class Summarization<
    * @param graph input graph
    * @return summarized output graph
    */
-  protected abstract Graph<GradoopId, V, E> summarizeInternal(
-    Graph<GradoopId, V, E> graph);
+  protected abstract LogicalGraph<G, V, E> summarizeInternal(
+    LogicalGraph<G, V, E> graph);
 
   /**
    * Creates a summarized edge from a group of edges including an edge
    * grouping value.
    */
-  protected static class EdgeGroupSummarizer<ED extends EPGMEdge> implements
-    GroupReduceFunction<EdgeGroupItem, Edge<GradoopId, ED>>,
-    ResultTypeQueryable<Edge<GradoopId, ED>> {
+  protected static class EdgeGroupSummarizer<ED extends EPGMEdge>
+    implements
+    GroupReduceFunction<EdgeGroupItem, ED>,
+    ResultTypeQueryable<ED> {
 
     /**
      * Edge data factory
@@ -342,10 +338,6 @@ public abstract class Summarization<
      * True, if property shall be considered.
      */
     private boolean useProperty;
-    /**
-     * Avoid object instantiation in each reduce call.
-     */
-    private final Edge<GradoopId, ED> reuseEdge;
 
     /**
      * Creates group reducer
@@ -361,7 +353,6 @@ public abstract class Summarization<
       this.useProperty =
         groupPropertyKey != null && !"".equals(groupPropertyKey);
       this.edgeFactory = edgeFactory;
-      this.reuseEdge = new Edge<>();
     }
 
     /**
@@ -369,14 +360,14 @@ public abstract class Summarization<
      */
     @Override
     public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-      Collector<Edge<GradoopId, ED>> collector) throws Exception {
+      Collector<ED> collector) throws Exception {
       int edgeCount = 0;
       boolean initialized = false;
       // new edge id will be the first edge id in the group (which is sorted)
       GradoopId newSourceVertexId = null;
       GradoopId newTargetVertexId = null;
       String edgeLabel = GConstants.DEFAULT_EDGE_LABEL;
-      String edgeGroupingValue = null;
+      PropertyValue edgeGroupingValue = null;
 
       for (EdgeGroupItem e : edgeGroupItems) {
         edgeCount++;
@@ -399,10 +390,7 @@ public abstract class Summarization<
       }
       newEdgeData.setProperty(COUNT_PROPERTY_KEY, edgeCount);
 
-      reuseEdge.setSource(newSourceVertexId);
-      reuseEdge.setTarget(newTargetVertexId);
-      reuseEdge.setValue(newEdgeData);
-      collector.collect(reuseEdge);
+      collector.collect(newEdgeData);
     }
 
     /**
@@ -410,10 +398,9 @@ public abstract class Summarization<
      */
     @Override
     @SuppressWarnings("unchecked")
-    public TypeInformation<Edge<GradoopId, ED>> getProducedType() {
-      return new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
-        BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(edgeFactory.getType()));
+    public TypeInformation<ED> getProducedType() {
+      return (TypeInformation<ED>)
+        TypeExtractor.createTypeInfo(edgeFactory.getType());
     }
   }
 
@@ -423,11 +410,10 @@ public abstract class Summarization<
    * projected edge information possibly containing the edge label and a
    * group property.
    */
-  @FunctionAnnotation.ForwardedFieldsFirst("f1->f2") // edge target id
-  @FunctionAnnotation.ForwardedFieldsSecond("f1") // edge source id
+//  @FunctionAnnotation.ForwardedFieldsFirst("f1->f2") // edge target id
+//  @FunctionAnnotation.ForwardedFieldsSecond("f1") // edge source id
   protected static class SourceJoin<E extends EPGMEdge>
-    implements
-    JoinFunction<Edge<GradoopId, E>, VertexWithRepresentative, EdgeGroupItem> {
+    implements JoinFunction<E, VertexWithRepresentative, EdgeGroupItem> {
 
     /**
      * Vertex property key for grouping
@@ -465,23 +451,23 @@ public abstract class Summarization<
      * {@inheritDoc}
      */
     @Override
-    public EdgeGroupItem join(Edge<GradoopId, E> e,
+    public EdgeGroupItem join(E e,
       VertexWithRepresentative vertexRepresentative) throws Exception {
-      String groupLabel = useLabel ? e.getValue().getLabel() : null;
-      String groupPropertyValue = null;
+      String groupLabel = useLabel ? e.getLabel() : null;
+      PropertyValue groupPropertyValue = null;
 
       boolean hasProperty =
-        useProperty && (e.getValue().getPropertyValue(groupPropertyKey) != null);
+        useProperty && (e.getPropertyValue(groupPropertyKey) != null);
       if (useProperty && hasProperty) {
-        groupPropertyValue =
-          e.getValue().getPropertyValue(groupPropertyKey).toString();
+        groupPropertyValue = e.getPropertyValue(groupPropertyKey);
       } else if (useProperty) {
-        groupPropertyValue = NULL_VALUE;
+        groupPropertyValue = PropertyValue.create(NULL_VALUE);
+//        groupPropertyValue = PropertyValue.create(0);
       }
-      reuseEdgeGroupItem.setEdgeId(e.getValue().getId());
+      reuseEdgeGroupItem.setEdgeId(e.getId());
       reuseEdgeGroupItem.setSourceId(
         vertexRepresentative.getGroupRepresentativeVertexId());
-      reuseEdgeGroupItem.setTargetId(e.getTarget());
+      reuseEdgeGroupItem.setTargetId(e.getTargetId());
       reuseEdgeGroupItem.setGroupLabel(groupLabel);
       reuseEdgeGroupItem.setGroupPropertyValue(groupPropertyValue);
 
@@ -493,8 +479,8 @@ public abstract class Summarization<
    * Takes a projected edge and an (vertex-id, group-representative) tuple
    * and replaces the edge-target-id with the group-representative.
    */
-  @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3;f4")
-  @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
+//  @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3;f4")
+//  @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
   protected static class TargetJoin implements
     JoinFunction<EdgeGroupItem, VertexWithRepresentative, EdgeGroupItem> {
 

@@ -19,9 +19,7 @@ package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 
@@ -32,11 +30,11 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
  * the vertex id, vertex label and vertex property. Depending on the
  * summarization parameters, label and property can be null.
  *
- * @param <VD> EPGM vertex type
+ * @param <V> EPGM vertex type
  */
-@FunctionAnnotation.ForwardedFields("f0")
-public class VertexToGroupVertexMapper<VD extends EPGMVertex> implements
-  MapFunction<Vertex<GradoopId, VD>, VertexForGrouping> {
+//@FunctionAnnotation.ForwardedFields("f0")
+public class VertexToGroupVertexMapper<V extends EPGMVertex>
+  implements MapFunction<V, VertexForGrouping> {
 
   /**
    * Vertex property key that can be used for grouping.
@@ -72,11 +70,10 @@ public class VertexToGroupVertexMapper<VD extends EPGMVertex> implements
    * {@inheritDoc}
    */
   @Override
-  public VertexForGrouping map(Vertex<GradoopId, VD> vertex) throws Exception {
+  public VertexForGrouping map(V vertex) throws Exception {
     reuseVertexForGrouping.setVertexId(vertex.getId());
-    reuseVertexForGrouping.setGroupLabel(getGroupLabel(vertex.getValue()));
-    reuseVertexForGrouping
-      .setGroupPropertyValue(getGroupPropertyValue(vertex.getValue()));
+    reuseVertexForGrouping.setGroupLabel(getGroupLabel(vertex));
+    reuseVertexForGrouping.setGroupPropertyValue(getGroupPropertyValue(vertex));
     return reuseVertexForGrouping;
   }
 
@@ -86,7 +83,7 @@ public class VertexToGroupVertexMapper<VD extends EPGMVertex> implements
    * @param vertexData vertex data
    * @return vertex label or {@code null} if no label is required
    */
-  private String getGroupLabel(VD vertexData) {
+  private String getGroupLabel(V vertexData) {
     return useLabel ? vertexData.getLabel() : null;
   }
 
@@ -99,7 +96,7 @@ public class VertexToGroupVertexMapper<VD extends EPGMVertex> implements
    * @param vertexData vertex data
    * @return property value, default value or {@code null}
    */
-  private String getGroupPropertyValue(VD vertexData) {
+  private String getGroupPropertyValue(V vertexData) {
     boolean hasProperty = vertexData.getPropertyValue(groupPropertyKey) != null;
     String returnValue = null;
     if (useProperty && hasProperty) {

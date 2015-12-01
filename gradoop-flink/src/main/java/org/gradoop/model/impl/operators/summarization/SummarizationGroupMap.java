@@ -24,6 +24,7 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
 import org.gradoop.model.impl.operators.summarization.functions
@@ -88,21 +89,22 @@ public class SummarizationGroupMap<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, V, E> summarizeInternal(
-    Graph<GradoopId, V, E> graph) {
+  protected LogicalGraph<G, V, E> summarizeInternal(
+    LogicalGraph<G, V, E> graph) {
 
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices()
       // map vertex data to a smaller representation for grouping
-      .map(new VertexToGroupVertexMapper<V>(getVertexGroupingKey(),
+      .map(new VertexToGroupVertexMapper<V>(
+        getVertexGroupingKey(),
         useVertexLabels()));
 
     DataSet<VertexGroupItem> groupedVertices =
       // group vertices by label / property / both
       groupVertices(verticesForGrouping)
-        // build vertex group item
-        .reduceGroup(new VertexGroupReducer());
+      // build vertex group item
+      .reduceGroup(new VertexGroupReducer());
 
-    DataSet<Vertex<GradoopId, V>> summarizedVertices = groupedVertices
+    DataSet<V> summarizedVertices = groupedVertices
       // filter group representative tuples
       .filter(new VertexGroupItemToSummarizedVertexFilter())
       // build summarized vertex
@@ -117,11 +119,11 @@ public class SummarizationGroupMap<
         .map(new VertexGroupItemToVertexWithRepresentativeMapper());
 
     // build summarized edges
-    DataSet<Edge<GradoopId, E>> summarizedEdges =
+    DataSet<E> summarizedEdges =
       buildSummarizedEdges(graph, vertexToRepresentativeMap);
 
-    return Graph
-      .fromDataSet(summarizedVertices, summarizedEdges, graph.getContext());
+    return LogicalGraph.fromDataSets(
+      summarizedVertices, summarizedEdges, graph.getConfig());
   }
 
   /**

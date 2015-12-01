@@ -1,5 +1,7 @@
 package org.gradoop.util;
 
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -150,6 +152,16 @@ public class FlinkAsciiGraphLoader<
   }
 
   /**
+   * Returns all vertices that belong to the given graph variables.
+   *
+   * @param variables graph variables used in the GDL script
+   * @return vertices that are contained in the graphs
+   */
+  public Collection<V> getVerticesByGraphVariables(String... variables) {
+    return loader.getVerticesByGraphVariables(variables);
+  }
+
+  /**
    * Returns the vertex which is identified by the given variable. If the
    * variable cannot be found, the method returns {@code null}.
    *
@@ -167,6 +179,16 @@ public class FlinkAsciiGraphLoader<
    */
   public Collection<E> getEdges() {
     return loader.getEdges();
+  }
+
+  /**
+   * Returns all edges that belong to the given graph variables.
+   *
+   * @param variables graph variables used in the GDL script
+   * @return edges
+   */
+  public Collection<E> getEdgesByGraphVariables(String... variables) {
+    return loader.getEdgesByGraphVariables(variables);
   }
 
   /**

@@ -24,7 +24,7 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 /**
  * Filter those tuples which are used to create  objects.
  */
-@FunctionAnnotation.ForwardedFields("*->*")
+//@FunctionAnnotation.ForwardedFields("*->*")
 public class VertexGroupItemToRepresentativeFilter implements
   FilterFunction<VertexGroupItem> {
 

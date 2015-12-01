@@ -19,6 +19,7 @@ package org.gradoop.model.impl.operators.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Edge representation used in grouping edges to summarized edges.
@@ -30,7 +31,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * f4: edge group property value
  */
 public class EdgeGroupItem
-  extends Tuple5<GradoopId, GradoopId, GradoopId, String, String> {
+  extends Tuple5<GradoopId, GradoopId, GradoopId, String, PropertyValue> {
 
   public GradoopId getEdgeId() {
     return f0;
@@ -64,11 +65,11 @@ public class EdgeGroupItem
     f3 = groupLabel;
   }
 
-  public String getGroupPropertyValue() {
+  public PropertyValue getGroupPropertyValue() {
     return f4;
   }
 
-  public void setGroupPropertyValue(String groupPropertyValue) {
+  public void setGroupPropertyValue(PropertyValue groupPropertyValue) {
     f4 = groupPropertyValue;
   }
 }

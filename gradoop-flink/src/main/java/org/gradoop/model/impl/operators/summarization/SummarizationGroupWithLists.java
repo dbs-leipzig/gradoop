@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichGroupReduceFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -30,20 +29,17 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .VertexWithRepresentative;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
 
 import java.util.List;
 
@@ -89,8 +85,8 @@ public class SummarizationGroupWithLists<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, V, E> summarizeInternal(
-    Graph<GradoopId, V, E> graph) {
+  protected LogicalGraph<G, V, E> summarizeInternal(
+    LogicalGraph<G, V, E> graph) {
 
     /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
@@ -103,22 +99,22 @@ public class SummarizationGroupWithLists<
       groupVertices(verticesForGrouping);
 
     // create new summarized gelly vertices
-    DataSet<Tuple2<Vertex<GradoopId, V>, List<GradoopId>>>
-      newVerticesWithGroupVertexIds =
+    DataSet<Tuple2<V, List<GradoopId>>> newVerticesWithGroupVertexIds =
       buildSummarizedVerticesWithVertexIdList(groupedVertices);
 
-    DataSet<Vertex<GradoopId, V>> newVertices =
-      newVerticesWithGroupVertexIds.map(new SummarizedVertexForwarder<V>());
+    DataSet<V> summarizedVertices = newVerticesWithGroupVertexIds
+      .map(new SummarizedVertexForwarder<V>());
 
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
       newVerticesWithGroupVertexIds
         .flatMap(new VertexToGroupRepresentativeMapper<V>());
 
     /* build summarized vertices */
-    DataSet<Edge<GradoopId, E>> newEdges =
-      buildSummarizedEdges(graph, vertexToRepresentativeMap);
+    DataSet<E> summarizedEdges = buildSummarizedEdges(
+      graph, vertexToRepresentativeMap);
 
-    return Graph.fromDataSet(newVertices, newEdges, graph.getContext());
+    return LogicalGraph.fromDataSets(
+      summarizedVertices, summarizedEdges, graph.getConfig());
   }
 
 
@@ -129,7 +125,7 @@ public class SummarizationGroupWithLists<
    * @param groupedSortedVertices grouped and sorted vertices
    * @return data set containing summarized vertex and its grouped vertex ids
    */
-  protected DataSet<Tuple2<Vertex<GradoopId, V>, List<GradoopId>>>
+  protected DataSet<Tuple2<V, List<GradoopId>>>
   buildSummarizedVerticesWithVertexIdList(
     UnsortedGrouping<VertexForGrouping> groupedSortedVertices) {
     return groupedSortedVertices.reduceGroup(
@@ -142,10 +138,8 @@ public class SummarizationGroupWithLists<
    * vertex identifiers that the summarized vertex represents.
    */
   private static class VertexGroupSummarizer<VD extends EPGMVertex> extends
-    RichGroupReduceFunction<VertexForGrouping, Tuple2<Vertex<GradoopId, VD>,
-          List<GradoopId>>>
-    implements ResultTypeQueryable<Tuple2<Vertex<GradoopId, VD>,
-      List<GradoopId>>> {
+    RichGroupReduceFunction<VertexForGrouping, Tuple2<VD, List<GradoopId>>>
+    implements ResultTypeQueryable<Tuple2<VD, List<GradoopId>>> {
 
     /**
      * Vertex data factory
@@ -164,13 +158,9 @@ public class SummarizationGroupWithLists<
      */
     private final boolean useProperty;
     /**
-     * Avoid object instantiation in each reduce call.
-     */
-    private final Vertex<GradoopId, VD> reuseVertex;
-    /**
      * Avoid object instantiation.
      */
-    private final Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> reuseTuple;
+    private final Tuple2<VD, List<GradoopId>> reuseTuple;
 
     /**
      * Creates group reducer
@@ -186,7 +176,6 @@ public class SummarizationGroupWithLists<
       this.useProperty =
         groupPropertyKey != null && !"".equals(groupPropertyKey);
       this.vertexFactory = vertexFactory;
-      this.reuseVertex = new Vertex<>();
       this.reuseTuple = new Tuple2<>();
     }
 
@@ -195,7 +184,7 @@ public class SummarizationGroupWithLists<
      */
     @Override
     public void reduce(Iterable<VertexForGrouping> vertices,
-      Collector<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>> collector)
+      Collector<Tuple2<VD, List<GradoopId>>> collector)
       throws Exception {
       String groupLabel = null;
       String groupValue = null;
@@ -214,18 +203,14 @@ public class SummarizationGroupWithLists<
           initialized = true;
         }
       }
-      VD vertexData =
-        vertexFactory.createVertex(groupLabel);
+      VD vertexData = vertexFactory.createVertex(groupLabel);
       if (useProperty) {
         vertexData.setProperty(groupPropertyKey, groupValue);
       }
-      vertexData
-        .setProperty(COUNT_PROPERTY_KEY, (long) groupedVertexIds.size());
+      vertexData.setProperty(COUNT_PROPERTY_KEY, (long) groupedVertexIds.size());
 
-      reuseVertex.f0 = vertexData.getId();
-      reuseVertex.f1 = vertexData;
 
-      reuseTuple.f0 = reuseVertex;
+      reuseTuple.f0 = vertexData;
       reuseTuple.f1 = groupedVertexIds;
 
       collector.collect(reuseTuple);
@@ -243,11 +228,10 @@ public class SummarizationGroupWithLists<
     }
 
     @Override
-    public TypeInformation<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>>
+    public TypeInformation<Tuple2<VD, List<GradoopId>>>
     getProducedType() {
       return new TupleTypeInfo<>(
-        new TupleTypeInfo<>(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
-          TypeExtractor.getForClass(vertexFactory.getType())),
+        TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(List.class));
     }
   }
@@ -258,19 +242,17 @@ public class SummarizationGroupWithLists<
    *
    * @param <VD> vertex data type
    */
-  @FunctionAnnotation.ForwardedFields("f0->*")
+//  @FunctionAnnotation.ForwardedFields("f0->*")
   private static class SummarizedVertexForwarder<VD extends EPGMVertex>
-    implements MapFunction
-    <Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>, Vertex<GradoopId, VD>> {
+    implements MapFunction<Tuple2<VD, List<GradoopId>>, VD> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Vertex<GradoopId, VD> map(
-      Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> vertexListTuple2
+    public VD map(
+      Tuple2<VD, List<GradoopId>> vertexListTuple2
     ) throws Exception {
-
       return vertexListTuple2.f0;
     }
   }
@@ -283,7 +265,7 @@ public class SummarizationGroupWithLists<
    * @param <VD> vertex data type
    */
   private static class VertexToGroupRepresentativeMapper<VD extends EPGMVertex>
-    implements FlatMapFunction<Tuple2<Vertex<GradoopId, VD>, List<GradoopId>>,
+    implements FlatMapFunction<Tuple2<VD, List<GradoopId>>,
       VertexWithRepresentative> {
 
     /**
@@ -303,7 +285,7 @@ public class SummarizationGroupWithLists<
      */
     @Override
     public void flatMap(
-      Tuple2<Vertex<GradoopId, VD>, List<GradoopId>> vertexListTuple2,
+      Tuple2<VD, List<GradoopId>> vertexListTuple2,
       Collector<VertexWithRepresentative> collector) throws Exception {
 
       for (GradoopId vertexId : vertexListTuple2.f1) {

@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
+import org.gradoop.GradoopTestUtils;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -25,6 +26,9 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
+import java.util.Collection;
+
+import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
 import static org.gradoop.model.impl.operators.summarization.Summarization.NULL_VALUE;
 import static org.junit.Assert.assertTrue;
 
@@ -147,6 +151,10 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, vertexGroupingKey, false,
         edgeGroupingKey, false).run();
 
+    System.out.println(loader.getGraphHeadByVariable("expected"));
+
+    printLogicalGraph(output);
+
     assertTrue(output.equalsByElementDataCollected(
       loader.getLogicalGraphByVariable("expected")));
   }
@@ -166,9 +174,9 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString("expected[" +
       "(dresden {city = \"Dresden\",            count = 2});" +
       "(others  {city = \"" + NULL_VALUE + "\", count = 1});" +
-      "(others)-[{since = 2013, count = 1}]->(dresden);" +
+      "(others)-[{since = \"2013\", count = 1}]->(dresden);" +
       "(others)-[{since = \"" + NULL_VALUE + "\", count = 2}]->(dresden);" +
-      "(dresden)-[{since = 2014, count = 1}]->(dresden)" +
+      "(dresden)-[{since = \"2014\", count = 1}]->(dresden)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -322,10 +330,15 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "(p)-[{since = \"" + NULL_VALUE + "\", count = 4}]->(t);" +
       "(f)-[{since = \"" + NULL_VALUE + "\", count = 4}]->(t);" +
       "(f)-[{since = \"" + NULL_VALUE + "\", count = 5}]->(p);" +
+//      "(p)-[{since = 0, count = 4}]->(t);" +
+//      "(f)-[{since = 0, count = 4}]->(t);" +
+//      "(f)-[{since = 0, count = 5}]->(p);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new SummarizationRunner(input, null, true, edgeGroupingKey, false).run();
+
+    printLogicalGraph(output);
 
     assertTrue(output.equalsByElementDataCollected(
       loader.getLogicalGraphByVariable("expected")));

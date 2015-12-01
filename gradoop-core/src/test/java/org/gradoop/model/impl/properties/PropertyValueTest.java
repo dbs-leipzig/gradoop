@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.properties;
 
 import org.gradoop.storage.exceptions.UnsupportedTypeException;
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -44,11 +43,6 @@ public class PropertyValueTest {
     p = create(BIG_DECIMAL_VAL_7);
     assertTrue(p.isBigDecimal());
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
-    // DateTime
-    // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
-//    p = create(DATETIME_VAL_8);
-//    assertTrue(p.isDateTime());
-//    assertEquals(DATETIME_VAL_8, p.getDateTime());
   }
 
   @Test
@@ -111,7 +105,6 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
-    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -137,7 +130,6 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
-    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -163,7 +155,6 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
-    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -189,7 +180,6 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
-    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -215,7 +205,6 @@ public class PropertyValueTest {
     assertTrue(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
-    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -241,7 +230,6 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertTrue(p.isString());
     assertFalse(p.isBigDecimal());
-    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -267,7 +255,6 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertTrue(p.isBigDecimal());
-    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -283,34 +270,6 @@ public class PropertyValueTest {
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 
-  // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
-
-//  @Test
-//  public void testIsDateTime() throws Exception {
-//    PropertyValue p = new PropertyValue(DATETIME_VAL_8);
-//    assertFalse(p.isBoolean());
-//    assertFalse(p.isInt());
-//    assertFalse(p.isLong());
-//    assertFalse(p.isFloat());
-//    assertFalse(p.isDouble());
-//    assertFalse(p.isString());
-//    assertFalse(p.isBigDecimal());
-//    assertTrue(p.isDateTime());
-//  }
-//
-//  @Test
-//  public void testGetDateTime() throws Exception {
-//    PropertyValue p = new PropertyValue(DATETIME_VAL_8);
-//    assertEquals(DATETIME_VAL_8, p.getDateTime());
-//  }
-//
-//  @Test
-//  public void testSetDateTime() throws Exception {
-//    PropertyValue p = new PropertyValue();
-//    p.setDateTime(DATETIME_VAL_8);
-//    assertEquals(DATETIME_VAL_8, p.getDateTime());
-//  }
-
   @Test
   public void testEqualsAndHashCode() throws Exception {
     validateEqualsAndHashCode(create(true), create(true), create(false));
@@ -321,19 +280,13 @@ public class PropertyValueTest {
 
     validateEqualsAndHashCode(create(10F), create(10F), create(11F));
 
-    // TODO: breaks for Double because of
-    // https://issues.apache.org/jira/browse/HADOOP-12217
-//    validateEqualsAndHashCode(create(10.), create(10.), create(11.));
+    validateEqualsAndHashCode(create(10.), create(10.), create(11.));
 
     validateEqualsAndHashCode(create("10"), create("10"), create("11"));
 
     validateEqualsAndHashCode(create(new BigDecimal(10)),
       create(new BigDecimal(10)),
       create(new BigDecimal(11)));
-
-    DateTime now1 = new DateTime("2015-11-28T16:27:29.840+01:00");
-    DateTime now2 = new DateTime("2015-11-28T16:27:30.840+01:00");
-    validateEqualsAndHashCode(create(now1), create(now1), create(now2));
   }
 
   /**
@@ -373,11 +326,6 @@ public class PropertyValueTest {
     validateCompareTo(create(new BigDecimal(10)),
       create(new BigDecimal(10)),
       create(new BigDecimal(11)));
-
-    DateTime now1 = new DateTime("2015-11-28T16:27:29.840+01:00");
-    DateTime now2 = new DateTime("2015-11-28T16:27:30.840+01:00");
-    validateCompareTo(create(now1), create(now1),
-      create(now2));
   }
 
   @Test
@@ -402,10 +350,6 @@ public class PropertyValueTest {
 
     p = create(BIG_DECIMAL_VAL_7);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    // TODO: fails because of wrong ISOCHRONOLOGY after serializing
-//    p = PropertyValue.create(DATETIME_VAL_8);
-//    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
   /**
    * Assumes that p1 == p2 < p3

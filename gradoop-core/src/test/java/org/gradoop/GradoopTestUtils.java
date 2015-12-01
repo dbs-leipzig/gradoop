@@ -19,7 +19,6 @@ package org.gradoop;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.collections.functors.ExceptionClosure;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.hadoop.io.Writable;
 import org.gradoop.model.api.EPGMElement;
@@ -28,11 +27,9 @@ import org.gradoop.model.api.EPGMIdentifiable;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;
 import org.gradoop.util.AsciiGraphLoader;
 import org.gradoop.util.GradoopConfig;
-import org.joda.time.DateTime;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -65,8 +62,6 @@ public class GradoopTestUtils {
   public static final String KEY_5 = "key5";
   public static final String KEY_6 = "key6";
   public static final String KEY_7 = "key7";
-  // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
-//  public static final String KEY_8 = "key8";
 
   public static final boolean     BOOL_VAL_1        = true;
   public static final int         INT_VAL_2         = 23;
@@ -75,8 +70,6 @@ public class GradoopTestUtils {
   public static final double      DOUBLE_VAL_5      = 2.3;
   public static final String      STRING_VAL_6      = "23";
   public static final BigDecimal  BIG_DECIMAL_VAL_7 = new BigDecimal(23);
-  // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
-//  public static final DateTime    DATETIME_VAL_8    = new DateTime(42);
 
   static {
     SUPPORTED_PROPERTIES = Maps.newTreeMap();
@@ -87,8 +80,6 @@ public class GradoopTestUtils {
     SUPPORTED_PROPERTIES.put(KEY_5, DOUBLE_VAL_5);
     SUPPORTED_PROPERTIES.put(KEY_6, STRING_VAL_6);
     SUPPORTED_PROPERTIES.put(KEY_7, BIG_DECIMAL_VAL_7);
-    // TODO: supported when https://issues.apache.org/jira/browse/PIG-4748 is solved
-//    SUPPORTED_PROPERTIES.put(KEY_8, DATETIME_VAL_8);
   }
 
   /**

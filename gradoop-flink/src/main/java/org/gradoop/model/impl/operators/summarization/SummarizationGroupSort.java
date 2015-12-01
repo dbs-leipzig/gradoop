@@ -2,28 +2,19 @@ package org.gradoop.model.impl.operators.summarization;
 
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToRepresentativeFilter;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToSummarizedVertexFilter;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToSummarizedVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToVertexWithRepresentativeMapper;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupReducer;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToRepresentativeFilter;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexFilter;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToVertexWithRepresentativeMapper;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupReducer;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .VertexWithRepresentative;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
 
 /**
  * Summarization implementation that requires sorting of vertex groups to chose
@@ -69,8 +60,8 @@ public class SummarizationGroupSort<
    * {@inheritDoc}
    */
   @Override
-  protected Graph<GradoopId, V, E> summarizeInternal(
-    Graph<GradoopId, V, E> graph) {
+  protected LogicalGraph<G, V, E> summarizeInternal(
+    LogicalGraph<G, V, E> graph) {
 
     DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices()
       // map vertices to a compact representation
@@ -86,7 +77,7 @@ public class SummarizationGroupSort<
         // create vertex group items
         .reduceGroup(new VertexGroupReducer());
 
-    DataSet<Vertex<GradoopId, V>> summarizedVertices = sortedGroupedVertices
+    DataSet<V> summarizedVertices = sortedGroupedVertices
       // filter group representative tuples
       .filter(new VertexGroupItemToSummarizedVertexFilter())
         // build summarized vertex
@@ -101,11 +92,11 @@ public class SummarizationGroupSort<
         .map(new VertexGroupItemToVertexWithRepresentativeMapper());
 
     // build summarized edges
-    DataSet<Edge<GradoopId, E>> summarizedEdges =
-      buildSummarizedEdges(graph, vertexToRepresentativeMap);
+    DataSet<E> summarizedEdges = buildSummarizedEdges(
+      graph, vertexToRepresentativeMap);
 
-    return Graph
-      .fromDataSet(summarizedVertices, summarizedEdges, graph.getContext());
+    return LogicalGraph.fromDataSets(
+      summarizedVertices, summarizedEdges, graph.getConfig());
   }
 
   /**
