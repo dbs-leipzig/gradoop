@@ -378,7 +378,8 @@ public class PropertyValue
 
   @Override
   public String toString() {
-    return getObject().toString();
+    return isString() ? String.format("\"%s\"", getObject().toString()) :
+      getObject().toString();
   }
 
   /**
