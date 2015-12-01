@@ -23,14 +23,13 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
-import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Returns a collection with all logical graphs that exist in both input
  * collections. Graph equality is based on their identifiers.
- * <p>
+ *
  * This operator implementation requires that a list of subgraph identifiers
  * in the resulting graph collections fits into the workers main memory.
  *
@@ -38,10 +37,8 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class IntersectionBroadcast<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
+public class IntersectionBroadcast
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends Intersection<G, V, E> {
 
   @Override

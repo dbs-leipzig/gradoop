@@ -30,20 +30,17 @@ import org.gradoop.model.impl.GraphCollection;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class ReduceCombination<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  implements UnaryCollectionToGraphOperator<G, V, E>{
+public class ReduceCombination
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryCollectionToGraphOperator<G, V, E> {
 
   @Override
   public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
 
     return LogicalGraph.fromDataSets(
-        collection.getVertices(),
-        collection.getEdges(),
-        collection.getConfig()
-      );
+      collection.getVertices(),
+      collection.getEdges(),
+      collection.getConfig());
   }
 
   @Override

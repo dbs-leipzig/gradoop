@@ -9,6 +9,13 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.tuple.ValueOfTuple1;
 import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 
+/**
+ * Aggregate function returning the vertex count of a graph.
+ *
+ * @param <G> graph head type
+ * @param <V> vertex type
+ * @param <E> edge type
+ */
 public class VertexCount
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements AggregateFunction<Long, G, V, E> {

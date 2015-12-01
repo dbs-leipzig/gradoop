@@ -334,7 +334,8 @@ public class Split
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f2")
   private static class JoinEdgeTupleWithSourceGraphs<VD extends EPGMVertex>
     implements
-    JoinFunction<Tuple3<GradoopId, GradoopId, GradoopId>, VD, Tuple3<GradoopId, GradoopIdSet, GradoopId>> {
+    JoinFunction<Tuple3<GradoopId, GradoopId, GradoopId>, VD,
+      Tuple3<GradoopId, GradoopIdSet, GradoopId>> {
     /**
      * Reduce object instantiation
      */
@@ -438,7 +439,8 @@ public class Split
    */
   @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f2")
   private static class CrossEdgesWithGraphSet implements CrossFunction
-    <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, GradoopIdSet, Tuple4<GradoopId, GradoopIdSet, GradoopIdSet, GradoopIdSet>> {
+    <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, GradoopIdSet,
+      Tuple4<GradoopId, GradoopIdSet, GradoopIdSet, GradoopIdSet>> {
     /**
      * Reduce object instantiations.
      */
@@ -457,8 +459,8 @@ public class Split
      */
     @Override
     public Tuple4<GradoopId, GradoopIdSet, GradoopIdSet, GradoopIdSet>
-    cross(Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> tuple3, GradoopIdSet subgraphs
-    ) throws Exception {
+    cross(Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> tuple3,
+      GradoopIdSet subgraphs) throws Exception {
 
       reuseTuple.f0 = tuple3.f0;
       reuseTuple.f1 = tuple3.f1;
