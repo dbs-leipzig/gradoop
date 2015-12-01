@@ -22,9 +22,6 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.GroupReduceOperator;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -32,18 +29,14 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToRepresentativeFilter;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToSummarizedVertexFilter;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToSummarizedVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToVertexWithRepresentativeMapper;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToRepresentativeFilter;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexFilter;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToVertexWithRepresentativeMapper;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .VertexWithRepresentative;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Summarization implementation that does not require sorting of vertex groups.
@@ -236,7 +229,7 @@ public class SummarizationGroupCombine<
       GradoopId groupRepresentativeVertexId = null;
       Long groupCount = 0L;
       String groupLabel = null;
-      String groupPropertyValue = null;
+      PropertyValue groupPropertyValue = PropertyValue.NULL_VALUE;
       boolean firstElement = true;
 
       for (VertexGroupItem vertexGroupItem : vertexGroupItems) {
@@ -255,8 +248,9 @@ public class SummarizationGroupCombine<
           firstElement = false;
         }
         reuseVertexGroupItem.setVertexId(vertexGroupItem.getVertexId());
-        reuseVertexGroupItem
-          .setGroupRepresentativeVertexId(groupRepresentativeVertexId);
+        reuseVertexGroupItem.setGroupRepresentativeVertexId(
+          groupRepresentativeVertexId);
+        reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);
 
         // only partition representative tuples have a group count > 0
         if (vertexGroupItem.getGroupCount().equals(0L)) {
@@ -267,8 +261,8 @@ public class SummarizationGroupCombine<
         }
       }
       reuseVertexGroupItem.setVertexId(groupRepresentativeVertexId);
-      reuseVertexGroupItem
-        .setGroupRepresentativeVertexId(groupRepresentativeVertexId);
+      reuseVertexGroupItem.setGroupRepresentativeVertexId(
+        groupRepresentativeVertexId);
       reuseVertexGroupItem.setGroupLabel(groupLabel);
       reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);
       reuseVertexGroupItem.setGroupCount(groupCount);

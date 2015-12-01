@@ -21,7 +21,6 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
@@ -33,7 +32,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.SourceId;
-import org.gradoop.model.impl.functions.epgm.TargetId;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
@@ -91,10 +89,6 @@ public abstract class Summarization<
   V extends EPGMVertex,
   E extends EPGMEdge>
   implements UnaryGraphToGraphOperator<G, V, E> {
-  /**
-   * Used to represent vertices that do not have the vertex grouping property.
-   */
-  public static final String NULL_VALUE = "__NULL";
   /**
    * EPGMProperty key to store the number of summarized entities in a group.
    */
@@ -367,7 +361,7 @@ public abstract class Summarization<
       GradoopId newSourceVertexId = null;
       GradoopId newTargetVertexId = null;
       String edgeLabel = GConstants.DEFAULT_EDGE_LABEL;
-      PropertyValue edgeGroupingValue = null;
+      PropertyValue edgeGroupingValue = PropertyValue.NULL_VALUE;
 
       for (EdgeGroupItem e : edgeGroupItems) {
         edgeCount++;
@@ -453,17 +447,16 @@ public abstract class Summarization<
     @Override
     public EdgeGroupItem join(E e,
       VertexWithRepresentative vertexRepresentative) throws Exception {
-      String groupLabel = useLabel ? e.getLabel() : null;
-      PropertyValue groupPropertyValue = null;
 
-      boolean hasProperty =
-        useProperty && (e.getPropertyValue(groupPropertyKey) != null);
+      String groupLabel = useLabel ? e.getLabel() : null;
+      PropertyValue groupPropertyValue = PropertyValue.NULL_VALUE;
+
+      boolean hasProperty = useProperty && (e.hasProperty(groupPropertyKey));
+
       if (useProperty && hasProperty) {
         groupPropertyValue = e.getPropertyValue(groupPropertyKey);
-      } else if (useProperty) {
-        groupPropertyValue = PropertyValue.create(NULL_VALUE);
-//        groupPropertyValue = PropertyValue.create(0);
       }
+
       reuseEdgeGroupItem.setEdgeId(e.getId());
       reuseEdgeGroupItem.setSourceId(
         vertexRepresentative.getGroupRepresentativeVertexId());

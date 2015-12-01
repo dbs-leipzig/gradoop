@@ -18,29 +18,19 @@
 package org.gradoop.model.impl.operators.summarization;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToRepresentativeFilter;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToSummarizedVertexFilter;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToSummarizedVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupItemToVertexWithRepresentativeMapper;
-import org.gradoop.model.impl.operators.summarization.functions
-  .VertexGroupReducer;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToRepresentativeFilter;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexFilter;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexMapper;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToVertexWithRepresentativeMapper;
+import org.gradoop.model.impl.operators.summarization.functions.VertexGroupReducer;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .VertexWithRepresentative;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
 
 /**
  * Summarization implementation that does not require sorting of vertex groups.
@@ -102,7 +92,7 @@ public class SummarizationGroupMap<
       // group vertices by label / property / both
       groupVertices(verticesForGrouping)
       // build vertex group item
-      .reduceGroup(new VertexGroupReducer());
+        .reduceGroup(new VertexGroupReducer());
 
     DataSet<V> summarizedVertices = groupedVertices
       // filter group representative tuples

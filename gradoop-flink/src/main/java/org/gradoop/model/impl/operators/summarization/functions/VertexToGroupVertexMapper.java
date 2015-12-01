@@ -18,10 +18,9 @@
 package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Creates a minimal representation of vertex data to be used for grouping.
@@ -96,13 +95,11 @@ public class VertexToGroupVertexMapper<V extends EPGMVertex>
    * @param vertexData vertex data
    * @return property value, default value or {@code null}
    */
-  private String getGroupPropertyValue(V vertexData) {
+  private PropertyValue getGroupPropertyValue(V vertexData) {
     boolean hasProperty = vertexData.getPropertyValue(groupPropertyKey) != null;
-    String returnValue = null;
+    PropertyValue returnValue = PropertyValue.NULL_VALUE;
     if (useProperty && hasProperty) {
-      returnValue = vertexData.getPropertyValue(groupPropertyKey).toString();
-    } else if (useProperty) {
-      returnValue = Summarization.NULL_VALUE;
+      returnValue = vertexData.getPropertyValue(groupPropertyKey);
     }
     return returnValue;
   }

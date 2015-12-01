@@ -18,11 +18,11 @@
 package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Creates a single {@link VertexGroupItem} for each group element
@@ -58,7 +58,7 @@ public class VertexGroupReducer implements
     GradoopId groupRepresentativeVertexId = GradoopId.get();
     long groupCount = 0L;
     String groupLabel = null;
-    String groupPropertyValue = null;
+    PropertyValue groupPropertyValue = PropertyValue.NULL_VALUE;
     boolean firstElement = true;
 
     for (VertexForGrouping vertexForGrouping : groupVertices) {
@@ -67,16 +67,20 @@ public class VertexGroupReducer implements
         groupPropertyValue = vertexForGrouping.getGroupPropertyValue();
         firstElement = false;
       }
-      // no need to set group label / property value for those tuples
+      // no need to set group label
       reuseVertexGroupItem.setVertexId(vertexForGrouping.getVertexId());
+      reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);
       reuseVertexGroupItem.setGroupRepresentativeVertexId(
         groupRepresentativeVertexId);
       collector.collect(reuseVertexGroupItem);
       groupCount++;
     }
 
-    createGroupRepresentativeTuple(groupRepresentativeVertexId, groupLabel,
-      groupPropertyValue, groupCount);
+    createGroupRepresentativeTuple(
+      groupRepresentativeVertexId,
+      groupLabel,
+      groupPropertyValue,
+      groupCount);
     collector.collect(reuseVertexGroupItem);
     reuseVertexGroupItem.reset();
   }
@@ -91,7 +95,7 @@ public class VertexGroupReducer implements
    * @param groupCount          total group count
    */
   private void createGroupRepresentativeTuple(GradoopId groupRepresentative,
-    String groupLabel, String groupPropertyValue, long groupCount) {
+    String groupLabel, PropertyValue groupPropertyValue, long groupCount) {
     reuseVertexGroupItem.setVertexId(groupRepresentative);
     reuseVertexGroupItem.setGroupLabel(groupLabel);
     reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);

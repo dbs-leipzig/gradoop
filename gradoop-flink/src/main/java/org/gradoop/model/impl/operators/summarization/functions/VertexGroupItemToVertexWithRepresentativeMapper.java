@@ -18,10 +18,8 @@
 package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
-import org.gradoop.model.impl.operators.summarization.tuples
-  .VertexWithRepresentative;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
 
 /**
  * Maps a {@link VertexGroupItem} to a {@link VertexWithRepresentative}.

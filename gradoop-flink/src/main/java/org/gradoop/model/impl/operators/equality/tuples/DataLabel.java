@@ -68,18 +68,17 @@ public class DataLabel extends Tuple3<GradoopId, GradoopId, String>
 
   @Override
   public boolean equals(Object o) {
-    boolean equals = o instanceof DataLabel;
+    boolean isDataLabel = o instanceof DataLabel;
 
-    if (equals) {
-      equals = this.getLabel().equals(((DataLabel) o).getLabel());
+    if (!isDataLabel) {
+      return super.equals(o);
     }
 
-    return equals;
+    return this.getLabel().equals(((DataLabel) o).getLabel());
   }
 
   @Override
   public int hashCode() {
     return this.getLabel().hashCode();
   }
-
 }

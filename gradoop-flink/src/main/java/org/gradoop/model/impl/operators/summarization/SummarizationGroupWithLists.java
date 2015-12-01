@@ -23,7 +23,6 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichGroupReduceFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
@@ -35,6 +34,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
@@ -184,10 +184,10 @@ public class SummarizationGroupWithLists<
      */
     @Override
     public void reduce(Iterable<VertexForGrouping> vertices,
-      Collector<Tuple2<VD, List<GradoopId>>> collector)
-      throws Exception {
+      Collector<Tuple2<VD, List<GradoopId>>> collector) throws Exception {
+
       String groupLabel = null;
-      String groupValue = null;
+      PropertyValue groupValue = null;
       List<GradoopId> groupedVertexIds = Lists.newArrayList();
       boolean initialized = false;
       for (VertexForGrouping v : vertices) {
@@ -198,33 +198,24 @@ public class SummarizationGroupWithLists<
             useLabel ? v.getGroupLabel() : GConstants.DEFAULT_VERTEX_LABEL;
           // get group value if necessary
           if (useProperty) {
-            groupValue = getGroupProperty(v.getGroupPropertyValue());
+            groupValue = v.getGroupPropertyValue();
           }
           initialized = true;
         }
       }
       VD vertexData = vertexFactory.createVertex(groupLabel);
+
       if (useProperty) {
         vertexData.setProperty(groupPropertyKey, groupValue);
       }
-      vertexData.setProperty(COUNT_PROPERTY_KEY, (long) groupedVertexIds.size());
 
+      vertexData.setProperty(
+        COUNT_PROPERTY_KEY, (long) groupedVertexIds.size());
 
       reuseTuple.f0 = vertexData;
       reuseTuple.f1 = groupedVertexIds;
 
       collector.collect(reuseTuple);
-    }
-
-    /**
-     * Returns the group property value or the default value if vertices in
-     * the group do not have the property.
-     *
-     * @param vertexPropertyValue vertex property value
-     * @return final vertex group value
-     */
-    private String getGroupProperty(String vertexPropertyValue) {
-      return (vertexPropertyValue != null) ? vertexPropertyValue : NULL_VALUE;
     }
 
     @Override

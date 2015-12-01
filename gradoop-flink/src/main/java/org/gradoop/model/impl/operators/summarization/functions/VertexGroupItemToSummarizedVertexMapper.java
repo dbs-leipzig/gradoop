@@ -18,16 +18,12 @@
 package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 

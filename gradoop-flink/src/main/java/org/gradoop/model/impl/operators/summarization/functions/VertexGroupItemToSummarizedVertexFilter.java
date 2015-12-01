@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 
 /**

@@ -19,6 +19,7 @@ package org.gradoop.model.impl.operators.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Vertex representation which is used as output of group reduce.
@@ -30,7 +31,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * f4: total group count
  */
 public class VertexGroupItem
-  extends Tuple5<GradoopId, GradoopId, String, String, Long> {
+  extends Tuple5<GradoopId, GradoopId, String, PropertyValue, Long> {
 
   /**
    * Creates a vertex group item.
@@ -64,11 +65,11 @@ public class VertexGroupItem
     f2 = groupLabel;
   }
 
-  public String getGroupPropertyValue() {
+  public PropertyValue getGroupPropertyValue() {
     return f3;
   }
 
-  public void setGroupPropertyValue(String groupPropertyValue) {
+  public void setGroupPropertyValue(PropertyValue groupPropertyValue) {
     f3 = groupPropertyValue;
   }
 
