@@ -409,7 +409,7 @@ public class LogicalGraph
    */
   @Override
   public GraphCollection<G, V, E> callForCollection(
-    UnaryGraphToCollectionOperator<V, E, G> operator) throws Exception {
+    UnaryGraphToCollectionOperator<G, V, E> operator) throws Exception {
     return operator.execute(this);
   }
 

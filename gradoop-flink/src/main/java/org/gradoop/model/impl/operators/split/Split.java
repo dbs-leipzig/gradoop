@@ -44,7 +44,7 @@ import java.util.Set;
  */
 public class Split
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryGraphToCollectionOperator<V, E, G> {
+  implements UnaryGraphToCollectionOperator<G, V, E> {
   /**
    * Mapping from a vertex to a long value
    */

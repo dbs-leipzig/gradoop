@@ -319,7 +319,7 @@ public interface LogicalGraphOperators
    * @return result of given operator
    */
   GraphCollection<G, V, E> callForCollection(
-    UnaryGraphToCollectionOperator<V, E, G> operator) throws Exception;
+    UnaryGraphToCollectionOperator<G, V, E> operator) throws Exception;
 
   /**
    * Writes the logical graph into three separate JSON files. {@code

@@ -26,12 +26,13 @@ import org.gradoop.model.impl.GraphCollection;
 /**
  * Creates a {@link GraphCollection} based on one {@link LogicalGraph}.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <G> EPGM graph head type
  */
-public interface UnaryGraphToCollectionOperator<VD extends EPGMVertex, ED
-  extends EPGMEdge, GD extends EPGMGraphHead> extends
+public interface UnaryGraphToCollectionOperator
+  <G extends EPGMGraphHead, V extends EPGMVertex, E
+  extends EPGMEdge> extends
   Operator {
   /**
    * Executes the operator.
@@ -39,6 +40,6 @@ public interface UnaryGraphToCollectionOperator<VD extends EPGMVertex, ED
    * @param graph input graph
    * @return operator result
    */
-  GraphCollection<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) throws
+  GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
     Exception;
 }

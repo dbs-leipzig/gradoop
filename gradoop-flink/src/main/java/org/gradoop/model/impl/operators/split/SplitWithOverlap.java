@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class SplitWithOverlap
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryGraphToCollectionOperator<V, E, G>, Serializable {
+  implements UnaryGraphToCollectionOperator<G, V, E>, Serializable {
   /**
    * serial version uid
    */
