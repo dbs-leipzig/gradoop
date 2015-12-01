@@ -58,7 +58,7 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
 
     loader.appendToDatabaseFromString(
       "expected1[(eve)];" +
-      "expected2[(carol)-[ckd]->(dave)-[dkc]->(carol)");
+      "expected2[(carol)-[ckd]->(dave)-[dkc]->(carol)]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
