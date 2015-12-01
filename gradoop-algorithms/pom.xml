@@ -63,6 +63,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Flink -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-test-utils</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Others -->
         <dependency>
             <groupId>junit</groupId>
