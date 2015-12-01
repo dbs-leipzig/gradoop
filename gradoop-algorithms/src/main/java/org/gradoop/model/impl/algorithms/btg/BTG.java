@@ -33,7 +33,7 @@ import org.gradoop.model.impl.operators.split.SplitWithOverlap;
  * @see BTGAlgorithm
  */
 public class BTG<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGraphHead> implements
-  UnaryGraphToCollectionOperator<VD, ED, GD> {
+  UnaryGraphToCollectionOperator<GD, VD, ED> {
   /**
    * BTG ID PropertyKey
    */

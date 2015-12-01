@@ -42,10 +42,10 @@ import java.io.Serializable;
  * @see EPGMLabelPropagationAlgorithm
  */
 public class EPGMLabelPropagation<
+  GD extends EPGMGraphHead,
   VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  implements UnaryGraphToCollectionOperator<VD, ED, GD>, Serializable {
+  ED extends EPGMEdge>
+  implements UnaryGraphToCollectionOperator<GD, VD, ED>, Serializable {
   /**
    * serial version uid
    */

@@ -51,7 +51,7 @@ import org.gradoop.model.api.operators.GraphCollectionOperators;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.model.impl.functions.api.Predicate;
+import org.gradoop.model.api.functions.Predicate;
 import org.gradoop.model.impl.functions.epgm.ById;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;

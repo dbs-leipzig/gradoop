@@ -22,8 +22,8 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.functions.api.Predicate;
-import org.gradoop.model.impl.functions.api.UnaryFunction;
+import org.gradoop.model.api.functions.Predicate;
+import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 
 /**

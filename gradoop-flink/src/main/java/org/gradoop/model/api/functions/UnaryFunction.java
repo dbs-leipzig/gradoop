@@ -14,22 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.gradoop.model.api.functions;
 
-package org.gradoop.model.impl.functions.api;
+import java.io.Serializable;
 
 /**
- * Used by predicate based operations (e.g., Selection, Filter).
+ * Defines a function with singe input and output. Used e.g. in projection.
  *
- * @param <T> type to perform predicate function on
+ * @param <I> input type
+ * @param <O> output type
  */
-public interface Predicate<T> {
-
+public interface UnaryFunction<I, O> extends Serializable {
   /**
-   * Returns true if {@code entity} fulfils the predicate.
+   * Creates output from given input.
    *
-   * @param entity entity to apply predicate on
-   * @return true if predicate is fulfilled, false otherwise
+   * @param entity some entity
+   * @return some object
    * @throws Exception
    */
-  boolean filter(T entity) throws Exception;
+  O execute(I entity) throws Exception;
 }

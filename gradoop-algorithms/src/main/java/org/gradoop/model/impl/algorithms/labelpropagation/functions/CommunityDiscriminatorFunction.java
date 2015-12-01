@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.api.UnaryFunction;
+import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.split.Split;
 import org.gradoop.model.impl.operators.split.SplitWithOverlap;

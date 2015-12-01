@@ -19,7 +19,7 @@ package org.gradoop.model.impl.operators.projection;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.api.UnaryFunction;
+import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;

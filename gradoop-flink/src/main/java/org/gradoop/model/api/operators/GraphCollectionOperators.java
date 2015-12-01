@@ -24,7 +24,7 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.Order;
-import org.gradoop.model.impl.functions.api.Predicate;
+import org.gradoop.model.api.functions.Predicate;
 import org.gradoop.model.impl.GraphCollection;
 
 /**

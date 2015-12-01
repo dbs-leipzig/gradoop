@@ -57,7 +57,7 @@ public class LabelPropagation<
   VD extends EPGMVertex,
   ED extends EPGMEdge,
   GD extends EPGMGraphHead>
-  implements UnaryGraphToCollectionOperator<VD, ED, GD> {
+  implements UnaryGraphToCollectionOperator<GD, VD, ED> {
   /**
    * Counter to define maximal Iteration for the Algorithm
    */
