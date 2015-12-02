@@ -356,7 +356,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testUpdateFromString() {
+  public void testAppendFromString() {
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]",
         config);
@@ -370,7 +370,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testUpdateFromString2() {
+  public void testAppendFromString2() {
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]",
         config);
@@ -384,17 +384,30 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testUpdateFromStringWithVariables() {
+  public void testAppendFromStringWithVariables() {
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[(a)-->(b)]",
+      AsciiGraphLoader.fromString("g0[(a)-[e]->(b)]",
         config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
-    validateCaches(asciiGraphLoader, 0, 2, 0);
+    validateCaches(asciiGraphLoader, 1, 2, 1);
 
-    asciiGraphLoader.appendFromString("[(a)-->()]");
-    validateCollections(asciiGraphLoader, 2, 3, 2);
-    validateCaches(asciiGraphLoader, 0, 2, 0);
+    asciiGraphLoader.appendFromString("g1[(a)-[e]->(b)]");
+    validateCollections(asciiGraphLoader, 2, 2, 1);
+    validateCaches(asciiGraphLoader, 2, 2, 1);
+
+    GraphHeadPojo g1 = asciiGraphLoader.getGraphHeadByVariable("g0");
+    GraphHeadPojo g2 = asciiGraphLoader.getGraphHeadByVariable("g1");
+    VertexPojo a = asciiGraphLoader.getVertexByVariable("a");
+    EdgePojo e = asciiGraphLoader.getEdgeByVariable("e");
+
+    assertEquals("Vertex has wrong graph count", 2, a.getGraphCount());
+    assertTrue("Vertex was not in g1", a.getGraphIds().contains(g1.getId()));
+    assertTrue("Vertex was not in g2", a.getGraphIds().contains(g2.getId()));
+
+    assertEquals("Edge has wrong graph count", 2, e.getGraphCount());
+    assertTrue("Edge was not in g1", a.getGraphIds().contains(g1.getId()));
+    assertTrue("Edge was not in g2", a.getGraphIds().contains(g2.getId()));
   }
 
   @Test

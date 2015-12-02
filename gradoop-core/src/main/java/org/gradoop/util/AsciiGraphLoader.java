@@ -426,9 +426,7 @@ public class AsciiGraphLoader
    */
   private void initVertices() {
     for (Vertex v : gdlHandler.getVertices()) {
-      if (!vertexIds.containsKey(v.getId())) {
-        initVertex(v);
-      }
+      initVertex(v);
     }
 
     for (Map.Entry<String, Vertex> e : gdlHandler.getVertexCache().entrySet()) {
@@ -441,9 +439,7 @@ public class AsciiGraphLoader
    */
   private void initEdges() {
     for (Edge e : gdlHandler.getEdges()) {
-      if (!edgeIds.containsKey(e.getId())) {
-        initEdge(e);
-      }
+      initEdge(e);
     }
 
     for (Map.Entry<String, Edge> e : gdlHandler.getEdgeCache().entrySet()) {
@@ -466,18 +462,24 @@ public class AsciiGraphLoader
   }
 
   /**
-   * Creates a new EPGMVertex from the GDL Loader.
+   * Creates a new EPGMVertex from the GDL Loader or updates an existing one.
    *
    * @param v vertex from GDL Loader
    * @return EPGM Vertex
    */
   private V initVertex(Vertex v) {
-    V vertex = config.getVertexFactory().createVertex(
-      v.getLabel(),
-      PropertyList.createFromMap(v.getProperties()),
-      createGradoopIdSet(v));
-    vertexIds.put(v.getId(), vertex.getId());
-    vertices.put(vertex.getId(), vertex);
+    V vertex;
+    if (!vertexIds.containsKey(v.getId())) {
+      vertex = config.getVertexFactory().createVertex(
+        v.getLabel(),
+        PropertyList.createFromMap(v.getProperties()),
+        createGradoopIdSet(v));
+      vertexIds.put(v.getId(), vertex.getId());
+      vertices.put(vertex.getId(), vertex);
+    } else {
+      vertex = vertices.get(vertexIds.get(v.getId()));
+      vertex.setGraphIds(createGradoopIdSet(v));
+    }
     return vertex;
   }
 
@@ -488,14 +490,20 @@ public class AsciiGraphLoader
    * @return EPGM edge
    */
   private E initEdge(Edge e) {
-    E edge = config.getEdgeFactory().createEdge(
+    E edge;
+    if (!edgeIds.containsKey(e.getId())) {
+      edge = config.getEdgeFactory().createEdge(
         e.getLabel(),
         vertexIds.get(e.getSourceVertexId()),
         vertexIds.get(e.getTargetVertexId()),
         PropertyList.createFromMap(e.getProperties()),
         createGradoopIdSet(e));
-    edgeIds.put(e.getId(), edge.getId());
-    edges.put(edge.getId(), edge);
+      edgeIds.put(e.getId(), edge.getId());
+      edges.put(edge.getId(), edge);
+    } else {
+      edge = edges.get(edgeIds.get(e.getId()));
+      edge.setGraphIds(createGradoopIdSet(e));
+    }
     return edge;
   }
 
