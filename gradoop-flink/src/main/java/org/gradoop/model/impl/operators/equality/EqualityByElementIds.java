@@ -7,6 +7,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryGraphToValueOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.bool.Or;
+import org.gradoop.model.impl.functions.counting.Count;
 import org.gradoop.model.impl.functions.epgm.ToGradoopIdSet;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
@@ -45,12 +46,22 @@ public class EqualityByElementIds
       .map(new Id<E>())
       .reduceGroup(new ToGradoopIdSet());
 
-
     return Or.union(
-      And.cross(firstGraph.isEmpty(), secondGraph.isEmpty()),
       And.cross(
-        Equals.cross(firstGraphVertexIds, secondGraphVertexIds),
-        Equals.cross(firstGraphEdgeIds, secondGraphEdgeIds)
+        firstGraph.isEmpty(),
+        secondGraph.isEmpty()),
+      And.cross(
+        Equals.cross(
+          firstGraphVertexIds,
+          secondGraphVertexIds),
+        Or.union(
+          And.cross(
+            Count.isEmpty(firstGraphEdgeIds),
+            Count.isEmpty(secondGraphEdgeIds)),
+          Equals.cross(
+            firstGraphEdgeIds,
+            secondGraphEdgeIds)
+        )
       )
     );
   }
