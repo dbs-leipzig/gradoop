@@ -29,12 +29,12 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
+import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.api.functions.Predicate;
-import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
@@ -263,8 +263,8 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> project(UnaryFunction<V, V> vertexFunction,
-    UnaryFunction<E, E> edgeFunction) throws Exception {
+  public LogicalGraph<G, V, E> project(ProjectionFunction<V> vertexFunction,
+    ProjectionFunction<E> edgeFunction) throws Exception {
     return callForGraph(
       new Projection<G, V, E>(vertexFunction, edgeFunction));
   }
