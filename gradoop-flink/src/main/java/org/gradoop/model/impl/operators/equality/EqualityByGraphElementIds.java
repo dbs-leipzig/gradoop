@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.CrossOperator;
 import org.apache.flink.api.java.operators.GroupReduceOperator;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -15,9 +14,9 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.bool.Or;
-import org.gradoop.model.impl.functions.join.LeftSide;
-import org.gradoop.model.impl.functions.counting.Tuple1With1L;
+import org.gradoop.model.impl.operators.count.Count;
 import org.gradoop.model.impl.functions.epgm.Tuple1WithId;
+import org.gradoop.model.impl.functions.join.LeftSide;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.equality.functions
@@ -39,7 +38,7 @@ import org.gradoop.model.impl.operators.equality.functions
  */
 public class EqualityByGraphElementIds
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends EqualityBase
+  extends EqualityBase<G, V, E>
   implements BinaryCollectionToValueOperator<G, V, E, Boolean> {
 
   @Override
@@ -52,15 +51,14 @@ public class EqualityByGraphElementIds
     DataSet<Tuple3<GradoopIdSet, GradoopIdSet, Long>> secondGraphsWithCount =
       getGraphElementIdsWithCount(secondCollection);
 
-    DataSet<Tuple1<Long>> distinctFirstGraphCount = firstGraphsWithCount
-      .map(new Tuple1With1L<Tuple3<GradoopIdSet, GradoopIdSet, Long>>())
-      .sum(0);
+    DataSet<Long> distinctFirstGraphCount = Count
+      .count(firstGraphsWithCount);
 
-    DataSet<Tuple1<Long>> matchingIdCount = firstGraphsWithCount
-      .join(secondGraphsWithCount)
-      .where(0, 1, 2).equalTo(0, 1, 2)
-      .with(new Tuple1With1L<Tuple3<GradoopIdSet, GradoopIdSet, Long>>())
-      .sum(0);
+    DataSet<Long> matchingIdCount = Count.count(
+      firstGraphsWithCount
+        .join(secondGraphsWithCount)
+        .where(0, 1, 2).equalTo(0, 1, 2)
+    );
 
     return Or.union(
       And.cross(firstCollection.isEmpty(), secondCollection.isEmpty()),

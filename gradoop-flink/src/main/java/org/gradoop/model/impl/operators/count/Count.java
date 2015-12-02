@@ -15,10 +15,11 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.counting;
+package org.gradoop.model.impl.operators.count;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.tuple.ValueOfTuple1;
 
@@ -35,5 +36,12 @@ public class Count {
   public static <T> DataSet<Boolean> isEmpty(DataSet<T> dataSet) {
     return Equals.cross(count(dataSet),
       dataSet.getExecutionEnvironment().fromElements(0L));
+  }
+
+  public static <T> DataSet<Tuple2<T,Long>> groupBy(DataSet<T> dataSet) {
+    return dataSet
+      .map(new Tuple2WithObjectAnd1L<T>())
+      .groupBy(0)
+      .sum(1);
   }
 }

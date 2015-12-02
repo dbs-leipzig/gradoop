@@ -6,8 +6,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.tuple.ValueOfTuple1;
-import org.gradoop.model.impl.functions.counting.Tuple1With1L;
+import org.gradoop.model.impl.operators.count.Count;
 
 /**
  * Aggregate function returning the vertex count of a graph.
@@ -22,10 +21,6 @@ public class VertexCount
 
   @Override
   public DataSet<Long> execute(LogicalGraph<G, V, E> graph) {
-    return graph
-      .getVertices()
-      .map(new Tuple1With1L<V>())
-      .sum(0)
-      .map(new ValueOfTuple1<Long>());
+    return Count.count(graph.getVertices());
   }
 }
