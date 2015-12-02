@@ -25,6 +25,7 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
+import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
 import static org.gradoop.util.GConstants.NULL_STRING;
 import static org.junit.Assert.assertTrue;
 

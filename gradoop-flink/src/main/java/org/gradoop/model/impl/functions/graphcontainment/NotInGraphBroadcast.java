@@ -12,6 +12,6 @@ public class NotInGraphBroadcast<GE extends EPGMGraphElement>
 
   @Override
   public boolean filter(GE element) throws Exception {
-    return element.getGraphIds().contains(graphId);
+    return !element.getGraphIds().contains(graphId);
   }
 }

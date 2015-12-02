@@ -51,6 +51,8 @@ public abstract class GradoopFlinkTestBase {
 
   protected static final int DEFAULT_PARALLELISM = 4;
 
+  protected static final long TASKMANAGER_MEMORY_SIZE_MB = 256L;
+
   protected static ForkableFlinkMiniCluster cluster = null;
 
   /**
@@ -115,7 +117,7 @@ public abstract class GradoopFlinkTestBase {
     config.setInteger("local.number-taskmanager", 1);
     config.setInteger("taskmanager.numberOfTaskSlots", DEFAULT_PARALLELISM);
     config.setBoolean("local.start-webserver", false);
-    config.setLong("taskmanager.memory.size", 128L);
+    config.setLong("taskmanager.memory.size", TASKMANAGER_MEMORY_SIZE_MB);
     config.setBoolean("fs.overwrite-files", true);
     config.setString("akka.ask.timeout", "1000s");
     config.setString("akka.startup-timeout", "60 s");

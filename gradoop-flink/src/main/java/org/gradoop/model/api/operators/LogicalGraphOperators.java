@@ -379,5 +379,10 @@ public interface LogicalGraphOperators
   Boolean equalsByElementDataCollected(LogicalGraph<G, V, E> other) throws
     Exception;
 
+  /**
+   * Returns true, if the graph contains zero vertices.
+   *
+   * @return true, if graph is empty.
+   */
   DataSet<Boolean> isEmpty();
 }

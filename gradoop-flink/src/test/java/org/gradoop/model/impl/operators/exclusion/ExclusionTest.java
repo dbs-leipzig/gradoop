@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
 import static org.junit.Assert.assertTrue;
 
 public class ExclusionTest extends BinaryGraphOperatorsTestBase {
@@ -56,7 +57,7 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString(
+    loader.appendToDatabaseFromString("" +
       "expected1[(eve)];" +
       "expected2[(carol)-[ckd]->(dave)-[dkc]->(carol)]");
 
