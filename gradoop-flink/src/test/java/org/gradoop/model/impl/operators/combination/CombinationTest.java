@@ -88,7 +88,7 @@ public class CombinationTest extends BinaryGraphOperatorsTestBase {
       "(bob)-[bka]->(alice);" +
       "(eve)-[eka]->(alice);" +
       "(eve)-[ekb]->(bob);" +
-      "(carol)-[ckb]->(dave);" +
+      "(carol)-[ckd]->(dave);" +
       "(dave)-[dkc]->(carol);" +
       "(frank)-[fkc]->(carol);" +
       "(frank)-[fkd]->(dave)]"

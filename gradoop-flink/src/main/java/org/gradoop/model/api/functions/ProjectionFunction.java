@@ -12,26 +12,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.gradoop.model.api.functions;
 
-import java.io.Serializable;
+import org.gradoop.model.api.EPGMElement;
 
 /**
- * Defines a function with singe input and output. Used e.g. in projection.
+ * Takes an EPGM element as input and returns an EPGM element.
  *
- * @param <I> input type
- * @param <O> output type
+ * @param <EL> EPGM element type
  */
-public interface UnaryFunction<I, O> extends Serializable {
-  /**
-   * Creates output from given input.
-   *
-   * @param entity some entity
-   * @return some object
-   * @throws Exception
-   */
-  O execute(I entity) throws Exception;
+public interface ProjectionFunction<EL extends EPGMElement>
+  extends UnaryFunction<EL, EL> {
 }

@@ -15,23 +15,7 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api.functions;
-
-import java.io.Serializable;
-
 /**
- * Defines a function with singe input and output. Used e.g. in projection.
- *
- * @param <I> input type
- * @param <O> output type
+ * Contains all user defined functions related to the graph projection.
  */
-public interface UnaryFunction<I, O> extends Serializable {
-  /**
-   * Creates output from given input.
-   *
-   * @param entity some entity
-   * @return some object
-   * @throws Exception
-   */
-  O execute(I entity) throws Exception;
-}
+package org.gradoop.model.impl.operators.projection.functions;

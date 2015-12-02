@@ -31,16 +31,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.model.impl.operators.projection;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.epgm.Clone;
+import org.gradoop.model.impl.operators.projection.functions.ProjectionMapper;
 
 /**
  * Creates a projected version of the logical graph using the user defined
@@ -50,19 +52,17 @@ import org.gradoop.model.impl.functions.epgm.Clone;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class Projection<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
+public class Projection
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements UnaryGraphToGraphOperator<G, V, E> {
   /**
    * Vertex projection function.
    */
-  private final UnaryFunction<V, V> vertexFunc;
+  private final ProjectionFunction<V> vertexFunc;
   /**
    * Edge projection function.
    */
-  private final UnaryFunction<E, E> edgeFunc;
+  private final ProjectionFunction<E> edgeFunc;
 
   /**
    * Creates new projection.
@@ -70,8 +70,8 @@ public class Projection<
    * @param vertexFunc vertex projection function
    * @param edgeFunc   edge projection function
    */
-  public Projection(UnaryFunction<V, V> vertexFunc,
-    UnaryFunction<E, E> edgeFunc) {
+  public Projection(ProjectionFunction<V> vertexFunc,
+    ProjectionFunction<E> edgeFunc) {
     this.vertexFunc = vertexFunc;
     this.edgeFunc = edgeFunc;
   }
@@ -81,7 +81,7 @@ public class Projection<
    *
    * @return unary vertex to vertex function
    */
-  protected UnaryFunction<V, V> getVertexFunc() {
+  protected ProjectionFunction<V> getVertexFunc() {
     return this.vertexFunc;
   }
 
@@ -90,7 +90,7 @@ public class Projection<
    *
    * @return unary vertex to vertex function
    */
-  protected UnaryFunction<E, E> getEdgeFunc() {
+  protected ProjectionFunction<E> getEdgeFunc() {
     return this.edgeFunc;
   }
 
@@ -104,68 +104,10 @@ public class Projection<
       graph.getGraphHead()
         .map(new Clone<G>()),
       graph.getVertices()
-        .map(new VertexProjection<>(getVertexFunc())),
+        .map(new ProjectionMapper<>(getVertexFunc())),
       graph.getEdges()
-        .map(new EdgeProjection<>(getEdgeFunc())),
+        .map(new ProjectionMapper<>(getEdgeFunc())),
       graph.getConfig());
-  }
-
-  /**
-   * apply the vertex projection to all vertices
-   *
-   * @param <VD> vertex data type
-   */
-  private static class VertexProjection<VD extends EPGMVertex>
-    implements
-    MapFunction<VD, VD> {
-    /**
-     * Vertex to vertex function
-     */
-    private UnaryFunction<VD, VD> vertexFunc;
-
-    /**
-     * create a new ProjectVerticesMapper
-     *
-     * @param vertexFunc the vertex projection function
-     */
-    public VertexProjection(UnaryFunction<VD, VD> vertexFunc) {
-      this.vertexFunc = vertexFunc;
-    }
-
-    @Override
-    public VD map(VD vertex) throws Exception {
-      return vertexFunc.execute(vertex);
-    }
-  }
-
-  /**
-   * apply the edge projection to all edges
-   *
-   * @param <ED> edge data type
-   */
-  private static class EdgeProjection<ED extends EPGMEdge> implements
-    MapFunction<ED, ED> {
-    /**
-     * Edge to edge function
-     */
-    private UnaryFunction<ED, ED> edgeFunc;
-
-    /**
-     * Create a new ProjectEdgesMapper
-     *
-     * @param edgeFunc the edge projection function
-     */
-    public EdgeProjection(UnaryFunction<ED, ED> edgeFunc) {
-      this.edgeFunc = edgeFunc;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ED map(ED edge) throws Exception {
-      return edgeFunc.execute(edge);
-    }
   }
 
   /**

@@ -38,6 +38,8 @@ public class ReduceExclusionTest extends ReduceTestBase {
         "exp14[]");
 
     checkExpectationsEqualResults(
-      loader, new ReduceOverlap<GraphHeadPojo, VertexPojo, EdgePojo>());
+      loader, new ReduceExclusion<GraphHeadPojo, VertexPojo, EdgePojo>(
+        loader.getGraphHeadByVariable("g1").getId()
+      ));
   }
 }

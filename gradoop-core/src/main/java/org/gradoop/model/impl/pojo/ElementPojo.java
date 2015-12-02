@@ -60,6 +60,7 @@ public abstract class ElementPojo implements EPGMElement {
    */
   @Override
   public void setId(GradoopId id) {
+    this.id = id;
   }
 
   /**

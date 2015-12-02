@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
@@ -21,10 +22,10 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
+import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.api.functions.Predicate;
-import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 
 /**
@@ -63,8 +64,8 @@ public interface LogicalGraphOperators
    * @param edgeFunction   edge data projection function
    * @return projected logical graph
    */
-  LogicalGraph<G, V, E> project(UnaryFunction<V, V> vertexFunction,
-    UnaryFunction<E, E> edgeFunction) throws Exception;
+  LogicalGraph<G, V, E> project(ProjectionFunction<V> vertexFunction,
+    ProjectionFunction<E> edgeFunction) throws Exception;
 
   /**
    * Applies the given aggregate function to the logical graph and stores the
