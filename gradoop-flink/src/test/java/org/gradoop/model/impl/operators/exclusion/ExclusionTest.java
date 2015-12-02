@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
 import static org.junit.Assert.assertTrue;
 
 public class ExclusionTest extends BinaryGraphOperatorsTestBase {
@@ -49,7 +48,7 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("expected");
 
     assertTrue("exclusion of same graph failed",
-      expected.equalsByElementIdsCollected(g0.exclude(g0)));
+      expected.equalsByElementIds(g0.exclude(g0)).collect().get(0));
   }
 
   @Test
@@ -71,9 +70,9 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("expected2");
 
     assertTrue("excluding overlapping graphs failed",
-      expected1.equalsByElementIdsCollected(g0.exclude(g2)));
+      expected1.equalsByElementIds(g0.exclude(g2)).collect().get(0));
     assertTrue("excluding switched overlapping graphs failed",
-      expected2.equalsByElementIdsCollected(g2.exclude(g0)));
+      expected2.equalsByElementIds(g2.exclude(g0)).collect().get(0));
   }
 
   @Test
@@ -87,9 +86,9 @@ public class ExclusionTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("g1");
 
     assertTrue("excluding non overlapping graphs failed",
-      g0.equalsByElementIdsCollected(g0.exclude(g1)));
+      g0.equalsByElementIds(g0.exclude(g1)).collect().get(0));
     assertTrue("excluding switched non overlapping graphs failed",
-      g1.equalsByElementIdsCollected(g1.exclude(g0)));
+      g1.equalsByElementIds(g1.exclude(g0)).collect().get(0));
   }
 
   @Test

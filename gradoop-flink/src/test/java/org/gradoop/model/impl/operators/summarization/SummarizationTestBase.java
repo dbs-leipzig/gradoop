@@ -25,7 +25,6 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
 import static org.gradoop.util.GConstants.NULL_STRING;
 import static org.junit.Assert.assertTrue;
 
@@ -60,8 +59,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, vertexGroupingKey, false, null, false)
         .run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -91,8 +90,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, vertexGroupingKey, false, null, false)
         .run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -115,8 +114,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, vertexGroupingKey, false, null, false)
         .run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -148,8 +147,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, vertexGroupingKey, false,
         edgeGroupingKey, false).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -176,8 +175,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, vertexGroupingKey, false,
         edgeGroupingKey, false).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -201,8 +200,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new SummarizationRunner(input, null, true, null, false).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -232,8 +231,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, vertexGroupingKey, true, null, false)
         .run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -270,8 +269,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, vertexGroupingKey, true, null, false)
         .run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -297,8 +296,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(input, null, true, edgeGroupingKey, false)
         .run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -331,8 +330,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new SummarizationRunner(input, null, true, edgeGroupingKey, false).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -365,8 +364,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(
         input, vertexGroupingKey, true, edgeGroupingKey, false).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -391,8 +390,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new SummarizationRunner(input, null, true, null, true).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -422,8 +421,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new SummarizationRunner(input, vertexGroupingKey, true, null, true).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -462,8 +461,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new SummarizationRunner(input, vertexGroupingKey, true, null, true).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -489,8 +488,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new SummarizationRunner(input, null, true, edgeGroupingKey, true).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -522,8 +521,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new SummarizationRunner(input, null, true, edgeGroupingKey, true).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -556,8 +555,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(
         input, vertexGroupingKey, true, edgeGroupingKey, true).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   @Test
@@ -600,8 +599,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       new SummarizationRunner(
         input, vertexGroupingKey, true, edgeGroupingKey, true).run();
 
-    assertTrue(output.equalsByElementDataCollected(
-      loader.getLogicalGraphByVariable("expected")));
+    assertTrue(output.equalsByElementData(
+      loader.getLogicalGraphByVariable("expected")).collect().get(0));
   }
 
   private class SummarizationRunner {

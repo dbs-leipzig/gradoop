@@ -65,6 +65,7 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.model.impl.operators.equality.EqualityByGraphElementData;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphElementIds;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphIds;
 import org.gradoop.model.impl.operators.intersection.Intersection;
@@ -470,27 +471,9 @@ public class GraphCollection<
    * {@inheritDoc}
    */
   @Override
-  public Boolean equalsByGraphIdsCollected(
-    GraphCollection<G, V, E> other) throws Exception {
-    return collectEquals(equalsByGraphIds(other));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public DataSet<Boolean> equalsByGraphElementIds(
     GraphCollection<G, V, E> other) {
     return new EqualityByGraphElementIds<G, V, E>().execute(this, other);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Boolean equalsByGraphElementIdsCollected(
-    GraphCollection<G, V, E> other) throws Exception {
-    return collectEquals(equalsByGraphElementIds(other));
   }
 
   @Override
@@ -501,5 +484,11 @@ public class GraphCollection<
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
+  }
+
+  @Override
+  public DataSet<Boolean> equalsByGraphElementData(
+    GraphCollection<G, V, E> other) {
+    return new EqualityByGraphElementData<G, V, E>().execute(this, other);
   }
 }

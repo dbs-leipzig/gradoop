@@ -47,6 +47,9 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.GraphOperators;
 import org.gradoop.model.impl.functions.bool.False;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Collection;
@@ -291,5 +294,6 @@ public abstract class GraphBase<
       .collect()
       .get(0);
   }
+
 
 }

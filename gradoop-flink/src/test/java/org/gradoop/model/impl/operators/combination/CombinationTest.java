@@ -46,7 +46,7 @@ public class CombinationTest extends BinaryGraphOperatorsTestBase {
       .combine(g0);
 
     assertTrue("combining same graph failed",
-      g0.equalsByElementIdsCollected(combination));
+      g0.equalsByElementIds(combination).collect().get(0));
   }
 
   @Test
@@ -73,9 +73,9 @@ public class CombinationTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("expected");
 
     assertTrue("combining overlapping graphs failed",
-      expected.equalsByElementIdsCollected(g0.combine(g2)));
+      expected.equalsByElementIds(g0.combine(g2)).collect().get(0));
     assertTrue("combining switched overlapping graphs failed",
-      expected.equalsByElementIdsCollected(g2.combine(g0)));
+      expected.equalsByElementIds(g2.combine(g0)).collect().get(0));
   }
 
   @Test
@@ -102,9 +102,9 @@ public class CombinationTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("expected");
 
     assertTrue("combining non overlapping graphs failed",
-      expected.equalsByElementIdsCollected(g0.combine(g1)));
+      expected.equalsByElementIds(g0.combine(g1)).collect().get(0));
     assertTrue("combining switched non overlapping graphs failed",
-      expected.equalsByElementIdsCollected(g1.combine(g0)));
+      expected.equalsByElementIds(g1.combine(g0)).collect().get(0));
   }
 
   @Test

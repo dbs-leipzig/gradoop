@@ -30,9 +30,9 @@ public class BinaryCollectionOperatorsTestBase extends GradoopFlinkTestBase {
     String attribute) throws Exception {
     assertTrue(
       "wrong graph ids for " + attribute + " overlapping collections",
-      result.equalsByGraphIdsCollected(expectation));
+      result.equalsByGraphIds(expectation).collect().get(0));
     assertTrue(
       "wrong graph element ids for" + attribute + " overlapping collections",
-      result.equalsByGraphElementIdsCollected(expectation));
+      result.equalsByGraphElementIds(expectation).collect().get(0));
   }
 }

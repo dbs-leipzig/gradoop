@@ -468,26 +468,8 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public Boolean equalsByElementIdsCollected(LogicalGraph<G, V, E> other) throws
-    Exception {
-    return collectEquals(equalsByElementIds(other));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
     return new EqualityByElementData<G, V, E>().execute(this, other);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Boolean equalsByElementDataCollected(
-    LogicalGraph<G, V, E> other) throws Exception {
-    return collectEquals(equalsByElementData(other));
   }
 
   public DataSet<G> getGraphHead() {

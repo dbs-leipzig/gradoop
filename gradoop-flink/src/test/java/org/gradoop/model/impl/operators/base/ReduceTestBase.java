@@ -4,7 +4,6 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.overlap.ReduceOverlap;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -40,10 +39,10 @@ public abstract class ReduceTestBase extends GradoopFlinkTestBase {
       loader.getLogicalGraphByVariable("exp14");
 
     assertTrue("partial overlap failed",
-      operator.execute(col13).equalsByElementDataCollected(exp13));
+      operator.execute(col13).equalsByElementData(exp13).collect().get(0));
     assertTrue("without overlap failed",
-      operator.execute(col12).equalsByElementDataCollected(exp12));
+      operator.execute(col12).equalsByElementData(exp12).collect().get(0));
     assertTrue("with full overlap failed",
-      operator.execute(col14).equalsByElementDataCollected(exp14));
+      operator.execute(col14).equalsByElementData(exp14).collect().get(0));
   }
 }

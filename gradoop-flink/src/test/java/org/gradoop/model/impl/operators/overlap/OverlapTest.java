@@ -46,7 +46,7 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
       .overlap(graph);
 
     assertTrue("overlap of same graph failed",
-      graph.equalsByElementIdsCollected(overlap));
+      graph.equalsByElementIds(overlap).collect().get(0));
   }
 
   public void testOverlappingGraphs() throws Exception {
@@ -65,9 +65,9 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("expected");
 
     assertTrue("combining overlapping graphs failed",
-      expected.equalsByElementIdsCollected(g0.overlap(g2)));
+      expected.equalsByElementIds(g0.overlap(g2)).collect().get(0));
     assertTrue("combining switched overlapping graphs failed",
-      expected.equalsByElementIdsCollected(g2.overlap(g0)));
+      expected.equalsByElementIds(g2.overlap(g0)).collect().get(0));
   }
 
   @Test
@@ -85,9 +85,9 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
       .getLogicalGraphByVariable("expected");
 
     assertTrue("overlap non overlapping graphs failed",
-      expected.equalsByElementIdsCollected(g0.overlap(g1)));
+      expected.equalsByElementIds(g0.overlap(g1)).collect().get(0));
     assertTrue("overlap switched non overlapping graphs failed",
-      expected.equalsByElementIdsCollected(g1.overlap(g0)));
+      expected.equalsByElementIds(g1.overlap(g0)).collect().get(0));
   }
 
   @Test

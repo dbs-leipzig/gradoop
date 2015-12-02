@@ -23,6 +23,9 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.Order;
 import org.gradoop.model.api.functions.Predicate;
 import org.gradoop.model.impl.GraphCollection;
@@ -262,17 +265,6 @@ public interface GraphCollectionOperators
   DataSet<Boolean> equalsByGraphIds(GraphCollection<G, V, E> other);
 
   /**
-   * Convenience method for collected result of
-   * {@link #equalsByGraphIds(GraphCollection)}
-   *
-   * @param other other graph
-   * @return true, if equal by graph ids
-   * @throws Exception
-   */
-  Boolean equalsByGraphIdsCollected(GraphCollection<G, V, E> other) throws
-    Exception;
-
-  /**
    * Checks, if another collection contains the same graphs as this graph
    * (by vertex and edge ids).
    *
@@ -281,16 +273,9 @@ public interface GraphCollectionOperators
    */
   DataSet<Boolean> equalsByGraphElementIds(GraphCollection<G, V, E> other);
 
-  /**
-   * Convenience method for collected result of
-   * {@link #equalsByGraphElementIds(GraphCollection)}
-   *
-   * @param other other graph
-   * @return true, if equal by element ids
-   * @throws Exception
-   */
-  Boolean equalsByGraphElementIdsCollected(
-    GraphCollection<G, V, E> other) throws Exception;
 
   DataSet<Boolean> isEmpty();
+
+  DataSet<Boolean> equalsByGraphElementData(
+    GraphCollection<G, V, E> result);
 }
