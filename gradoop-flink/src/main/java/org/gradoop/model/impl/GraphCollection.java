@@ -420,7 +420,7 @@ public class GraphCollection<
    */
   @Override
   public GraphCollection<G, V, E> callForCollection(
-    UnaryCollectionToCollectionOperator<V, E, G> op) {
+    UnaryCollectionToCollectionOperator<G, V, E> op) {
     return op.execute(this);
   }
 

@@ -210,7 +210,7 @@ public interface GraphCollectionOperators
    * @return result of given operator
    */
   GraphCollection<G, V, E> callForCollection(
-    UnaryCollectionToCollectionOperator<V, E, G> op);
+    UnaryCollectionToCollectionOperator<G, V, E> op);
 
   /**
    * Calls the given binary collection to collection operator using that
