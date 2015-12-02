@@ -243,6 +243,10 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     for (String propertyKey : propertyKeys) {
       switch (propertyKey) {
+      case KEY_0:
+        assertTrue(v.getPropertyValue(propertyKey).isNull());
+        assertEquals(NULL_VAL_0, v.getPropertyValue(propertyKey).getObject());
+        break;
       case KEY_1:
         assertTrue(v.getPropertyValue(propertyKey).isBoolean());
         assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
@@ -271,11 +275,6 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
         assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
         assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
         break;
-      // TODO: fails because of wrong ISOCHRONOLOGY after deserializing
-//      case KEY_8:
-//        assertTrue(v.getPropertyValue(propertyKey).isDateTime());
-//        assertEquals(DATETIME_VAL_8, v.getPropertyValue(propertyKey).getDateTime());
-//        break;
       }
     }
   }

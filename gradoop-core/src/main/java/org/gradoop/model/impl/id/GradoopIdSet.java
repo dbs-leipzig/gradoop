@@ -24,6 +24,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -51,10 +52,20 @@ public class GradoopIdSet implements Iterable<GradoopId>,
   /**
    * Creates a new instance from multiple GradoopIDs.
    *
-   * @param ids given ids
+   * @param ids array of gradoop ids
    * @return gradoop ids
    */
   public static GradoopIdSet fromExisting(GradoopId... ids) {
+    return fromExisting(Arrays.asList(ids));
+  }
+
+  /**
+   * Creates a new instance from multiple GradoopIDs.
+   *
+   * @param ids given ids
+   * @return gradoop ids
+   */
+  public static GradoopIdSet fromExisting(Collection<GradoopId> ids) {
     GradoopIdSet gradoopIdSet = new GradoopIdSet();
 
     for (GradoopId id : ids) {

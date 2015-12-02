@@ -23,9 +23,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.Order;
 import org.gradoop.model.api.functions.Predicate;
 import org.gradoop.model.impl.GraphCollection;
@@ -273,9 +270,28 @@ public interface GraphCollectionOperators
    */
   DataSet<Boolean> equalsByGraphElementIds(GraphCollection<G, V, E> other);
 
-
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the collection is empty.
+   *
+   * A collection is considered empty, if it contains no logical graphs.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
+   */
   DataSet<Boolean> isEmpty();
 
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the graph collection is equal to the given graph collection.
+   *
+   * Equality is defined on the data contained inside the collection, i.e.
+   * graph heads, vertices and edges.
+   *
+   * @param result graph collection to compare with
+   * @return  1-element dataset containing {@code true} if the two collections
+   *          are equal or {@code false} if not
+   */
   DataSet<Boolean> equalsByGraphElementData(
     GraphCollection<G, V, E> result);
 }

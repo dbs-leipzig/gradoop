@@ -47,9 +47,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.GraphOperators;
 import org.gradoop.model.impl.functions.bool.False;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Collection;
@@ -199,6 +196,16 @@ public abstract class GraphBase<
   }
 
   /**
+   * Returns a dataset containing a single graph head associated with that
+   * logical graph.
+   *
+   * @return 1-element dataset
+   */
+  public DataSet<G> getGraphHead() {
+    return this.graphHeads;
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -280,20 +287,4 @@ public abstract class GraphBase<
   public long getEdgeCount() throws Exception {
     return edges.count();
   }
-
-  /**
-   * Collects a boolean dataset and extracts its first member.
-   *
-   * @param booleanDataSet boolean dataset
-   * @return first member
-   * @throws Exception
-   */
-  protected Boolean collectEquals(DataSet<Boolean> booleanDataSet) throws
-    Exception {
-    return booleanDataSet
-      .collect()
-      .get(0);
-  }
-
-
 }

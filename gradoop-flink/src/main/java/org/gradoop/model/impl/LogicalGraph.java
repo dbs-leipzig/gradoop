@@ -472,10 +472,9 @@ public class LogicalGraph
     return new EqualityByElementData<G, V, E>().execute(this, other);
   }
 
-  public DataSet<G> getGraphHead() {
-    return this.graphHeads;
-  }
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DataSet<Boolean> isEmpty() {
     return getVertices()

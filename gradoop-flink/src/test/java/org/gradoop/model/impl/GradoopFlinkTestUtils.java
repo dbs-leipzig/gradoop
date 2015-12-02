@@ -13,8 +13,12 @@ import java.util.Collection;
 public class GradoopFlinkTestUtils {
 
   public static <T> T writeAndRead(T element) throws Exception {
-    DataSet<T> dataSet = ExecutionEnvironment.getExecutionEnvironment()
-      .fromElements(element);
+    return writeAndRead(element, ExecutionEnvironment.getExecutionEnvironment());
+  }
+
+  public static <T> T writeAndRead(T element, ExecutionEnvironment env)
+    throws Exception {
+    DataSet<T> dataSet = env.fromElements(element);
     return dataSet.collect().get(0);
   }
 

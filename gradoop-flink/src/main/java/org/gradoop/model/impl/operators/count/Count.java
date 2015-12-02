@@ -23,8 +23,20 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.tuple.ValueOfTuple1;
 
+/**
+ * Utility methods to count the number of elements in a dataset without
+ * collecting it.
+ */
 public class Count {
 
+  /**
+   * Counts the elements in the given dataset and stores the result in a
+   * 1-element dataset.
+   *
+   * @param dataSet input dataset
+   * @param <T>     element type in input dataset
+   * @return 1-element dataset with count of input dataset
+   */
   public static <T> DataSet<Long> count(DataSet<T> dataSet) {
     return dataSet
       .map(new Tuple1With1L<T>())
@@ -33,12 +45,30 @@ public class Count {
       .map(new ValueOfTuple1<Long>());
   }
 
+  /**
+   * Counts the elements in the given dataset. If the dataset is empty, a
+   * 1-element dataset will be returned containing {@code true}. Otherwise
+   * it contains {@code false}.
+   *
+   * @param dataSet input dataset
+   * @param <T>     element type in input dataset
+   * @return 1-element dataset containing true iff input dataset is empty
+   */
   public static <T> DataSet<Boolean> isEmpty(DataSet<T> dataSet) {
     return Equals.cross(count(dataSet),
       dataSet.getExecutionEnvironment().fromElements(0L));
   }
 
-  public static <T> DataSet<Tuple2<T,Long>> groupBy(DataSet<T> dataSet) {
+  /**
+   * Groups the input dataset by the contained elements and counts the elements
+   * per group. Returns a {@code Tuple2} containing the group element and the
+   * corresponding count value.
+   *
+   * @param dataSet input dataset
+   * @param <T>     element type in input dataset
+   * @return {@code Tuple2} with group value and group count
+   */
+  public static <T> DataSet<Tuple2<T, Long>> groupBy(DataSet<T> dataSet) {
     return dataSet
       .map(new Tuple2WithObjectAnd1L<T>())
       .groupBy(0)

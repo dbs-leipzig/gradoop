@@ -98,9 +98,10 @@ public class GradoopTestUtils {
     GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
       GradoopConfig.getDefaultConfig();
 
-    return AsciiGraphLoader.fromFile(
-      GradoopHBaseTestBase.class.getResource(SOCIAL_NETWORK_GDL_FILE).getFile(),
-      config);
+    String fileName =
+      GradoopTestUtils.class.getResource(SOCIAL_NETWORK_GDL_FILE).getFile();
+
+    return AsciiGraphLoader.fromFile(fileName, config);
   }
 
   /**

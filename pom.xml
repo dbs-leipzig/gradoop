@@ -16,7 +16,7 @@
 
     <modules>
         <module>gradoop-examples</module>
-        <module>gradoop-algorithms</module>
+        <!--<module>gradoop-algorithms</module>-->
         <module>gradoop-flink</module>
         <module>gradoop-core</module>
         <module>gradoop-checkstyle</module>

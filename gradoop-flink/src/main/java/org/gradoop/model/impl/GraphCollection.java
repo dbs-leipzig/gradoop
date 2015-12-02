@@ -476,6 +476,9 @@ public class GraphCollection<
     return new EqualityByGraphElementIds<G, V, E>().execute(this, other);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DataSet<Boolean> isEmpty() {
     return getGraphHeads()
@@ -486,6 +489,9 @@ public class GraphCollection<
       .map(new Not());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DataSet<Boolean> equalsByGraphElementData(
     GraphCollection<G, V, E> other) {

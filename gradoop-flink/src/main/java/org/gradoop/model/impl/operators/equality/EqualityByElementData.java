@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.CrossOperator;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;

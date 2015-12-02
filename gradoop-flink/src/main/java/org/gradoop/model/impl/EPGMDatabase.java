@@ -46,7 +46,9 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.io.hbase.HBaseReader;
 import org.gradoop.io.hbase.HBaseWriter;
-import org.gradoop.io.json.JsonReader;
+import org.gradoop.io.json.JsonReader.JsonToEdgeMapper;
+import org.gradoop.io.json.JsonReader.JsonToGraphHeadMapper;
+import org.gradoop.io.json.JsonReader.JsonToVertexMapper;
 import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -226,15 +228,15 @@ public class EPGMDatabase<
     // read vertex, edge and graph data
 
     DataSet<V> vertices = env.readTextFile(vertexFile)
-      .map(new JsonReader.JsonToVertexMapper<>(config.getVertexFactory()))
+      .map(new JsonToVertexMapper<>(config.getVertexFactory()))
       .returns(vertexTypeInfo);
     DataSet<E> edges = env.readTextFile(edgeFile)
-      .map(new JsonReader.JsonToEdgeMapper<>(config.getEdgeFactory()))
+      .map(new JsonToEdgeMapper<>(config.getEdgeFactory()))
       .returns(edgeTypeInfo);
     DataSet<G> graphHeads;
     if (graphFile != null) {
       graphHeads = env.readTextFile(graphFile)
-        .map(new JsonReader.JsonToGraphMapper<>(config.getGraphHeadFactory()))
+        .map(new JsonToGraphHeadMapper<>(config.getGraphHeadFactory()))
         .returns(graphTypeInfo);
     } else {
       graphHeads = env.fromElements(

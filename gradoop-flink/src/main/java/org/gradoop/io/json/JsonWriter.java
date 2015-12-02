@@ -37,11 +37,11 @@ public class JsonWriter extends JsonIO {
    * "meta":{"label":"Employee","graphs":[0,1,2,3]}
    * }
    *
-   * @param <VD> EPGM vertex type
+   * @param <V> EPGM vertex type
    */
-  public static class VertexTextFormatter<VD extends EPGMVertex> extends
+  public static class VertexTextFormatter<V extends EPGMVertex> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<VD> {
+    TextOutputFormat.TextFormatter<V> {
 
     /**
      * Creates a JSON string representation from a given vertex.
@@ -50,7 +50,7 @@ public class JsonWriter extends JsonIO {
      * @return JSON string representation
      */
     @Override
-    public String format(VD v) {
+    public String format(V v) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, v.getId());
@@ -74,11 +74,11 @@ public class JsonWriter extends JsonIO {
    * "meta":{"label":"friendOf","graphs":[0,1,2,3]}
    * }
    *
-   * @param <ED> EPGM edge type
+   * @param <E> EPGM edge type
    */
-  public static class EdgeTextFormatter<ED extends EPGMEdge> extends
+  public static class EdgeTextFormatter<E extends EPGMEdge> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<ED> {
+    TextOutputFormat.TextFormatter<E> {
 
     /**
      * Creates a JSON string representation from a given edge.
@@ -87,7 +87,7 @@ public class JsonWriter extends JsonIO {
      * @return JSON string representation
      */
     @Override
-    public String format(ED e) {
+    public String format(E e) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, e.getId());
@@ -111,11 +111,11 @@ public class JsonWriter extends JsonIO {
    * "meta":{"label":"Community"}
    * }
    *
-   * @param <GD> EPGM graph head type
+   * @param <G> EPGM graph head type
    */
-  public static class GraphTextFormatter<GD extends EPGMGraphHead> extends
+  public static class GraphTextFormatter<G extends EPGMGraphHead> extends
     EntityToJsonFormatter implements
-    TextOutputFormat.TextFormatter<GD> {
+    TextOutputFormat.TextFormatter<G> {
 
     /**
      * Creates a JSON string representation of a given graph head object.
@@ -124,7 +124,7 @@ public class JsonWriter extends JsonIO {
      * @return JSON string representation
      */
     @Override
-    public String format(GD g) {
+    public String format(G g) {
       JSONObject json = new JSONObject();
       try {
         json.put(IDENTIFIER, g.getId());

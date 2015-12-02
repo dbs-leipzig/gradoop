@@ -19,6 +19,9 @@ package org.gradoop.model.impl.functions.bool;
 
 import org.apache.flink.api.common.functions.MapFunction;
 
+/**
+ * Logical "NOT" as Flink function.
+ */
 public class Not implements MapFunction<Boolean, Boolean> {
 
   @Override

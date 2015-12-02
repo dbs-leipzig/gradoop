@@ -66,7 +66,10 @@ public abstract class GradoopFlinkTestBase {
   protected GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config;
 
   public GradoopFlinkTestBase() {
-    this.env = new TestEnvironment(cluster, DEFAULT_PARALLELISM);
+    TestEnvironment testEnv = new TestEnvironment(cluster, DEFAULT_PARALLELISM);
+    // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
+    testEnv.setAsContext();
+    this.env = testEnv;
     this.config = GradoopFlinkConfig.createDefaultConfig(env);
   }
 
@@ -104,7 +107,7 @@ public abstract class GradoopFlinkTestBase {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    File logDir = File.createTempFile("TestBaseUtils-logdir", (String) null);
+    File logDir = File.createTempFile("TestBaseUtils-logdir", null);
     Assert.assertTrue("Unable to delete temp file", logDir.delete());
     Assert.assertTrue("Unable to create temp directory", logDir.mkdir());
 
@@ -152,9 +155,7 @@ public abstract class GradoopFlinkTestBase {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
       loader = getNewLoader();
 
-
-    String file = getClass().getResource(fileName).getFile();
-    loader.initDatabaseFromFile(file);
+    loader.initDatabaseFromFile(fileName);
     return loader;
   }
 

@@ -51,22 +51,22 @@ public class JsonReader extends JsonIO {
    * "graphs":[0,1,2,3]}
    * }
    *
-   * @param <VD> EPGM vertex type class
+   * @param <V> EPGM vertex type class
    */
-  public static class JsonToVertexMapper<VD extends EPGMVertex> extends
-    JsonToEntityMapper implements MapFunction<String, VD> {
+  public static class JsonToVertexMapper<V extends EPGMVertex> extends
+    JsonToEntityMapper implements MapFunction<String, V> {
 
     /**
      * Creates vertex data objects.
      */
-    private final EPGMVertexFactory<VD> vertexFactory;
+    private final EPGMVertexFactory<V> vertexFactory;
 
     /**
      * Creates map function
      *
      * @param vertexFactory vertex data factory
      */
-    public JsonToVertexMapper(EPGMVertexFactory<VD> vertexFactory) {
+    public JsonToVertexMapper(EPGMVertexFactory<V> vertexFactory) {
       this.vertexFactory = vertexFactory;
     }
 
@@ -78,7 +78,7 @@ public class JsonReader extends JsonIO {
      * @throws Exception
      */
     @Override
-    public VD map(String s) throws Exception {
+    public V map(String s) throws Exception {
       JSONObject jsonVertex = new JSONObject(s);
       GradoopId vertexID = getID(jsonVertex);
       String label = getLabel(jsonVertex);
@@ -106,22 +106,22 @@ public class JsonReader extends JsonIO {
    * "meta":{"label":"worksFor","graphs":[1,2,3,4]}
    * }
    *
-   * @param <ED> EPGM edge type
+   * @param <E> EPGM edge type
    */
-  public static class JsonToEdgeMapper<ED extends EPGMEdge> extends
-    JsonToEntityMapper implements MapFunction<String, ED> {
+  public static class JsonToEdgeMapper<E extends EPGMEdge> extends
+    JsonToEntityMapper implements MapFunction<String, E> {
 
     /**
      * Edge data factory.
      */
-    private final EPGMEdgeFactory<ED> edgeFactory;
+    private final EPGMEdgeFactory<E> edgeFactory;
 
     /**
      * Creates map function.
      *
      * @param edgeFactory edge data factory
      */
-    public JsonToEdgeMapper(EPGMEdgeFactory<ED> edgeFactory) {
+    public JsonToEdgeMapper(EPGMEdgeFactory<E> edgeFactory) {
       this.edgeFactory = edgeFactory;
     }
 
@@ -133,7 +133,7 @@ public class JsonReader extends JsonIO {
      * @throws Exception
      */
     @Override
-    public ED map(String s) throws Exception {
+    public E map(String s) throws Exception {
       JSONObject jsonEdge = new JSONObject(s);
       GradoopId edgeID = getID(jsonEdge);
       String edgeLabel = getLabel(jsonEdge);
@@ -189,22 +189,22 @@ public class JsonReader extends JsonIO {
    * "meta":{"label":"Community","vertices":[0,1,2],"edges":[4,5,6]}
    * }
    *
-   * @param <GD> EPGM graph head type
+   * @param <G> EPGM graph head type
    */
-  public static class JsonToGraphMapper<GD extends EPGMGraphHead> extends
-    JsonToEntityMapper implements MapFunction<String, GD> {
+  public static class JsonToGraphHeadMapper<G extends EPGMGraphHead> extends
+    JsonToEntityMapper implements MapFunction<String, G> {
 
     /**
      * Creates graph data objects
      */
-    private final EPGMGraphHeadFactory<GD> graphHeadFactory;
+    private final EPGMGraphHeadFactory<G> graphHeadFactory;
 
     /**
      * Creates map function
      *
      * @param graphHeadFactory graph data factory
      */
-    public JsonToGraphMapper(EPGMGraphHeadFactory<GD> graphHeadFactory) {
+    public JsonToGraphHeadMapper(EPGMGraphHeadFactory<G> graphHeadFactory) {
       this.graphHeadFactory = graphHeadFactory;
     }
 
@@ -216,7 +216,7 @@ public class JsonReader extends JsonIO {
      * @throws Exception
      */
     @Override
-    public GD map(String s) throws Exception {
+    public G map(String s) throws Exception {
       JSONObject jsonGraph = new JSONObject(s);
       GradoopId graphID = getID(jsonGraph);
       String label = getLabel(jsonGraph);

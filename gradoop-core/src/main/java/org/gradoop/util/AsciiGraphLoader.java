@@ -160,6 +160,9 @@ public class AsciiGraphLoader
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   AsciiGraphLoader<G, V, E> fromFile(String fileName,
     GradoopConfig<G, V, E> config) throws IOException {
+
+    System.out.println("*** loading from file ***");
+    System.out.println(fileName);
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)

@@ -19,12 +19,11 @@ package org.gradoop.model.impl.functions.bool;
 
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * Logical equals as Flink function.
+ * Equality as Flink function.
  *
- * @param <T> compared type
+ * @param <T> input element type
  */
 public class Equals<T>
   implements CrossFunction<T, T, Boolean> {
@@ -34,10 +33,16 @@ public class Equals<T>
     return left.equals(right);
   }
 
+  /**
+   * Checks for pair-wise equality between the elements of the given input sets.
+   *
+   * @param first   first input dataset
+   * @param second  second input dataset
+   * @param <T>     dataset element type
+   * @return dataset with {@code boolean} values for each pair
+   */
   public static <T> DataSet<Boolean> cross(
     DataSet<T> first, DataSet<T> second) {
-
     return first.cross(second).with(new Equals<T>());
   }
-
 }

@@ -40,7 +40,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.epgm.Clone;
 import org.gradoop.model.impl.operators.projection.functions.ProjectionMapper;
 

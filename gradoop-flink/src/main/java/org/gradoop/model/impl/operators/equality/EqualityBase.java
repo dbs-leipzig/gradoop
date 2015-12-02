@@ -29,6 +29,10 @@ import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Superclass of all equality operators.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public abstract class EqualityBase
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {

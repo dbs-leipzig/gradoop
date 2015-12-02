@@ -404,11 +404,8 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
 
   @Override
   public String toString() {
-    return
-      getObject() != null ?
-        isString() ?
-          String.format("\"%s\"", getString()) :
-          getObject().toString() :
-        GConstants.NULL_STRING;
+    return getObject() != null ?
+      getObject().toString() :
+      GConstants.NULL_STRING;
   }
 }

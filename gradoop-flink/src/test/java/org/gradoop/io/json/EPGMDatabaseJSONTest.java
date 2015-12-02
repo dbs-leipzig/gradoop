@@ -17,23 +17,26 @@
 
 package org.gradoop.io.json;
 
-import org.apache.flink.api.java.ExecutionEnvironment;
+import com.google.common.collect.Lists;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
+import java.util.Collection;
+
+import static org.gradoop.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(Parameterized.class)
 public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
 
   @Rule
@@ -61,7 +64,7 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
 
     EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
       graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
-      ExecutionEnvironment.getExecutionEnvironment());
+      getExecutionEnvironment());
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       databaseGraph = graphStore.getDatabaseGraph();
@@ -79,24 +82,36 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
     final String edgeFile = tmpDir + "/edges.json";
     final String graphFile = tmpDir + "/graphs.json";
 
-    getSocialNetworkLoader().getDatabase()
-      .writeAsJson(vertexFile, edgeFile, graphFile);
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getSocialNetworkLoader();
+
+    loader.getDatabase().writeAsJson(vertexFile, edgeFile, graphFile);
 
     EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
       newGraphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
-      ExecutionEnvironment.getExecutionEnvironment());
+      getExecutionEnvironment());
 
-    assertEquals(
-      getSocialNetworkLoader().getDatabase().getDatabaseGraph().getVertexCount(),
-      newGraphStore.getDatabaseGraph().getVertexCount()
-    );
-    assertEquals(
-      getSocialNetworkLoader().getDatabase().getDatabaseGraph().getEdgeCount(),
-      newGraphStore.getDatabaseGraph().getEdgeCount()
-    );
-    assertEquals(
-      getSocialNetworkLoader().getDatabase().getCollection().getGraphCount(),
-      newGraphStore.getCollection().getGraphCount()
-    );
+    Collection<GraphHeadPojo> expectedGraphHeads  = loader.getGraphHeads();
+    Collection<VertexPojo>    expectedVertices    = loader.getVertices();
+    Collection<EdgePojo>      expectedEdges       = loader.getEdges();
+
+    Collection<GraphHeadPojo> loadedGraphHeads    = Lists.newArrayList();
+    Collection<VertexPojo>    loadedVertices      = Lists.newArrayList();
+    Collection<EdgePojo>      loadedEdges         = Lists.newArrayList();
+
+    newGraphStore.getCollection().getGraphHeads()
+      .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
+    newGraphStore.getDatabaseGraph().getVertices()
+      .output(new LocalCollectionOutputFormat<>(loadedVertices));
+    newGraphStore.getDatabaseGraph().getEdges()
+      .output(new LocalCollectionOutputFormat<>(loadedEdges));
+
+    getExecutionEnvironment().execute();
+
+    validateEPGMElementCollections(expectedGraphHeads, loadedGraphHeads);
+    validateEPGMElementCollections(expectedVertices, loadedVertices);
+    validateEPGMGraphElementCollections(expectedVertices, loadedVertices);
+    validateEPGMElementCollections(expectedEdges, loadedEdges);
+    validateEPGMGraphElementCollections(expectedEdges, loadedEdges);
   }
 }
