@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -11,8 +10,8 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.bool.Or;
+import org.gradoop.model.impl.operators.count.Count;
 import org.gradoop.model.impl.functions.join.LeftSide;
-import org.gradoop.model.impl.functions.counting.Tuple1With1L;
 import org.gradoop.model.impl.operators.equality.functions.DataLabelWithCount;
 import org.gradoop.model.impl.operators.equality.functions.EdgeDataLabeler;
 import org.gradoop.model.impl.operators.equality.functions.GraphHeadDataLabeler;
@@ -47,25 +46,14 @@ public class EqualityByGraphElementData
     DataSet<Tuple2<String, Long>> secondGraphLabels =
       labelGraphs(secondCollection);
 
-    DataSet<Tuple1<Long>> distinctFirstGraphCount = firstGraphLabels
-      .map(new Tuple1With1L<Tuple2<String, Long>>())
-      .sum(0);
+    DataSet<Long> firstLabelCount = Count.count(firstGraphLabels);
 
-    DataSet<Tuple1<Long>> matchingIdCount = firstGraphLabels
-      .join(secondGraphLabels)
-      .where(0, 1).equalTo(0, 1)
-      .with(new Tuple1With1L<Tuple2<String, Long>>())
-      .sum(0);
-
-    try {
-      Equals.cross(distinctFirstGraphCount, matchingIdCount);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    DataSet<Long> matchingLabelCount = Count.count(firstGraphLabels
+      .join(secondGraphLabels).where(0, 1).equalTo(0, 1));
 
     return Or.union(
       And.cross(firstCollection.isEmpty(), secondCollection.isEmpty()),
-      Equals.cross(distinctFirstGraphCount, matchingIdCount)
+      Equals.cross(firstLabelCount, matchingLabelCount)
     );
   }
 

@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -11,7 +10,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.bool.Or;
-import org.gradoop.model.impl.functions.counting.Tuple1With1L;
+import org.gradoop.model.impl.operators.count.Count;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -38,15 +37,14 @@ public class EqualityByGraphIds
     DataSet<Tuple2<GradoopId, Long>> secondGraphIdsWithCount =
       getIdsWithCount(secondCollection);
 
-    DataSet<Tuple1<Long>> distinctFirstIdCount = firstGraphIdsWithCount
-      .map(new Tuple1With1L<Tuple2<GradoopId, Long>>())
-      .sum(0);
+    DataSet<Long> distinctFirstIdCount = Count
+      .count(firstGraphIdsWithCount);
 
-    DataSet<Tuple1<Long>> matchingIdCount = firstGraphIdsWithCount
-      .join(secondGraphIdsWithCount)
-      .where(0, 1).equalTo(0, 1)
-      .with(new Tuple1With1L<Tuple2<GradoopId, Long>>())
-      .sum(0);
+    DataSet<Long> matchingIdCount = Count.count(
+      firstGraphIdsWithCount
+        .join(secondGraphIdsWithCount)
+        .where(0, 1).equalTo(0, 1)
+    );
 
     return Or.union(
       And.cross(firstCollection.isEmpty(), secondCollection.isEmpty()),

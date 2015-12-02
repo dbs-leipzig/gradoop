@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.functions.counting;
+package org.gradoop.model.impl.operators.count;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;

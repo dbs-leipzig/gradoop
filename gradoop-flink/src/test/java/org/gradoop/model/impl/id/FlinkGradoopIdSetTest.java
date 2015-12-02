@@ -4,10 +4,8 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.functions.bool.Equals;
-import org.gradoop.model.impl.functions.counting.Tuple1With1L;
+import org.gradoop.model.impl.operators.count.Count;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -49,13 +47,9 @@ public class FlinkGradoopIdSetTest extends GradoopFlinkTestBase {
     DataSet<Tuple1<GradoopIdSet>> ds3 = env
       .fromElements(new Tuple1<>(set3));
 
-    ds1.cross(ds3).with(new Equals<Tuple1<GradoopIdSet>>()).print();
-
-
     assertCount("self join", ds1, ds1, 1L);
     assertCount("same elements and same order join", ds1, ds2, 1L);
     assertCount("same elements shuffled join", ds1, ds3, 1L);
-
   }
 
   private <T> void assertCount(
@@ -65,21 +59,17 @@ public class FlinkGradoopIdSetTest extends GradoopFlinkTestBase {
     Long expectedCount
   ) throws Exception {
 
-    List<Tuple1<Long>> joinCountTupleList = ds1
+    List<Long> joinCountTupleList = Count.count(ds1
       .join(ds2)
       .where(0).equalTo(0)
-      .map(new Tuple1With1L<Tuple2<Tuple1<T>, Tuple1<T>>>())
-      .sum(0)
+    )
     .collect();
 
     Long joinCount = joinCountTupleList.isEmpty() ?
       0 :
-      joinCountTupleList.get(0).f0;
+      joinCountTupleList.get(0);
 
     assertEquals(message, joinCount, expectedCount);
   }
-
-
-
 
 }
