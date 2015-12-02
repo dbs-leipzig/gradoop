@@ -25,6 +25,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 
 /**
@@ -74,6 +75,19 @@ public class FlinkAsciiGraphLoader<
       throw new IllegalArgumentException("AsciiGraph must not be null");
     }
     loader = AsciiGraphLoader.fromString(asciiGraphs, config);
+  }
+
+  /**
+   * Initializes the database from the given ASCII GDL stream.
+   *
+   * @param stream GDL stream
+   * @throws IOException
+   */
+  public void initDatabaseFromStream(InputStream stream) throws IOException {
+    if (stream == null) {
+      throw new IllegalArgumentException("AsciiGraph must not be null");
+    }
+    loader = AsciiGraphLoader.fromStream(stream, config);
   }
 
   /**

@@ -35,6 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
@@ -98,10 +99,9 @@ public class GradoopTestUtils {
     GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
       GradoopConfig.getDefaultConfig();
 
-    String fileName =
-      GradoopTestUtils.class.getResource(SOCIAL_NETWORK_GDL_FILE).getFile();
-
-    return AsciiGraphLoader.fromFile(fileName, config);
+    InputStream inputStream =
+      GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
+    return AsciiGraphLoader.fromStream(inputStream, config);
   }
 
   /**

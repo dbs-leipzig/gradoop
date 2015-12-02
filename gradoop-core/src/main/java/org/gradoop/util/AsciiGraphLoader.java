@@ -34,6 +34,7 @@ import org.s1ck.gdl.model.GraphElement;
 import org.s1ck.gdl.model.Vertex;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -128,9 +129,10 @@ public class AsciiGraphLoader
    *
    * @param asciiGraph  GDL string
    * @param config      Gradoop configuration
+   * @param <G>         EPGM graph type
    * @param <V>         EPGM vertex type
    * @param <E>         EPGM edge type
-   * @param <G>         EPGM graph type
+   *
    * @return AsciiGraphLoader
    */
   public static
@@ -150,9 +152,10 @@ public class AsciiGraphLoader
    *
    * @param fileName  File that contains a GDL script
    * @param config    Gradoop configuration
+   * @param <G>       EPGM graph type
    * @param <V>       EPGM vertex type
    * @param <E>       EPGM edge type
-   * @param <G>       EPGM graph type
+   *
    * @return AsciiGraphLoader
    * @throws IOException
    */
@@ -160,14 +163,35 @@ public class AsciiGraphLoader
   <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
   AsciiGraphLoader<G, V, E> fromFile(String fileName,
     GradoopConfig<G, V, E> config) throws IOException {
-
-    System.out.println("*** loading from file ***");
-    System.out.println(fileName);
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
       .buildFromFile(fileName),
+      config);
+  }
+
+  /**
+   * Creates an AsciiGraphLoader from the given ASCII GDL file.
+   *
+   * @param inputStream   File that contains a GDL script
+   * @param config        Gradoop configuration
+   * @param <G>           EPGM graph type
+   * @param <V>           EPGM vertex type
+   * @param <E>           EPGM edge type
+   *
+   * @return AsciiGraphLoader
+   * @throws IOException
+   */
+  public static
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+  AsciiGraphLoader<G, V, E> fromStream(InputStream inputStream,
+    GradoopConfig<G, V, E> config) throws IOException {
+    return new AsciiGraphLoader<>(new GDLHandler.Builder()
+      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .buildFromStream(inputStream),
       config);
   }
 

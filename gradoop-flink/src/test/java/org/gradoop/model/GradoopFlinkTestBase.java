@@ -37,6 +37,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -159,6 +160,16 @@ public abstract class GradoopFlinkTestBase {
     return loader;
   }
 
+  protected FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+  getLoaderFromStream(
+    InputStream inputStream) throws IOException {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+      loader = getNewLoader();
+
+    loader.initDatabaseFromStream(inputStream);
+    return loader;
+  }
+
   /**
    * Creates a social network as a basis for tests.
    * <p/>
@@ -170,7 +181,9 @@ public abstract class GradoopFlinkTestBase {
   protected FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
   getSocialNetworkLoader() throws
     IOException {
-    return getLoaderFromFile(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
+    InputStream inputStream = getClass()
+      .getResourceAsStream(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
+    return getLoaderFromStream(inputStream);
   }
 
   /**
