@@ -202,7 +202,7 @@
                         <excludes>
                             <exclude>**/*TestBase*.class</exclude>
                         </excludes>
-                        <argLine>-Xmx512M -Dlog4j.configuration=${log4j.properties}</argLine>
+                        <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
                     </configuration>
                 </plugin>
             </plugins>
