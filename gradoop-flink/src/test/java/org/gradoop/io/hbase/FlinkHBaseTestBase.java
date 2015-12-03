@@ -8,7 +8,7 @@ import org.junit.BeforeClass;
 /**
  * Used for tests that require a HBase and Flink cluster up and running.
  */
-public class FlinkHBaseTestBase {
+public class FlinkHBaseTestBase extends GradoopFlinkTestBase {
 
   /**
    * Start Flink and HBase cluster.
@@ -27,7 +27,7 @@ public class FlinkHBaseTestBase {
    * @throws Exception
    */
   @AfterClass
-  public static void teardown() throws Exception {
+  public static void tearDown() throws Exception {
     GradoopFlinkTestBase.tearDown();
     GradoopHBaseTestBase.tearDown();
   }

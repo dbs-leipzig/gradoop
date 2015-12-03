@@ -11,9 +11,8 @@ import java.io.Serializable;
  * @param <G>   EPGM graph head type
  * @param <PG>  Persistent graph head type
  */
-public interface PersistentGraphHeadFactory<
-  G extends EPGMGraphHead,
-  PG extends PersistentGraphHead>
+public interface PersistentGraphHeadFactory
+  <G extends EPGMGraphHead, PG extends PersistentGraphHead>
   extends Serializable {
 
   /**

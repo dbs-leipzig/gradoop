@@ -35,17 +35,16 @@
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Vertex;
-import org.gradoop.io.hbase.HBaseReader;
 import org.gradoop.io.hbase.HBaseWriter;
+import org.gradoop.io.hbase.inputformats.EdgeTableInputFormat;
+import org.gradoop.io.hbase.inputformats.GraphHeadTableInputFormat;
+import org.gradoop.io.hbase.inputformats.VertexTableInputFormat;
 import org.gradoop.io.json.JsonReader.JsonToEdgeMapper;
 import org.gradoop.io.json.JsonReader.JsonToGraphHeadMapper;
 import org.gradoop.io.json.JsonReader.JsonToVertexMapper;
@@ -53,6 +52,7 @@ import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.functions.tuple.ValueOfTuple1;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
@@ -60,7 +60,6 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojoFactory;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
-import org.gradoop.model.impl.tuples.Subgraph;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentEdgeFactory;
@@ -292,10 +291,10 @@ public class EPGMDatabase<
     PV extends PersistentVertex<E>,
     PE extends PersistentEdge<V>> void writeToHBase(
     EPGMStore<G, V, E> epgmStore,
+    final PersistentGraphHeadFactory<G, PG> persistentGraphHeadFactory,
     final PersistentVertexFactory<V, E, PV> persistentVertexFactory,
-    final PersistentEdgeFactory<V, E, PE> persistentEdgeFactory,
-    final PersistentGraphHeadFactory<G, PG> persistentGraphHeadFactory) throws
-    Exception {
+    final PersistentEdgeFactory<V, E, PE> persistentEdgeFactory)
+      throws Exception {
 
     HBaseWriter<G, V, E> hBaseWriter = new HBaseWriter<>();
 
@@ -428,10 +427,10 @@ public class EPGMDatabase<
    * Creates an EPGM database from an EPGM Store using the given arguments.
    *
    * @param epgmStore EPGM store
-   * @param env       Flink execution environment
    * @param <G>       graph data type
    * @param <V>       vertex data type
    * @param <E>       edge data type
+   * @param config Gradoop Flink configuration
    * @return EPGM database
    */
   @SuppressWarnings("unchecked")
@@ -439,59 +438,45 @@ public class EPGMDatabase<
     G extends EPGMGraphHead,
     V extends EPGMVertex,
     E extends EPGMEdge> EPGMDatabase<G, V, E> fromHBase(
-    EPGMStore<G, V, E> epgmStore, ExecutionEnvironment env) {
+    EPGMStore<G, V, E> epgmStore, GradoopFlinkConfig<G, V, E> config) {
 
-    GradoopConfig<G, V, E> conf = epgmStore.getConfig();
-    // used for type hinting when loading vertex data
-    TypeInformation<Vertex<GradoopId, V>> vertexTypeInfo =
-      new TupleTypeInfo(Vertex.class, BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(
-          epgmStore.getConfig().getVertexFactory().getType()));
-    // used for type hinting when loading edge data
-    TypeInformation<Edge<GradoopId, E>> edgeTypeInfo =
-      new TupleTypeInfo(Edge.class, BasicTypeInfo.LONG_TYPE_INFO,
-        BasicTypeInfo.LONG_TYPE_INFO, TypeExtractor.createTypeInfo(
-          conf.getEdgeHandler().getEdgeFactory().getType()));
     // used for type hinting when loading graph data
-    TypeInformation<Subgraph<GradoopId, G>> graphTypeInfo =
-      new TupleTypeInfo(Subgraph.class, BasicTypeInfo.LONG_TYPE_INFO,
-        TypeExtractor.createTypeInfo(
-          conf.getGraphHeadHandler().getGraphHeadFactory().getType()));
+    TypeInformation<Tuple1<G>> graphTypeInfo = new TupleTypeInfo(
+      Tuple1.class,
+      TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType()));
 
-    DataSet<Vertex<GradoopId, V>> vertexDataSet = env.createInput(
-      new HBaseReader.VertexTableInputFormat<>(
-        conf.getVertexHandler(), epgmStore.getVertexTableName()),
-      vertexTypeInfo);
+    // used for type hinting when loading vertex data
+    TypeInformation<Tuple1<V>> vertexTypeInfo = new TupleTypeInfo(
+      Tuple1.class,
+      TypeExtractor.createTypeInfo(config.getVertexFactory().getType()));
 
-    DataSet<Edge<GradoopId, E>> edgeDataSet = env.createInput(
-      new HBaseReader.EdgeTableInputFormat<>(conf.getEdgeHandler(),
-        epgmStore.getEdgeTableName()), edgeTypeInfo);
+    // used for type hinting when loading edge data
+    TypeInformation<Tuple1<E>> edgeTypeInfo = new TupleTypeInfo(
+      Tuple1.class,
+      TypeExtractor.createTypeInfo(config.getEdgeFactory().getType()));
 
-    DataSet<Subgraph<GradoopId, G>> subgraphDataSet = env.createInput(
-      new HBaseReader.GraphHeadTableInputFormat<>(
-        conf.getGraphHeadHandler(), epgmStore.getGraphHeadName()),
-      graphTypeInfo);
+
+    DataSet<Tuple1<G>> graphHeads = config.getExecutionEnvironment()
+      .createInput(
+        new GraphHeadTableInputFormat<>(
+          config.getGraphHeadHandler(), epgmStore.getGraphHeadName()),
+        graphTypeInfo);
+
+    DataSet<Tuple1<V>> vertices = config.getExecutionEnvironment()
+      .createInput(new VertexTableInputFormat<>(
+        config.getVertexHandler(), epgmStore.getVertexTableName()),
+        vertexTypeInfo);
+
+    DataSet<Tuple1<E>> edges = config.getExecutionEnvironment().createInput(
+      new EdgeTableInputFormat<>(
+        config.getEdgeHandler(), epgmStore.getEdgeTableName()),
+      edgeTypeInfo);
 
     return new EPGMDatabase<>(
-      subgraphDataSet.map(new MapFunction<Subgraph<GradoopId, G>, G>() {
-        @Override
-        public G map(Subgraph<GradoopId, G> longGDSubgraph) throws Exception {
-          return longGDSubgraph.getValue();
-        }
-      }).withForwardedFields("f1->*"),
-      vertexDataSet.map(new MapFunction<Vertex<GradoopId, V>, V>() {
-        @Override
-        public V map(Vertex<GradoopId, V> longVDVertex) throws Exception {
-          return longVDVertex.getValue();
-        }
-      }).withForwardedFields("f1->*"),
-      edgeDataSet.map(new MapFunction<Edge<GradoopId, E>, E>() {
-        @Override
-        public E map(Edge<GradoopId, E> longEDEdge) throws Exception {
-          return longEDEdge.getValue();
-        }
-      }).withForwardedFields("f2->*"),
-      GradoopFlinkConfig.createConfig(conf, env));
+      graphHeads.map(new ValueOfTuple1<G>()),
+      vertices.map(new ValueOfTuple1<V>()),
+      edges.map(new ValueOfTuple1<E>()),
+      config);
   }
 
   /**

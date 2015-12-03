@@ -43,8 +43,6 @@ public class HBaseVertexFactory
   public HBaseVertex createVertex(VertexPojo inputVertex,
     Set<EdgePojo> outgoingEdges, Set<EdgePojo> incomingEdges) {
     checkNotNull(inputVertex, "Input vertex was null");
-    checkNotNull(outgoingEdges, "Outgoing edges were null");
-    checkNotNull(incomingEdges, "Incoming edges were null");
     return new HBaseVertex(inputVertex, outgoingEdges, incomingEdges);
   }
 }

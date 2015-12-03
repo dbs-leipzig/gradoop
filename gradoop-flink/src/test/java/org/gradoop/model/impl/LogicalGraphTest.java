@@ -19,7 +19,6 @@ package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.GradoopTestUtils;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.EPGMVertex;

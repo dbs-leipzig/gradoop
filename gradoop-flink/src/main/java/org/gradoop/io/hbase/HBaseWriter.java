@@ -17,23 +17,23 @@
 
 package org.gradoop.io.hbase;
 
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.hadoop.mapreduce.HadoopOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.apache.hadoop.hbase.client.Mutation;
-import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
+import org.gradoop.io.hbase.functions.EdgeSetBySourceId;
+import org.gradoop.io.hbase.functions.EdgeSetByTargetId;
+import org.gradoop.io.hbase.functions.BuildPersistentEdge;
+import org.gradoop.io.hbase.functions.BuildPersistentGraphHead;
+import org.gradoop.io.hbase.functions.BuildPersistentVertex;
+import org.gradoop.io.hbase.functions.BuildEdgeMutation;
+import org.gradoop.io.hbase.functions.BuildGraphHeadMutation;
+import org.gradoop.io.hbase.functions.BuildVertexMutation;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -59,7 +59,8 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Contains methods and classes to write an EPGM database to HBase.
+ * Converts runtime representation of EPGM elements into persistent
+ * representations and writes them to HBase.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -74,11 +75,11 @@ public class HBaseWriter<
    * Converts runtime vertex data to persistent vertex data (includes
    * incoming and outgoing edge data) and writes it to HBase.
    *
-   * @param epgmDatabase                EPGM database instance
+   * @param epgmDatabase            EPGM database instance
    * @param vertexHandler           vertex data handler
    * @param persistentVertexFactory persistent vertex data factory
-   * @param vertexDataTableName         HBase vertex data table name
-   * @param <PVD>                       persistent vertex data type
+   * @param vertexDataTableName     HBase vertex data table name
+   * @param <PVD>                   persistent vertex data type
    * @throws Exception
    */
   public <PVD extends PersistentVertex<E>> void writeVertices(
@@ -89,91 +90,48 @@ public class HBaseWriter<
 
     final LogicalGraph<G, V, E> graph = epgmDatabase.getDatabaseGraph();
 
-    // group edges by source vertex id (vertex-id, [out-edge-data])
-    DataSet<Tuple2<GradoopId, Set<E>>> vertexToOutgoingEdges = graph.getEdges()
-      .groupBy(new SourceId<E>())
-      .reduceGroup(new GroupReduceFunction<E, Tuple2<GradoopId, Set<E>>>() {
+    // group edges by source vertex id (vertex-id, [out-edge])
+    DataSet<Tuple2<GradoopId, Set<E>>> vertexToOutgoingEdges =
+      graph.getEdges()
+        .groupBy(new SourceId<E>())
+        .reduceGroup(new EdgeSetBySourceId<E>());
+
+    // group edges by target vertex id (vertex-id, [in-edge])
+    DataSet<Tuple2<GradoopId, Set<E>>> vertexToIncomingEdges =
+      graph.getEdges()
+        .groupBy(new TargetId<E>())
+        .reduceGroup(new EdgeSetByTargetId<E>());
+
+    // co-group (vertex-data) with (vertex-id, [out-edge])
+    DataSet<Tuple2<V, Set<E>>> vertexDataWithOutgoingEdges = graph.getVertices()
+      .coGroup(vertexToOutgoingEdges)
+      .where(new Id<V>()).equalTo(0)
+      .with(new CoGroupFunction
+        <V, Tuple2<GradoopId, Set<E>>, Tuple2<V, Set<E>>>() {
+
         @Override
-        public void reduce(Iterable<E> edgeIterable,
-          Collector<Tuple2<GradoopId, Set<E>>> collector) throws Exception {
-          Set<E> outgoingEdgeData = Sets.newHashSet();
-          GradoopId vertexId = null;
-          boolean initialized = false;
-          for (E edge : edgeIterable) {
-            if (!initialized) {
-              vertexId = edge.getSourceId();
-              initialized = true;
-            }
-            outgoingEdgeData.add(edge);
+        public void coGroup(Iterable<V> vertexIterable,
+          Iterable<Tuple2<GradoopId, Set<E>>> outEdgesIterable,
+          Collector<Tuple2<V, Set<E>>> collector) throws Exception {
+          // read vertex from left group
+          V vertex = vertexIterable.iterator().next();
+          Set<E> outgoingEdgeData = null;
+
+          // read outgoing edge from right group (may be empty)
+          for (Tuple2<GradoopId, Set<E>> oEdges : outEdgesIterable) {
+            outgoingEdgeData = oEdges.f1;
           }
-          collector.collect(new Tuple2<>(vertexId, outgoingEdgeData));
+          collector.collect(new Tuple2<>(vertex, outgoingEdgeData));
         }
       });
 
-    // group edges by target vertex id (vertex-id, [in-edge-data])
-    DataSet<Tuple2<GradoopId, Set<E>>> vertexToIncomingEdges = graph.getEdges()
-      .groupBy(new TargetId<E>())
-      .reduceGroup(new GroupReduceFunction<E, Tuple2<GradoopId, Set<E>>>() {
-        @Override
-        public void reduce(Iterable<E> edgeIterable,
-          Collector<Tuple2<GradoopId, Set<E>>> collector) throws Exception {
-          Set<E> outgoingEdgeData = Sets.newHashSet();
-          GradoopId vertexId = null;
-          boolean initialized = false;
-          for (E edge : edgeIterable) {
-            if (!initialized) {
-              vertexId = edge.getTargetId();
-              initialized = true;
-            }
-            outgoingEdgeData.add(edge);
-          }
-          collector.collect(new Tuple2<>(vertexId, outgoingEdgeData));
-        }
-      });
-
-    // co-group (vertex-data) with (vertex-id, [out-edge-data]) to simulate left
-    // outer join
-    DataSet<Tuple2<V, Set<E>>> vertexDataWithOutgoingEdges =
-      graph.getVertices()
-        .coGroup(vertexToOutgoingEdges)
-        .where("id")
-        .equalTo(0)
-        .with(
-          new CoGroupFunction<V, Tuple2<GradoopId, Set<E>>,
-            Tuple2<V, Set<E>>>() {
-            @Override
-            public void coGroup(Iterable<V> vertexIterable,
-              Iterable<Tuple2<GradoopId, Set<E>>> outEdgesIterable,
-              Collector<Tuple2<V, Set<E>>> collector) throws
-              Exception {
-              V vertex = null;
-              Set<E> outgoingEdgeData = null;
-              // read vertex data from left group
-              for (V v : vertexIterable) {
-                vertex = v;
-              }
-              // read outgoing edge from right group (may be empty)
-              for (Tuple2<GradoopId, Set<E>> oEdges : outEdgesIterable) {
-                outgoingEdgeData = oEdges.f1;
-              }
-              collector.collect(new Tuple2<>(vertex, outgoingEdgeData));
-            }
-          });
-
-    // co-group (vertex-data, (vertex-id, [out-edge-data])) with (vertex-id,
-    // [in-edge-data]) to simulate left outer join
+    // co-group
+    // (vertex, (vertex-id, [out-edge])) with (vertex-id, [in-edge])
     DataSet<PersistentVertex<E>> persistentVertexDataSet =
       vertexDataWithOutgoingEdges
         .coGroup(vertexToIncomingEdges)
-        .where(new KeySelector<Tuple2<V, Set<E>>, GradoopId>() {
-          @Override
-          public GradoopId getKey(Tuple2<V, Set<E>> vdSetTuple2
-          ) throws Exception {
-            return vdSetTuple2.f0.getId();
-          }
-        })
-        .equalTo(0)
-        .with(new PersistentVertexCoGroupFunction<>(persistentVertexFactory));
+        .where("f0.id").equalTo(0)
+        .with(new BuildPersistentVertex<>(persistentVertexFactory));
 
     // write (persistent-vertex-data) to HBase table
     Job job = Job.getInstance();
@@ -181,8 +139,8 @@ public class HBaseWriter<
       .set(TableOutputFormat.OUTPUT_TABLE, vertexDataTableName);
 
     persistentVertexDataSet
-      .map(new VertexToHBaseMapper<>(vertexHandler)).
-      output(
+      .map(new BuildVertexMutation<>(vertexHandler))
+      .output(
         new HadoopOutputFormat<>(new TableOutputFormat<GradoopId>(), job));
   }
 
@@ -212,10 +170,10 @@ public class HBaseWriter<
       .equalTo(new SourceId<E>())
       // join result with vertices on edge target vertex id
       .join(graph.getVertices())
-      .where("f1.targetVertexId")
+      .where("f1.targetId")
       .equalTo(new Id<V>())
       // ((source-vertex-data, edge-data), target-vertex-data)
-      .with(new PersistentEdgeJoinFunction<>(persistentEdgeFactory));
+      .with(new BuildPersistentEdge<>(persistentEdgeFactory));
 
     // write (persistent-edge-data) to HBase table
     Job job = Job.getInstance();
@@ -223,8 +181,8 @@ public class HBaseWriter<
       .set(TableOutputFormat.OUTPUT_TABLE, edgeDataTableName);
 
     persistentEdgeDataSet
-      .map(new EdgeToHBaseMapper<>(edgeHandler)).
-      output(
+      .map(new BuildEdgeMutation<>(edgeHandler))
+      .output(
         new HadoopOutputFormat<>(new TableOutputFormat<GradoopId>(), job));
   }
 
@@ -327,10 +285,9 @@ public class HBaseWriter<
     DataSet<PersistentGraphHead> persistentGraphDataSet =
       graphToVertexIdsAndEdgeIds
         .join(epgmDatabase.getCollection().getGraphHeads())
-        .where(0)
-        .equalTo("id")
+        .where(0).equalTo(new Id<G>())
         .with(
-          new PersistentGraphHeadJoinFunction<>(persistentGraphHeadFactory));
+          new BuildPersistentGraphHead<>(persistentGraphHeadFactory));
 
     // write (persistent-graph-data) to HBase table
     Job job = Job.getInstance();
@@ -338,320 +295,8 @@ public class HBaseWriter<
       .set(TableOutputFormat.OUTPUT_TABLE, graphDataTableName);
 
     persistentGraphDataSet
-      .map(new GraphHeadToHBaseMapper<>(graphHeadHandler)).
+      .map(new BuildGraphHeadMutation<>(graphHeadHandler)).
       output(
         new HadoopOutputFormat<>(new TableOutputFormat<GradoopId>(), job));
-  }
-
-  /**
-   * Used to create persistent vertex data from vertex data and
-   * outgoing/incoming edge data.
-   *
-   * @param <VD>  EPGM vertex type
-   * @param <ED>  EPGM edge type
-   * @param <PVD> EPGM persistent vertex type
-   */
-  public static class PersistentVertexCoGroupFunction<VD extends EPGMVertex,
-    ED extends EPGMEdge, PVD extends PersistentVertex<ED>> implements
-    CoGroupFunction<Tuple2<VD, Set<ED>>, Tuple2<GradoopId, Set<ED>>,
-      PersistentVertex<ED>> {
-
-    /**
-     * Persistent vertex data factory.
-     */
-    private final PersistentVertexFactory<VD, ED, PVD> vertexFactory;
-
-    /**
-     * Creates co group function.
-     *
-     * @param vertexFactory persistent vertex data factory
-     */
-    public PersistentVertexCoGroupFunction(
-      PersistentVertexFactory<VD, ED, PVD> vertexFactory) {
-      this.vertexFactory = vertexFactory;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void coGroup(Iterable<Tuple2<VD, Set<ED>>> iterable,
-      Iterable<Tuple2<GradoopId, Set<ED>>> iterable1,
-      Collector<PersistentVertex<ED>> collector) throws Exception {
-      VD vertex = null;
-      Set<ED> outgoingEdgeData = null;
-      Set<ED> incomingEdgeData = null;
-      for (Tuple2<VD, Set<ED>> left : iterable) {
-        vertex = left.f0;
-        outgoingEdgeData = left.f1;
-      }
-      for (Tuple2<GradoopId, Set<ED>> right : iterable1) {
-        incomingEdgeData = right.f1;
-      }
-      assert vertex != null;
-      collector.collect(vertexFactory
-        .createVertex(vertex, outgoingEdgeData, incomingEdgeData));
-    }
-  }
-
-  /**
-   * Creates persistent edge data objects from edge data and source/target
-   * vertex data
-   *
-   * @param <ED>  EPGM edge type
-   * @param <VD>  EPGM vertex type
-   * @param <PED> EPGM persistent edge type
-   */
-  public static class PersistentEdgeJoinFunction<
-    VD extends EPGMVertex,
-    ED extends EPGMEdge,
-    PED extends PersistentEdge<VD>>
-    implements JoinFunction<Tuple2<VD, ED>, VD, PersistentEdge<VD>> {
-
-    /**
-     * Persistent edge data factory.
-     */
-    private final PersistentEdgeFactory<VD, ED, PED> edgeFactory;
-
-    /**
-     * Creates join function
-     *
-     * @param edgeFactory persistent edge data factory.
-     */
-    public PersistentEdgeJoinFunction(
-      PersistentEdgeFactory<VD, ED, PED> edgeFactory) {
-      this.edgeFactory = edgeFactory;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PersistentEdge<VD> join(
-      Tuple2<VD, ED> sourceVertexAndEdge, VD targetVertex) throws Exception {
-      return edgeFactory.createEdge(sourceVertexAndEdge.f1,
-        sourceVertexAndEdge.f0, targetVertex);
-    }
-  }
-
-  /**
-   * Creates persistent graph data from graph data and vertex/edge identifiers.
-   *
-   * @param <GD>  EPGM graph head type
-   * @param <PGD> EPGM persistent graph head type
-   */
-  public static class PersistentGraphHeadJoinFunction<GD extends EPGMGraphHead,
-    PGD extends PersistentGraphHead> implements JoinFunction
-    <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, GD, PersistentGraphHead> {
-
-    /**
-     * Persistent graph data factory.
-     */
-    private PersistentGraphHeadFactory<GD, PGD> graphHeadFactory;
-
-    /**
-     * Creates join function.
-     *
-     * @param graphHeadFactory persistent graph data factory
-     */
-    public PersistentGraphHeadJoinFunction(
-      PersistentGraphHeadFactory<GD, PGD> graphHeadFactory) {
-      this.graphHeadFactory = graphHeadFactory;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PersistentGraphHead join(
-      Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> longSetSetTuple3,
-      GD graphHead) throws Exception {
-      return graphHeadFactory.createGraphHead(graphHead, longSetSetTuple3.f1,
-        longSetSetTuple3.f2);
-    }
-  }
-
-  /**
-   * Creates HBase {@link Mutation} from persistent graph data using graph
-   * data handler.
-   *
-   * @param <GD>  EPGM graph head type
-   * @param <PGD> EPGM persistent graph type
-   */
-  public static class GraphHeadToHBaseMapper<GD extends EPGMGraphHead, PGD
-    extends PersistentGraphHead> extends
-    RichMapFunction<PGD, Tuple2<GradoopId, Mutation>> {
-
-    /**
-     * Serial version uid.
-     */
-    private static final long serialVersionUID = 42L;
-
-    /**
-     * Reusable tuple for each writer.
-     */
-    private transient Tuple2<GradoopId, Mutation> reuseTuple;
-
-    /**
-     * Graph data handler to create Mutations.
-     */
-    private final GraphHeadHandler<GD> graphHeadHandler;
-
-    /**
-     * Creates rich map function.
-     *
-     * @param graphHeadHandler graph data handler
-     */
-    public GraphHeadToHBaseMapper(GraphHeadHandler<GD> graphHeadHandler) {
-      this.graphHeadHandler = graphHeadHandler;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void open(Configuration parameters) throws Exception {
-      super.open(parameters);
-      reuseTuple = new Tuple2<>();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tuple2<GradoopId, Mutation> map(PGD persistentGraphData) throws
-      Exception {
-      GradoopId key = persistentGraphData.getId();
-      Put put =
-        new Put(graphHeadHandler.getRowKey(persistentGraphData.getId()));
-      put = graphHeadHandler.writeGraphHead(put, persistentGraphData);
-
-      reuseTuple.f0 = key;
-      reuseTuple.f1 = put;
-      return reuseTuple;
-    }
-  }
-
-  /**
-   * Creates HBase {@link Mutation} from persistent vertex data using vertex
-   * data handler.
-   *
-   * @param <VD>  EPGM vertex type
-   * @param <ED>  EPGM edge type
-   * @param <PVD> EPGM persistent vertex type
-   */
-  public static class VertexToHBaseMapper<VD extends EPGMVertex, ED
-    extends EPGMEdge, PVD extends PersistentVertex<ED>> extends
-    RichMapFunction<PVD, Tuple2<GradoopId, Mutation>> {
-
-    /**
-     * Serial version uid.
-     */
-    private static final long serialVersionUID = 42L;
-
-    /**
-     * Reusable tuple for each writer.
-     */
-    private transient Tuple2<GradoopId, Mutation> reuseTuple;
-
-    /**
-     * Vertex data handler to create Mutations.
-     */
-    private final VertexHandler<VD, ED> vertexHandler;
-
-    /**
-     * Creates rich map function.
-     *
-     * @param vertexHandler vertex data handler
-     */
-    public VertexToHBaseMapper(VertexHandler<VD, ED> vertexHandler) {
-      this.vertexHandler = vertexHandler;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void open(Configuration parameters) throws Exception {
-      super.open(parameters);
-      reuseTuple = new Tuple2<>();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tuple2<GradoopId, Mutation> map(PVD persistentVertexData) throws
-      Exception {
-      GradoopId key = persistentVertexData.getId();
-      Put put =
-        new Put(vertexHandler.getRowKey(persistentVertexData.getId()));
-      put = vertexHandler.writeVertex(put, persistentVertexData);
-
-      reuseTuple.f0 = key;
-      reuseTuple.f1 = put;
-      return reuseTuple;
-    }
-  }
-
-  /**
-   * Creates HBase {@link Mutation} from persistent edge data using edge
-   * data handler.
-   *
-   * @param <ED>  EPGM edge type
-   * @param <VD>  EPGM vertex type
-   * @param <PED> EPGM persistent edge type
-   */
-  private static class EdgeToHBaseMapper
-    <ED extends EPGMEdge, VD extends EPGMVertex, PED extends PersistentEdge<VD>>
-    extends RichMapFunction<PED, Tuple2<GradoopId, Mutation>> {
-
-    /**
-     * Serial version uid.
-     */
-    private static final long serialVersionUID = 42L;
-
-    /**
-     * Reusable tuple for each writer.
-     */
-    private transient Tuple2<GradoopId, Mutation> reuseTuple;
-
-    /**
-     * Edge data handler to create Mutations.
-     */
-    private final EdgeHandler<VD, ED> edgeHandler;
-
-    /**
-     * Creates rich map function.
-     *
-     * @param edgeHandler edge data handler
-     */
-    public EdgeToHBaseMapper(EdgeHandler<VD, ED> edgeHandler) {
-      this.edgeHandler = edgeHandler;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tuple2<GradoopId, Mutation> map(PED persistentEdgeData) throws
-      Exception {
-      GradoopId key = persistentEdgeData.getId();
-      Put put = new Put(edgeHandler.getRowKey(persistentEdgeData.getId()));
-      put = edgeHandler.writeEdge(put, persistentEdgeData);
-
-      reuseTuple.f0 = key;
-      reuseTuple.f1 = put;
-      return reuseTuple;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void open(Configuration parameters) throws Exception {
-      super.open(parameters);
-      reuseTuple = new Tuple2<>();
-    }
   }
 }

@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains all classes related to HBase input and output to and from Flink.
+ * Contains InputFormats for EPGM elements.
  */
-package org.gradoop.io.hbase;
+package org.gradoop.io.hbase.inputformats;

@@ -1,149 +1,129 @@
-//
-///* * This file is part of Gradoop.
-// *
-// * Gradoop is free software: you can redistribute it and/or modify
-// * it under the terms of the GNU General Public License as published by
-// * the Free Software Foundation, either version 3 of the License, or
-// * (at your option) any later version.
-// *
-// * Gradoop is distributed in the hope that it will be useful,
-// * but WITHOUT ANY WARRANTY; without even the implied warranty of
-// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// * GNU General Public License for more details.
-// *
-// * You should have received a copy of the GNU General Public License
-// * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.*/
-//
-//
-//
-//package org.gradoop.io.hbase;
-//
-//import org.apache.flink.api.java.ExecutionEnvironment;
-//import org.gradoop.HBaseTestBase;
-//import org.gradoop.model.impl.EPGMDatabase;
-//import org.gradoop.io.json.EPGMDatabaseJSONTest;
-//import org.gradoop.model.impl.pojo.EdgePojo;
-//import org.gradoop.model.impl.pojo.GraphHeadPojo;
-//import org.gradoop.model.impl.pojo.VertexPojo;
-//import org.gradoop.storage.api.EPGMStore;
-//import org.gradoop.storage.api.PersistentEdge;
-//import org.gradoop.storage.api.PersistentGraphHead;
-//import org.gradoop.storage.api.PersistentVertex;
-//import org.gradoop.storage.impl.hbase.HBaseEdgeFactory;
-//import org.gradoop.storage.impl.hbase.HBaseGraphHeadFactory;
-//import org.gradoop.storage.impl.hbase.HBaseVertexFactory;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-//import org.junit.runners.Parameterized;
-//
-//import java.util.Iterator;
-//
-//import static org.gradoop.HBaseTestBase.*;
-//import static org.junit.Assert.assertEquals;
-//
-//@RunWith(Parameterized.class)
-//public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
-//
-//  public EPGMDatabaseHBaseTest(TestExecutionMode mode) {
-//    super(mode);
-//  }
-//
-//
-///*   * Writes persistent data using the {@link EPGMStore} and reads it via the
-//   * {@link EPGMDatabase}.
-//   *
-//   * @throws Exception*/
-//
-//
-//  @Test
-//  public void readFromHBaseTest() throws Exception {
-//    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> epgmStore =
-//      HBaseTestBase.createEmptyEPGMStore();
-//
-//    for (PersistentGraphHead graphData : createPersistentSocialGraphHead()) {
-//      epgmStore.writeGraphHead(graphData);
-//    }
-//    for (PersistentVertex<EdgePojo> vertexData :
-//      createPersistentSocialVertices()) {
-//      epgmStore.writeVertex(vertexData);
-//    }
-//    for (PersistentEdge<VertexPojo> edgeData :
-//      createPersistentSocialEdges()) {
-//      epgmStore.writeEdge(edgeData);
-//    }
-//
-//    epgmStore.flush();
-//
-//    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo>
-//      epgmDatabase = EPGMDatabase
-//      .fromHBase(epgmStore, ExecutionEnvironment.getExecutionEnvironment());
-//
-//    assertEquals("wrong graph count", 4,
-//      epgmDatabase.getCollection().getGraphCount());
-//    assertEquals("wrong vertex count", 11,
-//      epgmDatabase.getDatabaseGraph().getVertexCount());
-//    assertEquals("wrong edge count", 24,
-//      epgmDatabase.getDatabaseGraph().getEdgeCount());
-//
-//    epgmStore.close();
-//  }
-//
-//
-///*   * Reads data from JSON to {@link EPGMDatabase}, writes it to HBase, reads
-//   * it from {@link EPGMStore} and validates the counts.
-//   *
-//   * @throws Exception*/
-//
-//
-//  @Test
-//  public void writeToHBaseTest() throws Exception {
-//    // create empty EPGM store
-//    EPGMStore<VertexPojo, EdgePojo, GraphHeadPojo> epgmStore =
-//      createEmptyEPGMStore();
-//
-//    // read test data from json into EPGM database
-//    String vertexFile =
-//      EPGMDatabaseJSONTest.class.getResource("/data/sna_nodes").getFile();
-//    String edgeFile =
-//      EPGMDatabaseJSONTest.class.getResource("/data/sna_edges").getFile();
-//    String graphFile =
-//      EPGMDatabaseJSONTest.class.getResource("/data/sna_graphs").getFile();
-//
-//    EPGMDatabase<VertexPojo, EdgePojo, GraphHeadPojo> graphDB =
-//      EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
-//        ExecutionEnvironment.getExecutionEnvironment());
-//
-//    // write EPGM database to HBase
-//    graphDB.writeToHBase(epgmStore, new HBaseVertexFactory(),
-//      new HBaseEdgeFactory(),
-//      new HBaseGraphHeadFactory());
-//
-//    epgmStore.flush();
-//
-//    // check graph count
-//    int cnt = 0;
-//    for (Iterator<GraphHeadPojo> graphDataIterator =
-//         epgmStore.getGraphSpace(); graphDataIterator.hasNext(); ) {
-//      cnt++;
-//    }
-//    assertEquals("wrong graph count", 4, cnt);
-//
-//    // check edge count
-//    cnt = 0;
-//    for (Iterator<EdgePojo> edgeDataIterator =
-//         epgmStore.getEdgeSpace(); edgeDataIterator.hasNext(); ) {
-//      cnt++;
-//    }
-//    assertEquals("wrong edge count", 24, cnt);
-//
-//    // check vertex count
-//    cnt = 0;
-//    for (Iterator<VertexPojo> vertexDataIterator =
-//         epgmStore.getVertexSpace(); vertexDataIterator.hasNext(); ) {
-//      cnt++;
-//    }
-//    assertEquals("wrong vertex count", 11, cnt);
-//
-//    epgmStore.close();
-//  }
-//}
+package org.gradoop.io.hbase;
+
+import com.google.common.collect.Lists;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.storage.api.EPGMStore;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.impl.hbase.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;
+import org.gradoop.storage.impl.hbase.HBaseEdgeFactory;
+import org.gradoop.storage.impl.hbase.HBaseGraphHeadFactory;
+import org.gradoop.storage.impl.hbase.HBaseVertexFactory;
+import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.junit.Test;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import static org.gradoop.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentEdges;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentGraphHeads;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentVertices;
+
+public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
+
+  @Test
+  public void readFromHBaseTest() throws Exception {
+    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> epgmStore =
+      GradoopHBaseTestBase.createEmptyEPGMStore();
+
+    List<PersistentVertex<EdgePojo>> vertices =
+      Lists.newArrayList(getSocialPersistentVertices());
+    List<PersistentEdge<VertexPojo>> edges =
+      Lists.newArrayList(getSocialPersistentEdges());
+    List<PersistentGraphHead> graphHeads =
+      Lists.newArrayList(getSocialPersistentGraphHeads());
+
+    // store some data
+    for (PersistentGraphHead g : graphHeads) {
+      epgmStore.writeGraphHead(g);
+    }
+    for (PersistentVertex<EdgePojo> v : vertices) {
+      epgmStore.writeVertex(v);
+    }
+    for (PersistentEdge<VertexPojo> e : edges) {
+      epgmStore.writeEdge(e);
+    }
+
+    epgmStore.flush();
+
+    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
+      EPGMDatabase.fromHBase(epgmStore, getConfig());
+
+    Collection<GraphHeadPojo> loadedGraphHeads    = Lists.newArrayList();
+    Collection<VertexPojo>    loadedVertices      = Lists.newArrayList();
+    Collection<EdgePojo>      loadedEdges         = Lists.newArrayList();
+
+    epgmDatabase.getCollection().getGraphHeads()
+      .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
+    epgmDatabase.getDatabaseGraph().getVertices()
+      .output(new LocalCollectionOutputFormat<>(loadedVertices));
+    epgmDatabase.getDatabaseGraph().getEdges()
+      .output(new LocalCollectionOutputFormat<>(loadedEdges));
+
+    getExecutionEnvironment().execute();
+
+    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
+    validateEPGMElementCollections(vertices, loadedVertices);
+    validateEPGMGraphElementCollections(vertices, loadedVertices);
+    validateEPGMElementCollections(edges, loadedEdges);
+    validateEPGMGraphElementCollections(edges, loadedEdges);
+
+    epgmStore.close();
+  }
+
+  @Test
+  public void writeToHBaseTest() throws Exception {
+    // create empty EPGM store
+    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> epgmStore =
+      GradoopHBaseTestBase.createEmptyEPGMStore();
+
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+      loader = getSocialNetworkLoader();
+
+    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDB =
+      loader.getDatabase();
+
+    // write EPGM database to HBase
+    epgmDB.writeToHBase(epgmStore,
+      new HBaseGraphHeadFactory(),
+      new HBaseVertexFactory(),
+      new HBaseEdgeFactory());
+
+    epgmStore.flush();
+
+    // graph heads
+    validateEPGMElementCollections(
+      loader.getGraphHeads(),
+      Lists.newArrayList(epgmStore.getGraphSpace())
+    );
+    // vertices
+    validateEPGMElementCollections(
+      loader.getVertices(),
+      Lists.newArrayList(epgmStore.getVertexSpace())
+    );
+    validateEPGMGraphElementCollections(
+      loader.getVertices(),
+      Lists.newArrayList(epgmStore.getVertexSpace())
+    );
+    // edges
+    validateEPGMElementCollections(
+      loader.getEdges(),
+      Lists.newArrayList(epgmStore.getEdgeSpace())
+    );
+    validateEPGMGraphElementCollections(
+      loader.getEdges(),
+      Lists.newArrayList(epgmStore.getEdgeSpace())
+    );
+
+    epgmStore.close();
+  }
+}

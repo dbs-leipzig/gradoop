@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains tuple types used by all implementations.
+ * Contains Flink functions related to HBase.
  */
-package org.gradoop.model.impl.tuples;
+package org.gradoop.io.hbase.functions;
