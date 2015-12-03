@@ -52,9 +52,9 @@ public abstract class GradoopFlinkTestBase {
 
   protected static final int DEFAULT_PARALLELISM = 4;
 
-  protected static final long TASKMANAGER_MEMORY_SIZE_MB = 256L;
+  protected static final long TASKMANAGER_MEMORY_SIZE_MB = 200L;
 
-  protected static ForkableFlinkMiniCluster cluster = null;
+  protected static ForkableFlinkMiniCluster CLUSTER = null;
 
   /**
    * Flink Execution Environment
@@ -67,7 +67,7 @@ public abstract class GradoopFlinkTestBase {
   protected GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config;
 
   public GradoopFlinkTestBase() {
-    TestEnvironment testEnv = new TestEnvironment(cluster, DEFAULT_PARALLELISM);
+    TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM);
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
     testEnv.setAsContext();
     this.env = testEnv;
@@ -127,15 +127,14 @@ public abstract class GradoopFlinkTestBase {
     config.setString("akka.startup-timeout", "60 s");
     config.setInteger("jobmanager.web.port", 8081);
     config.setString("jobmanager.web.log.path", logFile.toString());
-    cluster =
+    CLUSTER =
       new ForkableFlinkMiniCluster(config, true, StreamingMode.BATCH_ONLY);
-    cluster.start();
+    CLUSTER.start();
   }
 
   @AfterClass
   public static void tearDown() throws Exception {
-    TestBaseUtils.stopCluster(
-      cluster, new FiniteDuration(1000, TimeUnit.SECONDS));
+    TestBaseUtils.stopCluster(CLUSTER, new FiniteDuration(1000, TimeUnit.SECONDS));
   }
 
   //----------------------------------------------------------------------------

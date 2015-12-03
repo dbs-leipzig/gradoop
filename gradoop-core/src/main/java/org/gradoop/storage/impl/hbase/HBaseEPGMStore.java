@@ -25,7 +25,6 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Writables;
-import org.gradoop.config.GradoopStoreConfig;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -49,18 +48,15 @@ import java.util.Iterator;
  * @param <G>   EPGM graph head type
  * @param <V>   EPGM vertex type
  * @param <E>   EPGM edge type
- * @param <PG>  persistent graph head type
- * @param <PV>  persistent vertex type
- * @param <PE>  persistent edge type
  */
 public class HBaseEPGMStore<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge,
-  PG extends PersistentGraphHead,
-  PV extends PersistentVertex<E>,
-  PE extends PersistentEdge<V>>
-  implements EPGMStore<G, V, E, PG, PV, PE> {
+  E extends EPGMEdge>
+  implements EPGMStore<G, V, E,
+  HBaseGraphHead,
+  HBaseVertex<E>,
+  HBaseEdge<V>> {
   /**
    * Default value for clearing buffer on fail.
    */
@@ -73,7 +69,7 @@ public class HBaseEPGMStore<
   /**
    * Gradoop configuration.
    */
-  private final GradoopHBaseConfig<G, V, E, PG, PV, PE> config;
+  private final GradoopHBaseConfig<G, V, E> config;
 
   /**
    * HBase table for storing graphs.
@@ -100,7 +96,7 @@ public class HBaseEPGMStore<
   HBaseEPGMStore(final HTable graphHeadTable,
     final HTable vertexTable,
     final HTable edgeTable,
-    final GradoopHBaseConfig<G, V, E, PG, PV, PE> config) {
+    final GradoopHBaseConfig<G, V, E> config) {
     this.graphHeadTable = Preconditions.checkNotNull(graphHeadTable);
     this.vertexTable = Preconditions.checkNotNull(vertexTable);
     this.edgeTable = Preconditions.checkNotNull(edgeTable);
@@ -118,7 +114,7 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public GradoopStoreConfig<G, V, E, PG, PV, PE> getConfig() {
+  public GradoopHBaseConfig<G, V, E> getConfig() {
     return config;
   }
 

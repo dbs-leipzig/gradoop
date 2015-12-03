@@ -41,7 +41,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.config.GradoopStoreConfig;
 import org.gradoop.io.hbase.HBaseWriter;
 import org.gradoop.io.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.io.hbase.inputformats.GraphHeadTableInputFormat;
@@ -65,6 +64,8 @@ import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.impl.hbase.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.util.GConstants;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -275,22 +276,14 @@ public class EPGMDatabase<
    * HBase tables must be created before calling this method.
    *
    * @param epgmStore EPGM store to handle HBase
-   * @param <PG>      persistent graph head type
-   * @param <PV>      persistent vertex type
-   * @param <PE>      persistent edge type
    *
    * @throws Exception
    */
-  public <
-    PG extends PersistentGraphHead,
-    PV extends PersistentVertex<E>,
-    PE extends PersistentEdge<V>> void writeToHBase(
-    EPGMStore<G, V, E, PG, PV, PE> epgmStore)
-      throws Exception {
+  public void writeToHBase(HBaseEPGMStore<G, V, E> epgmStore) throws Exception {
 
     HBaseWriter<G, V, E> hBaseWriter = new HBaseWriter<>();
 
-    GradoopStoreConfig<G, V, E, PG, PV, PE> conf = epgmStore.getConfig();
+    GradoopHBaseConfig<G, V, E> conf = epgmStore.getConfig();
     // transform graph data to persistent graph data and write it
     hBaseWriter.writeGraphHeads(this, conf.getGraphHeadHandler(),
       conf.getPersistentGraphHeadFactory(), epgmStore.getGraphHeadName());

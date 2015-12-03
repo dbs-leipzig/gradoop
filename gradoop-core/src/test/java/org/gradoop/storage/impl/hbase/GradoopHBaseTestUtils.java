@@ -131,8 +131,8 @@ public class GradoopHBaseTestUtils {
 
   private static List<PersistentEdge<VertexPojo>> getPersistentEdges(
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) {
-    PersistentEdgeFactory<VertexPojo, EdgePojo, HBaseEdge>
-      edgeDataFactory = new HBaseEdgeFactory();
+    PersistentEdgeFactory<VertexPojo, EdgePojo, HBaseEdge<VertexPojo>>
+      edgeDataFactory = new HBaseEdgeFactory<>();
 
     List<PersistentEdge<VertexPojo>> persistentEdgeData = new ArrayList<>();
 

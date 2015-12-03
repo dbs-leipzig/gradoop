@@ -30,7 +30,6 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
 import org.gradoop.model.impl.properties.PropertyList;
-import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentVertex;
@@ -57,8 +56,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @Test
   public void writeCloseOpenReadTest() {
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore =
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore =
       createEmptyEPGMStore();
 
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
@@ -89,8 +87,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @Test
   public void writeFlushReadTest() {
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore =
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore =
       createEmptyEPGMStore();
     graphStore.setAutoFlush(false);
 
@@ -127,8 +124,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void iteratorTest() throws InterruptedException, IOException,
     ClassNotFoundException {
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore =
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore =
       createEmptyEPGMStore();
 
     List<PersistentVertex<EdgePojo>> vertices =
@@ -183,12 +179,11 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @Test(expected = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() {
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore =
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore =
       createEmptyEPGMStore();
 
-    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex>
-      persistentVertexFactory = new HBaseVertexFactory();
+    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex<EdgePojo>>
+      persistentVertexFactory = new HBaseVertexFactory<>();
     EPGMVertexFactory<VertexPojo> vertexFactory =
       new VertexPojoFactory();
 
@@ -216,12 +211,11 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @Test
   public void propertyTypeTest() {
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore =
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore =
       createEmptyEPGMStore();
 
-    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex>
-      persistentVertexFactory = new HBaseVertexFactory();
+    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex<EdgePojo>>
+      persistentVertexFactory = new HBaseVertexFactory<>();
     EPGMVertexFactory<VertexPojo> vertexFactory =
       new VertexPojoFactory();
 
@@ -293,11 +287,10 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   private void writeGraphHead(
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore,
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     GraphHeadPojo graphHead, VertexPojo vertex, EdgePojo edge) {
     graphStore.writeGraphHead(
-      new HBaseGraphHeadFactory().createGraphHead(
+      new HBaseGraphHeadFactory<>().createGraphHead(
         graphHead,
         GradoopIdSet.fromExisting(vertex.getId()),
         GradoopIdSet.fromExisting(edge.getId())
@@ -306,11 +299,10 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   private void writeVertex(
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore,
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     VertexPojo vertex, EdgePojo edge) {
     graphStore.writeVertex(
-      new HBaseVertexFactory().createVertex(
+      new HBaseVertexFactory<VertexPojo, EdgePojo>().createVertex(
         vertex,
         Sets.newHashSet(edge),
         Sets.newHashSet(edge)
@@ -319,12 +311,11 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   private void writeEdge(
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore,
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     VertexPojo vertex, EdgePojo edge) {
 
     graphStore.writeEdge(
-      new HBaseEdgeFactory()
+      new HBaseEdgeFactory<VertexPojo, EdgePojo>()
         .createEdge(
           edge,
           vertex,
@@ -334,8 +325,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   private void validateGraphHead(
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore,
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     GraphHeadPojo originalGraphHead) {
 
     EPGMGraphHead loadedGraphHead = graphStore
@@ -345,8 +335,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   private void validateVertex(
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore,
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     VertexPojo originalVertex) {
 
     EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
@@ -356,8 +345,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   private void validateEdge(
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
-      HBaseGraphHead, HBaseVertex, HBaseEdge> graphStore,
+    HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     EdgePojo originalEdge) {
 
     EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());

@@ -17,27 +17,29 @@
 
 package org.gradoop.storage.impl.hbase;
 
+import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.storage.api.PersistentVertex;
 
 import java.util.Set;
 
 /**
  * Represents a persistent vertex data object.
+ *
+ * @param <E> EPGM edge type
  */
-public class HBaseVertex extends
-  HBaseGraphElement<EPGMVertex> implements PersistentVertex<EdgePojo> {
+public class HBaseVertex<E extends EPGMEdge> extends
+  HBaseGraphElement<EPGMVertex> implements PersistentVertex<E> {
 
   /**
    * Outgoing edge set
    */
-  private Set<EdgePojo> outgoingEdges;
+  private Set<E> outgoingEdges;
 
   /**
    * Incoming edge set
    */
-  private Set<EdgePojo> incomingEdges;
+  private Set<E> incomingEdges;
 
   /**
    * Creates persistent vertex data.
@@ -46,8 +48,7 @@ public class HBaseVertex extends
    * @param incomingEdges incoming edge
    * @param outgoingEdges outgoing edge
    */
-  HBaseVertex(EPGMVertex vertex, Set<EdgePojo> outgoingEdges,
-    Set<EdgePojo> incomingEdges) {
+  HBaseVertex(EPGMVertex vertex, Set<E> outgoingEdges, Set<E> incomingEdges) {
     super(vertex);
     this.outgoingEdges = outgoingEdges;
     this.incomingEdges = incomingEdges;
@@ -57,7 +58,7 @@ public class HBaseVertex extends
    * {@inheritDoc}
    */
   @Override
-  public Set<EdgePojo> getOutgoingEdges() {
+  public Set<E> getOutgoingEdges() {
     return outgoingEdges;
   }
 
@@ -65,7 +66,7 @@ public class HBaseVertex extends
    * {@inheritDoc}
    */
   @Override
-  public void setOutgoingEdges(Set<EdgePojo> outgoingEdgeIds) {
+  public void setOutgoingEdges(Set<E> outgoingEdgeIds) {
     this.outgoingEdges = outgoingEdgeIds;
   }
 
@@ -73,7 +74,7 @@ public class HBaseVertex extends
    * {@inheritDoc}
    */
   @Override
-  public Set<EdgePojo> getIncomingEdges() {
+  public Set<E> getIncomingEdges() {
     return incomingEdges;
   }
 
@@ -81,7 +82,7 @@ public class HBaseVertex extends
    * {@inheritDoc}
    */
   @Override
-  public void setIncomingEdges(Set<EdgePojo> incomingEdgeData) {
+  public void setIncomingEdges(Set<E> incomingEdgeData) {
     this.incomingEdges = incomingEdgeData;
   }
 

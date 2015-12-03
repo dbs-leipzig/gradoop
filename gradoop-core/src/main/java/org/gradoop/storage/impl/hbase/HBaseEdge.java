@@ -18,26 +18,28 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.storage.api.PersistentEdge;
 
 /**
  * Represents a persistent edge data object.
+ *
+ * @param <V> EPGM vertex type
  */
-public class HBaseEdge
+public class HBaseEdge<V extends EPGMVertex>
   extends HBaseGraphElement<EPGMEdge>
-  implements PersistentEdge<VertexPojo> {
+  implements PersistentEdge<V> {
 
   /**
    * Source vertex
    */
-  private VertexPojo source;
+  private V source;
 
   /**
    * Target vertex.
    */
-  private VertexPojo target;
+  private V target;
 
   /**
    * Creates persistent edge.
@@ -46,9 +48,7 @@ public class HBaseEdge
    * @param source  source vertex
    * @param target  target vertex
    */
-  HBaseEdge(EPGMEdge edge,
-    VertexPojo source,
-    VertexPojo target) {
+  HBaseEdge(EPGMEdge edge, V source, V target) {
     super(edge);
     this.source = source;
     this.target = target;
@@ -58,7 +58,7 @@ public class HBaseEdge
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo getSource() {
+  public V getSource() {
     return source;
   }
 
@@ -66,7 +66,7 @@ public class HBaseEdge
    * {@inheritDoc}
    */
   @Override
-  public void setSource(VertexPojo sourceVertex) {
+  public void setSource(V sourceVertex) {
     this.source = sourceVertex;
   }
 
@@ -74,7 +74,7 @@ public class HBaseEdge
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo getTarget() {
+  public V getTarget() {
     return target;
   }
 
@@ -82,7 +82,7 @@ public class HBaseEdge
    * {@inheritDoc}
    */
   @Override
-  public void setTarget(VertexPojo targetVertex) {
+  public void setTarget(V targetVertex) {
     this.target = targetVertex;
   }
 
