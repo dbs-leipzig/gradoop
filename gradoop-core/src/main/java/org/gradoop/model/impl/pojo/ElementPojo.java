@@ -185,7 +185,7 @@ public abstract class ElementPojo implements EPGMElement {
       id,
       label == null || label.equals("") ? "" : ":",
       label,
-      properties);
+      properties == null ? "" : properties);
   }
 
   /**

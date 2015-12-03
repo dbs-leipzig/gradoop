@@ -52,7 +52,7 @@ import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.functions.tuple.ValueOfTuple1;
+import org.gradoop.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
@@ -465,9 +465,9 @@ public class EPGMDatabase<
       edgeTypeInfo);
 
     return new EPGMDatabase<>(
-      graphHeads.map(new ValueOfTuple1<G>()),
-      vertices.map(new ValueOfTuple1<V>()),
-      edges.map(new ValueOfTuple1<E>()),
+      graphHeads.map(new ValueOf1<G>()),
+      vertices.map(new ValueOf1<V>()),
+      edges.map(new ValueOf1<E>()),
       config);
   }
 

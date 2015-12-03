@@ -7,8 +7,11 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class EqualityByGraphElementDataTest
+public class EqualityByGraphDataTest
   extends EqualityTestBase {
+
+  private final EqualityByGraphData<GraphHeadPojo, VertexPojo, EdgePojo>
+    equals = new EqualityByGraphData<>();
 
   @Test
   public void testBasicStructuralEquality() {
@@ -47,8 +50,8 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c167 =
       loader.getGraphCollectionByVariables("g1", "g6", "g7");
 
-    EqualityByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementData<>();
+    EqualityByGraphData<GraphHeadPojo, VertexPojo, EdgePojo> equals
+      = new EqualityByGraphData<>();
 
     collectAndAssertEquals(equals.execute(c12, c67));
     collectAndAssertEquals(equals.execute(c126, c167));
@@ -115,8 +118,8 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c167 =
       loader.getGraphCollectionByVariables("g1", "g6", "g7");
 
-    EqualityByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementData<>();
+    EqualityByGraphData<GraphHeadPojo, VertexPojo, EdgePojo> equals
+      = new EqualityByGraphData<>();
 
     collectAndAssertEquals(equals.execute(c12, c67));
     collectAndAssertEquals(equals.execute(c126, c167));
@@ -165,8 +168,8 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eLabel =
       loader.getGraphCollectionByVariables("ab1el", "ad1");
 
-    EqualityByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementData<>();
+    EqualityByGraphData<GraphHeadPojo, VertexPojo, EdgePojo> equals
+      = new EqualityByGraphData<>();
 
     collectAndAssertEquals(equals.execute(ref, dup));
     collectAndAssertNotEquals(equals.execute(ref, eDir));
@@ -211,9 +214,6 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eValue =
       loader.getGraphCollectionByVariables("p123eValue", "p023a");
 
-    EqualityByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementData<>();
-
     collectAndAssertEquals(equals.execute(ref, dup));
     collectAndAssertNotEquals(equals.execute(ref, eDir));
     collectAndAssertNotEquals(equals.execute(ref, vKey));
@@ -222,5 +222,34 @@ public class EqualityByGraphElementDataTest
       equals.execute(ref, vValue));
     collectAndAssertNotEquals(
       equals.execute(ref, eValue));
+  }
+
+  @Test
+  public void testGraphHeadData() {
+
+    String asciiGraphs = "g01:G{x=1}[];g02:G{x=1}[];" +
+      "g11:G{x=1}[()-->()];g12:G{x=1}[()-->()];" +
+      "g21:G{x=2}[()-->()];g22:G{x=2}[()-->()];" +
+      "g31:H{x=1}[()-->()];g32:H{x=1}[()-->()]";
+
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(asciiGraphs);
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c1 =
+      loader.getGraphCollectionByVariables("g01", "g11", "g21", "g31");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c2 =
+      loader.getGraphCollectionByVariables("g02", "g12", "g22", "g32");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c3 =
+      loader.getGraphCollectionByVariables("g02", "g12", "g31", "g32");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c4 =
+      loader.getGraphCollectionByVariables("g01","g02");
+
+    collectAndAssertEquals(equals.execute(c1, c2));
+    collectAndAssertNotEquals(equals.execute(c1, c3));
+    // only graph head data
+    collectAndAssertEquals(equals.execute(c4, c4));
   }
 }

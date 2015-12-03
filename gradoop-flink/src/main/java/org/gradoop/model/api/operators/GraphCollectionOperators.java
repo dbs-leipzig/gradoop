@@ -285,6 +285,19 @@ public interface GraphCollectionOperators
    * Returns a 1-element dataset containing a {@code boolean} value which
    * indicates if the graph collection is equal to the given graph collection.
    *
+   * Equality is defined on the element data contained inside the collection,
+   * i.e. vertices and edges.
+   *
+   * @param result graph collection to compare with
+   * @return  1-element dataset containing {@code true} if the two collections
+   *          are equal or {@code false} if not
+   */
+  DataSet<Boolean> equalsByGraphElementData(GraphCollection<G, V, E> result);
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the graph collection is equal to the given graph collection.
+   *
    * Equality is defined on the data contained inside the collection, i.e.
    * graph heads, vertices and edges.
    *
@@ -292,6 +305,5 @@ public interface GraphCollectionOperators
    * @return  1-element dataset containing {@code true} if the two collections
    *          are equal or {@code false} if not
    */
-  DataSet<Boolean> equalsByGraphElementData(
-    GraphCollection<G, V, E> result);
+  DataSet<Boolean> equalsByGraphData(GraphCollection<G, V, E> result);
 }

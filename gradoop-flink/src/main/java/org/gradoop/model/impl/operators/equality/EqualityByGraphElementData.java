@@ -28,10 +28,8 @@ import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.operators.count.Count;
-import org.gradoop.model.impl.functions.join.LeftSide;
 import org.gradoop.model.impl.operators.equality.functions.DataLabelWithCount;
 import org.gradoop.model.impl.operators.equality.functions.EdgeDataLabeler;
-import org.gradoop.model.impl.operators.equality.functions.GraphHeadDataLabeler;
 import org.gradoop.model.impl.operators.equality.functions.LabelAppender;
 import org.gradoop.model.impl.operators.equality.functions.SortAndConcatLabels;
 import org.gradoop.model.impl.operators.equality.functions.SourceLabelAppender;
@@ -75,23 +73,34 @@ public class EqualityByGraphElementData
   }
 
   /**
-   * Returns a dataset containing canonical labels for all graphs of an input
-   * collection.
+   * Returns a dataset containing canonical labels and their count for all
+   * graphs of an input collection.
    *
    * @param collection input collection
-   * @return canonical labels
+   * @return canonical labels with count
    */
-  private DataSet<Tuple2<String, Long>> labelGraphs(
+  protected DataSet<Tuple2<String, Long>> labelGraphs(
     GraphCollection<G, V, E> collection) {
 
-    DataSet<DataLabel> graphHeadLabels = collection.getGraphHeads()
-      .map(new GraphHeadDataLabeler<G>());
+    DataSet<DataLabel> graphDataLabels = getElementDataLabels(collection);
 
+    return graphDataLabels
+      .map(new DataLabelWithCount())
+      .groupBy(0)
+      .sum(1);
+  }
+
+  /**
+   * Returns a dataset containing canonical labels for all graphs of an input
+   * collection based on element labels and properties.
+   *
+   * @param collection input collection
+   * @return element data labels
+   */
+  protected DataSet<DataLabel> getElementDataLabels(
+    GraphCollection<G, V, E> collection) {
     DataSet<DataLabel> vertexLabels = collection.getVertices()
-      .flatMap(new VertexDataLabeler<V>())
-      .join(graphHeadLabels)
-      .where(0).equalTo(1)
-      .with(new LeftSide<DataLabel, DataLabel>());
+      .flatMap(new VertexDataLabeler<V>());
 
     DataSet<EdgeDataLabel> edgeLabels = collection.getEdges()
       .flatMap(new EdgeDataLabeler<E>())
@@ -112,7 +121,7 @@ public class EqualityByGraphElementData
       .groupBy(0, 1)
       .reduceGroup(new SortAndConcatLabels<DataLabel>());
 
-    DataSet<DataLabel> graphDataLabels = vertexLabels
+    return vertexLabels
       .leftOuterJoin(outgoingEdgeLabels)
       .where(0, 1).equalTo(0, 1)
       .with(new LabelAppender())
@@ -121,14 +130,6 @@ public class EqualityByGraphElementData
       .with(new LabelAppender())
       .groupBy(0)
       .reduceGroup(new SortAndConcatLabels<DataLabel>());
-
-    return graphHeadLabels
-      .join(graphDataLabels)
-      .where(1).equalTo(0)
-      .with(new LabelAppender())
-      .map(new DataLabelWithCount())
-      .groupBy(0)
-      .sum(1);
   }
 
   @Override

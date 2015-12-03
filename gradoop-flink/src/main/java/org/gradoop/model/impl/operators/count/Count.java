@@ -21,7 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.impl.functions.bool.Equals;
-import org.gradoop.model.impl.functions.tuple.ValueOfTuple1;
+import org.gradoop.model.impl.functions.tuple.ValueOf1;
 
 /**
  * Utility methods to count the number of elements in a dataset without
@@ -42,7 +42,7 @@ public class Count {
       .map(new Tuple1With1L<T>())
       .union(dataSet.getExecutionEnvironment().fromElements(new Tuple1<>(0L)))
       .sum(0)
-      .map(new ValueOfTuple1<Long>());
+      .map(new ValueOf1<Long>());
   }
 
   /**

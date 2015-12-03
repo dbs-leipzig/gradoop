@@ -497,4 +497,12 @@ public class GraphCollection<
     GraphCollection<G, V, E> other) {
     return new EqualityByGraphElementData<G, V, E>().execute(this, other);
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByGraphData(GraphCollection<G, V, E> result) {
+    return null;
+  }
 }

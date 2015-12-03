@@ -55,4 +55,39 @@ public class GradoopFlinkTestUtils {
       System.out.println(e);
     }
   }
+
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> void printGraphCollection(
+    GraphCollection<G, V, E> graph) throws Exception {
+
+    Collection<G> graphHeadCollection = Lists.newArrayList();
+    Collection<V> vertexCollection = Lists.newArrayList();
+    Collection<E> edgeCollection = Lists.newArrayList();
+
+    graph.getGraphHeads().output(
+      new LocalCollectionOutputFormat<>(graphHeadCollection));
+    graph.getVertices().output(
+      new LocalCollectionOutputFormat<>(vertexCollection));
+    graph.getEdges().output(
+      new LocalCollectionOutputFormat<>(edgeCollection));
+
+    graph.getConfig().getExecutionEnvironment().execute();
+
+    System.out.println("*** GraphHead Collection ***");
+    for (G g : graphHeadCollection) {
+      System.out.println(g);
+    }
+
+    System.out.println("*** Vertex Collection ***");
+    for (V v : vertexCollection) {
+      System.out.println(v);
+    }
+
+    System.out.println("*** Edge Collection ***");
+    for (E e : edgeCollection) {
+      System.out.println(e);
+    }
+  }
 }
