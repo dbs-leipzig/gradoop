@@ -1,5 +1,6 @@
 package org.gradoop.util;
 
+import org.gradoop.config.GradoopConfig;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;

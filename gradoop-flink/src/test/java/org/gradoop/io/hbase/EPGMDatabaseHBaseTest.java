@@ -10,16 +10,14 @@ import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentVertex;
-import org.gradoop.storage.impl.hbase.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;
-import org.gradoop.storage.impl.hbase.HBaseEdgeFactory;
-import org.gradoop.storage.impl.hbase.HBaseGraphHeadFactory;
-import org.gradoop.storage.impl.hbase.HBaseVertexFactory;
+import org.gradoop.storage.impl.hbase.HBaseEdge;
+import org.gradoop.storage.impl.hbase.HBaseGraphHead;
+import org.gradoop.storage.impl.hbase.HBaseVertex;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.gradoop.GradoopTestUtils.validateEPGMElementCollections;
@@ -32,7 +30,8 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
 
   @Test
   public void readFromHBaseTest() throws Exception {
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> epgmStore =
+    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
+      HBaseGraphHead, HBaseVertex, HBaseEdge> epgmStore =
       GradoopHBaseTestBase.createEmptyEPGMStore();
 
     List<PersistentVertex<EdgePojo>> vertices =
@@ -83,7 +82,8 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
   @Test
   public void writeToHBaseTest() throws Exception {
     // create empty EPGM store
-    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> epgmStore =
+    EPGMStore<GraphHeadPojo, VertexPojo, EdgePojo,
+      HBaseGraphHead, HBaseVertex, HBaseEdge> epgmStore =
       GradoopHBaseTestBase.createEmptyEPGMStore();
 
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
@@ -93,10 +93,7 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
       loader.getDatabase();
 
     // write EPGM database to HBase
-    epgmDB.writeToHBase(epgmStore,
-      new HBaseGraphHeadFactory(),
-      new HBaseVertexFactory(),
-      new HBaseEdgeFactory());
+    epgmDB.writeToHBase(epgmStore);
 
     epgmStore.flush();
 

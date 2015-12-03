@@ -41,6 +41,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.config.GradoopStoreConfig;
 import org.gradoop.io.hbase.HBaseWriter;
 import org.gradoop.io.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.io.hbase.inputformats.GraphHeadTableInputFormat;
@@ -62,13 +63,9 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
-import org.gradoop.storage.api.PersistentEdgeFactory;
 import org.gradoop.storage.api.PersistentGraphHead;
-import org.gradoop.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.storage.api.PersistentVertex;
-import org.gradoop.storage.api.PersistentVertexFactory;
 import org.gradoop.util.GConstants;
-import org.gradoop.util.GradoopConfig;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Collection;
@@ -268,6 +265,7 @@ public class EPGMDatabase<
       .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<E>());
     getCollection().getGraphHeads()
       .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<G>());
+
     config.getExecutionEnvironment().execute();
   }
 
@@ -276,13 +274,10 @@ public class EPGMDatabase<
    * <p/>
    * HBase tables must be created before calling this method.
    *
-   * @param epgmStore                   EPGM store to handle HBase
-   * @param persistentVertexFactory     persistent vertex data factory
-   * @param persistentEdgeFactory       persistent edge data factory
-   * @param persistentGraphHeadFactory  persistent graph data factory
-   * @param <PG>                        persistent graph head type
-   * @param <PV>                        persistent vertex type
-   * @param <PE>                        persistent edge type
+   * @param epgmStore EPGM store to handle HBase
+   * @param <PG>      persistent graph head type
+   * @param <PV>      persistent vertex type
+   * @param <PE>      persistent edge type
    *
    * @throws Exception
    */
@@ -290,28 +285,25 @@ public class EPGMDatabase<
     PG extends PersistentGraphHead,
     PV extends PersistentVertex<E>,
     PE extends PersistentEdge<V>> void writeToHBase(
-    EPGMStore<G, V, E> epgmStore,
-    final PersistentGraphHeadFactory<G, PG> persistentGraphHeadFactory,
-    final PersistentVertexFactory<V, E, PV> persistentVertexFactory,
-    final PersistentEdgeFactory<V, E, PE> persistentEdgeFactory)
+    EPGMStore<G, V, E, PG, PV, PE> epgmStore)
       throws Exception {
 
     HBaseWriter<G, V, E> hBaseWriter = new HBaseWriter<>();
 
-    GradoopConfig<G, V, E> conf = epgmStore.getConfig();
+    GradoopStoreConfig<G, V, E, PG, PV, PE> conf = epgmStore.getConfig();
     // transform graph data to persistent graph data and write it
     hBaseWriter.writeGraphHeads(this, conf.getGraphHeadHandler(),
-      persistentGraphHeadFactory, epgmStore.getGraphHeadName());
-    this.config.getExecutionEnvironment().execute();
+      conf.getPersistentGraphHeadFactory(), epgmStore.getGraphHeadName());
 
     // transform vertex data to persistent vertex data and write it
     hBaseWriter.writeVertices(this, conf.getVertexHandler(),
-      persistentVertexFactory, epgmStore.getVertexTableName());
-    this.config.getExecutionEnvironment().execute();
+      conf.getPersistentVertexFactory(), epgmStore.getVertexTableName());
 
     // transform edge data to persistent edge data and write it
-    hBaseWriter.writeEdges(this, conf.getEdgeHandler(), persistentEdgeFactory,
+    hBaseWriter.writeEdges(this, conf.getEdgeHandler(),
+      conf.getPersistentEdgeFactory(),
       epgmStore.getEdgeTableName());
+
     this.config.getExecutionEnvironment().execute();
   }
 
@@ -430,6 +422,9 @@ public class EPGMDatabase<
    * @param <G>       graph data type
    * @param <V>       vertex data type
    * @param <E>       edge data type
+   * @param <PG>      persistent graph head type
+   * @param <PV>      persistent vertex type
+   * @param <PE>      persistent edge type
    * @param config Gradoop Flink configuration
    * @return EPGM database
    */
@@ -437,8 +432,12 @@ public class EPGMDatabase<
   public static <
     G extends EPGMGraphHead,
     V extends EPGMVertex,
-    E extends EPGMEdge> EPGMDatabase<G, V, E> fromHBase(
-    EPGMStore<G, V, E> epgmStore, GradoopFlinkConfig<G, V, E> config) {
+    E extends EPGMEdge,
+    PG extends PersistentGraphHead,
+    PV extends PersistentVertex<E>,
+    PE extends PersistentEdge<V>> EPGMDatabase<G, V, E> fromHBase(
+    EPGMStore<G, V, E, PG, PV, PE> epgmStore,
+    GradoopFlinkConfig<G, V, E> config) {
 
     // used for type hinting when loading graph data
     TypeInformation<Tuple1<G>> graphTypeInfo = new TupleTypeInfo(

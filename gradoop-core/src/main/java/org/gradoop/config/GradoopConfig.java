@@ -1,4 +1,21 @@
 /*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
  * This file is part of gradoop.
  *
  * gradoop is free software: you can redistribute it and/or modify
@@ -15,7 +32,7 @@
  * along with gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.util;
+package org.gradoop.config;
 
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
@@ -35,6 +52,8 @@ import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.storage.impl.hbase.HBaseEdgeHandler;
 import org.gradoop.storage.impl.hbase.HBaseGraphHeadHandler;
 import org.gradoop.storage.impl.hbase.HBaseVertexHandler;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Basic Gradoop Configuration.
@@ -71,18 +90,12 @@ public class GradoopConfig<
   protected GradoopConfig(GraphHeadHandler<G> graphHeadHandler,
     VertexHandler<V, E> vertexHandler,
     EdgeHandler<V, E> edgeHandler) {
-    if (vertexHandler == null) {
-      throw new IllegalArgumentException("Vertex handler must not be null");
-    }
-    if (edgeHandler == null) {
-      throw new IllegalArgumentException("Edge handler must not be null");
-    }
-    if (graphHeadHandler == null) {
-      throw new IllegalArgumentException("Graph head handler must not be null");
-    }
-    this.vertexHandler = vertexHandler;
-    this.edgeHandler = edgeHandler;
-    this.graphHeadHandler = graphHeadHandler;
+    this.graphHeadHandler =
+      checkNotNull(graphHeadHandler, "GraphHeadHandler was null");
+    this.vertexHandler =
+      checkNotNull(vertexHandler, "VertexHandler was null");
+    this.edgeHandler =
+      checkNotNull(edgeHandler, "EdgeHandler was null");
   }
 
   /**

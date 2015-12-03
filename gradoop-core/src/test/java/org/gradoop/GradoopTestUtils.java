@@ -27,9 +27,8 @@ import org.gradoop.model.api.EPGMIdentifiable;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;
 import org.gradoop.util.AsciiGraphLoader;
-import org.gradoop.util.GradoopConfig;
+import org.gradoop.config.GradoopConfig;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;

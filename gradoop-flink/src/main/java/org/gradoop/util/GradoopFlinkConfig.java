@@ -18,6 +18,7 @@
 package org.gradoop.util;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.config.GradoopConfig;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;

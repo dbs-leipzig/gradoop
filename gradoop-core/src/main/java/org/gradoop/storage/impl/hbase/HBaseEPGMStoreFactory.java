@@ -23,15 +23,18 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.log4j.Logger;
+import org.gradoop.config.GradoopStoreConfig;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
-import org.gradoop.util.GradoopConfig;
 
 import java.io.IOException;
 
@@ -61,13 +64,21 @@ public class HBaseEPGMStoreFactory {
    * @param <G>           EPGM graph head type
    * @param <V>           EPGM vertex type
    * @param <E>           EPGM edge type
+   * @param <PG>          persistent graph head type
+   * @param <PV>          persistent vertex type
+   * @param <PE>          persistent edge type
    * @return a graph store instance or {@code null in the case of errors}
    */
   public static <
     G extends EPGMGraphHead,
     V extends EPGMVertex,
-    E extends EPGMEdge> EPGMStore<G, V, E> createOrOpenEPGMStore(
-    final Configuration config, final GradoopConfig<G, V, E> gradoopConfig) {
+    E extends EPGMEdge,
+    PG extends PersistentGraphHead,
+    PV extends PersistentVertex<E>,
+    PE extends PersistentEdge<V>>
+  HBaseEPGMStore<G, V, E, PG, PV, PE> createOrOpenEPGMStore(
+    final Configuration config,
+    final GradoopStoreConfig<G, V, E, PG, PV, PE> gradoopConfig) {
     return createOrOpenEPGMStore(config,
       GradoopHBaseConfig.createConfig(gradoopConfig,
         GConstants.DEFAULT_TABLE_VERTICES,
@@ -80,26 +91,33 @@ public class HBaseEPGMStoreFactory {
    * parameters. If something goes wrong, {@code null} is returned.
    *
    * @param config        Hadoop cluster configuration
-   * @param gradoopConfig Gradoop configuration
+   * @param gradoopStoreConfig Gradoop configuration
    * @param prefix        prefix for HBase table name
    * @param <G>           EPGM graph head type
    * @param <V>           EPGM vertex type
    * @param <E>           EPGM edge type
+   * @param <PG>          persistent graph head type
+   * @param <PV>          persistent vertex type
+   * @param <PE>          persistent edge type
    *
    * @return a graph store instance or {@code null in the case of errors}
    */
   public static <
     G extends EPGMGraphHead,
     V extends EPGMVertex,
-    E extends EPGMEdge>
-  EPGMStore<G, V, E> createOrOpenEPGMStore(
-    final Configuration config, final GradoopConfig<G, V, E> gradoopConfig,
+    E extends EPGMEdge,
+    PG extends PersistentGraphHead,
+    PV extends PersistentVertex<E>,
+    PE extends PersistentEdge<V>>
+  HBaseEPGMStore<G, V, E, PG, PV, PE> createOrOpenEPGMStore(
+    final Configuration config,
+    final GradoopStoreConfig<G, V, E, PG, PV, PE> gradoopStoreConfig,
     final String prefix) {
-    return createOrOpenEPGMStore(config, GradoopHBaseConfig.createConfig(
-      gradoopConfig,
-      prefix + GConstants.DEFAULT_TABLE_GRAPHS,
-      prefix + GConstants.DEFAULT_TABLE_VERTICES,
-      prefix + GConstants.DEFAULT_TABLE_EDGES));
+    return createOrOpenEPGMStore(config,
+      GradoopHBaseConfig.createConfig(gradoopStoreConfig,
+        prefix + GConstants.DEFAULT_TABLE_GRAPHS,
+        prefix + GConstants.DEFAULT_TABLE_VERTICES,
+        prefix + GConstants.DEFAULT_TABLE_EDGES));
   }
 
   /**
@@ -108,18 +126,24 @@ public class HBaseEPGMStoreFactory {
    *
    * @param config              Hadoop cluster configuration
    * @param gradoopHBaseConfig  Gradoop HBase configuration
-   * @param <G>           EPGM graph head type
-   * @param <V>           EPGM vertex type
-   * @param <E>           EPGM edge type
+   * @param <G>                 EPGM graph head type
+   * @param <V>                 EPGM vertex type
+   * @param <E>                 EPGM edge type
+   * @param <PG>                persistent graph head type
+   * @param <PV>                persistent vertex type
+   * @param <PE>                persistent edge type
    * @return EPGM store instance or {@code null in the case of errors}
    */
   public static <
     G extends EPGMGraphHead,
     V extends EPGMVertex,
-    E extends EPGMEdge>
-  EPGMStore<G, V, E> createOrOpenEPGMStore(
+    E extends EPGMEdge,
+    PG extends PersistentGraphHead,
+    PV extends PersistentVertex<E>,
+    PE extends PersistentEdge<V>>
+  HBaseEPGMStore<G, V, E, PG, PV, PE> createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig) {
+    final GradoopHBaseConfig<G, V, E, PG, PV, PE> gradoopHBaseConfig) {
     try {
       createTablesIfNotExists(config, gradoopHBaseConfig.getVertexHandler(),
         gradoopHBaseConfig.getEdgeHandler(),

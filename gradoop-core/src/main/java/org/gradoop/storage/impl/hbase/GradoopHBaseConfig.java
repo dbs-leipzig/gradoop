@@ -18,6 +18,7 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.apache.commons.lang.StringUtils;
+import org.gradoop.config.GradoopStoreConfig;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -29,25 +30,35 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
 import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
+import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentEdgeFactory;
+import org.gradoop.storage.api.PersistentGraphHead;
+import org.gradoop.storage.api.PersistentGraphHeadFactory;
+import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.api.PersistentVertexFactory;
 import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
-import org.gradoop.util.GradoopConfig;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Configuration class for using HBase with Gradoop.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * @param <G>   EPGM graph head type
+ * @param <V>   EPGM vertex type
+ * @param <E>   EPGM edge type
+ * @param <PG>  persistent graph head type
+ * @param <PV>  persistent vertex type
+ * @param <PE>  persistent edge type
  */
 public class GradoopHBaseConfig<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends GradoopConfig<G, V, E> {
+  E extends EPGMEdge,
+  PG extends PersistentGraphHead,
+  PV extends PersistentVertex<E>,
+  PE extends PersistentEdge<V>>
+  extends GradoopStoreConfig<G, V, E, PG, PV, PE> {
 
   /**
    * Graph table name.
@@ -66,23 +77,32 @@ public class GradoopHBaseConfig<
   /**
    * Creates a new Configuration.
    *
-   * @param graphHeadHandler  graph head handler
-   * @param vertexHandler     vertex handler
-   * @param edgeHandler       edge handler
-   * @param graphTableName    graph table name
-   * @param vertexTableName   vertex table name
-   * @param edgeTableName     edge table name
+   * @param graphHeadHandler            graph head handler
+   * @param vertexHandler               vertex handler
+   * @param edgeHandler                 edge handler
+   * @param persistentGraphHeadFactory  persistent graph head factory
+   * @param persistentVertexFactory     persistent vertex factory
+   * @param persistentEdgeFactory       persistent edge factory
+   * @param graphTableName              graph table name
+   * @param vertexTableName             vertex table name
+   * @param edgeTableName               edge table name
    */
-  private GradoopHBaseConfig(GraphHeadHandler<G> graphHeadHandler,
+  private GradoopHBaseConfig(
+    GraphHeadHandler<G> graphHeadHandler,
     VertexHandler<V, E> vertexHandler,
     EdgeHandler<V, E> edgeHandler,
+    PersistentGraphHeadFactory<G, PG> persistentGraphHeadFactory,
+    PersistentVertexFactory<V, E, PV> persistentVertexFactory,
+    PersistentEdgeFactory<V, E, PE> persistentEdgeFactory,
     String graphTableName,
     String vertexTableName,
     String edgeTableName) {
-    super(graphHeadHandler, vertexHandler, edgeHandler);
-    checkNotNull(graphHeadHandler, "GraphHeadHandler was null");
-    checkNotNull(vertexHandler, "VertexHandler was null");
-    checkNotNull(edgeHandler, "EdgeHandler was null");
+    super(graphHeadHandler,
+      vertexHandler,
+      edgeHandler,
+      persistentGraphHeadFactory,
+      persistentVertexFactory,
+      persistentEdgeFactory);
     checkArgument(!StringUtils.isEmpty(graphTableName),
       "Graph table name was null or empty");
     checkArgument(!StringUtils.isEmpty(vertexTableName),
@@ -98,18 +118,21 @@ public class GradoopHBaseConfig<
   /**
    * Creates a new Configuration.
    *
-   * @param config          Gradoop configuration
+   * @param config          Gradoop Store configuration
    * @param graphTableName  graph table name
    * @param vertexTableName vertex table name
    * @param edgeTableName   edge table name
    */
-  private GradoopHBaseConfig(GradoopConfig<G, V, E> config,
+  private GradoopHBaseConfig(GradoopStoreConfig<G, V, E, PG, PV, PE> config,
     String vertexTableName,
     String edgeTableName,
     String graphTableName) {
     this(config.getGraphHeadHandler(),
       config.getVertexHandler(),
       config.getEdgeHandler(),
+      config.getPersistentGraphHeadFactory(),
+      config.getPersistentVertexFactory(),
+      config.getPersistentEdgeFactory(),
       graphTableName,
       vertexTableName,
       edgeTableName);
@@ -121,18 +144,35 @@ public class GradoopHBaseConfig<
    *
    * @return Default Gradoop HBase configuration.
    */
-  public static GradoopHBaseConfig<GraphHeadPojo, VertexPojo, EdgePojo>
+  public static GradoopHBaseConfig<
+    GraphHeadPojo,
+    VertexPojo,
+    EdgePojo,
+    HBaseGraphHead,
+    HBaseVertex,
+    HBaseEdge>
   getDefaultConfig() {
+    GraphHeadHandler<GraphHeadPojo> graphHeadHandler =
+      new HBaseGraphHeadHandler<>(new GraphHeadPojoFactory());
     VertexHandler<VertexPojo, EdgePojo> vertexHandler =
       new HBaseVertexHandler<>(new VertexPojoFactory());
     EdgeHandler<VertexPojo, EdgePojo> edgeHandler =
       new HBaseEdgeHandler<>(new EdgePojoFactory());
-    GraphHeadHandler<GraphHeadPojo> graphHeadHandler =
-      new HBaseGraphHeadHandler<>(new GraphHeadPojoFactory());
+
+    PersistentGraphHeadFactory<GraphHeadPojo, HBaseGraphHead>
+      persistentGraphHeadFactory = new HBaseGraphHeadFactory();
+    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex>
+      persistentVertexFactory = new HBaseVertexFactory();
+    PersistentEdgeFactory<VertexPojo, EdgePojo, HBaseEdge>
+      persistentEdgeFactory = new HBaseEdgeFactory();
+
     return new GradoopHBaseConfig<>(
       graphHeadHandler,
       vertexHandler,
       edgeHandler,
+      persistentGraphHeadFactory,
+      persistentVertexFactory,
+      persistentEdgeFactory,
       GConstants.DEFAULT_TABLE_GRAPHS,
       GConstants.DEFAULT_TABLE_VERTICES,
       GConstants.DEFAULT_TABLE_EDGES);
@@ -145,17 +185,27 @@ public class GradoopHBaseConfig<
    * @param graphTableName  graph table name
    * @param vertexTableName vertex table name
    * @param edgeTableName   edge table name
-   * @param <G>            EPGM graph head type
-   * @param <V>            EPGM vertex type
-   * @param <E>            EPGM edge type
+   * @param <G>             EPGM graph head type
+   * @param <V>             EPGM vertex type
+   * @param <E>             EPGM edge type
+   * @param <PG>            persistent graph head type
+   * @param <PV>            persistent vertex type
+   * @param <PE>            persistent edge type
    *
    * @return Gradoop HBase configuration
    */
-  public static <G extends EPGMGraphHead,
+  public static <
+    G extends EPGMGraphHead,
     V extends EPGMVertex,
-    E extends EPGMEdge> GradoopHBaseConfig<G, V, E> createConfig(
-    GradoopConfig<G, V, E> gradoopConfig, String vertexTableName,
-    String edgeTableName, String graphTableName) {
+    E extends EPGMEdge,
+    PG extends PersistentGraphHead,
+    PV extends PersistentVertex<E>,
+    PE extends PersistentEdge<V>>
+  GradoopHBaseConfig<G, V, E, PG, PV, PE> createConfig(
+    GradoopStoreConfig<G, V, E, PG, PV, PE> gradoopConfig,
+    String vertexTableName,
+    String edgeTableName,
+    String graphTableName) {
     return new GradoopHBaseConfig<>(gradoopConfig,
       graphTableName,
       vertexTableName,

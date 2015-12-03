@@ -17,11 +17,11 @@
 
 package org.gradoop.storage.api;
 
+import org.gradoop.config.GradoopStoreConfig;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.GradoopConfig;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -30,20 +30,26 @@ import java.util.Iterator;
  * The EPGM store is responsible for writing and reading graph heads, vertices
  * and edges.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * @param <G>   EPGM graph head type
+ * @param <V>   EPGM vertex type
+ * @param <E>   EPGM edge type
+ * @param <PG>  persistent graph head type
+ * @param <PV>  persistent vertex type
+ * @param <PE>  persistent edge type
  */
 public interface EPGMStore<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge> {
+  E extends EPGMEdge,
+  PG extends PersistentGraphHead,
+  PV extends PersistentVertex<E>,
+  PE extends PersistentEdge<V>> {
   /**
    * Returns the Gradoop configuration associated with that EPGM Store,
    *
    * @return Gradoop Configuration
    */
-  GradoopConfig<G, V, E> getConfig();
+  GradoopStoreConfig<G, V, E, PG, PV, PE> getConfig();
 
   /**
    * Returns the HBase table name where vertex data is stored.
