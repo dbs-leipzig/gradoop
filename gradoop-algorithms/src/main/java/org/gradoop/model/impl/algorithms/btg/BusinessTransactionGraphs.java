@@ -18,9 +18,7 @@ public class BusinessTransactionGraphs
   public static final String TRANSDATA_VALUE = "T";
 
   @Override
-  public GraphCollection<G, V, E>
-  execute(LogicalGraph<G, V, E> graph) throws Exception {
-
+  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) {
     return GraphCollection.createEmptyCollection(graph.getConfig());
   }
 
@@ -28,6 +26,4 @@ public class BusinessTransactionGraphs
   public String getName() {
     return this.getClass().getSimpleName();
   }
-
-
 }

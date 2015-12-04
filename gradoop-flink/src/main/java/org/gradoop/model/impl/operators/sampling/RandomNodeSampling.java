@@ -80,8 +80,7 @@ public class RandomNodeSampling<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
-    Exception {
+  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
 
     DataSet<V> newVertices = graph.getVertices()
       .filter(new VertexRandomFilter<V>(sampleSize, randomSeed));

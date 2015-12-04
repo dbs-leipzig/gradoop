@@ -18,108 +18,51 @@
 package org.gradoop.model.impl.algorithms.labelpropagation;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.graph.Edge;
-import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
-import org.apache.flink.types.NullValue;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions
-  .CommunityDiscriminatorFunction;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions
-  .EdgeToLPEdgeMapper;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPJoin;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions
-  .LPKeySelector;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions
-  .VertexToLPVertexMapper;
-import org.gradoop.model.impl.algorithms.labelpropagation.pojos.LPVertexValue;
-import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.split.Split;
 
 /**
- * LabelPropagation Graph to Collection Operator.
+ * Wraps {@link org.apache.flink.graph.library.LabelPropagation} into the
+ * EPGM model.
  *
- * Encapsulates {@link LabelPropagationAlgorithm} in a Gradoop operator.
- *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
- * @see LabelPropagationAlgorithm
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class LabelPropagation<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge,
-  GD extends EPGMGraphHead>
-  implements UnaryGraphToCollectionOperator<GD, VD, ED> {
+public class LabelPropagation
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryGraphToCollectionOperator<G, V, E> {
+
   /**
    * Counter to define maximal Iteration for the Algorithm
    */
   private int maxIterations;
-  /**
-   * Value PropertyKey
-   */
-  private String propertyKey = "lpvertex.value";
-  /**
-   * Flink Execution Environment
-   */
-  private final ExecutionEnvironment env;
 
   /**
    * Constructor
    *
    * @param maxIterations Counter to define maximal Iteration for the Algorithm
-   * @param propertyKey   PropertyKey of the EPVertex value
-   * @param env           ExecutionEnvironment
    */
-  public LabelPropagation(int maxIterations, String propertyKey,
-    ExecutionEnvironment env) {
+  public LabelPropagation(int maxIterations) {
     this.maxIterations = maxIterations;
-    this.propertyKey = propertyKey;
-    this.env = env;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<GD, VD, ED> execute(
-    LogicalGraph<GD, VD, ED> logicalGraph) throws Exception {
-    // transform vertices and edges to LP representation
-    DataSet<Vertex<GradoopId, LPVertexValue>> vertices = logicalGraph
-      .getVertices().map(new VertexToLPVertexMapper<VD>());
-    DataSet<Edge<GradoopId, NullValue>> edges = logicalGraph
-      .getEdges().map(new EdgeToLPEdgeMapper<ED>());
+  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> logicalGraph)  {
+    DataSet<V> vertices = null;
+    DataSet<E> edges = null;
 
-    // construct gelly graph and execute the algorithm
-    Graph<GradoopId, LPVertexValue, NullValue> graph =
-      Graph.fromDataSet(vertices, edges, env);
-    graph = graph.run(new LabelPropagationAlgorithm(this.maxIterations));
+    // TODO: implement me
 
-    // map the result back to the original vertex set
-    DataSet<VD> labeledVertices =
-      graph.getVertices()
-        .join(logicalGraph.getVertices())
-        .where(new LPKeySelector())
-        .equalTo(new Id<VD>())
-        .with(new LPJoin<VD>());
-
-    // create a logical graph from the result
-    LogicalGraph<GD, VD, ED> labeledGraph = LogicalGraph
-      .fromDataSets(labeledVertices,
-        logicalGraph.getEdges(),
-        logicalGraph.getConfig());
-
-    // and split it into a collection according the result
-    return new Split<GD, VD, ED>(
-      new CommunityDiscriminatorFunction<VD>(propertyKey))
-      .execute(labeledGraph);
+    return GraphCollection.fromDataSets(
+      null, vertices, edges, logicalGraph.getConfig());
   }
 
   /**

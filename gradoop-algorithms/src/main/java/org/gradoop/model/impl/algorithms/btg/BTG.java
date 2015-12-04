@@ -64,8 +64,7 @@ public class BTG<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGrap
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<GD, VD, ED> execute(
-    final LogicalGraph<GD, VD, ED> graph) throws Exception {
+  public GraphCollection<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> graph) {
     DataSet<Vertex<GradoopId, BTGVertexValue>> vertices =
       graph.getVertices().map(new VertexToBTGVertexMapper<VD>());
     DataSet<Edge<GradoopId, NullValue>> edges =
@@ -73,7 +72,11 @@ public class BTG<VD extends EPGMVertex, ED extends EPGMEdge, GD extends EPGMGrap
     Graph<GradoopId, BTGVertexValue, NullValue> btgGraph =
       Graph.fromDataSet(vertices, edges, graph.getConfig()
         .getExecutionEnvironment());
-    btgGraph = btgGraph.run(new BTGAlgorithm(this.maxIterations));
+    try {
+      btgGraph = btgGraph.run(new BTGAlgorithm(this.maxIterations));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     DataSet<VD> btgLabeledVertices =
       btgGraph.getVertices().join(graph.getVertices())
         .where(new BTGKeySelector())

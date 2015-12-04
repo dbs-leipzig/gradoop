@@ -31,15 +31,13 @@ import org.gradoop.model.impl.GraphCollection;
  * @param <G> EPGM graph head type
  */
 public interface UnaryGraphToCollectionOperator
-  <G extends EPGMGraphHead, V extends EPGMVertex, E
-  extends EPGMEdge> extends
-  Operator {
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends Operator {
   /**
    * Executes the operator.
    *
    * @param graph input graph
    * @return operator result
    */
-  GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
-    Exception;
+  GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph);
 }

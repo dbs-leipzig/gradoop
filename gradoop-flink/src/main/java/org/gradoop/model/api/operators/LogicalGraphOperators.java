@@ -320,10 +320,9 @@ public interface LogicalGraphOperators
    *
    * @param operator unary graph to graph operator
    * @return result of given operator
-   * @throws Exception
    */
   LogicalGraph<G, V, E> callForGraph(
-    UnaryGraphToGraphOperator<G, V, E> operator) throws Exception;
+    UnaryGraphToGraphOperator<G, V, E> operator);
 
   /**
    * Creates a logical graph from that graph and the input graph using the
@@ -345,5 +344,5 @@ public interface LogicalGraphOperators
    * @return result of given operator
    */
   GraphCollection<G, V, E> callForCollection(
-    UnaryGraphToCollectionOperator<G, V, E> operator) throws Exception;
+    UnaryGraphToCollectionOperator<G, V, E> operator);
 }

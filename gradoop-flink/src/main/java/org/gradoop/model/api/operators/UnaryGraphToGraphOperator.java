@@ -38,8 +38,6 @@ public interface UnaryGraphToGraphOperator<
    *
    * @param graph input graph
    * @return operator result
-   * @throws Exception
    */
-  LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
-    Exception;
+  LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph);
 }

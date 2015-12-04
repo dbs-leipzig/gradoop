@@ -70,8 +70,7 @@ public class Aggregation<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) throws
-    Exception {
+  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
 
     DataSet<N> aggregateValue = aggregationFunc.execute(graph);
 
