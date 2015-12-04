@@ -41,10 +41,11 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.operators.GraphOperators;
+import org.gradoop.model.api.operators.GraphBaseOperators;
 import org.gradoop.model.impl.functions.bool.False;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -60,11 +61,9 @@ import java.util.Collection;
  * @see LogicalGraph
  * @see GraphCollection
  */
-public abstract class GraphBase<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  implements GraphOperators<V, E> {
+public abstract class GraphBase
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements GraphBaseOperators<V, E> {
 
   /**
    * Graph data associated with the logical graphs in that collection.
@@ -105,12 +104,12 @@ public abstract class GraphBase<
    * Creates a graph head dataset from a given collection.
    * Encapsulates the workaround for dataset creation from an empty collection.
    *
-   * @param graphHeads graph head collection
-   * @param config configuration
-   * @param <G> graph head type
-   * @param <V> vertex type
-   * @param <E> edge type
-   * @return edge dataset
+   * @param graphHeads  graph heads
+   * @param config      configuration
+   * @param <G>         graph head type
+   * @param <V>         vertex type
+   * @param <E>         edge type
+   * @return graph head dataset
    */
   protected static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> DataSet<G>
@@ -121,8 +120,9 @@ public abstract class GraphBase<
 
     DataSet<G> graphHeadSet;
     if (graphHeads.isEmpty()) {
-      graphHeads.add(config.getGraphHeadFactory().createGraphHead());
-      graphHeadSet = env.fromCollection(graphHeads).filter(new False<G>());
+      graphHeadSet = config.getExecutionEnvironment()
+        .fromElements(config.getGraphHeadFactory().createGraphHead())
+        .filter(new False<G>());
     } else {
       graphHeadSet =  env.fromCollection(graphHeads);
     }
@@ -133,12 +133,12 @@ public abstract class GraphBase<
    * Creates a vertex dataset from a given collection.
    * Encapsulates the workaround for dataset creation from an empty collection.
    *
-   * @param vertices vertex collection
-   * @param config configuration
-   * @param <G> graph head type
-   * @param <V> vertex type
-   * @param <E> edge type
-   * @return edge dataset
+   * @param vertices  vertex collection
+   * @param config    configuration
+   * @param <G>       graph head type
+   * @param <V>       vertex type
+   * @param <E>       edge type
+   * @return vertex dataset
    */
   protected static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> DataSet<V>
@@ -149,8 +149,9 @@ public abstract class GraphBase<
 
     DataSet<V> vertexSet;
     if (vertices.isEmpty()) {
-      vertices.add(config.getVertexFactory().createVertex());
-      vertexSet = env.fromCollection(vertices).filter(new False<V>());
+      vertexSet = config.getExecutionEnvironment()
+        .fromElements(config.getVertexFactory().createVertex())
+        .filter(new False<V>());
     } else {
       vertexSet = env.fromCollection(vertices);
     }
@@ -173,15 +174,14 @@ public abstract class GraphBase<
   createEdgeDataSet(
     Collection<E> edges, GradoopFlinkConfig<G, V, E> config) {
 
-    ExecutionEnvironment env = config.getExecutionEnvironment();
-
-    GradoopId dummyId = GradoopId.get();
     DataSet<E> edgeSet;
     if (edges.isEmpty()) {
-      edges.add(config.getEdgeFactory().createEdge(dummyId, dummyId));
-      edgeSet = env.fromCollection(edges).filter(new False<E>());
+      GradoopId dummyId = GradoopId.get();
+      edgeSet = config.getExecutionEnvironment()
+        .fromElements(config.getEdgeFactory().createEdge(dummyId, dummyId))
+        .filter(new False<E>());
     } else {
-      edgeSet = env.fromCollection(edges);
+      edgeSet = config.getExecutionEnvironment().fromCollection(edges);
     }
     return edgeSet;
   }
@@ -193,16 +193,6 @@ public abstract class GraphBase<
    */
   public GradoopFlinkConfig<G, V, E> getConfig() {
     return config;
-  }
-
-  /**
-   * Returns a dataset containing a single graph head associated with that
-   * logical graph.
-   *
-   * @return 1-element dataset
-   */
-  public DataSet<G> getGraphHead() {
-    return this.graphHeads;
   }
 
   /**
@@ -276,15 +266,18 @@ public abstract class GraphBase<
    * {@inheritDoc}
    */
   @Override
-  public long getVertexCount() throws Exception {
-    return vertices.count();
-  }
+  public void writeAsJson(String vertexFile, String edgeFile,
+    String graphFile) throws Exception {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long getEdgeCount() throws Exception {
-    return edges.count();
+    getVertices().writeAsFormattedText(vertexFile,
+      new JsonWriter.VertexTextFormatter<V>());
+
+    getEdges().writeAsFormattedText(edgeFile,
+      new JsonWriter.EdgeTextFormatter<E>());
+
+    graphHeads.writeAsFormattedText(graphFile,
+      new JsonWriter.GraphTextFormatter<G>());
+
+    getConfig().getExecutionEnvironment().execute();
   }
 }

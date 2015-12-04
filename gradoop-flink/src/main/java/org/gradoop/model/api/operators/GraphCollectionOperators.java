@@ -36,7 +36,20 @@ import org.gradoop.model.impl.GraphCollection;
  * @param <E> EPGM edge type
  */
 public interface GraphCollectionOperators
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends GraphBaseOperators<V, E> {
+
+  //----------------------------------------------------------------------------
+  // Logical Graph / Graph Head Getters
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns the graph heads associated with the logical graphs in that
+   * collection.
+   *
+   * @return graph heads
+   */
+  DataSet<G> getGraphHeads();
 
   /**
    * Returns logical graph from collection using the given identifier.
@@ -67,13 +80,9 @@ public interface GraphCollectionOperators
   GraphCollection<G, V, E> getGraphs(GradoopIdSet identifiers) throws
     Exception;
 
-  /**
-   * Returns the number of logical graphs contained in that collection.
-   *
-   * @return number of logical graphs
-   * @throws Exception
-   */
-  long getGraphCount() throws Exception;
+  //----------------------------------------------------------------------------
+  // Unary operators
+  //----------------------------------------------------------------------------
 
   /**
    * Filter containing graphs based on their associated graph data.
@@ -95,6 +104,54 @@ public interface GraphCollectionOperators
    */
   GraphCollection<G, V, E> select(
     Predicate<LogicalGraph<G, V, E>> predicateFunction) throws Exception;
+
+  /**
+   * Returns a distinct collection of logical graphs. Graph equality is based on
+   * graph identifiers.
+   *
+   * @return distinct graph collection
+   */
+  GraphCollection<G, V, E> distinct();
+
+  /**
+   * Returns a graph collection that is sorted by a given graph property key.
+   *
+   * @param propertyKey property which is used for comparison
+   * @param order       ascending, descending
+   * @return ordered collection
+   */
+  GraphCollection<G, V, E> sortBy(String propertyKey, Order order);
+
+  /**
+   * Returns the first {@code limit} logical graphs contained in that
+   * collection.
+   *
+   * @param limit number of graphs to return from collection
+   * @return part of graph collection
+   */
+  GraphCollection<G, V, E> top(int limit);
+
+  /**
+   * Applies a given unary graph to graph operator (e.g., summarize) on each
+   * logical graph in the graph collection.
+   *
+   * @param op unary graph to graph operator
+   * @return collection with resulting logical graphs
+   */
+  GraphCollection<G, V, E> apply(UnaryGraphToGraphOperator<G, V, E> op);
+
+  /**
+   * Applies binary graph to graph operator (e.g., combine) on each pair of
+   * logical graphs in that collection and produces a single output graph.
+   *
+   * @param op binary graph to graph operator
+   * @return logical graph
+   */
+  LogicalGraph<G, V, E> reduce(BinaryGraphToGraphOperator<G, V, E> op);
+
+  //----------------------------------------------------------------------------
+  // Binary operators
+  //----------------------------------------------------------------------------
 
   /**
    * Returns a collection with all logical graphs from two input collections.
@@ -160,48 +217,52 @@ public interface GraphCollectionOperators
     GraphCollection<G, V, E> otherCollection) throws Exception;
 
   /**
-   * Returns a distinct collection of logical graphs. Graph equality is based on
-   * graph identifiers.
+   * Checks, if another collection contains the same graphs as this graph
+   * (by id).
    *
-   * @return distinct graph collection
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by graph ids
    */
-  GraphCollection<G, V, E> distinct();
+  DataSet<Boolean> equalsByGraphIds(GraphCollection<G, V, E> other);
 
   /**
-   * Returns a graph collection that is sorted by a given graph property key.
+   * Checks, if another collection contains the same graphs as this graph
+   * (by vertex and edge ids).
    *
-   * @param propertyKey property which is used for comparison
-   * @param order       ascending, descending
-   * @return ordered collection
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by element ids
    */
-  GraphCollection<G, V, E> sortBy(String propertyKey, Order order);
+  DataSet<Boolean> equalsByGraphElementIds(GraphCollection<G, V, E> other);
 
   /**
-   * Returns the first {@code limit} logical graphs contained in that
-   * collection.
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the graph collection is equal to the given graph collection.
    *
-   * @param limit number of graphs to return from collection
-   * @return part of graph collection
+   * Equality is defined on the element data contained inside the collection,
+   * i.e. vertices and edges.
+   *
+   * @param other graph collection to compare with
+   * @return  1-element dataset containing {@code true} if the two collections
+   *          are equal or {@code false} if not
    */
-  GraphCollection<G, V, E> top(int limit);
+  DataSet<Boolean> equalsByGraphElementData(GraphCollection<G, V, E> other);
 
   /**
-   * Applies a given unary graph to graph operator (e.g., summarize) on each
-   * logical graph in the graph collection.
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the graph collection is equal to the given graph collection.
    *
-   * @param op unary graph to graph operator
-   * @return collection with resulting logical graphs
+   * Equality is defined on the data contained inside the collection, i.e.
+   * graph heads, vertices and edges.
+   *
+   * @param other graph collection to compare with
+   * @return  1-element dataset containing {@code true} if the two collections
+   *          are equal or {@code false} if not
    */
-  GraphCollection<G, V, E> apply(UnaryGraphToGraphOperator<G, V, E> op);
+  DataSet<Boolean> equalsByGraphData(GraphCollection<G, V, E> other);
 
-  /**
-   * Applies binary graph to graph operator (e.g., combine) on each pair of
-   * logical graphs in that collection and produces a single output graph.
-   *
-   * @param op binary graph to graph operator
-   * @return logical graph
-   */
-  LogicalGraph<G, V, E> reduce(BinaryGraphToGraphOperator<G, V, E> op);
+  //----------------------------------------------------------------------------
+  // Auxiliary operators
+  //----------------------------------------------------------------------------
 
   /**
    * Calls the given unary collection to collection operator for the collection.
@@ -233,77 +294,4 @@ public interface GraphCollectionOperators
    */
   LogicalGraph<G, V, E> callForGraph(
     UnaryCollectionToGraphOperator<G, V, E> op);
-
-  /**
-   * Writes the graph collection into three separate JSON files. {@code
-   * vertexFile} contains the vertex data of all logical graphs, {@code
-   * edgeFile} contains the edge data of all logical graphs and {@code
-   * graphFile} contains the graph data the logical graphs in the collection.
-   * <p>
-   * Operation uses Flink to write the internal datasets, thus writing to
-   * local file system ({@code file://}) as well as HDFS ({@code hdfs://}) is
-   * supported.
-   *
-   * @param vertexFile vertex data output file
-   * @param edgeFile   edge data output file
-   * @param graphFile  graph data output file
-   * @throws Exception
-   */
-  void writeAsJson(final String vertexFile, final String edgeFile,
-    final String graphFile) throws Exception;
-
-  /**
-   * Checks, if another collection contains the same graphs as this graph
-   * (by id).
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by graph ids
-   */
-  DataSet<Boolean> equalsByGraphIds(GraphCollection<G, V, E> other);
-
-  /**
-   * Checks, if another collection contains the same graphs as this graph
-   * (by vertex and edge ids).
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
-   */
-  DataSet<Boolean> equalsByGraphElementIds(GraphCollection<G, V, E> other);
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the collection is empty.
-   *
-   * A collection is considered empty, if it contains no logical graphs.
-   *
-   * @return  1-element dataset containing {@code true}, if the collection is
-   *          empty or {@code false} if not
-   */
-  DataSet<Boolean> isEmpty();
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the graph collection is equal to the given graph collection.
-   *
-   * Equality is defined on the element data contained inside the collection,
-   * i.e. vertices and edges.
-   *
-   * @param result graph collection to compare with
-   * @return  1-element dataset containing {@code true} if the two collections
-   *          are equal or {@code false} if not
-   */
-  DataSet<Boolean> equalsByGraphElementData(GraphCollection<G, V, E> result);
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the graph collection is equal to the given graph collection.
-   *
-   * Equality is defined on the data contained inside the collection, i.e.
-   * graph heads, vertices and edges.
-   *
-   * @param result graph collection to compare with
-   * @return  1-element dataset containing {@code true} if the two collections
-   *          are equal or {@code false} if not
-   */
-  DataSet<Boolean> equalsByGraphData(GraphCollection<G, V, E> result);
 }

@@ -37,12 +37,20 @@ import org.gradoop.model.impl.operators.summarization.Summarization;
  * @param <G> EPGM graph head type
  */
 public interface LogicalGraphOperators
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends GraphBaseOperators<V, E> {
 
-  /*
-  unary operators take one graph as input and return a single graph or a
-  graph collection
+  /**
+   * Returns a dataset containing a single graph head associated with that
+   * logical graph.
+   *
+   * @return 1-element dataset
    */
+  DataSet<G> getGraphHead();
+
+  //----------------------------------------------------------------------------
+  // Unary Operators
+  //----------------------------------------------------------------------------
 
   /**
    * Returns a graph collection containing all logical graph that match the
@@ -90,8 +98,6 @@ public interface LogicalGraphOperators
    * @throws Exception
    */
   LogicalGraph<G, V, E> sampleRandomNodes(Float sampleSize) throws Exception;
-
-  /* Summarization */
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -250,9 +256,9 @@ public interface LogicalGraphOperators
   LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
     String vertexGroupingKey, String edgeGroupingKey) throws Exception;
 
-  /*
-  binary operators take two graphs as input and return a single graph
-   */
+  //----------------------------------------------------------------------------
+  // Binary Operators
+  //----------------------------------------------------------------------------
 
   /**
    * Creates a new logical graph by combining the vertex and edge sets of
@@ -287,9 +293,27 @@ public interface LogicalGraphOperators
    */
   LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph);
 
-  /*
-  split operators
+  /**
+   * Checks, if another logical graph contains exactly the same vertices and
+   * edges (by id) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by element ids
    */
+  DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other);
+
+  /**
+   * Checks, if another logical graph contains vertices and edges with the same
+   * attached data (i.e. label and properties) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by element data
+   */
+  DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other);
+
+  //----------------------------------------------------------------------------
+  // Auxiliary Operators
+  //----------------------------------------------------------------------------
 
   /**
    * Creates a logical graph using the given unary graph operator.
@@ -322,46 +346,4 @@ public interface LogicalGraphOperators
    */
   GraphCollection<G, V, E> callForCollection(
     UnaryGraphToCollectionOperator<G, V, E> operator) throws Exception;
-
-  /**
-   * Writes the logical graph into three separate JSON files. {@code
-   * vertexFile} contains the vertex data, {@code edgeFile} contains the edge
-   * data and {@code graphFile} contains the graph data of that logical graph.
-   * <p/>
-   * Operation uses Flink to write the internal datasets, thus writing to
-   * local file system ({@code file://}) as well as HDFS ({@code hdfs://}) is
-   * supported.
-   *
-   * @param vertexFile vertex data output file
-   * @param edgeFile   edge data output file
-   * @param graphFile  graph data output file
-   * @throws Exception
-   */
-  void writeAsJson(final String vertexFile, final String edgeFile,
-    final String graphFile) throws Exception;
-
-  /**
-   * Checks, if another logical graph contains exactly the same vertices and
-   * edges (by id) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
-   */
-  DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other);
-
-  /**
-   * Checks, if another logical graph contains vertices and edges with the same
-   * attached data (i.e. label and properties) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element data
-   */
-  DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other);
-
-  /**
-   * Returns true, if the graph contains zero vertices.
-   *
-   * @return true, if graph is empty.
-   */
-  DataSet<Boolean> isEmpty();
 }

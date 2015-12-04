@@ -44,13 +44,21 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetDatabaseGraph() throws Exception {
-    LogicalGraph dbGraph = getSocialNetworkLoader()
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dbGraph =
+      getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
     assertNotNull("database graph was null", dbGraph);
-    assertEquals("vertex set has the wrong size", 11,
-      dbGraph.getVertices().count());
-    assertEquals("edge set has the wrong size", 24, dbGraph.getEdges().count());
+
+    Collection<VertexPojo> vertices = Lists.newArrayList();
+    Collection<EdgePojo> edges = Lists.newArrayList();
+
+    dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
+    dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
+
+    getExecutionEnvironment().execute();
+
+    assertEquals("vertex set has the wrong size", 11, vertices.size());
+    assertEquals("edge set has the wrong size", 24, edges.size());
   }
 
   @Test
@@ -69,10 +77,22 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       databaseGraph = graphStore.getDatabaseGraph();
 
-    assertEquals("Wrong vertex count", 11, databaseGraph.getVertexCount());
-    assertEquals("Wrong edge count", 24, databaseGraph.getEdgeCount());
-    assertEquals("Wrong graph count", 4,
-      graphStore.getCollection().getGraphCount());
+    Collection<GraphHeadPojo> graphHeads = Lists.newArrayList();
+    Collection<VertexPojo> vertices = Lists.newArrayList();
+    Collection<EdgePojo> edges = Lists.newArrayList();
+
+    graphStore.getCollection().getGraphHeads()
+      .output(new LocalCollectionOutputFormat<>(graphHeads));
+    databaseGraph.getVertices()
+      .output(new LocalCollectionOutputFormat<>(vertices));
+    databaseGraph.getEdges()
+      .output(new LocalCollectionOutputFormat<>(edges));
+
+    getExecutionEnvironment().execute();
+
+    assertEquals("Wrong graph count", 4, graphHeads.size());
+    assertEquals("Wrong vertex count", 11, vertices.size());
+    assertEquals("Wrong edge count", 24, edges.size());
   }
 
   @Test

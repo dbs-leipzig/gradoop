@@ -34,14 +34,12 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -65,6 +63,7 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.model.impl.operators.equality.EqualityByGraphData;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphElementData;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphElementIds;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphIds;
@@ -78,6 +77,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.apache.flink.shaded.com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Represents a collection of graphs inside the EPGM. As graphs may share
  * vertices and edges, the collections contains a single gelly graph
@@ -87,10 +88,8 @@ import java.util.List;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GraphCollection<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
+public class GraphCollection
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends GraphBase<G, V, E>
   implements GraphCollectionOperators<G, V, E> {
 
@@ -109,6 +108,10 @@ public class GraphCollection<
     super(graphHeads, vertices, edges, config);
   }
 
+  //----------------------------------------------------------------------------
+  // Factory methods
+  //----------------------------------------------------------------------------
+
   /**
    * Creates an empty graph collection.
    *
@@ -118,10 +121,9 @@ public class GraphCollection<
    * @param <E>     EPGM edge type
    * @return empty graph collection
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> GraphCollection<G, V, E> createEmptyCollection(
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E> createEmptyCollection(
     GradoopFlinkConfig<G, V, E> config) {
     Collection<G> graphHeads = new ArrayList<>();
     Collection<V> vertices = new ArrayList<>();
@@ -144,11 +146,14 @@ public class GraphCollection<
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-
   GraphCollection<G, V, E>
   fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
 
+    checkNotNull(graphHeads, "GraphHead DataSet was null");
+    checkNotNull(vertices, "Vertex DataSet was null");
+    checkNotNull(edges, "Edge DataSet was null");
+    checkNotNull(config, "Config was null");
     return new GraphCollection<>(graphHeads, vertices, edges, config);
   }
 
@@ -173,6 +178,10 @@ public class GraphCollection<
     Collection<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
 
+    checkNotNull(graphHeads, "GraphHead collection was null");
+    checkNotNull(vertices, "Vertex collection was null");
+    checkNotNull(edges, "Vertex collection was null");
+    checkNotNull(config, "Config was null");
     return fromDataSets(
       createGraphHeadDataSet(graphHeads, config),
       createVertexDataSet(vertices, config),
@@ -181,11 +190,12 @@ public class GraphCollection<
     );
   }
 
+  //----------------------------------------------------------------------------
+  // Logical Graph / Graph Head Getters
+  //----------------------------------------------------------------------------
+
   /**
-   * Returns the graph heads associated with the logical graphs in that
-   * collection.
-   *
-   * @return graph heads
+   * {@inheritDoc}
    */
   public DataSet<G> getGraphHeads() {
     return this.graphHeads;
@@ -194,7 +204,6 @@ public class GraphCollection<
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
   @Override
   public LogicalGraph<G, V, E> getGraph(final GradoopId graphID) throws
     Exception {
@@ -209,7 +218,7 @@ public class GraphCollection<
 
     DataSet<Tuple1<GradoopId>> graphIDDataSet = getConfig()
       .getExecutionEnvironment()
-      .fromCollection(Lists.newArrayList(new Tuple1<>(graphID)));
+      .fromElements(new Tuple1<>(graphID));
 
     // get graph data based on graph id
     List<G> graphData = this.graphHeads
@@ -271,13 +280,9 @@ public class GraphCollection<
     return new GraphCollection<>(newGraphHeads, vertices, edges, getConfig());
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long getGraphCount() throws Exception {
-    return this.graphHeads.count();
-  }
+  //----------------------------------------------------------------------------
+  // Unary Operators
+  //----------------------------------------------------------------------------
 
   /**
    * {@inheritDoc}
@@ -322,10 +327,56 @@ public class GraphCollection<
    * {@inheritDoc}
    */
   @Override
+  public GraphCollection<G, V, E> distinct() {
+    throw new NotImplementedException();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection<G, V, E> sortBy(String propertyKey, Order order) {
+    throw new NotImplementedException();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection<G, V, E> top(int limit) {
+    throw new NotImplementedException();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection<G, V, E> apply(
+    UnaryGraphToGraphOperator<G, V, E> op) {
+    throw new NotImplementedException();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph<G, V, E> reduce(
+    BinaryGraphToGraphOperator<G, V, E> op) {
+    throw new NotImplementedException();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public GraphCollection<G, V, E> select(
     Predicate<LogicalGraph<G, V, E>> predicateFunction) throws Exception {
     throw new NotImplementedException();
   }
+
+  //----------------------------------------------------------------------------
+  // Binary Operators
+  //----------------------------------------------------------------------------
 
   /**
    * {@inheritDoc}
@@ -378,43 +429,39 @@ public class GraphCollection<
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> distinct() {
-    throw new NotImplementedException();
+  public DataSet<Boolean> equalsByGraphIds(GraphCollection<G, V, E> other) {
+    return new EqualityByGraphIds<G, V, E>().execute(this, other);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> sortBy(String propertyKey, Order order) {
-    throw new NotImplementedException();
+  public DataSet<Boolean> equalsByGraphElementIds(
+    GraphCollection<G, V, E> other) {
+    return new EqualityByGraphElementIds<G, V, E>().execute(this, other);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> top(int limit) {
-    throw new NotImplementedException();
+  public DataSet<Boolean> equalsByGraphElementData(
+    GraphCollection<G, V, E> other) {
+    return new EqualityByGraphElementData<G, V, E>().execute(this, other);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> apply(
-    UnaryGraphToGraphOperator<G, V, E> op) {
-    throw new NotImplementedException();
+  public DataSet<Boolean> equalsByGraphData(GraphCollection<G, V, E> other) {
+    return new EqualityByGraphData<G, V, E>().execute(this, other);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph<G, V, E> reduce(
-    BinaryGraphToGraphOperator<G, V, E> op) {
-    throw new NotImplementedException();
-  }
+  //----------------------------------------------------------------------------
+  // Auxiliary Operators
+  //----------------------------------------------------------------------------
 
   /**
    * {@inheritDoc}
@@ -444,37 +491,9 @@ public class GraphCollection<
     return op.execute(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void writeAsJson(String vertexFile, String edgeFile,
-    String graphFile) throws Exception {
-    getVertices().writeAsFormattedText(vertexFile,
-      new JsonWriter.VertexTextFormatter<V>());
-    getEdges().writeAsFormattedText(edgeFile,
-      new JsonWriter.EdgeTextFormatter<E>());
-    getGraphHeads().writeAsFormattedText(graphFile,
-      new JsonWriter.GraphTextFormatter<G>());
-    getConfig().getExecutionEnvironment().execute();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Boolean> equalsByGraphIds(GraphCollection<G, V, E> other) {
-    return new EqualityByGraphIds<G, V, E>().execute(this, other);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Boolean> equalsByGraphElementIds(
-    GraphCollection<G, V, E> other) {
-    return new EqualityByGraphElementIds<G, V, E>().execute(this, other);
-  }
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
 
   /**
    * {@inheritDoc}
@@ -487,22 +506,5 @@ public class GraphCollection<
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Boolean> equalsByGraphElementData(
-    GraphCollection<G, V, E> other) {
-    return new EqualityByGraphElementData<G, V, E>().execute(this, other);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Boolean> equalsByGraphData(GraphCollection<G, V, E> result) {
-    return null;
   }
 }

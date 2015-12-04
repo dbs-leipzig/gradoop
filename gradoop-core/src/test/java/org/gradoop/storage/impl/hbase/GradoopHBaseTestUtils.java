@@ -76,7 +76,7 @@ public class GradoopHBaseTestUtils {
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) {
 
     PersistentGraphHeadFactory<GraphHeadPojo, HBaseGraphHead>
-      graphDataFactory = new HBaseGraphHeadFactory();
+      graphDataFactory = new HBaseGraphHeadFactory<>();
 
     List<PersistentGraphHead> persistentGraphData = new ArrayList<>();
 
@@ -106,8 +106,8 @@ public class GradoopHBaseTestUtils {
 
   private static List<PersistentVertex<EdgePojo>> getPersistentVertices(
     AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) {
-    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex>
-      vertexDataFactory = new HBaseVertexFactory();
+    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex<EdgePojo>>
+      vertexDataFactory = new HBaseVertexFactory<>();
 
     List<PersistentVertex<EdgePojo>> persistentVertexData = new ArrayList<>();
 

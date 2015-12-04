@@ -24,7 +24,6 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -53,6 +52,9 @@ import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a logical graph inside the EPGM.
@@ -81,14 +83,19 @@ public class LogicalGraph
     super(graphHead, vertices, edges, config);
   }
 
+  //----------------------------------------------------------------------------
+  // Factory methods
+  //----------------------------------------------------------------------------
+
   /**
-   * Creates a logical graph from the given arguments.
+   * Creates a logical graph from the given Gelly graph. A new graph head will
+   * created, all vertices and edges will be assigned to that logical graph.
    *
    * @param graph     Flink Gelly graph
    * @param config    Gradoop Flink configuration
-   * @param <G>      EPGM graph head type
-   * @param <V>      EPGM vertex type
-   * @param <E>      EPGM edge type
+   * @param <G>       EPGM graph head type
+   * @param <V>       EPGM vertex type
+   * @param <E>       EPGM edge type
    * @return Logical Graph
    */
   public static <
@@ -114,12 +121,47 @@ public class LogicalGraph
   }
 
   /**
+   * Creates a logical graph from the given Gelly graph. All vertices and edges
+   * will be assigned to the given graph head.
+   *
+   * @param graph     Flink Gelly graph
+   * @param graphHead EPGM graph head for the logical graph
+   * @param config    Gradoop Flink configuration
+   * @param <G>       EPGM graph head type
+   * @param <V>       EPGM vertex type
+   * @param <E>       EPGM edge type
+   * @return Logical Graph
+   */
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> LogicalGraph<G, V, E> fromGellyGraph(
+    Graph<GradoopId, V, E> graph,
+    G graphHead,
+    GradoopFlinkConfig<G, V, E> config) {
+    return fromDataSets(
+      config.getExecutionEnvironment().fromElements(graphHead),
+      graph.getVertices().map(new MapFunction<Vertex<GradoopId, V>, V>() {
+        @Override
+        public V map(Vertex<GradoopId, V> gellyVertex) throws Exception {
+          return gellyVertex.getValue();
+        }
+      }).withForwardedFields("f1->*"),
+      graph.getEdges().map(new MapFunction<Edge<GradoopId, E>, E>() {
+        @Override
+        public E map(Edge<GradoopId, E> gellyEdge) throws Exception {
+          return gellyEdge.getValue();
+        }
+      }).withForwardedFields("f2->*"), config);
+  }
+
+  /**
    * Creates a logical graph from the given arguments.
    *
    * @param <G>         EPGM graph head graph head type
    * @param <V>         EPGM vertex type
    * @param <E>         EPGM edge type
-   * @param graphHead   GraphHead DataSet
+   * @param graphHead   1-element GraphHead DataSet
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
@@ -155,6 +197,9 @@ public class LogicalGraph
     DataSet<V> vertices, DataSet<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
 
+    checkNotNull(vertices, "Vertex DataSet was null");
+    checkNotNull(edges, "Edge DataSet was null");
+    checkNotNull(config, "Config was null");
     G graphHead = config
       .getGraphHeadFactory()
       .createGraphHead();
@@ -170,32 +215,6 @@ public class LogicalGraph
       graphHeadSet,
       vertices,
       edges,
-      config
-    );
-  }
-
-
-  /**
-   * Creates a logical graph from the given arguments.
-   *
-   * @param <G>       EPGM graph type
-   * @param <V>       EPGM vertex type
-   * @param <E>       EPGM edge type
-   * @param graphHead Graph head associated with the logical graph
-   * @param vertices  Vertex collection
-   * @param edges     Edge collection
-   * @param config    Gradoop Flink configuration
-   * @return Logical graph
-   */
-  public static
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
-  LogicalGraph<G, V, E> fromCollections(
-    Collection<G> graphHead, Collection<V> vertices, Collection<E> edges,
-    GradoopFlinkConfig<G, V, E> config) {
-    return fromDataSets(
-      createGraphHeadDataSet(graphHead, config),
-      createVertexDataSet(vertices, config),
-      createEdgeDataSet(edges, config),
       config
     );
   }
@@ -221,10 +240,48 @@ public class LogicalGraph
     Collection<E> edges,
     GradoopFlinkConfig<G, V, E> config) {
 
-    Collection<G> graphHeads = Lists.newArrayList(graphHead);
+    List<G> graphHeads;
+    if (graphHead == null) {
+      graphHeads = Lists.newArrayListWithCapacity(0);
+    } else {
+      graphHeads = Lists.newArrayList(graphHead);
+    }
 
+    checkNotNull(vertices, "Vertex collection was null");
+    checkNotNull(edges, "Edge collection was null");
+    checkNotNull(config, "Config was null");
     return fromDataSets(
       createGraphHeadDataSet(graphHeads, config),
+      createVertexDataSet(vertices, config),
+      createEdgeDataSet(edges, config),
+      config
+    );
+  }
+
+  /**
+   * Creates a logical graph from the given arguments. A new graph head is
+   * created and all vertices and edges are assigned to that graph.
+   *
+   * @param <G>         EPGM graph type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
+   * @param vertices    Vertex collection
+   * @param edges       Edge collection
+   * @param config      Gradoop Flink configuration
+   * @return Logical graph
+   */
+  public static
+  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
+  LogicalGraph<G, V, E> fromCollections(
+    Collection<V> vertices,
+    Collection<E> edges,
+    GradoopFlinkConfig<G, V, E> config) {
+
+    checkNotNull(vertices, "Vertex collection was null");
+    checkNotNull(edges, "Edge collection was null");
+    checkNotNull(config, "Config was null");
+    return fromDataSets(
+      createGraphHeadDataSet(new ArrayList<G>(0), config),
       createVertexDataSet(vertices, config),
       createEdgeDataSet(edges, config),
       config
@@ -243,12 +300,27 @@ public class LogicalGraph
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   LogicalGraph<G, V, E> createEmptyGraph(GradoopFlinkConfig<G, V, E> config) {
-    Collection<G> graphHead = new ArrayList<>();
-    Collection<V> vertices = new ArrayList<>();
-    Collection<E> edges = new ArrayList<>();
+    checkNotNull(config, "Config was null");
 
-    return fromCollections(graphHead, vertices, edges, config);
+    Collection<V> vertices = new ArrayList<>(0);
+    Collection<E> edges = new ArrayList<>(0);
+    return fromCollections(null, vertices, edges, config);
   }
+
+  //----------------------------------------------------------------------------
+  // Containment methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * {@inheritDoc}
+   */
+  public DataSet<G> getGraphHead() {
+    return this.graphHeads;
+  }
+
+  //----------------------------------------------------------------------------
+  // Operators
+  //----------------------------------------------------------------------------
 
   /**
    * {@inheritDoc}
@@ -439,26 +511,6 @@ public class LogicalGraph
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
-  @Override
-  public void writeAsJson(String vertexFile, String edgeFile,
-    String graphFile) throws Exception {
-
-    getVertices().writeAsFormattedText(vertexFile,
-      new JsonWriter.VertexTextFormatter<V>());
-
-    getEdges().writeAsFormattedText(edgeFile,
-      new JsonWriter.EdgeTextFormatter<E>());
-
-    getGraphHead().writeAsFormattedText(graphFile,
-      new JsonWriter.GraphTextFormatter<G>());
-
-    getConfig().getExecutionEnvironment().execute();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other) {
     return new EqualityByElementIds<G, V, E>().execute(this, other);
@@ -471,6 +523,10 @@ public class LogicalGraph
   public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
     return new EqualityByElementData<G, V, E>().execute(this, other);
   }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
 
   /**
    * {@inheritDoc}

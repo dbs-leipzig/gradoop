@@ -28,28 +28,32 @@ import org.gradoop.model.impl.GraphCollection;
 /**
  * Operators that are available at all graph structures.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ *
  * @see LogicalGraph
  * @see GraphCollection
  */
-public interface GraphOperators<
-  VD extends EPGMVertex,
-  ED extends EPGMEdge> {
+public interface GraphBaseOperators
+  <V extends EPGMVertex, E extends EPGMEdge> {
+
+  //----------------------------------------------------------------------------
+  // Containment methods
+  //----------------------------------------------------------------------------
 
   /**
    * Returns all vertices including vertex data associated with that graph.
    *
    * @return vertices
    */
-  DataSet<VD> getVertices();
+  DataSet<V> getVertices();
 
   /**
    * Returns all edge data associated with that logical graph.
    *
    * @return edges
    */
-  DataSet<ED> getEdges();
+  DataSet<E> getEdges();
 
   /**
    * Returns the edge data associated with the outgoing edges of the given
@@ -58,7 +62,7 @@ public interface GraphOperators<
    * @param vertexID vertex identifier
    * @return outgoing edge data of given vertex
    */
-  DataSet<ED> getOutgoingEdges(final GradoopId vertexID);
+  DataSet<E> getOutgoingEdges(final GradoopId vertexID);
 
   /**
    * Returns the edge data associated with the incoming edges of the given
@@ -67,28 +71,45 @@ public interface GraphOperators<
    * @param vertexID vertex identifier
    * @return incoming edge data of given vertex
    */
-  DataSet<ED> getIncomingEdges(final GradoopId vertexID);
+  DataSet<E> getIncomingEdges(final GradoopId vertexID);
 
   /**
    * Transforms the EPGM graph to a Gelly Graph.
    *
    * @return Gelly Graph
    */
-  Graph<GradoopId, VD, ED> toGellyGraph();
+  Graph<GradoopId, V, E> toGellyGraph();
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
 
   /**
-   * Returns the number of vertices in that logical graph.
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the collection is empty.
    *
-   * @return number of vertices
-   * @throws Exception
+   * A collection is considered empty, if it contains no logical graphs.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
    */
-  long getVertexCount() throws Exception;
+  DataSet<Boolean> isEmpty();
 
   /**
-   * Returns the number of edges in that logical graph.
+   * Writes the logical graph / graph collection into three separate JSON files.
+   * {@code vertexFile} contains all vertices, {@code edgeFile} contains all
+   * edges and {@code graphFile} contains the graph data the logical graph /
+   * graph collection.
+   * <p>
+   * Operation uses Flink to write the internal datasets, thus writing to
+   * local file system ({@code file://}) as well as HDFS ({@code hdfs://}) is
+   * supported.
    *
-   * @return number of edges
+   * @param vertexFile vertex data output file
+   * @param edgeFile   edge data output file
+   * @param graphFile  graph data output file
    * @throws Exception
    */
-  long getEdgeCount() throws Exception;
+  void writeAsJson(final String vertexFile, final String edgeFile,
+    final String graphFile) throws Exception;
 }
