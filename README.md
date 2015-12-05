@@ -54,19 +54,19 @@ The following table contains an overview (GC = GraphCollection, G = Graph).
 | Operator      | In      | Out           | Output description                                                      | Impl |
 |:--------------|:--------|:--------------|:------------------------------------------------------------------------|:----:|
 | Selection     | GC      | GC            | Filter graphs based on their attached data (i.e. label, properties)     | Yes  |
-| Distinct      | GC      | GC            | No duplicate graphIds                                                   | No   |
+| Distinct      | GC      | GC            | No duplicate graphs                                                     | No   |
 | SortBy        | GC      | GC            | Graphs sorted by a given graph property key                             | No   |
 | Top           | GC      | GC            | The first n elements of the input collection                            | No   |
-| Union         | GC x GC | GC            | All graphIds from both collections                                      | Yes  |
-| Intersection  | GC x GC | GC            | Only graphIds that exist in both collections                            | Yes  |
+| Union         | GC x GC | GC            | All graphs from both input collections                                  | Yes  |
+| Intersection  | GC x GC | GC            | Only graphs that exist in both collections                              | Yes  |
 | Difference    | GC x GC | GC            | Only graphIds that exist in one collection                              | Yes  |
 | Equality      | GC x GC | {true, false} | Compare collections in terms of contained element data or identifiers   | Yes  |
-| Combination   | G x G   | G             | Vertices and edgeIds from both graphIds                                 | Yes  |
-| Overlap       | G x G   | G             | Vertices and edgeIds that exist in both graphIds                        | Yes  |
-| Exclusion     | G x G   | G             | Vertices and edgeIds that exist in only one graph                       | Yes  |
+| Combination   | G x G   | G             | Graph with vertices and edges from both input graphs                    | Yes  |
+| Overlap       | G x G   | G             | Graph with vertices and edges that exist in both input graphs           | Yes  |
+| Exclusion     | G x G   | G             | Graph with vertices and edges that exist only in the first graph        | Yes  |
 | Equality      | G x G   | {true, false} | Compares graphs in terms of contained element data or identifiers       | Yes  |
 | Pattern Match | G       | GC            | Graphs that match a given graph pattern                                 | No   |
-| Aggregation   | G       | G             | Graph with result of an aggregate function                              | Yes  |
+| Aggregation   | G       | G             | Graph with result of an aggregate function as a new property            | Yes  |
 | Projection    | G       | G             | Graph with projected vertex and edge sets                               | Yes  |
 | Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
 | Apply         | GC      | GC            | Applies operator to each graph in collection                            | No   |
