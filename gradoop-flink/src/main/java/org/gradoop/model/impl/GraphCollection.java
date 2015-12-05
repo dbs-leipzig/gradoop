@@ -288,7 +288,7 @@ public class GraphCollection
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> filter(
+  public GraphCollection<G, V, E> select(
     final Predicate<G> predicateFunction) throws Exception {
     // find graph heads matching the predicate
     DataSet<G> filteredGraphHeads =
@@ -362,15 +362,6 @@ public class GraphCollection
   @Override
   public LogicalGraph<G, V, E> reduce(
     BinaryGraphToGraphOperator<G, V, E> op) {
-    throw new NotImplementedException();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public GraphCollection<G, V, E> select(
-    Predicate<LogicalGraph<G, V, E>> predicateFunction) throws Exception {
     throw new NotImplementedException();
   }
 

@@ -85,25 +85,14 @@ public interface GraphCollectionOperators
   //----------------------------------------------------------------------------
 
   /**
-   * Filter containing graphs based on their associated graph data.
+   * Filter containing graphs based on their associated graph head.
    *
-   * @param predicateFunction predicate function for graph data
+   * @param predicateFunction predicate function for graph head
    * @return collection with logical graphs that fulfil the predicate
    * @throws Exception
    */
-  GraphCollection<G, V, E> filter(Predicate<G> predicateFunction) throws
+  GraphCollection<G, V, E> select(Predicate<G> predicateFunction) throws
     Exception;
-
-  /**
-   * Returns a collection with logical graphs that fulfil the given predicate
-   * function.
-   *
-   * @param predicateFunction predicate function
-   * @return logical graphs that fulfil the predicate
-   * @throws Exception
-   */
-  GraphCollection<G, V, E> select(
-    Predicate<LogicalGraph<G, V, E>> predicateFunction) throws Exception;
 
   /**
    * Returns a distinct collection of logical graphs. Graph equality is based on

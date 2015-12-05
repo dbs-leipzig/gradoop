@@ -3,11 +3,15 @@
 ## Gradoop: Distributed Graph Analytics on Hadoop
 
 [Gradoop](http://www.gradoop.com) is an open source (GPLv3) research framework 
-for scalable graph analytics. It offers a graph data model which extends the widespread 
+for scalable graph analytics built on top of [Apache Flink](http://flink.apache.org/)
+and [Apache HBase](http://hbase.apache.org/). It offers a graph data model which 
+extends the widespread 
 [property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
-by the concept of logical subgraphs and further provides operators that can be applied 
-on single graphIds and collections of graphIds. The combination of these operators allows
-the flexible, declarative definition of graph analytical workflows.
+by the concept of logical graphs and further provides operators that can be applied 
+on single logical graphs and collections of logical graphs. The combination of these 
+operators allows the flexible, declarative definition of graph analytical workflows.
+Gradoop can be easily integrated in a workflows which already use Flink operators
+and Flink libraries (i.e. Gelly, ML and Table).
 
 ```java
 // load social network from hdfs
@@ -30,42 +34,43 @@ as a proof of concept implementation and far from production ready.
 ## Data Model
 
 In the extended property graph model (EPGM), a database consists of multiple 
-property graphIds which are called logical graphIds. These graphIds are
-application-specific subsets from shared sets of vertexIds and edgeIds, i.e., may
-have common vertexIds and edgeIds. Additionally, not only vertexIds and edgeIds but
-also logical graphIds have a type label and can have different properties.
+property graphs which are called logical graphs. These graphs are
+application-specific subsets from shared sets of vertices and edges, i.e. may
+have common vertices and edges. Additionally, not only vertices and edges but
+also logical graphs have a type label and can have different properties.
 
-Data Model elements (logical graphIds, vertexIds and edgeIds) have a unique identifier
-inside their domain, a single label (e.g., User) and a number of key-value 
-properties (e.g, name = Alice). There is no schema involved, meaning each element
-can have arbitrary number of properties even if they have the same label.
+Data Model elements (logical graphs, vertices and edges) have a unique identifier, 
+a single label (e.g. User) and a number of key-value properties (e.g. name = Alice).
+There is no schema involved, meaning each element can have an arbitrary number of
+properties even if they have the same label.
 
 ### Graph operators
 
-The EPGM provides operators for both single graphIds as well as collections of
-graphIds; operators may also return single graphIds or graph collections.
+The EPGM provides operators for both single graphs as well as collections of
+graphs; operators may also return single graphs or graph collections.
 
-Our operator implementations are based on [Apache Flink](http://flink.apache.org/).
 The following table contains an overview (GC = GraphCollection, G = Graph).
 
-| Operator      | In      | Out | Output description                              | Impl |
-|:--------------|:--------|:----|:------------------------------------------------|:----:|
-| Selection     | GC      | GC  | Graphs that fulfil a predicate function         | Yes  |
-| Distinct      | GC      | GC  | No duplicate graphIds                             | No   |
-| SortBy        | GC      | GC  | Graphs sorted by graph property                 | No   |
-| Top           | GC      | GC  | The first n elements of the input collection    | No   |
-| Union         | GC x GC | GC  | All graphIds from both collections                | Yes  |
-| Intersection  | GC x GC | GC  | Only graphIds that exist in both collections      | Yes  |
-| Difference    | GC x GC | GC  | Only graphIds that exist in one collection        | Yes  |
-| Combination   | G x G   | G   | Vertices and edgeIds from both graphIds             | Yes  |
-| Overlap       | G x G   | G   | Vertices and edgeIds that exist in both graphIds    | Yes  |
-| Exclusion     | G x G   | G   | Vertices and edgeIds that exist in only one graph | Yes  |
-| Pattern Match | G       | GC  | Graphs that match a given graph pattern         | No   |
-| Aggregation   | G       | G   | Graph with result of an aggregate function      | Yes  |
-| Projection    | G       | G   | Graph with projected vertex and edge sets       | Yes  |
-| Summarization | G       | G   | Structural condense of the input graph          | Yes  |
-| Apply         | GC      | GC  | Applies operator to each graph in collection    | No   |
-| Reduce        | GC      | G   | Reduces collection to graph using operator      | No   |
+| Operator      | In      | Out           | Output description                                                      | Impl |
+|:--------------|:--------|:--------------|:------------------------------------------------------------------------|:----:|
+| Selection     | GC      | GC            | Filter graphs based on their attached data (i.e. label, properties)     | Yes  |
+| Distinct      | GC      | GC            | No duplicate graphIds                                                   | No   |
+| SortBy        | GC      | GC            | Graphs sorted by a given graph property key                             | No   |
+| Top           | GC      | GC            | The first n elements of the input collection                            | No   |
+| Union         | GC x GC | GC            | All graphIds from both collections                                      | Yes  |
+| Intersection  | GC x GC | GC            | Only graphIds that exist in both collections                            | Yes  |
+| Difference    | GC x GC | GC            | Only graphIds that exist in one collection                              | Yes  |
+| Equality      | GC x GC | {true, false} | Compare collections in terms of contained element data or identifiers   | Yes  |
+| Combination   | G x G   | G             | Vertices and edgeIds from both graphIds                                 | Yes  |
+| Overlap       | G x G   | G             | Vertices and edgeIds that exist in both graphIds                        | Yes  |
+| Exclusion     | G x G   | G             | Vertices and edgeIds that exist in only one graph                       | Yes  |
+| Equality      | G x G   | {true, false} | Compares graphs in terms of contained element data or identifiers       | Yes  |
+| Pattern Match | G       | GC            | Graphs that match a given graph pattern                                 | No   |
+| Aggregation   | G       | G             | Graph with result of an aggregate function                              | Yes  |
+| Projection    | G       | G             | Graph with projected vertex and edge sets                               | Yes  |
+| Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
+| Apply         | GC      | GC            | Applies operator to each graph in collection                            | No   |
+| Reduce        | GC      | G             | Reduces collection to graph using operator                              | Yes  |
 
 ## Setup
 
@@ -184,61 +189,31 @@ If you want to execute Gradoop on a cluster, you need *Hadoop 2.5.1* and
 ### gradoop-core
 
 The main contents of that module are the Extended Property Graph Data
-Model, the corresponding graph repository and its reference implementation for
-Apache HBase (wip).
-
-Furthermore, the module contains the Bulk Load / Write drivers based on
-MapReduce and file readers / writers for user defined file and graph formats.
+Model and a corresponding POJO implementation which is used in Flink. The
+persistent representation of the EPGM is also contained in core and its mapping
+to Apache HBase.
 
 ### gradoop-flink
 
-This module contains a reference implementation of the EPGM including the data
-model and its operators. The concepts of the EPGM are mapped to the property
-graph data model offered by 
-[Flink Gelly](https://ci.apache.org/projects/flink/flink-docs-master/libs/gelly_guide.html) 
-and additional Flink Datasets. The gradoop operator implementations leverage 
-existing Flink and Gelly operators.
+This module contains reference implementations of the EPGM operators. The 
+concepts of the EPGM are mapped to Flink DataSets and processed using Flink 
+operators.
 
 ### gradoop-examples
 
 Contains example pipelines showing use cases for Gradoop. 
 
-*   Graph summarization (build structural aggregates of property graphIds)
+*   Graph summarization (build structural aggregates of property graphs)
+
+### gradoop-algorithms
+
+Contains implementations of general graph algorithms (e.g. Label Propagation)
+adapted to be used with the EPGM model.
 
 ### gradoop-checkstyle
 
-Used to maintain the codestyle for the whole project.
-
-## Developer notes
-
-### Code style for IntelliJ IDEA
-
-*   copy codestyle from dev-support to your local IDEA config folder
-
-    > cp dev-support/gradoop-idea-codestyle.xml ~/.IntelliJIdea14/config/codeStyles
-
-*   restart IDEA
-
-*   `File -> Settings -> Code Style -> Java -> Scheme -> "Gradoop"`
+Used to maintain the code style for the whole project.
     
-### Troubleshooting
-
-* Exception while running test org.apache.giraph.io.hbase
-.TestHBaseRootMarkerVertexFormat (incorrect permissions, see
-http://stackoverflow.com/questions/17625938/hbase-minidfscluster-java-fails
--in-certain-environments for details)
-
-    > umask 022
-
-* Ubuntu + Giraph hostname problems. To avoid hostname issues comment the
-following line in /etc/hosts
-
-    `127.0.1.1   <your-host-name>`
-    
-* And add your hostname to the localhost entry
-
-    `127.0.0.1  localhost <your-host-name>`
-
 ### Version History
 
 * 0.0.1 first prototype using Hadoop MapReduce and Apache Giraph for operator
@@ -246,6 +221,7 @@ following line in /etc/hosts
 * 0.0.2 support for HBase as distributed graph storage
 * 0.0.3 Apache Flink replaces MapReduce and Giraph as operator implementation
  layer and distributed execution engine
+* 0.1 Major refactoring of internal EPGM representation (e.g. ID and property handling), Equality Operators, GDL-based unit testing
 
 
 
