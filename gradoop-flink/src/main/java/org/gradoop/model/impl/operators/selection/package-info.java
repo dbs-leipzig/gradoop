@@ -12,24 +12,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.gradoop.model.api.functions;
 
 /**
- * Used by predicate based operations (e.g., Selection, Filter).
- *
- * @param <T> type to perform predicate function on
+ * Contains classes related to selection.
  */
-public interface Predicate<T> {
-
-  /**
-   * Returns true if {@code entity} fulfils the predicate.
-   *
-   * @param entity entity to apply predicate on
-   * @return true if predicate is fulfilled, false otherwise
-   * @throws Exception
-   */
-  boolean filter(T entity) throws Exception;
-}
+package org.gradoop.model.impl.operators.selection;

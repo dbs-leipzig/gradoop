@@ -16,6 +16,7 @@
  */
 package org.gradoop.model.api.operators;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -24,7 +25,6 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.Order;
-import org.gradoop.model.api.functions.Predicate;
 import org.gradoop.model.impl.GraphCollection;
 
 /**
@@ -52,33 +52,28 @@ public interface GraphCollectionOperators
   DataSet<G> getGraphHeads();
 
   /**
-   * Returns logical graph from collection using the given identifier.
+   * Returns logical graph from collection using the given identifier. If the
+   * graph does not exist, an empty logical graph is returned.
    *
    * @param graphID graph identifier
-   * @return logical graph with given id or {@code null} if not contained
-   * @throws Exception
+   * @return logical graph with given id or an empty logical graph
    */
-  LogicalGraph<G, V, E> getGraph(final GradoopId graphID) throws Exception;
+  LogicalGraph<G, V, E> getGraph(final GradoopId graphID);
+  /**
+   * Extracts logical graphs from collection using their identifiers.
+   *
+   * @param identifiers graph identifiers
+   * @return collection containing requested logical graphs
+   */
+  GraphCollection<G, V, E> getGraphs(final GradoopId... identifiers);
 
   /**
    * Extracts logical graphs from collection using their identifiers.
    *
    * @param identifiers graph identifiers
    * @return collection containing requested logical graphs
-   * @throws Exception
    */
-  GraphCollection<G, V, E> getGraphs(final GradoopId... identifiers) throws
-    Exception;
-
-  /**
-   * Extracts logical graphs from collection using their identifiers.
-   *
-   * @param identifiers graph identifiers
-   * @return collection containing requested logical graphs
-   * @throws Exception
-   */
-  GraphCollection<G, V, E> getGraphs(GradoopIdSet identifiers) throws
-    Exception;
+  GraphCollection<G, V, E> getGraphs(GradoopIdSet identifiers);
 
   //----------------------------------------------------------------------------
   // Unary operators
@@ -89,10 +84,8 @@ public interface GraphCollectionOperators
    *
    * @param predicateFunction predicate function for graph head
    * @return collection with logical graphs that fulfil the predicate
-   * @throws Exception
    */
-  GraphCollection<G, V, E> select(Predicate<G> predicateFunction) throws
-    Exception;
+  GraphCollection<G, V, E> select(FilterFunction<G> predicateFunction);
 
   /**
    * Returns a distinct collection of logical graphs. Graph equality is based on
@@ -148,10 +141,8 @@ public interface GraphCollectionOperators
    *
    * @param otherCollection collection to build union with
    * @return union of both collections
-   * @throws Exception
    */
-  GraphCollection<G, V, E> union(
-    GraphCollection<G, V, E> otherCollection) throws Exception;
+  GraphCollection<G, V, E> union(GraphCollection<G, V, E> otherCollection);
 
   /**
    * Returns a collection with all logical graphs that exist in both input
@@ -159,10 +150,8 @@ public interface GraphCollectionOperators
    *
    * @param otherCollection collection to build intersect with
    * @return intersection of both collections
-   * @throws Exception
    */
-  GraphCollection<G, V, E> intersect(
-    GraphCollection<G, V, E> otherCollection) throws Exception;
+  GraphCollection<G, V, E> intersect(GraphCollection<G, V, E> otherCollection);
 
   /**
    * Returns a collection with all logical graphs that exist in both input
@@ -173,10 +162,9 @@ public interface GraphCollectionOperators
    *
    * @param otherCollection collection to build intersect with
    * @return intersection of both collections
-   * @throws Exception
    */
   GraphCollection<G, V, E> intersectWithSmallResult(
-    GraphCollection<G, V, E> otherCollection) throws Exception;
+    GraphCollection<G, V, E> otherCollection);
 
   /**
    * Returns a collection with all logical graphs that are contained in that
@@ -185,10 +173,8 @@ public interface GraphCollectionOperators
    *
    * @param otherCollection collection to subtract from that collection
    * @return difference between that and the other collection
-   * @throws Exception
    */
-  GraphCollection<G, V, E> difference(
-    GraphCollection<G, V, E> otherCollection) throws Exception;
+  GraphCollection<G, V, E> difference(GraphCollection<G, V, E> otherCollection);
 
   /**
    * Returns a collection with all logical graphs that are contained in that
@@ -200,10 +186,9 @@ public interface GraphCollectionOperators
    *
    * @param otherCollection collection to subtract from that collection
    * @return difference between that and the other collection
-   * @throws Exception
    */
   GraphCollection<G, V, E> differenceWithSmallResult(
-    GraphCollection<G, V, E> otherCollection) throws Exception;
+    GraphCollection<G, V, E> otherCollection);
 
   /**
    * Checks, if another collection contains the same graphs as this graph
@@ -269,11 +254,10 @@ public interface GraphCollectionOperators
    * @param op              binary collection to collection operator
    * @param otherCollection second input collection for operator
    * @return result of given operator
-   * @throws Exception
    */
   GraphCollection<G, V, E> callForCollection(
     BinaryCollectionToCollectionOperator<G, V, E> op,
-    GraphCollection<G, V, E> otherCollection) throws Exception;
+    GraphCollection<G, V, E> otherCollection);
 
   /**
    * Calls the given unary collection to graph operator for the collection.

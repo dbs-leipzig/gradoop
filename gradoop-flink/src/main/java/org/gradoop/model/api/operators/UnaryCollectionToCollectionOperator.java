@@ -30,8 +30,8 @@ import org.gradoop.model.impl.GraphCollection;
  * @param <G> EPGM graph head type
  */
 public interface UnaryCollectionToCollectionOperator
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> extends
-  Operator {
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends Operator {
   /**
    * Executes the operator.
    *

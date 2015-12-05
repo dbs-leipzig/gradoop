@@ -199,13 +199,13 @@ public abstract class GradoopFlinkTestBase {
   // Test helper
   //----------------------------------------------------------------------------
 
-  protected void collectAndAssertEquals(DataSet<Boolean> result) throws
+  protected void collectAndAssertTrue(DataSet<Boolean> result) throws
     Exception {
-    assertTrue("expected equality", result.collect().get(0));
+    assertTrue("expected true", result.collect().get(0));
   }
 
-  protected void collectAndAssertNotEquals(DataSet<Boolean> result) throws
+  protected void collectAndAssertFalse(DataSet<Boolean> result) throws
     Exception {
-    assertFalse("expected inequality", result.collect().get(0));
+    assertFalse("expected false", result.collect().get(0));
   }
 }

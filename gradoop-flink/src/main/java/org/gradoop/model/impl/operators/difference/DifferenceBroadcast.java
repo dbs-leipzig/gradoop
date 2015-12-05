@@ -50,11 +50,9 @@ public class DifferenceBroadcast<
    *
    * @param newSubgraphs graph dataset of the resulting graph collection
    * @return vertex set of the resulting graph collection
-   * @throws Exception
    */
   @Override
-  protected DataSet<V> computeNewVertices(
-    DataSet<G> newSubgraphs) throws Exception {
+  protected DataSet<V> computeNewVertices(DataSet<G> newSubgraphs) {
     DataSet<GradoopId> identifiers = newSubgraphs
       .map(new Id<G>());
 

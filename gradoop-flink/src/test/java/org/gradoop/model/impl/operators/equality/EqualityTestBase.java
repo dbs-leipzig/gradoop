@@ -10,14 +10,14 @@ import static org.junit.Assert.*;
 public class EqualityTestBase extends GradoopFlinkTestBase {
 
   @Override
-  protected void collectAndAssertEquals(DataSet<Boolean> result) {
+  protected void collectAndAssertTrue(DataSet<Boolean> result) {
 
     List<Boolean> collectedResult = collectAndAssertSizeOne(result);
     assertTrue("expected equality", collectedResult.get(0));
   }
 
   @Override
-  protected void collectAndAssertNotEquals(DataSet<Boolean> result) {
+  protected void collectAndAssertFalse(DataSet<Boolean> result) {
 
     List<Boolean> collectedResult = collectAndAssertSizeOne(result);
     assertFalse("expected inequality", collectedResult.get(0));

@@ -53,8 +53,8 @@ public class EqualityByGraphDataTest
     EqualityByGraphData<GraphHeadPojo, VertexPojo, EdgePojo> equals
       = new EqualityByGraphData<>();
 
-    collectAndAssertEquals(equals.execute(c12, c67));
-    collectAndAssertEquals(equals.execute(c126, c167));
+    collectAndAssertTrue(equals.execute(c12, c67));
+    collectAndAssertTrue(equals.execute(c126, c167));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c36 =
       loader.getGraphCollectionByVariables("g3", "g6");
@@ -65,16 +65,16 @@ public class EqualityByGraphDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c56 =
       loader.getGraphCollectionByVariables("g5", "g6");
 
-    collectAndAssertNotEquals(equals.execute(c12, c167));
-    collectAndAssertNotEquals(equals.execute(c12, c36));
-    collectAndAssertNotEquals(equals.execute(c12, c46));
-    collectAndAssertNotEquals(equals.execute(c12, c56));
+    collectAndAssertFalse(equals.execute(c12, c167));
+    collectAndAssertFalse(equals.execute(c12, c36));
+    collectAndAssertFalse(equals.execute(c12, c46));
+    collectAndAssertFalse(equals.execute(c12, c56));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> emptyCollection =
       GraphCollection.createEmptyCollection(getConfig());
 
-    collectAndAssertEquals(equals.execute(emptyCollection, emptyCollection));
-    collectAndAssertNotEquals(equals.execute(c12, emptyCollection));
+    collectAndAssertTrue(equals.execute(emptyCollection, emptyCollection));
+    collectAndAssertFalse(equals.execute(c12, emptyCollection));
   }
 
   @Test
@@ -121,8 +121,8 @@ public class EqualityByGraphDataTest
     EqualityByGraphData<GraphHeadPojo, VertexPojo, EdgePojo> equals
       = new EqualityByGraphData<>();
 
-    collectAndAssertEquals(equals.execute(c12, c67));
-    collectAndAssertEquals(equals.execute(c126, c167));
+    collectAndAssertTrue(equals.execute(c12, c67));
+    collectAndAssertTrue(equals.execute(c126, c167));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c36 =
       loader.getGraphCollectionByVariables("g3", "g6");
@@ -133,10 +133,10 @@ public class EqualityByGraphDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c56 =
       loader.getGraphCollectionByVariables("g5", "g6");
 
-    collectAndAssertNotEquals(equals.execute(c12, c167));
-    collectAndAssertNotEquals(equals.execute(c12, c36));
-    collectAndAssertNotEquals(equals.execute(c12, c46));
-    collectAndAssertNotEquals(equals.execute(c12, c56));
+    collectAndAssertFalse(equals.execute(c12, c167));
+    collectAndAssertFalse(equals.execute(c12, c36));
+    collectAndAssertFalse(equals.execute(c12, c46));
+    collectAndAssertFalse(equals.execute(c12, c56));
   }
 
   @Test
@@ -171,10 +171,10 @@ public class EqualityByGraphDataTest
     EqualityByGraphData<GraphHeadPojo, VertexPojo, EdgePojo> equals
       = new EqualityByGraphData<>();
 
-    collectAndAssertEquals(equals.execute(ref, dup));
-    collectAndAssertNotEquals(equals.execute(ref, eDir));
-    collectAndAssertNotEquals(equals.execute(ref, vLabel));
-    collectAndAssertNotEquals(equals.execute(ref, eLabel));
+    collectAndAssertTrue(equals.execute(ref, dup));
+    collectAndAssertFalse(equals.execute(ref, eDir));
+    collectAndAssertFalse(equals.execute(ref, vLabel));
+    collectAndAssertFalse(equals.execute(ref, eLabel));
   }
 
   @Test
@@ -214,13 +214,13 @@ public class EqualityByGraphDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eValue =
       loader.getGraphCollectionByVariables("p123eValue", "p023a");
 
-    collectAndAssertEquals(equals.execute(ref, dup));
-    collectAndAssertNotEquals(equals.execute(ref, eDir));
-    collectAndAssertNotEquals(equals.execute(ref, vKey));
-    collectAndAssertNotEquals(equals.execute(ref, eKey));
-    collectAndAssertNotEquals(
+    collectAndAssertTrue(equals.execute(ref, dup));
+    collectAndAssertFalse(equals.execute(ref, eDir));
+    collectAndAssertFalse(equals.execute(ref, vKey));
+    collectAndAssertFalse(equals.execute(ref, eKey));
+    collectAndAssertFalse(
       equals.execute(ref, vValue));
-    collectAndAssertNotEquals(
+    collectAndAssertFalse(
       equals.execute(ref, eValue));
   }
 
@@ -247,9 +247,9 @@ public class EqualityByGraphDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c4 =
       loader.getGraphCollectionByVariables("g01","g02");
 
-    collectAndAssertEquals(equals.execute(c1, c2));
-    collectAndAssertNotEquals(equals.execute(c1, c3));
+    collectAndAssertTrue(equals.execute(c1, c2));
+    collectAndAssertFalse(equals.execute(c1, c3));
     // only graph head data
-    collectAndAssertEquals(equals.execute(c4, c4));
+    collectAndAssertTrue(equals.execute(c4, c4));
   }
 }

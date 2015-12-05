@@ -50,16 +50,16 @@ public class EqualityByElementDataTest extends EqualityTestBase {
     EqualityByElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
       = new EqualityByElementData<>();
 
-    collectAndAssertEquals(equals.execute(g1, g2));
-    collectAndAssertNotEquals(equals.execute(g1, g3));
-    collectAndAssertNotEquals(equals.execute(g1, g4));
-    collectAndAssertNotEquals(equals.execute(g1, g5));
+    collectAndAssertTrue(equals.execute(g1, g2));
+    collectAndAssertFalse(equals.execute(g1, g3));
+    collectAndAssertFalse(equals.execute(g1, g4));
+    collectAndAssertFalse(equals.execute(g1, g5));
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> emptyGraph =
       LogicalGraph.createEmptyGraph(getConfig());
 
-    collectAndAssertEquals(equals.execute(emptyGraph, emptyGraph));
-    collectAndAssertNotEquals(equals.execute(g1, emptyGraph));
+    collectAndAssertTrue(equals.execute(emptyGraph, emptyGraph));
+    collectAndAssertFalse(equals.execute(g1, emptyGraph));
   }
 
   @Test
@@ -105,10 +105,10 @@ public class EqualityByElementDataTest extends EqualityTestBase {
     EqualityByElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
       = new EqualityByElementData<>();
 
-    collectAndAssertEquals(equals.execute(g1, g2));
-    collectAndAssertNotEquals(equals.execute(g1, g3));
-    collectAndAssertNotEquals(equals.execute(g1, g4));
-    collectAndAssertNotEquals(equals.execute(g1, g5));
+    collectAndAssertTrue(equals.execute(g1, g2));
+    collectAndAssertFalse(equals.execute(g1, g3));
+    collectAndAssertFalse(equals.execute(g1, g4));
+    collectAndAssertFalse(equals.execute(g1, g5));
   }
 
   @Test
@@ -141,10 +141,10 @@ public class EqualityByElementDataTest extends EqualityTestBase {
     EqualityByElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
       = new EqualityByElementData<>();
 
-    collectAndAssertEquals(equals.execute(ref, dup));
-    collectAndAssertNotEquals(equals.execute(ref, eDir));
-    collectAndAssertNotEquals(equals.execute(ref, vLabel));
-    collectAndAssertNotEquals(equals.execute(ref, eLabel));
+    collectAndAssertTrue(equals.execute(ref, dup));
+    collectAndAssertFalse(equals.execute(ref, eDir));
+    collectAndAssertFalse(equals.execute(ref, vLabel));
+    collectAndAssertFalse(equals.execute(ref, eLabel));
   }
 
   @Test
@@ -186,12 +186,12 @@ public class EqualityByElementDataTest extends EqualityTestBase {
     EqualityByElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
       = new EqualityByElementData<>();
 
-    collectAndAssertEquals(equals.execute(ref, dup));
-    collectAndAssertNotEquals(equals.execute(ref, eDir));
-    collectAndAssertNotEquals(equals.execute(ref, vKey));
-    collectAndAssertNotEquals(equals.execute(ref, eKey));
-    collectAndAssertNotEquals(equals.execute(ref, vValue));
-    collectAndAssertNotEquals(equals.execute(ref, eValue));
+    collectAndAssertTrue(equals.execute(ref, dup));
+    collectAndAssertFalse(equals.execute(ref, eDir));
+    collectAndAssertFalse(equals.execute(ref, vKey));
+    collectAndAssertFalse(equals.execute(ref, eKey));
+    collectAndAssertFalse(equals.execute(ref, vValue));
+    collectAndAssertFalse(equals.execute(ref, eValue));
   }
 
 }

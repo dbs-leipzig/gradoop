@@ -36,10 +36,7 @@ package org.gradoop.model.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -49,15 +46,11 @@ import org.gradoop.model.api.operators.GraphCollectionOperators;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.model.api.functions.Predicate;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
 import org.gradoop.model.impl.functions.epgm.ById;
-import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
-import org.gradoop.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
@@ -69,13 +62,13 @@ import org.gradoop.model.impl.operators.equality.EqualityByGraphElementIds;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphIds;
 import org.gradoop.model.impl.operators.intersection.Intersection;
 import org.gradoop.model.impl.operators.intersection.IntersectionBroadcast;
+import org.gradoop.model.impl.operators.selection.Selection;
 import org.gradoop.model.impl.operators.union.Union;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.apache.flink.shaded.com.google.common.base.Preconditions.checkNotNull;
 
@@ -205,8 +198,7 @@ public class GraphCollection
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> getGraph(final GradoopId graphID) throws
-    Exception {
+  public LogicalGraph<G, V, E> getGraph(final GradoopId graphID) {
     // filter vertices and edges based on given graph id
     DataSet<G> graphHead = getGraphHeads()
       .filter(new ById<G>(graphID));
@@ -216,32 +208,14 @@ public class GraphCollection
     DataSet<E> edges = getEdges()
       .filter(new InGraph<E>(graphID));
 
-    DataSet<Tuple1<GradoopId>> graphIDDataSet = getConfig()
-      .getExecutionEnvironment()
-      .fromElements(new Tuple1<>(graphID));
-
-    // get graph data based on graph id
-    List<G> graphData = this.graphHeads
-      .joinWithTiny(graphIDDataSet)
-      .where(new Id<G>())
-      .equalTo(0)
-      .with(new JoinFunction<G, Tuple1<GradoopId>, G>() {
-        @Override
-        public G join(G g, Tuple1<GradoopId> gID) throws Exception {
-          return g;
-        }
-      }).first(1).collect();
-
-    return (graphData.size() > 0) ? LogicalGraph
-      .fromDataSets(graphHead, vertices, edges, getConfig()) : null;
+    return LogicalGraph.fromDataSets(graphHead, vertices, edges, getConfig());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E>
-  getGraphs(final GradoopId... identifiers) throws Exception {
+  public GraphCollection<G, V, E> getGraphs(final GradoopId... identifiers) {
 
     GradoopIdSet graphIds = new GradoopIdSet();
 
@@ -256,8 +230,7 @@ public class GraphCollection
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> getGraphs(
-    final GradoopIdSet identifiers) throws Exception {
+  public GraphCollection<G, V, E> getGraphs(final GradoopIdSet identifiers) {
 
     DataSet<G> newGraphHeads =
       this.graphHeads.filter(new FilterFunction<G>() {
@@ -288,39 +261,8 @@ public class GraphCollection
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> select(
-    final Predicate<G> predicateFunction) throws Exception {
-    // find graph heads matching the predicate
-    DataSet<G> filteredGraphHeads =
-      this.graphHeads.filter(new FilterFunction<G>() {
-        @Override
-        public boolean filter(G g) throws Exception {
-          return predicateFunction.filter(g);
-        }
-      });
-
-    // get the identifiers of these subgraphs
-    DataSet<GradoopId> graphIDs =
-      filteredGraphHeads.map(new MapFunction<G, GradoopId>() {
-        @Override
-        public GradoopId map(G g) throws Exception {
-          return g.getId();
-        }
-      });
-
-    // use graph ids to filter vertices from the actual graph structure
-    DataSet<V> vertices = getVertices()
-      .filter(new InAnyGraphBroadcast<V>())
-      .withBroadcastSet(graphIDs,
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
-
-    DataSet<E> edges = getEdges()
-      .filter(new InAnyGraphBroadcast<E>())
-      .withBroadcastSet(graphIDs,
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
-
-    return new GraphCollection<>(filteredGraphHeads, vertices, edges,
-      getConfig());
+  public GraphCollection<G, V, E> select(final FilterFunction<G> predicate) {
+    return new Selection<G, V, E>(predicate).execute(this);
   }
 
   /**
@@ -374,7 +316,7 @@ public class GraphCollection
    */
   @Override
   public GraphCollection<G, V, E> union(
-    GraphCollection<G, V, E> otherCollection) throws Exception {
+    GraphCollection<G, V, E> otherCollection) {
     return callForCollection(new Union<G, V, E>(), otherCollection);
   }
 
@@ -383,7 +325,7 @@ public class GraphCollection
    */
   @Override
   public GraphCollection<G, V, E> intersect(
-    GraphCollection<G, V, E> otherCollection) throws Exception {
+    GraphCollection<G, V, E> otherCollection) {
     return callForCollection(new Intersection<G, V, E>(), otherCollection);
   }
 
@@ -392,7 +334,7 @@ public class GraphCollection
    */
   @Override
   public GraphCollection<G, V, E> intersectWithSmallResult(
-    GraphCollection<G, V, E> otherCollection) throws Exception {
+    GraphCollection<G, V, E> otherCollection) {
     return callForCollection(new IntersectionBroadcast<G, V, E>(),
       otherCollection);
   }
@@ -402,7 +344,7 @@ public class GraphCollection
    */
   @Override
   public GraphCollection<G, V, E> difference(
-    GraphCollection<G, V, E> otherCollection) throws Exception {
+    GraphCollection<G, V, E> otherCollection) {
     return callForCollection(new Difference<G, V, E>(), otherCollection);
   }
 
@@ -411,7 +353,7 @@ public class GraphCollection
    */
   @Override
   public GraphCollection<G, V, E> differenceWithSmallResult(
-    GraphCollection<G, V, E> otherCollection) throws Exception {
+    GraphCollection<G, V, E> otherCollection) {
     return callForCollection(new DifferenceBroadcast<G, V, E>(),
       otherCollection);
   }
@@ -469,7 +411,7 @@ public class GraphCollection
   @Override
   public GraphCollection<G, V, E> callForCollection(
     BinaryCollectionToCollectionOperator<G, V, E> op,
-    GraphCollection<G, V, E> otherCollection) throws Exception {
+    GraphCollection<G, V, E> otherCollection) {
     return op.execute(this, otherCollection);
   }
 

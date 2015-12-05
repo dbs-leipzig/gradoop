@@ -28,12 +28,12 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
+import org.gradoop.model.api.functions.PredicateFunction;
 import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.model.api.functions.Predicate;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
@@ -327,7 +327,7 @@ public class LogicalGraph
    */
   @Override
   public GraphCollection<G, V, E> match(String graphPattern,
-    Predicate<LogicalGraph> predicateFunc) {
+    PredicateFunction<LogicalGraph> predicateFunc) {
     throw new NotImplementedException();
   }
 

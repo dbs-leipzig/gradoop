@@ -34,9 +34,9 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c5
       = loader.getGraphCollectionByVariables("g1","g4");
 
-    collectAndAssertEquals(equals.execute(c1, c2));
+    collectAndAssertTrue(equals.execute(c1, c2));
 
-    collectAndAssertNotEquals(equals.execute(c1, c5));
+    collectAndAssertFalse(equals.execute(c1, c5));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c3
       = loader.getGraphCollectionByVariables("g1","g2");
@@ -44,12 +44,12 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c4
       = loader.getGraphCollectionByVariables("g3","g4");
 
-    collectAndAssertNotEquals(equals.execute(c3, c4));
+    collectAndAssertFalse(equals.execute(c3, c4));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> emptyCollection =
       GraphCollection.createEmptyCollection(getConfig());
 
-    collectAndAssertEquals(equals.execute(emptyCollection, emptyCollection));
-    collectAndAssertNotEquals(equals.execute(c1, emptyCollection));
+    collectAndAssertTrue(equals.execute(emptyCollection, emptyCollection));
+    collectAndAssertFalse(equals.execute(c1, emptyCollection));
   }
 }

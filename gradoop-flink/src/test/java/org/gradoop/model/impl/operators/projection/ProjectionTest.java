@@ -21,16 +21,12 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.functions.bool.Equals;
-import org.gradoop.model.impl.functions.epgm.Clone;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-
-import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
 
 public class ProjectionTest extends GradoopFlinkTestBase {
 
@@ -55,8 +51,8 @@ public class ProjectionTest extends GradoopFlinkTestBase {
       new TestProjection<EdgePojo>()
     );
 
-    collectAndAssertEquals(result.equalsByElementData(expectation));
-    collectAndAssertNotEquals(
+    collectAndAssertTrue(result.equalsByElementData(expectation));
+    collectAndAssertFalse(
       result.getGraphHead()
         .cross(original.getGraphHead())
         .with(new Equals<GraphHeadPojo>())

@@ -66,6 +66,6 @@ public class BusinessTransactionGraphsTest extends GradoopFlinkTestBase {
       iig.callForCollection(
         new BusinessTransactionGraphs<GraphHeadPojo,VertexPojo, EdgePojo>());
 
-    collectAndAssertEquals(expectation.equalsByGraphElementIds(result));
+    collectAndAssertTrue(expectation.equalsByGraphElementIds(result));
   }
 }

@@ -42,8 +42,7 @@ public class Union<
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<V> computeNewVertices(
-    DataSet<G> newGraphHeads) throws Exception {
+  protected DataSet<V> computeNewVertices(DataSet<G> newGraphHeads) {
     return firstCollection.getVertices()
       .union(secondCollection.getVertices())
       .distinct(new Id<V>());

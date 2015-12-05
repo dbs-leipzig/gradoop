@@ -30,7 +30,7 @@ public class LabelPropagationTest extends GradoopFlinkTestBase {
       loader.getLogicalGraphByVariable("input").callForCollection(
         new LabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(10));
 
-    collectAndAssertEquals(outputCollection.equalsByGraphElementIds(
+    collectAndAssertTrue(outputCollection.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("c1", "c2")));
   }
 }

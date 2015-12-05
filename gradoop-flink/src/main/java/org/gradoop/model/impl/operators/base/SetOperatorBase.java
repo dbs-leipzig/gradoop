@@ -60,8 +60,8 @@ public abstract class SetOperatorBase<
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<V> computeNewVertices(
-    DataSet<G> newGraphHeads) throws Exception {
+  protected DataSet<V> computeNewVertices(DataSet<G> newGraphHeads) {
+
     DataSet<Tuple2<V, GradoopId>> verticesWithGraphs =
       firstCollection.getVertices().flatMap(
         new FlatMapFunction<V, Tuple2<V, GradoopId>>() {

@@ -42,8 +42,8 @@ public class IntersectionBroadcast
   extends Intersection<G, V, E> {
 
   @Override
-  protected DataSet<V> computeNewVertices(
-    DataSet<G> newSubgraphs) throws Exception {
+  protected DataSet<V> computeNewVertices(DataSet<G> newSubgraphs) {
+
     DataSet<GradoopId> identifiers = secondCollection.getGraphHeads()
       .map(new Id<G>());
 

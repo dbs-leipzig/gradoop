@@ -63,7 +63,7 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
   @Override
   public GraphCollection<G, V, E> execute(
     GraphCollection<G, V, E> firstCollection,
-    GraphCollection<G, V, E> secondCollection) throws Exception {
+    GraphCollection<G, V, E> secondCollection) {
 
     // do some init stuff for the actual operator
     this.firstCollection = firstCollection;
@@ -83,8 +83,7 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
    * @param newGraphHeads new graph heads
    * @return vertex set of the resulting graph collection
    */
-  protected abstract DataSet<V> computeNewVertices(
-    DataSet<G> newGraphHeads) throws Exception;
+  protected abstract DataSet<V> computeNewVertices(DataSet<G> newGraphHeads);
 
   /**
    * Overridden by inheriting classes.

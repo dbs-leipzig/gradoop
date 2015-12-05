@@ -25,7 +25,7 @@ import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.api.functions.Predicate;
+import org.gradoop.model.api.functions.PredicateFunction;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 
 /**
@@ -62,7 +62,7 @@ public interface LogicalGraphOperators
    * @return logical graphs that match the given graph pattern
    */
   GraphCollection<G, V, E> match(String graphPattern,
-    Predicate<LogicalGraph> predicateFunc);
+    PredicateFunction<LogicalGraph> predicateFunc);
 
   /**
    * Creates a projected version of the logical graph using the given vertex

@@ -478,20 +478,19 @@ public class EPGMDatabase<
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph<G, V, E> getDatabaseGraph() {
-
     return LogicalGraph
       .fromDataSets(graphHead, database.getVertices(), database.getEdges(),
         config);
   }
 
   /**
-   * Returns a logical graph by its identifier.
+   * Returns a logical graph by its identifier. If the logical graph does not
+   * exist, an empty logical graph is returned.
    *
    * @param graphID graph identifier
-   * @return logical graph or {@code null} if graph does not exist
-   * @throws Exception
+   * @return logical graph (possibly empty)
    */
-  public LogicalGraph<G, V, E> getGraph(GradoopId graphID) throws Exception {
+  public LogicalGraph<G, V, E> getGraph(GradoopId graphID) {
     return database.getGraph(graphID);
   }
 

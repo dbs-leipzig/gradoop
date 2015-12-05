@@ -1,7 +1,6 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.ArrayUtils;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.functions.bool.Equals;
@@ -34,21 +33,19 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
       loader.getDatabase().getGraph(g.getId());
 
     // head <> head
-    collectAndAssertEquals(graphFromLoader.getGraphHead()
+    collectAndAssertTrue(graphFromLoader.getGraphHead()
       .cross(graphFromDB.getGraphHead())
       .with(new Equals<GraphHeadPojo>())
     );
 
     // elements <> elements
-    collectAndAssertEquals(graphFromLoader.equalsByElementIds(graphFromDB));
+    collectAndAssertTrue(graphFromLoader.equalsByElementIds(graphFromDB));
   }
 
   @Test
   public void testNonExistingGraph() throws Exception {
-    assertNull(
-      "graph was not null",
-      getSocialNetworkLoader().getDatabase().getGraph(new GradoopId())
-    );
+    collectAndAssertTrue(getSocialNetworkLoader().getDatabase()
+      .getGraph(new GradoopId()).isEmpty());
   }
 
   @Test
@@ -77,15 +74,15 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
       loader.getDatabase().getCollection().getGraphs(graphIdSet);
 
     // heads <> heads
-    collectAndAssertEquals(
+    collectAndAssertTrue(
       collectionFromLoader.equalsByGraphIds(collectionFromDbViaArray));
-    collectAndAssertEquals(
+    collectAndAssertTrue(
       collectionFromLoader.equalsByGraphIds(collectionFromDbViaSet));
 
     // elements <> elements
-    collectAndAssertEquals(
+    collectAndAssertTrue(
       collectionFromLoader.equalsByGraphElementIds(collectionFromDbViaArray));
-    collectAndAssertEquals(
+    collectAndAssertTrue(
       collectionFromLoader.equalsByGraphElementIds(collectionFromDbViaSet));
   }
 
@@ -101,11 +98,11 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
       loader.getDatabase().getCollection();
 
     // heads <> heads
-    collectAndAssertEquals(
+    collectAndAssertTrue(
       collectionFromLoader.equalsByGraphIds(collectionFromDb));
 
     // elements <> elements
-    collectAndAssertEquals(
+    collectAndAssertTrue(
       collectionFromLoader.equalsByGraphElementIds(collectionFromDb));
   }
 }
