@@ -41,7 +41,6 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
-import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.GraphCollectionOperators;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
@@ -303,8 +302,8 @@ public class GraphCollection
    */
   @Override
   public LogicalGraph<G, V, E> reduce(
-    BinaryGraphToGraphOperator<G, V, E> op) {
-    throw new NotImplementedException();
+    UnaryCollectionToGraphOperator<G, V, E> op) {
+    return callForGraph(op);
   }
 
   //----------------------------------------------------------------------------
