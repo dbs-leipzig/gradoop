@@ -29,6 +29,8 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.EdgeToGellyEdgeMapper;
+import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPMessageFunction;
+import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPUpdateFunction;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPVertexJoin;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.VertexToGellyVertexMapper;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -37,6 +39,17 @@ import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Wraps {@link LabelPropagation} into the EPGM model.
+ *
+ * During vertex centric iteration (Label Propagation Algorithm):
+ *
+ * In each super step each vertex will adopt the value sent by the majority of
+ * their neighbors or the smallest one if there is just one neighbor. If
+ * multiple labels occur with the same frequency, the minimum of them will be
+ * selected as new label. If a vertex changes its value in a super step, the new
+ * value will be propagated to the neighbours.
+ *
+ * The computation will terminate if no new values are assigned.
+ *
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -60,6 +73,7 @@ public class LabelPropagation
    * Constructor
    *
    * @param maxIterations Counter to define maximal iteration for the algorithm
+   * @param propertyKey   Property key to access the label value
    */
   public LabelPropagation(int maxIterations, String propertyKey) {
     this.maxIterations = maxIterations;
@@ -87,12 +101,10 @@ public class LabelPropagation
       Graph.fromDataSet(vertices, edges, env);
 
     // run Gelly vertex centric iteration
-    try {
-      gellyGraph = gellyGraph.run(
-        new LabelPropagationAlgorithm(this.maxIterations));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    gellyGraph = gellyGraph.runVertexCentricIteration(
+      new LPUpdateFunction(),
+      new LPMessageFunction(),
+      maxIterations);
 
     // join labeled vertices with initial vertex set and update vertex property
     DataSet<V> labeledVertices = gellyGraph.getVertices()
@@ -101,8 +113,8 @@ public class LabelPropagation
       .with(new LPVertexJoin<V>(propertyKey));
 
     // return labeled graph
-    return LogicalGraph.fromDataSets
-      (labeledVertices, logicalGraph.getEdges(), logicalGraph.getConfig());
+    return LogicalGraph.fromDataSets(
+      labeledVertices, logicalGraph.getEdges(), logicalGraph.getConfig());
   }
 
   /**

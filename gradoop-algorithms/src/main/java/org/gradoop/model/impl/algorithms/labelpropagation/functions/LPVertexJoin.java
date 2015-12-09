@@ -23,13 +23,13 @@ public class LPVertexJoin<V extends EPGMVertex> implements
    *
    * @param propertyKey Property key to access the label value
    */
-  public LPVertexJoin(String propertyKey){
+  public LPVertexJoin(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
   @Override
   public V join(Vertex<GradoopId, PropertyValue> gellyVertex, V epgmVertex)
-    throws Exception {
+      throws Exception {
     epgmVertex.setProperty(propertyKey, gellyVertex.getValue());
     return epgmVertex;
   }

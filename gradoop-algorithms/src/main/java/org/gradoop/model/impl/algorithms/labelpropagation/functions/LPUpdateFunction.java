@@ -28,7 +28,7 @@ public class LPUpdateFunction
     MessageIterator<PropertyValue> msg) throws Exception {
     PropertyValue value = getNewValue(vertex,
       Lists.newArrayList(msg.iterator()));
-    if(!vertex.getValue().equals(value)){
+    if (!vertex.getValue().equals(value)) {
       setNewVertexValue(value);
     }
   }

@@ -19,13 +19,16 @@ public class EdgeToGellyEdgeMapper<E extends EPGMEdge>
    */
   private final Edge<GradoopId, NullValue> reuseEdge;
 
+  /**
+   * Constructor
+   */
   public EdgeToGellyEdgeMapper() {
     reuseEdge = new Edge<>();
   }
 
   @Override
   public Edge<GradoopId, NullValue> map(E epgmEdge)
-    throws Exception {
+      throws Exception {
     reuseEdge.setSource(epgmEdge.getSourceId());
     reuseEdge.setTarget(epgmEdge.getTargetId());
     reuseEdge.setValue(NullValue.getInstance());
