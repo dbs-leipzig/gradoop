@@ -20,7 +20,6 @@ package org.gradoop.model;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.runtime.StreamingMode;
 import org.apache.flink.test.util.ForkableFlinkMiniCluster;
 import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
@@ -128,7 +127,7 @@ public abstract class GradoopFlinkTestBase {
     config.setInteger("jobmanager.web.port", 8081);
     config.setString("jobmanager.web.log.path", logFile.toString());
     CLUSTER =
-      new ForkableFlinkMiniCluster(config, true, StreamingMode.BATCH_ONLY);
+      new ForkableFlinkMiniCluster(config, true);
     CLUSTER.start();
   }
 
