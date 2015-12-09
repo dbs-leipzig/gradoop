@@ -30,6 +30,12 @@ public class Not implements MapFunction<Boolean, Boolean> {
     return !b;
   }
 
+  /**
+   * Map a a boolean dataset to its inverse.
+   *
+   * @param b boolean dataset
+   * @return inverse dataset
+   */
   public static DataSet<Boolean> map(DataSet<Boolean> b) {
     return b.map(new Not());
   }
