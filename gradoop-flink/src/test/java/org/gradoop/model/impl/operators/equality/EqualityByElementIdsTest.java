@@ -64,5 +64,6 @@ public class EqualityByElementIdsTest extends EqualityTestBase {
 
     collectAndAssertTrue(equals.execute(emptyGraph, emptyGraph));
     collectAndAssertFalse(equals.execute(g1, emptyGraph));
+    collectAndAssertFalse(equals.execute(emptyGraph, g1));
   }
 }

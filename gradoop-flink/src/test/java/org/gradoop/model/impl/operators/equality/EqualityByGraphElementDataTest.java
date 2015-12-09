@@ -72,6 +72,7 @@ public class EqualityByGraphElementDataTest
 
     collectAndAssertTrue(equals.execute(emptyCollection, emptyCollection));
     collectAndAssertFalse(equals.execute(c12, emptyCollection));
+    collectAndAssertFalse(equals.execute(emptyCollection, c12));
   }
 
   @Test

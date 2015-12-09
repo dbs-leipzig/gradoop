@@ -26,6 +26,7 @@ import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.And;
 import org.gradoop.model.impl.functions.bool.Equals;
+import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.operators.count.Count;
 import org.gradoop.model.impl.id.GradoopId;
@@ -63,9 +64,15 @@ public class EqualityByGraphIds
         .where(0, 1).equalTo(0, 1)
     );
 
+    DataSet<Boolean> firstCollectionIsEmpty = firstCollection.isEmpty();
+
     return Or.union(
-      And.cross(firstCollection.isEmpty(), secondCollection.isEmpty()),
-      Equals.cross(distinctFirstIdCount, matchingIdCount)
+      And.cross(firstCollectionIsEmpty, secondCollection.isEmpty()),
+      And.cross(
+        Not.map(firstCollectionIsEmpty),
+        Equals.cross(distinctFirstIdCount, matchingIdCount)
+      )
+
     );
   }
 

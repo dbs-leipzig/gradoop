@@ -63,5 +63,6 @@ public class EqualityByGraphIdsTest extends EqualityTestBase {
     collectAndAssertTrue(equals.execute(emptyCollection, emptyCollection));
     collectAndAssertFalse(equals.execute(c1, emptyCollection));
     collectAndAssertFalse(equals.execute(c3, emptyCollection));
+    collectAndAssertFalse(equals.execute(emptyCollection, c1));
   }
 }
