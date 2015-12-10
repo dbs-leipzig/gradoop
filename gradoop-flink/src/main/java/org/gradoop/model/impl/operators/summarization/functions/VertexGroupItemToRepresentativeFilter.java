@@ -21,9 +21,8 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 
 /**
- * Filter those tuples which are used to create  objects.
+ * Filter those tuples which only contain a vertex and its representative.
  */
-//@FunctionAnnotation.ForwardedFields("*->*")
 public class VertexGroupItemToRepresentativeFilter implements
   FilterFunction<VertexGroupItem> {
 

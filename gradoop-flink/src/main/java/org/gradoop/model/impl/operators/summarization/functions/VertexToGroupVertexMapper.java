@@ -31,7 +31,6 @@ import org.gradoop.model.impl.properties.PropertyValue;
  *
  * @param <V> EPGM vertex type
  */
-//@FunctionAnnotation.ForwardedFields("f0")
 public class VertexToGroupVertexMapper<V extends EPGMVertex>
   implements MapFunction<V, VertexForGrouping> {
 

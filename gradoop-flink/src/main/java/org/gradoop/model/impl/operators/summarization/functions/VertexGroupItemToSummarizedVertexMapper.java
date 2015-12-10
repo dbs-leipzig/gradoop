@@ -32,18 +32,15 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
  * group label, the group property value and the number of vertices in the
  * group.
  *
- * @param <VD> EPGM vertex type
+ * @param <V> EPGM vertex type
  */
-//@FunctionAnnotation.ForwardedFields("f0")
-public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
-  implements
-  MapFunction<VertexGroupItem, VD>,
-  ResultTypeQueryable<VD> {
+public class VertexGroupItemToSummarizedVertexMapper<V extends EPGMVertex>
+  implements MapFunction<VertexGroupItem, V>, ResultTypeQueryable<V> {
 
   /**
    * Vertex data factory.
    */
-  private final EPGMVertexFactory<VD> vertexFactory;
+  private final EPGMVertexFactory<V> vertexFactory;
   /**
    * Vertex property key used for grouping.
    */
@@ -65,7 +62,7 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
    * @param useLabel          true, if vertex label shall be considered
    */
   public VertexGroupItemToSummarizedVertexMapper(
-    EPGMVertexFactory<VD> vertexFactory, String groupPropertyKey,
+    EPGMVertexFactory<V> vertexFactory, String groupPropertyKey,
     boolean useLabel) {
     this.vertexFactory = vertexFactory;
     this.groupPropertyKey = groupPropertyKey;
@@ -82,9 +79,9 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
    * @throws Exception
    */
   @Override
-  public VD map(VertexGroupItem vertexGroupItem) throws
+  public V map(VertexGroupItem vertexGroupItem) throws
     Exception {
-    VD summarizedVertexData = vertexFactory.initVertex(
+    V summarizedVertexData = vertexFactory.initVertex(
       vertexGroupItem.getGroupRepresentativeVertexId());
     if (useLabel) {
       summarizedVertexData.setLabel(vertexGroupItem.getGroupLabel());
@@ -105,8 +102,8 @@ public class VertexGroupItemToSummarizedVertexMapper<VD extends EPGMVertex>
    */
   @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<VD> getProducedType() {
-    return (TypeInformation<VD>)
+  public TypeInformation<V> getProducedType() {
+    return (TypeInformation<V>)
       TypeExtractor.createTypeInfo(vertexFactory.getType());
   }
 }

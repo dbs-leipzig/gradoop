@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.functions.tuple;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 
 /**
@@ -10,6 +11,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
  * @param <T1> f1 type
  * @param <T2> f2 type
  */
+@FunctionAnnotation.ForwardedFields("f1->*")
 public class Value1Of3<T0, T1, T2>
   implements MapFunction<Tuple3<T0, T1, T2>, T1> {
 

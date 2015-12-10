@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
@@ -33,9 +34,9 @@ import org.gradoop.model.impl.properties.PropertyValue;
  * vertex id of the group representative, the group label, the group
  * property value and the total number of group elements.
  */
-//@FunctionAnnotation.ForwardedFields("f0;f1->f2;f2->f3")
-public class VertexGroupReducer implements
-  GroupReduceFunction<VertexForGrouping, VertexGroupItem> {
+@FunctionAnnotation.ForwardedFields("f0;f1->f2;f2->f3")
+public class VertexGroupReducer
+  implements GroupReduceFunction<VertexForGrouping, VertexGroupItem> {
   /**
    * Reduce object instantiations.
    */
