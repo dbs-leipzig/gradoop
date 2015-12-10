@@ -17,24 +17,21 @@
 
 package org.gradoop.model.impl.operators.split.functions;
 
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
- * Join the new GradoopIds, representing the new graphs, with the vertices by
- * adding them to the vertices graph sets
+ * Transform an edge into a Tuple3 of edge id, source vertex and
+ * target id
+ *
+ * @param <E> EPGM edge type
  */
-public class JoinVertexIdWithGraphIds implements
-  JoinFunction
-    <Tuple2<GradoopId, PropertyValue>, Tuple2<PropertyValue, GradoopId>,
-      Tuple2<GradoopId, GradoopId>> {
-
+public class EdgeToTuple<E extends EPGMEdge>
+  implements MapFunction<E, Tuple3<E, GradoopId, GradoopId>> {
   @Override
-  public Tuple2<GradoopId, GradoopId> join(
-    Tuple2<GradoopId, PropertyValue> vertexSplitKey,
-      Tuple2<PropertyValue, GradoopId> splitKeyGradoopId) {
-    return new Tuple2<>(vertexSplitKey.f0, splitKeyGradoopId.f1);
+  public Tuple3<E, GradoopId, GradoopId> map(E edge) {
+    return new Tuple3<>(edge, edge.getSourceId(), edge.getTargetId());
   }
 }

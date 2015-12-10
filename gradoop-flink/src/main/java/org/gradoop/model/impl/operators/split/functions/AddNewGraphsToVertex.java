@@ -17,43 +17,28 @@
 
 package org.gradoop.model.impl.operators.split.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.List;
 
 /**
- * Join edge tuples with the graph sets of their sources
+ * Adds new graph id's to the initial vertex set
  *
- * @param <E> EPGM edge type
+ * @param <V> EPGM vertex type
  */
-@FunctionAnnotation.ForwardedFieldsFirst("f0;f2")
-public class JoinEdgeTupleWithSourceGraphs<E extends EPGMEdge>
-  implements JoinFunction
-    <Tuple3<E, GradoopId, GradoopId>, Tuple2<GradoopId, List<GradoopId>>,
-      Tuple3<E, List<GradoopId>, GradoopId>> {
-
-  /**
-   * Reduce object instantiation.
-   */
-  private final Tuple3<E, List<GradoopId>, GradoopId> reuseTuple =
-    new Tuple3<>();
-
+public  class AddNewGraphsToVertex<V extends EPGMVertex> implements
+  JoinFunction<V, Tuple2<GradoopId, List<GradoopId>>, V> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public Tuple3<E, List<GradoopId>, GradoopId> join(
-    Tuple3<E, GradoopId, GradoopId> left,
-    Tuple2<GradoopId, List<GradoopId>> right) {
-    reuseTuple.f0 = left.f0;
-    reuseTuple.f1 = Lists.newArrayList(right.f1);
-    reuseTuple.f2 = left.f2;
-    return reuseTuple;
+  public V join(V v,
+    Tuple2<GradoopId, List<GradoopId>> tuple2) {
+    v.getGraphIds().addAll(tuple2.f1);
+    return v;
   }
+
 }
