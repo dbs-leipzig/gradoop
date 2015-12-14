@@ -17,26 +17,23 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
-import org.apache.flink.api.common.functions.GroupCombineFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.GroupReduceOperator;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToRepresentativeFilter;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexFilter;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToVertexWithRepresentativeMapper;
-import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.operators.summarization.functions.BuildVertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.functions.ReduceVertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.functions.FilterGroupRepresentatives;
+import org.gradoop.model.impl.operators.summarization.functions.FilterSumVertexCandidates;
+import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedVertex;
+import org.gradoop.model.impl.operators.summarization.functions.BuildVertexWithRepresentative;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
-import org.gradoop.model.impl.properties.PropertyValue;
+
+import java.util.List;
 
 /**
  * Summarization implementation that does not require sorting of vertex groups.
@@ -47,23 +44,23 @@ import org.gradoop.model.impl.properties.PropertyValue;
  *
  * Algorithmic idea:
  *
- * 1) group vertices by label / property / both
- * 2) combine groups:
- * - convert vertex data to smaller representation {@link VertexGroupItem}
- * - create partition representative tuple (partition count, group label/prop)
- * 3) group combine output by label / property / both
- * 4) reduce groups
- * - pick group representative from all partitions
- * - update input tuples with group representative and collect them
- * - create group representative tuple (group count, group label/prop)
- * 5) filter group representative tuples from group reduce output
- * - build summarized vertices
- * 6) filter non group representative tuples from group reduce output
- * - build {@link VertexWithRepresentative} tuples
- * 7) join output from 6) with edges
- * - replace source / target vertex id with vertex group representative
- * 8) group edges on source/target vertex and possibly edge label / property
- * 9) build summarized edges
+ * 1) Group vertices on label and/or property
+ * 2) Combine groups:
+ *    - convert vertex data to smaller representation {@link VertexGroupItem}
+ *    - create partition representative tuple (partition count, label/prop)
+ * 3) Group combine output on label and/or property
+ * 4) Reduce groups
+ *    - create group representative from all partitions
+ *    - update input tuples with group representative and collect them
+ *    - create group representative tuple (group count, group label/prop)
+ * 5) Filter group representative tuples from group reduce output
+ *    - build summarized vertices
+ * 6) Filter non group representative tuples from group reduce output
+ *    - build {@link VertexWithRepresentative} tuples
+ * 7) Join output from 6) with edges
+ *    - replace source / target vertex id with vertex group representative
+ * 8) Group edges on source/target vertex and value and/or property
+ * 9) Build summarized edges
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -77,14 +74,15 @@ public class SummarizationGroupCombine<
   /**
    * Creates summarization.
    *
-   * @param vertexGroupingKey property key to summarize vertices
-   * @param edgeGroupingKey   property key to summarize edges
-   * @param useVertexLabels   summarize on vertex label true/false
-   * @param useEdgeLabels     summarize on edge label true/false
+   * @param vertexGroupingKeys  property keys to summarize vertices
+   * @param edgeGroupingKeys    property keys to summarize edges
+   * @param useVertexLabels     summarize on vertex label true/false
+   * @param useEdgeLabels       summarize on edge label true/false
    */
-  public SummarizationGroupCombine(String vertexGroupingKey,
-    String edgeGroupingKey, boolean useVertexLabels, boolean useEdgeLabels) {
-    super(vertexGroupingKey, edgeGroupingKey, useVertexLabels, useEdgeLabels);
+  public SummarizationGroupCombine(
+    List<String> vertexGroupingKeys, List<String> edgeGroupingKeys,
+    boolean useVertexLabels, boolean useEdgeLabels) {
+    super(vertexGroupingKeys, edgeGroupingKeys, useVertexLabels, useEdgeLabels);
   }
 
   /**
@@ -94,38 +92,39 @@ public class SummarizationGroupCombine<
   protected LogicalGraph<G, V, E> summarizeInternal(
     LogicalGraph<G, V, E> graph) {
 
-    /* build summarized vertices */
     // map vertex data to a smaller representation for grouping
-    DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices().map(
-      new VertexToGroupVertexMapper<V>(getVertexGroupingKey(),
-        useVertexLabels()));
+    DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
+      .map(new BuildVertexGroupItem<V>(
+        getVertexGroupingKeys(), useVertexLabels()));
 
-    // group vertices by either label or property or both
-    UnsortedGrouping<VertexForGrouping> groupedVertices =
+    // group vertices by either label and/or both
+    UnsortedGrouping<VertexGroupItem> groupedVertices =
       groupVertices(verticesForGrouping);
 
-    // combine groups on partition basis
-    DataSet<VertexGroupItem> combineGroup =
-      groupedVertices.combineGroup(new VertexGroupCombineFunction());
+    // combine groups on partitions
+    DataSet<VertexGroupItem> combinedGroupItems =
+      groupedVertices.combineGroup(
+        new ReduceVertexGroupItem(useVertexLabels()));
 
-    // group output again
-    UnsortedGrouping<VertexGroupItem> unsortedGrouping =
-      groupVertexGroupItems(combineGroup);
+    // group partition output again
+    UnsortedGrouping<VertexGroupItem> groupedGroupItems =
+      groupVertices(combinedGroupItems);
 
     // group reduce groups
     GroupReduceOperator<VertexGroupItem, VertexGroupItem> reduceGroup =
-      unsortedGrouping.reduceGroup(new VertexGroupReduceFunction());
+      groupedGroupItems
+        .reduceGroup(new ReduceVertexGroupItem(useVertexLabels()));
 
     // filter group representative tuples and build final vertices
     DataSet<V> summarizedVertices =
-      reduceGroup.filter(new VertexGroupItemToSummarizedVertexFilter()).map(
-        new VertexGroupItemToSummarizedVertexMapper<>(config.getVertexFactory(),
-          getVertexGroupingKey(), useVertexLabels()));
+      reduceGroup.filter(new FilterSumVertexCandidates())
+        .map(new BuildSummarizedVertex<>(getVertexGroupingKeys(),
+          useVertexLabels(), config.getVertexFactory()));
 
     // filter vertex to representative tuples (used for edge join)
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
-      reduceGroup.filter(new VertexGroupItemToRepresentativeFilter())
-        .map(new VertexGroupItemToVertexWithRepresentativeMapper());
+      reduceGroup.filter(new FilterGroupRepresentatives())
+        .map(new BuildVertexWithRepresentative());
 
     // build summarized edges
     DataSet<E> summarizedEdges = buildSummarizedEdges(
@@ -134,144 +133,6 @@ public class SummarizationGroupCombine<
     return LogicalGraph.fromDataSets(
       summarizedVertices, summarizedEdges, graph.getConfig());
   }
-
-  /**
-   * Takes a vertex as input and creates an initial {@link VertexGroupItem}.
-   * As group combine is executed per partition, there may be partial results
-   * which need to be combined in the group reduce function later.
-   *
-   * Each partition creates a {@link VertexGroupItem} for each element in the
-   * group and one additional {@link VertexGroupItem} that represents the
-   * partition (i.e, partition count).
-   */
-  private static class VertexGroupCombineFunction implements
-    GroupCombineFunction<VertexForGrouping, VertexGroupItem> {
-
-    /**
-     * Avoid additional object initialization.
-     */
-    private final VertexGroupItem reuseVertexGroupItem;
-
-    /**
-     * Creates group combine function
-     */
-    public VertexGroupCombineFunction() {
-      this.reuseVertexGroupItem = new VertexGroupItem();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void combine(Iterable<VertexForGrouping> vertices,
-      Collector<VertexGroupItem> collector) throws Exception {
-
-      GradoopId groupRepresentativeVertexId = null;
-      Long groupPartitionCount = 0L;
-      boolean firstElement = true;
-
-      for (VertexForGrouping vertex : vertices) {
-        reuseVertexGroupItem.setVertexId(vertex.getVertexId());
-        if (firstElement) {
-          groupRepresentativeVertexId = vertex.getVertexId();
-          reuseVertexGroupItem
-            .setGroupRepresentativeVertexId(groupRepresentativeVertexId);
-          reuseVertexGroupItem.setGroupLabel(vertex.getGroupLabel());
-          reuseVertexGroupItem
-            .setGroupPropertyValue(vertex.getGroupPropertyValue());
-
-          firstElement = false;
-        }
-
-        groupPartitionCount++;
-        collector.collect(reuseVertexGroupItem);
-      }
-      reuseVertexGroupItem.setVertexId(groupRepresentativeVertexId);
-      reuseVertexGroupItem.setGroupCount(groupPartitionCount);
-
-      collector.collect(reuseVertexGroupItem);
-      reuseVertexGroupItem.reset();
-    }
-  }
-
-
-  /**
-   * Takes the output tuples of the group combine step and chooses a group
-   * representative (group representative of first incoming tuple).
-   * Replaces the group representative of all following tuples with group
-   * final group representative.
-   * <p/>
-   * When reading partition representative tuple, the final group count gets
-   * accumulated and the group label / property is read from the first
-   * partition representative tuple.
-   */
-  private static class VertexGroupReduceFunction implements
-    GroupReduceFunction<VertexGroupItem, VertexGroupItem> {
-
-    /**
-     * Avoid object instantiation.
-     */
-    private final VertexGroupItem reuseVertexGroupItem;
-
-    /**
-     * Create group reduce function.
-     */
-    private VertexGroupReduceFunction() {
-      reuseVertexGroupItem = new VertexGroupItem();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void reduce(Iterable<VertexGroupItem> vertexGroupItems,
-      Collector<VertexGroupItem> collector) throws Exception {
-      GradoopId groupRepresentativeVertexId = null;
-      Long groupCount = 0L;
-      String groupLabel = null;
-      PropertyValue groupPropertyValue = PropertyValue.NULL_VALUE;
-      boolean firstElement = true;
-
-      for (VertexGroupItem vertexGroupItem : vertexGroupItems) {
-        if (firstElement) {
-          // take final group representative vertex id from first tuple
-          groupRepresentativeVertexId =
-            vertexGroupItem.getGroupRepresentativeVertexId();
-          // if label grouping is needed, each tuple carries the label
-          if (vertexGroupItem.getGroupLabel() != null) {
-            groupLabel = vertexGroupItem.getGroupLabel();
-          }
-          // if property grouping is needed, each tuple carries the value
-          if (vertexGroupItem.getGroupPropertyValue() != null) {
-            groupPropertyValue = vertexGroupItem.getGroupPropertyValue();
-          }
-          firstElement = false;
-        }
-        reuseVertexGroupItem.setVertexId(vertexGroupItem.getVertexId());
-        reuseVertexGroupItem.setGroupRepresentativeVertexId(
-          groupRepresentativeVertexId);
-        reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);
-
-        // only partition representative tuples have a group count > 0
-        if (vertexGroupItem.getGroupCount().equals(0L)) {
-          collector.collect(reuseVertexGroupItem);
-        } else {
-          // accumulate final group count from partition representative tuples
-          groupCount += vertexGroupItem.getGroupCount();
-        }
-      }
-      reuseVertexGroupItem.setVertexId(groupRepresentativeVertexId);
-      reuseVertexGroupItem.setGroupRepresentativeVertexId(
-        groupRepresentativeVertexId);
-      reuseVertexGroupItem.setGroupLabel(groupLabel);
-      reuseVertexGroupItem.setGroupPropertyValue(groupPropertyValue);
-      reuseVertexGroupItem.setGroupCount(groupCount);
-
-      collector.collect(reuseVertexGroupItem);
-      reuseVertexGroupItem.reset();
-    }
-  }
-
   /**
    * {@inheritDoc}
    */

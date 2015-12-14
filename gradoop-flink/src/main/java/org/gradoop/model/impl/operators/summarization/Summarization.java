@@ -17,30 +17,27 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.SourceId;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.summarization.functions.UpdateSourceId;
+import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedEdge;
+import org.gradoop.model.impl.operators.summarization.functions.UpdateTargetId;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
-import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
 
-import org.gradoop.model.impl.properties.PropertyValue;
-import org.gradoop.util.GConstants;
+
 import org.gradoop.util.GradoopFlinkConfig;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The summarization operator determines a structural grouping of similar
@@ -101,11 +98,11 @@ public abstract class Summarization<
   /**
    * Used to summarize vertices.
    */
-  private final String vertexGroupingKey;
+  private final List<String> vertexGroupingKeys;
   /**
    * Used to summarize edges.
    */
-  private final String edgeGroupingKey;
+  private final List<String> edgeGroupingKeys;
   /**
    * True if vertices shall be summarized using their label.
    */
@@ -118,17 +115,17 @@ public abstract class Summarization<
   /**
    * Creates summarization.
    *
-   * @param vertexGroupingKey property key to summarize vertices
-   * @param edgeGroupingKey   property key to summarize edges
-   * @param useVertexLabels   summarize on vertex label true/false
-   * @param useEdgeLabels     summarize on edge label true/false
+   * @param vertexGroupingKeys  property keys to summarize vertices
+   * @param edgeGroupingKeys    property keys to summarize edges
+   * @param useVertexLabels     summarize on vertex label true/false
+   * @param useEdgeLabels       summarize on edge label true/false
    */
-  Summarization(String vertexGroupingKey, String edgeGroupingKey,
+  Summarization(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys,
     boolean useVertexLabels, boolean useEdgeLabels) {
-    this.vertexGroupingKey = vertexGroupingKey;
-    this.edgeGroupingKey = edgeGroupingKey;
-    this.useVertexLabels = useVertexLabels;
-    this.useEdgeLabels = useEdgeLabels;
+    this.vertexGroupingKeys = checkNotNull(vertexGroupingKeys);
+    this.edgeGroupingKeys   = checkNotNull(edgeGroupingKeys);
+    this.useVertexLabels    = useVertexLabels;
+    this.useEdgeLabels      = useEdgeLabels;
   }
 
   /**
@@ -140,8 +137,8 @@ public abstract class Summarization<
 
     config = graph.getConfig();
 
-    if (!useVertexProperty() &&
-      !useEdgeProperty() &&
+    if (!useVertexProperties() &&
+      !useEdgeProperties() &&
       !useVertexLabels() &&
       !useEdgeLabels()) {
       result = graph;
@@ -157,8 +154,8 @@ public abstract class Summarization<
    * @return true if vertex property shall be used for summarization, false
    * otherwise
    */
-  protected boolean useVertexProperty() {
-    return vertexGroupingKey != null && !"".equals(vertexGroupingKey);
+  protected boolean useVertexProperties() {
+    return !vertexGroupingKeys.isEmpty();
   }
 
   /**
@@ -166,8 +163,8 @@ public abstract class Summarization<
    *
    * @return vertex property key
    */
-  protected String getVertexGroupingKey() {
-    return vertexGroupingKey;
+  protected List<String> getVertexGroupingKeys() {
+    return vertexGroupingKeys;
   }
 
   /**
@@ -186,8 +183,8 @@ public abstract class Summarization<
    * @return true if edge property shall be used for summarization, false
    * otherwise
    */
-  protected boolean useEdgeProperty() {
-    return edgeGroupingKey != null && !"".equals(edgeGroupingKey);
+  protected boolean useEdgeProperties() {
+    return !edgeGroupingKeys.isEmpty();
   }
 
   /**
@@ -195,8 +192,8 @@ public abstract class Summarization<
    *
    * @return edge property key
    */
-  protected String getEdgeGroupingKey() {
-    return edgeGroupingKey;
+  protected List<String> getEdgeGroupingKeys() {
+    return edgeGroupingKeys;
   }
 
   /**
@@ -215,35 +212,15 @@ public abstract class Summarization<
    * @param groupVertices dataset containing vertex representation for grouping
    * @return unsorted vertex grouping
    */
-  protected UnsortedGrouping<VertexForGrouping> groupVertices(
-    DataSet<VertexForGrouping> groupVertices) {
-    UnsortedGrouping<VertexForGrouping> vertexGrouping;
-    if (useVertexLabels() && useVertexProperty()) {
-      vertexGrouping = groupVertices.groupBy(1, 2);
-    } else if (useVertexLabels()) {
-      vertexGrouping = groupVertices.groupBy(1);
-    } else {
-      vertexGrouping = groupVertices.groupBy(2);
-    }
-    return vertexGrouping;
-  }
-
-  /**
-   * Groups {@link VertexGroupItem} by either vertex label, vertex property
-   * or both. This is used by group combine approaches.
-   *
-   * @param groupedVertices dataset containing vertex group items
-   * @return unsorted grouping
-   */
-  protected UnsortedGrouping<VertexGroupItem> groupVertexGroupItems(
-    DataSet<VertexGroupItem> groupedVertices) {
+  protected UnsortedGrouping<VertexGroupItem> groupVertices(
+    DataSet<VertexGroupItem> groupVertices) {
     UnsortedGrouping<VertexGroupItem> vertexGrouping;
-    if (useVertexLabels() && useVertexProperty()) {
-      vertexGrouping = groupedVertices.groupBy(2, 3);
+    if (useVertexLabels() && useVertexProperties()) {
+      vertexGrouping = groupVertices.groupBy(2, 3);
     } else if (useVertexLabels()) {
-      vertexGrouping = groupedVertices.groupBy(2);
+      vertexGrouping = groupVertices.groupBy(2);
     } else {
-      vertexGrouping = groupedVertices.groupBy(3);
+      vertexGrouping = groupVertices.groupBy(3);
     }
     return vertexGrouping;
   }
@@ -266,14 +243,14 @@ public abstract class Summarization<
       .join(vertexToRepresentativeMap)
       .where(new SourceId<E>()).equalTo(0)
       // project edges to necessary information
-      .with(new SourceJoin<E>(getEdgeGroupingKey(), useEdgeLabels()))
+      .with(new UpdateSourceId<E>(getEdgeGroupingKeys(), useEdgeLabels()))
       // join result with vertex-group-map on edge-target-id == vertex-id
-      .join(vertexToRepresentativeMap).where(2).equalTo(0)
-      .with(new TargetJoin());
+      .join(vertexToRepresentativeMap)
+      .where(2).equalTo(0)
+      .with(new UpdateTargetId());
 
-    return groupEdges(edges).reduceGroup(
-      new EdgeGroupSummarizer<>(getEdgeGroupingKey(), useEdgeLabels(),
-        config.getEdgeFactory()));
+    return groupEdges(edges).reduceGroup(new BuildSummarizedEdge<>(
+      getEdgeGroupingKeys(), useEdgeLabels(), config.getEdgeFactory()));
   }
 
   /**
@@ -285,11 +262,11 @@ public abstract class Summarization<
   protected UnsortedGrouping<EdgeGroupItem> groupEdges(
     DataSet<EdgeGroupItem> edges) {
     UnsortedGrouping<EdgeGroupItem> groupedEdges;
-    if (useEdgeProperty() && useEdgeLabels()) {
+    if (useEdgeProperties() && useEdgeLabels()) {
       groupedEdges = edges.groupBy(1, 2, 3, 4);
     } else if (useEdgeLabels()) {
       groupedEdges = edges.groupBy(1, 2, 3);
-    } else if (useEdgeProperty()) {
+    } else if (useEdgeProperties()) {
       groupedEdges = edges.groupBy(1, 2, 4);
     } else {
       groupedEdges = edges.groupBy(1, 2);
@@ -305,186 +282,4 @@ public abstract class Summarization<
    */
   protected abstract LogicalGraph<G, V, E> summarizeInternal(
     LogicalGraph<G, V, E> graph);
-
-  /**
-   * Creates a summarized edge from a group of edges including an edge
-   * grouping value.
-   */
-  protected static class EdgeGroupSummarizer<ED extends EPGMEdge>
-    implements
-    GroupReduceFunction<EdgeGroupItem, ED>,
-    ResultTypeQueryable<ED> {
-
-    /**
-     * Edge data factory
-     */
-    private final EPGMEdgeFactory<ED> edgeFactory;
-    /**
-     * Edge property key to store group value
-     */
-    private final String groupPropertyKey;
-    /**
-     * True, if label shall be considered
-     */
-    private boolean useLabel;
-
-    /**
-     * True, if property shall be considered.
-     */
-    private boolean useProperty;
-
-    /**
-     * Creates group reducer
-     *
-     * @param groupPropertyKey edge property key to store group value
-     * @param useLabel         use edge label
-     * @param edgeFactory  edge data factory
-     */
-    public EdgeGroupSummarizer(String groupPropertyKey, boolean useLabel,
-      EPGMEdgeFactory<ED> edgeFactory) {
-      this.groupPropertyKey = groupPropertyKey;
-      this.useLabel = useLabel;
-      this.useProperty =
-        groupPropertyKey != null && !"".equals(groupPropertyKey);
-      this.edgeFactory = edgeFactory;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-      Collector<ED> collector) throws Exception {
-      int edgeCount = 0;
-      boolean initialized = false;
-      // new edge id will be the first edge id in the group (which is sorted)
-      GradoopId newSourceVertexId = null;
-      GradoopId newTargetVertexId = null;
-      String edgeLabel = GConstants.DEFAULT_EDGE_LABEL;
-      PropertyValue edgeGroupingValue = PropertyValue.NULL_VALUE;
-
-      for (EdgeGroupItem e : edgeGroupItems) {
-        edgeCount++;
-        if (!initialized) {
-          newSourceVertexId = e.getSourceId();
-          newTargetVertexId = e.getTargetId();
-          if (useLabel) {
-            edgeLabel = e.getGroupLabel();
-          }
-          edgeGroupingValue = e.getGroupPropertyValue();
-          initialized = true;
-        }
-      }
-
-      ED newEdgeData = edgeFactory.createEdge(
-        edgeLabel, newSourceVertexId, newTargetVertexId);
-
-      if (useProperty) {
-        newEdgeData.setProperty(groupPropertyKey, edgeGroupingValue);
-      }
-      newEdgeData.setProperty(COUNT_PROPERTY_KEY, edgeCount);
-
-      collector.collect(newEdgeData);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public TypeInformation<ED> getProducedType() {
-      return (TypeInformation<ED>)
-        TypeExtractor.createTypeInfo(edgeFactory.getType());
-    }
-  }
-
-  /**
-   * Takes an edge and a tuple (vertex-id, group-representative) as input.
-   * Replaces the edge-source-id with the group-representative and outputs
-   * projected edge information possibly containing the edge label and a
-   * group property.
-   */
-//  @FunctionAnnotation.ForwardedFieldsFirst("f1->f2") // edge target id
-//  @FunctionAnnotation.ForwardedFieldsSecond("f1") // edge source id
-  protected static class SourceJoin<E extends EPGMEdge>
-    implements JoinFunction<E, VertexWithRepresentative, EdgeGroupItem> {
-
-    /**
-     * Vertex property key for grouping
-     */
-    private final String groupPropertyKey;
-    /**
-     * True, if vertex label shall be considered.
-     */
-    private final boolean useLabel;
-    /**
-     * True, if vertex property shall be considered.
-     */
-    private final boolean useProperty;
-
-    /**
-     * Avoid object initialization in each call.
-     */
-    private final EdgeGroupItem reuseEdgeGroupItem;
-
-    /**
-     * Creates join function.
-     *
-     * @param groupPropertyKey vertex property key for grouping
-     * @param useLabel         true, if vertex label shall be used
-     */
-    public SourceJoin(String groupPropertyKey, boolean useLabel) {
-      this.groupPropertyKey = groupPropertyKey;
-      this.useLabel = useLabel;
-      this.reuseEdgeGroupItem = new EdgeGroupItem();
-      this.useProperty =
-        groupPropertyKey != null && !"".equals(groupPropertyKey);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public EdgeGroupItem join(E e,
-      VertexWithRepresentative vertexRepresentative) throws Exception {
-
-      String groupLabel = useLabel ? e.getLabel() : null;
-      PropertyValue groupPropertyValue = PropertyValue.NULL_VALUE;
-
-      boolean hasProperty = useProperty && (e.hasProperty(groupPropertyKey));
-
-      if (useProperty && hasProperty) {
-        groupPropertyValue = e.getPropertyValue(groupPropertyKey);
-      }
-
-      reuseEdgeGroupItem.setEdgeId(e.getId());
-      reuseEdgeGroupItem.setSourceId(
-        vertexRepresentative.getGroupRepresentativeVertexId());
-      reuseEdgeGroupItem.setTargetId(e.getTargetId());
-      reuseEdgeGroupItem.setGroupLabel(groupLabel);
-      reuseEdgeGroupItem.setGroupPropertyValue(groupPropertyValue);
-
-      return reuseEdgeGroupItem;
-    }
-  }
-
-  /**
-   * Takes a projected edge and an (vertex-id, group-representative) tuple
-   * and replaces the edge-target-id with the group-representative.
-   */
-//  @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3;f4")
-//  @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
-  protected static class TargetJoin implements
-    JoinFunction<EdgeGroupItem, VertexWithRepresentative, EdgeGroupItem> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public EdgeGroupItem join(EdgeGroupItem edge,
-      VertexWithRepresentative vertexRepresentative) throws Exception {
-      edge.setField(vertexRepresentative.getGroupRepresentativeVertexId(), 2);
-      return edge;
-    }
-  }
 }

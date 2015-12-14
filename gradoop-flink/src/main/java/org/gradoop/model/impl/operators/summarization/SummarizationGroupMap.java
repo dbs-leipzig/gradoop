@@ -22,35 +22,37 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.summarization.functions.VertexToGroupVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToRepresentativeFilter;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexFilter;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToSummarizedVertexMapper;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupItemToVertexWithRepresentativeMapper;
-import org.gradoop.model.impl.operators.summarization.functions.VertexGroupReducer;
-import org.gradoop.model.impl.operators.summarization.tuples.VertexForGrouping;
+import org.gradoop.model.impl.operators.summarization.functions.BuildVertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.functions.FilterGroupRepresentatives;
+import org.gradoop.model.impl.operators.summarization.functions.FilterSumVertexCandidates;
+import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedVertex;
+import org.gradoop.model.impl.operators.summarization.functions.BuildVertexWithRepresentative;
+import org.gradoop.model.impl.operators.summarization.functions.ReduceVertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
+
+
+
+import java.util.List;
 
 /**
  * Summarization implementation that does not require sorting of vertex groups.
  *
  * Algorithmic idea:
  *
- * 1) Map vertices to a smaller representation {@link org.gradoop.model.impl
- * .operators.summarization.SummarizationGroupMap.VertexForGrouping}
+ * 1) Map vertices to a minimal representation {@link VertexGroupItem}
  * 2) Group vertices on label and/or property.
  * 3) Reduce group and collect one {@link VertexGroupItem} for each group
- * element and one additional {@link VertexGroupItem} for the group that
- * holds the group count.
- * 4) Filter output of 3
- * a) tuples with group count == 0 are mapped to {@link
- * VertexWithRepresentative}
- * b) tuples with group count > 0 are used to build final summarized vertices
+ *    element and one additional {@link VertexGroupItem} for the group that
+ *    holds the group count.
+ * 4) Filter output of 3)
+ *    a)  tuples with group count == 0 are mapped to
+ *        {@link VertexWithRepresentative}
+ *    b) tuples with group count > 0 are used to build final summarized vertices
  * 5) Output of 4a) is joined with edges
  * 6) Edge source and target vertex ids are replaced by group representative.
  * 7) Edges are grouped by source and target id and optionally by label
- * and/or edge property.
+ *    and/or edge property.
  * 8) Group reduce edges and create final summarized edges.
  *
  * @param <G> EPGM graph head type
@@ -65,14 +67,15 @@ public class SummarizationGroupMap<
   /**
    * Creates summarization.
    *
-   * @param vertexGroupingKey property key to summarize vertices
-   * @param edgeGroupingKey   property key to summarize edges
-   * @param useVertexLabels   summarize on vertex label true/false
-   * @param useEdgeLabels     summarize on edge label true/false
+   * @param vertexGroupingKeys  property key to summarize vertices
+   * @param edgeGroupingKeys    property key to summarize edges
+   * @param useVertexLabels     summarize on vertex label true/false
+   * @param useEdgeLabels       summarize on edge label true/false
    */
-  public SummarizationGroupMap(String vertexGroupingKey, String edgeGroupingKey,
+  public SummarizationGroupMap(List<String> vertexGroupingKeys,
+    List<String> edgeGroupingKeys,
     boolean useVertexLabels, boolean useEdgeLabels) {
-    super(vertexGroupingKey, edgeGroupingKey, useVertexLabels, useEdgeLabels);
+    super(vertexGroupingKeys, edgeGroupingKeys, useVertexLabels, useEdgeLabels);
   }
 
   /**
@@ -82,31 +85,30 @@ public class SummarizationGroupMap<
   protected LogicalGraph<G, V, E> summarizeInternal(
     LogicalGraph<G, V, E> graph) {
 
-    DataSet<VertexForGrouping> verticesForGrouping = graph.getVertices()
-      // map vertex data to a smaller representation for grouping
-      .map(new VertexToGroupVertexMapper<V>(
-        getVertexGroupingKey(),
+    DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
+      // map vertex to vertex group item
+      .map(new BuildVertexGroupItem<V>(
+        getVertexGroupingKeys(),
         useVertexLabels()));
 
-    DataSet<VertexGroupItem> groupedVertices =
-      // group vertices by label / property / both
+    DataSet<VertexGroupItem> vertexGroupItems =
+      // group vertices by label / properties / both
       groupVertices(verticesForGrouping)
-      // build vertex group item
-        .reduceGroup(new VertexGroupReducer());
+        .reduceGroup(new ReduceVertexGroupItem(useVertexLabels()));
 
-    DataSet<V> summarizedVertices = groupedVertices
+    DataSet<V> summarizedVertices = vertexGroupItems
       // filter group representative tuples
-      .filter(new VertexGroupItemToSummarizedVertexFilter())
+      .filter(new FilterSumVertexCandidates())
       // build summarized vertex
-      .map(new VertexGroupItemToSummarizedVertexMapper<>(
-        config.getVertexFactory(), getVertexGroupingKey(), useVertexLabels()));
+      .map(new BuildSummarizedVertex<>(getVertexGroupingKeys(),
+        useVertexLabels(), config.getVertexFactory()));
 
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
-      groupedVertices
+      vertexGroupItems
         // filter group element tuples
-        .filter(new VertexGroupItemToRepresentativeFilter())
+        .filter(new FilterGroupRepresentatives())
         // build vertex to group representative tuple
-        .map(new VertexGroupItemToVertexWithRepresentativeMapper());
+        .map(new BuildVertexWithRepresentative());
 
     // build summarized edges
     DataSet<E> summarizedEdges =

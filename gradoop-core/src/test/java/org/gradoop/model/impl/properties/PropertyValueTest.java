@@ -95,7 +95,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsNull() throws Exception {
-    PropertyValue p = new PropertyValue(null);
+    PropertyValue p = PropertyValue.create(null);
     assertTrue(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
@@ -108,7 +108,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsBoolean() throws Exception {
-    PropertyValue p = new PropertyValue(true);
+    PropertyValue p = PropertyValue.create(true);
     assertFalse(p.isNull());
     assertTrue(p.isBoolean());
     assertFalse(p.isInt());
@@ -121,7 +121,7 @@ public class PropertyValueTest {
 
   @Test
   public void testGetBoolean() throws Exception {
-    PropertyValue p = new PropertyValue(BOOL_VAL_1);
+    PropertyValue p = PropertyValue.create(BOOL_VAL_1);
     assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
@@ -134,7 +134,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsInt() throws Exception {
-    PropertyValue p = new PropertyValue(INT_VAL_2);
+    PropertyValue p = PropertyValue.create(INT_VAL_2);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertTrue(p.isInt());
@@ -147,7 +147,7 @@ public class PropertyValueTest {
 
   @Test
   public void testGetInt() throws Exception {
-    PropertyValue p = new PropertyValue(INT_VAL_2);
+    PropertyValue p = PropertyValue.create(INT_VAL_2);
     assertEquals(INT_VAL_2, p.getInt());
   }
 
@@ -160,7 +160,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsLong() throws Exception {
-    PropertyValue p = new PropertyValue(LONG_VAL_3);
+    PropertyValue p = PropertyValue.create(LONG_VAL_3);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
@@ -173,7 +173,7 @@ public class PropertyValueTest {
 
   @Test
   public void testGetLong() throws Exception {
-    PropertyValue p = new PropertyValue(LONG_VAL_3);
+    PropertyValue p = PropertyValue.create(LONG_VAL_3);
     assertEquals(LONG_VAL_3, p.getLong());
   }
 
@@ -186,7 +186,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsFloat() throws Exception {
-    PropertyValue p = new PropertyValue(FLOAT_VAL_4);
+    PropertyValue p = PropertyValue.create(FLOAT_VAL_4);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
@@ -199,7 +199,7 @@ public class PropertyValueTest {
 
   @Test
   public void testGetFloat() throws Exception {
-    PropertyValue p = new PropertyValue(FLOAT_VAL_4);
+    PropertyValue p = PropertyValue.create(FLOAT_VAL_4);
     assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
@@ -212,7 +212,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsDouble() throws Exception {
-    PropertyValue p = new PropertyValue(DOUBLE_VAL_5);
+    PropertyValue p = PropertyValue.create(DOUBLE_VAL_5);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
@@ -225,7 +225,7 @@ public class PropertyValueTest {
 
   @Test
   public void testGetDouble() throws Exception {
-    PropertyValue p = new PropertyValue(DOUBLE_VAL_5);
+    PropertyValue p = PropertyValue.create(DOUBLE_VAL_5);
     assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
@@ -238,7 +238,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsString() throws Exception {
-    PropertyValue p = new PropertyValue(STRING_VAL_6);
+    PropertyValue p = PropertyValue.create(STRING_VAL_6);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
@@ -251,7 +251,7 @@ public class PropertyValueTest {
 
   @Test
   public void testGetString() throws Exception {
-    PropertyValue p = new PropertyValue(STRING_VAL_6);
+    PropertyValue p = PropertyValue.create(STRING_VAL_6);
     assertEquals(STRING_VAL_6, p.getString());
   }
 
@@ -264,7 +264,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsBigDecimal() throws Exception {
-    PropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
+    PropertyValue p = PropertyValue.create(BIG_DECIMAL_VAL_7);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
@@ -277,7 +277,7 @@ public class PropertyValueTest {
 
   @Test
   public void testGetBigDecimal() throws Exception {
-    PropertyValue p = new PropertyValue(BIG_DECIMAL_VAL_7);
+    PropertyValue p = PropertyValue.create(BIG_DECIMAL_VAL_7);
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 

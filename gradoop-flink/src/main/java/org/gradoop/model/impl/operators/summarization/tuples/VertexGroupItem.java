@@ -19,7 +19,7 @@ package org.gradoop.model.impl.operators.summarization.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.model.impl.properties.PropertyValueList;
 
 /**
  * Vertex representation which is used as output of group reduce.
@@ -27,11 +27,11 @@ import org.gradoop.model.impl.properties.PropertyValue;
  * f0: vertex id
  * f1: group representative vertex id
  * f2: vertex group label
- * f3: vertex group property
+ * f3: vertex group properties
  * f4: total group count
  */
 public class VertexGroupItem
-  extends Tuple5<GradoopId, GradoopId, String, PropertyValue, Long> {
+  extends Tuple5<GradoopId, GradoopId, String, PropertyValueList, Long> {
 
   /**
    * Creates a vertex group item.
@@ -48,11 +48,11 @@ public class VertexGroupItem
     f0 = vertexId;
   }
 
-  public GradoopId getGroupRepresentativeVertexId() {
+  public GradoopId getGroupRepresentative() {
     return f1;
   }
 
-  public void setGroupRepresentativeVertexId(
+  public void setGroupRepresentative(
     GradoopId groupRepresentativeVertexId) {
     f1 = groupRepresentativeVertexId;
   }
@@ -65,12 +65,12 @@ public class VertexGroupItem
     f2 = groupLabel;
   }
 
-  public PropertyValue getGroupPropertyValue() {
+  public PropertyValueList getGroupPropertyValues() {
     return f3;
   }
 
-  public void setGroupPropertyValue(PropertyValue groupPropertyValue) {
-    f3 = groupPropertyValue;
+  public void setGroupPropertyValues(PropertyValueList groupPropertyValues) {
+    f3 = groupPropertyValues;
   }
 
   public Long getGroupCount() {

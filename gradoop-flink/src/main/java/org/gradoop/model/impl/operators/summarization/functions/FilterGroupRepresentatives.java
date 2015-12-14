@@ -15,21 +15,22 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.summarization;
+package org.gradoop.model.impl.operators.summarization.functions;
 
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 
-public class SummarizationGroupWithListsTest extends
-  SummarizationTestBase {
+/**
+ * Filter those tuples which only contain a vertex and its representative.
+ */
+public class FilterGroupRepresentatives implements
+  FilterFunction<VertexGroupItem> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
-  getSummarizationImpl(
-    String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
-    boolean useEdgeLabel) {
-    return new SummarizationGroupWithLists<>(vertexGroupingKey, edgeGroupingKey,
-      useVertexLabel, useEdgeLabel);
+  public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
+    return vertexGroupItem.getGroupCount().equals(0L);
   }
 }

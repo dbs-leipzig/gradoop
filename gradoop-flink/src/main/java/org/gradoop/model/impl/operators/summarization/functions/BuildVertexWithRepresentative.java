@@ -26,7 +26,7 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresent
  * Maps a {@link VertexGroupItem} to a {@link VertexWithRepresentative}.
  */
 @FunctionAnnotation.ForwardedFields("f0;f1")
-public class VertexGroupItemToVertexWithRepresentativeMapper
+public class BuildVertexWithRepresentative
   implements MapFunction<VertexGroupItem, VertexWithRepresentative> {
 
   /**
@@ -37,7 +37,7 @@ public class VertexGroupItemToVertexWithRepresentativeMapper
   /**
    * Creates mapper.
    */
-  public VertexGroupItemToVertexWithRepresentativeMapper() {
+  public BuildVertexWithRepresentative() {
     this.reuseTuple = new VertexWithRepresentative();
   }
 
@@ -49,7 +49,7 @@ public class VertexGroupItemToVertexWithRepresentativeMapper
     Exception {
     reuseTuple.setVertexId(vertexGroupItem.getVertexId());
     reuseTuple.setGroupRepresentativeVertexId(
-      vertexGroupItem.getGroupRepresentativeVertexId());
+      vertexGroupItem.getGroupRepresentative());
     return reuseTuple;
   }
 }

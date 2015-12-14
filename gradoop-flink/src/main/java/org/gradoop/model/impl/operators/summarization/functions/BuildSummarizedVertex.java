@@ -26,6 +26,10 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
+import org.gradoop.model.impl.properties.PropertyValue;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Creates a new vertex representing a vertex group. The vertex stores the
@@ -34,40 +38,37 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
  *
  * @param <V> EPGM vertex type
  */
-public class VertexGroupItemToSummarizedVertexMapper<V extends EPGMVertex>
+public class BuildSummarizedVertex<V extends EPGMVertex>
   implements MapFunction<VertexGroupItem, V>, ResultTypeQueryable<V> {
 
+
   /**
-   * Vertex data factory.
+   * Vertex property keys used for grouping.
    */
-  private final EPGMVertexFactory<V> vertexFactory;
-  /**
-   * Vertex property key used for grouping.
-   */
-  private final String groupPropertyKey;
+  private final List<String> groupPropertyKeys;
+
   /**
    * True, if the vertex label shall be considered.
    */
   private final boolean useLabel;
+
   /**
-   * True, if the vertex property shall be considered.
+   * Vertex factory.
    */
-  private final boolean useProperty;
+  private final EPGMVertexFactory<V> vertexFactory;
 
   /**
    * Creates map function.
    *
-   * @param vertexFactory vertex data factory
-   * @param groupPropertyKey  vertex property key for grouping
+   * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be considered
+   * @param vertexFactory     vertex factory
    */
-  public VertexGroupItemToSummarizedVertexMapper(
-    EPGMVertexFactory<V> vertexFactory, String groupPropertyKey,
-    boolean useLabel) {
-    this.vertexFactory = vertexFactory;
-    this.groupPropertyKey = groupPropertyKey;
+  public BuildSummarizedVertex(List<String> groupPropertyKeys, boolean useLabel,
+    EPGMVertexFactory<V> vertexFactory) {
+    this.groupPropertyKeys = groupPropertyKeys;
     this.useLabel = useLabel;
-    useProperty = groupPropertyKey != null && !"".equals(groupPropertyKey);
+    this.vertexFactory = vertexFactory;
   }
 
   /**
@@ -81,20 +82,58 @@ public class VertexGroupItemToSummarizedVertexMapper<V extends EPGMVertex>
   @Override
   public V map(VertexGroupItem vertexGroupItem) throws
     Exception {
-    V summarizedVertexData = vertexFactory.initVertex(
-      vertexGroupItem.getGroupRepresentativeVertexId());
+    V summarizedVertex = vertexFactory.initVertex(
+      vertexGroupItem.getGroupRepresentative());
+
+    appendLabel(vertexGroupItem, summarizedVertex);
+    appendProperties(vertexGroupItem, summarizedVertex);
+    appendAggregateValues(vertexGroupItem, summarizedVertex);
+
+    return summarizedVertex;
+  }
+
+  /**
+   * Appends the label if necessary.
+   *
+   * @param vertexGroupItem   vertex group item
+   * @param summarizedVertex  summarized vertex
+   */
+  private void appendLabel(VertexGroupItem vertexGroupItem,
+    V summarizedVertex) {
     if (useLabel) {
-      summarizedVertexData.setLabel(vertexGroupItem.getGroupLabel());
+      summarizedVertex.setLabel(vertexGroupItem.getGroupLabel());
     }
-    if (useProperty) {
-      summarizedVertexData.setProperty(
-        groupPropertyKey, vertexGroupItem.getGroupPropertyValue());
-    }
-    summarizedVertexData.setProperty(
+  }
+
+  /**
+   * Appends aggregate values if necessary.
+   *
+   * @param vertexGroupItem   vertex group item
+   * @param summarizedVertex  summarized vertex
+   */
+  private void appendAggregateValues(VertexGroupItem vertexGroupItem,
+    V summarizedVertex) {
+    summarizedVertex.setProperty(
       Summarization.COUNT_PROPERTY_KEY,
       vertexGroupItem.getGroupCount());
+  }
 
-    return summarizedVertexData;
+  /**
+   * Appends properties if necessary.
+   *
+   * @param vertexGroupItem   vertex group item
+   * @param summarizedVertex  summarized vertex
+   */
+  private void appendProperties(VertexGroupItem vertexGroupItem,
+    V summarizedVertex) {
+
+    Iterator<String> keyIterator = groupPropertyKeys.iterator();
+    Iterator<PropertyValue> valueIterator =
+      vertexGroupItem.getGroupPropertyValues().iterator();
+
+    while (keyIterator.hasNext() && valueIterator.hasNext()) {
+      summarizedVertex.setProperty(keyIterator.next(), valueIterator.next());
+    }
   }
 
   /**

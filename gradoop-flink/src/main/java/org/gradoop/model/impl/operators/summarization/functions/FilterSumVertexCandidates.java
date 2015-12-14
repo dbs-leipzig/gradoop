@@ -15,20 +15,23 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.summarization;
+package org.gradoop.model.impl.operators.summarization.functions;
 
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 
-public class SummarizationGroupSortTest extends SummarizationTestBase {
+/**
+ * Filter those tuples which are used to create new summarized vertices.
+ * Those tuples have a group count > 0.
+ */
+public class FilterSumVertexCandidates
+  implements FilterFunction<VertexGroupItem> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
-  getSummarizationImpl(
-    String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
-    boolean useEdgeLabel) {
-    return new SummarizationGroupSort<>(vertexGroupingKey, edgeGroupingKey,
-      useVertexLabel, useEdgeLabel);
+  public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
+    return !vertexGroupItem.getGroupCount().equals(0L);
   }
 }

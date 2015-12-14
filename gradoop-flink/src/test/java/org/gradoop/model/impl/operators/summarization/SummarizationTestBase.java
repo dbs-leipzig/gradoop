@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
+import com.google.common.collect.Lists;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -25,6 +26,9 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
+import java.util.List;
+
+import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
 import static org.gradoop.util.GConstants.NULL_STRING;
 
 @SuppressWarnings("Duplicates")
@@ -32,11 +36,11 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   public abstract Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
   getSummarizationImpl(
-    String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
-    boolean useEdgeLabel);
+    List<String> vertexGroupingKeys, boolean useVertexLabel,
+    List<String> edgeGroupingKeys, boolean useEdgeLabel);
 
   @Test
-  public void testSummarizeOnVertexPropertySymmetricGraph() throws Exception {
+  public void testVertexPropertySymmetricGraph() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -63,7 +67,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexProperty() throws Exception {
+  public void testSingleVertexProperty() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -94,7 +98,44 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexPropertyWithAbsentValue() throws Exception {
+  public void testMultipleVertexProperties() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getSocialNetworkLoader();
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("g0")
+      .combine(loader.getLogicalGraphByVariable("g1"))
+      .combine(loader.getLogicalGraphByVariable("g2"));
+
+    final List<String> vertexGroupingKeys = Lists.newArrayList("city", "gender");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(leipzigF {city = \"Leipzig\", gender=\"f\", count = 1});" +
+      "(leipzigM {city = \"Leipzig\", gender=\"m\", count = 1});" +
+      "(dresdenF {city = \"Dresden\", gender=\"f\", count = 2});" +
+      "(dresdenM {city = \"Dresden\", gender=\"m\", count = 1});" +
+      "(berlinM  {city = \"Berlin\", gender=\"m\",  count = 1});" +
+      "(leipzigF)-[{count = 1}]->(leipzigM);" +
+      "(leipzigM)-[{count = 1}]->(leipzigF);" +
+      "(leipzigM)-[{count = 1}]->(dresdenF);" +
+      "(dresdenF)-[{count = 1}]->(leipzigF);" +
+      "(dresdenF)-[{count = 2}]->(leipzigM);" +
+      "(dresdenF)-[{count = 1}]->(dresdenM);" +
+      "(dresdenM)-[{count = 1}]->(dresdenF);" +
+      "(berlinM)-[{count = 1}]->(dresdenF);" +
+      "(berlinM)-[{count = 1}]->(dresdenM)" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationRunner(input, vertexGroupingKeys, false, null, false)
+        .run();
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testSingleVertexPropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -118,7 +159,33 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexAndEdgeProperty() throws Exception {
+  public void testMultipleVertexPropertiesWithAbsentValue() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getSocialNetworkLoader();
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader.getLogicalGraphByVariable("g3");
+
+    final List<String> vertexGroupingKeys = Lists.newArrayList("city", "gender");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(dresdenF {city = \"Dresden\", gender=\"f\", count = 1});" +
+      "(dresdenM {city = \"Dresden\", gender=\"m\", count = 1});" +
+      "(others  {city = " + NULL_STRING + ", gender = " + NULL_STRING + ", count = 1});" +
+      "(others)-[{count = 2}]->(dresdenM);" +
+      "(others)-[{count = 1}]->(dresdenF);" +
+      "(dresdenF)-[{count = 1}]->(dresdenM)" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationRunner(input, vertexGroupingKeys, false, null, false)
+        .run();
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testSingleVertexAndSingleEdgeProperty() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -151,7 +218,113 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexAndEdgePropertyWithAbsentValues() throws
+  public void testSingleVertexPropertyAndMultipleEdgeProperties() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("" +
+        "input[" +
+        "(v0 {a=0,b=0});" +
+        "(v1 {a=0,b=1});" +
+        "(v2 {a=0,b=1});" +
+        "(v3 {a=1,b=0});" +
+        "(v4 {a=1,b=1});" +
+        "(v5 {a=1,b=0});" +
+        "(v0)-[{a=0,b=1}]->(v1);" +
+        "(v0)-[{a=0,b=2}]->(v2);" +
+        "(v1)-[{a=0,b=3}]->(v2);" +
+        "(v2)-[{a=0,b=2}]->(v3);" +
+        "(v2)-[{a=0,b=1}]->(v3);" +
+        "(v4)-[{a=1,b=2}]->(v2);" +
+        "(v5)-[{a=1,b=3}]->(v2);" +
+        "(v3)-[{a=2,b=3}]->(v4);" +
+        "(v4)-[{a=2,b=1}]->(v5);" +
+        "(v5)-[{a=2,b=0}]->(v3);" +
+        "]"
+    );
+
+    final List<String> vertexGroupingKeys = Lists.newArrayList("a");
+    final List<String> edgeGroupingKeys = Lists.newArrayList("a", "b");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00 {a=0,count=3});" +
+      "(v01 {a=1,count=3});" +
+      "(v00)-[{a=0,b=1,count=1}]->(v00);" +
+      "(v00)-[{a=0,b=2,count=1}]->(v00);" +
+      "(v00)-[{a=0,b=3,count=1}]->(v00);" +
+      "(v01)-[{a=2,b=0,count=1}]->(v01);" +
+      "(v01)-[{a=2,b=1,count=1}]->(v01);" +
+      "(v01)-[{a=2,b=3,count=1}]->(v01);" +
+      "(v00)-[{a=0,b=1,count=1}]->(v01);" +
+      "(v00)-[{a=0,b=2,count=1}]->(v01);" +
+      "(v01)-[{a=1,b=2,count=1}]->(v00);" +
+      "(v01)-[{a=1,b=3,count=1}]->(v00);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationRunner(loader.getLogicalGraphByVariable("input"),
+        vertexGroupingKeys, false,
+        edgeGroupingKeys, false)
+        .run();
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testMultipleVertexAndMultipleEdgeProperties() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("" +
+        "input[" +
+        "(v0 {a=0,b=0});" +
+        "(v1 {a=0,b=1});" +
+        "(v2 {a=0,b=1});" +
+        "(v3 {a=1,b=0});" +
+        "(v4 {a=1,b=1});" +
+        "(v5 {a=1,b=0});" +
+        "(v0)-[{a=0,b=1}]->(v1);" +
+        "(v0)-[{a=0,b=2}]->(v2);" +
+        "(v1)-[{a=0,b=3}]->(v2);" +
+        "(v2)-[{a=0,b=2}]->(v3);" +
+        "(v2)-[{a=0,b=1}]->(v3);" +
+        "(v4)-[{a=1,b=2}]->(v2);" +
+        "(v5)-[{a=1,b=3}]->(v2);" +
+        "(v3)-[{a=2,b=3}]->(v4);" +
+        "(v4)-[{a=2,b=1}]->(v5);" +
+        "(v5)-[{a=2,b=0}]->(v3);" +
+        "]"
+      );
+
+    final List<String> vertexGroupingKeys = Lists.newArrayList("a", "b");
+    final List<String> edgeGroupingKeys = Lists.newArrayList("a", "b");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00 {a=0,b=0,count=1});" +
+      "(v01 {a=0,b=1,count=2});" +
+      "(v10 {a=1,b=0,count=2});" +
+      "(v11 {a=1,b=1,count=1});" +
+      "(v00)-[{a=0,b=1,count=1}]->(v01);" +
+      "(v00)-[{a=0,b=2,count=1}]->(v01);" +
+      "(v01)-[{a=0,b=3,count=1}]->(v01);" +
+      "(v01)-[{a=0,b=1,count=1}]->(v10);" +
+      "(v01)-[{a=0,b=2,count=1}]->(v10);" +
+      "(v11)-[{a=2,b=1,count=1}]->(v10);" +
+      "(v10)-[{a=2,b=3,count=1}]->(v11);" +
+      "(v10)-[{a=2,b=0,count=1}]->(v10);" +
+      "(v10)-[{a=1,b=3,count=1}]->(v01);" +
+      "(v11)-[{a=1,b=2,count=1}]->(v01)" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationRunner(loader.getLogicalGraphByVariable("input"),
+        vertexGroupingKeys, false,
+        edgeGroupingKeys, false)
+        .run();
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testVertexAndEdgePropertyWithAbsentValues() throws
     Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
@@ -179,7 +352,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexLabel() throws Exception {
+  public void testVertexLabel() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -197,14 +370,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, null, true, null, false).run();
+      new SummarizationRunner(input, true, false).run();
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
   @Test
-  public void testSummarizeOnVertexLabelAndVertexProperty() throws Exception {
+  public void testVertexLabelAndSingleVertexProperty() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -235,7 +408,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexLabelAndVertexPropertyWithAbsentValue()
+  public void testVertexLabelAndSingleVertexPropertyWithAbsentValue()
     throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
@@ -273,7 +446,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexLabelAndEdgeProperty() throws Exception {
+  public void testVertexLabelAndSingleEdgeProperty() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -300,8 +473,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexLabelAndEdgePropertyWithAbsentValue() throws
-    Exception {
+  public void testVertexLabelAndSingleEdgePropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -331,8 +503,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexLabelAndVertexAndEdgeProperty() throws
-    Exception {
+  public void testVertexLabelAndSingleVertexAndSingleEdgeProperty() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -365,7 +536,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexAndEdgeLabel() throws Exception {
+  public void testVertexAndEdgeLabel() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -384,14 +555,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, null, true, null, true).run();
+      new SummarizationRunner(input, true, true).run();
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
   @Test
-  public void testSummarizeOnVertexAndEdgeLabelAndVertexProperty() throws
+  public void testVertexAndEdgeLabelAndSingleVertexProperty() throws
     Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
@@ -422,9 +593,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void
-  testSummarizeOnVertexAndEdgeLabelAndVertexPropertyWithAbsentValue() throws
-    Exception {
+  public void testVertexAndEdgeLabelAndSingleVertexPropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -462,8 +631,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexAndEdgeLabelAndEdgeProperty() throws
-    Exception {
+  public void testVertexAndEdgeLabelAndSingleEdgeProperty() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -489,8 +657,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexAndEdgeLabelAndEdgePropertyWithAbsentValue()
-    throws Exception {
+  public void testVertexAndEdgeLabelAndSingleEdgePropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -522,8 +689,7 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSummarizeOnVertexAndEdgeLabelAndVertexAndEdgeProperty() throws
-    Exception {
+  public void testVertexAndEdgeLabelAndVertexAndSingleEdgeProperty() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -556,10 +722,8 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void
-  testSummarizeOnVertexAndEdgeLabelAndVertexAndEdgePropertyWithAbsentValue()
-    throws
-    Exception {
+  public void testVertexAndEdgeLabelAndSingleVertexAndSingleEdgePropertyWithAbsentValue()
+    throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
@@ -601,28 +765,54 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
   private class SummarizationRunner {
     private LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph;
-    private String vertexGroupingKey;
+    private final List<String> vertexGroupingKeys;
     private final boolean useVertexLabels;
-    private final String edgeGroupingKey;
+    private final List<String> edgeGroupingKeys;
     private final boolean useEdgeLabels;
 
     public SummarizationRunner(
-      LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-        inputGraph,
-      String vertexGroupingKey, boolean useVertexLabels, String edgeGroupingKey,
+      LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph,
+      String vertexGroupingKey, boolean useVertexLabels,
+      String edgeGroupingKey, boolean useEdgeLabels) {
+      this(inputGraph,
+        (vertexGroupingKey != null)
+          ? Lists.newArrayList(vertexGroupingKey) : Lists.<String>newArrayList(),
+        useVertexLabels,
+        (edgeGroupingKey != null)
+          ? Lists.newArrayList(edgeGroupingKey) : Lists.<String>newArrayList(),
+        useEdgeLabels
+        );
+    }
+
+    public SummarizationRunner(
+      LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph,
+      boolean useVertexLabels,
       boolean useEdgeLabels) {
+      this(inputGraph,
+        Lists.<String>newArrayList(), useVertexLabels,
+        Lists.<String>newArrayList(), useEdgeLabels);
+    }
+
+    public SummarizationRunner(
+      LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph,
+      List<String> vertexGroupingKeys, boolean useVertexLabels,
+      List<String> edgeGroupingKeys, boolean useEdgeLabels) {
       this.inputGraph = inputGraph;
-      this.vertexGroupingKey = vertexGroupingKey;
+
+      this.vertexGroupingKeys = (vertexGroupingKeys != null) ?
+        vertexGroupingKeys : Lists.<String>newArrayList();
       this.useVertexLabels = useVertexLabels;
-      this.edgeGroupingKey = edgeGroupingKey;
+
+      this.edgeGroupingKeys = (edgeGroupingKeys != null) ?
+        edgeGroupingKeys : Lists.<String>newArrayList();
       this.useEdgeLabels = useEdgeLabels;
     }
 
-    public LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> run()
-      throws Exception {
+    public LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> run() {
       Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
-        summarization = getSummarizationImpl(vertexGroupingKey, useVertexLabels,
-        edgeGroupingKey, useEdgeLabels);
+        summarization = getSummarizationImpl(
+        vertexGroupingKeys, useVertexLabels,
+        edgeGroupingKeys, useEdgeLabels);
 
       return summarization.execute(inputGraph);
     }

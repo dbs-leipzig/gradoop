@@ -17,6 +17,7 @@
 
 package org.gradoop.examples;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -30,9 +31,8 @@ import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 import org.gradoop.model.impl.operators.summarization.SummarizationGroupCombine;
 import org.gradoop.model.impl.operators.summarization.SummarizationGroupMap;
-import org.gradoop.model.impl.operators.summarization.SummarizationGroupSort;
-import org.gradoop.model.impl.operators.summarization
-  .SummarizationGroupWithLists;
+
+import java.util.List;
 
 /**
  * SummarizationExample example that can be executed on a cluster.
@@ -159,25 +159,19 @@ public class SummarizationExample implements ProgramDescription {
     String edgeKey, boolean useVertexLabels, boolean useEdgeLabels,
     String summarizationStrategy) {
     Summarization summarization;
+
+    List<String> vertexKeys = Lists.newArrayList(vertexKey);
+    List<String> edgeKeys = Lists.newArrayList(edgeKey);
+
     switch (summarizationStrategy) {
     case "map":
       summarization =
-        new SummarizationGroupMap(vertexKey, edgeKey, useVertexLabels,
-          useEdgeLabels);
-      break;
-    case "sort":
-      summarization =
-        new SummarizationGroupSort(vertexKey, edgeKey, useVertexLabels,
-          useEdgeLabels);
-      break;
-    case "list":
-      summarization =
-        new SummarizationGroupWithLists(vertexKey, edgeKey, useVertexLabels,
+        new SummarizationGroupMap(vertexKeys, edgeKeys, useVertexLabels,
           useEdgeLabels);
       break;
     default:
       summarization =
-        new SummarizationGroupCombine(vertexKey, edgeKey, useVertexLabels,
+        new SummarizationGroupCombine(vertexKeys, edgeKeys, useVertexLabels,
           useEdgeLabels);
     }
     return summarization;

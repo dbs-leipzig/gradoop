@@ -28,6 +28,8 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.api.functions.PredicateFunction;
 import org.gradoop.model.impl.operators.summarization.Summarization;
 
+import java.util.List;
+
 /**
  * Describes all operators that can be applied on a single logical graph in the
  * EPGM.
@@ -105,11 +107,11 @@ public interface LogicalGraphOperators
    * accordingly. Vertices with missing property key are represented by an
    * additional vertex.
    *
-   * @param vertexGroupingKey property key to group vertices
+   * @param vertexGroupingKeys property keys to group vertices
    * @return summarized logical graph
    * @see Summarization
    */
-  LogicalGraph<G, V, E> summarize(String vertexGroupingKey);
+  LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -119,13 +121,13 @@ public interface LogicalGraphOperators
    * given property key. Vertices and edges with missing property key are
    * represented by an additional vertex.
    *
-   * @param vertexGroupingKey vertex property key
-   * @param edgeGroupingKey   edge property key
+   * @param vertexGroupingKeys property keys to group vertices
+   * @param edgeGroupingKeys   property keys to group edges
    * @return summarized logical graph
    * @see Summarization
    */
-  LogicalGraph<G, V, E> summarize(String vertexGroupingKey,
-    String edgeGroupingKey);
+  LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys,
+    List<String> edgeGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -146,12 +148,12 @@ public interface LogicalGraphOperators
    * grouped accordingly. Vertices with missing property key are represented
    * by an additional vertex.
    *
-   * @param vertexGroupingKey vertex property key
+   * @param vertexGroupingKeys property keys to group vertices
    * @return summarized logical graph
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexLabelAndVertexProperty(
-    String vertexGroupingKey);
+    List<String> vertexGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -161,12 +163,12 @@ public interface LogicalGraphOperators
    * property key. Edges with missing property key are represented by an
    * additional edge.
    *
-   * @param edgeGroupingKey edge property key
+   * @param edgeGroupingKeys property keys to group edges
    * @return summarized logical graph
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexLabelAndEdgeProperty(
-    String edgeGroupingKey);
+    List<String> edgeGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -177,13 +179,13 @@ public interface LogicalGraphOperators
    * Vertices and edges with missing property keys are represented by an
    * additional vertex / edge.
    *
-   * @param vertexGroupingKey vertex property key
-   * @param edgeGroupingKey   edge property key
+   * @param vertexGroupingKeys  property keys to group vertices
+   * @param edgeGroupingKeys    property keys to group edges
    * @return summarized logical graph
    * @see Summarization
    */
-  LogicalGraph<G, V, E> summarizeOnVertexLabel(String vertexGroupingKey,
-    String edgeGroupingKey);
+  LogicalGraph<G, V, E> summarizeOnVertexLabel(List<String> vertexGroupingKeys,
+    List<String> edgeGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -205,12 +207,12 @@ public interface LogicalGraphOperators
    * grouped by their label. Vertices with missing property key are
    * represented by an additional vertex.
    *
-   * @param vertexGroupingKey vertex property key
+   * @param vertexGroupingKeys property keys to group vertices
    * @return summarized logical graph
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndVertexProperty(
-    String vertexGroupingKey);
+    List<String> vertexGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -221,12 +223,12 @@ public interface LogicalGraphOperators
    * Edges with missing property key are represented by an
    * additional edge.
    *
-   * @param edgeGroupingKey edge property key
+   * @param edgeGroupingKeys property keys to group edges
    * @return summarized logical graph
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
-    String edgeGroupingKey);
+    List<String> edgeGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -236,13 +238,13 @@ public interface LogicalGraphOperators
    * Vertices and edges with missing property key are represented by an
    * additional vertex / edge.
    *
-   * @param vertexGroupingKey vertex property key
-   * @param edgeGroupingKey   edge property key
+   * @param vertexGroupingKeys property keys to group vertices
+   * @param edgeGroupingKeys   property keys to group edges
    * @return summarized logical graph
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
-    String vertexGroupingKey, String edgeGroupingKey);
+    List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
 
   //----------------------------------------------------------------------------
   // Binary Operators

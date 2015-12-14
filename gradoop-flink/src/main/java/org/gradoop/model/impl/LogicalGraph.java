@@ -47,7 +47,7 @@ import org.gradoop.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.model.impl.operators.overlap.Overlap;
 import org.gradoop.model.impl.operators.projection.Projection;
 import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
-import org.gradoop.model.impl.operators.summarization.SummarizationGroupCombine;
+import org.gradoop.model.impl.operators.summarization.SummarizationGroupMap;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.ArrayList;
@@ -363,19 +363,19 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarize(String vertexGroupingKey) {
-    return summarize(vertexGroupingKey, null);
+  public LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys) {
+    return summarize(vertexGroupingKeys, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarize(String vertexGroupingKey,
-    String edgeGroupingKey) {
+  public LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys,
+    List<String> edgeGroupingKeys) {
     return callForGraph(
-      new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
-        edgeGroupingKey, false, false));
+      new SummarizationGroupMap<G, V, E>(vertexGroupingKeys,
+        edgeGroupingKeys, false, false));
   }
 
   /**
@@ -391,8 +391,8 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexLabelAndVertexProperty(
-    String vertexGroupingKey) {
-    return summarizeOnVertexLabel(vertexGroupingKey, null);
+    List<String> vertexGroupingKeys) {
+    return summarizeOnVertexLabel(vertexGroupingKeys, null);
   }
 
   /**
@@ -400,8 +400,8 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexLabelAndEdgeProperty(
-    String edgeGroupingKey) {
-    return summarizeOnVertexLabel(null, edgeGroupingKey);
+    List<String> edgeGroupingKeys) {
+    return summarizeOnVertexLabel(null, edgeGroupingKeys);
   }
 
   /**
@@ -409,10 +409,10 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexLabel(
-    String vertexGroupingKey, String edgeGroupingKey) {
+    List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
     return callForGraph(
-      new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
-        edgeGroupingKey, true, false));
+      new SummarizationGroupMap<G, V, E>(vertexGroupingKeys,
+        edgeGroupingKeys, true, false));
   }
 
   /**
@@ -429,8 +429,8 @@ public class LogicalGraph
   @Override
   public LogicalGraph<G, V, E>
   summarizeOnVertexAndEdgeLabelAndVertexProperty(
-    String vertexGroupingKey) {
-    return summarizeOnVertexAndEdgeLabel(vertexGroupingKey, null);
+    List<String> vertexGroupingKeys) {
+    return summarizeOnVertexAndEdgeLabel(vertexGroupingKeys, null);
   }
 
   /**
@@ -438,8 +438,8 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
-    String edgeGroupingKey) {
-    return summarizeOnVertexAndEdgeLabel(null, edgeGroupingKey);
+    List<String> edgeGroupingKeys) {
+    return summarizeOnVertexAndEdgeLabel(null, edgeGroupingKeys);
   }
 
   /**
@@ -447,10 +447,10 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
-    String vertexGroupingKey, String edgeGroupingKey) {
+    List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
     return callForGraph(
-      new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
-        edgeGroupingKey, true, true));
+      new SummarizationGroupMap<G, V, E>(vertexGroupingKeys,
+        edgeGroupingKeys, true, true));
   }
 
   /**

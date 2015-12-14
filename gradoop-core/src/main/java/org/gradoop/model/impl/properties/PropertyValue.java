@@ -38,7 +38,7 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
   /**
    * Represents a property value that is {@code null}.
    */
-  public static final PropertyValue NULL_VALUE = new PropertyValue(null);
+  public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
 
   /**
    * {@code <property-type>} for empty property value (i.e. {@code null})
@@ -95,8 +95,19 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
    *
    * @param value value with supported type
    */
-  public PropertyValue(Object value) {
+  private PropertyValue(Object value) {
     setObject(value);
+  }
+
+  /**
+   * Creates a new property value from given byte array.
+   *
+   * This is for internal use only, needs to be package protected.
+   *
+   * @param rawBytes internal byte representation of property value
+   */
+  PropertyValue(byte[] rawBytes) {
+    this.rawBytes = rawBytes;
   }
 
   /**
@@ -392,13 +403,13 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeInt(rawBytes.length);
+    dataOutput.writeShort(rawBytes.length);
     dataOutput.write(rawBytes);
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    rawBytes = new byte[dataInput.readInt()];
+    rawBytes = new byte[dataInput.readShort()];
     dataInput.readFully(rawBytes);
   }
 

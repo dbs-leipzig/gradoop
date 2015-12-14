@@ -21,15 +21,16 @@ import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
-public class SummarizationGroupCombineTest extends
-  SummarizationTestBase {
+import java.util.List;
+
+public class SummarizationGroupCombineTest extends SummarizationTestBase {
 
   @Override
   public Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
   getSummarizationImpl(
-    String vertexGroupingKey, boolean useVertexLabel, String edgeGroupingKey,
-    boolean useEdgeLabel) {
-    return new SummarizationGroupCombine<>(vertexGroupingKey, edgeGroupingKey,
+    List<String> vertexGroupingKeys, boolean useVertexLabel,
+    List<String> edgeGroupingKeys, boolean useEdgeLabel) {
+    return new SummarizationGroupCombine<>(vertexGroupingKeys, edgeGroupingKeys,
       useVertexLabel, useEdgeLabel);
   }
 }
