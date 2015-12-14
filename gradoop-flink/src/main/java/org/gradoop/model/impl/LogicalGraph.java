@@ -336,7 +336,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> project(ProjectionFunction<V> vertexFunction,
-    ProjectionFunction<E> edgeFunction) throws Exception {
+    ProjectionFunction<E> edgeFunction) {
     return callForGraph(
       new Projection<G, V, E>(vertexFunction, edgeFunction));
   }
@@ -346,7 +346,7 @@ public class LogicalGraph
    */
   @Override
   public <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
-    AggregateFunction<N, G, V, E> aggregateFunc) throws Exception {
+    AggregateFunction<N, G, V, E> aggregateFunc) {
 
     return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
@@ -355,8 +355,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> sampleRandomNodes(Float
-    sampleSize) throws Exception {
+  public LogicalGraph<G, V, E> sampleRandomNodes(Float sampleSize) {
     return callForGraph(new RandomNodeSampling<G, V, E>(sampleSize));
   }
 
@@ -364,8 +363,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarize(String vertexGroupingKey) throws
-    Exception {
+  public LogicalGraph<G, V, E> summarize(String vertexGroupingKey) {
     return summarize(vertexGroupingKey, null);
   }
 
@@ -374,7 +372,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarize(String vertexGroupingKey,
-    String edgeGroupingKey) throws Exception {
+    String edgeGroupingKey) {
     return callForGraph(
       new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
         edgeGroupingKey, false, false));
@@ -384,7 +382,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexLabel() throws Exception {
+  public LogicalGraph<G, V, E> summarizeOnVertexLabel() {
     return summarizeOnVertexLabel(null, null);
   }
 
@@ -393,7 +391,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexLabelAndVertexProperty(
-    String vertexGroupingKey) throws Exception {
+    String vertexGroupingKey) {
     return summarizeOnVertexLabel(vertexGroupingKey, null);
   }
 
@@ -402,7 +400,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexLabelAndEdgeProperty(
-    String edgeGroupingKey) throws Exception {
+    String edgeGroupingKey) {
     return summarizeOnVertexLabel(null, edgeGroupingKey);
   }
 
@@ -411,7 +409,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexLabel(
-    String vertexGroupingKey, String edgeGroupingKey) throws Exception {
+    String vertexGroupingKey, String edgeGroupingKey) {
     return callForGraph(
       new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
         edgeGroupingKey, true, false));
@@ -421,8 +419,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel() throws
-    Exception {
+  public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel() {
     return summarizeOnVertexAndEdgeLabel(null, null);
   }
 
@@ -432,7 +429,7 @@ public class LogicalGraph
   @Override
   public LogicalGraph<G, V, E>
   summarizeOnVertexAndEdgeLabelAndVertexProperty(
-    String vertexGroupingKey) throws Exception {
+    String vertexGroupingKey) {
     return summarizeOnVertexAndEdgeLabel(vertexGroupingKey, null);
   }
 
@@ -441,7 +438,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
-    String edgeGroupingKey) throws Exception {
+    String edgeGroupingKey) {
     return summarizeOnVertexAndEdgeLabel(null, edgeGroupingKey);
   }
 
@@ -450,7 +447,7 @@ public class LogicalGraph
    */
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
-    String vertexGroupingKey, String edgeGroupingKey) throws Exception {
+    String vertexGroupingKey, String edgeGroupingKey) {
     return callForGraph(
       new SummarizationGroupCombine<G, V, E>(vertexGroupingKey,
         edgeGroupingKey, true, true));

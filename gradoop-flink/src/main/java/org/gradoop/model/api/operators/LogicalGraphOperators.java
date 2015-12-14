@@ -73,7 +73,7 @@ public interface LogicalGraphOperators
    * @return projected logical graph
    */
   LogicalGraph<G, V, E> project(ProjectionFunction<V> vertexFunction,
-    ProjectionFunction<E> edgeFunction) throws Exception;
+    ProjectionFunction<E> edgeFunction);
 
   /**
    * Applies the given aggregate function to the logical graph and stores the
@@ -84,10 +84,9 @@ public interface LogicalGraphOperators
    * @param aggregateFunc computes an aggregate on the logical graph
    * @param <N>           output type of the aggregate function
    * @return logical graph with additional property storing the aggregate
-   * @throws Exception
    */
   <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
-    AggregateFunction<N, G, V, E> aggregateFunc) throws Exception;
+    AggregateFunction<N, G, V, E> aggregateFunc);
 
   /**
    * Creates a new graph from a randomly chosen subset of nodes and their
@@ -95,9 +94,8 @@ public interface LogicalGraphOperators
    *
    * @param sampleSize relative amount of nodes in the result graph
    * @return logical graph with random nodes and their associated edges
-   * @throws Exception
    */
-  LogicalGraph<G, V, E> sampleRandomNodes(Float sampleSize) throws Exception;
+  LogicalGraph<G, V, E> sampleRandomNodes(Float sampleSize);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -109,10 +107,9 @@ public interface LogicalGraphOperators
    *
    * @param vertexGroupingKey property key to group vertices
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<G, V, E> summarize(String vertexGroupingKey) throws Exception;
+  LogicalGraph<G, V, E> summarize(String vertexGroupingKey);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -125,11 +122,10 @@ public interface LogicalGraphOperators
    * @param vertexGroupingKey vertex property key
    * @param edgeGroupingKey   edge property key
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarize(String vertexGroupingKey,
-    String edgeGroupingKey) throws Exception;
+    String edgeGroupingKey);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -138,10 +134,9 @@ public interface LogicalGraphOperators
    * Vertices are grouped by their label. Edges are grouped accordingly.
    *
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<G, V, E> summarizeOnVertexLabel() throws Exception;
+  LogicalGraph<G, V, E> summarizeOnVertexLabel();
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -153,11 +148,10 @@ public interface LogicalGraphOperators
    *
    * @param vertexGroupingKey vertex property key
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexLabelAndVertexProperty(
-    String vertexGroupingKey) throws Exception;
+    String vertexGroupingKey);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -169,11 +163,10 @@ public interface LogicalGraphOperators
    *
    * @param edgeGroupingKey edge property key
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexLabelAndEdgeProperty(
-    String edgeGroupingKey) throws Exception;
+    String edgeGroupingKey);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -187,11 +180,10 @@ public interface LogicalGraphOperators
    * @param vertexGroupingKey vertex property key
    * @param edgeGroupingKey   edge property key
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexLabel(String vertexGroupingKey,
-    String edgeGroupingKey) throws Exception;
+    String edgeGroupingKey);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -201,10 +193,9 @@ public interface LogicalGraphOperators
    * by their label.
    *
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
-  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel() throws Exception;
+  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel();
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -216,11 +207,10 @@ public interface LogicalGraphOperators
    *
    * @param vertexGroupingKey vertex property key
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndVertexProperty(
-    String vertexGroupingKey) throws Exception;
+    String vertexGroupingKey);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -233,11 +223,10 @@ public interface LogicalGraphOperators
    *
    * @param edgeGroupingKey edge property key
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
-    String edgeGroupingKey) throws Exception;
+    String edgeGroupingKey);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -250,11 +239,10 @@ public interface LogicalGraphOperators
    * @param vertexGroupingKey vertex property key
    * @param edgeGroupingKey   edge property key
    * @return summarized logical graph
-   * @throws Exception
    * @see Summarization
    */
   LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
-    String vertexGroupingKey, String edgeGroupingKey) throws Exception;
+    String vertexGroupingKey, String edgeGroupingKey);
 
   //----------------------------------------------------------------------------
   // Binary Operators
