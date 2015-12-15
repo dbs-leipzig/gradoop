@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>org.gradoop</groupId>
         <artifactId>gradoop</artifactId>
-        <groupId>de.uni-leipzig.de.dbs</groupId>
         <version>0.2-SNAPSHOT</version>
     </parent>
 
@@ -16,16 +16,8 @@
     <name>Gradoop Flink</name>
     <description>EPGM Mapping and Operator Implementations</description>
 
-    <properties>
-        <top.dir>${project.basedir}/..</top.dir>
-    </properties>
-
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -58,11 +50,11 @@
     </build>
 
     <dependencies>
-        <!-- Compile -->
+        <!-- Compile dependencies -->
 
         <!-- Gradoop -->
         <dependency>
-            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <groupId>org.gradoop</groupId>
             <artifactId>gradoop-core</artifactId>
         </dependency>
 
@@ -82,11 +74,11 @@
             <artifactId>flink-hbase</artifactId>
         </dependency>
 
-        <!-- Testing -->
+        <!-- Test dependencies -->
 
         <!-- Gradoop -->
         <dependency>
-            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <groupId>org.gradoop</groupId>
             <artifactId>gradoop-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
@@ -118,12 +110,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

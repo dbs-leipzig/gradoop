@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>org.gradoop</groupId>
         <artifactId>gradoop</artifactId>
-        <groupId>de.uni-leipzig.de.dbs</groupId>
         <version>0.2-SNAPSHOT</version>
     </parent>
 
@@ -16,16 +16,8 @@
     <name>Gradoop Examples</name>
     <description>Contains possible use cases for Gradoop.</description>
 
-    <properties>
-        <top.dir>${project.basedir}/..</top.dir>
-    </properties>
-
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -58,17 +50,18 @@
     </build>
 
     <dependencies>
-        <!-- Compile -->
+        <!-- Compile dependencies -->
+
         <dependency>
-            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <groupId>org.gradoop</groupId>
             <artifactId>gradoop-flink</artifactId>
         </dependency>
 
-        <!-- Testing -->
+        <!-- Test dependencies -->
 
         <!-- Gradoop -->
         <dependency>
-            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <groupId>org.gradoop</groupId>
             <artifactId>gradoop-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
