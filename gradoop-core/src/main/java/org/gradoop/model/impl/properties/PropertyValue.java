@@ -100,17 +100,6 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
   }
 
   /**
-   * Creates a new property value from given byte array.
-   *
-   * This is for internal use only, needs to be package protected.
-   *
-   * @param rawBytes internal byte representation of property value
-   */
-  PropertyValue(byte[] rawBytes) {
-    this.rawBytes = rawBytes;
-  }
-
-  /**
    * Creates a new Property Value from the given object.
    *
    * If the given object type is not supported, an
@@ -401,16 +390,66 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
     return Bytes.compareTo(rawBytes, o.rawBytes);
   }
 
+  /**
+   * Byte representation:
+   *
+   * byte 1       : type info
+   *
+   * for dynamic length types (e.g. String and BigDecimal)
+   * byte 2       : length (short)
+   * byte 3       : length (short)
+   * byte 4 - end : value bytes
+   *
+   * for fixed length types (e.g. int, long, float, ...)
+   * byte 2 - end : value bytes
+   *
+   * @param dataOutput data output to write data to
+   * @throws IOException
+   */
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeShort(rawBytes.length);
-    dataOutput.write(rawBytes);
+    // null?
+    // type
+    dataOutput.writeByte(rawBytes[0]);
+    // dynamic type?
+    if (rawBytes[0] == TYPE_STRING || rawBytes[0] == TYPE_BIG_DECIMAL) {
+      // write length
+      dataOutput.writeShort(rawBytes.length - OFFSET);
+    }
+    // write data
+    dataOutput.write(rawBytes, OFFSET, rawBytes.length - OFFSET);
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    rawBytes = new byte[dataInput.readShort()];
-    dataInput.readFully(rawBytes);
+    short length = 0;
+    // type
+    byte type = dataInput.readByte();
+    // dynamic type?
+    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL) {
+      // read length
+      length = dataInput.readShort();
+    } else if (type == TYPE_NULL) {
+      length = 0;
+    } else if (type == TYPE_BOOLEAN) {
+      length = Bytes.SIZEOF_BOOLEAN;
+    } else if (type == TYPE_INTEGER) {
+      length = Bytes.SIZEOF_INT;
+    } else if (type == TYPE_LONG) {
+      length = Bytes.SIZEOF_LONG;
+    } else if (type == TYPE_FLOAT) {
+      length = Bytes.SIZEOF_FLOAT;
+    } else if (type == TYPE_DOUBLE) {
+      length = Bytes.SIZEOF_DOUBLE;
+    }
+    // init new array
+    rawBytes = new byte[OFFSET + length];
+    // read type info
+    rawBytes[0] = type;
+    // read data
+    for (int i = OFFSET; i < rawBytes.length; i++) {
+      rawBytes[i] = dataInput.readByte();
+    }
   }
 
   @Override

@@ -19,13 +19,15 @@ package org.gradoop.model.impl.properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Writables;
 import org.apache.hadoop.io.WritableComparable;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -64,17 +66,17 @@ public class PropertyValueList
    * @return property value list containing the given properties
    */
   public static PropertyValueList fromPropertyValues(
-    Collection<PropertyValue> propertyValues) {
+    Collection<PropertyValue> propertyValues) throws IOException {
 
-    PropertyValue[] valueArray = new PropertyValue[propertyValues.size()];
-    propertyValues.toArray(valueArray);
-    PropertyValueList result = null;
-    try {
-      result = new PropertyValueList(Writables.getBytes(valueArray));
-    } catch (IOException e) {
-      e.printStackTrace();
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    DataOutputStream out = new DataOutputStream(byteStream);
+
+    for (PropertyValue propertyValue : propertyValues) {
+      propertyValue.write(out);
     }
-    return result;
+
+    out.flush();
+    return new PropertyValueList(byteStream.toByteArray());
   }
 
   @Override
@@ -128,9 +130,15 @@ public class PropertyValueList
     implements Iterator<PropertyValue> {
 
     /**
-     * Buffers the byte representation and allows access to the property values
+     * Used to wrap the byte array of PropertyValueList
      */
-    private final ByteBuffer buffer;
+    private final ByteArrayInputStream byteStream;
+
+    /**
+     * Wraps the {@code byteStream} and is used to access the {@code readFields}
+     * method of PropertyValue.
+     */
+    private final DataInputStream in;
 
     /**
      * Creates new iterator
@@ -141,21 +149,36 @@ public class PropertyValueList
       if (rawBytes == null) {
         rawBytes = new byte[0];
       }
-      this.buffer = ByteBuffer.wrap(rawBytes);
-      buffer.rewind();
+      byteStream = new ByteArrayInputStream(rawBytes);
+      in = new DataInputStream(byteStream);
     }
 
     @Override
     public boolean hasNext() {
-      return buffer.hasRemaining();
+      boolean hasNext;
+      if (byteStream.available() > 0) {
+        hasNext = true;
+      } else {
+        // close the stream if no more data is available
+        try {
+          in.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        hasNext = false;
+      }
+      return hasNext;
     }
 
     @Override
     public PropertyValue next() {
-      short length = buffer.getShort();
-      byte[] bytes = new byte[length];
-      buffer.get(bytes, 0, length);
-      return new PropertyValue(bytes);
+      PropertyValue nextValue = new PropertyValue();
+      try {
+        nextValue.readFields(in);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      return nextValue;
     }
 
     @Override

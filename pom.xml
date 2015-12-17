@@ -81,7 +81,7 @@
         <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
         <plugin.maven_assembly.version>2.4</plugin.maven_assembly.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
-        <plugin.maven-surefire.version>2.7</plugin.maven-surefire.version>
+        <plugin.maven-surefire.version>2.19</plugin.maven-surefire.version>
     </properties>
 
     <repositories>

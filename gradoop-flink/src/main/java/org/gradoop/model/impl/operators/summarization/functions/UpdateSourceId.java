@@ -26,6 +26,7 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresent
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -92,7 +93,7 @@ public class UpdateSourceId<E extends EPGMEdge>
    * @param edge edge
    * @return property value list
    */
-  private PropertyValueList getPropertyValueList(E edge) {
+  private PropertyValueList getPropertyValueList(E edge) throws IOException {
     List<PropertyValue> values =
       Lists.newArrayListWithCapacity(edge.getPropertyCount());
     for (String groupPropertyKey : groupPropertyKeys) {

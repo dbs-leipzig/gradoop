@@ -52,16 +52,6 @@ public class GradoopId implements Comparable<GradoopId>,
     new GradoopId(new UUID(Long.MIN_VALUE, Long.MIN_VALUE));
 
   /**
-   * 128-bit UUID
-   */
-//  private UUID uuid;
-
-  /**
-   * TODO: Replace with {@link UUID} when
-   * https://issues.apache.org/jira/browse/FLINK-3088 is fixed
-   */
-
-  /**
    * Most significant bits of a 128-bit UUID
    */
   private long mostSigBits;
