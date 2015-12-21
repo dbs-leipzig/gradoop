@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.grouping;
 
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.grouping.Grouping.GroupingBuilder;
 

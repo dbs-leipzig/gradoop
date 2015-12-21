@@ -2,6 +2,7 @@ package org.gradoop.model.impl.operators.split;
 
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.functions.UnaryFunction;
+import org.gradoop.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -84,8 +85,11 @@ public class SplitTest extends GradoopFlinkTestBase {
       input.callForCollection(new Split<GraphHeadPojo,
         VertexPojo, EdgePojo>(new TestHelperFunction()));
 
-    collectAndAssertTrue(result.equalsByGraphElementIds(
-      loader.getGraphCollectionByVariables("graph1", "graph2")));
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+      expectation = loader.getGraphCollectionByVariables(
+      "graph1", "graph2", "graph3");
+
+    collectAndAssertTrue(result.equalsByGraphElementIds(expectation));
   }
 
   @Test

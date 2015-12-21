@@ -32,7 +32,7 @@ import org.gradoop.model.impl.LogicalGraph;
  * @param <T> value type
  */
 public interface BinaryGraphToValueOperator
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead, T>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge, T>
   extends Operator {
 
   /**

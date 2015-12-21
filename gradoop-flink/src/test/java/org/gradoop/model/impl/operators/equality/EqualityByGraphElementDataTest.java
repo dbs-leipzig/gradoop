@@ -47,11 +47,8 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c167 =
       loader.getGraphCollectionByVariables("g1", "g6", "g7");
 
-    EqualityByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementData<>();
-
-    collectAndAssertTrue(equals.execute(c12, c67));
-    collectAndAssertTrue(equals.execute(c126, c167));
+    collectAndAssertTrue(c12.equalsByGraphElementData(c67));
+    collectAndAssertTrue(c126.equalsByGraphElementData(c167));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c36 =
       loader.getGraphCollectionByVariables("g3", "g6");
@@ -62,17 +59,18 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c56 =
       loader.getGraphCollectionByVariables("g5", "g6");
 
-    collectAndAssertFalse(equals.execute(c12, c167));
-    collectAndAssertFalse(equals.execute(c12, c36));
-    collectAndAssertFalse(equals.execute(c12, c46));
-    collectAndAssertFalse(equals.execute(c12, c56));
+    collectAndAssertFalse(c12.equalsByGraphElementData(c167));
+    collectAndAssertFalse(c12.equalsByGraphElementData(c36));
+    collectAndAssertFalse(c12.equalsByGraphElementData(c46));
+    collectAndAssertFalse(c12.equalsByGraphElementData(c56));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> emptyCollection =
       GraphCollection.createEmptyCollection(getConfig());
 
-    collectAndAssertTrue(equals.execute(emptyCollection, emptyCollection));
-    collectAndAssertFalse(equals.execute(c12, emptyCollection));
-    collectAndAssertFalse(equals.execute(emptyCollection, c12));
+    collectAndAssertTrue(
+      emptyCollection.equalsByGraphElementData(emptyCollection));
+    collectAndAssertFalse(c12.equalsByGraphElementData(emptyCollection));
+    collectAndAssertFalse(emptyCollection.equalsByGraphElementData(c12));
   }
 
   @Test
@@ -116,11 +114,8 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c167 =
       loader.getGraphCollectionByVariables("g1", "g6", "g7");
 
-    EqualityByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementData<>();
-
-    collectAndAssertTrue(equals.execute(c12, c67));
-    collectAndAssertTrue(equals.execute(c126, c167));
+    collectAndAssertTrue(c12.equalsByGraphElementData(c67));
+    collectAndAssertTrue(c126.equalsByGraphElementData(c167));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c36 =
       loader.getGraphCollectionByVariables("g3", "g6");
@@ -131,10 +126,10 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c56 =
       loader.getGraphCollectionByVariables("g5", "g6");
 
-    collectAndAssertFalse(equals.execute(c12, c167));
-    collectAndAssertFalse(equals.execute(c12, c36));
-    collectAndAssertFalse(equals.execute(c12, c46));
-    collectAndAssertFalse(equals.execute(c12, c56));
+    collectAndAssertFalse(c12.equalsByGraphElementData(c167));
+    collectAndAssertFalse(c12.equalsByGraphElementData(c36));
+    collectAndAssertFalse(c12.equalsByGraphElementData(c46));
+    collectAndAssertFalse(c12.equalsByGraphElementData(c56));
   }
 
   @Test
@@ -166,13 +161,10 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eLabel =
       loader.getGraphCollectionByVariables("ab1el", "ad1");
 
-    EqualityByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementData<>();
-
-    collectAndAssertTrue(equals.execute(ref, dup));
-    collectAndAssertFalse(equals.execute(ref, eDir));
-    collectAndAssertFalse(equals.execute(ref, vLabel));
-    collectAndAssertFalse(equals.execute(ref, eLabel));
+    collectAndAssertTrue(ref.equalsByGraphElementData(dup));
+    collectAndAssertFalse(ref.equalsByGraphElementData(eDir));
+    collectAndAssertFalse(ref.equalsByGraphElementData(vLabel));
+    collectAndAssertFalse(ref.equalsByGraphElementData(eLabel));
   }
 
   @Test
@@ -212,16 +204,11 @@ public class EqualityByGraphElementDataTest
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> eValue =
       loader.getGraphCollectionByVariables("p123eValue", "p023a");
 
-    EqualityByGraphElementData<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementData<>();
-
-    collectAndAssertTrue(equals.execute(ref, dup));
-    collectAndAssertFalse(equals.execute(ref, eDir));
-    collectAndAssertFalse(equals.execute(ref, vKey));
-    collectAndAssertFalse(equals.execute(ref, eKey));
-    collectAndAssertFalse(
-      equals.execute(ref, vValue));
-    collectAndAssertFalse(
-      equals.execute(ref, eValue));
+    collectAndAssertTrue(ref.equalsByGraphElementData(dup));
+    collectAndAssertFalse(ref.equalsByGraphElementData(eDir));
+    collectAndAssertFalse(ref.equalsByGraphElementData(vKey));
+    collectAndAssertFalse(ref.equalsByGraphElementData(eKey));
+    collectAndAssertFalse(ref.equalsByGraphElementData(vValue));
+    collectAndAssertFalse(ref.equalsByGraphElementData(eValue));
   }
 }

@@ -12,9 +12,6 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
   @Test
   public void testExecute() throws Exception {
 
-    EqualityByGraphElementIds<GraphHeadPojo, VertexPojo, EdgePojo> equals
-      = new EqualityByGraphElementIds<>();
-
     // 4 graphs : 1-2 of same elements, 1-3 different vertex, 1-4 different edge
     String asciiGraphs = "" +
       "g1[(a:A)-[b:b]->(c:C)];" +
@@ -34,9 +31,9 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c5
       = loader.getGraphCollectionByVariables("g1","g4");
 
-    collectAndAssertTrue(equals.execute(c1, c2));
+    collectAndAssertTrue(c1.equalsByGraphElementIds(c2));
 
-    collectAndAssertFalse(equals.execute(c1, c5));
+    collectAndAssertFalse(c1.equalsByGraphElementIds(c5));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c3
       = loader.getGraphCollectionByVariables("g1","g2");
@@ -44,13 +41,14 @@ public class EqualityByGraphElementIdsTest extends EqualityTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> c4
       = loader.getGraphCollectionByVariables("g3","g4");
 
-    collectAndAssertFalse(equals.execute(c3, c4));
+    collectAndAssertFalse(c3.equalsByGraphElementIds(c4));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> emptyCollection =
       GraphCollection.createEmptyCollection(getConfig());
 
-    collectAndAssertTrue(equals.execute(emptyCollection, emptyCollection));
-    collectAndAssertFalse(equals.execute(c1, emptyCollection));
-    collectAndAssertFalse(equals.execute(emptyCollection, c1));
+    collectAndAssertTrue(
+      emptyCollection.equalsByGraphElementIds(emptyCollection));
+    collectAndAssertFalse(c1.equalsByGraphElementIds(emptyCollection));
+    collectAndAssertFalse(emptyCollection.equalsByGraphElementIds(c1));
   }
 }

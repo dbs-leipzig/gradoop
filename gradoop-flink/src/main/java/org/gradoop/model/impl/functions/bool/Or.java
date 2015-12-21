@@ -58,4 +58,8 @@ public class Or implements ReduceFunction<Boolean>,
   public static DataSet<Boolean> cross(DataSet<Boolean> a, DataSet<Boolean> b) {
     return a.cross(b).with(new Or());
   }
+
+  public static DataSet<Boolean> reduce(DataSet<Boolean> d) {
+    return d.reduce(new Or());
+  }
 }

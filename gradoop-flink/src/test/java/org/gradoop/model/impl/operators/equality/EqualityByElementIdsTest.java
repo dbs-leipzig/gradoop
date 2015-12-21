@@ -46,24 +46,20 @@ public class EqualityByElementIdsTest extends EqualityTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g7 =
       loader.getLogicalGraphByVariable("g7");
 
+    collectAndAssertTrue(g1.equalsByElementIds(g1));
+    collectAndAssertTrue(g1.equalsByElementIds(g2));
+    collectAndAssertFalse(g1.equalsByElementIds(g3));
+    collectAndAssertFalse(g1.equalsByElementIds(g4));
 
-    EqualityByElementIds<GraphHeadPojo, VertexPojo, EdgePojo> equals =
-      new EqualityByElementIds<>();
-
-    collectAndAssertTrue(equals.execute(g1, g1));
-    collectAndAssertTrue(equals.execute(g1, g2));
-    collectAndAssertFalse(equals.execute(g1, g3));
-    collectAndAssertFalse(equals.execute(g1, g4));
-
-    collectAndAssertTrue(equals.execute(g5, g5));
-    collectAndAssertTrue(equals.execute(g5, g6));
-    collectAndAssertFalse(equals.execute(g5, g7));
+    collectAndAssertTrue(g5.equalsByElementIds(g5));
+    collectAndAssertTrue(g5.equalsByElementIds(g6));
+    collectAndAssertFalse(g5.equalsByElementIds(g7));
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> emptyGraph =
       LogicalGraph.createEmptyGraph(getConfig());
 
-    collectAndAssertTrue(equals.execute(emptyGraph, emptyGraph));
-    collectAndAssertFalse(equals.execute(g1, emptyGraph));
-    collectAndAssertFalse(equals.execute(emptyGraph, g1));
+    collectAndAssertTrue(emptyGraph.equalsByElementIds(emptyGraph));
+    collectAndAssertFalse(g1.equalsByElementIds(emptyGraph));
+    collectAndAssertFalse(emptyGraph.equalsByElementIds(g1));
   }
 }

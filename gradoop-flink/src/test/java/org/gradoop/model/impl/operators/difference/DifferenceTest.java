@@ -48,6 +48,7 @@ public class DifferenceTest extends BinaryCollectionOperatorsTestBase {
     checkAssertions(col01, result, "non");
 
     result = col01.differenceWithSmallResult(col23);
+
     checkAssertions(col01, result, "small non");
   }
 

@@ -24,6 +24,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -48,16 +49,16 @@ public class DifferenceBroadcast<
    * Computes the resulting vertices by collecting a list of resulting
    * subgraphs and checking if the vertex is contained in that list.
    *
-   * @param newSubgraphs graph dataset of the resulting graph collection
+   * @param newGraphHeads graph dataset of the resulting graph collection
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<V> computeNewVertices(DataSet<G> newSubgraphs) {
-    DataSet<GradoopId> identifiers = newSubgraphs
+  protected DataSet<V> computeNewVertices(DataSet<G> newGraphHeads) {
+    DataSet<GradoopId> identifiers = newGraphHeads
       .map(new Id<G>());
 
     return firstCollection.getVertices()
-      .filter(new InAllGraphsBroadcast<V>())
+      .filter(new InAnyGraphBroadcast<V>())
       .withBroadcastSet(identifiers,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }

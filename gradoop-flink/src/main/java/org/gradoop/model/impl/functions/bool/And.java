@@ -59,4 +59,8 @@ public class And implements CrossFunction<Boolean, Boolean, Boolean>,
   public static DataSet<Boolean> cross(DataSet<Boolean> a, DataSet<Boolean> b) {
     return a.cross(b).with(new And());
   }
+
+  public static DataSet<Boolean> reduce(DataSet<Boolean> d) {
+    return d.reduce(new And());
+  }
 }

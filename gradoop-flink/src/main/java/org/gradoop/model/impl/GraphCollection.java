@@ -37,13 +37,20 @@ import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.operators.cam.functions.EdgeDataLabeler;
+import org.gradoop.model.impl.operators.cam.functions.EdgeIdLabeler;
+import org.gradoop.model.impl.operators.cam.functions.EdgeSurpressor;
+import org.gradoop.model.impl.operators.cam.functions.GraphHeadDataLabeler;
+import org.gradoop.model.impl.operators.cam.functions.GraphHeadEmptyLabeler;
+import org.gradoop.model.impl.operators.cam.functions.GraphHeadIdLabeler;
+import org.gradoop.model.impl.operators.cam.functions.VertexDataLabeler;
+import org.gradoop.model.impl.operators.cam.functions.VertexIdLabeler;
+import org.gradoop.model.impl.operators.cam.functions.VertexSurpressor;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.model.impl.operators.distinct.Distinct;
-import org.gradoop.model.impl.operators.equality.EqualityByGraphData;
-import org.gradoop.model.impl.operators.equality.EqualityByGraphElementData;
-import org.gradoop.model.impl.operators.equality.EqualityByGraphElementIds;
-import org.gradoop.model.impl.operators.equality.EqualityByGraphIds;
+import org.gradoop.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.model.impl.operators.intersection.Intersection;
 import org.gradoop.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.model.impl.operators.selection.Selection;
@@ -330,7 +337,7 @@ public class GraphCollection
    */
   @Override
   public DataSet<Boolean> equalsByGraphIds(GraphCollection<G, V, E> other) {
-    return new EqualityByGraphIds<G, V, E>().execute(this, other);
+    return new CollectionEqualityByGraphIds<G, V, E>().execute(this, other);
   }
 
   /**
@@ -339,7 +346,11 @@ public class GraphCollection
   @Override
   public DataSet<Boolean> equalsByGraphElementIds(
     GraphCollection<G, V, E> other) {
-    return new EqualityByGraphElementIds<G, V, E>().execute(this, other);
+    return new CollectionEquality<>(
+      new GraphHeadEmptyLabeler<G>(),
+      new VertexIdLabeler<V>(),
+      new EdgeIdLabeler<E>()
+    ).execute(this, other);
   }
 
   /**
@@ -348,7 +359,11 @@ public class GraphCollection
   @Override
   public DataSet<Boolean> equalsByGraphElementData(
     GraphCollection<G, V, E> other) {
-    return new EqualityByGraphElementData<G, V, E>().execute(this, other);
+    return new CollectionEquality<>(
+      new GraphHeadEmptyLabeler<G>(),
+      new VertexDataLabeler<V>(),
+      new EdgeDataLabeler<E>()
+    ).execute(this, other);
   }
 
   /**
@@ -356,7 +371,11 @@ public class GraphCollection
    */
   @Override
   public DataSet<Boolean> equalsByGraphData(GraphCollection<G, V, E> other) {
-    return new EqualityByGraphData<G, V, E>().execute(this, other);
+    return new CollectionEquality<>(
+      new GraphHeadDataLabeler<G>(),
+      new VertexDataLabeler<V>(),
+      new EdgeDataLabeler<E>()
+    ).execute(this, other);
   }
 
   //----------------------------------------------------------------------------
@@ -424,5 +443,16 @@ public class GraphCollection
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
+  }
+
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E> fromGraph(LogicalGraph<G, V, E> logicalGraph) {
+    return fromDataSets(
+      logicalGraph.getGraphHead(),
+      logicalGraph.getVertices(),
+      logicalGraph.getEdges(),
+      logicalGraph.getConfig()
+    );
   }
 }

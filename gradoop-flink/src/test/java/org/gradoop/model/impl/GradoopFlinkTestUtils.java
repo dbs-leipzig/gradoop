@@ -7,6 +7,11 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.operators.cam.CanonicalAdjacencyMatrix;
+import org.gradoop.model.impl.operators.cam.functions.EdgeDataLabeler;
+import org.gradoop.model.impl.operators.cam.functions.GraphHeadDataLabeler;
+import org.gradoop.model.impl.operators.cam.functions.VertexDataLabeler;
+import org.gradoop.model.impl.operators.equality.CollectionEquality;
 
 import java.util.Collection;
 
@@ -60,20 +65,20 @@ public class GradoopFlinkTestUtils {
     G extends EPGMGraphHead,
     V extends EPGMVertex,
     E extends EPGMEdge> void printGraphCollection(
-    GraphCollection<G, V, E> graph) throws Exception {
+    GraphCollection<G, V, E> collection) throws Exception {
 
     Collection<G> graphHeadCollection = Lists.newArrayList();
     Collection<V> vertexCollection = Lists.newArrayList();
     Collection<E> edgeCollection = Lists.newArrayList();
 
-    graph.getGraphHeads().output(
+    collection.getGraphHeads().output(
       new LocalCollectionOutputFormat<>(graphHeadCollection));
-    graph.getVertices().output(
+    collection.getVertices().output(
       new LocalCollectionOutputFormat<>(vertexCollection));
-    graph.getEdges().output(
+    collection.getEdges().output(
       new LocalCollectionOutputFormat<>(edgeCollection));
 
-    graph.getConfig().getExecutionEnvironment().execute();
+    collection.getConfig().getExecutionEnvironment().execute();
 
     System.out.println("*** GraphHead Collection ***");
     for (G g : graphHeadCollection) {
@@ -89,5 +94,27 @@ public class GradoopFlinkTestUtils {
     for (E e : edgeCollection) {
       System.out.println(e);
     }
+  }
+
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> void printCanonicalAdjacencyMatrix(
+    LogicalGraph<G, V,E> graph) throws Exception {
+
+    printCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
+  }
+
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> void printCanonicalAdjacencyMatrix(
+    GraphCollection<G, V, E> collection) throws Exception {
+
+    new CanonicalAdjacencyMatrix<>(
+      new GraphHeadDataLabeler<G>(),
+      new VertexDataLabeler<V>(),
+      new EdgeDataLabeler<E>()
+    ).execute(collection).print();
   }
 }

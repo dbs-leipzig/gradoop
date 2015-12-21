@@ -42,9 +42,14 @@ import org.gradoop.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.model.impl.functions.graphcontainment.GraphContainmentUpdater;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
+import org.gradoop.model.impl.operators.cam.functions.EdgeDataLabeler;
+import org.gradoop.model.impl.operators.cam.functions.EdgeIdLabeler;
+import org.gradoop.model.impl.operators.cam.functions.GraphHeadEmptyLabeler;
+import org.gradoop.model.impl.operators.cam.functions.VertexDataLabeler;
+import org.gradoop.model.impl.operators.cam.functions.VertexIdLabeler;
 import org.gradoop.model.impl.operators.combination.Combination;
-import org.gradoop.model.impl.operators.equality.EqualityByElementData;
-import org.gradoop.model.impl.operators.equality.EqualityByElementIds;
+import org.gradoop.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.model.impl.operators.equality.GraphEquality;
 import org.gradoop.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.model.impl.operators.transformation.Transformation;
 import org.gradoop.model.impl.operators.overlap.Overlap;
@@ -571,7 +576,11 @@ public class LogicalGraph
    */
   @Override
   public DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other) {
-    return new EqualityByElementIds<G, V, E>().execute(this, other);
+    return new GraphEquality<>(
+      new GraphHeadEmptyLabeler<G>(),
+      new VertexIdLabeler<V>(),
+      new EdgeIdLabeler<E>()
+    ).execute(this, other);
   }
 
   /**
@@ -579,7 +588,11 @@ public class LogicalGraph
    */
   @Override
   public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
-    return new EqualityByElementData<G, V, E>().execute(this, other);
+    return new GraphEquality<>(
+      new GraphHeadEmptyLabeler<G>(),
+      new VertexDataLabeler<V>(),
+      new EdgeDataLabeler<E>()
+    ).execute(this, other);
   }
 
   //----------------------------------------------------------------------------
