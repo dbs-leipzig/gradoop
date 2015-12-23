@@ -22,16 +22,14 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 
 /**
  * Filter those tuples which are used to create new summarized vertices.
- * Those tuples have a group count > 0.
  */
-public class FilterSumVertexCandidates
-  implements FilterFunction<VertexGroupItem> {
+public class FilterCandidates implements FilterFunction<VertexGroupItem> {
 
   /**
    * {@inheritDoc}
    */
   @Override
   public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
-    return !vertexGroupItem.getGroupCount().equals(0L);
+    return vertexGroupItem.isCandidate();
   }
 }

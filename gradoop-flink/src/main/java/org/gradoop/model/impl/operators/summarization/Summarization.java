@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.model.api.EPGMEdge;
@@ -25,14 +26,13 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.SourceId;
-import org.gradoop.model.impl.operators.summarization.functions.UpdateSourceId;
+import org.gradoop.model.impl.operators.summarization.functions.BuildEdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedEdge;
-import org.gradoop.model.impl.operators.summarization.functions.UpdateTargetId;
+import org.gradoop.model.impl.operators.summarization.functions.UpdateEdgeGroupItem;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
-
-
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.List;
@@ -86,10 +86,6 @@ public abstract class Summarization<
   V extends EPGMVertex,
   E extends EPGMEdge>
   implements UnaryGraphToGraphOperator<G, V, E> {
-  /**
-   * EPGMProperty key to store the number of summarized entities in a group.
-   */
-  public static final String COUNT_PROPERTY_KEY = "count";
 
   /**
    * Gradoop Flink configuration.
@@ -100,32 +96,45 @@ public abstract class Summarization<
    */
   private final List<String> vertexGroupingKeys;
   /**
-   * Used to summarize edges.
-   */
-  private final List<String> edgeGroupingKeys;
-  /**
    * True if vertices shall be summarized using their label.
    */
   private final boolean useVertexLabels;
   /**
+   * Aggregate function which is applied on summarized vertices.
+   */
+  private final PropertyValueAggregator vertexAggregator;
+  /**
+   * Used to summarize edges.
+   */
+  private final List<String> edgeGroupingKeys;
+  /**
    * True if edges shall be summarized using their label.
    */
   private final boolean useEdgeLabels;
+  /**
+   * Aggregate function which is applied on summarized edges.
+   */
+  private final PropertyValueAggregator edgeAggregator;
 
   /**
    * Creates summarization.
    *
    * @param vertexGroupingKeys  property keys to summarize vertices
-   * @param edgeGroupingKeys    property keys to summarize edges
    * @param useVertexLabels     summarize on vertex label true/false
+   * @param vertexAggregator    aggregate function for summarized vertices
+   * @param edgeGroupingKeys    property keys to summarize edges
    * @param useEdgeLabels       summarize on edge label true/false
+   * @param edgeAggregator      aggregate function for summarized edges
    */
-  Summarization(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys,
-    boolean useVertexLabels, boolean useEdgeLabels) {
+  Summarization(List<String> vertexGroupingKeys, boolean useVertexLabels,
+    PropertyValueAggregator vertexAggregator, List<String> edgeGroupingKeys,
+    boolean useEdgeLabels, PropertyValueAggregator edgeAggregator) {
     this.vertexGroupingKeys = checkNotNull(vertexGroupingKeys);
-    this.edgeGroupingKeys   = checkNotNull(edgeGroupingKeys);
     this.useVertexLabels    = useVertexLabels;
+    this.vertexAggregator   = vertexAggregator;
+    this.edgeGroupingKeys   = checkNotNull(edgeGroupingKeys);
     this.useEdgeLabels      = useEdgeLabels;
+    this.edgeAggregator     = edgeAggregator;
   }
 
   /**
@@ -178,6 +187,15 @@ public abstract class Summarization<
   }
 
   /**
+   * Returns the aggregate function which shall be applied on vertex groups.
+   *
+   * @return vertex aggregate function
+   */
+  protected PropertyValueAggregator getVertexAggregator() {
+    return vertexAggregator;
+  }
+
+  /**
    * Returns true if the edge property shall be used for summarization.
    *
    * @return true if edge property shall be used for summarization, false
@@ -207,6 +225,15 @@ public abstract class Summarization<
   }
 
   /**
+   * Returns the aggregate function which shall be applied on edge groups.
+   *
+   * @return edge aggregate function
+   */
+  protected PropertyValueAggregator getEdgeAggregator() {
+    return edgeAggregator;
+  }
+
+  /**
    * Group vertices by either vertex label, vertex property or both.
    *
    * @param groupVertices dataset containing vertex representation for grouping
@@ -223,34 +250,6 @@ public abstract class Summarization<
       vertexGrouping = groupVertices.groupBy(3);
     }
     return vertexGrouping;
-  }
-
-  /**
-   * Build summarized edges by joining them with vertices and their group
-   * representative.
-   *
-   * @param graph                     inout graph
-   * @param vertexToRepresentativeMap dataset containing tuples of vertex id
-   *                                  and group representative
-   * @return summarized edges
-   */
-  protected DataSet<E> buildSummarizedEdges(
-    LogicalGraph<G, V, E> graph,
-    DataSet<VertexWithRepresentative> vertexToRepresentativeMap) {
-
-    // join edges with vertex-group-map on vertex-id == edge-source-id
-    DataSet<EdgeGroupItem> edges = graph.getEdges()
-      .join(vertexToRepresentativeMap)
-      .where(new SourceId<E>()).equalTo(0)
-      // project edges to necessary information
-      .with(new UpdateSourceId<E>(getEdgeGroupingKeys(), useEdgeLabels()))
-      // join result with vertex-group-map on edge-target-id == vertex-id
-      .join(vertexToRepresentativeMap)
-      .where(2).equalTo(0)
-      .with(new UpdateTargetId());
-
-    return groupEdges(edges).reduceGroup(new BuildSummarizedEdge<>(
-      getEdgeGroupingKeys(), useEdgeLabels(), config.getEdgeFactory()));
   }
 
   /**
@@ -275,6 +274,37 @@ public abstract class Summarization<
   }
 
   /**
+   * Build summarized edges by joining them with vertices and their group
+   * representative.
+   *
+   * @param graph                     inout graph
+   * @param vertexToRepresentativeMap dataset containing tuples of vertex id
+   *                                  and group representative
+   * @return summarized edges
+   */
+  protected DataSet<E> buildSummarizedEdges(
+    LogicalGraph<G, V, E> graph,
+    DataSet<VertexWithRepresentative> vertexToRepresentativeMap) {
+
+    // join edges with vertex-group-map on vertex-id == edge-source-id
+    DataSet<EdgeGroupItem> edges = graph.getEdges()
+      .join(vertexToRepresentativeMap)
+      .where(new SourceId<E>()).equalTo(0)
+      // project edges to necessary information
+      .with(new BuildEdgeGroupItem<E>(
+        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregator()))
+      // join result with vertex-group-map on edge-target-id == vertex-id
+      .join(vertexToRepresentativeMap)
+      .where(2).equalTo(0)
+      .with(new UpdateEdgeGroupItem());
+
+    return groupEdges(edges)
+      .reduceGroup(new BuildSummarizedEdge<>(
+        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregator(),
+        config.getEdgeFactory()));
+  }
+
+  /**
    * Overridden by concrete implementations.
    *
    * @param graph input graph
@@ -282,4 +312,196 @@ public abstract class Summarization<
    */
   protected abstract LogicalGraph<G, V, E> summarizeInternal(
     LogicalGraph<G, V, E> graph);
+
+
+  /**
+   * Used for building a summarization instance.
+   *
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
+   */
+  public static final class SummarizationBuilder<
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> {
+
+    /**
+     * Summarization strategy
+     */
+    private SummarizationStrategy strategy;
+
+    /**
+     * Property keys to group vertices.
+     */
+    private List<String> vertexGroupingKeys;
+
+    /**
+     * Property keys to group edges.
+     */
+    private List<String> edgeGroupingKeys;
+
+    /**
+     * True, if vertex labels shall be considered in summarization.
+     */
+    private boolean useVertexLabel;
+
+    /**
+     * True, if edge labels shall be considered in summarization.
+     */
+    private boolean useEdgeLabel;
+
+    /**
+     * Aggregator which will be applied on vertex properties.
+     */
+    private PropertyValueAggregator vertexValueAggregator;
+
+    /**
+     * Aggregator which will be applied on edge properties.
+     */
+    private PropertyValueAggregator edgeValueAggregator;
+
+    /**
+     * Creates a new summarization builder
+     */
+    public SummarizationBuilder() {
+      this.vertexGroupingKeys     = Lists.newArrayList();
+      this.edgeGroupingKeys       = Lists.newArrayList();
+      this.useVertexLabel         = false;
+      this.useEdgeLabel           = false;
+      this.vertexValueAggregator  = null;
+      this.edgeValueAggregator    = null;
+    }
+
+    /**
+     * Set the summarization strategy.
+     *
+     * @param strategy summarization strategy
+     * @see {@link SummarizationStrategy}
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> setStrategy(
+      SummarizationStrategy strategy) {
+      this.strategy = strategy;
+      return this;
+    }
+
+    /**
+     * Adds a property key to the vertex grouping keys.
+     *
+     * @param key property key
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> addVertexGroupingKey(String key) {
+      checkNotNull(key);
+      this.vertexGroupingKeys.add(key);
+      return this;
+    }
+
+    /**
+     * Adds a list of property keys to the vertex grouping keys.
+     *
+     * @param keys property keys
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> addVertexGroupingKeys(
+      List<String> keys) {
+      checkNotNull(keys);
+      this.vertexGroupingKeys.addAll(keys);
+      return this;
+    }
+
+    /**
+     * Adds a property key to the edge grouping keys.
+     *
+     * @param key property key
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> addEdgeGroupingKey(String key) {
+      checkNotNull(key);
+      this.edgeGroupingKeys.add(key);
+      return this;
+    }
+
+    /**
+     * Adds a list of property keys to the edge grouping keys.
+     *
+     * @param keys property keys
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> addEdgeGroupingKeys(
+      List<String> keys) {
+      checkNotNull(keys);
+      this.edgeGroupingKeys.addAll(keys);
+      return this;
+    }
+
+    /**
+     * Define, if the vertex label shall be used for grouping vertices.
+     *
+     * @param useVertexLabel true, if label shall be used, false otherwise
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> useVertexLabel(
+      boolean useVertexLabel) {
+      this.useVertexLabel = useVertexLabel;
+      return this;
+    }
+
+    /**
+     * Define, if the edge label shall be used for grouping edges.
+     *
+     * @param useEdgeLabel true, if label shall be used, false otherwise
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> useEdgeLabel(
+      boolean useEdgeLabel) {
+      this.useEdgeLabel = useEdgeLabel;
+      return this;
+    }
+
+    /**
+     * Used to compute an aggregate for each vertex group.
+     *
+     * @param vertexValueAggregator aggregator
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> setVertexValueAggregator(
+      PropertyValueAggregator vertexValueAggregator) {
+      this.vertexValueAggregator = vertexValueAggregator;
+      return this;
+    }
+
+    /**
+     * Used to compute an aggregate for each edge group.
+     *
+     * @param edgeValueAggregator aggregator
+     * @return this builder
+     */
+    public SummarizationBuilder<G, V, E> setEdgeValueAggregator(
+      PropertyValueAggregator edgeValueAggregator) {
+      this.edgeValueAggregator = edgeValueAggregator;
+      return this;
+    }
+
+    /**
+     * Creates a new summarization instance based on the configured parameters.
+     *
+     * @return summarization
+     */
+    public Summarization<G, V, E> build() {
+      if (vertexGroupingKeys.isEmpty() && !useVertexLabel) {
+        throw new IllegalArgumentException(
+          "Provide vertex key(s) and/or use vertex labels for summarization.");
+      }
+
+      if (strategy == SummarizationStrategy.GROUP_MAP) {
+        return new SummarizationGroupMap<>(
+          vertexGroupingKeys, useVertexLabel, vertexValueAggregator,
+          edgeGroupingKeys, useEdgeLabel, edgeValueAggregator);
+      } else {
+        throw new IllegalArgumentException("Unsupported strategy: " + strategy);
+      }
+    }
+  }
 }

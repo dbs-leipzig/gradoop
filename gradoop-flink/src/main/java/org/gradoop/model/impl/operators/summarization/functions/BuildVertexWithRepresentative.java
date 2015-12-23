@@ -48,7 +48,7 @@ public class BuildVertexWithRepresentative
   public VertexWithRepresentative map(VertexGroupItem vertexGroupItem) throws
     Exception {
     reuseTuple.setVertexId(vertexGroupItem.getVertexId());
-    reuseTuple.setGroupRepresentativeVertexId(
+    reuseTuple.setGroupRepresentative(
       vertexGroupItem.getGroupRepresentative());
     return reuseTuple;
   }

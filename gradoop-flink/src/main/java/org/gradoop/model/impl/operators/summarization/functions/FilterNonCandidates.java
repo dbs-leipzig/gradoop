@@ -23,14 +23,13 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 /**
  * Filter those tuples which only contain a vertex and its representative.
  */
-public class FilterGroupRepresentatives implements
-  FilterFunction<VertexGroupItem> {
+public class FilterNonCandidates implements FilterFunction<VertexGroupItem> {
 
   /**
    * {@inheritDoc}
    */
   @Override
   public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
-    return vertexGroupItem.getGroupCount().equals(0L);
+    return !vertexGroupItem.isCandidate();
   }
 }

@@ -17,11 +17,11 @@
 
 package org.gradoop.model.impl.operators.summarization.functions;
 
-import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.properties.PropertyValueList;
 
@@ -30,14 +30,8 @@ import org.gradoop.model.impl.properties.PropertyValueList;
  */
 @FunctionAnnotation.ForwardedFields("f0;f3;f4") // vertexId, label, properties
 public class ReduceVertexGroupItem
-  implements
-  GroupReduceFunction<VertexGroupItem, VertexGroupItem>,
-  GroupCombineFunction<VertexGroupItem, VertexGroupItem> {
-
-  /**
-   * True, if the vertex label shall be considered.
-   */
-  private final boolean useLabel;
+  extends BuildBase
+  implements GroupReduceFunction<VertexGroupItem, VertexGroupItem> {
 
   /**
    * Reduce object instantiations.
@@ -47,70 +41,58 @@ public class ReduceVertexGroupItem
   /**
    * Creates group reduce function.
    *
-   * @param useLabel true, if labels are used for grouping
+   * @param useLabel          true, iff labels are used for grouping
+   * @param vertexAggregator  aggregate function for summarized vertices
    */
-  public ReduceVertexGroupItem(boolean useLabel) {
-    this.useLabel = useLabel;
+  public ReduceVertexGroupItem(boolean useLabel,
+    PropertyValueAggregator vertexAggregator) {
+    super(null, useLabel, vertexAggregator);
     this.reuseVertexGroupItem = new VertexGroupItem();
   }
 
   @Override
-  public void combine(Iterable<VertexGroupItem> iterable,
+  public void reduce(Iterable<VertexGroupItem> vertexGroupItems,
     Collector<VertexGroupItem> collector) throws Exception {
-    reduceInternal(iterable, collector, true);
-  }
 
-  @Override
-  public void reduce(Iterable<VertexGroupItem> iterable,
-    Collector<VertexGroupItem> collector) throws Exception {
-    reduceInternal(iterable, collector, false);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void reduceInternal(Iterable<VertexGroupItem> vertexGroupItems,
-    Collector<VertexGroupItem> collector, boolean combine) throws Exception {
-
-    GradoopId groupRepresentative = null;
-
-    long groupCount = 0L;
-    String groupLabel = null;
+    GradoopId groupRepresentative         = null;
+    String groupLabel                     = null;
     PropertyValueList groupPropertyValues = null;
-    boolean firstElement = true;
 
-    for (VertexGroupItem vertexGroupItem : vertexGroupItems) {
+    boolean firstElement                  = true;
+
+    for (VertexGroupItem groupItem : vertexGroupItems) {
       if (firstElement) {
-        groupRepresentative = combine ?
-          vertexGroupItem.getGroupRepresentative() : GradoopId.get();
-        groupLabel = vertexGroupItem.getGroupLabel();
-        groupPropertyValues = vertexGroupItem.getGroupPropertyValues();
+        groupRepresentative = GradoopId.get();
+        groupLabel          = groupItem.getGroupLabel();
+        groupPropertyValues = groupItem.getGroupPropertyValues();
 
-        if (useLabel) {
+        if (useLabel()) {
           reuseVertexGroupItem.setGroupLabel(groupLabel);
         }
+
         reuseVertexGroupItem.setGroupPropertyValues(groupPropertyValues);
         reuseVertexGroupItem.setGroupRepresentative(groupRepresentative);
+        reuseVertexGroupItem.setGroupAggregate(groupItem.getGroupAggregate());
+        reuseVertexGroupItem.setCandidate(groupItem.isCandidate());
+
         firstElement = false;
       }
-      reuseVertexGroupItem.setVertexId(vertexGroupItem.getVertexId());
+      reuseVertexGroupItem.setVertexId(groupItem.getVertexId());
 
       collector.collect(reuseVertexGroupItem);
 
-      if (combine) {
-        groupCount++;
-      } else {
-        groupCount += vertexGroupItem.getGroupCount();
+      if (doAggregate()) {
+        aggregate(groupItem.getGroupAggregate());
       }
     }
 
-    createGroupRepresentativeTuple(
+    // collect single item representing the whole group
+    collector.collect(createCandidateTuple(
       groupRepresentative,
       groupLabel,
-      groupPropertyValues,
-      groupCount);
-    collector.collect(reuseVertexGroupItem);
-    reuseVertexGroupItem.reset();
+      groupPropertyValues));
+
+    resetAggregator();
   }
 
   /**
@@ -120,13 +102,15 @@ public class ReduceVertexGroupItem
    * @param groupRepresentative group representative vertex id
    * @param groupLabel          group label
    * @param groupPropertyValues group property values
-   * @param groupCount          total group count
+   * @return vertex group item
    */
-  private void createGroupRepresentativeTuple(GradoopId groupRepresentative,
-    String groupLabel, PropertyValueList groupPropertyValues, long groupCount) {
+  private VertexGroupItem createCandidateTuple(GradoopId groupRepresentative,
+    String groupLabel, PropertyValueList groupPropertyValues) {
     reuseVertexGroupItem.setVertexId(groupRepresentative);
     reuseVertexGroupItem.setGroupLabel(groupLabel);
     reuseVertexGroupItem.setGroupPropertyValues(groupPropertyValues);
-    reuseVertexGroupItem.setGroupCount(groupCount);
+    reuseVertexGroupItem.setGroupAggregate(getAggregate());
+    reuseVertexGroupItem.setCandidate(true);
+    return reuseVertexGroupItem;
   }
 }

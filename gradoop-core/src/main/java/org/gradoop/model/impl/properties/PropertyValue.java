@@ -25,6 +25,7 @@ import org.gradoop.util.GConstants;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
@@ -33,12 +34,18 @@ import java.util.Arrays;
  *
  * A property value wraps a value that implements a supported data type.
  */
-public class PropertyValue implements WritableComparable<PropertyValue> {
+public class PropertyValue
+  implements WritableComparable<PropertyValue>, Serializable {
 
   /**
    * Represents a property value that is {@code null}.
    */
   public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
+
+  /**
+   * Class version for serialization.
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * {@code <property-type>} for empty property value (i.e. {@code null})
@@ -367,6 +374,17 @@ public class PropertyValue implements WritableComparable<PropertyValue> {
   //----------------------------------------------------------------------------
   // Util
   //----------------------------------------------------------------------------
+
+  public Class<?> getType() {
+    return rawBytes[0] == TYPE_BOOLEAN ?
+      Boolean.class     : rawBytes[0] == TYPE_INTEGER     ?
+      Integer.class     : rawBytes[0] == TYPE_LONG        ?
+      Long.class        : rawBytes[0] == TYPE_FLOAT       ?
+      Float.class       : rawBytes[0] == TYPE_DOUBLE      ?
+      Double.class      : rawBytes[0] == TYPE_STRING      ?
+      String.class      : rawBytes[0] == TYPE_BIG_DECIMAL ?
+      BigDecimal.class  : null;
+  }
 
   @Override
   public boolean equals(Object o) {

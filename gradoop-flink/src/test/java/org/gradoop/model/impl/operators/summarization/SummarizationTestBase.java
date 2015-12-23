@@ -17,27 +17,25 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
-import com.google.common.collect.Lists;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.operators.summarization.Summarization.SummarizationBuilder;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.CountAggregator;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.MaxAggregator;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.MinAggregator;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.SumAggregator;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
 import static org.gradoop.util.GConstants.NULL_STRING;
 
 @SuppressWarnings("Duplicates")
 public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
-  public abstract Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
-  getSummarizationImpl(
-    List<String> vertexGroupingKeys, boolean useVertexLabel,
-    List<String> edgeGroupingKeys, boolean useEdgeLabel);
+  public abstract SummarizationStrategy getStrategy();
 
   @Test
   public void testVertexPropertySymmetricGraph() throws Exception {
@@ -46,8 +44,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
       .getLogicalGraphByVariable("g2");
-
-    final String vertexGroupingKey = "city";
 
     loader.appendToDatabaseFromString("expected[" +
       "(leipzig {city = \"Leipzig\", count = 2});" +
@@ -59,8 +55,13 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, false, null, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -76,8 +77,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
 
-    final String vertexGroupingKey = "city";
-
     loader.appendToDatabaseFromString("expected[" +
       "(leipzig {city = \"Leipzig\", count = 2});" +
       "(dresden {city = \"Dresden\", count = 3});" +
@@ -90,8 +89,13 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, false, null, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -106,8 +110,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
-
-    final List<String> vertexGroupingKeys = Lists.newArrayList("city", "gender");
 
     loader.appendToDatabaseFromString("expected[" +
       "(leipzigF {city = \"Leipzig\", gender=\"f\", count = 1});" +
@@ -127,8 +129,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKeys, false, null, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .addVertexGroupingKey("gender")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -141,7 +149,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader.getLogicalGraphByVariable("g3");
 
-    final String vertexGroupingKey = "city";
 
     loader.appendToDatabaseFromString("expected[" +
       "(dresden {city = \"Dresden\", count = 2});" +
@@ -151,8 +158,13 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, false, null, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -165,8 +177,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader.getLogicalGraphByVariable("g3");
 
-    final List<String> vertexGroupingKeys = Lists.newArrayList("city", "gender");
-
     loader.appendToDatabaseFromString("expected[" +
       "(dresdenF {city = \"Dresden\", gender=\"f\", count = 1});" +
       "(dresdenM {city = \"Dresden\", gender=\"m\", count = 1});" +
@@ -177,8 +187,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKeys, false, null, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .addVertexGroupingKey("gender")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -194,9 +210,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
 
-    final String vertexGroupingKey = "city";
-    final String edgeGroupingKey = "since";
-
     loader.appendToDatabaseFromString("expected[" +
       "(leipzig {city = \"Leipzig\", count = 2});" +
       "(dresden {city = \"Dresden\", count = 3});" +
@@ -210,8 +223,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, false,
-        edgeGroupingKey, false).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .addEdgeGroupingKey("since")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -241,9 +260,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
         "]"
     );
 
-    final List<String> vertexGroupingKeys = Lists.newArrayList("a");
-    final List<String> edgeGroupingKeys = Lists.newArrayList("a", "b");
-
     loader.appendToDatabaseFromString("expected[" +
       "(v00 {a=0,count=3});" +
       "(v01 {a=1,count=3});" +
@@ -260,10 +276,15 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(loader.getLogicalGraphByVariable("input"),
-        vertexGroupingKeys, false,
-        edgeGroupingKeys, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("a")
+        .addEdgeGroupingKey("a")
+        .addEdgeGroupingKey("b")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(loader.getLogicalGraphByVariable("input"));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -293,9 +314,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
         "]"
       );
 
-    final List<String> vertexGroupingKeys = Lists.newArrayList("a", "b");
-    final List<String> edgeGroupingKeys = Lists.newArrayList("a", "b");
-
     loader.appendToDatabaseFromString("expected[" +
       "(v00 {a=0,b=0,count=1});" +
       "(v01 {a=0,b=1,count=2});" +
@@ -314,10 +332,16 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(loader.getLogicalGraphByVariable("input"),
-        vertexGroupingKeys, false,
-        edgeGroupingKeys, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("a")
+        .addVertexGroupingKey("b")
+        .addEdgeGroupingKey("a")
+        .addEdgeGroupingKey("b")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(loader.getLogicalGraphByVariable("input"));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -332,9 +356,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
       .getLogicalGraphByVariable("g3");
 
-    final String vertexGroupingKey = "city";
-    final String edgeGroupingKey = "since";
-
     loader.appendToDatabaseFromString("expected[" +
       "(dresden {city = \"Dresden\", count = 2});" +
       "(others  {city = " + NULL_STRING + ", count = 1});" +
@@ -344,8 +365,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, false,
-        edgeGroupingKey, false).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .addEdgeGroupingKey("since")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -370,7 +397,13 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, true, false).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -386,8 +419,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
 
-    final String vertexGroupingKey = "city";
-
     loader.appendToDatabaseFromString("expected[" +
       "(l:Person {city = \"Leipzig\", count = 2});" +
       "(d:Person {city = \"Dresden\", count = 3});" +
@@ -400,8 +431,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, true, null, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .addVertexGroupingKey("city")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -415,8 +452,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
       .getDatabase().getDatabaseGraph();
-
-    final String vertexGroupingKey = "city";
 
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city = \"Leipzig\", count = 2});" +
@@ -438,8 +473,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, true, null, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .addVertexGroupingKey("city")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -455,8 +496,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
 
-    final String edgeGroupingKey = "since";
-
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person {count = 6});" +
       "(p)-[{since = 2014, count = 4}]->(p);" +
@@ -465,8 +504,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, null, true, edgeGroupingKey, false)
-        .run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .addEdgeGroupingKey("since")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -479,8 +524,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
       .getDatabase().getDatabaseGraph();
-
-    final String edgeGroupingKey = "since";
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count = 6});" +
@@ -496,7 +539,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, null, true, edgeGroupingKey, false).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .addEdgeGroupingKey("since")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -512,9 +562,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
 
-    final String vertexGroupingKey = "city";
-    final String edgeGroupingKey = "since";
-
     loader.appendToDatabaseFromString("expected[" +
       "(l:Person {city = \"Leipzig\", count = 2});" +
       "(d:Person {city = \"Dresden\", count = 3});" +
@@ -528,8 +575,15 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(
-        input, vertexGroupingKey, true, edgeGroupingKey, false).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .addVertexGroupingKey("city")
+        .addEdgeGroupingKey("since")
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -555,7 +609,14 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, true, true).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .useEdgeLabel(true)
+        .setStrategy(getStrategy())
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -572,8 +633,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
 
-    final String vertexGroupingKey = "city";
-
     loader.appendToDatabaseFromString("expected[" +
       "(l:Person {city = \"Leipzig\", count = 2});" +
       "(d:Person {city = \"Dresden\", count = 3});" +
@@ -586,7 +645,15 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, true, null, true).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .useVertexLabel(true)
+        .useEdgeLabel(true)
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -599,8 +666,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
       .getDatabase().getDatabaseGraph();
-
-    final String vertexGroupingKey = "city";
 
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city = \"Leipzig\", count = 2});" +
@@ -624,7 +689,15 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, vertexGroupingKey, true, null, true).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .useVertexLabel(true)
+        .useEdgeLabel(true)
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -640,8 +713,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
 
-    final String edgeGroupingKey = "since";
-
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person {count = 6});" +
       "(p)-[:knows {since = 2013, count = 3}]->(p);" +
@@ -650,7 +721,15 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, null, true, edgeGroupingKey, true).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addEdgeGroupingKey("since")
+        .useVertexLabel(true)
+        .useEdgeLabel(true)
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -663,8 +742,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
       .getDatabase().getDatabaseGraph();
-
-    final String edgeGroupingKey = "since";
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count = 6});" +
@@ -682,7 +759,15 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(input, null, true, edgeGroupingKey, true).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addEdgeGroupingKey("since")
+        .useVertexLabel(true)
+        .useEdgeLabel(true)
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -698,9 +783,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
 
-    final String vertexGroupingKey = "city";
-    final String edgeGroupingKey = "since";
-
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city = \"Leipzig\", count = 2});" +
       "(pD:Person {city = \"Dresden\", count = 3});" +
@@ -714,8 +796,16 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(
-        input, vertexGroupingKey, true, edgeGroupingKey, true).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .addEdgeGroupingKey("since")
+        .useVertexLabel(true)
+        .useEdgeLabel(true)
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -729,9 +819,6 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
       .getDatabase().getDatabaseGraph();
-
-    final String vertexGroupingKey = "city";
-    final String edgeGroupingKey = "since";
 
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city = \"Leipzig\", count = 2});" +
@@ -756,65 +843,462 @@ public abstract class SummarizationTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
-      new SummarizationRunner(
-        input, vertexGroupingKey, true, edgeGroupingKey, true).run();
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .addVertexGroupingKey("city")
+        .addEdgeGroupingKey("since")
+        .useVertexLabel(true)
+        .useEdgeLabel(true)
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
-  private class SummarizationRunner {
-    private LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph;
-    private final List<String> vertexGroupingKeys;
-    private final boolean useVertexLabels;
-    private final List<String> edgeGroupingKeys;
-    private final boolean useEdgeLabels;
+  //----------------------------------------------------------------------------
+  // Tests for aggregate functions
+  //----------------------------------------------------------------------------
 
-    public SummarizationRunner(
-      LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph,
-      String vertexGroupingKey, boolean useVertexLabels,
-      String edgeGroupingKey, boolean useEdgeLabels) {
-      this(inputGraph,
-        (vertexGroupingKey != null)
-          ? Lists.newArrayList(vertexGroupingKey) : Lists.<String>newArrayList(),
-        useVertexLabels,
-        (edgeGroupingKey != null)
-          ? Lists.newArrayList(edgeGroupingKey) : Lists.<String>newArrayList(),
-        useEdgeLabels
-        );
-    }
+  @Test
+  public void testCount() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue {a=2});" +
+        "(v2:Blue {a=4});" +
+        "(v3:Red  {a=4});" +
+        "(v4:Red  {a=2});" +
+        "(v5:Red  {a=4});" +
+        "(v0)-[{b=2}]->(v1);" +
+        "(v0)-[{b=1}]->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-[{b=3}]->(v3);" +
+        "(v2)-[{b=1}]->(v3);" +
+        "(v3)-[{b=3}]->(v4);" +
+        "(v4)-[{b=1}]->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
 
-    public SummarizationRunner(
-      LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph,
-      boolean useVertexLabels,
-      boolean useEdgeLabels) {
-      this(inputGraph,
-        Lists.<String>newArrayList(), useVertexLabels,
-        Lists.<String>newArrayList(), useEdgeLabels);
-    }
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
 
-    public SummarizationRunner(
-      LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph,
-      List<String> vertexGroupingKeys, boolean useVertexLabels,
-      List<String> edgeGroupingKeys, boolean useEdgeLabels) {
-      this.inputGraph = inputGraph;
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {count=3});" +
+      "(v01:Red  {count=3});" +
+      "(v00)-[{count=3}]->(v00);" +
+      "(v00)-[{count=2}]->(v01);" +
+      "(v01)-[{count=3}]->(v01);" +
+      "]");
 
-      this.vertexGroupingKeys = (vertexGroupingKeys != null) ?
-        vertexGroupingKeys : Lists.<String>newArrayList();
-      this.useVertexLabels = useVertexLabels;
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new CountAggregator("count"))
+        .setEdgeValueAggregator(new CountAggregator("count"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
 
-      this.edgeGroupingKeys = (edgeGroupingKeys != null) ?
-        edgeGroupingKeys : Lists.<String>newArrayList();
-      this.useEdgeLabels = useEdgeLabels;
-    }
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
 
-    public LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> run() {
-      Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
-        summarization = getSummarizationImpl(
-        vertexGroupingKeys, useVertexLabels,
-        edgeGroupingKeys, useEdgeLabels);
+  @Test
+  public void testSum() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue {a=2});" +
+        "(v2:Blue {a=4});" +
+        "(v3:Red  {a=4});" +
+        "(v4:Red  {a=2});" +
+        "(v5:Red  {a=4});" +
+        "(v0)-[{b=2}]->(v1);" +
+        "(v0)-[{b=1}]->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-[{b=3}]->(v3);" +
+        "(v2)-[{b=1}]->(v3);" +
+        "(v3)-[{b=3}]->(v4);" +
+        "(v4)-[{b=1}]->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
 
-      return summarization.execute(inputGraph);
-    }
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {sumA= 9});" +
+      "(v01:Red  {sumA=10});" +
+      "(v00)-[{sumB=5}]->(v00);" +
+      "(v00)-[{sumB=4}]->(v01);" +
+      "(v01)-[{sumB=5}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new SumAggregator("a", "sumA"))
+        .setEdgeValueAggregator(new SumAggregator("b", "sumB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testSumWithMissingValue() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue);" +
+        "(v2:Blue {a=4});" +
+        "(v3:Red  {a=4});" +
+        "(v4:Red  {a=2});" +
+        "(v5:Red  {a=4});" +
+        "(v0)-->(v1);" +
+        "(v0)-[{b=1}]->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-[{b=3}]->(v3);" +
+        "(v2)-[{b=1}]->(v3);" +
+        "(v3)-[{b=3}]->(v4);" +
+        "(v4)-[{b=1}]->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {sumA= 7});" +
+      "(v01:Red  {sumA=10});" +
+      "(v00)-[{sumB=3}]->(v00);" +
+      "(v00)-[{sumB=4}]->(v01);" +
+      "(v01)-[{sumB=5}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new SumAggregator("a", "sumA"))
+        .setEdgeValueAggregator(new SumAggregator("b", "sumB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testSumWithMissingValues() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue);" +
+        "(v1:Blue);" +
+        "(v2:Blue);" +
+        "(v3:Red);" +
+        "(v4:Red);" +
+        "(v5:Red);" +
+        "(v0)-->(v1);" +
+        "(v0)-->(v2);" +
+        "(v1)-->(v2);" +
+        "(v2)-->(v3);" +
+        "(v2)-->(v3);" +
+        "(v3)-->(v4);" +
+        "(v4)-->(v5);" +
+        "(v5)-->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {sumA= " + NULL_STRING + "});" +
+      "(v01:Red  {sumA= " + NULL_STRING + "});" +
+      "(v00)-[{sumB=" + NULL_STRING + "}]->(v00);" +
+      "(v00)-[{sumB=" + NULL_STRING + "}]->(v01);" +
+      "(v01)-[{sumB=" + NULL_STRING + "}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new SumAggregator("a", "sumA"))
+        .setEdgeValueAggregator(new SumAggregator("b", "sumB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testMin() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue {a=2});" +
+        "(v2:Blue {a=4});" +
+        "(v3:Red  {a=4});" +
+        "(v4:Red  {a=2});" +
+        "(v5:Red  {a=4});" +
+        "(v0)-[{b=2}]->(v1);" +
+        "(v0)-[{b=1}]->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-[{b=3}]->(v3);" +
+        "(v2)-[{b=1}]->(v3);" +
+        "(v3)-[{b=3}]->(v4);" +
+        "(v4)-[{b=1}]->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {minA=2});" +
+      "(v01:Red  {minA=2});" +
+      "(v00)-[{minB=1}]->(v00);" +
+      "(v00)-[{minB=1}]->(v01);" +
+      "(v01)-[{minB=1}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new MinAggregator("a", "minA"))
+        .setEdgeValueAggregator(new MinAggregator("b", "minB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testMinWithMissingValue() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue);" +
+        "(v2:Blue {a=4});" +
+        "(v3:Red  {a=4});" +
+        "(v4:Red);" +
+        "(v5:Red  {a=4});" +
+        "(v0)-[{b=2}]->(v1);" +
+        "(v0)-->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-[{b=3}]->(v3);" +
+        "(v2)-->(v3);" +
+        "(v3)-[{b=3}]->(v4);" +
+        "(v4)-->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {minA=3});" +
+      "(v01:Red  {minA=4});" +
+      "(v00)-[{minB=2}]->(v00);" +
+      "(v00)-[{minB=3}]->(v01);" +
+      "(v01)-[{minB=1}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new MinAggregator("a", "minA"))
+        .setEdgeValueAggregator(new MinAggregator("b", "minB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testMinWithMissingValues() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue);" +
+        "(v1:Blue);" +
+        "(v2:Blue);" +
+        "(v3:Red);" +
+        "(v4:Red);" +
+        "(v5:Red);" +
+        "(v0)-->(v1);" +
+        "(v0)-->(v2);" +
+        "(v1)-->(v2);" +
+        "(v2)-->(v3);" +
+        "(v2)-->(v3);" +
+        "(v3)-->(v4);" +
+        "(v4)-->(v5);" +
+        "(v5)-->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {minA= " + NULL_STRING + "});" +
+      "(v01:Red  {minA= " + NULL_STRING + "});" +
+      "(v00)-[{minB=" + NULL_STRING + "}]->(v00);" +
+      "(v00)-[{minB=" + NULL_STRING + "}]->(v01);" +
+      "(v01)-[{minB=" + NULL_STRING + "}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new MinAggregator("a", "minA"))
+        .setEdgeValueAggregator(new MinAggregator("b", "minB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testMax() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue {a=2});" +
+        "(v2:Blue {a=4});" +
+        "(v3:Red  {a=4});" +
+        "(v4:Red  {a=2});" +
+        "(v5:Red  {a=4});" +
+        "(v0)-[{b=2}]->(v1);" +
+        "(v0)-[{b=1}]->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-[{b=3}]->(v3);" +
+        "(v2)-[{b=1}]->(v3);" +
+        "(v3)-[{b=3}]->(v4);" +
+        "(v4)-[{b=1}]->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {maxA=4});" +
+      "(v01:Red  {maxA=4});" +
+      "(v00)-[{maxB=2}]->(v00);" +
+      "(v00)-[{maxB=3}]->(v01);" +
+      "(v01)-[{maxB=3}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new MaxAggregator("a", "maxA"))
+        .setEdgeValueAggregator(new MaxAggregator("b", "maxB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testMaxWithMissingValue() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue {a=2});" +
+        "(v2:Blue);" +
+        "(v3:Red);" +
+        "(v4:Red  {a=2});" +
+        "(v5:Red  {a=4});" +
+        "(v0)-->(v1);" +
+        "(v0)-[{b=1}]->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-->(v3);" +
+        "(v2)-[{b=1}]->(v3);" +
+        "(v3)-->(v4);" +
+        "(v4)-[{b=1}]->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {maxA=3});" +
+      "(v01:Red  {maxA=4});" +
+      "(v00)-[{maxB=2}]->(v00);" +
+      "(v00)-[{maxB=1}]->(v01);" +
+      "(v01)-[{maxB=1}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new MaxAggregator("a", "maxA"))
+        .setEdgeValueAggregator(new MaxAggregator("b", "maxB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testMaxWithMissingValues() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue);" +
+        "(v1:Blue);" +
+        "(v2:Blue);" +
+        "(v3:Red);" +
+        "(v4:Red);" +
+        "(v5:Red);" +
+        "(v0)-->(v1);" +
+        "(v0)-->(v2);" +
+        "(v1)-->(v2);" +
+        "(v2)-->(v3);" +
+        "(v2)-->(v3);" +
+        "(v3)-->(v4);" +
+        "(v4)-->(v5);" +
+        "(v5)-->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {maxA= " + NULL_STRING + "});" +
+      "(v01:Red  {maxA= " + NULL_STRING + "});" +
+      "(v00)-[{maxB=" + NULL_STRING + "}]->(v00);" +
+      "(v00)-[{maxB=" + NULL_STRING + "}]->(v01);" +
+      "(v01)-[{maxB=" + NULL_STRING + "}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new SummarizationBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setVertexValueAggregator(new MaxAggregator("a", "maxA"))
+        .setEdgeValueAggregator(new MaxAggregator("b", "maxB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 }

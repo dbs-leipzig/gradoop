@@ -23,15 +23,14 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.summarization.functions.BuildVertexGroupItem;
-import org.gradoop.model.impl.operators.summarization.functions.FilterGroupRepresentatives;
-import org.gradoop.model.impl.operators.summarization.functions.FilterSumVertexCandidates;
+import org.gradoop.model.impl.operators.summarization.functions.FilterNonCandidates;
+import org.gradoop.model.impl.operators.summarization.functions.FilterCandidates;
 import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedVertex;
 import org.gradoop.model.impl.operators.summarization.functions.BuildVertexWithRepresentative;
 import org.gradoop.model.impl.operators.summarization.functions.ReduceVertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
-
-
 
 import java.util.List;
 
@@ -67,15 +66,23 @@ public class SummarizationGroupMap<
   /**
    * Creates summarization.
    *
-   * @param vertexGroupingKeys  property key to summarize vertices
-   * @param edgeGroupingKeys    property key to summarize edges
-   * @param useVertexLabels     summarize on vertex label true/false
-   * @param useEdgeLabels       summarize on edge label true/false
+   * @param vertexGroupingKeys      property key to summarize vertices
+   * @param useVertexLabels         summarize on vertex label true/false
+   * @param vertexAggregateFunction aggregate function for summarized vertices
+   * @param edgeGroupingKeys        property key to summarize edges
+   * @param useEdgeLabels           summarize on edge label true/false
+   * @param edgeAggregateFunction   aggregate function for summarized edges
    */
-  public SummarizationGroupMap(List<String> vertexGroupingKeys,
+  SummarizationGroupMap(
+    List<String> vertexGroupingKeys,
+    boolean useVertexLabels,
+    PropertyValueAggregator vertexAggregateFunction,
     List<String> edgeGroupingKeys,
-    boolean useVertexLabels, boolean useEdgeLabels) {
-    super(vertexGroupingKeys, edgeGroupingKeys, useVertexLabels, useEdgeLabels);
+    boolean useEdgeLabels,
+    PropertyValueAggregator edgeAggregateFunction) {
+    super(
+      vertexGroupingKeys, useVertexLabels, vertexAggregateFunction,
+      edgeGroupingKeys, useEdgeLabels, edgeAggregateFunction);
   }
 
   /**
@@ -88,25 +95,26 @@ public class SummarizationGroupMap<
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       // map vertex to vertex group item
       .map(new BuildVertexGroupItem<V>(
-        getVertexGroupingKeys(),
-        useVertexLabels()));
+        getVertexGroupingKeys(), useVertexLabels(), getVertexAggregator()));
 
     DataSet<VertexGroupItem> vertexGroupItems =
       // group vertices by label / properties / both
       groupVertices(verticesForGrouping)
-        .reduceGroup(new ReduceVertexGroupItem(useVertexLabels()));
+        // apply aggregate function
+        .reduceGroup(
+          new ReduceVertexGroupItem(useVertexLabels(), getVertexAggregator()));
 
     DataSet<V> summarizedVertices = vertexGroupItems
       // filter group representative tuples
-      .filter(new FilterSumVertexCandidates())
+      .filter(new FilterCandidates())
       // build summarized vertex
       .map(new BuildSummarizedVertex<>(getVertexGroupingKeys(),
-        useVertexLabels(), config.getVertexFactory()));
+        useVertexLabels(), getVertexAggregator(), config.getVertexFactory()));
 
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
       vertexGroupItems
         // filter group element tuples
-        .filter(new FilterGroupRepresentatives())
+        .filter(new FilterNonCandidates())
         // build vertex to group representative tuple
         .map(new BuildVertexWithRepresentative());
 

@@ -95,10 +95,10 @@ public class PropertyTest {
     Property p2 = new Property("key1", PropertyValue.create(10));
     Property p3 = new Property("key2", PropertyValue.create(10));
 
-    assertEquals(0, p1.compareTo(p1));
-    assertEquals(0, p1.compareTo(p2));
-    assertEquals(-1, p1.compareTo(p3));
-    assertEquals(1, p3.compareTo(p1));
+    assertTrue(p1.compareTo(p1) == 0);
+    assertTrue(p1.compareTo(p2) == 0);
+    assertTrue(p1.compareTo(p3) < 0);
+    assertTrue(p3.compareTo(p1) > 0);
   }
 
   @Test

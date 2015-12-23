@@ -332,19 +332,19 @@ public class PropertyValueTest {
       create(true));
 
     validateCompareTo(create(10), create(10),
-      create(11));
+      create(12));
 
     validateCompareTo(create(10L), create(10L),
-      create(11L));
+      create(12L));
 
     validateCompareTo(create(10F), create(10F),
-      create(11F));
+      create(12F));
 
     validateCompareTo(create(10.), create(10.),
-      create(11.));
+      create(12.));
 
     validateCompareTo(create("10"), create("10"),
-      create("11"));
+      create("12"));
 
     validateCompareTo(create(new BigDecimal(10)),
       create(new BigDecimal(10)),
@@ -382,11 +382,11 @@ public class PropertyValueTest {
    */
   private void validateCompareTo(PropertyValue p1, PropertyValue p2,
     PropertyValue p3) {
-    assertEquals(0, p1.compareTo(p1));
-    assertEquals(0, p1.compareTo(p2));
-    assertEquals(0, p2.compareTo(p1));
-    assertEquals(-1, p1.compareTo(p3));
-    assertEquals(1, p3.compareTo(p1));
-    assertEquals(1, p3.compareTo(p2));
+    assertTrue(p1.compareTo(p1) == 0);
+    assertTrue(p1.compareTo(p2) == 0);
+    assertTrue(p2.compareTo(p1) == 0);
+    assertTrue(p1.compareTo(p3) < 0);
+    assertTrue(p3.compareTo(p1) > 0);
+    assertTrue(p3.compareTo(p2) > 0);
   }
 }

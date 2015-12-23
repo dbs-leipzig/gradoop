@@ -34,18 +34,18 @@ public class PropertyValueListTest {
   @Test
   public void testCompareTo() throws Exception {
     PropertyValueList p1 = PropertyValueList.fromPropertyValues(
-      Lists.newArrayList(PropertyValue.create(1L), PropertyValue.create(2L))
-    );
-    PropertyValueList p2 = PropertyValueList.fromPropertyValues(
-      Lists.newArrayList(PropertyValue.create(1L), PropertyValue.create(2L))
-    );
-    PropertyValueList p3 = PropertyValueList.fromPropertyValues(
       Lists.newArrayList(PropertyValue.create(1L), PropertyValue.create(3L))
     );
+    PropertyValueList p2 = PropertyValueList.fromPropertyValues(
+      Lists.newArrayList(PropertyValue.create(1L), PropertyValue.create(3L))
+    );
+    PropertyValueList p3 = PropertyValueList.fromPropertyValues(
+      Lists.newArrayList(PropertyValue.create(1L), PropertyValue.create(4L))
+    );
 
-    assertEquals(0, p1.compareTo(p2));
-    assertEquals(-1, p1.compareTo(p3));
-    assertEquals(1, p3.compareTo(p1));
+    assertTrue(p1.compareTo(p2) == 0);
+    assertTrue(p1.compareTo(p3) < 0);
+    assertTrue(p3.compareTo(p1) > 0);
   }
 
   @Test

@@ -29,20 +29,15 @@ import org.gradoop.model.impl.id.GradoopId;
  */
 public class VertexWithRepresentative extends Tuple2<GradoopId, GradoopId> {
 
-  public GradoopId getVertexId() {
-    return f0;
-  }
-
   public void setVertexId(GradoopId vertexId) {
     f0 = vertexId;
   }
 
-  public GradoopId getGroupRepresentativeVertexId() {
+  public GradoopId getGroupRepresentative() {
     return f1;
   }
 
-  public void setGroupRepresentativeVertexId(
-    GradoopId groupRepresentativeVertexId) {
-    f1 = groupRepresentativeVertexId;
+  public void setGroupRepresentative(GradoopId groupRepresentative) {
+    f1 = groupRepresentative;
   }
 }

@@ -15,22 +15,7 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.summarization;
-
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-
-import java.util.List;
-
-public class SummarizationGroupCombineTest extends SummarizationTestBase {
-
-  @Override
-  public Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
-  getSummarizationImpl(
-    List<String> vertexGroupingKeys, boolean useVertexLabel,
-    List<String> edgeGroupingKeys, boolean useEdgeLabel) {
-    return new SummarizationGroupCombine<>(vertexGroupingKeys, edgeGroupingKeys,
-      useVertexLabel, useEdgeLabel);
-  }
-}
+/**
+ * Contains all aggregate functions that can be applied during summarization.
+ */
+package org.gradoop.model.impl.operators.summarization.functions.aggregation;

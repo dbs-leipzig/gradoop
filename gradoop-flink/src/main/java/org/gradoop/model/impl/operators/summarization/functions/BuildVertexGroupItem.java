@@ -17,15 +17,13 @@
 
 package org.gradoop.model.impl.operators.summarization.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.properties.PropertyValue;
-import org.gradoop.model.impl.properties.PropertyValueList;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -37,16 +35,9 @@ import java.util.List;
  * @param <V> EPGM vertex type
  */
 public class BuildVertexGroupItem<V extends EPGMVertex>
+  extends BuildBase
   implements MapFunction<V, VertexGroupItem> {
 
-  /**
-   * Vertex property keys that are used for grouping.
-   */
-  private final List<String> groupPropertyKeys;
-  /**
-   * True, if vertex label shall be considered.
-   */
-  private final boolean useLabel;
   /**
    * Reduce object instantiations.
    */
@@ -57,14 +48,16 @@ public class BuildVertexGroupItem<V extends EPGMVertex>
    *
    * @param groupPropertyKeys vertex property keys
    * @param useLabel          true, if label shall be considered
+   * @param vertexAggregator  aggregate function for summarized vertices
    */
   public BuildVertexGroupItem(List<String> groupPropertyKeys,
-    boolean useLabel) {
-    this.groupPropertyKeys = groupPropertyKeys;
-    this.useLabel = useLabel;
+    boolean useLabel, PropertyValueAggregator vertexAggregator) {
+    super(groupPropertyKeys, useLabel, vertexAggregator);
+
     this.reuseVertexGroupItem = new VertexGroupItem();
-    this.reuseVertexGroupItem.setGroupCount(1L);
     this.reuseVertexGroupItem.setGroupRepresentative(new GradoopId());
+    this.reuseVertexGroupItem.setGroupAggregate(PropertyValue.NULL_VALUE);
+    this.reuseVertexGroupItem.setCandidate(false);
   }
 
   /**
@@ -73,40 +66,11 @@ public class BuildVertexGroupItem<V extends EPGMVertex>
   @Override
   public VertexGroupItem map(V vertex) throws Exception {
     reuseVertexGroupItem.setVertexId(vertex.getId());
-    reuseVertexGroupItem.setGroupLabel(getGroupLabel(vertex));
-    reuseVertexGroupItem.setGroupPropertyValues(getPropertyValueList(vertex));
-    return reuseVertexGroupItem;
-  }
-
-  /**
-   * Returns the vertex label or {@code null} if no label is required.
-   *
-   * @param vertexData vertex data
-   * @return vertex label or {@code null} if no label is required
-   */
-  private String getGroupLabel(V vertexData) {
-    return useLabel ? vertexData.getLabel() : null;
-  }
-
-  /**
-   * Returns a property value list containing all grouping values. If a vertex
-   * does not have a value, it is set to {@code PropertyValue.NULL_VALUE}.
-   *
-   * @param vertex vertex
-   * @return property value list
-   */
-  private PropertyValueList getPropertyValueList(V vertex) throws IOException {
-    List<PropertyValue> values =
-      Lists.newArrayListWithCapacity(vertex.getPropertyCount());
-
-    for (String groupPropertyKey : groupPropertyKeys) {
-      if (vertex.hasProperty(groupPropertyKey)) {
-        values.add(vertex.getPropertyValue(groupPropertyKey));
-      } else {
-        values.add(PropertyValue.NULL_VALUE);
-      }
+    reuseVertexGroupItem.setGroupLabel(getLabel(vertex));
+    reuseVertexGroupItem.setGroupPropertyValues(getGroupProperties(vertex));
+    if (doAggregate()) {
+      reuseVertexGroupItem.setGroupAggregate(getValueForAggregation(vertex));
     }
-
-    return PropertyValueList.fromPropertyValues(values);
+    return reuseVertexGroupItem;
   }
 }

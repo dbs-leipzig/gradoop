@@ -17,7 +17,6 @@
 
 package org.gradoop.examples;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -29,10 +28,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.operators.summarization.Summarization;
-import org.gradoop.model.impl.operators.summarization.SummarizationGroupCombine;
-import org.gradoop.model.impl.operators.summarization.SummarizationGroupMap;
-
-import java.util.List;
+import org.gradoop.model.impl.operators.summarization.SummarizationStrategy;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.CountAggregator;
 
 /**
  * SummarizationExample example that can be executed on a cluster.
@@ -67,10 +64,6 @@ public class SummarizationExample implements ProgramDescription {
    * Use edge label option
    */
   public static final String OPTION_USE_EDGE_LABELS = "uel";
-  /**
-   * Summarize strategy option
-   */
-  public static final String OPTION_SUMMARIZE_STRATEGY = "sst";
 
   /**
    * Command line options
@@ -93,8 +86,6 @@ public class SummarizationExample implements ProgramDescription {
       "Summarize on vertex labels");
     OPTIONS.addOption(OPTION_USE_EDGE_LABELS, "use-edge-labels", false,
       "Summarize on edge labels");
-    OPTIONS.addOption(OPTION_SUMMARIZE_STRATEGY, "summarize-strategy", true,
-      "Set summarization strategy [combine (default),map,sort,list]");
   }
 
   /**
@@ -121,8 +112,6 @@ public class SummarizationExample implements ProgramDescription {
       useEdgeKey ? cmd.getOptionValue(OPTION_EDGE_GROUPING_KEY) : null;
     boolean useVertexLabels = cmd.hasOption(OPTION_USE_VERTEX_LABELS);
     boolean useEdgeLabels = cmd.hasOption(OPTION_USE_EDGE_LABELS);
-    String summarizationStrategy =
-      cmd.getOptionValue(OPTION_SUMMARIZE_STRATEGY, "combine");
 
     // initialize EPGM database
     EPGMDatabase graphDatabase = EPGMDatabase
@@ -131,8 +120,7 @@ public class SummarizationExample implements ProgramDescription {
 
     // initialize summarization method
     Summarization summarization =
-      getSummarization(vertexKey, edgeKey, useVertexLabels, useEdgeLabels,
-        summarizationStrategy);
+      getSummarization(vertexKey, edgeKey, useVertexLabels, useEdgeLabels);
     // call summarization on whole database graph
     LogicalGraph summarizedGraph =
       graphDatabase.getDatabaseGraph().callForGraph(summarization);
@@ -152,29 +140,20 @@ public class SummarizationExample implements ProgramDescription {
    * @param useVertexLabels       use vertex label for summarization,
    *                              true/false
    * @param useEdgeLabels         use edge label for summarization, true/false
-   * @param summarizationStrategy summarization strategy
    * @return summarization implementation
    */
   private static Summarization getSummarization(String vertexKey,
-    String edgeKey, boolean useVertexLabels, boolean useEdgeLabels,
-    String summarizationStrategy) {
-    Summarization summarization;
+    String edgeKey, boolean useVertexLabels, boolean useEdgeLabels) {
 
-    List<String> vertexKeys = Lists.newArrayList(vertexKey);
-    List<String> edgeKeys = Lists.newArrayList(edgeKey);
-
-    switch (summarizationStrategy) {
-    case "map":
-      summarization =
-        new SummarizationGroupMap(vertexKeys, edgeKeys, useVertexLabels,
-          useEdgeLabels);
-      break;
-    default:
-      summarization =
-        new SummarizationGroupCombine(vertexKeys, edgeKeys, useVertexLabels,
-          useEdgeLabels);
-    }
-    return summarization;
+    return new Summarization.SummarizationBuilder<>()
+      .setStrategy(SummarizationStrategy.GROUP_MAP)
+      .addVertexGroupingKey(vertexKey)
+      .addEdgeGroupingKey(edgeKey)
+      .useVertexLabel(useVertexLabels)
+      .useEdgeLabel(useEdgeLabels)
+      .setVertexValueAggregator(new CountAggregator())
+      .setEdgeValueAggregator(new CountAggregator())
+      .build();
   }
 
   /**

@@ -25,13 +25,11 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
-import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
 import org.gradoop.util.GConstants;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -41,16 +39,9 @@ import java.util.List;
  * @param <E> EPGM edge type
  */
 public class BuildSummarizedEdge<E extends EPGMEdge>
+  extends BuildBase
   implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
 
-  /**
-   * Edge property keys used for grouping.
-   */
-  private final List<String> groupPropertyKeys;
-  /**
-   * True, if label shall be considered.
-   */
-  private boolean useLabel;
   /**
    * Edge factory.
    */
@@ -61,12 +52,14 @@ public class BuildSummarizedEdge<E extends EPGMEdge>
    *
    * @param groupPropertyKeys edge property keys
    * @param useLabel          use edge label
+   * @param valueAggregator   aggregate function for edge values
    * @param edgeFactory       edge factory
    */
-  public BuildSummarizedEdge(List<String> groupPropertyKeys, boolean useLabel,
+  public BuildSummarizedEdge(List<String> groupPropertyKeys,
+    boolean useLabel,
+    PropertyValueAggregator valueAggregator,
     EPGMEdgeFactory<E> edgeFactory) {
-    this.groupPropertyKeys = groupPropertyKeys;
-    this.useLabel = useLabel;
+    super(groupPropertyKeys, useLabel, valueAggregator);
     this.edgeFactory = edgeFactory;
   }
 
@@ -77,61 +70,39 @@ public class BuildSummarizedEdge<E extends EPGMEdge>
   public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
     Collector<E> collector) throws Exception {
 
-    int edgeCount = 0;
-    boolean initialized = false;
-
-    GradoopId newSourceVertexId = null;
-    GradoopId newTargetVertexId = null;
-    String edgeLabel = GConstants.DEFAULT_EDGE_LABEL;
+    GradoopId newSourceVertexId           = null;
+    GradoopId newTargetVertexId           = null;
+    String edgeLabel                      = GConstants.DEFAULT_EDGE_LABEL;
     PropertyValueList groupPropertyValues = null;
 
+    boolean firstElement                  = false;
+
     for (EdgeGroupItem e : edgeGroupItems) {
-      edgeCount++;
-      if (!initialized) {
+      if (!firstElement) {
         newSourceVertexId = e.getSourceId();
         newTargetVertexId = e.getTargetId();
-        if (useLabel) {
+        if (useLabel()) {
           edgeLabel = e.getGroupLabel();
         }
         groupPropertyValues = e.getGroupPropertyValues();
-        initialized = true;
+        firstElement = true;
+      }
+
+      if (doAggregate()) {
+        aggregate(e.getGroupAggregate());
+      } else {
+        break;
       }
     }
 
-    E e = edgeFactory.createEdge(
+    E sumEdge = edgeFactory.createEdge(
       edgeLabel, newSourceVertexId, newTargetVertexId);
-    // properties
-    appendProperties(groupPropertyValues, e);
-    // aggregate functions
-    appendAggregateValues(edgeCount, e);
 
-    collector.collect(e);
-  }
+    setGroupProperties(sumEdge, groupPropertyValues);
+    setAggregate(sumEdge);
+    resetAggregator();
 
-  /**
-   * Append aggregate values to the new edge.
-   *
-   * @param edgeCount number of edges represented by that edge
-   * @param e         summarized edge
-   */
-  private void appendAggregateValues(int edgeCount, E e) {
-    e.setProperty(Summarization.COUNT_PROPERTY_KEY, edgeCount);
-  }
-
-  /**
-   * Append group property values to the new edge.
-   *
-   *
-   * @param groupPropertyValues property values for that group
-   * @param e                   summarized edge
-   */
-  private void appendProperties(PropertyValueList groupPropertyValues, E e) {
-    Iterator<String> keyIterator = groupPropertyKeys.iterator();
-    Iterator<PropertyValue> valueIterator = groupPropertyValues.iterator();
-
-    while (keyIterator.hasNext() && valueIterator.hasNext()) {
-      e.setProperty(keyIterator.next(), valueIterator.next());
-    }
+    collector.collect(sumEdge);
   }
 
   /**

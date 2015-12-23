@@ -17,8 +17,9 @@
 
 package org.gradoop.model.impl.operators.summarization.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.tuple.Tuple6;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
 
 /**
@@ -28,17 +29,12 @@ import org.gradoop.model.impl.properties.PropertyValueList;
  * f1: group representative vertex id
  * f2: vertex group label
  * f3: vertex group properties
- * f4: total group count
+ * f4: vertex group aggregate value
+ * f5: candidate tuple yes/no
  */
 public class VertexGroupItem
-  extends Tuple5<GradoopId, GradoopId, String, PropertyValueList, Long> {
-
-  /**
-   * Creates a vertex group item.
-   */
-  public VertexGroupItem() {
-    setGroupCount(0L);
-  }
+  extends Tuple6
+    <GradoopId, GradoopId, String, PropertyValueList, PropertyValue, Boolean> {
 
   public GradoopId getVertexId() {
     return f0;
@@ -73,23 +69,19 @@ public class VertexGroupItem
     f3 = groupPropertyValues;
   }
 
-  public Long getGroupCount() {
+  public PropertyValue getGroupAggregate() {
     return f4;
   }
 
-  public void setGroupCount(Long groupCount) {
+  public void setGroupAggregate(PropertyValue groupCount) {
     f4 = groupCount;
   }
 
-  /**
-   * Resets the fields to initial values. This is necessary if the tuples are
-   * reused and not all fields are set by a thread.
-   */
-  public void reset() {
-    f0 = null;
-    f1 = null;
-    f2 = null;
-    f3 = null;
-    f4 = 0L;
+  public Boolean isCandidate() {
+    return f5;
+  }
+
+  public void setCandidate(Boolean isCandidate) {
+    f5 = isCandidate;
   }
 }

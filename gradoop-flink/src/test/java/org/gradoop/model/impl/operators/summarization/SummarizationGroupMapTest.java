@@ -17,20 +17,10 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-
-import java.util.List;
-
 public class SummarizationGroupMapTest extends SummarizationTestBase {
 
   @Override
-  public Summarization<GraphHeadPojo, VertexPojo, EdgePojo>
-  getSummarizationImpl(
-    List<String> vertexGroupingKeys, boolean useVertexLabel,
-    List<String> edgeGroupingKeys, boolean useEdgeLabel) {
-    return new SummarizationGroupMap<>(vertexGroupingKeys, edgeGroupingKeys,
-      useVertexLabel, useEdgeLabel);
+  public SummarizationStrategy getStrategy() {
+    return SummarizationStrategy.GROUP_MAP;
   }
 }
