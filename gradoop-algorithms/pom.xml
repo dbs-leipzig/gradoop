@@ -2,29 +2,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <parent>
+        <groupId>org.gradoop</groupId>
         <artifactId>gradoop</artifactId>
-        <groupId>de.uni-leipzig.de.dbs</groupId>
         <version>0.2-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gradoop-algorithms</artifactId>
     <packaging>jar</packaging>
 
     <name>Gradoop Algorithms</name>
-    <description>Domain specific algorithms that can be executed in Gradoop.</description>
-
-    <properties>
-        <top.dir>${project.basedir}/..</top.dir>
-    </properties>
+    <description>Domain specific algorithms that can be executed in Gradoop.
+    </description>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -45,19 +40,19 @@
     </build>
 
     <dependencies>
-        <!-- Compile -->
+        <!-- Compile dependencies -->
 
         <!-- Gradoop -->
         <dependency>
-            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <groupId>org.gradoop</groupId>
             <artifactId>gradoop-flink</artifactId>
         </dependency>
 
-        <!-- Testing -->
+        <!-- Test dependencies -->
 
         <!-- Gradoop -->
         <dependency>
-            <groupId>de.uni-leipzig.de.dbs</groupId>
+            <groupId>org.gradoop</groupId>
             <artifactId>gradoop-flink</artifactId>
             <type>test-jar</type>
             <scope>test</scope>

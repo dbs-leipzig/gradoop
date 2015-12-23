@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>org.gradoop</groupId>
         <artifactId>gradoop</artifactId>
-        <groupId>de.uni-leipzig.de.dbs</groupId>
         <version>0.2-SNAPSHOT</version>
     </parent>
 
@@ -16,16 +16,8 @@
     <name>Gradoop Core</name>
     <description>Gradoop core classes</description>
 
-    <properties>
-        <top.dir>${project.basedir}/..</top.dir>
-    </properties>
-
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -54,6 +46,8 @@
     </build>
 
     <dependencies>
+        <!-- Compile dependencies -->
+
         <!-- HBase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
@@ -62,17 +56,11 @@
 
         <!-- Others -->
         <dependency>
-            <groupId>org.apache.pig</groupId>
-            <artifactId>pig</artifactId>
-        </dependency>
-
-
-        <dependency>
             <groupId>org.s1ck</groupId>
             <artifactId>gdl</artifactId>
         </dependency>
 
-        <!-- Testing -->
+        <!-- Test dependencies -->
 
         <!-- HBase -->
         <dependency>
@@ -90,22 +78,10 @@
         </dependency>
 
         <!-- Others -->
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.5</version>
         </dependency>
     </dependencies>
 </project>

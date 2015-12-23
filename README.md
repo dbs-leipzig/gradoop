@@ -59,6 +59,32 @@ The following table contains an overview (GC = Graph Collection, G = Logical Gra
 
 ## Setup
 
+### Use gradoop via Maven
+
+* Add repository and dependency to your maven project
+
+```
+<repositories>
+  <repository>
+    <id>dbleipzig</id>
+    <name>Database Group Leipzig University</name>
+    <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
+    <releases>
+      <enabled>true</enabled>
+    </releases>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+   </repository>
+</repositories>
+
+<dependency>
+  <groupId>org.gradoop</groupId>
+  <artifactId>gradoop-flink</artifactId>
+  <version>0.2-SNAPSHOT</version>
+</dependency>
+```
+
 ### Build gradoop from source
 
 * Clone Gradoop into your local file system

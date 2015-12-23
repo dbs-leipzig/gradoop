@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.uni-leipzig.de.dbs</groupId>
+    <groupId>org.gradoop</groupId>
     <artifactId>gradoop</artifactId>
     <packaging>pom</packaging>
     <version>0.2-SNAPSHOT</version>
@@ -13,6 +13,13 @@
     <url>http://www.gradoop.org</url>
     <description>GRADOOP : Graph Analytics on Hadoop</description>
     <inceptionYear>2014</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License, Version 3</name>
+            <url>https://www.gnu.org/licenses/gpl.txt</url>
+        </license>
+    </licenses>
 
     <modules>
         <module>gradoop-examples</module>
@@ -42,7 +49,7 @@
         <developer>
             <id>kgomez</id>
             <name>Kevin Gomez</name>
-            <email>k.gomez@freenet.de</email>
+            <email>gomez@studserv.uni-leipzig.de</email>
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
@@ -50,12 +57,25 @@
         <developer>
             <id>nteichmann</id>
             <name>Niklas Teichmann</name>
-            <email>mai11hcg@studserv.uni-leipzig.de</email>
+            <email>teichmann@studserv.uni-leipzig.de</email>
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</connection>
+        <developerConnection>scm:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</developerConnection>
+        <url>http://github.com/dbs-leipzig/gradoop.git</url>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>dbleipzig</id>
+            <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <top.dir>${project.basedir}</top.dir>
@@ -68,18 +88,14 @@
         <dep.gdl.version>0.2-SNAPSHOT</dep.gdl.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
         <dep.junit.version>4.11</dep.junit.version>
-        <dep.junitparams.version>1.0.4</dep.junitparams.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
-        <dep.mockito.version>1.10.19</dep.mockito.version>
-        <dep.pig.version>0.15.0</dep.pig.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
 
         <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.14</plugin.maven-checkstyle.version>
         <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
-        <plugin.maven_assembly.version>2.4</plugin.maven_assembly.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
         <plugin.maven-surefire.version>2.19</plugin.maven-surefire.version>
     </properties>
@@ -127,7 +143,7 @@
                     <version>${plugin.maven-checkstyle.version}</version>
                     <dependencies>
                         <dependency>
-                            <groupId>de.uni-leipzig.de.dbs</groupId>
+                            <groupId>org.gradoop</groupId>
                             <artifactId>gradoop-checkstyle</artifactId>
                             <version>${project.version}</version>
                         </dependency>
@@ -164,26 +180,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>${plugin.maven_assembly.version}</version>
-                    <configuration>
-                        <descriptorRefs>
-                            <descriptorRef>jar-with-dependencies</descriptorRef>
-                        </descriptorRefs>
-                        <tarLongFileMode>gnu</tarLongFileMode>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>assemble-all</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>single</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${plugin.maven-jar.version}</version>
                     <executions>
@@ -211,16 +207,17 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- compile dependencies -->
+            <!-- Compile dependencies -->
+
             <!-- Gradoop -->
             <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-flink</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -268,22 +265,17 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.pig</groupId>
-                <artifactId>pig</artifactId>
-                <version>${dep.pig.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
                 <scope>provided</scope>
             </dependency>
 
-            <!-- test dependencies -->
+            <!-- Test dependencies -->
+
             <!-- Gradoop -->
             <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-core</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
@@ -291,7 +283,7 @@
             </dependency>
 
             <dependency>
-                <groupId>de.uni-leipzig.de.dbs</groupId>
+                <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-flink</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
@@ -328,20 +320,6 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${dep.junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${dep.mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.skyscreamer</groupId>
-                <artifactId>jsonassert</artifactId>
-                <version>${dep.jsonassert.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

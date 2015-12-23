@@ -20,6 +20,11 @@
 <module name="checker">
     <property name="localeLanguage" value="en"/>
 
+    <!-- Checks for the correct license header in *.java files -->
+    <module name="Header">
+        <property name="headerFile" value="${checkstyle.header.file}"/>
+    </module>
+
     <!-- Checks for Javadoc comments (checker).           -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html -->
     <!-- Require package javadoc -->
