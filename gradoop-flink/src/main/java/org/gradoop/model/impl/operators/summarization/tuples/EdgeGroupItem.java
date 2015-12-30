@@ -36,8 +36,8 @@ public class EdgeGroupItem
   extends Tuple6
   <GradoopId, GradoopId, GradoopId, String, PropertyValueList, PropertyValue> {
 
-  public void setEdgeId(GradoopId edgeId) {
-    f0 = edgeId;
+  public EdgeGroupItem() {
+    f0 = GradoopId.MAX_VALUE;
   }
 
   public GradoopId getSourceId() {

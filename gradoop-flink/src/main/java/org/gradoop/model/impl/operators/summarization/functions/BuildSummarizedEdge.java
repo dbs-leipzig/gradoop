@@ -17,101 +17,69 @@
 
 package org.gradoop.model.impl.operators.summarization.functions;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
-import org.gradoop.model.impl.properties.PropertyValueList;
 import org.gradoop.util.GConstants;
 
 import java.util.List;
 
 /**
- * Creates a summarized edge from a group of edges including an edge
- * grouping value.
+ * Creates a single {@link EdgeGroupItem} from a set of group items.
  *
- * @param <E> EPGM edge type
+ * @see ReduceEdgeGroupItems
+ * @see CombineEdgeGroupItems
  */
-public class BuildSummarizedEdge<E extends EPGMEdge>
-  extends BuildBase
-  implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
+public abstract class BuildSummarizedEdge extends BuildBase {
 
   /**
-   * Edge factory.
-   */
-  private final EPGMEdgeFactory<E> edgeFactory;
-
-  /**
-   * Creates group reducer
+   * Creates group reducer / combiner
    *
    * @param groupPropertyKeys edge property keys
    * @param useLabel          use edge label
    * @param valueAggregator   aggregate function for edge values
-   * @param edgeFactory       edge factory
    */
   public BuildSummarizedEdge(List<String> groupPropertyKeys,
     boolean useLabel,
-    PropertyValueAggregator valueAggregator,
-    EPGMEdgeFactory<E> edgeFactory) {
+    PropertyValueAggregator valueAggregator) {
     super(groupPropertyKeys, useLabel, valueAggregator);
-    this.edgeFactory = edgeFactory;
   }
 
   /**
-   * {@inheritDoc}
+   * Iterators the given edge group items and build a group representative item.
+   *
+   * @param edgeGroupItems edge group items
+   * @return group representative item
    */
-  @Override
-  public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-    Collector<E> collector) throws Exception {
+  protected EdgeGroupItem reduceInternal(
+    Iterable<EdgeGroupItem> edgeGroupItems) {
 
-    GradoopId newSourceVertexId           = null;
-    GradoopId newTargetVertexId           = null;
-    String edgeLabel                      = GConstants.DEFAULT_EDGE_LABEL;
-    PropertyValueList groupPropertyValues = null;
+    EdgeGroupItem edgeGroupItem = new EdgeGroupItem();
 
-    boolean firstElement                  = false;
+    boolean firstElement = true;
 
     for (EdgeGroupItem e : edgeGroupItems) {
-      if (!firstElement) {
-        newSourceVertexId = e.getSourceId();
-        newTargetVertexId = e.getTargetId();
+      if (firstElement) {
+        edgeGroupItem.setSourceId(e.getSourceId());
+        edgeGroupItem.setTargetId(e.getTargetId());
         if (useLabel()) {
-          edgeLabel = e.getGroupLabel();
+          edgeGroupItem.setGroupLabel(e.getGroupLabel());
+        } else {
+          edgeGroupItem.setGroupLabel(GConstants.DEFAULT_EDGE_LABEL);
         }
-        groupPropertyValues = e.getGroupPropertyValues();
-        firstElement = true;
+        edgeGroupItem.setGroupPropertyValues(e.getGroupPropertyValues());
+        firstElement = false;
       }
 
       if (doAggregate()) {
         aggregate(e.getGroupAggregate());
       } else {
+        // no need to iterate further
         break;
       }
     }
 
-    E sumEdge = edgeFactory.createEdge(
-      edgeLabel, newSourceVertexId, newTargetVertexId);
+    edgeGroupItem.setGroupAggregate(getAggregate());
 
-    setGroupProperties(sumEdge, groupPropertyValues);
-    setAggregate(sumEdge);
-    resetAggregator();
-
-    collector.collect(sumEdge);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @SuppressWarnings("unchecked")
-  public TypeInformation<E> getProducedType() {
-    return (TypeInformation<E>)
-      TypeExtractor.createTypeInfo(edgeFactory.getType());
+    return edgeGroupItem;
   }
 }

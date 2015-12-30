@@ -69,7 +69,6 @@ public class BuildEdgeGroupItem<E extends EPGMEdge>
   @Override
   public EdgeGroupItem join(
     E edge, VertexWithRepresentative vertexRepresentative) throws Exception {
-    reuseEdgeGroupItem.setEdgeId(edge.getId());
     reuseEdgeGroupItem.setSourceId(
       vertexRepresentative.getGroupRepresentative());
     reuseEdgeGroupItem.setTargetId(edge.getTargetId());

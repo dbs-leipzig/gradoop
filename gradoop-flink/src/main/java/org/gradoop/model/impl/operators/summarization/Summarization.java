@@ -19,6 +19,7 @@ package org.gradoop.model.impl.operators.summarization;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.GroupCombineOperator;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -28,6 +29,11 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.operators.summarization.functions.BuildEdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedEdge;
+
+import org.gradoop.model.impl.operators.summarization.functions
+  .CombineEdgeGroupItems;
+import org.gradoop.model.impl.operators.summarization.functions
+  .ReduceEdgeGroupItems;
 import org.gradoop.model.impl.operators.summarization.functions.UpdateEdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
@@ -298,9 +304,16 @@ public abstract class Summarization<
       .where(2).equalTo(0)
       .with(new UpdateEdgeGroupItem());
 
-    return groupEdges(edges)
-      .reduceGroup(new BuildSummarizedEdge<>(
-        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregator(),
+    // group + combine
+    DataSet<EdgeGroupItem> combinedEdges = groupEdges(edges)
+      .combineGroup(new CombineEdgeGroupItems(
+        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregator()));
+
+    // group + reduce + build final edges
+    return groupEdges(combinedEdges)
+      .reduceGroup(new ReduceEdgeGroupItems<>(getEdgeGroupingKeys(),
+        useEdgeLabels(),
+        getEdgeAggregator(),
         config.getEdgeFactory()));
   }
 
