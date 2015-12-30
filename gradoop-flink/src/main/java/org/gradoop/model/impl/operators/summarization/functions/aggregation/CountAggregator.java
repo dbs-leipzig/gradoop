@@ -22,7 +22,7 @@ import org.gradoop.model.impl.properties.PropertyValue;
 /**
  * Special sum aggregator to count elements.
  */
-public class CountAggregator extends PropertyValueAggregator {
+public class CountAggregator extends SumAggregator {
 
   /**
    * Default property key to fetch values for aggregation.
@@ -83,7 +83,7 @@ public class CountAggregator extends PropertyValueAggregator {
 
   @Override
   protected void aggregateInternal(PropertyValue value) {
-    aggregate++;
+    aggregate += value.getLong();
   }
 
   @Override

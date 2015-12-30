@@ -100,6 +100,10 @@ public class EPGMDatabase<
       config.getGraphHeadFactory().createGraphHead(GConstants.DB_GRAPH_LABEL));
   }
 
+  //----------------------------------------------------------------------------
+  // from/to JSON file
+  //----------------------------------------------------------------------------
+
   /**
    * Creates a database from JSON files. Paths can be local (file://) or HDFS
    * (hdfs://).
@@ -253,6 +257,73 @@ public class EPGMDatabase<
     config.getExecutionEnvironment().execute();
   }
 
+  //----------------------------------------------------------------------------
+  // from/to HBase
+  //----------------------------------------------------------------------------
+
+  /**
+   * Creates an EPGM database from an EPGM Store using the given arguments.
+   *
+   * @param epgmStore EPGM store
+   * @param <G>       graph data type
+   * @param <V>       vertex data type
+   * @param <E>       edge data type
+   * @param <PG>      persistent graph head type
+   * @param <PV>      persistent vertex type
+   * @param <PE>      persistent edge type
+   * @param config Gradoop Flink configuration
+   * @return EPGM database
+   */
+  @SuppressWarnings("unchecked")
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge,
+    PG extends PersistentGraphHead,
+    PV extends PersistentVertex<E>,
+    PE extends PersistentEdge<V>> EPGMDatabase<G, V, E> fromHBase(
+    EPGMStore<G, V, E, PG, PV, PE> epgmStore,
+    GradoopFlinkConfig<G, V, E> config) {
+
+    // used for type hinting when loading graph data
+    TypeInformation<Tuple1<G>> graphTypeInfo = new TupleTypeInfo(
+      Tuple1.class,
+      TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType()));
+
+    // used for type hinting when loading vertex data
+    TypeInformation<Tuple1<V>> vertexTypeInfo = new TupleTypeInfo(
+      Tuple1.class,
+      TypeExtractor.createTypeInfo(config.getVertexFactory().getType()));
+
+    // used for type hinting when loading edge data
+    TypeInformation<Tuple1<E>> edgeTypeInfo = new TupleTypeInfo(
+      Tuple1.class,
+      TypeExtractor.createTypeInfo(config.getEdgeFactory().getType()));
+
+
+    DataSet<Tuple1<G>> graphHeads = config.getExecutionEnvironment()
+      .createInput(
+        new GraphHeadTableInputFormat<>(
+          config.getGraphHeadHandler(), epgmStore.getGraphHeadName()),
+        graphTypeInfo);
+
+    DataSet<Tuple1<V>> vertices = config.getExecutionEnvironment()
+      .createInput(new VertexTableInputFormat<>(
+          config.getVertexHandler(), epgmStore.getVertexTableName()),
+        vertexTypeInfo);
+
+    DataSet<Tuple1<E>> edges = config.getExecutionEnvironment().createInput(
+      new EdgeTableInputFormat<>(
+        config.getEdgeHandler(), epgmStore.getEdgeTableName()),
+      edgeTypeInfo);
+
+    return new EPGMDatabase<>(
+      graphHeads.map(new ValueOf1<G>()),
+      vertices.map(new ValueOf1<V>()),
+      edges.map(new ValueOf1<E>()),
+      config);
+  }
+
   /**
    * Writes the EPGM database instance to HBase using the given arguments.
    * <p/>
@@ -282,6 +353,10 @@ public class EPGMDatabase<
 
     this.config.getExecutionEnvironment().execute();
   }
+
+  //----------------------------------------------------------------------------
+  // from Collection
+  //----------------------------------------------------------------------------
 
   /**
    * Creates a database from collections of vertex and edge data objects.
@@ -392,69 +467,6 @@ public class EPGMDatabase<
   }
 
   /**
-   * Creates an EPGM database from an EPGM Store using the given arguments.
-   *
-   * @param epgmStore EPGM store
-   * @param <G>       graph data type
-   * @param <V>       vertex data type
-   * @param <E>       edge data type
-   * @param <PG>      persistent graph head type
-   * @param <PV>      persistent vertex type
-   * @param <PE>      persistent edge type
-   * @param config Gradoop Flink configuration
-   * @return EPGM database
-   */
-  @SuppressWarnings("unchecked")
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge,
-    PG extends PersistentGraphHead,
-    PV extends PersistentVertex<E>,
-    PE extends PersistentEdge<V>> EPGMDatabase<G, V, E> fromHBase(
-    EPGMStore<G, V, E, PG, PV, PE> epgmStore,
-    GradoopFlinkConfig<G, V, E> config) {
-
-    // used for type hinting when loading graph data
-    TypeInformation<Tuple1<G>> graphTypeInfo = new TupleTypeInfo(
-      Tuple1.class,
-      TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType()));
-
-    // used for type hinting when loading vertex data
-    TypeInformation<Tuple1<V>> vertexTypeInfo = new TupleTypeInfo(
-      Tuple1.class,
-      TypeExtractor.createTypeInfo(config.getVertexFactory().getType()));
-
-    // used for type hinting when loading edge data
-    TypeInformation<Tuple1<E>> edgeTypeInfo = new TupleTypeInfo(
-      Tuple1.class,
-      TypeExtractor.createTypeInfo(config.getEdgeFactory().getType()));
-
-
-    DataSet<Tuple1<G>> graphHeads = config.getExecutionEnvironment()
-      .createInput(
-        new GraphHeadTableInputFormat<>(
-          config.getGraphHeadHandler(), epgmStore.getGraphHeadName()),
-        graphTypeInfo);
-
-    DataSet<Tuple1<V>> vertices = config.getExecutionEnvironment()
-      .createInput(new VertexTableInputFormat<>(
-        config.getVertexHandler(), epgmStore.getVertexTableName()),
-        vertexTypeInfo);
-
-    DataSet<Tuple1<E>> edges = config.getExecutionEnvironment().createInput(
-      new EdgeTableInputFormat<>(
-        config.getEdgeHandler(), epgmStore.getEdgeTableName()),
-      edgeTypeInfo);
-
-    return new EPGMDatabase<>(
-      graphHeads.map(new ValueOf1<G>()),
-      vertices.map(new ValueOf1<V>()),
-      edges.map(new ValueOf1<E>()),
-      config);
-  }
-
-  /**
    * Returns a logical graph containing the complete vertex and edge space of
    * that EPGM database.
    *
@@ -465,6 +477,10 @@ public class EPGMDatabase<
       .fromDataSets(graphHead, database.getVertices(), database.getEdges(),
         config);
   }
+
+  //----------------------------------------------------------------------------
+  // Util methods
+  //----------------------------------------------------------------------------
 
   /**
    * Returns a logical graph by its identifier. If the logical graph does not

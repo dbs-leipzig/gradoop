@@ -56,7 +56,11 @@ public class BuildVertexGroupItem<V extends EPGMVertex>
 
     this.reuseVertexGroupItem = new VertexGroupItem();
     this.reuseVertexGroupItem.setGroupRepresentative(new GradoopId());
-    this.reuseVertexGroupItem.setGroupAggregate(PropertyValue.NULL_VALUE);
+    if (doAggregate() && isCountAggregator()) {
+      this.reuseVertexGroupItem.setGroupAggregate(PropertyValue.create(1L));
+    } else {
+      this.reuseVertexGroupItem.setGroupAggregate(PropertyValue.NULL_VALUE);
+    }
     this.reuseVertexGroupItem.setCandidate(false);
   }
 
@@ -68,7 +72,7 @@ public class BuildVertexGroupItem<V extends EPGMVertex>
     reuseVertexGroupItem.setVertexId(vertex.getId());
     reuseVertexGroupItem.setGroupLabel(getLabel(vertex));
     reuseVertexGroupItem.setGroupPropertyValues(getGroupProperties(vertex));
-    if (doAggregate()) {
+    if (doAggregate() && !isCountAggregator()) {
       reuseVertexGroupItem.setGroupAggregate(getValueForAggregation(vertex));
     }
     return reuseVertexGroupItem;

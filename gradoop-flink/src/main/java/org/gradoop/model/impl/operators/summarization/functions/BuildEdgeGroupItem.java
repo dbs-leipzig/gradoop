@@ -56,7 +56,11 @@ public class BuildEdgeGroupItem<E extends EPGMEdge>
     boolean useLabel, PropertyValueAggregator edgeAggregator) {
     super(groupPropertyKeys, useLabel, edgeAggregator);
     this.reuseEdgeGroupItem = new EdgeGroupItem();
-    this.reuseEdgeGroupItem.setGroupAggregate(PropertyValue.NULL_VALUE);
+    if (doAggregate() && isCountAggregator()) {
+      this.reuseEdgeGroupItem.setGroupAggregate(PropertyValue.create(1L));
+    } else {
+      this.reuseEdgeGroupItem.setGroupAggregate(PropertyValue.NULL_VALUE);
+    }
   }
 
   /**
@@ -71,7 +75,7 @@ public class BuildEdgeGroupItem<E extends EPGMEdge>
     reuseEdgeGroupItem.setTargetId(edge.getTargetId());
     reuseEdgeGroupItem.setGroupLabel(getLabel(edge));
     reuseEdgeGroupItem.setGroupPropertyValues(getGroupProperties(edge));
-    if (doAggregate()) {
+    if (doAggregate() && !isCountAggregator()) {
       reuseEdgeGroupItem.setGroupAggregate(getValueForAggregation(edge));
     }
     return reuseEdgeGroupItem;

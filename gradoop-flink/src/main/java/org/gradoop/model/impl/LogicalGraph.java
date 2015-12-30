@@ -47,7 +47,7 @@ import org.gradoop.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.model.impl.operators.overlap.Overlap;
 import org.gradoop.model.impl.operators.projection.Projection;
 import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
-import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.operators.summarization.Summarization.SummarizationBuilder;
 import org.gradoop.model.impl.operators.summarization.SummarizationStrategy;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.CountAggregator;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -375,11 +375,17 @@ public class LogicalGraph
   @Override
   public LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys) {
-    return callForGraph(
-      new Summarization.SummarizationBuilder<G, V, E>()
+    SummarizationBuilder<G, V, E> builder = new SummarizationBuilder<>();
+
+    if (vertexGroupingKeys != null) {
+      builder.addVertexGroupingKeys(vertexGroupingKeys);
+    }
+    if (edgeGroupingKeys != null) {
+      builder.addEdgeGroupingKeys(edgeGroupingKeys);
+    }
+
+    return callForGraph(builder
         .setStrategy(SummarizationStrategy.GROUP_MAP)
-        .addVertexGroupingKeys(vertexGroupingKeys)
-        .addEdgeGroupingKeys(edgeGroupingKeys)
         .useVertexLabel(false)
         .useEdgeLabel(false)
         .setVertexValueAggregator(new CountAggregator())
@@ -419,11 +425,16 @@ public class LogicalGraph
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    return callForGraph(
-      new Summarization.SummarizationBuilder<G, V, E>()
+    SummarizationBuilder<G, V, E> builder = new SummarizationBuilder<>();
+
+    if (vertexGroupingKeys != null) {
+      builder.addVertexGroupingKeys(vertexGroupingKeys);
+    }
+    if (edgeGroupingKeys != null) {
+      builder.addEdgeGroupingKeys(edgeGroupingKeys);
+    }
+    return callForGraph(builder
         .setStrategy(SummarizationStrategy.GROUP_MAP)
-        .addVertexGroupingKeys(vertexGroupingKeys)
-        .addEdgeGroupingKeys(edgeGroupingKeys)
         .useVertexLabel(true)
         .useEdgeLabel(false)
         .setVertexValueAggregator(new CountAggregator())
@@ -464,11 +475,16 @@ public class LogicalGraph
   @Override
   public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    return callForGraph(
-      new Summarization.SummarizationBuilder<G, V, E>()
+    SummarizationBuilder<G, V, E> builder = new SummarizationBuilder<>();
+
+    if (vertexGroupingKeys != null) {
+      builder.addVertexGroupingKeys(vertexGroupingKeys);
+    }
+    if (edgeGroupingKeys != null) {
+      builder.addEdgeGroupingKeys(edgeGroupingKeys);
+    }
+    return callForGraph(builder
         .setStrategy(SummarizationStrategy.GROUP_MAP)
-        .addVertexGroupingKeys(vertexGroupingKeys)
-        .addEdgeGroupingKeys(edgeGroupingKeys)
         .useVertexLabel(true)
         .useEdgeLabel(true)
         .setVertexValueAggregator(new CountAggregator())

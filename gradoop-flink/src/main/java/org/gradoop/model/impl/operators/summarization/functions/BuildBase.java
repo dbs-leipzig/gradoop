@@ -20,7 +20,12 @@ package org.gradoop.model.impl.operators.summarization.functions;
 import com.google.common.collect.Lists;
 import org.gradoop.model.api.EPGMAttributed;
 import org.gradoop.model.api.EPGMLabeled;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation
+  .CountAggregator;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
+
+import org.gradoop.model.impl.operators.summarization.functions.aggregation
+  .SumAggregator;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
 
@@ -233,5 +238,14 @@ public abstract class BuildBase implements Serializable {
   protected void setAggregate(EPGMAttributed element,
     PropertyValue value) {
     element.setProperty(valueAggregator.getAggregatePropertyKey(), value);
+  }
+
+  /**
+   * Returns true, if the aggregator is a sum aggregator.
+   *
+   * @return true, if aggregator is sum aggregator
+   */
+  protected boolean isCountAggregator() {
+    return valueAggregator instanceof CountAggregator;
   }
 }
