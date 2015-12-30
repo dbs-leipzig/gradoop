@@ -19,7 +19,6 @@ package org.gradoop.model.impl.operators.summarization;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.GroupCombineOperator;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -28,12 +27,8 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.operators.summarization.functions.BuildEdgeGroupItem;
-import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedEdge;
-
-import org.gradoop.model.impl.operators.summarization.functions
-  .CombineEdgeGroupItems;
-import org.gradoop.model.impl.operators.summarization.functions
-  .ReduceEdgeGroupItems;
+import org.gradoop.model.impl.operators.summarization.functions.CombineEdgeGroupItems;
+import org.gradoop.model.impl.operators.summarization.functions.ReduceEdgeGroupItems;
 import org.gradoop.model.impl.operators.summarization.functions.UpdateEdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
@@ -268,13 +263,13 @@ public abstract class Summarization<
     DataSet<EdgeGroupItem> edges) {
     UnsortedGrouping<EdgeGroupItem> groupedEdges;
     if (useEdgeProperties() && useEdgeLabels()) {
-      groupedEdges = edges.groupBy(1, 2, 3, 4);
+      groupedEdges = edges.groupBy(0, 1, 2, 3);
     } else if (useEdgeLabels()) {
-      groupedEdges = edges.groupBy(1, 2, 3);
+      groupedEdges = edges.groupBy(0, 1, 2);
     } else if (useEdgeProperties()) {
-      groupedEdges = edges.groupBy(1, 2, 4);
+      groupedEdges = edges.groupBy(0, 1, 3);
     } else {
-      groupedEdges = edges.groupBy(1, 2);
+      groupedEdges = edges.groupBy(0, 1);
     }
     return groupedEdges;
   }
@@ -283,7 +278,7 @@ public abstract class Summarization<
    * Build summarized edges by joining them with vertices and their group
    * representative.
    *
-   * @param graph                     inout graph
+   * @param graph                     input graph
    * @param vertexToRepresentativeMap dataset containing tuples of vertex id
    *                                  and group representative
    * @return summarized edges
@@ -301,7 +296,7 @@ public abstract class Summarization<
         getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregator()))
       // join result with vertex-group-map on edge-target-id == vertex-id
       .join(vertexToRepresentativeMap)
-      .where(2).equalTo(0)
+      .where(1).equalTo(0)
       .with(new UpdateEdgeGroupItem());
 
     // group + combine

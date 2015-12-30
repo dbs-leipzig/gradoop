@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @param <E> EPGM edge type
  */
-@FunctionAnnotation.ForwardedFieldsSecond("f1") // vertex id -> source id
+@FunctionAnnotation.ForwardedFieldsSecond("f1->f0") // vertex id -> source id
 public class BuildEdgeGroupItem<E extends EPGMEdge>
   extends BuildBase
   implements JoinFunction<E, VertexWithRepresentative, EdgeGroupItem> {

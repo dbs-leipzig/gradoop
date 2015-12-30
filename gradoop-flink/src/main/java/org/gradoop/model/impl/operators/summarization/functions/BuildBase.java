@@ -20,12 +20,8 @@ package org.gradoop.model.impl.operators.summarization.functions;
 import com.google.common.collect.Lists;
 import org.gradoop.model.api.EPGMAttributed;
 import org.gradoop.model.api.EPGMLabeled;
-import org.gradoop.model.impl.operators.summarization.functions.aggregation
-  .CountAggregator;
+import org.gradoop.model.impl.operators.summarization.functions.aggregation.CountAggregator;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
-
-import org.gradoop.model.impl.operators.summarization.functions.aggregation
-  .SumAggregator;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
 

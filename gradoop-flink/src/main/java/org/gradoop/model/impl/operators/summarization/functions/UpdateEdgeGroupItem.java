@@ -26,8 +26,8 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresent
  * Takes a projected edge and an (vertex-id, group-representative) tuple
  * and replaces the edge-target-id with the group-representative.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3;f4;f5")
-@FunctionAnnotation.ForwardedFieldsSecond("f1->f2") // vertex id -> target id
+@FunctionAnnotation.ForwardedFieldsFirst("f0;f2;f3;f4")
+@FunctionAnnotation.ForwardedFieldsSecond("f1->f1") // vertex id -> target id
 public class UpdateEdgeGroupItem implements
   JoinFunction<EdgeGroupItem, VertexWithRepresentative, EdgeGroupItem> {
 
@@ -37,7 +37,7 @@ public class UpdateEdgeGroupItem implements
   @Override
   public EdgeGroupItem join(EdgeGroupItem edge,
     VertexWithRepresentative vertexRepresentative) throws Exception {
-    edge.setField(vertexRepresentative.getGroupRepresentative(), 2);
+    edge.setTargetId(vertexRepresentative.getGroupRepresentative());
     return edge;
   }
 }

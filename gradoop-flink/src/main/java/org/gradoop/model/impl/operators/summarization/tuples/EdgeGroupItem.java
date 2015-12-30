@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.operators.summarization.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple6;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
@@ -25,58 +25,53 @@ import org.gradoop.model.impl.properties.PropertyValueList;
 /**
  * Edge representation used in grouping edges to summarized edges.
  *
- * f0: edge id
- * f1: source vertex id
- * f2: target vertex id
- * f3: edge group label
- * f4: edge group property values
- * f5: edge group aggregate value
+ * f0: source vertex id
+ * f1: target vertex id
+ * f2: edge group label
+ * f3: edge group property values
+ * f4: edge group aggregate value
  */
 public class EdgeGroupItem
-  extends Tuple6
-  <GradoopId, GradoopId, GradoopId, String, PropertyValueList, PropertyValue> {
-
-  public EdgeGroupItem() {
-    f0 = GradoopId.MAX_VALUE;
-  }
+  extends
+  Tuple5<GradoopId, GradoopId, String, PropertyValueList, PropertyValue> {
 
   public GradoopId getSourceId() {
-    return f1;
+    return f0;
   }
 
   public void setSourceId(GradoopId sourceVertexId) {
-    f1 = sourceVertexId;
+    f0 = sourceVertexId;
   }
 
   public GradoopId getTargetId() {
-    return f2;
+    return f1;
   }
 
   public void setTargetId(GradoopId targetVertexId) {
-    f2 = targetVertexId;
+    f1 = targetVertexId;
   }
 
   public String getGroupLabel() {
-    return f3;
+    return f2;
   }
 
   public void setGroupLabel(String groupLabel) {
-    f3 = groupLabel;
+    f2 = groupLabel;
   }
 
   public PropertyValueList getGroupPropertyValues() {
-    return f4;
+    return f3;
   }
 
   public void setGroupPropertyValues(PropertyValueList groupPropertyValues) {
-    f4 = groupPropertyValues;
+    f3 = groupPropertyValues;
   }
 
   public PropertyValue getGroupAggregate() {
-    return f5;
+    return f4;
   }
 
   public void setGroupAggregate(PropertyValue value) {
-    this.f5 = value;
+    this.f4 = value;
   }
 }
