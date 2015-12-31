@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.operators.summarization.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
 
@@ -26,10 +25,23 @@ import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresent
  * Takes a projected edge and an (vertex-id, group-representative) tuple
  * and replaces the edge-target-id with the group-representative.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("f0;f2;f3;f4")
-@FunctionAnnotation.ForwardedFieldsSecond("f1->f1") // vertex id -> target id
 public class UpdateEdgeGroupItem implements
   JoinFunction<EdgeGroupItem, VertexWithRepresentative, EdgeGroupItem> {
+
+  /**
+   * Field in {@link EdgeGroupItem} which is overridden by the group
+   * representative id.
+   */
+  private final int field;
+
+  /**
+   * Creates new join function.
+   *
+   * @param field field that is overridden by the group representative
+   */
+  public UpdateEdgeGroupItem(int field) {
+    this.field = field;
+  }
 
   /**
    * {@inheritDoc}
@@ -37,7 +49,7 @@ public class UpdateEdgeGroupItem implements
   @Override
   public EdgeGroupItem join(EdgeGroupItem edge,
     VertexWithRepresentative vertexRepresentative) throws Exception {
-    edge.setTargetId(vertexRepresentative.getGroupRepresentative());
+    edge.setField(vertexRepresentative.getGroupRepresentative(), field);
     return edge;
   }
 }

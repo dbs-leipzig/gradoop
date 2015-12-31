@@ -17,28 +17,23 @@
 
 package org.gradoop.model.impl.operators.summarization.functions;
 
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
-import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 import java.util.List;
 
 /**
- * Takes an edge and a tuple (vertex-id, group-representative) as input.
- * Replaces the edge-source-id with the group-representative and outputs
- * projected edge information possibly containing the edge label and a
- * group property.
+ * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which
+ * contains only necessary information for further processing.
  *
  * @param <E> EPGM edge type
  */
-@FunctionAnnotation.ForwardedFieldsSecond("f1->f0") // vertex id -> source id
 public class BuildEdgeGroupItem<E extends EPGMEdge>
   extends BuildBase
-  implements JoinFunction<E, VertexWithRepresentative, EdgeGroupItem> {
+  implements MapFunction<E, EdgeGroupItem> {
 
   /**
    * Avoid object initialization in each call.
@@ -46,7 +41,7 @@ public class BuildEdgeGroupItem<E extends EPGMEdge>
   private final EdgeGroupItem reuseEdgeGroupItem;
 
   /**
-   * Creates join function.
+   * Creates map function.
    *
    * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be used
@@ -67,10 +62,8 @@ public class BuildEdgeGroupItem<E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public EdgeGroupItem join(
-    E edge, VertexWithRepresentative vertexRepresentative) throws Exception {
-    reuseEdgeGroupItem.setSourceId(
-      vertexRepresentative.getGroupRepresentative());
+  public EdgeGroupItem map(E edge) throws Exception {
+    reuseEdgeGroupItem.setSourceId(edge.getSourceId());
     reuseEdgeGroupItem.setTargetId(edge.getTargetId());
     reuseEdgeGroupItem.setGroupLabel(getLabel(edge));
     reuseEdgeGroupItem.setGroupPropertyValues(getGroupProperties(edge));

@@ -233,7 +233,9 @@ public abstract class BuildBase implements Serializable {
    */
   protected void setAggregate(EPGMAttributed element,
     PropertyValue value) {
-    element.setProperty(valueAggregator.getAggregatePropertyKey(), value);
+    if (doAggregate()) {
+      element.setProperty(valueAggregator.getAggregatePropertyKey(), value);
+    }
   }
 
   /**

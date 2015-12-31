@@ -25,7 +25,6 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.operators.summarization.functions.BuildEdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.functions.CombineEdgeGroupItems;
 import org.gradoop.model.impl.operators.summarization.functions.ReduceEdgeGroupItems;
@@ -287,17 +286,22 @@ public abstract class Summarization<
     LogicalGraph<G, V, E> graph,
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap) {
 
-    // join edges with vertex-group-map on vertex-id == edge-source-id
     DataSet<EdgeGroupItem> edges = graph.getEdges()
-      .join(vertexToRepresentativeMap)
-      .where(new SourceId<E>()).equalTo(0)
-      // project edges to necessary information
-      .with(new BuildEdgeGroupItem<E>(
+      // build edge group items
+      .map(new BuildEdgeGroupItem<E>(
         getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregator()))
-      // join result with vertex-group-map on edge-target-id == vertex-id
+      // join edges with vertex-group-map on source-id == vertex-id
+      .join(vertexToRepresentativeMap)
+      .where(0).equalTo(0)
+      .with(new UpdateEdgeGroupItem(0))
+      .withForwardedFieldsFirst("f1;f2;f3;f4")
+      .withForwardedFieldsSecond("f1->f0")
+      // join result with vertex-group-map on target-id == vertex-id
       .join(vertexToRepresentativeMap)
       .where(1).equalTo(0)
-      .with(new UpdateEdgeGroupItem());
+      .with(new UpdateEdgeGroupItem(1))
+      .withForwardedFieldsFirst("f0;f2;f3;f4")
+      .withForwardedFieldsSecond("f1->f1");
 
     // group + combine
     DataSet<EdgeGroupItem> combinedEdges = groupEdges(edges)
