@@ -17,10 +17,10 @@
 
 package org.gradoop.model.impl.operators.summarization;
 
-public class SummarizationGroupMapTest extends SummarizationTestBase {
+public class SummarizationGroupReduceTest extends SummarizationTestBase {
 
   @Override
   public SummarizationStrategy getStrategy() {
-    return SummarizationStrategy.GROUP_MAP;
+    return SummarizationStrategy.GROUP_REDUCE;
   }
 }

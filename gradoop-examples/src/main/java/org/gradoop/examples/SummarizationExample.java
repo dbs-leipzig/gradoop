@@ -146,7 +146,7 @@ public class SummarizationExample implements ProgramDescription {
     String edgeKey, boolean useVertexLabels, boolean useEdgeLabels) {
 
     return new Summarization.SummarizationBuilder<>()
-      .setStrategy(SummarizationStrategy.GROUP_MAP)
+      .setStrategy(SummarizationStrategy.GROUP_REDUCE)
       .addVertexGroupingKey(vertexKey)
       .addEdgeGroupingKey(edgeKey)
       .useVertexLabel(useVertexLabels)

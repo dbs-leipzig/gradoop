@@ -385,7 +385,7 @@ public class LogicalGraph
     }
 
     return callForGraph(builder
-        .setStrategy(SummarizationStrategy.GROUP_MAP)
+        .setStrategy(SummarizationStrategy.GROUP_REDUCE)
         .useVertexLabel(false)
         .useEdgeLabel(false)
         .setVertexValueAggregator(new CountAggregator())
@@ -434,7 +434,7 @@ public class LogicalGraph
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
     return callForGraph(builder
-        .setStrategy(SummarizationStrategy.GROUP_MAP)
+        .setStrategy(SummarizationStrategy.GROUP_REDUCE)
         .useVertexLabel(true)
         .useEdgeLabel(false)
         .setVertexValueAggregator(new CountAggregator())
@@ -484,7 +484,7 @@ public class LogicalGraph
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
     return callForGraph(builder
-        .setStrategy(SummarizationStrategy.GROUP_MAP)
+        .setStrategy(SummarizationStrategy.GROUP_REDUCE)
         .useVertexLabel(true)
         .useEdgeLabel(true)
         .setVertexValueAggregator(new CountAggregator())

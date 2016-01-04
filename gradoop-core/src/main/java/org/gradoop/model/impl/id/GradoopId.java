@@ -17,13 +17,18 @@
 
 package org.gradoop.model.impl.id;
 
-import org.apache.hadoop.io.Writable;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.MemorySegment;
+import org.apache.flink.types.NormalizableKey;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -36,8 +41,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @see org.gradoop.model.api.EPGMIdentifiable
  */
-public class GradoopId implements Comparable<GradoopId>,
-  WritableComparable<GradoopId>, Writable, Serializable {
+public class GradoopId
+  implements WritableComparable<GradoopId>, NormalizableKey<GradoopId> {
+
+  /**
+   * Represents a null id.
+   */
+  public static final GradoopId NULL_VALUE =
+    new GradoopId(new UUID(0L, 0L));
 
   /**
    * Highest possible Gradoop Id.
@@ -52,14 +63,14 @@ public class GradoopId implements Comparable<GradoopId>,
     new GradoopId(new UUID(Long.MIN_VALUE, Long.MIN_VALUE));
 
   /**
-   * Most significant bits of a 128-bit UUID
+   * Number of bytes to represent an id internally.
    */
-  private long mostSigBits;
+  private static final int ID_SIZE = 16;
 
   /**
-   * Least significant bits of a 128-bit UUID
+   * Internal representation
    */
-  private long leastSigBits;
+  private byte[] rawBytes = new byte[ID_SIZE];
 
   /**
    * Create a new UUID.
@@ -74,8 +85,9 @@ public class GradoopId implements Comparable<GradoopId>,
    */
   GradoopId(UUID uuid) {
     checkNotNull(uuid, "UUID was null");
-    this.mostSigBits = uuid.getMostSignificantBits();
-    this.leastSigBits = uuid.getLeastSignificantBits();
+    ByteBuffer buffer = ByteBuffer.wrap(rawBytes);
+    buffer.putLong(uuid.getMostSignificantBits());
+    buffer.putLong(uuid.getLeastSignificantBits());
   }
 
   /**
@@ -108,39 +120,52 @@ public class GradoopId implements Comparable<GradoopId>,
       return false;
     }
     GradoopId that = (GradoopId) o;
-    return mostSigBits == that.mostSigBits &&
-      leastSigBits == that.leastSigBits;
+    return Arrays.equals(rawBytes, that.rawBytes);
   }
 
   @Override
   public int hashCode() {
-    long hilo = mostSigBits ^ leastSigBits;
-    return ((int) (hilo >> 32)) ^ (int) hilo;
+    return Arrays.hashCode(rawBytes);
   }
 
   @Override
   public int compareTo(GradoopId o) {
-    return this.mostSigBits < o.mostSigBits ? -1 :
-      this.mostSigBits > o.mostSigBits ? 1 :
-        this.leastSigBits < o.leastSigBits ? -1 :
-          this.leastSigBits > o.leastSigBits ? 1 :
-            0;
+    return Bytes.compareTo(rawBytes, o.rawBytes);
   }
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeLong(mostSigBits);
-    dataOutput.writeLong(leastSigBits);
+    dataOutput.write(rawBytes);
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    this.mostSigBits = dataInput.readLong();
-    this.leastSigBits = dataInput.readLong();
+    dataInput.readFully(rawBytes);
   }
 
   @Override
   public String toString() {
-    return new UUID(mostSigBits, leastSigBits).toString();
+    ByteBuffer buffer = ByteBuffer.wrap(rawBytes);
+    return new UUID(buffer.getLong(), buffer.getLong()).toString();
+  }
+
+  @Override
+  public int getMaxNormalizedKeyLen() {
+    return ID_SIZE;
+  }
+
+  @Override
+  public void copyNormalizedKey(MemorySegment target, int offset, int len) {
+    target.put(offset, rawBytes);
+  }
+
+  @Override
+  public void write(DataOutputView out) throws IOException {
+    out.write(rawBytes);
+  }
+
+  @Override
+  public void read(DataInputView in) throws IOException {
+    in.readFully(rawBytes);
   }
 }

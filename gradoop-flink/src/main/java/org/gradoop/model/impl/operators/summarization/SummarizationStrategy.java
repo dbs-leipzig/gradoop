@@ -23,7 +23,7 @@ package org.gradoop.model.impl.operators.summarization;
  */
 public enum SummarizationStrategy {
   /**
-   * {@see SummarizationGroupMap}
+   * {@see SummarizationGroupReduce}
    */
-  GROUP_MAP
+  GROUP_REDUCE
 }

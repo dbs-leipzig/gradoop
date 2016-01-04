@@ -29,7 +29,7 @@ import org.gradoop.model.impl.properties.PropertyValueList;
  * Reduces or combines a group of {@link VertexGroupItem} instances.
  */
 @FunctionAnnotation.ForwardedFields("f0;f3;f4") // vertexId, label, properties
-public class ReduceVertexGroupItem
+public class ReduceVertexGroupItems
   extends BuildBase
   implements GroupReduceFunction<VertexGroupItem, VertexGroupItem> {
 
@@ -44,7 +44,7 @@ public class ReduceVertexGroupItem
    * @param useLabel          true, iff labels are used for grouping
    * @param vertexAggregator  aggregate function for summarized vertices
    */
-  public ReduceVertexGroupItem(boolean useLabel,
+  public ReduceVertexGroupItems(boolean useLabel,
     PropertyValueAggregator vertexAggregator) {
     super(null, useLabel, vertexAggregator);
     this.reuseVertexGroupItem = new VertexGroupItem();

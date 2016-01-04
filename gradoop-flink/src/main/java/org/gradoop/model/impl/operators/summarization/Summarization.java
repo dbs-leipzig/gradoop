@@ -507,8 +507,8 @@ public abstract class Summarization<
           "Provide vertex key(s) and/or use vertex labels for summarization.");
       }
 
-      if (strategy == SummarizationStrategy.GROUP_MAP) {
-        return new SummarizationGroupMap<>(
+      if (strategy == SummarizationStrategy.GROUP_REDUCE) {
+        return new SummarizationGroupReduce<>(
           vertexGroupingKeys, useVertexLabel, vertexValueAggregator,
           edgeGroupingKeys, useEdgeLabel, edgeValueAggregator);
       } else {

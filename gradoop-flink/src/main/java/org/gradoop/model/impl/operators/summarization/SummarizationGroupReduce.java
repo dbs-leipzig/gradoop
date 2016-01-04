@@ -27,7 +27,7 @@ import org.gradoop.model.impl.operators.summarization.functions.FilterNonCandida
 import org.gradoop.model.impl.operators.summarization.functions.FilterCandidates;
 import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedVertex;
 import org.gradoop.model.impl.operators.summarization.functions.BuildVertexWithRepresentative;
-import org.gradoop.model.impl.operators.summarization.functions.ReduceVertexGroupItem;
+import org.gradoop.model.impl.operators.summarization.functions.ReduceVertexGroupItems;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
@@ -58,7 +58,7 @@ import java.util.List;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class SummarizationGroupMap<
+public class SummarizationGroupReduce<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge>
@@ -73,7 +73,7 @@ public class SummarizationGroupMap<
    * @param useEdgeLabels           summarize on edge label true/false
    * @param edgeAggregateFunction   aggregate function for summarized edges
    */
-  SummarizationGroupMap(
+  SummarizationGroupReduce(
     List<String> vertexGroupingKeys,
     boolean useVertexLabels,
     PropertyValueAggregator vertexAggregateFunction,
@@ -102,7 +102,7 @@ public class SummarizationGroupMap<
       groupVertices(verticesForGrouping)
         // apply aggregate function
         .reduceGroup(
-          new ReduceVertexGroupItem(useVertexLabels(), getVertexAggregator()));
+          new ReduceVertexGroupItems(useVertexLabels(), getVertexAggregator()));
 
     DataSet<V> summarizedVertices = vertexGroupItems
       // filter group representative tuples
@@ -131,6 +131,6 @@ public class SummarizationGroupMap<
    */
   @Override
   public String getName() {
-    return SummarizationGroupMap.class.getName();
+    return SummarizationGroupReduce.class.getName();
   }
 }
