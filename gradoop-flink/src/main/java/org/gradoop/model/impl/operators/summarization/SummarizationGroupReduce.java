@@ -29,6 +29,8 @@ import org.gradoop.model.impl.operators.summarization.functions.BuildSummarizedV
 import org.gradoop.model.impl.operators.summarization.functions.BuildVertexWithRepresentative;
 import org.gradoop.model.impl.operators.summarization.functions.ReduceVertexGroupItems;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.PropertyValueAggregator;
+
+import org.gradoop.model.impl.operators.summarization.tuples.EdgeGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.summarization.tuples.VertexWithRepresentative;
 
@@ -39,20 +41,21 @@ import java.util.List;
  *
  * Algorithmic idea:
  *
- * 1) Map vertices to a minimal representation {@link VertexGroupItem}
+ * 1) Map vertices to a minimal representation, i.e. {@link VertexGroupItem}.
  * 2) Group vertices on label and/or property.
- * 3) Reduce group and collect one {@link VertexGroupItem} for each group
- *    element and one additional {@link VertexGroupItem} for the group that
- *    holds the group count.
+ * 3) Create a group representative for each group and collect a non-candidate
+ *    {@link VertexGroupItem} for each group element and one additional
+ *    candidate {@link VertexGroupItem} that holds the group aggregate.
  * 4) Filter output of 3)
- *    a)  tuples with group count == 0 are mapped to
- *        {@link VertexWithRepresentative}
- *    b) tuples with group count > 0 are used to build final summarized vertices
- * 5) Output of 4a) is joined with edges
- * 6) Edge source and target vertex ids are replaced by group representative.
- * 7) Edges are grouped by source and target id and optionally by label
+ *    a) non-candidate tuples are mapped to {@link VertexWithRepresentative}
+ *    b) candidate tuples are used to build final summarized vertices
+ * 5) Map edges to a minimal representation, i.e. {@link EdgeGroupItem}
+ * 6) Join edges with output of 4a) and replace source/target id with group
+ *    representative.
+ * 7) Updated edges are grouped by source and target id and optionally by label
  *    and/or edge property.
- * 8) Group reduce edges and create final summarized edges.
+ * 8) Group combine on the workers and compute aggregate.
+ * 9) Group reduce globally and create final summarized edges.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
