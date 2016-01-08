@@ -19,6 +19,7 @@ package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
@@ -47,6 +48,7 @@ import org.gradoop.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.model.impl.operators.overlap.Overlap;
 import org.gradoop.model.impl.operators.projection.Projection;
 import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
+import org.gradoop.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.model.impl.operators.summarization.Summarization.SummarizationBuilder;
 import org.gradoop.model.impl.operators.summarization.SummarizationStrategy;
 import org.gradoop.model.impl.operators.summarization.functions.aggregation.CountAggregator;
@@ -347,9 +349,40 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
+  public LogicalGraph<G, V, E> vertexInducedSubgraph(
+    FilterFunction<V> vertexFilterFunction) {
+    checkNotNull(vertexFilterFunction);
+    return callForGraph(new Subgraph<G, V, E>(vertexFilterFunction, null));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph<G, V, E> edgeInducedSubgraph(
+    FilterFunction<E> edgeFilterFunction) {
+    checkNotNull(edgeFilterFunction);
+    return callForGraph(new Subgraph<G, V, E>(null, edgeFilterFunction));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph<G, V, E> subgraph(FilterFunction<V> vertexFilterFunction,
+    FilterFunction<E> edgeFilterFunction) {
+    checkNotNull(vertexFilterFunction);
+    checkNotNull(edgeFilterFunction);
+    return callForGraph(
+      new Subgraph<G, V, E>(vertexFilterFunction, edgeFilterFunction));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
     AggregateFunction<N, G, V, E> aggregateFunc) {
-
     return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
 

@@ -20,7 +20,7 @@
 (gdbs)-[:hasMember]->(alice)
 (gdbs)-[:hasMember]->(bob)
 
-(databases)<-[:hasTag]-(gdbs)-[:hasTag]->(graphs)<-[:hasTag]-(gps)-[:hasTag]->(hadoop)
+(databases)<-[ghtd:hasTag]-(gdbs)-[ghtg1:hasTag]->(graphs)<-[ghtg2:hasTag]-(gps)-[ghth:hasTag]->(hadoop)
 
 // logical graphs
 g0:Community {interest = "Databases", vertexCount = 3} [

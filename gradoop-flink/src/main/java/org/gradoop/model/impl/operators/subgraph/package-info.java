@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains classes related to the split operator.
+ * Contains classes related to the subgraph operator.
  */
-package org.gradoop.model.impl.operators.split;
+package org.gradoop.model.impl.operators.subgraph;

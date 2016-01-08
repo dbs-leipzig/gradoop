@@ -17,6 +17,7 @@
 
 package org.gradoop.model.api.operators;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -76,6 +77,42 @@ public interface LogicalGraphOperators
    */
   LogicalGraph<G, V, E> project(ProjectionFunction<V> vertexFunction,
     ProjectionFunction<E> edgeFunction);
+
+  /**
+   * Returns the subgraph that is induced by the vertices which fulfill the
+   * given filter function.
+   *
+   * @param vertexFilterFunction vertex filter function
+   * @return vertex-induced subgraph as a new logical graph
+   */
+  LogicalGraph<G, V, E> vertexInducedSubgraph(
+    FilterFunction<V> vertexFilterFunction);
+
+  /**
+   * Returns the subgraph that is induced by the edges which fulfill the given
+   * filter function.
+   *
+   * @param edgeFilterFunction edge filter function
+   * @return edge-induced subgraph as a new logical graph
+   */
+  LogicalGraph<G, V, E> edgeInducedSubgraph(
+    FilterFunction<E> edgeFilterFunction);
+
+  /**
+   * Returns a subgraph of the logical graph which contains only those vertices
+   * and edges that fulfil the given vertex and edge filter function
+   * respectively.
+   *
+   * Note, that the operator does not verify the consistency of the resulting
+   * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
+   *
+   * @param vertexFilterFunction  vertex filter function
+   * @param edgeFilterFunction    edge filter function
+   * @return  logical graph which fulfils the given predicates and is a subgraph
+   *          of that graph
+   */
+  LogicalGraph<G, V, E> subgraph(FilterFunction<V> vertexFilterFunction,
+    FilterFunction<E> edgeFilterFunction);
 
   /**
    * Applies the given aggregate function to the logical graph and stores the
