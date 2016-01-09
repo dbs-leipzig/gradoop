@@ -98,6 +98,7 @@
         <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
         <plugin.maven-surefire.version>2.19</plugin.maven-surefire.version>
+        <plugin.maven-shade.version>2.4.2</plugin.maven-shade.version>
     </properties>
 
     <repositories>
@@ -201,6 +202,11 @@
                         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${plugin.maven-shade.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -254,7 +260,6 @@
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-server</artifactId>
                 <version>${dep.hbase.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <!-- Others -->

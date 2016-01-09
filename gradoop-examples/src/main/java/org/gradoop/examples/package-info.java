@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains Gradoop summarization example for cluster execution.
+ * Contains example Gradoop programs that can be executed on a Flink cluster.
  */
 package org.gradoop.examples;
