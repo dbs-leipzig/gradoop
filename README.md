@@ -55,7 +55,7 @@ The following table contains an overview (GC = Graph Collection, G = Logical Gra
 | Projection    | G       | G             | Graph with projected vertex and edge sets                               | Yes  |
 | Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
 | Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
-| Subraph       | G       | G             | Subgraph that fulfils given vertex and edge predicates                  | Yes  |
+| Subgraph      | G       | G             | Subgraph that fulfils given vertex and edge predicates                  | Yes  |
 | Apply         | GC      | GC            | Applies operator to each graph in collection                            | No   |
 | Reduce        | GC      | G             | Reduces collection to graph using binary operator (e.g. combine)        | Yes  |
 
