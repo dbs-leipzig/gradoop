@@ -38,6 +38,7 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.model.impl.operators.distinct.Distinct;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphData;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphElementData;
 import org.gradoop.model.impl.operators.equality.EqualityByGraphElementIds;
@@ -244,7 +245,7 @@ public class GraphCollection
    */
   @Override
   public GraphCollection<G, V, E> select(final FilterFunction<G> predicate) {
-    return new Selection<G, V, E>(predicate).execute(this);
+    return callForCollection(new Selection<G, V, E>(predicate));
   }
 
   /**
@@ -252,7 +253,7 @@ public class GraphCollection
    */
   @Override
   public GraphCollection<G, V, E> distinct() {
-    throw new NotImplementedException();
+    return callForCollection(new Distinct<G, V, E>());
   }
 
   /**
