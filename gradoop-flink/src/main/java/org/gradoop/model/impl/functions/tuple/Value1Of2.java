@@ -15,23 +15,24 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api.functions;
+package org.gradoop.model.impl.functions.tuple;
 
-import java.io.Serializable;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * Defines a function with single input and output.
+ * (f0,f1) => f0
  *
- * @param <I> input type
- * @param <O> output type
+ * @param <T0> f0 type
+ * @param <T1> f1 type
  */
-public interface UnaryFunction<I, O> extends Serializable {
-  /**
-   * Creates output from given input.
-   *
-   * @param entity some entity
-   * @return some object
-   * @throws Exception
-   */
-  O execute(I entity) throws Exception;
+@FunctionAnnotation.ForwardedFields("f1->*")
+public class Value1Of2<T0, T1>
+  implements MapFunction<Tuple2<T0, T1>, T1> {
+
+  @Override
+  public T1 map(Tuple2<T0, T1> tuple2) throws Exception {
+    return tuple2.f1;
+  }
 }

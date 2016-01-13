@@ -20,18 +20,21 @@ package org.gradoop.model.api.functions;
 import java.io.Serializable;
 
 /**
- * Defines a function with single input and output.
+ * Defines a function with two inputs and one output.
+ * Used e.g. in projection.
  *
- * @param <I> input type
+ * @param <I1> first input type
+ * @param <I2> second input type
  * @param <O> output type
  */
-public interface UnaryFunction<I, O> extends Serializable {
+public interface BinaryFunction<I1, I2, O> extends Serializable {
   /**
    * Creates output from given input.
    *
-   * @param entity some entity
+   * @param first first entity
+   * @param second second entity
    * @return some object
    * @throws Exception
    */
-  O execute(I entity) throws Exception;
+  O execute(I1 first, I2 second) throws Exception;
 }

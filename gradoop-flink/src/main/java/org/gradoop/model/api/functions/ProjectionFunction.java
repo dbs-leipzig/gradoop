@@ -25,5 +25,5 @@ import org.gradoop.model.api.EPGMElement;
  * @param <EL> EPGM element type
  */
 public interface ProjectionFunction<EL extends EPGMElement>
-  extends UnaryFunction<EL, EL> {
+  extends BinaryFunction<EL, EL, EL> {
 }
