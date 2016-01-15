@@ -41,8 +41,6 @@ public interface BinaryCollectionToValueOperator
    * @param secondCollection second input collection
    * @return operator result
    */
-  DataSet<T> execute(
-    GraphCollection<G, V, E> firstCollection,
-    GraphCollection<G, V, E> secondCollection
-  );
+  DataSet<T> execute(GraphCollection<G, V, E> firstCollection,
+    GraphCollection<G, V, E> secondCollection);
 }

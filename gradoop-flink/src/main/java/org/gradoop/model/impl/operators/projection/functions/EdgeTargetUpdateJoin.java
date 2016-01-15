@@ -17,36 +17,29 @@
 
 package org.gradoop.model.impl.operators.projection.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.functions.ProjectionFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Applies a given projection function on the input EPGM element.
+ * Joins an edges with a Tuple2 that contains the id of the original edge
+ * target in its first field and the new edge target vertex in its second.
+ * The output is an edge with updated target id.
  *
- * @param <EL> EPGM element
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class ProjectionMapper<EL extends EPGMElement>
-  implements MapFunction<EL, EL> {
-  /**
-   * Edge to edge function
-   */
-  private ProjectionFunction<EL> edgeFunc;
-
-  /**
-   * Create a new ProjectEdgesMapper
-   *
-   * @param func the edge projection function
-   */
-  public ProjectionMapper(ProjectionFunction<EL> func) {
-    this.edgeFunc = func;
-  }
+public class EdgeTargetUpdateJoin<V extends EPGMVertex, E extends EPGMEdge>
+  implements JoinFunction<E, Tuple2<GradoopId, V>, E> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public EL map(EL edge) throws Exception {
-    return edgeFunc.execute(edge);
+  public E join(E e, Tuple2<GradoopId, V> vertexTuple) throws Exception {
+    e.setTargetId(vertexTuple.f1.getId());
+    return e;
   }
 }

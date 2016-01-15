@@ -35,8 +35,8 @@ public class ProjectionTest extends GradoopFlinkTestBase {
 
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
-        "org:Ga{k=0}[(:Va{k=0})-[:ea{k=0}]->(:Va{k=0})];" +
-        "exp:Ga{k=0}[(:Vb{k=1})-[:eb{k=1}]->(:Vb{k=1})]"
+        "org:Ga{k=0}[(:Va{k=0, l=0})-[:ea{l=1}]->(:Va{l=1, m=2})];" +
+        "exp:Ga{k=0}[(:Vb{k=1, l=0})-[:eb{k=1, l=1}]->(:Vb{k=1, l=1})]"
       );
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> original = loader
@@ -63,11 +63,12 @@ public class ProjectionTest extends GradoopFlinkTestBase {
     implements ProjectionFunction<GE> {
 
     @Override
-    public GE execute(GE element) throws Exception {
-      element.setLabel(element.getLabel().replace('a', 'b'));
-      element.setProperty("k", 1);
+    public GE execute(GE oldElement, GE newElement) throws Exception {
+      newElement.setLabel(oldElement.getLabel().replace('a', 'b'));
+      newElement.setProperty("k", 1);
+      newElement.setProperty("l", oldElement.getPropertyValue("l"));
 
-      return element;
+      return newElement;
     }
   }
 }

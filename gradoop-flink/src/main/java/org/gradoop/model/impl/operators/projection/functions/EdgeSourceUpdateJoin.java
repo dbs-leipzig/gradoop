@@ -15,33 +15,31 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api.operators;
+package org.gradoop.model.impl.operators.projection.functions;
 
-import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Creates a (usually 1-element) Boolean dataset based on two input graphs.
+ * Joins an edges with a Tuple2 that contains the id of the original edge
+ * source in its first field and the new edge source vertex in its second.
+ * The output is an edge with updated source id.
  *
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
- * @param <T> value type
  */
-public interface BinaryGraphToValueOperator
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead, T>
-  extends Operator {
+public class EdgeSourceUpdateJoin<V extends EPGMVertex, E extends EPGMEdge>
+  implements JoinFunction<E, Tuple2<GradoopId, V>, E> {
 
   /**
-   * Executes the operator.
-   *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return operator result
+   * {@inheritDoc}
    */
-  DataSet<T> execute(LogicalGraph<G, V, E> firstGraph,
-    LogicalGraph<G, V, E> secondGraph);
+  @Override
+  public E join(E e, Tuple2<GradoopId, V> vertexTuple) throws Exception {
+    e.setSourceId(vertexTuple.f1.getId());
+    return e;
+  }
 }

@@ -17,6 +17,8 @@
 
 package org.gradoop.model.impl.operators.projection;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
@@ -24,7 +26,16 @@ import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Clone;
-import org.gradoop.model.impl.operators.projection.functions.ProjectionMapper;
+import org.gradoop.model.impl.functions.epgm.SourceId;
+import org.gradoop.model.impl.functions.epgm.TargetId;
+import org.gradoop.model.impl.functions.tuple.Value1Of2;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.projection.functions
+  .EdgeSourceUpdateJoin;
+import org.gradoop.model.impl.operators.projection.functions
+  .EdgeTargetUpdateJoin;
+import org.gradoop.model.impl.operators.projection.functions.ProjectionEdgeMapper;
+import org.gradoop.model.impl.operators.projection.functions.ProjectionVertexMapper;
 
 /**
  * Creates a projected version of the logical graph using the user defined
@@ -37,10 +48,12 @@ import org.gradoop.model.impl.operators.projection.functions.ProjectionMapper;
 public class Projection
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements UnaryGraphToGraphOperator<G, V, E> {
+
   /**
    * Vertex projection function.
    */
   private final ProjectionFunction<V> vertexFunc;
+
   /**
    * Edge projection function.
    */
@@ -82,14 +95,27 @@ public class Projection
   @Override
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
 
-    return LogicalGraph.fromDataSets(
-      graph.getGraphHead()
-        .map(new Clone<G>()),
-      graph.getVertices()
-        .map(new ProjectionMapper<>(getVertexFunc())),
-      graph.getEdges()
-        .map(new ProjectionMapper<>(getEdgeFunc())),
-      graph.getConfig());
+    DataSet<Tuple2<GradoopId, V>> vertexTuple = graph.getVertices().map(
+      new ProjectionVertexMapper<>(
+        graph.getConfig().getVertexFactory(),
+        getVertexFunc()));
+
+    DataSet<E> edges = graph.getEdges()
+      .map(new ProjectionEdgeMapper<E>(graph.getConfig().getEdgeFactory(),
+        getEdgeFunc()))
+      //update source vertex ids
+      .join(vertexTuple)
+      .where(new SourceId<E>()).equalTo(0)
+      .with(new EdgeSourceUpdateJoin<V, E>())
+      //update target vertex ids
+      .join(vertexTuple)
+      .where(new TargetId<E>()).equalTo(0)
+      .with(new EdgeTargetUpdateJoin<V, E>());
+
+    DataSet<V> vertices = vertexTuple.map(new Value1Of2<GradoopId, V>());
+
+    return LogicalGraph.fromDataSets(graph.getGraphHead().map(new Clone<G>()),
+      vertices, edges, graph.getConfig());
   }
 
   /**

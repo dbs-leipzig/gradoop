@@ -47,7 +47,6 @@ public interface BinaryCollectionToCollectionOperator<
    * @param secondCollection second input collection
    * @return operator result
    */
-  GraphCollection<G, V, E> execute(
-    GraphCollection<G, V, E> firstCollection,
+  GraphCollection<G, V, E> execute(GraphCollection<G, V, E> firstCollection,
     GraphCollection<G, V, E> secondCollection);
 }
