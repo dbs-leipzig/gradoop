@@ -46,6 +46,7 @@ import org.gradoop.model.impl.operators.equality.EqualityByGraphIds;
 import org.gradoop.model.impl.operators.intersection.Intersection;
 import org.gradoop.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.model.impl.operators.selection.Selection;
+import org.gradoop.model.impl.operators.limit.Limit;
 import org.gradoop.model.impl.operators.union.Union;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
@@ -268,8 +269,8 @@ public class GraphCollection
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> top(int limit) {
-    throw new NotImplementedException();
+  public GraphCollection<G, V, E> limit(int n) {
+    return callForCollection(new Limit<G, V, E>(n));
   }
 
   /**

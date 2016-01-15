@@ -41,7 +41,7 @@ The following table contains an overview (GC = Graph Collection, G = Logical Gra
 | Selection     | GC      | GC            | Filter graphs based on their attached data (i.e. label, properties)     | Yes  |
 | Distinct      | GC      | GC            | Collection with no duplicate graphs                                     | Yes  |
 | SortBy        | GC      | GC            | Collection sorted by values of a given property key                     | No   |
-| Top           | GC      | GC            | The first n elements of the input collection                            | No   |
+| Limit         | GC      | GC            | The first n arbitrary elements of the input collection                  | Yes  |
 | Union         | GC x GC | GC            | All graphs from both input collections                                  | Yes  |
 | Intersection  | GC x GC | GC            | Only graphs that exist in both collections                              | Yes  |
 | Difference    | GC x GC | GC            | Only graphs that exist only in the first collection                     | Yes  |

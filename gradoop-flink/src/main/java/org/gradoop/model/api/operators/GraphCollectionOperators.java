@@ -106,13 +106,13 @@ public interface GraphCollectionOperators
   GraphCollection<G, V, E> sortBy(String propertyKey, Order order);
 
   /**
-   * Returns the first {@code limit} logical graphs contained in that
+   * Returns the first {@code n} arbitrary logical graphs contained in that
    * collection.
    *
-   * @param limit number of graphs to return from collection
-   * @return part of graph collection
+   * @param n number of graphs to return from collection
+   * @return subset of the graph collection
    */
-  GraphCollection<G, V, E> top(int limit);
+  GraphCollection<G, V, E> limit(int n);
 
   /**
    * Applies a given unary graph to graph operator (e.g., summarize) on each
