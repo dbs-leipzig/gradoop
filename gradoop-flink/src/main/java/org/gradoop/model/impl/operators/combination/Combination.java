@@ -21,14 +21,13 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
 
 /**
- * Creates a new logical graph by combining the vertex and edge sets of two
- * input graphs. Vertex and edge equality is based on their
- * respective identifiers.
+ * Computes the overlap graph from two logical graphs or a graph collection.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -36,17 +35,21 @@ import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
  */
 public class Combination
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends BinaryGraphToGraphOperatorBase<G, V, E> {
+  implements ReducibleBinaryGraphToGraphOperator<G, V, E> {
 
   /**
-   * {@inheritDoc}
+   * Creates a new logical graph by union the vertex and edge sets of two
+   * input graphs. Vertex and edge equality is based on their respective
+   * identifiers.
+   *
+   * @param firstGraph  first input graph
+   * @param secondGraph second input graph
+   * @return combined graph
    */
   @Override
-  protected LogicalGraph<G, V, E> executeInternal(
-    LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
+  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> firstGraph,
+    LogicalGraph<G, V, E> secondGraph) {
 
-    // build distinct union of vertex sets and update graph ids at vertices
-    // cannot use Gelly union here because of missing argument for KeySelector
     DataSet<V> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
       .distinct(new Id<V>());
@@ -60,10 +63,26 @@ public class Combination
   }
 
   /**
+   * Creates a new logical graph by union the vertex and edge sets of all graph
+   * contained in the given collection.
+   *
+   * @param collection input collection
+   * @return combined graph
+   */
+  @Override
+  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
+    return LogicalGraph.fromDataSets(
+      collection.getVertices(),
+      collection.getEdges(),
+      collection.getConfig());
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public String getName() {
     return Combination.class.getName();
   }
+
 }

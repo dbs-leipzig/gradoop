@@ -25,13 +25,14 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.GraphCollectionOperators;
+import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
-import org.gradoop.model.impl.functions.epgm.ById;
+import org.gradoop.model.impl.functions.epgm.BySameId;
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.id.GradoopId;
@@ -185,7 +186,7 @@ public class GraphCollection
   public LogicalGraph<G, V, E> getGraph(final GradoopId graphID) {
     // filter vertices and edges based on given graph id
     DataSet<G> graphHead = getGraphHeads()
-      .filter(new ById<G>(graphID));
+      .filter(new BySameId<G>(graphID));
 
     DataSet<V> vertices = getVertices()
       .filter(new InGraph<V>(graphID));
@@ -287,7 +288,7 @@ public class GraphCollection
    */
   @Override
   public LogicalGraph<G, V, E> reduce(
-    UnaryCollectionToGraphOperator<G, V, E> op) {
+    ReducibleBinaryGraphToGraphOperator<G, V, E> op) {
     return callForGraph(op);
   }
 

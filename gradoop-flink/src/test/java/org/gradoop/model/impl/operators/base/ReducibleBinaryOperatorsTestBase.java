@@ -1,6 +1,5 @@
 package org.gradoop.model.impl.operators.base;
 
-import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -11,7 +10,7 @@ import org.gradoop.util.FlinkAsciiGraphLoader;
 
 import static org.junit.Assert.assertTrue;
 
-public abstract class ReduceTestBase extends GradoopFlinkTestBase {
+public abstract class ReducibleBinaryOperatorsTestBase extends BinaryGraphOperatorsTestBase {
 
   protected void checkExpectationsEqualResults(
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader,

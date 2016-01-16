@@ -125,16 +125,17 @@ public interface GraphCollectionOperators
 
   /**
    * Transforms a graph collection into a logical graph by applying a
-   * {@link UnaryCollectionToGraphOperator}.
+   * {@link BinaryGraphToGraphOperator} pairwise on the elements of the
+   * collection.
    *
-   * @param op unary graph to collection operator
+   * @param op reducible binary graph to graph operator
    * @return logical graph
    *
-   * @see org.gradoop.model.impl.operators.exclusion.ReduceExclusion
-   * @see org.gradoop.model.impl.operators.overlap.ReduceOverlap
-   * @see org.gradoop.model.impl.operators.combination.ReduceCombination
+   * @see org.gradoop.model.impl.operators.exclusion.Exclusion
+   * @see org.gradoop.model.impl.operators.overlap.Overlap
+   * @see org.gradoop.model.impl.operators.combination.Combination
    */
-  LogicalGraph<G, V, E> reduce(UnaryCollectionToGraphOperator<G, V, E> op);
+  LogicalGraph<G, V, E> reduce(ReducibleBinaryGraphToGraphOperator<G, V, E> op);
 
   //----------------------------------------------------------------------------
   // Binary operators

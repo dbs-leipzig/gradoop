@@ -15,37 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.combination;
+package org.gradoop.model.api.operators;
 
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.GraphCollection;
 
 /**
- * Combines all logical graphs of a GraphCollection into a single LogicalGraph.
+ * A marker interface for instances of {@link BinaryGraphToGraphOperator} that
+ * support the reduction of a collection to a single logical graph.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class ReduceCombination
+public interface ReducibleBinaryGraphToGraphOperator
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryCollectionToGraphOperator<G, V, E> {
-
-  @Override
-  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
-
-    return LogicalGraph.fromDataSets(
-      collection.getVertices(),
-      collection.getEdges(),
-      collection.getConfig());
-  }
-
-  @Override
-  public String getName() {
-    return ReduceCombination.class.getName();
-  }
+  extends
+  BinaryGraphToGraphOperator<G, V, E>,
+  UnaryCollectionToGraphOperator<G, V, E> {
 }

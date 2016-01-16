@@ -38,19 +38,21 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.epgm.ByDifferentId;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.epgm.TargetId;
+import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.functions.graphcontainment.NotInGraphBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.model.impl.functions.join.LeftSide;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
 
 /**
- * Creates a new logical graph containing only vertices and edges that
- * exist in the first input graph but not in the second input graph. Vertex and
- * edge equality is based on their respective identifiers.
+ * Computes the exclusion graph from two logical graphs or a graph collection.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -60,13 +62,42 @@ public class Exclusion<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge>
-  extends BinaryGraphToGraphOperatorBase<G, V, E> {
+  implements ReducibleBinaryGraphToGraphOperator<G, V, E> {
 
   /**
-   * {@inheritDoc}
+   * Graph identifier to start excluding from in a collection scenario.
+   */
+  private final GradoopId startId;
+
+  /**
+   * Creates an operator instance which can be applied on two logical graphs.
+   */
+  public Exclusion() {
+    startId = null;
+  }
+
+  /**
+   * Creates an operator instance which can be applied on a graph collection. As
+   * exclusion is not a commutative operation, a start graph needs to be set
+   * from which the remaining graphs will be excluded.
+   *
+   * @param startId graph id from which other graphs will be exluded from
+   */
+  public Exclusion(GradoopId startId) {
+    this.startId = startId;
+  }
+
+  /**
+   * Creates a new logical graph containing only vertices and edges that exist
+   * in the first input graph but not in the second input graph. Vertex and edge
+   * equality is based on their respective identifiers.
+   *
+   * @param firstGraph  first input graph
+   * @param secondGraph second input graph
+   * @return first graph without elements from second graph
    */
   @Override
-  protected LogicalGraph<G, V, E> executeInternal(
+  public LogicalGraph<G, V, E> execute(
     LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
     DataSet<GradoopId> graphId = secondGraph
@@ -91,6 +122,37 @@ public class Exclusion<
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());
+  }
+
+  /**
+   * Creates a new logical graph that contains only vertices and edges that
+   * are contained in the starting graph but not in any other graph that is part
+   * of the given collection.
+   *
+   * @param collection input collection
+   * @return excluded graph
+   */
+  @Override
+  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
+    DataSet<GradoopId> excludedGraphIds = collection.getGraphHeads()
+      .filter(new ByDifferentId<G>(startId))
+      .map(new Id<G>());
+
+    DataSet<V> vertices = collection.getVertices()
+      .filter(new InGraph<V>(startId))
+      .filter(new NotInGraphsBroadcast<V>())
+      .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);
+
+    DataSet<E> edges = collection.getEdges()
+      .filter(new InGraph<E>(startId))
+      .filter(new NotInGraphsBroadcast<E>())
+      .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);
+
+    return LogicalGraph.fromDataSets(
+      vertices,
+      edges,
+      collection.getConfig()
+    );
   }
 
   /**

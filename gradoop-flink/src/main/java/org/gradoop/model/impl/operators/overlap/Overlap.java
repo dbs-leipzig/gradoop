@@ -38,16 +38,15 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.base.BinaryGraphToGraphOperatorBase;
 
 /**
- * Creates a new logical graph containing the overlapping vertex and edge
- * sets of two input graphs. Vertex and edge equality is based on their
- * respective identifiers.
+ * Computes the overlap graph from two logical graphs or a graph collection.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -57,31 +56,76 @@ public class Overlap<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge>
-  extends BinaryGraphToGraphOperatorBase<G, V, E> {
+  implements ReducibleBinaryGraphToGraphOperator<G, V, E> {
 
   /**
-   * {@inheritDoc}
+   * Creates a new logical graph containing the overlapping vertex and edge
+   * sets of two input graphs. Vertex and edge equality is based on their
+   * respective identifiers.
+   *
+   * @param firstGraph  first input graph
+   * @param secondGraph second input graph
+   * @return graph with overlapping elements from both input graphs
    */
   @Override
-  protected LogicalGraph<G, V, E> executeInternal(
+  public LogicalGraph<G, V, E> execute(
     LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
     DataSet<GradoopId> graphIds = firstGraph.getGraphHead()
       .union(secondGraph.getGraphHead())
       .map(new Id<G>());
 
-    DataSet<V> newVertexSet = firstGraph.getVertices()
-      .filter(new InAllGraphsBroadcast<V>())
-      .withBroadcastSet(
-        graphIds, InAllGraphsBroadcast.GRAPH_IDS);
+    return LogicalGraph.fromDataSets(
+      getVertices(firstGraph.getVertices(), graphIds),
+      getEdges(firstGraph.getEdges(), graphIds),
+      firstGraph.getConfig());
+  }
 
-    DataSet<E> newEdgeSet = firstGraph.getEdges()
-      .filter(new InAllGraphsBroadcast<E>())
-      .withBroadcastSet(
-        graphIds, InAllGraphsBroadcast.GRAPH_IDS);
+  /**
+   * Creates a new logical graph containing the overlapping vertex and edge sets
+   * of the graphs contained in the given collection. Vertex and edge equality
+   * is based on their respective identifiers.
+   *
+   * @param collection input collection
+   * @return graph with overlapping elements from the input collection
+   */
+  @Override
+  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
+    DataSet<G> graphHeads = collection.getGraphHeads();
+
+    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<G>());
 
     return LogicalGraph.fromDataSets(
-      newVertexSet, newEdgeSet, firstGraph.getConfig());
+      getVertices(collection.getVertices(), graphIDs),
+      getEdges(collection.getEdges(), graphIDs),
+      collection.getConfig()
+    );
+  }
+
+  /**
+   * Filters vertices based on the given graph identifiers.
+   *
+   * @param vertices  vertices
+   * @param ids       graph identifiers
+   * @return filtered vertices
+   */
+  private DataSet<V> getVertices(DataSet<V> vertices, DataSet<GradoopId> ids) {
+    return vertices
+      .filter(new InAllGraphsBroadcast<V>())
+      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
+  }
+
+  /**
+   * Filters edges based on the given graph identifiers.
+   *
+   * @param edges edges
+   * @param ids   graph identifiers
+   * @return filtered edges
+   */
+  private DataSet<E> getEdges(DataSet<E> edges, DataSet<GradoopId> ids) {
+    return edges
+      .filter(new InAllGraphsBroadcast<E>())
+      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
   }
 
   /**
@@ -91,4 +135,6 @@ public class Overlap<
   public String getName() {
     return Overlap.class.getName();
   }
+
+
 }

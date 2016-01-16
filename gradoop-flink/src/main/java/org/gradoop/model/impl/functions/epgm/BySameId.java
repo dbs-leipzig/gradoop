@@ -22,11 +22,11 @@ import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Filters elements by id.
+ * Filters elements if their identifier is equal to the given identifier.
  *
- * @param <EL> element type
+ * @param <EL> EPGM element type
  */
-public class ById<EL extends EPGMElement> implements FilterFunction<EL> {
+public class BySameId<EL extends EPGMElement> implements FilterFunction<EL> {
 
   /**
    * id
@@ -34,10 +34,11 @@ public class ById<EL extends EPGMElement> implements FilterFunction<EL> {
   private final GradoopId id;
 
   /**
-   * constructor
-   * @param id id
+   * Creates a new filter instance
+   *
+   * @param id identifier
    */
-  public ById(GradoopId id) {
+  public BySameId(GradoopId id) {
     this.id = id;
   }
 

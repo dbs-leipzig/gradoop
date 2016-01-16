@@ -21,6 +21,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.base.BinaryGraphOperatorsTestBase;
+import org.gradoop.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -33,7 +34,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
-public class OverlapTest extends BinaryGraphOperatorsTestBase {
+public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
@@ -49,6 +50,7 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
       graph.equalsByElementIds(overlap).collect().get(0));
   }
 
+  @Test
   public void testOverlappingGraphs() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
@@ -139,5 +141,20 @@ public class OverlapTest extends BinaryGraphOperatorsTestBase {
 
     checkElementMatches(inVertices, outVertices);
     checkElementMatches(inEdges, outEdges);
+  }
+
+  @Test
+  public void testReduceCollection() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("" +
+        "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
+        "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)];" +
+        "exp12[(b)];" +
+        "exp13[];" +
+        "exp14[(a)-[e1]->(b)]"
+      );
+
+    checkExpectationsEqualResults(
+      loader, new Overlap<GraphHeadPojo, VertexPojo, EdgePojo>());
   }
 }
