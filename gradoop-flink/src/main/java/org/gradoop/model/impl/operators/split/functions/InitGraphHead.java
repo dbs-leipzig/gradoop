@@ -36,7 +36,7 @@ public class InitGraphHead<G extends EPGMGraphHead>
   /**
    * EPGMGraphHeadFactory
    */
-  private EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final EPGMGraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Constructor

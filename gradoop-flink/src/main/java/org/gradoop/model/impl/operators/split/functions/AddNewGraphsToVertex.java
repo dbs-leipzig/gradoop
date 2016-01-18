@@ -25,20 +25,20 @@ import org.gradoop.model.impl.id.GradoopId;
 import java.util.List;
 
 /**
- * Adds new graph id's to the initial vertex set
+ * Adds new graph ids to the initial vertex set
  *
  * @param <V> EPGM vertex type
  */
-public  class AddNewGraphsToVertex<V extends EPGMVertex> implements
-  JoinFunction<V, Tuple2<GradoopId, List<GradoopId>>, V> {
+public class AddNewGraphsToVertex<V extends EPGMVertex>
+  implements JoinFunction<V, Tuple2<GradoopId, List<GradoopId>>, V> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public V join(V v,
-    Tuple2<GradoopId, List<GradoopId>> tuple2) {
-    v.getGraphIds().addAll(tuple2.f1);
-    return v;
+  public V join(V vertex,
+    Tuple2<GradoopId, List<GradoopId>> vertexWithGraphIds) {
+    vertex.getGraphIds().addAll(vertexWithGraphIds.f1);
+    return vertex;
   }
 
 }

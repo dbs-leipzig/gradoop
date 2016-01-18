@@ -32,8 +32,14 @@ import org.apache.flink.api.java.tuple.Tuple2;
 public class Project2To1<T0, T1>
   implements MapFunction<Tuple2<T0, T1>, Tuple1<T1>> {
 
+  /**
+   * Reduce object instantiation
+   */
+  private final Tuple1<T1> reuseTuple = new Tuple1<>();
+
   @Override
   public Tuple1<T1> map(Tuple2<T0, T1> pair) throws Exception {
-    return new Tuple1<>(pair.f1);
+    reuseTuple.f0 = pair.f1;
+    return reuseTuple;
   }
 }

@@ -34,7 +34,7 @@ import org.gradoop.model.impl.functions.tuple.Project2To1;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.split.functions.InitGraphHead;
 import org.gradoop.model.impl.operators.split.functions.AddNewGraphsToVertex;
-import org.gradoop.model.impl.operators.split.functions.EdgeToTuple;
+import org.gradoop.model.impl.operators.split.functions.EdgeToTriple;
 import org.gradoop.model.impl.operators.split.functions.SplitValues;
 import org.gradoop.model.impl.operators.split.functions.JoinEdgeTupleWithSourceGraphs;
 import org.gradoop.model.impl.operators.split.functions.JoinEdgeTupleWithTargetGraphs;
@@ -91,20 +91,22 @@ public class Split
         .flatMap(new SplitValues<>(function));
 
     // extract the split properties into a dataset
-    DataSet<Tuple1<PropertyValue>> distinctSplitValues =
-      vertexIdWithSplitValues
-        .map(new Project2To1<GradoopId, PropertyValue>())
-        .distinct();
+    DataSet<Tuple1<PropertyValue>> distinctSplitValues = vertexIdWithSplitValues
+      .map(new Project2To1<GradoopId, PropertyValue>())
+      .distinct();
 
     // generate one new unique GraphId per distinct split property
     DataSet<Tuple2<PropertyValue, GradoopId>> splitValuesWithGraphIds =
-      distinctSplitValues.map(new PairWithNewId<PropertyValue>());
+      distinctSplitValues
+        .map(new PairWithNewId<PropertyValue>());
 
     // build a dataset of the vertex ids and the new associated graph ids
     DataSet<Tuple2<GradoopId, List<GradoopId>>> vertexIdWithGraphIds =
       vertexIdWithSplitValues
-        .join(splitValuesWithGraphIds).where(1).equalTo(0)
-        .with(new JoinVertexIdWithGraphIds()).groupBy(0)
+        .join(splitValuesWithGraphIds)
+        .where(1).equalTo(0)
+        .with(new JoinVertexIdWithGraphIds())
+        .groupBy(0)
         .reduceGroup(new MultipleGraphIdsGroupReducer());
 
     // add new graph ids to the initial vertex set
@@ -117,7 +119,7 @@ public class Split
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    // extract graph id's into a dataset
+    // extract graph ids into a dataset
     DataSet<Tuple1<GradoopId>> newGraphIds = splitValuesWithGraphIds
       .map(new Project2To1<PropertyValue, GradoopId>());
 
@@ -132,8 +134,8 @@ public class Split
 
     // construct tuples of the edges with the ids of their source and target
     // vertices
-    DataSet<Tuple3<E, GradoopId, GradoopId>> edgeSourceTarget =
-      graph.getEdges().map(new EdgeToTuple<E>());
+    DataSet<Tuple3<E, GradoopId, GradoopId>> edgeSourceTarget = graph.getEdges()
+      .map(new EdgeToTriple<E>());
 
     // replace the source vertex id by the graph list of this vertex
     DataSet<Tuple3<E, List<GradoopId>, GradoopId>> edgeGraphIdsTarget =

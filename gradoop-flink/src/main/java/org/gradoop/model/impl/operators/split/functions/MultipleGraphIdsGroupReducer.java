@@ -30,21 +30,25 @@ import java.util.List;
  * groupReduce each group of vertices into a single vertex, whose graphId set
  * contains all graphs of each origin vertex
  */
-public class MultipleGraphIdsGroupReducer implements
-  GroupReduceFunction
+public class MultipleGraphIdsGroupReducer implements GroupReduceFunction
     <Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, List<GradoopId>>> {
 
   @Override
   public void reduce(
     Iterable<Tuple2<GradoopId, GradoopId>> iterable,
     Collector<Tuple2<GradoopId, List<GradoopId>>> collector) {
-    List<Tuple2<GradoopId, GradoopId>> tuples =
-      Lists.newArrayList(iterable);
-    List<GradoopId> newGraphs = new ArrayList<>();
-    Tuple2<GradoopId, GradoopId> firstTuple = tuples.get(0);
-    for (Tuple2<GradoopId, GradoopId> tuple: tuples) {
-      newGraphs.add(tuple.f1);
+
+    boolean first = true;
+    GradoopId vertexId = null;
+    List<GradoopId> newGraphIds = Lists.newArrayList();
+
+    for (Tuple2<GradoopId, GradoopId> tuple : iterable) {
+      if (first) {
+        vertexId = tuple.f0;
+        first = false;
+      }
+      newGraphIds.add(tuple.f1);
     }
-    collector.collect(new Tuple2<>(firstTuple.f0, newGraphs));
+    collector.collect(new Tuple2<>(vertexId, newGraphIds));
   }
 }

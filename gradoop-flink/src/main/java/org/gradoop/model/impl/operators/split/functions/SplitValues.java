@@ -55,11 +55,11 @@ public class SplitValues<V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public void flatMap(V vd,
+  public void flatMap(V vertex,
     Collector<Tuple2<GradoopId, PropertyValue>> collector) throws Exception {
-    List<PropertyValue> splitKeys = function.execute(vd);
-    for (PropertyValue key : splitKeys) {
-      collector.collect(new Tuple2<>(vd.getId(), key));
+    List<PropertyValue> splitValues = function.execute(vertex);
+    for (PropertyValue value : splitValues) {
+      collector.collect(new Tuple2<>(vertex.getId(), value));
     }
   }
 }

@@ -23,13 +23,17 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Transform an edge into a Tuple3 of edge id, source vertex and
- * target id
+ * Transform an edge into a Tuple3.
+ *
+ * f0: edge identifier
+ * f1: source vertex identifier
+ * f2: target vertex identifier
  *
  * @param <E> EPGM edge type
  */
-public class EdgeToTuple<E extends EPGMEdge>
+public class EdgeToTriple<E extends EPGMEdge>
   implements MapFunction<E, Tuple3<E, GradoopId, GradoopId>> {
+
   @Override
   public Tuple3<E, GradoopId, GradoopId> map(E edge) {
     return new Tuple3<>(edge, edge.getSourceId(), edge.getTargetId());
