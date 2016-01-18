@@ -15,32 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api.functions;
+package org.gradoop.model.api.operators;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.LogicalGraph;
 
 /**
- * Describes an aggregate function as input for the
- * {@link org.gradoop.model.impl.operators.aggregation.Aggregation} operator.
+ * A marker interface for instances of {@link UnaryGraphToGraphOperator} that
+ * support the application on each element in a graph collection.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <N> result type of aggregated numeric values
  */
-public interface AggregateFunction<G extends EPGMGraphHead,
-  V extends EPGMVertex, E extends EPGMEdge, N extends Number> {
-
-  /**
-   * Defines the aggregate function.
-   *
-   * @param graph input graph
-   * @return aggregated value as 1-element dataset
-   */
-  DataSet<N> execute(LogicalGraph<G, V, E> graph);
-
+public interface ApplicableUnaryGraphToGraphOperator
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends UnaryCollectionToCollectionOperator<G, V, E> {
 }

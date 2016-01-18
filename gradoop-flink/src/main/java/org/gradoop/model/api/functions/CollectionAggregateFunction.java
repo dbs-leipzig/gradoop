@@ -18,29 +18,33 @@
 package org.gradoop.model.api.functions;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Describes an aggregate function as input for the
- * {@link org.gradoop.model.impl.operators.aggregation.Aggregation} operator.
+ * Describes an aggregate function that can be applied on a collection of graphs
+ * and computes an aggregate value for each graph contained in the collection.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  * @param <N> result type of aggregated numeric values
+ * @see CollectionAggregateFunction
  */
-public interface AggregateFunction<G extends EPGMGraphHead,
+public interface CollectionAggregateFunction<G extends EPGMGraphHead,
   V extends EPGMVertex, E extends EPGMEdge, N extends Number> {
 
   /**
-   * Defines the aggregate function.
+   * Defines the aggregate function. The input is a graph collection, the output
+   * contains a tuple for each graph contained in the collection. The tuple
+   * holds the graph identifier and the associated aggregate value (e.g. count).
    *
-   * @param graph input graph
-   * @return aggregated value as 1-element dataset
+   * @param collection input graph collection
+   * @return data set containing graph id + aggregate tuples
    */
-  DataSet<N> execute(LogicalGraph<G, V, E> graph);
-
+  DataSet<Tuple2<GradoopId, N>> execute(GraphCollection<G, V, E> collection);
 }

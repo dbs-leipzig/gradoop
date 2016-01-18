@@ -114,29 +114,6 @@ public interface GraphCollectionOperators
    */
   GraphCollection<G, V, E> limit(int n);
 
-  /**
-   * Applies a given unary graph to graph operator (e.g., summarize) on each
-   * logical graph in the graph collection.
-   *
-   * @param op unary graph to graph operator
-   * @return collection with resulting logical graphs
-   */
-  GraphCollection<G, V, E> apply(UnaryGraphToGraphOperator<G, V, E> op);
-
-  /**
-   * Transforms a graph collection into a logical graph by applying a
-   * {@link BinaryGraphToGraphOperator} pairwise on the elements of the
-   * collection.
-   *
-   * @param op reducible binary graph to graph operator
-   * @return logical graph
-   *
-   * @see org.gradoop.model.impl.operators.exclusion.Exclusion
-   * @see org.gradoop.model.impl.operators.overlap.Overlap
-   * @see org.gradoop.model.impl.operators.combination.Combination
-   */
-  LogicalGraph<G, V, E> reduce(ReducibleBinaryGraphToGraphOperator<G, V, E> op);
-
   //----------------------------------------------------------------------------
   // Binary operators
   //----------------------------------------------------------------------------
@@ -273,4 +250,28 @@ public interface GraphCollectionOperators
    */
   LogicalGraph<G, V, E> callForGraph(
     UnaryCollectionToGraphOperator<G, V, E> op);
+
+  /**
+   * Applies a given unary graph to graph operator (e.g., aggregate) on each
+   * logical graph in the graph collection.
+   *
+   * @param op applicable unary graph to graph operator
+   * @return collection with resulting logical graphs
+   */
+  GraphCollection<G, V, E> apply(
+    ApplicableUnaryGraphToGraphOperator<G, V, E> op);
+
+  /**
+   * Transforms a graph collection into a logical graph by applying a
+   * {@link BinaryGraphToGraphOperator} pairwise on the elements of the
+   * collection.
+   *
+   * @param op reducible binary graph to graph operator
+   * @return logical graph
+   *
+   * @see org.gradoop.model.impl.operators.exclusion.Exclusion
+   * @see org.gradoop.model.impl.operators.overlap.Overlap
+   * @see org.gradoop.model.impl.operators.combination.Combination
+   */
+  LogicalGraph<G, V, E> reduce(ReducibleBinaryGraphToGraphOperator<G, V, E> op);
 }

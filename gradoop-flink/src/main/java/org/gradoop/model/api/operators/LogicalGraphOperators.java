@@ -125,7 +125,7 @@ public interface LogicalGraphOperators
    * @return logical graph with additional property storing the aggregate
    */
   <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
-    AggregateFunction<N, G, V, E> aggregateFunc);
+    AggregateFunction<G, V, E, N> aggregateFunc);
 
   /**
    * Creates a new graph from a randomly chosen subset of nodes and their

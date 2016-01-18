@@ -17,40 +17,53 @@
 
 package org.gradoop.model.impl.functions.epgm;
 
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.impl.id.GradoopId;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Sets a property value of an EPGM element.
  *
- * @param <EL> EPGM element type
- * @param <T>  property type
+ * @param <EL> element type
  */
-public class PropertySetter<EL extends EPGMElement, T>
-  implements JoinFunction<EL, Tuple2<GradoopId, T>, EL> {
+public class PropertySetterBroadcast<EL extends EPGMElement>
+  extends RichMapFunction<EL, EL> {
 
   /**
-   * Property key
+   * constant string for accessing broadcast variable "property value"
+   */
+  public static final String VALUE = "value";
+
+  /**
+   * property key
    */
   private final String propertyKey;
 
   /**
-   * Creates a new instance.
-   *
-   * @param propertyKey property key to set value
+   * property value
    */
-  public PropertySetter(final String propertyKey) {
+  private Object propertyValue;
+
+  /**
+   * Constructor
+   *
+   * @param propertyKey property key
+   */
+  public PropertySetterBroadcast(String propertyKey) {
     this.propertyKey = checkNotNull(propertyKey);
   }
 
   @Override
-  public EL join(EL element, Tuple2<GradoopId, T> propertyTuple) throws
-    Exception {
-    element.setProperty(propertyKey, propertyTuple.f1);
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+    this.propertyValue = getRuntimeContext().getBroadcastVariable(VALUE).get(0);
+  }
+
+  @Override
+  public EL map(EL element) throws Exception {
+    element.setProperty(propertyKey, propertyValue);
     return element;
   }
 }

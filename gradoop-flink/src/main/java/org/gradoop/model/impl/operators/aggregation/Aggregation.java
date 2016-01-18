@@ -24,7 +24,9 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.PropertySetter;
+import org.gradoop.model.impl.functions.epgm.PropertySetterBroadcast;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Takes a logical graph and a user defined aggregate function as input. The
@@ -37,33 +39,34 @@ import org.gradoop.model.impl.functions.epgm.PropertySetter;
  * @param <N> output type of aggregate function
  */
 public class Aggregation<
-  N extends Number,
   G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge>
+  E extends EPGMEdge,
+  N extends Number>
   implements UnaryGraphToGraphOperator<G, V, E> {
 
   /**
    * Used to store aggregate result.
    */
   private final String aggregatePropertyKey;
+
   /**
-   * User defined aggregate function.
+   * User-defined aggregate function which is applied on a single logical graph.
    */
-  private final AggregateFunction<N, G, V, E> aggregationFunc;
+  private final AggregateFunction<G, V, E, N> aggregationFunction;
 
   /**
    * Creates new aggregation.
    *
    * @param aggregatePropertyKey property key to store result of {@code
-   *                             aggregationFunc}
-   * @param aggregationFunc      user defined aggregation function which gets
+   *                             aggregationFunction}
+   * @param aggregationFunction  user defined aggregation function which gets
    *                             called on the input graph
    */
   public Aggregation(final String aggregatePropertyKey,
-    AggregateFunction<N, G, V, E> aggregationFunc) {
-    this.aggregatePropertyKey = aggregatePropertyKey;
-    this.aggregationFunc = aggregationFunc;
+    final AggregateFunction<G, V, E, N> aggregationFunction) {
+    this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
+    this.aggregationFunction = checkNotNull(aggregationFunction);
   }
 
   /**
@@ -72,11 +75,11 @@ public class Aggregation<
   @Override
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
 
-    DataSet<N> aggregateValue = aggregationFunc.execute(graph);
+    DataSet<N> aggregateValue = aggregationFunction.execute(graph);
 
     DataSet<G> graphHead = graph.getGraphHead()
-      .map(new PropertySetter<G>(aggregatePropertyKey))
-      .withBroadcastSet(aggregateValue, PropertySetter.VALUE);
+      .map(new PropertySetterBroadcast<G>(aggregatePropertyKey))
+      .withBroadcastSet(aggregateValue, PropertySetterBroadcast.VALUE);
 
     return LogicalGraph.fromDataSets(
         graphHead,

@@ -1,0 +1,94 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.gradoop.model.impl.operators.aggregation;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.functions.CollectionAggregateFunction;
+import org.gradoop.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.epgm.PropertySetter;
+import org.gradoop.model.impl.id.GradoopId;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Takes a collection of logical graphs and a user defined aggregate function as
+ * input. The aggregate function is applied on each logical graph contained in
+ * the collection and the aggregate is stored as an additional property at the
+ * graphs.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ * @param <N> output type of aggregate function
+ */
+public class CollectionAggregation<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  N extends Number>
+  implements ApplicableUnaryGraphToGraphOperator<G, V, E> {
+
+  /**
+   * Used to store aggregate result.
+   */
+  private final String aggregatePropertyKey;
+
+  /**
+   * User-defined aggregate function which is applied on a graph collection.
+   */
+  private final CollectionAggregateFunction<G, V, E, N> aggregateFunction;
+
+  /**
+   * Creates a new operator instance.
+   *
+   * @param aggregatePropertyKey  property key to store aggregate value
+   * @param aggregateFunction     function to compute aggregate value
+   */
+  public CollectionAggregation(final String aggregatePropertyKey,
+    final CollectionAggregateFunction<G, V, E, N> aggregateFunction) {
+    this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
+    this.aggregateFunction = checkNotNull(aggregateFunction);
+  }
+
+  @Override
+  public GraphCollection<G, V, E> execute(GraphCollection<G, V, E> collection) {
+    DataSet<Tuple2<GradoopId, N>> aggregateValues =
+      aggregateFunction.execute(collection);
+
+    DataSet<G> graphHeads = collection.getGraphHeads()
+      .join(aggregateValues)
+      .where(new Id<G>()).equalTo(0)
+      .with(new PropertySetter<G, N>(aggregatePropertyKey));
+
+    return GraphCollection.fromDataSets(graphHeads,
+      collection.getVertices(),
+      collection.getEdges(),
+      collection.getConfig());
+  }
+
+  @Override
+  public String getName() {
+    return CollectionAggregation.class.getName();
+  }
+}

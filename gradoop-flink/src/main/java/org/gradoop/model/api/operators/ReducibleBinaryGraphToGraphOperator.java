@@ -32,6 +32,5 @@ import org.gradoop.model.api.EPGMVertex;
 public interface ReducibleBinaryGraphToGraphOperator
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends
-  BinaryGraphToGraphOperator<G, V, E>,
-  UnaryCollectionToGraphOperator<G, V, E> {
+  BinaryGraphToGraphOperator<G, V, E>, UnaryCollectionToGraphOperator<G, V, E> {
 }

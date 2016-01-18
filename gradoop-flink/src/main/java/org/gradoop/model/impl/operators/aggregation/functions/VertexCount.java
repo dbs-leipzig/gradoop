@@ -18,26 +18,52 @@
 package org.gradoop.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
+import org.gradoop.model.api.functions.CollectionAggregateFunction;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.graphcontainment.ExpandGraphs;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.count.Count;
 
 /**
- * Aggregate function returning the vertex count of a graph.
+ * Aggregate function returning the vertex count of a graph / graph collection.
  *
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class VertexCount
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements AggregateFunction<Long, G, V, E> {
+  implements
+  AggregateFunction<G, V, E, Long>, CollectionAggregateFunction<G, V, E, Long> {
 
+  /**
+   * Returns a 1-element dataset containing the vertex count of the given graph.
+   *
+   * @param graph input graph
+   * @return 1-element dataset with vertex count
+   */
   @Override
   public DataSet<Long> execute(LogicalGraph<G, V, E> graph) {
     return Count.count(graph.getVertices());
+  }
+
+  /**
+   * Returns a dataset containing graph identifiers and the corresponding vertex
+   * count.
+   *
+   * @param collection input graph collection
+   * @return dataset with graph + vertex count tuples
+   */
+  @Override
+  public DataSet<Tuple2<GradoopId, Long>> execute(
+    GraphCollection<G, V, E> collection) {
+    return Count.groupBy(
+      collection.getVertices().flatMap(new ExpandGraphs<V>()));
   }
 }

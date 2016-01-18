@@ -382,7 +382,7 @@ public class LogicalGraph
    */
   @Override
   public <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
-    AggregateFunction<N, G, V, E> aggregateFunc) {
+    AggregateFunction<G, V, E, N> aggregateFunc) {
     return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
 

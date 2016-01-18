@@ -23,12 +23,12 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.GraphCollectionOperators;
 import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
@@ -274,24 +274,6 @@ public class GraphCollection
     return callForCollection(new Limit<G, V, E>(n));
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public GraphCollection<G, V, E> apply(
-    UnaryGraphToGraphOperator<G, V, E> op) {
-    throw new NotImplementedException();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph<G, V, E> reduce(
-    ReducibleBinaryGraphToGraphOperator<G, V, E> op) {
-    return callForGraph(op);
-  }
-
   //----------------------------------------------------------------------------
   // Binary Operators
   //----------------------------------------------------------------------------
@@ -407,6 +389,24 @@ public class GraphCollection
   public LogicalGraph<G, V, E> callForGraph(
     UnaryCollectionToGraphOperator<G, V, E> op) {
     return op.execute(this);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection<G, V, E> apply(
+    ApplicableUnaryGraphToGraphOperator<G, V, E> op) {
+    return callForCollection(op);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph<G, V, E> reduce(
+    ReducibleBinaryGraphToGraphOperator<G, V, E> op) {
+    return callForGraph(op);
   }
 
   //----------------------------------------------------------------------------
