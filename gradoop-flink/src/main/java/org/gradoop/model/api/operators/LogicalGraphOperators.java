@@ -283,6 +283,24 @@ public interface LogicalGraphOperators
   LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
 
+  /**
+   * Checks, if another logical graph contains exactly the same vertices and
+   * edges (by id) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by element ids
+   */
+  DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other);
+
+  /**
+   * Checks, if another logical graph contains vertices and edges with the same
+   * attached data (i.e. label and properties) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, if equal by element data
+   */
+  DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other);
+
   //----------------------------------------------------------------------------
   // Binary Operators
   //----------------------------------------------------------------------------
@@ -320,27 +338,19 @@ public interface LogicalGraphOperators
    */
   LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph);
 
-  /**
-   * Checks, if another logical graph contains exactly the same vertices and
-   * edges (by id) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
-   */
-  DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other);
-
-  /**
-   * Checks, if another logical graph contains vertices and edges with the same
-   * attached data (i.e. label and properties) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element data
-   */
-  DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other);
-
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * Splits the graph into multiple logical graphs using the property value
+   * which is assigned to the given property key. Vertices and edges that do
+   * not have this property will be removed from the resulting collection.
+   *
+   * @param propertyKey split property key
+   * @return graph collection
+   */
+  GraphCollection<G, V, E> splitBy(String propertyKey);
 
   /**
    * Creates a logical graph using the given unary graph operator.

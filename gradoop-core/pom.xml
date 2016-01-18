@@ -66,6 +66,11 @@
             <artifactId>gdl</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+        </dependency>
+
         <!-- Test dependencies -->
 
         <!-- HBase -->

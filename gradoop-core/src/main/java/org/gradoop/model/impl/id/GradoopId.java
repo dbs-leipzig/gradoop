@@ -156,7 +156,7 @@ public class GradoopId
 
   @Override
   public void copyNormalizedKey(MemorySegment target, int offset, int len) {
-    target.put(offset, rawBytes);
+    target.put(offset, rawBytes, 0, len);
   }
 
   @Override

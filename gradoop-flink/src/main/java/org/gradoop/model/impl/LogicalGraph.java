@@ -38,6 +38,7 @@ import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
+import org.gradoop.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.model.impl.functions.graphcontainment.GraphContainmentUpdater;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
@@ -48,6 +49,7 @@ import org.gradoop.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.model.impl.operators.overlap.Overlap;
 import org.gradoop.model.impl.operators.projection.Projection;
 import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
+import org.gradoop.model.impl.operators.split.Split;
 import org.gradoop.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.model.impl.operators.summarization.Summarization.SummarizationBuilder;
 import org.gradoop.model.impl.operators.summarization.SummarizationStrategy;
@@ -323,7 +325,7 @@ public class LogicalGraph
   }
 
   //----------------------------------------------------------------------------
-  // Operators
+  // Unary Operators
   //----------------------------------------------------------------------------
 
   /**
@@ -525,6 +527,10 @@ public class LogicalGraph
         .build());
   }
 
+  //----------------------------------------------------------------------------
+  // Binary Operators
+  //----------------------------------------------------------------------------
+
   /**
    * {@inheritDoc}
    */
@@ -548,6 +554,26 @@ public class LogicalGraph
   public LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph) {
     return callForGraph(new Exclusion<G, V, E>(), otherGraph);
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other) {
+    return new EqualityByElementIds<G, V, E>().execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
+    return new EqualityByElementData<G, V, E>().execute(this, other);
+  }
+
+  //----------------------------------------------------------------------------
+  // Auxiliary Operators
+  //----------------------------------------------------------------------------
 
   /**
    * {@inheritDoc}
@@ -581,16 +607,10 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other) {
-    return new EqualityByElementIds<G, V, E>().execute(this, other);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
-    return new EqualityByElementData<G, V, E>().execute(this, other);
+  public GraphCollection<G, V, E> splitBy(String propertyKey) {
+    return callForCollection(
+      new Split<G, V, E>(
+        new PropertyGetter<V>(Lists.newArrayList(propertyKey))));
   }
 
   //----------------------------------------------------------------------------

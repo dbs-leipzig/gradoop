@@ -46,10 +46,12 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <!-- libs that are not provided by flink -->
+                                    <!-- libs that are not provided by flink binary -->
                                     <include>org.apache.hbase:hbase-common</include>
+                                    <include>org.apache.flink:flink-gelly</include>
                                     <include>org.gradoop:*</include>
                                     <include>org.s1ck:gdl</include>
+                                    <include>org.codehaus.jettison:jettison</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
@@ -61,6 +63,11 @@
 
     <dependencies>
         <!-- Compile dependencies -->
+
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-algorithms</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.gradoop</groupId>
