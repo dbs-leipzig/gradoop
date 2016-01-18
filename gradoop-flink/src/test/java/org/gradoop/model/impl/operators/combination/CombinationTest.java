@@ -20,7 +20,6 @@ package org.gradoop.model.impl.operators.combination;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.base.BinaryGraphOperatorsTestBase;
 import org.gradoop.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -166,6 +165,6 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
       );
 
     checkExpectationsEqualResults(
-      loader, new Combination<GraphHeadPojo, VertexPojo, EdgePojo>());
+      loader, new ReduceCombination<GraphHeadPojo, VertexPojo, EdgePojo>());
   }
 }

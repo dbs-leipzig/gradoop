@@ -20,7 +20,6 @@ package org.gradoop.model.impl.operators.overlap;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.base.BinaryGraphOperatorsTestBase;
 import org.gradoop.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -155,6 +154,6 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
       );
 
     checkExpectationsEqualResults(
-      loader, new Overlap<GraphHeadPojo, VertexPojo, EdgePojo>());
+      loader, new ReduceOverlap<GraphHeadPojo, VertexPojo, EdgePojo>());
   }
 }

@@ -21,13 +21,12 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 
 /**
- * Computes the overlap graph from two logical graphs or a graph collection.
+ * Computes the combined graph from two logical graphs.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -35,7 +34,7 @@ import org.gradoop.model.impl.functions.epgm.Id;
  */
 public class Combination
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements ReducibleBinaryGraphToGraphOperator<G, V, E> {
+  implements BinaryGraphToGraphOperator<G, V, E> {
 
   /**
    * Creates a new logical graph by union the vertex and edge sets of two
@@ -60,21 +59,6 @@ public class Combination
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());
-  }
-
-  /**
-   * Creates a new logical graph by union the vertex and edge sets of all graph
-   * contained in the given collection.
-   *
-   * @param collection input collection
-   * @return combined graph
-   */
-  @Override
-  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
-    return LogicalGraph.fromDataSets(
-      collection.getVertices(),
-      collection.getEdges(),
-      collection.getConfig());
   }
 
   /**

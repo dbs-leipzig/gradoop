@@ -20,7 +20,6 @@ package org.gradoop.model.impl.operators.exclusion;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.base.BinaryGraphOperatorsTestBase;
 import org.gradoop.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -154,7 +153,7 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
         "exp14[]");
 
     checkExpectationsEqualResults(
-      loader, new Exclusion<GraphHeadPojo, VertexPojo, EdgePojo>(
+      loader, new ReduceExclusion<GraphHeadPojo, VertexPojo, EdgePojo>(
         loader.getGraphHeadByVariable("g1").getId()
       ));
   }

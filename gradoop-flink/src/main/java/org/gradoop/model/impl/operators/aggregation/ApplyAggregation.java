@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <E> EPGM edge type
  * @param <N> output type of aggregate function
  */
-public class CollectionAggregation<
+public class ApplyAggregation<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
@@ -65,7 +65,7 @@ public class CollectionAggregation<
    * @param aggregatePropertyKey  property key to store aggregate value
    * @param aggregateFunction     function to compute aggregate value
    */
-  public CollectionAggregation(final String aggregatePropertyKey,
+  public ApplyAggregation(final String aggregatePropertyKey,
     final CollectionAggregateFunction<G, V, E, N> aggregateFunction) {
     this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
     this.aggregateFunction = checkNotNull(aggregateFunction);
@@ -89,6 +89,6 @@ public class CollectionAggregation<
 
   @Override
   public String getName() {
-    return CollectionAggregation.class.getName();
+    return ApplyAggregation.class.getName();
   }
 }

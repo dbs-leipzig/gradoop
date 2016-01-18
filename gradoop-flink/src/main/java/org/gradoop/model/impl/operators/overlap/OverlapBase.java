@@ -35,56 +35,46 @@
 package org.gradoop.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Computes the overlap graph from two logical graphs.
+ * Base class for overlap operators that contains common logic.
  *
- * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
+ * @see Overlap
+ * @see ReduceOverlap
  */
-public class Overlap
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends OverlapBase<V, E>
-  implements BinaryGraphToGraphOperator<G, V, E> {
+public abstract class OverlapBase
+  <V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
-   * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of two input graphs. Vertex and edge equality is based on their
-   * respective identifiers.
+   * Filters vertices based on the given graph identifiers.
    *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return graph with overlapping elements from both input graphs
+   * @param vertices  vertices
+   * @param ids       graph identifiers
+   * @return filtered vertices
    */
-  @Override
-  public LogicalGraph<G, V, E> execute(
-    LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
-
-    DataSet<GradoopId> graphIds = firstGraph.getGraphHead()
-      .union(secondGraph.getGraphHead())
-      .map(new Id<G>());
-
-    return LogicalGraph.fromDataSets(
-      getVertices(firstGraph.getVertices(), graphIds),
-      getEdges(firstGraph.getEdges(), graphIds),
-      firstGraph.getConfig());
+  protected DataSet<V> getVertices(DataSet<V> vertices,
+    DataSet<GradoopId> ids) {
+    return vertices
+      .filter(new InAllGraphsBroadcast<V>())
+      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
   }
 
   /**
-   * {@inheritDoc}
+   * Filters edges based on the given graph identifiers.
+   *
+   * @param edges edges
+   * @param ids   graph identifiers
+   * @return filtered edges
    */
-  @Override
-  public String getName() {
-    return Overlap.class.getName();
+  protected DataSet<E> getEdges(DataSet<E> edges, DataSet<GradoopId> ids) {
+    return edges
+      .filter(new InAllGraphsBroadcast<E>())
+      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
   }
-
-
 }

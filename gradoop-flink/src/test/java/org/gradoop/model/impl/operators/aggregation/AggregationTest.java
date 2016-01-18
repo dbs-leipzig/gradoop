@@ -74,8 +74,8 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
       inputCollection
-        .apply(new CollectionAggregation<>(VERTEX_COUNT, new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>()))
-        .apply(new CollectionAggregation<>(EDGE_COUNT, new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>()));
+        .apply(new ApplyAggregation<>(VERTEX_COUNT, new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>()))
+        .apply(new ApplyAggregation<>(EDGE_COUNT, new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>()));
 
     GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
