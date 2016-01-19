@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.model.api.functions.UnaryFunction;
+import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.LabelPropagation;
@@ -33,10 +33,7 @@ import org.gradoop.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.GradoopFlinkConfig;
-
-import java.util.List;
 
 /**
  * Benchmark program that works on LDBC datasets.
@@ -46,14 +43,15 @@ import java.util.List;
  * 1) Extract subgraph with:
  *    - vertex predicate: must be of type 'Person'
  *    - edge predicate: must be of type 'knows'
- * 2) Compute communities using label propagation
- * 3) Compute vertex count per community
- * 4) Select communities with a vertex count greater than 1000
- * 5) Combine those collections to a single graph*
- * 6) Summarize the subgraph using the vertex attributes 'city' and 'gender' and
+ * 2) Project vertices and edges to necessary information
+ * 3) Compute communities using label propagation
+ * 4) Compute vertex count per community
+ * 5) Select communities with a vertex count greater than 1000
+ * 6) Combine those collections to a single graph*
+ * 7) Summarize the subgraph using the vertex attributes 'city' and 'gender' and
  *    - count the number of vertices represented by each super vertex
  *    - count the number of edges represented by each super edge
- * 7) Aggregate the summarized graph:
+ * 8) Aggregate the summarized graph:
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
  */
@@ -133,7 +131,8 @@ public class SocialNetworkExample2 implements ProgramDescription {
     final String knows        = "knows";
     final String city         = "city";
     final String gender       = "gender";
-    final String label        = "birthday";
+    final String birthday     = "birthday";
+    final String label        = "label";
 
     return socialNetwork
       // 1) extract subgraph
@@ -148,29 +147,48 @@ public class SocialNetworkExample2 implements ProgramDescription {
           return edge.getLabel().equals(knows);
         }
       })
-      // 2a) compute communities
+      // 2) project to necessary information
+      .project(new ProjectionFunction<VertexPojo>() {
+        @Override
+        public VertexPojo execute(VertexPojo oldEdge, VertexPojo newEdge) throws
+          Exception {
+          newEdge.setLabel(oldEdge.getLabel());
+          newEdge.setProperty(city, oldEdge.getPropertyValue(city));
+          newEdge.setProperty(gender, oldEdge.getPropertyValue(gender));
+          newEdge.setProperty(label, oldEdge.getPropertyValue(birthday));
+          return newEdge;
+        }
+      }, new ProjectionFunction<EdgePojo>() {
+        @Override
+        public EdgePojo execute(EdgePojo oldEdge, EdgePojo newEdge) throws
+          Exception {
+          newEdge.setLabel(oldEdge.getLabel());
+          return newEdge;
+        }
+      })
+      // 3a) compute communities
       .callForGraph(
         new LabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(10, label))
-      // 2b) separate communities
+      // 3b) separate communities
       .splitBy(label)
-      // 3) compute vertex count per community
+      // 4) compute vertex count per community
       .apply(new ApplyAggregation<>(
           vertexCount, new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>()))
-      // 4) select graphs with more than 1000 vertices
+      // 5) select graphs with more than 1000 vertices
       .select(new FilterFunction<GraphHeadPojo>() {
         @Override
         public boolean filter(GraphHeadPojo graphHead) throws Exception {
           return graphHead.getPropertyValue(vertexCount).getLong() > 1000;
         }
       })
-      // 5) build a single graph from the filtered graphs
+      // 6) build a single graph from the filtered graphs
       .reduce(new ReduceCombination<GraphHeadPojo, VertexPojo, EdgePojo>())
-      // 6) summarize that graph
+      // 7) summarize that graph
       .summarize(Lists.newArrayList(city, gender))
-      // 7) count verticesG
+      // 8a) count vertices of summary graph
       .aggregate(
         vertexCount, new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>())
-      // 8) count edges
+      // 8b) count edges of summary graph
       .aggregate(
         edgeCount, new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>());
   }
@@ -178,29 +196,5 @@ public class SocialNetworkExample2 implements ProgramDescription {
   @Override
   public String getDescription() {
     return SocialNetworkExample2.class.getName();
-  }
-
-  /**
-   * Used to declare values on which the graph is split.
-   */
-  public static class SplitFunction
-    implements UnaryFunction<VertexPojo, List<PropertyValue>> {
-    /**
-     * Property key
-     */
-    private final String propertyKey;
-    /**
-     * Constructor
-     *
-     * @param propertyKey property key to select split value
-     */
-    public SplitFunction(String propertyKey) {
-      this.propertyKey = propertyKey;
-    }
-
-    @Override
-    public List<PropertyValue> execute(VertexPojo entity) throws Exception {
-      return Lists.newArrayList(entity.getPropertyValue(propertyKey));
-    }
   }
 }

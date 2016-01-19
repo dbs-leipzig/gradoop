@@ -137,16 +137,12 @@ public class Split
     DataSet<Tuple3<E, GradoopId, GradoopId>> edgeSourceTarget = graph.getEdges()
       .map(new EdgeToTriple<E>());
 
-    // replace the source vertex id by the graph list of this vertex
-    DataSet<Tuple3<E, List<GradoopId>, GradoopId>> edgeGraphIdsTarget =
+    // replace source and target id by the graph list the corresponding vertex
+    DataSet<Tuple3<E, List<GradoopId>, List<GradoopId>>> edgeGraphIdsGraphIds =
       edgeSourceTarget
         .join(vertexIdWithGraphIds)
         .where(1).equalTo(0)
-        .with(new JoinEdgeTupleWithSourceGraphs<E>());
-
-    // replace the target vertex id by the graph list of this vertex
-    DataSet<Tuple3<E, List<GradoopId>, List<GradoopId>>> edgeGraphIdsGraphIds =
-      edgeGraphIdsTarget
+        .with(new JoinEdgeTupleWithSourceGraphs<E>())
         .join(vertexIdWithGraphIds)
         .where(2).equalTo(0)
         .with(new JoinEdgeTupleWithTargetGraphs<E>());
