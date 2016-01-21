@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.model.api.functions.ModificationFunction;
 import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
@@ -148,22 +149,28 @@ public class SocialNetworkExample2 implements ProgramDescription {
         }
       })
       // 2) project to necessary information
-      .project(new ProjectionFunction<VertexPojo>() {
+      .modify(new ModificationFunction<GraphHeadPojo>() {
         @Override
-        public VertexPojo execute(VertexPojo oldEdge, VertexPojo newEdge) throws
-          Exception {
-          newEdge.setLabel(oldEdge.getLabel());
-          newEdge.setProperty(city, oldEdge.getPropertyValue(city));
-          newEdge.setProperty(gender, oldEdge.getPropertyValue(gender));
-          newEdge.setProperty(label, oldEdge.getPropertyValue(birthday));
-          return newEdge;
+        public GraphHeadPojo execute(GraphHeadPojo current,
+          GraphHeadPojo modified) throws Exception {
+          return current;
         }
-      }, new ProjectionFunction<EdgePojo>() {
+      }, new ModificationFunction<VertexPojo>() {
         @Override
-        public EdgePojo execute(EdgePojo oldEdge, EdgePojo newEdge) throws
+        public VertexPojo execute(VertexPojo current, VertexPojo modified) throws
           Exception {
-          newEdge.setLabel(oldEdge.getLabel());
-          return newEdge;
+          modified.setLabel(current.getLabel());
+          modified.setProperty(city, current.getPropertyValue(city));
+          modified.setProperty(gender, current.getPropertyValue(gender));
+          modified.setProperty(label, current.getPropertyValue(birthday));
+          return modified;
+        }
+      }, new ModificationFunction<EdgePojo>() {
+        @Override
+        public EdgePojo execute(EdgePojo current, EdgePojo modified) throws
+          Exception {
+          modified.setLabel(current.getLabel());
+          return modified;
         }
       })
       // 3a) compute communities
