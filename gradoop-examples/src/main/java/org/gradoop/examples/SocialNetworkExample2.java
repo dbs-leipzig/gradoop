@@ -23,7 +23,6 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.api.functions.ModificationFunction;
-import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.LabelPropagation;
