@@ -78,18 +78,33 @@ public class Modification
 
   @Override
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
-    GradoopFlinkConfig<G, V, E> cfg = graph.getConfig();
+    return executeInternal(
+      graph.getGraphHead(),
+      graph.getVertices(),
+      graph.getEdges(),
+      graph.getConfig());
+  }
 
-    DataSet<G> graphHead = graph.getGraphHead()
-      .map(new ModifyGraphHead<>(graphHeadModFunc, cfg.getGraphHeadFactory()));
-
-    DataSet<V> vertices = graph.getVertices()
-      .map(new ModifyVertex<>(vertexModFunc, cfg.getVertexFactory()));
-
-    DataSet<E> edges = graph.getEdges()
-      .map(new ModifyEdge<>(edgeModFunc, cfg.getEdgeFactory()));
-
-    return LogicalGraph.fromDataSets(graphHead, vertices, edges, cfg);
+  /**
+   * Applies the modification functions on the given datasets.
+   *
+   * @param graphHeads  graph heads
+   * @param vertices    vertices
+   * @param edges       edges
+   * @param config      gradoop flink config
+   * @return modified logical graph
+   */
+  protected LogicalGraph<G, V, E> executeInternal(DataSet<G> graphHeads,
+    DataSet<V> vertices, DataSet<E> edges, GradoopFlinkConfig<G, V, E> config) {
+    return LogicalGraph.fromDataSets(
+      graphHeads.map(new ModifyGraphHead<>(
+        graphHeadModFunc, config.getGraphHeadFactory())),
+      vertices.map(new ModifyVertex<>(
+        vertexModFunc, config.getVertexFactory())),
+      edges.map(new ModifyEdge<>(
+        edgeModFunc, config.getEdgeFactory())),
+      config
+    );
   }
 
   @Override

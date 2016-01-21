@@ -23,13 +23,11 @@ import static org.junit.Assert.assertEquals;
 
 public class ModificationTest extends GradoopFlinkTestBase {
 
-  private static String TEST_GRAPH = "" +
-    "org:A{k=0}[" +
-    "(:A {k=0, l=0})-[:a {l=1}]->(:B {l=1, m=2})" +
-    "];" +
-    "exp:A{k=1}[" +
-    "(:A {k=1})-[]->(:B {l=1, n=2})" +
-    "]";
+  protected static final String TEST_GRAPH = "" +
+    "g0:A  { a = 1 } [(:A { a = 1, b = 2 })-[:a { a = 1, b = 2 }]->(:B { c = 2 })]" +
+    "g1:B  { a = 2 } [(:A { a = 2, b = 2 })-[:a { a = 2, b = 2 }]->(:B { c = 3 })]" +
+    "g01:A { a = 2 } [(:A { a = 2, b = 1 })-->(:B { d = 2 })]" +
+    "g11:B { a = 3 } [(:A { a = 3, b = 1 })-->(:B { d = 3 })]";
 
   /**
    * Tests if the identifiers of the resulting elements are the same as in the
@@ -42,23 +40,26 @@ public class ModificationTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(TEST_GRAPH);
 
-    GradoopId expectedGraphHeadId = loader.getGraphHeadByVariable("org").getId();
+    List<GradoopId> expectedGraphHeadIds = Lists.newArrayList();
     List<GradoopId> expectedVertexIds = Lists.newArrayList();
-    for (VertexPojo v : loader.getVerticesByGraphVariables("org")) {
-      expectedVertexIds.add(v.getId());
-    }
     List<GradoopId> expectedEdgeIds = Lists.newArrayList();
-    for (EdgePojo e : loader.getEdgesByGraphVariables("org")) {
-      expectedEdgeIds.add(e.getId());
-    }
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      loader.getLogicalGraphByVariable("org")
-        .modify(
-          new GraphHeadModifier<GraphHeadPojo>(),
-          new VertexModifier<VertexPojo>(),
-          new EdgeModifier<EdgePojo>()
-        );
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph =
+      loader.getLogicalGraphByVariable("g0");
+
+    inputGraph.getGraphHead().map(new Id<GraphHeadPojo>()).output(
+      new LocalCollectionOutputFormat<>(expectedGraphHeadIds));
+    inputGraph.getVertices().map(new Id<VertexPojo>()).output(
+      new LocalCollectionOutputFormat<>(expectedVertexIds));
+    inputGraph.getEdges().map(new Id<EdgePojo>()).output(
+      new LocalCollectionOutputFormat<>(expectedEdgeIds));
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result = inputGraph
+      .modify(
+        new GraphHeadModifier<GraphHeadPojo>(),
+        new VertexModifier<VertexPojo>(),
+        new EdgeModifier<EdgePojo>()
+      );
 
     List<GradoopId> resultGraphHeadIds = Lists.newArrayList();
     List<GradoopId> resultVertexIds = Lists.newArrayList();
@@ -76,8 +77,7 @@ public class ModificationTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    assertEquals(expectedGraphHeadId, resultGraphHeadIds.get(0));
-
+    validateIdLists(expectedGraphHeadIds, resultGraphHeadIds);
     validateIdLists(expectedVertexIds, resultVertexIds);
     validateIdLists(expectedEdgeIds, resultEdgeIds);
   }
@@ -94,10 +94,10 @@ public class ModificationTest extends GradoopFlinkTestBase {
       getLoaderFromString(TEST_GRAPH);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> original = loader
-      .getLogicalGraphByVariable("org");
+      .getLogicalGraphByVariable("g0");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
-      .getLogicalGraphByVariable("exp");
+      .getLogicalGraphByVariable("g01");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
       result = original.modify(
@@ -114,10 +114,10 @@ public class ModificationTest extends GradoopFlinkTestBase {
     implements ModificationFunction<G> {
 
     @Override
-    public G execute(G gOld, G gNew) {
-      gNew.setLabel(gOld.getLabel());
-      gNew.setProperty("k", gOld.getPropertyValue("k").getInt() + 1L);
-      return gNew;
+    public G execute(G current, G modified) {
+      modified.setLabel(current.getLabel());
+      modified.setProperty("a", current.getPropertyValue("a").getInt() + 1L);
+      return modified;
     }
   }
 
@@ -125,15 +125,15 @@ public class ModificationTest extends GradoopFlinkTestBase {
     implements ModificationFunction<V> {
 
     @Override
-    public V execute(V vOld, V vNew) {
-      vNew.setLabel(vOld.getLabel());
-      if (vOld.getLabel().equals("B")) {
-        vNew.setProperty("l", vOld.getPropertyValue("l"));
-        vNew.setProperty("n", vOld.getPropertyValue("m"));
-      } else {
-        vNew.setProperty("k", vOld.getPropertyValue("k").getInt() + 1L);
+    public V execute(V current, V modified) {
+      modified.setLabel(current.getLabel());
+      if (current.getLabel().equals("A")) {
+        modified.setProperty("a", current.getPropertyValue("a").getInt() + 1);
+        modified.setProperty("b", current.getPropertyValue("b").getInt() - 1);
+      } else if (current.getLabel().equals("B")) {
+        modified.setProperty("d", current.getPropertyValue("c"));
       }
-      return vNew;
+      return modified;
     }
   }
 
@@ -141,9 +141,8 @@ public class ModificationTest extends GradoopFlinkTestBase {
     implements ModificationFunction<E> {
 
     @Override
-    public E execute(E eOld, E eNew) {
-      return eNew;
+    public E execute(E current, E modified) {
+      return modified;
     }
   }
-
 }
