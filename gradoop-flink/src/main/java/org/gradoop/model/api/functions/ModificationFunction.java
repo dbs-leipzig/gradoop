@@ -40,8 +40,7 @@ public interface ModificationFunction<EL extends EPGMAttributed & EPGMLabeled>
    * @param current   current element
    * @param modified  structural identical, but plain element
    * @return modified version of current element
-   * @throws Exception
    */
   @Override
-  EL execute(EL current, EL modified) throws Exception;
+  EL execute(EL current, EL modified);
 }

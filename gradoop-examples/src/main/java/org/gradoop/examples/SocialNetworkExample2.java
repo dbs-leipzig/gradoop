@@ -151,13 +151,12 @@ public class SocialNetworkExample2 implements ProgramDescription {
       .modify(new ModificationFunction<GraphHeadPojo>() {
         @Override
         public GraphHeadPojo execute(GraphHeadPojo current,
-          GraphHeadPojo modified) throws Exception {
+          GraphHeadPojo modified) {
           return current;
         }
       }, new ModificationFunction<VertexPojo>() {
         @Override
-        public VertexPojo execute(VertexPojo current, VertexPojo modified) throws
-          Exception {
+        public VertexPojo execute(VertexPojo current, VertexPojo modified) {
           modified.setLabel(current.getLabel());
           modified.setProperty(city, current.getPropertyValue(city));
           modified.setProperty(gender, current.getPropertyValue(gender));
@@ -166,8 +165,7 @@ public class SocialNetworkExample2 implements ProgramDescription {
         }
       }, new ModificationFunction<EdgePojo>() {
         @Override
-        public EdgePojo execute(EdgePojo current, EdgePojo modified) throws
-          Exception {
+        public EdgePojo execute(EdgePojo current, EdgePojo modified) {
           modified.setLabel(current.getLabel());
           return modified;
         }

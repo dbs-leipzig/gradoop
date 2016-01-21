@@ -34,7 +34,6 @@ public interface BinaryFunction<I1, I2, O> extends Serializable {
    * @param first first entity
    * @param second second entity
    * @return some object
-   * @throws Exception
    */
-  O execute(I1 first, I2 second) throws Exception;
+  O execute(I1 first, I2 second);
 }

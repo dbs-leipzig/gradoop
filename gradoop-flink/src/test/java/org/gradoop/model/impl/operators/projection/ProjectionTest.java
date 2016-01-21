@@ -60,7 +60,7 @@ public class ProjectionTest extends GradoopFlinkTestBase {
     implements ProjectionFunction<GE> {
 
     @Override
-    public GE execute(GE oldElement, GE newElement) throws Exception {
+    public GE execute(GE oldElement, GE newElement) {
       newElement.setLabel(oldElement.getLabel().replace('a', 'b'));
       newElement.setProperty("k", 1);
       newElement.setProperty("l", oldElement.getPropertyValue("l"));

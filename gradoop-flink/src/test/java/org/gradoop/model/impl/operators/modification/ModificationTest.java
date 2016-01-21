@@ -114,7 +114,7 @@ public class ModificationTest extends GradoopFlinkTestBase {
     implements ModificationFunction<G> {
 
     @Override
-    public G execute(G gOld, G gNew) throws Exception {
+    public G execute(G gOld, G gNew) {
       gNew.setLabel(gOld.getLabel());
       gNew.setProperty("k", gOld.getPropertyValue("k").getInt() + 1L);
       return gNew;
@@ -125,7 +125,7 @@ public class ModificationTest extends GradoopFlinkTestBase {
     implements ModificationFunction<V> {
 
     @Override
-    public V execute(V vOld, V vNew) throws Exception {
+    public V execute(V vOld, V vNew) {
       vNew.setLabel(vOld.getLabel());
       if (vOld.getLabel().equals("B")) {
         vNew.setProperty("l", vOld.getPropertyValue("l"));
@@ -141,7 +141,7 @@ public class ModificationTest extends GradoopFlinkTestBase {
     implements ModificationFunction<E> {
 
     @Override
-    public E execute(E eOld, E eNew) throws Exception {
+    public E execute(E eOld, E eNew) {
       return eNew;
     }
   }
