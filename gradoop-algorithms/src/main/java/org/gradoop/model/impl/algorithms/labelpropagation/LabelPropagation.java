@@ -85,8 +85,6 @@ public class LabelPropagation
    */
   @Override
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> logicalGraph) {
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
     // prepare vertex set for Gelly vertex centric iteration
     DataSet<Vertex<GradoopId, PropertyValue>> vertices =
       logicalGraph.getVertices()
@@ -98,7 +96,8 @@ public class LabelPropagation
 
     // create Gelly graph
     Graph<GradoopId, PropertyValue, NullValue> gellyGraph =
-      Graph.fromDataSet(vertices, edges, env);
+      Graph.fromDataSet(vertices, edges,
+        logicalGraph.getConfig().getExecutionEnvironment());
 
     // run Gelly vertex centric iteration
     gellyGraph = gellyGraph.runVertexCentricIteration(

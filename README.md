@@ -52,7 +52,7 @@ The following table contains an overview (GC = Graph Collection, G = Logical Gra
 | Equality      | G x G   | {true, false} | Compares graphs in terms of contained element data or identifiers       | Yes  |
 | Pattern Match | G       | GC            | Graphs that match a given graph pattern                                 | No   |
 | Aggregation   | G       | G             | Graph with result of an aggregate function as a new property            | Yes  |
-| Projection    | G       | G             | Graph with projected vertex and edge sets                               | Yes  |
+| Modification  | G       | G             | Graph with modified (graph, vertex, edge) data                          | Yes  |
 | Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
 | Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
 | Subgraph      | G       | G             | Subgraph that fulfils given vertex and edge predicates                  | Yes  |
