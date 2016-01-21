@@ -54,7 +54,6 @@ The following table contains an overview (GC = Graph Collection, G = Logical Gra
 | Aggregation   | G       | G             | Graph with result of an aggregate function as a new property            | Yes  |
 | Modification  | G       | G             | Graph with modified (graph, vertex, edge) data                          | Yes  |
 | Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
-| Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
 | Subgraph      | G       | G             | Subgraph that fulfils given vertex and edge predicates                  | Yes  |
 | Apply         | GC      | GC            | Applies operator to each graph in collection                            | No   |
 | Reduce        | GC      | G             | Reduces collection to graph using binary operator (e.g. combine)        | Yes  |
