@@ -23,6 +23,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
+import org.gradoop.model.api.functions.ModificationFunction;
 import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
@@ -71,12 +72,29 @@ public interface LogicalGraphOperators
    * Creates a projected version of the logical graph using the given vertex
    * and edge data projection functions.
    *
+   * Note that this method creates new graph head, vertex and edge instances
+   * during projection.
+   *
    * @param vertexFunction vertex data projection function
    * @param edgeFunction   edge data projection function
    * @return projected logical graph
    */
   LogicalGraph<G, V, E> project(ProjectionFunction<V> vertexFunction,
     ProjectionFunction<E> edgeFunction);
+
+  /**
+   * Modifies the elements of the logical graph using the given modification
+   * functions. The identity of the elements is preserverd.
+   *
+   * @param graphHeadModificationFunction graph head modification Function
+   * @param vertexModificationFunction    vertex modification function
+   * @param edgeModificationFunction      edge modification function
+   * @return modified logical graph
+   */
+  LogicalGraph<G, V, E> modify(
+    ModificationFunction<G> graphHeadModificationFunction,
+    ModificationFunction<V> vertexModificationFunction,
+    ModificationFunction<E> edgeModificationFunction);
 
   /**
    * Returns the subgraph that is induced by the vertices which fulfill the

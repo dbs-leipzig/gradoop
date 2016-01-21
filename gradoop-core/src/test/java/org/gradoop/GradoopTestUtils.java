@@ -24,6 +24,7 @@ import org.apache.hadoop.io.Writable;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.api.EPGMIdentifiable;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -101,6 +102,31 @@ public class GradoopTestUtils {
     InputStream inputStream =
       GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
     return AsciiGraphLoader.fromStream(inputStream, config);
+  }
+
+  /**
+   * Checks it the two collections contain the identifiers.
+   *
+   * @param collection1 first collection
+   * @param collection2 second collection
+   */
+  public static void validateIdLists(
+    Collection<GradoopId> collection1,
+    Collection<GradoopId> collection2) {
+
+    List<GradoopId> list1 = Lists.newArrayList(collection1);
+    List<GradoopId> list2 = Lists.newArrayList(collection2);
+
+    Collections.sort(list1);
+    Collections.sort(list2);
+    Iterator<GradoopId> it1 = list1.iterator();
+    Iterator<GradoopId> it2 = list2.iterator();
+
+    while(it1.hasNext()) {
+      assertTrue("id mismatch", it1.next().equals(it2.next()));
+    }
+    assertFalse("too many elements in first collection", it1.hasNext());
+    assertFalse("too many elements in second collection", it2.hasNext());
   }
 
   /**

@@ -29,6 +29,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
+import org.gradoop.model.api.functions.ModificationFunction;
 import org.gradoop.model.api.functions.PredicateFunction;
 import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
@@ -46,6 +47,7 @@ import org.gradoop.model.impl.operators.combination.Combination;
 import org.gradoop.model.impl.operators.equality.EqualityByElementData;
 import org.gradoop.model.impl.operators.equality.EqualityByElementIds;
 import org.gradoop.model.impl.operators.exclusion.Exclusion;
+import org.gradoop.model.impl.operators.modification.Modification;
 import org.gradoop.model.impl.operators.overlap.Overlap;
 import org.gradoop.model.impl.operators.projection.Projection;
 import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
@@ -345,6 +347,20 @@ public class LogicalGraph
     ProjectionFunction<E> edgeFunction) {
     return callForGraph(
       new Projection<G, V, E>(vertexFunction, edgeFunction));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph<G, V, E> modify(
+    ModificationFunction<G> graphHeadModificationFunction,
+    ModificationFunction<V> vertexModificationFunction,
+    ModificationFunction<E> edgeModificationFunction) {
+    return callForGraph(new Modification<>(
+      graphHeadModificationFunction,
+      vertexModificationFunction,
+      edgeModificationFunction));
   }
 
   /**

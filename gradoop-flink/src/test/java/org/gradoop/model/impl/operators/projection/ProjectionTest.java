@@ -53,10 +53,7 @@ public class ProjectionTest extends GradoopFlinkTestBase {
 
     collectAndAssertTrue(result.equalsByElementData(expectation));
     collectAndAssertFalse(
-      result.getGraphHead()
-        .cross(original.getGraphHead())
-        .with(new Equals<GraphHeadPojo>())
-    );
+      Equals.cross(result.getGraphHead(), original.getGraphHead()));
   }
 
   public static class TestProjection<GE extends EPGMGraphElement>
