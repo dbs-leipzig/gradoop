@@ -1,7 +1,6 @@
 package org.gradoop.model.impl.algorithms.labelpropagation;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -9,9 +8,7 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import static org.gradoop.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
-
-public class LabelPropagationTest extends GradoopFlinkTestBase {
+public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
   /**
    * Tests if the resulting graph contains vertices and edges with the same
    * associated data (i.e. the label propagation value).
@@ -78,7 +75,8 @@ public class LabelPropagationTest extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> outputGraph =
       loader.getLogicalGraphByVariable("input").callForGraph(
-        new LabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(10, "value"));
+        new GradoopLabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(
+          10, "value"));
 
     collectAndAssertTrue(outputGraph.equalsByElementData(
       loader.getLogicalGraphByVariable("result")));
@@ -143,7 +141,8 @@ public class LabelPropagationTest extends GradoopFlinkTestBase {
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> outputGraph =
       loader.getLogicalGraphByVariable("input").callForGraph(
-        new LabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(10, "value"));
+        new GradoopLabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(10,
+          "value"));
 
     collectAndAssertTrue(outputGraph.equalsByElementIds(
       loader.getLogicalGraphByVariable("result")));

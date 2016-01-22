@@ -28,12 +28,12 @@ import org.gradoop.model.impl.properties.PropertyValue;
  *
  * @param <V> EPGM vertex type
  */
-public class LPVertexJoin<V extends EPGMVertex> implements
-  JoinFunction<Vertex<GradoopId, PropertyValue>, V, V> {
+public class LPVertexJoin<V extends EPGMVertex>
+  implements JoinFunction<Vertex<GradoopId, PropertyValue>, V, V> {
   /**
    * Property key to access the label value which will be propagated
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
    * Constructor

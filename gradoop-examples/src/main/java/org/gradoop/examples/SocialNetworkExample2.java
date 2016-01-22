@@ -25,7 +25,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.api.functions.ModificationFunction;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.algorithms.labelpropagation.LabelPropagation;
+import org.gradoop.model.impl.algorithms.labelpropagation.GellyLabelPropagation;
 import org.gradoop.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.model.impl.operators.aggregation.functions.EdgeCount;
 import org.gradoop.model.impl.operators.aggregation.functions.VertexCount;
@@ -125,6 +125,13 @@ public class SocialNetworkExample2 implements ProgramDescription {
   private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
   execute(LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> socialNetwork) {
 
+    final int maxIterations   = 4;
+    // LDBC graphalytics dataset:
+    // 1    -   1000
+    // 10   -   7500
+    // 100  -  50000
+    // 1000 - 350000
+    final int minClusterSize  = 350000;
     final String vertexCount  = "vertexCount";
     final String edgeCount    = "edgeCount";
     final String person       = "person";
@@ -172,17 +179,18 @@ public class SocialNetworkExample2 implements ProgramDescription {
       })
       // 3a) compute communities
       .callForGraph(
-        new LabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(10, label))
+        new GellyLabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(
+          maxIterations, label))
       // 3b) separate communities
       .splitBy(label)
       // 4) compute vertex count per community
       .apply(new ApplyAggregation<>(
           vertexCount, new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>()))
-      // 5) select graphs with more than 1000 vertices
+      // 5) select graphs with more than minClusterSize vertices
       .select(new FilterFunction<GraphHeadPojo>() {
         @Override
-        public boolean filter(GraphHeadPojo graphHead) throws Exception {
-          return graphHead.getPropertyValue(vertexCount).getLong() > 1000;
+        public boolean filter(GraphHeadPojo g) throws Exception {
+          return g.getPropertyValue(vertexCount).getLong() > minClusterSize;
         }
       })
       // 6) build a single graph from the filtered graphs

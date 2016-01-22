@@ -28,13 +28,13 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.EdgeToGellyEdgeMapper;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPMessageFunction;
-import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPUpdateFunction;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPVertexJoin;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.VertexToGellyVertexMapper;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyValue;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Wraps {@link LabelPropagation} into the EPGM model.
@@ -54,19 +54,19 @@ import org.gradoop.model.impl.properties.PropertyValue;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class LabelPropagation
+public abstract class LabelPropagation
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements UnaryGraphToGraphOperator<G, V, E> {
 
   /**
    * Counter to define maximum number of iterations for the algorithm
    */
-  private int maxIterations;
+  private final int maxIterations;
 
   /**
    * Property key to access the label value which will be propagated
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
    * Constructor
@@ -74,9 +74,9 @@ public class LabelPropagation
    * @param maxIterations Counter to define maximal iteration for the algorithm
    * @param propertyKey   Property key to access the label value
    */
-  public LabelPropagation(int maxIterations, String propertyKey) {
+  protected LabelPropagation(int maxIterations, String propertyKey) {
     this.maxIterations = maxIterations;
-    this.propertyKey = propertyKey;
+    this.propertyKey = checkNotNull(propertyKey);
   }
 
   /**
@@ -98,14 +98,7 @@ public class LabelPropagation
       Graph.fromDataSet(vertices, edges,
         logicalGraph.getConfig().getExecutionEnvironment());
 
-    // run Gelly vertex centric iteration
-    gellyGraph = gellyGraph.runVertexCentricIteration(
-      new LPUpdateFunction(),
-      new LPMessageFunction(),
-      maxIterations);
-
-    // join labeled vertices with initial vertex set and update vertex property
-    DataSet<V> labeledVertices = gellyGraph.getVertices()
+    DataSet<V> labeledVertices = executeInternal(gellyGraph)
       .join(logicalGraph.getVertices())
       .where(0).equalTo(new Id<V>())
       .with(new LPVertexJoin<V>(propertyKey));
@@ -113,6 +106,24 @@ public class LabelPropagation
     // return labeled graph
     return LogicalGraph.fromDataSets(
       labeledVertices, logicalGraph.getEdges(), logicalGraph.getConfig());
+  }
+
+  /**
+   * Executes the label propagation and returns the updated vertex dataset.
+   *
+   * @param gellyGraph gelly graph with initialized vertices
+   * @return updated vertex set
+   */
+  protected abstract DataSet<Vertex<GradoopId, PropertyValue>>
+  executeInternal(Graph<GradoopId, PropertyValue, NullValue> gellyGraph);
+
+  /**
+   * Returns the maximum number of iterations the algorithm is executed.
+   *
+   * @return maximum number of iterations
+   */
+  protected int getMaxIterations() {
+    return maxIterations;
   }
 
   /**
