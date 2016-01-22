@@ -26,7 +26,7 @@ import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.CollectionAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.graphcontainment.ExpandGraphs;
+import org.gradoop.model.impl.functions.graphcontainment.ExpandGraphsToIds;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.count.Count;
 
@@ -64,6 +64,6 @@ public class VertexCount
   public DataSet<Tuple2<GradoopId, Long>> execute(
     GraphCollection<G, V, E> collection) {
     return Count.groupBy(
-      collection.getVertices().flatMap(new ExpandGraphs<V>()));
+      collection.getVertices().flatMap(new ExpandGraphsToIds<V>()));
   }
 }

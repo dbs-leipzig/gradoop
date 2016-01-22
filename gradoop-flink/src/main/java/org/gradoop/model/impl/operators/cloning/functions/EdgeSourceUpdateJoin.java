@@ -15,30 +15,31 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.graphcontainment;
+package org.gradoop.model.impl.operators.cloning.functions;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Takes a graph element as input and collects all graph ids the element is
- * contained in.
+ * Joins edges with a Tuple2 that contains the id of the original edge
+ * source in its first field and the id of the new edge source vertex in its
+ * second.
+ * The output is an edge with updated source id.
  *
- * graph-element -> {graph id 1, graph id 2, ..., graph id n}
- *
- * @param <GE> EPGM graph element (i.e. vertex / edge)
+ * @param <E> EPGM edge type
  */
-@FunctionAnnotation.ReadFields("graphIds")
-public class ExpandGraphs<GE extends EPGMGraphElement>
-  implements FlatMapFunction<GE, GradoopId> {
-
+@FunctionAnnotation.ForwardedFieldsSecond("f1->sourceId")
+public class EdgeSourceUpdateJoin<E extends EPGMEdge>
+  implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void flatMap(GE ge, Collector<GradoopId> collector) throws Exception {
-    for (GradoopId gradoopId : ge.getGraphIds()) {
-      collector.collect(gradoopId);
-    }
+  public E join(E e, Tuple2<GradoopId, GradoopId> vertexTuple) {
+    e.setSourceId(vertexTuple.f1);
+    return e;
   }
 }

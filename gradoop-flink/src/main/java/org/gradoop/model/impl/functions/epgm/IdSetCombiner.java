@@ -15,24 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api.functions;
+package org.gradoop.model.impl.functions.epgm;
 
-import java.io.Serializable;
+import org.apache.flink.api.common.functions.ReduceFunction;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
- * Defines a function with two inputs and one output.
+ * Reduces GradoopIdSets into a single, distinct one.
  *
- * @param <I1> first input type
- * @param <I2> second input type
- * @param <O> output type
  */
-public interface BinaryFunction<I1, I2, O> extends Serializable {
-  /**
-   * Creates output from given input.
-   *
-   * @param first first entity
-   * @param second second entity
-   * @return some object
-   */
-  O execute(I1 first, I2 second);
+public class IdSetCombiner
+  implements ReduceFunction<GradoopIdSet> {
+
+  @Override
+  public GradoopIdSet reduce(GradoopIdSet in1, GradoopIdSet in2) {
+    in1.addAll(in2);
+    return in1;
+  }
 }

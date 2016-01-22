@@ -26,7 +26,7 @@ import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.CollectionAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.graphcontainment.ExpandGraphs;
+import org.gradoop.model.impl.functions.graphcontainment.ExpandGraphsToIds;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.count.Count;
 
@@ -63,6 +63,7 @@ public class EdgeCount
   @Override
   public DataSet<Tuple2<GradoopId, Long>> execute(
     GraphCollection<G, V, E> collection) {
-    return Count.groupBy(collection.getEdges().flatMap(new ExpandGraphs<E>()));
+    return Count.groupBy(
+      collection.getEdges().flatMap(new ExpandGraphsToIds<E>()));
   }
 }

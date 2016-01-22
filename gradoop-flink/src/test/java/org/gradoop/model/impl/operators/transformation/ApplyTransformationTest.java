@@ -54,9 +54,15 @@ public class ApplyTransformationTest extends TransformationTest {
 
     getExecutionEnvironment().execute();
 
-    GradoopTestUtils.validateIdLists(expectedGraphHeadIds, resultGraphHeadIds);
-    GradoopTestUtils.validateIdLists(expectedVertexIds, resultVertexIds);
-    GradoopTestUtils.validateIdLists(expectedEdgeIds, resultEdgeIds);
+    GradoopTestUtils.validateIdEquality(
+      expectedGraphHeadIds,
+      resultGraphHeadIds);
+    GradoopTestUtils.validateIdEquality(
+      expectedVertexIds,
+      resultVertexIds);
+    GradoopTestUtils.validateIdEquality(
+      expectedEdgeIds,
+      resultEdgeIds);
   }
 
   @Test

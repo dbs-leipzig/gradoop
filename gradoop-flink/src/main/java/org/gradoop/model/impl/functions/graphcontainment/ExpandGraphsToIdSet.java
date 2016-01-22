@@ -15,32 +15,27 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.epgm;
+package org.gradoop.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
- * Creates a new {@link GradoopId} for the input element and returns both.
+ * Maps an element to a GradoopIdSet of all graph ids the element is
+ * contained in.
  *
- * @param <T>
+ * graph-element -> {graph id 1, graph id 2, ..., graph id n}
+ *
+ * @param <GE> EPGM graph element (i.e. vertex / edge)
  */
-@FunctionAnnotation.ForwardedFields("f0")
-public class PairWithNewId<T>
-  implements MapFunction<Tuple1<T>, Tuple2<T, GradoopId>> {
-
-  /**
-   * Reduce object instantiations
-   */
-  private final Tuple2<T, GradoopId> reuseTuple = new Tuple2<>();
+@FunctionAnnotation.ForwardedFields("graphIds->*")
+public class ExpandGraphsToIdSet<GE extends EPGMGraphElement>
+  implements MapFunction<GE, GradoopIdSet> {
 
   @Override
-  public Tuple2<T, GradoopId> map(Tuple1<T> input) throws Exception {
-    reuseTuple.f0 = input.f0;
-    reuseTuple.f1 = GradoopId.get();
-    return reuseTuple;
+  public GradoopIdSet map(GE ge) {
+    return ge.getGraphIds();
   }
 }

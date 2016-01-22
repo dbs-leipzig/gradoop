@@ -29,7 +29,7 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.epgm.PairWithNewId;
+import org.gradoop.model.impl.functions.epgm.PairTupleWithNewId;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.tuple.Project2To1;
 import org.gradoop.model.impl.id.GradoopId;
@@ -99,7 +99,7 @@ public class Split
     // generate one new unique GraphId per distinct split property
     DataSet<Tuple2<PropertyValue, GradoopId>> splitValuesWithGraphIds =
       distinctSplitValues
-        .map(new PairWithNewId<PropertyValue>());
+        .map(new PairTupleWithNewId<PropertyValue>());
 
     // build a dataset of the vertex ids and the new associated graph ids
     DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdWithGraphIds =

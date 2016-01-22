@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains classed related to projection.
+ * Contains classed related to cloning.
  */
-package org.gradoop.model.impl.operators.projection;
+package org.gradoop.model.impl.operators.cloning;

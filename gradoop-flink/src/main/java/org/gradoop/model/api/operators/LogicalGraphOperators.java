@@ -24,7 +24,6 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.TransformationFunction;
-import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.api.functions.PredicateFunction;
@@ -69,18 +68,13 @@ public interface LogicalGraphOperators
     PredicateFunction<LogicalGraph> predicateFunc);
 
   /**
-   * Creates a projected version of the logical graph using the given vertex
-   * and edge data projection functions.
+   * Creates a copy of the logical graph.
    *
-   * Note that this method creates new graph head, vertex and edge instances
-   * during projection.
+   * Note that this method creates new graph head, vertex and edge instances.
    *
-   * @param vertexFunction vertex data projection function
-   * @param edgeFunction   edge data projection function
    * @return projected logical graph
    */
-  LogicalGraph<G, V, E> project(ProjectionFunction<V> vertexFunction,
-    ProjectionFunction<E> edgeFunction);
+  LogicalGraph<G, V, E> copy();
 
   /**
    * Transforms the elements of the logical graph using the given transformation

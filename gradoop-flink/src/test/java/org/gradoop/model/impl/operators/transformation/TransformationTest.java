@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.gradoop.GradoopTestUtils.validateIdLists;
+import static org.gradoop.GradoopTestUtils.validateIdEquality;
 import static org.junit.Assert.assertEquals;
 
 public class TransformationTest extends GradoopFlinkTestBase {
@@ -77,9 +77,9 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    validateIdLists(expectedGraphHeadIds, resultGraphHeadIds);
-    validateIdLists(expectedVertexIds, resultVertexIds);
-    validateIdLists(expectedEdgeIds, resultEdgeIds);
+    validateIdEquality(expectedGraphHeadIds, resultGraphHeadIds);
+    validateIdEquality(expectedVertexIds, resultVertexIds);
+    validateIdEquality(expectedEdgeIds, resultEdgeIds);
   }
 
 

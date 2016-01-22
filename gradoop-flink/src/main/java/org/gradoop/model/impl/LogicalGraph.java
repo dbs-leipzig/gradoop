@@ -31,7 +31,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.api.functions.PredicateFunction;
-import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
@@ -49,7 +48,7 @@ import org.gradoop.model.impl.operators.equality.EqualityByElementIds;
 import org.gradoop.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.model.impl.operators.transformation.Transformation;
 import org.gradoop.model.impl.operators.overlap.Overlap;
-import org.gradoop.model.impl.operators.projection.Projection;
+import org.gradoop.model.impl.operators.cloning.Cloning;
 import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
 import org.gradoop.model.impl.operators.split.Split;
 import org.gradoop.model.impl.operators.subgraph.Subgraph;
@@ -343,10 +342,9 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> project(ProjectionFunction<V> vertexFunction,
-    ProjectionFunction<E> edgeFunction) {
+  public LogicalGraph<G, V, E> copy() {
     return callForGraph(
-      new Projection<G, V, E>(vertexFunction, edgeFunction));
+      new Cloning<G, V, E>());
   }
 
   /**

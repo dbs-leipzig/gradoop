@@ -15,15 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api.functions;
-
-import org.gradoop.model.api.EPGMElement;
-
 /**
- * Takes an EPGM element as input and returns an EPGM element.
- *
- * @param <EL> EPGM element type
+ * Contains all user defined functions related to the graph cloning.
  */
-public interface ProjectionFunction<EL extends EPGMElement>
-  extends BinaryFunction<EL, EL, EL> {
-}
+package org.gradoop.model.impl.operators.cloning.functions;

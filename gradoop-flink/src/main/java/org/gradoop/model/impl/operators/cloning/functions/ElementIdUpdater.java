@@ -15,31 +15,32 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.projection.functions;
+package org.gradoop.model.impl.operators.cloning.functions;
 
-import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 
+
 /**
- * Joins an edges with a Tuple2 that contains the id of the original edge
- * target in its first field and the new edge target vertex in its second.
- * The output is an edge with updated target id.
+ * Updates the id of an EPGM element in a Tuple2 by the GradoopId in the
+ * second field.
  *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * @param <EL> EPGM element type
  */
-public class EdgeTargetUpdateJoin<V extends EPGMVertex, E extends EPGMEdge>
-  implements JoinFunction<E, Tuple2<GradoopId, V>, E> {
+@FunctionAnnotation.ForwardedFieldsFirst("graphIds;label;properties")
+@FunctionAnnotation.ForwardedFieldsSecond("*->id")
+public class ElementIdUpdater<EL extends EPGMVertex>
+  implements MapFunction<Tuple2<EL, GradoopId>, EL> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public E join(E e, Tuple2<GradoopId, V> vertexTuple) throws Exception {
-    e.setTargetId(vertexTuple.f1.getId());
-    return e;
+  public EL map(Tuple2<EL, GradoopId> tuple2) {
+    tuple2.f0.setId(tuple2.f1);
+    return tuple2.f0;
   }
 }

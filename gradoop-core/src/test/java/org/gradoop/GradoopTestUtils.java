@@ -105,12 +105,12 @@ public class GradoopTestUtils {
   }
 
   /**
-   * Checks it the two collections contain the identifiers.
+   * Checks if the two collections contain the same identifiers.
    *
    * @param collection1 first collection
    * @param collection2 second collection
    */
-  public static void validateIdLists(
+  public static void validateIdEquality(
     Collection<GradoopId> collection1,
     Collection<GradoopId> collection2) {
 
@@ -127,6 +127,23 @@ public class GradoopTestUtils {
     }
     assertFalse("too many elements in first collection", it1.hasNext());
     assertFalse("too many elements in second collection", it2.hasNext());
+  }
+
+  /**
+   * Checks if no identifier is contained in both lists.
+   *
+   * @param collection1 first collection
+   * @param collection2 second collection
+   */
+  public static void validateIdInequality(
+    Collection<GradoopId> collection1,
+    Collection<GradoopId> collection2) {
+
+    for (GradoopId id1 : collection1) {
+      for (GradoopId id2 : collection2) {
+        assertFalse("id in both collections", id1.equals(id2));
+      }
+    }
   }
 
   /**
