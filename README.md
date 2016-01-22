@@ -52,7 +52,7 @@ The following table contains an overview (GC = Graph Collection, G = Logical Gra
 | Equality      | G x G   | {true, false} | Compares graphs in terms of contained element data or identifiers       | Yes  |
 | Pattern Match | G       | GC            | Graphs that match a given graph pattern                                 | No   |
 | Aggregation   | G       | G             | Graph with result of an aggregate function as a new property            | Yes  |
-| Modification  | G       | G             | Graph with modified (graph, vertex, edge) data                          | Yes  |
+| Transformation| G       | G             | Graph with transformed (graph, vertex, edge) data                       | Yes  |
 | Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
 | Subgraph      | G       | G             | Subgraph that fulfils given vertex and edge predicates                  | Yes  |
 | Apply         | GC      | GC            | Applies operator to each graph in collection                            | No   |

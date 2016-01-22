@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.modification;
+package org.gradoop.model.impl.operators.transformation;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
@@ -6,7 +6,6 @@ import org.gradoop.GradoopTestUtils;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.modification.functions.ModifyGraphHead;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -15,7 +14,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class ApplyModificationTest extends ModificationTest {
+public class ApplyTransformationTest extends TransformationTest {
 
   @Test
   public void testElementIdentity() throws Exception {
@@ -37,7 +36,7 @@ public class ApplyModificationTest extends ModificationTest {
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
-      inputCollection.apply(new ApplyModification<>(
+      inputCollection.apply(new ApplyTransformation<>(
         new GraphHeadModifier<GraphHeadPojo>(),
         new VertexModifier<VertexPojo>(),
         new EdgeModifier<EdgePojo>()));
@@ -72,7 +71,7 @@ public class ApplyModificationTest extends ModificationTest {
       loader.getGraphCollectionByVariables("g01", "g11");
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
-      inputCollection.apply(new ApplyModification<>(
+      inputCollection.apply(new ApplyTransformation<>(
         new GraphHeadModifier<GraphHeadPojo>(),
         new VertexModifier<VertexPojo>(),
         new EdgeModifier<EdgePojo>()));

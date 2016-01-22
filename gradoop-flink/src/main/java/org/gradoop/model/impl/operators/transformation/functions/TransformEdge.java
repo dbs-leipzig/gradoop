@@ -15,21 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.modification.functions;
+package org.gradoop.model.impl.operators.transformation.functions;
 
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.api.functions.ModificationFunction;
+import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Modification map function for edges.
+ * Transformation map function for edges.
  *
  * @param <E> EPGM edge type
  */
-public class ModifyEdge<E extends EPGMEdge> extends ModifyBase<E> {
+public class TransformEdge<E extends EPGMEdge> extends TransformBase<E> {
 
   /**
    * Factory to init modified edge.
@@ -39,12 +39,12 @@ public class ModifyEdge<E extends EPGMEdge> extends ModifyBase<E> {
   /**
    * Constructor
    *
-   * @param modificationFunction  edge modification function
+   * @param transformationFunction  edge modification function
    * @param edgeFactory           edge factory
    */
-  public ModifyEdge(ModificationFunction<E> modificationFunction,
+  public TransformEdge(TransformationFunction<E> transformationFunction,
     EPGMEdgeFactory<E> edgeFactory) {
-    super(modificationFunction);
+    super(transformationFunction);
     this.edgeFactory = checkNotNull(edgeFactory);
   }
 

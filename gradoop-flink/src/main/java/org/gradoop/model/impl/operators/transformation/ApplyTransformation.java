@@ -15,39 +15,39 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.modification;
+package org.gradoop.model.impl.operators.transformation;
 
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.functions.ModificationFunction;
+import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 
 /**
- * Applies the modification operator on on all logical graphs in a graph
+ * Applies the transformation operator on on all logical graphs in a graph
  * collection.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class ApplyModification
+public class ApplyTransformation
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends Modification<G, V, E>
+  extends Transformation<G, V, E>
   implements ApplicableUnaryGraphToGraphOperator<G, V, E> {
 
   /**
    * Creates a new operator instance.
    *
-   * @param graphHeadModFunc graph head modification function
-   * @param vertexModFunc    vertex modification function
-   * @param edgeModFunc      edge modification function
+   * @param graphHeadModFunc graph head transformation function
+   * @param vertexModFunc    vertex transformation function
+   * @param edgeModFunc      edge transformation function
    */
-  public ApplyModification(ModificationFunction<G> graphHeadModFunc,
-    ModificationFunction<V> vertexModFunc,
-    ModificationFunction<E> edgeModFunc) {
+  public ApplyTransformation(TransformationFunction<G> graphHeadModFunc,
+    TransformationFunction<V> vertexModFunc,
+    TransformationFunction<E> edgeModFunc) {
     super(graphHeadModFunc, vertexModFunc, edgeModFunc);
   }
 

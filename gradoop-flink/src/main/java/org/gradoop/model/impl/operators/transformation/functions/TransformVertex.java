@@ -15,21 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.modification.functions;
+package org.gradoop.model.impl.operators.transformation.functions;
 
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
-import org.gradoop.model.api.functions.ModificationFunction;
+import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Modification map function for vertices.
+ * Transformation map function for vertices.
  *
  * @param <V> EPGM vertex type
  */
-public class ModifyVertex<V extends EPGMVertex> extends ModifyBase<V> {
+public class TransformVertex<V extends EPGMVertex> extends TransformBase<V> {
 
   /**
    * Factory to init modified vertex.
@@ -39,12 +39,12 @@ public class ModifyVertex<V extends EPGMVertex> extends ModifyBase<V> {
   /**
    * Constructor
    *
-   * @param modificationFunction  vertex modification function
+   * @param transformationFunction  vertex modification function
    * @param vertexFactory         vertex factory
    */
-  public ModifyVertex(ModificationFunction<V> modificationFunction,
+  public TransformVertex(TransformationFunction<V> transformationFunction,
     EPGMVertexFactory<V> vertexFactory) {
-    super(modificationFunction);
+    super(transformationFunction);
     this.vertexFactory = checkNotNull(vertexFactory);
   }
 

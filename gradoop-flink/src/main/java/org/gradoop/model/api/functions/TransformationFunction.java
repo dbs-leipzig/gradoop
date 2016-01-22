@@ -21,26 +21,26 @@ import org.gradoop.model.api.EPGMAttributed;
 import org.gradoop.model.api.EPGMLabeled;
 
 /**
- * A modification function is applied on an EPGM element (i.e. graph head,
- * vertex and edge) to modify its data, but not its identity.
+ * A transformation function is applied on an EPGM element (i.e. graph head,
+ * vertex and edge) to transform its data, but not its identity.
  *
  * @param <EL> EPGM attributed / labeled element
  */
-public interface ModificationFunction<EL extends EPGMAttributed & EPGMLabeled>
+public interface TransformationFunction<EL extends EPGMAttributed & EPGMLabeled>
   extends BinaryFunction<EL, EL, EL> {
 
   /**
    * The method takes the current version of the element and a copy of that
    * element as input. The copy is initialized with the current structural
    * information (i.e. identifiers, graph membership, source / target
-   * identifiers). The implementation is able to modify the element by either
+   * identifiers). The implementation is able to transform the element by either
    * updating the current version and return it or by adding necessary
    * information to the new entity and return it.
    *
-   * @param current   current element
-   * @param modified  structural identical, but plain element
-   * @return modified version of current element
+   * @param current       current element
+   * @param transformed   structural identical, but plain element
+   * @return transformed element
    */
   @Override
-  EL execute(EL current, EL modified);
+  EL execute(EL current, EL transformed);
 }

@@ -18,4 +18,4 @@
 /**
  * Contains functions required for the graph modification operator.
  */
-package org.gradoop.model.impl.operators.modification.functions;
+package org.gradoop.model.impl.operators.transformation.functions;

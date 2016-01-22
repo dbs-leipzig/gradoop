@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
-import org.gradoop.model.api.functions.ModificationFunction;
+import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
@@ -83,18 +83,18 @@ public interface LogicalGraphOperators
     ProjectionFunction<E> edgeFunction);
 
   /**
-   * Modifies the elements of the logical graph using the given modification
-   * functions. The identity of the elements is preserverd.
+   * Transforms the elements of the logical graph using the given transformation
+   * functions. The identity of the elements is preserved.
    *
-   * @param graphHeadModificationFunction graph head modification Function
-   * @param vertexModificationFunction    vertex modification function
-   * @param edgeModificationFunction      edge modification function
-   * @return modified logical graph
+   * @param graphHeadTransformationFunction graph head transformation function
+   * @param vertexTransformationFunction    vertex transformation function
+   * @param edgeTransformationFunction      edge transformation function
+   * @return transformed logical graph
    */
-  LogicalGraph<G, V, E> modify(
-    ModificationFunction<G> graphHeadModificationFunction,
-    ModificationFunction<V> vertexModificationFunction,
-    ModificationFunction<E> edgeModificationFunction);
+  LogicalGraph<G, V, E> transform(
+    TransformationFunction<G> graphHeadTransformationFunction,
+    TransformationFunction<V> vertexTransformationFunction,
+    TransformationFunction<E> edgeTransformationFunction);
 
   /**
    * Returns the subgraph that is induced by the vertices which fulfill the

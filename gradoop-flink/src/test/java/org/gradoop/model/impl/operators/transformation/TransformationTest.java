@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.modification;
+package org.gradoop.model.impl.operators.transformation;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
@@ -6,7 +6,7 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.functions.ModificationFunction;
+import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
@@ -21,7 +21,7 @@ import java.util.List;
 import static org.gradoop.GradoopTestUtils.validateIdLists;
 import static org.junit.Assert.assertEquals;
 
-public class ModificationTest extends GradoopFlinkTestBase {
+public class TransformationTest extends GradoopFlinkTestBase {
 
   protected static final String TEST_GRAPH = "" +
     "g0:A  { a = 1 } [(:A { a = 1, b = 2 })-[:a { a = 1, b = 2 }]->(:B { c = 2 })]" +
@@ -55,7 +55,7 @@ public class ModificationTest extends GradoopFlinkTestBase {
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result = inputGraph
-      .modify(
+      .transform(
         new GraphHeadModifier<GraphHeadPojo>(),
         new VertexModifier<VertexPojo>(),
         new EdgeModifier<EdgePojo>()
@@ -100,7 +100,7 @@ public class ModificationTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("g01");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      result = original.modify(
+      result = original.transform(
       new GraphHeadModifier<GraphHeadPojo>(),
       new VertexModifier<VertexPojo>(),
       new EdgeModifier<EdgePojo>()
@@ -111,38 +111,38 @@ public class ModificationTest extends GradoopFlinkTestBase {
   }
 
   public static class GraphHeadModifier<G extends EPGMGraphHead>
-    implements ModificationFunction<G> {
+    implements TransformationFunction<G> {
 
     @Override
-    public G execute(G current, G modified) {
-      modified.setLabel(current.getLabel());
-      modified.setProperty("a", current.getPropertyValue("a").getInt() + 1L);
-      return modified;
+    public G execute(G current, G transformed) {
+      transformed.setLabel(current.getLabel());
+      transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1L);
+      return transformed;
     }
   }
 
   public static class VertexModifier<V extends EPGMVertex>
-    implements ModificationFunction<V> {
+    implements TransformationFunction<V> {
 
     @Override
-    public V execute(V current, V modified) {
-      modified.setLabel(current.getLabel());
+    public V execute(V current, V transformed) {
+      transformed.setLabel(current.getLabel());
       if (current.getLabel().equals("A")) {
-        modified.setProperty("a", current.getPropertyValue("a").getInt() + 1);
-        modified.setProperty("b", current.getPropertyValue("b").getInt() - 1);
+        transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
+        transformed.setProperty("b", current.getPropertyValue("b").getInt() - 1);
       } else if (current.getLabel().equals("B")) {
-        modified.setProperty("d", current.getPropertyValue("c"));
+        transformed.setProperty("d", current.getPropertyValue("c"));
       }
-      return modified;
+      return transformed;
     }
   }
 
   public static class EdgeModifier<E extends EPGMEdge>
-    implements ModificationFunction<E> {
+    implements TransformationFunction<E> {
 
     @Override
-    public E execute(E current, E modified) {
-      return modified;
+    public E execute(E current, E transformed) {
+      return transformed;
     }
   }
 }

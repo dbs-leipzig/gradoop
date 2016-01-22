@@ -15,34 +15,34 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.modification.functions;
+package org.gradoop.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.functions.ModificationFunction;
+import org.gradoop.model.api.functions.TransformationFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Initializes the current version and executes the modification function.
+ * Initializes the current version and executes the transformation function.
  *
  * @param <EL> EPGM element type
  */
-public abstract class ModifyBase<EL extends EPGMElement>
+public abstract class TransformBase<EL extends EPGMElement>
   implements MapFunction<EL, EL> {
 
   /**
    * Element modification function
    */
-  private final ModificationFunction<EL> modificationFunction;
+  private final TransformationFunction<EL> transformationFunction;
 
   /**
    * Constructor
    *
-   * @param modificationFunction element modification function
+   * @param transformationFunction element modification function
    */
-  protected ModifyBase(ModificationFunction<EL> modificationFunction) {
-    this.modificationFunction = checkNotNull(modificationFunction);
+  protected TransformBase(TransformationFunction<EL> transformationFunction) {
+    this.transformationFunction = checkNotNull(transformationFunction);
   }
 
   /**
@@ -54,7 +54,7 @@ public abstract class ModifyBase<EL extends EPGMElement>
    */
   @Override
   public EL map(EL element) throws Exception {
-    return modificationFunction.execute(element, initFrom(element));
+    return transformationFunction.execute(element, initFrom(element));
   }
 
   /**

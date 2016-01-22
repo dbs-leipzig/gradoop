@@ -15,21 +15,22 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.modification.functions;
+package org.gradoop.model.impl.operators.transformation.functions;
 
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
-import org.gradoop.model.api.functions.ModificationFunction;
+import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Modification map function for graph heads.
+ * Transformation map function for graph heads.
  *
  * @param <G> EPGM graph head type
  */
-public class ModifyGraphHead<G extends EPGMGraphHead> extends ModifyBase<G> {
+public class TransformGraphHead<G extends EPGMGraphHead> extends
+  TransformBase<G> {
 
   /**
    * Factory to init modified graph head.
@@ -39,12 +40,12 @@ public class ModifyGraphHead<G extends EPGMGraphHead> extends ModifyBase<G> {
   /**
    * Constructor
    *
-   * @param modificationFunction  graph head modification function
+   * @param transformationFunction  graph head modification function
    * @param graphHeadFactory      graph head factory
    */
-  public ModifyGraphHead(ModificationFunction<G> modificationFunction,
+  public TransformGraphHead(TransformationFunction<G> transformationFunction,
     EPGMGraphHeadFactory<G> graphHeadFactory) {
-    super(modificationFunction);
+    super(transformationFunction);
     this.graphHeadFactory = checkNotNull(graphHeadFactory);
   }
 

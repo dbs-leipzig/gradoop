@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.model.api.functions.ModificationFunction;
+import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.GellyLabelPropagation;
@@ -155,26 +155,26 @@ public class SocialNetworkExample2 implements ProgramDescription {
         }
       })
       // 2) project to necessary information
-      .modify(new ModificationFunction<GraphHeadPojo>() {
+      .transform(new TransformationFunction<GraphHeadPojo>() {
         @Override
         public GraphHeadPojo execute(GraphHeadPojo current,
-          GraphHeadPojo modified) {
+          GraphHeadPojo transformed) {
           return current;
         }
-      }, new ModificationFunction<VertexPojo>() {
+      }, new TransformationFunction<VertexPojo>() {
         @Override
-        public VertexPojo execute(VertexPojo current, VertexPojo modified) {
-          modified.setLabel(current.getLabel());
-          modified.setProperty(city, current.getPropertyValue(city));
-          modified.setProperty(gender, current.getPropertyValue(gender));
-          modified.setProperty(label, current.getPropertyValue(birthday));
-          return modified;
+        public VertexPojo execute(VertexPojo current, VertexPojo transformed) {
+          transformed.setLabel(current.getLabel());
+          transformed.setProperty(city, current.getPropertyValue(city));
+          transformed.setProperty(gender, current.getPropertyValue(gender));
+          transformed.setProperty(label, current.getPropertyValue(birthday));
+          return transformed;
         }
-      }, new ModificationFunction<EdgePojo>() {
+      }, new TransformationFunction<EdgePojo>() {
         @Override
-        public EdgePojo execute(EdgePojo current, EdgePojo modified) {
-          modified.setLabel(current.getLabel());
-          return modified;
+        public EdgePojo execute(EdgePojo current, EdgePojo transformed) {
+          transformed.setLabel(current.getLabel());
+          return transformed;
         }
       })
       // 3a) compute communities
