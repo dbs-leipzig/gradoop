@@ -53,9 +53,9 @@ import org.gradoop.model.impl.operators.projection.Projection;
 import org.gradoop.model.impl.operators.sampling.RandomNodeSampling;
 import org.gradoop.model.impl.operators.split.Split;
 import org.gradoop.model.impl.operators.subgraph.Subgraph;
-import org.gradoop.model.impl.operators.summarization.Summarization.SummarizationBuilder;
-import org.gradoop.model.impl.operators.summarization.SummarizationStrategy;
-import org.gradoop.model.impl.operators.summarization.functions.aggregation.CountAggregator;
+import org.gradoop.model.impl.operators.grouping.Grouping.GroupingBuilder;
+import org.gradoop.model.impl.operators.grouping.GroupingStrategy;
+import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.ArrayList;
@@ -414,17 +414,17 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys) {
-    return summarize(vertexGroupingKeys, null);
+  public LogicalGraph<G, V, E> groupBy(List<String> vertexGroupingKeys) {
+    return groupBy(vertexGroupingKeys, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys,
+  public LogicalGraph<G, V, E> groupBy(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys) {
-    SummarizationBuilder<G, V, E> builder = new SummarizationBuilder<>();
+    GroupingBuilder<G, V, E> builder = new GroupingBuilder<>();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -434,7 +434,7 @@ public class LogicalGraph
     }
 
     return callForGraph(builder
-        .setStrategy(SummarizationStrategy.GROUP_REDUCE)
+        .setStrategy(GroupingStrategy.GROUP_REDUCE)
         .useVertexLabel(false)
         .useEdgeLabel(false)
         .setVertexValueAggregator(new CountAggregator())
@@ -446,35 +446,35 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexLabel() {
-    return summarizeOnVertexLabel(null, null);
+  public LogicalGraph<G, V, E> groupByVertexLabel() {
+    return groupByVertexLabel(null, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexLabelAndVertexProperty(
+  public LogicalGraph<G, V, E> groupByVertexLabelAndVertexProperties(
     List<String> vertexGroupingKeys) {
-    return summarizeOnVertexLabel(vertexGroupingKeys, null);
+    return groupByVertexLabel(vertexGroupingKeys, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexLabelAndEdgeProperty(
+  public LogicalGraph<G, V, E> groupByVertexLabelAndEdgeProperties(
     List<String> edgeGroupingKeys) {
-    return summarizeOnVertexLabel(null, edgeGroupingKeys);
+    return groupByVertexLabel(null, edgeGroupingKeys);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexLabel(
+  public LogicalGraph<G, V, E> groupByVertexLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    SummarizationBuilder<G, V, E> builder = new SummarizationBuilder<>();
+    GroupingBuilder<G, V, E> builder = new GroupingBuilder<>();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -483,7 +483,7 @@ public class LogicalGraph
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
     return callForGraph(builder
-        .setStrategy(SummarizationStrategy.GROUP_REDUCE)
+        .setStrategy(GroupingStrategy.GROUP_REDUCE)
         .useVertexLabel(true)
         .useEdgeLabel(false)
         .setVertexValueAggregator(new CountAggregator())
@@ -495,36 +495,35 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel() {
-    return summarizeOnVertexAndEdgeLabel(null, null);
+  public LogicalGraph<G, V, E> groupByVertexAndEdgeLabel() {
+    return groupByVertexAndEdgeLabel(null, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E>
-  summarizeOnVertexAndEdgeLabelAndVertexProperty(
+  public LogicalGraph<G, V, E> groupByVertexAndEdgeLabelAndVertexProperties(
     List<String> vertexGroupingKeys) {
-    return summarizeOnVertexAndEdgeLabel(vertexGroupingKeys, null);
+    return groupByVertexAndEdgeLabel(vertexGroupingKeys, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+  public LogicalGraph<G, V, E> groupByVertexAndEdgeLabelAndEdgeProperties(
     List<String> edgeGroupingKeys) {
-    return summarizeOnVertexAndEdgeLabel(null, edgeGroupingKeys);
+    return groupByVertexAndEdgeLabel(null, edgeGroupingKeys);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
+  public LogicalGraph<G, V, E> groupByVertexAndEdgeLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    SummarizationBuilder<G, V, E> builder = new SummarizationBuilder<>();
+    GroupingBuilder<G, V, E> builder = new GroupingBuilder<>();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -533,7 +532,7 @@ public class LogicalGraph
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
     return callForGraph(builder
-        .setStrategy(SummarizationStrategy.GROUP_REDUCE)
+        .setStrategy(GroupingStrategy.GROUP_REDUCE)
         .useVertexLabel(true)
         .useEdgeLabel(true)
         .setVertexValueAggregator(new CountAggregator())

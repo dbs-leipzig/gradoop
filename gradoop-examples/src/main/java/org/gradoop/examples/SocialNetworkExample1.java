@@ -39,10 +39,10 @@ import org.gradoop.util.GradoopFlinkConfig;
  * 1) Extract subgraph with:
  *    - vertex predicate: must be of type 'Person'
  *    - edge predicate: must be of type 'knows'
- * 2) Summarize the subgraph using the vertex attributes 'city' and 'gender' and
+ * 2) Group the subgraph using the vertex attributes 'city' and 'gender' and
  *    - count the number of vertices represented by each super vertex
  *    - count the number of edges represented by each super edge
- * 3) Aggregate the summarized graph:
+ * 3) Aggregate the grouped graph:
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
  */
@@ -129,7 +129,7 @@ public class SocialNetworkExample1 implements ProgramDescription {
             return edge.getLabel().equals("knows");
           }
         })
-      .summarize(Lists.newArrayList("gender", "city"))
+      .groupBy(Lists.newArrayList("gender", "city"))
       .aggregate(
         "vertexCount",
         new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>())

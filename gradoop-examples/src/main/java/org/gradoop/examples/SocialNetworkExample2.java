@@ -43,15 +43,15 @@ import org.gradoop.util.GradoopFlinkConfig;
  * 1) Extract subgraph with:
  *    - vertex predicate: must be of type 'Person'
  *    - edge predicate: must be of type 'knows'
- * 2) Project vertices and edges to necessary information
+ * 2) Transform vertices and edges to necessary information
  * 3) Compute communities using label propagation
  * 4) Compute vertex count per community
- * 5) Select communities with a vertex count greater than 1000
- * 6) Combine those collections to a single graph*
- * 7) Summarize the subgraph using the vertex attributes 'city' and 'gender' and
+ * 5) Select communities with a vertex count greater than a given threshold
+ * 6) Combine the remaining graphs to a single graph
+ * 7) Group the graph using the vertex attributes 'city' and 'gender' and
  *    - count the number of vertices represented by each super vertex
  *    - count the number of edges represented by each super edge
- * 8) Aggregate the summarized graph:
+ * 8) Aggregate the grouped graph:
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
  */
@@ -193,14 +193,14 @@ public class SocialNetworkExample2 implements ProgramDescription {
           return g.getPropertyValue(vertexCount).getLong() > minClusterSize;
         }
       })
-      // 6) build a single graph from the filtered graphs
+      // 6) reduce filtered graphs to a single graph using combination
       .reduce(new ReduceCombination<GraphHeadPojo, VertexPojo, EdgePojo>())
-      // 7) summarize that graph
-      .summarize(Lists.newArrayList(city, gender))
-      // 8a) count vertices of summary graph
+      // 7) group that graph by vertex properties
+      .groupBy(Lists.newArrayList(city, gender))
+      // 8a) count vertices of grouped graph
       .aggregate(
         vertexCount, new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>())
-      // 8b) count edges of summary graph
+      // 8b) count edges of grouped graph
       .aggregate(
         edgeCount, new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>());
   }

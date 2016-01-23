@@ -32,31 +32,53 @@ properties even if they have the same label.
 ### Graph operators
 
 The EPGM provides operators for both single logical graphs as well as collections 
-of logical graphs; operators may also return single graphs or graph collections.
+of logical graphs; operators may also return single graphs or graph collections. 
+The following tables contains an overview (GC = Graph Collection, G = Logical Graph).
 
-The following table contains an overview (GC = Graph Collection, G = Logical Graph).
+#### Unary logical graph operators (one graph as input):
 
-| Operator      | In      | Out           | Output description                                                      | Impl |
-|:--------------|:--------|:--------------|:------------------------------------------------------------------------|:----:|
-| Selection     | GC      | GC            | Filter graphs based on their attached data (i.e. label, properties)     | Yes  |
-| Distinct      | GC      | GC            | Collection with no duplicate graphs                                     | Yes  |
-| SortBy        | GC      | GC            | Collection sorted by values of a given property key                     | No   |
-| Limit         | GC      | GC            | The first n arbitrary elements of the input collection                  | Yes  |
-| Union         | GC x GC | GC            | All graphs from both input collections                                  | Yes  |
-| Intersection  | GC x GC | GC            | Only graphs that exist in both collections                              | Yes  |
-| Difference    | GC x GC | GC            | Only graphs that exist only in the first collection                     | Yes  |
-| Equality      | GC x GC | {true, false} | Compare collections in terms of contained element data or identifiers   | Yes  |
-| Combination   | G x G   | G             | Graph with vertices and edges from both input graphs                    | Yes  |
-| Overlap       | G x G   | G             | Graph with vertices and edges that exist in both input graphs           | Yes  |
-| Exclusion     | G x G   | G             | Graph with vertices and edges that exist only in the first graph        | Yes  |
-| Equality      | G x G   | {true, false} | Compares graphs in terms of contained element data or identifiers       | Yes  |
-| Pattern Match | G       | GC            | Graphs that match a given graph pattern                                 | No   |
-| Aggregation   | G       | G             | Graph with result of an aggregate function as a new property            | Yes  |
-| Transformation| G       | G             | Graph with transformed (graph, vertex, edge) data                       | Yes  |
-| Summarization | G       | G             | Structural condense of the input graph                                  | Yes  |
-| Subgraph      | G       | G             | Subgraph that fulfils given vertex and edge predicates                  | Yes  |
-| Apply         | GC      | GC            | Applies operator to each graph in collection                            | No   |
-| Reduce        | GC      | G             | Reduces collection to graph using binary operator (e.g. combine)        | Yes  |
+| Operator      | Output | Output description                                           | Impl |
+|:--------------|:-------|:-------------------------------------------------------------|:----:|
+| Aggregation   | G      | Graph with result of an aggregate function as a new property | Yes  |
+| Matching      | GC     | Graphs that match a given graph pattern                      | No   |
+| Transformation| G      | Graph with transformed (graph, vertex, edge) data            | Yes  |
+| Grouping      | G      | Structural condense of the input graph                       | Yes  |
+| Subgraph      | G      | Subgraph that fulfils given vertex and edge predicates       | Yes  |
+
+#### Binary logical graph operators (two graphs as input):
+
+| Operator      | Output        | Output description                                                     | Impl |
+|:--------------|:--------------|:-----------------------------------------------------------------------|:----:|
+| Combination   | G             | Graph with vertices and edges from both input graphs                   | Yes  |
+| Overlap       | G             | Graph with vertices and edges that exist in both input graphs          | Yes  |
+| Exclusion     | G             | Graph with vertices and edges that exist only in the first graph       | Yes  |
+| Equality      | {true, false} | Compare graphs in terms of identity or equality of contained elements  | Yes  |
+
+#### Unary graph collection operators (one collection as input):
+
+| Operator      | Output  | Output description                                                  | Impl |
+|:--------------|:--------|:--------------------------------------------------------------------|:----:|
+| Selection     | GC      | Filter graphs based on their attached data (i.e. label, properties) | Yes  |
+| Distinct      | GC      | Collection with no duplicate graphs                                 | Yes  |
+| SortBy        | GC      | Collection sorted by values of a given property key                 | No   |
+| Limit         | GC      | The first n arbitrary elements of the input collection              | Yes  |
+
+#### Binary graph collection operators (two collections as input):
+
+| Operator      | Output        | Output description                                                         | Impl |
+|:--------------|:--------------|:---------------------------------------------------------------------------|:----:|
+| Union         | GC            | All graphs from both input collections                                     | Yes  |
+| Intersection  | GC            | Only graphs that exist in both collections                                 | Yes  |
+| Difference    | GC            | Only graphs that exist only in the first collection                        | Yes  |
+| Equality      | {true, false} | Compare collections in terms of identity or equality of contained elements | Yes  |
+
+#### Auxiliary operators:
+
+| Operator      | In   | Out  | Output description                                                      | Impl |
+|:--------------|:-----|:-----|:------------------------------------------------------------------------|:----:|
+| Apply         | GC   | GC   | Applies unary operator (e.g. aggregate) on each graph in the collection | Yes  |
+| Reduce        | GC   | G    | Reduces collection to single graph using binary operator (e.g. combine) | Yes  |
+| Call          | GC/G | GC/G | Applies external algorithm on graph or graph collection                 | Yes  |
 
 ## Setup
 
@@ -112,16 +134,17 @@ This module contains reference implementations of the EPGM operators. The
 concepts of the EPGM are mapped to Flink DataSets and processed using Flink 
 operators.
 
-### gradoop-examples
-
-Contains example pipelines showing use cases for Gradoop. 
-
-*   Graph summarization (build structural aggregates of property graphs)
-
 ### gradoop-algorithms
 
 Contains implementations of general graph algorithms (e.g. Label Propagation)
 adapted to be used with the EPGM model.
+
+### gradoop-examples
+
+Contains example pipelines showing use cases for Gradoop. 
+
+*   Graph grouping example (build structural aggregates of property graphs)
+*   Social network examples (composition of multiple operators to analyze social networks graphs)
 
 ### gradoop-checkstyle
 

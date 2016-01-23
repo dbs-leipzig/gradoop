@@ -28,7 +28,7 @@ import org.gradoop.model.api.functions.ProjectionFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.api.functions.PredicateFunction;
-import org.gradoop.model.impl.operators.summarization.Summarization;
+import org.gradoop.model.impl.operators.grouping.Grouping;
 
 import java.util.List;
 
@@ -163,10 +163,10 @@ public interface LogicalGraphOperators
    * additional vertex.
    *
    * @param vertexGroupingKeys property keys to group vertices
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys);
+  LogicalGraph<G, V, E> groupBy(List<String> vertexGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -178,10 +178,10 @@ public interface LogicalGraphOperators
    *
    * @param vertexGroupingKeys property keys to group vertices
    * @param edgeGroupingKeys   property keys to group edges
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarize(List<String> vertexGroupingKeys,
+  LogicalGraph<G, V, E> groupBy(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys);
 
   /**
@@ -190,10 +190,10 @@ public interface LogicalGraphOperators
    *
    * Vertices are grouped by their label. Edges are grouped accordingly.
    *
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarizeOnVertexLabel();
+  LogicalGraph<G, V, E> groupByVertexLabel();
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -204,10 +204,10 @@ public interface LogicalGraphOperators
    * by an additional vertex.
    *
    * @param vertexGroupingKeys property keys to group vertices
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarizeOnVertexLabelAndVertexProperty(
+  LogicalGraph<G, V, E> groupByVertexLabelAndVertexProperties(
     List<String> vertexGroupingKeys);
 
   /**
@@ -219,10 +219,10 @@ public interface LogicalGraphOperators
    * additional edge.
    *
    * @param edgeGroupingKeys property keys to group edges
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarizeOnVertexLabelAndEdgeProperty(
+  LogicalGraph<G, V, E> groupByVertexLabelAndEdgeProperties(
     List<String> edgeGroupingKeys);
 
   /**
@@ -236,23 +236,22 @@ public interface LogicalGraphOperators
    *
    * @param vertexGroupingKeys  property keys to group vertices
    * @param edgeGroupingKeys    property keys to group edges
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarizeOnVertexLabel(List<String> vertexGroupingKeys,
+  LogicalGraph<G, V, E> groupByVertexLabel(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
    * and edges.
    * <p/>
-   * Vertices are grouped by their label, edges are grouped
-   * by their label.
+   * Vertices are grouped by their label, edges are grouped by their label.
    *
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel();
+  LogicalGraph<G, V, E> groupByVertexAndEdgeLabel();
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -263,10 +262,10 @@ public interface LogicalGraphOperators
    * represented by an additional vertex.
    *
    * @param vertexGroupingKeys property keys to group vertices
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndVertexProperty(
+  LogicalGraph<G, V, E> groupByVertexAndEdgeLabelAndVertexProperties(
     List<String> vertexGroupingKeys);
 
   /**
@@ -274,15 +273,14 @@ public interface LogicalGraphOperators
    * and edges.
    * <p/>
    * Vertices are grouped by their label. Edges are grouped by their label
-   * and the given property key.
-   * Edges with missing property key are represented by an
-   * additional edge.
+   * and the given property key. Edges with missing property key are represented
+   * by an additional edge.
    *
    * @param edgeGroupingKeys property keys to group edges
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabelAndEdgeProperty(
+  LogicalGraph<G, V, E> groupByVertexAndEdgeLabelAndEdgeProperties(
     List<String> edgeGroupingKeys);
 
   /**
@@ -295,10 +293,10 @@ public interface LogicalGraphOperators
    *
    * @param vertexGroupingKeys property keys to group vertices
    * @param edgeGroupingKeys   property keys to group edges
-   * @return summarized logical graph
-   * @see Summarization
+   * @return grouped logical graph
+   * @see Grouping
    */
-  LogicalGraph<G, V, E> summarizeOnVertexAndEdgeLabel(
+  LogicalGraph<G, V, E> groupByVertexAndEdgeLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
 
   /**
