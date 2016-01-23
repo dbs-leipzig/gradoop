@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.functions.graphcontainment;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.api.EPGMGraphElement;
 
 /**
@@ -24,13 +25,13 @@ import org.gradoop.model.api.EPGMGraphElement;
  *
  * @param <GE> element type
  */
+@FunctionAnnotation.ReadFields("graphIds")
 public class InAllGraphsBroadcast
   <GE extends EPGMGraphElement>
   extends GraphsContainmentFilterBroadcast<GE> {
 
   @Override
   public boolean filter(GE element) throws Exception {
-
     return element.getGraphIds().containsAll(this.graphIds);
   }
 }

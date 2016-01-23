@@ -25,7 +25,7 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.grouping.functions.BuildVertexGroupItem;
 import org.gradoop.model.impl.operators.grouping.functions.FilterNonCandidates;
 import org.gradoop.model.impl.operators.grouping.functions.FilterCandidates;
-import org.gradoop.model.impl.operators.grouping.functions.BuildSummarizedVertex;
+import org.gradoop.model.impl.operators.grouping.functions.BuildSuperVertex;
 import org.gradoop.model.impl.operators.grouping.functions.BuildVertexWithRepresentative;
 import org.gradoop.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
@@ -110,7 +110,7 @@ public class GroupingGroupReduce<
       // filter group representative tuples
       .filter(new FilterCandidates())
       // build super vertices
-      .map(new BuildSummarizedVertex<>(getVertexGroupingKeys(),
+      .map(new BuildSuperVertex<>(getVertexGroupingKeys(),
         useVertexLabels(), getVertexAggregator(), config.getVertexFactory()));
 
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =

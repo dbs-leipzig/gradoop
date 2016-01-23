@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
@@ -29,6 +30,8 @@ import org.gradoop.model.impl.properties.PropertyValue;
  *
  * @param <V> EPGM vertex type
  */
+@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ReadFields("properties")
 public class VertexToGellyVertexMapper<V extends EPGMVertex>
   implements MapFunction<V, Vertex<GradoopId, PropertyValue>> {
   /**

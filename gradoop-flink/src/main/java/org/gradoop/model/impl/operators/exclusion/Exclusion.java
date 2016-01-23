@@ -71,9 +71,7 @@ public class Exclusion
   public LogicalGraph<G, V, E> execute(
     LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
-    DataSet<GradoopId> graphId = secondGraph
-      .getGraphHead()
-      .map(new Id<G>());
+    DataSet<GradoopId> graphId = secondGraph.getGraphHead().map(new Id<G>());
 
     DataSet<V> newVertexSet = firstGraph.getVertices()
       .filter(new NotInGraphBroadcast<V>())

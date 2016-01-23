@@ -60,8 +60,10 @@ public class Difference<
 
     // union the subgraphs, group them by their identifier and check that
     // there is no graph in the group that belongs to the second collection
-    return thisGraphs.union(otherGraphs)
-      .groupBy(new SubgraphTupleKeySelector<G, Long>()).reduceGroup(
+    return thisGraphs
+      .union(otherGraphs)
+      .groupBy(new GraphTupleKeySelector<G, Long>())
+      .reduceGroup(
         new GroupReduceFunction<Tuple2<G, Long>, G>() {
           @Override
           public void reduce(

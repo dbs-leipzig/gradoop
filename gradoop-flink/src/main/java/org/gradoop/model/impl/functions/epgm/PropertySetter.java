@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
@@ -30,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <EL> EPGM element type
  * @param <T>  property type
  */
+@FunctionAnnotation.ForwardedFieldsFirst("id")
 public class PropertySetter<EL extends EPGMElement, T>
   implements JoinFunction<EL, Tuple2<GradoopId, T>, EL> {
 

@@ -18,11 +18,13 @@
 package org.gradoop.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 /**
  * Filter those tuples which only contain a vertex and its representative.
  */
+@FunctionAnnotation.ReadFields("f5")
 public class FilterNonCandidates implements FilterFunction<VertexGroupItem> {
 
   /**

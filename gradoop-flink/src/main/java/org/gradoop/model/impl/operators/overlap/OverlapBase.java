@@ -48,8 +48,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @see Overlap
  * @see ReduceOverlap
  */
-public abstract class OverlapBase
-  <V extends EPGMVertex, E extends EPGMEdge> {
+public abstract class OverlapBase<V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
    * Filters vertices based on the given graph identifiers.

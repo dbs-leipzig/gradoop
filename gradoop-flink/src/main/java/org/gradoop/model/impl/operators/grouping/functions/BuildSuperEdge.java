@@ -29,7 +29,7 @@ import java.util.List;
  * @see ReduceEdgeGroupItems
  * @see CombineEdgeGroupItems
  */
-public abstract class BuildSummarizedEdge extends BuildBase {
+public abstract class BuildSuperEdge extends BuildBase {
 
   /**
    * Creates group reducer / combiner
@@ -38,7 +38,7 @@ public abstract class BuildSummarizedEdge extends BuildBase {
    * @param useLabel          use edge label
    * @param valueAggregator   aggregate function for edge values
    */
-  public BuildSummarizedEdge(List<String> groupPropertyKeys,
+  public BuildSuperEdge(List<String> groupPropertyKeys,
     boolean useLabel,
     PropertyValueAggregator valueAggregator) {
     super(groupPropertyKeys, useLabel, valueAggregator);

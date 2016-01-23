@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.count;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
@@ -25,11 +26,26 @@ import org.apache.flink.api.java.tuple.Tuple2;
  *
  * @param <T> value type
  */
+@FunctionAnnotation.ForwardedFields("*->f0")
 public class Tuple2WithObjectAnd1L<T>
   implements MapFunction<T, Tuple2<T, Long>> {
 
+  /**
+   * Reduce instantiations
+   */
+  private final Tuple2<T, Long> reuseTuple;
+
+  /**
+   * Constructor
+   */
+  public Tuple2WithObjectAnd1L() {
+    reuseTuple = new Tuple2<>();
+    reuseTuple.f1 = 1L;
+  }
+
   @Override
   public Tuple2<T, Long> map(T t) throws Exception {
-    return new Tuple2<>(t, 1L);
+    reuseTuple.f0 = t;
+    return reuseTuple;
   }
 }

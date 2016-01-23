@@ -17,14 +17,13 @@
 
 package org.gradoop.model.impl.operators.split.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
-
-import java.util.List;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
  * Adds new graph id's to the edge if source and target vertex are part of
@@ -32,16 +31,19 @@ import java.util.List;
  *
  * @param <E> EPGM edge Type
  */
+@FunctionAnnotation.ForwardedFields("f0.id->id;f0.sourceId->sourceId;" +
+  "f0.targetId->targetId;f0.label->label;f0.properties->properties")
 public class AddNewGraphsToEdge<E extends EPGMEdge>
-  implements FlatMapFunction<Tuple3<E, List<GradoopId>, List<GradoopId>>, E> {
+  implements FlatMapFunction<Tuple3<E, GradoopIdSet, GradoopIdSet>, E> {
 
   @Override
   public void flatMap(
-    Tuple3<E, List<GradoopId>, List<GradoopId>> tuple3,
+    Tuple3<E, GradoopIdSet, GradoopIdSet> triple,
     Collector<E> collector) {
-    List<GradoopId> sourceGraphs = tuple3.f1;
-    List<GradoopId> targetGraphs = tuple3.f2;
-    List<GradoopId> graphsToBeAdded = Lists.newArrayList();
+    GradoopIdSet sourceGraphs = triple.f1;
+    GradoopIdSet targetGraphs = triple.f2;
+    GradoopIdSet graphsToBeAdded = new GradoopIdSet();
+
     boolean filter = false;
     for (GradoopId id : sourceGraphs) {
       if (targetGraphs.contains(id)) {
@@ -49,9 +51,10 @@ public class AddNewGraphsToEdge<E extends EPGMEdge>
         filter = true;
       }
     }
-    E edge = tuple3.f0;
-    edge.getGraphIds().addAll(graphsToBeAdded);
+
     if (filter) {
+      E edge = triple.f0;
+      edge.getGraphIds().addAll(graphsToBeAdded);
       collector.collect(edge);
     }
   }

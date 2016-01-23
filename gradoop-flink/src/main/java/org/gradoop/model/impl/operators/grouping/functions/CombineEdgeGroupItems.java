@@ -28,7 +28,7 @@ import java.util.List;
  * Combines a group of {@link EdgeGroupItem} to a single {@link EdgeGroupItem}.
  */
 public class CombineEdgeGroupItems
-  extends BuildSummarizedEdge
+  extends BuildSuperEdge
   implements GroupCombineFunction<EdgeGroupItem, EdgeGroupItem> {
   /**
    * Creates group reducer

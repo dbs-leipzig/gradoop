@@ -157,9 +157,9 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
     MapFunction<C, Tuple2<C, Long>> {
 
     /**
-     * Value to add to the resulting tuple.
+     * Reduce instantiations
      */
-    private final Long secondField;
+    private final Tuple2<C, Long> reuseTuple = new Tuple2<>();
 
     /**
      * Creates this mapper
@@ -167,7 +167,7 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
      * @param secondField user defined long value
      */
     public Tuple2LongMapper(Long secondField) {
-      this.secondField = secondField;
+      this.reuseTuple.f1 = secondField;
     }
 
     /**
@@ -175,33 +175,33 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
      */
     @Override
     public Tuple2<C, Long> map(C c) throws Exception {
-      return new Tuple2<>(c, secondField);
+      reuseTuple.f0 = c;
+      return reuseTuple;
     }
   }
 
   /**
-   * Returns the identifier of the subgraph in the given tuple.
+   * Returns the identifier of the logical graph in the given tuple.
    *
    * @param <GD> graph data type
    * @param <C>  type of second element in tuple
    */
-  protected static class SubgraphTupleKeySelector<GD extends EPGMGraphHead, C>
-    implements
-    KeySelector<Tuple2<GD, C>, GradoopId> {
+  @FunctionAnnotation.ForwardedFields("f0.id->*")
+  protected static class GraphTupleKeySelector<GD extends EPGMGraphHead, C>
+    implements KeySelector<Tuple2<GD, C>, GradoopId> {
 
     /**
      * Empty constructor for initialization in inheriting classes.
      */
-    public SubgraphTupleKeySelector() {
+    public GraphTupleKeySelector() {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public GradoopId getKey(Tuple2<GD, C> subgraph) throws
-      Exception {
-      return subgraph.f0.getId();
+    public GradoopId getKey(Tuple2<GD, C> pair) throws Exception {
+      return pair.f0.getId();
     }
   }
 }

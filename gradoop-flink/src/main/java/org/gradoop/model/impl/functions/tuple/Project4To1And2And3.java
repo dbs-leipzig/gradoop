@@ -34,9 +34,14 @@ import org.apache.flink.api.java.tuple.Tuple4;
 public class Project4To1And2And3<T0, T1, T2, T3>
   implements MapFunction<Tuple4<T0, T1, T2, T3>, Tuple3<T1, T2, T3>> {
 
+  /**
+   * Reduce instantiations
+   */
+  private final Tuple3<T1, T2, T3> reuseTuple = new Tuple3<>();
+
   @Override
-  public Tuple3<T1, T2, T3> map(Tuple4<T0, T1, T2, T3> tuple4) throws
-    Exception {
-    return new Tuple3<>(tuple4.f1, tuple4.f2, tuple4.f3);
+  public Tuple3<T1, T2, T3> map(Tuple4<T0, T1, T2, T3> quad) throws Exception {
+    reuseTuple.setFields(quad.f1, quad.f2, quad.f3);
+    return reuseTuple;
   }
 }

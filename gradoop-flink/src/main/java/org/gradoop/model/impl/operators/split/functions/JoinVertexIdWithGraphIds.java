@@ -29,15 +29,20 @@ import org.gradoop.model.impl.properties.PropertyValue;
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f1")
-public class JoinVertexIdWithGraphIds implements
-  JoinFunction
-    <Tuple2<GradoopId, PropertyValue>, Tuple2<PropertyValue, GradoopId>,
-      Tuple2<GradoopId, GradoopId>> {
+public class JoinVertexIdWithGraphIds
+  implements JoinFunction<Tuple2<GradoopId, PropertyValue>,
+  Tuple2<PropertyValue, GradoopId>, Tuple2<GradoopId, GradoopId>> {
+
+  /**
+   * Reduce instantiations
+   */
+  private final Tuple2<GradoopId, GradoopId> reuseTuple = new Tuple2<>();
 
   @Override
   public Tuple2<GradoopId, GradoopId> join(
     Tuple2<GradoopId, PropertyValue> vertexSplitKey,
       Tuple2<PropertyValue, GradoopId> splitKeyGradoopId) {
-    return new Tuple2<>(vertexSplitKey.f0, splitKeyGradoopId.f1);
+    reuseTuple.setFields(vertexSplitKey.f0, splitKeyGradoopId.f1);
+    return reuseTuple;
   }
 }

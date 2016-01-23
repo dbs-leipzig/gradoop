@@ -58,24 +58,22 @@ public class Limit
 
   @Override
   public GraphCollection<G, V, E> execute(GraphCollection<G, V, E> collection) {
-    DataSet<G> graphHeads = collection.getGraphHeads()
-      .first(limit);
 
-    DataSet<GradoopId> firstGraphHeadIds = graphHeads.map(new Id<G>());
+    DataSet<G> graphHeads = collection.getGraphHeads().first(limit);
 
-    DataSet<V> newVertices = collection.getVertices()
+    DataSet<GradoopId> firstIds = graphHeads.map(new Id<G>());
+
+    DataSet<V> filteredVertices = collection.getVertices()
       .filter(new InAllGraphsBroadcast<V>())
-      .withBroadcastSet(firstGraphHeadIds,
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
+      .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<E> newEdges = collection.getEdges()
+    DataSet<E> filteredEdges = collection.getEdges()
       .filter(new InAllGraphsBroadcast<E>())
-      .withBroadcastSet(firstGraphHeadIds,
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
+      .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return GraphCollection.fromDataSets(graphHeads,
-      newVertices,
-      newEdges,
+      filteredVertices,
+      filteredEdges,
       collection.getConfig());
   }
 

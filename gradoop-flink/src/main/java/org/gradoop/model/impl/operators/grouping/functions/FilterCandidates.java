@@ -18,11 +18,13 @@
 package org.gradoop.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 /**
  * Filter those tuples which are used to create new summarized vertices.
  */
+@FunctionAnnotation.ReadFields("f5")
 public class FilterCandidates implements FilterFunction<VertexGroupItem> {
 
   /**

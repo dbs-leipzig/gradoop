@@ -19,6 +19,7 @@ package org.gradoop.model.impl.functions.tuple;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple3;
 
 /**
@@ -30,10 +31,16 @@ import org.apache.flink.api.java.tuple.Tuple3;
  */
 @FunctionAnnotation.ForwardedFields("f1->*")
 public class Value1Of3<T0, T1, T2>
-  implements MapFunction<Tuple3<T0, T1, T2>, T1> {
+  implements
+  MapFunction<Tuple3<T0, T1, T2>, T1>, KeySelector<Tuple3<T0, T1, T2>, T1> {
 
   @Override
   public T1 map(Tuple3<T0, T1, T2> triple) throws Exception {
+    return triple.f1;
+  }
+
+  @Override
+  public T1 getKey(Tuple3<T0, T1, T2> triple) throws Exception {
     return triple.f1;
   }
 }

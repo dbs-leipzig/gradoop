@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.split.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
@@ -31,11 +32,18 @@ import org.gradoop.model.impl.id.GradoopId;
  *
  * @param <E> EPGM edge type
  */
+@FunctionAnnotation.ForwardedFields("*->f0;sourceId->f1;targetId->f2")
 public class EdgeToTriple<E extends EPGMEdge>
   implements MapFunction<E, Tuple3<E, GradoopId, GradoopId>> {
 
+  /**
+   * Reduce instantiations
+   */
+  private final Tuple3<E, GradoopId, GradoopId> reuseTuple = new Tuple3<>();
+
   @Override
   public Tuple3<E, GradoopId, GradoopId> map(E edge) {
-    return new Tuple3<>(edge, edge.getSourceId(), edge.getTargetId());
+    reuseTuple.setFields(edge, edge.getSourceId(), edge.getTargetId());
+    return reuseTuple;
   }
 }

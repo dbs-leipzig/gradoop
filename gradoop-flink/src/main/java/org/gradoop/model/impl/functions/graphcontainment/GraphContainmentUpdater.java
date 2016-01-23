@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.impl.id.GradoopId;
@@ -28,6 +29,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <G>   EPGM graph head type
  * @param <GE>  EPGM graph element type
  */
+@FunctionAnnotation.ForwardedFields("id;label;properties")
 public class GraphContainmentUpdater
   <G extends EPGMGraphHead, GE extends EPGMGraphElement>
   implements MapFunction<GE, GE> {

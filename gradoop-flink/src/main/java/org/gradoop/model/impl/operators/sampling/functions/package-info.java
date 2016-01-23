@@ -15,22 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.join;
-
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-
 /**
- * left, right => right
- *
- * @param <L> left type
- * @param <R> right type
+ * Contains all user defined functions related graph sampling.
  */
-@FunctionAnnotation.ForwardedFieldsSecond("*->*")
-public class RightSide<L, R> implements JoinFunction<L, R, R> {
-
-  @Override
-  public R join(L left, R right) throws Exception {
-    return right;
-  }
-}
+package org.gradoop.model.impl.operators.sampling.functions;

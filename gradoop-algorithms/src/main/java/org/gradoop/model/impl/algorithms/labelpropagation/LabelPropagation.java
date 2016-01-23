@@ -94,9 +94,8 @@ public abstract class LabelPropagation
       .map(new EdgeToGellyEdgeMapper<E>());
 
     // create Gelly graph
-    Graph<GradoopId, PropertyValue, NullValue> gellyGraph =
-      Graph.fromDataSet(vertices, edges,
-        logicalGraph.getConfig().getExecutionEnvironment());
+    Graph<GradoopId, PropertyValue, NullValue> gellyGraph = Graph.fromDataSet(
+      vertices, edges, logicalGraph.getConfig().getExecutionEnvironment());
 
     DataSet<V> labeledVertices = executeInternal(gellyGraph)
       .join(logicalGraph.getVertices())

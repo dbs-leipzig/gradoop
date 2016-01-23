@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl.operators.sampling;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -28,8 +27,7 @@ import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.join.LeftSide;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.epgm.TargetId;
-
-import java.util.Random;
+import org.gradoop.model.impl.operators.sampling.functions.VertexRandomFilter;
 
 /**
  * Takes a logical graph and a user defined aggregate function as input. The
@@ -48,21 +46,21 @@ public class RandomNodeSampling<
   /**
    * relative amount of nodes in the result graph
    */
-  private final Float sampleSize;
+  private final float sampleSize;
 
   /**
    * seed for the random number generator
    * if no seed is null, the random generator is created without seed
    */
-  private final Long randomSeed;
+  private final long randomSeed;
 
   /**
    * Creates new RandomNodeSampling instance.
    *
    * @param sampleSize relative sample size
    */
-  public RandomNodeSampling(Float sampleSize) {
-    this(sampleSize, null);
+  public RandomNodeSampling(float sampleSize) {
+    this(sampleSize, 0L);
   }
 
   /**
@@ -71,7 +69,7 @@ public class RandomNodeSampling<
    * @param sampleSize relative sample size
    * @param randomSeed random seed value (can be {@code null})
    */
-  public RandomNodeSampling(Float sampleSize, Long randomSeed) {
+  public RandomNodeSampling(float sampleSize, long randomSeed) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
   }
@@ -105,43 +103,5 @@ public class RandomNodeSampling<
   @Override
   public String getName() {
     return RandomNodeSampling.class.getName();
-  }
-
-  /**
-   * Creates a random value for each vertex and filters those that are below
-   * a given threshold.
-   *
-   * @param <VD> vertex data type
-   */
-  private static class VertexRandomFilter<VD extends EPGMVertex>
-    implements FilterFunction<VD> {
-    /**
-     * Threshold to decide if a vertex needs to be filtered.
-     */
-    private final Float threshold;
-    /**
-     * Random instance
-     */
-    private final Random randomGenerator;
-
-    /**
-     * Creates a new filter instance.
-     *
-     * @param sampleSize relative sample size
-     * @param randomSeed random seed (can be {@code} null)
-     */
-    public VertexRandomFilter(Float sampleSize, Long randomSeed) {
-      threshold = sampleSize;
-      randomGenerator =
-        (randomSeed != null) ? new Random(randomSeed) : new Random();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean filter(VD vertex) throws Exception {
-      return randomGenerator.nextFloat() < threshold;
-    }
   }
 }

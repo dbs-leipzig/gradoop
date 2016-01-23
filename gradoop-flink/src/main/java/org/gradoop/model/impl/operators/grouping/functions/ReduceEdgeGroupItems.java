@@ -19,6 +19,7 @@ package org.gradoop.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
@@ -30,13 +31,13 @@ import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import java.util.List;
 
 /**
- * Creates a new summarized {@link EPGMEdge} from a group of
- * {@link EdgeGroupItem}.
+ * Creates a new super {@link EPGMEdge} from a group of {@link EdgeGroupItem}.
  *
  * @param <E> EPGM edge type
  */
+@FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId")
 public class ReduceEdgeGroupItems<E extends EPGMEdge>
-  extends BuildSummarizedEdge
+  extends BuildSuperEdge
   implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
 
   /**

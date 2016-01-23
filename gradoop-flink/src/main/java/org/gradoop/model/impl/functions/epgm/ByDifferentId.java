@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.id.GradoopId;
 
@@ -26,6 +27,7 @@ import org.gradoop.model.impl.id.GradoopId;
  *
  * @param <EL> EPGM element type
  */
+@FunctionAnnotation.ReadFields("id")
 public class ByDifferentId<EL extends EPGMElement>
   implements FilterFunction<EL> {
 
@@ -44,7 +46,7 @@ public class ByDifferentId<EL extends EPGMElement>
   }
 
   @Override
-  public boolean filter(EL el) throws Exception {
-    return !el.getId().equals(id);
+  public boolean filter(EL element) throws Exception {
+    return !element.getId().equals(id);
   }
 }

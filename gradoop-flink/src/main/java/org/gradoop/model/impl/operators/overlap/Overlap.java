@@ -69,8 +69,8 @@ public class Overlap
     LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
 
     DataSet<GradoopId> graphIds = firstGraph.getGraphHead()
-      .union(secondGraph.getGraphHead())
-      .map(new Id<G>());
+      .map(new Id<G>())
+      .union(secondGraph.getGraphHead().map(new Id<G>()));
 
     return LogicalGraph.fromDataSets(
       getVertices(firstGraph.getVertices(), graphIds),

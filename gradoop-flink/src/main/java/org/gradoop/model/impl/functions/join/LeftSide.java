@@ -30,7 +30,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 public class LeftSide<L, R> implements JoinFunction<L, R, L> {
 
   @Override
-  public L join(L l, R r) throws Exception {
-    return l;
+  public L join(L left, R right) throws Exception {
+    return left;
   }
 }

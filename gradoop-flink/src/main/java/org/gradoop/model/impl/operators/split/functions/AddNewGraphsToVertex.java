@@ -18,25 +18,27 @@
 package org.gradoop.model.impl.operators.split.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-
-import java.util.List;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
  * Adds new graph ids to the initial vertex set
  *
  * @param <V> EPGM vertex type
  */
+@FunctionAnnotation.ReadFieldsFirst("graphIds")
+@FunctionAnnotation.ReadFieldsSecond("f1")
 public class AddNewGraphsToVertex<V extends EPGMVertex>
-  implements JoinFunction<V, Tuple2<GradoopId, List<GradoopId>>, V> {
+  implements JoinFunction<V, Tuple2<GradoopId, GradoopIdSet>, V> {
   /**
    * {@inheritDoc}
    */
   @Override
   public V join(V vertex,
-    Tuple2<GradoopId, List<GradoopId>> vertexWithGraphIds) {
+    Tuple2<GradoopId, GradoopIdSet> vertexWithGraphIds) {
     vertex.getGraphIds().addAll(vertexWithGraphIds.f1);
     return vertex;
   }

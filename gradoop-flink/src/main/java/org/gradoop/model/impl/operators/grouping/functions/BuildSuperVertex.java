@@ -19,6 +19,7 @@ package org.gradoop.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.graph.Vertex;
@@ -37,7 +38,9 @@ import java.util.List;
  *
  * @param <V> EPGM vertex type
  */
-public class BuildSummarizedVertex<V extends EPGMVertex>
+@FunctionAnnotation.ForwardedFields("f1->id")
+@FunctionAnnotation.ReadFields("f1;f2;f3;f4")
+public class BuildSuperVertex<V extends EPGMVertex>
   extends BuildBase
   implements MapFunction<VertexGroupItem, V>, ResultTypeQueryable<V> {
 
@@ -54,7 +57,7 @@ public class BuildSummarizedVertex<V extends EPGMVertex>
    * @param valueAggregator   aggregate function for vertex values
    * @param vertexFactory     vertex factory
    */
-  public BuildSummarizedVertex(List<String> groupPropertyKeys,
+  public BuildSuperVertex(List<String> groupPropertyKeys,
     boolean useLabel,
     PropertyValueAggregator valueAggregator,
     EPGMVertexFactory<V> vertexFactory) {

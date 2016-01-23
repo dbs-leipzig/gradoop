@@ -17,37 +17,38 @@
 
 package org.gradoop.model.impl.operators.split.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
-
-import java.util.List;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
- * groupReduce each group of vertices into a single vertex, whose graphId set
- * contains all graphs of each origin vertex
+ * Reduce each group of vertices into a single vertex, whose graphId set
+ * contains all graphs of each origin vertex.
  */
-public class MultipleGraphIdsGroupReducer implements GroupReduceFunction
-    <Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, List<GradoopId>>> {
+@FunctionAnnotation.ForwardedFields("f0")
+public class MultipleGraphIdsGroupReducer
+  implements GroupReduceFunction<Tuple2<GradoopId, GradoopId>,
+  Tuple2<GradoopId, GradoopIdSet>> {
 
   @Override
   public void reduce(
     Iterable<Tuple2<GradoopId, GradoopId>> iterable,
-    Collector<Tuple2<GradoopId, List<GradoopId>>> collector) {
+    Collector<Tuple2<GradoopId, GradoopIdSet>> collector) {
 
     boolean first = true;
     GradoopId vertexId = null;
-    List<GradoopId> newGraphIds = Lists.newArrayList();
+    GradoopIdSet idSet = new GradoopIdSet();
 
-    for (Tuple2<GradoopId, GradoopId> tuple : iterable) {
+    for (Tuple2<GradoopId, GradoopId> vertexGraphPair : iterable) {
       if (first) {
-        vertexId = tuple.f0;
+        vertexId = vertexGraphPair.f0;
         first = false;
       }
-      newGraphIds.add(tuple.f1);
+      idSet.add(vertexGraphPair.f1);
     }
-    collector.collect(new Tuple2<>(vertexId, newGraphIds));
+    collector.collect(new Tuple2<>(vertexId, idSet));
   }
 }

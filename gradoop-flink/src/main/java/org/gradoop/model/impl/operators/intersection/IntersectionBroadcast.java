@@ -44,13 +44,11 @@ public class IntersectionBroadcast
   @Override
   protected DataSet<V> computeNewVertices(DataSet<G> newSubgraphs) {
 
-    DataSet<GradoopId> identifiers = secondCollection.getGraphHeads()
-      .map(new Id<G>());
+    DataSet<GradoopId> ids = secondCollection.getGraphHeads().map(new Id<G>());
 
     return firstCollection.getVertices()
       .filter(new InAnyGraphBroadcast<V>())
-      .withBroadcastSet(
-        identifiers, GraphsContainmentFilterBroadcast.GRAPH_IDS);
+      .withBroadcastSet(ids, GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
 
   @Override

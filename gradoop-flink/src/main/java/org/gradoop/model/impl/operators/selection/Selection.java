@@ -61,8 +61,7 @@ public class Selection
   public GraphCollection<G, V, E> execute(
     GraphCollection<G, V, E> collection) {
     // find graph heads matching the predicate
-    DataSet<G> graphHeads = collection.getGraphHeads()
-      .filter(predicate);
+    DataSet<G> graphHeads = collection.getGraphHeads().filter(predicate);
 
     // get the identifiers of these logical graphs
     DataSet<GradoopId> graphIDs = graphHeads.map(new Id<G>());
@@ -70,13 +69,11 @@ public class Selection
     // use graph ids to filter vertices from the actual graph structure
     DataSet<V> vertices = collection.getVertices()
       .filter(new InAnyGraphBroadcast<V>())
-      .withBroadcastSet(graphIDs,
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
+      .withBroadcastSet(graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     DataSet<E> edges = collection.getEdges()
       .filter(new InAnyGraphBroadcast<E>())
-      .withBroadcastSet(graphIDs,
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
+      .withBroadcastSet(graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return GraphCollection.fromDataSets(
       graphHeads, vertices, edges, collection.getConfig());

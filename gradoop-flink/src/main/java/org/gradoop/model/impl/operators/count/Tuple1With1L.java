@@ -29,18 +29,19 @@ import org.apache.flink.api.java.tuple.Tuple1;
 public class Tuple1With1L<T>
   implements JoinFunction<T, T, Tuple1<Long>>, MapFunction<T, Tuple1<Long>> {
 
+  /**
+   * Numeric one
+   */
+  private static final Tuple1<Long> ONE = new Tuple1<>(1L);
+
   @Override
   public Tuple1<Long> join(T left, T right) throws Exception {
-    return getOne();
+    return ONE;
   }
 
   @Override
   public Tuple1<Long> map(T x) throws Exception {
-    return getOne();
-  }
-
-  private Tuple1<Long> getOne() {
-    return new Tuple1<>(1L);
+    return ONE;
   }
 }
 

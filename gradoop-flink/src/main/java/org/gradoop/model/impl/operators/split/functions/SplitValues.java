@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.split.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMVertex;
@@ -27,13 +28,16 @@ import org.gradoop.model.impl.properties.PropertyValue;
 
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Maps the vertices to Tuple2's, where each tuple contains the vertex
- * and one split values the split values are determined using a user defined
- * function
+ * Maps the vertices to pairs, where each pair contains the vertex id and one
+ * split value. The split values are determined using a user defined function.
  *
  * @param <V> EPGM vertex type
  */
+@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ReadFields("properties")
 public class SplitValues<V extends EPGMVertex>
   implements FlatMapFunction<V, Tuple2<GradoopId, PropertyValue>> {
   /**
@@ -44,11 +48,10 @@ public class SplitValues<V extends EPGMVertex>
   /**
    * Constructor
    *
-   * @param function actual defined Function
+   * @param function user-defined function to determine split values
    */
-  public SplitValues(
-    UnaryFunction<V, List<PropertyValue>> function) {
-    this.function = function;
+  public SplitValues(UnaryFunction<V, List<PropertyValue>> function) {
+    this.function = checkNotNull(function);
   }
 
   /**

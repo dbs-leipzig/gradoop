@@ -82,11 +82,10 @@ public abstract class SetOperatorBase<
       .with(
         new JoinFunction<Tuple2<V, GradoopId>, G, V>() {
           @Override
-          public V join(Tuple2<V, GradoopId> vertices,
-            G subgraph) throws Exception {
-            return vertices.f0;
+          public V join(Tuple2<V, GradoopId> tuple, G g) throws Exception {
+            return tuple.f0;
           }
-        })
+        }).withForwardedFieldsFirst("f0->*")
       .distinct(new Id<V>());
   }
 

@@ -30,11 +30,12 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.PairWithNewId;
+import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.tuple.Project2To1;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.operators.split.functions.InitGraphHead;
 import org.gradoop.model.impl.operators.split.functions.AddNewGraphsToVertex;
-import org.gradoop.model.impl.operators.split.functions.EdgeToTriple;
 import org.gradoop.model.impl.operators.split.functions.SplitValues;
 import org.gradoop.model.impl.operators.split.functions.JoinEdgeTupleWithSourceGraphs;
 import org.gradoop.model.impl.operators.split.functions.JoinEdgeTupleWithTargetGraphs;
@@ -101,7 +102,7 @@ public class Split
         .map(new PairWithNewId<PropertyValue>());
 
     // build a dataset of the vertex ids and the new associated graph ids
-    DataSet<Tuple2<GradoopId, List<GradoopId>>> vertexIdWithGraphIds =
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdWithGraphIds =
       vertexIdWithSplitValues
         .join(splitValuesWithGraphIds)
         .where(1).equalTo(0)
@@ -132,19 +133,14 @@ public class Split
     // compute edges
     //--------------------------------------------------------------------------
 
-    // construct tuples of the edges with the ids of their source and target
-    // vertices
-    DataSet<Tuple3<E, GradoopId, GradoopId>> edgeSourceTarget = graph.getEdges()
-      .map(new EdgeToTriple<E>());
-
     // replace source and target id by the graph list the corresponding vertex
-    DataSet<Tuple3<E, List<GradoopId>, List<GradoopId>>> edgeGraphIdsGraphIds =
-      edgeSourceTarget
+    DataSet<Tuple3<E, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
+      graph.getEdges()
         .join(vertexIdWithGraphIds)
-        .where(1).equalTo(0)
+        .where(new SourceId<E>()).equalTo(0)
         .with(new JoinEdgeTupleWithSourceGraphs<E>())
         .join(vertexIdWithGraphIds)
-        .where(2).equalTo(0)
+        .where("f0.targetId").equalTo(0)
         .with(new JoinEdgeTupleWithTargetGraphs<E>());
 
     // add new graph ids to the edges iff source and target are contained in the

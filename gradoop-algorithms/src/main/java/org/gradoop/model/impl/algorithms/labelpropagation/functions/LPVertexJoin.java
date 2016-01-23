@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
@@ -28,17 +29,20 @@ import org.gradoop.model.impl.properties.PropertyValue;
  *
  * @param <V> EPGM vertex type
  */
+@FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
+@FunctionAnnotation.ReadFieldsFirst("f1")
 public class LPVertexJoin<V extends EPGMVertex>
   implements JoinFunction<Vertex<GradoopId, PropertyValue>, V, V> {
+
   /**
-   * Property key to access the label value which will be propagated
+   * Property key to access the value which will be propagated
    */
   private final String propertyKey;
 
   /**
    * Constructor
    *
-   * @param propertyKey Property key to access the label value
+   * @param propertyKey property key to access the propagation value
    */
   public LPVertexJoin(String propertyKey) {
     this.propertyKey = propertyKey;

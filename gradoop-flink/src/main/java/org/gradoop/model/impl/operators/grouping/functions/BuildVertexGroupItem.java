@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
@@ -34,6 +35,8 @@ import java.util.List;
  *
  * @param <V> EPGM vertex type
  */
+@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ReadFields("label;properties")
 public class BuildVertexGroupItem<V extends EPGMVertex>
   extends BuildBase
   implements MapFunction<V, VertexGroupItem> {
