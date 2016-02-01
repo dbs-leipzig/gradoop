@@ -28,6 +28,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.PropertySetter;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,8 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ApplyAggregation<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge,
-  N extends Number>
+  E extends EPGMEdge>
   implements ApplicableUnaryGraphToGraphOperator<G, V, E> {
 
   /**
@@ -57,7 +57,7 @@ public class ApplyAggregation<
   /**
    * User-defined aggregate function which is applied on a graph collection.
    */
-  private final CollectionAggregateFunction<G, V, E, N> aggregateFunction;
+  private final CollectionAggregateFunction<G, V, E> aggregateFunction;
 
   /**
    * Creates a new operator instance.
@@ -66,20 +66,20 @@ public class ApplyAggregation<
    * @param aggregateFunction     function to compute aggregate value
    */
   public ApplyAggregation(final String aggregatePropertyKey,
-    final CollectionAggregateFunction<G, V, E, N> aggregateFunction) {
+    final CollectionAggregateFunction<G, V, E> aggregateFunction) {
     this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
     this.aggregateFunction = checkNotNull(aggregateFunction);
   }
 
   @Override
   public GraphCollection<G, V, E> execute(GraphCollection<G, V, E> collection) {
-    DataSet<Tuple2<GradoopId, N>> aggregateValues =
+    DataSet<Tuple2<GradoopId, PropertyValue>> aggregateValues =
       aggregateFunction.execute(collection);
 
     DataSet<G> graphHeads = collection.getGraphHeads()
       .join(aggregateValues)
       .where(new Id<G>()).equalTo(0)
-      .with(new PropertySetter<G, N>(aggregatePropertyKey));
+      .with(new PropertySetter<G, PropertyValue>(aggregatePropertyKey));
 
     return GraphCollection.fromDataSets(graphHeads,
       collection.getVertices(),

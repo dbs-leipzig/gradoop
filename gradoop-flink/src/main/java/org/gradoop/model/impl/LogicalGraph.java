@@ -48,7 +48,6 @@ import org.gradoop.model.impl.operators.cam.functions.GraphHeadEmptyLabeler;
 import org.gradoop.model.impl.operators.cam.functions.VertexDataLabeler;
 import org.gradoop.model.impl.operators.cam.functions.VertexIdLabeler;
 import org.gradoop.model.impl.operators.combination.Combination;
-import org.gradoop.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.model.impl.operators.equality.GraphEquality;
 import org.gradoop.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.model.impl.operators.transformation.Transformation;
@@ -401,7 +400,7 @@ public class LogicalGraph
    */
   @Override
   public <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
-    AggregateFunction<G, V, E, N> aggregateFunc) {
+    AggregateFunction<G, V, E> aggregateFunc) {
     return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
 

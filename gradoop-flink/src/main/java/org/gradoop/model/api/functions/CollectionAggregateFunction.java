@@ -24,6 +24,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Describes an aggregate function that can be applied on a collection of graphs
@@ -32,11 +33,10 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <N> result type of aggregated numeric values
  * @see CollectionAggregateFunction
  */
 public interface CollectionAggregateFunction<G extends EPGMGraphHead,
-  V extends EPGMVertex, E extends EPGMEdge, N extends Number> {
+  V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
    * Defines the aggregate function. The input is a graph collection, the output
@@ -46,5 +46,6 @@ public interface CollectionAggregateFunction<G extends EPGMGraphHead,
    * @param collection input graph collection
    * @return data set containing graph id + aggregate tuples
    */
-  DataSet<Tuple2<GradoopId, N>> execute(GraphCollection<G, V, E> collection);
+  DataSet<Tuple2<GradoopId, PropertyValue>> execute(
+    GraphCollection<G, V, E> collection);
 }

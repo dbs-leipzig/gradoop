@@ -25,6 +25,7 @@ import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.PropertySetterBroadcast;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -53,7 +54,7 @@ public class Aggregation<
   /**
    * User-defined aggregate function which is applied on a single logical graph.
    */
-  private final AggregateFunction<G, V, E, N> aggregationFunction;
+  private final AggregateFunction<G, V, E> aggregationFunction;
 
   /**
    * Creates new aggregation.
@@ -64,7 +65,7 @@ public class Aggregation<
    *                             called on the input graph
    */
   public Aggregation(final String aggregatePropertyKey,
-    final AggregateFunction<G, V, E, N> aggregationFunction) {
+    final AggregateFunction<G, V, E> aggregationFunction) {
     this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
     this.aggregationFunction = checkNotNull(aggregationFunction);
   }
@@ -75,7 +76,7 @@ public class Aggregation<
   @Override
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
 
-    DataSet<N> aggregateValue = aggregationFunction.execute(graph);
+    DataSet<PropertyValue> aggregateValue = aggregationFunction.execute(graph);
 
     DataSet<G> graphHead = graph.getGraphHead()
       .map(new PropertySetterBroadcast<G>(aggregatePropertyKey))

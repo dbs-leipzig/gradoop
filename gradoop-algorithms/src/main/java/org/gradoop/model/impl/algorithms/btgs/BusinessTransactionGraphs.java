@@ -33,6 +33,7 @@ public class BusinessTransactionGraphs
   public static final String SUPERCLASS_VALUE_TRANSACTIONAL = "T";
   public static final String SUPERCLASS_VALUE_MASTER = "M";
   public static final String BTG_LABEL = "BusinessTransactionGraph";
+  public static final String SOURCEID_KEY = "sid";
 
   @Override
   public GraphCollection execute(LogicalGraph<G, V, E> iig) {

@@ -22,6 +22,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Describes an aggregate function as input for the
@@ -33,7 +34,7 @@ import org.gradoop.model.impl.LogicalGraph;
  * @param <N> result type of aggregated numeric values
  */
 public interface AggregateFunction<G extends EPGMGraphHead,
-  V extends EPGMVertex, E extends EPGMEdge, N extends Number> {
+  V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
    * Defines the aggregate function.
@@ -41,6 +42,6 @@ public interface AggregateFunction<G extends EPGMGraphHead,
    * @param graph input graph
    * @return aggregated value as 1-element dataset
    */
-  DataSet<N> execute(LogicalGraph<G, V, E> graph);
+  DataSet<PropertyValue> execute(LogicalGraph<G, V, E> graph);
 
 }

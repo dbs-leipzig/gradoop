@@ -26,9 +26,11 @@ import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.CollectionAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.epgm.ToPropertyValue;
 import org.gradoop.model.impl.functions.graphcontainment.ExpandGraphsToIds;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.count.Count;
+import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Aggregate function returning the edge count of a graph / collection.
@@ -40,7 +42,7 @@ import org.gradoop.model.impl.operators.count.Count;
 public class EdgeCount
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements
-  AggregateFunction<G, V, E, Long>, CollectionAggregateFunction<G, V, E, Long> {
+  AggregateFunction<G, V, E>, CollectionAggregateFunction<G, V, E> {
 
   /**
    * Returns a 1-element dataset containing the edge count of the given graph.
@@ -49,8 +51,10 @@ public class EdgeCount
    * @return 1-element dataset with vertex count
    */
   @Override
-  public DataSet<Long> execute(LogicalGraph<G, V, E> graph) {
-    return Count.count(graph.getEdges());
+  public DataSet<PropertyValue> execute(LogicalGraph<G, V, E> graph) {
+    return Count
+      .count(graph.getEdges())
+      .map(new ToPropertyValue<Long>());
   }
 
   /**
@@ -61,9 +65,13 @@ public class EdgeCount
    * @return dataset with graph + edge count tuples
    */
   @Override
-  public DataSet<Tuple2<GradoopId, Long>> execute(
+  public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
     GraphCollection<G, V, E> collection) {
-    return Count.groupBy(
-      collection.getEdges().flatMap(new ExpandGraphsToIds<E>()));
+    return Count
+      .groupBy(
+        collection
+          .getEdges()
+          .flatMap(new ExpandGraphsToIds<E>())
+      ).map(new GroupCountToPropertyValue());
   }
 }

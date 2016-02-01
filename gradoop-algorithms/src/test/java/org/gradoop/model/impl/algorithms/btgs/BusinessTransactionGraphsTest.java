@@ -32,10 +32,6 @@ public class BusinessTransactionGraphsTest  extends GradoopFlinkTestBase {
       .callForCollection(
         new BusinessTransactionGraphs<GraphHeadPojo, VertexPojo, EdgePojo> ());
 
-    GradoopFlinkTestUtils.printGraphCollection(expectation);
-
-    GradoopFlinkTestUtils.printGraphCollection(result);
-
     collectAndAssertTrue(expectation.equalsByGraphElementData(result));
   }
 }

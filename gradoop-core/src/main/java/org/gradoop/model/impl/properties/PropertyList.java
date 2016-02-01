@@ -153,7 +153,15 @@ public class PropertyList implements Iterable<Property>, Writable {
    * @param value property value
    */
   public void set(String key, Object value) {
-    set(key, PropertyValue.create(value));
+    PropertyValue propertyValue;
+
+    if(value instanceof PropertyValue) {
+      propertyValue = (PropertyValue) value;
+    } else {
+      propertyValue = PropertyValue.create(value);
+    }
+
+    set(key, propertyValue);
   }
 
   /**
