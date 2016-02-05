@@ -53,7 +53,7 @@ import java.io.IOException;
  * 2. mvn clean install
  * 3. run main method
  */
-public class ClusterCharacteristicPatterns  implements ProgramDescription {
+public class CategoryCharacteristicPatterns implements ProgramDescription {
 
   /**
    * main method
@@ -112,7 +112,7 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
       FlinkAsciiGraphLoader<>(gradoopConf);
 
     String gdl = FileUtils.readFileToString(
-      FileUtils.getFile(ClusterCharacteristicPatterns.class
+      FileUtils.getFile(CategoryCharacteristicPatterns.class
         .getResource("/data/gdl/itbda.gdl").getFile()));
 
     gdl = gdl
@@ -282,7 +282,7 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
 
   @Override
   public String getDescription() {
-    return  ClusterCharacteristicPatterns.class.getName();
+    return  CategoryCharacteristicPatterns.class.getName();
   }
 
 }
