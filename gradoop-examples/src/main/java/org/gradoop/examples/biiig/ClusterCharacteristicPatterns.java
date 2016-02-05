@@ -45,10 +45,21 @@ import org.gradoop.util.GradoopFlinkConfig;
 import java.io.IOException;
 
 /**
- * ITDBA example
+ * Example workflow of paper "Scalable Business Intelligence with Graph
+ * Collections" submitted to IT special issue on Big Data Analytics
+ *
+ * To execute the example:
+ * 1. checkout Gradoop
+ * 2. mvn clean install
+ * 3. run main method
  */
 public class ClusterCharacteristicPatterns  implements ProgramDescription {
 
+  /**
+   * main method
+   * @param args arguments (none required)
+   * @throws Exception
+   */
   public static void main(String[] args) throws Exception {
 
     ExampleOutput<GraphHeadPojo, VertexPojo, EdgePojo> out =
@@ -61,8 +72,7 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> btgs = iig
       .callForCollection(
-        new BusinessTransactionGraphs<GraphHeadPojo, VertexPojo, EdgePojo>()
-      );
+        new BusinessTransactionGraphs<GraphHeadPojo, VertexPojo, EdgePojo>());
 
     btgs = btgs.apply(new ApplyAggregation<>(
       "isClosed", new IsClosedAggregateFunction()));
@@ -84,56 +94,11 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
     out.print();
   }
 
-
-  @Override
-  public String getDescription() {
-    return  ClusterCharacteristicPatterns.class.getName();
-  }
-
   /**
-   * Aggregate function to determine "isClosed" measure
+   * Returns example integrated instance graph from GDL input.
+   * @return integrated instance graph
+   * @throws IOException
    */
-  private static class IsClosedAggregateFunction
-    implements ApplyAggregateFunction<GraphHeadPojo, VertexPojo, EdgePojo>
-  {
-    @Override
-    public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collection) {
-
-      return collection.getVertices()
-        .flatMap(new FlatMapFunction<VertexPojo, Tuple2<GradoopId, Integer>>() {
-          @Override
-          public void flatMap(VertexPojo vertex,
-            Collector<Tuple2<GradoopId, Integer>> collector) throws Exception {
-
-            for(GradoopId graphId : vertex.getGraphIds()) {
-              Integer openQuotation = vertex.getLabel().equals("Quotation") &&
-                vertex.getPropertyValue("status").toString().equals("open")
-                ? 1 : 0;
-
-              collector.collect(new Tuple2<>(graphId, openQuotation));
-            }
-          }
-        })
-        .groupBy(0).sum(1)
-        .map(
-          new MapFunction<Tuple2<GradoopId, Integer>,
-            Tuple2<GradoopId, PropertyValue>>() {
-
-            @Override
-            public Tuple2<GradoopId, PropertyValue> map(
-              Tuple2<GradoopId, Integer> openQuotations) throws
-              Exception {
-
-              Boolean isClosed = openQuotations.f1.equals(0);
-
-              return new Tuple2<>(
-                openQuotations.f0, PropertyValue.create(isClosed));
-            }
-          });
-    }
-  }
-
   public static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
   getIntegratedInstanceGraph() throws IOException {
 
@@ -165,17 +130,11 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
     return loader.getLogicalGraphByVariable("iig");
   }
 
-  private static class IsClosedPredicateFunction
-    implements FilterFunction<GraphHeadPojo> {
-
-    @Override
-    public boolean filter(GraphHeadPojo graphHead) throws Exception {
-      return graphHead.getPropertyValue("isClosed").getBoolean();
-    }
-  }
-
-  private static class CountSalesOrdersAggregateFunction implements
-    ApplyAggregateFunction<GraphHeadPojo,VertexPojo,EdgePojo> {
+  /**
+   * Aggregate function to determine "isClosed" measure
+   */
+  private static class IsClosedAggregateFunction
+    implements ApplyAggregateFunction<GraphHeadPojo, VertexPojo, EdgePojo> {
 
     @Override
     public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
@@ -187,9 +146,65 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
           public void flatMap(VertexPojo vertex,
             Collector<Tuple2<GradoopId, Integer>> collector) throws Exception {
 
-            for(GradoopId graphId : vertex.getGraphIds()) {
-              Integer foundSalesOrder = vertex.getLabel().equals("SalesOrder")
-                ? 1 : 0;
+            for (GradoopId graphId : vertex.getGraphIds()) {
+              Integer openQuotation = vertex.getLabel().equals("Quotation") &&
+                vertex.getPropertyValue("status").toString().equals("open") ?
+                1 : 0;
+
+              collector.collect(new Tuple2<>(graphId, openQuotation));
+            }
+          }
+        })
+        .groupBy(0).sum(1)
+        .map(
+          new MapFunction<Tuple2<GradoopId, Integer>,
+            Tuple2<GradoopId, PropertyValue>>() {
+
+            @Override
+            public Tuple2<GradoopId, PropertyValue> map(
+              Tuple2<GradoopId, Integer> openQuotations) throws
+              Exception {
+
+              Boolean isClosed = openQuotations.f1.equals(0);
+
+              return new Tuple2<>(
+                openQuotations.f0, PropertyValue.create(isClosed));
+            }
+          });
+    }
+  }
+
+  /**
+   * Predicate function to filter graphs by "isClosed" == true
+   */
+  private static class IsClosedPredicateFunction
+    implements FilterFunction<GraphHeadPojo> {
+
+    @Override
+    public boolean filter(GraphHeadPojo graphHead) throws Exception {
+      return graphHead.getPropertyValue("isClosed").getBoolean();
+    }
+  }
+
+  /**
+   * Aggregate function to count sales orders per graph.
+   */
+  private static class CountSalesOrdersAggregateFunction
+    implements ApplyAggregateFunction<GraphHeadPojo, VertexPojo, EdgePojo> {
+
+    @Override
+    public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
+      GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collection) {
+
+      return collection.getVertices()
+        .flatMap(new FlatMapFunction<VertexPojo, Tuple2<GradoopId, Integer>>() {
+          @Override
+          public void flatMap(VertexPojo vertex,
+            Collector<Tuple2<GradoopId, Integer>> collector) throws Exception {
+
+            for (GradoopId graphId : vertex.getGraphIds()) {
+              Integer foundSalesOrder =
+                vertex.getLabel().equals("SalesOrder") ? 1 : 0;
 
               collector.collect(new Tuple2<>(graphId, foundSalesOrder));
             }
@@ -212,14 +227,17 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
     }
   }
 
+  /**
+   * Transformation function to categorize graphs.
+   */
   private static class CategorizeGraphsTransformationFunction implements
     TransformationFunction<GraphHeadPojo> {
     @Override
     public GraphHeadPojo execute(GraphHeadPojo current,
       GraphHeadPojo transformed) {
 
-      String category = current.getPropertyValue("soCount").getInt() > 0
-        ? "won" : "lost";
+      String category =
+        current.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
 
       transformed.setProperty("category", PropertyValue.create(category));
 
@@ -227,6 +245,9 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
     }
   }
 
+  /**
+   * Transformation function to relabel vertices and to drop properties.
+   */
   private static class RelabelVerticesTransformationFunction implements
     TransformationFunction<VertexPojo> {
     @Override
@@ -234,9 +255,9 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
 
       transformed.setLabel(current.getPropertyValue(
         BusinessTransactionGraphs.SUPERTYPE_KEY).toString()
-        .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL)
-        ? current.getLabel()
-        : current
+        .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL) ?
+        current.getLabel() :
+        current
           .getPropertyValue(BusinessTransactionGraphs.SOURCEID_KEY).toString()
       );
 
@@ -244,6 +265,9 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
     }
   }
 
+  /**
+   * Transformation function to drop properties of edges.
+   */
   private static class EdgeLabelOnlyTransformationFunction implements
     TransformationFunction<EdgePojo> {
     @Override
@@ -254,4 +278,11 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
       return transformed;
     }
   }
+
+
+  @Override
+  public String getDescription() {
+    return  ClusterCharacteristicPatterns.class.getName();
+  }
+
 }

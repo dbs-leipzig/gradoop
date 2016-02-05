@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.operators.grouping;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.grouping.Grouping.GroupingBuilder;
 
@@ -48,12 +47,12 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("g2");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(leipzig {city = \"Leipzig\", count = 2});" +
-      "(dresden {city = \"Dresden\", count = 2});" +
-      "(leipzig)-[{count = 2}]->(leipzig);" +
-      "(leipzig)-[{count = 1}]->(dresden);" +
-      "(dresden)-[{count = 2}]->(dresden);" +
-      "(dresden)-[{count = 1}]->(leipzig)" +
+      "(leipzig {city = \"Leipzig\", count = 2L});" +
+      "(dresden {city = \"Dresden\", count = 2L});" +
+      "(leipzig)-[{count = 2L}]->(leipzig);" +
+      "(leipzig)-[{count = 1L}]->(dresden);" +
+      "(dresden)-[{count = 2L}]->(dresden);" +
+      "(dresden)-[{count = 1L}]->(leipzig)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -80,14 +79,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(leipzig {city = \"Leipzig\", count = 2});" +
-      "(dresden {city = \"Dresden\", count = 3});" +
-      "(berlin  {city = \"Berlin\",  count = 1});" +
-      "(dresden)-[{count = 2}]->(dresden);" +
-      "(dresden)-[{count = 3}]->(leipzig);" +
-      "(leipzig)-[{count = 2}]->(leipzig);" +
-      "(leipzig)-[{count = 1}]->(dresden);" +
-      "(berlin)-[{count = 2}]->(dresden)" +
+      "(leipzig {city = \"Leipzig\", count = 2L});" +
+      "(dresden {city = \"Dresden\", count = 3L});" +
+      "(berlin  {city = \"Berlin\",  count = 1L});" +
+      "(dresden)-[{count = 2L}]->(dresden);" +
+      "(dresden)-[{count = 3L}]->(leipzig);" +
+      "(leipzig)-[{count = 2L}]->(leipzig);" +
+      "(leipzig)-[{count = 1L}]->(dresden);" +
+      "(berlin)-[{count = 2L}]->(dresden)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -114,20 +113,20 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(leipzigF {city = \"Leipzig\", gender=\"f\", count = 1});" +
-      "(leipzigM {city = \"Leipzig\", gender=\"m\", count = 1});" +
-      "(dresdenF {city = \"Dresden\", gender=\"f\", count = 2});" +
-      "(dresdenM {city = \"Dresden\", gender=\"m\", count = 1});" +
-      "(berlinM  {city = \"Berlin\", gender=\"m\",  count = 1});" +
-      "(leipzigF)-[{count = 1}]->(leipzigM);" +
-      "(leipzigM)-[{count = 1}]->(leipzigF);" +
-      "(leipzigM)-[{count = 1}]->(dresdenF);" +
-      "(dresdenF)-[{count = 1}]->(leipzigF);" +
-      "(dresdenF)-[{count = 2}]->(leipzigM);" +
-      "(dresdenF)-[{count = 1}]->(dresdenM);" +
-      "(dresdenM)-[{count = 1}]->(dresdenF);" +
-      "(berlinM)-[{count = 1}]->(dresdenF);" +
-      "(berlinM)-[{count = 1}]->(dresdenM)" +
+      "(leipzigF {city = \"Leipzig\", gender=\"f\", count = 1L});" +
+      "(leipzigM {city = \"Leipzig\", gender=\"m\", count = 1L});" +
+      "(dresdenF {city = \"Dresden\", gender=\"f\", count = 2L});" +
+      "(dresdenM {city = \"Dresden\", gender=\"m\", count = 1L});" +
+      "(berlinM  {city = \"Berlin\", gender=\"m\",  count = 1L});" +
+      "(leipzigF)-[{count = 1L}]->(leipzigM);" +
+      "(leipzigM)-[{count = 1L}]->(leipzigF);" +
+      "(leipzigM)-[{count = 1L}]->(dresdenF);" +
+      "(dresdenF)-[{count = 1L}]->(leipzigF);" +
+      "(dresdenF)-[{count = 2L}]->(leipzigM);" +
+      "(dresdenF)-[{count = 1L}]->(dresdenM);" +
+      "(dresdenM)-[{count = 1L}]->(dresdenF);" +
+      "(berlinM)-[{count = 1L}]->(dresdenF);" +
+      "(berlinM)-[{count = 1L}]->(dresdenM)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -153,10 +152,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
 
     loader.appendToDatabaseFromString("expected[" +
-      "(dresden {city = \"Dresden\", count = 2});" +
-      "(others  {city = " + NULL_STRING + ", count = 1});" +
-      "(others)-[{count = 3}]->(dresden);" +
-      "(dresden)-[{count = 1}]->(dresden)" +
+      "(dresden {city = \"Dresden\", count = 2L});" +
+      "(others  {city = " + NULL_STRING + ", count = 1L});" +
+      "(others)-[{count = 3L}]->(dresden);" +
+      "(dresden)-[{count = 1L}]->(dresden)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -180,12 +179,12 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader.getLogicalGraphByVariable("g3");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(dresdenF {city = \"Dresden\", gender=\"f\", count = 1});" +
-      "(dresdenM {city = \"Dresden\", gender=\"m\", count = 1});" +
-      "(others  {city = " + NULL_STRING + ", gender = " + NULL_STRING + ", count = 1});" +
-      "(others)-[{count = 2}]->(dresdenM);" +
-      "(others)-[{count = 1}]->(dresdenF);" +
-      "(dresdenF)-[{count = 1}]->(dresdenM)" +
+      "(dresdenF {city = \"Dresden\", gender=\"f\", count = 1L});" +
+      "(dresdenM {city = \"Dresden\", gender=\"m\", count = 1L});" +
+      "(others  {city = " + NULL_STRING + ", gender = " + NULL_STRING + ", count = 1L});" +
+      "(others)-[{count = 2L}]->(dresdenM);" +
+      "(others)-[{count = 1L}]->(dresdenF);" +
+      "(dresdenF)-[{count = 1L}]->(dresdenM)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -213,15 +212,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(leipzig {city = \"Leipzig\", count = 2});" +
-      "(dresden {city = \"Dresden\", count = 3});" +
-      "(berlin  {city = \"Berlin\",  count = 1});" +
-      "(dresden)-[{since = 2014, count = 2}]->(dresden);" +
-      "(dresden)-[{since = 2013, count = 2}]->(leipzig);" +
-      "(dresden)-[{since = 2015, count = 1}]->(leipzig);" +
-      "(leipzig)-[{since = 2014, count = 2}]->(leipzig);" +
-      "(leipzig)-[{since = 2013, count = 1}]->(dresden);" +
-      "(berlin)-[{since = 2015, count = 2}]->(dresden)" +
+      "(leipzig {city = \"Leipzig\", count = 2L});" +
+      "(dresden {city = \"Dresden\", count = 3L});" +
+      "(berlin  {city = \"Berlin\",  count = 1L});" +
+      "(dresden)-[{since = 2014, count = 2L}]->(dresden);" +
+      "(dresden)-[{since = 2013, count = 2L}]->(leipzig);" +
+      "(dresden)-[{since = 2015, count = 1L}]->(leipzig);" +
+      "(leipzig)-[{since = 2014, count = 2L}]->(leipzig);" +
+      "(leipzig)-[{since = 2013, count = 1L}]->(dresden);" +
+      "(berlin)-[{since = 2015, count = 2L}]->(dresden)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -263,18 +262,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     );
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00 {a=0,count=3});" +
-      "(v01 {a=1,count=3});" +
-      "(v00)-[{a=0,b=1,count=1}]->(v00);" +
-      "(v00)-[{a=0,b=2,count=1}]->(v00);" +
-      "(v00)-[{a=0,b=3,count=1}]->(v00);" +
-      "(v01)-[{a=2,b=0,count=1}]->(v01);" +
-      "(v01)-[{a=2,b=1,count=1}]->(v01);" +
-      "(v01)-[{a=2,b=3,count=1}]->(v01);" +
-      "(v00)-[{a=0,b=1,count=1}]->(v01);" +
-      "(v00)-[{a=0,b=2,count=1}]->(v01);" +
-      "(v01)-[{a=1,b=2,count=1}]->(v00);" +
-      "(v01)-[{a=1,b=3,count=1}]->(v00);" +
+      "(v00 {a=0,count=3L});" +
+      "(v01 {a=1,count=3L});" +
+      "(v00)-[{a=0,b=1,count=1L}]->(v00);" +
+      "(v00)-[{a=0,b=2,count=1L}]->(v00);" +
+      "(v00)-[{a=0,b=3,count=1L}]->(v00);" +
+      "(v01)-[{a=2,b=0,count=1L}]->(v01);" +
+      "(v01)-[{a=2,b=1,count=1L}]->(v01);" +
+      "(v01)-[{a=2,b=3,count=1L}]->(v01);" +
+      "(v00)-[{a=0,b=1,count=1L}]->(v01);" +
+      "(v00)-[{a=0,b=2,count=1L}]->(v01);" +
+      "(v01)-[{a=1,b=2,count=1L}]->(v00);" +
+      "(v01)-[{a=1,b=3,count=1L}]->(v00);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -317,20 +316,20 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       );
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00 {a=0,b=0,count=1});" +
-      "(v01 {a=0,b=1,count=2});" +
-      "(v10 {a=1,b=0,count=2});" +
-      "(v11 {a=1,b=1,count=1});" +
-      "(v00)-[{a=0,b=1,count=1}]->(v01);" +
-      "(v00)-[{a=0,b=2,count=1}]->(v01);" +
-      "(v01)-[{a=0,b=3,count=1}]->(v01);" +
-      "(v01)-[{a=0,b=1,count=1}]->(v10);" +
-      "(v01)-[{a=0,b=2,count=1}]->(v10);" +
-      "(v11)-[{a=2,b=1,count=1}]->(v10);" +
-      "(v10)-[{a=2,b=3,count=1}]->(v11);" +
-      "(v10)-[{a=2,b=0,count=1}]->(v10);" +
-      "(v10)-[{a=1,b=3,count=1}]->(v01);" +
-      "(v11)-[{a=1,b=2,count=1}]->(v01)" +
+      "(v00 {a=0,b=0,count=1L});" +
+      "(v01 {a=0,b=1,count=2L});" +
+      "(v10 {a=1,b=0,count=2L});" +
+      "(v11 {a=1,b=1,count=1L});" +
+      "(v00)-[{a=0,b=1,count=1L}]->(v01);" +
+      "(v00)-[{a=0,b=2,count=1L}]->(v01);" +
+      "(v01)-[{a=0,b=3,count=1L}]->(v01);" +
+      "(v01)-[{a=0,b=1,count=1L}]->(v10);" +
+      "(v01)-[{a=0,b=2,count=1L}]->(v10);" +
+      "(v11)-[{a=2,b=1,count=1L}]->(v10);" +
+      "(v10)-[{a=2,b=3,count=1L}]->(v11);" +
+      "(v10)-[{a=2,b=0,count=1L}]->(v10);" +
+      "(v10)-[{a=1,b=3,count=1L}]->(v01);" +
+      "(v11)-[{a=1,b=2,count=1L}]->(v01)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -359,11 +358,11 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("g3");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(dresden {city = \"Dresden\", count = 2});" +
-      "(others  {city = " + NULL_STRING + ", count = 1});" +
-      "(others)-[{since = 2013, count = 1}]->(dresden);" +
-      "(others)-[{since = " + NULL_STRING + ", count = 2}]->(dresden);" +
-      "(dresden)-[{since = 2014, count = 1}]->(dresden)" +
+      "(dresden {city = \"Dresden\", count = 2L});" +
+      "(others  {city = " + NULL_STRING + ", count = 1L});" +
+      "(others)-[{since = 2013, count = 1L}]->(dresden);" +
+      "(others)-[{since = " + NULL_STRING + ", count = 2L}]->(dresden);" +
+      "(dresden)-[{since = 2014, count = 1L}]->(dresden)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -389,13 +388,13 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person  {count = 6});" +
-      "(t:Tag     {count = 3});" +
-      "(f:Forum   {count = 2});" +
-      "(p)-[{count = 10}]->(p);" +
-      "(f)-[{count =  6}]->(p)" +
-      "(p)-[{count =  4}]->(t);" +
-      "(f)-[{count =  4}]->(t);" +
+      "(p:Person  {count = 6L});" +
+      "(t:Tag     {count = 3L});" +
+      "(f:Forum   {count = 2L});" +
+      "(p)-[{count = 10L}]->(p);" +
+      "(f)-[{count =  6L}]->(p)" +
+      "(p)-[{count =  4L}]->(t);" +
+      "(f)-[{count =  4L}]->(t);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -422,14 +421,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(l:Person {city = \"Leipzig\", count = 2});" +
-      "(d:Person {city = \"Dresden\", count = 3});" +
-      "(b:Person {city = \"Berlin\",  count = 1});" +
-      "(d)-[{count = 2}]->(d);" +
-      "(d)-[{count = 3}]->(l);" +
-      "(l)-[{count = 2}]->(l);" +
-      "(l)-[{count = 1}]->(d);" +
-      "(b)-[{count = 2}]->(d)" +
+      "(l:Person {city = \"Leipzig\", count = 2L});" +
+      "(d:Person {city = \"Dresden\", count = 3L});" +
+      "(b:Person {city = \"Berlin\",  count = 1L});" +
+      "(d)-[{count = 2L}]->(d);" +
+      "(d)-[{count = 3L}]->(l);" +
+      "(l)-[{count = 2L}]->(l);" +
+      "(l)-[{count = 1L}]->(d);" +
+      "(b)-[{count = 2L}]->(d)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -456,22 +455,22 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city = \"Leipzig\", count = 2});" +
-      "(pD:Person {city = \"Dresden\", count = 3});" +
-      "(pB:Person {city = \"Berlin\",  count = 1});" +
-      "(t:Tag {city = " + NULL_STRING + ",   count = 3});" +
-      "(f:Forum {city = " + NULL_STRING + ", count = 2})" +
-      "(pD)-[{count = 2}]->(pD);" +
-      "(pD)-[{count = 3}]->(pL);" +
-      "(pL)-[{count = 2}]->(pL);" +
-      "(pL)-[{count = 1}]->(pD);" +
-      "(pB)-[{count = 2}]->(pD);" +
-      "(pB)-[{count = 1}]->(t);" +
-      "(pD)-[{count = 2}]->(t);" +
-      "(pL)-[{count = 1}]->(t)" +
-      "(f)-[{count = 3}]->(pD);" +
-      "(f)-[{count = 3}]->(pL);" +
-      "(f)-[{count = 4}]->(t);" +
+      "(pL:Person {city = \"Leipzig\", count = 2L});" +
+      "(pD:Person {city = \"Dresden\", count = 3L});" +
+      "(pB:Person {city = \"Berlin\",  count = 1L});" +
+      "(t:Tag {city = " + NULL_STRING + ",   count = 3L});" +
+      "(f:Forum {city = " + NULL_STRING + ", count = 2L})" +
+      "(pD)-[{count = 2L}]->(pD);" +
+      "(pD)-[{count = 3L}]->(pL);" +
+      "(pL)-[{count = 2L}]->(pL);" +
+      "(pL)-[{count = 1L}]->(pD);" +
+      "(pB)-[{count = 2L}]->(pD);" +
+      "(pB)-[{count = 1L}]->(t);" +
+      "(pD)-[{count = 2L}]->(t);" +
+      "(pL)-[{count = 1L}]->(t)" +
+      "(f)-[{count = 3L}]->(pD);" +
+      "(f)-[{count = 3L}]->(pL);" +
+      "(f)-[{count = 4L}]->(t);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -499,10 +498,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person {count = 6});" +
-      "(p)-[{since = 2014, count = 4}]->(p);" +
-      "(p)-[{since = 2013, count = 3}]->(p);" +
-      "(p)-[{since = 2015, count = 3}]->(p)" +
+      "(p:Person {count = 6L});" +
+      "(p)-[{since = 2014, count = 4L}]->(p);" +
+      "(p)-[{since = 2013, count = 3L}]->(p);" +
+      "(p)-[{since = 2015, count = 3L}]->(p)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -528,16 +527,16 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person  {count = 6});" +
-      "(t:Tag     {count = 3});" +
-      "(f:Forum   {count = 2});" +
-      "(p)-[{since = 2014, count = 4}]->(p);" +
-      "(p)-[{since = 2013, count = 3}]->(p);" +
-      "(p)-[{since = 2015, count = 3}]->(p);" +
-      "(f)-[{since = 2013, count = 1}]->(p)" +
-      "(p)-[{since = " + NULL_STRING + ", count = 4}]->(t);" +
-      "(f)-[{since = " + NULL_STRING + ", count = 4}]->(t);" +
-      "(f)-[{since = " + NULL_STRING + ", count = 5}]->(p);" +
+      "(p:Person  {count = 6L});" +
+      "(t:Tag     {count = 3L});" +
+      "(f:Forum   {count = 2L});" +
+      "(p)-[{since = 2014, count = 4L}]->(p);" +
+      "(p)-[{since = 2013, count = 3L}]->(p);" +
+      "(p)-[{since = 2015, count = 3L}]->(p);" +
+      "(f)-[{since = 2013, count = 1L}]->(p)" +
+      "(p)-[{since = " + NULL_STRING + ", count = 4L}]->(t);" +
+      "(f)-[{since = " + NULL_STRING + ", count = 4L}]->(t);" +
+      "(f)-[{since = " + NULL_STRING + ", count = 5L}]->(p);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -565,15 +564,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(l:Person {city = \"Leipzig\", count = 2});" +
-      "(d:Person {city = \"Dresden\", count = 3});" +
-      "(b:Person {city = \"Berlin\",  count = 1});" +
-      "(d)-[{since = 2014, count = 2}]->(d);" +
-      "(d)-[{since = 2013, count = 2}]->(l);" +
-      "(d)-[{since = 2015, count = 1}]->(l);" +
-      "(l)-[{since = 2014, count = 2}]->(l);" +
-      "(l)-[{since = 2013, count = 1}]->(d);" +
-      "(b)-[{since = 2015, count = 2}]->(d)" +
+      "(l:Person {city = \"Leipzig\", count = 2L});" +
+      "(d:Person {city = \"Dresden\", count = 3L});" +
+      "(b:Person {city = \"Berlin\",  count = 1L});" +
+      "(d)-[{since = 2014, count = 2L}]->(d);" +
+      "(d)-[{since = 2013, count = 2L}]->(l);" +
+      "(d)-[{since = 2015, count = 1L}]->(l);" +
+      "(l)-[{since = 2014, count = 2L}]->(l);" +
+      "(l)-[{since = 2013, count = 1L}]->(d);" +
+      "(b)-[{since = 2015, count = 2L}]->(d)" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -600,14 +599,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person  {count = 6});" +
-      "(t:Tag     {count = 3});" +
-      "(f:Forum   {count = 2});" +
-      "(f)-[:hasModerator {count =  2}]->(p);" +
-      "(p)-[:hasInterest  {count =  4}]->(t);" +
-      "(f)-[:hasMember    {count =  4}]->(p);" +
-      "(f)-[:hasTag       {count =  4}]->(t);" +
-      "(p)-[:knows        {count = 10}]->(p);" +
+      "(p:Person  {count = 6L});" +
+      "(t:Tag     {count = 3L});" +
+      "(f:Forum   {count = 2L});" +
+      "(f)-[:hasModerator {count =  2L}]->(p);" +
+      "(p)-[:hasInterest  {count =  4L}]->(t);" +
+      "(f)-[:hasMember    {count =  4L}]->(p);" +
+      "(f)-[:hasTag       {count =  4L}]->(t);" +
+      "(p)-[:knows        {count = 10L}]->(p);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -636,14 +635,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(l:Person {city = \"Leipzig\", count = 2});" +
-      "(d:Person {city = \"Dresden\", count = 3});" +
-      "(b:Person {city = \"Berlin\",  count = 1});" +
-      "(d)-[:knows {count = 2}]->(d);" +
-      "(d)-[:knows {count = 3}]->(l);" +
-      "(l)-[:knows {count = 2}]->(l);" +
-      "(l)-[:knows {count = 1}]->(d);" +
-      "(b)-[:knows {count = 2}]->(d);" +
+      "(l:Person {city = \"Leipzig\", count = 2L});" +
+      "(d:Person {city = \"Dresden\", count = 3L});" +
+      "(b:Person {city = \"Berlin\",  count = 1L});" +
+      "(d)-[:knows {count = 2L}]->(d);" +
+      "(d)-[:knows {count = 3L}]->(l);" +
+      "(l)-[:knows {count = 2L}]->(l);" +
+      "(l)-[:knows {count = 1L}]->(d);" +
+      "(b)-[:knows {count = 2L}]->(d);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -670,24 +669,24 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city = \"Leipzig\", count = 2});" +
-      "(pD:Person {city = \"Dresden\", count = 3});" +
-      "(pB:Person {city = \"Berlin\", count = 1});" +
-      "(t:Tag   {city = " + NULL_STRING + ", count = 3});" +
-      "(f:Forum {city = " + NULL_STRING + ", count = 2});" +
-      "(pD)-[:knows {count = 2}]->(pD);" +
-      "(pD)-[:knows {count = 3}]->(pL);" +
-      "(pL)-[:knows {count = 2}]->(pL);" +
-      "(pL)-[:knows {count = 1}]->(pD);" +
-      "(pB)-[:knows {count = 2}]->(pD);" +
-      "(pB)-[:hasInterest {count = 1}]->(t);" +
-      "(pD)-[:hasInterest {count = 2}]->(t);" +
-      "(pL)-[:hasInterest {count = 1}]->(t);" +
-      "(f)-[:hasModerator {count = 1}]->(pD);" +
-      "(f)-[:hasModerator {count = 1}]->(pL);" +
-      "(f)-[:hasMember {count = 2}]->(pD);" +
-      "(f)-[:hasMember {count = 2}]->(pL);" +
-      "(f)-[:hasTag {count = 4}]->(t);" +
+      "(pL:Person {city = \"Leipzig\", count = 2L});" +
+      "(pD:Person {city = \"Dresden\", count = 3L});" +
+      "(pB:Person {city = \"Berlin\", count = 1L});" +
+      "(t:Tag   {city = " + NULL_STRING + ", count = 3L});" +
+      "(f:Forum {city = " + NULL_STRING + ", count = 2L});" +
+      "(pD)-[:knows {count = 2L}]->(pD);" +
+      "(pD)-[:knows {count = 3L}]->(pL);" +
+      "(pL)-[:knows {count = 2L}]->(pL);" +
+      "(pL)-[:knows {count = 1L}]->(pD);" +
+      "(pB)-[:knows {count = 2L}]->(pD);" +
+      "(pB)-[:hasInterest {count = 1L}]->(t);" +
+      "(pD)-[:hasInterest {count = 2L}]->(t);" +
+      "(pL)-[:hasInterest {count = 1L}]->(t);" +
+      "(f)-[:hasModerator {count = 1L}]->(pD);" +
+      "(f)-[:hasModerator {count = 1L}]->(pL);" +
+      "(f)-[:hasMember {count = 2L}]->(pD);" +
+      "(f)-[:hasMember {count = 2L}]->(pL);" +
+      "(f)-[:hasTag {count = 4L}]->(t);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -716,10 +715,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person {count = 6});" +
-      "(p)-[:knows {since = 2013, count = 3}]->(p);" +
-      "(p)-[:knows {since = 2014, count = 4}]->(p);" +
-      "(p)-[:knows {since = 2015, count = 3}]->(p);" +
+      "(p:Person {count = 6L});" +
+      "(p)-[:knows {since = 2013, count = 3L}]->(p);" +
+      "(p)-[:knows {since = 2014, count = 4L}]->(p);" +
+      "(p)-[:knows {since = 2015, count = 3L}]->(p);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -746,17 +745,17 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person  {count = 6});" +
-      "(t:Tag     {count = 3});" +
-      "(f:Forum   {count = 2});" +
-      "(p)-[:knows {since = 2014, count = 4}]->(p);" +
-      "(p)-[:knows {since = 2013, count = 3}]->(p);" +
-      "(p)-[:knows {since = 2015, count = 3}]->(p);" +
-      "(f)-[:hasModerator {since = 2013, count = 1}]->(p);" +
-      "(f)-[:hasModerator {since = " + NULL_STRING + ", count = 1}]->(p);" +
-      "(p)-[:hasInterest  {since = " + NULL_STRING + ", count = 4}]->(t);" +
-      "(f)-[:hasMember    {since = " + NULL_STRING + ", count = 4}]->(p);" +
-      "(f)-[:hasTag       {since = " + NULL_STRING + ", count = 4}]->(t);" +
+      "(p:Person  {count = 6L});" +
+      "(t:Tag     {count = 3L});" +
+      "(f:Forum   {count = 2L});" +
+      "(p)-[:knows {since = 2014, count = 4L}]->(p);" +
+      "(p)-[:knows {since = 2013, count = 3L}]->(p);" +
+      "(p)-[:knows {since = 2015, count = 3L}]->(p);" +
+      "(f)-[:hasModerator {since = 2013, count = 1L}]->(p);" +
+      "(f)-[:hasModerator {since = " + NULL_STRING + ", count = 1L}]->(p);" +
+      "(p)-[:hasInterest  {since = " + NULL_STRING + ", count = 4L}]->(t);" +
+      "(f)-[:hasMember    {since = " + NULL_STRING + ", count = 4L}]->(p);" +
+      "(f)-[:hasTag       {since = " + NULL_STRING + ", count = 4L}]->(t);" +
 
       "]");
 
@@ -786,15 +785,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city = \"Leipzig\", count = 2});" +
-      "(pD:Person {city = \"Dresden\", count = 3});" +
-      "(pB:Person {city = \"Berlin\", count = 1});" +
-      "(pD)-[:knows {since = 2014, count = 2}]->(pD);" +
-      "(pD)-[:knows {since = 2013, count = 2}]->(pL);" +
-      "(pD)-[:knows {since = 2015, count = 1}]->(pL);" +
-      "(pL)-[:knows {since = 2014, count = 2}]->(pL);" +
-      "(pL)-[:knows {since = 2013, count = 1}]->(pD);" +
-      "(pB)-[:knows {since = 2015, count = 2}]->(pD);" +
+      "(pL:Person {city = \"Leipzig\", count = 2L});" +
+      "(pD:Person {city = \"Dresden\", count = 3L});" +
+      "(pB:Person {city = \"Berlin\", count = 1L});" +
+      "(pD)-[:knows {since = 2014, count = 2L}]->(pD);" +
+      "(pD)-[:knows {since = 2013, count = 2L}]->(pL);" +
+      "(pD)-[:knows {since = 2015, count = 1L}]->(pL);" +
+      "(pL)-[:knows {since = 2014, count = 2L}]->(pL);" +
+      "(pL)-[:knows {since = 2013, count = 1L}]->(pD);" +
+      "(pB)-[:knows {since = 2015, count = 2L}]->(pD);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -823,25 +822,25 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city = \"Leipzig\", count = 2});" +
-      "(pD:Person {city = \"Dresden\", count = 3});" +
-      "(pB:Person {city = \"Berlin\", count = 1});" +
-      "(t:Tag   {city = " + NULL_STRING + ", count = 3});" +
-      "(f:Forum {city = " + NULL_STRING + ", count = 2});" +
-      "(pD)-[:knows {since = 2014, count = 2}]->(pD);" +
-      "(pD)-[:knows {since = 2013, count = 2}]->(pL);" +
-      "(pD)-[:knows {since = 2015, count = 1}]->(pL);" +
-      "(pL)-[:knows {since = 2014, count = 2}]->(pL);" +
-      "(pL)-[:knows {since = 2013, count = 1}]->(pD);" +
-      "(pB)-[:knows {since = 2015, count = 2}]->(pD);" +
-      "(pB)-[:hasInterest {since = " + NULL_STRING + ", count = 1}]->(t);" +
-      "(pD)-[:hasInterest {since = " + NULL_STRING + ", count = 2}]->(t);" +
-      "(pL)-[:hasInterest {since = " + NULL_STRING + ", count = 1}]->(t);" +
-      "(f)-[:hasModerator {since = 2013, count = 1}]->(pD);" +
-      "(f)-[:hasModerator {since = " + NULL_STRING + ", count = 1}]->(pL);" +
-      "(f)-[:hasMember {since = " + NULL_STRING + ", count = 2}]->(pD);" +
-      "(f)-[:hasMember {since = " + NULL_STRING + ", count = 2}]->(pL);" +
-      "(f)-[:hasTag {since = " + NULL_STRING + ", count = 4}]->(t);" +
+      "(pL:Person {city = \"Leipzig\", count = 2L});" +
+      "(pD:Person {city = \"Dresden\", count = 3L});" +
+      "(pB:Person {city = \"Berlin\", count = 1L});" +
+      "(t:Tag   {city = " + NULL_STRING + ", count = 3L});" +
+      "(f:Forum {city = " + NULL_STRING + ", count = 2L});" +
+      "(pD)-[:knows {since = 2014, count = 2L}]->(pD);" +
+      "(pD)-[:knows {since = 2013, count = 2L}]->(pL);" +
+      "(pD)-[:knows {since = 2015, count = 1L}]->(pL);" +
+      "(pL)-[:knows {since = 2014, count = 2L}]->(pL);" +
+      "(pL)-[:knows {since = 2013, count = 1L}]->(pD);" +
+      "(pB)-[:knows {since = 2015, count = 2L}]->(pD);" +
+      "(pB)-[:hasInterest {since = " + NULL_STRING + ", count = 1L}]->(t);" +
+      "(pD)-[:hasInterest {since = " + NULL_STRING + ", count = 2L}]->(t);" +
+      "(pL)-[:hasInterest {since = " + NULL_STRING + ", count = 1L}]->(t);" +
+      "(f)-[:hasModerator {since = 2013, count = 1L}]->(pD);" +
+      "(f)-[:hasModerator {since = " + NULL_STRING + ", count = 1L}]->(pL);" +
+      "(f)-[:hasMember {since = " + NULL_STRING + ", count = 2L}]->(pD);" +
+      "(f)-[:hasMember {since = " + NULL_STRING + ", count = 2L}]->(pL);" +
+      "(f)-[:hasTag {since = " + NULL_STRING + ", count = 4L}]->(t);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
@@ -888,11 +887,11 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {count=3});" +
-      "(v01:Red  {count=3});" +
-      "(v00)-[{count=3}]->(v00);" +
-      "(v00)-[{count=2}]->(v01);" +
-      "(v01)-[{count=3}]->(v01);" +
+      "(v00:Blue {count=3L});" +
+      "(v01:Red  {count=3L});" +
+      "(v00)-[{count=3L}]->(v00);" +
+      "(v00)-[{count=2L}]->(v01);" +
+      "(v01)-[{count=3L}]->(v01);" +
       "]");
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =

@@ -42,15 +42,28 @@ import java.util.ArrayList;
 public class ExampleOutput
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
+  /**
+   * Flink dataset, collecting the output lines
+   */
   private DataSet<ArrayList<String>> outSet;
 
+  /**
+   * add graph to output
+   * @param caption output caption
+   * @param graph graph
+   */
   public void add(String caption, LogicalGraph<G, V, E> graph) {
     add(caption, GraphCollection.fromGraph(graph));
   }
 
+  /**
+   * add collection to output
+   * @param caption output caption
+   * @param collection collection
+   */
   public void add(String caption, GraphCollection<G, V, E> collection) {
 
-    if(outSet == null) {
+    if (outSet == null) {
       outSet = collection
         .getConfig().getExecutionEnvironment()
         .fromElements(new ArrayList<String>());
@@ -75,12 +88,19 @@ public class ExampleOutput
       .with(new OutputAppender());
   }
 
+  /**
+   * print output
+   * @throws Exception
+   */
   public void print() throws Exception {
     outSet
       .map(new LineCombiner())
       .print();
   }
 
+  /**
+   * Flink function to append output data set.
+   */
   private class OutputAppender
     implements CrossFunction<ArrayList<String>, String, ArrayList<String>> {
 
@@ -94,6 +114,9 @@ public class ExampleOutput
     }
   }
 
+  /**
+   * Flink function to combine outpur lines.
+   */
   private class LineCombiner implements MapFunction<ArrayList<String>, String> {
 
     @Override
