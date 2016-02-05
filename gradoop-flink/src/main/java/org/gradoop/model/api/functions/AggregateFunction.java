@@ -31,7 +31,6 @@ import org.gradoop.model.impl.properties.PropertyValue;
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <N> result type of aggregated numeric values
  */
 public interface AggregateFunction<G extends EPGMGraphHead,
   V extends EPGMVertex, E extends EPGMEdge> {

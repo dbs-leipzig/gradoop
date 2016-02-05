@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.functions.CollectionAggregateFunction;
+import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -41,7 +41,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <N> output type of aggregate function
  */
 public class ApplyAggregation<
   G extends EPGMGraphHead,
@@ -57,7 +56,7 @@ public class ApplyAggregation<
   /**
    * User-defined aggregate function which is applied on a graph collection.
    */
-  private final CollectionAggregateFunction<G, V, E> aggregateFunction;
+  private final ApplyAggregateFunction<G, V, E> aggregateFunction;
 
   /**
    * Creates a new operator instance.
@@ -66,7 +65,7 @@ public class ApplyAggregation<
    * @param aggregateFunction     function to compute aggregate value
    */
   public ApplyAggregation(final String aggregatePropertyKey,
-    final CollectionAggregateFunction<G, V, E> aggregateFunction) {
+    final ApplyAggregateFunction<G, V, E> aggregateFunction) {
     this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
     this.aggregateFunction = checkNotNull(aggregateFunction);
   }

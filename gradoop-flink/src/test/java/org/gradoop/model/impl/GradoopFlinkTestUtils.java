@@ -7,11 +7,10 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.operators.cam.CanonicalAdjacencyMatrix;
-import org.gradoop.model.impl.operators.cam.functions.EdgeDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.GraphHeadDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.VertexDataLabeler;
-import org.gradoop.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
+import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
 
 import java.util.Collection;
 
@@ -111,10 +110,10 @@ public class GradoopFlinkTestUtils {
     E extends EPGMEdge> void printCanonicalAdjacencyMatrix(
     GraphCollection<G, V, E> collection) throws Exception {
 
-    new CanonicalAdjacencyMatrix<>(
-      new GraphHeadDataLabeler<G>(),
-      new VertexDataLabeler<V>(),
-      new EdgeDataLabeler<E>()
+    new CanonicalAdjacencyMatrixBuilder<>(
+      new GraphHeadToDataString<G>(),
+      new VertexToDataString<V>(),
+      new EdgeToDataString<E>()
     ).execute(collection).print();
   }
 }

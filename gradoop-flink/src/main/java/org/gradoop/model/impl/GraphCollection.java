@@ -37,15 +37,12 @@ import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.operators.cam.functions.EdgeDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.EdgeIdLabeler;
-import org.gradoop.model.impl.operators.cam.functions.EdgeSurpressor;
-import org.gradoop.model.impl.operators.cam.functions.GraphHeadDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.GraphHeadEmptyLabeler;
-import org.gradoop.model.impl.operators.cam.functions.GraphHeadIdLabeler;
-import org.gradoop.model.impl.operators.cam.functions.VertexDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.VertexIdLabeler;
-import org.gradoop.model.impl.operators.cam.functions.VertexSurpressor;
+import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.model.impl.operators.distinct.Distinct;
@@ -172,6 +169,26 @@ public class GraphCollection
       createVertexDataSet(vertices, config),
       createEdgeDataSet(edges, config),
       config
+    );
+  }
+
+  /**
+   * Creates a graph collection from a given logical graph.
+   *
+   * @param logicalGraph  input graph
+   * @param <G>           EPGM graph type
+   * @param <V>           EPGM vertex type
+   * @param <E>           EPGM edge type
+   * @return 1-element graph collection
+   */
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E> fromGraph(LogicalGraph<G, V, E> logicalGraph) {
+    return fromDataSets(
+      logicalGraph.getGraphHead(),
+      logicalGraph.getVertices(),
+      logicalGraph.getEdges(),
+      logicalGraph.getConfig()
     );
   }
 
@@ -347,9 +364,9 @@ public class GraphCollection
   public DataSet<Boolean> equalsByGraphElementIds(
     GraphCollection<G, V, E> other) {
     return new CollectionEquality<>(
-      new GraphHeadEmptyLabeler<G>(),
-      new VertexIdLabeler<V>(),
-      new EdgeIdLabeler<E>()
+      new GraphHeadToEmptyString<G>(),
+      new VertexToIdString<V>(),
+      new EdgeToIdString<E>()
     ).execute(this, other);
   }
 
@@ -360,9 +377,9 @@ public class GraphCollection
   public DataSet<Boolean> equalsByGraphElementData(
     GraphCollection<G, V, E> other) {
     return new CollectionEquality<>(
-      new GraphHeadEmptyLabeler<G>(),
-      new VertexDataLabeler<V>(),
-      new EdgeDataLabeler<E>()
+      new GraphHeadToEmptyString<G>(),
+      new VertexToDataString<V>(),
+      new EdgeToDataString<E>()
     ).execute(this, other);
   }
 
@@ -372,9 +389,9 @@ public class GraphCollection
   @Override
   public DataSet<Boolean> equalsByGraphData(GraphCollection<G, V, E> other) {
     return new CollectionEquality<>(
-      new GraphHeadDataLabeler<G>(),
-      new VertexDataLabeler<V>(),
-      new EdgeDataLabeler<E>()
+      new GraphHeadToDataString<G>(),
+      new VertexToDataString<V>(),
+      new EdgeToDataString<E>()
     ).execute(this, other);
   }
 
@@ -443,16 +460,5 @@ public class GraphCollection
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
-  }
-
-  public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  GraphCollection<G, V, E> fromGraph(LogicalGraph<G, V, E> logicalGraph) {
-    return fromDataSets(
-      logicalGraph.getGraphHead(),
-      logicalGraph.getVertices(),
-      logicalGraph.getEdges(),
-      logicalGraph.getConfig()
-    );
   }
 }

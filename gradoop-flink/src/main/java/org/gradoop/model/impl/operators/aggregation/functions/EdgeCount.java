@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
-import org.gradoop.model.api.functions.CollectionAggregateFunction;
+import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.ToPropertyValue;
@@ -42,7 +42,7 @@ import org.gradoop.model.impl.properties.PropertyValue;
 public class EdgeCount
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements
-  AggregateFunction<G, V, E>, CollectionAggregateFunction<G, V, E> {
+  AggregateFunction<G, V, E>, ApplyAggregateFunction<G, V, E> {
 
   /**
    * Returns a 1-element dataset containing the edge count of the given graph.
@@ -67,11 +67,10 @@ public class EdgeCount
   @Override
   public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
     GraphCollection<G, V, E> collection) {
-    return Count
-      .groupBy(
-        collection
-          .getEdges()
+    return Count.groupBy(
+      collection
+        .getEdges()
           .flatMap(new ExpandGraphsToIds<E>())
-      ).map(new GroupCountToPropertyValue());
+    ).map(new GroupCountToPropertyValue());
   }
 }

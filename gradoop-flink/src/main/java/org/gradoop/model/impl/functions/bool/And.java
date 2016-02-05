@@ -60,6 +60,12 @@ public class And implements CrossFunction<Boolean, Boolean, Boolean>,
     return a.cross(b).with(new And());
   }
 
+  /**
+   * Performs a logical conjunction on a data set of boolean values.
+   *
+   * @param d boolean set
+   * @return conjunction
+   */
   public static DataSet<Boolean> reduce(DataSet<Boolean> d) {
     return d.reduce(new And());
   }

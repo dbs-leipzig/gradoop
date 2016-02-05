@@ -59,6 +59,12 @@ public class Or implements ReduceFunction<Boolean>,
     return a.cross(b).with(new Or());
   }
 
+  /**
+   * Performs a logical disjunction on a data set of boolean values.
+   *
+   * @param d boolean set
+   * @return disjunction
+   */
   public static DataSet<Boolean> reduce(DataSet<Boolean> d) {
     return d.reduce(new Or());
   }

@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.examples.utils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -9,13 +26,19 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.cam.CanonicalAdjacencyMatrix;
-import org.gradoop.model.impl.operators.cam.functions.EdgeDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.GraphHeadDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.VertexDataLabeler;
+import org.gradoop.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
+import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
 
 import java.util.ArrayList;
 
+/**
+ * Allows to collect and print intermediate results of example programs.
+ * @param <G> graph type
+ * @param <V> vertex type
+ * @param <E> edge type
+ */
 public class ExampleOutput
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
@@ -39,10 +62,10 @@ public class ExampleOutput
         .fromElements("\n*** " + caption + " ***\n");
 
     DataSet<String> graphStringSet =
-      new CanonicalAdjacencyMatrix<>(
-        new GraphHeadDataLabeler<G>(),
-        new VertexDataLabeler<V>(),
-        new EdgeDataLabeler<E>()
+      new CanonicalAdjacencyMatrixBuilder<>(
+        new GraphHeadToDataString<G>(),
+        new VertexToDataString<V>(),
+        new EdgeToDataString<E>()
       ).execute(collection);
 
     outSet = outSet

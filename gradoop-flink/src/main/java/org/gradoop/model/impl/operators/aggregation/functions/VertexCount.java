@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
-import org.gradoop.model.api.functions.CollectionAggregateFunction;
+import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.ToPropertyValue;
@@ -42,7 +42,7 @@ import org.gradoop.model.impl.properties.PropertyValue;
 public class VertexCount
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements
-  AggregateFunction<G, V, E>, CollectionAggregateFunction<G, V, E> {
+  AggregateFunction<G, V, E>, ApplyAggregateFunction<G, V, E> {
 
   /**
    * Returns a 1-element dataset containing the vertex count of the given graph.
@@ -69,7 +69,7 @@ public class VertexCount
     GraphCollection<G, V, E> collection) {
     return Count.groupBy(collection
       .getVertices()
-      .flatMap(new ExpandGraphsToIds<V>())
+        .flatMap(new ExpandGraphsToIds<V>())
     ).map(new GroupCountToPropertyValue());
   }
 }

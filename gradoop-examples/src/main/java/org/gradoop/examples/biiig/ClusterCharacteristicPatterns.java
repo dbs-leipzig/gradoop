@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.examples.biiig;
 
 import org.apache.commons.io.FileUtils;
@@ -10,7 +27,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.examples.utils.ExampleOutput;
-import org.gradoop.model.api.functions.CollectionAggregateFunction;
+import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -77,7 +94,7 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
    * Aggregate function to determine "isClosed" measure
    */
   private static class IsClosedAggregateFunction
-    implements CollectionAggregateFunction<GraphHeadPojo, VertexPojo, EdgePojo>
+    implements ApplyAggregateFunction<GraphHeadPojo, VertexPojo, EdgePojo>
   {
     @Override
     public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
@@ -158,7 +175,7 @@ public class ClusterCharacteristicPatterns  implements ProgramDescription {
   }
 
   private static class CountSalesOrdersAggregateFunction implements
-    CollectionAggregateFunction<GraphHeadPojo,VertexPojo,EdgePojo> {
+    ApplyAggregateFunction<GraphHeadPojo,VertexPojo,EdgePojo> {
 
     @Override
     public DataSet<Tuple2<GradoopId, PropertyValue>> execute(

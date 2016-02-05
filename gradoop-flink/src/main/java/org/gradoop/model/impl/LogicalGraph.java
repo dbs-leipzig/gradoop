@@ -42,11 +42,11 @@ import org.gradoop.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.model.impl.functions.graphcontainment.GraphContainmentUpdater;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
-import org.gradoop.model.impl.operators.cam.functions.EdgeDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.EdgeIdLabeler;
-import org.gradoop.model.impl.operators.cam.functions.GraphHeadEmptyLabeler;
-import org.gradoop.model.impl.operators.cam.functions.VertexDataLabeler;
-import org.gradoop.model.impl.operators.cam.functions.VertexIdLabeler;
+import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.model.impl.operators.combination.Combination;
 import org.gradoop.model.impl.operators.equality.GraphEquality;
 import org.gradoop.model.impl.operators.exclusion.Exclusion;
@@ -576,9 +576,9 @@ public class LogicalGraph
   @Override
   public DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other) {
     return new GraphEquality<>(
-      new GraphHeadEmptyLabeler<G>(),
-      new VertexIdLabeler<V>(),
-      new EdgeIdLabeler<E>()
+      new GraphHeadToEmptyString<G>(),
+      new VertexToIdString<V>(),
+      new EdgeToIdString<E>()
     ).execute(this, other);
   }
 
@@ -588,9 +588,9 @@ public class LogicalGraph
   @Override
   public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
     return new GraphEquality<>(
-      new GraphHeadEmptyLabeler<G>(),
-      new VertexDataLabeler<V>(),
-      new EdgeDataLabeler<E>()
+      new GraphHeadToEmptyString<G>(),
+      new VertexToDataString<V>(),
+      new EdgeToDataString<E>()
     ).execute(this, other);
   }
 

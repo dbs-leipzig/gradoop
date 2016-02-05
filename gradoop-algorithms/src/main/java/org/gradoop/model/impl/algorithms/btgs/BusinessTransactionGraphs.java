@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.algorithms.btgs;
 
 import org.apache.flink.api.java.DataSet;
@@ -11,9 +28,19 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.algorithms.btgs.functions.*;
+import org.gradoop.model.impl.algorithms.btgs.functions.NewBtgGraphHead;
+import org.gradoop.model.impl.algorithms.btgs.functions.ComponentToNewBtgId;
+import org.gradoop.model.impl.algorithms.btgs.functions.BtgMessenger;
+import org.gradoop.model.impl.algorithms.btgs.functions.BtgUpdater;
+import org.gradoop.model.impl.algorithms.btgs.functions.ToGellyVertexWithIdValue;
+import org.gradoop.model.impl.algorithms.btgs.functions.CollectGradoopIds;
+import org.gradoop.model.impl.algorithms.btgs.functions.MasterData;
+import org.gradoop.model.impl.algorithms.btgs.functions.SetBtgId;
+import org.gradoop.model.impl.algorithms.btgs.functions.SetBtgIds;
+import org.gradoop.model.impl.algorithms.btgs.functions.TargetIdBtgId;
+import org.gradoop.model.impl.algorithms.btgs.functions.TransactionalData;
 import org.gradoop.model.impl.functions.epgm.ExpandGradoopIds;
-import org.gradoop.model.impl.functions.epgm.GellyEdgeWithoutPayload;
+import org.gradoop.model.impl.functions.epgm.ToGellyEdgeWithNullValue;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.join.LeftSide;
@@ -23,16 +50,36 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
- * Created by peet on 01.02.16.
+ * Part of the BIIIG approach.
+ * Vertex-centric implementation to isolate business transaction graphs.
+ *
+ * @param <G> graph type
+ * @param <V> vertex type
+ * @param <E> edge type
  */
 public class BusinessTransactionGraphs
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements UnaryGraphToCollectionOperator<G, V, E> {
 
+  /**
+   * reserved property key referring to master or transactional data
+   */
   public static final String SUPERTYPE_KEY = "superType";
-  public static final String SUPERCLASS_VALUE_TRANSACTIONAL = "T";
+  /**
+   * reserved property value to mark master data
+   */
   public static final String SUPERCLASS_VALUE_MASTER = "M";
+  /**
+   * reserved property value to mark transactional data
+   */
+  public static final String SUPERCLASS_VALUE_TRANSACTIONAL = "T";
+  /**
+   * reserved label to mark business transaction graphs
+   */
   public static final String BTG_LABEL = "BusinessTransactionGraph";
+  /**
+   * reserved property key referring to the source identifier of vertices
+   */
   public static final String SOURCEID_KEY = "sid";
 
   @Override
@@ -49,10 +96,10 @@ public class BusinessTransactionGraphs
 
     DataSet<Edge<GradoopId, NullValue>> transEdges = transGraph
       .getEdges()
-      .map(new GellyEdgeWithoutPayload<E>());
+      .map(new ToGellyEdgeWithNullValue<E>());
 
     Graph<GradoopId, GradoopId, NullValue> gellyTransGraph = Graph.fromDataSet(
-      transVertices.map(new BtgVertex<V>()),
+      transVertices.map(new ToGellyVertexWithIdValue<V>()),
       transEdges,
       iig.getConfig().getExecutionEnvironment()
     );
@@ -67,7 +114,7 @@ public class BusinessTransactionGraphs
       .map(new SwitchPair<GradoopId, GradoopId>())
       .groupBy(0)
       .reduceGroup(new CollectGradoopIds())
-      .map(new BtgId());
+      .map(new ComponentToNewBtgId());
 
     DataSet<Tuple2<GradoopId, GradoopId>> vertexBtgMap = btgVerticesMap
       .flatMap(new ExpandGradoopIds())
@@ -75,19 +122,19 @@ public class BusinessTransactionGraphs
 
     DataSet<G> graphHeads = btgVerticesMap
       .map(new Value0Of2<GradoopId, GradoopIdSet>())
-      .map(new Btg<>(iig.getConfig().getGraphHeadFactory()));
+      .map(new NewBtgGraphHead<>(iig.getConfig().getGraphHeadFactory()));
 
     // filter and update edges
     DataSet<E> btgEdges = iig.getEdges()
       .join(vertexBtgMap)
       .where(new SourceId<E>()).equalTo(0)
-      .with(new SetBtg<E>());
+      .with(new SetBtgId<E>());
 
     // update transactional vertices
     transVertices = transVertices
       .join(vertexBtgMap)
       .where(new Id<V>()).equalTo(0)
-      .with(new SetBtg<V>());
+      .with(new SetBtgId<V>());
 
     // create master data BTG map
     vertexBtgMap = btgEdges
@@ -104,7 +151,7 @@ public class BusinessTransactionGraphs
 
     masterVertices = masterVertices.join(vertexBtgsMap)
       .where(new Id<V>()).equalTo(0)
-      .with(new SetBtgs<V>());
+      .with(new SetBtgIds<V>());
 
     return GraphCollection.fromDataSets(
       graphHeads,
