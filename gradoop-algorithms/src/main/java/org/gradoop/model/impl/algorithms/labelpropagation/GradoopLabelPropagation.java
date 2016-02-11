@@ -53,7 +53,7 @@ public class GradoopLabelPropagation
   @Override
   protected DataSet<Vertex<GradoopId, PropertyValue>> executeInternal(
     Graph<GradoopId, PropertyValue, NullValue> gellyGraph) {
-    return gellyGraph.runVertexCentricIteration(
+    return gellyGraph.runScatterGatherIteration(
       new LPUpdateFunction(), new LPMessageFunction(), getMaxIterations())
       .getVertices();
   }

@@ -83,7 +83,7 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients</artifactId>
+            <artifactId>flink-clients_2.10</artifactId>
             <scope>compile</scope>
         </dependency>
 

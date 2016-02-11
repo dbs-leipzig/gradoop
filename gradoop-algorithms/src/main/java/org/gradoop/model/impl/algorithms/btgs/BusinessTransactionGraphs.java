@@ -83,7 +83,7 @@ public class BusinessTransactionGraphs
   public static final String SOURCEID_KEY = "sid";
 
   @Override
-  public GraphCollection execute(LogicalGraph<G, V, E> iig) {
+  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> iig) {
 
     DataSet<V> masterVertices = iig.getVertices()
       .filter(new MasterData<V>());
@@ -106,7 +106,7 @@ public class BusinessTransactionGraphs
 
     gellyTransGraph = gellyTransGraph
       .getUndirected()
-      .runVertexCentricIteration(new BtgUpdater(), new BtgMessenger(), 100);
+      .runScatterGatherIteration(new BtgUpdater(), new BtgMessenger(), 100);
 
 
     DataSet<Tuple2<GradoopId, GradoopIdSet>> btgVerticesMap = gellyTransGraph

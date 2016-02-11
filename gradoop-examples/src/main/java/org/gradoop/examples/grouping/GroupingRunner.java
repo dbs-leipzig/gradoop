@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples;
+package org.gradoop.examples.grouping;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -32,9 +32,9 @@ import org.gradoop.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 
 /**
- * Graph grouping example example that can be executed on a cluster.
+ * A dedicated program for parametrized graph grouping.
  */
-public class GroupingExample implements ProgramDescription {
+public class GroupingRunner implements ProgramDescription {
 
   /**
    * Vertex input path option
@@ -185,7 +185,7 @@ public class GroupingExample implements ProgramDescription {
     ParseException {
     if (args.length == 0) {
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp(GroupingExample.class.getName(), OPTIONS, true);
+      formatter.printHelp(GroupingRunner.class.getName(), OPTIONS, true);
       return null;
     }
     CommandLineParser parser = new BasicParser();
@@ -220,6 +220,6 @@ public class GroupingExample implements ProgramDescription {
    */
   @Override
   public String getDescription() {
-    return GroupingExample.class.getName();
+    return GroupingRunner.class.getName();
   }
 }

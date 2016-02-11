@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples;
+package org.gradoop.examples.sna;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -32,9 +32,7 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
- * Benchmark program that works on LDBC datasets.
- *
- * The program executes the following workflow:
+ * The benchmark program executes the following workflow:
  *
  * 1) Extract subgraph with:
  *    - vertex predicate: must be of type 'Person'
@@ -46,12 +44,12 @@ import org.gradoop.util.GradoopFlinkConfig;
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
  */
-public class SocialNetworkExample1 implements ProgramDescription {
+public class SNABenchmark1 implements ProgramDescription {
 
   /**
    * File containing EPGM vertices.
    */
-  public static final String NODES_JSON = "nodes.json";
+  public static final String VERTICES_JSON = "nodes.json";
   /**
    * File containing EPGM edges.
    */
@@ -91,7 +89,7 @@ public class SocialNetworkExample1 implements ProgramDescription {
 
     EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
       EPGMDatabase.fromJsonFile(
-        inputDir + NODES_JSON,
+        inputDir + VERTICES_JSON,
         inputDir + EDGES_JSON,
         inputDir + GRAPHS_JSON,
         gradoopConf
@@ -101,7 +99,7 @@ public class SocialNetworkExample1 implements ProgramDescription {
       execute(epgmDatabase.getDatabaseGraph());
 
     result.writeAsJson(
-      outputDir + NODES_JSON,
+      outputDir + VERTICES_JSON,
       outputDir + EDGES_JSON,
       outputDir + GRAPHS_JSON
     );
@@ -140,6 +138,6 @@ public class SocialNetworkExample1 implements ProgramDescription {
 
   @Override
   public String getDescription() {
-    return SocialNetworkExample1.class.getName();
+    return SNABenchmark1.class.getName();
   }
 }

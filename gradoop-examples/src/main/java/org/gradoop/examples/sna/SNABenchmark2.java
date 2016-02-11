@@ -15,13 +15,15 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples;
+package org.gradoop.examples.sna;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
@@ -33,18 +35,17 @@ import org.gradoop.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
- * Benchmark program that works on LDBC datasets.
- *
  * The program executes the following workflow:
  *
  * 1) Extract subgraph with:
  *    - vertex predicate: must be of type 'Person'
  *    - edge predicate: must be of type 'knows'
  * 2) Transform vertices and edges to necessary information
- * 3) Compute communities using label propagation
+ * 3) Compute communities using Gelly label propagation
  * 4) Compute vertex count per community
  * 5) Select communities with a vertex count greater than a given threshold
  * 6) Combine the remaining graphs to a single graph
@@ -54,13 +55,16 @@ import org.gradoop.util.GradoopFlinkConfig;
  * 8) Aggregate the grouped graph:
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
+ *
+ * The program can be either executed using external data (for benchmarking) or
+ * demo data ({@link #main(String[])}).
  */
-public class SocialNetworkExample2 implements ProgramDescription {
+public class SNABenchmark2 implements ProgramDescription {
 
   /**
    * File containing EPGM vertices.
    */
-  public static final String NODES_JSON = "nodes.json";
+  public static final String VERTICES_JSON = "nodes.json";
   /**
    * File containing EPGM edges.
    */
@@ -71,16 +75,32 @@ public class SocialNetworkExample2 implements ProgramDescription {
   public static final String GRAPHS_JSON = "graphs.json";
 
   /**
-   * Runs the example program.
+   * Runs the benchmark program.
    *
-   * Need a (possibly HDFS) input directory that contains
+   * The program can be executed using either external data or demo data.
+   *
+   * If no arguments are given, the program is executed on a demo social network
+   * which is described in 'resources/data/gdl/sna.gdl'.
+   *
+   * For using external data, the following arguments are mandatory:
+   *
+   * 1) (possibly HDFS) input directory that contains
    *  - nodes.json
    *  - edges.json
    *  - graphs.json
    *
-   * Needs a (possibly HDFS) output directory to write the resulting graph to.
+   * 2) (possibly HDFS) output directory to write the resulting graph to
    *
-   * @param args args[0] = input dir, args[1] output dir
+   * 3) Threshold for community selection depending on the dataset size:
+   *
+   * Scale - Threshold (recommended)
+   * 1     -     1,000
+   * 10    -     7,500
+   * 100   -    50,000
+   * 1K    -   350,000
+   * 10K   - 2,450,000
+   *
+   * @param args args[0]: input dir, args[1]: output dir, args[2]: threshold
    * @throws Exception
    */
   @SuppressWarnings({
@@ -88,50 +108,100 @@ public class SocialNetworkExample2 implements ProgramDescription {
     "Duplicates"
   })
   public static void main(String[] args) throws Exception {
-    Preconditions.checkArgument(
-      args.length == 2, "input dir and output dir required");
-    String inputDir  = args[0];
-    String outputDir = args[1];
+
+    boolean useExternalData = args.length > 0;
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> gradoopConf =
       GradoopFlinkConfig.createDefaultConfig(env);
 
+    if (useExternalData) {
+      executeWithExternalData(args, gradoopConf);
+    } else {
+      executeWithDemoData(gradoopConf);
+    }
+  }
+
+  /**
+   * Runs the benchmark program with external data (e.g. from HDFS)
+   *
+   * @param args args[0]: input dir, args[1]: output dir, args[2]: threshold
+   * @param gradoopConf gradoop config
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  private static void executeWithExternalData(String[] args,
+    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> gradoopConf) throws
+    Exception {
+    Preconditions.checkArgument(
+      args.length == 3, "input dir, output dir and threshold required");
+    String inputDir  = args[0];
+    String outputDir = args[1];
+    int threshold    = Integer.parseInt(args[2]);
+
     EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
       EPGMDatabase.fromJsonFile(
-        inputDir + NODES_JSON,
+        inputDir + VERTICES_JSON,
         inputDir + EDGES_JSON,
         inputDir + GRAPHS_JSON,
-        gradoopConf
-      );
+        gradoopConf);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      execute(epgmDatabase.getDatabaseGraph());
+      execute(epgmDatabase.getDatabaseGraph(), threshold);
 
     result.writeAsJson(
-      outputDir + NODES_JSON,
+      outputDir + VERTICES_JSON,
       outputDir + EDGES_JSON,
-      outputDir + GRAPHS_JSON
-    );
+      outputDir + GRAPHS_JSON);
+  }
+
+  /**
+   * Runs the benchmark with demo data.
+   *
+   * @param gradoopConf gradoop config
+   * @throws Exception
+   */
+  private static void executeWithDemoData(
+    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> gradoopConf) throws
+    Exception {
+    ExampleOutput<GraphHeadPojo, VertexPojo, EdgePojo> out =
+      new ExampleOutput<>();
+
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      new FlinkAsciiGraphLoader<>(gradoopConf);
+
+    String graphDefinition = FileUtils.readFileToString(
+      FileUtils.getFile(SNABenchmark2.class
+        .getResource("/data/graphDefinition/sna.graphDefinition").getFile()));
+
+    loader.initDatabaseFromString(graphDefinition);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph =
+      loader.getLogicalGraphByVariable("db");
+
+    out.add("Input Graph", inputGraph);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> outputGraph =
+      execute(inputGraph, 2);
+
+    out.add("Output Graph", outputGraph);
+
+    out.print();
   }
 
   /**
    * The actual computation.
    *
    * @param socialNetwork social network graph
+   * @param threshold     used in community selection predicate
    * @return summarized, aggregated graph
    */
   private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-  execute(LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> socialNetwork) {
+  execute(LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> socialNetwork,
+    final int threshold) {
 
     final int maxIterations   = 4;
-    // LDBC graphalytics dataset:
-    // 1    -   1000
-    // 10   -   7500
-    // 100  -  50000
-    // 1000 - 350000
-    final int minClusterSize  = 350000;
     final String vertexCount  = "vertexCount";
     final String edgeCount    = "edgeCount";
     final String person       = "person";
@@ -146,15 +216,15 @@ public class SocialNetworkExample2 implements ProgramDescription {
       .subgraph(new FilterFunction<VertexPojo>() {
         @Override
         public boolean filter(VertexPojo vertex) throws Exception {
-          return vertex.getLabel().equals(person);
+          return vertex.getLabel().toLowerCase().equals(person);
         }
       }, new FilterFunction<EdgePojo>() {
         @Override
         public boolean filter(EdgePojo edge) throws Exception {
-          return edge.getLabel().equals(knows);
+          return edge.getLabel().toLowerCase().equals(knows);
         }
       })
-      // 2) project to necessary information
+      // project to necessary information
       .transform(new TransformationFunction<GraphHeadPojo>() {
         @Override
         public GraphHeadPojo execute(GraphHeadPojo current,
@@ -190,7 +260,7 @@ public class SocialNetworkExample2 implements ProgramDescription {
       .select(new FilterFunction<GraphHeadPojo>() {
         @Override
         public boolean filter(GraphHeadPojo g) throws Exception {
-          return g.getPropertyValue(vertexCount).getLong() > minClusterSize;
+          return g.getPropertyValue(vertexCount).getLong() > threshold;
         }
       })
       // 6) reduce filtered graphs to a single graph using combination
@@ -207,6 +277,6 @@ public class SocialNetworkExample2 implements ProgramDescription {
 
   @Override
   public String getDescription() {
-    return SocialNetworkExample2.class.getName();
+    return SNABenchmark2.class.getName();
   }
 }
