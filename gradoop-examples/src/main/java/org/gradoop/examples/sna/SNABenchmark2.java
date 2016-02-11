@@ -173,7 +173,7 @@ public class SNABenchmark2 implements ProgramDescription {
 
     String graphDefinition = FileUtils.readFileToString(
       FileUtils.getFile(SNABenchmark2.class
-        .getResource("/data/graphDefinition/sna.graphDefinition").getFile()));
+        .getResource("/data/gdl/sna.gdl").getFile()));
 
     loader.initDatabaseFromString(graphDefinition);
 
