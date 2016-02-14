@@ -43,7 +43,7 @@ public class VertexPojoTest {
   public void createVertexPojoTest() {
     GradoopId vertexID = GradoopId.get();
     String label = "A";
-    PropertyList props = new PropertyList();
+    PropertyList props = PropertyList.create();
     props.set("k1", "v1");
     props.set("k2", "v2");
 

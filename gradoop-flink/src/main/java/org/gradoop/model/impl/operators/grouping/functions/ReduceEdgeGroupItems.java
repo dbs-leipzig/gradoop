@@ -89,9 +89,7 @@ public class ReduceEdgeGroupItems<E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  @SuppressWarnings("unchecked")
   public TypeInformation<E> getProducedType() {
-    return (TypeInformation<E>)
-      TypeExtractor.createTypeInfo(edgeFactory.getType());
+    return TypeExtractor.createTypeInfo(edgeFactory.getType());
   }
 }

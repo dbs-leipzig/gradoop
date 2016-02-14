@@ -36,7 +36,7 @@ public class EdgePojoTest {
       .fromExisting(GradoopId.get(), GradoopId.get());
 
     String label = "A";
-    PropertyList props = new PropertyList();
+    PropertyList props = PropertyList.create();
     props.set("k1", "v1");
     props.set("k2", "v2");
 

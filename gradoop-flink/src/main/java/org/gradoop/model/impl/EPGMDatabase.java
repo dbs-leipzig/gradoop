@@ -24,6 +24,9 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.io.graph.GraphReader;
+import org.gradoop.io.graph.tuples.ImportEdge;
+import org.gradoop.io.graph.tuples.ImportVertex;
 import org.gradoop.io.hbase.HBaseWriter;
 import org.gradoop.io.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.io.hbase.inputformats.GraphHeadTableInputFormat;
@@ -35,6 +38,9 @@ import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.graphcontainment
+  .GraphContainmentUpdaterBroadcast;
 import org.gradoop.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -55,11 +61,13 @@ import org.gradoop.util.GradoopFlinkConfig;
 import java.util.Collection;
 
 /**
- * Enables the access an EPGM instance.
+ * Represents an EPGM database. Enables access to the database graph and to
+ * all logical graphs contained in the database. The database also handles in-
+ * and output from external sources / graphs.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
 public class EPGMDatabase<
   G extends EPGMGraphHead,
@@ -98,6 +106,70 @@ public class EPGMDatabase<
       edges, config);
     graphHead = config.getExecutionEnvironment().fromElements(
       config.getGraphHeadFactory().createGraphHead(GConstants.DB_GRAPH_LABEL));
+  }
+
+  //----------------------------------------------------------------------------
+  // from external graphs
+  //----------------------------------------------------------------------------
+
+  /**
+   * Creates an EPGM database from external graph data.
+   *
+   * @param vertices  import vertices
+   * @param edges     import edges
+   * @param config    Gradoop Flink configuration
+   * @param <G>       EPGM graph head type
+   * @param <V>       EPGM vertex type
+   * @param <E>       EPGM edge type
+   * @param <K>       Import Edge/Vertex identifier type
+   *
+   * @return EPGM database representing the external graph
+   */
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge,
+    K extends Comparable<K>>
+  EPGMDatabase<G, V, E> fromExternalGraph(DataSet<ImportVertex<K>> vertices,
+    DataSet<ImportEdge<K>> edges,
+    GradoopFlinkConfig<G, V, E> config) {
+    return fromExternalGraph(vertices, edges, null, config);
+  }
+
+  /**
+   * Creates an EPGM database from external graph data.
+   *
+   * @param vertices           import vertices
+   * @param edges              import edges
+   * @param lineagePropertyKey used to store external identifiers at resulting
+   *                           EPGM elements
+   * @param config             Gradoop Flink configuration
+   * @param <G>                EPGM graph head type
+   * @param <V>                EPGM vertex type
+   * @param <E>                EPGM edge type
+   * @param <K>                Import Edge/Vertex identifier type
+   *
+   * @return EPGM database representing the external graph
+   */
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge,
+    K extends Comparable<K>>
+  EPGMDatabase<G, V, E> fromExternalGraph(DataSet<ImportVertex<K>> vertices,
+    DataSet<ImportEdge<K>> edges,
+    String lineagePropertyKey,
+    GradoopFlinkConfig<G, V, E> config) {
+
+    LogicalGraph<G, V, E> logicalGraph = new GraphReader<>(
+      vertices, edges, lineagePropertyKey, config).getLogicalGraph();
+
+    return new EPGMDatabase<>(
+      config.getExecutionEnvironment().fromElements(
+        config.getGraphHeadFactory().createGraphHead()),
+      logicalGraph.getVertices(),
+      logicalGraph.getEdges(),
+      config);
   }
 
   //----------------------------------------------------------------------------
@@ -200,17 +272,16 @@ public class EPGMDatabase<
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
     // used for type hinting when loading vertex data
-    TypeInformation<V> vertexTypeInfo = (TypeInformation<V>)
-      TypeExtractor.createTypeInfo(config.getVertexFactory().getType());
+    TypeInformation<V> vertexTypeInfo = TypeExtractor
+      .createTypeInfo(config.getVertexFactory().getType());
     // used for type hinting when loading edge data
-    TypeInformation<E> edgeTypeInfo = (TypeInformation<E>)
-      TypeExtractor.createTypeInfo(config.getEdgeFactory().getType());
+    TypeInformation<E> edgeTypeInfo = TypeExtractor
+      .createTypeInfo(config.getEdgeFactory().getType());
     // used for type hinting when loading graph data
-    TypeInformation<G> graphTypeInfo = (TypeInformation<G>)
-      TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType());
+    TypeInformation<G> graphTypeInfo = TypeExtractor
+      .createTypeInfo(config.getGraphHeadFactory().getType());
 
     // read vertex, edge and graph data
-
     DataSet<V> vertices = env.readTextFile(vertexFile)
       .map(new JsonToVertexMapper<>(config.getVertexFactory()))
       .returns(vertexTypeInfo);
@@ -473,9 +544,32 @@ public class EPGMDatabase<
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph<G, V, E> getDatabaseGraph() {
-    return LogicalGraph
-      .fromDataSets(graphHead, database.getVertices(), database.getEdges(),
+    return getDatabaseGraph(false);
+  }
+
+  /**
+   * Returns a logical graph containing the complete vertex and edge space of
+   * that EPGM database.
+   *
+   * @param withGraphContainment true, if vertices and edges shall be updated to
+   *                             be contained in the logical graph representing
+   *                             the database
+   *
+   * @return logical graph of vertex and edge space
+   */
+  public LogicalGraph<G, V, E> getDatabaseGraph(boolean withGraphContainment) {
+    if (withGraphContainment) {
+      DataSet<GradoopId> graphId = graphHead.map(new Id<G>());
+      return LogicalGraph.fromDataSets(graphHead,
+        database.getVertices().map(new GraphContainmentUpdaterBroadcast<V>())
+          .withBroadcastSet(graphId, GraphContainmentUpdaterBroadcast.GRAPH_ID),
+        database.getEdges().map(new GraphContainmentUpdaterBroadcast<E>())
+          .withBroadcastSet(graphId, GraphContainmentUpdaterBroadcast.GRAPH_ID),
         config);
+    } else {
+      return LogicalGraph.fromDataSets(graphHead,
+        database.getVertices(), database.getEdges(), config);
+    }
   }
 
   //----------------------------------------------------------------------------

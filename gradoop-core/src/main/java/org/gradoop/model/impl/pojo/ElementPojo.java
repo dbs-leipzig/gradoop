@@ -210,7 +210,7 @@ public abstract class ElementPojo implements EPGMElement {
    */
   private void initProperties() {
     if (this.properties == null) {
-      this.properties = new PropertyList();
+      this.properties = PropertyList.create();
     }
   }
 }

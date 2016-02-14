@@ -192,7 +192,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
-    PropertyList props = new PropertyList();
+    PropertyList props = PropertyList.create();
     props.set("k1", value);
 
     final Set<EdgePojo> outEdges = Sets.newHashSetWithExpectedSize(0);

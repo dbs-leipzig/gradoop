@@ -39,7 +39,7 @@ public class PropertyListTest {
 
   @Test
   public void testContainsKey() throws Exception {
-    PropertyList properties = new PropertyList();
+    PropertyList properties = PropertyList.create();
 
     assertFalse("unexpected key found", properties.containsKey(KEY_1));
     properties.set(KEY_1, BOOL_VAL_1);
@@ -58,7 +58,7 @@ public class PropertyListTest {
 
   @Test
   public void testSet() throws Exception {
-    PropertyList properties = new PropertyList();
+    PropertyList properties = PropertyList.create();
 
     properties.set(Property.create(KEY_1, BOOL_VAL_1));
     assertEquals(BOOL_VAL_1, properties.get(KEY_1).getObject());
@@ -70,7 +70,7 @@ public class PropertyListTest {
 
   @Test
   public void testSet1() throws Exception {
-    PropertyList properties = new PropertyList();
+    PropertyList properties = PropertyList.create();
 
     properties.set(KEY_1, PropertyValue.create(BOOL_VAL_1));
     assertEquals(BOOL_VAL_1, properties.get(KEY_1).getObject());
@@ -82,7 +82,7 @@ public class PropertyListTest {
 
   @Test
   public void testSet2() throws Exception {
-    PropertyList properties = new PropertyList();
+    PropertyList properties = PropertyList.create();
 
     properties.set(KEY_1, BOOL_VAL_1);
     assertEquals(BOOL_VAL_1, properties.get(KEY_1).getObject());
@@ -94,7 +94,7 @@ public class PropertyListTest {
 
   @Test
   public void testSize() throws Exception {
-    PropertyList properties = new PropertyList();
+    PropertyList properties = PropertyList.create();
     assertEquals("wrong size", 0, properties.size());
     properties.set(KEY_1, BOOL_VAL_1);
     assertEquals("wrong size", 1, properties.size());
@@ -107,7 +107,7 @@ public class PropertyListTest {
 
   @Test
   public void testIsEmpty() throws Exception {
-    PropertyList properties = new PropertyList();
+    PropertyList properties = PropertyList.create();
     assertTrue("properties was not empty", properties.isEmpty());
     properties.set(KEY_1, BOOL_VAL_1);
     assertFalse("properties was empty", properties.isEmpty());
@@ -129,11 +129,11 @@ public class PropertyListTest {
     assertTrue("same hash code",
       properties1.hashCode() != properties3.hashCode());
 
-    properties1 = new PropertyList();
+    properties1 = PropertyList.create();
     properties1.set(KEY_1, BOOL_VAL_1);
     properties1.set(KEY_2, INT_VAL_2);
 
-    properties2 = new PropertyList();
+    properties2 = PropertyList.create();
     properties2.set(KEY_2, INT_VAL_2);
     properties2.set(KEY_1, BOOL_VAL_1);
 

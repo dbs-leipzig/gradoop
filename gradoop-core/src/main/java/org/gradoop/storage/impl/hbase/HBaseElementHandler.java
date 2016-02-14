@@ -127,7 +127,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    */
   @Override
   public PropertyList readProperties(final Result res) throws IOException {
-    PropertyList properties = new PropertyList();
+    PropertyList properties = PropertyList.create();
     Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
     for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
       properties.set(

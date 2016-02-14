@@ -41,6 +41,11 @@ import java.util.Map;
 public class PropertyList implements Iterable<Property>, Writable {
 
   /**
+   * Default capacity for new property lists.
+   */
+  private static final int DEFAULT_CAPACITY = 10;
+
+  /**
    * Internal representation
    */
   private List<Property> properties;
@@ -49,7 +54,35 @@ public class PropertyList implements Iterable<Property>, Writable {
    * Default constructor
    */
   public PropertyList() {
-    properties = Lists.newArrayList();
+    properties = Lists.newArrayListWithCapacity(DEFAULT_CAPACITY);
+  }
+
+  /**
+   * Creates property list with given capacity.
+   *
+   * @param capacity initial capacity
+   */
+  private PropertyList(int capacity) {
+    properties = Lists.newArrayListWithCapacity(capacity);
+  }
+
+  /**
+   * Creates a new property list.
+   *
+   * @return PropertyList
+   */
+  public static PropertyList create() {
+    return new PropertyList();
+  }
+
+  /**
+   * Creates a new property list with the given initial capacity.
+   *
+   * @param capacity initial capacity
+   * @return PropertyList
+   */
+  public static PropertyList createWithCapacity(int capacity) {
+    return new PropertyList(capacity);
   }
 
   /**
@@ -61,9 +94,13 @@ public class PropertyList implements Iterable<Property>, Writable {
    * @return PropertyList
    */
   public static PropertyList createFromMap(Map<String, Object> map) {
-    PropertyList properties = new PropertyList();
+    PropertyList properties;
 
-    if (map != null) {
+    if (map == null) {
+      properties = PropertyList.createWithCapacity(0);
+    } else {
+      properties = PropertyList.createWithCapacity(map.size());
+
       for (Map.Entry<String, Object> entry : map.entrySet()) {
         properties.set(entry.getKey(), PropertyValue.create(entry.getValue()));
       }
@@ -244,4 +281,5 @@ public class PropertyList implements Iterable<Property>, Writable {
   public String toString() {
     return StringUtils.join(properties, ",");
   }
+
 }

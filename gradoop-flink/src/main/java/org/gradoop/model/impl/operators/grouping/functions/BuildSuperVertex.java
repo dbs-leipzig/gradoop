@@ -88,10 +88,8 @@ public class BuildSuperVertex<V extends EPGMVertex>
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<V> getProducedType() {
-    return (TypeInformation<V>)
-      TypeExtractor.createTypeInfo(vertexFactory.getType());
+    return TypeExtractor.createTypeInfo(vertexFactory.getType());
   }
 }
