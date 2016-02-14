@@ -133,10 +133,9 @@ public interface LogicalGraphOperators
    *
    * @param propertyKey   used to store result of aggregate func
    * @param aggregateFunc computes an aggregate on the logical graph
-   * @param <N>           output type of the aggregate function
    * @return logical graph with additional property storing the aggregate
    */
-  <N extends Number> LogicalGraph<G, V, E> aggregate(String propertyKey,
+  LogicalGraph<G, V, E> aggregate(String propertyKey,
     AggregateFunction<G, V, E> aggregateFunc);
 
   /**
