@@ -29,8 +29,6 @@ import org.gradoop.model.impl.operators.transformation.functions.TransformGraphH
 import org.gradoop.model.impl.operators.transformation.functions.TransformVertex;
 import org.gradoop.util.GradoopFlinkConfig;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * The modification operators is a unary graph operator that takes a logical
  * graph as input and applies user defined modification functions on the
@@ -71,9 +69,16 @@ public class Transformation
   public Transformation(TransformationFunction<G> graphHeadTransFunc,
     TransformationFunction<V> vertexTransFunc,
     TransformationFunction<E> edgeTransFunc) {
-    this.graphHeadTransFunc = checkNotNull(graphHeadTransFunc);
-    this.vertexTransFunc = checkNotNull(vertexTransFunc);
-    this.edgeTransFunc = checkNotNull(edgeTransFunc);
+
+    if (graphHeadTransFunc == null &&
+      vertexTransFunc == null &&
+      edgeTransFunc == null) {
+      throw new IllegalArgumentException(
+        "Provide at least one transformation function.");
+    }
+    this.graphHeadTransFunc = graphHeadTransFunc;
+    this.vertexTransFunc    = vertexTransFunc;
+    this.edgeTransFunc      = edgeTransFunc;
   }
 
   @Override
@@ -96,13 +101,26 @@ public class Transformation
    */
   protected LogicalGraph<G, V, E> executeInternal(DataSet<G> graphHeads,
     DataSet<V> vertices, DataSet<E> edges, GradoopFlinkConfig<G, V, E> config) {
-    return LogicalGraph.fromDataSets(
+
+    DataSet<G> transformedGraphHeads = graphHeadTransFunc != null ?
       graphHeads.map(new TransformGraphHead<>(
-        graphHeadTransFunc, config.getGraphHeadFactory())),
+          graphHeadTransFunc, config.getGraphHeadFactory())) :
+      graphHeads;
+
+    DataSet<V> transformedVertices = vertexTransFunc != null ?
       vertices.map(new TransformVertex<>(
-        vertexTransFunc, config.getVertexFactory())),
+        vertexTransFunc, config.getVertexFactory())) :
+      vertices;
+
+    DataSet<E> transformedEdges = edgeTransFunc != null ?
       edges.map(new TransformEdge<>(
-        edgeTransFunc, config.getEdgeFactory())),
+        edgeTransFunc, config.getEdgeFactory())) :
+      edges;
+
+    return LogicalGraph.fromDataSets(
+      transformedGraphHeads,
+      transformedVertices,
+      transformedEdges,
       config
     );
   }

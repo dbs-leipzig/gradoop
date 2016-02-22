@@ -19,15 +19,29 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.gradoop.GradoopTestUtils.validateIdEquality;
-import static org.junit.Assert.assertEquals;
 
 public class TransformationTest extends GradoopFlinkTestBase {
 
   protected static final String TEST_GRAPH = "" +
     "g0:A  { a = 1 } [(:A { a = 1, b = 2 })-[:a { a = 1, b = 2 }]->(:B { c = 2 })]" +
     "g1:B  { a = 2 } [(:A { a = 2, b = 2 })-[:a { a = 2, b = 2 }]->(:B { c = 3 })]" +
+    // full graph transformation
     "g01:A { a = 2 } [(:A { a = 2, b = 1 })-->(:B { d = 2 })]" +
-    "g11:B { a = 3 } [(:A { a = 3, b = 1 })-->(:B { d = 3 })]";
+    "g11:B { a = 3 } [(:A { a = 3, b = 1 })-->(:B { d = 3 })]" +
+    // graph head only transformation
+    "g02:A { a = 2 } [(:A { a = 1, b = 2 })-[:a { a = 1, b = 2 }]->(:B { c = 2 })]" +
+    "g12:B { a = 3 } [(:A { a = 2, b = 2 })-[:a { a = 2, b = 2 }]->(:B { c = 3 })]" +
+    // vertex only transformation
+    "g03:A { a = 1 } [(:A { a = 2, b = 1 })-[:a { a = 1, b = 2 }]->(:B { d = 2 })]" +
+    "g13:B { a = 2 } [(:A { a = 3, b = 1 })-[:a { a = 2, b = 2 }]->(:B { d = 3 })]" +
+    // edge only transformation
+    "g04:A { a = 1 } [(:A { a = 1, b = 2 })-->(:B { c = 2 })]" +
+    "g14:B { a = 2 } [(:A { a = 2, b = 2 })-->(:B { c = 3 })]";
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testMissingFunctions() {
+    new Transformation<>(null, null, null);
+  }
 
   /**
    * Tests if the identifiers of the resulting elements are the same as in the
@@ -36,7 +50,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
    * @throws Exception
    */
   @Test
-  public void testElementIdentity() throws Exception {
+  public void testIdEquality() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(TEST_GRAPH);
 
@@ -89,7 +103,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
    * @throws Exception
    */
   @Test
-  public void testElementEquality() throws Exception {
+  public void testDataEquality() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(TEST_GRAPH);
 
@@ -106,8 +120,58 @@ public class TransformationTest extends GradoopFlinkTestBase {
       new EdgeModifier<EdgePojo>()
     );
 
-    // TODO: test graph head equality
-    collectAndAssertTrue(result.equalsByElementData(expected));
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  @Test
+  public void testGraphHeadOnlyTransformation() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(TEST_GRAPH);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> original = loader
+      .getLogicalGraphByVariable("g0");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("g02");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result = original
+      .transformGraphHead(new GraphHeadModifier<GraphHeadPojo>());
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  @Test
+  public void testVertexOnlyTransformation() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(TEST_GRAPH);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> original = loader
+      .getLogicalGraphByVariable("g0");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("g03");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result = original
+      .transformVertices(new VertexModifier<VertexPojo>());
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  @Test
+  public void testEdgeOnlyTransformation() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(TEST_GRAPH);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> original = loader
+      .getLogicalGraphByVariable("g0");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+      .getLogicalGraphByVariable("g04");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result = original
+      .transformEdges(new EdgeModifier<EdgePojo>());
+
+    collectAndAssertTrue(result.equalsByData(expected));
   }
 
   public static class GraphHeadModifier<G extends EPGMGraphHead>
@@ -116,7 +180,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
     @Override
     public G execute(G current, G transformed) {
       transformed.setLabel(current.getLabel());
-      transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1L);
+      transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
       return transformed;
     }
   }

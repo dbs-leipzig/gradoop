@@ -16,8 +16,13 @@ import java.util.List;
 
 public class ApplyTransformationTest extends TransformationTest {
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testMissingFunctions() {
+    new ApplyTransformation<>(null, null, null);
+  }
+
   @Test
-  public void testElementIdentity() throws Exception {
+  public void testIdEquality() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(TEST_GRAPH);
 
@@ -66,7 +71,7 @@ public class ApplyTransformationTest extends TransformationTest {
   }
 
   @Test
-  public void testElementEquality() throws Exception {
+  public void testDataEquality() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(TEST_GRAPH);
 
@@ -83,6 +88,66 @@ public class ApplyTransformationTest extends TransformationTest {
         new EdgeModifier<EdgePojo>()));
 
     collectAndAssertTrue(
-      outputCollection.equalsByGraphElementData(expectedCollection));
+      outputCollection.equalsByGraphData(expectedCollection));
+  }
+
+  @Test
+  public void testGraphHeadOnlyTransformation() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(TEST_GRAPH);
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> inputCollection =
+      loader.getGraphCollectionByVariables("g0", "g1");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectedCollection =
+      loader.getGraphCollectionByVariables("g02", "g12");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
+      inputCollection.apply(
+        new ApplyTransformation<GraphHeadPojo, VertexPojo, EdgePojo>(
+          new GraphHeadModifier<GraphHeadPojo>(), null, null));
+
+    collectAndAssertTrue(
+      outputCollection.equalsByGraphData(expectedCollection));
+  }
+
+  @Test
+  public void testVertexOnlyTransformation() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(TEST_GRAPH);
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> inputCollection =
+      loader.getGraphCollectionByVariables("g0", "g1");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectedCollection =
+      loader.getGraphCollectionByVariables("g03", "g13");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
+      inputCollection.apply(
+        new ApplyTransformation<GraphHeadPojo, VertexPojo, EdgePojo>(
+          null, new VertexModifier<VertexPojo>(), null));
+
+    collectAndAssertTrue(
+      outputCollection.equalsByGraphData(expectedCollection));
+  }
+
+  @Test
+  public void testEdgeOnlyTransformation() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(TEST_GRAPH);
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> inputCollection =
+      loader.getGraphCollectionByVariables("g0", "g1");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectedCollection =
+      loader.getGraphCollectionByVariables("g04", "g14");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
+      inputCollection.apply(
+        new ApplyTransformation<GraphHeadPojo, VertexPojo, EdgePojo>(
+          null, null, new EdgeModifier<EdgePojo>()));
+
+    collectAndAssertTrue(
+      outputCollection.equalsByGraphData(expectedCollection));
   }
 }

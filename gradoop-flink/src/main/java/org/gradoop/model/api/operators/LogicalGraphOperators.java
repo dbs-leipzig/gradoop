@@ -91,6 +91,36 @@ public interface LogicalGraphOperators
     TransformationFunction<E> edgeTransformationFunction);
 
   /**
+   * Transforms the graph head of the logical graph using the given
+   * transformation function. The identity of the graph is preserved.
+   *
+   * @param graphHeadTransformationFunction graph head transformation function
+   * @return transformed logical graph
+   */
+  LogicalGraph<G, V, E> transformGraphHead(
+    TransformationFunction<G> graphHeadTransformationFunction);
+
+  /**
+   * Transforms the vertices of the logical graph using the given transformation
+   * function. The identity of the vertices is preserved.
+   *
+   * @param vertexTransformationFunction vertex transformation function
+   * @return transformed logical graph
+   */
+  LogicalGraph<G, V, E> transformVertices(
+    TransformationFunction<V> vertexTransformationFunction);
+
+  /**
+   * Transforms the edges of the logical graph using the given transformation
+   * function. The identity of the edges is preserved.
+   *
+   * @param edgeTransformationFunction edge transformation function
+   * @return transformed logical graph
+   */
+  LogicalGraph<G, V, E> transformEdges(
+    TransformationFunction<E> edgeTransformationFunction);
+
+  /**
    * Returns the subgraph that is induced by the vertices which fulfill the
    * given filter function.
    *
@@ -306,9 +336,18 @@ public interface LogicalGraphOperators
    * attached data (i.e. label and properties) as this graph.
    *
    * @param other other graph
-   * @return 1-element dataset containing true, if equal by element data
+   * @return 1-element dataset containing true, iff equal by element data
    */
   DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other);
+
+  /**
+   * Checks, if another logical graph has the same attached data and contains
+   * vertices and edges with the same attached data as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, iff equal by element data
+   */
+  DataSet<Boolean> equalsByData(LogicalGraph<G, V, E> other);
 
   //----------------------------------------------------------------------------
   // Binary Operators

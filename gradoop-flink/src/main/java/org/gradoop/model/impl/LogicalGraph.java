@@ -44,6 +44,8 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.model.impl.operators.tostring.functions
+  .GraphHeadToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.VertexToIdString;
@@ -359,8 +361,28 @@ public class LogicalGraph
     TransformationFunction<G> graphHeadTransformationFunction,
     TransformationFunction<V> vertexTransformationFunction,
     TransformationFunction<E> edgeTransformationFunction) {
-    return callForGraph(new Transformation<>(graphHeadTransformationFunction,
-      vertexTransformationFunction, edgeTransformationFunction));
+    return callForGraph(new Transformation<>(
+      graphHeadTransformationFunction,
+      vertexTransformationFunction,
+      edgeTransformationFunction));
+  }
+
+  @Override
+  public LogicalGraph<G, V, E> transformGraphHead(
+    TransformationFunction<G> graphHeadTransformationFunction) {
+    return transform(graphHeadTransformationFunction, null, null);
+  }
+
+  @Override
+  public LogicalGraph<G, V, E> transformVertices(
+    TransformationFunction<V> vertexTransformationFunction) {
+    return transform(null, vertexTransformationFunction, null);
+  }
+
+  @Override
+  public LogicalGraph<G, V, E> transformEdges(
+    TransformationFunction<E> edgeTransformationFunction) {
+    return transform(null, null, edgeTransformationFunction);
   }
 
   /**
@@ -589,6 +611,18 @@ public class LogicalGraph
   public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
     return new GraphEquality<>(
       new GraphHeadToEmptyString<G>(),
+      new VertexToDataString<V>(),
+      new EdgeToDataString<E>()
+    ).execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByData(LogicalGraph<G, V, E> other) {
+    return new GraphEquality<>(
+      new GraphHeadToDataString<G>(),
       new VertexToDataString<V>(),
       new EdgeToDataString<E>()
     ).execute(this, other);
