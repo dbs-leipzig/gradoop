@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.aggregation.functions;
+package org.gradoop.model.impl.operators.aggregation.functions.sum;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -26,40 +26,56 @@ import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.ToPropertyValue;
-import org.gradoop.model.impl.functions.graphcontainment.ExpandGraphsToIds;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.count.Count;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
- * Aggregate function returning the edge count of a graph / collection.
+ * Aggregate function returning the sum of a specified property over all edges.
  *
  * @param <G> graph head type
  * @param <V> vertex type
  * @param <E> edge type
  */
-public class EdgeCount
+public class SumEdgeProperty
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements
   AggregateFunction<G, V, E>, ApplyAggregateFunction<G, V, E> {
 
   /**
-   * Returns a 1-element dataset containing the edge count of the given graph.
+   * Property key to retrieve property values
+   */
+  private String propertyKey;
+  /**
+   * User defined zero element of same type as the property values,
+   * needed to specify the type of the property
+   */
+  private Number zero;
+
+  /**
+   * Constructor
+   * @param propertyKey Property key to retrieve property values
+   * @param zero user defined zero element
+   */
+  public SumEdgeProperty(String propertyKey, Number zero) {
+    this.propertyKey = propertyKey;
+    this.zero = zero;
+  }
+
+  /**
+   * Returns a 1-element dataset containing the sum of the given property
+   * over the given elements.
    *
    * @param graph input graph
    * @return 1-element dataset with vertex count
    */
   @Override
   public DataSet<PropertyValue> execute(LogicalGraph<G, V, E> graph) {
-    return Count
-      .count(graph.getEdges())
-      .map(new ToPropertyValue<Long>());
+    return Sum.sum(graph.getEdges(), propertyKey, zero);
   }
 
   /**
    * Returns a dataset containing graph identifiers and the corresponding edge
-   * count.
+   * sum.
    *
    * @param collection input graph collection
    * @return dataset with graph + edge count tuples
@@ -67,10 +83,6 @@ public class EdgeCount
   @Override
   public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
     GraphCollection<G, V, E> collection) {
-    return Count.groupBy(
-      collection
-        .getEdges()
-          .flatMap(new ExpandGraphsToIds<E>())
-    ).map(new GroupCountToPropertyValue());
+    return Sum.groupBy(collection.getEdges(), propertyKey, zero);
   }
 }

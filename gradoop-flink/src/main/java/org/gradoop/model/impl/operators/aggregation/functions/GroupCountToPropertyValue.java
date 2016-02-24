@@ -26,6 +26,7 @@ import org.gradoop.model.impl.properties.PropertyValue;
  * Wraps the result of a group-by-id-count into a property value
  */
 @FunctionAnnotation.ForwardedFields("f0")
+@FunctionAnnotation.ReadFields("f1")
 public class GroupCountToPropertyValue implements
   MapFunction<Tuple2<GradoopId, Long>, Tuple2<GradoopId, PropertyValue>> {
 
