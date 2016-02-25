@@ -75,12 +75,15 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
         new BusinessTransactionGraphs<GraphHeadPojo, VertexPojo, EdgePojo>());
 
     btgs = btgs.apply(new ApplyAggregation<>(
-      "isClosed", new IsClosedAggregateFunction()));
+      "isClosed", PropertyValue.create(0),
+      new IsClosedAggregateFunction
+      ()));
 
     btgs = btgs.select(new IsClosedPredicateFunction());
 
     btgs = btgs.apply(new ApplyAggregation<>(
-      "soCount", new CountSalesOrdersAggregateFunction()));
+      "soCount", PropertyValue.create(0),
+      new CountSalesOrdersAggregateFunction()));
 
     out.add("Business Transaction Graphs with Measures", btgs);
 

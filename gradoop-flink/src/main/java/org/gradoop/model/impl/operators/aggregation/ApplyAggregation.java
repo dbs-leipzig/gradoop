@@ -26,8 +26,9 @@ import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.epgm.PropertySetter;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.aggregation.functions
+  .LeftOuterPropertySetter;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -54,6 +55,11 @@ public class ApplyAggregation<
   private final String aggregatePropertyKey;
 
   /**
+   * User-defined default property
+   */
+  private final PropertyValue defaultValue;
+
+  /**
    * User-defined aggregate function which is applied on a graph collection.
    */
   private final ApplyAggregateFunction<G, V, E> aggregateFunction;
@@ -63,10 +69,14 @@ public class ApplyAggregation<
    *
    * @param aggregatePropertyKey  property key to store aggregate value
    * @param aggregateFunction     function to compute aggregate value
+   * @param defaultValue     user-defined default value for graphs without
+   *                         vertices / edges
    */
   public ApplyAggregation(final String aggregatePropertyKey,
+    final PropertyValue defaultValue,
     final ApplyAggregateFunction<G, V, E> aggregateFunction) {
     this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
+    this.defaultValue = defaultValue;
     this.aggregateFunction = checkNotNull(aggregateFunction);
   }
 
@@ -76,9 +86,9 @@ public class ApplyAggregation<
       aggregateFunction.execute(collection);
 
     DataSet<G> graphHeads = collection.getGraphHeads()
-      .join(aggregateValues)
+      .coGroup(aggregateValues)
       .where(new Id<G>()).equalTo(0)
-      .with(new PropertySetter<G, PropertyValue>(aggregatePropertyKey));
+      .with(new LeftOuterPropertySetter<G>(aggregatePropertyKey, defaultValue));
 
     return GraphCollection.fromDataSets(graphHeads,
       collection.getVertices(),
