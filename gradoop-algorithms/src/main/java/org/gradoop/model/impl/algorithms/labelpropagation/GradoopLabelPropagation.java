@@ -46,7 +46,7 @@ public class GradoopLabelPropagation
    * @param maxIterations Counter to define maximal iteration for the algorithm
    * @param propertyKey   Property key to access the label value
    */
-  protected GradoopLabelPropagation(int maxIterations, String propertyKey) {
+  public GradoopLabelPropagation(int maxIterations, String propertyKey) {
     super(maxIterations, propertyKey);
   }
 
