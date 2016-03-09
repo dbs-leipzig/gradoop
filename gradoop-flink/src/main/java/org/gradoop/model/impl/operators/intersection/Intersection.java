@@ -23,6 +23,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.operators.base.SetOperatorBase;
+import org.gradoop.model.impl.operators.intersection.functions.GroupCountEquals;
 
 /**
  * Returns a collection with all logical graphs that exist in both input
@@ -51,7 +52,7 @@ public class Intersection<
     return firstCollection.getGraphHeads()
       .union(secondCollection.getGraphHeads())
       .groupBy(new Id<G>())
-      .reduceGroup(new GraphHeadGroupReducer<G>(2));
+      .reduceGroup(new GroupCountEquals<G>(2));
   }
 
   /**

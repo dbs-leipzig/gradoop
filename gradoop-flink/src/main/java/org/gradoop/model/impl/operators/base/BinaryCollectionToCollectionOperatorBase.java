@@ -17,22 +17,12 @@
 
 package org.gradoop.model.impl.operators.base;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.intersection.Intersection;
-
-import java.util.Iterator;
 
 /**
  * Abstract operator implementation which can be used with binary collection
@@ -100,108 +90,4 @@ public abstract class BinaryCollectionToCollectionOperatorBase<
    */
   protected abstract DataSet<E> computeNewEdges(DataSet<V> newVertices);
 
-  /**
-   * Checks if the number of grouped elements equals a given expected size.
-   *
-   * @param <GD> EPGM graph head type
-   * @see Intersection
-   */
-  protected static class GraphHeadGroupReducer<GD extends EPGMGraphHead>
-    implements GroupReduceFunction<GD, GD> {
-
-    /**
-     * User defined expectedGroupSize.
-     */
-    private final long expectedGroupSize;
-
-    /**
-     * Creates new group reducer.
-     *
-     * @param expectedGroupSize expected group size
-     */
-    public GraphHeadGroupReducer(long expectedGroupSize) {
-      this.expectedGroupSize = expectedGroupSize;
-    }
-
-    /**
-     * If the number of elements in the group is equal to the user expected
-     * group size, the subgraph will be returned.
-     *
-     * @param iterable  graph data
-     * @param collector output collector (contains 0 or 1 graph)
-     * @throws Exception
-     */
-    @Override
-    public void reduce(Iterable<GD> iterable,
-      Collector<GD> collector) throws Exception {
-      Iterator<GD> iterator = iterable.iterator();
-      long count = 0L;
-      GD graphHead = null;
-      while (iterator.hasNext()) {
-        graphHead = iterator.next();
-        count++;
-      }
-      if (count == expectedGroupSize) {
-        collector.collect(graphHead);
-      }
-    }
-  }
-
-  /**
-   * Creates a {@link Tuple2} from the given input and a given Long value.
-   *
-   * @param <C> input type
-   */
-  @FunctionAnnotation.ForwardedFields("*->f0")
-  protected static class Tuple2LongMapper<C> implements
-    MapFunction<C, Tuple2<C, Long>> {
-
-    /**
-     * Reduce instantiations
-     */
-    private final Tuple2<C, Long> reuseTuple = new Tuple2<>();
-
-    /**
-     * Creates this mapper
-     *
-     * @param secondField user defined long value
-     */
-    public Tuple2LongMapper(Long secondField) {
-      this.reuseTuple.f1 = secondField;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tuple2<C, Long> map(C c) throws Exception {
-      reuseTuple.f0 = c;
-      return reuseTuple;
-    }
-  }
-
-  /**
-   * Returns the identifier of the logical graph in the given tuple.
-   *
-   * @param <GD> graph data type
-   * @param <C>  type of second element in tuple
-   */
-  @FunctionAnnotation.ForwardedFields("f0.id->*")
-  protected static class GraphTupleKeySelector<GD extends EPGMGraphHead, C>
-    implements KeySelector<Tuple2<GD, C>, GradoopId> {
-
-    /**
-     * Empty constructor for initialization in inheriting classes.
-     */
-    public GraphTupleKeySelector() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GradoopId getKey(Tuple2<GD, C> pair) throws Exception {
-      return pair.f0.getId();
-    }
-  }
 }
