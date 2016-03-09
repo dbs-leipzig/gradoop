@@ -293,10 +293,19 @@ public class LogicalGraph
     checkNotNull(vertices, "Vertex collection was null");
     checkNotNull(edges, "Edge collection was null");
     checkNotNull(config, "Config was null");
+
+    G graphHead = config.getGraphHeadFactory().createGraphHead();
+
+    DataSet<V> vertexDataSet = createVertexDataSet(vertices, config)
+      .map(new GraphContainmentUpdater<G, V>(graphHead));
+
+    DataSet<E> edgeDataSet = createEdgeDataSet(edges, config)
+      .map(new GraphContainmentUpdater<G, E>(graphHead));
+
     return fromDataSets(
       createGraphHeadDataSet(new ArrayList<G>(0), config),
-      createVertexDataSet(vertices, config),
-      createEdgeDataSet(edges, config),
+      vertexDataSet,
+      edgeDataSet,
       config
     );
   }
