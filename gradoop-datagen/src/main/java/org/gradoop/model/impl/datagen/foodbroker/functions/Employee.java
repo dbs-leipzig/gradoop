@@ -1,7 +1,14 @@
 package org.gradoop.model.impl.datagen.foodbroker.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.model.impl.datagen.foodbroker.generator.EmployeeGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
@@ -11,15 +18,11 @@ import org.gradoop.model.impl.properties.PropertyList;
 import java.util.List;
 import java.util.Random;
 
-public class Employee extends
-  RichMapFunction<MasterDataSeed, MasterDataObject> {
+public class Employee<V extends EPGMVertex> extends
+  RichMapFunction<MasterDataSeed, MasterDataObject<V>>
+  implements ResultTypeQueryable<MasterDataObject<V>> {
 
-  public static final String CLASS_NAME = "Employee";
-  public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
-  public static final String FIRST_NAMES_FEMALE_BC = "firstNamesFemale";
-  public static final String LAST_NAMES_BC = "nouns";
-  public static final String CITIES_BC = "cities";  
-  
+  private final EPGMVertexFactory<V> vertexFactory;
   private List<String> firstNamesFemale;
   private List<String> firstNamesMale;
   private List<String> lastNames;
@@ -29,18 +32,23 @@ public class Employee extends
   private Integer lastNameCount;
   private Integer cityCount;
 
+  public Employee(EPGMVertexFactory<V> vertexFactory) {
+    this.vertexFactory = vertexFactory;
+  }
+
+
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
     firstNamesFemale = getRuntimeContext()
-      .getBroadcastVariable(FIRST_NAMES_FEMALE_BC);
+      .getBroadcastVariable(EmployeeGenerator.FIRST_NAMES_FEMALE_BC);
     firstNamesMale = getRuntimeContext()
-      .getBroadcastVariable(FIRST_NAMES_MALE_BC);
+      .getBroadcastVariable(EmployeeGenerator.FIRST_NAMES_MALE_BC);
     lastNames = getRuntimeContext()
-      .getBroadcastVariable(LAST_NAMES_BC);
+      .getBroadcastVariable(EmployeeGenerator.LAST_NAMES_BC);
     cities = getRuntimeContext()
-      .getBroadcastVariable(CITIES_BC);
+      .getBroadcastVariable(EmployeeGenerator.CITIES_BC);
 
     firstNameCountFemale = firstNamesFemale.size();
     firstNameCountMale = firstNamesMale.size();
@@ -49,7 +57,7 @@ public class Employee extends
   }
 
   @Override
-  public MasterDataObject map(MasterDataSeed seed) throws  Exception {
+  public MasterDataObject<V> map(MasterDataSeed seed) throws  Exception {
 
     Random random = new Random();
 
@@ -81,6 +89,20 @@ public class Employee extends
 
     properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
 
-    return new MasterDataObject(seed, Employee.CLASS_NAME, properties);
+    V vertex = vertexFactory
+      .createVertex(EmployeeGenerator.CLASS_NAME, properties);
+
+    return new MasterDataObject<>(seed, vertex);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TypeInformation<MasterDataObject<V>> getProducedType() {
+    return new TupleTypeInfo<>(
+      BasicTypeInfo.LONG_TYPE_INFO,
+      BasicTypeInfo.SHORT_TYPE_INFO,
+      TypeExtractor.createTypeInfo(vertexFactory.getType()));
   }
 }

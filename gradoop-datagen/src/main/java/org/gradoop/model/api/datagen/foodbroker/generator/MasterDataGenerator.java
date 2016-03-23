@@ -4,7 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 
-public interface MasterDataGenerator {
+public interface MasterDataGenerator<V extends EPGMVertex> {
 
-  DataSet<MasterDataObject> generate();
+  DataSet<MasterDataObject<V>> generate();
 }

@@ -4,6 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.functions.Product;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
@@ -12,17 +13,23 @@ import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductGenerator  extends AbstractMasterDataGenerator {
+public class ProductGenerator<V extends EPGMVertex>
+  extends AbstractMasterDataGenerator<V> {
+  public static final String CLASS_NAME = "Product";
 
+  public static final String NAMES_GROUPS_BC = "nameGroupPairs";
+  public static final String ADJECTIVES_BC = "adjectives";
 
   public ProductGenerator(ExecutionEnvironment env,
-    FoodBrokerConfig foodBrokerConfig) {
-    super(env, foodBrokerConfig);
+    FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory<V> vertexFactory) {
+    super(env, foodBrokerConfig, vertexFactory);
   }
 
-  public DataSet<MasterDataObject> generate() {
+  public DataSet<MasterDataObject<V>> generate() {
 
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Product.CLASS_NAME);
+    String className = EmployeeGenerator.CLASS_NAME;
+
+    List<MasterDataSeed> seeds = getMasterDataSeeds(className);
 
     List<String> adjectives = getStringValuesFromFile("product.adjectives");
     List<String> fruits = getStringValuesFromFile("product.fruits");
@@ -42,10 +49,10 @@ public class ProductGenerator  extends AbstractMasterDataGenerator {
     }
 
     return env.fromCollection(seeds)
-      .map(new Product())
+      .map(new Product<>(vertexFactory))
       .withBroadcastSet(
-        env.fromCollection(nameGroupPairs), Product.NAMES_GROUPS_BC)
+        env.fromCollection(nameGroupPairs), ProductGenerator.NAMES_GROUPS_BC)
       .withBroadcastSet(
-        env.fromCollection(adjectives), Product.ADJECTIVES_BC);
+        env.fromCollection(adjectives), ProductGenerator.ADJECTIVES_BC);
   }
 }

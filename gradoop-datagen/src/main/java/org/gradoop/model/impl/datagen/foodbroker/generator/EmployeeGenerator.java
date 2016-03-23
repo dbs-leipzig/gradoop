@@ -2,6 +2,8 @@ package org.gradoop.model.impl.datagen.foodbroker.generator;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.functions.Employee;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
@@ -9,17 +11,22 @@ import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 
 import java.util.List;
 
-public class EmployeeGenerator extends AbstractMasterDataGenerator {
-
+public class EmployeeGenerator<V extends EPGMVertex>
+  extends AbstractMasterDataGenerator<V> {
+  public static final String CLASS_NAME = "Employee";
+  public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
+  public static final String FIRST_NAMES_FEMALE_BC = "firstNamesFemale";
+  public static final String LAST_NAMES_BC = "nouns";
+  public static final String CITIES_BC = "cities";
 
   public EmployeeGenerator(ExecutionEnvironment env,
-    FoodBrokerConfig foodBrokerConfig) {
-    super(env, foodBrokerConfig);
+    FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory<V> vertexFactory) {
+    super(env, foodBrokerConfig, vertexFactory);
   }
 
-  public DataSet<MasterDataObject> generate() {
+  public DataSet<MasterDataObject<V>> generate() {
 
-    String className = Employee.CLASS_NAME;
+    String className = EmployeeGenerator.CLASS_NAME;
 
     List<MasterDataSeed> seeds = getMasterDataSeeds(className);
 
@@ -31,16 +38,16 @@ public class EmployeeGenerator extends AbstractMasterDataGenerator {
     List<String> nouns = getStringValuesFromFile("employee.last_names");
 
     return env.fromCollection(seeds)
-      .map(new Employee())
+      .map(new Employee<>(vertexFactory))
       .withBroadcastSet(
         env.fromCollection(firstNamesFemale),
-        Employee.FIRST_NAMES_FEMALE_BC)
+        EmployeeGenerator.FIRST_NAMES_FEMALE_BC)
       .withBroadcastSet(
         env.fromCollection(firstNamesMale),
-        Employee.FIRST_NAMES_MALE_BC)
+        EmployeeGenerator.FIRST_NAMES_MALE_BC)
       .withBroadcastSet(
-        env.fromCollection(nouns), Employee.LAST_NAMES_BC)
+        env.fromCollection(nouns), EmployeeGenerator.LAST_NAMES_BC)
       .withBroadcastSet(
-        env.fromCollection(cities), Employee.CITIES_BC);
+        env.fromCollection(cities), EmployeeGenerator.CITIES_BC);
   }
 }
