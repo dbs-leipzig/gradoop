@@ -1,9 +1,34 @@
 {
   "MasterData" : {
     "Customer" : {
-      "system" : "ERP",
       "offset" : 50,
       "growth" : 20,
+      "good" : 0.1,
+      "bad" : 0.1
+    },
+    "Employee" : {
+      "offset" : 30,
+      "growth" : 10,
+      "good" : 0.1,
+      "bad" : 0.1
+    },
+    "Logistics" : {
+      "offset" : 10,
+      "growth" : 0,
+      "good" : 0.1,
+      "bad" : 0.1
+    },
+    "Product" : {
+      "offset" : 1000,
+      "growth" : 10,
+      "good" : 0.1,
+      "bad" : 0.1,
+      "minPrice" : 0.5,
+      "maxPrice" : 8.5
+    },
+    "Vendor" : {
+      "offset" : 10,
+      "growth" : 5,
       "good" : 0.1,
       "bad" : 0.1
     }

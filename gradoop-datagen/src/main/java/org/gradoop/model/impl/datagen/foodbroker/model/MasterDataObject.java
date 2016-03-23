@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.datagen.model;
+package org.gradoop.model.impl.datagen.foodbroker.model;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.api.EPGMVertex;
