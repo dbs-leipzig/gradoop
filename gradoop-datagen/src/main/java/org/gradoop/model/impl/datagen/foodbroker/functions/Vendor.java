@@ -18,13 +18,11 @@ import org.gradoop.model.impl.properties.PropertyList;
 import java.util.List;
 import java.util.Random;
 
-public class Vendor extends RichMapFunction<MasterDataSeed, MasterDataObject> {
+public class Vendor<V extends EPGMVertex> extends
+  RichMapFunction<MasterDataSeed, MasterDataObject<V>>
+  implements ResultTypeQueryable<MasterDataObject<V>> {
 
-  public static final String CLASS_NAME = "Vendor";
-  public static final String ADJECTIVES_BC = "adjectives";
-  public static final String NOUNS_BC = "nouns";
-  public static final String CITIES_BC = "cities";
-  
+  private final EPGMVertexFactory<V> vertexFactory;
   private List<String> adjectives;
   private List<String> nouns;
   private List<String> cities;
@@ -32,16 +30,21 @@ public class Vendor extends RichMapFunction<MasterDataSeed, MasterDataObject> {
   private Integer nounCount;
   private Integer cityCount;
 
+  public Vendor(EPGMVertexFactory<V> vertexFactory) {
+    this.vertexFactory = vertexFactory;
+  }
+
+
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
     adjectives = getRuntimeContext()
-      .getBroadcastVariable(ADJECTIVES_BC);
+      .getBroadcastVariable(VendorGenerator.ADJECTIVES_BC);
     nouns = getRuntimeContext()
-      .getBroadcastVariable(NOUNS_BC);
+      .getBroadcastVariable(VendorGenerator.NOUNS_BC);
     cities = getRuntimeContext()
-      .getBroadcastVariable(CITIES_BC);
+      .getBroadcastVariable(VendorGenerator.CITIES_BC);
 
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
@@ -49,7 +52,7 @@ public class Vendor extends RichMapFunction<MasterDataSeed, MasterDataObject> {
   }
 
   @Override
-  public MasterDataObject map(MasterDataSeed seed) throws  Exception {
+  public MasterDataObject<V> map(MasterDataSeed seed) throws  Exception {
 
     Random random = new Random();
 
@@ -70,6 +73,20 @@ public class Vendor extends RichMapFunction<MasterDataSeed, MasterDataObject> {
 
     properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
 
-    return new MasterDataObject(seed, Vendor.CLASS_NAME, properties);
+    V vertex = vertexFactory
+      .createVertex(VendorGenerator.CLASS_NAME, properties);
+
+    return new MasterDataObject<>(seed, vertex);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TypeInformation<MasterDataObject<V>> getProducedType() {
+    return new TupleTypeInfo<>(
+      BasicTypeInfo.LONG_TYPE_INFO,
+      BasicTypeInfo.SHORT_TYPE_INFO,
+      TypeExtractor.createTypeInfo(vertexFactory.getType()));
   }
 }

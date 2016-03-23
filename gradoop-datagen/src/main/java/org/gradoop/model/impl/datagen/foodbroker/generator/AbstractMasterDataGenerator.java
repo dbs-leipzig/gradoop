@@ -18,51 +18,57 @@ import java.util.Map;
 /**
  * Created by peet on 23.03.16.
  */
-public abstract class AbstractMasterDataGenerator
-  implements MasterDataGenerator {
-  public static final Short GOOD_VALUE = 1;
-  public static final Short NORMAL_VALUE = 0;
-  public static final Short BAD_VALUE = -1;
+public abstract class AbstractMasterDataGenerator<V extends EPGMVertex>
+  implements MasterDataGenerator<V> {
+  public static final Short GOOD_VALUE = 0;
+  public static final Short NORMAL_VALUE = 1;
+  public static final Short BAD_VALUE = 2;
 
   protected final FoodBrokerConfig foodBrokerConfig;
   protected final ExecutionEnvironment env ;
+  protected final EPGMVertexFactory<V> vertexFactory;
 
   public AbstractMasterDataGenerator(ExecutionEnvironment env,
-    FoodBrokerConfig foodBrokerConfig) {
+    FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory<V> vertexFactory) {
     this.foodBrokerConfig = foodBrokerConfig;
     this.env = env;
+    this.vertexFactory = vertexFactory;
   }
 
   protected List<MasterDataSeed> getMasterDataSeeds(String className) {
+    Integer offset = foodBrokerConfig.getMasterDataOffset(className);
+
+    Integer growth = foodBrokerConfig.getMasterDataGrowth(className);
+
     Double goodRatio = foodBrokerConfig.getMasterDataGoodRatio(className);
 
     Double badRatio = foodBrokerConfig.getMasterDataBadRatio(className);
 
-    Integer count = foodBrokerConfig.getMasterDataCount(className);
+    Integer count = offset + foodBrokerConfig.getScaleFactor() * growth;
 
-    Integer goodCount = (int) Math.round(count * goodRatio);
-    Integer badCount = (int) Math.round(count * badRatio);
-    Integer normalCount = count - goodCount - badCount;
+    Long goodCount = Math.round(count * goodRatio);
+    Long badCount = Math.round(count * badRatio);
+    Long normalCount = count - goodCount - badCount;
 
     List<MasterDataSeed> seedList = new ArrayList<>();
 
-    Integer currentId = 0;
+    Long currentId = 0L;
 
-    Map<Short, Integer> qualityCounts = new HashMap<>();
+    Map<Short, Long> qualityCounts = new HashMap<>();
 
     qualityCounts.put(AbstractMasterDataGenerator.GOOD_VALUE, goodCount);
     qualityCounts.put(AbstractMasterDataGenerator.NORMAL_VALUE, normalCount);
     qualityCounts.put(AbstractMasterDataGenerator.BAD_VALUE, badCount);
 
-    for(Map.Entry<Short, Integer> qualityCount : qualityCounts.entrySet()) {
+    for(Map.Entry<Short, Long> qualityCount : qualityCounts.entrySet()) {
 
       Short quality = qualityCount.getKey();
 
       for(int i = 1; i <= qualityCount.getValue(); i++) {
+        currentId++;
         seedList.add(new MasterDataSeed(
           currentId, quality
         ));
-        currentId++;
       }
     }
 

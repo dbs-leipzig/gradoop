@@ -1,8 +1,17 @@
 package org.gradoop.model.impl.datagen.foodbroker.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
+import org.gradoop.model.impl.datagen.foodbroker.generator.CustomerGenerator;
+import org.gradoop.model.impl.datagen.foodbroker.generator.EmployeeGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -10,14 +19,11 @@ import org.gradoop.model.impl.properties.PropertyList;
 import java.util.List;
 import java.util.Random;
 
-public class Customer extends
-  RichMapFunction<MasterDataSeed, MasterDataObject> {
+public class Customer<V extends EPGMVertex> extends
+  RichMapFunction<MasterDataSeed, MasterDataObject<V>>
+  implements ResultTypeQueryable<MasterDataObject<V>> {
 
-  public static final String CLASS_NAME = "Customer";
-  public static final String ADJECTIVES_BC = "adjectives";
-  public static final String NOUNS_BC = "nouns";
-  public static final String CITIES_BC = "cities";
-  
+  private final EPGMVertexFactory<V> vertexFactory;
   private List<String> adjectives;
   private List<String> nouns;
   private List<String> cities;
@@ -25,16 +31,21 @@ public class Customer extends
   private Integer nounCount;
   private Integer cityCount;
 
+  public Customer(EPGMVertexFactory<V> vertexFactory) {
+    this.vertexFactory = vertexFactory;
+  }
+
+
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
     adjectives = getRuntimeContext()
-      .getBroadcastVariable(ADJECTIVES_BC);
+      .getBroadcastVariable(CustomerGenerator.ADJECTIVES_BC);
     nouns = getRuntimeContext()
-      .getBroadcastVariable(NOUNS_BC);
+      .getBroadcastVariable(CustomerGenerator.NOUNS_BC);
     cities = getRuntimeContext()
-      .getBroadcastVariable(CITIES_BC);
+      .getBroadcastVariable(CustomerGenerator.CITIES_BC);
 
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
@@ -42,7 +53,7 @@ public class Customer extends
   }
 
   @Override
-  public MasterDataObject map(MasterDataSeed seed) throws  Exception {
+  public MasterDataObject<V> map(MasterDataSeed seed) throws  Exception {
 
     Random random = new Random();
 
@@ -63,6 +74,20 @@ public class Customer extends
 
     properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
 
-    return  new MasterDataObject(seed, Customer.CLASS_NAME, properties);
+    V vertex = vertexFactory
+      .createVertex(CustomerGenerator.CLASS_NAME, properties);
+
+    return new MasterDataObject<>(seed, vertex);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TypeInformation<MasterDataObject<V>> getProducedType() {
+    return new TupleTypeInfo<>(
+      BasicTypeInfo.LONG_TYPE_INFO,
+      BasicTypeInfo.SHORT_TYPE_INFO,
+      TypeExtractor.createTypeInfo(vertexFactory.getType()));
   }
 }
