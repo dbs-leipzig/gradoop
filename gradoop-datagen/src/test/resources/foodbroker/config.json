@@ -1,0 +1,11 @@
+{
+  "MasterData" : {
+    "Customer" : {
+      "system" : "ERP",
+      "offset" : 50,
+      "growth" : 20,
+      "good" : 0.1,
+      "bad" : 0.1
+    }
+  }
+}
