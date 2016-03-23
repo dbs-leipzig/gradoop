@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.datagen.config;
+package org.gradoop.model.impl.datagen.foodbroker.config;
 
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
