@@ -2,9 +2,7 @@ package org.gradoop.model.impl.datagen.foodbroker.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.model.impl.datagen.foodbroker.generator.CustomerGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -12,10 +10,14 @@ import org.gradoop.model.impl.properties.PropertyList;
 import java.util.List;
 import java.util.Random;
 
-public class Customer<V extends EPGMVertex> extends
+public class Customer extends
   RichMapFunction<MasterDataSeed, MasterDataObject> {
 
   public static final String CLASS_NAME = "Customer";
+  public static final String ADJECTIVES_BC = "adjectives";
+  public static final String NOUNS_BC = "nouns";
+  public static final String CITIES_BC = "cities";
+  
   private List<String> adjectives;
   private List<String> nouns;
   private List<String> cities;
@@ -28,11 +30,11 @@ public class Customer<V extends EPGMVertex> extends
     super.open(parameters);
 
     adjectives = getRuntimeContext()
-      .getBroadcastVariable(CustomerGenerator.ADJECTIVES_BC);
+      .getBroadcastVariable(ADJECTIVES_BC);
     nouns = getRuntimeContext()
-      .getBroadcastVariable(CustomerGenerator.NOUNS_BC);
+      .getBroadcastVariable(NOUNS_BC);
     cities = getRuntimeContext()
-      .getBroadcastVariable(CustomerGenerator.CITIES_BC);
+      .getBroadcastVariable(CITIES_BC);
 
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();

@@ -1,13 +1,7 @@
 package org.gradoop.model.impl.datagen.foodbroker.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.model.impl.datagen.foodbroker.generator.EmployeeGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
@@ -17,10 +11,15 @@ import org.gradoop.model.impl.properties.PropertyList;
 import java.util.List;
 import java.util.Random;
 
-public class Employee<V extends EPGMVertex> extends
+public class Employee extends
   RichMapFunction<MasterDataSeed, MasterDataObject> {
 
-  private static final String CLASS_NAME = "Employee";
+  public static final String CLASS_NAME = "Employee";
+  public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
+  public static final String FIRST_NAMES_FEMALE_BC = "firstNamesFemale";
+  public static final String LAST_NAMES_BC = "nouns";
+  public static final String CITIES_BC = "cities";  
+  
   private List<String> firstNamesFemale;
   private List<String> firstNamesMale;
   private List<String> lastNames;
@@ -35,13 +34,13 @@ public class Employee<V extends EPGMVertex> extends
     super.open(parameters);
 
     firstNamesFemale = getRuntimeContext()
-      .getBroadcastVariable(EmployeeGenerator.FIRST_NAMES_FEMALE_BC);
+      .getBroadcastVariable(FIRST_NAMES_FEMALE_BC);
     firstNamesMale = getRuntimeContext()
-      .getBroadcastVariable(EmployeeGenerator.FIRST_NAMES_MALE_BC);
+      .getBroadcastVariable(FIRST_NAMES_MALE_BC);
     lastNames = getRuntimeContext()
-      .getBroadcastVariable(EmployeeGenerator.LAST_NAMES_BC);
+      .getBroadcastVariable(LAST_NAMES_BC);
     cities = getRuntimeContext()
-      .getBroadcastVariable(EmployeeGenerator.CITIES_BC);
+      .getBroadcastVariable(CITIES_BC);
 
     firstNameCountFemale = firstNamesFemale.size();
     firstNameCountMale = firstNamesMale.size();

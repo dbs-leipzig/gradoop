@@ -1,16 +1,9 @@
 package org.gradoop.model.impl.datagen.foodbroker.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.model.impl.datagen.foodbroker.generator.ProductGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -18,10 +11,13 @@ import org.gradoop.model.impl.properties.PropertyList;
 import java.util.List;
 import java.util.Random;
 
-public class Product<V extends EPGMVertex> extends
+public class Product extends
   RichMapFunction<MasterDataSeed, MasterDataObject> {
 
   public static final String CLASS_NAME = "Product";
+  public static final String NAMES_GROUPS_BC = "nameGroupPairs";
+  public static final String ADJECTIVES_BC = "adjectives";
+
   private List<Tuple2<String, String>> nameGroupPairs;
   private List<String> adjectives;
 
@@ -33,9 +29,9 @@ public class Product<V extends EPGMVertex> extends
     super.open(parameters);
 
     nameGroupPairs = getRuntimeContext()
-      .getBroadcastVariable(ProductGenerator.NAMES_GROUPS_BC);
+      .getBroadcastVariable(NAMES_GROUPS_BC);
     adjectives = getRuntimeContext()
-      .getBroadcastVariable(ProductGenerator.ADJECTIVES_BC);
+      .getBroadcastVariable(ADJECTIVES_BC);
 
     nameGroupPairCount = nameGroupPairs.size();
     adjectiveCount = adjectives.size();
