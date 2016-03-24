@@ -22,8 +22,6 @@ public class FoodBrokerConfig {
     return new FoodBrokerConfig(path);
   }
 
-
-
   private JSONObject getMasterDataConfigNode(String className) throws
     JSONException {
     return root.getJSONObject("MasterData").getJSONObject(className);
@@ -106,44 +104,50 @@ public class FoodBrokerConfig {
       (getMasterDataGrowth(className) * scaleFactor);
   }
 
-  public Integer getMinQuotationLines() {
+  public Integer getMinSalesQuotationLines() {
     int minLines = 0;
     try {
-      minLines = root.getJSONObject("TransactionalData").getJSONObject("SalesQuotation")
-          .getInt("minLines");
+      minLines = getSalesQuotationNode().getInt("minLines");
     } catch (JSONException e) {
       e.printStackTrace();
     }
     return minLines;
   }
 
+  protected JSONObject getSalesQuotationNode() throws JSONException {
+    return getTransactionalNodes().getJSONObject("SalesQuotation");
+  }
+
+  protected JSONObject getTransactionalNodes() throws JSONException {
+    return root.getJSONObject("TransactionalData");
+  }
+
   public Integer getMaxQuotationLines() {
     int maxLines = 0;
     try {
-      maxLines = root.getJSONObject("TransactionalData").getJSONObject("SalesQuotation")
-        .getInt("maxLines");
+      maxLines = getSalesQuotationNode().getInt("maxLines");
     } catch (JSONException e) {
       e.printStackTrace();
     }
     return maxLines;
   }
 
-  public Float getProbability() {
+  public Float getSalesQuotationConfirmationProbability() {
     Float probability = null;
     try {
-      probability = (float) root.getJSONObject("TransactionalData")
-        .getJSONObject("SalesQuotation").getDouble("probability");
+      probability = (float)
+        getSalesQuotationNode().getDouble("probability");
     } catch (JSONException e) {
       e.printStackTrace();
     }
     return probability;
   }
 
-  public Float getProbabilityInfluence() {
+  public Float getSalesQuotationConfirmationProbabilityInfluence() {
     Float influence = null;
     try {
-      influence = (float) root.getJSONObject("TransactionalData")
-        .getJSONObject("SalesQuotation").getDouble("probabilityInfluence");
+      influence = (float)
+        getSalesQuotationNode().getDouble("probabilityInfluence");
     } catch (JSONException e) {
       e.printStackTrace();
     }

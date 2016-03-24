@@ -4,7 +4,6 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.functions.Product;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
@@ -13,15 +12,11 @@ import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductGenerator<V extends EPGMVertex>
-  extends AbstractMasterDataGenerator {
-  public static final String CLASS_NAME = "Product";
+public class ProductGenerator  extends AbstractMasterDataGenerator {
 
-  public static final String NAMES_GROUPS_BC = "nameGroupPairs";
-  public static final String ADJECTIVES_BC = "adjectives";
 
   public ProductGenerator(ExecutionEnvironment env,
-    FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory<V> vertexFactory) {
+    FoodBrokerConfig foodBrokerConfig) {
     super(env, foodBrokerConfig);
   }
 
@@ -47,10 +42,10 @@ public class ProductGenerator<V extends EPGMVertex>
     }
 
     return env.fromCollection(seeds)
-      .map(new Product<>())
+      .map(new Product())
       .withBroadcastSet(
-        env.fromCollection(nameGroupPairs), ProductGenerator.NAMES_GROUPS_BC)
+        env.fromCollection(nameGroupPairs), Product.NAMES_GROUPS_BC)
       .withBroadcastSet(
-        env.fromCollection(adjectives), ProductGenerator.ADJECTIVES_BC);
+        env.fromCollection(adjectives), Product.ADJECTIVES_BC);
   }
 }

@@ -28,4 +28,16 @@ public class MasterDataObject
   public GradoopId getId() {
     return f2;
   }
+
+  public Long getPrimaryKey() {
+    return this.f0;
+  }
+
+  public String getLabel() {
+    return this.f3;
+  }
+
+  public PropertyList getProperties() {
+    return this.f4;
+  }
 }
