@@ -11,7 +11,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.model.impl.datagen.foodbroker.generator.CustomerGenerator;
-import org.gradoop.model.impl.datagen.foodbroker.generator.EmployeeGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
