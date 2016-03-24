@@ -18,10 +18,13 @@ import org.gradoop.model.impl.properties.PropertyList;
 import java.util.List;
 import java.util.Random;
 
-public class Vendor<V extends EPGMVertex> extends
-  RichMapFunction<MasterDataSeed, MasterDataObject> {
+public class Vendor extends RichMapFunction<MasterDataSeed, MasterDataObject> {
 
-  private static final String CLASS_NAME = "Vendor";
+  public static final String CLASS_NAME = "Vendor";
+  public static final String ADJECTIVES_BC = "adjectives";
+  public static final String NOUNS_BC = "nouns";
+  public static final String CITIES_BC = "cities";
+  
   private List<String> adjectives;
   private List<String> nouns;
   private List<String> cities;
@@ -34,11 +37,11 @@ public class Vendor<V extends EPGMVertex> extends
     super.open(parameters);
 
     adjectives = getRuntimeContext()
-      .getBroadcastVariable(VendorGenerator.ADJECTIVES_BC);
+      .getBroadcastVariable(ADJECTIVES_BC);
     nouns = getRuntimeContext()
-      .getBroadcastVariable(VendorGenerator.NOUNS_BC);
+      .getBroadcastVariable(NOUNS_BC);
     cities = getRuntimeContext()
-      .getBroadcastVariable(VendorGenerator.CITIES_BC);
+      .getBroadcastVariable(CITIES_BC);
 
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
