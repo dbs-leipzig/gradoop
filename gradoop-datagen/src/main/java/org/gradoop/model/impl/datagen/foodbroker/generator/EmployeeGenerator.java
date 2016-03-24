@@ -12,7 +12,7 @@ import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import java.util.List;
 
 public class EmployeeGenerator<V extends EPGMVertex>
-  extends AbstractMasterDataGenerator<V> {
+  extends AbstractMasterDataGenerator {
   public static final String CLASS_NAME = "Employee";
   public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
   public static final String FIRST_NAMES_FEMALE_BC = "firstNamesFemale";
@@ -21,10 +21,10 @@ public class EmployeeGenerator<V extends EPGMVertex>
 
   public EmployeeGenerator(ExecutionEnvironment env,
     FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory<V> vertexFactory) {
-    super(env, foodBrokerConfig, vertexFactory);
+    super(env, foodBrokerConfig);
   }
 
-  public DataSet<MasterDataObject<V>> generate() {
+  public DataSet<MasterDataObject> generate() {
 
     String className = EmployeeGenerator.CLASS_NAME;
 
@@ -38,7 +38,7 @@ public class EmployeeGenerator<V extends EPGMVertex>
     List<String> nouns = getStringValuesFromFile("employee.last_names");
 
     return env.fromCollection(seeds)
-      .map(new Employee<>(vertexFactory))
+      .map(new Employee())
       .withBroadcastSet(
         env.fromCollection(firstNamesFemale),
         EmployeeGenerator.FIRST_NAMES_FEMALE_BC)

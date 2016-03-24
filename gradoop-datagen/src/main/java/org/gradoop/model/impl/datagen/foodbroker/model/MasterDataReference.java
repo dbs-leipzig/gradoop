@@ -16,7 +16,7 @@ public class MasterDataReference extends Tuple2<Short, GradoopId> {
 
   public MasterDataReference(MasterDataObject masterDataObject) {
     setQuality(masterDataObject.getQuality());
-    setTargetId(masterDataObject.getVertex().getId());
+    setTargetId(masterDataObject.getId());
   }
 
   public GradoopId getTargetId() {

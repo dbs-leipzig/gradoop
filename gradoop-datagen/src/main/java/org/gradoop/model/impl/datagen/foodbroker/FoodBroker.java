@@ -2,7 +2,6 @@ package org.gradoop.model.impl.datagen.foodbroker;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -13,8 +12,7 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationWon;
 import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuoationConfirmation;
-import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuoationLinePartOf;
-import org.gradoop.model.impl.datagen.foodbroker.functions.GoodOrBad;
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationLinePartOf;
 import org.gradoop.model.impl.datagen.foodbroker.functions.CreateSalesQuotation;
 import org.gradoop.model.impl.datagen.foodbroker.functions
   .SalesQuotationLineContains;
@@ -56,26 +54,23 @@ public class FoodBroker
 
     // Customer
 
-    DataSet<MasterDataObject<V>> customers = new CustomerGenerator<>(
+    DataSet<MasterDataObject> customers = new CustomerGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
 
     Integer customerCount =
       foodBrokerConfig.getMasterDataCount(CustomerGenerator.CLASS_NAME);
 
-    DataSet<Tuple2<Long, Short>> customerQualities = customers
-      .flatMap(new GoodOrBad<V>());
-
     // Vendor
 
-    DataSet<MasterDataObject<V>> vendors = new VendorGenerator<>(
+    DataSet<MasterDataObject> vendors = new VendorGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
 
-    DataSet<MasterDataObject<V>> logistics = new LogisticsGenerator<>(
+    DataSet<MasterDataObject> logistics = new LogisticsGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
 
     // Employee
 
-    DataSet<MasterDataObject<V>> employees = new EmployeeGenerator<>(
+    DataSet<MasterDataObject> employees = new EmployeeGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
 
     Integer employeeCount =
@@ -83,7 +78,7 @@ public class FoodBroker
 
     // Product
 
-    DataSet<MasterDataObject<V>> products = new ProductGenerator<>(
+    DataSet<MasterDataObject> products = new ProductGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
 
     Integer productCount =
@@ -92,10 +87,10 @@ public class FoodBroker
     DataSet<Long> cases = new CaseGenerator<V, E>(
       env, foodBrokerConfig).generate();
 
-    EPGMVertexFactory<V> vertexFactory = gradoopFlinkConfig.getVertexFactory();
+    EPGMVertexFactory vertexFactory = gradoopFlinkConfig.getVertexFactory();
     EPGMEdgeFactory<E> edgeFactory = gradoopFlinkConfig.getEdgeFactory();
 
-    DataSet<MasterDataObject<V>> vertices = customers
+    DataSet<MasterDataObject> vertices = customers
       .union(vendors)
       .union(logistics)
       .union(employees)
@@ -105,10 +100,10 @@ public class FoodBroker
 
     DataSet<SalesQuotation> salesQuotations = cases
       .map(new CreateSalesQuotation(employeeCount, customerCount))
-      .leftOuterJoin(employees)
+      .join(employees)
       .where(1).equalTo(0)
-      .with(new SalesQuotationSentBy<V>())
-      .leftOuterJoin(customerQualities)
+      .with(new SalesQuotationSentBy())
+      .join(customers)
       .where(3).equalTo(0)
       .with(new SalesQuotationSentTo());
 
@@ -118,8 +113,9 @@ public class FoodBroker
     Integer maxLines = foodBrokerConfig.getMaxQuotationLines();
 
     DataSet<SalesQuotationLine> salesQuotationLines = salesQuotations
-      .flatMap(new SalesQuoationLinePartOf(productCount, minLines, maxLines))
-      .leftOuterJoin(products)
+      .flatMap(new SalesQuotationLinePartOf(productCount, minLines, maxLines));
+
+    salesQuotationLines = salesQuotationLines.join(products)
       .where(1).equalTo(0)
       .with(new SalesQuotationLineContains());
 
@@ -139,8 +135,9 @@ public class FoodBroker
 
     try {
       salesQuotations.print();
-    } catch (Exception e) {e.printStackTrace();}
-
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
 
     return LogicalGraph.createEmptyGraph(gradoopFlinkConfig);
