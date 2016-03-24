@@ -10,14 +10,14 @@ import java.util.Random;
 /**
  * Created by peet on 24.03.16.
  */
-public class SalesQuoationLinePartOf implements
+public class SalesQuotationLinePartOf implements
   FlatMapFunction<SalesQuotation, SalesQuotationLine> {
 
   private final Integer productCount;
   private final Integer minLines;
   private final Integer maxLines;
 
-  public SalesQuoationLinePartOf(Integer productCount, Integer minLines,
+  public SalesQuotationLinePartOf(Integer productCount, Integer minLines,
     Integer maxLines) {
     this.productCount = productCount;
     this.minLines = minLines;
@@ -36,7 +36,7 @@ public class SalesQuoationLinePartOf implements
       SalesQuotationLine salesQuotationLine = new SalesQuotationLine();
 
       salesQuotationLine.setPartOf(salesQuotation.getId());
-      salesQuotationLine.setCountains((long) random.nextInt(productCount));
+      salesQuotationLine.setContains((long) random.nextInt(productCount));
 
       collector.collect(salesQuotationLine);
     }

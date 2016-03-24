@@ -30,8 +30,10 @@ public class SalesQuoationConfirmation
     Float productInfluence =
       salesQuotationLine.getQuality() * probabilityInfluence;
 
-    Float score = new Random().nextFloat() +
-      sentByInfluence + sentToInfluence + productInfluence;
+    Float score = 1 - (new Random().nextFloat() +
+      sentByInfluence + sentToInfluence + productInfluence);
+
+    System.out.println(score);
 
     String status = SalesQuotation.STATUS_WON;
 

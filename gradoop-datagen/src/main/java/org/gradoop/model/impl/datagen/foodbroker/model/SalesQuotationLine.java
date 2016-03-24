@@ -9,16 +9,15 @@ import org.gradoop.model.impl.id.GradoopId;
 public class SalesQuotationLine extends Tuple3<GradoopId, Long, Short> {
 
   public SalesQuotationLine() {
-
+    setContainsQuality((short) 0);
   }
 
-  public void setPartOf(GradoopId caseId) {
-    this.f0 = caseId;
+  public void setPartOf(GradoopId salesQuotationId) {
+    this.f0 = salesQuotationId;
   }
 
-  public void setCountains(Long contains) {
+  public void setContains(Long contains) {
     this.f1 = contains;
-    this.f2 = (short) 0;
   }
 
   public Short getQuality() {

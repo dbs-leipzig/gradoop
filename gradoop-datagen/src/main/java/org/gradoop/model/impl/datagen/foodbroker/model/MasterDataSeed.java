@@ -11,12 +11,16 @@ public class MasterDataSeed extends Tuple2<Integer, Short> {
 
   }
 
-  public MasterDataSeed(Integer intId, Short kind) {
+  public MasterDataSeed(Integer intId, Short quality) {
     this.f0 = intId;
-    this.f1 = kind;
+    this.f1 = quality;
   }
 
   public Integer getLongId() {
     return this.f0;
+  }
+
+  public Short getQuality() {
+    return this.f1;
   }
 }
