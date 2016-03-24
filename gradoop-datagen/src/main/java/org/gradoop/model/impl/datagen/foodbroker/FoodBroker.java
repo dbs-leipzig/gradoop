@@ -2,19 +2,33 @@ package org.gradoop.model.impl.datagen.foodbroker;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.api.datagen.GraphGenerator;
 import org.gradoop.model.impl.LogicalGraph;
-
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationWon;
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuoationConfirmation;
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuoationLinePartOf;
+import org.gradoop.model.impl.datagen.foodbroker.functions.GoodOrBad;
+import org.gradoop.model.impl.datagen.foodbroker.functions.CreateSalesQuotation;
+import org.gradoop.model.impl.datagen.foodbroker.functions
+  .SalesQuotationLineContains;
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationSentBy;
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationSentTo;
+import org.gradoop.model.impl.datagen.foodbroker.model.SalesQuotation;
+import org.gradoop.model.impl.datagen.foodbroker.generator.CaseGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.generator.CustomerGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.generator.EmployeeGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.generator.LogisticsGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.generator.ProductGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.generator.VendorGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
+import org.gradoop.model.impl.datagen.foodbroker.model.SalesQuotationLine;
 import org.gradoop.util.GradoopFlinkConfig;
 
 
@@ -40,8 +54,18 @@ public class FoodBroker
 
     foodBrokerConfig.setScaleFactor(scaleFactor);
 
+    // Customer
+
     DataSet<MasterDataObject<V>> customers = new CustomerGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
+
+    Integer customerCount =
+      foodBrokerConfig.getMasterDataCount(CustomerGenerator.CLASS_NAME);
+
+    DataSet<Tuple2<Long, Short>> customerQualities = customers
+      .flatMap(new GoodOrBad<V>());
+
+    // Vendor
 
     DataSet<MasterDataObject<V>> vendors = new VendorGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
@@ -49,11 +73,27 @@ public class FoodBroker
     DataSet<MasterDataObject<V>> logistics = new LogisticsGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
 
+    // Employee
+
     DataSet<MasterDataObject<V>> employees = new EmployeeGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
 
+    Integer employeeCount =
+      foodBrokerConfig.getMasterDataCount(EmployeeGenerator.CLASS_NAME);
+
+    // Product
+
     DataSet<MasterDataObject<V>> products = new ProductGenerator<>(
       env, foodBrokerConfig, gradoopFlinkConfig.getVertexFactory()).generate();
+
+    Integer productCount =
+      foodBrokerConfig.getMasterDataCount(ProductGenerator.CLASS_NAME);
+
+    DataSet<Long> cases = new CaseGenerator<V, E>(
+      env, foodBrokerConfig).generate();
+
+    EPGMVertexFactory<V> vertexFactory = gradoopFlinkConfig.getVertexFactory();
+    EPGMEdgeFactory<E> edgeFactory = gradoopFlinkConfig.getEdgeFactory();
 
     DataSet<MasterDataObject<V>> vertices = customers
       .union(vendors)
@@ -61,11 +101,47 @@ public class FoodBroker
       .union(employees)
       .union(products);
 
+    // SalesQuotation
+
+    DataSet<SalesQuotation> salesQuotations = cases
+      .map(new CreateSalesQuotation(employeeCount, customerCount))
+      .leftOuterJoin(employees)
+      .where(1).equalTo(0)
+      .with(new SalesQuotationSentBy<V>())
+      .leftOuterJoin(customerQualities)
+      .where(3).equalTo(0)
+      .with(new SalesQuotationSentTo());
+
+    // SalesQuotationLine
+
+    Integer minLines = foodBrokerConfig.getMinQuotationLines();
+    Integer maxLines = foodBrokerConfig.getMaxQuotationLines();
+
+    DataSet<SalesQuotationLine> salesQuotationLines = salesQuotations
+      .flatMap(new SalesQuoationLinePartOf(productCount, minLines, maxLines))
+      .leftOuterJoin(products)
+      .where(1).equalTo(0)
+      .with(new SalesQuotationLineContains());
+
+    // Confirmation
+
+    Float probability = foodBrokerConfig.getProbability();
+    Float probabilityInfluence = foodBrokerConfig.getProbabilityInfluence();
+
+    salesQuotations = salesQuotationLines
+      .groupBy(0)
+      .sum(2)
+      .join(salesQuotations)
+      .where(0).equalTo(5)
+      .with(new SalesQuoationConfirmation(probability, probabilityInfluence));
+
+    salesQuotations = salesQuotations.filter(new SalesQuotationWon());
+
     try {
-      vertices.print();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+      salesQuotations.print();
+    } catch (Exception e) {e.printStackTrace();}
+
+
 
     return LogicalGraph.createEmptyGraph(gradoopFlinkConfig);
   }

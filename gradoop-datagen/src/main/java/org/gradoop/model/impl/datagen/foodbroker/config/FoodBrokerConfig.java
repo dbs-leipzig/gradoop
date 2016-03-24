@@ -86,4 +86,67 @@ public class FoodBrokerConfig {
   public Integer getScaleFactor() {
     return scaleFactor;
   }
+
+  public Integer getCaseCount() {
+
+    Integer casesPerScaleFactor = 0;
+
+    try {
+      casesPerScaleFactor = root
+        .getJSONObject("Process").getInt("casesPerScaleFactor");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    return scaleFactor * casesPerScaleFactor;
+  }
+
+  public Integer getMasterDataCount(String className) {
+    return getMasterDataOffset(className) +
+      (getMasterDataGrowth(className) * scaleFactor);
+  }
+
+  public Integer getMinQuotationLines() {
+    int minLines = 0;
+    try {
+      minLines = root.getJSONObject("TransactionalData").getJSONObject("SalesQuotation")
+          .getInt("minLines");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return minLines;
+  }
+
+  public Integer getMaxQuotationLines() {
+    int maxLines = 0;
+    try {
+      maxLines = root.getJSONObject("TransactionalData").getJSONObject("SalesQuotation")
+        .getInt("maxLines");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return maxLines;
+  }
+
+  public Float getProbability() {
+    Float probability = null;
+    try {
+      probability = (float) root.getJSONObject("TransactionalData")
+        .getJSONObject("SalesQuotation").getDouble("probability");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return probability;
+  }
+
+  public Float getProbabilityInfluence() {
+    Float influence = null;
+    try {
+      influence = (float) root.getJSONObject("TransactionalData")
+        .getJSONObject("SalesQuotation").getDouble("probabilityInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
 }
