@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductGenerator<V extends EPGMVertex>
-  extends AbstractMasterDataGenerator<V> {
+  extends AbstractMasterDataGenerator {
   public static final String CLASS_NAME = "Product";
 
   public static final String NAMES_GROUPS_BC = "nameGroupPairs";
@@ -22,14 +22,12 @@ public class ProductGenerator<V extends EPGMVertex>
 
   public ProductGenerator(ExecutionEnvironment env,
     FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory<V> vertexFactory) {
-    super(env, foodBrokerConfig, vertexFactory);
+    super(env, foodBrokerConfig);
   }
 
-  public DataSet<MasterDataObject<V>> generate() {
+  public DataSet<MasterDataObject> generate() {
 
-    String className = EmployeeGenerator.CLASS_NAME;
-
-    List<MasterDataSeed> seeds = getMasterDataSeeds(className);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(Product.CLASS_NAME);
 
     List<String> adjectives = getStringValuesFromFile("product.adjectives");
     List<String> fruits = getStringValuesFromFile("product.fruits");
@@ -49,7 +47,7 @@ public class ProductGenerator<V extends EPGMVertex>
     }
 
     return env.fromCollection(seeds)
-      .map(new Product<>(vertexFactory))
+      .map(new Product<>())
       .withBroadcastSet(
         env.fromCollection(nameGroupPairs), ProductGenerator.NAMES_GROUPS_BC)
       .withBroadcastSet(
