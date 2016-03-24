@@ -1,20 +1,20 @@
 package org.gradoop.model.impl.datagen.foodbroker.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
-import org.gradoop.model.impl.datagen.foodbroker.model.TransactionalDataObject;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.impl.datagen.foodbroker.model.SalesQuotation;
 
 public class SalesQuotationSentTo implements
-  JoinFunction<TransactionalDataObject, MasterDataObject, TransactionalDataObject> {
-
+  JoinFunction<SalesQuotation,Tuple2<Long, Short>,SalesQuotation> {
 
   @Override
-  public TransactionalDataObject join(TransactionalDataObject quotation,
-    MasterDataObject customer) throws Exception {
+  public SalesQuotation join(SalesQuotation salesQuotation,
+    Tuple2<Long, Short> sentToQuality) throws Exception {
 
-    quotation.getReferences().put(SalesQuotation.SENT_TO, customer.getId());
-    quotation.getQualities().put(SalesQuotation.SENT_TO, customer.getQuality());
+    if(sentToQuality != null) {
+      salesQuotation.setSentToQuality(sentToQuality.f1);
+    }
 
-    return quotation;
+    return salesQuotation;
   }
 }

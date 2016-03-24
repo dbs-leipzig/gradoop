@@ -32,5 +32,17 @@
       "good" : 0.1,
       "bad" : 0.1
     }
+  },
+  "Process" : {
+    "casesPerScaleFactor" : 10000
+  },
+  "TransactionalData" : {
+    "SalesQuotation" : {
+      "minLines" : 1,
+      "maxLines" : 20,
+      "probability" : 0.6,
+      "probabilityInfluence" : 0.2
+    }
   }
+
 }
