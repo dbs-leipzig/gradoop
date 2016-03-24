@@ -19,21 +19,15 @@ import java.util.List;
 import java.util.Random;
 
 public class Logistics<V extends EPGMVertex> extends
-  RichMapFunction<MasterDataSeed, MasterDataObject<V>>
-  implements ResultTypeQueryable<MasterDataObject<V>> {
+  RichMapFunction<MasterDataSeed, MasterDataObject> {
 
-  private final EPGMVertexFactory<V> vertexFactory;
+  private static final String CLASS_NAME = "Logistics";
   private List<String> adjectives;
   private List<String> nouns;
   private List<String> cities;
   private Integer adjectiveCount;
   private Integer nounCount;
   private Integer cityCount;
-
-  public Logistics(EPGMVertexFactory<V> vertexFactory) {
-    this.vertexFactory = vertexFactory;
-  }
-
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -52,7 +46,7 @@ public class Logistics<V extends EPGMVertex> extends
   }
 
   @Override
-  public MasterDataObject<V> map(MasterDataSeed seed) throws  Exception {
+  public MasterDataObject map(MasterDataSeed seed) throws  Exception {
 
     Random random = new Random();
 
@@ -73,20 +67,7 @@ public class Logistics<V extends EPGMVertex> extends
 
     properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
 
-    V vertex = vertexFactory
-      .createVertex(LogisticsGenerator.CLASS_NAME, properties);
 
-    return new MasterDataObject<>(seed, vertex);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public TypeInformation<MasterDataObject<V>> getProducedType() {
-    return new TupleTypeInfo<>(
-      BasicTypeInfo.LONG_TYPE_INFO,
-      BasicTypeInfo.SHORT_TYPE_INFO,
-      TypeExtractor.createTypeInfo(vertexFactory.getType()));
+    return new MasterDataObject(seed, Logistics.CLASS_NAME, properties);
   }
 }

@@ -12,18 +12,18 @@ import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import java.util.List;
 
 public class VendorGenerator<V extends EPGMVertex>
-  extends AbstractMasterDataGenerator<V> {
+  extends AbstractMasterDataGenerator {
   public static final String CLASS_NAME = "Vendor";
   public static final String ADJECTIVES_BC = "adjectives";
   public static final String NOUNS_BC = "nouns";
   public static final String CITIES_BC = "cities";
 
   public VendorGenerator(ExecutionEnvironment env,
-    FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory<V> vertexFactory) {
-    super(env, foodBrokerConfig, vertexFactory);
+    FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory vertexFactory) {
+    super(env, foodBrokerConfig);
   }
 
-  public DataSet<MasterDataObject<V>> generate() {
+  public DataSet<MasterDataObject> generate() {
 
     String className = VendorGenerator.CLASS_NAME;
 
@@ -34,7 +34,7 @@ public class VendorGenerator<V extends EPGMVertex>
     List<String> nouns = getStringValuesFromFile("vendor.nouns");
 
     return env.fromCollection(seeds)
-      .map(new Vendor<>(vertexFactory))
+      .map(new Vendor<>())
       .withBroadcastSet(
         env.fromCollection(adjectives), VendorGenerator.ADJECTIVES_BC)
       .withBroadcastSet(

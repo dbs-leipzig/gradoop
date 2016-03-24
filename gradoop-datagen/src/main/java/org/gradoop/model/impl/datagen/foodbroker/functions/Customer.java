@@ -1,14 +1,8 @@
 package org.gradoop.model.impl.datagen.foodbroker.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.model.impl.datagen.foodbroker.generator.CustomerGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
@@ -19,21 +13,15 @@ import java.util.List;
 import java.util.Random;
 
 public class Customer<V extends EPGMVertex> extends
-  RichMapFunction<MasterDataSeed, MasterDataObject<V>>
-  implements ResultTypeQueryable<MasterDataObject<V>> {
+  RichMapFunction<MasterDataSeed, MasterDataObject> {
 
-  private final EPGMVertexFactory<V> vertexFactory;
+  public static final String CLASS_NAME = "Customer";
   private List<String> adjectives;
   private List<String> nouns;
   private List<String> cities;
   private Integer adjectiveCount;
   private Integer nounCount;
   private Integer cityCount;
-
-  public Customer(EPGMVertexFactory<V> vertexFactory) {
-    this.vertexFactory = vertexFactory;
-  }
-
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -52,7 +40,7 @@ public class Customer<V extends EPGMVertex> extends
   }
 
   @Override
-  public MasterDataObject<V> map(MasterDataSeed seed) throws  Exception {
+  public MasterDataObject map(MasterDataSeed seed) throws  Exception {
 
     Random random = new Random();
 
@@ -73,20 +61,6 @@ public class Customer<V extends EPGMVertex> extends
 
     properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
 
-    V vertex = vertexFactory
-      .createVertex(CustomerGenerator.CLASS_NAME, properties);
-
-    return new MasterDataObject<>(seed, vertex);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public TypeInformation<MasterDataObject<V>> getProducedType() {
-    return new TupleTypeInfo<>(
-      BasicTypeInfo.LONG_TYPE_INFO,
-      BasicTypeInfo.SHORT_TYPE_INFO,
-      TypeExtractor.createTypeInfo(vertexFactory.getType()));
+    return  new MasterDataObject(seed, Customer.CLASS_NAME, properties);
   }
 }

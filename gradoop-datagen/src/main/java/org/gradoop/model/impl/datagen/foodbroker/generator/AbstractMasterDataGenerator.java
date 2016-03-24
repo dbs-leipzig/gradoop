@@ -18,21 +18,19 @@ import java.util.Map;
 /**
  * Created by peet on 23.03.16.
  */
-public abstract class AbstractMasterDataGenerator<V extends EPGMVertex>
-  implements MasterDataGenerator<V> {
+public abstract class AbstractMasterDataGenerator
+  implements MasterDataGenerator {
   public static final Short GOOD_VALUE = 1;
   public static final Short NORMAL_VALUE = 0;
   public static final Short BAD_VALUE = -1;
 
   protected final FoodBrokerConfig foodBrokerConfig;
   protected final ExecutionEnvironment env ;
-  protected final EPGMVertexFactory<V> vertexFactory;
 
   public AbstractMasterDataGenerator(ExecutionEnvironment env,
-    FoodBrokerConfig foodBrokerConfig, EPGMVertexFactory<V> vertexFactory) {
+    FoodBrokerConfig foodBrokerConfig) {
     this.foodBrokerConfig = foodBrokerConfig;
     this.env = env;
-    this.vertexFactory = vertexFactory;
   }
 
   protected List<MasterDataSeed> getMasterDataSeeds(String className) {
@@ -61,10 +59,10 @@ public abstract class AbstractMasterDataGenerator<V extends EPGMVertex>
       Short quality = qualityCount.getKey();
 
       for(int i = 1; i <= qualityCount.getValue(); i++) {
-        currentId++;
         seedList.add(new MasterDataSeed(
           currentId, quality
         ));
+        currentId++;
       }
     }
 
