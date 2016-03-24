@@ -20,9 +20,9 @@ import java.util.Map;
  */
 public abstract class AbstractMasterDataGenerator<V extends EPGMVertex>
   implements MasterDataGenerator<V> {
-  public static final Short GOOD_VALUE = 0;
-  public static final Short NORMAL_VALUE = 1;
-  public static final Short BAD_VALUE = 2;
+  public static final Short GOOD_VALUE = 1;
+  public static final Short NORMAL_VALUE = 0;
+  public static final Short BAD_VALUE = -1;
 
   protected final FoodBrokerConfig foodBrokerConfig;
   protected final ExecutionEnvironment env ;
@@ -36,31 +36,27 @@ public abstract class AbstractMasterDataGenerator<V extends EPGMVertex>
   }
 
   protected List<MasterDataSeed> getMasterDataSeeds(String className) {
-    Integer offset = foodBrokerConfig.getMasterDataOffset(className);
-
-    Integer growth = foodBrokerConfig.getMasterDataGrowth(className);
-
     Double goodRatio = foodBrokerConfig.getMasterDataGoodRatio(className);
 
     Double badRatio = foodBrokerConfig.getMasterDataBadRatio(className);
 
-    Integer count = offset + foodBrokerConfig.getScaleFactor() * growth;
+    Integer count = foodBrokerConfig.getMasterDataCount(className);
 
-    Long goodCount = Math.round(count * goodRatio);
-    Long badCount = Math.round(count * badRatio);
-    Long normalCount = count - goodCount - badCount;
+    Integer goodCount = (int) Math.round(count * goodRatio);
+    Integer badCount = (int) Math.round(count * badRatio);
+    Integer normalCount = count - goodCount - badCount;
 
     List<MasterDataSeed> seedList = new ArrayList<>();
 
-    Long currentId = 0L;
+    Integer currentId = 0;
 
-    Map<Short, Long> qualityCounts = new HashMap<>();
+    Map<Short, Integer> qualityCounts = new HashMap<>();
 
     qualityCounts.put(AbstractMasterDataGenerator.GOOD_VALUE, goodCount);
     qualityCounts.put(AbstractMasterDataGenerator.NORMAL_VALUE, normalCount);
     qualityCounts.put(AbstractMasterDataGenerator.BAD_VALUE, badCount);
 
-    for(Map.Entry<Short, Long> qualityCount : qualityCounts.entrySet()) {
+    for(Map.Entry<Short, Integer> qualityCount : qualityCounts.entrySet()) {
 
       Short quality = qualityCount.getKey();
 

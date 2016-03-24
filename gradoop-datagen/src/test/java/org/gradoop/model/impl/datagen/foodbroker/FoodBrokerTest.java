@@ -18,7 +18,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
           .getFile()));
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> enterpriseGraph =
-      foodBroker.generate(1);
+      foodBroker.generate(0);
 
     //GradoopFlinkTestUtils.printLogicalGraph(enterpriseGraph);
   }
