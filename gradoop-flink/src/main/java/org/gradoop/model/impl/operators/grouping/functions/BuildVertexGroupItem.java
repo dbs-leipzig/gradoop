@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.model.impl.properties.PropertyValueList;
 
 import java.util.List;
 
@@ -31,7 +31,8 @@ import java.util.List;
  * Creates a minimal representation of vertex data to be used for grouping.
  *
  * The output of that mapper is {@link VertexGroupItem} that contains
- * the vertex id, vertex label, vertex properties and an initial group count.
+ * the vertex id, vertex label, vertex group properties and vertex aggregate
+ * properties.
  *
  * @param <V> EPGM vertex type
  */
@@ -51,20 +52,19 @@ public class BuildVertexGroupItem<V extends EPGMVertex>
    *
    * @param groupPropertyKeys vertex property keys
    * @param useLabel          true, if label shall be considered
-   * @param vertexAggregator  aggregate function for summarized vertices
+   * @param vertexAggregators aggregate functions for super vertices
    */
   public BuildVertexGroupItem(List<String> groupPropertyKeys,
-    boolean useLabel, PropertyValueAggregator vertexAggregator) {
-    super(groupPropertyKeys, useLabel, vertexAggregator);
+    boolean useLabel, List<PropertyValueAggregator> vertexAggregators) {
+    super(groupPropertyKeys, useLabel, vertexAggregators);
 
     this.reuseVertexGroupItem = new VertexGroupItem();
     this.reuseVertexGroupItem.setGroupRepresentative(GradoopId.NULL_VALUE);
-    if (doAggregate() && isCountAggregator()) {
-      this.reuseVertexGroupItem.setGroupAggregate(PropertyValue.create(1L));
-    } else {
-      this.reuseVertexGroupItem.setGroupAggregate(PropertyValue.NULL_VALUE);
-    }
     this.reuseVertexGroupItem.setCandidate(false);
+    if (!doAggregate()) {
+      this.reuseVertexGroupItem.setAggregateValues(
+        PropertyValueList.createEmptyList());
+    }
   }
 
   /**
@@ -74,9 +74,9 @@ public class BuildVertexGroupItem<V extends EPGMVertex>
   public VertexGroupItem map(V vertex) throws Exception {
     reuseVertexGroupItem.setVertexId(vertex.getId());
     reuseVertexGroupItem.setGroupLabel(getLabel(vertex));
-    reuseVertexGroupItem.setGroupPropertyValues(getGroupProperties(vertex));
-    if (doAggregate() && !isCountAggregator()) {
-      reuseVertexGroupItem.setGroupAggregate(getValueForAggregation(vertex));
+    reuseVertexGroupItem.setGroupingValues(getGroupProperties(vertex));
+    if (doAggregate()) {
+      reuseVertexGroupItem.setAggregateValues(getAggregateValues(vertex));
     }
     return reuseVertexGroupItem;
   }

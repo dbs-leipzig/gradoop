@@ -101,9 +101,9 @@ public abstract class Grouping<
    */
   private final boolean useVertexLabels;
   /**
-   * Aggregate function which is applied on super vertices.
+   * Aggregate functions which are applied on super vertices.
    */
-  private final PropertyValueAggregator vertexAggregator;
+  private final List<PropertyValueAggregator> vertexAggregators;
   /**
    * Used to group edges.
    */
@@ -113,33 +113,33 @@ public abstract class Grouping<
    */
   private final boolean useEdgeLabels;
   /**
-   * Aggregate function which is applied on super edges.
+   * Aggregate functions which are applied on super edges.
    */
-  private final PropertyValueAggregator edgeAggregator;
+  private final List<PropertyValueAggregator> edgeAggregators;
 
   /**
    * Creates grouping operator instance.
    *
-   * @param vertexGroupingKeys  property key to group vertices
+   * @param vertexGroupingKeys  property keys to group vertices
    * @param useVertexLabels     group on vertex label true/false
-   * @param vertexAggregator    aggregate function for grouped vertices
-   * @param edgeGroupingKeys    property key to group edges
+   * @param vertexAggregators   aggregate functions for grouped vertices
+   * @param edgeGroupingKeys    property keys to group edges
    * @param useEdgeLabels       group on edge label true/false
-   * @param edgeAggregator      aggregate function for grouped edges
+   * @param edgeAggregators     aggregate functions for grouped edges
    */
   Grouping(
     List<String> vertexGroupingKeys,
     boolean useVertexLabels,
-    PropertyValueAggregator vertexAggregator,
+    List<PropertyValueAggregator> vertexAggregators,
     List<String> edgeGroupingKeys,
     boolean useEdgeLabels,
-    PropertyValueAggregator edgeAggregator) {
+    List<PropertyValueAggregator> edgeAggregators) {
     this.vertexGroupingKeys = checkNotNull(vertexGroupingKeys);
     this.useVertexLabels    = useVertexLabels;
-    this.vertexAggregator   = vertexAggregator;
+    this.vertexAggregators  = vertexAggregators;
     this.edgeGroupingKeys   = checkNotNull(edgeGroupingKeys);
     this.useEdgeLabels      = useEdgeLabels;
-    this.edgeAggregator     = edgeAggregator;
+    this.edgeAggregators    = edgeAggregators;
   }
 
   /**
@@ -163,16 +163,16 @@ public abstract class Grouping<
   }
 
   /**
-   * Returns true if the vertex property shall be used for grouping.
+   * Returns true if vertex properties shall be used for grouping.
    *
-   * @return true iff vertex property shall be used for grouping
+   * @return true iff vertex properties shall be used for grouping
    */
   protected boolean useVertexProperties() {
     return !vertexGroupingKeys.isEmpty();
   }
 
   /**
-   * Vertex property key to use for grouping vertices.
+   * Returns vertex property keys which are used for grouping vertices.
    *
    * @return vertex property keys
    */
@@ -190,25 +190,25 @@ public abstract class Grouping<
   }
 
   /**
-   * Returns the aggregate function which is be applied on super vertices.
+   * Returns the aggregate functions which are applied on super vertices.
    *
-   * @return vertex aggregate function
+   * @return vertex aggregate functions
    */
-  protected PropertyValueAggregator getVertexAggregator() {
-    return vertexAggregator;
+  protected List<PropertyValueAggregator> getVertexAggregators() {
+    return vertexAggregators;
   }
 
   /**
-   * Returns true if the edge property shall be used for grouping.
+   * Returns true if edge properties shall be used for grouping.
    *
-   * @return true, iff edge property shall be used for grouping
+   * @return true, iff edge properties shall be used for grouping
    */
   protected boolean useEdgeProperties() {
     return !edgeGroupingKeys.isEmpty();
   }
 
   /**
-   * Edge property key to use for grouping edges.
+   * Returns edge property keys which are used for grouping edges.
    *
    * @return edge property keys
    */
@@ -226,12 +226,12 @@ public abstract class Grouping<
   }
 
   /**
-   * Returns the aggregate function which shall be applied on super edges.
+   * Returns the aggregate functions which shall be applied on super edges.
    *
-   * @return edge aggregate function
+   * @return edge aggregate functions
    */
-  protected PropertyValueAggregator getEdgeAggregator() {
-    return edgeAggregator;
+  protected List<PropertyValueAggregator> getEdgeAggregators() {
+    return edgeAggregators;
   }
 
   /**
@@ -289,7 +289,7 @@ public abstract class Grouping<
     DataSet<EdgeGroupItem> edges = graph.getEdges()
       // build edge group items
       .map(new BuildEdgeGroupItem<E>(
-        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregator()))
+        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators()))
       // join edges with vertex-group-map on source-id == vertex-id
       .join(vertexToRepresentativeMap)
       .where(0).equalTo(0)
@@ -306,13 +306,13 @@ public abstract class Grouping<
     // group + combine
     DataSet<EdgeGroupItem> combinedEdges = groupEdges(edges)
       .combineGroup(new CombineEdgeGroupItems(
-        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregator()));
+        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators()));
 
     // group + reduce + build final edges
     return groupEdges(combinedEdges)
       .reduceGroup(new ReduceEdgeGroupItems<>(getEdgeGroupingKeys(),
         useEdgeLabels(),
-        getEdgeAggregator(),
+        getEdgeAggregators(),
         config.getEdgeFactory()));
   }
 
@@ -363,14 +363,14 @@ public abstract class Grouping<
     private boolean useEdgeLabel;
 
     /**
-     * Aggregator which will be applied on vertex properties.
+     * Aggregate functions which will be applied on vertex properties.
      */
-    private PropertyValueAggregator vertexValueAggregator;
+    private List<PropertyValueAggregator> vertexValueAggregators;
 
     /**
-     * Aggregator which will be applied on edge properties.
+     * Aggregate functions which will be applied on edge properties.
      */
-    private PropertyValueAggregator edgeValueAggregator;
+    private List<PropertyValueAggregator> edgeValueAggregators;
 
     /**
      * Creates a new grouping builder
@@ -380,8 +380,8 @@ public abstract class Grouping<
       this.edgeGroupingKeys       = Lists.newArrayList();
       this.useVertexLabel         = false;
       this.useEdgeLabel           = false;
-      this.vertexValueAggregator  = null;
-      this.edgeValueAggregator    = null;
+      this.vertexValueAggregators = Lists.newArrayList();
+      this.edgeValueAggregators   = Lists.newArrayList();
     }
 
     /**
@@ -471,26 +471,30 @@ public abstract class Grouping<
     }
 
     /**
-     * Used to compute an aggregate for each super vertex.
+     * Add an aggregate function which is applied on a group of vertices
+     * represented by a single super vertex.
      *
-     * @param vertexValueAggregator aggregator
+     * @param aggregator vertex aggregator
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> setVertexValueAggregator(
-      PropertyValueAggregator vertexValueAggregator) {
-      this.vertexValueAggregator = vertexValueAggregator;
+    public GroupingBuilder<G, V, E> addVertexAggregator(
+      PropertyValueAggregator aggregator) {
+      checkNotNull(aggregator, "Aggregator must not be null");
+      this.vertexValueAggregators.add(aggregator);
       return this;
     }
 
     /**
-     * Used to compute an aggregate for each super edge.
+     * Add an aggregate function which is applied on a group of edges
+     * represented by a single super edge.
      *
-     * @param edgeValueAggregator aggregator
+     * @param aggregator edge aggregator
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> setEdgeValueAggregator(
-      PropertyValueAggregator edgeValueAggregator) {
-      this.edgeValueAggregator = edgeValueAggregator;
+    public GroupingBuilder<G, V, E> addEdgeAggregator(
+      PropertyValueAggregator aggregator) {
+      checkNotNull(aggregator, "Aggregator must not be null");
+      this.edgeValueAggregators.add(aggregator);
       return this;
     }
 
@@ -508,8 +512,8 @@ public abstract class Grouping<
 
       if (strategy == GroupingStrategy.GROUP_REDUCE) {
         return new GroupingGroupReduce<>(
-          vertexGroupingKeys, useVertexLabel, vertexValueAggregator,
-          edgeGroupingKeys, useEdgeLabel, edgeValueAggregator);
+          vertexGroupingKeys, useVertexLabel, vertexValueAggregators,
+          edgeGroupingKeys, useEdgeLabel, edgeValueAggregators);
       } else {
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);
       }

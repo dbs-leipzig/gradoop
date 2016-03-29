@@ -21,6 +21,7 @@ import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyV
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.util.GConstants;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,19 +30,19 @@ import java.util.List;
  * @see ReduceEdgeGroupItems
  * @see CombineEdgeGroupItems
  */
-public abstract class BuildSuperEdge extends BuildBase {
+abstract class BuildSuperEdge extends BuildBase {
 
   /**
    * Creates group reducer / combiner
    *
    * @param groupPropertyKeys edge property keys
    * @param useLabel          use edge label
-   * @param valueAggregator   aggregate function for edge values
+   * @param valueAggregators  aggregate functions for edge values
    */
   public BuildSuperEdge(List<String> groupPropertyKeys,
     boolean useLabel,
-    PropertyValueAggregator valueAggregator) {
-    super(groupPropertyKeys, useLabel, valueAggregator);
+    List<PropertyValueAggregator> valueAggregators) {
+    super(groupPropertyKeys, useLabel, valueAggregators);
   }
 
   /**
@@ -51,34 +52,34 @@ public abstract class BuildSuperEdge extends BuildBase {
    * @return group representative item
    */
   protected EdgeGroupItem reduceInternal(
-    Iterable<EdgeGroupItem> edgeGroupItems) {
+    Iterable<EdgeGroupItem> edgeGroupItems) throws IOException {
 
     EdgeGroupItem edgeGroupItem = new EdgeGroupItem();
 
     boolean firstElement = true;
 
-    for (EdgeGroupItem e : edgeGroupItems) {
+    for (EdgeGroupItem edge : edgeGroupItems) {
       if (firstElement) {
-        edgeGroupItem.setSourceId(e.getSourceId());
-        edgeGroupItem.setTargetId(e.getTargetId());
+        edgeGroupItem.setSourceId(edge.getSourceId());
+        edgeGroupItem.setTargetId(edge.getTargetId());
         if (useLabel()) {
-          edgeGroupItem.setGroupLabel(e.getGroupLabel());
+          edgeGroupItem.setGroupLabel(edge.getGroupLabel());
         } else {
           edgeGroupItem.setGroupLabel(GConstants.DEFAULT_EDGE_LABEL);
         }
-        edgeGroupItem.setGroupPropertyValues(e.getGroupPropertyValues());
+        edgeGroupItem.setGroupingValues(edge.getGroupingValues());
         firstElement = false;
       }
 
       if (doAggregate()) {
-        aggregate(e.getGroupAggregate());
+        aggregate(edge.getAggregateValues());
       } else {
         // no need to iterate further
         break;
       }
     }
 
-    edgeGroupItem.setGroupAggregate(getAggregate());
+    edgeGroupItem.setAggregateValues(getAggregateValues());
 
     return edgeGroupItem;
   }

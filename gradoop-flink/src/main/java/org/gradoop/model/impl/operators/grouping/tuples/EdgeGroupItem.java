@@ -19,21 +19,20 @@ package org.gradoop.model.impl.operators.grouping.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
 
 /**
- * Edge representation used in grouping edges to summarized edges.
+ * Edge representation used for grouping edges to super edges.
  *
  * f0: source vertex id
  * f1: target vertex id
  * f2: edge group label
  * f3: edge group property values
- * f4: edge group aggregate value
+ * f4: edge group aggregate values
  */
 public class EdgeGroupItem
   extends
-  Tuple5<GradoopId, GradoopId, String, PropertyValueList, PropertyValue> {
+  Tuple5<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList> {
 
   public GradoopId getSourceId() {
     return f0;
@@ -59,19 +58,19 @@ public class EdgeGroupItem
     f2 = groupLabel;
   }
 
-  public PropertyValueList getGroupPropertyValues() {
+  public PropertyValueList getGroupingValues() {
     return f3;
   }
 
-  public void setGroupPropertyValues(PropertyValueList groupPropertyValues) {
+  public void setGroupingValues(PropertyValueList groupPropertyValues) {
     f3 = groupPropertyValues;
   }
 
-  public PropertyValue getGroupAggregate() {
+  public PropertyValueList getAggregateValues() {
     return f4;
   }
 
-  public void setGroupAggregate(PropertyValue value) {
+  public void setAggregateValues(PropertyValueList value) {
     this.f4 = value;
   }
 }

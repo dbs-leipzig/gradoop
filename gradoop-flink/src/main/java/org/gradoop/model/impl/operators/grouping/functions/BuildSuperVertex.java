@@ -32,9 +32,8 @@ import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyV
 import java.util.List;
 
 /**
- * Creates a new vertex representing a vertex group. The vertex stores the
- * group label, the group property value and the number of vertices in the
- * group.
+ * Creates a new super vertex representing a vertex group. The vertex stores the
+ * group label, the group property value and the aggregate values for its group.
  *
  * @param <V> EPGM vertex type
  */
@@ -54,14 +53,14 @@ public class BuildSuperVertex<V extends EPGMVertex>
    *
    * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be considered
-   * @param valueAggregator   aggregate function for vertex values
+   * @param valueAggregators  aggregate functions for vertex values
    * @param vertexFactory     vertex factory
    */
   public BuildSuperVertex(List<String> groupPropertyKeys,
     boolean useLabel,
-    PropertyValueAggregator valueAggregator,
+    List<PropertyValueAggregator> valueAggregators,
     EPGMVertexFactory<V> vertexFactory) {
-    super(groupPropertyKeys, useLabel, valueAggregator);
+    super(groupPropertyKeys, useLabel, valueAggregators);
     this.vertexFactory = vertexFactory;
   }
 
@@ -76,13 +75,13 @@ public class BuildSuperVertex<V extends EPGMVertex>
   @Override
   public V map(VertexGroupItem groupItem) throws
     Exception {
-    V sumVertex = vertexFactory.initVertex(groupItem.getGroupRepresentative());
+    V supVertex = vertexFactory.initVertex(groupItem.getGroupRepresentative());
 
-    setLabel(sumVertex, groupItem.getGroupLabel());
-    setGroupProperties(sumVertex, groupItem.getGroupPropertyValues());
-    setAggregate(sumVertex, groupItem.getGroupAggregate());
+    setLabel(supVertex, groupItem.getGroupLabel());
+    setGroupProperties(supVertex, groupItem.getGroupingValues());
+    setAggregateValues(supVertex, groupItem.getAggregateValues());
 
-    return sumVertex;
+    return supVertex;
   }
 
   /**

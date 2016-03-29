@@ -71,21 +71,21 @@ public class GroupingGroupReduce<
    *
    * @param vertexGroupingKeys  property key to group vertices
    * @param useVertexLabels     group on vertex label true/false
-   * @param vertexAggregator    aggregate function for grouped vertices
+   * @param vertexAggregators   aggregate functions for grouped vertices
    * @param edgeGroupingKeys    property key to group edges
    * @param useEdgeLabels       group on edge label true/false
-   * @param edgeAggregator      aggregate function for grouped edges
+   * @param edgeAggregators     aggregate functions for grouped edges
    */
   GroupingGroupReduce(
     List<String> vertexGroupingKeys,
     boolean useVertexLabels,
-    PropertyValueAggregator vertexAggregator,
+    List<PropertyValueAggregator> vertexAggregators,
     List<String> edgeGroupingKeys,
     boolean useEdgeLabels,
-    PropertyValueAggregator edgeAggregator) {
+    List<PropertyValueAggregator> edgeAggregators) {
     super(
-      vertexGroupingKeys, useVertexLabels, vertexAggregator,
-      edgeGroupingKeys, useEdgeLabels, edgeAggregator);
+      vertexGroupingKeys, useVertexLabels, vertexAggregators,
+      edgeGroupingKeys, useEdgeLabels, edgeAggregators);
   }
 
   /**
@@ -97,21 +97,21 @@ public class GroupingGroupReduce<
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       // map vertex to vertex group item
       .map(new BuildVertexGroupItem<V>(
-        getVertexGroupingKeys(), useVertexLabels(), getVertexAggregator()));
+        getVertexGroupingKeys(), useVertexLabels(), getVertexAggregators()));
 
     DataSet<VertexGroupItem> vertexGroupItems =
       // group vertices by label / properties / both
       groupVertices(verticesForGrouping)
         // apply aggregate function
-        .reduceGroup(
-          new ReduceVertexGroupItems(useVertexLabels(), getVertexAggregator()));
+        .reduceGroup(new ReduceVertexGroupItems(
+          useVertexLabels(), getVertexAggregators()));
 
     DataSet<V> superVertices = vertexGroupItems
       // filter group representative tuples
       .filter(new FilterCandidates())
       // build super vertices
       .map(new BuildSuperVertex<>(getVertexGroupingKeys(),
-        useVertexLabels(), getVertexAggregator(), config.getVertexFactory()));
+        useVertexLabels(), getVertexAggregators(), config.getVertexFactory()));
 
     DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
       vertexGroupItems

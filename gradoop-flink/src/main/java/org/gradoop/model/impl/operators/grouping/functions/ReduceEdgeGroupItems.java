@@ -31,7 +31,8 @@ import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import java.util.List;
 
 /**
- * Creates a new super {@link EPGMEdge} from a group of {@link EdgeGroupItem}.
+ * Creates a new super edge representing an edge group. The edge stores the
+ * group label, the group property value and the aggregate values for its group.
  *
  * @param <E> EPGM edge type
  */
@@ -50,12 +51,14 @@ public class ReduceEdgeGroupItems<E extends EPGMEdge>
    *
    * @param groupPropertyKeys edge property keys
    * @param useLabel          use edge label
-   * @param valueAggregator   aggregate function for edge values
+   * @param valueAggregators  aggregate functions for edge values
    * @param edgeFactory       edge factory
    */
-  public ReduceEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
-    PropertyValueAggregator valueAggregator, EPGMEdgeFactory<E> edgeFactory) {
-    super(groupPropertyKeys, useLabel, valueAggregator);
+  public ReduceEdgeGroupItems(List<String> groupPropertyKeys,
+    boolean useLabel,
+    List<PropertyValueAggregator> valueAggregators,
+    EPGMEdgeFactory<E> edgeFactory) {
+    super(groupPropertyKeys, useLabel, valueAggregators);
     this.edgeFactory = edgeFactory;
   }
 
@@ -73,16 +76,16 @@ public class ReduceEdgeGroupItems<E extends EPGMEdge>
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
 
-    E sumEdge = edgeFactory.createEdge(
+    E supEdge = edgeFactory.createEdge(
       edgeGroupItem.getGroupLabel(),
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
 
-    setGroupProperties(sumEdge, edgeGroupItem.getGroupPropertyValues());
-    setAggregate(sumEdge);
-    resetAggregator();
+    setGroupProperties(supEdge, edgeGroupItem.getGroupingValues());
+    setAggregateValues(supEdge);
+    resetAggregators();
 
-    collector.collect(sumEdge);
+    collector.collect(supEdge);
   }
 
   /**

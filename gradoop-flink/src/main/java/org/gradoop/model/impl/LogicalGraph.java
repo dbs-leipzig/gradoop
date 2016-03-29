@@ -470,8 +470,8 @@ public class LogicalGraph
         .setStrategy(GroupingStrategy.GROUP_REDUCE)
         .useVertexLabel(false)
         .useEdgeLabel(false)
-        .setVertexValueAggregator(new CountAggregator())
-        .setEdgeValueAggregator(new CountAggregator())
+        .addVertexAggregator(new CountAggregator())
+        .addEdgeAggregator(new CountAggregator())
         .build());
   }
 
@@ -519,8 +519,8 @@ public class LogicalGraph
         .setStrategy(GroupingStrategy.GROUP_REDUCE)
         .useVertexLabel(true)
         .useEdgeLabel(false)
-        .setVertexValueAggregator(new CountAggregator())
-        .setEdgeValueAggregator(new CountAggregator())
+        .addVertexAggregator(new CountAggregator())
+        .addEdgeAggregator(new CountAggregator())
         .build());
   }
 
@@ -568,8 +568,8 @@ public class LogicalGraph
         .setStrategy(GroupingStrategy.GROUP_REDUCE)
         .useVertexLabel(true)
         .useEdgeLabel(true)
-        .setVertexValueAggregator(new CountAggregator())
-        .setEdgeValueAggregator(new CountAggregator())
+        .addVertexAggregator(new CountAggregator())
+        .addEdgeAggregator(new CountAggregator())
         .build());
   }
 

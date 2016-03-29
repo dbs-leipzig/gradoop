@@ -149,8 +149,8 @@ public class GroupingRunner implements ProgramDescription {
       .addEdgeGroupingKey(edgeKey)
       .useVertexLabel(useVertexLabels)
       .useEdgeLabel(useEdgeLabels)
-      .setVertexValueAggregator(new CountAggregator())
-      .setEdgeValueAggregator(new CountAggregator())
+      .addVertexAggregator(new CountAggregator())
+      .addEdgeAggregator(new CountAggregator())
       .build();
   }
 
