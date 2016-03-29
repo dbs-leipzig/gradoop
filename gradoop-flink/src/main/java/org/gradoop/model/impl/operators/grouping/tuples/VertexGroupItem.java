@@ -19,22 +19,21 @@ package org.gradoop.model.impl.operators.grouping.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
 
 /**
- * Vertex representation which is used as output of group reduce.
+ * Vertex representation used for grouping vertices to super vertices.
  *
  * f0: vertex id
  * f1: group representative vertex id
  * f2: vertex group label
  * f3: vertex group properties
- * f4: vertex group aggregate value
+ * f4: vertex group aggregate values
  * f5: candidate tuple yes/no
  */
 public class VertexGroupItem
-  extends Tuple6
-    <GradoopId, GradoopId, String, PropertyValueList, PropertyValue, Boolean> {
+  extends Tuple6<GradoopId, GradoopId, String,
+  PropertyValueList, PropertyValueList, Boolean> {
 
   public GradoopId getVertexId() {
     return f0;
@@ -61,19 +60,19 @@ public class VertexGroupItem
     f2 = groupLabel;
   }
 
-  public PropertyValueList getGroupPropertyValues() {
+  public PropertyValueList getGroupingValues() {
     return f3;
   }
 
-  public void setGroupPropertyValues(PropertyValueList groupPropertyValues) {
+  public void setGroupingValues(PropertyValueList groupPropertyValues) {
     f3 = groupPropertyValues;
   }
 
-  public PropertyValue getGroupAggregate() {
+  public PropertyValueList getAggregateValues() {
     return f4;
   }
 
-  public void setGroupAggregate(PropertyValue groupCount) {
+  public void setAggregateValues(PropertyValueList groupCount) {
     f4 = groupCount;
   }
 

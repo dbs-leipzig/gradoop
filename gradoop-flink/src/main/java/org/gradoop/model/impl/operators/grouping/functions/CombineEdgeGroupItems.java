@@ -35,11 +35,11 @@ public class CombineEdgeGroupItems
    *
    * @param groupPropertyKeys edge property keys
    * @param useLabel          use edge label
-   * @param valueAggregator   aggregate function for edge values
+   * @param valueAggregators  aggregate functions for edge values
    */
   public CombineEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
-    PropertyValueAggregator valueAggregator) {
-    super(groupPropertyKeys, useLabel, valueAggregator);
+    List<PropertyValueAggregator> valueAggregators) {
+    super(groupPropertyKeys, useLabel, valueAggregators);
   }
 
   /**
@@ -53,6 +53,6 @@ public class CombineEdgeGroupItems
   public void combine(Iterable<EdgeGroupItem> edgeGroupItems,
     Collector<EdgeGroupItem> collector) throws Exception {
     collector.collect(reduceInternal(edgeGroupItems));
-    resetAggregator();
+    resetAggregators();
   }
 }

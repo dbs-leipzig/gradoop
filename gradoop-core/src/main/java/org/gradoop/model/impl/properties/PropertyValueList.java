@@ -28,6 +28,7 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -36,7 +37,13 @@ import java.util.Iterator;
  * Represents a list of property values.
  */
 public class PropertyValueList
-  implements Iterable<PropertyValue>, WritableComparable<PropertyValueList> {
+  implements
+  Iterable<PropertyValue>, WritableComparable<PropertyValueList>, Serializable {
+
+  /**
+   * Class version for serialization.
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * Property values are stored in their byte representation.
@@ -44,7 +51,7 @@ public class PropertyValueList
   private byte[] bytes;
 
   /**
-   * Default constructor.
+   * Default constructor (used for (de-)serialization.
    */
   public PropertyValueList() {
   }
@@ -56,6 +63,15 @@ public class PropertyValueList
    */
   private PropertyValueList(byte[] bytes) {
     this.bytes = bytes;
+  }
+
+  /**
+   * Creates a new property value list containing no elements.
+   *
+   * @return empty property value list
+   */
+  public static PropertyValueList createEmptyList() {
+    return new PropertyValueList(new byte[0]);
   }
 
   /**

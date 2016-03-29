@@ -22,7 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.model.impl.properties.PropertyValueList;
 
 import java.util.List;
 
@@ -48,16 +48,15 @@ public class BuildEdgeGroupItem<E extends EPGMEdge>
    *
    * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be used
-   * @param edgeAggregator    aggregate function for summarized edges
+   * @param edgeAggregators   aggregate functions for super edges
    */
   public BuildEdgeGroupItem(List<String> groupPropertyKeys,
-    boolean useLabel, PropertyValueAggregator edgeAggregator) {
-    super(groupPropertyKeys, useLabel, edgeAggregator);
+    boolean useLabel, List<PropertyValueAggregator> edgeAggregators) {
+    super(groupPropertyKeys, useLabel, edgeAggregators);
     this.reuseEdgeGroupItem = new EdgeGroupItem();
-    if (doAggregate() && isCountAggregator()) {
-      this.reuseEdgeGroupItem.setGroupAggregate(PropertyValue.create(1L));
-    } else {
-      this.reuseEdgeGroupItem.setGroupAggregate(PropertyValue.NULL_VALUE);
+    if (!doAggregate()) {
+      this.reuseEdgeGroupItem.setAggregateValues(
+        PropertyValueList.createEmptyList());
     }
   }
 
@@ -69,9 +68,9 @@ public class BuildEdgeGroupItem<E extends EPGMEdge>
     reuseEdgeGroupItem.setSourceId(edge.getSourceId());
     reuseEdgeGroupItem.setTargetId(edge.getTargetId());
     reuseEdgeGroupItem.setGroupLabel(getLabel(edge));
-    reuseEdgeGroupItem.setGroupPropertyValues(getGroupProperties(edge));
-    if (doAggregate() && !isCountAggregator()) {
-      reuseEdgeGroupItem.setGroupAggregate(getValueForAggregation(edge));
+    reuseEdgeGroupItem.setGroupingValues(getGroupProperties(edge));
+    if (doAggregate()) {
+      reuseEdgeGroupItem.setAggregateValues(getAggregateValues(edge));
     }
     return reuseEdgeGroupItem;
   }

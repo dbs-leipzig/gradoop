@@ -20,8 +20,7 @@ package org.gradoop.model.impl.operators.grouping.functions;
 import com.google.common.collect.Lists;
 import org.gradoop.model.api.EPGMAttributed;
 import org.gradoop.model.api.EPGMLabeled;
-import org.gradoop.model.impl.operators.grouping.functions.aggregation
-  .CountAggregator;
+import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.model.impl.properties.PropertyValueList;
@@ -34,12 +33,17 @@ import java.util.List;
 /**
  * Encapsulates logic that is used for building summarized vertices and edges.
  */
-public abstract class BuildBase implements Serializable {
+abstract class BuildBase implements Serializable {
 
   /**
    * Class version for serialization.
    */
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Used for count aggregation.
+   */
+  private static final PropertyValue ONE = PropertyValue.create(1L);
 
   /**
    * Property keys that are used for grouping.
@@ -52,30 +56,32 @@ public abstract class BuildBase implements Serializable {
   private final boolean useLabel;
 
   /**
-   * Aggregate function that is applied on grouped elements.
+   * Aggregate functions that are applied on grouped elements.
    */
-  private final PropertyValueAggregator valueAggregator;
+  private final List<PropertyValueAggregator> valueAggregators;
 
   /**
    * Creates build base.
    *
    * @param groupPropertyKeys property keys used for grouping
    * @param useLabel          true, if element label shall be used for grouping
-   * @param valueAggregator   aggregate function for element values
+   * @param valueAggregators  aggregate functions for super elements
    */
   protected BuildBase(List<String> groupPropertyKeys,
-    boolean useLabel, PropertyValueAggregator valueAggregator) {
+    boolean useLabel, List<PropertyValueAggregator> valueAggregators) {
     this.groupPropertyKeys  = groupPropertyKeys;
     this.useLabel           = useLabel;
-    this.valueAggregator    = valueAggregator;
+    this.valueAggregators = valueAggregators;
   }
 
   /**
-   * Resets the underlying aggregator
+   * Resets the underlying aggregators
    */
-  protected void resetAggregator() {
+  protected void resetAggregators() {
     if (doAggregate()) {
-      valueAggregator.resetAggregate();
+      for (PropertyValueAggregator valueAggregator : valueAggregators) {
+        valueAggregator.resetAggregate();
+      }
     }
   }
 
@@ -170,81 +176,106 @@ public abstract class BuildBase implements Serializable {
    * @return true, iff the group shall be aggregated
    */
   protected boolean doAggregate() {
-    return valueAggregator != null;
+    return !valueAggregators.isEmpty();
   }
 
   /**
-   * Returns the property value of the given element which is used for the
-   * aggregation. If the element does not have the property, the method returns
-   * {@code PropertyValue.NULL_VALUE}.
+   * Returns the property values of the given element which are used for
+   * aggregation. If the EPGM element does not have a property, it uses
+   * {@code PropertyValue.NULL_VALUE} instead.
    *
-   * @param   attributed attributed element
-   * @return  property value for aggregate or {@code PropertyValue.NULL_VALUE}
-   *          if property not present
+   * @param   attributed attributed EPGM element
+   * @return  property values for aggregation
    */
-  protected PropertyValue getValueForAggregation(EPGMAttributed attributed) {
-    PropertyValue result;
-    String propertyKey = valueAggregator.getPropertyKey();
-    if (attributed.hasProperty(propertyKey)) {
-      result = attributed.getPropertyValue(propertyKey);
+  protected PropertyValueList getAggregateValues(EPGMAttributed attributed)
+      throws IOException {
+    List<PropertyValue> propertyValues =
+      Lists.newArrayListWithCapacity(valueAggregators.size());
+
+    for (PropertyValueAggregator valueAggregator : valueAggregators) {
+      String propertyKey = valueAggregator.getPropertyKey();
+      if (valueAggregator instanceof CountAggregator) {
+        propertyValues.add(ONE);
+      } else if (attributed.hasProperty(propertyKey)) {
+        propertyValues.add(attributed.getPropertyValue(propertyKey));
+      } else {
+        propertyValues.add(PropertyValue.NULL_VALUE);
+      }
+    }
+    return PropertyValueList.fromPropertyValues(propertyValues);
+  }
+
+  /**
+   * Add the given values to the corresponding aggregate.
+   *
+   * @param values property values
+   */
+  protected void aggregate(PropertyValueList values) {
+    Iterator<PropertyValueAggregator> aggIt = valueAggregators.iterator();
+    Iterator<PropertyValue> valueIt = values.iterator();
+
+    while (aggIt.hasNext() && valueIt.hasNext()) {
+      PropertyValueAggregator aggregator = aggIt.next();
+      PropertyValue value = valueIt.next();
+
+      aggregator.aggregate(value);
+    }
+  }
+
+  /**
+   * Returns the current aggregate values from the aggregators.
+   *
+   * @return aggregate values
+   */
+  protected PropertyValueList getAggregateValues() throws IOException {
+    PropertyValueList result;
+    if (!doAggregate()) {
+      result = PropertyValueList.createEmptyList();
     } else {
-      result = PropertyValue.NULL_VALUE;
+      List<PropertyValue> propertyValues =
+        Lists.newArrayListWithCapacity(valueAggregators.size());
+      for (PropertyValueAggregator valueAggregator : valueAggregators) {
+        propertyValues.add(valueAggregator.getAggregate());
+      }
+      result = PropertyValueList.fromPropertyValues(propertyValues);
     }
     return result;
   }
 
   /**
-   * Add the given value to the aggregate.
-   *
-   * @param value property value
-   */
-  protected void aggregate(PropertyValue value) {
-    valueAggregator.aggregate(value);
-  }
-
-  /**
-   * Returns the current aggregate value.
-   *
-   * @return aggregate value or {@code PropertyValue.NULL_VALUE}
-   */
-  protected PropertyValue getAggregate() {
-    return doAggregate() ?
-      valueAggregator.getAggregate() : PropertyValue.NULL_VALUE;
-  }
-
-  /**
    * Sets the final aggregate value as a new property at the given element. The
-   * value is fetched from the internal aggregator.
+   * values are fetched from the internal aggregators.
    *
    * @param element attributed element
    */
-  protected void setAggregate(EPGMAttributed element) {
+  protected void setAggregateValues(EPGMAttributed element) {
     if (doAggregate()) {
-      element.setProperty(
-        valueAggregator.getAggregatePropertyKey(),
-        valueAggregator.getAggregate());
+      for (PropertyValueAggregator valueAggregator : valueAggregators) {
+        element.setProperty(
+          valueAggregator.getAggregatePropertyKey(),
+          valueAggregator.getAggregate());
+      }
     }
   }
 
   /**
-   * Sets the given value as a new property at the given element.
+   * Sets the given property values as new properties at the given element.
    *
    * @param element attributed element
-   * @param value   final aggregate value
+   * @param values  aggregate values
    */
-  protected void setAggregate(EPGMAttributed element,
-    PropertyValue value) {
+  protected void setAggregateValues(
+    EPGMAttributed element, PropertyValueList values) {
     if (doAggregate()) {
-      element.setProperty(valueAggregator.getAggregatePropertyKey(), value);
-    }
-  }
+      Iterator<PropertyValueAggregator> aggIt = valueAggregators.iterator();
+      Iterator<PropertyValue> valueIt = values.iterator();
 
-  /**
-   * Returns true, if the aggregator is a sum aggregator.
-   *
-   * @return true, if aggregator is sum aggregator
-   */
-  protected boolean isCountAggregator() {
-    return valueAggregator instanceof CountAggregator;
+      while (aggIt.hasNext() && valueIt.hasNext()) {
+        PropertyValueAggregator aggregator = aggIt.next();
+        PropertyValue value = valueIt.next();
+
+        element.setProperty(aggregator.getAggregatePropertyKey(), value);
+      }
+    }
   }
 }

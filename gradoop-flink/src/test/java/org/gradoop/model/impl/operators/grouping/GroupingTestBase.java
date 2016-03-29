@@ -58,8 +58,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .addVertexGroupingKey("city")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -92,8 +92,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .addVertexGroupingKey("city")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -133,8 +133,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .addVertexGroupingKey("city")
         .addVertexGroupingKey("gender")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -161,8 +161,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .addVertexGroupingKey("city")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -191,8 +191,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .addVertexGroupingKey("city")
         .addVertexGroupingKey("gender")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -227,8 +227,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -281,8 +281,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexGroupingKey("a")
         .addEdgeGroupingKey("a")
         .addEdgeGroupingKey("b")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(loader.getLogicalGraphByVariable("input"));
@@ -338,8 +338,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexGroupingKey("b")
         .addEdgeGroupingKey("a")
         .addEdgeGroupingKey("b")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(loader.getLogicalGraphByVariable("input"));
@@ -369,8 +369,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -400,8 +400,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -435,8 +435,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
         .addVertexGroupingKey("city")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -477,8 +477,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
         .addVertexGroupingKey("city")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -508,8 +508,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
         .addEdgeGroupingKey("since")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -543,8 +543,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
         .addEdgeGroupingKey("since")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -580,8 +580,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .useVertexLabel(true)
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -614,8 +614,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .useVertexLabel(true)
         .useEdgeLabel(true)
         .setStrategy(getStrategy())
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .build()
         .execute(input);
 
@@ -650,8 +650,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexGroupingKey("city")
         .useVertexLabel(true)
         .useEdgeLabel(true)
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -694,8 +694,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexGroupingKey("city")
         .useVertexLabel(true)
         .useEdgeLabel(true)
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -726,8 +726,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
         .useEdgeLabel(true)
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -764,8 +764,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
         .useEdgeLabel(true)
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -802,8 +802,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
         .useEdgeLabel(true)
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -849,8 +849,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
         .useEdgeLabel(true)
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -862,6 +862,48 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   //----------------------------------------------------------------------------
   // Tests for aggregate functions
   //----------------------------------------------------------------------------
+
+  @Test
+  public void testNoAggregate() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue {a=2});" +
+        "(v2:Blue {a=4});" +
+        "(v3:Red  {a=4});" +
+        "(v4:Red  {a=2});" +
+        "(v5:Red  {a=4});" +
+        "(v0)-[{b=2}]->(v1);" +
+        "(v0)-[{b=1}]->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-[{b=3}]->(v3);" +
+        "(v2)-[{b=1}]->(v3);" +
+        "(v3)-[{b=3}]->(v4);" +
+        "(v4)-[{b=1}]->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue);" +
+      "(v01:Red);" +
+      "(v00)-->(v00);" +
+      "(v00)-->(v01);" +
+      "(v01)-->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
 
   @Test
   public void testCount() throws Exception {
@@ -897,8 +939,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new CountAggregator("count"))
-        .setEdgeValueAggregator(new CountAggregator("count"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -941,8 +983,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new SumAggregator("a", "sumA"))
-        .setEdgeValueAggregator(new SumAggregator("b", "sumB"))
+        .addVertexAggregator(new SumAggregator("a", "sumA"))
+        .addEdgeAggregator(new SumAggregator("b", "sumB"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -985,8 +1027,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new SumAggregator("a", "sumA"))
-        .setEdgeValueAggregator(new SumAggregator("b", "sumB"))
+        .addVertexAggregator(new SumAggregator("a", "sumA"))
+        .addEdgeAggregator(new SumAggregator("b", "sumB"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1029,8 +1071,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new SumAggregator("a", "sumA"))
-        .setEdgeValueAggregator(new SumAggregator("b", "sumB"))
+        .addVertexAggregator(new SumAggregator("a", "sumA"))
+        .addEdgeAggregator(new SumAggregator("b", "sumB"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1073,8 +1115,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new MinAggregator("a", "minA"))
-        .setEdgeValueAggregator(new MinAggregator("b", "minB"))
+        .addVertexAggregator(new MinAggregator("a", "minA"))
+        .addEdgeAggregator(new MinAggregator("b", "minB"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1117,8 +1159,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new MinAggregator("a", "minA"))
-        .setEdgeValueAggregator(new MinAggregator("b", "minB"))
+        .addVertexAggregator(new MinAggregator("a", "minA"))
+        .addEdgeAggregator(new MinAggregator("b", "minB"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1161,8 +1203,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new MinAggregator("a", "minA"))
-        .setEdgeValueAggregator(new MinAggregator("b", "minB"))
+        .addVertexAggregator(new MinAggregator("a", "minA"))
+        .addEdgeAggregator(new MinAggregator("b", "minB"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1205,8 +1247,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new MaxAggregator("a", "maxA"))
-        .setEdgeValueAggregator(new MaxAggregator("b", "maxB"))
+        .addVertexAggregator(new MaxAggregator("a", "maxA"))
+        .addEdgeAggregator(new MaxAggregator("b", "maxB"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1249,8 +1291,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new MaxAggregator("a", "maxA"))
-        .setEdgeValueAggregator(new MaxAggregator("b", "maxB"))
+        .addVertexAggregator(new MaxAggregator("a", "maxA"))
+        .addEdgeAggregator(new MaxAggregator("b", "maxB"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1293,8 +1335,58 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
       new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
         .useVertexLabel(true)
-        .setVertexValueAggregator(new MaxAggregator("a", "maxA"))
-        .setEdgeValueAggregator(new MaxAggregator("b", "maxB"))
+        .addVertexAggregator(new MaxAggregator("a", "maxA"))
+        .addEdgeAggregator(new MaxAggregator("b", "maxB"))
+        .setStrategy(getStrategy())
+        .build()
+        .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testMultipleAggregators() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("input[" +
+        "(v0:Blue {a=3});" +
+        "(v1:Blue {a=2});" +
+        "(v2:Blue {a=4});" +
+        "(v3:Red  {a=4});" +
+        "(v4:Red  {a=2});" +
+        "(v5:Red  {a=4});" +
+        "(v0)-[{b=2}]->(v1);" +
+        "(v0)-[{b=1}]->(v2);" +
+        "(v1)-[{b=2}]->(v2);" +
+        "(v2)-[{b=3}]->(v3);" +
+        "(v2)-[{b=1}]->(v3);" +
+        "(v3)-[{b=3}]->(v4);" +
+        "(v4)-[{b=1}]->(v5);" +
+        "(v5)-[{b=1}]->(v3);" +
+        "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input = loader
+      .getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Blue {minA=2,maxA=4,sumA=9,count=3L});" +
+      "(v01:Red  {minA=2,maxA=4,sumA=10,count=3L});" +
+      "(v00)-[{minB=1,maxB=2,sumB=5,count=3L}]->(v00);" +
+      "(v00)-[{minB=1,maxB=3,sumB=4,count=2L}]->(v01);" +
+      "(v01)-[{minB=1,maxB=3,sumB=5,count=3L}]->(v01);" +
+      "]");
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+      new GroupingBuilder<GraphHeadPojo, VertexPojo, EdgePojo>()
+        .useVertexLabel(true)
+        .addVertexAggregator(new MinAggregator("a", "minA"))
+        .addVertexAggregator(new MaxAggregator("a", "maxA"))
+        .addVertexAggregator(new SumAggregator("a", "sumA"))
+        .addVertexAggregator(new CountAggregator("count"))
+        .addEdgeAggregator(new MinAggregator("b", "minB"))
+        .addEdgeAggregator(new MaxAggregator("b", "maxB"))
+        .addEdgeAggregator(new SumAggregator("b", "sumB"))
+        .addEdgeAggregator(new CountAggregator("count"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
