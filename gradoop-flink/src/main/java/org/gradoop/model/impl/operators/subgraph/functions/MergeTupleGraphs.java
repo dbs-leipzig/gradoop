@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.impl.functions.epgm;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
+package org.gradoop.model.impl.operators.subgraph.functions;
+
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
@@ -24,26 +25,30 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
- * Takes a tuple 2, containing an object and a gradoop id set, and creates one
- * new tuple 2 of the object and a gradoop id for each gradoop id in the set.
- *
- * @param <T> f0 type
+ * Reduces groups of tuples 2 containin two gradoop ids into one tuple
+ * per group, containing the first gradoop id and a gradoop id set,
+ * containing all the second gradoop ids.
  */
 @FunctionAnnotation.ReadFields("f1")
 @FunctionAnnotation.ForwardedFields("f0->f0")
-public class ExpandGradoopIds<T> implements FlatMapFunction
-  <Tuple2<T, GradoopIdSet>, Tuple2<T, GradoopId>> {
+public class MergeTupleGraphs implements
+  GroupReduceFunction<
+    Tuple2<GradoopId, GradoopId>,
+    Tuple2<GradoopId, GradoopIdSet>> {
 
   @Override
-  public void flatMap(
-    Tuple2<T, GradoopIdSet> pair,
-    Collector<Tuple2<T, GradoopId>> collector) throws Exception {
-
-    T firstField = pair.f0;
-
-    for (GradoopId toId : pair.f1) {
-      collector.collect(new Tuple2<>(firstField, toId));
+  public void reduce(Iterable<Tuple2<GradoopId, GradoopId>> iterable,
+    Collector<Tuple2<GradoopId, GradoopIdSet>> collector) throws Exception {
+    GradoopIdSet set = new GradoopIdSet();
+    boolean empty = true;
+    GradoopId first = null;
+    for (Tuple2<GradoopId, GradoopId> tuple : iterable) {
+      set.add(tuple.f1);
+      empty = false;
+      first = tuple.f0;
     }
-
+    if (!empty) {
+      collector.collect(new Tuple2<>(first, set));
+    }
   }
 }

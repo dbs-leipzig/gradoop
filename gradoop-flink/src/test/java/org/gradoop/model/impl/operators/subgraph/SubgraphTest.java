@@ -2,14 +2,18 @@ package org.gradoop.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.model.impl.properties.Property;
+import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class SubgraphTest extends GradoopFlinkTestBase {
 
@@ -191,5 +195,175 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       input.edgeInducedSubgraph(edgeFilterFunction);
 
     collectAndAssertTrue(output.equalsByElementData(expected));
+  }
+
+  @Test
+  public void testCollectionSubgraph() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+      loader = getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString(
+      "(jay:Person {" +
+        "name = \"Jay\", age=45, gender = \"f\", city = \"Leipzig\"})" +
+      "g4:Community[" +
+        "(jay)-[jkb:knows {since = 2016}]->(bob);" +
+        "(bob)-[blj:likes]->(jay);" +
+        "]");
+
+    loader.appendToDatabaseFromString(
+      "expected0[" +
+        "(alice);" +
+        "(bob);" +
+        "]"
+    );
+
+    loader.appendToDatabaseFromString(
+      "expected1[]"
+    );
+
+    loader.appendToDatabaseFromString(
+      "expected4[" +
+        "(jay)-[jkb]->(bob);" +
+        "]"
+    );
+
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> input =
+      loader.getGraphCollectionByVariables("g0","g1","g4");
+
+
+    FilterFunction<VertexPojo> vertexFilterFunction = new FilterFunction<VertexPojo>() {
+      @Override
+      public boolean filter(VertexPojo vertexPojo) throws Exception {
+        PropertyValue city = vertexPojo.getProperties().get("city");
+        return city != null && city.toString().equals("Leipzig");
+      }
+    };
+
+    FilterFunction<EdgePojo> edgeFilterFunction = new FilterFunction<EdgePojo>() {
+      @Override
+      public boolean filter(EdgePojo edgePojo) throws Exception {
+        if(edgePojo.getLabel().equals("knows")){
+          if(edgePojo.getPropertyValue("since").getInt() == 2016){
+            return true;
+          }
+
+        }
+        return false;
+      }
+    };
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    input.apply(
+      new ApplySubgraph<GraphHeadPojo, VertexPojo, EdgePojo>(
+        vertexFilterFunction, edgeFilterFunction));
+
+    collectAndAssertTrue(result.equalsByGraphElementIds(
+      loader.getGraphCollectionByVariables(
+        "expected0", "expected1", "expected4")));
+    collectAndAssertTrue(result.equalsByGraphData(
+      loader.getGraphCollectionByVariables(
+        "expected0", "expected1", "expected4")));
+  }
+
+  @Test
+  public void testCollectionVertexInducedSubgraph() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+      loader = getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString(
+      "(jay:Person {" +
+        "name = \"Jay\", age=45, gender = \"f\", city = \"Leipzig\"})" +
+        "g4:Community[" +
+        "(jay)-[jkb:knows]->(bob);" +
+        "(bob)-[blj:likes]->(jay);" +
+        "]");
+
+    loader.appendToDatabaseFromString(
+      "expected0[" +
+        "(alice)-[akb]->(bob)-[bka]->(alice);" +
+        "]"
+    );
+
+    loader.appendToDatabaseFromString(
+      "expected1[]"
+    );
+
+    loader.appendToDatabaseFromString(
+      "expected4[" +
+        "(jay)-[jkb]->(bob)-[blj]->(jay);" +
+        "]"
+    );
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> input =
+      loader.getGraphCollectionByVariables("g0","g1","g4");
+
+
+    FilterFunction<VertexPojo> vertexFilterFunction = new FilterFunction<VertexPojo>() {
+      @Override
+      public boolean filter(VertexPojo vertexPojo) throws Exception {
+        PropertyValue city = vertexPojo.getProperties().get("city");
+        return city != null && city.toString().equals("Leipzig");
+      }
+    };
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      input.apply(
+        new ApplySubgraph<GraphHeadPojo, VertexPojo, EdgePojo>(
+          vertexFilterFunction, null));
+
+    collectAndAssertTrue(result.equalsByGraphElementIds(
+      loader.getGraphCollectionByVariables(
+        "expected0", "expected1", "expected4")));
+    collectAndAssertTrue(result.equalsByGraphData(
+      loader.getGraphCollectionByVariables(
+        "expected0", "expected1", "expected4")));
+  }
+
+  @Test
+  public void testCollectionEdgeInducedSubgraph() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+      loader = getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString(
+      "expected0[" +
+        "(eve)-[ekb]->(bob);" +
+        "]"
+    );
+
+    loader.appendToDatabaseFromString(
+      "expected1[" +
+        "(frank)-[fkc]->(carol);" +
+        "(frank)-[fkd]->(dave);" +
+        "]"
+    );
+
+    loader.appendToDatabaseFromString(
+      "expected2[]"
+    );
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> input =
+      loader.getGraphCollectionByVariables("g0","g1","g2");
+
+
+    FilterFunction<EdgePojo> edgeFilterFunction = new FilterFunction<EdgePojo>
+      () {
+      @Override
+      public boolean filter(EdgePojo edgePojo) throws Exception {
+        return edgePojo.getPropertyValue("since").getInt() == 2015;
+      }
+    };
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      input.apply(
+        new ApplySubgraph<GraphHeadPojo, VertexPojo, EdgePojo>(
+          null, edgeFilterFunction));
+
+    collectAndAssertTrue(result.equalsByGraphElementIds(
+      loader.getGraphCollectionByVariables(
+        "expected0", "expected1", "expected2")));
+    collectAndAssertTrue(result.equalsByGraphData(
+      loader.getGraphCollectionByVariables(
+        "expected0", "expected1", "expected2")));
   }
 }

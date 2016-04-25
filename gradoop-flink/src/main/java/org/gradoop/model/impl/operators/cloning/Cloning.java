@@ -34,7 +34,7 @@ import org.gradoop.model.impl.operators.cloning.functions.EdgeSourceUpdateJoin;
 import org.gradoop.model.impl.operators.cloning.functions.EdgeTargetUpdateJoin;
 import org.gradoop.model.impl.operators.cloning.functions.Value0Of2ToId;
 import org.gradoop.model.impl.operators.cloning.functions.ElementGraphUpdater;
-import org.gradoop.model.impl.operators.cloning.functions.ElementIdUpdater;
+import org.gradoop.model.impl.functions.epgm.ElementIdUpdater;
 
 /**
  * Creates a copy of the logical graph with new ids for the graph head,

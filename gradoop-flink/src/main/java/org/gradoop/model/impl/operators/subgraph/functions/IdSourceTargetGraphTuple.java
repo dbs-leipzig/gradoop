@@ -14,35 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.impl.functions.epgm;
+
+package org.gradoop.model.impl.operators.subgraph.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.util.Collector;
+import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
- * Takes a tuple 2, containing an object and a gradoop id set, and creates one
- * new tuple 2 of the object and a gradoop id for each gradoop id in the set.
+ * Maps an edge  tuples 4 containing the id of this edge, the id of its
+ * source and target and a graph this edge is contained in. One tuple per graph.
  *
- * @param <T> f0 type
+ * @param <E> epgm edge type
  */
-@FunctionAnnotation.ReadFields("f1")
-@FunctionAnnotation.ForwardedFields("f0->f0")
-public class ExpandGradoopIds<T> implements FlatMapFunction
-  <Tuple2<T, GradoopIdSet>, Tuple2<T, GradoopId>> {
+
+@FunctionAnnotation.ReadFields("graphIds")
+@FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
+public class IdSourceTargetGraphTuple<E extends EPGMEdge>
+  implements FlatMapFunction<
+  E, Tuple4<GradoopId, GradoopId, GradoopId, GradoopId>> {
 
   @Override
   public void flatMap(
-    Tuple2<T, GradoopIdSet> pair,
-    Collector<Tuple2<T, GradoopId>> collector) throws Exception {
+    E edge,
+    Collector<Tuple4<GradoopId, GradoopId, GradoopId, GradoopId>> collector) {
 
-    T firstField = pair.f0;
-
-    for (GradoopId toId : pair.f1) {
-      collector.collect(new Tuple2<>(firstField, toId));
+    for (GradoopId graphId : edge.getGraphIds()) {
+      collector.collect(new Tuple4<>(
+        edge.getId(),
+        edge.getSourceId(),
+        edge.getTargetId(),
+        graphId));
     }
 
   }

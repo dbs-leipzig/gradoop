@@ -117,7 +117,7 @@ public class BusinessTransactionGraphs
       .map(new ComponentToNewBtgId());
 
     DataSet<Tuple2<GradoopId, GradoopId>> vertexBtgMap = btgVerticesMap
-      .flatMap(new ExpandGradoopIds())
+      .flatMap(new ExpandGradoopIds<GradoopId>())
       .map(new SwitchPair<GradoopId, GradoopId>());
 
     DataSet<G> graphHeads = btgVerticesMap

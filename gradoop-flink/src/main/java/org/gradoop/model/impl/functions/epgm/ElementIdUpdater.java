@@ -14,36 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.model.impl.functions.epgm;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIdSet;
+
 
 /**
- * Takes a tuple 2, containing an object and a gradoop id set, and creates one
- * new tuple 2 of the object and a gradoop id for each gradoop id in the set.
+ * Updates the id of an EPGM element in a Tuple2 by the GradoopId in the
+ * second field.
  *
- * @param <T> f0 type
+ * @param <EL> EPGM element type
  */
-@FunctionAnnotation.ReadFields("f1")
-@FunctionAnnotation.ForwardedFields("f0->f0")
-public class ExpandGradoopIds<T> implements FlatMapFunction
-  <Tuple2<T, GradoopIdSet>, Tuple2<T, GradoopId>> {
+@FunctionAnnotation.ForwardedFieldsFirst("graphIds;label;properties")
+@FunctionAnnotation.ForwardedFieldsSecond("*->id")
+public class ElementIdUpdater<EL extends EPGMVertex>
+  implements MapFunction<Tuple2<EL, GradoopId>, EL> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void flatMap(
-    Tuple2<T, GradoopIdSet> pair,
-    Collector<Tuple2<T, GradoopId>> collector) throws Exception {
-
-    T firstField = pair.f0;
-
-    for (GradoopId toId : pair.f1) {
-      collector.collect(new Tuple2<>(firstField, toId));
-    }
-
+  public EL map(Tuple2<EL, GradoopId> tuple2) {
+    tuple2.f0.setId(tuple2.f1);
+    return tuple2.f0;
   }
 }
