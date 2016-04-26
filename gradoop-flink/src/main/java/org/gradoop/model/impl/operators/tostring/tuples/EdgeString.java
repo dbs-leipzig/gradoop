@@ -84,4 +84,12 @@ public class EdgeString extends Tuple6<GradoopId, GradoopId, GradoopId,
   public void setTargetLabel(String targetLabel) {
     this.f5 = targetLabel;
   }
+
+  public void setSourceId(GradoopId sourceId) {
+    this.f1 = sourceId;
+  }
+
+  public void setTargetId(GradoopId targetId) {
+    this.f2 = targetId;
+  }
 }

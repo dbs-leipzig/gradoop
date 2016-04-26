@@ -34,7 +34,10 @@ import org.gradoop.model.impl.operators.tostring.functions.IncomingAdjacencyList
 import org.gradoop.model.impl.operators.tostring.functions.MultiEdgeStringCombiner;
 import org.gradoop.model.impl.operators.tostring.functions.OutgoingAdjacencyList;
 import org.gradoop.model.impl.operators.tostring.functions.SourceStringUpdater;
+import org.gradoop.model.impl.operators.tostring.functions.SwitchSourceTargetIds;
 import org.gradoop.model.impl.operators.tostring.functions.TargetStringUpdater;
+import org.gradoop.model.impl.operators.tostring.functions
+  .UndirectedAdjacencyList;
 import org.gradoop.model.impl.operators.tostring.tuples.EdgeString;
 import org.gradoop.model.impl.operators.tostring.tuples.GraphHeadString;
 import org.gradoop.model.impl.operators.tostring.tuples.VertexString;
@@ -62,20 +65,28 @@ public class CanonicalAdjacencyMatrixBuilder
    * function describing string representation of edges
    */
   private final EdgeToString<E> egeLabelingFunction;
+  /**
+   * sets mode for either directed or undirected graph
+   */
+  private final boolean directed;
 
   /**
    * constructor
    * @param graphHeadToString representation of graph heads
    * @param vertexToString representation of vertices
-   * @param egeLabelingFunction representation of edges
+   * @param edgeLabelingFunction representation of edges
+   * @param directed sets mode for either directed or undirected graph
    */
   public CanonicalAdjacencyMatrixBuilder(
     GraphHeadToString<G> graphHeadToString,
     VertexToString<V> vertexToString,
-    EdgeToString<E> egeLabelingFunction) {
+    EdgeToString<E> edgeLabelingFunction,
+    boolean directed
+  ) {
     this.graphHeadToString = graphHeadToString;
     this.vertexToString = vertexToString;
-    this.egeLabelingFunction = egeLabelingFunction;
+    this.egeLabelingFunction = edgeLabelingFunction;
+    this.directed = directed;
   }
 
   @Override
@@ -91,57 +102,91 @@ public class CanonicalAdjacencyMatrixBuilder
 
     // 3. label edges
     DataSet<EdgeString> edgeLabels = collection.getEdges()
-      .flatMap(egeLabelingFunction)
-      .groupBy(0, 1, 2)
-      .reduceGroup(new MultiEdgeStringCombiner());
+      .flatMap(egeLabelingFunction);
 
-    // 4. extend edge labels by vertex labels
+    if (directed) {
+      // 4. combine labels of parallel edges
+      edgeLabels = edgeLabels
+        .groupBy(0, 1, 2)
+        .reduceGroup(new MultiEdgeStringCombiner());
 
-    edgeLabels = edgeLabels
-      .join(vertexLabels)
-      .where(0, 1).equalTo(0, 1) // graphId,sourceId = graphId,vertexId
-      .with(new SourceStringUpdater())
-      .join(vertexLabels)
-      .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId
-      .with(new TargetStringUpdater());
+      // 5. extend edge labels by vertex labels
 
-    // 5. extend vertex labels by outgoing vertex+edge labels
+      edgeLabels = edgeLabels
+        .join(vertexLabels)
+        .where(0, 1).equalTo(0, 1) // graphId,sourceId = graphId,vertexId
+        .with(new SourceStringUpdater())
+        .join(vertexLabels)
+        .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId
+        .with(new TargetStringUpdater());
 
-    DataSet<VertexString> outgoingAdjacencyListLabels = edgeLabels
-      .groupBy(0, 1) // graphId, sourceId
-      .reduceGroup(new OutgoingAdjacencyList());
+      // 6. extend vertex labels by outgoing vertex+edge labels
 
+      DataSet<VertexString> outgoingAdjacencyListLabels =
+        edgeLabels.groupBy(0, 1) // graphId, sourceId
+          .reduceGroup(new OutgoingAdjacencyList());
 
-    // 6. extend vertex labels by outgoing vertex+edge labels
+      // 7. extend vertex labels by outgoing vertex+edge labels
 
-    DataSet<VertexString> incomingAdjacencyListLabels = edgeLabels
-      .groupBy(0, 2) // graphId, targetId
-      .reduceGroup(new IncomingAdjacencyList());
+      DataSet<VertexString> incomingAdjacencyListLabels =
+        edgeLabels.groupBy(0, 2) // graphId, targetId
+          .reduceGroup(new IncomingAdjacencyList());
 
-    // 7. combine vertex labels
+      // 8. combine vertex labels
 
-    vertexLabels = vertexLabels
-      .leftOuterJoin(outgoingAdjacencyListLabels)
-      .where(0, 1).equalTo(0, 1)
-      .with(new LabelCombiner<VertexString>())
-      .leftOuterJoin(incomingAdjacencyListLabels)
-      .where(0, 1).equalTo(0, 1)
-      .with(new LabelCombiner<VertexString>());
+      vertexLabels = vertexLabels
+        .leftOuterJoin(outgoingAdjacencyListLabels)
+        .where(0, 1).equalTo(0, 1)
+        .with(new LabelCombiner<VertexString>())
+        .leftOuterJoin(incomingAdjacencyListLabels)
+        .where(0, 1).equalTo(0, 1)
+        .with(new LabelCombiner<VertexString>());
+    } else {
+    // undirected graph
 
-    // 8. create adjacency matrix labels
+      // 4. union edges with flipped edges and combine labels of parallel edges
+
+      edgeLabels = edgeLabels
+        .union(edgeLabels
+          .map(new SwitchSourceTargetIds()))
+        .groupBy(0, 1, 2)
+        .reduceGroup(new MultiEdgeStringCombiner());
+
+      // 5. extend edge labels by vertex labels
+
+      edgeLabels = edgeLabels
+        .join(vertexLabels)
+        .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId
+        .with(new TargetStringUpdater());
+
+      // 6/7. extend vertex labels by vertex+edge labels
+
+      DataSet<VertexString> adjacencyListLabels =
+        edgeLabels.groupBy(0, 1) // graphId, sourceId
+          .reduceGroup(new UndirectedAdjacencyList());
+
+      // 8. combine vertex labels
+
+      vertexLabels = vertexLabels
+        .leftOuterJoin(adjacencyListLabels)
+        .where(0, 1).equalTo(0, 1)
+        .with(new LabelCombiner<VertexString>());
+    }
+
+    // 9. create adjacency matrix labels
 
     DataSet<GraphHeadString> adjacencyMatrixLabels = vertexLabels
       .groupBy(0)
       .reduceGroup(new AdjacencyMatrix());
 
-    // 9. combine graph labels
+    // 10. combine graph labels
 
     graphHeadLabels = graphHeadLabels
-      .join(adjacencyMatrixLabels)
+      .leftOuterJoin(adjacencyMatrixLabels)
       .where(0).equalTo(0)
       .with(new LabelCombiner<GraphHeadString>());
 
-    // 10. add empty head to prevent empty result for empty collection
+    // 11. add empty head to prevent empty result for empty collection
 
     graphHeadLabels = graphHeadLabels
       .union(collection
@@ -149,7 +194,7 @@ public class CanonicalAdjacencyMatrixBuilder
         .getExecutionEnvironment()
         .fromElements(new GraphHeadString(GradoopId.get(), "")));
 
-    // 11. label collection
+    // 12. label collection
 
     return graphHeadLabels
       .reduceGroup(new ConcatGraphHeadStrings());

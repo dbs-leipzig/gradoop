@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
   @Test
-  public void textExecute() throws Exception {
+  public void testDirected() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader = new
       FlinkAsciiGraphLoader<>(getConfig());
 
@@ -32,14 +32,41 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
       new CanonicalAdjacencyMatrixBuilder<>(
         new GraphHeadToDataString<GraphHeadPojo>(),
         new VertexToDataString<VertexPojo>(),
-        new EdgeToDataString<EdgePojo>()
-      );
+        new EdgeToDataString<EdgePojo>(), true);
 
     String result = cam.execute(g).collect().get(0);
 
     String expectation = FileUtils.readFileToString(
       FileUtils.getFile(CanonicalAdjacencyMatrixBuilderTest.class
-        .getResource("/data/expected/cam_test").getFile()));
+        .getResource("/data/expected/cam_test_directed").getFile()));
+
+    assertTrue(expectation.equals(result));
+  }
+
+  @Test
+  public void testUndirected() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader = new
+      FlinkAsciiGraphLoader<>(getConfig());
+
+    loader.initDatabaseFromFile(CanonicalAdjacencyMatrixBuilderTest.class
+      .getResource("/data/gdl/cam_test.gdl").getFile());
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> g = loader
+      .getDatabase().getCollection();
+
+    CanonicalAdjacencyMatrixBuilder<GraphHeadPojo, VertexPojo, EdgePojo> cam =
+      new CanonicalAdjacencyMatrixBuilder<>(
+        new GraphHeadToDataString<GraphHeadPojo>(),
+        new VertexToDataString<VertexPojo>(),
+        new EdgeToDataString<EdgePojo>(), false);
+
+    String result = cam.execute(g).collect().get(0);
+
+    String expectation = FileUtils.readFileToString(
+      FileUtils.getFile(CanonicalAdjacencyMatrixBuilderTest.class
+        .getResource("/data/expected/cam_test_undirected").getFile()));
+
+    System.out.println(result);
 
     assertTrue(expectation.equals(result));
   }
