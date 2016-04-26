@@ -609,8 +609,7 @@ public class LogicalGraph
     return new GraphEquality<>(
       new GraphHeadToEmptyString<G>(),
       new VertexToIdString<V>(),
-      new EdgeToIdString<E>()
-    ).execute(this, other);
+      new EdgeToIdString<E>(), true).execute(this, other);
   }
 
   /**
@@ -621,8 +620,7 @@ public class LogicalGraph
     return new GraphEquality<>(
       new GraphHeadToEmptyString<G>(),
       new VertexToDataString<V>(),
-      new EdgeToDataString<E>()
-    ).execute(this, other);
+      new EdgeToDataString<E>(), true).execute(this, other);
   }
 
   /**
@@ -633,8 +631,7 @@ public class LogicalGraph
     return new GraphEquality<>(
       new GraphHeadToDataString<G>(),
       new VertexToDataString<V>(),
-      new EdgeToDataString<E>()
-    ).execute(this, other);
+      new EdgeToDataString<E>(), true).execute(this, other);
   }
 
   //----------------------------------------------------------------------------

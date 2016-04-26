@@ -78,8 +78,7 @@ public class ExampleOutput
       new CanonicalAdjacencyMatrixBuilder<>(
         new GraphHeadToDataString<G>(),
         new VertexToDataString<V>(),
-        new EdgeToDataString<E>()
-      ).execute(collection);
+        new EdgeToDataString<E>(), true).execute(collection);
 
     outSet = outSet
       .cross(captionSet)

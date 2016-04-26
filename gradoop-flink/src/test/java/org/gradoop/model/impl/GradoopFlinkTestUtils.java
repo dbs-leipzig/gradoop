@@ -98,22 +98,42 @@ public class GradoopFlinkTestUtils {
   public static <
     G extends EPGMGraphHead,
     V extends EPGMVertex,
-    E extends EPGMEdge> void printCanonicalAdjacencyMatrix(
+    E extends EPGMEdge> void printDirectedCanonicalAdjacencyMatrix(
     LogicalGraph<G, V,E> graph) throws Exception {
 
-    printCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
+    printDirectedCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
   }
 
   public static <
     G extends EPGMGraphHead,
     V extends EPGMVertex,
-    E extends EPGMEdge> void printCanonicalAdjacencyMatrix(
+    E extends EPGMEdge> void printDirectedCanonicalAdjacencyMatrix(
     GraphCollection<G, V, E> collection) throws Exception {
 
     new CanonicalAdjacencyMatrixBuilder<>(
       new GraphHeadToDataString<G>(),
       new VertexToDataString<V>(),
-      new EdgeToDataString<E>()
-    ).execute(collection).print();
+      new EdgeToDataString<E>(), true).execute(collection).print();
+  }
+
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> void printUndirectedCanonicalAdjacencyMatrix(
+    LogicalGraph<G, V,E> graph) throws Exception {
+
+    printUndirectedCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
+  }
+
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> void printUndirectedCanonicalAdjacencyMatrix(
+    GraphCollection<G, V, E> collection) throws Exception {
+
+    new CanonicalAdjacencyMatrixBuilder<>(
+      new GraphHeadToDataString<G>(),
+      new VertexToDataString<V>(),
+      new EdgeToDataString<E>(), false).execute(collection).print();
   }
 }
