@@ -73,7 +73,7 @@ public class Employee<V extends EPGMVertex>
         " " + lastNames.get(random.nextInt(lastNameCount));
     }
 
-    String bid = "EMP" + seed.getId().toString();
+    String bid = "EMP" + seed.hashCode();
 
     PropertyList properties = new PropertyList();
 

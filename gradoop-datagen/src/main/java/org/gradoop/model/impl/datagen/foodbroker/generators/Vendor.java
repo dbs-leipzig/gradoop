@@ -57,7 +57,7 @@ public class Vendor<V extends EPGMVertex>
     String name = adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nouns.get(random.nextInt(nounCount));
 
-    String bid = "VEN" + seed.getId().toString();
+    String bid = "VEN" + seed.hashCode();
 
     PropertyList properties = new PropertyList();
 
