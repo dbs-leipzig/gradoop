@@ -1,26 +1,26 @@
 package org.gradoop.model.impl.datagen.foodbroker.model;
 
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.impl.id.GradoopId;
 
-/**
- * Created by peet on 23.03.16.
- */
-public class MasterDataSeed extends Tuple2<Integer, Short> {
+public class MasterDataSeed extends Tuple2<GradoopId, Integer> {
+
+  public static final String QUALITY = "quality";
 
   public MasterDataSeed() {
 
   }
 
-  public MasterDataSeed(Integer intId, Short quality) {
-    this.f0 = intId;
+  public MasterDataSeed(Integer quality) {
+    this.f0 = GradoopId.get();
     this.f1 = quality;
   }
 
-  public Integer getLongId() {
+  public GradoopId getId() {
     return this.f0;
   }
 
-  public Short getQuality() {
+  public Integer getQuality() {
     return this.f1;
   }
 }

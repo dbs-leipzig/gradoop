@@ -1,7 +1,8 @@
 package org.gradoop.model.impl.datagen.foodbroker;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.GradoopFlinkTestUtils;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -12,14 +13,17 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   @Test
   public void testGenerate() throws Exception {
 
+    FoodBrokerConfig config = FoodBrokerConfig.fromFile(
+      FoodBrokerTest.class.getResource("/foodbroker/config.json").getFile());
+
+    config.setScaleFactor(0);
+
     FoodBroker<GraphHeadPojo, VertexPojo, EdgePojo> foodBroker =
-      new FoodBroker<>(getExecutionEnvironment(), getConfig(), FoodBrokerConfig
-        .fromFile(FoodBrokerTest.class.getResource("/foodbroker/config.json")
-          .getFile()));
+      new FoodBroker<>(getExecutionEnvironment(), getConfig(), config);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> enterpriseGraph =
-      foodBroker.generate(0);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> cases =
+      foodBroker.execute();
 
-    //GradoopFlinkTestUtils.printLogicalGraph(enterpriseGraph);
+    GradoopFlinkTestUtils.printGraphCollection(cases);
   }
 }
