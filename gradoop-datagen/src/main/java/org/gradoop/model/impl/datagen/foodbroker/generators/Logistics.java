@@ -54,7 +54,7 @@ public class Logistics<V extends EPGMVertex>
     String name = adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nouns.get(random.nextInt(nounCount));
 
-    String bid = "LOG" + seed.getId().toString();
+    String bid = "LOG" + seed.hashCode();
 
     PropertyList properties = new PropertyList();
 

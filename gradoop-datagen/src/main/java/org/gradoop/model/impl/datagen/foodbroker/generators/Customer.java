@@ -57,7 +57,7 @@ public class Customer<V extends EPGMVertex>
     String name = adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nouns.get(random.nextInt(nounCount));
 
-    String bid = "CUS" + seed.getId().toString();
+    String bid = "CUS" + seed.hashCode();
 
     PropertyList properties = new PropertyList();
 

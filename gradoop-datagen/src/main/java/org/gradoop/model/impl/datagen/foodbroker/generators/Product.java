@@ -53,7 +53,7 @@ public class Product<V extends EPGMVertex>
     Tuple2<String, String> nameGroupPair = nameGroupPairs
       .get(random.nextInt(nameGroupPairCount));
 
-    String bid = "PRD" + seed.getId().toString();
+    String bid = "PRD" + seed.hashCode();
     String name = adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nameGroupPair.f0;
     String category = nameGroupPair.f1;
