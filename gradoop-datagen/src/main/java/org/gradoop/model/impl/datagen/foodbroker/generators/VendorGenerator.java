@@ -1,24 +1,22 @@
-package org.gradoop.model.impl.datagen.foodbroker.generator;
+package org.gradoop.model.impl.datagen.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.model.impl.datagen.foodbroker.functions.Vendor;
-import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
+import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.List;
 
-public class VendorGenerator extends AbstractMasterDataGenerator {
+public class VendorGenerator<V extends EPGMVertex>
+  extends AbstractMasterDataGenerator<V> {
 
-
-  public VendorGenerator(ExecutionEnvironment env,
-    FoodBrokerConfig foodBrokerConfig) {
-    super(env, foodBrokerConfig);
+  public VendorGenerator(
+    GradoopFlinkConfig gradoopFlinkConfig, FoodBrokerConfig foodBrokerConfig) {
+    super(gradoopFlinkConfig, foodBrokerConfig);
   }
 
-  public DataSet<MasterDataObject> generate() {
+  public DataSet<V> generate() {
 
     String className = Vendor.CLASS_NAME;
 
@@ -29,12 +27,13 @@ public class VendorGenerator extends AbstractMasterDataGenerator {
     List<String> nouns = getStringValuesFromFile("vendor.nouns");
 
     return env.fromCollection(seeds)
-      .map(new Vendor())
+      .map(new Vendor<>(vertexFactory))
       .withBroadcastSet(
         env.fromCollection(adjectives), Vendor.ADJECTIVES_BC)
       .withBroadcastSet(
         env.fromCollection(nouns), Vendor.NOUNS_BC)
       .withBroadcastSet(
-        env.fromCollection(cities), Vendor.CITIES_BC);
+        env.fromCollection(cities), Vendor.CITIES_BC)
+      .returns(vertexFactory.getType());
   }
 }

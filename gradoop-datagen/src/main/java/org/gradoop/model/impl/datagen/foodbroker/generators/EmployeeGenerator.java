@@ -1,23 +1,22 @@
-package org.gradoop.model.impl.datagen.foodbroker.generator;
+package org.gradoop.model.impl.datagen.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.model.impl.datagen.foodbroker.functions.Employee;
-import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
+import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.List;
 
-public class EmployeeGenerator extends AbstractMasterDataGenerator {
+public class EmployeeGenerator<V extends EPGMVertex>
+  extends AbstractMasterDataGenerator<V> {
 
-
-  public EmployeeGenerator(ExecutionEnvironment env,
-    FoodBrokerConfig foodBrokerConfig) {
-    super(env, foodBrokerConfig);
+  public EmployeeGenerator(
+    GradoopFlinkConfig gradoopFlinkConfig, FoodBrokerConfig foodBrokerConfig) {
+    super(gradoopFlinkConfig, foodBrokerConfig);
   }
 
-  public DataSet<MasterDataObject> generate() {
+  public DataSet<V> generate() {
 
     String className = Employee.CLASS_NAME;
 
@@ -31,7 +30,7 @@ public class EmployeeGenerator extends AbstractMasterDataGenerator {
     List<String> nouns = getStringValuesFromFile("employee.last_names");
 
     return env.fromCollection(seeds)
-      .map(new Employee())
+      .map(new Employee<>(vertexFactory))
       .withBroadcastSet(
         env.fromCollection(firstNamesFemale),
         Employee.FIRST_NAMES_FEMALE_BC)
@@ -41,6 +40,7 @@ public class EmployeeGenerator extends AbstractMasterDataGenerator {
       .withBroadcastSet(
         env.fromCollection(nouns), Employee.LAST_NAMES_BC)
       .withBroadcastSet(
-        env.fromCollection(cities), Employee.CITIES_BC);
+        env.fromCollection(cities), Employee.CITIES_BC)
+      .returns(vertexFactory.getType());
   }
 }

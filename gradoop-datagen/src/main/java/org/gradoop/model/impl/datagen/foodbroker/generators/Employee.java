@@ -1,18 +1,18 @@
-package org.gradoop.model.impl.datagen.foodbroker.functions;
+package org.gradoop.model.impl.datagen.foodbroker.generators;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.model.impl.datagen.foodbroker.generator.EmployeeGenerator;
-import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
 
 import java.util.List;
 import java.util.Random;
 
-public class Employee extends
-  RichMapFunction<MasterDataSeed, MasterDataObject> {
+public class Employee<V extends EPGMVertex>
+  extends RichMapFunction<MasterDataSeed, V> {
 
   public static final String CLASS_NAME = "Employee";
   public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
@@ -28,6 +28,12 @@ public class Employee extends
   private Integer firstNameCountMale;
   private Integer lastNameCount;
   private Integer cityCount;
+
+  private final EPGMVertexFactory<V> vertexFactory;
+
+  public Employee(EPGMVertexFactory<V> vertexFactory) {
+    this.vertexFactory = vertexFactory;
+  }
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -49,7 +55,7 @@ public class Employee extends
   }
 
   @Override
-  public MasterDataObject map(MasterDataSeed seed) throws  Exception {
+  public V map(MasterDataSeed seed) throws  Exception {
 
     Random random = new Random();
 
@@ -57,7 +63,7 @@ public class Employee extends
     String gender = null;
     String name = null;
 
-    if(seed.getLongId() % 2 == 0) {
+    if(seed.hashCode() % 2 == 0) {
       gender = "f";
       name = firstNamesFemale.get(random.nextInt(firstNameCountFemale)) +
         " " + lastNames.get(random.nextInt(lastNameCount));
@@ -67,7 +73,7 @@ public class Employee extends
         " " + lastNames.get(random.nextInt(lastNameCount));
     }
 
-    String bid = "EMP" + seed.getLongId().toString();
+    String bid = "EMP" + seed.getId().toString();
 
     PropertyList properties = new PropertyList();
 
@@ -76,11 +82,13 @@ public class Employee extends
     properties.set("num", bid);
     properties.set("gender", gender);
 
+    properties.set(MasterDataSeed.QUALITY, seed.getQuality());
+
     properties.set(BusinessTransactionGraphs.SUPERTYPE_KEY,
       BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER);
 
     properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
 
-    return new MasterDataObject(seed, Employee.CLASS_NAME, properties);
+    return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
   }
 }

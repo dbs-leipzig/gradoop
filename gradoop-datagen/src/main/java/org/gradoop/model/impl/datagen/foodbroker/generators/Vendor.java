@@ -1,19 +1,20 @@
-package org.gradoop.model.impl.datagen.foodbroker.functions;
+package org.gradoop.model.impl.datagen.foodbroker.generators;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataObject;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
 
 import java.util.List;
 import java.util.Random;
 
-public class Customer extends
-  RichMapFunction<MasterDataSeed, MasterDataObject> {
+public class Vendor<V extends EPGMVertex>
+  extends RichMapFunction<MasterDataSeed, V> {
 
-  public static final String CLASS_NAME = "Customer";
+  public static final String CLASS_NAME = "Vendor";
   public static final String ADJECTIVES_BC = "adjectives";
   public static final String NOUNS_BC = "nouns";
   public static final String CITIES_BC = "cities";
@@ -24,6 +25,12 @@ public class Customer extends
   private Integer adjectiveCount;
   private Integer nounCount;
   private Integer cityCount;
+
+  private final EPGMVertexFactory<V> vertexFactory;
+
+  public Vendor(EPGMVertexFactory<V> vertexFactory) {
+    this.vertexFactory = vertexFactory;
+  }
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -42,7 +49,7 @@ public class Customer extends
   }
 
   @Override
-  public MasterDataObject map(MasterDataSeed seed) throws  Exception {
+  public V map(MasterDataSeed seed) throws  Exception {
 
     Random random = new Random();
 
@@ -50,7 +57,7 @@ public class Customer extends
     String name = adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nouns.get(random.nextInt(nounCount));
 
-    String bid = "CUS" + seed.getLongId().toString();
+    String bid = "VEN" + seed.getId().toString();
 
     PropertyList properties = new PropertyList();
 
@@ -58,11 +65,13 @@ public class Customer extends
     properties.set("name", name);
     properties.set("num", bid);
 
+    properties.set(MasterDataSeed.QUALITY, seed.getQuality());
+
     properties.set(BusinessTransactionGraphs.SUPERTYPE_KEY,
       BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER);
 
     properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
 
-    return  new MasterDataObject(seed, Customer.CLASS_NAME, properties);
+    return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
   }
 }
