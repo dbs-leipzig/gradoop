@@ -1,22 +1,44 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gradoop.model.impl.datagen.foodbroker.model;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.impl.id.GradoopId;
 
-public class MasterDataSeed extends Tuple2<GradoopId, Integer> {
+/**
+ * (number, quality)
+ */
+public class MasterDataSeed extends Tuple2<Integer, Integer> {
 
-  public static final String QUALITY = "quality";
-
+  /**
+   * default constructor
+   */
   public MasterDataSeed() {
-
   }
 
-  public MasterDataSeed(Integer quality) {
-    this.f0 = GradoopId.get();
-    this.f1 = quality;
+  /**
+   * valued constructor
+   * @param number sequence number
+   * @param quality master data quality
+   */
+  public MasterDataSeed(Integer number, Integer quality) {
+    super(number, quality);
   }
 
-  public GradoopId getId() {
+  public Integer getNumber() {
     return this.f0;
   }
 
