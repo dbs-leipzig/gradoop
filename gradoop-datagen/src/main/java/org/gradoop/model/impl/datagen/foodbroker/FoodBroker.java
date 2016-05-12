@@ -24,11 +24,11 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.CollectionGenerator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.model.impl.datagen.foodbroker.generators.CustomerGenerator;
-import org.gradoop.model.impl.datagen.foodbroker.generators.EmployeeGenerator;
-import org.gradoop.model.impl.datagen.foodbroker.generators.LogisticsGenerator;
-import org.gradoop.model.impl.datagen.foodbroker.generators.ProductGenerator;
-import org.gradoop.model.impl.datagen.foodbroker.generators.VendorGenerator;
+import org.gradoop.model.impl.datagen.foodbroker.masterdata.CustomerGenerator;
+import org.gradoop.model.impl.datagen.foodbroker.masterdata.EmployeeGenerator;
+import org.gradoop.model.impl.datagen.foodbroker.masterdata.LogisticsGenerator;
+import org.gradoop.model.impl.datagen.foodbroker.masterdata.ProductGenerator;
+import org.gradoop.model.impl.datagen.foodbroker.masterdata.VendorGenerator;
 import org.gradoop.util.GradoopFlinkConfig;
 
 

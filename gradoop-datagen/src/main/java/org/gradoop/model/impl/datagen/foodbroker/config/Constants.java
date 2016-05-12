@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.impl.datagen.foodbroker;
+package org.gradoop.model.impl.datagen.foodbroker.config;
 
 /**
  * Constants used for the FoodBroker data generator

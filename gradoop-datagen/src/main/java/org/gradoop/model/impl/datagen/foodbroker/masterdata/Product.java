@@ -14,51 +14,49 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.impl.datagen.foodbroker.generators;
+package org.gradoop.model.impl.datagen.foodbroker.masterdata;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
-import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
 
 import java.util.List;
 import java.util.Random;
 
-public class Customer<V extends EPGMVertex>
+public class Product<V extends EPGMVertex>
   extends RichMapFunction<MasterDataSeed, V> {
 
-  public static final String CLASS_NAME = "Customer";
+  public static final String CLASS_NAME = "Product";
+  public static final String NAMES_GROUPS_BC = "nameGroupPairs";
   public static final String ADJECTIVES_BC = "adjectives";
-  public static final String NOUNS_BC = "nouns";
-  public static final String CITIES_BC = "cities";
-  private static final String ACRONYM = "CUS";
+  private static final String ACRONYM = "PRD";
 
+  private List<Tuple2<String, String>> nameGroupPairs;
   private List<String> adjectives;
-  private List<String> nouns;
-  private List<String> cities;
+
+  private Integer nameGroupPairCount;
   private Integer adjectiveCount;
-  private Integer nounCount;
-  private Integer cityCount;
 
   private final EPGMVertexFactory<V> vertexFactory;
 
-  public Customer(EPGMVertexFactory<V> vertexFactory) {
+  public Product(EPGMVertexFactory<V> vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
+
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
+    nameGroupPairs = getRuntimeContext().getBroadcastVariable(NAMES_GROUPS_BC);
     adjectives = getRuntimeContext().getBroadcastVariable(ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(NOUNS_BC);
-    cities = getRuntimeContext().getBroadcastVariable(CITIES_BC);
 
-    nounCount = nouns.size();
+    nameGroupPairCount = nameGroupPairs.size();
     adjectiveCount = adjectives.size();
-    cityCount = cities.size();
   }
 
   @Override
@@ -67,14 +65,15 @@ public class Customer<V extends EPGMVertex>
 
     Random random = new Random();
 
-    properties.set("city", cities.get(random.nextInt(cityCount)));
+    Tuple2<String, String> nameGroupPair = nameGroupPairs
+      .get(random.nextInt(nameGroupPairCount));
+
+    properties.set("category", nameGroupPair.f1);
 
     properties.set("name",
       adjectives.get(random.nextInt(adjectiveCount)) +
-      " " + nouns.get(random.nextInt(nounCount)));
+      " " + nameGroupPair.f0);
 
     return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
   }
-
-
 }

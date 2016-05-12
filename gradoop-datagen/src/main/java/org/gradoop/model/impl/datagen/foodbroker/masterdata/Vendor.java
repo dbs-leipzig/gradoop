@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.impl.datagen.foodbroker.generators;
+package org.gradoop.model.impl.datagen.foodbroker.masterdata;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
-import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.model.impl.datagen.foodbroker.Constants;
-import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
 
 import java.util.List;

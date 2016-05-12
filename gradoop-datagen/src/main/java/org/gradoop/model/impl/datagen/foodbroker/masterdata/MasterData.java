@@ -1,8 +1,8 @@
-package org.gradoop.model.impl.datagen.foodbroker.generators;
+package org.gradoop.model.impl.datagen.foodbroker.masterdata;
 
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.model.impl.datagen.foodbroker.Constants;
-import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
+import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
 
 public class MasterData {
