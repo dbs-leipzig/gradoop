@@ -14,12 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.impl.datagen.foodbroker.generators;
+package org.gradoop.model.impl.datagen.foodbroker;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMVertex;
-
-public interface MasterDataGenerator<V extends EPGMVertex> {
-
-  DataSet<V> generate();
+/**
+ * Constants used for the FoodBroker data generator
+ */
+public class Constants {
+  /**
+   * property key for master data quality
+   */
+  public static final String QUALITY = "quality";
 }

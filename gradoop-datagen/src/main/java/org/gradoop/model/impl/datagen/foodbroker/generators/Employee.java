@@ -1,3 +1,19 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gradoop.model.impl.datagen.foodbroker.generators;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -5,6 +21,7 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
+import org.gradoop.model.impl.datagen.foodbroker.Constants;
 import org.gradoop.model.impl.datagen.foodbroker.model.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
 
@@ -18,8 +35,9 @@ public class Employee<V extends EPGMVertex>
   public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
   public static final String FIRST_NAMES_FEMALE_BC = "firstNamesFemale";
   public static final String LAST_NAMES_BC = "nouns";
-  public static final String CITIES_BC = "cities";  
-  
+  public static final String CITIES_BC = "cities";
+  private static String ACRONYM = "EMP";
+
   private List<String> firstNamesFemale;
   private List<String> firstNamesMale;
   private List<String> lastNames;
@@ -56,14 +74,16 @@ public class Employee<V extends EPGMVertex>
 
   @Override
   public V map(MasterDataSeed seed) throws  Exception {
+    PropertyList properties = MasterData.createDefaultProperties(ACRONYM, seed);
 
     Random random = new Random();
 
-    String city = cities.get(random.nextInt(cityCount));
-    String gender = null;
-    String name = null;
+    properties.set("city", cities.get(random.nextInt(cityCount)));
 
-    if(seed.hashCode() % 2 == 0) {
+    String gender;
+    String name;
+
+    if(seed.getNumber() % 2 == 0) {
       gender = "f";
       name = firstNamesFemale.get(random.nextInt(firstNameCountFemale)) +
         " " + lastNames.get(random.nextInt(lastNameCount));
@@ -73,21 +93,8 @@ public class Employee<V extends EPGMVertex>
         " " + lastNames.get(random.nextInt(lastNameCount));
     }
 
-    String bid = "EMP" + seed.hashCode();
-
-    PropertyList properties = new PropertyList();
-
-    properties.set("city", city);
     properties.set("name", name);
-    properties.set("num", bid);
     properties.set("gender", gender);
-
-    properties.set(MasterDataSeed.QUALITY, seed.getQuality());
-
-    properties.set(BusinessTransactionGraphs.SUPERTYPE_KEY,
-      BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER);
-
-    properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
 
     return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
   }
