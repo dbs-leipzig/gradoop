@@ -3,7 +3,10 @@ package org.gradoop.model.impl.operators.matching.simulation.dual;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.DeltaIteration;
+import org.apache.flink.api.java.operators.GroupReduceOperator;
 import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.apache.flink.api.java.operators.JoinOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -105,7 +108,7 @@ public class DualSimulation
 
     // TODO: the following is only necessary if diameter(query) > 1
 
-    DataSet<FatVertex> result = simulate(fatVertices);
+    DataSet<FatVertex> result = simulateDelta(fatVertices);
 
     //--------------------------------------------------------------------------
     // Post-processing (build maximum match graph)
@@ -149,7 +152,7 @@ public class DualSimulation
    * @param vertices vertices and their neighborhood information
    * @return valid triples according to dual simulation
    */
-  private DataSet<FatVertex> simulate(DataSet<FatVertex> vertices) {
+  private DataSet<FatVertex> simulateBulk(DataSet<FatVertex> vertices) {
 
     // ITERATION HEAD
     IterativeDataSet<FatVertex> workingSet = vertices
@@ -189,6 +192,42 @@ public class DualSimulation
     // ITERATION FOOTER
     return workingSet
       .closeWith(nextWorkingSet, messages);
+  }
+
+  private DataSet<FatVertex> simulateDelta(DataSet<FatVertex> vertices) {
+    // prepare initial working set
+    DataSet<Message> initialWorkingSet = vertices
+      .flatMap(new ValidateNeighborhood(query))
+      .groupBy(0)
+      .combineGroup(new Messages())
+      .groupBy(0)
+      .reduceGroup(new Messages());
+
+    // ITERATION HEAD
+    DeltaIteration<FatVertex, Message> iteration = vertices
+      .iterateDelta(initialWorkingSet, Integer.MAX_VALUE, 0);
+
+    // ITERATION BODY
+
+    // get updated vertices
+    JoinOperator.EquiJoin<FatVertex, Message, FatVertex> deltas = iteration
+      .getSolutionSet()
+      .join(iteration.getWorkset())
+      .where(0).equalTo(0)
+      .with(new UpdateVertexState(query));
+
+    // prepare new messages for the next round from updates
+    GroupReduceOperator<Message, Message> updates = deltas
+      .filter(new ValidFatVertices())
+      .flatMap(new ValidateNeighborhood(query))
+      .groupBy(0)
+      .combineGroup(new Messages())
+      .groupBy(0)
+      .reduceGroup(new Messages());
+
+    // ITERATION FOOTER
+    // filter vertices with no candidates after iteration
+    return iteration.closeWith(deltas, updates).filter(new ValidFatVertices());
   }
 
   /**
