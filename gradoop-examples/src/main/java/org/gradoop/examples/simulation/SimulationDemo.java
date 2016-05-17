@@ -10,6 +10,8 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Reads LDBC Social Network and executes a graph simulation.
  */
@@ -64,6 +66,9 @@ public class SimulationDemo implements ProgramDescription {
       outputDir + EDGES_JSON,
       outputDir + GRAPHS_JSON
     );
+
+    System.out.println(String.format("Net runtime [s]: %d",
+      env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS)));
   }
 
   private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> execute(

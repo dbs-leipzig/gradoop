@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.operators.matching.common.functions;
 
 import com.google.common.collect.Lists;
@@ -59,24 +76,10 @@ public class MatchingTriples<V extends EPGMVertex, E extends EPGMEdge>
         for (Edge queryEdge : edges) {
           Vertex querySourceVertex = queryHandler
             .getVertexById(queryEdge.getSourceVertexId());
-          boolean match =
-            EntityMatcher.match(matchingPair.getVertex(), querySourceVertex) &&
-              EntityMatcher.match(matchingPair.getEdge(), queryEdge) &&
-              EntityMatcher.match(targetVertex, queryTargetVertex);
 
-//          System.out.println(String.format(
-//            "(%d:%s)-[%2d:%s]->(%d:%s) == (%d:%s)-[%2d:%s]->(%d:%s) => %s",
-//            matchingPair.getVertex().getPropertyValue("id").getInt(),
-//            matchingPair.getVertex().getLabel(),
-//            matchingPair.getEdge().getPropertyValue("id").getInt(),
-//            matchingPair.getEdge().getLabel(),
-//            targetVertex.getPropertyValue("id").getInt(),
-//            targetVertex.getLabel(),
-//            querySourceVertex.getId(), querySourceVertex.getLabel(),
-//            queryEdge.getId(), queryEdge.getLabel(),
-//            queryTargetVertex.getId(), queryTargetVertex.getLabel(), match));
-
-          if (match) {
+          if (EntityMatcher.match(matchingPair.getVertex(), querySourceVertex)
+            && EntityMatcher.match(matchingPair.getEdge(), queryEdge)
+            && EntityMatcher.match(targetVertex, queryTargetVertex)) {
             candidates.add(queryEdge.getId());
           }
         }

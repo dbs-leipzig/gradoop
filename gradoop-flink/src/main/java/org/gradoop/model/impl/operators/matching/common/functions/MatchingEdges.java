@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.operators.matching.common.functions;
 
 import org.gradoop.model.api.EPGMEdge;
@@ -17,11 +34,6 @@ public class MatchingEdges<E extends EPGMEdge>
 
   @Override
   public boolean filter(E e) throws Exception {
-    boolean match = EntityMatcher.match(e, getQueryHandler().getEdges());
-//    System.out.println(String.format("[%d:%s] => %s",
-//      e.getPropertyValue("id").getInt(),
-//      e.getLabel(),
-//      match));
-    return match;
+    return EntityMatcher.match(e, getQueryHandler().getEdges());
   }
 }

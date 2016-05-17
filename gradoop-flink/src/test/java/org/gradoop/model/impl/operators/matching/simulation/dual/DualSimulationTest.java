@@ -8,11 +8,8 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Vertex;
 
-public class DualSimulationTest extends GradoopFlinkTestBase {
+public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGraph1PathPattern0() throws Exception {
@@ -24,7 +21,6 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.PATH_PATTERN_0;
-    printPattern(query);
 
     loader.appendToDatabaseFromString("expected[" +
       "(v1)-[e2]->(v6)" +
@@ -32,12 +28,8 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
       "(v2)-[e3]->(v6)" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -51,7 +43,6 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.PATH_PATTERN_1;
-    printPattern(query);
 
     loader.appendToDatabaseFromString("expected[" +
       "(v0)-[e0]->(v1)" +
@@ -59,12 +50,8 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
       "(v2)-[e2]->(v3)" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -78,18 +65,13 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.LOOP_PATTERN_0;
-    printPattern(query);
 
     loader.appendToDatabaseFromString("expected[" +
       "(v9)-[e15]->(v9)" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -103,7 +85,6 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.CYCLE_PATTERN_0;
-    printPattern(query);
 
     loader.appendToDatabaseFromString("expected[" +
       "(v1)-[e2]->(v6)" +
@@ -114,12 +95,8 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
       "(v2)-[e3]->(v6)" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -133,18 +110,13 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.CYCLE_PATTERN_1;
-    printPattern(query);
 
     loader.appendToDatabaseFromString("expected[" +
       "(v9)-[e15]->(v9)" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -158,7 +130,6 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.CYCLE_PATTERN_2;
-    printPattern(query);
 
     loader.appendToDatabaseFromString("expected[" +
       "(v1)-[e2]->(v6)" +
@@ -171,12 +142,8 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
       "(v5)-[e9]->(v7)" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -190,7 +157,6 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.CYCLE_PATTERN_3;
-    printPattern(query);
 
     // expected result
     loader.appendToDatabaseFromString("expected[" +
@@ -211,12 +177,8 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
       "(v6)-[e14]->(v10)" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -230,7 +192,6 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.CYCLE_PATTERN_4;
-    printPattern(query);
 
     loader.appendToDatabaseFromString("expected[" +
       "(v1)-[e2]->(v6)" +
@@ -241,12 +202,8 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
       "(v2)-[e3]->(v6)" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -260,28 +217,15 @@ public class DualSimulationTest extends GradoopFlinkTestBase {
 
     // pattern
     String query = TestData.TREE_PATTERN_0;
-    printPattern(query);
 
     loader.appendToDatabaseFromString("expected[" +
       "]");
 
-    // create operator
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query);
-
     // execute and validate
-    collectAndAssertTrue(op.execute(db)
+    collectAndAssertTrue(getOperator(query).execute(db)
       .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 
-  private void printPattern(String query) {
-    GDLHandler gdlHandler = new GDLHandler.Builder().buildFromString(query);
-    System.out.println("Pattern:");
-    for (Vertex vertex : gdlHandler.getVertices()) {
-      System.out.println(vertex);
-    }
-    for (Edge edge : gdlHandler.getEdges()) {
-      System.out.println(edge);
-    }
-  }
+  protected abstract DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo>
+  getOperator(String query);
 }
