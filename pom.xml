@@ -153,6 +153,7 @@
                     <configuration>
                         <configLocation>gradoop/checkstyle.xml</configLocation>
                         <headerLocation>gradoop/LICENSE.txt</headerLocation>
+                        <includeResources>false</includeResources>
                     </configuration>
                     <executions>
                         <execution>
