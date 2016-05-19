@@ -84,7 +84,7 @@
         <project.maven.version>3.0.0</project.maven.version>
         <project.build.targetJdk>1.7</project.build.targetJdk>
 
-        <dep.flink.version>1.0.0</dep.flink.version>
+        <dep.flink.version>1.0.3</dep.flink.version>
         <dep.gdl.version>0.2-SNAPSHOT</dep.gdl.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
         <dep.junit.version>4.11</dep.junit.version>

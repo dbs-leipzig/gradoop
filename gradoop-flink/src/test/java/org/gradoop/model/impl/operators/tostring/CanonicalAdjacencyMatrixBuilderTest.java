@@ -66,8 +66,6 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
       FileUtils.getFile(CanonicalAdjacencyMatrixBuilderTest.class
         .getResource("/data/expected/cam_test_undirected").getFile()));
 
-    System.out.println(result);
-
     assertTrue(expectation.equals(result));
   }
 
