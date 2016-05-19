@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Updates the state of a {@link FatVertex} according to the deletions it
- * gets sent.
+ * Updates the state of a {@link FatVertex} according to the message it
+ * receives.
  *
  * Forwarded Fields First:
  *
@@ -44,10 +44,26 @@ import java.util.Map;
 public class UpdateVertexState
   extends RichJoinFunction<FatVertex, Message, FatVertex> {
 
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  /**
+   * GDL query
+   */
   private final String query;
 
-  private QueryHandler queryHandler;
+  /**
+   * Query handler
+   */
+  private transient QueryHandler queryHandler;
 
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
   public UpdateVertexState(String query) {
     this.query = query;
   }
@@ -60,19 +76,28 @@ public class UpdateVertexState
 
   @Override
   public FatVertex join(FatVertex fatVertex, Message message) throws Exception {
-
-    fatVertex.isUpdated(false);
     if (message != null) {
-      fatVertex.isUpdated(true);
       // TODO: message to SELF should be processed first
       for (int i = 0; i < message.getSenderIds().size(); i++) {
         processDeletion(fatVertex, message.getSenderIds().get(i),
           message.getDeletions().get(i), message.getMessageTypes().get(i));
       }
+      fatVertex.setUpdated(true);
+    } else {
+      fatVertex.setUpdated(false);
     }
+
     return fatVertex;
   }
 
+  /**
+   * Processes a deletion on the current vertex.
+   *
+   * @param fatVertex   fat vertex
+   * @param senderId    sender vertexId
+   * @param deletion    sender vertex candidate deletion id
+   * @param messageType message type
+   */
   private void processDeletion(FatVertex fatVertex, GradoopId senderId,
     Long deletion, MessageType messageType) {
     switch (messageType) {
@@ -95,9 +120,17 @@ public class UpdateVertexState
         queryHandler.getEdgeIdsBySourceVertexId(deletion));
       updateParentIds(fatVertex, senderId);
       break;
+    default:
+      throw new IllegalArgumentException("Unsupported type: " + messageType);
     }
   }
 
+  /**
+   * Removes the sender vertex id from the parents of the current vertex.
+   *
+   * @param fatVertex fat vertex
+   * @param senderId  sender vertex id
+   */
   private void updateParentIds(FatVertex fatVertex, GradoopId senderId) {
     fatVertex.getParentIds().remove(senderId);
   }
@@ -172,13 +205,12 @@ public class UpdateVertexState
   private void updateOutgoingEdges(FatVertex fatVertex, Collection<Long>
     queryEdges, GradoopId targetVertex) {
     if (queryEdges != null) {
-      Iterator<Map.Entry<IdPair, List<Long>>> edgeIterator =
-        fatVertex.getEdgeCandidates().entrySet().iterator();
-
-      while(edgeIterator.hasNext()) {
+      Iterator<Map.Entry<IdPair, List<Long>>> edgeIterator = fatVertex
+        .getEdgeCandidates().entrySet().iterator();
+      while (edgeIterator.hasNext()) {
         Map.Entry<IdPair, List<Long>> e = edgeIterator.next();
-        if (targetVertex == null
-          || e.getKey().getTargetId().equals(targetVertex)) {
+        if (targetVertex == null ||
+          e.getKey().getTargetId().equals(targetVertex)) {
           e.getValue().removeAll(queryEdges);
           if (e.getValue().isEmpty()) {
             edgeIterator.remove();

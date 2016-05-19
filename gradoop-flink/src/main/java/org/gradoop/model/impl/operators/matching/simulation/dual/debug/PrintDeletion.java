@@ -26,8 +26,17 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.Deletion
  */
 public class PrintDeletion extends Printer<Deletion> {
 
+  /**
+   * Logger
+   */
   private static final Logger LOG = Logger.getLogger(PrintDeletion.class);
 
+  /**
+   * Constructor
+   *
+   * @param isIterative true, if called in iterative context
+   * @param prefix prefix for output
+   */
   public PrintDeletion(boolean isIterative, String prefix) {
     super(isIterative, prefix);
   }

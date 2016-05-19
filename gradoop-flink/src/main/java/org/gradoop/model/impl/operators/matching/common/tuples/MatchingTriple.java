@@ -23,9 +23,9 @@ import org.gradoop.model.impl.id.GradoopId;
 import java.util.List;
 
 /**
- * Represents a source vertex, edge and target vertex triple that matches at
- * least one triple in the database. Each triple contains a list of identifiers
- * that match to edge ids in the query graph.
+ * Represents an edge, source and target vertex triple that matches at least one
+ * triple in the data graph. Each triple contains a list of identifiers that
+ * match to edge ids in the query graph.
 
  * f0: edge id
  * f1: source vertex id

@@ -16,6 +16,6 @@
  */
 
 /**
- * Implementation of tight graph simulation.
+ * Contains tuples that are used by all pattern matching implementations.
  */
-package org.gradoop.model.impl.operators.matching.simulation.tight;
+package org.gradoop.model.impl.operators.matching.common.tuples;

@@ -25,15 +25,19 @@ import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
  *
  * @param <E> EPGM edge type
  */
-public class MatchingEdges<E extends EPGMEdge>
-  extends MatchingElements<E> {
+public class MatchingEdges<E extends EPGMEdge> extends MatchingElements<E> {
 
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
   public MatchingEdges(final String query) {
     super(query);
   }
 
   @Override
   public boolean filter(E e) throws Exception {
-    return EntityMatcher.match(e, getQueryHandler().getEdges());
+    return EntityMatcher.matchAll(e, getQueryHandler().getEdges());
   }
 }

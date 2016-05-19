@@ -30,10 +30,21 @@ import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 public abstract class MatchingElements<EL extends EPGMElement>
   extends RichFilterFunction<EL> {
 
+  /**
+   * GDL query
+   */
   private final String query;
 
+  /**
+   * Query handler
+   */
   private transient QueryHandler queryHandler;
 
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
   public MatchingElements(final String query) {
     this.query = query;
   }

@@ -80,7 +80,7 @@ public class FatVertex extends Tuple6<GradoopId, List<Long>, List<GradoopId>,
     return f5;
   }
 
-  public void isUpdated(boolean isUpdated) {
-    f5 = isUpdated;
+  public void setUpdated(boolean updated) {
+    f5 = updated;
   }
 }

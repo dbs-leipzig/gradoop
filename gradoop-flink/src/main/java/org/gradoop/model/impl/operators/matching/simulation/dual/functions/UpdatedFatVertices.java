@@ -23,8 +23,7 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples
   .FatVertex;
 
 /**
- * Filters a {@link FatVertex} that has been updated during the previous
- * iteration.
+ * Filters a {@link FatVertex} that has been updated.
  *
  * Read fields:
  *

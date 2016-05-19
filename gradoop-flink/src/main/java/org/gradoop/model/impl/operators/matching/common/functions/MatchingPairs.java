@@ -40,12 +40,31 @@ import static org.gradoop.model.impl.operators.matching.common.matching.EntityMa
 public class MatchingPairs<V extends EPGMVertex, E extends EPGMEdge> extends
   RichFlatJoinFunction<V, E, MatchingPair<V, E>> {
 
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  /**
+   * GDL query
+   */
   private final String query;
 
+  /**
+   * Query handler
+   */
   private transient QueryHandler queryHandler;
 
+  /**
+   * Reduce instantiations
+   */
   private final MatchingPair<V, E> reuseTuple;
 
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
   public MatchingPairs(final String query) {
     this.query = query;
     this.reuseTuple = new MatchingPair<>();
@@ -58,8 +77,8 @@ public class MatchingPairs<V extends EPGMVertex, E extends EPGMEdge> extends
   }
 
   @Override
-  public void join(V sourceVertex, E edge, Collector<MatchingPair<V, E>> collector) throws
-    Exception {
+  public void join(V sourceVertex, E edge,
+    Collector<MatchingPair<V, E>> collector) throws Exception {
 
     boolean match = false;
 

@@ -24,7 +24,9 @@ import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.TripleWithDirection;
 
 /**
- * Duplicates and reverses the incoming triple.
+ * Clones and reverses the incoming triple:
+ *
+ * (e,s,t,c) -> (e,s,t,true,c),(e,t,s,false,c)
  *
  * Forwarded fields:
  *
@@ -32,12 +34,18 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.TripleWi
  * f3->f4: query candidates
  */
 @FunctionAnnotation.ForwardedFields("f0;f3->f4")
-public class DuplicateTriples implements
+public class CloneAndReverse implements
   FlatMapFunction<MatchingTriple, TripleWithDirection> {
 
+  /**
+   * Reduce instantiations
+   */
   private final TripleWithDirection reuseTuple;
 
-  public DuplicateTriples() {
+  /**
+   * Constructor
+   */
+  public CloneAndReverse() {
     reuseTuple = new TripleWithDirection();
   }
 
@@ -49,12 +57,12 @@ public class DuplicateTriples implements
 
     reuseTuple.setSourceId(matchingTriple.getSourceVertexId());
     reuseTuple.setTargetId(matchingTriple.getTargetVertexId());
-    reuseTuple.isOutgoing(true);
+    reuseTuple.setOutgoing(true);
     collector.collect(reuseTuple);
 
     reuseTuple.setSourceId(matchingTriple.getTargetVertexId());
     reuseTuple.setTargetId(matchingTriple.getSourceVertexId());
-    reuseTuple.isOutgoing(false);
+    reuseTuple.setOutgoing(false);
     collector.collect(reuseTuple);
   }
 }

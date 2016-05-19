@@ -25,12 +25,21 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Contains methods to match query entities and database entities.
+ * Contains methods to match query and data graph entities.
  */
 public class EntityMatcher {
 
+  /**
+   * Matches the given data graph element against all given query elements.
+   *
+   * @param dbElement     data graph element (vertex/edge)
+   * @param queryElements query graph elements (vertices/edges)
+   * @param <EL1>         EPGM element type
+   * @param <EL2>         GDL element type
+   * @return true, iff the data graph element matches at least one query element
+   */
   public static <EL1 extends EPGMElement, EL2 extends GraphElement>
-  boolean match(EL1 dbElement, Collection<EL2> queryElements) {
+  boolean matchAll(EL1 dbElement, Collection<EL2> queryElements) {
 
     boolean match = false;
 
@@ -44,12 +53,21 @@ public class EntityMatcher {
     return match;
   }
 
+  /**
+   * Matches the given data graph element against the given query element.
+   *
+   * @param dbElement     data graph element (vertex/edge)
+   * @param queryElement  query graph element (vertex/edge)
+   * @param <EL1>         EPGM element type
+   * @param <EL2>         GDL element type
+   * @return true, iff the data graph element matches the query graph element
+   */
   public static <EL1 extends EPGMElement, EL2 extends GraphElement>
   boolean match(EL1 dbElement, EL2 queryElement) {
 
     boolean match  = false;
     // verify label
-    if(queryElement.getLabel().equals(dbElement.getLabel())) {
+    if (queryElement.getLabel().equals(dbElement.getLabel())) {
       match = true;
     }
     // verify properties

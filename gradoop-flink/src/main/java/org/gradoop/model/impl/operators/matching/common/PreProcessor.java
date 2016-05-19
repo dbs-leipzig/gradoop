@@ -34,51 +34,123 @@ import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
 /**
  * Provides methods for filtering vertices, edges, pairs (vertex + edge) and
  * triples based on a given query.
- *
  */
 public class PreProcessor {
 
+  /**
+   * Filters vertices based on the given GDL query. The resulting dataset only
+   * contains vertices that match at least one vertex in the query graph.
+   *
+   * @param graph data graph
+   * @param query query graph
+   * @param <G>   EPGM graph head type
+   * @param <V>   EPGM vertex type
+   * @param <E>   EPGM edge type
+   * @return dataset with matching vertices
+   */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   DataSet<V> filterVertices(LogicalGraph<G, V, E> graph, final String query) {
     return graph.getVertices().filter(new MatchingVertices<V>(query));
   }
 
+  /**
+   * Filters edges based on the given GDL query. The resulting dataset only
+   * contains edges that match at least one edge in the query graph.
+   *
+   * @param graph data graph
+   * @param query query graph
+   * @param <G>   EPGM graph head type
+   * @param <V>   EPGM vertex type
+   * @param <E>   EPGM edge type
+   * @return dataset with matching edges
+   */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   DataSet<E> filterEdges(LogicalGraph<G, V, E> graph, final String query) {
     return graph.getEdges().filter(new MatchingEdges<E>(query));
   }
 
+  /**
+   * Filters vertex-edge pairs based on the given GDL query. The resulting
+   * dataset only contains vertex-edge pairs that match at least one vertex-edge
+   * pair in the query graph.
+   *
+   * @param graph data graph
+   * @param query query graph
+   * @param <G>   EPGM graph head type
+   * @param <V>   EPGM vertex type
+   * @param <E>   EPGM edge type
+   * @return dataset with matching vertex-edge pairs
+   */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   DataSet<MatchingPair<V, E>> filterPairs(LogicalGraph<G, V, E> graph,
     final String query) {
-    return filterPairs(graph, filterVertices(graph, query), query);
+    return filterPairs(graph, query, filterVertices(graph, query));
   }
 
+  /**
+   * Filters vertex-edge pairs based on the given GDL query. The resulting
+   * dataset only contains vertex-edge pairs that match at least one vertex-edge
+   * pair in the query graph.
+   *
+   * @param graph             data graph
+   * @param query             query graph
+   * @param filteredVertices  used for the edge join
+   * @param <G>               EPGM graph head type
+   * @param <V>               EPGM vertex type
+   * @param <E>               EPGM edge type
+
+   * @return dataset with matching vertex-edge pairs
+   */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   DataSet<MatchingPair<V, E>> filterPairs(LogicalGraph<G, V, E> graph,
-    DataSet<V> filteredVertices, final String query) {
+    final String query, DataSet<V> filteredVertices) {
     return filteredVertices
       .join(filterEdges(graph, query))
       .where(new Id<V>()).equalTo(new SourceId<E>())
       .with(new MatchingPairs<V, E>(query));
   }
 
+  /**
+   * Filters vertex-edge-vertex pairs based on the given GDL query. The
+   * resulting dataset only contains triples that match at least one triple in
+   * the query graph.
+   *
+   * @param graph data graph
+   * @param query query graph
+   * @param <G>   EPGM graph head type
+   * @param <V>   EPGM vertex type
+   * @param <E>   EPGM edge type
+   * @return dataset with matching triples
+   */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   DataSet<MatchingTriple> filterTriplets(LogicalGraph<G, V, E> graph,
     final String query) {
-    return filterTriplets(graph, filterVertices(graph, query), query);
+    return filterTriplets(graph, query, filterVertices(graph, query));
   }
 
+  /**
+   * Filters vertex-edge-vertex pairs based on the given GDL query. The
+   * resulting dataset only contains triples that match at least one triple in
+   * the query graph.
+   *
+   * @param graph             data graph
+   * @param query             query graph
+   * @param filteredVertices  used for the edge join
+   * @param <G>               EPGM graph head type
+   * @param <V>               EPGM vertex type
+   * @param <E>               EPGM edge type
+   * @return dataset with matching triples
+   */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   DataSet<MatchingTriple> filterTriplets(LogicalGraph<G, V, E> graph,
-    DataSet<V> filteredVertices, final String query) {
-    return filterPairs(graph, filteredVertices, query)
+    final String query, DataSet<V> filteredVertices) {
+    return filterPairs(graph, query, filteredVertices)
       .join(filteredVertices)
       .where("f1.targetId").equalTo(new Id<V>())
       .with(new MatchingTriples<V, E>(query));

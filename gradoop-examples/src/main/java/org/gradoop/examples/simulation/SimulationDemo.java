@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.examples.simulation;
 
 import org.apache.flink.api.common.ProgramDescription;
@@ -17,6 +34,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class SimulationDemo implements ProgramDescription {
 
+  /**
+   * Query graph.
+   */
   public static final String QUERY = "" +
     "(p1:person {gender=\"male\"})-[:knows]->(p2:person {gender=\"female\"})" +
     "(p1)-[:isLocatedIn]->(:city)-[:isPartOf]->(c:country {name=\"Germany\"})" +
@@ -71,6 +91,12 @@ public class SimulationDemo implements ProgramDescription {
       env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS)));
   }
 
+  /**
+   * Executes dual simulation on the given logical graph.
+   *
+   * @param databaseGraph data graph
+   * @return result match graph
+   */
   private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> execute(
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> databaseGraph) {
 

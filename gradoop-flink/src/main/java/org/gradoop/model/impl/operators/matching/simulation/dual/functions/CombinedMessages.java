@@ -19,7 +19,7 @@ package org.gradoop.model.impl.operators.matching.simulation.dual.functions;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.GroupCombineFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.Deletion;
@@ -27,18 +27,22 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.Message;
 import org.gradoop.model.impl.operators.matching.simulation.dual.util.MessageType;
 
 /**
- * Combines a collection of {@link Deletion} to a single message and
- * groups messages with the same recipient.
+ * Combines a collection of deletions to a single message.
+ *
+ * [deletion] -> message
+ *
+ * Forwarded fields:
+ *
+ * f0: recipient id
  */
-public class Messages implements
-  GroupCombineFunction<Deletion, Message>,
-  GroupReduceFunction<Message, Message> {
+@FunctionAnnotation.ForwardedFields("f0")
+public class CombinedMessages implements
+  GroupCombineFunction<Deletion, Message> {
 
-  private final Message reuseMessage;
-
-  public Messages() {
-    reuseMessage = new Message();
-  }
+  /**
+   * Reduce instantiations
+   */
+  private final Message reuseMessage = new Message();
 
   @Override
   public void combine(Iterable<Deletion> deletions,
@@ -58,23 +62,5 @@ public class Messages implements
     }
 
     collector.collect(reuseMessage);
-  }
-
-  @Override
-  public void reduce(Iterable<Message> messages,
-    Collector<Message> collector) throws Exception {
-    boolean first = true;
-    Message result = null;
-    for (Message message : messages) {
-      if (first) {
-        result = message;
-        first = false;
-      } else {
-        result.getSenderIds().addAll(message.getSenderIds());
-        result.getDeletions().addAll(message.getDeletions());
-        result.getMessageTypes().addAll(message.getMessageTypes());
-      }
-    }
-    collector.collect(result);
   }
 }

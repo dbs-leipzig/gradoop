@@ -82,7 +82,7 @@ public class GraphMetrics {
     distances.put(v.getId(), 0);
     int ecc = 0;
 
-    while(!queue.isEmpty()) {
+    while (!queue.isEmpty()) {
       Long current = queue.poll();
       Integer currentDistance = distances.get(current);
       ecc = currentDistance > ecc ? currentDistance : ecc;

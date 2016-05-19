@@ -23,7 +23,6 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
 import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
 import org.gradoop.model.impl.operators.matching.common.tuples.MatchingPair;
@@ -33,9 +32,12 @@ import org.s1ck.gdl.model.Vertex;
 import java.util.Collection;
 import java.util.List;
 
+import static org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher.match;
+
 /**
- * Filters a {@link MatchingTriple} based on its occurrence in the given GDL
- * query pattern.
+ * Takes a vertex-edge pair and the corresponding target vertex as input and
+ * evaluates, if the triple matches against the query graph. The output is
+ * a {@link MatchingTriple} containing all query candidates for the triple.
  *
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
@@ -43,12 +45,31 @@ import java.util.List;
 public class MatchingTriples<V extends EPGMVertex, E extends EPGMEdge>
   extends RichFlatJoinFunction<MatchingPair<V, E>, V, MatchingTriple> {
 
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  /**
+   * GDL query
+   */
   private final String query;
 
+  /**
+   * Query handler
+   */
   private transient QueryHandler queryHandler;
 
+  /**
+   * Reduce instantiations
+   */
   private final MatchingTriple reuseTriple;
 
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
   public MatchingTriples(final String query) {
     this.query = query;
     this.reuseTriple = new MatchingTriple();
@@ -77,9 +98,9 @@ public class MatchingTriples<V extends EPGMVertex, E extends EPGMEdge>
           Vertex querySourceVertex = queryHandler
             .getVertexById(queryEdge.getSourceVertexId());
 
-          if (EntityMatcher.match(matchingPair.getVertex(), querySourceVertex)
-            && EntityMatcher.match(matchingPair.getEdge(), queryEdge)
-            && EntityMatcher.match(targetVertex, queryTargetVertex)) {
+          if (match(matchingPair.getVertex(), querySourceVertex) &&
+            match(matchingPair.getEdge(), queryEdge) &&
+            match(targetVertex, queryTargetVertex)) {
             candidates.add(queryEdge.getId());
           }
         }

@@ -18,14 +18,31 @@
 package org.gradoop.model.impl.operators.matching.simulation.dual.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples
   .FatVertex;
 
 /**
- * Produces a single {@link FatVertex} from a group of fat vertices.
+ * Merges multiple fat vertices into a single {@link FatVertex}.
+ *
+ * [fatVertex] -> fatVertex
+ *
+ * Forwarded fields:
+ *
+ * f0: vertex id
+ *
+ * Read fields:
+ *
+ * f1: vertex query candidates
+ * f2: parent ids
+ * f3: counters for incoming edge candidates
+ * f4: outgoing edges (edgeId, targetId) and their query candidates
+ *
  */
-public class GroupFatVertices implements
+@FunctionAnnotation.ForwardedFields("f0")
+@FunctionAnnotation.ReadFields("f1;f2;f3;f4")
+public class GroupedFatVertices implements
   GroupReduceFunction<FatVertex, FatVertex> {
 
   @Override
@@ -46,19 +63,26 @@ public class GroupFatVertices implements
     collector.collect(result);
   }
 
+  /**
+   * Merges two fat vertices.
+   *
+   * @param result base
+   * @param diff   diff to merge
+   * @return base merged with diff
+   */
   private FatVertex merge(FatVertex result, FatVertex diff) {
-    // update CA
+    // update vertex candidates (CA)
     if (diff.getCandidates().removeAll(result.getCandidates())) {
       result.getCandidates().addAll(diff.getCandidates());
     }
-    // update P_IDs
+    // update parent ids (P_IDs)
     result.getParentIds().addAll(diff.getParentIds());
-    // update IN_CA
+    // update incoming edge counts (IN_CA)
     for (int i = 0; i < diff.getIncomingCandidateCounts().length; i++) {
       result.getIncomingCandidateCounts()[i] += diff
         .getIncomingCandidateCounts()[i];
     }
-    // update OUT_CA
+    // update outgoing edges (OUT_CA)
     result.getEdgeCandidates().putAll(diff.getEdgeCandidates());
 
     return result;

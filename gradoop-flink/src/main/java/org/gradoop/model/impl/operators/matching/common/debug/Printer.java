@@ -33,26 +33,59 @@ import java.util.Map;
 /**
  * Base class for printing debug output using vertex and edge mappings. Both
  * map a {@link GradoopId} to a readable numeric id.
+ *
+ * @param <IN> input type
  */
 @FunctionAnnotation.ForwardedFields("*")
 public abstract class Printer<IN> extends RichMapFunction<IN, IN> {
 
+  /**
+   * Broadcast set name for vertex mapping
+   */
   public static final String VERTEX_MAPPING = "vertexMapping";
 
+  /**
+   * Broadcast set name for edge mapping
+   */
   public static final String EDGE_MAPPING = "edgeMapping";
 
+  /**
+   * Mapping gradoopId -> propertyValue
+   *
+   * The value is used to represent the vertex with the corresponding id.
+   */
   protected Map<GradoopId, PropertyValue> vertexMap;
 
+  /**
+   * Mapping gradoopId -> propertyValue
+   *
+   * The value is used to represent the edge with the corresponding id.
+   */
   protected Map<GradoopId, PropertyValue> edgeMap;
 
+  /**
+   * String is put in front of debug output.
+   */
   protected final String prefix;
 
+  /**
+   * Used to differ between iterative and non-iterative runtime context.
+   */
   protected final boolean isIterative;
 
+  /**
+   * Constructor
+   */
   public Printer() {
     this(false, "");
   }
 
+  /**
+   * Constructor
+   *
+   * @param isIterative true, if called in iterative context
+   * @param prefix prefix for output
+   */
   public Printer(boolean isIterative, String prefix) {
     this.isIterative  = isIterative;
     this.prefix       = prefix;
@@ -71,20 +104,43 @@ public abstract class Printer<IN> extends RichMapFunction<IN, IN> {
 
   @Override
   public IN map(IN in) throws Exception {
-    getLogger().debug(String.format("%s%s",getHeader(), getDebugString(in)));
+    getLogger().debug(String.format("%s%s", getHeader(), getDebugString(in)));
     return in;
   }
 
+  /**
+   * Returns the debug string representation of the concrete Object.
+   *
+   * @param in input object
+   * @return debug string representation for input object
+   */
   protected abstract String getDebugString(IN in);
 
+  /**
+   * Returns the logger for the concrete subclass.
+   *
+   * @return logger
+   */
   protected abstract Logger getLogger();
 
+  /**
+   * Builds the header for debug string which contains the prefix and the
+   * superstep number (0 if non-iterative).
+   *
+   * @return debug header
+   */
   protected String getHeader() {
     return String.format("[%d][%s]: ",
       isIterative ? getIterationRuntimeContext().getSuperstepNumber() : 0,
       prefix != null && !prefix.isEmpty() ? prefix : " ");
   }
 
+  /**
+   * Used to initialize vertex and edge mapping.
+   *
+   * @param tuples broadcast set tuples
+   * @return mapping
+   */
   private Map<GradoopId, PropertyValue> initMapping(
     List<Tuple2<GradoopId, PropertyValue>> tuples) {
     Map<GradoopId, PropertyValue> map = Maps.newHashMap();
@@ -94,9 +150,18 @@ public abstract class Printer<IN> extends RichMapFunction<IN, IN> {
     return map;
   }
 
-  protected List<PropertyValue> convertList(List<GradoopId> gradoopIds, boolean isVertex) {
-    List<PropertyValue> result = Lists.newArrayListWithCapacity(gradoopIds.size());
-    for (GradoopId gradoopId : gradoopIds) {
+  /**
+   * Converts a list of GradoopIds into a list of corresponding property
+   * values.
+   *
+   * @param ids       gradoop ids
+   * @param isVertex  true - use vertex mapping, false - use edge mapping
+   * @return list of property values
+   */
+  protected List<PropertyValue> convertList(List<GradoopId> ids,
+    boolean isVertex) {
+    List<PropertyValue> result = Lists.newArrayListWithCapacity(ids.size());
+    for (GradoopId gradoopId : ids) {
       result.add(isVertex ? vertexMap.get(gradoopId) : edgeMap.get(gradoopId));
     }
     return result;

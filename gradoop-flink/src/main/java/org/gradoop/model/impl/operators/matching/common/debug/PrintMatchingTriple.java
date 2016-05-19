@@ -26,6 +26,9 @@ import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
  */
 public class PrintMatchingTriple extends Printer<MatchingTriple> {
 
+  /**
+   * Logger
+   */
   private static final Logger LOG = Logger.getLogger(PrintMatchingTriple.class);
 
   @Override

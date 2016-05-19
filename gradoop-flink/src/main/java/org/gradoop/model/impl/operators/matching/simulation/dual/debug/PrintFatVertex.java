@@ -32,8 +32,17 @@ import java.util.Map;
  */
 public class PrintFatVertex extends Printer<FatVertex> {
 
+  /**
+   * Logger
+   */
   private static final Logger LOG = Logger.getLogger(PrintFatVertex.class);
 
+  /**
+   * Constructor
+   *
+   * @param isIterative true, if called in iterative context
+   * @param prefix      prefix for output
+   */
   public PrintFatVertex(boolean isIterative, String prefix) {
     super(isIterative, prefix);
   }
@@ -54,6 +63,13 @@ public class PrintFatVertex extends Printer<FatVertex> {
     return LOG;
   }
 
+  /**
+   * Returns string representations for outgoing edges including their
+   * pattern candidates.
+   *
+   * @param edgeCandidates runtime representation
+   * @return string representation
+   */
   private List<String> getEdgeCandidates(Map<IdPair, List<Long>>
     edgeCandidates) {
 

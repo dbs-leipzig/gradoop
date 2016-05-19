@@ -36,20 +36,40 @@ import java.util.List;
 public class BuildFatVertex
   extends RichGroupCombineFunction<TripleWithDirection, FatVertex> {
 
-  private final FatVertex reuseVertex = new FatVertex();
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
 
+  /**
+   * Reduce instantiations
+   */
+  private final FatVertex reuseVertex;
+
+  /**
+   * GDL query
+   */
   private final String query;
 
-  private QueryHandler queryHandler;
+  /**
+   * Query handler
+   */
+  private transient QueryHandler qHandler;
 
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
   public BuildFatVertex(String query) {
-    this.query = query;
+    this.query        = query;
+    this.reuseVertex  = new FatVertex();
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    this.queryHandler = QueryHandler.fromString(query);
+    this.qHandler = QueryHandler.fromString(query);
   }
 
   @Override
@@ -73,24 +93,51 @@ public class BuildFatVertex
     collector.collect(reuseVertex);
   }
 
-  private void initFatVertex(TripleWithDirection tripleWithDirection) {
-    reuseVertex.setVertexId(tripleWithDirection.getSourceId());
+  /**
+   * Initializes the fat vertex.
+   *
+   * @param triple edge triple
+   */
+  private void initFatVertex(TripleWithDirection triple) {
+    reuseVertex.setVertexId(triple.getSourceId());
     reuseVertex.setCandidates(Lists.<Long>newArrayList());
     reuseVertex.setParentIds(Lists.<GradoopId>newArrayList());
-    reuseVertex.setIncomingCandidateCounts(new int[queryHandler.getEdgeCount()]);
+    reuseVertex.setIncomingCandidateCounts(new int[qHandler.getEdgeCount()]);
     reuseVertex.setEdgeCandidates(Maps.<IdPair, List<Long>>newHashMap());
-    reuseVertex.isUpdated(true);
+    reuseVertex.setUpdated(true);
   }
 
+  /**
+   * Updates vertex candidates and outgoing edges of the fat vertex based on the
+   * given outgoing edge triple.
+   *
+   * @param triple outgoing edge tripe
+   */
   private void processOutgoingEdgeTriple(TripleWithDirection triple) {
     for (Long queryEdgeId : triple.getCandidates()) {
-      // update CA
-      updateCandidates(queryHandler.getEdgeById(queryEdgeId).getSourceVertexId());
+      // update vertex candidates (CA)
+      updateCandidates(qHandler.getEdgeById(queryEdgeId).getSourceVertexId());
     }
-    // update OUT_CA
+    // update outgoing edges (OUT_CA)
     updateOutgoingEdges(triple);
   }
 
+  /**
+   * Updates query candidates of the resulting fat vertex.
+   *
+   * @param candidate query vertex id
+   */
+  private void updateCandidates(Long candidate) {
+    if (!reuseVertex.getCandidates().contains(candidate)) {
+      reuseVertex.getCandidates().add(candidate);
+    }
+  }
+
+  /**
+   * Updates outgoing edges of the resulting fat vertex.
+   *
+   * @param triple outgoing edge triple
+   */
   private void updateOutgoingEdges(TripleWithDirection triple) {
     IdPair idPair = new IdPair();
     idPair.setEdgeId(triple.getEdgeId());
@@ -98,23 +145,28 @@ public class BuildFatVertex
     reuseVertex.getEdgeCandidates().put(idPair, triple.getCandidates());
   }
 
+  /**
+   * Updates vertex candidates, parent ids and incoming edge candidate counts of
+   * the fat vertex based on the given incoming edge triple.
+   *
+   * @param triple incoming edge triple
+   */
   private void processIncomingEdgeTriple(TripleWithDirection triple) {
     for (Long queryEdgeId : triple.getCandidates()) {
-      // update IN_CA
+      // update incoming edge counts (IN_CA)
       reuseVertex.getIncomingCandidateCounts()[queryEdgeId.intValue()]++;
-      // update P_IDs
+      // update parent ids (P_IDs)
       updateParentIds(triple);
-      // update CA
-      updateCandidates(queryHandler.getEdgeById(queryEdgeId).getTargetVertexId());
+      // update vertex candidates (CA)
+      updateCandidates(qHandler.getEdgeById(queryEdgeId).getTargetVertexId());
     }
   }
 
-  private void updateCandidates(Long candidate) {
-    if (!reuseVertex.getCandidates().contains(candidate)) {
-      reuseVertex.getCandidates().add(candidate);
-    }
-  }
-
+  /**
+   * Adds the targetId of the given triple to the parent ids.
+   *
+   * @param triple incoming edge triple
+   */
   private void updateParentIds(TripleWithDirection triple) {
     if (!reuseVertex.getParentIds().contains(triple.getTargetId())) {
       reuseVertex.getParentIds().add(triple.getTargetId());

@@ -28,14 +28,22 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.FatVerte
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.IdPair;
 
 /**
- * Collects all edges contained in a {@link FatVertex}.
+ * Extracts all edges contained ina a {@link FatVertex}.
+ *
+ * fatVertex -> [(edgeId,sourceId,targetId)]*
  */
 @FunctionAnnotation.ReadFields("f4")
 public class EdgeTriple implements
   FlatMapFunction<FatVertex, Tuple3<GradoopId, GradoopId, GradoopId>> {
 
+  /**
+   * Reduce instantiations
+   */
   private final Tuple3<GradoopId, GradoopId, GradoopId> reuseTuple;
 
+  /**
+   * Constructor
+   */
   public EdgeTriple() {
     reuseTuple = new Tuple3<>();
   }

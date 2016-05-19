@@ -19,6 +19,7 @@ package org.gradoop.model.impl.operators.matching.simulation.dual.functions;
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.apache.flink.util.Collector;
@@ -40,16 +41,40 @@ import java.util.Set;
  * For each query vertex candidate, the flatMap function checks if the vertex
  * has the corresponding incident incoming and outgoing edges. If this is not
  * the case, the vertex sends delete messages to all of its neighbors.
+ *
+ * fatVertex -> [deletion]
+ *
+ * f0->f1: vertexId -> senderId
  */
+@FunctionAnnotation.ForwardedFields("f0->f1")
 public class ValidateNeighborhood
   extends RichFlatMapFunction<FatVertex, Deletion> {
 
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  /**
+   * GDL query
+   */
   private final String query;
 
+  /**
+   * Query handler
+   */
+  private transient QueryHandler queryHandler;
+
+  /**
+   * Reduce instantiations
+   */
   private final Deletion reuseDeletion;
 
-  private QueryHandler queryHandler;
-
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
   public ValidateNeighborhood(String query) {
     this.query          = query;
     this.reuseDeletion  = new Deletion();
@@ -62,8 +87,8 @@ public class ValidateNeighborhood
   }
 
   @Override
-  public void flatMap(FatVertex fatVertex, Collector<Deletion> collector)
-    throws Exception {
+  public void flatMap(FatVertex fatVertex, Collector<Deletion> collector) throws
+    Exception {
 
     List<Long> deletions = Lists
       .newArrayListWithCapacity(fatVertex.getCandidates().size());
@@ -215,10 +240,10 @@ public class ValidateNeighborhood
    * @return all outgoing edge candidates of {@code fatVertex}
    */
   private Set<Long> getOutgoingEdgeCandidates(FatVertex fatVertex) {
-      Set<Long> outgoingEdgeCandidates = Sets.newHashSet();
-      for (List<Long> candidates : fatVertex.getEdgeCandidates().values()) {
-        outgoingEdgeCandidates.addAll(candidates);
-      }
-      return outgoingEdgeCandidates;
+    Set<Long> outgoingEdgeCandidates = Sets.newHashSet();
+    for (List<Long> candidates : fatVertex.getEdgeCandidates().values()) {
+      outgoingEdgeCandidates.addAll(candidates);
+    }
+    return outgoingEdgeCandidates;
   }
 }

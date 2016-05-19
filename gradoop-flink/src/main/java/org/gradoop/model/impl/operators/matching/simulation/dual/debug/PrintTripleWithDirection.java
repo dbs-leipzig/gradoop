@@ -27,9 +27,18 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.TripleWi
  */
 public class PrintTripleWithDirection extends Printer<TripleWithDirection> {
 
+  /**
+   * Logger
+   */
   private static final Logger LOG = Logger
     .getLogger(PrintTripleWithDirection.class);
 
+  /**
+   * Constructor
+   *
+   * @param isIterative true, if called in iterative context
+   * @param prefix prefix for output
+   */
   public PrintTripleWithDirection(boolean isIterative, String prefix) {
     super(isIterative, prefix);
   }

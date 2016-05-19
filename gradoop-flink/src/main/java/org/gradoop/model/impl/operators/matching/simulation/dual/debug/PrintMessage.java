@@ -27,8 +27,17 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.Message;
  */
 public class PrintMessage extends Printer<Message> {
 
+  /**
+   * Logger
+   */
   private static final Logger LOG = Logger.getLogger(PrintMessage.class);
 
+  /**
+   * Constructor
+   *
+   * @param isIterative true, if called in iterative context
+   * @param prefix      prefix for output
+   */
   public PrintMessage(boolean isIterative, String prefix) {
     super(isIterative, prefix);
   }

@@ -14,31 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.gradoop.model.impl.operators.matching.common.functions;
-
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
-
 /**
- * Filter vertices based on their occurrence in the given GDL pattern.
- *
- * @param <V> EPGM vertex type
+ * Programs to run simulation algorithms on extended property graphs.
  */
-public class MatchingVertices<V extends EPGMVertex>
-  extends MatchingElements<V> {
-
-  /**
-   * Create new filter.
-   *
-   * @param query GDL query string
-   */
-  public MatchingVertices(final String query) {
-    super(query);
-  }
-
-  @Override
-  public boolean filter(V v) throws Exception {
-    return EntityMatcher.matchAll(v, getQueryHandler().getVertices());
-  }
-}
+package org.gradoop.examples.simulation;

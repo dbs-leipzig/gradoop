@@ -62,8 +62,8 @@ public class TripleWithDirection extends
     return f3;
   }
 
-  public void isOutgoing(Boolean isOutgoing) {
-    f3 = isOutgoing;
+  public void setOutgoing(Boolean outgoing) {
+    f3 = outgoing;
   }
 
   public List<Long> getCandidates() {
