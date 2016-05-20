@@ -34,6 +34,7 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
+import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
 import org.gradoop.model.impl.operators.matching.simulation.dual.debug.PrintDeletion;
 import org.gradoop.model.impl.operators.matching.simulation.dual.debug.PrintFatVertex;
@@ -85,6 +86,11 @@ public class DualSimulation
   private final String query;
 
   /**
+   * Query handler
+   */
+  private final QueryHandler queryHandler;
+
+  /**
    * If true, the original vertex and edge data gets attached to the resulting
    * vertices and edges.
    */
@@ -118,6 +124,7 @@ public class DualSimulation
     Preconditions.checkState(!Strings.isNullOrEmpty(query),
       "Query must not be null or empty");
     this.query            = query;
+    this.queryHandler     = QueryHandler.fromString(query);
     this.attachData       = attachData;
     this.useBulkIteration = useBulkIteration;
   }
@@ -132,11 +139,38 @@ public class DualSimulation
         .map(new PairElementWithPropertyValue<E>("id"));
     }
 
+    LogicalGraph<G, V, E> result;
+
+    if (queryHandler.isSingleVertexGraph()) {
+      result = executeForVertex(graph);
+    } else {
+      result = executeForPattern(graph);
+    }
+
+    return result;
+  }
+
+  /**
+   * Filters vertices based on the given query.
+   *
+   * @param graph data graph
+   * @return match graph
+   */
+  private LogicalGraph<G, V, E> executeForVertex(LogicalGraph<G, V, E> graph) {
+    return LogicalGraph.fromDataSets(
+      PreProcessor.filterVertices(graph, query), graph.getConfig());
+  }
+
+  /**
+   * Performs dual simulation based on the given query.
+   *
+   * @param graph data graph
+   * @return match graph
+   */
+  private LogicalGraph<G, V, E> executeForPattern(LogicalGraph<G, V, E> graph) {
     //--------------------------------------------------------------------------
     // Pre-processing (filter candidates + build initial working set)
     //--------------------------------------------------------------------------
-
-    // TODO: the following is only necessary if diameter(query) > 0
 
     DataSet<MatchingTriple> triples = filterTriples(graph);
     DataSet<FatVertex> fatVertices = buildInitialWorkingSet(triples);
@@ -144,8 +178,6 @@ public class DualSimulation
     //--------------------------------------------------------------------------
     // Dual Simulation
     //--------------------------------------------------------------------------
-
-    // TODO: the following is only necessary if diameter(query) > 1
 
     DataSet<FatVertex> result = useBulkIteration ?
       simulateBulk(fatVertices) : simulateDelta(fatVertices);

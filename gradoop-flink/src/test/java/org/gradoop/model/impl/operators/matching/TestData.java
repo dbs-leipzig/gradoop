@@ -8,6 +8,9 @@ public class TestData {
   public static final String PATH_PATTERN_1 =
     "(:A)-[:a]->(:A)";
 
+  public static final String PATH_PATTERN_2 =
+    "(:A)";
+
   public static final String LOOP_PATTERN_0 =
     "(b:B)-[:d]->(b)";
 

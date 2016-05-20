@@ -31,13 +31,31 @@ public class QueryHandlerTest {
   static QueryHandler QUERY_HANDLER = QueryHandler.fromString(TEST_QUERY);
 
   @Test
+  public void testGetVertexCount() {
+    assertEquals(3, QUERY_HANDLER.getVertexCount());
+  }
+
+  @Test
+  public void testGetEdgeCount() {
+    assertEquals(4, QUERY_HANDLER.getEdgeCount());
+  }
+
+  @Test
+  public void testIsSingleVertexGraph() {
+    assertFalse(QUERY_HANDLER.isSingleVertexGraph());
+    assertTrue(QueryHandler.fromString("(v0)").isSingleVertexGraph());
+  }
+
+  @Test
   public void testGetDiameter() {
     assertEquals(2, QUERY_HANDLER.getDiameter());
+    assertEquals(0, QueryHandler.fromString("(v0)").getDiameter());
   }
 
   @Test
   public void testGetRadius() {
     assertEquals(1, QUERY_HANDLER.getRadius());
+    assertEquals(0, QueryHandler.fromString("(v0)").getRadius());
   }
 
   @Test

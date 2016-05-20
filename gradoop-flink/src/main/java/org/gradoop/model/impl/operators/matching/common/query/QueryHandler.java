@@ -132,6 +132,15 @@ public class QueryHandler {
   }
 
   /**
+   * Checks if the graph returns a single vertex and no edges (no loops).
+   *
+   * @return true, if single vertex graph
+   */
+  public boolean isSingleVertexGraph() {
+    return getVertexCount() == 1 && getEdgeCount() == 0;
+  }
+
+  /**
    * Returns the diameter of the query graph.
    *
    * @return diameter
@@ -320,11 +329,17 @@ public class QueryHandler {
    */
   public Collection<Vertex> getNeighbors(Long vertexId) {
     Set<Vertex> neighbors = Sets.newHashSet();
-    for (Edge edge : getEdgesBySourceVertexId(vertexId)) {
-      neighbors.add(getVertexById(edge.getTargetVertexId()));
+    Collection<Edge> outgoingEdges = getEdgesBySourceVertexId(vertexId);
+    if (outgoingEdges != null) {
+      for (Edge edge : outgoingEdges) {
+        neighbors.add(getVertexById(edge.getTargetVertexId()));
+      }
     }
-    for (Edge edge : getEdgesByTargetVertexId(vertexId)) {
-      neighbors.add(getVertexById(edge.getSourceVertexId()));
+    Collection<Edge> incomingEdges = getEdgesByTargetVertexId(vertexId);
+    if (incomingEdges != null) {
+      for (Edge edge : incomingEdges) {
+        neighbors.add(getVertexById(edge.getSourceVertexId()));
+      }
     }
     return neighbors;
   }

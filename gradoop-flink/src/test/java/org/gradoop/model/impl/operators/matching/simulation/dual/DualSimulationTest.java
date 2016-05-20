@@ -56,6 +56,26 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
   }
 
   @Test
+  public void testGraph1PathPattern2() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(TestData.GRAPH_1);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> db =
+      loader.getLogicalGraphByVariable("db");
+
+    // pattern
+    String query = TestData.PATH_PATTERN_2;
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v1);(v2);(v5)" +
+      "]");
+
+    // execute and validate
+    collectAndAssertTrue(getOperator(query).execute(db)
+      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
   public void testGraph2LoopPattern0() throws Exception {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString(TestData.GRAPH_2);
