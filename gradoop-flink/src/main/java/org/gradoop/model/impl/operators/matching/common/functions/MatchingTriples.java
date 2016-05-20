@@ -19,31 +19,34 @@ package org.gradoop.model.impl.operators.matching.common.functions;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
-import org.gradoop.model.impl.operators.matching.common.tuples.MatchingPair;
+import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
+
 import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Vertex;
 
-import java.util.Collection;
+
 import java.util.List;
-
-import static org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher.match;
 
 /**
  * Takes a vertex-edge pair and the corresponding target vertex as input and
  * evaluates, if the triple matches against the query graph. The output is
- * a {@link MatchingTriple} containing all query candidates for the triple.
+ * a {@link TripleWithCandidates} containing all query candidates for the
+ * triple.
  *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * Forwarded fields first:
+ *
+ * f0:      edge id
+ * f1:      source vertex id
+ * f3->f2:  target vertex id
  */
-public class MatchingTriples<V extends EPGMVertex, E extends EPGMEdge>
-  extends RichFlatJoinFunction<MatchingPair<V, E>, V, MatchingTriple> {
+@FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3->f2")
+public class MatchingTriples extends RichFlatJoinFunction<
+  TripleWithSourceEdgeCandidates, IdWithCandidates, TripleWithCandidates> {
 
   /**
    * serial version uid
@@ -63,7 +66,7 @@ public class MatchingTriples<V extends EPGMVertex, E extends EPGMEdge>
   /**
    * Reduce instantiations
    */
-  private final MatchingTriple reuseTriple;
+  private final TripleWithCandidates reuseTriple;
 
   /**
    * Constructor
@@ -72,7 +75,7 @@ public class MatchingTriples<V extends EPGMVertex, E extends EPGMEdge>
    */
   public MatchingTriples(final String query) {
     this.query = query;
-    this.reuseTriple = new MatchingTriple();
+    this.reuseTriple = new TripleWithCandidates();
   }
 
   @Override
@@ -82,36 +85,26 @@ public class MatchingTriples<V extends EPGMVertex, E extends EPGMEdge>
   }
 
   @Override
-  public void join(MatchingPair<V, E> matchingPair, V targetVertex,
-    Collector<MatchingTriple> collector) throws Exception {
+  public void join(TripleWithSourceEdgeCandidates pair,
+    IdWithCandidates target,
+    Collector<TripleWithCandidates> collector) throws Exception {
 
-    Collection<Vertex> queryVertices = queryHandler
-      .getVerticesByLabel(targetVertex.getLabel());
+    List<Long> newEdgeCandidates = Lists.newArrayListWithCapacity(
+      pair.getEdgeCandidates().size());
 
-    List<Long> candidates = Lists.newArrayList();
-
-    for (Vertex queryTargetVertex : queryVertices) {
-      Collection<Edge> edges = queryHandler
-        .getEdgesByTargetVertexId(queryTargetVertex.getId());
-      if (edges != null) {
-        for (Edge queryEdge : edges) {
-          Vertex querySourceVertex = queryHandler
-            .getVertexById(queryEdge.getSourceVertexId());
-
-          if (match(matchingPair.getVertex(), querySourceVertex) &&
-            match(matchingPair.getEdge(), queryEdge) &&
-            match(targetVertex, queryTargetVertex)) {
-            candidates.add(queryEdge.getId());
-          }
-        }
+    for (Long eQ : pair.getEdgeCandidates()) {
+      Edge e = queryHandler.getEdgeById(eQ);
+      if (pair.getSourceCandidates().contains(e.getSourceVertexId()) &&
+        target.getCandidates().contains(e.getTargetVertexId())) {
+        newEdgeCandidates.add(eQ);
       }
     }
 
-    if (candidates.size() > 0) {
-      reuseTriple.setEdgeId(matchingPair.getEdge().getId());
-      reuseTriple.setSourceVertexId(matchingPair.getVertex().getId());
-      reuseTriple.setTargetVertexId(targetVertex.getId());
-      reuseTriple.setQueryCandidates(candidates);
+    if (!newEdgeCandidates.isEmpty()) {
+      reuseTriple.setEdgeId(pair.getEdgeId());
+      reuseTriple.setSourceId(pair.getSourceId());
+      reuseTriple.setTargetId(target.getId());
+      reuseTriple.setEdgeCandidates(newEdgeCandidates);
       collector.collect(reuseTriple);
     }
   }

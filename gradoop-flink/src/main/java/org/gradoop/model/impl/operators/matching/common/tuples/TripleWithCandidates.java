@@ -30,9 +30,9 @@ import java.util.List;
  * f0: edge id
  * f1: source vertex id
  * f2: target vertex id
- * f3: query candidates
+ * f3: edge query candidates
  */
-public class MatchingTriple
+public class TripleWithCandidates
   extends Tuple4<GradoopId, GradoopId, GradoopId, List<Long>> {
 
   public GradoopId getEdgeId() {
@@ -43,27 +43,27 @@ public class MatchingTriple
     f0 = id;
   }
 
-  public GradoopId getSourceVertexId() {
+  public GradoopId getSourceId() {
     return f1;
   }
 
-  public void setSourceVertexId(GradoopId id) {
+  public void setSourceId(GradoopId id) {
     f1 = id;
   }
 
-  public GradoopId getTargetVertexId() {
+  public GradoopId getTargetId() {
     return f2;
   }
 
-  public void setTargetVertexId(GradoopId id) {
+  public void setTargetId(GradoopId id) {
     f2 = id;
   }
 
-  public List<Long> getQueryCandidates() {
+  public List<Long> getEdgeCandidates() {
     return f3;
   }
 
-  public void setQueryCandidates(List<Long> ids) {
+  public void setEdgeCandidates(List<Long> ids) {
     f3 = ids;
   }
 }

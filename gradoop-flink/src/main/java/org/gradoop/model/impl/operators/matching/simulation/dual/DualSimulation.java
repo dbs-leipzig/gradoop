@@ -22,6 +22,7 @@ import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
@@ -29,13 +30,16 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.PairElementWithPropertyValue;
+import org.gradoop.model.impl.functions.epgm.VertexFromId;
+import org.gradoop.model.impl.functions.join.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.model.impl.operators.matching.simulation.dual.debug.PrintDeletion;
 import org.gradoop.model.impl.operators.matching.simulation.dual.debug.PrintFatVertex;
 import org.gradoop.model.impl.operators.matching.simulation.dual.debug.PrintMessage;
@@ -157,8 +161,23 @@ public class DualSimulation
    * @return match graph
    */
   private LogicalGraph<G, V, E> executeForVertex(LogicalGraph<G, V, E> graph) {
-    return LogicalGraph.fromDataSets(
-      PreProcessor.filterVertices(graph, query), graph.getConfig());
+    DataSet<Tuple1<GradoopId>> matchingVertexIds = PreProcessor
+      .filterVertices(graph, query)
+      .project(0);
+
+    if (attachData) {
+      return LogicalGraph.fromDataSets(matchingVertexIds
+          .join(graph.getVertices())
+          .where(0).equalTo(new Id<V>())
+          .with(new RightSide<Tuple1<GradoopId>, V>()),
+        graph.getConfig()
+      );
+    } else {
+      return LogicalGraph.fromDataSets(matchingVertexIds
+        .map(new VertexFromId<>(graph.getConfig().getVertexFactory())),
+        graph.getConfig()
+      );
+    }
   }
 
   /**
@@ -172,7 +191,7 @@ public class DualSimulation
     // Pre-processing (filter candidates + build initial working set)
     //--------------------------------------------------------------------------
 
-    DataSet<MatchingTriple> triples = filterTriples(graph);
+    DataSet<TripleWithCandidates> triples = filterTriples(graph);
     DataSet<FatVertex> fatVertices = buildInitialWorkingSet(triples);
 
     //--------------------------------------------------------------------------
@@ -192,12 +211,12 @@ public class DualSimulation
   /**
    * Extracts valid triples from the input graph based on the query.
    *
-   * @param graph input graph
+   * @param g input graph
    * @return triples that have a match in the query graph
    */
-  private DataSet<MatchingTriple> filterTriples(LogicalGraph<G, V, E> graph) {
+  private DataSet<TripleWithCandidates> filterTriples(LogicalGraph<G, V, E> g) {
     // filter vertex-edge-vertex triples by query predicates
-    return PreProcessor.filterTriplets(graph, query);
+    return PreProcessor.filterTriplets(g, query);
   }
 
   /**
@@ -207,7 +226,7 @@ public class DualSimulation
    * @return data set containing fat vertices
    */
   private DataSet<FatVertex> buildInitialWorkingSet(
-    DataSet<MatchingTriple> triples) {
+    DataSet<TripleWithCandidates> triples) {
     return triples.flatMap(new CloneAndReverse())
       .groupBy(1) // sourceId
       .combineGroup(new BuildFatVertex(query))

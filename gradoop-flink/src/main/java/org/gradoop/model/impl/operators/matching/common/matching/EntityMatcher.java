@@ -17,11 +17,13 @@
 
 package org.gradoop.model.impl.operators.matching.common.matching;
 
+import com.google.common.collect.Lists;
 import org.gradoop.model.api.EPGMElement;
 import org.s1ck.gdl.model.GraphElement;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,6 +53,28 @@ public class EntityMatcher {
       }
     }
     return match;
+  }
+
+  /**
+   * Returns all query candidate ids for the given EPGM element.
+   *
+   * @param dbElement     EPGM element (vertices/edges)
+   * @param queryElements query graph elements (vertices/edges)
+   * @param <EL1>         EPGM element type
+   * @param <EL2>         GDL element type
+   * @return all candidate ids for {@code dbElement}
+   */
+  public static <EL1 extends EPGMElement, EL2 extends GraphElement>
+  List<Long> getMatches(EL1 dbElement, Collection<EL2> queryElements) {
+    List<Long> matches = Lists.newArrayListWithCapacity(queryElements.size());
+
+    for (GraphElement queryElement : queryElements) {
+      if (match(dbElement, queryElement)) {
+        matches.add(queryElement.getId());
+      }
+    }
+
+    return matches;
   }
 
   /**

@@ -19,12 +19,12 @@ package org.gradoop.model.impl.operators.matching.common.debug;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 /**
- * Debug output for {@link MatchingTriple}.
+ * Debug output for {@link TripleWithCandidates}.
  */
-public class PrintMatchingTriple extends Printer<MatchingTriple> {
+public class PrintMatchingTriple extends Printer<TripleWithCandidates> {
 
   /**
    * Logger
@@ -32,12 +32,12 @@ public class PrintMatchingTriple extends Printer<MatchingTriple> {
   private static final Logger LOG = Logger.getLogger(PrintMatchingTriple.class);
 
   @Override
-  protected String getDebugString(MatchingTriple t) {
+  protected String getDebugString(TripleWithCandidates t) {
     return String.format("(%s,%s,%s,[%s])",
       edgeMap.get(t.getEdgeId()),
-      vertexMap.get(t.getSourceVertexId()),
-      vertexMap.get(t.getTargetVertexId()),
-      StringUtils.join(t.getQueryCandidates(), ','));
+      vertexMap.get(t.getSourceId()),
+      vertexMap.get(t.getTargetId()),
+      StringUtils.join(t.getEdgeCandidates(), ','));
   }
 
   @Override

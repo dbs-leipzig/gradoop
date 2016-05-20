@@ -20,7 +20,7 @@ package org.gradoop.model.impl.operators.matching.simulation.dual.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.TripleWithDirection;
 
 /**
@@ -35,7 +35,7 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.TripleWi
  */
 @FunctionAnnotation.ForwardedFields("f0;f3->f4")
 public class CloneAndReverse implements
-  FlatMapFunction<MatchingTriple, TripleWithDirection> {
+  FlatMapFunction<TripleWithCandidates, TripleWithDirection> {
 
   /**
    * Reduce instantiations
@@ -50,18 +50,18 @@ public class CloneAndReverse implements
   }
 
   @Override
-  public void flatMap(MatchingTriple matchingTriple,
+  public void flatMap(TripleWithCandidates tripleWithCandidates,
     Collector<TripleWithDirection> collector) throws Exception {
-    reuseTuple.setEdgeId(matchingTriple.getEdgeId());
-    reuseTuple.setCandidates(matchingTriple.getQueryCandidates());
+    reuseTuple.setEdgeId(tripleWithCandidates.getEdgeId());
+    reuseTuple.setCandidates(tripleWithCandidates.getEdgeCandidates());
 
-    reuseTuple.setSourceId(matchingTriple.getSourceVertexId());
-    reuseTuple.setTargetId(matchingTriple.getTargetVertexId());
+    reuseTuple.setSourceId(tripleWithCandidates.getSourceId());
+    reuseTuple.setTargetId(tripleWithCandidates.getTargetId());
     reuseTuple.setOutgoing(true);
     collector.collect(reuseTuple);
 
-    reuseTuple.setSourceId(matchingTriple.getTargetVertexId());
-    reuseTuple.setTargetId(matchingTriple.getSourceVertexId());
+    reuseTuple.setSourceId(tripleWithCandidates.getTargetId());
+    reuseTuple.setTargetId(tripleWithCandidates.getSourceId());
     reuseTuple.setOutgoing(false);
     collector.collect(reuseTuple);
   }

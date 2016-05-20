@@ -18,34 +18,31 @@
 package org.gradoop.model.impl.operators.matching.common.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
+
+import java.util.List;
 
 /**
- * Represents a vertex and a single incident edge.
+ * Represents an EPGM graph element (vertex/edge) and its query candidates.
  *
- * f0: source vertex
- * f1: outgoing edge
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * f0: EPGM graph element id
+ * f1: query candidates
  */
-public class MatchingPair<V extends EPGMVertex, E extends EPGMEdge>
-  extends Tuple2<V, E> {
+public class IdWithCandidates extends Tuple2<GradoopId, List<Long>> {
 
-  public V getVertex() {
+  public GradoopId getId() {
     return f0;
   }
 
-  public void setVertex(V v) {
-    f0 = v;
+  public void setId(GradoopId id) {
+    f0 = id;
   }
 
-  public E getEdge() {
+  public List<Long> getCandidates() {
     return f1;
   }
 
-  public void setEdge(E e) {
-    f1 = e;
+  public void setCandidates(List<Long> candidates) {
+    f1 = candidates;
   }
 }

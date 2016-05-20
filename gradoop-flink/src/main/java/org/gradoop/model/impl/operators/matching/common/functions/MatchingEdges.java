@@ -17,15 +17,46 @@
 
 package org.gradoop.model.impl.operators.matching.common.functions;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.s1ck.gdl.model.Edge;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Filter edges based on their occurrence in the given GDL pattern.
  *
+ * Forwarded fields:
+ *
+ * id -> f0:        edge id
+ * sourceId -> f1:  source vertex id
+ * targetId -> f1:  target vertex id
+ *
  * @param <E> EPGM edge type
  */
-public class MatchingEdges<E extends EPGMEdge> extends MatchingElements<E> {
+@FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
+public class MatchingEdges<E extends EPGMEdge>
+  extends MatchingElements<E, TripleWithCandidates> {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  /**
+   * Reduce instantiations.
+   */
+  private final TripleWithCandidates reuseTuple;
+
+  /**
+   * Query edges to match against.
+   */
+  private transient Collection<Edge> queryEdges;
 
   /**
    * Constructor
@@ -34,10 +65,25 @@ public class MatchingEdges<E extends EPGMEdge> extends MatchingElements<E> {
    */
   public MatchingEdges(final String query) {
     super(query);
+    this.reuseTuple = new TripleWithCandidates();
   }
 
   @Override
-  public boolean filter(E e) throws Exception {
-    return EntityMatcher.matchAll(e, getQueryHandler().getEdges());
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+    queryEdges = getQueryHandler().getEdges();
+  }
+
+  @Override
+  public void flatMap(E e, Collector<TripleWithCandidates> collector) throws
+    Exception {
+    List<Long> candidates = EntityMatcher.getMatches(e, queryEdges);
+    if (!candidates.isEmpty()) {
+      reuseTuple.setEdgeId(e.getId());
+      reuseTuple.setSourceId(e.getSourceId());
+      reuseTuple.setTargetId(e.getTargetId());
+      reuseTuple.setEdgeCandidates(candidates);
+      collector.collect(reuseTuple);
+    }
   }
 }

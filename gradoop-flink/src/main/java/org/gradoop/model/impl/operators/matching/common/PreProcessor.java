@@ -22,14 +22,13 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.operators.matching.common.functions.MatchingEdges;
 import org.gradoop.model.impl.operators.matching.common.functions.MatchingPairs;
 import org.gradoop.model.impl.operators.matching.common.functions.MatchingTriples;
 import org.gradoop.model.impl.operators.matching.common.functions.MatchingVertices;
-import org.gradoop.model.impl.operators.matching.common.tuples.MatchingPair;
-import org.gradoop.model.impl.operators.matching.common.tuples.MatchingTriple;
+import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 /**
  * Provides methods for filtering vertices, edges, pairs (vertex + edge) and
@@ -46,12 +45,13 @@ public class PreProcessor {
    * @param <G>   EPGM graph head type
    * @param <V>   EPGM vertex type
    * @param <E>   EPGM edge type
-   * @return dataset with matching vertices
+   * @return dataset with matching vertex ids and their candidates
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  DataSet<V> filterVertices(LogicalGraph<G, V, E> graph, final String query) {
-    return graph.getVertices().filter(new MatchingVertices<V>(query));
+  DataSet<IdWithCandidates> filterVertices(LogicalGraph<G, V, E> graph,
+    final String query) {
+    return graph.getVertices().flatMap(new MatchingVertices<V>(query));
   }
 
   /**
@@ -63,12 +63,13 @@ public class PreProcessor {
    * @param <G>   EPGM graph head type
    * @param <V>   EPGM vertex type
    * @param <E>   EPGM edge type
-   * @return dataset with matching edges
+   * @return dataset with matching edge triples and their candidates
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  DataSet<E> filterEdges(LogicalGraph<G, V, E> graph, final String query) {
-    return graph.getEdges().filter(new MatchingEdges<E>(query));
+  DataSet<TripleWithCandidates> filterEdges(LogicalGraph<G, V, E> graph,
+    final String query) {
+    return graph.getEdges().flatMap(new MatchingEdges<E>(query));
   }
 
   /**
@@ -76,7 +77,7 @@ public class PreProcessor {
    * dataset only contains vertex-edge pairs that match at least one vertex-edge
    * pair in the query graph.
    *
-   * @param graph data graph
+   * @param g     data graph
    * @param query query graph
    * @param <G>   EPGM graph head type
    * @param <V>   EPGM vertex type
@@ -85,15 +86,15 @@ public class PreProcessor {
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  DataSet<MatchingPair<V, E>> filterPairs(LogicalGraph<G, V, E> graph,
+  DataSet<TripleWithSourceEdgeCandidates> filterPairs(LogicalGraph<G, V, E> g,
     final String query) {
-    return filterPairs(graph, query, filterVertices(graph, query));
+    return filterPairs(g, query, filterVertices(g, query));
   }
 
   /**
    * Filters vertex-edge pairs based on the given GDL query. The resulting
    * dataset only contains vertex-edge pairs that match at least one vertex-edge
-   * pair in the query graph.
+   * pair in the query graph and their corresponding candidates
    *
    * @param graph             data graph
    * @param query             query graph
@@ -102,16 +103,17 @@ public class PreProcessor {
    * @param <V>               EPGM vertex type
    * @param <E>               EPGM edge type
 
-   * @return dataset with matching vertex-edge pairs
+   * @return dataset with matching vertex-edge pairs and their candidates
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  DataSet<MatchingPair<V, E>> filterPairs(LogicalGraph<G, V, E> graph,
-    final String query, DataSet<V> filteredVertices) {
+  DataSet<TripleWithSourceEdgeCandidates> filterPairs(
+    LogicalGraph<G, V, E> graph, final String query,
+    DataSet<IdWithCandidates> filteredVertices) {
     return filteredVertices
       .join(filterEdges(graph, query))
-      .where(new Id<V>()).equalTo(new SourceId<E>())
-      .with(new MatchingPairs<V, E>(query));
+      .where(0).equalTo(1)
+      .with(new MatchingPairs(query));
   }
 
   /**
@@ -128,7 +130,7 @@ public class PreProcessor {
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  DataSet<MatchingTriple> filterTriplets(LogicalGraph<G, V, E> graph,
+  DataSet<TripleWithCandidates> filterTriplets(LogicalGraph<G, V, E> graph,
     final String query) {
     return filterTriplets(graph, query, filterVertices(graph, query));
   }
@@ -144,15 +146,15 @@ public class PreProcessor {
    * @param <G>               EPGM graph head type
    * @param <V>               EPGM vertex type
    * @param <E>               EPGM edge type
-   * @return dataset with matching triples
+   * @return dataset with matching triples and their candidates
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  DataSet<MatchingTriple> filterTriplets(LogicalGraph<G, V, E> graph,
-    final String query, DataSet<V> filteredVertices) {
+  DataSet<TripleWithCandidates> filterTriplets(LogicalGraph<G, V, E> graph,
+    final String query, DataSet<IdWithCandidates> filteredVertices) {
     return filterPairs(graph, query, filteredVertices)
       .join(filteredVertices)
-      .where("f1.targetId").equalTo(new Id<V>())
-      .with(new MatchingTriples<V, E>(query));
+      .where(3).equalTo(0)
+      .with(new MatchingTriples(query));
   }
 }

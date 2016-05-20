@@ -17,16 +17,44 @@
 
 package org.gradoop.model.impl.operators.matching.common.functions;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
+import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.s1ck.gdl.model.Vertex;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Filter vertices based on their occurrence in the given GDL pattern.
  *
+ * Forwarded fields:
+ *
+ * id->f0: vertex id
+ *
  * @param <V> EPGM vertex type
  */
+@FunctionAnnotation.ForwardedFields("id->f0")
 public class MatchingVertices<V extends EPGMVertex>
-  extends MatchingElements<V> {
+  extends MatchingElements<V, IdWithCandidates> {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  /**
+   * Reduce instantiations
+   */
+  private final IdWithCandidates reuseTuple;
+
+  /**
+   * Query vertices to match against.
+   */
+  private transient Collection<Vertex> queryVertices;
 
   /**
    * Create new filter.
@@ -35,10 +63,23 @@ public class MatchingVertices<V extends EPGMVertex>
    */
   public MatchingVertices(final String query) {
     super(query);
+    this.reuseTuple = new IdWithCandidates();
   }
 
   @Override
-  public boolean filter(V v) throws Exception {
-    return EntityMatcher.matchAll(v, getQueryHandler().getVertices());
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+    queryVertices = getQueryHandler().getVertices();
+  }
+
+  @Override
+  public void flatMap(V v, Collector<IdWithCandidates> collector) throws
+    Exception {
+    List<Long> candidates = EntityMatcher.getMatches(v, queryVertices);
+    if (!candidates.isEmpty()) {
+      reuseTuple.setId(v.getId());
+      reuseTuple.setCandidates(candidates);
+      collector.collect(reuseTuple);
+    }
   }
 }

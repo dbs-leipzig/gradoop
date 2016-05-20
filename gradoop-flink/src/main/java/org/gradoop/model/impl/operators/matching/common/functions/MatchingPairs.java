@@ -17,28 +17,30 @@
 
 package org.gradoop.model.impl.operators.matching.common.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.model.impl.operators.matching.common.tuples.MatchingPair;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Vertex;
+import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
 
-import java.util.Collection;
-
-import static org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher.match;
+import java.util.List;
 
 /**
- * Filters a vertex-edge pair if it occurs at least once in the query graph.
+ * Filters vertex-edge pairs based on their corresponding candidates.
  *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * Forwarded Fields Second:
+ *
+ * f0:      edge id
+ * f1:      source vertex id
+ * f2->f3:  target vertex id
  */
-public class MatchingPairs<V extends EPGMVertex, E extends EPGMEdge> extends
-  RichFlatJoinFunction<V, E, MatchingPair<V, E>> {
+@FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f2->f3")
+public class MatchingPairs extends RichFlatJoinFunction<
+  IdWithCandidates, TripleWithCandidates, TripleWithSourceEdgeCandidates> {
 
   /**
    * serial version uid
@@ -58,7 +60,7 @@ public class MatchingPairs<V extends EPGMVertex, E extends EPGMEdge> extends
   /**
    * Reduce instantiations
    */
-  private final MatchingPair<V, E> reuseTuple;
+  private final TripleWithSourceEdgeCandidates reuseTuple;
 
   /**
    * Constructor
@@ -67,7 +69,7 @@ public class MatchingPairs<V extends EPGMVertex, E extends EPGMEdge> extends
    */
   public MatchingPairs(final String query) {
     this.query = query;
-    this.reuseTuple = new MatchingPair<>();
+    this.reuseTuple = new TripleWithSourceEdgeCandidates();
   }
 
   @Override
@@ -77,29 +79,28 @@ public class MatchingPairs<V extends EPGMVertex, E extends EPGMEdge> extends
   }
 
   @Override
-  public void join(V sourceVertex, E edge,
-    Collector<MatchingPair<V, E>> collector) throws Exception {
+  public void join(IdWithCandidates sourceVertex, TripleWithCandidates edge,
+    Collector<TripleWithSourceEdgeCandidates> collector) throws Exception {
 
-    boolean match = false;
+    List<Long> newSourceCandidates = Lists.newArrayListWithCapacity(
+      sourceVertex.getCandidates().size());
+    List<Long> newEdgeCandidates = Lists.newArrayListWithCapacity(
+      edge.getEdgeCandidates().size());
 
-    Collection<Vertex> queryVertices = queryHandler
-      .getVerticesByLabel(sourceVertex.getLabel());
-
-    for (Vertex queryVertex : queryVertices) {
-      Collection<Edge> queryEdges = queryHandler
-        .getEdgesBySourceVertexId(queryVertex.getId());
-      if (queryEdges != null) {
-        for (Edge queryEdge : queryEdges) {
-          if (match(sourceVertex, queryVertex) && match(edge, queryEdge)) {
-            match = true;
-          }
-        }
+    for (Long eQ : edge.getEdgeCandidates()) {
+      Long vQ = queryHandler.getEdgeById(eQ).getSourceVertexId();
+      if (sourceVertex.getCandidates().contains(vQ)) {
+        newSourceCandidates.add(vQ);
+        newEdgeCandidates.add(eQ);
       }
     }
 
-    if (match) {
-      reuseTuple.setVertex(sourceVertex);
-      reuseTuple.setEdge(edge);
+    if (!newEdgeCandidates.isEmpty()) {
+      reuseTuple.setEdgeId(edge.getEdgeId());
+      reuseTuple.setSourceId(edge.getSourceId());
+      reuseTuple.setSourceCandidates(newSourceCandidates);
+      reuseTuple.setTargetId(edge.getTargetId());
+      reuseTuple.setEdgeCandidates(newEdgeCandidates);
       collector.collect(reuseTuple);
     }
   }
