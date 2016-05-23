@@ -2,7 +2,6 @@ package org.gradoop.model.impl.operators.split;
 
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.functions.UnaryFunction;
-import org.gradoop.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -44,7 +43,7 @@ public class SplitTest extends GradoopFlinkTestBase {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
       input.callForCollection(new Split<GraphHeadPojo,
-            VertexPojo, EdgePojo>(new TestHelperFunction()));
+            VertexPojo, EdgePojo>(new SelectKeyValues()));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
@@ -83,7 +82,7 @@ public class SplitTest extends GradoopFlinkTestBase {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
       input.callForCollection(new Split<GraphHeadPojo,
-        VertexPojo, EdgePojo>(new TestHelperFunction()));
+        VertexPojo, EdgePojo>(new SelectKeyValues()));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
       expectation = loader.getGraphCollectionByVariables(
@@ -91,6 +90,7 @@ public class SplitTest extends GradoopFlinkTestBase {
 
     collectAndAssertTrue(result.equalsByGraphElementIds(expectation));
   }
+
 
   @Test
   public void testSplitWithMultipleKeys() throws Exception {
@@ -120,13 +120,47 @@ public class SplitTest extends GradoopFlinkTestBase {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
       input.callForCollection(new Split<GraphHeadPojo,
-        VertexPojo, EdgePojo>(new TestHelperFunction()));
+        VertexPojo, EdgePojo>(new SelectKeyValues()));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
   }
 
-  public static class TestHelperFunction
+  @Test
+  public void testSplitWithSingleResultGraph() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("" +
+          "g1:Persons [" +
+          "(v0:Person {id = 0, author = \"value0\"})" +
+          "(v1:Person {id = 0, author = \"value1\"})" +
+          "(v2:Person {id = 0, author = \"value2\"})" +
+          "(v3:Person {id = 0, author = \"value3\"})" +
+          "(v0)-[e0:sameAs {id = 0, sim=\"0.91\"}]->(v1)" +
+          "(v0)-[e1:sameAs {id = 1, sim=\"0.3\"}]->(v2)" +
+          "(v2)-[e2:sameAs {id = 2, sim=\"0.1\"}]->(v1)" +
+          "(v2)-[e3:sameAs {id = 3, sim=\"0.99\"}]->(v3)" +
+          "]" +
+          "g2 [" +
+          "(v0)-[e0:sameAs {id = 0, sim=\"0.91\"}]->(v1)" +
+          "(v0)-[e1:sameAs {id = 1, sim=\"0.3\"}]->(v2)" +
+          "(v2)-[e2:sameAs {id = 2, sim=\"0.1\"}]->(v1)" +
+          "(v2)-[e3:sameAs {id = 3, sim=\"0.99\"}]->(v3)" +
+          "]"
+      );
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+      loader.getLogicalGraphByVariable("g1");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      input.splitBy("id");
+
+    collectAndAssertTrue(result.equalsByGraphElementIds(
+      loader.getGraphCollectionByVariables("g2")));
+    collectAndAssertTrue(result.equalsByGraphElementData(
+      loader.getGraphCollectionByVariables("g2")));
+  }
+
+  public static class SelectKeyValues
     implements UnaryFunction<VertexPojo, List<PropertyValue>>{
     @Override
     public List<PropertyValue> execute(VertexPojo entity) throws Exception {
