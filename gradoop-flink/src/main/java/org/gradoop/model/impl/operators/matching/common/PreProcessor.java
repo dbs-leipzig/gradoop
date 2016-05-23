@@ -22,6 +22,8 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.operators.matching.common.functions.BuildIdWithCandidates;
+import org.gradoop.model.impl.operators.matching.common.functions.BuildTripleWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.functions.MatchingEdges;
 import org.gradoop.model.impl.operators.matching.common.functions.MatchingPairs;
 import org.gradoop.model.impl.operators.matching.common.functions.MatchingTriples;
@@ -51,7 +53,9 @@ public class PreProcessor {
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   DataSet<IdWithCandidates> filterVertices(LogicalGraph<G, V, E> graph,
     final String query) {
-    return graph.getVertices().flatMap(new MatchingVertices<V>(query));
+    return graph.getVertices()
+      .filter(new MatchingVertices<V>(query))
+      .map(new BuildIdWithCandidates<V>(query));
   }
 
   /**
@@ -69,7 +73,9 @@ public class PreProcessor {
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   DataSet<TripleWithCandidates> filterEdges(LogicalGraph<G, V, E> graph,
     final String query) {
-    return graph.getEdges().flatMap(new MatchingEdges<E>(query));
+    return graph.getEdges()
+      .filter(new MatchingEdges<E>(query))
+      .map(new BuildTripleWithCandidates<E>(query));
   }
 
   /**

@@ -17,20 +17,29 @@
 
 package org.gradoop.model.impl.operators.matching.common.functions;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
+import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.s1ck.gdl.model.Edge;
 
 import java.util.Collection;
 
 /**
- * Filter edges based on their occurrence in the given GDL pattern.
+ * Converts an EPGM edge to a {@link TripleWithCandidates} tuple.
+ *
+ * Forwarded fields:
+ *
+ * id -> f0:        edge id
+ * sourceId -> f1:  source vertex id
+ * targetId -> f1:  target vertex id
  *
  * @param <E> EPGM edge type
  */
-public class MatchingEdges<E extends EPGMEdge>
-  extends AbstractFilter<E> {
+@FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
+public class BuildTripleWithCandidates<E extends EPGMEdge>
+  extends AbstractBuilder<E, TripleWithCandidates> {
 
   /**
    * serial version uid
@@ -38,17 +47,22 @@ public class MatchingEdges<E extends EPGMEdge>
   private static final long serialVersionUID = 42L;
 
   /**
-   * Query edges to match against.
+   * Query vertices to match against.
    */
   private transient Collection<Edge> queryEdges;
 
+  /**
+   * Reduce instantiations
+   */
+  private TripleWithCandidates reuseTuple;
   /**
    * Constructor
    *
    * @param query GDL query
    */
-  public MatchingEdges(final String query) {
+  public BuildTripleWithCandidates(String query) {
     super(query);
+    reuseTuple = new TripleWithCandidates();
   }
 
   @Override
@@ -58,7 +72,11 @@ public class MatchingEdges<E extends EPGMEdge>
   }
 
   @Override
-  public boolean filter(E e) throws Exception {
-    return EntityMatcher.matchAll(e, queryEdges);
+  public TripleWithCandidates map(E e) throws Exception {
+    reuseTuple.setEdgeId(e.getId());
+    reuseTuple.setSourceId(e.getSourceId());
+    reuseTuple.setTargetId(e.getTargetId());
+    reuseTuple.setEdgeCandidates(EntityMatcher.getMatches(e, queryEdges));
+    return reuseTuple;
   }
 }

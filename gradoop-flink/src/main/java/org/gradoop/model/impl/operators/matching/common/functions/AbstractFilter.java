@@ -17,48 +17,45 @@
 
 package org.gradoop.model.impl.operators.matching.common.functions;
 
+import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
-import org.s1ck.gdl.model.Vertex;
-
-import java.util.Collection;
+import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 
 /**
- * Filter vertices based on their occurrence in the given GDL pattern.
+ * Base class for filtering EPGM elements based on their matches.
  *
- * @param <V> EPGM vertex type
+ * @param <EL>  EPGM element type
  */
-public class MatchingVertices<V extends EPGMVertex>
-  extends AbstractFilter<V> {
+public abstract class AbstractFilter<EL extends EPGMElement>
+  extends RichFilterFunction<EL> {
 
   /**
-   * serial version uid
+   * GDL query
    */
-  private static final long serialVersionUID = 42L;
+  private final String query;
 
   /**
-   * Query vertices to match against.
+   * Query handler
    */
-  private transient Collection<Vertex> queryVertices;
+  private transient QueryHandler queryHandler;
 
   /**
-   * Create new filter.
+   * Constructor
    *
-   * @param query GDL query string
+   * @param query GDL query
    */
-  public MatchingVertices(final String query) {
-    super(query);
+  public AbstractFilter(final String query) {
+    this.query = query;
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    queryVertices = getQueryHandler().getVertices();
+    queryHandler = QueryHandler.fromString(query);
   }
 
-  @Override
-  public boolean filter(V v) throws Exception {
-    return EntityMatcher.matchAll(v, queryVertices);
+  protected QueryHandler getQueryHandler() {
+    return queryHandler;
   }
 }

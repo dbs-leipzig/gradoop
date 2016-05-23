@@ -17,19 +17,19 @@
 
 package org.gradoop.model.impl.operators.matching.common.functions;
 
-import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 
 /**
- * Base class for matching EPGM elements.
+ * Base class for mapping EPGM elements to representations for mapping.
  *
- * @param <EL>  EPGM element type
+ * @param <EL> EPGM element type
  * @param <OUT> output type
  */
-public abstract class MatchingElements<EL extends EPGMElement, OUT>
-  extends RichFlatMapFunction<EL, OUT> {
+public abstract class AbstractBuilder<EL extends EPGMElement, OUT>
+  extends RichMapFunction<EL, OUT> {
 
   /**
    * GDL query
@@ -46,7 +46,7 @@ public abstract class MatchingElements<EL extends EPGMElement, OUT>
    *
    * @param query GDL query
    */
-  public MatchingElements(final String query) {
+  public AbstractBuilder(final String query) {
     this.query = query;
   }
 

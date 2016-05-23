@@ -17,20 +17,29 @@
 
 package org.gradoop.model.impl.operators.matching.common.functions;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
+import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.s1ck.gdl.model.Vertex;
 
 import java.util.Collection;
 
 /**
- * Filter vertices based on their occurrence in the given GDL pattern.
+ * Converts an EPGM vertex to a {@link IdWithCandidates} tuple.
+ *
+ * vertex -> (vertexId, vertexCandidates)
+ *
+ * Forwarded Fields:
+ *
+ * id->f0: vertex id
  *
  * @param <V> EPGM vertex type
  */
-public class MatchingVertices<V extends EPGMVertex>
-  extends AbstractFilter<V> {
+@FunctionAnnotation.ForwardedFields("id->f0")
+public class BuildIdWithCandidates<V extends EPGMVertex>
+  extends AbstractBuilder<V, IdWithCandidates> {
 
   /**
    * serial version uid
@@ -43,12 +52,18 @@ public class MatchingVertices<V extends EPGMVertex>
   private transient Collection<Vertex> queryVertices;
 
   /**
-   * Create new filter.
-   *
-   * @param query GDL query string
+   * Reduce instantiations
    */
-  public MatchingVertices(final String query) {
+  private IdWithCandidates reuseTuple;
+
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
+  public BuildIdWithCandidates(String query) {
     super(query);
+    reuseTuple = new IdWithCandidates();
   }
 
   @Override
@@ -58,7 +73,9 @@ public class MatchingVertices<V extends EPGMVertex>
   }
 
   @Override
-  public boolean filter(V v) throws Exception {
-    return EntityMatcher.matchAll(v, queryVertices);
+  public IdWithCandidates map(V v) throws Exception {
+    reuseTuple.setId(v.getId());
+    reuseTuple.setCandidates(EntityMatcher.getMatches(v, queryVertices));
+    return reuseTuple;
   }
 }
