@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.examples.AbstractRunner;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.aggregation.functions.count.EdgeCount;
@@ -29,7 +29,6 @@ import org.gradoop.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * The benchmark program executes the following workflow:
@@ -44,20 +43,8 @@ import org.gradoop.util.GradoopFlinkConfig;
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
  */
-public class SNABenchmark1 implements ProgramDescription {
-
-  /**
-   * File containing EPGM vertices.
-   */
-  public static final String VERTICES_JSON = "nodes.json";
-  /**
-   * File containing EPGM edges.
-   */
-  public static final String EDGES_JSON = "edges.json";
-  /**
-   * File containing EPGM graph heads.
-   */
-  public static final String GRAPHS_JSON = "graphs.json";
+public class SNABenchmark1 extends AbstractRunner
+  implements ProgramDescription {
 
   /**
    * Runs the example program.
@@ -82,27 +69,13 @@ public class SNABenchmark1 implements ProgramDescription {
     String inputDir  = args[0];
     String outputDir = args[1];
 
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> gradoopConf =
-      GradoopFlinkConfig.createDefaultConfig(env);
-
     EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
-      EPGMDatabase.fromJsonFile(
-        inputDir + VERTICES_JSON,
-        inputDir + EDGES_JSON,
-        inputDir + GRAPHS_JSON,
-        gradoopConf
-      );
+      readEPGMDatabase(inputDir);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
       execute(epgmDatabase.getDatabaseGraph());
 
-    result.writeAsJson(
-      outputDir + VERTICES_JSON,
-      outputDir + EDGES_JSON,
-      outputDir + GRAPHS_JSON
-    );
+    writeLogicalGraph(result, outputDir);
   }
 
   /**

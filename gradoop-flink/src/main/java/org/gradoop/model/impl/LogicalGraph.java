@@ -44,8 +44,7 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.model.impl.operators.tostring.functions
-  .GraphHeadToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.VertexToIdString;
@@ -171,13 +170,35 @@ public class LogicalGraph
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param <G>         EPGM graph head graph head type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
+   * @param vertices  Vertex dataset
+   * @param config    Gradoop Flink configuration
+   * @param <G>       EPGM graph head graph head type
+   * @param <V>       EPGM vertex type
+   * @param <E>       EPGM edge type
+   * @return Logical graph
+   */
+  public static <
+    G extends EPGMGraphHead,
+    V extends EPGMVertex,
+    E extends EPGMEdge> LogicalGraph<G, V, E> fromDataSets(
+    DataSet<V> vertices, GradoopFlinkConfig<G, V, E> config) {
+    return fromDataSets(vertices,
+      createEdgeDataSet(Lists.<E>newArrayListWithCapacity(0), config), config);
+  }
+
+  /**
+   * Creates a logical graph from the given arguments.
+   *
+   * The method assumes that the given vertices and edges are already assigned
+   * to the given graph head.
+   *
    * @param graphHead   1-element GraphHead DataSet
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
+   * @param <G>         EPGM graph head graph head type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
    * @return Logical graph
    */
   public static <
@@ -195,12 +216,12 @@ public class LogicalGraph
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
    *
-   * @param <G>         EPGM graph head graph head type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
+   * @param <G>         EPGM graph head graph head type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
    * @return Logical graph
    */
   public static <
@@ -258,6 +279,10 @@ public class LogicalGraph
       graphHeads = Lists.newArrayListWithCapacity(0);
     } else {
       graphHeads = Lists.newArrayList(graphHead);
+    }
+
+    if (edges == null) {
+      edges = Lists.newArrayListWithCapacity(0);
     }
 
     checkNotNull(vertices, "Vertex collection was null");
