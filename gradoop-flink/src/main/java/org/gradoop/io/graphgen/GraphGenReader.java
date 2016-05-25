@@ -19,10 +19,8 @@ public class GraphGenReader {
   /**
    * Creates a reader to get Collections from GraphGen files
    *
-   * @param content GraphGen file content
    */
-  protected GraphGenReader(String content) {
-    this.content = content;
+  protected GraphGenReader() {
     graphCollection = new HashSet<>();
 
   }
@@ -33,9 +31,12 @@ public class GraphGenReader {
    *
    * @return Collection of graphs as tuples
    */
-  protected Collection<Tuple3<Long, Collection<Tuple2<Integer, String>>,
+  public Collection<Tuple3<Long, Collection<Tuple2<Integer, String>>,
     Collection<Tuple3<Integer, Integer, String>>>> getGraphCollection() {
 
+    if (content.isEmpty()) {
+      return null;
+    }
     if (!graphCollection.isEmpty()) {
       return graphCollection;
     }
@@ -44,7 +45,8 @@ public class GraphGenReader {
     Collection<Tuple3< Integer, Integer, String>> edges = new HashSet<>();
 
     //remove first tag so that split does not have empty first element
-    String[] contentArray = content.replaceFirst("t # ", "").split("t # ");
+    String[] contentArray = content.trim().replaceFirst("t # ", "").split("t " +
+      "# ");
 
     for (int i = 0; i < contentArray.length; i++) {
       vertices.addAll(this.getVertices(contentArray[i]));
@@ -57,7 +59,6 @@ public class GraphGenReader {
       vertices = new HashSet<>();
       edges = new HashSet<>();
     }
-    System.out.println(graphCollection.toString());
     return graphCollection;
   }
 
@@ -96,8 +97,7 @@ public class GraphGenReader {
       HashSet<>();
     String[] edge = new String[4];
 
-    //-1 because last character is \n
-    content = content.substring(content.indexOf("e"), content.length()-1);
+    content = content.substring(content.indexOf("e"), content.length());
     String[] edges = content.split("\n");
 
     for (int i = 0; i < edges.length; i++) {
@@ -112,6 +112,7 @@ public class GraphGenReader {
     return Long.parseLong(content.substring(0,1));
   }
 
-
-
+  public void setContent(String content) {
+    this.content = content;
+  }
 }
