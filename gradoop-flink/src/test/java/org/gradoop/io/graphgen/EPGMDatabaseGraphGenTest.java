@@ -1,27 +1,10 @@
-/*
- * This file is part of Gradoop.
- *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.gradoop.io.graphgen;
 
 import com.google.common.collect.Lists;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.io.json.EPGMDatabaseJSONTest;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
@@ -40,13 +23,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class EPGMDatabaseGraphGenTest  extends GradoopFlinkTestBase {
 
-  /**
-   * Test method for
-   * {@link GraphGenStringToCollection#getGraphCollection() getGraphCollection}
-   */
   @Test
   public void testGetGraphCollection() {
-    Collection<Tuple3<Long, Collection<Tuple2<Integer, String>>,
+    Collection<Tuple3<
+      Long,
+      Collection<Tuple2<Integer, String>>,
       Collection<Tuple3<Integer, Integer, String>>>> graphCollection = new
       HashSet<>();
     Collection<Tuple2<Integer, String>> vertices = new HashSet<>();
@@ -83,40 +64,37 @@ public class EPGMDatabaseGraphGenTest  extends GradoopFlinkTestBase {
       "v 4 44\n" +
       "e 2 3 23\n" +
       "e 4 3 43\n";
-    GraphGenStringToCollection graphGenStringToCollection = new
-      GraphGenStringToCollection();
-    graphGenStringToCollection.setContent(testGraphs);
+    GraphGenReader graphGenReader = new GraphGenReader();
+    graphGenReader.setContent(testGraphs);
 
-    assertEquals("test", graphGenStringToCollection.getGraphCollection(),
-      graphCollection);
+    assertEquals("test", graphGenReader.getGraphCollection(), graphCollection);
+
   }
 
-  /**
-   * Test method for
-   * {@link org.gradoop.model.impl.EPGMDatabase#fromGraphGenFile(String, ExecutionEnvironment) fromgraphGenFile}
-   * @throws Exception
-   */
+
   @Test
   public void testFromGraphGenFile() throws Exception {
     String graphGenFile =
       EPGMDatabaseGraphGenTest.class.getResource("/data/graphgen/io_test.gg")
         .getFile();
 
-    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> graphStore =
-      EPGMDatabase.fromGraphGenFile(graphGenFile, getExecutionEnvironment());
+    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
+      graphStore = EPGMDatabase.fromGraphGenFile(graphGenFile,
+      getExecutionEnvironment());
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> databaseGraph =
-      graphStore.getDatabaseGraph();
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
+      databaseGraph = graphStore.getDatabaseGraph();
 
     Collection<GraphHeadPojo> graphHeads = Lists.newArrayList();
     Collection<VertexPojo> vertices = Lists.newArrayList();
     Collection<EdgePojo> edges = Lists.newArrayList();
 
-    graphStore.getCollection().getGraphHeads().output(new
-      LocalCollectionOutputFormat<>(graphHeads));
-    databaseGraph.getVertices().output(new LocalCollectionOutputFormat<>
-      (vertices));
-    databaseGraph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
+    graphStore.getCollection().getGraphHeads()
+      .output(new LocalCollectionOutputFormat<>(graphHeads));
+    databaseGraph.getVertices()
+      .output(new LocalCollectionOutputFormat<>(vertices));
+    databaseGraph.getEdges()
+      .output(new LocalCollectionOutputFormat<>(edges));
 
     getExecutionEnvironment().execute();
 
