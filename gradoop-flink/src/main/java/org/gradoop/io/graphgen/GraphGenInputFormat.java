@@ -1,8 +1,8 @@
 package org.gradoop.io.graphgen;
 
 import java.io.IOException;
-import com.google.common.base.Charsets;
 import com.google.common.io.Closeables;
+import org.apache.commons.io.Charsets;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -25,15 +25,15 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
  * Created by stephan on 18.05.16.
  */
 public class GraphGenInputFormat extends TextInputFormat{
-  public static final byte[] START_TAG_BYTE = "t".getBytes(Charsets.UTF_8);;
-  public static final byte[] END_TAG_BYTE = "t".getBytes(Charsets.UTF_8);;
+  public static final byte[] START_TAG_BYTE = "t".getBytes(Charsets.UTF_8);
+  public static final byte[] END_TAG_BYTE = "t".getBytes(Charsets.UTF_8);
 
   @Override
   public RecordReader<LongWritable, Text> createRecordReader(InputSplit split, TaskAttemptContext context) {
     try {
       return new GenGraphRecordReader((FileSplit) split, context.getConfiguration());
     } catch (IOException ioe) {
-      System.err.println("Error while creating GraphGenRecordReader: " +  ioe);
+      System.err.println("Error while creating GraphGenRecordReader: " + ioe);
       return null;
     }
   }
@@ -53,6 +53,7 @@ public class GraphGenInputFormat extends TextInputFormat{
     private final DataOutputBuffer buffer = new DataOutputBuffer();
     private LongWritable currentKey;
     private Text currentValue;
+    private int valueLength = 0;
 
     public GenGraphRecordReader(FileSplit split, Configuration conf) throws IOException {
       // open the file and seek to the start of the split
@@ -70,8 +71,18 @@ public class GraphGenInputFormat extends TextInputFormat{
           buffer.write(START_TAG_BYTE);
           if (readUntilMatch(END_TAG_BYTE, true)) {
             key.set(fsin.getPos());
-            //vermutung hier minus endtagbyte
-            value.set(buffer.getData(), 0, buffer.getLength());
+            if (fsin.getPos() != end) {
+              //- end tag because it is the new start tag and shall not be added
+              valueLength = buffer.getLength() - END_TAG_BYTE.length;
+            } else {
+              // in this case there is no new start tag
+              valueLength = buffer.getLength();
+            }
+            //- end tag because it is the new start tag and shall not be added
+            value.set(buffer.getData(), 0, valueLength);
+            //set the buffer to position before end tag of old graph which is
+            // start tag of the new one
+            fsin.seek(fsin.getPos() - END_TAG_BYTE.length);
             return true;
           }
         } finally {
@@ -97,7 +108,7 @@ public class GraphGenInputFormat extends TextInputFormat{
         int b = fsin.read();
         // end of file:
         if (b == -1) {
-          return false;
+          return true;
         }
         // save to buffer:
         if (withinBlock) {
