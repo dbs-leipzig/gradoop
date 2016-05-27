@@ -15,25 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.matching.isomorphism.query;
-
-import java.util.List;
-
 /**
- * Interface representing a step by step traversal over a graph.
+ * Contains functionality used by all pattern matching implementations.
  */
-public interface Traversal {
-
-  /**
-   * Return a list containing each step of the traversal.
-   * @return traversal steps
-   */
-  List<Step> getSteps();
-
-  /**
-   * Return the i-th step of the traversal.
-   * @param i number of step to be returned
-   * @return Step at the i-th position
-   */
-  Step getStep(int i);
-}
+package org.gradoop.model.impl.operators.matching.isomorphism.query;

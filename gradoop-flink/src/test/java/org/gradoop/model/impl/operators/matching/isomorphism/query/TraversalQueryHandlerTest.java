@@ -1,10 +1,10 @@
 package org.gradoop.model.impl.operators.matching.isomorphism.query;
 
 import org.junit.Test;
-import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.GDLHandler.Builder;
 
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class TraversalQueryHandlerTest {
 
@@ -17,6 +17,12 @@ public class TraversalQueryHandlerTest {
     "(v2)-[e3:a]->(v1)" +
     "(v3)-[e4:c]->(v3)";
 
+  static final String EXPECTED_STEPS = "" +
+    "1 2 0 false" +
+    "1 1 2 true" +
+    "2 3 2 true" +
+    "0 0 1 true";
+
   static TraversalQueryHandler TRAVERSAL_QUERY_HANDLER =
     TraversalQueryHandler.fromString(TEST_QUERY);
 
@@ -24,8 +30,10 @@ public class TraversalQueryHandlerTest {
   public void testDFSTraversal() {
     Traversal traversal = TRAVERSAL_QUERY_HANDLER.getTraversal();
     List<Step> steps = traversal.getSteps();
+    String result = "";
     for(Step step : steps) {
-      System.out.println(step.toString());
+      result += step.toString();
     }
+    assertEquals(result, EXPECTED_STEPS);
   }
 }

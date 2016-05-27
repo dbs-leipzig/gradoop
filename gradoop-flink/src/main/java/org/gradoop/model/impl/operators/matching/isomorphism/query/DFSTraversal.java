@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.operators.matching.isomorphism.query;
 
 import org.s1ck.gdl.model.Edge;
@@ -30,10 +47,10 @@ public class DFSTraversal implements Traversal {
     Map<Long, Boolean> vertexVisited = new HashMap<>();
     Map<Long, Boolean> edgeTraversed = new HashMap<>();
     steps = new ArrayList<>();
-    for(Vertex vertex : vertices) {
+    for (Vertex vertex : vertices) {
       vertexIdToEdges.put(vertex.getId(), new ArrayList<Edge>());
     }
-    for(Edge edge : edges){
+    for (Edge edge : edges) {
       vertexIdToEdges.get(edge.getSourceVertexId()).add(edge);
       vertexIdToEdges.get(edge.getTargetVertexId()).add(edge);
     }
@@ -42,26 +59,26 @@ public class DFSTraversal implements Traversal {
     vertexVisited.put(currentVertexId, true);
     Stack<Edge> edgeStack = new Stack<>();
     edgeStack.addAll(vertexIdToEdges.get(currentVertexId));
-    while(edgeStack.size() > 0) {
+    while (edgeStack.size() > 0) {
       Edge edge = edgeStack.pop();
-      if(!edgeTraversed.containsKey(edge.getId())){
+      if (!edgeTraversed.containsKey(edge.getId())) {
         Long sourceId = edge.getSourceVertexId();
         Long targetId = edge.getTargetVertexId();
         Boolean sourceVisited = vertexVisited.containsKey(sourceId);
         Boolean targetVisited = vertexVisited.containsKey(targetId);
-        if(sourceVisited && !targetVisited) {
+        if (sourceVisited && !targetVisited) {
           currentVertexId = targetId;
-          steps.add(new Step(sourceId, edge.getId(), targetId, true ));
+          steps.add(new Step(sourceId, edge.getId(), targetId, true));
           edgeStack.addAll(vertexIdToEdges.get(currentVertexId));
           vertexVisited.put(currentVertexId, true);
         }
-        if(!sourceVisited && targetVisited) {
+        if (!sourceVisited && targetVisited) {
           currentVertexId = sourceId;
-          steps.add(new Step(sourceId, edge.getId(), targetId, false ));
+          steps.add(new Step(sourceId, edge.getId(), targetId, false));
           edgeStack.addAll(vertexIdToEdges.get(currentVertexId));
           vertexVisited.put(currentVertexId, true);
         }
-        if(sourceVisited && targetVisited) {
+        if (sourceVisited && targetVisited) {
           steps.add(new Step(sourceId, edge.getId(), targetId, true));
         }
         vertexVisited.put(currentVertexId, true);
