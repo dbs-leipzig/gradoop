@@ -81,7 +81,7 @@ public class QueryHandler {
    *
    * @param gdlString GDL query string
    */
-  private QueryHandler(String gdlString) {
+  public QueryHandler(String gdlString) {
     gdlHandler = new GDLHandler.Builder().buildFromString(gdlString);
   }
 
