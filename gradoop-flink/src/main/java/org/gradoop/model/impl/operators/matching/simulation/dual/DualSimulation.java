@@ -33,7 +33,7 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.PairElementWithPropertyValue;
 import org.gradoop.model.impl.functions.epgm.VertexFromId;
-import org.gradoop.model.impl.functions.join.RightSide;
+import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;

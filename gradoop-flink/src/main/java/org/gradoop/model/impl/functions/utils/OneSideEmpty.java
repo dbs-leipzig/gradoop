@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.impl.functions.join;
+package org.gradoop.model.impl.functions.utils;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 

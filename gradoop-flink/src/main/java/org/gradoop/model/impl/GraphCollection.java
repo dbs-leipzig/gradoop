@@ -19,7 +19,10 @@ package org.gradoop.model.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -29,10 +32,19 @@ import org.gradoop.model.api.operators.GraphCollectionOperators;
 import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.model.impl.functions.utils.First;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
 import org.gradoop.model.impl.functions.epgm.BySameId;
+import org.gradoop.model.impl.functions.epgm.GraphElementExpander;
+import org.gradoop.model.impl.functions.epgm.GraphElementSet;
+import org.gradoop.model.impl.functions.epgm.GraphTransactionTriple;
+import org.gradoop.model.impl.functions.epgm.GraphVerticesEdges;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.epgm.TransactionEdges;
+import org.gradoop.model.impl.functions.epgm.TransactionGraphHead;
+import org.gradoop.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.id.GradoopId;
@@ -53,11 +65,13 @@ import org.gradoop.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.model.impl.operators.selection.Selection;
 import org.gradoop.model.impl.operators.limit.Limit;
 import org.gradoop.model.impl.operators.union.Union;
+import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import static org.apache.flink.shaded.com.google.common.base.Preconditions.checkNotNull;
 
@@ -457,5 +471,95 @@ public class GraphCollection
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
+  }
+
+  /**
+   * Creates a graph collection from a graph transaction dataset.
+   * Overlapping vertices and edge are merged by Id comparison only.
+   *
+   * @param transactions  transaction dataset
+   * @param config        Gradoop config
+   * @param <G>           EPGM graph head type
+   * @param <V>           EPGM vertex type
+   * @param <E>           EPGM edge type
+   * @return graph collection
+   */
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E> fromTransactions(
+    DataSet<GraphTransaction<G, V, E>> transactions,
+    GradoopFlinkConfig<G, V, E> config) {
+
+    GroupReduceFunction<V, V> vertexReducer = new First<>();
+    GroupReduceFunction<E, E> edgeReducer = new First<>();
+
+    return fromTransactions(transactions, vertexReducer, edgeReducer, config);
+  }
+
+  /**
+   * Creates a graph collection from a graph transaction dataset.
+   * Overlapping vertices and edge are merged using provided reduce functions.
+   *
+   * @param transactions        transaction dataset
+   * @param vertexMergeReducer  vertex merge function
+   * @param edgeMergeReducer    edge merge function
+   * @param config              Gradoop config
+   * @param <G>                 EPGM graph head type
+   * @param <V>                 EPGM vertex type
+   * @param <E>                 EPGM edge type
+   * @return graph collection
+   */
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E> fromTransactions(
+    DataSet<GraphTransaction<G, V, E>> transactions,
+    GroupReduceFunction<V, V> vertexMergeReducer,
+    GroupReduceFunction<E, E> edgeMergeReducer,
+    GradoopFlinkConfig<G, V, E> config) {
+
+    DataSet<Tuple3<G, Set<V>, Set<E>>> triples = transactions
+      .map(new GraphTransactionTriple<G, V, E>());
+
+    DataSet<G> graphHeads =
+      triples.map(new TransactionGraphHead<G, V, E>());
+
+    DataSet<V> vertices = triples
+      .flatMap(new TransactionVertices<G, V, E>())
+      .returns(config.getVertexFactory().getType())
+      .groupBy(new Id<V>())
+      .reduceGroup(vertexMergeReducer);
+
+    DataSet<E> edges = triples
+      .flatMap(new TransactionEdges<G, V, E>())
+      .returns(config.getEdgeFactory().getType())
+      .groupBy(new Id<E>())
+      .reduceGroup(edgeMergeReducer);
+
+    return fromDataSets(graphHeads, vertices, edges, config);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<GraphTransaction<G, V, E>> toTransactions() {
+
+    DataSet<Tuple2<GradoopId, Set<V>>> graphVertices = getVertices()
+      .flatMap(new GraphElementExpander<V>())
+      .groupBy(0)
+      .reduceGroup(new GraphElementSet<V>());
+
+    DataSet<Tuple2<GradoopId, Set<E>>> graphEdges = getEdges()
+      .flatMap(new GraphElementExpander<E>())
+      .groupBy(0)
+      .reduceGroup(new GraphElementSet<E>());
+
+    return graphVertices
+      .join(graphEdges)
+      .where(0).equalTo(0)
+      .with(new GraphVerticesEdges<V, E>())
+      .join(getGraphHeads())
+      .where(0).equalTo(new Id<G>())
+      .with(new GraphTransactionTriple<G, V, E>());
   }
 }

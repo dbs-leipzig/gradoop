@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains join function implementations that are globally used.
+ * Contains EPGM tuple representations.
  */
-package org.gradoop.model.impl.functions.join;
+package org.gradoop.model.impl.tuples;

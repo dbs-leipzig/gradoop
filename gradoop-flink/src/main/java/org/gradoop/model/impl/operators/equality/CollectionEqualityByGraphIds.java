@@ -26,7 +26,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.join.OneSideEmpty;
+import org.gradoop.model.impl.functions.utils.OneSideEmpty;
 import org.gradoop.model.impl.functions.tuple.ValueInTuple1;
 import org.gradoop.model.impl.id.GradoopId;
 

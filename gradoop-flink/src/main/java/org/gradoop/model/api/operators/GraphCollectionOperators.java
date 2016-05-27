@@ -25,6 +25,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.Order;
 import org.gradoop.model.impl.GraphCollection;
 
@@ -274,4 +275,10 @@ public interface GraphCollectionOperators
    * @see org.gradoop.model.impl.operators.combination.Combination
    */
   LogicalGraph<G, V, E> reduce(ReducibleBinaryGraphToGraphOperator<G, V, E> op);
+
+  /**
+   * Transforms a graph collection into a set of graph transactions.
+   * @return graph transactions representing the graph collection
+   */
+  DataSet<GraphTransaction<G, V, E>> toTransactions();
 }

@@ -27,8 +27,8 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.epgm.TargetId;
-import org.gradoop.model.impl.functions.join.LeftSide;
-import org.gradoop.model.impl.functions.join.RightSide;
+import org.gradoop.model.impl.functions.utils.LeftSide;
+import org.gradoop.model.impl.functions.utils.RightSide;
 
 /**
  * Extracts a subgraph from a logical graph using the given filter functions.
