@@ -43,7 +43,7 @@ import org.gradoop.model.impl.functions.epgm.ExpandGradoopIds;
 import org.gradoop.model.impl.functions.epgm.ToGellyEdgeWithNullValue;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.SourceId;
-import org.gradoop.model.impl.functions.join.LeftSide;
+import org.gradoop.model.impl.functions.utils.LeftSide;
 import org.gradoop.model.impl.functions.tuple.SwitchPair;
 import org.gradoop.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.model.impl.id.GradoopId;

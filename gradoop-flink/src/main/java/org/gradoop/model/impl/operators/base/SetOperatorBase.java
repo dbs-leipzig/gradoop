@@ -26,7 +26,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.join.LeftSide;
+import org.gradoop.model.impl.functions.utils.LeftSide;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.epgm.TargetId;
 import org.gradoop.model.impl.id.GradoopId;

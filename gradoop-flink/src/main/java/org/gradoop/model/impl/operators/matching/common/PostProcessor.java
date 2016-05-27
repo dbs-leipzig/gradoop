@@ -27,7 +27,7 @@ import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.functions.epgm.EdgeFromIds;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.VertexFromId;
-import org.gradoop.model.impl.functions.join.RightSide;
+import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.simulation.dual.functions.EdgeTriple;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.FatVertex;

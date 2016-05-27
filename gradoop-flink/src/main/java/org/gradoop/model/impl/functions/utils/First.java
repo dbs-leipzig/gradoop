@@ -15,22 +15,20 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.functions.join;
+package org.gradoop.model.impl.functions.utils;
 
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.util.Collector;
 
 /**
- * left, right => left
- *
- * @param <L> left type
- * @param <R> right type
+ * t1,t2,..,tn => t1
+ * @param <T> data type
  */
-@FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSide<L, R> implements JoinFunction<L, R, L> {
+public class First<T> implements GroupReduceFunction<T, T> {
 
   @Override
-  public L join(L left, R right) throws Exception {
-    return left;
+  public void reduce(Iterable<T> iterable, Collector<T> collector) throws
+    Exception {
+    collector.collect(iterable.iterator().next());
   }
 }
