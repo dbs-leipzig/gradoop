@@ -128,7 +128,7 @@ public class DualSimulation
     Preconditions.checkState(!Strings.isNullOrEmpty(query),
       "Query must not be null or empty");
     this.query            = query;
-    this.queryHandler     = QueryHandler.fromString(query);
+    this.queryHandler     = new QueryHandler(query);
     this.attachData       = attachData;
     this.useBulkIteration = useBulkIteration;
   }

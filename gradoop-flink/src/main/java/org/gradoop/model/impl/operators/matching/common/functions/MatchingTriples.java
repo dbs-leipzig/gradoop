@@ -81,7 +81,7 @@ public class MatchingTriples extends RichFlatJoinFunction<
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    queryHandler = QueryHandler.fromString(query);
+    queryHandler = new QueryHandler(query);
   }
 
   @Override

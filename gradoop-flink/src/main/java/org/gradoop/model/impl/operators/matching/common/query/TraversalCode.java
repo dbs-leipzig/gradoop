@@ -15,25 +15,54 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.matching.isomorphism.query;
+package org.gradoop.model.impl.operators.matching.common.query;
+
+import com.google.common.collect.Lists;
 
 import java.util.List;
 
 /**
- * Interface representing a step by step traversal over a graph.
+ * A traversal code represents a traversal through a query graph.
  */
-public interface Traversal {
+public class TraversalCode {
+
+  /**
+   * Steps represent the traversal code.
+   */
+  private final List<Step> steps;
+
+  /**
+   * Initialize a new traversal code
+   */
+  TraversalCode() {
+    this.steps = Lists.newArrayList();
+  }
+
+  /**
+   * Add a step to the traversal code.
+   *
+   * @param step new step
+   */
+  void add(Step step) {
+    steps.add(step);
+  }
 
   /**
    * Return a list containing each step of the traversal.
+   *
    * @return traversal steps
    */
-  List<Step> getSteps();
+  public List<Step> getSteps() {
+    return steps;
+  }
 
   /**
-   * Return the i-th step of the traversal.
+   * Return the i-th step of the traversal code.
+   *
    * @param i number of step to be returned
    * @return Step at the i-th position
    */
-  Step getStep(int i);
+  public Step getStep(int i) {
+    return steps.get(i);
+  }
 }

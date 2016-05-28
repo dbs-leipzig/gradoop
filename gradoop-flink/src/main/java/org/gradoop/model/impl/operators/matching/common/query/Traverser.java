@@ -15,7 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.model.impl.operators.matching.common.query;
+
 /**
- * Contains functionality used by all pattern matching implementations.
+ * Used to traverse a query graph.
  */
-package org.gradoop.model.impl.operators.matching.isomorphism.query;
+interface Traverser {
+
+  /**
+   * Traverse the graph.
+   *
+   * @return traversal code
+   */
+  TraversalCode traverse();
+
+}

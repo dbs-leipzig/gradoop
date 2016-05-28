@@ -69,7 +69,7 @@ public class BuildFatVertex
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    this.qHandler = QueryHandler.fromString(query);
+    this.qHandler = new QueryHandler(query);
   }
 
   @Override
