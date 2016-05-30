@@ -40,13 +40,14 @@ public class GraphGenInputFormat extends TextInputFormat {
   /**
    * The byte representation of the start tag which is 't'.
    */
-  public static final byte[] START_TAG_BYTE = "t".getBytes(Charsets.UTF_8);
+  private static final byte[] START_TAG_BYTE = "t".getBytes(Charsets
+    .UTF_8);
 
   /**
    * The byte representation of the end tag which is 't', in this case 't' is
    * not only the end tag but also the start tag of the next graph.
    */
-  public static final byte[] END_TAG_BYTE = "t".getBytes(Charsets.UTF_8);
+  private static final byte[] END_TAG_BYTE = "t".getBytes(Charsets.UTF_8);
 
   /**
    * Returns the actual file reader which handles the file split.
