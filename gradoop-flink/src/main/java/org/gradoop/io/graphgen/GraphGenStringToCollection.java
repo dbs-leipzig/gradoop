@@ -42,8 +42,9 @@ public class GraphGenStringToCollection {
   /**
    * Constructor which initiates a new collection for 3-tuples
    */
-  public GraphGenStringToCollection() {
+  protected GraphGenStringToCollection() {
     graphCollection = new HashSet<>();
+
   }
 
   /**
