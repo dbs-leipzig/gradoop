@@ -29,6 +29,9 @@ public class TestData {
   public static final String CYCLE_PATTERN_4 =
     "(a0:A)-[:a]->(b0:B)-[:a]->(a1:A)-[:a]->(b1:B)-[:a]->(a0)";
 
+  public static final String CYCLE_PATTERN_5 =
+    "(v0:B)-[:a]->(v1:C)<-[:b]-(v0)";
+
   public static final String TREE_PATTERN_0 =
     "(:B)-[:b]->(:C)<-[:a]-(:A)";
 

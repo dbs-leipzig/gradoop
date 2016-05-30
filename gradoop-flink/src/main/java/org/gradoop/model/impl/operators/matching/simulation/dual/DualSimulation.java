@@ -28,7 +28,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.epgm.PairElementWithPropertyValue;
 import org.gradoop.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;

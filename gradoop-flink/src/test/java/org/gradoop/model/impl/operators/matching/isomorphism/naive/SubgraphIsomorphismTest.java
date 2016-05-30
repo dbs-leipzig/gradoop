@@ -35,4 +35,31 @@ public class SubgraphIsomorphismTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(op.execute(db).equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("expected1")));
   }
+
+  @Test
+  public void testGraph2CyclePattern5() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(TestData.GRAPH_2);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> db =
+      loader.getLogicalGraphByVariable("db");
+
+    // pattern
+    String query = TestData.CYCLE_PATTERN_5;
+
+    loader.appendToDatabaseFromString("" +
+      "expected1[" +
+      "(v0)-[e1]->(v4)<-[e2]-(v0)" +
+      "]" +
+      "expected2[" +
+      "(v5)-[e9]->(v4)<-[e10]-(v5)" +
+      "]");
+
+    SubgraphIsomorphism<GraphHeadPojo, VertexPojo, EdgePojo> op =
+      new SubgraphIsomorphism<>(query, false);
+
+    // execute and validate
+    collectAndAssertTrue(op.execute(db).equalsByGraphElementIds(
+      loader.getGraphCollectionByVariables("expected1", "expected2")));
+  }
 }

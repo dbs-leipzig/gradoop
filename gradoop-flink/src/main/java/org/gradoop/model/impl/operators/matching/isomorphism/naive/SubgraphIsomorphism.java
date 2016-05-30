@@ -1,10 +1,8 @@
 package org.gradoop.model.impl.operators.matching.isomorphism.naive;
 
-import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMElement;
@@ -13,15 +11,12 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.epgm.MergedGraphIds;
 import org.gradoop.model.impl.operators.matching.PatternMatchingBase;
+import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.model.impl.operators.matching.common.functions.ElementHasCandidate;
-
-import org.gradoop.model.impl.operators.matching.common.functions
-  .ElementsFromEmbedding;
+import org.gradoop.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalQueryHandler;
 import org.gradoop.model.impl.operators.matching.common.query.Traverser;
@@ -31,7 +26,6 @@ import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandida
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintEdgeStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintEmbeddingWithWeldPoint;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintVertexStep;
-
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.*;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EdgeStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EmbeddingWithTiePoint;
@@ -201,34 +195,8 @@ public class SubgraphIsomorphism
         graph.getConfig().getVertexFactory(),
         graph.getConfig().getEdgeFactory()));
 
-    Class<G> graphHeadType = graph.getConfig().getGraphHeadFactory().getType();
-    DataSet<G> graphHeads = epgmElements
-      .filter(new IsInstance<EPGMElement, G>(graphHeadType))
-      .map(new Cast<EPGMElement, G>(graphHeadType))
-      .returns(TypeExtractor.createTypeInfo(graphHeadType));
-
-    Class<V> vertexType = graph.getConfig().getVertexFactory().getType();
-    DataSet<V> newVertices = epgmElements
-      .filter(new IsInstance<EPGMElement, V>(vertexType))
-      .map(new Cast<EPGMElement, V>(vertexType))
-      .returns(TypeExtractor.createTypeInfo(vertexType))
-      .groupBy(new Id<V>())
-      .combineGroup(new MergedGraphIds<V>())
-      .groupBy(new Id<V>())
-      .reduceGroup(new MergedGraphIds<V>());
-
-    Class<E> edgeType = graph.getConfig().getEdgeFactory().getType();
-    DataSet<E> newEdges = epgmElements
-      .filter(new IsInstance<EPGMElement, E>(edgeType))
-      .map(new Cast<EPGMElement, E>(edgeType))
-      .returns(TypeExtractor.createTypeInfo(edgeType))
-      .groupBy(new Id<E>())
-      .combineGroup(new MergedGraphIds<E>())
-      .groupBy(new Id<E>())
-      .reduceGroup(new MergedGraphIds<E>());
-
-    return GraphCollection.fromDataSets(
-      graphHeads, newVertices, newEdges, graph.getConfig());
+    return PostProcessor.extractGraphCollection(
+      epgmElements, graph.getConfig(), true);
   }
 
   @Override
