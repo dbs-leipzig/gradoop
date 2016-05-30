@@ -17,8 +17,11 @@
 
 package org.gradoop.io.graphgen;
 
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.io.graphgen.tuples.GraphGenEdge;
+import org.gradoop.io.graphgen.tuples.GraphGenGraph;
+import org.gradoop.io.graphgen.tuples.GraphGenGraphHead;
+import org.gradoop.io.graphgen.tuples.GraphGenVertex;
+
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -31,8 +34,7 @@ public class GraphGenStringToCollection {
   /**
    * The 3-tuple collection containing the graph head, the vertices and edges
    */
-  protected Collection<Tuple3<Long, Collection<Tuple2<Integer, String>>,
-    Collection<Tuple3<Integer, Integer, String>>>> graphCollection;
+  protected Collection<GraphGenGraph> graphCollection;
 
   /**
    * GraphGen string representation of the graph
@@ -52,8 +54,7 @@ public class GraphGenStringToCollection {
    *
    * @return Collection of graphs as tuples
    */
-  public Collection<Tuple3<Long, Collection<Tuple2<Integer, String>>,
-    Collection<Tuple3<Integer, Integer, String>>>> getGraphCollection() {
+  public Collection<GraphGenGraph> getGraphCollection() {
 
     if (content.isEmpty()) {
       return null;
@@ -61,9 +62,9 @@ public class GraphGenStringToCollection {
     if (!graphCollection.isEmpty()) {
       return graphCollection;
     }
-    Long graphHead;
-    Collection<Tuple2<Integer, String>> vertices = new HashSet<>();
-    Collection<Tuple3<Integer, Integer, String>> edges = new HashSet<>();
+    GraphGenGraphHead graphHead;
+    Collection<GraphGenVertex> vertices = new HashSet<>();
+    Collection<GraphGenEdge> edges = new HashSet<>();
 
     //remove first tag so that split does not have empty first element
     String[] contentArray = content.trim().replaceFirst("t # ", "").split("t " +
@@ -74,8 +75,7 @@ public class GraphGenStringToCollection {
       edges.addAll(this.getEdges(contentArray[i]));
       graphHead = this.getGraphHead(contentArray[i]);
 
-      graphCollection.add(new Tuple3<Long, Collection<Tuple2<Integer, String>>,
-        Collection<Tuple3<Integer, Integer, String>>>(graphHead, vertices,
+      graphCollection.add(new GraphGenGraph(graphHead, vertices,
         edges));
 
       vertices = new HashSet<>();
@@ -90,8 +90,8 @@ public class GraphGenStringToCollection {
    * @param content the GraphGen graph segment
    * @return collection of vertices as tuples
    */
-  protected Collection<Tuple2<Integer, String>> getVertices(String content) {
-    Collection<Tuple2<Integer, String>> vertexCollection = new HashSet<>();
+  protected Collection<GraphGenVertex> getVertices(String content) {
+    Collection<GraphGenVertex> vertexCollection = new HashSet<>();
     String[] vertex;
     //-1 cause before e is \n
     content = content.substring(content.indexOf("v"), content.indexOf("e") - 1);
@@ -99,7 +99,7 @@ public class GraphGenStringToCollection {
 
     for (int i = 0; i < vertices.length; i++) {
       vertex = vertices[i].split(" ");
-      vertexCollection.add(new Tuple2<Integer, String>(Integer.parseInt(
+      vertexCollection.add(new GraphGenVertex(Integer.parseInt(
         vertex[1].trim()), vertex[2].trim()));
     }
     return vertexCollection;
@@ -111,10 +111,10 @@ public class GraphGenStringToCollection {
    * @param content the GraphGen graph segment
    * @return collection of edges as tuples
    */
-  protected Collection<Tuple3<Integer, Integer, String>> getEdges(String
+  protected Collection<GraphGenEdge> getEdges(String
     content) {
 
-    Collection<Tuple3<Integer, Integer, String>> edgeCollection = new
+    Collection<GraphGenEdge> edgeCollection = new
       HashSet<>();
     String[] edge;
 
@@ -123,7 +123,7 @@ public class GraphGenStringToCollection {
 
     for (int i = 0; i < edges.length; i++) {
       edge = edges[i].split(" ");
-      edgeCollection.add(new Tuple3<Integer, Integer, String>(Integer
+      edgeCollection.add(new GraphGenEdge(Integer
         .parseInt(edge[1].trim()), Integer.parseInt(edge[2].trim()), edge[3]));
     }
     return edgeCollection;
@@ -133,8 +133,8 @@ public class GraphGenStringToCollection {
    * @param content containing current graph as string
    * @return returns the graph head defined in content
    */
-  protected Long getGraphHead(String content) {
-    return Long.parseLong(content.substring(0, 1));
+  protected GraphGenGraphHead getGraphHead(String content) {
+    return new GraphGenGraphHead(Long.parseLong(content.substring(0, 1)));
   }
 
   /**

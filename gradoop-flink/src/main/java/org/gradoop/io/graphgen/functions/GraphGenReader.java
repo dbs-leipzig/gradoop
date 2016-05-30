@@ -22,11 +22,13 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.gradoop.io.graphgen.GraphGenStringToCollection;
+import org.gradoop.io.graphgen.tuples.GraphGenEdge;
+import org.gradoop.io.graphgen.tuples.GraphGenGraph;
+import org.gradoop.io.graphgen.tuples.GraphGenVertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMElement;
@@ -108,9 +110,8 @@ public class GraphGenReader {
         GraphGenStringToCollection();
       graphGenStringToCollection.setContent(graphString);
 
-      Collection<Tuple3<Long, Collection<Tuple2<Integer, String>>,
-        Collection<Tuple3<Integer, Integer, String>>>> collection;
-      collection = graphGenStringToCollection.getGraphCollection();
+      Collection<GraphGenGraph> graphCollection;
+      graphCollection = graphGenStringToCollection.getGraphCollection();
 
       GradoopId id;
       String label;
@@ -118,8 +119,7 @@ public class GraphGenReader {
       GradoopIdSet graphs = new GradoopIdSet();
       Map<Integer, GradoopId> integerGradoopIdMapVertices;
 
-      for (Tuple3<Long, Collection<Tuple2<Integer, String>>,
-        Collection<Tuple3<Integer, Integer, String>>> tuple : collection) {
+      for (GraphGenGraph graph : graphCollection) {
         integerGradoopIdMapVertices = new HashedMap();
         graphs.clear();
 
@@ -127,21 +127,17 @@ public class GraphGenReader {
         graphs.add(id);
         collector.collect(this.graphHeadFactory.initGraphHead(id));
 
-        for (Tuple2<Integer, String> tupleVertex :
-          (Collection<Tuple2<Integer, String>>) tuple.getField(1)) {
+        for (GraphGenVertex vertex : graph.getGraphVertices()) {
           id = GradoopId.get();
-          integerGradoopIdMapVertices.put((Integer) tupleVertex.getField(0),
-            id);
-          label = tupleVertex.getField(1).toString();
-          collector.collect(
-            this.vertexFactory.initVertex(id, label, graphs));
+          integerGradoopIdMapVertices.put(vertex.getId(), id);
+          label = vertex.getLabel();
+          collector.collect(this.vertexFactory.initVertex(id, label, graphs));
         }
 
-        for (Tuple3<Integer, Integer, String> tupleEdge :
-          (Collection<Tuple3<Integer, Integer, String>>) tuple.getField(2)) {
-          id = integerGradoopIdMapVertices.get(tupleEdge.getField(0));
-          targetId = integerGradoopIdMapVertices.get(tupleEdge.getField(1));
-          label = tupleEdge.getField(2).toString();
+        for (GraphGenEdge edge :graph.getGraphEdges()) {
+          id = integerGradoopIdMapVertices.get(edge.getSourceId());
+          targetId = integerGradoopIdMapVertices.get(edge.getTargetId());
+          label = edge.getLabel();
           collector.collect(this.edgeFactory.createEdge(label, id, targetId,
             graphs));
         }

@@ -22,6 +22,10 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.io.graphgen.tuples.GraphGenEdge;
+import org.gradoop.io.graphgen.tuples.GraphGenGraph;
+import org.gradoop.io.graphgen.tuples.GraphGenGraphHead;
+import org.gradoop.io.graphgen.tuples.GraphGenVertex;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
@@ -46,32 +50,32 @@ public class EPGMDatabaseGraphGenTest  extends GradoopFlinkTestBase {
    */
   @Test
   public void testGetGraphCollection() {
-    Collection<Tuple3<Long, Collection<Tuple2<Integer, String>>,
-      Collection<Tuple3<Integer, Integer, String>>>> graphCollection = new
-      HashSet<>();
-    Collection<Tuple2<Integer, String>> vertices = new HashSet<>();
-    Collection<Tuple3<Integer, Integer, String>> edges = new HashSet<>();
+    Collection<GraphGenGraph> graphCollection = new HashSet<>();
+    GraphGenGraphHead graphHead = new GraphGenGraphHead();
+    Collection<GraphGenVertex> vertices = new HashSet<>();
+    Collection<GraphGenEdge> edges = new HashSet<>();
 
     //Graph 0
-    vertices.add(new Tuple2<Integer, String>(0, "00"));
-    vertices.add(new Tuple2<Integer, String>(1, "11"));
-    edges.add(new Tuple3<Integer, Integer, String>(0, 1, "01"));
+    graphHead.setId(0L);
+    vertices.add(new GraphGenVertex(0, "00"));
+    vertices.add(new GraphGenVertex(1, "11"));
+    edges.add(new GraphGenEdge(0, 1, "01"));
 
-    graphCollection.add(new Tuple3<Long, Collection<Tuple2<Integer, String>>,
-      Collection<Tuple3<Integer, Integer, String>>>(0L, vertices, edges));
+    graphCollection.add(new GraphGenGraph(graphHead, vertices, edges));
 
+    graphHead = new GraphGenGraphHead();
     vertices = new HashSet<>();
     edges = new HashSet<>();
 
     //Graph 1
-    vertices.add(new Tuple2<Integer, String>(2, "22"));
-    vertices.add(new Tuple2<Integer, String>(3, "33"));
-    vertices.add(new Tuple2<Integer, String>(4, "44"));
-    edges.add(new Tuple3<Integer, Integer, String>(2, 3, "23"));
-    edges.add(new Tuple3<Integer, Integer, String>(4, 3, "43"));
+    graphHead.setId(1L);
+    vertices.add(new GraphGenVertex(2, "22"));
+    vertices.add(new GraphGenVertex(3, "33"));
+    vertices.add(new GraphGenVertex(4, "44"));
+    edges.add(new GraphGenEdge(2, 3, "23"));
+    edges.add(new GraphGenEdge(4, 3, "43"));
 
-    graphCollection.add(new Tuple3<Long, Collection<Tuple2<Integer, String>>,
-      Collection<Tuple3<Integer, Integer, String>>>(1L, vertices, edges));
+    graphCollection.add(new GraphGenGraph(graphHead, vertices, edges));
 
     String testGraphs = "t # 0\n" +
       "v 0 00\n" +
