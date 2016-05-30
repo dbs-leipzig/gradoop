@@ -17,13 +17,10 @@
 
 package org.gradoop.model.impl.operators.matching.simulation.dual;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -35,6 +32,7 @@ import org.gradoop.model.impl.functions.epgm.PairElementWithPropertyValue;
 import org.gradoop.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.matching.PatternMatchingBase;
 import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
@@ -55,7 +53,6 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.functions.Valid
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.Deletion;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.FatVertex;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.Message;
-import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
@@ -67,6 +64,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  */
 public class DualSimulation
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends PatternMatchingBase<G, V, E>
   implements UnaryGraphToGraphOperator<G, V, E> {
 
   /**
@@ -75,30 +73,9 @@ public class DualSimulation
   private static Logger LOG = Logger.getLogger(DualSimulation.class);
 
   /**
-   * Vertex mapping used for debug
-   */
-  private DataSet<Tuple2<GradoopId, PropertyValue>> vertexMapping;
-
-  /**
-   * Edge mapping used for debug
-   */
-  private DataSet<Tuple2<GradoopId, PropertyValue>> edgeMapping;
-
-  /**
-   * GDL based query string
-   */
-  private final String query;
-
-  /**
    * Query handler
    */
   private final QueryHandler queryHandler;
-
-  /**
-   * If true, the original vertex and edge data gets attached to the resulting
-   * vertices and edges.
-   */
-  private final boolean attachData;
 
   /**
    * If true, the algorithm uses bulk iteration for the core iteration.
@@ -124,12 +101,9 @@ public class DualSimulation
    */
   public DualSimulation(String query, boolean attachData,
     boolean useBulkIteration) {
+    super(query, attachData);
 
-    Preconditions.checkState(!Strings.isNullOrEmpty(query),
-      "Query must not be null or empty");
-    this.query            = query;
     this.queryHandler     = new QueryHandler(query);
-    this.attachData       = attachData;
     this.useBulkIteration = useBulkIteration;
   }
 
@@ -137,10 +111,7 @@ public class DualSimulation
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
 
     if (LOG.isDebugEnabled()) {
-      vertexMapping = graph.getVertices()
-        .map(new PairElementWithPropertyValue<V>("id"));
-      edgeMapping = graph.getEdges()
-        .map(new PairElementWithPropertyValue<E>("id"));
+      initDebugMappings(graph);
     }
 
     LogicalGraph<G, V, E> result;

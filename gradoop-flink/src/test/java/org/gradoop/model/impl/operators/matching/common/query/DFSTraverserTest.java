@@ -2,6 +2,7 @@ package org.gradoop.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.gradoop.model.impl.operators.matching.TestData;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -34,7 +35,7 @@ public class DFSTraverserTest {
       new Step(2L, 3L, 2L, true),
       new Step(2L, 1L, 1L, false),
       new Step(1L, 0L, 0L, false),
-      new Step(0L, 2L, 1L, false)
+      new Step(0L, 2L, 1L, false) 
     )));
   }
 

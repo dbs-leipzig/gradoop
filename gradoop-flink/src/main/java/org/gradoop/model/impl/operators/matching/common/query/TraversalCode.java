@@ -19,12 +19,18 @@ package org.gradoop.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * A traversal code represents a traversal through a query graph.
  */
-public class TraversalCode {
+public class TraversalCode implements Serializable {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
 
   /**
    * Steps represent the traversal code.

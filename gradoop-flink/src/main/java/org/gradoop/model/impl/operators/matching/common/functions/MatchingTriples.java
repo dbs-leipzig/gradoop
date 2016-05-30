@@ -104,7 +104,7 @@ public class MatchingTriples extends RichFlatJoinFunction<
       reuseTriple.setEdgeId(pair.getEdgeId());
       reuseTriple.setSourceId(pair.getSourceId());
       reuseTriple.setTargetId(target.getId());
-      reuseTriple.setEdgeCandidates(newEdgeCandidates);
+      reuseTriple.setCandidates(newEdgeCandidates);
       collector.collect(reuseTriple);
     }
   }

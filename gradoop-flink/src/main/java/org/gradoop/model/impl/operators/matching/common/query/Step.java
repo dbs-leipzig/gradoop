@@ -17,10 +17,17 @@
 
 package org.gradoop.model.impl.operators.matching.common.query;
 
+import java.io.Serializable;
+
 /**
  * Class representing a single step in a {@link TraversalCode}.
  */
-public class Step {
+public class Step implements Serializable {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
 
   /**
    * Long id of the starting vertex of this step

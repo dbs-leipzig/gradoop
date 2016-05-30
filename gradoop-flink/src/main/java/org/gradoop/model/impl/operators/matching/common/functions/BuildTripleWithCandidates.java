@@ -76,7 +76,7 @@ public class BuildTripleWithCandidates<E extends EPGMEdge>
     reuseTuple.setEdgeId(e.getId());
     reuseTuple.setSourceId(e.getSourceId());
     reuseTuple.setTargetId(e.getTargetId());
-    reuseTuple.setEdgeCandidates(EntityMatcher.getMatches(e, queryEdges));
+    reuseTuple.setCandidates(EntityMatcher.getMatches(e, queryEdges));
     return reuseTuple;
   }
 }

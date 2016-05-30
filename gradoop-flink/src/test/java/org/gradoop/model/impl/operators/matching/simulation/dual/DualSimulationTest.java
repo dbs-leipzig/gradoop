@@ -159,7 +159,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
       "(v5)-[e6]->(v4)" +
       "(v6)-[e7]->(v2)" +
       "(v6)-[e8]->(v5)" +
-      "(v5)-[e9]->(v7)" +
+      "(v6)-[e9]->(v7)" +
       "]");
 
     // execute and validate

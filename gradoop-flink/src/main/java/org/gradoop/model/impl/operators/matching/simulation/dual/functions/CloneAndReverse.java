@@ -53,7 +53,7 @@ public class CloneAndReverse implements
   public void flatMap(TripleWithCandidates tripleWithCandidates,
     Collector<TripleWithDirection> collector) throws Exception {
     reuseTuple.setEdgeId(tripleWithCandidates.getEdgeId());
-    reuseTuple.setCandidates(tripleWithCandidates.getEdgeCandidates());
+    reuseTuple.setCandidates(tripleWithCandidates.getCandidates());
 
     reuseTuple.setSourceId(tripleWithCandidates.getSourceId());
     reuseTuple.setTargetId(tripleWithCandidates.getTargetId());

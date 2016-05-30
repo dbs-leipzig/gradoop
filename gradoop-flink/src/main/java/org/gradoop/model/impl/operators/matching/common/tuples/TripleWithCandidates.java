@@ -59,11 +59,11 @@ public class TripleWithCandidates
     f2 = id;
   }
 
-  public List<Long> getEdgeCandidates() {
+  public List<Long> getCandidates() {
     return f3;
   }
 
-  public void setEdgeCandidates(List<Long> ids) {
-    f3 = ids;
+  public void setCandidates(List<Long> candidates) {
+    f3 = candidates;
   }
 }

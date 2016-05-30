@@ -24,12 +24,13 @@ import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandida
 /**
  * Debug output for {@link TripleWithCandidates}.
  */
-public class PrintMatchingTriple extends Printer<TripleWithCandidates> {
+public class PrintTripleWithCandidates extends Printer<TripleWithCandidates> {
 
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintMatchingTriple.class);
+  private static final Logger LOG = Logger.getLogger(
+    PrintTripleWithCandidates.class);
 
   @Override
   protected String getDebugString(TripleWithCandidates t) {
@@ -37,7 +38,7 @@ public class PrintMatchingTriple extends Printer<TripleWithCandidates> {
       edgeMap.get(t.getEdgeId()),
       vertexMap.get(t.getSourceId()),
       vertexMap.get(t.getTargetId()),
-      StringUtils.join(t.getEdgeCandidates(), ','));
+      StringUtils.join(t.getCandidates(), ','));
   }
 
   @Override

@@ -15,18 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.matching.common.query;
-
 /**
- * Used to traverse a query graph.
+ * Contains tuples that are used exclusively by that implementation.
  */
-public interface Traverser {
-
-  /**
-   * Traverse the graph.
-   *
-   * @return traversal code
-   */
-  TraversalCode traverse();
-
-}
+package org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples;

@@ -15,18 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.matching.common.query;
-
 /**
- * Used to traverse a query graph.
+ * Contains a naive traversal implementation for subgraph isomorphism.
  */
-public interface Traverser {
-
-  /**
-   * Traverse the graph.
-   *
-   * @return traversal code
-   */
-  TraversalCode traverse();
-
-}
+package org.gradoop.model.impl.operators.matching.isomorphism.naive;

@@ -85,9 +85,9 @@ public class MatchingPairs extends RichFlatJoinFunction<
     List<Long> newSourceCandidates = Lists.newArrayListWithCapacity(
       sourceVertex.getCandidates().size());
     List<Long> newEdgeCandidates = Lists.newArrayListWithCapacity(
-      edge.getEdgeCandidates().size());
+      edge.getCandidates().size());
 
-    for (Long eQ : edge.getEdgeCandidates()) {
+    for (Long eQ : edge.getCandidates()) {
       Long vQ = queryHandler.getEdgeById(eQ).getSourceVertexId();
       if (sourceVertex.getCandidates().contains(vQ)) {
         newSourceCandidates.add(vQ);
