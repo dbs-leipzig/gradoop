@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graphgen;
+package org.gradoop.io.graphgen.functions;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -26,6 +26,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.gradoop.io.graphgen.GraphGenStringToCollection;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMElement;
@@ -42,8 +43,7 @@ import java.util.Map;
 /**
  * This class contains static classes to generate datasets of EPGMGraphHead,
  * EPGMVertex and EPGMEdge. Therefore a mapping from a graphgen collection to
- * a dataset of tuple2 containing a EPGMElement as EPGMElement and the
- * corresponding class is provided. As well as a filter on this class element
+ * a dataset of EPGMElements is provided. As well as a filter on this element
  * and a mapper from the general EPGMElement to the specified EPGMElement.
  */
 public class GraphGenReader {
@@ -51,8 +51,8 @@ public class GraphGenReader {
   /**
    * Reads graph data from a 3-tuple collection. The collection consists of the
    * graph head, the vertices and the edges. The result of the mapping is a
-   * tuple-2 dataset containing EPGMElements(EPGMGraphHead, EPGMVertex and
-   * EPGMEdge) as EPGMElements and the corresponding class for verification.
+   * dataset containing EPGMElements(EPGMGraphHead, EPGMVertex and EPGMEdge)
+   * as EPGMElements.
    *
    * @param <G> EPGM graph head type
    * @param <V> EPGM vertex type
@@ -60,7 +60,7 @@ public class GraphGenReader {
    */
   public static class GraphGenCollectionToEPGMElementsMapper<G extends
     EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> implements
-    FlatMapFunction<Tuple2<LongWritable, Text>, Tuple2<EPGMElement, Class>> {
+    FlatMapFunction<Tuple2<LongWritable, Text>, EPGMElement> {
 
     /**
      * Creates graph data objects
@@ -93,17 +93,16 @@ public class GraphGenReader {
     }
 
     /**
-     * Constructs a tuple-2 dataset containing EPGMElements(EPGMGraphHead,
-     * EPGMVertex and EPGMEdge) as EPGMElement and the corresponding class for
-     * verification.
+     * Constructs a dataset containing EPGMElements(EPGMGraphHead,
+     * EPGMVertex and EPGMEdge) as EPGMElement.
      *
      * @param inputTuple consists of a key(LongWritable) and a value(Text)
-     * @param collector  of tuple-2 of EPGMElement and Class
+     * @param collector  of EPGMElements
      * @throws Exception
      */
     @Override
     public void flatMap(Tuple2<LongWritable, Text> inputTuple,
-      Collector<Tuple2<EPGMElement, Class>> collector) throws Exception {
+      Collector<EPGMElement> collector) throws Exception {
       String graphString = inputTuple.getField(1).toString();
       GraphGenStringToCollection graphGenStringToCollection = new
         GraphGenStringToCollection();
@@ -126,9 +125,7 @@ public class GraphGenReader {
 
         id = GradoopId.get();
         graphs.add(id);
-        collector.collect(new Tuple2<EPGMElement, Class>(this.graphHeadFactory
-          .initGraphHead(id),
-          EPGMGraphHead.class));
+        collector.collect(this.graphHeadFactory.initGraphHead(id));
 
         for (Tuple2<Integer, String> tupleVertex :
           (Collection<Tuple2<Integer, String>>) tuple.getField(1)) {
@@ -136,9 +133,8 @@ public class GraphGenReader {
           integerGradoopIdMapVertices.put((Integer) tupleVertex.getField(0),
             id);
           label = tupleVertex.getField(1).toString();
-          collector.collect(new Tuple2<EPGMElement, Class>(
-            this.vertexFactory.initVertex(id, label, graphs), EPGMVertex
-            .class));
+          collector.collect(
+            this.vertexFactory.initVertex(id, label, graphs));
         }
 
         for (Tuple3<Integer, Integer, String> tupleEdge :
@@ -146,20 +142,19 @@ public class GraphGenReader {
           id = integerGradoopIdMapVertices.get(tupleEdge.getField(0));
           targetId = integerGradoopIdMapVertices.get(tupleEdge.getField(1));
           label = tupleEdge.getField(2).toString();
-          collector.collect(new Tuple2<EPGMElement, Class>(
-            this.edgeFactory.createEdge(label, id, targetId, graphs),
-            EPGMEdge.class));
+          collector.collect(this.edgeFactory.createEdge(label, id, targetId,
+            graphs));
         }
       }
     }
   }
 
   /**
-   * Accepts only those Tuple2<EPGMElement, Class>> where the class field entry is
-   * equal to the committed one
+   * Accepts only those EPGMElements where the element is instance of
+   * committed class.
    */
   public static class GraphGenFilterOnClass implements
-    FilterFunction<Tuple2<EPGMElement, Class>> {
+    FilterFunction<EPGMElement> {
 
     /**
      * The class on which the filter works.
@@ -176,43 +171,42 @@ public class GraphGenReader {
     }
 
     /**
-     * The filter function accepts only those tuples, where the class field
-     * is equal to the class committed on construction.
+     * The filter function accepts only those elements, where the element is
+     * instance of the class committed on construction.
      *
-     * @param elementTuple the tuple to be filtered
+     * @param element the tuple to be filtered
      * @return true if class field is equal to class of compromise
      * @throws Exception
      */
     @Override
-    public boolean filter(Tuple2<EPGMElement, Class> elementTuple) throws
+    public boolean filter(EPGMElement element) throws
       Exception {
-      return elementTuple.getField(1).equals(filterClass);
+      return filterClass.isInstance(element);
     }
   }
 
   /**
    * Returns DataSet<El> where El is an EPGMGraphHead, an EPGMVertex or an
-   * EPGMEdge. The element itself is received from the element field of the
-   * given Tuple2<EPGMElement, Class>.
+   * EPGMEdge. The element itself is cast from EPGMElement to El.
    *
    * @param <El> the type to be returned
    */
   public static class GraphGenEPGMElementMapper<El extends EPGMElement>
     implements
-    MapFunction<Tuple2<EPGMElement, Class>, El> {
+    MapFunction<EPGMElement, El> {
 
     /**
-     * Returns an EPGMElement of type El which has been cast from the element
-     * field of Tuple2<EPGMElement, Class>.
+     * Returns an EPGMElement of type El which has been cast from the
+     * EPGMElement.
      *
-     * @param elementTuple tuple of Class and EPGMElement
-     * @return EPGMElement of type El cast from element field from the tuple
+     * @param element EPGMElement
+     * @return EPGMElement of type El cast from EPGMElement
      * @throws Exception
      */
     @Override
-    public El map(Tuple2<EPGMElement, Class> elementTuple) throws
+    public El map(EPGMElement element) throws
       Exception {
-      return (El) elementTuple.getField(0);
+      return (El) element;
     }
   }
 
