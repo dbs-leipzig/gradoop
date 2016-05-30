@@ -5,12 +5,9 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.matching.common.query.Step;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples
-  .EdgeStep;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples
-  .EmbeddingWithTiePoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EdgeStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EmbeddingWithTiePoint;
 
 /**
  * Extends an embedding with an edge if possible.
@@ -42,7 +39,7 @@ public class UpdateEdgeEmbeddings extends
 
   private final TraversalCode traversalCode;
 
-  private Step step;
+  private int candidate;
 
   public UpdateEdgeEmbeddings(TraversalCode traversalCode) {
     this.traversalCode = traversalCode;
@@ -51,8 +48,8 @@ public class UpdateEdgeEmbeddings extends
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    step = traversalCode.getStep(
-      getIterationRuntimeContext().getSuperstepNumber() - 1);
+    candidate = (int) traversalCode.getStep(
+      getIterationRuntimeContext().getSuperstepNumber() - 1).getVia();
   }
 
   @Override
@@ -62,8 +59,8 @@ public class UpdateEdgeEmbeddings extends
     GradoopId[] edgeEmbeddings = embedding.getEmbedding().getEdgeEmbeddings();
 
     // traverse if no edge set for that step
-    if (edgeEmbeddings[(int) step.getVia()] == null) {
-      edgeEmbeddings[(int) step.getVia()] = edgeStep.getEdgeId();
+    if (edgeEmbeddings[candidate] == null) {
+      edgeEmbeddings[candidate] = edgeStep.getEdgeId();
       embedding.getEmbedding().setEdgeEmbeddings(edgeEmbeddings);
       embedding.setTiePointId(edgeStep.getNextId());
       collector.collect(embedding);

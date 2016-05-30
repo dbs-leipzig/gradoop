@@ -56,6 +56,7 @@ public class UpdateVertexEmbeddings extends RichFlatJoinFunction
 
     GradoopId[] vertexEmbeddings = embedding.getEmbedding().getVertexEmbeddings();
 
+    // not seen before or same as seen before (bijection)
     if (vertexEmbeddings[candidate] == null ||
       vertexEmbeddings[candidate].equals(vertexStep.getVertexId())) {
       vertexEmbeddings[candidate] = vertexStep.getVertexId();
