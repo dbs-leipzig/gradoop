@@ -26,7 +26,7 @@ import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples
  *
  * Forwarded fields first:
  *
- * f0.f0: vertex embedding
+ * f0.f0: vertex embeddings
  *
  * Forwarded fields second:
  *
@@ -62,7 +62,7 @@ public class UpdateEdgeEmbeddings extends
     GradoopId[] edgeEmbeddings = embedding.getEmbedding().getEdgeEmbeddings();
 
     // traverse if no edge set for that step
-    if (edgeEmbeddings[(int) step.getVia()] != null) {
+    if (edgeEmbeddings[(int) step.getVia()] == null) {
       edgeEmbeddings[(int) step.getVia()] = edgeStep.getEdgeId();
       embedding.getEmbedding().setEdgeEmbeddings(edgeEmbeddings);
       embedding.setTiePointId(edgeStep.getNextId());

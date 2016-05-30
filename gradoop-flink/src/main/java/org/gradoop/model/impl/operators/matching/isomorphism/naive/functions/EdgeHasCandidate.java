@@ -5,7 +5,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.utils.Constants;
 
 /**
  * Filters edge triples if their candidates contain a given candidate. This
@@ -42,7 +42,8 @@ public class EdgeHasCandidate
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    int step = getIterationRuntimeContext().getSuperstepNumber();
+    int step = (int) getRuntimeContext()
+      .getBroadcastVariable(Constants.BC_SUPERSTEP).get(0);
     candidate = traversalCode.getStep(step - 1).getVia();
   }
 

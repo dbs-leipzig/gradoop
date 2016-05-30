@@ -6,8 +6,12 @@ import org.gradoop.model.impl.operators.matching.common.tuples.Embedding;
 
 /**
  * Represents an embedding and a weld point to grow the embedding.
+ *
+ * f0: embedding
+ * f1: tie point
  */
-public class EmbeddingWithTiePoint extends Tuple2<Embedding, GradoopId> {
+public class EmbeddingWithTiePoint
+  extends Tuple2<Embedding, GradoopId> {
 
   public Embedding getEmbedding() {
     return f0;

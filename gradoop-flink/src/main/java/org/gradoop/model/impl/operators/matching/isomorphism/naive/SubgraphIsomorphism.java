@@ -18,13 +18,21 @@ import org.gradoop.model.impl.operators.matching.common.query.TraversalQueryHand
 import org.gradoop.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintEdgeStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintEmbeddingWithWeldPoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintVertexStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.BuildEdgeStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.BuildEmbeddingWithTiePoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.BuildVertexStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.EdgeHasCandidate;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.SuperStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.UpdateEdgeEmbeddings;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.UpdateVertexEmbeddings;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.VertexHasCandidate;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EdgeStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EmbeddingWithTiePoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.VertexStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.utils.Constants;
 
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a
@@ -96,14 +104,6 @@ public class SubgraphIsomorphism
     DataSet<TripleWithCandidates> edges = PreProcessor.filterEdges(
       graph, query);
 
-    if (LOG.isDebugEnabled()) {
-      vertices = printIdWithCandidates(vertices);
-    }
-
-    if (LOG.isDebugEnabled()) {
-      edges = printTriplesWithCandidates(edges);
-    }
-
     DataSet<EmbeddingWithTiePoint> initialEmbeddings = vertices
       .filter(new ElementHasCandidate(traversalCode.getStep(0).getFrom()))
       .map(new BuildEmbeddingWithTiePoint(traversalCode,
@@ -126,26 +126,71 @@ public class SubgraphIsomorphism
 
     // ITERATION BODY
 
-    // traverse edges
+    // get current superstep
+    DataSet<Integer> superStep = embeddings
+      .first(1)
+      .map(new SuperStep());
+
+    // traverse to outgoing/incoming edges
     DataSet<EdgeStep> edgeSteps = edges
       .filter(new EdgeHasCandidate(traversalCode))
-      .map(new BuildEdgeStep(traversalCode));
+      .withBroadcastSet(superStep, Constants.BC_SUPERSTEP)
+      .map(new BuildEdgeStep(traversalCode))
+      .withBroadcastSet(superStep, Constants.BC_SUPERSTEP);
 
-    DataSet<EmbeddingWithTiePoint> embeddingsWithEdges = embeddings
+    if (LOG.isDebugEnabled()) {
+      edgeSteps = edgeSteps
+        .map(new PrintEdgeStep(true, "post-filter-map-edge"))
+        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
+        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+    }
+
+    DataSet<EmbeddingWithTiePoint> nextWorkSet = embeddings
       .join(edgeSteps)
       .where(1).equalTo(1) // tiePointId == tiePointId
       .with(new UpdateEdgeEmbeddings(traversalCode));
 
     if (LOG.isDebugEnabled()) {
-      embeddingsWithEdges = embeddingsWithEdges
-        .map(new PrintEmbeddingWithWeldPoint(true, "embeddingWithE"))
+      nextWorkSet = nextWorkSet
+        .map(new PrintEmbeddingWithWeldPoint(true, "post-edge-update"))
+        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
+        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+    }
+
+    // traverse to vertices
+    DataSet<VertexStep> vertexSteps = vertices
+      .filter(new VertexHasCandidate(traversalCode))
+      .withBroadcastSet(superStep, Constants.BC_SUPERSTEP)
+      .map(new BuildVertexStep());
+
+    if (LOG.isDebugEnabled()) {
+      vertexSteps = vertexSteps
+        .map(new PrintVertexStep(true, "post-filter-project-vertex"))
+        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
+        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+    }
+
+    nextWorkSet = nextWorkSet
+      .join(vertexSteps)
+      .where(1).equalTo(0) // tiePointId == vertexId
+      .with(new UpdateVertexEmbeddings(traversalCode));
+
+    if (LOG.isDebugEnabled()) {
+      nextWorkSet = nextWorkSet
+        .map(new PrintEmbeddingWithWeldPoint(true, "post-vertex-update"))
         .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
         .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
     }
 
     // ITERATION FOOTER
     DataSet<EmbeddingWithTiePoint> result = embeddings
-      .closeWith(embeddingsWithEdges, embeddingsWithEdges);
+      .closeWith(nextWorkSet, nextWorkSet);
+
+    //--------------------------------------------------------------------------
+    // Post-Processing (Build Graph Collection from Embeddings)
+    //--------------------------------------------------------------------------
+
+
 
     try {
       result.collect();

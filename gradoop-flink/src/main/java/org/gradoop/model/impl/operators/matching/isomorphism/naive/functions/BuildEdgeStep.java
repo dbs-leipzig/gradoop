@@ -7,6 +7,10 @@ import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EdgeStep;
 
+
+import org.gradoop.model.impl.operators.matching.isomorphism.naive.utils
+  .Constants;
+
 /**
  * Converts an edge into a step edge according to the traversal.
  *
@@ -46,7 +50,8 @@ public class BuildEdgeStep
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    int step = getIterationRuntimeContext().getSuperstepNumber();
+    int step = (int) getRuntimeContext()
+      .getBroadcastVariable(Constants.BC_SUPERSTEP).get(0);
     isOutgoing = traversalCode.getStep(step - 1).isOutgoing();
   }
 

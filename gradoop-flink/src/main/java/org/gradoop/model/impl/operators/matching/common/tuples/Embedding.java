@@ -11,6 +11,14 @@ import org.gradoop.model.impl.id.GradoopId;
  */
 public class Embedding extends Tuple2<GradoopId[], GradoopId[]> {
 
+  public Embedding() {
+  }
+
+  public Embedding(GradoopId[] vertexEmbeddings, GradoopId[] edgeEmbeddings) {
+    f0 = vertexEmbeddings;
+    f1 = edgeEmbeddings;
+  }
+
   public GradoopId[] getVertexEmbeddings() {
     return f0;
   }
