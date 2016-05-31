@@ -17,19 +17,18 @@
 
 package org.gradoop.model.impl.operators.base;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.utils.LeftSide;
+import org.gradoop.model.impl.functions.graphcontainment.PairVertexWithGraphs;
 import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.epgm.TargetId;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.base.functions.LeftJoin0OfTuple2;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.intersection.Intersection;
 import org.gradoop.model.impl.operators.union.Union;
@@ -63,29 +62,14 @@ public abstract class SetOperatorBase<
   protected DataSet<V> computeNewVertices(DataSet<G> newGraphHeads) {
 
     DataSet<Tuple2<V, GradoopId>> verticesWithGraphs =
-      firstCollection.getVertices().flatMap(
-        new FlatMapFunction<V, Tuple2<V, GradoopId>>() {
-          @Override
-          public void flatMap(V v,
-            Collector<Tuple2<V, GradoopId>> collector) throws
-            Exception {
-            for (GradoopId graphId : v.getGraphIds()) {
-              collector.collect(new Tuple2<>(v, graphId));
-            }
-          }
-        });
+      firstCollection.getVertices().flatMap(new PairVertexWithGraphs<V>());
 
     return verticesWithGraphs
       .join(newGraphHeads)
       .where(1)
       .equalTo(new Id<G>())
-      .with(
-        new JoinFunction<Tuple2<V, GradoopId>, G, V>() {
-          @Override
-          public V join(Tuple2<V, GradoopId> tuple, G g) throws Exception {
-            return tuple.f0;
-          }
-        }).withForwardedFieldsFirst("f0->*")
+      .with(new LeftJoin0OfTuple2<V, G>())
+      .withForwardedFieldsFirst("f0->*")
       .distinct(new Id<V>());
   }
 
