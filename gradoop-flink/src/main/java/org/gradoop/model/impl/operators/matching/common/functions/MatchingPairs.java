@@ -39,8 +39,8 @@ import java.util.List;
  * f2->f3:  target vertex id
  */
 @FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f2->f3")
-public class MatchingPairs extends RichFlatJoinFunction<
-  IdWithCandidates, TripleWithCandidates, TripleWithSourceEdgeCandidates> {
+public class MatchingPairs extends RichFlatJoinFunction
+  <IdWithCandidates, TripleWithCandidates, TripleWithSourceEdgeCandidates> {
 
   /**
    * serial version uid

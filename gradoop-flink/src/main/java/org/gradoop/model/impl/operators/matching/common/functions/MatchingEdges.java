@@ -29,8 +29,7 @@ import java.util.Collection;
  *
  * @param <E> EPGM edge type
  */
-public class MatchingEdges<E extends EPGMEdge>
-  extends AbstractFilter<E> {
+public class MatchingEdges<E extends EPGMEdge> extends AbstractFilter<E> {
 
   /**
    * serial version uid

@@ -31,9 +31,9 @@ public class PrintEmbeddingWithWeldPoint
   protected String getDebugString(EmbeddingWithTiePoint embedding) {
     return String.format("(([%s],[%s]),%s)",
       StringUtils.join(convertList(Arrays.asList(
-        embedding.getEmbedding().getVertexEmbeddings()), true), ','),
+        embedding.getEmbedding().getVertexMappings()), true), ','),
       StringUtils.join(convertList(Arrays.asList(
-        embedding.getEmbedding().getEdgeEmbeddings()), false), ','),
+        embedding.getEmbedding().getEdgeMappings()), false), ','),
       vertexMap.get(embedding.getTiePointId()));
   }
 

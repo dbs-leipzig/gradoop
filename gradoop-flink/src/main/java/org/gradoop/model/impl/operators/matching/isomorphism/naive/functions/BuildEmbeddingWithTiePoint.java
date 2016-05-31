@@ -37,7 +37,7 @@ public class BuildEmbeddingWithTiePoint
     this.candidate              = traversalCode.getStep(0).getFrom();
     reuseEmbedding              = new Embedding();
     reuseEmbeddingWithTiePoint = new EmbeddingWithTiePoint();
-    reuseEmbedding.setEdgeEmbeddings(new GradoopId[(int) edgeCount]);
+    reuseEmbedding.setEdgeMappings(new GradoopId[(int) edgeCount]);
     reuseEmbeddingWithTiePoint.setEmbedding(reuseEmbedding);
   }
 
@@ -46,7 +46,7 @@ public class BuildEmbeddingWithTiePoint
     reuseEmbeddingWithTiePoint.setTiePointId(v.getId());
     GradoopId[] vertexEmbeddings = new GradoopId[(int) vertexCount];
     vertexEmbeddings[(int) candidate] = v.getId();
-    reuseEmbedding.setVertexEmbeddings(vertexEmbeddings);
+    reuseEmbedding.setVertexMappings(vertexEmbeddings);
     return reuseEmbeddingWithTiePoint;
   }
 }

@@ -14,7 +14,7 @@ import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.Embedd
  *
  * Read fields first:
  *
- * f0.f1: edge embeddings
+ * f0.f1: edge mappings
  *
  * Read fields second:
  *
@@ -23,7 +23,7 @@ import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.Embedd
  *
  * Forwarded fields first:
  *
- * f0.f0: vertex embeddings
+ * f0.f0: vertex mappings
  *
  * Forwarded fields second:
  *
@@ -34,14 +34,14 @@ import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.Embedd
 @FunctionAnnotation.ReadFieldsSecond("f0;f2")
 @FunctionAnnotation.ForwardedFieldsFirst("f0.f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f2->f1")
-public class UpdateEdgeEmbeddings extends
+public class UpdateEdgeMappings extends
   RichFlatJoinFunction<EmbeddingWithTiePoint, EdgeStep, EmbeddingWithTiePoint> {
 
   private final TraversalCode traversalCode;
 
   private int candidate;
 
-  public UpdateEdgeEmbeddings(TraversalCode traversalCode) {
+  public UpdateEdgeMappings(TraversalCode traversalCode) {
     this.traversalCode = traversalCode;
   }
 
@@ -56,12 +56,12 @@ public class UpdateEdgeEmbeddings extends
   public void join(EmbeddingWithTiePoint embedding, EdgeStep edgeStep,
     Collector<EmbeddingWithTiePoint> collector) throws Exception {
 
-    GradoopId[] edgeEmbeddings = embedding.getEmbedding().getEdgeEmbeddings();
+    GradoopId[] edgeEmbeddings = embedding.getEmbedding().getEdgeMappings();
 
     // traverse if no edge set for that step
     if (edgeEmbeddings[candidate] == null) {
       edgeEmbeddings[candidate] = edgeStep.getEdgeId();
-      embedding.getEmbedding().setEdgeEmbeddings(edgeEmbeddings);
+      embedding.getEmbedding().setEdgeMappings(edgeEmbeddings);
       embedding.setTiePointId(edgeStep.getNextId());
       collector.collect(embedding);
     }

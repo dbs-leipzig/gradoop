@@ -34,12 +34,10 @@ import org.gradoop.model.impl.functions.epgm.MergedGraphIds;
 import org.gradoop.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.Cast;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.IsInstance;
+import org.gradoop.model.impl.functions.utils.Cast;
+import org.gradoop.model.impl.functions.utils.IsInstance;
 import org.gradoop.model.impl.operators.matching.simulation.dual.functions.EdgeTriple;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.FatVertex;
-
-
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
@@ -60,12 +58,33 @@ public class PostProcessor {
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   GraphCollection<G, V, E> extractGraphCollection(
+    DataSet<EPGMElement> epgmElements, GradoopFlinkConfig<G, V, E> config) {
+    return extractGraphCollection(epgmElements, config, true);
+  }
+
+  /**
+   * Extracts a {@link GraphCollection} from a set of {@link EPGMElement}.
+   *
+   * @param epgmElements  EPGM elements
+   * @param config        Gradoop Flink config
+   * @param mayOverlap    elements may be contained in multiple graphs
+   * @param <G>           EPGM graph head type
+   * @param <V>           EPGM vertex type
+   * @param <E>           EPGM edge type
+   * @return Graph collection
+   */
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E> extractGraphCollection(
     DataSet<EPGMElement> epgmElements, GradoopFlinkConfig<G, V, E> config,
     boolean mayOverlap) {
+    Class<G> graphHeadType  = config.getGraphHeadFactory().getType();
+    Class<V> vertexType     = config.getVertexFactory().getType();
+    Class<E> edgeType       = config.getEdgeFactory().getType();
     return GraphCollection.fromDataSets(
-      extractGraphHeads(epgmElements, config.getGraphHeadFactory().getType()),
-      extractVertices(epgmElements, config.getVertexFactory().getType()),
-      extractEdges(epgmElements, config.getEdgeFactory().getType()),
+      extractGraphHeads(epgmElements, graphHeadType),
+      extractVertices(epgmElements, vertexType, mayOverlap),
+      extractEdges(epgmElements, edgeType, mayOverlap),
       config
     );
   }
@@ -129,20 +148,22 @@ public class PostProcessor {
    *
    * @param epgmElements  EPGM elements
    * @param vertexType    vertex type
+   * @param mayOverlap    vertices may be contained in multiple graphs
    * @param <V>           EPGM vertex type
    * @return EPGM vertices
    */
   public static <V extends EPGMVertex>
   DataSet<V> extractVertices(DataSet<EPGMElement> epgmElements,
-    Class<V> vertexType) {
-    return epgmElements
+    Class<V> vertexType, boolean mayOverlap) {
+    DataSet<V> result = epgmElements
       .filter(new IsInstance<EPGMElement, V>(vertexType))
       .map(new Cast<EPGMElement, V>(vertexType))
-      .returns(TypeExtractor.createTypeInfo(vertexType))
+      .returns(TypeExtractor.createTypeInfo(vertexType));
+    return mayOverlap ? result
       .groupBy(new Id<V>())
       .combineGroup(new MergedGraphIds<V>())
       .groupBy(new Id<V>())
-      .reduceGroup(new MergedGraphIds<V>());
+      .reduceGroup(new MergedGraphIds<V>()) : result;
   }
 
   /**
@@ -164,20 +185,22 @@ public class PostProcessor {
    *
    * @param epgmElements  EPGM elements
    * @param edgeType      edge type
+   * @param mayOverlap    edges may be contained in multiple graphs
    * @param <E>           EPGM edge type
    * @return EPGM edges
    */
   public static <E extends EPGMEdge>
   DataSet<E> extractEdges(DataSet<EPGMElement> epgmElements,
-    Class<E> edgeType) {
-    return epgmElements
+    Class<E> edgeType, boolean mayOverlap) {
+    DataSet<E> result = epgmElements
       .filter(new IsInstance<EPGMElement, E>(edgeType))
       .map(new Cast<EPGMElement, E>(edgeType))
-      .returns(TypeExtractor.createTypeInfo(edgeType))
+      .returns(TypeExtractor.createTypeInfo(edgeType));
+
+    return mayOverlap ? result
       .groupBy(new Id<E>())
-      .combineGroup(new MergedGraphIds<E>())
-      .groupBy(new Id<E>())
-      .reduceGroup(new MergedGraphIds<E>());
+      .combineGroup(new MergedGraphIds<E>()).groupBy(new Id<E>())
+      .reduceGroup(new MergedGraphIds<E>()) : result;
   }
 
   /**

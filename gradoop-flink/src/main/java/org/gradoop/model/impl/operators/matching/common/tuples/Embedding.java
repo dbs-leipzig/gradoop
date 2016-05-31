@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.operators.matching.common.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -6,32 +23,24 @@ import org.gradoop.model.impl.id.GradoopId;
 /**
  * Represents an embedding of a query pattern in the search graph.
  *
- * f0: vertex embeddings
- * f1: edge embeddings
+ * f0: vertex mappings
+ * f1: edge mappings
  */
 public class Embedding extends Tuple2<GradoopId[], GradoopId[]> {
 
-  public Embedding() {
-  }
-
-  public Embedding(GradoopId[] vertexEmbeddings, GradoopId[] edgeEmbeddings) {
-    f0 = vertexEmbeddings;
-    f1 = edgeEmbeddings;
-  }
-
-  public GradoopId[] getVertexEmbeddings() {
+  public GradoopId[] getVertexMappings() {
     return f0;
   }
 
-  public void setVertexEmbeddings(GradoopId[] vertexEmbedding) {
-    f0 = vertexEmbedding;
+  public void setVertexMappings(GradoopId[] vertexMappings) {
+    f0 = vertexMappings;
   }
 
-  public GradoopId[] getEdgeEmbeddings() {
+  public GradoopId[] getEdgeMappings() {
     return f1;
   }
 
-  public void setEdgeEmbeddings(GradoopId[] edgeEmbedding) {
-    f1 = edgeEmbedding;
+  public void setEdgeMappings(GradoopId[] edgeMappings) {
+    f1 = edgeMappings;
   }
 }

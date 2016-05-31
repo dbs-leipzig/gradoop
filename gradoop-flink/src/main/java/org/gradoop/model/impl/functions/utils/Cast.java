@@ -1,14 +1,22 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive.functions;
+package org.gradoop.model.impl.functions.utils;
 
 import org.apache.flink.api.common.functions.MapFunction;
 
 /**
- * Copyright 2016 martin.
+ * Casts an object of type {@link IN} to type {@link T}.
  */
 public class Cast<IN, T> implements MapFunction<IN, T> {
 
+  /**
+   * Class for type cast
+   */
   private final Class<T> clazz;
 
+  /**
+   * Constructor
+   *
+   * @param clazz class for type cast
+   */
   public Cast(Class<T> clazz) {
     this.clazz = clazz;
   }

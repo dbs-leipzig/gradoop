@@ -11,6 +11,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.utils.SuperStep;
 import org.gradoop.model.impl.operators.matching.PatternMatchingBase;
 import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
@@ -146,7 +147,7 @@ public class SubgraphIsomorphism
     DataSet<EmbeddingWithTiePoint> nextWorkSet = embeddings
       .join(edgeSteps)
       .where(1).equalTo(1) // tiePointId == tiePointId
-      .with(new UpdateEdgeEmbeddings(traversalCode));
+      .with(new UpdateEdgeMappings(traversalCode));
 
     if (LOG.isDebugEnabled()) {
       nextWorkSet = nextWorkSet
@@ -171,7 +172,7 @@ public class SubgraphIsomorphism
     nextWorkSet = nextWorkSet
       .join(vertexSteps)
       .where(1).equalTo(0) // tiePointId == vertexId
-      .with(new UpdateVertexEmbeddings(traversalCode));
+      .with(new UpdateVertexMappings(traversalCode));
 
     if (LOG.isDebugEnabled()) {
       nextWorkSet = nextWorkSet
@@ -195,8 +196,7 @@ public class SubgraphIsomorphism
         graph.getConfig().getVertexFactory(),
         graph.getConfig().getEdgeFactory()));
 
-    return PostProcessor.extractGraphCollection(
-      epgmElements, graph.getConfig(), true);
+    return PostProcessor.extractGraphCollection(epgmElements, graph.getConfig());
   }
 
   @Override

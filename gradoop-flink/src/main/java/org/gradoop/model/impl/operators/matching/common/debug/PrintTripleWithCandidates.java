@@ -25,7 +25,6 @@ import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandida
  * Debug output for {@link TripleWithCandidates}.
  */
 public class PrintTripleWithCandidates extends Printer<TripleWithCandidates> {
-
   /**
    * Logger
    */

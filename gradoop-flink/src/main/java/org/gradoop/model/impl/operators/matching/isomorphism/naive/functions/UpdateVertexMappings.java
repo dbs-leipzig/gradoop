@@ -14,7 +14,7 @@ import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.Vertex
  *
  * Read fields first:
  *
- * f0.f0: vertex embeddings
+ * f0.f0: vertex mappings
  *
  * Read fields second:
  *
@@ -22,12 +22,12 @@ import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.Vertex
  *
  * Forwarded fields first:
  *
- * f0.f1: edge embeddings
+ * f0.f1: edge mappings
  *
  */
 @FunctionAnnotation.ReadFieldsFirst("f0.f0")
 @FunctionAnnotation.ReadFieldsSecond("f0")
-public class UpdateVertexEmbeddings extends RichFlatJoinFunction
+public class UpdateVertexMappings extends RichFlatJoinFunction
   <EmbeddingWithTiePoint, VertexStep, EmbeddingWithTiePoint> {
 
   private final TraversalCode traversalCode;
@@ -38,7 +38,7 @@ public class UpdateVertexEmbeddings extends RichFlatJoinFunction
 
   private int candidate;
 
-  public UpdateVertexEmbeddings(TraversalCode traversalCode) {
+  public UpdateVertexMappings(TraversalCode traversalCode) {
     this.traversalCode  = traversalCode;
     this.stepCount      = traversalCode.getSteps().size();
   }
@@ -54,18 +54,18 @@ public class UpdateVertexEmbeddings extends RichFlatJoinFunction
   public void join(EmbeddingWithTiePoint embedding, VertexStep vertexStep,
     Collector<EmbeddingWithTiePoint> collector) throws Exception {
 
-    GradoopId[] vertexEmbeddings = embedding.getEmbedding().getVertexEmbeddings();
+    GradoopId[] vertexMappings = embedding.getEmbedding().getVertexMappings();
 
     // not seen before or same as seen before (bijection)
-    if (vertexEmbeddings[candidate] == null ||
-      vertexEmbeddings[candidate].equals(vertexStep.getVertexId())) {
-      vertexEmbeddings[candidate] = vertexStep.getVertexId();
-      embedding.getEmbedding().setVertexEmbeddings(vertexEmbeddings);
+    if (vertexMappings[candidate] == null ||
+      vertexMappings[candidate].equals(vertexStep.getVertexId())) {
+      vertexMappings[candidate] = vertexStep.getVertexId();
+      embedding.getEmbedding().setVertexMappings(vertexMappings);
 
       // set next tie point if there are more steps
       if (currentStep < stepCount - 1) {
         int nextFrom = (int) traversalCode.getStep(currentStep + 1).getFrom();
-        embedding.setTiePointId(vertexEmbeddings[nextFrom]);
+        embedding.setTiePointId(vertexMappings[nextFrom]);
       }
       collector.collect(embedding);
     }

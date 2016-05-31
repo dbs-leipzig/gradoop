@@ -29,8 +29,7 @@ import java.util.Collection;
  *
  * @param <V> EPGM vertex type
  */
-public class MatchingVertices<V extends EPGMVertex>
-  extends AbstractFilter<V> {
+public class MatchingVertices<V extends EPGMVertex> extends AbstractFilter<V> {
 
   /**
    * serial version uid
