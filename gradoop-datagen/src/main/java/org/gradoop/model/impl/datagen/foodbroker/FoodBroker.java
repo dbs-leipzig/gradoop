@@ -23,12 +23,21 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.CollectionGenerator;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.datagen.foodbroker.complainthandling.*;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.CustomerGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.EmployeeGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.LogisticsGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.ProductGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.VendorGenerator;
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationConfirmation;
+
+
+
+import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage.*;
+
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationLineQuality;
+import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationWon;
 import org.gradoop.util.GradoopFlinkConfig;
 
 
@@ -71,6 +80,125 @@ public class FoodBroker
       .generateSequence(1, foodBrokerConfig.getCaseCount());
 
     // TODO: process simulation
+
+    // SalesQuotation
+
+    DataSet<V> salesQuotations = new SalesQuotationGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, caseSeeds, employees, customers)
+      .generate();
+
+    // SalesQuotationLines
+
+    DataSet<V> salesQuotationLines = new SalesQuotationLineGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, salesQuotations, products)
+      .generate();
+
+    // Confirmation
+
+    salesQuotations = salesQuotationLines
+      .groupBy("caseId")
+      .reduceGroup(new SalesQuotationLineQuality())
+      .join(salesQuotations)
+      .where("id").equalTo("id")
+      .with(new SalesQuotationConfirmation());
+
+    salesQuotations = salesQuotations.filter(new SalesQuotationWon());
+
+    // SalesOrder
+
+    DataSet<V> salesOrders = new SalesOrderGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, salesQuotations, employees).generate();
+
+    // SalesOrderLine
+
+    DataSet<V> salesOrderLines = new SalesOrderLineGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, salesOrders,
+        salesQuotationLines).generate();
+
+    // PurchOrder
+
+    DataSet<V> purchOrders = new PurchOrderGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, salesOrders, salesOrderLines, employees, vendors)
+      .generate();
+
+    // PurchOrderLines
+
+    DataSet<V> purchOrderLines = new PurchOrderLineGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, purchOrders, salesOrderLines)
+      .generate();
+
+    // DeliveryNotes
+
+    DataSet<V> deliveryNotes = new DeliveryNoteGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, purchOrders, logistics)
+      .generate();
+
+    // PurchInvoices
+
+    DataSet<V> purchInvoices = new PurchInvoiceGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, purchOrders, purchOrderLines)
+      .generate();
+
+    // SalesInvoices
+
+    DataSet<V> salesInvoices = new SalesInvoiceGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, salesOrderLines).generate();
+
+    // ComplaintHandling
+
+    // CH LateDelivery
+
+    DataSet<V> lateDeliverySalesOrderLines = new
+      LateDeliverySalesOrderLineGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, salesOrders, salesOrderLines, deliveryNotes).generate();
+
+    DataSet<V> lateDeliveryPurchOrderLines = new
+      LateDeliveryPurchOrderLineGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, lateDeliverySalesOrderLines).generate();
+
+    DataSet<V> lateDeliveryTickets = new NewTicketGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, NewTicket
+        .TICKET_REASON_LATE_DELIVERY, salesOrders, employees, customers, null)
+      .generate();
+
+    DataSet<V> lateDeliverySalesInvoices = new
+      LateDeliverySalesInvoiceGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, lateDeliveryTickets, lateDeliverySalesOrderLines,
+      salesOrders, employees, customers).generate();
+
+    DataSet<V> lateDeliveryPurchInvoices = new
+      LateDeliveryPurchInvoiceGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, lateDeliveryTickets, lateDeliveryPurchOrderLines,
+      purchOrders, employees, vendors).generate();
+
+
+    // CH BadQuality
+
+    DataSet<V> badQualityPurchOrderLines = new
+      BadQualityPurchOrderLineGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, deliveryNotes, purchOrders, purchOrderLines).generate();
+
+    DataSet<V> badQualitySalesOrderLines = new
+      BadQualitySalesOrderLineGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, badQualityPurchOrderLines, deliveryNotes,
+      purchOrders, purchOrderLines, products, logistics, vendors,
+      salesOrderLines, salesOrders).generate();
+
+    DataSet<V> badQualityTickets = new NewTicketGenerator<V>
+      (gradoopFlinkConfig, foodBrokerConfig, NewTicket
+        .TICKET_REASON_BAD_QUALITY, salesOrders, employees, customers,
+        deliveryNotes).generate();
+
+    DataSet<V> badQualitySalesInvoices = new
+      BadQualitySalesInvoiceGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, badQualityTickets, badQualitySalesOrderLines,
+      salesOrders, employees, customers).generate();
+
+    DataSet<V> badQualityPurchInvoices = new
+      BadQualityPurchInvoiceGenerator<V>(gradoopFlinkConfig,
+      foodBrokerConfig, badQualityTickets, badQualityPurchOrderLines,
+      purchOrders, employees, vendors).generate();
+
 
     DataSet<V> masterData = customers
       .union(vendors)
