@@ -27,17 +27,21 @@ public class SalesInvoiceGenerator<V extends EPGMVertex> extends
   AbstractTransactionalDataGenerator<V> {
 
   private DataSet<V> salesOrderLines;
+  private DataSet<V> salesOrders;
 
   public SalesInvoiceGenerator(GradoopFlinkConfig gradoopFlinkConfig,
-    FoodBrokerConfig foodBrokerConfig, DataSet<V> salesOrderLines) {
+    FoodBrokerConfig foodBrokerConfig, DataSet<V> salesOrderLines, DataSet<V>
+    salesOrders) {
     super(gradoopFlinkConfig, foodBrokerConfig);
 
     this.salesOrderLines = salesOrderLines;
+    this.salesOrders = salesOrders;
   }
 
   @Override
   public DataSet<V> generate() {
-    return salesOrderLines
-      .map(new SalesInvoice(vertexFactory));
+    return salesOrders
+      .map(new SalesInvoice(vertexFactory))
+      .withBroadcastSet(salesOrderLines, "");
   }
 }

@@ -142,7 +142,8 @@ public class FoodBroker
     // SalesInvoices
 
     DataSet<V> salesInvoices = new SalesInvoiceGenerator<V>
-      (gradoopFlinkConfig, foodBrokerConfig, salesOrderLines).generate();
+      (gradoopFlinkConfig, foodBrokerConfig, salesOrderLines, salesOrders)
+      .generate();
 
     // ComplaintHandling
 
@@ -156,10 +157,10 @@ public class FoodBroker
       LateDeliveryPurchOrderLineGenerator<V>(gradoopFlinkConfig,
       foodBrokerConfig, lateDeliverySalesOrderLines).generate();
 
-    DataSet<V> lateDeliveryTickets = new NewTicketGenerator<V>
-      (gradoopFlinkConfig, foodBrokerConfig, NewTicket
-        .TICKET_REASON_LATE_DELIVERY, salesOrders, employees, customers, null)
-      .generate();
+    DataSet<V> lateDeliveryTickets =
+      new NewTicketGenerator<V>(gradoopFlinkConfig, foodBrokerConfig,
+        NewTicket.TICKET_REASON_LATE_DELIVERY, lateDeliverySalesOrderLines,
+        employees, customers, null).generate();
 
     DataSet<V> lateDeliverySalesInvoices = new
       LateDeliverySalesInvoiceGenerator<V>(gradoopFlinkConfig,
@@ -186,7 +187,7 @@ public class FoodBroker
 
     DataSet<V> badQualityTickets = new NewTicketGenerator<V>
       (gradoopFlinkConfig, foodBrokerConfig, NewTicket
-        .TICKET_REASON_BAD_QUALITY, salesOrders, employees, customers,
+        .TICKET_REASON_BAD_QUALITY, badQualitySalesOrderLines, employees, customers,
         deliveryNotes).generate();
 
     DataSet<V> badQualitySalesInvoices = new
