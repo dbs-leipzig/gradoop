@@ -17,12 +17,15 @@
 
 package org.gradoop.model.impl.datagen.foodbroker.complainthandling;
 
+import org.apache.flink.api.common.functions.RichGroupReduceFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 
 
-public class NewTicket<V extends EPGMVertex> extends RichMapFunction<V, V>{
+public class NewTicket<V extends EPGMVertex> extends
+  RichGroupReduceFunction<V, V> {
 
   public static final String TICKET_REASON_LATE_DELIVERY = "lateDelivery";
   public static final String TICKET_REASON_BAD_QUALITY = "badQuality";
@@ -36,7 +39,7 @@ public class NewTicket<V extends EPGMVertex> extends RichMapFunction<V, V>{
   }
 
   @Override
-  public V map(V v) throws Exception {
-    return null;
+  public void reduce(Iterable<V> values, Collector<V> out) throws Exception {
+
   }
 }

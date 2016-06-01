@@ -29,18 +29,20 @@ public class NewTicketGenerator<V extends EPGMVertex> extends
   AbstractTransactionalDataGenerator<V> {
 
   private String ticketReason;
-  private DataSet<V> salesOrders;
+  private DataSet<V> lateDeliverySalesOrderLines;
   private DataSet<V> employees;
   private DataSet<V> customers;
   private DataSet<V> deliveryNotes;
 
   public NewTicketGenerator(GradoopFlinkConfig gradoopFlinkConfig,
     FoodBrokerConfig foodBrokerConfig, String ticketReason, DataSet<V>
-    salesOrders, DataSet<V> employees, DataSet<V> customers, DataSet<V> deliveryNotes) {
+    lateDeliverySalesOrderLines, DataSet<V> employees, DataSet<V> customers,
+    DataSet<V>
+    deliveryNotes) {
     super(gradoopFlinkConfig, foodBrokerConfig);
 
     this.ticketReason = ticketReason;
-    this.salesOrders = salesOrders;
+    this.lateDeliverySalesOrderLines = lateDeliverySalesOrderLines;
     this.employees = employees;
     this.customers = customers;
     this.deliveryNotes = deliveryNotes;
@@ -48,8 +50,9 @@ public class NewTicketGenerator<V extends EPGMVertex> extends
 
   @Override
   public DataSet<V> generate() {
-    return salesOrders
-      .map(new NewTicket(vertexFactory, this.ticketReason))
+    return lateDeliverySalesOrderLines
+      .groupBy("salesOrder") // Pseudo!
+      .reduceGroup(new NewTicket(vertexFactory, this.ticketReason))
       .withBroadcastSet(employees, "")
       .withBroadcastSet(customers, "")
       .withBroadcastSet(deliveryNotes, "");

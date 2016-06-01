@@ -40,8 +40,9 @@ public class PurchInvoiceGenerator<V extends EPGMVertex> extends
 
   @Override
   public DataSet<V> generate() {
-    return purchOrders
-      .flatMap(new PurchInvoice(vertexFactory))
-      .withBroadcastSet(purchOrderLines, "");
+    return purchOrderLines
+      .groupBy("purchOrder") // Pseudo!
+      .reduceGroup(new PurchInvoice(vertexFactory))
+      .withBroadcastSet(purchOrders, "");
   }
 }

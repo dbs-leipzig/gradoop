@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.datagen.foodbroker.foodbrokerage;
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.common.functions.RichGroupReduceFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMVertex;
@@ -25,7 +26,7 @@ import org.gradoop.model.api.EPGMVertexFactory;
 
 
 public class PurchInvoice<V extends EPGMVertex> extends
-  RichFlatMapFunction<V, V> {
+  RichGroupReduceFunction<V, V> {
 
   private final EPGMVertexFactory<V> vertexFactory;
 
@@ -39,7 +40,7 @@ public class PurchInvoice<V extends EPGMVertex> extends
   }
 
   @Override
-  public void flatMap(V v, Collector<V> collector) throws Exception {
+  public void reduce(Iterable<V> values, Collector<V> out) throws Exception {
 
   }
 }
