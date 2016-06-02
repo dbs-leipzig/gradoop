@@ -30,7 +30,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -52,7 +52,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -72,7 +72,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -92,7 +92,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -117,7 +117,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -137,7 +137,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -164,7 +164,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -199,7 +199,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -224,7 +224,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   @Test
@@ -243,7 +243,7 @@ public abstract class DualSimulationTest extends GradoopFlinkTestBase {
 
     // execute and validate
     collectAndAssertTrue(getOperator(query).execute(db)
-      .equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+      .equalsByGraphElementIds(loader.getGraphCollectionByVariables("expected")));
   }
 
   protected abstract DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo>

@@ -24,6 +24,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.PairElementWithPropertyValue;
 import org.gradoop.model.impl.id.GradoopId;
@@ -41,8 +42,9 @@ import org.gradoop.model.impl.properties.PropertyValue;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public abstract class PatternMatchingBase
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+public abstract class PatternMatching
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements UnaryGraphToCollectionOperator<G, V, E> {
   /**
    * GDL based query string
    */
@@ -67,7 +69,7 @@ public abstract class PatternMatchingBase
    * @param query       GDL query graph
    * @param attachData  true, if original data shall be attached to the result
    */
-  public PatternMatchingBase(String query, boolean attachData) {
+  public PatternMatching(String query, boolean attachData) {
     Preconditions.checkState(!Strings.isNullOrEmpty(query),
       "Query must not be null or empty");
     this.query            = query;

@@ -25,13 +25,13 @@ import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.matching.PatternMatchingBase;
+import org.gradoop.model.impl.operators.matching.PatternMatching;
 import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
@@ -63,8 +63,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  */
 public class DualSimulation
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends PatternMatchingBase<G, V, E>
-  implements UnaryGraphToGraphOperator<G, V, E> {
+  extends PatternMatching<G, V, E> {
 
   /**
    * Logger
@@ -85,15 +84,6 @@ public class DualSimulation
   /**
    * Creates a new operator instance.
    *
-   * @param query GDL based query
-   */
-  public DualSimulation(String query) {
-    this(query, true, false);
-  }
-
-  /**
-   * Creates a new operator instance.
-   *
    * @param query             GDL based query
    * @param attachData        attach original data to resulting vertices/edges
    * @param useBulkIteration  true to use bulk, false to use delta iteration
@@ -107,7 +97,7 @@ public class DualSimulation
   }
 
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) {
 
     if (LOG.isDebugEnabled()) {
       initDebugMappings(graph);
@@ -121,7 +111,7 @@ public class DualSimulation
       result = executeForPattern(graph);
     }
 
-    return result;
+    return GraphCollection.fromGraph(result);
   }
 
   /**

@@ -27,6 +27,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -38,15 +39,15 @@ public abstract class AbstractRunner {
   /**
    * File containing EPGM vertices.
    */
-  protected static final String VERTICES_JSON = "nodes.json";
+  private static final String VERTICES_JSON = "nodes.json";
   /**
    * File containing EPGM edges.
    */
-  protected static final String EDGES_JSON = "edges.json";
+  private static final String EDGES_JSON = "edges.json";
   /**
    * File containing EPGM graph heads.
    */
-  protected static final String GRAPHS_JSON = "graphs.json";
+  private static final String GRAPHS_JSON = "graphs.json";
   /**
    * Command line options for the runner.
    */
@@ -136,6 +137,28 @@ public abstract class AbstractRunner {
       directory + VERTICES_JSON,
       directory + EDGES_JSON,
       directory + GRAPHS_JSON);
+  }
+
+  /**
+   * Writes a graph collection into a given directory.
+   *
+   * @param collection  graph collection
+   * @param directory   output path
+   * @param <G>         EPGM graph head type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
+   * @throws Exception
+   */
+  protected static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  void writeGraphCollection(GraphCollection<G, V, E> collection,
+    String directory) throws Exception {
+    directory = appendSeparator(directory);
+    collection.writeAsJson(
+      directory + VERTICES_JSON,
+      directory + EDGES_JSON,
+      directory + GRAPHS_JSON
+    );
   }
 
   /**

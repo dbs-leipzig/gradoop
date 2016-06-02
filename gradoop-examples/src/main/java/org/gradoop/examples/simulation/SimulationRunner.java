@@ -21,6 +21,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.matching.simulation.dual.DualSimulation;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -38,23 +39,23 @@ public class SimulationRunner extends AbstractRunner
   /**
    * Option to declare path to input graph
    */
-  public static final String OPTION_INPUT_PATH  = "i";
+  private static final String OPTION_INPUT_PATH  = "i";
   /**
    *Option to declare path to output graph
     */
-  public static final String OPTION_OUTPUT_PATH = "o";
+  private static final String OPTION_OUTPUT_PATH = "o";
   /**
    * GDL query string
    */
-  public static final String OPTION_QUERY_GRAPH = "q";
+  private static final String OPTION_QUERY_GRAPH = "q";
   /**
    * Attach original data true/false
    */
-  public static final String OPTION_ATTACH_DATA = "a";
+  private static final String OPTION_ATTACH_DATA = "a";
   /**
    * Use bulk iteration true/false
     */
-  public static final String OPTION_USE_BULK    = "b";
+  private static final String OPTION_USE_BULK    = "b";
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
@@ -91,10 +92,10 @@ public class SimulationRunner extends AbstractRunner
     EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
       readEPGMDatabase(inputDir);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
       execute(epgmDatabase.getDatabaseGraph(), query, attachData, useBulk);
 
-    writeLogicalGraph(result, outputDir);
+    writeGraphCollection(result, outputDir);
 
     System.out.println(String.format("Net runtime [s]: %d",
       getExecutionEnvironment()
@@ -128,7 +129,7 @@ public class SimulationRunner extends AbstractRunner
    * @param useBulk       use bulk iteration instead of delta iteration
    * @return result match graph
    */
-  private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> execute(
+  private static GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> execute(
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> databaseGraph,
     String query, boolean attachData, boolean useBulk) {
 

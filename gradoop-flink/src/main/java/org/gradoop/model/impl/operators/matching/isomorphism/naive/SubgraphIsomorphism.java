@@ -12,7 +12,7 @@ import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.utils.SuperStep;
-import org.gradoop.model.impl.operators.matching.PatternMatchingBase;
+import org.gradoop.model.impl.operators.matching.PatternMatching;
 import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
@@ -44,7 +44,7 @@ import org.gradoop.model.impl.operators.matching.isomorphism.naive.utils.Constan
  */
 public class SubgraphIsomorphism
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends PatternMatchingBase<G, V, E>
+  extends PatternMatching<G, V, E>
   implements UnaryGraphToCollectionOperator<G, V, E> {
 
   /**

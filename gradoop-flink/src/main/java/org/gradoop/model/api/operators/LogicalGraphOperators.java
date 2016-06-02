@@ -59,13 +59,11 @@ public interface LogicalGraphOperators
    * Returns a graph collection containing all logical graph that match the
    * given graph pattern.
    *
-   * @param graphPattern  graph pattern
-   * @param predicateFunc predicate describing the semantic properties of the
-   *                      pattern
+   * @param graphPattern  GDL graph pattern
+   *
    * @return logical graphs that match the given graph pattern
    */
-  GraphCollection<G, V, E> match(String graphPattern,
-    PredicateFunction<LogicalGraph> predicateFunc);
+  GraphCollection<G, V, E> match(String graphPattern);
 
   /**
    * Creates a copy of the logical graph.

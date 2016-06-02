@@ -42,6 +42,8 @@ import org.gradoop.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.model.impl.functions.graphcontainment.GraphContainmentUpdater;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
+import org.gradoop.model.impl.operators.matching.isomorphism.naive
+  .SubgraphIsomorphism;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
 import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -373,9 +375,9 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> match(String graphPattern,
-    PredicateFunction<LogicalGraph> predicateFunc) {
-    throw new NotImplementedException();
+  public GraphCollection<G, V, E> match(String graphPattern) {
+    return callForCollection(
+      new SubgraphIsomorphism<G, V, E>(graphPattern, true));
   }
 
   /**
