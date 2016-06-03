@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions;
 
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
@@ -30,19 +47,36 @@ import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.
 @FunctionAnnotation.ReadFieldsSecond("f0")
 public class UpdateVertexMappings extends RichFlatJoinFunction
   <EmbeddingWithTiePoint, VertexStep, EmbeddingWithTiePoint> {
-
+  /**
+   * Traversal code
+   */
   private final TraversalCode traversalCode;
-
+  /**
+   * Current step in the traversal
+   */
   private int currentStep;
-
+  /**
+   * From field of the next step in the traversal (if not last)
+   */
   private int nextFrom;
-
+  /**
+   * Total number of steps in the traversal
+   */
   private int stepCount;
-
+  /**
+   * Index to check in the vertex mapping
+   */
   private int candidate;
-
+  /**
+   * From fields of the previous steps (used for faster checking)
+   */
   private int[] previousFroms;
 
+  /**
+   * Constructor
+   *
+   * @param tc traversal code for the current exploration
+   */
   public UpdateVertexMappings(TraversalCode tc) {
     this.traversalCode  = tc;
     this.stepCount      = tc.getSteps().size();
@@ -74,7 +108,7 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
     GradoopId vertexId = vertexStep.getVertexId();
     boolean isMapped = vertexMappings[candidate] != null;
 
-    // not seen before or same as seen before (bijection)
+    // not seen before or same as seen before (ensure bijection)
     if ((!isMapped && !seenBefore(vertexMappings, vertexId)) ||
       (isMapped && vertexMappings[candidate].equals(vertexId))) {
 
@@ -89,10 +123,22 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
     }
   }
 
+  /**
+   * Check if there are more traversal steps left.
+   *
+   * @return true, if there are more steps
+   */
   private boolean hasMoreSteps() {
     return currentStep < stepCount - 1;
   }
 
+  /**
+   * Check if the given id has been visited before.
+   *
+   * @param vertexMappings  current vertex mappings
+   * @param id              current vertex id
+   * @return true, if visited before
+   */
   private boolean seenBefore(GradoopId[] vertexMappings, GradoopId id) {
     boolean result = false;
     for (int i = 0; i <= currentStep; i++) {

@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.operators.matching.isomorphism.explorative;
 
 import org.apache.flink.api.java.DataSet;
@@ -39,11 +56,16 @@ import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandida
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.debug.PrintEdgeStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.debug.PrintEmbeddingWithWeldPoint;
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.debug.PrintVertexStep;
-import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.*;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.BuildEdgeStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.BuildEmbeddingWithTiePoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.BuildVertexStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.EdgeHasCandidate;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.UpdateEdgeMappings;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.UpdateVertexMappings;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.VertexHasCandidate;
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.EdgeStep;
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
-import org.gradoop.model.impl.operators.matching.isomorphism.explorative.utils.Constants;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import static org.gradoop.model.impl.operators.matching.common.PostProcessor.extractGraphCollection;
@@ -62,12 +84,15 @@ public class ExplorativeSubgraphIsomorphism
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends PatternMatching<G, V, E>
   implements UnaryGraphToCollectionOperator<G, V, E> {
-
+  /**
+   * Name for broadcast set which contains the superstep id.
+   */
+  public static final String BC_SUPERSTEP = "bc_superstep";
   /**
    * Logger
    */
-  private static Logger LOG = Logger.getLogger(ExplorativeSubgraphIsomorphism.class);
-
+  private static final Logger LOG = Logger.getLogger(
+    ExplorativeSubgraphIsomorphism.class);
   /**
    * Traversal code to process the graph.
    */
@@ -173,9 +198,9 @@ public class ExplorativeSubgraphIsomorphism
     // traverse to outgoing/incoming edges
     DataSet<EdgeStep> edgeSteps = edges
       .filter(new EdgeHasCandidate(traversalCode))
-      .withBroadcastSet(superStep, Constants.BC_SUPERSTEP)
+      .withBroadcastSet(superStep, BC_SUPERSTEP)
       .map(new BuildEdgeStep(traversalCode))
-      .withBroadcastSet(superStep, Constants.BC_SUPERSTEP);
+      .withBroadcastSet(superStep, BC_SUPERSTEP);
 
     if (LOG.isDebugEnabled()) {
       edgeSteps = edgeSteps
@@ -199,7 +224,7 @@ public class ExplorativeSubgraphIsomorphism
     // traverse to vertices
     DataSet<VertexStep> vertexSteps = vertices
       .filter(new VertexHasCandidate(traversalCode))
-      .withBroadcastSet(superStep, Constants.BC_SUPERSTEP)
+      .withBroadcastSet(superStep, BC_SUPERSTEP)
       .map(new BuildVertexStep());
 
     if (LOG.isDebugEnabled()) {

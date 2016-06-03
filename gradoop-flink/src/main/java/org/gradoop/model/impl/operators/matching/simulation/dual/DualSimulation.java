@@ -119,7 +119,8 @@ public class DualSimulation
    * @param graph data graph
    * @return match graph
    */
-  protected GraphCollection<G, V, E> executeForPattern(LogicalGraph<G, V, E> graph) {
+  protected GraphCollection<G, V, E> executeForPattern(
+    LogicalGraph<G, V, E> graph) {
     //--------------------------------------------------------------------------
     // Pre-processing (filter candidates + build initial working set)
     //--------------------------------------------------------------------------

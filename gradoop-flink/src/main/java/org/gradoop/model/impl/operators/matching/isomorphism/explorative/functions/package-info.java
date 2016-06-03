@@ -15,22 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples;
-
-import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.model.impl.id.GradoopId;
-
 /**
- * Represents a vertex that is joined with an {@link EmbeddingWithTiePoint}
- * to extend it at the tie point.
+ * Contains Flink functions that are used by {@link org.gradoop.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism}.
  */
-public class VertexStep extends Tuple1<GradoopId> {
-
-  public GradoopId getVertexId() {
-    return f0;
-  }
-
-  public void setVertexId(GradoopId vertexId) {
-    f0 = vertexId;
-  }
-}
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions;

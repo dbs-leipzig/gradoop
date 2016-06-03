@@ -26,7 +26,6 @@ import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.api.functions.PredicateFunction;
 import org.gradoop.model.impl.operators.grouping.Grouping;
 
 import java.util.List;

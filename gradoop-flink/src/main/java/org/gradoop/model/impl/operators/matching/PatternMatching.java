@@ -20,7 +20,6 @@ package org.gradoop.model.impl.operators.matching;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
@@ -29,19 +28,14 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.PairElementWithPropertyValue;
-import org.gradoop.model.impl.functions.epgm.VertexFromId;
-import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.PrintIdWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.debug.PrintTripleWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.model.impl.operators.matching.simulation.dual.DualSimulation;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
@@ -57,7 +51,7 @@ public abstract class PatternMatching
   /**
    * Logger from the concrete implementation
    */
-  private final Logger log;
+  protected final Logger log;
   /**
    * Query handler
    */
@@ -98,7 +92,6 @@ public abstract class PatternMatching
 
   @Override
   public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) {
-
     if (log.isDebugEnabled()) {
       initDebugMappings(graph);
     }
@@ -131,7 +124,6 @@ public abstract class PatternMatching
    */
   protected abstract GraphCollection<G, V, E> executeForPattern(
     LogicalGraph<G, V, E> graph);
-
 
   /**
    * Initializes the debug mappings between vertices/edges and their debug id.
@@ -172,6 +164,4 @@ public abstract class PatternMatching
       .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
       .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
   }
-
-
 }

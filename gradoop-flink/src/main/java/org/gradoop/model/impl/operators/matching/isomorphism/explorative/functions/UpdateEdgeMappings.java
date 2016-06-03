@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions;
 
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
@@ -36,11 +53,20 @@ import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.
 @FunctionAnnotation.ForwardedFieldsSecond("f2->f1")
 public class UpdateEdgeMappings extends
   RichFlatJoinFunction<EmbeddingWithTiePoint, EdgeStep, EmbeddingWithTiePoint> {
-
+  /**
+   * Traversal code for the current exploration
+   */
   private final TraversalCode traversalCode;
-
+  /**
+   * Index to check in the edge mapping
+   */
   private int candidate;
 
+  /**
+   * Constructor
+   *
+   * @param traversalCode traversal code for the current exploration
+   */
   public UpdateEdgeMappings(TraversalCode traversalCode) {
     this.traversalCode = traversalCode;
   }
