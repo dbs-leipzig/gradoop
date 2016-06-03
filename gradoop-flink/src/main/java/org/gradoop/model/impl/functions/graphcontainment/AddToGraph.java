@@ -30,7 +30,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <GE>  EPGM graph element type
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class GraphContainmentUpdater
+public class AddToGraph
   <G extends EPGMGraphHead, GE extends EPGMGraphElement>
   implements MapFunction<GE, GE> {
 
@@ -44,7 +44,7 @@ public class GraphContainmentUpdater
    *
    * @param graphHead graph head used for updating
    */
-  public GraphContainmentUpdater(G graphHead) {
+  public AddToGraph(G graphHead) {
     this.graphHeadId = graphHead.getId();
   }
 

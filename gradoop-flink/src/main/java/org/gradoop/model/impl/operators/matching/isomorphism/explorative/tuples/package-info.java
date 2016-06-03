@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains a naive traversal implementation for subgraph isomorphism.
+ * Contains tuples that are used exclusively by that implementation.
  */
-package org.gradoop.model.impl.operators.matching.isomorphism.naive;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples;

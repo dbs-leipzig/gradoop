@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive.functions;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -6,7 +6,7 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EmbeddingWithTiePoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
 
 /**
  * Initializes an {@link EmbeddingWithTiePoint} from the given vertex.

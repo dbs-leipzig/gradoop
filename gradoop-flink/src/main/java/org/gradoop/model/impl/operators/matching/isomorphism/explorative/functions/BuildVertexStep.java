@@ -1,9 +1,9 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive.functions;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.VertexStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
 
 /**
  * (id, [candidates]) -> (id)

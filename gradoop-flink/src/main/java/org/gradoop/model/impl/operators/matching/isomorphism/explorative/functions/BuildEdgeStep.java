@@ -1,14 +1,14 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive.functions;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EdgeStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.EdgeStep;
 
 
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.utils
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.utils
   .Constants;
 
 /**

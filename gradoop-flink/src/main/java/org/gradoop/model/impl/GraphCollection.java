@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -131,13 +132,37 @@ public class GraphCollection
   /**
    * Creates a graph collection from the given arguments.
    *
+   * @param graphHeads  GraphHead DataSet
+   * @param vertices    Vertex DataSet
+   * @param config      Gradoop Flink configuration
    * @param <G>         EPGM graph head type
    * @param <V>         EPGM vertex type
    * @param <E>         EPGM edge type
+   * @return Graph collection
+   */
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E>
+  fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices,
+    GradoopFlinkConfig<G, V, E> config) {
+    return fromDataSets(
+      graphHeads,
+      vertices,
+      createEdgeDataSet(new ArrayList<E>(0), config),
+      config
+    );
+  }
+
+  /**
+   * Creates a graph collection from the given arguments.
+   *
    * @param graphHeads  GraphHead DataSet
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
+   * @param <G>         EPGM graph head type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
    * @return Graph collection
    */
   public static

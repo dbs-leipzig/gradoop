@@ -39,8 +39,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.graphcontainment
-  .GraphContainmentUpdaterBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 import org.gradoop.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -561,10 +560,10 @@ public class EPGMDatabase<
     if (withGraphContainment) {
       DataSet<GradoopId> graphId = graphHead.map(new Id<G>());
       return LogicalGraph.fromDataSets(graphHead,
-        database.getVertices().map(new GraphContainmentUpdaterBroadcast<V>())
-          .withBroadcastSet(graphId, GraphContainmentUpdaterBroadcast.GRAPH_ID),
-        database.getEdges().map(new GraphContainmentUpdaterBroadcast<E>())
-          .withBroadcastSet(graphId, GraphContainmentUpdaterBroadcast.GRAPH_ID),
+        database.getVertices().map(new AddToGraphBroadcast<V>())
+          .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID),
+        database.getEdges().map(new AddToGraphBroadcast<E>())
+          .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID),
         config);
     } else {
       return LogicalGraph.fromDataSets(graphHead,

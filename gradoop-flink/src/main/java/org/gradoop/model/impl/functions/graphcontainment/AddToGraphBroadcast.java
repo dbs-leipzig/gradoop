@@ -30,7 +30,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <GE> EPGM graph element type
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class GraphContainmentUpdaterBroadcast
+public class AddToGraphBroadcast
   <GE extends EPGMGraphElement>
   extends RichMapFunction<GE, GE> {
 

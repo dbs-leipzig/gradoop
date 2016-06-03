@@ -1,13 +1,14 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive.functions;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions;
 
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.matching.common.query.Step;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EmbeddingWithTiePoint;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.VertexStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
 
 /**
  * Extends an embedding with a vertex if possible.
@@ -34,13 +35,17 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
 
   private int currentStep;
 
+  private int nextFrom;
+
   private int stepCount;
 
   private int candidate;
 
-  public UpdateVertexMappings(TraversalCode traversalCode) {
-    this.traversalCode  = traversalCode;
-    this.stepCount      = traversalCode.getSteps().size();
+  private int[] previousFroms;
+
+  public UpdateVertexMappings(TraversalCode tc) {
+    this.traversalCode  = tc;
+    this.stepCount      = tc.getSteps().size();
   }
 
   @Override
@@ -48,6 +53,16 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
     super.open(parameters);
     currentStep = getIterationRuntimeContext().getSuperstepNumber() - 1;
     candidate = (int) traversalCode.getStep(currentStep).getTo();
+
+    if (hasMoreSteps()) {
+      this.nextFrom = (int) traversalCode.getStep(currentStep + 1).getFrom();
+    }
+
+    previousFroms = new int[currentStep + 1];
+    for (int i = 0; i <= currentStep; i++) {
+      Step s = traversalCode.getStep(i);
+      previousFroms[i] = (int) s.getFrom();
+    }
   }
 
   @Override
@@ -56,18 +71,36 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
 
     GradoopId[] vertexMappings = embedding.getEmbedding().getVertexMappings();
 
+    GradoopId vertexId = vertexStep.getVertexId();
+    boolean isMapped = vertexMappings[candidate] != null;
+
     // not seen before or same as seen before (bijection)
-    if (vertexMappings[candidate] == null ||
-      vertexMappings[candidate].equals(vertexStep.getVertexId())) {
-      vertexMappings[candidate] = vertexStep.getVertexId();
+    if ((!isMapped && !seenBefore(vertexMappings, vertexId)) ||
+      (isMapped && vertexMappings[candidate].equals(vertexId))) {
+
+      vertexMappings[candidate] = vertexId;
       embedding.getEmbedding().setVertexMappings(vertexMappings);
 
-      // set next tie point if there are more steps
-      if (currentStep < stepCount - 1) {
-        int nextFrom = (int) traversalCode.getStep(currentStep + 1).getFrom();
+      // set next tie point if there are more steps in the traversal
+      if (hasMoreSteps()) {
         embedding.setTiePointId(vertexMappings[nextFrom]);
       }
       collector.collect(embedding);
     }
+  }
+
+  private boolean hasMoreSteps() {
+    return currentStep < stepCount - 1;
+  }
+
+  private boolean seenBefore(GradoopId[] vertexMappings, GradoopId id) {
+    boolean result = false;
+    for (int i = 0; i <= currentStep; i++) {
+      if (vertexMappings[previousFroms[i]].equals(id)) {
+        result = true;
+        break;
+      }
+    }
+    return result;
   }
 }

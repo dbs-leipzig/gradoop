@@ -1,37 +1,53 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMElement;
 import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.epgm.VertexFromId;
+import org.gradoop.model.impl.functions.tuple.ObjectTo1;
+import org.gradoop.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.model.impl.functions.utils.SuperStep;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.PatternMatching;
-import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.model.impl.operators.matching.common.functions.ElementHasCandidate;
 import org.gradoop.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
+import org.gradoop.model.impl.operators.matching.common.functions.AddGraphElementToNewGraph;
+import org.gradoop.model.impl.operators.matching.common.functions.MatchingVertices;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalQueryHandler;
 import org.gradoop.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintEdgeStep;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintEmbeddingWithWeldPoint;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.debug.PrintVertexStep;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.functions.*;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EdgeStep;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.EmbeddingWithTiePoint;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.VertexStep;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.utils.Constants;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.debug.PrintEdgeStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.debug.PrintEmbeddingWithWeldPoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.debug.PrintVertexStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.functions.*;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.EdgeStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.utils.Constants;
+import org.gradoop.util.GradoopFlinkConfig;
+
+import static org.gradoop.model.impl.operators.matching.common.PostProcessor.extractGraphCollection;
+import static org.gradoop.model.impl.operators.matching.common.PostProcessor.extractGraphCollectionWithData;
 
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a
@@ -42,7 +58,7 @@ import org.gradoop.model.impl.operators.matching.isomorphism.naive.utils.Constan
  * @param <E> EPGM edge type
  *
  */
-public class SubgraphIsomorphism
+public class ExplorativeSubgraphIsomorphism
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends PatternMatching<G, V, E>
   implements UnaryGraphToCollectionOperator<G, V, E> {
@@ -50,12 +66,7 @@ public class SubgraphIsomorphism
   /**
    * Logger
    */
-  private static Logger LOG = Logger.getLogger(SubgraphIsomorphism.class);
-
-  /**
-   * Query handler.
-   */
-  private final TraversalQueryHandler queryHandler;
+  private static Logger LOG = Logger.getLogger(ExplorativeSubgraphIsomorphism.class);
 
   /**
    * Traversal code to process the graph.
@@ -68,7 +79,7 @@ public class SubgraphIsomorphism
    * @param query      GDL query graph
    * @param attachData true, if original data shall be attached to the result
    */
-  public SubgraphIsomorphism(String query, boolean attachData) {
+  public ExplorativeSubgraphIsomorphism(String query, boolean attachData) {
     this(query, attachData, null);
   }
 
@@ -79,20 +90,48 @@ public class SubgraphIsomorphism
    * @param attachData  true, if original data shall be attached to the result
    * @param traverser   Traverser used for the query graph
    */
-  public SubgraphIsomorphism(String query, boolean attachData,
+  public ExplorativeSubgraphIsomorphism(String query, boolean attachData,
     Traverser traverser) {
-    super(query, attachData);
-    this.queryHandler = (traverser != null) ?
+    super(query, (traverser != null) ?
       new TraversalQueryHandler(query, traverser) :
-      new TraversalQueryHandler(query);
-    this.traversalCode = queryHandler.getTraversalCode();
+      new TraversalQueryHandler(query), attachData, LOG);
+
+    this.traversalCode = ((TraversalQueryHandler) queryHandler)
+      .getTraversalCode();
   }
 
   @Override
-  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) {
-    if (LOG.isDebugEnabled()) {
-      initDebugMappings(graph);
+  protected GraphCollection<G, V, E> executeForVertex(
+    LogicalGraph<G, V, E> graph) {
+    GradoopFlinkConfig<G, V, E> config = graph.getConfig();
+    EPGMGraphHeadFactory<G> graphHeadFactory = config.getGraphHeadFactory();
+    EPGMVertexFactory<V> vertexFactory = config.getVertexFactory();
+
+    DataSet<V> matchingVertices = graph.getVertices()
+      .filter(new MatchingVertices<V>(query));
+
+    if (!attachData) {
+      matchingVertices = matchingVertices
+        .map(new Id<V>())
+        .map(new ObjectTo1<GradoopId>())
+        .map(new VertexFromId<>(vertexFactory));
     }
+
+    DataSet<Tuple2<V, G>> pairs = matchingVertices
+      .map(new AddGraphElementToNewGraph<V, G>(graphHeadFactory))
+      .returns(new TupleTypeInfo<Tuple2<V, G>>(
+        TypeExtractor.getForClass(vertexFactory.getType()),
+        TypeExtractor.getForClass(graphHeadFactory.getType())));
+
+    return GraphCollection.fromDataSets(
+      pairs.map(new Value1Of2<V, G>()),
+      pairs.map(new Value0Of2<V, G>()),
+      config);
+  }
+
+  @Override
+  protected GraphCollection<G, V, E> executeForPattern(
+    LogicalGraph<G, V, E> graph) {
 
     //--------------------------------------------------------------------------
     // Pre-processing (filter candidates + build initial initialEmbeddings)
@@ -100,6 +139,7 @@ public class SubgraphIsomorphism
 
     DataSet<IdWithCandidates> vertices = PreProcessor.filterVertices(
       graph, query);
+
     DataSet<TripleWithCandidates> edges = PreProcessor.filterEdges(
       graph, query);
 
@@ -196,11 +236,13 @@ public class SubgraphIsomorphism
         graph.getConfig().getVertexFactory(),
         graph.getConfig().getEdgeFactory()));
 
-    return PostProcessor.extractGraphCollection(epgmElements, graph.getConfig());
+    return attachData ?
+      extractGraphCollectionWithData(epgmElements, graph, true) :
+      extractGraphCollection(epgmElements, graph.getConfig(), true);
   }
 
   @Override
   public String getName() {
-    return SubgraphIsomorphism.class.getName();
+    return ExplorativeSubgraphIsomorphism.class.getName();
   }
 }

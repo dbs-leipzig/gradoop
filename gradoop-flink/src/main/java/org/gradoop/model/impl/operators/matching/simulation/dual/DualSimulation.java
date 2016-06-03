@@ -71,11 +71,6 @@ public class DualSimulation
   private static Logger LOG = Logger.getLogger(DualSimulation.class);
 
   /**
-   * Query handler
-   */
-  private final QueryHandler queryHandler;
-
-  /**
    * If true, the algorithm uses bulk iteration for the core iteration.
    * Otherwise it uses delta iteration.
    */
@@ -90,53 +85,31 @@ public class DualSimulation
    */
   public DualSimulation(String query, boolean attachData,
     boolean useBulkIteration) {
-    super(query, attachData);
-
-    this.queryHandler     = new QueryHandler(query);
+    super(query, new QueryHandler(query), attachData, LOG);
     this.useBulkIteration = useBulkIteration;
   }
 
   @Override
-  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) {
-
-    if (LOG.isDebugEnabled()) {
-      initDebugMappings(graph);
-    }
-
-    LogicalGraph<G, V, E> result;
-
-    if (queryHandler.isSingleVertexGraph()) {
-      result = executeForVertex(graph);
-    } else {
-      result = executeForPattern(graph);
-    }
-
-    return GraphCollection.fromGraph(result);
-  }
-
-  /**
-   * Filters vertices based on the given query.
-   *
-   * @param graph data graph
-   * @return match graph
-   */
-  private LogicalGraph<G, V, E> executeForVertex(LogicalGraph<G, V, E> graph) {
+  protected GraphCollection<G, V, E> executeForVertex(
+    LogicalGraph<G, V, E> graph)  {
     DataSet<Tuple1<GradoopId>> matchingVertexIds = PreProcessor
       .filterVertices(graph, query)
       .project(0);
 
     if (attachData) {
-      return LogicalGraph.fromDataSets(matchingVertexIds
-          .join(graph.getVertices())
-          .where(0).equalTo(new Id<V>())
-          .with(new RightSide<Tuple1<GradoopId>, V>()),
-        graph.getConfig()
-      );
+      return GraphCollection.fromGraph(
+        LogicalGraph.fromDataSets(matchingVertexIds
+            .join(graph.getVertices())
+            .where(0).equalTo(new Id<V>())
+            .with(new RightSide<Tuple1<GradoopId>, V>()),
+          graph.getConfig()
+        ));
     } else {
-      return LogicalGraph.fromDataSets(matchingVertexIds
-        .map(new VertexFromId<>(graph.getConfig().getVertexFactory())),
-        graph.getConfig()
-      );
+      return GraphCollection.fromGraph(
+        LogicalGraph.fromDataSets(matchingVertexIds
+            .map(new VertexFromId<>(graph.getConfig().getVertexFactory())),
+          graph.getConfig()
+        ));
     }
   }
 
@@ -146,7 +119,7 @@ public class DualSimulation
    * @param graph data graph
    * @return match graph
    */
-  private LogicalGraph<G, V, E> executeForPattern(LogicalGraph<G, V, E> graph) {
+  protected GraphCollection<G, V, E> executeForPattern(LogicalGraph<G, V, E> graph) {
     //--------------------------------------------------------------------------
     // Pre-processing (filter candidates + build initial working set)
     //--------------------------------------------------------------------------
@@ -343,7 +316,7 @@ public class DualSimulation
    * @param vertices valid vertices after simulation
    * @return maximum match graph
    */
-  private LogicalGraph<G, V, E> postProcess(LogicalGraph<G, V, E> graph,
+  private GraphCollection<G, V, E> postProcess(LogicalGraph<G, V, E> graph,
     DataSet<FatVertex> vertices) {
     GradoopFlinkConfig<G, V, E> config = graph.getConfig();
 
@@ -355,7 +328,8 @@ public class DualSimulation
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
       PostProcessor.extractEdges(vertices, config.getEdgeFactory());
 
-    return LogicalGraph.fromDataSets(matchVertices, matchEdges, config);
+    return GraphCollection.fromGraph(
+      LogicalGraph.fromDataSets(matchVertices, matchEdges, config));
   }
 
   /**

@@ -20,19 +20,28 @@ package org.gradoop.model.impl.operators.matching;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.PairElementWithPropertyValue;
+import org.gradoop.model.impl.functions.epgm.VertexFromId;
+import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.PrintIdWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.debug.PrintTripleWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
+import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.model.impl.operators.matching.simulation.dual.DualSimulation;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
@@ -45,6 +54,14 @@ import org.gradoop.model.impl.properties.PropertyValue;
 public abstract class PatternMatching
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements UnaryGraphToCollectionOperator<G, V, E> {
+  /**
+   * Logger from the concrete implementation
+   */
+  private final Logger log;
+  /**
+   * Query handler
+   */
+  protected final QueryHandler queryHandler;
   /**
    * GDL based query string
    */
@@ -69,13 +86,58 @@ public abstract class PatternMatching
    * @param query       GDL query graph
    * @param attachData  true, if original data shall be attached to the result
    */
-  public PatternMatching(String query, boolean attachData) {
+  public PatternMatching(String query, QueryHandler queryHandler,
+    boolean attachData, Logger log) {
     Preconditions.checkState(!Strings.isNullOrEmpty(query),
       "Query must not be null or empty");
-    this.query            = query;
-    this.attachData       = attachData;
+    this.query         = query;
+    this.queryHandler  = queryHandler;
+    this.attachData    = attachData;
+    this.log           = log;
   }
 
+  @Override
+  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+
+    if (log.isDebugEnabled()) {
+      initDebugMappings(graph);
+    }
+
+    GraphCollection<G, V, E> result;
+
+    if (queryHandler.isSingleVertexGraph()) {
+      result = executeForVertex(graph);
+    } else {
+      result = executeForPattern(graph);
+    }
+
+    return result;
+  }
+
+  /**
+   * Computes the result for single vertex query graphs.
+   *
+   * @param graph data graph
+   * @return result collection
+   */
+  protected abstract GraphCollection<G, V, E> executeForVertex(
+    LogicalGraph<G, V, E> graph);
+
+  /**
+   * Computes the result for pattern query graph.
+   *
+   * @param graph data graph
+   * @return result collection
+   */
+  protected abstract GraphCollection<G, V, E> executeForPattern(
+    LogicalGraph<G, V, E> graph);
+
+
+  /**
+   * Initializes the debug mappings between vertices/edges and their debug id.
+   *
+   * @param graph data graph
+   */
   protected void initDebugMappings(LogicalGraph<G, V, E> graph) {
     vertexMapping = graph.getVertices()
       .map(new PairElementWithPropertyValue<V>("id"));
@@ -83,6 +145,12 @@ public abstract class PatternMatching
       .map(new PairElementWithPropertyValue<E>("id"));
   }
 
+  /**
+   * Prints {@link TripleWithCandidates} to debug log.
+   *
+   * @param edges edge triples with candidates
+   * @return edges
+   */
   protected DataSet<TripleWithCandidates> printTriplesWithCandidates(
     DataSet<TripleWithCandidates> edges) {
     return edges
@@ -91,6 +159,12 @@ public abstract class PatternMatching
       .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
   }
 
+  /**
+   * Prints {@link IdWithCandidates} to debug log.
+   *
+   * @param vertices vertex ids with candidates
+   * @return vertices
+   */
   protected DataSet<IdWithCandidates> printIdWithCandidates(
     DataSet<IdWithCandidates> vertices) {
     return vertices
@@ -98,4 +172,6 @@ public abstract class PatternMatching
       .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
       .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
   }
+
+
 }

@@ -1,8 +1,8 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive.debug;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.debug;
 
 import org.apache.log4j.Logger;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
-import org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples.VertexStep;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
 
 /**
  * Debug output for {@link VertexStep}.

@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive.utils;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.utils;
 
 /**
  * Copyright 2016 martin.

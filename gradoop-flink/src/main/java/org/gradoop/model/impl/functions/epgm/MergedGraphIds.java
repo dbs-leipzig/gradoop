@@ -2,6 +2,7 @@ package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopIdSet;
@@ -15,7 +16,9 @@ import java.util.Iterator;
  * GraphElement* -> GraphElement
  */
 public class MergedGraphIds<GE extends EPGMGraphElement>
-  implements GroupCombineFunction<GE, GE>, GroupReduceFunction<GE, GE> {
+  implements GroupCombineFunction<GE, GE>, GroupReduceFunction<GE, GE>,
+  JoinFunction<GE, GE, GE> {
+
 
   @Override
   public void combine(Iterable<GE> values, Collector<GE> out) throws Exception {
@@ -31,5 +34,11 @@ public class MergedGraphIds<GE extends EPGMGraphElement>
       graphIds.addAll(iterator.next().getGraphIds());
     }
     out.collect(result);
+  }
+
+  @Override
+  public GE join(GE first, GE second) throws Exception {
+    first.getGraphIds().addAll(second.getGraphIds());
+    return first;
   }
 }

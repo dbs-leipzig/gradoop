@@ -28,6 +28,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.EdgeFromIds;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.MergedGraphIds;
@@ -89,6 +90,33 @@ public class PostProcessor {
     );
   }
 
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E> extractGraphCollectionWithData(
+    DataSet<EPGMElement> epgmElements, LogicalGraph<G, V, E> inputGraph,
+    boolean mayOverlap) {
+    GradoopFlinkConfig<G, V, E> config = inputGraph.getConfig();
+
+    // get result collection without data
+    GraphCollection<G, V, E> collection =
+      extractGraphCollection(epgmElements, config, mayOverlap);
+
+    // attach data by joining first and merging the graph head ids
+    DataSet<V> newVertices = inputGraph.getVertices()
+      .join(collection.getVertices())
+      .where(new Id<V>()).equalTo(new Id<V>())
+      .with(new MergedGraphIds<V>())
+      .withForwardedFieldsFirst("id;label;properties;");
+
+    DataSet<E> newEdges = inputGraph.getEdges()
+      .join(collection.getEdges())
+      .where(new Id<E>()).equalTo(new Id<E>())
+      .with(new MergedGraphIds<E>())
+      .withForwardedFieldsFirst("id;label;properties");
+
+    return GraphCollection.fromDataSets(
+      collection.getGraphHeads(), newVertices, newEdges, config);
+  }
   /**
    * Extracts vertex ids from the given pattern matching result.
    *

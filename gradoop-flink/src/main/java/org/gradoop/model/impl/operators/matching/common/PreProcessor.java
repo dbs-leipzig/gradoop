@@ -40,7 +40,8 @@ public class PreProcessor {
 
   /**
    * Filters vertices based on the given GDL query. The resulting dataset only
-   * contains vertices that match at least one vertex in the query graph.
+   * contains vertex ids and their candidates that match at least one vertex in
+   * the query graph.
    *
    * @param graph data graph
    * @param query query graph

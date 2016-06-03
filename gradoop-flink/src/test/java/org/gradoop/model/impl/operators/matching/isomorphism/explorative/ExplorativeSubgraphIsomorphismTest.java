@@ -1,17 +1,14 @@
-package org.gradoop.model.impl.operators.matching.simulation.dual;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative;
 
 import org.gradoop.model.impl.operators.matching.PatternMatching;
+import org.gradoop.model.impl.operators.matching.isomorphism.SubgraphIsomorphismTest;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
-/**
- * Creates an {@link DualSimulation} instance that used bulk iteration.
- */
-public class DualSimulationBulkTest extends DualSimulationTest {
+public class ExplorativeSubgraphIsomorphismTest extends SubgraphIsomorphismTest {
 
-
-  public DualSimulationBulkTest(String testName, String dataGraph,
+  public ExplorativeSubgraphIsomorphismTest(String testName, String dataGraph,
     String queryGraph, String[] expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
@@ -21,6 +18,6 @@ public class DualSimulationBulkTest extends DualSimulationTest {
   @Override
   public PatternMatching<GraphHeadPojo, VertexPojo, EdgePojo> getImplementation(
     String queryGraph, boolean attachData) {
-    return new DualSimulation<>(queryGraph, attachData, true);
+    return new ExplorativeSubgraphIsomorphism<>(queryGraph, attachData);
   }
 }

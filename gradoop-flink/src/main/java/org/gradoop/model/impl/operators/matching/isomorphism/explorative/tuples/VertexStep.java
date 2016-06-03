@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.operators.matching.isomorphism.naive.tuples;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.model.impl.id.GradoopId;

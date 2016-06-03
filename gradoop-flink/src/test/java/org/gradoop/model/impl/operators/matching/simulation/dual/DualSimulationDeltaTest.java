@@ -1,5 +1,6 @@
 package org.gradoop.model.impl.operators.matching.simulation.dual;
 
+import org.gradoop.model.impl.operators.matching.PatternMatching;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -9,9 +10,16 @@ import org.gradoop.model.impl.pojo.VertexPojo;
  */
 public class DualSimulationDeltaTest extends DualSimulationTest {
 
+  public DualSimulationDeltaTest(String testName, String dataGraph,
+    String queryGraph, String[] expectedGraphVariables,
+    String expectedCollection) {
+    super(testName, dataGraph, queryGraph, expectedGraphVariables,
+      expectedCollection);
+  }
+
   @Override
-  protected DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> getOperator(
-    String query) {
-    return new DualSimulation<>(query, true, false);
+  public PatternMatching<GraphHeadPojo, VertexPojo, EdgePojo> getImplementation(
+    String queryGraph, boolean attachData) {
+    return new DualSimulation<>(queryGraph, attachData, false);
   }
 }
