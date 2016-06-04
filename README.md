@@ -16,6 +16,13 @@ and Flink libraries (i.e. Gelly, ML and Table).
 Gradoop is **work in progress** which means APIs may change. It is currently used
 as a proof of concept implementation and far from production ready.
 
+##### Further Information
+
+* [Extended Property Graphs with Apache Flink, SIGMOD NDA Workshop, June 2016](http://dbs.uni-leipzig.de/file/EPGM.pdf)
+* [Gradoop @Flink/Neo4j Meetup Berlin, March 2016](http://www.slideshare.net/s1ck/gradoop-scalable-graph-analytics-with-apache-flink-flink-neo4j-meetup-berlin)
+* [Gradoop @FOSDEM GraphDevroom, January 2016](https://fosdem.org/2016/schedule/event/graph_processing_gradoop_flink_analytics)
+* [Gradoop @FlinkForward, September 2015](http://www.slideshare.net/FlinkForward/martin-junghans-gradoop-scalable-graph-analytics-with-apache-flink) ([YouTube](https://youtu.be/WmP9xB_sG2o?list=PLDX4T_cnKjD31JeWR1aMOi9LXPRQ6nyHO))
+
 ## Data Model
 
 In the extended property graph model (EPGM), a database consists of multiple 
