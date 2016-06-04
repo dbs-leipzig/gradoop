@@ -35,7 +35,10 @@ import org.gradoop.util.GradoopFlinkConfig;
  * Base class for example runners.
  */
 public abstract class AbstractRunner {
-
+  /**
+   * Command line options for the runner.
+   */
+  protected static final Options OPTIONS = new Options();
   /**
    * File containing EPGM vertices.
    */
@@ -49,17 +52,9 @@ public abstract class AbstractRunner {
    */
   private static final String GRAPHS_JSON = "graphs.json";
   /**
-   * Command line options for the runner.
-   */
-  protected static final Options OPTIONS;
-  /**
    * Flink execution environment.
    */
   private static ExecutionEnvironment ENV;
-
-  static {
-    OPTIONS = new Options();
-  }
 
   /**
    * Parses the program arguments and performs sanity checks.

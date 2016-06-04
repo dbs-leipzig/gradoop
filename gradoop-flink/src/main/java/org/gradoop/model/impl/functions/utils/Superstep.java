@@ -17,32 +17,33 @@
 
 package org.gradoop.model.impl.functions.utils;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.IterationRuntimeContext;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
 
 /**
- * Checks if a given object of type {@link IN} is instance of a specific class
- * of type {@link T}.
+ * Returns the current superstep using {@link IterationRuntimeContext}.
  *
- * @param <IN>  input type
- * @param <T>   class type to check
+ * Note that this function can only be applied in an iterative context (i.e.
+ * bulk or delta iteration).
+ *
+ * @param <T> input type
  */
-public class IsInstance<IN, T> implements FilterFunction<IN> {
-  /**
-   * Class for isInstance check
-   */
-  private final Class<T> clazz;
+public class Superstep<T> extends RichMapFunction<T, Integer> {
 
   /**
-   * Constructor
-   *
-   * @param clazz class for isInstance check
+   * super step
    */
-  public IsInstance(Class<T> clazz) {
-    this.clazz = clazz;
+  private Integer superstep;
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+    superstep = getIterationRuntimeContext().getSuperstepNumber();
   }
 
   @Override
-  public boolean filter(IN value) throws Exception {
-    return clazz.isInstance(value);
+  public Integer map(T value) throws Exception {
+    return superstep;
   }
 }

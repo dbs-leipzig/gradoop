@@ -49,43 +49,43 @@ public abstract class PatternMatching
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements UnaryGraphToCollectionOperator<G, V, E> {
   /**
+   * GDL based query string
+   */
+  private final String query;
+  /**
    * Logger from the concrete implementation
    */
-  protected final Logger log;
+  private final Logger log;
   /**
    * Query handler
    */
-  protected final QueryHandler queryHandler;
-  /**
-   * GDL based query string
-   */
-  protected final String query;
+  private final QueryHandler queryHandler;
   /**
    * If true, the original vertex and edge data gets attached to the resulting
    * vertices and edges.
    */
-  protected final boolean attachData;
+  private final boolean attachData;
   /**
    * Vertex mapping used for debug
    */
-  protected DataSet<Tuple2<GradoopId, PropertyValue>> vertexMapping;
+  private DataSet<Tuple2<GradoopId, PropertyValue>> vertexMapping;
   /**
    * Edge mapping used for debug
    */
-  protected DataSet<Tuple2<GradoopId, PropertyValue>> edgeMapping;
+  private DataSet<Tuple2<GradoopId, PropertyValue>> edgeMapping;
 
   /**
    * Constructor
    *
    * @param query       GDL query graph
    * @param attachData  true, if original data shall be attached to the result
+   * @param log         Logger of the concrete implementation
    */
-  public PatternMatching(String query, QueryHandler queryHandler,
-    boolean attachData, Logger log) {
+  public PatternMatching(String query, boolean attachData, Logger log) {
     Preconditions.checkState(!Strings.isNullOrEmpty(query),
       "Query must not be null or empty");
     this.query         = query;
-    this.queryHandler  = queryHandler;
+    this.queryHandler  = getQueryHandler();
     this.attachData    = attachData;
     this.log           = log;
   }
@@ -126,15 +126,47 @@ public abstract class PatternMatching
     LogicalGraph<G, V, E> graph);
 
   /**
-   * Initializes the debug mappings between vertices/edges and their debug id.
+   * Returns the query handler used by the concrete implementation.
    *
-   * @param graph data graph
+   * @return query handler
    */
-  protected void initDebugMappings(LogicalGraph<G, V, E> graph) {
-    vertexMapping = graph.getVertices()
-      .map(new PairElementWithPropertyValue<V>("id"));
-    edgeMapping = graph.getEdges()
-      .map(new PairElementWithPropertyValue<E>("id"));
+  protected abstract QueryHandler getQueryHandler();
+
+  /**
+   * Returns the GDL query processed by this operator instance.
+   *
+   * @return GDL query
+   */
+  protected String getQuery() {
+    return query;
+  }
+
+  /**
+   * Determines if the original vertex and edge data shall be attached
+   * to the vertices/edges in the resulting subgraphs.
+   *
+   * @return true, if original data must be attached
+   */
+  protected boolean doAttachData() {
+    return attachData;
+  }
+
+  /**
+   * Returns a mapping between vertex id and property value used for debug.
+   *
+   * @return vertex id -> property value mapping
+   */
+  protected DataSet<Tuple2<GradoopId, PropertyValue>> getVertexMapping() {
+    return vertexMapping;
+  }
+
+  /**
+   * Returns a mapping between edge id and property value used for debug.
+   *
+   * @return edge id -> property value mapping
+   */
+  protected DataSet<Tuple2<GradoopId, PropertyValue>> getEdgeMapping() {
+    return edgeMapping;
   }
 
   /**
@@ -163,5 +195,17 @@ public abstract class PatternMatching
       .map(new PrintIdWithCandidates())
       .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
       .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+  }
+
+  /**
+   * Initializes the debug mappings between vertices/edges and their debug id.
+   *
+   * @param graph data graph
+   */
+  private void initDebugMappings(LogicalGraph<G, V, E> graph) {
+    vertexMapping = graph.getVertices()
+      .map(new PairElementWithPropertyValue<V>("id"));
+    edgeMapping = graph.getEdges()
+      .map(new PairElementWithPropertyValue<E>("id"));
   }
 }

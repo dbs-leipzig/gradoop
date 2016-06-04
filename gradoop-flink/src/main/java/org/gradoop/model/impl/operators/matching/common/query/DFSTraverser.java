@@ -32,20 +32,16 @@ public class DFSTraverser implements RootedTraverser {
   /**
    * Query handler to access the query graph.
    */
-  private final QueryHandler queryHandler;
-
-  /**
-   * Creates a new DFS traverser.
-   *
-   * @param queryHandler query handler
-   */
-  public DFSTraverser(QueryHandler queryHandler) {
-    this.queryHandler = queryHandler;
-  }
+  private QueryHandler queryHandler;
 
   @Override
   public TraversalCode traverse() {
     return traverse(queryHandler.getVertices().iterator().next().getId());
+  }
+
+  @Override
+  public void setQueryHandler(QueryHandler queryHandler) {
+    this.queryHandler = queryHandler;
   }
 
   @Override

@@ -40,6 +40,7 @@ import org.gradoop.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
+import org.gradoop.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
@@ -372,9 +373,17 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> match(String graphPattern) {
-    return callForCollection(
-      new ExplorativeSubgraphIsomorphism<G, V, E>(graphPattern, true));
+  public GraphCollection<G, V, E> match(String pattern) {
+    return match(pattern, true);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection<G, V, E> match(String pattern, boolean attachData) {
+    return callForCollection(new ExplorativeSubgraphIsomorphism<G, V, E>(
+      pattern, attachData, new DFSTraverser()));
   }
 
   /**

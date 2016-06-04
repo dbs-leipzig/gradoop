@@ -38,7 +38,7 @@ import org.gradoop.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.model.impl.functions.utils.SuperStep;
+import org.gradoop.model.impl.functions.utils.Superstep;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.PatternMatching;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
@@ -47,8 +47,9 @@ import org.gradoop.model.impl.operators.matching.common.functions.ElementHasCand
 import org.gradoop.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
 import org.gradoop.model.impl.operators.matching.common.functions.AddGraphElementToNewGraph;
 import org.gradoop.model.impl.operators.matching.common.functions.MatchingVertices;
+import org.gradoop.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
-import org.gradoop.model.impl.operators.matching.common.query.TraversalQueryHandler;
 import org.gradoop.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
@@ -105,7 +106,7 @@ public class ExplorativeSubgraphIsomorphism
    * @param attachData true, if original data shall be attached to the result
    */
   public ExplorativeSubgraphIsomorphism(String query, boolean attachData) {
-    this(query, attachData, null);
+    this(query, attachData, new DFSTraverser());
   }
 
   /**
@@ -117,12 +118,9 @@ public class ExplorativeSubgraphIsomorphism
    */
   public ExplorativeSubgraphIsomorphism(String query, boolean attachData,
     Traverser traverser) {
-    super(query, (traverser != null) ?
-      new TraversalQueryHandler(query, traverser) :
-      new TraversalQueryHandler(query), attachData, LOG);
-
-    this.traversalCode = ((TraversalQueryHandler) queryHandler)
-      .getTraversalCode();
+    super(query, attachData, LOG);
+    traverser.setQueryHandler(getQueryHandler());
+    this.traversalCode = traverser.traverse();
   }
 
   @Override
@@ -133,9 +131,9 @@ public class ExplorativeSubgraphIsomorphism
     EPGMVertexFactory<V> vertexFactory = config.getVertexFactory();
 
     DataSet<V> matchingVertices = graph.getVertices()
-      .filter(new MatchingVertices<V>(query));
+      .filter(new MatchingVertices<V>(getQuery()));
 
-    if (!attachData) {
+    if (!doAttachData()) {
       matchingVertices = matchingVertices
         .map(new Id<V>())
         .map(new ObjectTo1<GradoopId>())
@@ -163,21 +161,21 @@ public class ExplorativeSubgraphIsomorphism
     //--------------------------------------------------------------------------
 
     DataSet<IdWithCandidates> vertices = PreProcessor.filterVertices(
-      graph, query);
+      graph, getQuery());
 
     DataSet<TripleWithCandidates> edges = PreProcessor.filterEdges(
-      graph, query);
+      graph, getQuery());
 
     DataSet<EmbeddingWithTiePoint> initialEmbeddings = vertices
       .filter(new ElementHasCandidate(traversalCode.getStep(0).getFrom()))
       .map(new BuildEmbeddingWithTiePoint(traversalCode,
-        queryHandler.getVertexCount(), queryHandler.getEdgeCount()));
+        getQueryHandler().getVertexCount(), getQueryHandler().getEdgeCount()));
 
     if (LOG.isDebugEnabled()) {
       initialEmbeddings = initialEmbeddings
         .map(new PrintEmbeddingWithWeldPoint())
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     //--------------------------------------------------------------------------
@@ -193,7 +191,7 @@ public class ExplorativeSubgraphIsomorphism
     // get current superstep
     DataSet<Integer> superStep = embeddings
       .first(1)
-      .map(new SuperStep());
+      .map(new Superstep<EmbeddingWithTiePoint>());
 
     // traverse to outgoing/incoming edges
     DataSet<EdgeStep> edgeSteps = edges
@@ -205,8 +203,8 @@ public class ExplorativeSubgraphIsomorphism
     if (LOG.isDebugEnabled()) {
       edgeSteps = edgeSteps
         .map(new PrintEdgeStep(true, "post-filter-map-edge"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     DataSet<EmbeddingWithTiePoint> nextWorkSet = embeddings
@@ -217,8 +215,8 @@ public class ExplorativeSubgraphIsomorphism
     if (LOG.isDebugEnabled()) {
       nextWorkSet = nextWorkSet
         .map(new PrintEmbeddingWithWeldPoint(true, "post-edge-update"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // traverse to vertices
@@ -230,8 +228,8 @@ public class ExplorativeSubgraphIsomorphism
     if (LOG.isDebugEnabled()) {
       vertexSteps = vertexSteps
         .map(new PrintVertexStep(true, "post-filter-project-vertex"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     nextWorkSet = nextWorkSet
@@ -242,8 +240,8 @@ public class ExplorativeSubgraphIsomorphism
     if (LOG.isDebugEnabled()) {
       nextWorkSet = nextWorkSet
         .map(new PrintEmbeddingWithWeldPoint(true, "post-vertex-update"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // ITERATION FOOTER
@@ -261,9 +259,14 @@ public class ExplorativeSubgraphIsomorphism
         graph.getConfig().getVertexFactory(),
         graph.getConfig().getEdgeFactory()));
 
-    return attachData ?
+    return doAttachData() ?
       extractGraphCollectionWithData(epgmElements, graph, true) :
       extractGraphCollection(epgmElements, graph.getConfig(), true);
+  }
+
+  @Override
+  protected QueryHandler getQueryHandler() {
+    return new QueryHandler(getQuery());
   }
 
   @Override

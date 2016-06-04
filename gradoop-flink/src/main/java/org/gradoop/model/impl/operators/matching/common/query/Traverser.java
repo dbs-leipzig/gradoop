@@ -29,4 +29,11 @@ public interface Traverser {
    */
   TraversalCode traverse();
 
+  /**
+   * Set the query handler to access the query graph.
+   *
+   * @param queryHandler query handler
+   */
+  void setQueryHandler(QueryHandler queryHandler);
+
 }

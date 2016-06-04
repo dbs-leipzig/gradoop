@@ -55,14 +55,28 @@ public interface LogicalGraphOperators
   //----------------------------------------------------------------------------
 
   /**
-   * Returns a graph collection containing all logical graph that match the
-   * given graph pattern.
+   * Returns a graph collection containing all subgraphs of the input graph
+   * that match the given graph pattern.
    *
-   * @param graphPattern  GDL graph pattern
+   * @param pattern  GDL graph pattern
    *
-   * @return logical graphs that match the given graph pattern
+   * @return subgraphs of the input graph that match the given graph pattern
    */
-  GraphCollection<G, V, E> match(String graphPattern);
+  GraphCollection<G, V, E> match(String pattern);
+
+  /**
+   * Returns a graph collection containing all subgraphs of the input graph
+   * that match the given graph pattern.
+   *
+   * This method allows to control if the original vertex and edge data
+   * (labels and properties) shall be attached to the resulting subgraphs.
+   * Note that this requires additional JOIN operations.
+   *
+   * @param pattern     GDL graph pattern
+   * @param attachData  attach original vertex and edge data to the result
+   * @return subgraphs of the input graph that match the given graph pattern
+   */
+  GraphCollection<G, V, E> match(String pattern, boolean attachData);
 
   /**
    * Creates a copy of the logical graph.

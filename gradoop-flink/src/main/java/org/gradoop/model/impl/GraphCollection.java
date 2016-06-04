@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;

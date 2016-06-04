@@ -87,7 +87,7 @@ public abstract class SubgraphIsomorphismTest extends PatternMatchingTest {
         new String[] {"expected1", "expected2"},
         "expected1[" +
           "(v1)-[e2]->(v6)-[e8]->(v5)-[e6]->(v4)-[e4]->(v1)" +
-        "]," +
+        "]" +
         "expected2[" +
           "(v5)-[e6]->(v4)-[e4]->(v1)-[e2]->(v6)-[e8]->(v5)" +
         "]"

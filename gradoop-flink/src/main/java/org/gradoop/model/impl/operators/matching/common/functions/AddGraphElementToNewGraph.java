@@ -26,6 +26,13 @@ import org.gradoop.model.api.EPGMGraphHeadFactory;
 
 /**
  * (GE) -> (GE (+ GraphHead), GraphHead)
+ *
+ * Forwarded fields:
+ *
+ * *->f0: input graph element
+ *
+ * @param <GE> EPGM graph element type
+ * @param <G> EPGM graph head type
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
 public class AddGraphElementToNewGraph

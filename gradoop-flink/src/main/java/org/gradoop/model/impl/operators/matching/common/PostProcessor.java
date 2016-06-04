@@ -90,6 +90,18 @@ public class PostProcessor {
     );
   }
 
+  /**
+   * Extracts a {@link GraphCollection} from a set of {@link EPGMElement} and
+   * attaches the original data from the input {@link LogicalGraph}.
+   *
+   * @param epgmElements  EPGM elements
+   * @param inputGraph    original input graph
+   * @param mayOverlap    true, if elements may be contained in multiple graphs
+   * @param <G>           EPGM graph head type
+   * @param <V>           EPGM vertex type
+   * @param <E>           EPGM edge type
+   * @return Graph collection
+   */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   GraphCollection<G, V, E> extractGraphCollectionWithData(
