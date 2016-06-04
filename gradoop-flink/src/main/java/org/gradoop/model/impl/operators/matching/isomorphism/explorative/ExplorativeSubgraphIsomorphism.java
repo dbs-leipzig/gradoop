@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.operators.matching.isomorphism.explorative;
 
+import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
@@ -69,6 +70,8 @@ import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
 import org.gradoop.util.GradoopFlinkConfig;
 
+
+import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
 import static org.gradoop.model.impl.operators.matching.common.PostProcessor.extractGraphCollection;
 import static org.gradoop.model.impl.operators.matching.common.PostProcessor.extractGraphCollectionWithData;
 
@@ -98,6 +101,14 @@ public class ExplorativeSubgraphIsomorphism
    * Traversal code to process the graph.
    */
   private final TraversalCode traversalCode;
+  /**
+   * Join strategy used for the join between embeddings and edges
+   */
+  private final JoinOperatorBase.JoinHint edgeStepJoinStrategy;
+  /**
+   * Join strategy used for the join between embeddings and vertices
+   */
+  private final JoinOperatorBase.JoinHint vertexStepJoinStrategy;
 
   /**
    * Constructor
@@ -118,9 +129,29 @@ public class ExplorativeSubgraphIsomorphism
    */
   public ExplorativeSubgraphIsomorphism(String query, boolean attachData,
     Traverser traverser) {
+    this(query, attachData, traverser,
+      OPTIMIZER_CHOOSES, OPTIMIZER_CHOOSES);
+  }
+
+  /**
+   * Constructor
+   *
+   * @param query                   GDL query graph
+   * @param attachData              true, if original data shall be attached
+   *                                to the result
+   * @param traverser               Traverser used for the query graph
+   * @param edgeStepJoinStrategy    Join strategy for edge extension
+   * @param vertexStepJoinStrategy  Join strategy for vertex extension
+   */
+  public ExplorativeSubgraphIsomorphism(String query, boolean attachData,
+    Traverser traverser,
+    JoinOperatorBase.JoinHint edgeStepJoinStrategy,
+    JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
     super(query, attachData, LOG);
     traverser.setQueryHandler(getQueryHandler());
-    this.traversalCode = traverser.traverse();
+    this.traversalCode          = traverser.traverse();
+    this.edgeStepJoinStrategy   = edgeStepJoinStrategy;
+    this.vertexStepJoinStrategy = vertexStepJoinStrategy;
   }
 
   @Override
@@ -157,7 +188,7 @@ public class ExplorativeSubgraphIsomorphism
     LogicalGraph<G, V, E> graph) {
 
     //--------------------------------------------------------------------------
-    // Pre-processing (filter candidates + build initial initialEmbeddings)
+    // Pre-processing (filter candidates + build initial embeddings)
     //--------------------------------------------------------------------------
 
     DataSet<IdWithCandidates> vertices = PreProcessor.filterVertices(
@@ -179,9 +210,40 @@ public class ExplorativeSubgraphIsomorphism
     }
 
     //--------------------------------------------------------------------------
-    // Traversal
+    // Exploration via Traversal
     //--------------------------------------------------------------------------
 
+    DataSet<EmbeddingWithTiePoint> result = explore(
+      vertices, edges, initialEmbeddings);
+
+
+    //--------------------------------------------------------------------------
+    // Post-Processing (build Graph Collection from embeddings)
+    //--------------------------------------------------------------------------
+
+    DataSet<EPGMElement> epgmElements = result
+      .<Tuple1<Embedding>>project(0)
+      .flatMap(new ElementsFromEmbedding<>(traversalCode,
+        graph.getConfig().getGraphHeadFactory(),
+        graph.getConfig().getVertexFactory(),
+        graph.getConfig().getEdgeFactory()));
+
+    return doAttachData() ?
+      extractGraphCollectionWithData(epgmElements, graph, true) :
+      extractGraphCollection(epgmElements, graph.getConfig(), true);
+  }
+
+  /**
+   * Explores the data graph according to the traversal code of this operator.
+   *
+   * @param vertices          vertex candidates
+   * @param edges             edge candidates
+   * @param initialEmbeddings initial embeddings which are extended
+   * @return final embeddings
+   */
+  private DataSet<EmbeddingWithTiePoint> explore(
+    DataSet<IdWithCandidates> vertices, DataSet<TripleWithCandidates> edges,
+    DataSet<EmbeddingWithTiePoint> initialEmbeddings) {
     // ITERATION HEAD
     IterativeDataSet<EmbeddingWithTiePoint> embeddings = initialEmbeddings
       .iterate(traversalCode.getSteps().size());
@@ -189,16 +251,16 @@ public class ExplorativeSubgraphIsomorphism
     // ITERATION BODY
 
     // get current superstep
-    DataSet<Integer> superStep = embeddings
+    DataSet<Integer> superstep = embeddings
       .first(1)
       .map(new Superstep<EmbeddingWithTiePoint>());
 
     // traverse to outgoing/incoming edges
     DataSet<EdgeStep> edgeSteps = edges
       .filter(new EdgeHasCandidate(traversalCode))
-      .withBroadcastSet(superStep, BC_SUPERSTEP)
+      .withBroadcastSet(superstep, BC_SUPERSTEP)
       .map(new BuildEdgeStep(traversalCode))
-      .withBroadcastSet(superStep, BC_SUPERSTEP);
+      .withBroadcastSet(superstep, BC_SUPERSTEP);
 
     if (LOG.isDebugEnabled()) {
       edgeSteps = edgeSteps
@@ -208,7 +270,7 @@ public class ExplorativeSubgraphIsomorphism
     }
 
     DataSet<EmbeddingWithTiePoint> nextWorkSet = embeddings
-      .join(edgeSteps)
+      .join(edgeSteps, edgeStepJoinStrategy)
       .where(1).equalTo(1) // tiePointId == tiePointId
       .with(new UpdateEdgeMappings(traversalCode));
 
@@ -222,7 +284,7 @@ public class ExplorativeSubgraphIsomorphism
     // traverse to vertices
     DataSet<VertexStep> vertexSteps = vertices
       .filter(new VertexHasCandidate(traversalCode))
-      .withBroadcastSet(superStep, BC_SUPERSTEP)
+      .withBroadcastSet(superstep, BC_SUPERSTEP)
       .map(new BuildVertexStep());
 
     if (LOG.isDebugEnabled()) {
@@ -233,7 +295,7 @@ public class ExplorativeSubgraphIsomorphism
     }
 
     nextWorkSet = nextWorkSet
-      .join(vertexSteps)
+      .join(vertexSteps, vertexStepJoinStrategy)
       .where(1).equalTo(0) // tiePointId == vertexId
       .with(new UpdateVertexMappings(traversalCode));
 
@@ -245,23 +307,8 @@ public class ExplorativeSubgraphIsomorphism
     }
 
     // ITERATION FOOTER
-    DataSet<EmbeddingWithTiePoint> result = embeddings
+    return embeddings
       .closeWith(nextWorkSet, nextWorkSet);
-
-    //--------------------------------------------------------------------------
-    // Post-Processing (Build Graph Collection from Embeddings)
-    //--------------------------------------------------------------------------
-
-    DataSet<EPGMElement> epgmElements = result
-      .<Tuple1<Embedding>>project(0)
-      .flatMap(new ElementsFromEmbedding<>(traversalCode,
-        graph.getConfig().getGraphHeadFactory(),
-        graph.getConfig().getVertexFactory(),
-        graph.getConfig().getEdgeFactory()));
-
-    return doAttachData() ?
-      extractGraphCollectionWithData(epgmElements, graph, true) :
-      extractGraphCollection(epgmElements, graph.getConfig(), true);
   }
 
   @Override

@@ -20,11 +20,13 @@ package org.gradoop.examples.simulation;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
+import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.matching.PatternMatching;
+import org.gradoop.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
 import org.gradoop.model.impl.operators.matching.simulation.dual.DualSimulation;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -32,6 +34,8 @@ import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
 import java.util.concurrent.TimeUnit;
+
+import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST;
 
 /**
  * Performs graph pattern matching on an arbitrary input graph.
@@ -41,22 +45,28 @@ public class PatternMatchingRunner extends AbstractRunner
   /**
    * Refers to {@link DualSimulation} using bulk iteration
    */
-  private static final String ALGORITHM_DUAL_BULK = "dual-bulk";
+  private static final String ALGO_DUAL_BULK = "dual-bulk";
   /**
    * Refers to {@link DualSimulation} using delta iteration
    */
-  private static final String ALGORITHM_DUAL_DELTA = "dual-delta";
+  private static final String ALGO_DUAL_DELTA = "dual-delta";
   /**
    * Refers to {@link ExplorativeSubgraphIsomorphism}
    */
-  private static final String ALGORITHM_ISO_EXP = "iso-exp";
+  private static final String ALGO_ISO_EXP = "iso-exp";
+  /**
+   * Refers to {@link ExplorativeSubgraphIsomorphism} using
+   * BROADCAST_HASH_FIRST as {@link JoinHint} for extending embeddings.
+   */
+  private static final String ALGO_ISO_EXP_BC_HASH_FIRST = "iso-exp-bc-hf";
   /**
    * Used for console output
    */
   private static final String[] AVAILABLE_ALGORITHMS = new String[] {
-      ALGORITHM_DUAL_BULK,
-      ALGORITHM_DUAL_DELTA,
-      ALGORITHM_ISO_EXP
+      ALGO_DUAL_BULK,
+      ALGO_DUAL_DELTA,
+      ALGO_ISO_EXP,
+      ALGO_ISO_EXP_BC_HASH_FIRST
   };
   /**
    * Option to declare path to input graph
@@ -163,14 +173,18 @@ public class PatternMatchingRunner extends AbstractRunner
     PatternMatching<GraphHeadPojo, VertexPojo, EdgePojo> op;
 
     switch (algorithm) {
-    case ALGORITHM_DUAL_BULK :
+    case ALGO_DUAL_BULK:
       op = new DualSimulation<>(query, attachData, true);
       break;
-    case ALGORITHM_DUAL_DELTA :
+    case ALGO_DUAL_DELTA:
       op = new DualSimulation<>(query, attachData, false);
       break;
-    case ALGORITHM_ISO_EXP :
+    case ALGO_ISO_EXP:
       op = new ExplorativeSubgraphIsomorphism<>(query, attachData);
+      break;
+    case ALGO_ISO_EXP_BC_HASH_FIRST:
+      op = new ExplorativeSubgraphIsomorphism<>(query, attachData,
+        new DFSTraverser(), BROADCAST_HASH_FIRST, BROADCAST_HASH_FIRST);
       break;
     default :
       throw new IllegalArgumentException(algorithm + " not supported");
