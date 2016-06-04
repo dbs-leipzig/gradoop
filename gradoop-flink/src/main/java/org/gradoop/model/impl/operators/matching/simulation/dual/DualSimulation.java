@@ -17,24 +17,21 @@
 
 package org.gradoop.model.impl.operators.matching.simulation.dual;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.epgm.PairElementWithPropertyValue;
 import org.gradoop.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.model.impl.functions.utils.RightSide;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.matching.PatternMatching;
 import org.gradoop.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.model.impl.operators.matching.common.debug.Printer;
@@ -55,7 +52,6 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.functions.Valid
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.Deletion;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.FatVertex;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.Message;
-import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
@@ -67,38 +63,12 @@ import org.gradoop.util.GradoopFlinkConfig;
  */
 public class DualSimulation
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryGraphToGraphOperator<G, V, E> {
+  extends PatternMatching<G, V, E> {
 
   /**
    * Logger
    */
   private static Logger LOG = Logger.getLogger(DualSimulation.class);
-
-  /**
-   * Vertex mapping used for debug
-   */
-  private DataSet<Tuple2<GradoopId, PropertyValue>> vertexMapping;
-
-  /**
-   * Edge mapping used for debug
-   */
-  private DataSet<Tuple2<GradoopId, PropertyValue>> edgeMapping;
-
-  /**
-   * GDL based query string
-   */
-  private final String query;
-
-  /**
-   * Query handler
-   */
-  private final QueryHandler queryHandler;
-
-  /**
-   * If true, the original vertex and edge data gets attached to the resulting
-   * vertices and edges.
-   */
-  private final boolean attachData;
 
   /**
    * If true, the algorithm uses bulk iteration for the core iteration.
@@ -109,74 +79,36 @@ public class DualSimulation
   /**
    * Creates a new operator instance.
    *
-   * @param query GDL based query
+   * @param query       GDL based query
+   * @param attachData  attach original data to resulting vertices/edges
+   * @param useBulk     true to use bulk, false to use delta iteration
    */
-  public DualSimulation(String query) {
-    this(query, true, false);
-  }
-
-  /**
-   * Creates a new operator instance.
-   *
-   * @param query             GDL based query
-   * @param attachData        attach original data to resulting vertices/edges
-   * @param useBulkIteration  true to use bulk, false to use delta iteration
-   */
-  public DualSimulation(String query, boolean attachData,
-    boolean useBulkIteration) {
-
-    Preconditions.checkState(!Strings.isNullOrEmpty(query),
-      "Query must not be null or empty");
-    this.query            = query;
-    this.queryHandler     = QueryHandler.fromString(query);
-    this.attachData       = attachData;
-    this.useBulkIteration = useBulkIteration;
+  public DualSimulation(String query, boolean attachData, boolean useBulk) {
+    super(query, attachData, LOG);
+    this.useBulkIteration = useBulk;
   }
 
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
-
-    if (LOG.isDebugEnabled()) {
-      vertexMapping = graph.getVertices()
-        .map(new PairElementWithPropertyValue<V>("id"));
-      edgeMapping = graph.getEdges()
-        .map(new PairElementWithPropertyValue<E>("id"));
-    }
-
-    LogicalGraph<G, V, E> result;
-
-    if (queryHandler.isSingleVertexGraph()) {
-      result = executeForVertex(graph);
-    } else {
-      result = executeForPattern(graph);
-    }
-
-    return result;
-  }
-
-  /**
-   * Filters vertices based on the given query.
-   *
-   * @param graph data graph
-   * @return match graph
-   */
-  private LogicalGraph<G, V, E> executeForVertex(LogicalGraph<G, V, E> graph) {
+  protected GraphCollection<G, V, E> executeForVertex(
+    LogicalGraph<G, V, E> graph)  {
     DataSet<Tuple1<GradoopId>> matchingVertexIds = PreProcessor
-      .filterVertices(graph, query)
+      .filterVertices(graph, getQuery())
       .project(0);
 
-    if (attachData) {
-      return LogicalGraph.fromDataSets(matchingVertexIds
-          .join(graph.getVertices())
-          .where(0).equalTo(new Id<V>())
-          .with(new RightSide<Tuple1<GradoopId>, V>()),
-        graph.getConfig()
-      );
+    if (doAttachData()) {
+      return GraphCollection.fromGraph(
+        LogicalGraph.fromDataSets(matchingVertexIds
+            .join(graph.getVertices())
+            .where(0).equalTo(new Id<V>())
+            .with(new RightSide<Tuple1<GradoopId>, V>()),
+          graph.getConfig()
+        ));
     } else {
-      return LogicalGraph.fromDataSets(matchingVertexIds
-        .map(new VertexFromId<>(graph.getConfig().getVertexFactory())),
-        graph.getConfig()
-      );
+      return GraphCollection.fromGraph(
+        LogicalGraph.fromDataSets(matchingVertexIds
+            .map(new VertexFromId<>(graph.getConfig().getVertexFactory())),
+          graph.getConfig()
+        ));
     }
   }
 
@@ -186,7 +118,8 @@ public class DualSimulation
    * @param graph data graph
    * @return match graph
    */
-  private LogicalGraph<G, V, E> executeForPattern(LogicalGraph<G, V, E> graph) {
+  protected GraphCollection<G, V, E> executeForPattern(
+    LogicalGraph<G, V, E> graph) {
     //--------------------------------------------------------------------------
     // Pre-processing (filter candidates + build initial working set)
     //--------------------------------------------------------------------------
@@ -209,6 +142,14 @@ public class DualSimulation
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected QueryHandler getQueryHandler() {
+    return new QueryHandler(getQuery());
+  }
+
+  /**
    * Extracts valid triples from the input graph based on the query.
    *
    * @param g input graph
@@ -216,7 +157,7 @@ public class DualSimulation
    */
   private DataSet<TripleWithCandidates> filterTriples(LogicalGraph<G, V, E> g) {
     // filter vertex-edge-vertex triples by query predicates
-    return PreProcessor.filterTriplets(g, query);
+    return PreProcessor.filterTriplets(g, getQuery());
   }
 
   /**
@@ -229,13 +170,13 @@ public class DualSimulation
     DataSet<TripleWithCandidates> triples) {
     return triples.flatMap(new CloneAndReverse())
       .groupBy(1) // sourceId
-      .combineGroup(new BuildFatVertex(query))
+      .combineGroup(new BuildFatVertex(getQuery()))
       .groupBy(0) // vertexId
       .reduceGroup(new GroupedFatVertices());
   }
 
   /**
-   * Performs dual simulation using bulkd iteration.
+   * Performs dual simulation using bulk iteration.
    *
    * @param vertices fat vertices
    * @return remaining fat vertices after dual simulation
@@ -245,8 +186,8 @@ public class DualSimulation
     if (LOG.isDebugEnabled()) {
       vertices = vertices
         .map(new PrintFatVertex(false, "iteration start"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // ITERATION HEAD
@@ -257,13 +198,13 @@ public class DualSimulation
     // validate neighborhood of each vertex and create deletions
     DataSet<Deletion> deletions = workSet
       .filter(new UpdatedFatVertices())
-      .flatMap(new ValidateNeighborhood(query));
+      .flatMap(new ValidateNeighborhood(getQuery()));
 
     if (LOG.isDebugEnabled()) {
       deletions = deletions
         .map(new PrintDeletion(true, "deletion"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // combine deletions to message
@@ -274,8 +215,8 @@ public class DualSimulation
     if (LOG.isDebugEnabled()) {
       combinedMessages = combinedMessages
         .map(new PrintMessage(true, "combined"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // group messages to final message
@@ -286,22 +227,22 @@ public class DualSimulation
     if (LOG.isDebugEnabled()) {
       messages = messages
         .map(new PrintMessage(true, "grouped"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // update candidates and build next working set
     DataSet<FatVertex> nextWorkingSet = workSet
       .leftOuterJoin(messages)
       .where(0).equalTo(0) // vertexId == recipientId
-      .with(new UpdateVertexState(query))
+      .with(new UpdateVertexState(getQuery()))
       .filter(new ValidFatVertices());
 
     if (LOG.isDebugEnabled()) {
       nextWorkingSet = nextWorkingSet
         .map(new PrintFatVertex(true, "next workset"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // ITERATION FOOTER
@@ -317,7 +258,7 @@ public class DualSimulation
   private DataSet<FatVertex> simulateDelta(DataSet<FatVertex> vertices) {
     // prepare initial working set
     DataSet<Message> initialWorkingSet = vertices
-      .flatMap(new ValidateNeighborhood(query))
+      .flatMap(new ValidateNeighborhood(getQuery()))
       .groupBy(0)
       .combineGroup(new CombinedMessages())
       .groupBy(0)
@@ -326,13 +267,13 @@ public class DualSimulation
     if (LOG.isDebugEnabled()) {
       vertices = vertices
         .map(new PrintFatVertex(false, "initial solution set"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
 
       initialWorkingSet = initialWorkingSet
         .map(new PrintMessage(false, "initial working set"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // ITERATION HEAD
@@ -345,19 +286,19 @@ public class DualSimulation
     DataSet<FatVertex> deltas = iteration.getSolutionSet()
       .join(iteration.getWorkset())
       .where(0).equalTo(0)
-      .with(new UpdateVertexState(query));
+      .with(new UpdateVertexState(getQuery()));
 
     if (LOG.isDebugEnabled()) {
       deltas = deltas
         .map(new PrintFatVertex(true, "solution set delta"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // prepare new messages for the next round from updates
     DataSet<Message> updates = deltas
       .filter(new ValidFatVertices())
-      .flatMap(new ValidateNeighborhood(query))
+      .flatMap(new ValidateNeighborhood(getQuery()))
       .groupBy(0)
       .combineGroup(new CombinedMessages())
       .groupBy(0)
@@ -366,8 +307,8 @@ public class DualSimulation
     if (LOG.isDebugEnabled()) {
       updates = updates
         .map(new PrintMessage(true, "next working set"))
-        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
-        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
+        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
+        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
     }
 
     // ITERATION FOOTER
@@ -376,26 +317,27 @@ public class DualSimulation
   }
 
   /**
-   * Extracts vertices and edges from the query result and constructs a maximum
-   * match graph.
+   * Extracts vertices and edges from the query result and constructs a
+   * maximum match graph.
    *
    * @param graph    input graph
    * @param vertices valid vertices after simulation
    * @return maximum match graph
    */
-  private LogicalGraph<G, V, E> postProcess(LogicalGraph<G, V, E> graph,
+  private GraphCollection<G, V, E> postProcess(LogicalGraph<G, V, E> graph,
     DataSet<FatVertex> vertices) {
     GradoopFlinkConfig<G, V, E> config = graph.getConfig();
 
-    DataSet<V> matchVertices = attachData ?
+    DataSet<V> matchVertices = doAttachData() ?
       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :
       PostProcessor.extractVertices(vertices, config.getVertexFactory());
 
-    DataSet<E> matchEdges = attachData ?
+    DataSet<E> matchEdges = doAttachData() ?
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
       PostProcessor.extractEdges(vertices, config.getEdgeFactory());
 
-    return LogicalGraph.fromDataSets(matchVertices, matchEdges, config);
+    return GraphCollection.fromGraph(
+      LogicalGraph.fromDataSets(matchVertices, matchEdges, config));
   }
 
   /**

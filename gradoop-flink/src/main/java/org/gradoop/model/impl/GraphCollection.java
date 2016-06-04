@@ -131,13 +131,37 @@ public class GraphCollection
   /**
    * Creates a graph collection from the given arguments.
    *
+   * @param graphHeads  GraphHead DataSet
+   * @param vertices    Vertex DataSet
+   * @param config      Gradoop Flink configuration
    * @param <G>         EPGM graph head type
    * @param <V>         EPGM vertex type
    * @param <E>         EPGM edge type
+   * @return Graph collection
+   */
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  GraphCollection<G, V, E>
+  fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices,
+    GradoopFlinkConfig<G, V, E> config) {
+    return fromDataSets(
+      graphHeads,
+      vertices,
+      createEdgeDataSet(new ArrayList<E>(0), config),
+      config
+    );
+  }
+
+  /**
+   * Creates a graph collection from the given arguments.
+   *
    * @param graphHeads  GraphHead DataSet
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
+   * @param <G>         EPGM graph head type
+   * @param <V>         EPGM vertex type
+   * @param <E>         EPGM edge type
    * @return Graph collection
    */
   public static

@@ -28,7 +28,7 @@ public class QueryHandlerTest {
     "(v3)-[e4:c]->(v3)";
 
   static GDLHandler GDL_HANDLER = new Builder().buildFromString(TEST_QUERY);
-  static QueryHandler QUERY_HANDLER = QueryHandler.fromString(TEST_QUERY);
+  static QueryHandler QUERY_HANDLER = new QueryHandler(TEST_QUERY);
 
   @Test
   public void testGetVertexCount() {
@@ -43,19 +43,19 @@ public class QueryHandlerTest {
   @Test
   public void testIsSingleVertexGraph() {
     assertFalse(QUERY_HANDLER.isSingleVertexGraph());
-    assertTrue(QueryHandler.fromString("(v0)").isSingleVertexGraph());
+    assertTrue(new QueryHandler("(v0)").isSingleVertexGraph());
   }
 
   @Test
   public void testGetDiameter() {
     assertEquals(2, QUERY_HANDLER.getDiameter());
-    assertEquals(0, QueryHandler.fromString("(v0)").getDiameter());
+    assertEquals(0, new QueryHandler("(v0)").getDiameter());
   }
 
   @Test
   public void testGetRadius() {
     assertEquals(1, QUERY_HANDLER.getRadius());
-    assertEquals(0, QueryHandler.fromString("(v0)").getRadius());
+    assertEquals(0, new QueryHandler("(v0)").getRadius());
   }
 
   @Test
@@ -97,6 +97,19 @@ public class QueryHandlerTest {
       GDL_HANDLER.getEdgeCache().get("e1"),
       GDL_HANDLER.getEdgeCache().get("e3"));
     assertTrue(elementsEqual(aEdges, expected));
+  }
+
+  @Test
+  public void testGetEdgesByVertexId() throws Exception {
+    Vertex v2 = GDL_HANDLER.getVertexCache().get("v2");
+    List<Edge> edges = Lists.newArrayList(
+      QUERY_HANDLER.getEdgesByVertexId(v2.getId()));
+
+    List<Edge> expected = Lists.newArrayList(
+      GDL_HANDLER.getEdgeCache().get("e1"),
+      GDL_HANDLER.getEdgeCache().get("e2"),
+      GDL_HANDLER.getEdgeCache().get("e3"));
+    assertTrue(elementsEqual(edges, expected));
   }
 
   @Test

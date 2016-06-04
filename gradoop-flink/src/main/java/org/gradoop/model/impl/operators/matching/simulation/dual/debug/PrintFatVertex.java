@@ -70,11 +70,11 @@ public class PrintFatVertex extends Printer<FatVertex> {
    * @param edgeCandidates runtime representation
    * @return string representation
    */
-  private List<String> getEdgeCandidates(Map<IdPair, List<Long>>
+  private List<String> getEdgeCandidates(Map<IdPair, boolean[]>
     edgeCandidates) {
 
     List<String> entries = Lists.newArrayList();
-    for (Map.Entry<IdPair, List<Long>> entry : edgeCandidates.entrySet()) {
+    for (Map.Entry<IdPair, boolean[]> entry : edgeCandidates.entrySet()) {
       // (edge-id,target-id)
       entries.add(String.format("(%s,%s):[%s]",
         edgeMap.get(entry.getKey().getEdgeId()),

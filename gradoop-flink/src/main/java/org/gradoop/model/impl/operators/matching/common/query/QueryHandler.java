@@ -81,18 +81,8 @@ public class QueryHandler {
    *
    * @param gdlString GDL query string
    */
-  private QueryHandler(String gdlString) {
+  public QueryHandler(String gdlString) {
     gdlHandler = new GDLHandler.Builder().buildFromString(gdlString);
-  }
-
-  /**
-   * Create a query handler using the given GQL query string.
-   *
-   * @param gdlString GQL query string
-   * @return query handler
-   */
-  public static QueryHandler fromString(String gdlString) {
-    return new QueryHandler(gdlString);
   }
 
   /**
@@ -218,6 +208,24 @@ public class QueryHandler {
       initLabelToEdgeCache();
     }
     return labelToEdgeCache.get(label);
+  }
+
+  /**
+   * Returns all outgoing and incoming edges that are incident to the given
+   * vertex id.
+   *
+   * @param vertexId vertex id
+   * @return incoming and outgoing edges
+   */
+  public Collection<Edge> getEdgesByVertexId(Long vertexId) {
+    List<Edge> result = Lists.newArrayList();
+    if (getEdgesBySourceVertexId(vertexId) != null) {
+      result.addAll(getEdgesBySourceVertexId(vertexId));
+    }
+    if (getEdgesByTargetVertexId(vertexId) != null) {
+      result.addAll(getEdgesByTargetVertexId(vertexId));
+    }
+    return result;
   }
 
   /**

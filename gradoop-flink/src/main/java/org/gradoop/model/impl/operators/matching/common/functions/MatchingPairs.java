@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl.operators.matching.common.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
@@ -26,8 +25,6 @@ import org.gradoop.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
-
-import java.util.List;
 
 /**
  * Filters vertex-edge pairs based on their corresponding candidates.
@@ -39,8 +36,8 @@ import java.util.List;
  * f2->f3:  target vertex id
  */
 @FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f2->f3")
-public class MatchingPairs extends RichFlatJoinFunction<
-  IdWithCandidates, TripleWithCandidates, TripleWithSourceEdgeCandidates> {
+public class MatchingPairs extends RichFlatJoinFunction
+  <IdWithCandidates, TripleWithCandidates, TripleWithSourceEdgeCandidates> {
 
   /**
    * serial version uid
@@ -75,27 +72,34 @@ public class MatchingPairs extends RichFlatJoinFunction<
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    queryHandler = QueryHandler.fromString(query);
+    queryHandler = new QueryHandler(query);
   }
 
   @Override
   public void join(IdWithCandidates sourceVertex, TripleWithCandidates edge,
     Collector<TripleWithSourceEdgeCandidates> collector) throws Exception {
 
-    List<Long> newSourceCandidates = Lists.newArrayListWithCapacity(
-      sourceVertex.getCandidates().size());
-    List<Long> newEdgeCandidates = Lists.newArrayListWithCapacity(
-      edge.getEdgeCandidates().size());
+    boolean[] sourceCandidates  = sourceVertex.getCandidates();
+    boolean[] edgeCandidates    = edge.getCandidates();
 
-    for (Long eQ : edge.getEdgeCandidates()) {
-      Long vQ = queryHandler.getEdgeById(eQ).getSourceVertexId();
-      if (sourceVertex.getCandidates().contains(vQ)) {
-        newSourceCandidates.add(vQ);
-        newEdgeCandidates.add(eQ);
+    boolean[] newSourceCandidates = new boolean[sourceCandidates.length];
+    boolean[] newEdgeCandidates   = new boolean[edgeCandidates.length];
+
+    boolean pairStillValid = false;
+
+    for (int eQ = 0; eQ < edgeCandidates.length; eQ++) {
+      if (edgeCandidates[eQ]) {
+        int vQ = queryHandler
+          .getEdgeById((long) eQ).getSourceVertexId().intValue();
+        if (sourceCandidates[vQ]) {
+          newSourceCandidates[vQ] = true;
+          newEdgeCandidates[eQ]   = true;
+          pairStillValid          = true;
+        }
       }
     }
 
-    if (!newEdgeCandidates.isEmpty()) {
+    if (pairStillValid) {
       reuseTuple.setEdgeId(edge.getEdgeId());
       reuseTuple.setSourceId(edge.getSourceId());
       reuseTuple.setSourceCandidates(newSourceCandidates);

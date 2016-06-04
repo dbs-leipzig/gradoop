@@ -15,29 +15,34 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.matching.common.debug;
+package org.gradoop.model.impl.operators.matching.isomorphism.explorative.debug;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.gradoop.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.model.impl.operators.matching.common.debug.Printer;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
 
 /**
- * Debug output for {@link TripleWithCandidates}.
+ * Debug output for {@link VertexStep}.
  */
-public class PrintMatchingTriple extends Printer<TripleWithCandidates> {
-
+public class PrintVertexStep extends Printer<VertexStep> {
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintMatchingTriple.class);
+  private static Logger LOG = Logger.getLogger(PrintVertexStep.class);
+
+  /**
+   * Constructor
+   *
+   * @param isIterative true, if used in iterative context
+   * @param prefix      prefix for debug string
+   */
+  public PrintVertexStep(boolean isIterative, String prefix) {
+    super(isIterative, prefix);
+  }
 
   @Override
-  protected String getDebugString(TripleWithCandidates t) {
-    return String.format("(%s,%s,%s,[%s])",
-      edgeMap.get(t.getEdgeId()),
-      vertexMap.get(t.getSourceId()),
-      vertexMap.get(t.getTargetId()),
-      StringUtils.join(t.getEdgeCandidates(), ','));
+  protected String getDebugString(VertexStep vertexStep) {
+    return String.format("(%s)", vertexMap.get(vertexStep.getVertexId()));
   }
 
   @Override

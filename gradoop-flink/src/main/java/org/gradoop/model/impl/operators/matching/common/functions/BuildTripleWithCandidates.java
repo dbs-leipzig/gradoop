@@ -40,21 +40,22 @@ import java.util.Collection;
 @FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
 public class BuildTripleWithCandidates<E extends EPGMEdge>
   extends AbstractBuilder<E, TripleWithCandidates> {
-
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
   /**
    * Query vertices to match against.
    */
   private transient Collection<Edge> queryEdges;
-
+  /**
+   * Number of edges in the query graph
+   */
+  private int edgeCount;
   /**
    * Reduce instantiations
    */
-  private TripleWithCandidates reuseTuple;
+  private final TripleWithCandidates reuseTuple;
   /**
    * Constructor
    *
@@ -69,6 +70,7 @@ public class BuildTripleWithCandidates<E extends EPGMEdge>
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     queryEdges = getQueryHandler().getEdges();
+    edgeCount  = queryEdges.size();
   }
 
   @Override
@@ -76,7 +78,8 @@ public class BuildTripleWithCandidates<E extends EPGMEdge>
     reuseTuple.setEdgeId(e.getId());
     reuseTuple.setSourceId(e.getSourceId());
     reuseTuple.setTargetId(e.getTargetId());
-    reuseTuple.setEdgeCandidates(EntityMatcher.getMatches(e, queryEdges));
+    reuseTuple.setCandidates(
+      getCandidates(edgeCount, EntityMatcher.getMatches(e, queryEdges)));
     return reuseTuple;
   }
 }

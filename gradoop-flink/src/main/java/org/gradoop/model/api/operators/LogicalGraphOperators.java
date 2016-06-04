@@ -26,7 +26,6 @@ import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.api.functions.PredicateFunction;
 import org.gradoop.model.impl.operators.grouping.Grouping;
 
 import java.util.List;
@@ -56,16 +55,28 @@ public interface LogicalGraphOperators
   //----------------------------------------------------------------------------
 
   /**
-   * Returns a graph collection containing all logical graph that match the
-   * given graph pattern.
+   * Returns a graph collection containing all subgraphs of the input graph
+   * that match the given graph pattern.
    *
-   * @param graphPattern  graph pattern
-   * @param predicateFunc predicate describing the semantic properties of the
-   *                      pattern
-   * @return logical graphs that match the given graph pattern
+   * @param pattern  GDL graph pattern
+   *
+   * @return subgraphs of the input graph that match the given graph pattern
    */
-  GraphCollection<G, V, E> match(String graphPattern,
-    PredicateFunction<LogicalGraph> predicateFunc);
+  GraphCollection<G, V, E> match(String pattern);
+
+  /**
+   * Returns a graph collection containing all subgraphs of the input graph
+   * that match the given graph pattern.
+   *
+   * This method allows to control if the original vertex and edge data
+   * (labels and properties) shall be attached to the resulting subgraphs.
+   * Note that this requires additional JOIN operations.
+   *
+   * @param pattern     GDL graph pattern
+   * @param attachData  attach original vertex and edge data to the result
+   * @return subgraphs of the input graph that match the given graph pattern
+   */
+  GraphCollection<G, V, E> match(String pattern, boolean attachData);
 
   /**
    * Creates a copy of the logical graph.

@@ -83,7 +83,7 @@ public class ValidateNeighborhood
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    queryHandler = QueryHandler.fromString(query);
+    queryHandler = new QueryHandler(query);
   }
 
   @Override
@@ -241,8 +241,12 @@ public class ValidateNeighborhood
    */
   private Set<Long> getOutgoingEdgeCandidates(FatVertex fatVertex) {
     Set<Long> outgoingEdgeCandidates = Sets.newHashSet();
-    for (List<Long> candidates : fatVertex.getEdgeCandidates().values()) {
-      outgoingEdgeCandidates.addAll(candidates);
+    for (boolean[] candidates : fatVertex.getEdgeCandidates().values()) {
+      for (int i = 0; i < candidates.length; i++) {
+        if (candidates[i]) {
+          outgoingEdgeCandidates.add((long) i);
+        }
+      }
     }
     return outgoingEdgeCandidates;
   }

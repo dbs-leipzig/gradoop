@@ -20,8 +20,6 @@ package org.gradoop.model.impl.operators.matching.simulation.dual.tuples;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.model.impl.id.GradoopId;
 
-import java.util.List;
-
 /**
  * Represents an edge-source-target triple and its query candidates.
  *
@@ -32,7 +30,7 @@ import java.util.List;
  * f4: query candidates
  */
 public class TripleWithDirection extends
-  Tuple5<GradoopId, GradoopId, GradoopId, Boolean, List<Long>> {
+  Tuple5<GradoopId, GradoopId, GradoopId, Boolean, boolean[]> {
 
   public GradoopId getEdgeId() {
     return f0;
@@ -66,11 +64,11 @@ public class TripleWithDirection extends
     f3 = outgoing;
   }
 
-  public List<Long> getCandidates() {
+  public boolean[] getCandidates() {
     return f4;
   }
 
-  public void setCandidates(List<Long> candidates) {
+  public void setCandidates(boolean[] candidates) {
     f4 = candidates;
   }
 }

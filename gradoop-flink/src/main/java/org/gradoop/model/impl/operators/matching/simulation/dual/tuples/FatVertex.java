@@ -34,7 +34,7 @@ import java.util.Map;
  * f5: updated flag
  */
 public class FatVertex extends Tuple6<GradoopId, List<Long>, List<GradoopId>,
-    int[], Map<IdPair, List<Long>>, Boolean> {
+    int[], Map<IdPair, boolean[]>, Boolean> {
 
   public GradoopId getVertexId() {
     return f0;
@@ -68,11 +68,11 @@ public class FatVertex extends Tuple6<GradoopId, List<Long>, List<GradoopId>,
     f3 = incomingCandidateCounts;
   }
 
-  public Map<IdPair, List<Long>> getEdgeCandidates() {
+  public Map<IdPair, boolean[]> getEdgeCandidates() {
     return f4;
   }
 
-  public void setEdgeCandidates(Map<IdPair, List<Long>> edgeCandidates) {
+  public void setEdgeCandidates(Map<IdPair, boolean[]> edgeCandidates) {
     f4 = edgeCandidates;
   }
 

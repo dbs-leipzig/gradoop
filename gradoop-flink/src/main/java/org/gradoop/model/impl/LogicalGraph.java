@@ -18,7 +18,6 @@
 package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
@@ -30,7 +29,6 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.TransformationFunction;
-import org.gradoop.model.api.functions.PredicateFunction;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.LogicalGraphOperators;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
@@ -39,9 +37,11 @@ import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
 import org.gradoop.model.impl.functions.epgm.PropertyGetter;
-import org.gradoop.model.impl.functions.graphcontainment.GraphContainmentUpdater;
+import org.gradoop.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.Aggregation;
+import org.gradoop.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
 import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -242,8 +242,8 @@ public class LogicalGraph
       .fromElements(graphHead);
 
     // update vertices and edges with new graph head id
-    vertices = vertices.map(new GraphContainmentUpdater<G, V>(graphHead));
-    edges = edges.map(new GraphContainmentUpdater<G, E>(graphHead));
+    vertices = vertices.map(new AddToGraph<G, V>(graphHead));
+    edges = edges.map(new AddToGraph<G, E>(graphHead));
 
     return new LogicalGraph<>(
       graphHeadSet,
@@ -322,10 +322,10 @@ public class LogicalGraph
     G graphHead = config.getGraphHeadFactory().createGraphHead();
 
     DataSet<V> vertexDataSet = createVertexDataSet(vertices, config)
-      .map(new GraphContainmentUpdater<G, V>(graphHead));
+      .map(new AddToGraph<G, V>(graphHead));
 
     DataSet<E> edgeDataSet = createEdgeDataSet(edges, config)
-      .map(new GraphContainmentUpdater<G, E>(graphHead));
+      .map(new AddToGraph<G, E>(graphHead));
 
     return fromDataSets(
       createGraphHeadDataSet(new ArrayList<G>(0), config),
@@ -373,9 +373,17 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> match(String graphPattern,
-    PredicateFunction<LogicalGraph> predicateFunc) {
-    throw new NotImplementedException();
+  public GraphCollection<G, V, E> match(String pattern) {
+    return match(pattern, true);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection<G, V, E> match(String pattern, boolean attachData) {
+    return callForCollection(new ExplorativeSubgraphIsomorphism<G, V, E>(
+      pattern, attachData, new DFSTraverser()));
   }
 
   /**

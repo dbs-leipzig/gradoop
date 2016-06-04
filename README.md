@@ -40,7 +40,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 | Operator      | Output | Output description                                           | Impl |
 |:--------------|:-------|:-------------------------------------------------------------|:----:|
 | Aggregation   | G      | Graph with result of an aggregate function as a new property | Yes  |
-| Matching      | GC     | Graphs that match a given graph pattern                      | No   |
+| Matching      | GC     | Graphs that match a given graph pattern                      | Yes  |
 | Transformation| G      | Graph with transformed (graph, vertex, edge) data            | Yes  |
 | Grouping      | G      | Structural condense of the input graph                       | Yes  |
 | Subgraph      | G      | Subgraph that fulfils given vertex and edge predicates       | Yes  |

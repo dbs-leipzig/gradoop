@@ -2,6 +2,8 @@ package org.gradoop.model.impl.operators.matching;
 
 public class TestData {
 
+  public static final String DATA_GRAPH_VARIABLE = "db";
+
   public static final String PATH_PATTERN_0 =
     "(:A)-[:a]->(:B)";
 
@@ -10,6 +12,12 @@ public class TestData {
 
   public static final String PATH_PATTERN_2 =
     "(:A)";
+
+  public static final String PATH_PATTERN_3 =
+    "(:B)-[:d]->(:B)";
+
+  public static final String PATH_PATTERN_4 =
+    "(:A)-[:a]->(:A)-[:a]->(:A)";
 
   public static final String LOOP_PATTERN_0 =
     "(b:B)-[:d]->(b)";
@@ -29,10 +37,14 @@ public class TestData {
   public static final String CYCLE_PATTERN_4 =
     "(a0:A)-[:a]->(b0:B)-[:a]->(a1:A)-[:a]->(b1:B)-[:a]->(a0)";
 
+  public static final String CYCLE_PATTERN_5 =
+    "(v0:B)-[:a]->(v1:C)<-[:b]-(v0)";
+
   public static final String TREE_PATTERN_0 =
     "(:B)-[:b]->(:C)<-[:a]-(:A)";
 
-  public static final String GRAPH_1 = "db [" +
+  public static final String GRAPH_1 = DATA_GRAPH_VARIABLE +
+    "[" +
     "(v0:B {id=0})" +
     "(v1:A {id=1})" +
     "(v2:A {id=2})" +
@@ -59,7 +71,8 @@ public class TestData {
     "(v9)-[e12:c {id=12}]->(v10)" +
     "]";
 
-  public static final String GRAPH_2 = "db [" +
+  public static final String GRAPH_2 = DATA_GRAPH_VARIABLE +
+    "[" +
     "(v0:B {id=0})" +
     "(v1:A {id=1})" +
     "(v2:A {id=2})" +
@@ -94,9 +107,17 @@ public class TestData {
     "(v11)-[e18:a {id=18}]->(v12)" +
     "]";
 
-  public static final String GRAPH_3 = "db [" +
+  public static final String GRAPH_3 = DATA_GRAPH_VARIABLE +
+    "[" +
     "(v0:A {id=0})-[e0:a {id=0}]->(v1:A {id=1})" +
     "(v1)-[e1:a {id=1}]->(v2:A {id=2})" +
     "(v2)-[e2:a {id=2}]->(v3:A {id=3})" +
+    "]";
+
+  public static final String GRAPH_4 = DATA_GRAPH_VARIABLE +
+    "[" +
+    "(v0:A {id=0})-[e0:a {id=0}]->(v1:A {id=1})" +
+    "(v1)-[e1:a {id=1}]->(v2:A {id=2})-[e3:a {id=3}]->(v3:A {id=3})" +
+    "(v1)-[e2:a {id=2}]->(v2)" +
     "]";
 }

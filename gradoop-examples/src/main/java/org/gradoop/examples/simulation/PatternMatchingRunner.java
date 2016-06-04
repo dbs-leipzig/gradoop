@@ -18,10 +18,16 @@
 package org.gradoop.examples.simulation;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
+import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.operators.matching.PatternMatching;
+import org.gradoop.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
 import org.gradoop.model.impl.operators.matching.simulation.dual.DualSimulation;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -29,32 +35,59 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Performs graph pattern matching using simulation on an arbitrary input graph.
- */
-public class SimulationRunner extends AbstractRunner
-  implements ProgramDescription {
+import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST;
 
+/**
+ * Performs graph pattern matching on an arbitrary input graph.
+ */
+public class PatternMatchingRunner extends AbstractRunner
+  implements ProgramDescription {
+  /**
+   * Refers to {@link DualSimulation} using bulk iteration
+   */
+  private static final String ALGO_DUAL_BULK = "dual-bulk";
+  /**
+   * Refers to {@link DualSimulation} using delta iteration
+   */
+  private static final String ALGO_DUAL_DELTA = "dual-delta";
+  /**
+   * Refers to {@link ExplorativeSubgraphIsomorphism}
+   */
+  private static final String ALGO_ISO_EXP = "iso-exp";
+  /**
+   * Refers to {@link ExplorativeSubgraphIsomorphism} using
+   * BROADCAST_HASH_FIRST as {@link JoinHint} for extending embeddings.
+   */
+  private static final String ALGO_ISO_EXP_BC_HASH_FIRST = "iso-exp-bc-hf";
+  /**
+   * Used for console output
+   */
+  private static final String[] AVAILABLE_ALGORITHMS = new String[] {
+      ALGO_DUAL_BULK,
+      ALGO_DUAL_DELTA,
+      ALGO_ISO_EXP,
+      ALGO_ISO_EXP_BC_HASH_FIRST
+  };
   /**
    * Option to declare path to input graph
    */
-  public static final String OPTION_INPUT_PATH  = "i";
+  private static final String OPTION_INPUT_PATH  = "i";
   /**
    *Option to declare path to output graph
     */
-  public static final String OPTION_OUTPUT_PATH = "o";
+  private static final String OPTION_OUTPUT_PATH = "o";
   /**
    * GDL query string
    */
-  public static final String OPTION_QUERY_GRAPH = "q";
+  private static final String OPTION_QUERY_GRAPH = "q";
+  /**
+   * Pattern Matching algorithm
+   */
+  private static final String OPTION_ALGORITHM = "a";
   /**
    * Attach original data true/false
    */
-  public static final String OPTION_ATTACH_DATA = "a";
-  /**
-   * Use bulk iteration true/false
-    */
-  public static final String OPTION_USE_BULK    = "b";
+  private static final String OPTION_ATTACH_DATA = "d";
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
@@ -63,10 +96,11 @@ public class SimulationRunner extends AbstractRunner
       "Output graph directory");
     OPTIONS.addOption(OPTION_QUERY_GRAPH, "query", true,
       "GDL based query graph");
+    OPTIONS.addOption(OPTION_ALGORITHM, "algorithm", true,
+      String.format("Algorithm to execute the matching [%s]",
+        StringUtils.join(AVAILABLE_ALGORITHMS, ',')));
     OPTIONS.addOption(OPTION_ATTACH_DATA, "attach-data", false,
       "Attach original vertex and edge data to the match graph");
-    OPTIONS.addOption(OPTION_USE_BULK, "bulk-iteration", false,
-      "Use bulk iteration for simulation kernel (delta otherwise)");
   }
 
   /**
@@ -76,7 +110,8 @@ public class SimulationRunner extends AbstractRunner
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, SimulationRunner.class.getName());
+    CommandLine cmd = parseArguments(args,
+      PatternMatchingRunner.class.getName());
     if (cmd == null) {
       return;
     }
@@ -85,16 +120,16 @@ public class SimulationRunner extends AbstractRunner
     String inputDir     = cmd.getOptionValue(OPTION_INPUT_PATH);
     String outputDir    = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     String query        = cmd.getOptionValue(OPTION_QUERY_GRAPH);
+    String algorithm    = cmd.getOptionValue(OPTION_ALGORITHM);
     boolean attachData  = cmd.hasOption(OPTION_ATTACH_DATA);
-    boolean useBulk     = cmd.hasOption(OPTION_USE_BULK);
 
     EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
       readEPGMDatabase(inputDir);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      execute(epgmDatabase.getDatabaseGraph(), query, attachData, useBulk);
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      execute(epgmDatabase.getDatabaseGraph(), query, attachData, algorithm);
 
-    writeLogicalGraph(result, outputDir);
+    writeGraphCollection(result, outputDir);
 
     System.out.println(String.format("Net runtime [s]: %d",
       getExecutionEnvironment()
@@ -117,6 +152,9 @@ public class SimulationRunner extends AbstractRunner
     if (!cmd.hasOption(OPTION_QUERY_GRAPH)) {
       throw new IllegalArgumentException("Define a graph query.");
     }
+    if (!cmd.hasOption(OPTION_ALGORITHM)) {
+      throw new IllegalArgumentException("Chose an algorithm.");
+    }
   }
 
   /**
@@ -125,21 +163,38 @@ public class SimulationRunner extends AbstractRunner
    * @param databaseGraph data graph
    * @param query         query graph
    * @param attachData    attach vertex and edge data to the match graph
-   * @param useBulk       use bulk iteration instead of delta iteration
+   * @param algorithm     algorithm to use for pattern matching
    * @return result match graph
    */
-  private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> execute(
+  private static GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> execute(
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> databaseGraph,
-    String query, boolean attachData, boolean useBulk) {
+    String query, boolean attachData, String algorithm) {
 
-    DualSimulation<GraphHeadPojo, VertexPojo, EdgePojo> op =
-      new DualSimulation<>(query, attachData, useBulk);
+    PatternMatching<GraphHeadPojo, VertexPojo, EdgePojo> op;
+
+    switch (algorithm) {
+    case ALGO_DUAL_BULK:
+      op = new DualSimulation<>(query, attachData, true);
+      break;
+    case ALGO_DUAL_DELTA:
+      op = new DualSimulation<>(query, attachData, false);
+      break;
+    case ALGO_ISO_EXP:
+      op = new ExplorativeSubgraphIsomorphism<>(query, attachData);
+      break;
+    case ALGO_ISO_EXP_BC_HASH_FIRST:
+      op = new ExplorativeSubgraphIsomorphism<>(query, attachData,
+        new DFSTraverser(), BROADCAST_HASH_FIRST, BROADCAST_HASH_FIRST);
+      break;
+    default :
+      throw new IllegalArgumentException(algorithm + " not supported");
+    }
 
     return op.execute(databaseGraph);
   }
 
   @Override
   public String getDescription() {
-    return SimulationRunner.class.getName();
+    return PatternMatchingRunner.class.getName();
   }
 }
