@@ -40,21 +40,22 @@ import java.util.Collection;
 @FunctionAnnotation.ForwardedFields("id->f0")
 public class BuildIdWithCandidates<V extends EPGMVertex>
   extends AbstractBuilder<V, IdWithCandidates> {
-
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
   /**
    * Query vertices to match against.
    */
   private transient Collection<Vertex> queryVertices;
-
+  /**
+   * Number of vertices in the query graph
+   */
+  private int vertexCount;
   /**
    * Reduce instantiations
    */
-  private IdWithCandidates reuseTuple;
+  private final IdWithCandidates reuseTuple;
 
   /**
    * Constructor
@@ -70,12 +71,14 @@ public class BuildIdWithCandidates<V extends EPGMVertex>
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     queryVertices = getQueryHandler().getVertices();
+    vertexCount   = queryVertices.size();
   }
 
   @Override
   public IdWithCandidates map(V v) throws Exception {
     reuseTuple.setId(v.getId());
-    reuseTuple.setCandidates(EntityMatcher.getMatches(v, queryVertices));
+    reuseTuple.setCandidates(getCandidates(vertexCount,
+      EntityMatcher.getMatches(v, queryVertices)));
     return reuseTuple;
   }
 }

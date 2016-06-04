@@ -29,7 +29,6 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.util.MessageTyp
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -202,21 +201,40 @@ public class UpdateVertexState
    * @param queryEdges    edge candidates to be removed
    * @param targetVertex  target vertex to consider
    */
-  private void updateOutgoingEdges(FatVertex fatVertex, Collection<Long>
-    queryEdges, GradoopId targetVertex) {
+  private void updateOutgoingEdges(FatVertex fatVertex,
+    Collection<Long> queryEdges, GradoopId targetVertex) {
     if (queryEdges != null) {
-      Iterator<Map.Entry<IdPair, List<Long>>> edgeIterator = fatVertex
+      Iterator<Map.Entry<IdPair, boolean[]>> edgeIterator = fatVertex
         .getEdgeCandidates().entrySet().iterator();
       while (edgeIterator.hasNext()) {
-        Map.Entry<IdPair, List<Long>> e = edgeIterator.next();
+        Map.Entry<IdPair, boolean[]> e = edgeIterator.next();
         if (targetVertex == null ||
           e.getKey().getTargetId().equals(targetVertex)) {
-          e.getValue().removeAll(queryEdges);
-          if (e.getValue().isEmpty()) {
+          // remove edge candidates for that edge
+          for (Long eQ : queryEdges) {
+            e.getValue()[eQ.intValue()] = false;
+          }
+          // remove edge if there are no candidates left
+          if (allFalse(e.getValue())) {
             edgeIterator.remove();
           }
         }
       }
     }
+  }
+
+  /**
+   * Checks if the given array contains only false values.
+   *
+   * @param a array
+   * @return true, iff all values are false
+   */
+  private boolean allFalse(boolean[] a) {
+    for (boolean b : a) {
+      if (b) {
+        return false;
+      }
+    }
+    return true;
   }
 }

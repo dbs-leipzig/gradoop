@@ -34,7 +34,7 @@ public class ElementHasCandidate implements FilterFunction<IdWithCandidates> {
   /**
    * Candidate to test on
    */
-  private final long candidate;
+  private final int candidate;
 
   /**
    * Constructor
@@ -42,11 +42,11 @@ public class ElementHasCandidate implements FilterFunction<IdWithCandidates> {
    * @param candidate candidate to test on
    */
   public ElementHasCandidate(long candidate) {
-    this.candidate = candidate;
+    this.candidate = (int) candidate;
   }
 
   @Override
   public boolean filter(IdWithCandidates idWithCandidates) throws Exception {
-    return idWithCandidates.getCandidates().contains(candidate);
+    return idWithCandidates.getCandidates()[candidate];
   }
 }

@@ -44,7 +44,7 @@ public class VertexHasCandidate extends RichFilterFunction<IdWithCandidates> {
   /**
    * Candidate to test on
    */
-  private long candidate;
+  private int candidate;
 
   /**
    * Constructor
@@ -60,11 +60,11 @@ public class VertexHasCandidate extends RichFilterFunction<IdWithCandidates> {
     super.open(parameters);
     int step = (int) getRuntimeContext()
       .getBroadcastVariable(ExplorativeSubgraphIsomorphism.BC_SUPERSTEP).get(0);
-    candidate = traversalCode.getStep(step - 1).getTo();
+    candidate = (int) traversalCode.getStep(step - 1).getTo();
   }
 
   @Override
   public boolean filter(IdWithCandidates t) throws Exception {
-    return t.getCandidates().contains(candidate);
+    return t.getCandidates()[candidate];
   }
 }

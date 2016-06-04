@@ -28,8 +28,6 @@ import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.FatVerte
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.IdPair;
 import org.gradoop.model.impl.operators.matching.simulation.dual.tuples.TripleWithDirection;
 
-import java.util.List;
-
 /**
  * Combines a collection of {@link TripleWithDirection} to a {@link FatVertex}.
  */
@@ -103,7 +101,7 @@ public class BuildFatVertex
     reuseVertex.setCandidates(Lists.<Long>newArrayList());
     reuseVertex.setParentIds(Lists.<GradoopId>newArrayList());
     reuseVertex.setIncomingCandidateCounts(new int[qHandler.getEdgeCount()]);
-    reuseVertex.setEdgeCandidates(Maps.<IdPair, List<Long>>newHashMap());
+    reuseVertex.setEdgeCandidates(Maps.<IdPair, boolean[]>newHashMap());
     reuseVertex.setUpdated(true);
   }
 
@@ -114,9 +112,10 @@ public class BuildFatVertex
    * @param triple outgoing edge tripe
    */
   private void processOutgoingEdgeTriple(TripleWithDirection triple) {
-    for (Long queryEdgeId : triple.getCandidates()) {
-      // update vertex candidates (CA)
-      updateCandidates(qHandler.getEdgeById(queryEdgeId).getSourceVertexId());
+    for (int eQ = 0; eQ < triple.getCandidates().length; eQ++) {
+      if (triple.getCandidates()[eQ]) {
+        updateCandidates(qHandler.getEdgeById((long) eQ).getSourceVertexId());
+      }
     }
     // update outgoing edges (OUT_CA)
     updateOutgoingEdges(triple);
@@ -152,13 +151,15 @@ public class BuildFatVertex
    * @param triple incoming edge triple
    */
   private void processIncomingEdgeTriple(TripleWithDirection triple) {
-    for (Long queryEdgeId : triple.getCandidates()) {
-      // update incoming edge counts (IN_CA)
-      reuseVertex.getIncomingCandidateCounts()[queryEdgeId.intValue()]++;
-      // update parent ids (P_IDs)
-      updateParentIds(triple);
-      // update vertex candidates (CA)
-      updateCandidates(qHandler.getEdgeById(queryEdgeId).getTargetVertexId());
+    for (int eQ = 0; eQ < triple.getCandidates().length; eQ++) {
+      if (triple.getCandidates()[eQ]) {
+        // update incoming edge counts (IN_CA)
+        reuseVertex.getIncomingCandidateCounts()[eQ]++;
+        // update parent ids (P_IDs)
+        updateParentIds(triple);
+        // update vertex candidates (CA)
+        updateCandidates(qHandler.getEdgeById((long) eQ).getTargetVertexId());
+      }
     }
   }
 

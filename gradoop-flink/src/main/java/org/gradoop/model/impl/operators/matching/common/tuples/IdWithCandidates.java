@@ -20,15 +20,14 @@ package org.gradoop.model.impl.operators.matching.common.tuples;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.impl.id.GradoopId;
 
-import java.util.List;
-
 /**
- * Represents an EPGM graph element (vertex/edge) and its query candidates.
+ * Represents an EPGM graph element (vertex/edge) and its query candidates. The
+ * query candidates are represented by a bit vector.
  *
  * f0: EPGM graph element id
  * f1: query candidates
  */
-public class IdWithCandidates extends Tuple2<GradoopId, List<Long>> {
+public class IdWithCandidates extends Tuple2<GradoopId, boolean[]> {
 
   public GradoopId getId() {
     return f0;
@@ -38,11 +37,11 @@ public class IdWithCandidates extends Tuple2<GradoopId, List<Long>> {
     f0 = id;
   }
 
-  public List<Long> getCandidates() {
+  public boolean[] getCandidates() {
     return f1;
   }
 
-  public void setCandidates(List<Long> candidates) {
+  public void setCandidates(boolean[] candidates) {
     f1 = candidates;
   }
 }

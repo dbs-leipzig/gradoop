@@ -45,7 +45,7 @@ public class EdgeHasCandidate
   /**
    * Candidate to test on
    */
-  private long candidate;
+  private int candidate;
 
   /**
    * Constructor
@@ -61,11 +61,11 @@ public class EdgeHasCandidate
     super.open(parameters);
     int step = (int) getRuntimeContext()
       .getBroadcastVariable(ExplorativeSubgraphIsomorphism.BC_SUPERSTEP).get(0);
-    candidate = traversalCode.getStep(step - 1).getVia();
+    candidate = (int) traversalCode.getStep(step - 1).getVia();
   }
 
   @Override
   public boolean filter(TripleWithCandidates t) throws Exception {
-    return t.getCandidates().contains(candidate);
+    return t.getCandidates()[candidate];
   }
 }
