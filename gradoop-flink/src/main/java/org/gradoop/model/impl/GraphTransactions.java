@@ -62,4 +62,8 @@ public class GraphTransactions
   public DataSet<GraphTransaction<G, V, E>> getTransactions() {
     return this.transactions;
   }
+
+  public GradoopFlinkConfig<G, V, E> getConfig() {
+    return config;
+  }
 }

@@ -22,6 +22,7 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
+import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * Describes all operators that can be applied on a single logical graph in the
@@ -39,4 +40,10 @@ public interface GraphTransactionsOperators
    * @return data set of graph transactions
    */
   DataSet<GraphTransaction<G, V, E>> getTransactions();
+
+  /**
+   * Getter.
+   * @return Gradoop Flink Configuration
+   */
+  GradoopFlinkConfig<G, V, E> getConfig();
 }

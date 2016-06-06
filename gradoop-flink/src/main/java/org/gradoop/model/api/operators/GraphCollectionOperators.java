@@ -22,10 +22,10 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.Order;
 import org.gradoop.model.impl.GraphCollection;
 
@@ -280,5 +280,5 @@ public interface GraphCollectionOperators
    * Transforms a graph collection into a set of graph transactions.
    * @return graph transactions representing the graph collection
    */
-  DataSet<GraphTransaction<G, V, E>> toTransactions();
+  GraphTransactions<G, V, E> toTransactions();
 }

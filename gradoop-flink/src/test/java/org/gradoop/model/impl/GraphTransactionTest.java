@@ -1,12 +1,10 @@
 package org.gradoop.model.impl;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.functions.utils.First;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -22,11 +20,11 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
         .getDatabase()
         .getCollection();
 
-    DataSet<GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo>>
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo>
       transactions = originalCollection.toTransactions();
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> restoredCollection =
-      GraphCollection.fromTransactions(transactions, getConfig());
+      GraphCollection.fromTransactions(transactions);
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));
@@ -48,12 +46,12 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
         .getDatabase()
         .getCollection();
 
-    DataSet<GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo>>
-      transactions = originalCollection.toTransactions();
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
+      originalCollection.toTransactions();
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> restoredCollection =
       GraphCollection.fromTransactions(transactions,
-        new First<VertexPojo>(), new First<EdgePojo>(), getConfig());
+        new First<VertexPojo>(), new First<EdgePojo>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));
