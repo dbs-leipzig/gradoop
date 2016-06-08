@@ -21,7 +21,9 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -38,21 +40,149 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class contains static classes to generate datasets of EPGMGraphHead,
  * EPGMVertex and EPGMEdge. Therefore a mapping from a graphgen collection to
  * a dataset of EPGMElements is provided. As well as a filter on this element
  * and a mapper from the general EPGMElement to the specified EPGMElement.
+ * Additionally it is possible to generate graph transactions from a GraphGen
+ * file.
  */
 public class GraphGenReader {
 
   /**
-   * Reads graph data from a 3-tuple collection. The collection consists of the
-   * graph head, the vertices and the edges. The result of the mapping is a
+   * Reads graph imported from a GraphGen file. The result of the mapping is a
+   * dataset of of graph transactions, with each GraphTransaction consisting
+   * of a graph head, a set of vertices and a set of edges.
+   *
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
+   */
+  public static class GraphGenCollectionToGraphTransactions<G extends
+    EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> implements
+    FlatMapFunction<Tuple2<LongWritable, Text>, GraphTransaction<G, V, E>> {
+
+    /**
+     * Creates graph data objects
+     */
+    private final EPGMGraphHeadFactory<G> graphHeadFactory;
+
+    /**
+     * Creates graph data objects
+     */
+    private final EPGMVertexFactory<V> vertexFactory;
+
+    /**
+     * Creates graph data objects
+     */
+    private final EPGMEdgeFactory<E> edgeFactory;
+
+    /**
+     * Reduce object instantiation.
+     */
+    private GraphTransaction<G, V, E> graphTransaction;
+
+    /**
+     * Creates a flatmap function.
+     *
+     * @param graphHeadFactory graph head data factory
+     * @param vertexFactory    vertex data factory
+     * @param edgeFactory      edge data factory
+     */
+    public GraphGenCollectionToGraphTransactions(
+      EPGMGraphHeadFactory<G> graphHeadFactory, EPGMVertexFactory<V>
+      vertexFactory, EPGMEdgeFactory<E> edgeFactory) {
+      this.graphHeadFactory = graphHeadFactory;
+      this.vertexFactory = vertexFactory;
+      this.edgeFactory = edgeFactory;
+
+      Set<V> vertices = new HashSet<>();
+      Set<E> edges = new HashSet<>();
+      V source = this.vertexFactory.createVertex();
+      V target = this.vertexFactory.createVertex();
+      vertices.add(source);
+      vertices.add(target);
+      edges.add(this.edgeFactory.createEdge(source.getId(), target.getId()));
+
+      graphTransaction = new GraphTransaction<G, V, E>(this
+        .graphHeadFactory.initGraphHead(GradoopId.get()), vertices, edges);
+    }
+
+    /**
+     * Constructs a dataset containing GraphTransaction(s).
+     *
+     * @param inputTuple consists of a key(LongWritable) and a value(Text)
+     * @param collector of GraphTransaction(s)
+     * @throws Exception
+     */
+    @Override
+    public void flatMap(Tuple2<LongWritable, Text> inputTuple,
+      Collector<GraphTransaction<G, V, E>> collector) throws Exception {
+      String graphString = inputTuple.getField(1).toString();
+      GraphGenStringToCollection graphGenStringToCollection = new
+        GraphGenStringToCollection();
+      graphGenStringToCollection.setContent(graphString);
+
+      Collection<GraphGenGraph> graphCollection;
+      graphCollection = graphGenStringToCollection.getGraphCollection();
+
+      Set<V> vertices = new HashSet<>();
+      Set<E> edges = new HashSet<>();
+
+      GradoopId id;
+      String label;
+      GradoopId targetId;
+      GradoopIdSet graphs = new GradoopIdSet();
+      Map<Integer, GradoopId> integerGradoopIdMapVertices;
+
+      for (GraphGenGraph graph : graphCollection) {
+        integerGradoopIdMapVertices = new HashedMap();
+        graphs.clear();
+        vertices.clear();
+        edges.clear();
+
+        id = GradoopId.get();
+        graphs.add(id);
+
+        for (GraphGenVertex vertex : graph.getGraphVertices()) {
+          id = GradoopId.get();
+          integerGradoopIdMapVertices.put(vertex.getId(), id);
+          label = vertex.getLabel();
+          vertices.add(this.vertexFactory.initVertex(id, label, graphs));
+        }
+
+        for (GraphGenEdge edge :graph.getGraphEdges()) {
+          id = integerGradoopIdMapVertices.get(edge.getSourceId());
+          targetId = integerGradoopIdMapVertices.get(edge.getTargetId());
+          label = edge.getLabel();
+          edges.add(this.edgeFactory.createEdge(label, id, targetId, graphs));
+        }
+        collector.collect(new GraphTransaction<G, V, E>(this
+          .graphHeadFactory.initGraphHead(id), vertices, edges));
+      }
+    }
+
+    /**
+     * Returns the produced type information (GraphTransaction<G, V, E>) of the
+     * flatmap.
+     *
+     * @return type information of GraphTransaction<G, V, E>
+     */
+    public TypeInformation<GraphTransaction<G, V, E>> getProducedType() {
+      return TypeExtractor.getForObject(this.graphTransaction);
+    }
+  }
+
+  /**
+   * Reads graph imported from a GraphGen file. The result of the mapping is a
    * dataset containing EPGMElements(EPGMGraphHead, EPGMVertex and EPGMEdge)
    * as EPGMElements.
    *
