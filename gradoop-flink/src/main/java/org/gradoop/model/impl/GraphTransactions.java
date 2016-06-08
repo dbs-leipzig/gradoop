@@ -134,4 +134,7 @@ public class GraphTransactions
     return this.transactions;
   }
 
+  public GradoopFlinkConfig<G, V, E> getConfig() {
+    return config;
+  }
 }
