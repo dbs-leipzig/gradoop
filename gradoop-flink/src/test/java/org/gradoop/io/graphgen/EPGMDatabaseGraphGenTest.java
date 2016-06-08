@@ -39,9 +39,6 @@ import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by stephan on 18.05.16.
- */
 public class EPGMDatabaseGraphGenTest  extends GradoopFlinkTestBase {
 
   /**
