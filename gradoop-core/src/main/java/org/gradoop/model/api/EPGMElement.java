@@ -17,6 +17,8 @@
 
 package org.gradoop.model.api;
 
+import java.io.Serializable;
+
 /**
  * Base interface for all elements in the EPGM.
  *
@@ -25,5 +27,5 @@ package org.gradoop.model.api;
  * @see EPGMEdge
  */
 public interface EPGMElement
-  extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed {
+  extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed, Serializable {
 }
