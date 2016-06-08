@@ -40,7 +40,7 @@ public class GraphTransactionsGraphGenTest extends GradoopFlinkTestBase {
   @Test
   public void testFromGraphGenFile() throws Exception {
     String graphGenFile =
-      EPGMDatabaseGraphGenTest.class.getResource("/data/graphgen/io_test.gg")
+      GraphTransactionsGraphGenTest.class.getResource("/data/graphgen/io_test.gg")
         .getFile();
 
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions =
@@ -59,7 +59,7 @@ public class GraphTransactionsGraphGenTest extends GradoopFlinkTestBase {
   @Test
   public void testFromGraphGenFileWithEdgeCheck() throws Exception {
     String graphGenFile =
-      EPGMDatabaseGraphGenTest.class.getResource("/data/graphgen/io_test.gg")
+      GraphTransactionsGraphGenTest.class.getResource("/data/graphgen/io_test.gg")
         .getFile();
 
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions =
