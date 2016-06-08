@@ -27,6 +27,7 @@
         <module>gradoop-flink</module>
         <module>gradoop-core</module>
         <module>gradoop-checkstyle</module>
+        <module>gradoop-datagen</module>
     </modules>
 
     <developers>

@@ -32,7 +32,6 @@ import org.gradoop.model.api.operators.GraphCollectionOperators;
 import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.api.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.model.impl.functions.utils.First;
 import org.gradoop.model.impl.functions.bool.Not;
 import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
@@ -47,14 +46,9 @@ import org.gradoop.model.impl.functions.epgm.TransactionGraphHead;
 import org.gradoop.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.model.impl.functions.utils.First;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
-import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.model.impl.operators.distinct.Distinct;
@@ -62,8 +56,16 @@ import org.gradoop.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.model.impl.operators.intersection.Intersection;
 import org.gradoop.model.impl.operators.intersection.IntersectionBroadcast;
-import org.gradoop.model.impl.operators.selection.Selection;
 import org.gradoop.model.impl.operators.limit.Limit;
+import org.gradoop.model.impl.operators.selection.Selection;
+import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.model.impl.operators.tostring.functions
+  .GraphHeadToDataString;
+import org.gradoop.model.impl.operators.tostring.functions
+  .GraphHeadToEmptyString;
+import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.model.impl.operators.union.Union;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -73,7 +75,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import static org.apache.flink.shaded.com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.flink.shaded.com.google.common.base.Preconditions
+  .checkNotNull;
 
 /**
  * Represents a collection of graphs inside the EPGM. As graphs may share
@@ -501,47 +504,46 @@ public class GraphCollection
    * Creates a graph collection from a graph transaction dataset.
    * Overlapping vertices and edge are merged by Id comparison only.
    *
-   * @param transactions  transaction dataset
-   * @param config        Gradoop config
    * @param <G>           EPGM graph head type
    * @param <V>           EPGM vertex type
    * @param <E>           EPGM edge type
+   * @param transactions  transaction dataset
    * @return graph collection
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   GraphCollection<G, V, E> fromTransactions(
-    DataSet<GraphTransaction<G, V, E>> transactions,
-    GradoopFlinkConfig<G, V, E> config) {
+    GraphTransactions<G, V, E> transactions) {
 
     GroupReduceFunction<V, V> vertexReducer = new First<>();
     GroupReduceFunction<E, E> edgeReducer = new First<>();
 
-    return fromTransactions(transactions, vertexReducer, edgeReducer, config);
+    return fromTransactions(transactions, vertexReducer, edgeReducer);
   }
 
   /**
    * Creates a graph collection from a graph transaction dataset.
    * Overlapping vertices and edge are merged using provided reduce functions.
    *
-   * @param transactions        transaction dataset
-   * @param vertexMergeReducer  vertex merge function
-   * @param edgeMergeReducer    edge merge function
-   * @param config              Gradoop config
    * @param <G>                 EPGM graph head type
    * @param <V>                 EPGM vertex type
    * @param <E>                 EPGM edge type
+   * @param transactions        transaction dataset
+   * @param vertexMergeReducer  vertex merge function
+   * @param edgeMergeReducer    edge merge function
    * @return graph collection
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   GraphCollection<G, V, E> fromTransactions(
-    DataSet<GraphTransaction<G, V, E>> transactions,
+    GraphTransactions<G, V, E> transactions,
     GroupReduceFunction<V, V> vertexMergeReducer,
-    GroupReduceFunction<E, E> edgeMergeReducer,
-    GradoopFlinkConfig<G, V, E> config) {
+    GroupReduceFunction<E, E> edgeMergeReducer) {
+
+    GradoopFlinkConfig<G, V, E> config = transactions.getConfig();
 
     DataSet<Tuple3<G, Set<V>, Set<E>>> triples = transactions
+      .getTransactions()
       .map(new GraphTransactionTriple<G, V, E>());
 
     DataSet<G> graphHeads =
@@ -566,7 +568,7 @@ public class GraphCollection
    * {@inheritDoc}
    */
   @Override
-  public DataSet<GraphTransaction<G, V, E>> toTransactions() {
+  public GraphTransactions<G, V, E> toTransactions() {
 
     DataSet<Tuple2<GradoopId, Set<V>>> graphVertices = getVertices()
       .flatMap(new GraphElementExpander<V>())
@@ -578,12 +580,13 @@ public class GraphCollection
       .groupBy(0)
       .reduceGroup(new GraphElementSet<E>());
 
-    return graphVertices
+    DataSet<GraphTransaction<G, V, E>>  transactions = graphVertices
       .join(graphEdges)
       .where(0).equalTo(0)
       .with(new GraphVerticesEdges<V, E>())
-      .join(getGraphHeads())
-      .where(0).equalTo(new Id<G>())
+      .join(getGraphHeads()).where(0)
+      .equalTo(new Id<G>())
       .with(new GraphTransactionTriple<G, V, E>());
+    return new GraphTransactions<>(transactions, getConfig());
   }
 }
