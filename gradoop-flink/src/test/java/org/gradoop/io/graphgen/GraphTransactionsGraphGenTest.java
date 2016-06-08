@@ -33,7 +33,8 @@ public class GraphTransactionsGraphGenTest extends GradoopFlinkTestBase {
 
   /**
    * Test method for
-   * {@link org.gradoop.model.impl.EPGMDatabase#fromGraphGenFile(String, ExecutionEnvironment) fromgraphGenFile}
+   *
+   * {@link org.gradoop.model.impl.GraphTransactions#fromGraphGenFile(String, ExecutionEnvironment) fromgraphGenFile}
    * @throws Exception
    */
   @Test
@@ -51,7 +52,8 @@ public class GraphTransactionsGraphGenTest extends GradoopFlinkTestBase {
 
   /**
    * Test method for
-   * {@link org.gradoop.model.impl.EPGMDatabase#fromGraphGenFile(String, ExecutionEnvironment) fromgraphGenFile}
+   *
+   * {@link org.gradoop.model.impl.GraphTransactions#fromGraphGenFile(String, ExecutionEnvironment) fromgraphGenFile}
    * @throws Exception
    */
   @Test
