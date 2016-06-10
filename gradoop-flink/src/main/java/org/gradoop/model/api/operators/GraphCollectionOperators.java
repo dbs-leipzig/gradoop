@@ -39,7 +39,7 @@ import org.gradoop.model.impl.GraphCollection;
  */
 public interface GraphCollectionOperators
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends GraphBaseOperators<V, E> {
+  extends GraphBaseOperators<G, V, E> {
 
   //----------------------------------------------------------------------------
   // Logical Graph / Graph Head Getters

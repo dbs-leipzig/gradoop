@@ -46,7 +46,7 @@ import java.util.Collection;
  */
 public abstract class GraphBase
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements GraphBaseOperators<V, E> {
+  implements GraphBaseOperators<G, V, E> {
 
   /**
    * Graph data associated with the logical graphs in that collection.

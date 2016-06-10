@@ -40,7 +40,7 @@ import java.util.List;
  */
 public interface LogicalGraphOperators
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends GraphBaseOperators<V, E> {
+  extends GraphBaseOperators<G, V, E> {
 
   /**
    * Returns a dataset containing a single graph head associated with that

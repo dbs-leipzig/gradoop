@@ -19,7 +19,9 @@ package org.gradoop.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
+import org.gradoop.io.api.DataSink;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
@@ -28,6 +30,7 @@ import org.gradoop.model.impl.GraphCollection;
 /**
  * Operators that are available at all graph structures.
  *
+ * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  *
@@ -35,7 +38,7 @@ import org.gradoop.model.impl.GraphCollection;
  * @see GraphCollection
  */
 public interface GraphBaseOperators
-  <V extends EPGMVertex, E extends EPGMEdge> {
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
   //----------------------------------------------------------------------------
   // Containment methods
@@ -62,6 +65,7 @@ public interface GraphBaseOperators
    * @param vertexID vertex identifier
    * @return outgoing edge data of given vertex
    */
+  @Deprecated
   DataSet<E> getOutgoingEdges(final GradoopId vertexID);
 
   /**
@@ -71,6 +75,7 @@ public interface GraphBaseOperators
    * @param vertexID vertex identifier
    * @return incoming edge data of given vertex
    */
+  @Deprecated
   DataSet<E> getIncomingEdges(final GradoopId vertexID);
 
   /**
@@ -110,6 +115,14 @@ public interface GraphBaseOperators
    * @param graphFile  graph data output file
    * @throws Exception
    */
+  @Deprecated
   void writeAsJson(final String vertexFile, final String edgeFile,
     final String graphFile) throws Exception;
+
+  /**
+   * Writes logical graph/graph collection to given data sink.
+   *
+   * @param dataSink data sing
+   */
+  void writeTo(DataSink<G, V, E> dataSink);
 }

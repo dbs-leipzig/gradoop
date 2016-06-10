@@ -24,6 +24,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.io.api.DataSink;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -724,5 +725,13 @@ public class LogicalGraph
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeTo(DataSink<G, V, E> dataSink) {
+    dataSink.write(this);
   }
 }
