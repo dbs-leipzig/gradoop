@@ -101,25 +101,6 @@ public interface GraphBaseOperators
   DataSet<Boolean> isEmpty();
 
   /**
-   * Writes the logical graph / graph collection into three separate JSON files.
-   * {@code vertexFile} contains all vertices, {@code edgeFile} contains all
-   * edges and {@code graphFile} contains the graph data the logical graph /
-   * graph collection.
-   * <p>
-   * Operation uses Flink to write the internal datasets, thus writing to
-   * local file system ({@code file://}) as well as HDFS ({@code hdfs://}) is
-   * supported.
-   *
-   * @param vertexFile vertex data output file
-   * @param edgeFile   edge data output file
-   * @param graphFile  graph data output file
-   * @throws Exception
-   */
-  @Deprecated
-  void writeAsJson(final String vertexFile, final String edgeFile,
-    final String graphFile) throws Exception;
-
-  /**
    * Writes logical graph/graph collection to given data sink.
    *
    * @param dataSink data sing

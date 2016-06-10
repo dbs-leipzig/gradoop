@@ -15,12 +15,13 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.json;
+package org.gradoop.io.impl.json;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -70,22 +71,21 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
     String graphFile =
       EPGMDatabaseJSONTest.class.getResource("/data/json/sna/graphs.json").getFile();
 
-    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
-      graphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
-      getExecutionEnvironment());
+    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new JSONDataSource<>(graphFile, vertexFile, edgeFile, config);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-      databaseGraph = graphStore.getDatabaseGraph();
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+      collection = dataSource.getGraphCollection();
 
     Collection<GraphHeadPojo> graphHeads = Lists.newArrayList();
     Collection<VertexPojo> vertices = Lists.newArrayList();
     Collection<EdgePojo> edges = Lists.newArrayList();
 
-    graphStore.getCollection().getGraphHeads()
+    collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(graphHeads));
-    databaseGraph.getVertices()
+    collection.getVertices()
       .output(new LocalCollectionOutputFormat<>(vertices));
-    databaseGraph.getEdges()
+    collection.getEdges()
       .output(new LocalCollectionOutputFormat<>(edges));
 
     getExecutionEnvironment().execute();
@@ -99,17 +99,22 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
   public void testWriteAsJsonFile() throws Exception {
     String tmpDir = temporaryFolder.getRoot().toString();
     final String vertexFile = tmpDir + "/nodes.json";
-    final String edgeFile = tmpDir + "/edges.json";
-    final String graphFile = tmpDir + "/graphs.json";
+    final String edgeFile   = tmpDir + "/edges.json";
+    final String graphFile  = tmpDir + "/graphs.json";
 
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
-    loader.getDatabase().writeAsJson(vertexFile, edgeFile, graphFile);
+    // write to JSON
+    loader.getDatabase()
+      .writeTo(new JSONDataSink<>(graphFile, vertexFile, edgeFile, getConfig()));
 
-    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
-      newGraphStore = EPGMDatabase.fromJsonFile(vertexFile, edgeFile, graphFile,
-      getExecutionEnvironment());
+    getExecutionEnvironment().execute();
+
+    // read from JSON
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collection =
+      new JSONDataSource<>(graphFile, vertexFile, edgeFile, getConfig())
+        .getGraphCollection();
 
     Collection<GraphHeadPojo> expectedGraphHeads  = loader.getGraphHeads();
     Collection<VertexPojo>    expectedVertices    = loader.getVertices();
@@ -119,11 +124,11 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
     Collection<VertexPojo>    loadedVertices      = Lists.newArrayList();
     Collection<EdgePojo>      loadedEdges         = Lists.newArrayList();
 
-    newGraphStore.getCollection().getGraphHeads()
+    collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
-    newGraphStore.getDatabaseGraph().getVertices()
+    collection.getVertices()
       .output(new LocalCollectionOutputFormat<>(loadedVertices));
-    newGraphStore.getDatabaseGraph().getEdges()
+    collection.getEdges()
       .output(new LocalCollectionOutputFormat<>(loadedEdges));
 
     getExecutionEnvironment().execute();
