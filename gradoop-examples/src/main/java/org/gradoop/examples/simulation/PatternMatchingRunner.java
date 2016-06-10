@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.matching.PatternMatching;
@@ -123,11 +122,11 @@ public class PatternMatchingRunner extends AbstractRunner
     String algorithm    = cmd.getOptionValue(OPTION_ALGORITHM);
     boolean attachData  = cmd.hasOption(OPTION_ATTACH_DATA);
 
-    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
-      readEPGMDatabase(inputDir);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
+      readLogicalGraph(inputDir);
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      execute(epgmDatabase.getDatabaseGraph(), query, attachData, algorithm);
+      execute(epgmDatabase, query, attachData, algorithm);
 
     writeGraphCollection(result, outputDir);
 

@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -43,8 +42,8 @@ import org.gradoop.model.impl.pojo.VertexPojo;
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
  */
-public class SNABenchmark1 extends AbstractRunner
-  implements ProgramDescription {
+public class SNABenchmark1
+  extends AbstractRunner implements ProgramDescription {
 
   /**
    * Runs the example program.
@@ -69,11 +68,11 @@ public class SNABenchmark1 extends AbstractRunner
     String inputDir  = args[0];
     String outputDir = args[1];
 
-    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
-      readEPGMDatabase(inputDir);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
+      readLogicalGraph(inputDir);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      execute(epgmDatabase.getDatabaseGraph());
+      execute(epgmDatabase);
 
     writeLogicalGraph(result, outputDir);
   }

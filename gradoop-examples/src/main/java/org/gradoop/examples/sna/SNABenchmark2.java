@@ -23,9 +23,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.examples.AbstractRunner;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.model.api.functions.TransformationFunction;
-import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.GellyLabelPropagation;
 import org.gradoop.model.impl.operators.aggregation.ApplyAggregation;
@@ -60,20 +60,8 @@ import org.gradoop.util.GradoopFlinkConfig;
  * The program can be either executed using external data (for benchmarking) or
  * demo data ({@link #main(String[])}).
  */
-public class SNABenchmark2 implements ProgramDescription {
-
-  /**
-   * File containing EPGM vertices.
-   */
-  public static final String VERTICES_JSON = "nodes.json";
-  /**
-   * File containing EPGM edges.
-   */
-  public static final String EDGES_JSON = "edges.json";
-  /**
-   * File containing EPGM graph heads.
-   */
-  public static final String GRAPHS_JSON = "graphs.json";
+public class SNABenchmark2
+  extends AbstractRunner implements ProgramDescription {
 
   /**
    * Runs the benchmark program.
@@ -112,15 +100,11 @@ public class SNABenchmark2 implements ProgramDescription {
 
     boolean useExternalData = args.length > 0;
 
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> gradoopConf =
-      GradoopFlinkConfig.createDefaultConfig(env);
-
     if (useExternalData) {
-      executeWithExternalData(args, gradoopConf);
+      executeWithExternalData(args);
     } else {
-      executeWithDemoData(gradoopConf);
+      executeWithDemoData(GradoopFlinkConfig
+        .createDefaultConfig(ExecutionEnvironment.getExecutionEnvironment()));
     }
   }
 
@@ -128,33 +112,22 @@ public class SNABenchmark2 implements ProgramDescription {
    * Runs the benchmark program with external data (e.g. from HDFS)
    *
    * @param args args[0]: input dir, args[1]: output dir, args[2]: threshold
-   * @param gradoopConf gradoop config
    * @throws Exception
    */
   @SuppressWarnings("unchecked")
-  private static void executeWithExternalData(String[] args,
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> gradoopConf) throws
-    Exception {
+  private static void executeWithExternalData(String[] args) throws Exception {
     Preconditions.checkArgument(
       args.length == 3, "input dir, output dir and threshold required");
     String inputDir  = args[0];
     String outputDir = args[1];
     int threshold    = Integer.parseInt(args[2]);
 
-    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
-      EPGMDatabase.fromJsonFile(
-        inputDir + VERTICES_JSON,
-        inputDir + EDGES_JSON,
-        inputDir + GRAPHS_JSON,
-        gradoopConf);
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
+      readLogicalGraph(inputDir);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      execute(epgmDatabase.getDatabaseGraph(), threshold);
+    writeLogicalGraph(execute(epgmDatabase, threshold), outputDir);
 
-    result.writeAsJson(
-      outputDir + VERTICES_JSON,
-      outputDir + EDGES_JSON,
-      outputDir + GRAPHS_JSON);
+    getExecutionEnvironment().execute();
   }
 
   /**

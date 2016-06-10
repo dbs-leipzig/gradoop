@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains all classes related to json input and output to Flink.
+ * Contains functions to transform EPGM entities into JSON and vice versa.
  */
-package org.gradoop.io.json;
+package org.gradoop.io.impl.json.functions;

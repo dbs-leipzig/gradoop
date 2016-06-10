@@ -24,6 +24,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.io.api.DataSink;
 import org.gradoop.io.graph.GraphReader;
 import org.gradoop.io.graph.tuples.ImportEdge;
 import org.gradoop.io.graph.tuples.ImportVertex;
@@ -31,10 +32,6 @@ import org.gradoop.io.hbase.HBaseWriter;
 import org.gradoop.io.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.io.hbase.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.io.hbase.inputformats.VertexTableInputFormat;
-import org.gradoop.io.json.JsonReader.JsonToEdgeMapper;
-import org.gradoop.io.json.JsonReader.JsonToGraphHeadMapper;
-import org.gradoop.io.json.JsonReader.JsonToVertexMapper;
-import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -42,12 +39,6 @@ import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 import org.gradoop.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.EdgePojoFactory;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojoFactory;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.pojo.VertexPojoFactory;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -172,162 +163,6 @@ public class EPGMDatabase<
   }
 
   //----------------------------------------------------------------------------
-  // from/to JSON file
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates a database from JSON files. Paths can be local (file://) or HDFS
-   * (hdfs://).
-   * <p/>
-   * Uses default factories for POJO creation.
-   *
-   * @param vertexFile path to vertex data file
-   * @param edgeFile   path to edge data file
-   * @param env        Flink execution environment
-   * @return EPGM database with default factories.
-   * @see VertexPojoFactory
-   * @see EdgePojoFactory
-   * @see GraphHeadPojoFactory
-   */
-  @SuppressWarnings("unchecked")
-  public static EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> fromJsonFile(
-    String vertexFile, String edgeFile, ExecutionEnvironment env) {
-    return fromJsonFile(vertexFile, edgeFile,
-      GradoopFlinkConfig.createDefaultConfig(env));
-  }
-
-  /**
-   * Creates a database from JSON files. Paths can be local (file://) or HDFS
-   * (hdfs://). Data POJOs are created using the given factories.
-   *
-   * @param vertexFile  path to vertex data file
-   * @param edgeFile    path to edge data file
-   * @param config      Gradoop Flink configuration
-   * @param <G>         EPGM grpah head type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
-   * @return EPGM database
-   */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> EPGMDatabase fromJsonFile(
-    String vertexFile, String edgeFile, GradoopFlinkConfig<G, V, E> config) {
-    return fromJsonFile(vertexFile, edgeFile, null, config);
-  }
-
-  /**
-   * Creates a database from JSON files. Paths can be local (file://) or HDFS
-   * (hdfs://).
-   * <p/>
-   * Uses default factories for POJO creation.
-   *
-   * @param vertexFile vertex data file
-   * @param edgeFile   edge data file
-   * @param graphFile  graph data file
-   * @param env        Flink execution environment
-   * @return EPGM database
-   * @see VertexPojoFactory
-   * @see EdgePojoFactory
-   * @see GraphHeadPojoFactory
-   */
-  @SuppressWarnings("unchecked")
-  public static EPGMDatabase<
-    GraphHeadPojo,
-    VertexPojo,
-    EdgePojo> fromJsonFile(
-    String vertexFile, String edgeFile, String graphFile,
-    ExecutionEnvironment env) {
-    return fromJsonFile(vertexFile, edgeFile, graphFile,
-      GradoopFlinkConfig.createDefaultConfig(env));
-  }
-
-  /**
-   * Creates a database from JSON files. Paths can be local (file://) or HDFS
-   * (hdfs://).
-   *
-   * @param vertexFile  vertex data file
-   * @param edgeFile    edge data file
-   * @param graphFile   graph data file
-   * @param config      Gradoop Flink configuration
-   * @param <V>        EPGM vertex type
-   * @param <E>        EPGM edge type
-   * @param <G>        EPGM graph head type
-   *
-   * @return EPGM database
-   */
-  @SuppressWarnings("unchecked")
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge>
-  EPGMDatabase fromJsonFile(
-    String vertexFile, String edgeFile, String graphFile,
-    GradoopFlinkConfig<G, V, E> config) {
-    if (config == null) {
-      throw new IllegalArgumentException("config must not be null");
-    }
-
-    ExecutionEnvironment env = config.getExecutionEnvironment();
-
-    // used for type hinting when loading vertex data
-    TypeInformation<V> vertexTypeInfo = TypeExtractor
-      .createTypeInfo(config.getVertexFactory().getType());
-    // used for type hinting when loading edge data
-    TypeInformation<E> edgeTypeInfo = TypeExtractor
-      .createTypeInfo(config.getEdgeFactory().getType());
-    // used for type hinting when loading graph data
-    TypeInformation<G> graphTypeInfo = TypeExtractor
-      .createTypeInfo(config.getGraphHeadFactory().getType());
-
-    // read vertex, edge and graph data
-    DataSet<V> vertices = env.readTextFile(vertexFile)
-      .map(new JsonToVertexMapper<>(config.getVertexFactory()))
-      .returns(vertexTypeInfo);
-    DataSet<E> edges = env.readTextFile(edgeFile)
-      .map(new JsonToEdgeMapper<>(config.getEdgeFactory()))
-      .returns(edgeTypeInfo);
-    DataSet<G> graphHeads;
-    if (graphFile != null) {
-      graphHeads = env.readTextFile(graphFile)
-        .map(new JsonToGraphHeadMapper<>(config.getGraphHeadFactory()))
-        .returns(graphTypeInfo);
-    } else {
-      graphHeads = env.fromElements(
-        config.getGraphHeadFactory().createGraphHead());
-    }
-
-    return new EPGMDatabase<>(graphHeads, vertices, edges, config);
-  }
-
-  /**
-   * Writes the epgm database into three separate JSON files. {@code
-   * vertexFile} contains all vertex data, {@code edgeFile} contains all edge
-   * data and {@code graphFile} contains graph data of all logical graphs.
-   * <p/>
-   * Operation uses Flink to write the internal datasets, thus writing to
-   * local file system ({@code file://}) as well as HDFS ({@code hdfs://}) is
-   * supported.
-   *
-   * @param vertexFile vertex data output file
-   * @param edgeFile   edge data output file
-   * @param graphFile  graph data output file
-   * @throws Exception
-   */
-  public void writeAsJson(final String vertexFile, final String edgeFile,
-    final String graphFile) throws Exception {
-    getDatabaseGraph().getVertices()
-      .writeAsFormattedText(vertexFile,
-        new JsonWriter.VertexTextFormatter<V>());
-    getDatabaseGraph().getEdges()
-      .writeAsFormattedText(edgeFile, new JsonWriter.EdgeTextFormatter<E>());
-    getCollection().getGraphHeads()
-      .writeAsFormattedText(graphFile, new JsonWriter.GraphTextFormatter<G>());
-
-    config.getExecutionEnvironment().execute();
-  }
-
-  //----------------------------------------------------------------------------
   // from/to HBase
   //----------------------------------------------------------------------------
 
@@ -429,75 +264,6 @@ public class EPGMDatabase<
   //----------------------------------------------------------------------------
 
   /**
-   * Creates a database from collections of vertex and edge data objects.
-   * <p/>
-   * Uses default factories for POJO creation.
-   *
-   * @param vertexDataCollection collection of vertex data objects
-   * @param edgeDataCollection   collection of edge data objects
-   * @param env                  Flink execution environment
-   * @return EPGM database
-   * @see VertexPojoFactory
-   * @see EdgePojoFactory
-   * @see GraphHeadPojoFactory
-   */
-  @SuppressWarnings("unchecked")
-  public static EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
-  fromCollection(
-    Collection<VertexPojo> vertexDataCollection,
-    Collection<EdgePojo> edgeDataCollection, ExecutionEnvironment env) {
-    return fromCollection(null, vertexDataCollection, edgeDataCollection,
-      GradoopFlinkConfig.createDefaultConfig(env));
-  }
-
-  /**
-   * Creates a database from collections of vertex and data objects.
-   *
-   * @param vertexDataCollection  collection of vertex data objects
-   * @param edgeDataCollection    collection of edge data objects
-   * @param config                Gradoop Flink Config
-   * @param <G>                   EPGM graph head type
-   * @param <V>                   EPGM vertex type
-   * @param <E>                   EPGM edge type
-   * @return EPGM database
-   */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> EPGMDatabase fromCollection(
-    Collection<V> vertexDataCollection, Collection<E> edgeDataCollection,
-    GradoopFlinkConfig<G, V, E> config) {
-    return fromCollection(null, vertexDataCollection, edgeDataCollection,
-      config);
-  }
-
-  /**
-   * Creates a database from collections of vertex, edge and graph data
-   * objects.
-   * <p/>
-   * Uses default factories for POJO creation.
-   *
-   * @param vertexDataCollection collection of vertex data objects
-   * @param edgeDataCollection   collection of edge data objects
-   * @param graphDataCollection  collection of graph data objects
-   * @param env                  Flink execution environment
-   * @return EPGM database
-   * @see VertexPojoFactory
-   * @see EdgePojoFactory
-   * @see GraphHeadPojoFactory
-   */
-  @SuppressWarnings("unchecked")
-  public static EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo>
-  fromCollection(
-    Collection<GraphHeadPojo> graphDataCollection,
-    Collection<VertexPojo> vertexDataCollection,
-    Collection<EdgePojo> edgeDataCollection,
-    ExecutionEnvironment env) {
-    return fromCollection(graphDataCollection, vertexDataCollection,
-      edgeDataCollection, GradoopFlinkConfig.createDefaultConfig(env));
-  }
-
-  /**
    * Creates a database from collections of vertex and data objects.
    *
    * @param graphDataCollection   collection of graph heads
@@ -592,8 +358,7 @@ public class EPGMDatabase<
    * @return collection of all logical graphs
    */
   public GraphCollection<G, V, E> getCollection() {
-    DataSet<V> newVertices =
-      database.getVertices()
+    DataSet<V> newVertices = database.getVertices()
         .filter(new FilterFunction<V>() {
           @Override
           public boolean filter(V vertex) throws
@@ -611,5 +376,14 @@ public class EPGMDatabase<
 
     return GraphCollection.fromDataSets(database.getGraphHeads(), newVertices,
       newEdges, config);
+  }
+
+  /**
+   * Writes the database to the given sink.
+   *
+   * @param dataSink data sink
+   */
+  public void writeTo(DataSink<G, V, E> dataSink) {
+    dataSink.write(database);
   }
 }
