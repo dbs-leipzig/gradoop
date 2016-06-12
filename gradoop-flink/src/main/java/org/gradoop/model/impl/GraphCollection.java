@@ -23,6 +23,7 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.io.api.DataSink;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -71,6 +72,7 @@ import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -588,5 +590,13 @@ public class GraphCollection
       .equalTo(new Id<G>())
       .with(new GraphTransactionTriple<G, V, E>());
     return new GraphTransactions<>(transactions, getConfig());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeTo(DataSink<G, V, E> dataSink) throws IOException {
+    dataSink.write(this);
   }
 }

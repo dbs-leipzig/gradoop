@@ -24,7 +24,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.gradoop.io.json.JsonWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -46,7 +45,7 @@ import java.util.Collection;
  */
 public abstract class GraphBase
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements GraphBaseOperators<V, E> {
+  implements GraphBaseOperators<G, V, E> {
 
   /**
    * Graph data associated with the logical graphs in that collection.
@@ -243,24 +242,5 @@ public abstract class GraphBase
         }
       }).withForwardedFields("*->f2"),
       config.getExecutionEnvironment());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void writeAsJson(String vertexFile, String edgeFile,
-    String graphFile) throws Exception {
-
-    getVertices().writeAsFormattedText(vertexFile,
-      new JsonWriter.VertexTextFormatter<V>());
-
-    getEdges().writeAsFormattedText(edgeFile,
-      new JsonWriter.EdgeTextFormatter<E>());
-
-    graphHeads.writeAsFormattedText(graphFile,
-      new JsonWriter.GraphTextFormatter<G>());
-
-    getConfig().getExecutionEnvironment().execute();
   }
 }

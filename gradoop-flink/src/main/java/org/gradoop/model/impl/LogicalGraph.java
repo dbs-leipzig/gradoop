@@ -24,6 +24,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.gradoop.io.api.DataSink;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -62,6 +63,7 @@ import org.gradoop.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.util.GradoopFlinkConfig;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -724,5 +726,13 @@ public class LogicalGraph
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeTo(DataSink<G, V, E> dataSink) throws IOException {
+    dataSink.write(this);
   }
 }

@@ -23,10 +23,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.io.impl.json.JSONDataSink;
+import org.gradoop.io.impl.json.JSONDataSource;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -81,13 +82,13 @@ public abstract class AbstractRunner {
    * @param <G>       EPGM graph head type
    * @param <V>       EPGM vertex type
    * @param <E>       EPGM edge type
-   * @return EPGM database
+   * @return EPGM logical graph
    */
   @SuppressWarnings("unchecked")
   protected static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  EPGMDatabase<G, V, E> readEPGMDatabase(String directory) {
-    return readEPGMDatabase(directory, true);
+  LogicalGraph<G, V, E> readLogicalGraph(String directory) {
+    return readLogicalGraph(directory, true);
   }
 
   /**
@@ -98,19 +99,20 @@ public abstract class AbstractRunner {
    * @param <G>             EPGM graph head type
    * @param <V>             EPGM vertex type
    * @param <E>             EPGM edge type
-   * @return EPGM database
+   * @return EPGM logical graph
    */
   @SuppressWarnings("unchecked")
   protected static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  EPGMDatabase<G, V, E> readEPGMDatabase(String directory,
+  LogicalGraph<G, V, E> readLogicalGraph(String directory,
     boolean readGraphHeads) {
     directory = appendSeparator(directory);
-    return EPGMDatabase.fromJsonFile(
+    return new JSONDataSource(
+      readGraphHeads ? directory + GRAPHS_JSON : null,
       directory + VERTICES_JSON,
       directory + EDGES_JSON,
-      readGraphHeads ? directory + GRAPHS_JSON : null,
-      GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
+      GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()))
+      .getLogicalGraph();
   }
 
   /**
@@ -128,10 +130,13 @@ public abstract class AbstractRunner {
   void writeLogicalGraph(LogicalGraph<G, V, E> graph, String directory) throws
     Exception {
     directory = appendSeparator(directory);
-    graph.writeAsJson(
+    graph.writeTo(new JSONDataSink<>(
+      directory + GRAPHS_JSON,
       directory + VERTICES_JSON,
       directory + EDGES_JSON,
-      directory + GRAPHS_JSON);
+      graph.getConfig()));
+
+    getExecutionEnvironment().execute();
   }
 
   /**
@@ -149,11 +154,13 @@ public abstract class AbstractRunner {
   void writeGraphCollection(GraphCollection<G, V, E> collection,
     String directory) throws Exception {
     directory = appendSeparator(directory);
-    collection.writeAsJson(
+    collection.writeTo(new JSONDataSink<>(
+      directory + GRAPHS_JSON,
       directory + VERTICES_JSON,
       directory + EDGES_JSON,
-      directory + GRAPHS_JSON
-    );
+      collection.getConfig()));
+
+    getExecutionEnvironment().execute();
   }
 
   /**
