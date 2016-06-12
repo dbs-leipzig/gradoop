@@ -15,7 +15,25 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.io.impl.hbase.functions;
+
+import org.gradoop.model.api.EPGMEdge;
+
 /**
- * Contains all classes related to HBase input and output to and from Flink.
+ * Takes grouped edges as input and outputs a tuple containing source vertex id
+ * and the edges.
+ *
+ * edge+ -> (sourceId, edge+)
+ *
+ * @param <E> EPGM edge type
  */
-package org.gradoop.io.hbase;
+public class EdgeSetBySourceId<E extends EPGMEdge>
+  extends EdgeSet<E> {
+
+  /**
+   * Constructor
+   */
+  public EdgeSetBySourceId() {
+    extractBySourceId = true;
+  }
+}

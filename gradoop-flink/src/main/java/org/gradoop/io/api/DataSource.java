@@ -24,6 +24,8 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
 
+import java.io.IOException;
+
 /**
  * Data source in analytical programs.
  *
@@ -39,19 +41,19 @@ public interface DataSource
    *
    * @return logial graph
    */
-  LogicalGraph<G, V, E> getLogicalGraph();
+  LogicalGraph<G, V, E> getLogicalGraph() throws IOException;
 
   /**
    * Reads the input as graph collection.
    *
    * @return graph collection
    */
-  GraphCollection<G, V, E> getGraphCollection();
+  GraphCollection<G, V, E> getGraphCollection() throws IOException;
 
   /**
    * Reads the input as graph transactions.
    *
    * @return graph transactions
    */
-  GraphTransactions<G, V, E> getGraphTransactions();
+  GraphTransactions<G, V, E> getGraphTransactions() throws IOException;
 }

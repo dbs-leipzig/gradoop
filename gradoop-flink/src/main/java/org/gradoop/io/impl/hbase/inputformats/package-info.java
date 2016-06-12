@@ -18,4 +18,4 @@
 /**
  * Contains InputFormats for EPGM elements.
  */
-package org.gradoop.io.hbase.inputformats;
+package org.gradoop.io.impl.hbase.inputformats;

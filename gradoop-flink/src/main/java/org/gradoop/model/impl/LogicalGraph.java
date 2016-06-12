@@ -63,6 +63,7 @@ import org.gradoop.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.util.GradoopFlinkConfig;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -731,7 +732,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public void writeTo(DataSink<G, V, E> dataSink) {
+  public void writeTo(DataSink<G, V, E> dataSink) throws IOException {
     dataSink.write(this);
   }
 }

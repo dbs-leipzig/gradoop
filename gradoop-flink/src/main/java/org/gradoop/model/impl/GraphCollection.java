@@ -72,6 +72,7 @@ import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.gradoop.util.Order;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -595,7 +596,7 @@ public class GraphCollection
    * {@inheritDoc}
    */
   @Override
-  public void writeTo(DataSink<G, V, E> dataSink) {
+  public void writeTo(DataSink<G, V, E> dataSink) throws IOException {
     dataSink.write(this);
   }
 }

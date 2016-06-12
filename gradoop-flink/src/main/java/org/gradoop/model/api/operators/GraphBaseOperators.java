@@ -27,6 +27,8 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.GraphCollection;
 
+import java.io.IOException;
+
 /**
  * Operators that are available at all graph structures.
  *
@@ -105,5 +107,5 @@ public interface GraphBaseOperators
    *
    * @param dataSink data sing
    */
-  void writeTo(DataSink<G, V, E> dataSink);
+  void writeTo(DataSink<G, V, E> dataSink) throws IOException;
 }
