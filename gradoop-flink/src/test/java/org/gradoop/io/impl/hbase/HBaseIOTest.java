@@ -1,8 +1,9 @@
-package org.gradoop.io.hbase;
+package org.gradoop.io.impl.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.impl.EPGMDatabase;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -23,7 +24,7 @@ import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPers
 import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentGraphHeads;
 import static org.gradoop.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentVertices;
 
-public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
+public class HBaseIOTest extends FlinkHBaseTestBase {
 
   @Test
   public void readFromHBaseTest() throws Exception {
@@ -51,18 +52,18 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
     epgmStore.flush();
 
     // read social graph from HBase via EPGMDatabase
-    EPGMDatabase<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
-      EPGMDatabase.fromHBase(epgmStore, getConfig());
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collection =
+      new HBaseDataSource<>(epgmStore, getConfig()).getGraphCollection();
 
     Collection<GraphHeadPojo> loadedGraphHeads    = Lists.newArrayList();
     Collection<VertexPojo>    loadedVertices      = Lists.newArrayList();
     Collection<EdgePojo>      loadedEdges         = Lists.newArrayList();
 
-    epgmDatabase.getCollection().getGraphHeads()
+    collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
-    epgmDatabase.getDatabaseGraph().getVertices()
+    collection.getVertices()
       .output(new LocalCollectionOutputFormat<>(loadedVertices));
-    epgmDatabase.getDatabaseGraph().getEdges()
+    collection.getEdges()
       .output(new LocalCollectionOutputFormat<>(loadedEdges));
 
     getExecutionEnvironment().execute();
@@ -89,7 +90,9 @@ public class EPGMDatabaseHBaseTest extends FlinkHBaseTestBase {
       loader.getDatabase();
 
     // write social graph to HBase via EPGM database
-    epgmDB.writeToHBase(epgmStore);
+    epgmDB.writeTo(new HBaseDataSink<>(epgmStore, getConfig()));
+
+    getExecutionEnvironment().execute();
 
     epgmStore.flush();
 

@@ -1,4 +1,4 @@
-package org.gradoop.io.hbase;
+package org.gradoop.io.impl.hbase;
 
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;

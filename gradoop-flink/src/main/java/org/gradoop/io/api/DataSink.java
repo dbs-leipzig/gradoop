@@ -24,6 +24,8 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
 
+import java.io.IOException;
+
 /**
  * Data source in analytical programs.
  *
@@ -39,19 +41,19 @@ public interface DataSink
    *
    * @param logicalGraph logical graph
    */
-  void write(LogicalGraph<G, V, E> logicalGraph);
+  void write(LogicalGraph<G, V, E> logicalGraph) throws IOException;
 
   /**
    * Writes a logical graph to the data sink.
    *
    * @param graphCollection graph collection
    */
-  void write(GraphCollection<G, V, E> graphCollection);
+  void write(GraphCollection<G, V, E> graphCollection) throws IOException;
 
   /**
    * Writes a logical graph to the data sink.
    *
    * @param graphTransactions graph transactions
    */
-  void write(GraphTransactions<G, V, E> graphTransactions);
+  void write(GraphTransactions<G, V, E> graphTransactions) throws IOException;
 }

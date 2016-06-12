@@ -38,7 +38,7 @@ import static org.gradoop.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
+public class JSONIOTest extends GradoopFlinkTestBase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -65,11 +65,11 @@ public class EPGMDatabaseJSONTest extends GradoopFlinkTestBase {
   @Test
   public void testFromJsonFile() throws Exception {
     String vertexFile =
-      EPGMDatabaseJSONTest.class.getResource("/data/json/sna/nodes.json").getFile();
+      JSONIOTest.class.getResource("/data/json/sna/nodes.json").getFile();
     String edgeFile =
-      EPGMDatabaseJSONTest.class.getResource("/data/json/sna/edges.json").getFile();
+      JSONIOTest.class.getResource("/data/json/sna/edges.json").getFile();
     String graphFile =
-      EPGMDatabaseJSONTest.class.getResource("/data/json/sna/graphs.json").getFile();
+      JSONIOTest.class.getResource("/data/json/sna/graphs.json").getFile();
 
     DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       new JSONDataSource<>(graphFile, vertexFile, edgeFile, config);

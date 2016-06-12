@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.hbase.inputformats;
+package org.gradoop.io.impl.hbase.inputformats;
 
 import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
@@ -23,40 +23,39 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.storage.api.EdgeHandler;
+import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
 
 /**
- * Reads edge data from HBase.
+ * Reads vertex data from HBase.
  *
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class EdgeTableInputFormat<
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends TableInputFormat<Tuple1<E>> {
+public class VertexTableInputFormat
+  <V extends EPGMVertex, E extends EPGMEdge>
+  extends TableInputFormat<Tuple1<V>> {
 
   /**
-   * Handles reading of persistent edge data.
+   * Handles reading of persistent vertex data.
    */
-  private final EdgeHandler<V, E> edgeHandler;
+  private final VertexHandler<V, E> vertexHandler;
 
   /**
    * Table to read from.
    */
-  private final String edgeTableName;
+  private final String vertexTableName;
 
   /**
-   * Creates an edge table input format.
+   * Creates an vertex table input format.
    *
-   * @param edgeHandler   edge data handler
-   * @param edgeTableName edge data table name
+   * @param vertexHandler   vertex data handler
+   * @param vertexTableName vertex data table name
    */
-  public EdgeTableInputFormat(EdgeHandler<V, E> edgeHandler,
-    String edgeTableName) {
-    this.edgeHandler = edgeHandler;
-    this.edgeTableName = edgeTableName;
+  public VertexTableInputFormat(VertexHandler<V, E> vertexHandler,
+    String vertexTableName) {
+    this.vertexHandler = vertexHandler;
+    this.vertexTableName = vertexTableName;
   }
 
   /**
@@ -74,14 +73,14 @@ public class EdgeTableInputFormat<
    */
   @Override
   protected String getTableName() {
-    return edgeTableName;
+    return vertexTableName;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<E> mapResultToTuple(Result result) {
-    return new Tuple1<>(edgeHandler.readEdge(result));
+  protected Tuple1<V> mapResultToTuple(Result result) {
+    return new Tuple1<>(vertexHandler.readVertex(result));
   }
 }

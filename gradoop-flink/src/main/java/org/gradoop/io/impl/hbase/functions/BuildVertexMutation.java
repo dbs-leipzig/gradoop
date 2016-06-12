@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.hbase.functions;
+package org.gradoop.io.impl.hbase.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -25,20 +25,20 @@ import org.apache.hadoop.hbase.client.Put;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.storage.api.EdgeHandler;
-import org.gradoop.storage.api.PersistentEdge;
+import org.gradoop.storage.api.PersistentVertex;
+import org.gradoop.storage.api.VertexHandler;
 
 /**
- * Creates HBase {@link Mutation} from persistent edge data using edge
+ * Creates HBase {@link Mutation} from persistent vertex data using vertex
  * data handler.
  *
  * @param <V>  EPGM vertex type
  * @param <E>  EPGM edge type
- * @param <PE> EPGM persistent edge type
+ * @param <PV> EPGM persistent vertex type
  */
-public class BuildEdgeMutation
-  <V extends EPGMVertex, E extends EPGMEdge, PE extends PersistentEdge<V>>
-  extends RichMapFunction<PE, Tuple2<GradoopId, Mutation>> {
+public class BuildVertexMutation
+  <V extends EPGMVertex, E extends EPGMEdge, PV extends PersistentVertex<E>>
+  extends RichMapFunction<PV, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -51,32 +51,17 @@ public class BuildEdgeMutation
   private transient Tuple2<GradoopId, Mutation> reuseTuple;
 
   /**
-   * Edge data handler to create Mutations.
+   * Vertex data handler to create Mutations.
    */
-  private final EdgeHandler<V, E> edgeHandler;
+  private final VertexHandler<V, E> vertexHandler;
 
   /**
    * Creates rich map function.
    *
-   * @param edgeHandler edge data handler
+   * @param vertexHandler vertex data handler
    */
-  public BuildEdgeMutation(EdgeHandler<V, E> edgeHandler) {
-    this.edgeHandler = edgeHandler;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Tuple2<GradoopId, Mutation> map(PE persistentEdgeData) throws
-    Exception {
-    GradoopId key = persistentEdgeData.getId();
-    Put put = new Put(edgeHandler.getRowKey(persistentEdgeData.getId()));
-    put = edgeHandler.writeEdge(put, persistentEdgeData);
-
-    reuseTuple.f0 = key;
-    reuseTuple.f1 = put;
-    return reuseTuple;
+  public BuildVertexMutation(VertexHandler<V, E> vertexHandler) {
+    this.vertexHandler = vertexHandler;
   }
 
   /**
@@ -86,5 +71,21 @@ public class BuildEdgeMutation
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     reuseTuple = new Tuple2<>();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Tuple2<GradoopId, Mutation> map(PV persistentVertexData) throws
+    Exception {
+    GradoopId key = persistentVertexData.getId();
+    Put put =
+      new Put(vertexHandler.getRowKey(persistentVertexData.getId()));
+    put = vertexHandler.writeVertex(put, persistentVertexData);
+
+    reuseTuple.f0 = key;
+    reuseTuple.f1 = put;
+    return reuseTuple;
   }
 }

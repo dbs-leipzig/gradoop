@@ -29,7 +29,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public abstract class JSONBase
+abstract class JSONBase
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
   /**
    * Gradoop Flink configuration
@@ -49,14 +49,15 @@ public abstract class JSONBase
   private final String edgePath;
 
   /**
-   * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
+   * Creates a new data source/sink. Paths can be local (file://) or HDFS
+   * (hdfs://).
    *
    * @param vertexPath    vertex data file
    * @param edgePath      edge data file
    * @param graphHeadPath graph data file
    * @param config        Gradoop Flink configuration
    */
-  public JSONBase(String graphHeadPath, String vertexPath,
+  JSONBase(String graphHeadPath, String vertexPath,
     String edgePath, GradoopFlinkConfig<G, V, E> config) {
     if (config == null) {
       throw new IllegalArgumentException("config must not be null");
