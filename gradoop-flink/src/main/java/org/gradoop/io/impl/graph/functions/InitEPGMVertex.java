@@ -15,15 +15,16 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graph.functions;
+package org.gradoop.io.impl.graph.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.io.graph.tuples.ImportVertex;
+import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
@@ -34,6 +35,11 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <V> EPGM vertex type
  * @param <K> Import Edge/Vertex identifier type
  */
+@FunctionAnnotation.ForwardedFields(
+  "f0;" + // vertex id
+  "f1->f2.label;" + // vertex label
+  "f2->f2.properties" // vertex properties
+)
 public class InitEPGMVertex<V extends EPGMVertex, K extends Comparable<K>>
   extends InitEPGMElement<V, K>
   implements MapFunction<ImportVertex<K>, Tuple3<K, GradoopId, V>>,

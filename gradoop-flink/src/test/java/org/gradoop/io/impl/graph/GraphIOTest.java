@@ -1,10 +1,10 @@
-package org.gradoop.io.graph;
+package org.gradoop.io.impl.graph;
 
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.io.graph.tuples.ImportEdge;
-import org.gradoop.io.graph.tuples.ImportVertex;
+import org.gradoop.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
-public class EPGMDatabaseGraphReaderTest extends GradoopFlinkTestBase {
+public class GraphIOTest extends GradoopFlinkTestBase {
 
   @Test
   public void testWithLineage() throws Exception {
@@ -40,9 +40,11 @@ public class EPGMDatabaseGraphReaderTest extends GradoopFlinkTestBase {
         "(a)-[:a {foo=42, __L = 0L}]->(b)-[:b {foo=42, __L = 1L}]->(a);" +
         "]").getLogicalGraphByVariable("expected");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output = EPGMDatabase
-      .fromExternalGraph(importVertices, importEdges, "__L", getConfig())
-      .getDatabaseGraph(true);
+    GraphDataSource<GraphHeadPojo, VertexPojo, EdgePojo, Long> dataSource =
+      new GraphDataSource<>(importVertices, importEdges, "__L", getConfig());
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output = dataSource
+      .getLogicalGraph();
 
     collectAndAssertTrue(output.equalsByElementData(expected));
   }
@@ -69,9 +71,11 @@ public class EPGMDatabaseGraphReaderTest extends GradoopFlinkTestBase {
         "(a)-[:a {foo=42}]->(b)-[:b {foo=42}]->(a);" +
         "]").getLogicalGraphByVariable("expected");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output = EPGMDatabase
-      .fromExternalGraph(importVertices, importEdges, getConfig())
-      .getDatabaseGraph(true);
+    GraphDataSource<GraphHeadPojo, VertexPojo, EdgePojo, Long> dataSource =
+      new GraphDataSource<>(importVertices, importEdges, getConfig());
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output = dataSource
+      .getLogicalGraph();
 
     collectAndAssertTrue(output.equalsByElementData(expected));
   }

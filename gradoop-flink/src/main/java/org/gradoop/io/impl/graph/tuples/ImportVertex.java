@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graph.tuples;
+package org.gradoop.io.impl.graph.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.impl.properties.PropertyList;

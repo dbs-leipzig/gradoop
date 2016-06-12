@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graph.functions;
+package org.gradoop.io.impl.graph.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -24,7 +24,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.io.graph.tuples.ImportEdge;
+import org.gradoop.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.impl.id.GradoopId;
