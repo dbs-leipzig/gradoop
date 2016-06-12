@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graph.functions;
+package org.gradoop.io.impl.graph.functions;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.model.api.EPGMElement;

@@ -15,42 +15,49 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graph;
+package org.gradoop.io.impl.graph;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.io.graph.functions.InitEPGMVertex;
-import org.gradoop.io.graph.functions.InitEPGMEdge;
-import org.gradoop.io.graph.functions.UpdateEPGMEdge;
-import org.gradoop.io.graph.tuples.ImportEdge;
-import org.gradoop.io.graph.tuples.ImportVertex;
+import org.gradoop.io.api.DataSource;
+import org.gradoop.io.impl.graph.functions.InitEPGMVertex;
+import org.gradoop.io.impl.graph.functions.InitEPGMEdge;
+import org.gradoop.io.impl.graph.functions.UpdateEPGMEdge;
+import org.gradoop.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.tuple.Project3To0And1;
 import org.gradoop.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GradoopFlinkConfig;
 
+import java.io.IOException;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Transforms an import/external graph into an EPGM database.
+ * Transforms an external graph into an EPGM database. The external graph needs
+ * to be represented by a data set of {@link ImportVertex} and a data set of
+ * {@link ImportEdge}. This class transforms the external graph into an EPGM
+ * {@link LogicalGraph}.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  * @param <K> External vertex/edge identifier type
  */
-public class GraphReader<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
-  K extends Comparable<K>> {
+public class GraphDataSource
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge,
+    K extends Comparable<K>>
+  implements DataSource<G, V, E> {
 
   /**
    * Vertices to import.
@@ -72,6 +79,21 @@ public class GraphReader<
    */
   private final GradoopFlinkConfig<G, V, E> config;
 
+
+  /**
+   * Creates a new graph reader with no lineage information stored at the
+   * resulting EPGM graph.
+   *
+   * @param importVertices  vertices to import
+   * @param importEdges     edges to import
+   * @param config          gradoop config
+   */
+  public GraphDataSource(DataSet<ImportVertex<K>> importVertices,
+    DataSet<ImportEdge<K>> importEdges,
+    GradoopFlinkConfig<G, V, E> config) {
+    this(importVertices, importEdges, null, config);
+  }
+
   /**
    * Creates a new graph reader.
    *
@@ -84,7 +106,7 @@ public class GraphReader<
    *                            (can be {@code null})
    * @param config              gradoop config
    */
-  public GraphReader(DataSet<ImportVertex<K>> importVertices,
+  public GraphDataSource(DataSet<ImportVertex<K>> importVertices,
     DataSet<ImportEdge<K>> importEdges,
     String lineagePropertyKey,
     GradoopFlinkConfig<G, V, E> config) {
@@ -99,6 +121,7 @@ public class GraphReader<
    *
    * @return logical graph
    */
+  @Override
   public LogicalGraph<G, V, E> getLogicalGraph() {
 
     TypeInformation<K> externalIdType = ((TupleTypeInfo<?>) importVertices
@@ -124,5 +147,15 @@ public class GraphReader<
       .with(new UpdateEPGMEdge<E, K>());
 
     return LogicalGraph.fromDataSets(epgmVertices, epgmEdges, config);
+  }
+
+  @Override
+  public GraphCollection<G, V, E> getGraphCollection() throws IOException {
+    return GraphCollection.fromGraph(getLogicalGraph());
+  }
+
+  @Override
+  public GraphTransactions<G, V, E> getGraphTransactions() throws IOException {
+    return getGraphCollection().toTransactions();
   }
 }

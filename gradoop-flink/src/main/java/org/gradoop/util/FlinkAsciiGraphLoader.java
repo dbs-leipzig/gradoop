@@ -239,7 +239,7 @@ public class FlinkAsciiGraphLoader<
   @SuppressWarnings("unchecked")
   public EPGMDatabase<G, V, E> getDatabase() {
     return EPGMDatabase
-      .fromCollection(loader.getGraphHeads(),
+      .fromCollections(loader.getGraphHeads(),
         loader.getVertices(),
         loader.getEdges(),
         config);

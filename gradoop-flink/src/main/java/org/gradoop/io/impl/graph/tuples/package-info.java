@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains all classes related to reading an external graph into Gradoop.
+ * Contains all tuples related to reading an external graph into Gradoop.
  */
-package org.gradoop.io.graph;
+package org.gradoop.io.impl.graph.tuples;

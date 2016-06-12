@@ -21,9 +21,6 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.io.api.DataSink;
-import org.gradoop.io.graph.GraphReader;
-import org.gradoop.io.graph.tuples.ImportEdge;
-import org.gradoop.io.graph.tuples.ImportVertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -45,6 +42,7 @@ import java.util.Collection;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
+@Deprecated
 public class EPGMDatabase<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
@@ -85,70 +83,6 @@ public class EPGMDatabase<
   }
 
   //----------------------------------------------------------------------------
-  // from external graphs
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates an EPGM database from external graph data.
-   *
-   * @param vertices  import vertices
-   * @param edges     import edges
-   * @param config    Gradoop Flink configuration
-   * @param <G>       EPGM graph head type
-   * @param <V>       EPGM vertex type
-   * @param <E>       EPGM edge type
-   * @param <K>       Import Edge/Vertex identifier type
-   *
-   * @return EPGM database representing the external graph
-   */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge,
-    K extends Comparable<K>>
-  EPGMDatabase<G, V, E> fromExternalGraph(DataSet<ImportVertex<K>> vertices,
-    DataSet<ImportEdge<K>> edges,
-    GradoopFlinkConfig<G, V, E> config) {
-    return fromExternalGraph(vertices, edges, null, config);
-  }
-
-  /**
-   * Creates an EPGM database from external graph data.
-   *
-   * @param vertices           import vertices
-   * @param edges              import edges
-   * @param lineagePropertyKey used to store external identifiers at resulting
-   *                           EPGM elements
-   * @param config             Gradoop Flink configuration
-   * @param <G>                EPGM graph head type
-   * @param <V>                EPGM vertex type
-   * @param <E>                EPGM edge type
-   * @param <K>                Import Edge/Vertex identifier type
-   *
-   * @return EPGM database representing the external graph
-   */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge,
-    K extends Comparable<K>>
-  EPGMDatabase<G, V, E> fromExternalGraph(DataSet<ImportVertex<K>> vertices,
-    DataSet<ImportEdge<K>> edges,
-    String lineagePropertyKey,
-    GradoopFlinkConfig<G, V, E> config) {
-
-    LogicalGraph<G, V, E> logicalGraph = new GraphReader<>(
-      vertices, edges, lineagePropertyKey, config).getLogicalGraph();
-
-    return new EPGMDatabase<>(
-      config.getExecutionEnvironment().fromElements(
-        config.getGraphHeadFactory().createGraphHead()),
-      logicalGraph.getVertices(),
-      logicalGraph.getEdges(),
-      config);
-  }
-
-  //----------------------------------------------------------------------------
   // from Collection
   //----------------------------------------------------------------------------
 
@@ -165,11 +99,10 @@ public class EPGMDatabase<
    * @return EPGM database
    */
   @SuppressWarnings("unchecked")
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge>
-  EPGMDatabase fromCollection(
+  @Deprecated
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  EPGMDatabase fromCollections(
     Collection<G> graphDataCollection,
     Collection<V> vertexDataCollection,
     Collection<E> edgeDataCollection,
@@ -191,12 +124,18 @@ public class EPGMDatabase<
     return new EPGMDatabase<>(graphHeads, vertices, edges, config);
   }
 
+
+  //----------------------------------------------------------------------------
+  // Util methods
+  //----------------------------------------------------------------------------
+
   /**
    * Returns a logical graph containing the complete vertex and edge space of
    * that EPGM database.
    *
    * @return logical graph of vertex and edge space
    */
+  @Deprecated
   public LogicalGraph<G, V, E> getDatabaseGraph() {
     return getDatabaseGraph(false);
   }
@@ -211,6 +150,7 @@ public class EPGMDatabase<
    *
    * @return logical graph of vertex and edge space
    */
+  @Deprecated
   public LogicalGraph<G, V, E> getDatabaseGraph(boolean withGraphContainment) {
     if (withGraphContainment) {
       DataSet<GradoopId> graphId = graphHead.map(new Id<G>());
@@ -226,10 +166,6 @@ public class EPGMDatabase<
     }
   }
 
-  //----------------------------------------------------------------------------
-  // Util methods
-  //----------------------------------------------------------------------------
-
   /**
    * Returns a logical graph by its identifier. If the logical graph does not
    * exist, an empty logical graph is returned.
@@ -237,6 +173,7 @@ public class EPGMDatabase<
    * @param graphID graph identifier
    * @return logical graph (possibly empty)
    */
+  @Deprecated
   public LogicalGraph<G, V, E> getGraph(GradoopId graphID) {
     return database.getGraph(graphID);
   }
@@ -246,6 +183,7 @@ public class EPGMDatabase<
    *
    * @return collection of all logical graphs
    */
+  @Deprecated
   public GraphCollection<G, V, E> getCollection() {
     DataSet<V> newVertices = database.getVertices()
         .filter(new FilterFunction<V>() {
@@ -272,6 +210,7 @@ public class EPGMDatabase<
    *
    * @param dataSink data sink
    */
+  @Deprecated
   public void writeTo(DataSink<G, V, E> dataSink) throws IOException {
     dataSink.write(database);
   }
