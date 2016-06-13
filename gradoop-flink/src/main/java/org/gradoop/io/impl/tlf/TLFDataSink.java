@@ -17,32 +17,19 @@
 
 package org.gradoop.io.impl.tlf;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.io.api.DataSink;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionToTLFDictionaryEdgeMap;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionToTLFDictionaryFileFormat;
-
-import org.gradoop.io.impl.tlf.functions
-  .GraphTransactionWithTLFDictionaryToSimpleLabels;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFileFormat;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryConstants;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionToTLFDictionaryVertexMap;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryMapGroupReducer;
+import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFile;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
-
-import java.util.Map;
-
 
 /**
  * Writes an EPGM representation into one TLF file. The format
- * is documented at {@link GraphTransactionsToTLFFileFormat}.
+ * is documented at {@link GraphTransactionsToTLFFile}.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -61,20 +48,7 @@ public class TLFDataSink
    */
   public TLFDataSink(String tlfPath, GradoopFlinkConfig<G, V, E>
     config) {
-    super(tlfPath, "", "", config);
-  }
-
-  /**
-   * Creates a new data sink. Paths can be local (file://) or HDFS (hdfs://).
-   *
-   * @param tlfPath tlf data file
-   * @param tlfVertexDictionaryPath tlf vertex dictionary file
-   * @param tlfEdgeDictionaryPath tlf edge dictionary file
-   * @param config Gradoop Flink configuration
-   */
-  public TLFDataSink(String tlfPath, String tlfVertexDictionaryPath, String
-    tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E> config) {
-    super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
+    super(tlfPath, config);
   }
 
   @Override
@@ -89,69 +63,7 @@ public class TLFDataSink
 
   @Override
   public void write(GraphTransactions<G, V, E> graphTransactions) {
-    DataSet<GraphTransaction<G, V, E>> simpleLabelTransaction;
-    DataSet<Map<String, Integer>> vertexDictionary = null;
-    DataSet<Map<String, Integer>> edgeDictionary = null;
-    // if the graph transaction vertex labels are set by a dictionary
-    if (hasVertexDictionary()) {
-      vertexDictionary = graphTransactions.getTransactions()
-        // get a vertex dictionary for each transaction
-        .flatMap(new GraphTransactionToTLFDictionaryVertexMap<G, V, E>())
-        // reduce them to one dictionary without duplicates
-        .reduceGroup(new TLFDictionaryMapGroupReducer());
-      // write the vertex dictionary
-      vertexDictionary
-        .writeAsFormattedText(getTLFVertexDictionaryPath(),
-          new GraphTransactionToTLFDictionaryFileFormat());
-    }
-
-    if (hasEdgeDictionary()) {
-      edgeDictionary = graphTransactions.getTransactions()
-        // get an edge dictionary for each transaction
-        .flatMap(new GraphTransactionToTLFDictionaryEdgeMap<G, V, E>())
-        // reduce them to one dictionary without duplicates
-        .reduceGroup(new TLFDictionaryMapGroupReducer());
-      // write the edge dictionary
-      edgeDictionary
-        .writeAsFormattedText(getTLFEdgeDictionaryPath(),
-          new GraphTransactionToTLFDictionaryFileFormat());
-    }
-
-
-    if (hasVertexDictionary() || hasEdgeDictionary()) {
-      if (hasVertexDictionary() && hasEdgeDictionary()) {
-        simpleLabelTransaction = graphTransactions.getTransactions()
-          // map the simple integer-like labels
-          .map(new GraphTransactionWithTLFDictionaryToSimpleLabels<G, V, E>(
-            hasVertexDictionary(), hasEdgeDictionary()))
-          .withBroadcastSet(vertexDictionary,
-            TLFDictionaryConstants.BROADCAST_VERTEX_DICTIONARY)
-          .withBroadcastSet(edgeDictionary,
-            TLFDictionaryConstants.BROADCAST_EDGE_DICTIONARY);
-      } else if (hasVertexDictionary()) {
-        simpleLabelTransaction = graphTransactions.getTransactions()
-          // map the simple integer-like labels
-          .map(new GraphTransactionWithTLFDictionaryToSimpleLabels<G, V, E>(
-            hasVertexDictionary(), hasEdgeDictionary()))
-          .withBroadcastSet(vertexDictionary,
-            TLFDictionaryConstants.BROADCAST_VERTEX_DICTIONARY);
-      } else {
-        simpleLabelTransaction = graphTransactions.getTransactions()
-          // map the simple integer-like labels
-          .map(new GraphTransactionWithTLFDictionaryToSimpleLabels<G, V, E>(
-            hasVertexDictionary(), hasEdgeDictionary()))
-          .withBroadcastSet(edgeDictionary,
-            TLFDictionaryConstants.BROADCAST_EDGE_DICTIONARY);
-      }
-      // write the TLF format adjusted graphs to file
-      simpleLabelTransaction
-        .writeAsFormattedText(getTLFPath(),
-          new GraphTransactionsToTLFFileFormat<G, V, E>());
-    // if there was no dictionary used the graphs can simply be written
-    } else {
-      graphTransactions.getTransactions()
-        .writeAsFormattedText(getTLFPath(),
-          new GraphTransactionsToTLFFileFormat<G, V, E>());
-    }
+    graphTransactions.getTransactions().writeAsFormattedText(getTLFPath
+      (), new GraphTransactionsToTLFFile<G, V, E>());
   }
 }

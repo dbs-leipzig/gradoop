@@ -17,13 +17,10 @@
 
 package org.gradoop.io.impl.tlf;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.util.GradoopFlinkConfig;
-
-import java.util.Map;
 
 /**
  * Base class for TLF data source and sink.
@@ -39,45 +36,18 @@ abstract class TLFBase
    */
   private final GradoopFlinkConfig<G, V, E> config;
   /**
-   * File to read/write TLF content to
+   * File to write TLF content to
    */
   private final String tlfPath;
-  /**
-   * File to read TLF vertex dictionary;
-   */
-  private final String tlfVertexDictionaryPath;
-  /**
-   * File to read TLF edge dictionary;
-   */
-  private final String tlfEdgeDictionaryPath;
-  /**
-   * True if tlfVertexDictionaryPath != ""
-   */
-  private boolean hasVertexDictionary;
-  /**
-   * True if tlfEdgeDictionaryPath != ""
-   */
-  private boolean hasEdgeDictionary;
-  /**
-   * Dataset containing one entry which is the vertex dictionary.
-   */
-  private DataSet<Map<Integer, String>> vertexDictionary;
-  /**
-   * Dataset containing ine entry which is the edge dictionary.
-   */
-  private DataSet<Map<Integer, String>> edgeDictionary;
 
   /**
    * Creates a new data source/sink. Paths can be local (file://) or HDFS
    * (hdfs://).
    *
    * @param tlfPath tlf data file
-   * @param tlfVertexDictionaryPath tlf vertex dictionary file
-   * @param tlfEdgeDictionaryPath tlf edge dictionary file
    * @param config Gradoop Flink configuration
    */
-  TLFBase(String tlfPath, String tlfVertexDictionaryPath, String
-    tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E> config) {
+  TLFBase(String tlfPath, GradoopFlinkConfig<G, V, E> config) {
     if (config == null) {
       throw new IllegalArgumentException("config must not be null");
     }
@@ -86,13 +56,7 @@ abstract class TLFBase
     }
 
     this.tlfPath = tlfPath;
-    this.tlfVertexDictionaryPath = tlfVertexDictionaryPath;
-    this.tlfEdgeDictionaryPath = tlfEdgeDictionaryPath;
     this.config = config;
-
-    hasVertexDictionary = !tlfVertexDictionaryPath.equals("");
-    hasEdgeDictionary = !tlfEdgeDictionaryPath.equals("");
-
   }
 
   public GradoopFlinkConfig<G, V, E> getConfig() {
@@ -101,48 +65,5 @@ abstract class TLFBase
 
   public String getTLFPath() {
     return tlfPath;
-  }
-
-  public String getTLFVertexDictionaryPath() {
-    return tlfVertexDictionaryPath;
-  }
-
-  public String getTLFEdgeDictionaryPath() {
-    return tlfEdgeDictionaryPath;
-  }
-
-  /**
-   * Returns true if there is a vertex dictionary.
-   *
-   * @return true if there is a vertex dictionary.
-   */
-  public boolean hasVertexDictionary() {
-    return hasVertexDictionary;
-  }
-
-  /**
-   * Returns true if there is an edge dictionary.
-   *
-   * @return true if there is an edge dictionary.
-   */
-  public boolean hasEdgeDictionary() {
-    return hasEdgeDictionary;
-  }
-
-  public DataSet<Map<Integer, String>> getVertexDictionary() {
-    return vertexDictionary;
-  }
-
-  public void setVertexDictionary(
-    DataSet<Map<Integer, String>> vertexDictionary) {
-    this.vertexDictionary = vertexDictionary;
-  }
-
-  public DataSet<Map<Integer, String>> getEdgeDictionary() {
-    return edgeDictionary;
-  }
-
-  public void setEdgeDictionary(DataSet<Map<Integer, String>> edgeDictionary) {
-    this.edgeDictionary = edgeDictionary;
   }
 }
