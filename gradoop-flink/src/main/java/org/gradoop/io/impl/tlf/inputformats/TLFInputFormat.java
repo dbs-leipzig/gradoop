@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graphgen;
+package org.gradoop.io.impl.tlf.inputformats;
 
 import java.io.IOException;
 import org.apache.commons.io.Charsets;
@@ -33,10 +33,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 
 /**
- * This input format is used to extract complete GraphGen graph strings from
+ * This input format is used to extract complete TLF graph strings from
  * distributed hdfs files.
  */
-public class GraphGenInputFormat extends TextInputFormat {
+public class TLFInputFormat extends TextInputFormat {
   /**
    * The byte representation of the start tag which is 't'.
    */
@@ -52,9 +52,9 @@ public class GraphGenInputFormat extends TextInputFormat {
   /**
    * Returns the actual file reader which handles the file split.
    *
-   * @param split the split of the file containing all GraphGen content
+   * @param split the split of the file containing all TLF content
    * @param context current task attempt context
-   * @return the GraphGenRecordReader
+   * @return the TLFRecordReader
    */
   @Override
   public RecordReader<LongWritable, Text> createRecordReader(InputSplit
@@ -63,13 +63,13 @@ public class GraphGenInputFormat extends TextInputFormat {
       return new GraphGraphRecordReader((FileSplit) split, context
         .getConfiguration());
     } catch (IOException ioe) {
-      System.err.println("Error while creating GraphGenRecordReader: " + ioe);
+      System.err.println("Error while creating TLFRecordReader: " + ioe);
       return null;
     }
   }
 
   /**
-   * GraphGenRecordReader class to read through a given GraphGen document to
+   * TLFRecordReader class to read through a given TLF document to
    * output graph blocks as records which are specified by the start tag and
    * end tag.
    */
@@ -112,10 +112,10 @@ public class GraphGenInputFormat extends TextInputFormat {
     private int valueLength;
 
     /**
-     * Constructor for the reader which handles GraphGen splits and
+     * Constructor for the reader which handles TLF splits and
      * initializes the file input stream.
      *
-     * @param split the split of the file containing all GraphGen content
+     * @param split the split of the file containing all TLF content
      * @param conf the configuration of the task attempt context
      * @throws IOException
      */
@@ -253,7 +253,7 @@ public class GraphGenInputFormat extends TextInputFormat {
     /**
      * Called once for initialization.
      *
-     * @param split the split of the file containing all GraphGen content
+     * @param split the split of the file containing all TLF content
      * @param context current task attempt context
      * @throws IOException
      * @throws InterruptedException

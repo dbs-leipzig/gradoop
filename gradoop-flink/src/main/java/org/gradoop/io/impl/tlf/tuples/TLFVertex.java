@@ -15,19 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graphgen.tuples;
+package org.gradoop.io.impl.tlf.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * Represents a vertex used in a graph generation from GraphGen-files.
+ * Represents a vertex used in a graph generation from TLF-files.
  */
-public class GraphGenVertex extends Tuple2<Integer, String> {
+public class TLFVertex extends Tuple2<Integer, String> {
 
   /**
    * default constructor
    */
-  public GraphGenVertex() {
+  public TLFVertex() {
   }
 
   /**
@@ -35,7 +35,7 @@ public class GraphGenVertex extends Tuple2<Integer, String> {
    * @param id vertex id
    * @param label vertex label
    */
-  public GraphGenVertex(Integer id, String label) {
+  public TLFVertex(Integer id, String label) {
     setId(id);
     setLabel(label);
   }

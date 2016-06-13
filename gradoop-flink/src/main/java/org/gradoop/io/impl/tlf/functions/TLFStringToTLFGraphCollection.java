@@ -15,36 +15,36 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graphgen;
+package org.gradoop.io.impl.tlf.functions;
 
-import org.gradoop.io.graphgen.tuples.GraphGenEdge;
-import org.gradoop.io.graphgen.tuples.GraphGenGraph;
-import org.gradoop.io.graphgen.tuples.GraphGenGraphHead;
-import org.gradoop.io.graphgen.tuples.GraphGenVertex;
+import org.gradoop.io.impl.tlf.tuples.TLFEdge;
+import org.gradoop.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.io.impl.tlf.tuples.TLFGraphHead;
+import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 
 import java.util.Collection;
 import java.util.HashSet;
 
 /**
  * Generates a collection of 3-tuples which contain the graph head, the
- * vertices and the edges from a GraphGen string
+ * vertices and the edges from a TLF string
  */
-public class GraphGenStringToCollection {
+public class TLFStringToTLFGraphCollection {
 
   /**
    * The 3-tuple collection containing the graph head, the vertices and edges
    */
-  protected Collection<GraphGenGraph> graphCollection;
+  protected Collection<TLFGraph> graphCollection;
 
   /**
-   * GraphGen string representation of the graph
+   * TLF string representation of the graph
    */
   protected String content;
 
   /**
    * Constructor which initiates a new collection for 3-tuples
    */
-  public GraphGenStringToCollection() {
+  public TLFStringToTLFGraphCollection() {
     graphCollection = new HashSet<>();
   }
 
@@ -54,7 +54,7 @@ public class GraphGenStringToCollection {
    *
    * @return Collection of graphs as tuples
    */
-  public Collection<GraphGenGraph> getGraphCollection() {
+  public Collection<TLFGraph> getGraphCollection() {
 
     if (content.isEmpty()) {
       return null;
@@ -62,9 +62,9 @@ public class GraphGenStringToCollection {
     if (!graphCollection.isEmpty()) {
       return graphCollection;
     }
-    GraphGenGraphHead graphHead;
-    Collection<GraphGenVertex> vertices = new HashSet<>();
-    Collection<GraphGenEdge> edges = new HashSet<>();
+    TLFGraphHead graphHead;
+    Collection<TLFVertex> vertices = new HashSet<>();
+    Collection<TLFEdge> edges = new HashSet<>();
 
     //remove first tag so that split does not have empty first element
     String[] contentArray = content.trim().replaceFirst("t # ", "").split("t " +
@@ -75,7 +75,7 @@ public class GraphGenStringToCollection {
       edges.addAll(this.getEdges(contentArray[i]));
       graphHead = this.getGraphHead(contentArray[i]);
 
-      graphCollection.add(new GraphGenGraph(graphHead, vertices,
+      graphCollection.add(new TLFGraph(graphHead, vertices,
         edges));
 
       vertices = new HashSet<>();
@@ -85,13 +85,13 @@ public class GraphGenStringToCollection {
   }
 
   /**
-   * Reads the vertices of a complete GraphGen graph segment.
+   * Reads the vertices of a complete TLF graph segment.
    *
-   * @param content the GraphGen graph segment
+   * @param content the TLF graph segment
    * @return collection of vertices as tuples
    */
-  protected Collection<GraphGenVertex> getVertices(String content) {
-    Collection<GraphGenVertex> vertexCollection = new HashSet<>();
+  protected Collection<TLFVertex> getVertices(String content) {
+    Collection<TLFVertex> vertexCollection = new HashSet<>();
     String[] vertex;
     //-1 cause before e is \n
     content = content.substring(content.indexOf("v"), content.indexOf("e") - 1);
@@ -99,22 +99,22 @@ public class GraphGenStringToCollection {
 
     for (int i = 0; i < vertices.length; i++) {
       vertex = vertices[i].split(" ");
-      vertexCollection.add(new GraphGenVertex(Integer.parseInt(
+      vertexCollection.add(new TLFVertex(Integer.parseInt(
         vertex[1].trim()), vertex[2].trim()));
     }
     return vertexCollection;
   }
 
   /**
-   * Reads the edges of a complete GraphGen graph segment
+   * Reads the edges of a complete TLF graph segment.
    *
-   * @param content the GraphGen graph segment
+   * @param content the TLF graph segment
    * @return collection of edges as tuples
    */
-  protected Collection<GraphGenEdge> getEdges(String
+  protected Collection<TLFEdge> getEdges(String
     content) {
 
-    Collection<GraphGenEdge> edgeCollection = new
+    Collection<TLFEdge> edgeCollection = new
       HashSet<>();
     String[] edge;
 
@@ -123,22 +123,25 @@ public class GraphGenStringToCollection {
 
     for (int i = 0; i < edges.length; i++) {
       edge = edges[i].split(" ");
-      edgeCollection.add(new GraphGenEdge(Integer
+      edgeCollection.add(new TLFEdge(Integer
         .parseInt(edge[1].trim()), Integer.parseInt(edge[2].trim()), edge[3]));
     }
     return edgeCollection;
   }
 
   /**
+   * Returns the graph head defined in content.
+   *
    * @param content containing current graph as string
    * @return returns the graph head defined in content
    */
-  protected GraphGenGraphHead getGraphHead(String content) {
-    return new GraphGenGraphHead(Long.parseLong(content.substring(0, 1)));
+  protected TLFGraphHead getGraphHead(String content) {
+    return new TLFGraphHead(Long.parseLong(content.substring(0, 1)));
   }
 
   /**
    * Sets the current content.
+   *
    * @param content the content to be set.
    */
   public void setContent(String content) {

@@ -15,7 +15,35 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.io.impl.tlf.tuples;
+
+import org.apache.flink.api.java.tuple.Tuple1;
+
 /**
- * Contains all classes related to GraphGen input and output to Flink.
+ * Represents a graph head used in a graph generation from TLF-files.
  */
-package org.gradoop.io.graphgen;
+public class TLFGraphHead extends Tuple1<Long> {
+
+  /**
+   * default constructor
+   */
+  public TLFGraphHead() {
+  }
+
+  /**
+   * valued constructor
+   * @param id graph head id
+   */
+  public TLFGraphHead(Long id) {
+    setId(id);
+  }
+
+  public Long getId() {
+    return this.f0;
+  }
+
+  public void setId(long id) {
+    this.f0 = id;
+  }
+
+}

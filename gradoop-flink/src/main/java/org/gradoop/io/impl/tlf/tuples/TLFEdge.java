@@ -15,19 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graphgen.tuples;
+package org.gradoop.io.impl.tlf.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 
 /**
- * Represents an edge used in a graph generation from GraphGen-files.
+ * Represents an edge used in a graph generation from TLF-files.
  */
-public class GraphGenEdge extends Tuple3<Integer, Integer, String> {
+public class TLFEdge extends Tuple3<Integer, Integer, String> {
 
   /**
    * default constructor
    */
-  public GraphGenEdge() {
+  public TLFEdge() {
   }
 
   /**
@@ -36,7 +36,7 @@ public class GraphGenEdge extends Tuple3<Integer, Integer, String> {
    * @param targetId id of the target vertex
    * @param label edge label
    */
-  public GraphGenEdge(Integer sourceId, Integer targetId, String label) {
+  public TLFEdge(Integer sourceId, Integer targetId, String label) {
     setSourceId(sourceId);
     setTargetId(targetId);
     setLabel(label);

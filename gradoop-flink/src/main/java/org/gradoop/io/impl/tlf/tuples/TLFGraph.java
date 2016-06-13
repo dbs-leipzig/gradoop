@@ -15,60 +15,60 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.graphgen.tuples;
+package org.gradoop.io.impl.tlf.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 
 import java.util.Collection;
 
 /**
- *  Represents a graph used in a graph generation from GraphGen-files.
+ *  Represents a graph used in a graph generation from TLF-files.
  */
-public class GraphGenGraph extends Tuple3<GraphGenGraphHead,
-  Collection<GraphGenVertex>, Collection<GraphGenEdge>> {
+public class TLFGraph extends Tuple3<TLFGraphHead,
+  Collection<TLFVertex>, Collection<TLFEdge>> {
 
   /**
    * default constructor
    */
-  public GraphGenGraph() {
+  public TLFGraph() {
   }
 
   /**
    * valued constructor
    *
    * @param graphHead the graph head
-   * @param graphVertices collection containing GraphGenVertex
-   * @param graphEdges collection containing GraphGenEdge
+   * @param graphVertices collection containing TLFVertex
+   * @param graphEdges collection containing TLFEdge
    */
-  public GraphGenGraph(GraphGenGraphHead graphHead,
-    Collection<GraphGenVertex> graphVertices, Collection<GraphGenEdge>
+  public TLFGraph(TLFGraphHead graphHead,
+    Collection<TLFVertex> graphVertices, Collection<TLFEdge>
     graphEdges) {
     setGraphHead(graphHead);
     setGraphVertices(graphVertices);
     setGraphEdges(graphEdges);
   }
 
-  public GraphGenGraphHead getGraphHead() {
+  public TLFGraphHead getGraphHead() {
     return this.f0;
   }
 
-  public void setGraphHead(GraphGenGraphHead graphHead) {
+  public void setGraphHead(TLFGraphHead graphHead) {
     this.f0 = graphHead;
   }
 
-  public Collection<GraphGenVertex> getGraphVertices() {
+  public Collection<TLFVertex> getGraphVertices() {
     return this.f1;
   }
 
-  public void setGraphVertices(Collection<GraphGenVertex> graphVertices) {
+  public void setGraphVertices(Collection<TLFVertex> graphVertices) {
     this.f1 = graphVertices;
   }
 
-  public Collection<GraphGenEdge> getGraphEdges() {
+  public Collection<TLFEdge> getGraphEdges() {
     return this.f2;
   }
 
-  public void setGraphEdges(Collection<GraphGenEdge> graphEdges) {
+  public void setGraphEdges(Collection<TLFEdge> graphEdges) {
     this.f2 = graphEdges;
   }
 }

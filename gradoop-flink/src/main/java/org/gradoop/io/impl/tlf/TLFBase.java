@@ -15,55 +15,55 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl;
+package org.gradoop.io.impl.tlf;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.operators.GraphTransactionsOperators;
-import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
- * Represents a logical graph inside the EPGM.
+ * Base class for TLF data source and sink.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GraphTransactions
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements GraphTransactionsOperators<G, V, E> {
-
+abstract class TLFBase
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
   /**
-   * Graph data associated with the logical graphs in that collection.
-   */
-  private final DataSet<GraphTransaction<G, V, E>> transactions;
-
-  /**
-   * Gradoop Flink configuration.
+   * Gradoop Flink configuration
    */
   private final GradoopFlinkConfig<G, V, E> config;
+  /**
+   * File to write TLF content to
+   */
+  private final String tlfPath;
 
   /**
-   * Creates a new graph transactions based on the given parameters.
+   * Creates a new data source/sink. Paths can be local (file://) or HDFS
+   * (hdfs://).
    *
-   * @param transactions transaction data set
+   * @param tlfPath tlf data file
    * @param config Gradoop Flink configuration
    */
-  public GraphTransactions(DataSet<GraphTransaction<G, V, E>> transactions,
-    GradoopFlinkConfig<G, V, E> config) {
-    this.transactions = transactions;
-    this.config = config;
-  }
+  TLFBase(String tlfPath, GradoopFlinkConfig<G, V, E> config) {
+    if (config == null) {
+      throw new IllegalArgumentException("config must not be null");
+    }
+    if (tlfPath == null) {
+      throw new IllegalArgumentException("vertex file must not be null");
+    }
 
-  @Override
-  public DataSet<GraphTransaction<G, V, E>> getTransactions() {
-    return this.transactions;
+    this.tlfPath = tlfPath;
+    this.config = config;
   }
 
   public GradoopFlinkConfig<G, V, E> getConfig() {
     return config;
+  }
+
+  public String getTLFPath() {
+    return tlfPath;
   }
 }
