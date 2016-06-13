@@ -71,4 +71,36 @@ public class GraphTransactionsGraphGenTest extends GradoopFlinkTestBase {
     assertEquals("Wrong edge count", 2, graphTransaction.getEdges().size());
 
   }
+
+  /**
+   * Test method for
+   *
+   * {@link org.gradoop.model.impl.GraphTransactions#writeAsGraphGenFile(String) writeAsGraphGenFile}
+   */
+  @Test
+  public void testWriteAsGraphGen() throws Exception {
+    String graphGenFileImport =
+      GraphTransactionsGraphGenTest.class.getResource
+        ("/data/graphgen/io_test.gg")
+        .getFile();
+
+    String graphGenFileExport =
+      GraphTransactionsGraphGenTest.class.getResource(
+        "/data/graphgen")
+        .toURI().getPath().toString().concat("/io_test_output");
+
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions =
+      GraphTransactions.fromGraphGenFile(graphGenFileImport, getExecutionEnvironment());
+
+    graphTransactions.writeAsGraphGenFile(graphGenFileExport);
+
+
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo>
+      graphTransactionsCompare = GraphTransactions.fromGraphGenFile
+      (graphGenFileExport, getExecutionEnvironment());
+
+
+    assertEquals("Wrong graph count", 2, graphTransactionsCompare.getTransactions()
+      .count());
+  }
 }

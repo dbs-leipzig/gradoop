@@ -24,6 +24,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.gradoop.io.graphgen.GraphGenInputFormat;
 import org.gradoop.io.graphgen.functions.GraphGenReader;
+import org.gradoop.io.graphgen.functions.GraphGenWriter;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -87,9 +88,9 @@ public class GraphTransactions
    *
    * @param graphGenFile file containing GraphGen content
    * @param config Gradoop Flink configuration
-   * @param <G> EPGM vertex type
-   * @param <V> EPGM edge type
-   * @param <E> EPGM graph head type
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
    * @return GraphTransactions
    */
   public static <
@@ -126,6 +127,50 @@ public class GraphTransactions
       return null;
     }
     return new GraphTransactions<G, V, E>(transactions, config);
+  }
+
+  /**
+   * Writes the GraphTransactions in GraphGen format into normal file system.
+   *
+   * @param graphFile path to GraphGenFile (starts with one '/' but without
+   *                  'file:/'at the beginning)
+   * @throws Exception
+   */
+  public void writeAsGraphGenFile(String graphFile) throws Exception {
+    this.writeAsGraphGen(graphFile, false);
+  }
+
+  /**
+   * Writes the GraphTransactions in GraphGen format into hadoop file system.
+   *
+   * @param graphFile path to GraphGenFile (starts with '/' but without
+   *                  'hdfs:/' the beginning)
+   * @throws Exception
+   */
+  public void writeAsGraphGenHadoopFile(String graphFile) throws Exception {
+    this.writeAsGraphGen(graphFile, true);
+  }
+
+  /**
+   * Writes the GraphTransactions in GraphGen format into either normal
+   * or hadoop file system.
+   *
+   * @param graphFile path to GraphGenFile, e.g. '/path/to/my/textfile'
+   * @param hadoop true if saved in hdfs
+   * @throws Exception
+   */
+  private void writeAsGraphGen(String graphFile, boolean hadoop) throws
+    Exception {
+
+    if (hadoop) {
+      graphFile = "hdfs://" + graphFile;
+    } else {
+      graphFile = "file://" + graphFile;
+    }
+
+    this.transactions.writeAsFormattedText(graphFile, new GraphGenWriter
+      .GraphTransactionsToGraphGenFile<G, V, E>());
+    config.getExecutionEnvironment().execute();
   }
 
 
