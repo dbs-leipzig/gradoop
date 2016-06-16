@@ -19,7 +19,7 @@ package org.gradoop.examples.sna;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -145,9 +145,9 @@ public class SNABenchmark2
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       new FlinkAsciiGraphLoader<>(gradoopConf);
 
-    String graphDefinition = FileUtils.readFileToString(
-      FileUtils.getFile(SNABenchmark2.class
-        .getResource("/data/gdl/sna.gdl").getFile()));
+    String graphDefinition = IOUtils.toString(
+      SNABenchmark2.class
+        .getResourceAsStream("/data/gdl/sna.gdl"));
 
     loader.initDatabaseFromString(graphDefinition);
 
