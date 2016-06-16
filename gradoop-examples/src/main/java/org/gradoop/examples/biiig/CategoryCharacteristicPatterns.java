@@ -17,7 +17,7 @@
 
 package org.gradoop.examples.biiig;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -114,9 +114,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader = new
       FlinkAsciiGraphLoader<>(gradoopConf);
 
-    String gdl = FileUtils.readFileToString(
-      FileUtils.getFile(CategoryCharacteristicPatterns.class
-        .getResource("/data/gdl/itbda.gdl").getFile()));
+    String gdl = IOUtils.toString(
+      CategoryCharacteristicPatterns.class
+        .getResourceAsStream("/data/gdl/itbda.gdl"));
 
     gdl = gdl
       .replaceAll("SOURCEID_KEY",
