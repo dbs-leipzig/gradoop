@@ -24,18 +24,33 @@ import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
+ * Takes an object of type EPGMGraphElement, and creates a tuple2 for each
+ *  gradoop id containing in the set of the object and the object.
  * element => (graphId, element)
- *
  * @param <EL> graph element type
  */
 public class GraphElementExpander<EL extends EPGMGraphElement> implements
-  FlatMapFunction<EL, Tuple2<GradoopId, EL>> {
-  @Override
-  public void flatMap(EL el, Collector<Tuple2<GradoopId, EL>> collector) throws
-    Exception {
+  FlatMapFunction<EL, Tuple2<GradoopId, EPGMGraphElement>> {
 
+  /**
+   * reuse tuple
+   */
+  private  Tuple2<GradoopId, EPGMGraphElement> reuse;
+
+  /**
+   * constructor
+   */
+  public GraphElementExpander() {
+    reuse = new Tuple2<>();
+  }
+
+  @Override
+  public void flatMap(EL el, Collector
+    <Tuple2<GradoopId, EPGMGraphElement>> collector) throws Exception {
     for (GradoopId graphId : el.getGraphIds()) {
-      collector.collect(new Tuple2<>(graphId, el));
+      reuse.f0 = graphId;
+      reuse.f1 = el;
+      collector.collect(reuse);
     }
   }
 }
