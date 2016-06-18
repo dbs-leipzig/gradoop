@@ -25,6 +25,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.io.api.DataSink;
 import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.EPGMGraphElement;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.ApplicableUnaryGraphToGraphOperator;
@@ -38,13 +39,12 @@ import org.gradoop.model.impl.functions.bool.Or;
 import org.gradoop.model.impl.functions.bool.True;
 import org.gradoop.model.impl.functions.epgm.BySameId;
 import org.gradoop.model.impl.functions.epgm.GraphElementExpander;
-import org.gradoop.model.impl.functions.epgm.GraphElementSet;
 import org.gradoop.model.impl.functions.epgm.GraphTransactionTriple;
-import org.gradoop.model.impl.functions.epgm.GraphVerticesEdges;
-import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.model.impl.functions.epgm.TransactionGraphHead;
+import org.gradoop.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.model.impl.functions.epgm.TransactionVertices;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.epgm.GraphElementsHeadsToTransaction;
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.model.impl.functions.utils.First;
@@ -571,24 +571,20 @@ public class GraphCollection
    */
   @Override
   public GraphTransactions<G, V, E> toTransactions() {
+    DataSet<Tuple2<GradoopId, EPGMGraphElement>> graphVertices = getVertices()
+      .flatMap(new GraphElementExpander<V>());
 
-    DataSet<Tuple2<GradoopId, Set<V>>> graphVertices = getVertices()
-      .flatMap(new GraphElementExpander<V>())
-      .groupBy(0)
-      .reduceGroup(new GraphElementSet<V>());
+    DataSet<Tuple2<GradoopId, EPGMGraphElement>> graphEdges = getEdges()
+      .flatMap(new GraphElementExpander<E>());
 
-    DataSet<Tuple2<GradoopId, Set<E>>> graphEdges = getEdges()
-      .flatMap(new GraphElementExpander<E>())
-      .groupBy(0)
-      .reduceGroup(new GraphElementSet<E>());
+    DataSet<Tuple2<GradoopId, EPGMGraphElement>> verticesAndEdges =
+      graphVertices.union(graphEdges);
 
-    DataSet<GraphTransaction<G, V, E>>  transactions = graphVertices
-      .join(graphEdges)
-      .where(0).equalTo(0)
-      .with(new GraphVerticesEdges<V, E>())
-      .join(getGraphHeads()).where(0)
-      .equalTo(new Id<G>())
-      .with(new GraphTransactionTriple<G, V, E>());
+    DataSet<GraphTransaction<G, V, E>>  transactions = verticesAndEdges
+      .coGroup(getGraphHeads())
+      .where(0).equalTo(new Id<G>())
+      .with(new GraphElementsHeadsToTransaction<G, V, E>());
+
     return new GraphTransactions<>(transactions, getConfig());
   }
 
