@@ -30,6 +30,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import static org.junit.Assert.assertEquals;
 
@@ -127,5 +129,52 @@ public class TLFIOTest extends GradoopFlinkTestBase {
 
     assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
       .count());
+  }
+
+
+
+  /**
+   * Test method for
+   *
+   * {@link TLFDataSource#getGraphTransactions()}
+   * @throws Exception
+   */
+  @Test
+  public void testFromTLFFileWithDictionary() throws Exception {
+    String tlfFile =
+      TLFIOTest.class
+        .getResource("/data/tlf/io_test.tlf")
+        .getFile();
+    String tlfVertexDictionaryFile =
+      TLFIOTest.class
+        .getResource("/data/tlf/io_test_vertex_dictionary.tlf")
+        .getFile();
+    String tlfEdgeDictionaryFile =
+      TLFIOTest.class
+        .getResource("/data/tlf/io_test_edge_dictionary.tlf")
+        .getFile();
+
+    // create datasource
+    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(tlfFile, tlfVertexDictionaryFile, "", config);
+    //get transactions
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+      = dataSource.getGraphTransactions();
+    //get first transaction which contains one complete graph
+    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
+      graphTransactions.getTransactions().collect().get(0);
+    //get vertices of the first transaction/graph
+    VertexPojo[] vertexArray = graphTransaction.getVertices()
+      .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
+    //sort vertices by label(alphabetically)
+    Arrays.sort(vertexArray, new Comparator<VertexPojo>() {
+      @Override
+      public int compare(VertexPojo vertex1, VertexPojo vertex2) {
+        return vertex1.getLabel().compareTo(vertex2.getLabel());
+      }
+    });
+
+    assertEquals("Wrong vertex label", "Vertex0", vertexArray[0].getLabel());
+    assertEquals("Wrong vertex label", "Vertex1", vertexArray[1].getLabel());
   }
 }

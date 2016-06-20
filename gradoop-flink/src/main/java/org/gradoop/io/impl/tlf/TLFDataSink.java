@@ -48,7 +48,20 @@ public class TLFDataSink
    */
   public TLFDataSink(String tlfPath, GradoopFlinkConfig<G, V, E>
     config) {
-    super(tlfPath, config);
+    super(tlfPath, "", "", config);
+  }
+
+  /**
+   * Creates a new data sink. Paths can be local (file://) or HDFS (hdfs://).
+   *
+   * @param tlfPath tlf data file
+   * @param tlfVertexDictionaryPath tlf vertex dictionary file
+   * @param tlfEdgeDictionaryPath tlf edge dictionary file
+   * @param config Gradoop Flink configuration
+   */
+  public TLFDataSink(String tlfPath, String tlfVertexDictionaryPath, String
+    tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E> config) {
+    super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
   }
 
   @Override
