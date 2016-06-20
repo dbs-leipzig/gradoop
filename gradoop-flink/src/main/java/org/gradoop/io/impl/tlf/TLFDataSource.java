@@ -23,7 +23,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.gradoop.io.api.DataSource;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryFunctions.GraphTransactionDictionaryMapper;
+import org.gradoop.io.impl.tlf.functions.TLFDictionaryEdgeLabelToTransaction;
+import org.gradoop.io.impl.tlf.functions.TLFDictionaryVertexLabelToTransaction;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.io.impl.tlf.functions.TLFGraphCollectionToGraphTransactions;
 import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFile;
@@ -88,7 +89,6 @@ public class TLFDataSource
     return GraphCollection.fromTransactions(getGraphTransactions());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public GraphTransactions<G, V, E> getGraphTransactions() throws IOException {
     DataSet<GraphTransaction<G, V, E>> transactions;
@@ -112,28 +112,16 @@ public class TLFDataSource
         .returns(typeInformation);
 
     // map the integer valued labels to strings from dictionary
-    if (hasVertexDictionary() || hasEdgeDictionary()) {
-      if (hasVertexDictionary() && hasEdgeDictionary()) {
-        transactions
-          .map(new GraphTransactionDictionaryMapper(hasVertexDictionary(),
-            hasEdgeDictionary()))
-          .withBroadcastSet(getVertexDictionary(),
-            GraphTransactionDictionaryMapper.VERTEX_DICTIONARY)
-          .withBroadcastSet(getEdgeDictionary(),
-            GraphTransactionDictionaryMapper.EDGE_DICTIONARY);
-      } else if (hasVertexDictionary()) {
-        transactions = transactions
-          .map(new GraphTransactionDictionaryMapper(hasVertexDictionary(),
-            hasEdgeDictionary()))
-          .withBroadcastSet(getVertexDictionary(),
-            GraphTransactionDictionaryMapper.VERTEX_DICTIONARY);
-      } else if (hasEdgeDictionary()) {
-        transactions = transactions
-          .map(new GraphTransactionDictionaryMapper(hasVertexDictionary(),
-            hasEdgeDictionary()))
-          .withBroadcastSet(getEdgeDictionary(),
-            GraphTransactionDictionaryMapper.EDGE_DICTIONARY);
-      }
+    if (hasVertexDictionary()) {
+      transactions = transactions
+        .map(new TLFDictionaryVertexLabelToTransaction<G, V, E>())
+        .withBroadcastSet(getVertexDictionary(),
+          TLFDictionaryVertexLabelToTransaction.VERTEX_DICTIONARY);
+    } else if (hasEdgeDictionary()) {
+      transactions = transactions
+        .map(new TLFDictionaryEdgeLabelToTransaction<G, V, E>())
+        .withBroadcastSet(getEdgeDictionary(),
+          TLFDictionaryEdgeLabelToTransaction.EDGE_DICTIONARY);
     }
     return new GraphTransactions<G, V, E>(transactions, getConfig());
   }
