@@ -23,6 +23,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.gradoop.io.api.DataSource;
+import org.gradoop.io.impl.tlf.functions.TLFDictionaryFunctions.GraphTransactionDictionaryMapper;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.io.impl.tlf.functions.TLFGraphCollectionToGraphTransactions;
 import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFile;
@@ -60,22 +61,37 @@ public class TLFDataSource
    */
   public TLFDataSource(String tlfPath, GradoopFlinkConfig<G, V, E>
     config) {
-    super(tlfPath, config);
+    super(tlfPath, "", "", config);
+  }
+
+  /**
+   * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
+   *
+   * @param tlfPath tlf data file
+   * @param tlfVertexDictionaryPath tlf vertex dictionary file
+   * @param tlfEdgeDictionaryPath tlf edge dictionary file
+   * @param config Gradoop Flink configuration
+   */
+  public TLFDataSource(String tlfPath, String tlfVertexDictionaryPath, String
+    tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E>
+    config) {
+    super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
   }
 
   @Override
-  public LogicalGraph<G, V, E> getLogicalGraph() {
+  public LogicalGraph<G, V, E> getLogicalGraph() throws IOException {
     return getGraphCollection().reduce(new ReduceCombination<G, V, E>());
   }
 
   @Override
-  public GraphCollection<G, V, E> getGraphCollection() {
+  public GraphCollection<G, V, E> getGraphCollection() throws IOException {
     return GraphCollection.fromTransactions(getGraphTransactions());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public GraphTransactions<G, V, E> getGraphTransactions() {
-    DataSet<GraphTransaction<G, V, E>> transactions = null;
+  public GraphTransactions<G, V, E> getGraphTransactions() throws IOException {
+    DataSet<GraphTransaction<G, V, E>> transactions;
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     // create the mapper
@@ -88,15 +104,36 @@ public class TLFDataSource
     TypeInformation<GraphTransaction<G, V, E>> typeInformation =
       tlfCollectionToGraphTransactions
         .getProducedType();
-    try {
-      // map the file's content to transactions
-      transactions = env.readHadoopFile(new TLFInputFormat(),
-        LongWritable.class, Text.class, getTLFPath())
-          .flatMap(tlfCollectionToGraphTransactions)
-          .returns(typeInformation);
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+
+    // map the file's content to transactions
+    transactions = env.readHadoopFile(new TLFInputFormat(),
+      LongWritable.class, Text.class, getTLFPath())
+        .flatMap(tlfCollectionToGraphTransactions)
+        .returns(typeInformation);
+
+    // map the integer valued labels to strings from dictionary
+    if (hasVertexDictionary() || hasEdgeDictionary()) {
+      if (hasVertexDictionary() && hasEdgeDictionary()) {
+        transactions
+          .map(new GraphTransactionDictionaryMapper(hasVertexDictionary(),
+            hasEdgeDictionary()))
+          .withBroadcastSet(getVertexDictionary(),
+            GraphTransactionDictionaryMapper.VERTEX_DICTIONARY)
+          .withBroadcastSet(getEdgeDictionary(),
+            GraphTransactionDictionaryMapper.EDGE_DICTIONARY);
+      } else if (hasVertexDictionary()) {
+        transactions = transactions
+          .map(new GraphTransactionDictionaryMapper(hasVertexDictionary(),
+            hasEdgeDictionary()))
+          .withBroadcastSet(getVertexDictionary(),
+            GraphTransactionDictionaryMapper.VERTEX_DICTIONARY);
+      } else if (hasEdgeDictionary()) {
+        transactions = transactions
+          .map(new GraphTransactionDictionaryMapper(hasVertexDictionary(),
+            hasEdgeDictionary()))
+          .withBroadcastSet(getEdgeDictionary(),
+            GraphTransactionDictionaryMapper.EDGE_DICTIONARY);
+      }
     }
     return new GraphTransactions<G, V, E>(transactions, getConfig());
   }
