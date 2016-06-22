@@ -99,22 +99,6 @@ abstract class TLFBase
     hasVertexDictionary = !tlfVertexDictionaryPath.equals("");
     hasEdgeDictionary = !tlfEdgeDictionaryPath.equals("");
 
-    ExecutionEnvironment env = config.getExecutionEnvironment();
-    if (hasVertexDictionary) {
-
-      vertexDictionary = env
-        .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
-          .class, getTLFVertexDictionaryPath())
-        .map(new TLFDictionaryStringToTuple())
-        .reduceGroup(new TLFDictionaryTupleToMapGroupReducer());
-    }
-    if (hasEdgeDictionary) {
-      edgeDictionary = env
-        .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
-          .class, getTLFEdgeDictionaryPath())
-        .map(new TLFDictionaryStringToTuple())
-        .reduceGroup(new TLFDictionaryTupleToMapGroupReducer());
-    }
   }
 
   public GradoopFlinkConfig<G, V, E> getConfig() {
@@ -155,7 +139,16 @@ abstract class TLFBase
     return vertexDictionary;
   }
 
+  public void setVertexDictionary(
+    DataSet<Map<Integer, String>> vertexDictionary) {
+    this.vertexDictionary = vertexDictionary;
+  }
+
   public DataSet<Map<Integer, String>> getEdgeDictionary() {
     return edgeDictionary;
+  }
+
+  public void setEdgeDictionary(DataSet<Map<Integer, String>> edgeDictionary) {
+    this.edgeDictionary = edgeDictionary;
   }
 }
