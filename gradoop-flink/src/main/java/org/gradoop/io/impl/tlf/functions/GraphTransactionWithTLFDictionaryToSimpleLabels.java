@@ -27,6 +27,14 @@ import org.gradoop.model.impl.tuples.GraphTransaction;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Map function which sets the simple label from either the vertex labels or
+ * the edge labels or both.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ */
 public class GraphTransactionWithTLFDictionaryToSimpleLabels<G extends
   EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> extends
   RichMapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>> {
