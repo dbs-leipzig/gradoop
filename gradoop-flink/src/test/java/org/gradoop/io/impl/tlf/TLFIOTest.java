@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 
@@ -94,6 +95,114 @@ public class TLFIOTest extends GradoopFlinkTestBase {
   /**
    * Test method for
    *
+   * {@link TLFDataSource#getGraphTransactions()}
+   * @throws Exception
+   */
+  @Test
+  public void testFromTLFFileWithDictionary() throws Exception {
+    String tlfFile =
+      TLFIOTest.class
+        .getResource("/data/tlf/io_test.tlf")
+        .getFile();
+    String tlfVertexDictionaryFile =
+      TLFIOTest.class
+        .getResource("/data/tlf/io_test_vertex_dictionary.tlf")
+        .getFile();
+    String tlfEdgeDictionaryFile =
+      TLFIOTest.class
+        .getResource("/data/tlf/io_test_edge_dictionary.tlf")
+        .getFile();
+
+    // create datasource
+    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(tlfFile, tlfVertexDictionaryFile, "", config);
+    //get transactions
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+      = dataSource.getGraphTransactions();
+    //get first transaction which contains one complete graph
+    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
+      graphTransactions.getTransactions().collect().get(0);
+    //get vertices of the first transaction/graph
+    VertexPojo[] vertexArray = graphTransaction.getVertices()
+      .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
+    //sort vertices by label(alphabetically)
+    Arrays.sort(vertexArray, new Comparator<VertexPojo>() {
+      @Override
+      public int compare(VertexPojo vertex1, VertexPojo vertex2) {
+        return vertex1.getLabel().compareTo(vertex2.getLabel());
+      }
+    });
+
+    assertEquals("Wrong vertex label", "Vertex0", vertexArray[0].getLabel());
+    assertEquals("Wrong vertex label", "Vertex1", vertexArray[1].getLabel());
+  }
+
+
+  /**
+   * Test method for
+   *
+   * {@link TLFDataSource#getGraphTransactions()}
+   * @throws Exception
+   */
+  @Test
+  public void testFromTLFFileWithVertexDictionaryYeast() throws Exception {
+    String tlfFileImport =
+      TLFIOTest.class.getResource
+        ("/data/tlf/io_test_yeast_active_output.tlf")
+        .getFile();
+    String tlfVertexDictionaryFileImport =
+      TLFIOTest.class.getResource
+        ("/data/tlf/io_test_yeast_mapping.tlf")
+        .getFile();
+
+    String tlfFileExport =
+      TLFIOTest.class.getResource("/data/tlf")
+        .toURI().getPath().concat("/io_test_output_yeast_active");
+    File file = new File(tlfFileExport);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+    String tlfVertexDictionaryFileExport =
+      TLFIOTest.class.getResource("/data/tlf")
+        .toURI().getPath().concat
+        ("/dictionaries/io_test_output_yeast_mapping");
+    file = new File(tlfFileExport);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+
+    // read from inputfile
+    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(tlfFileImport, tlfVertexDictionaryFileImport,
+        "", config);
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+      = dataSource.getGraphTransactions();
+
+    //get first transaction which contains one complete graph
+    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
+      graphTransactions.getTransactions().collect().get(0);
+    //get vertices of the first transaction/graph
+    VertexPojo[] vertexArray = graphTransaction.getVertices()
+      .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
+    //sort vertices by label(alphabetically)
+    Arrays.sort(vertexArray, new Comparator<VertexPojo>() {
+      @Override
+      public int compare(VertexPojo vertex1, VertexPojo vertex2) {
+        return vertex1.getLabel().compareTo(vertex2.getLabel());
+      }
+    });
+    assertEquals("Wrong vertex label", "C", vertexArray[0].getLabel());
+    assertEquals("Wrong vertex label", "Cu", vertexArray[9].getLabel());
+    assertEquals("Wrong graph count", 9568, graphTransactions.getTransactions()
+      .count());
+  }
+
+
+
+
+  /**
+   * Test method for
+   *
    * {@link TLFDataSink#write(GraphTransactions)}
    */
   @Test
@@ -128,6 +237,71 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
       .count());
   }
+
+  /**
+   * Test method for
+   *
+   * {@link TLFDataSink#write(GraphTransactions)}
+   */
+  @Test
+  public void testWriteAsTLFWithVertexDictionaryYeast() throws Exception {
+    String tlfFileImport =
+      TLFIOTest.class.getResource
+        ("/data/tlf/io_test_yeast_active_output.tlf")
+        .getFile();
+    String tlfVertexDictionaryFileImport =
+      TLFIOTest.class.getResource
+        ("/data/tlf/io_test_yeast_mapping.tlf")
+        .getFile();
+
+    String tlfFileExport =
+      TLFIOTest.class.getResource("/data/tlf")
+        .toURI().getPath().concat("/io_test_output_yeast_active");
+    File file = new File(tlfFileExport);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+    String tlfVertexDictionaryFileExport =
+      TLFIOTest.class.getResource("/data/tlf")
+        .toURI().getPath().concat
+        ("/dictionaries/io_test_output_yeast_mapping");
+    file = new File(tlfFileExport);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+
+    // read from inputfile
+    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(tlfFileImport, tlfVertexDictionaryFileImport,
+        "", config);
+    // write to ouput path
+    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+      new TLFDataSink<>(tlfFileExport, tlfVertexDictionaryFileExport,
+        "", getConfig());
+    dataSink.write(dataSource.getGraphTransactions());
+    // read from output path
+    dataSource = new TLFDataSource<>(tlfFileExport, config);
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+      = dataSource.getGraphTransactions();
+
+    //get first transaction which contains one complete graph
+    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
+      graphTransactions.getTransactions().collect().get(0);
+    //get vertices of the first transaction/graph
+    VertexPojo[] vertexArray = graphTransaction.getVertices()
+      .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
+
+    Integer[] countArray = {0, 0, 0, 0};
+    for (int i = 0; i < vertexArray.length; i++) {
+      countArray[Integer.parseInt(vertexArray[i].getLabel())]++;
+    }
+    Arrays.sort(countArray);
+    Integer[] compareArray = {1, 4, 4, 9};
+    assertArrayEquals("Wrong vertex label count", compareArray, countArray);
+    assertEquals("Wrong graph count", 9568, graphTransactions.getTransactions()
+      .count());
+  }
+
 
   /**
    * Test method for
@@ -185,41 +359,6 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
       = dataSource.getGraphTransactions();
 
-    getExecutionEnvironment().execute();
-
-    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
-      .count());
-  }
-
-
-
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSource#getGraphTransactions()}
-   * @throws Exception
-   */
-  @Test
-  public void testFromTLFFileWithDictionary() throws Exception {
-    String tlfFile =
-      TLFIOTest.class
-        .getResource("/data/tlf/io_test.tlf")
-        .getFile();
-    String tlfVertexDictionaryFile =
-      TLFIOTest.class
-        .getResource("/data/tlf/io_test_vertex_dictionary.tlf")
-        .getFile();
-    String tlfEdgeDictionaryFile =
-      TLFIOTest.class
-        .getResource("/data/tlf/io_test_edge_dictionary.tlf")
-        .getFile();
-
-    // create datasource
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFile, tlfVertexDictionaryFile, "", config);
-    //get transactions
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
-      = dataSource.getGraphTransactions();
     //get first transaction which contains one complete graph
     GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
       graphTransactions.getTransactions().collect().get(0);
@@ -234,7 +373,12 @@ public class TLFIOTest extends GradoopFlinkTestBase {
       }
     });
 
-    assertEquals("Wrong vertex label", "Vertex0", vertexArray[0].getLabel());
-    assertEquals("Wrong vertex label", "Vertex1", vertexArray[1].getLabel());
+    assertEquals("Wrong vertex label", "0", vertexArray[0].getLabel());
+    assertEquals("Wrong vertex label", "1", vertexArray[1].getLabel());
+    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
+      .count());
   }
+
+
+
 }

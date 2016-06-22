@@ -135,7 +135,8 @@ public class TLFDataSource
         .map(new TLFDictionaryVertexLabelToTransaction<G, V, E>())
         .withBroadcastSet(getVertexDictionary(),
           TLFDictionaryVertexLabelToTransaction.VERTEX_DICTIONARY);
-    } else if (hasEdgeDictionary()) {
+    }
+    if (hasEdgeDictionary()) {
       transactions = transactions
         .map(new TLFDictionaryEdgeLabelToTransaction<G, V, E>())
         .withBroadcastSet(getEdgeDictionary(),
