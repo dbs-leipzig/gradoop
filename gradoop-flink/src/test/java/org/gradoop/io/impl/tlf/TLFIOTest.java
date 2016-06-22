@@ -98,8 +98,6 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWriteAsTLF() throws Exception {
-    String tmpDir = temporaryFolder.getRoot().toString();
-
     String tlfFileImport =
       TLFIOTest.class.getResource
         ("/data/tlf/io_test.tlf")
@@ -119,6 +117,68 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     // write to ouput path
     DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
       new TLFDataSink<>(tlfFileExport,getConfig());
+    dataSink.write(dataSource.getGraphTransactions());
+    // read from output path
+    dataSource = new TLFDataSource<>(tlfFileExport, config);
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+      = dataSource.getGraphTransactions();
+
+    getExecutionEnvironment().execute();
+
+    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
+      .count());
+  }
+
+  /**
+   * Test method for
+   *
+   * {@link TLFDataSink#write(GraphTransactions)}
+   */
+  @Test
+  public void testWriteAsTLFWithDictionaries() throws Exception {
+    String tlfFileImport =
+      TLFIOTest.class.getResource
+        ("/data/tlf/io_test.tlf")
+        .getFile();
+    String tlfVertexDictionaryFileImport =
+      TLFIOTest.class.getResource
+        ("/data/tlf/io_test_vertex_dictionary.tlf")
+        .getFile();
+    String tlfEdgeDictionaryFileImport =
+      TLFIOTest.class.getResource
+        ("/data/tlf/io_test_edge_dictionary.tlf")
+        .getFile();
+
+    String tlfFileExport =
+      TLFIOTest.class.getResource("/data/tlf")
+        .toURI().getPath().concat("/io_test_output");
+    File file = new File(tlfFileExport);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+    String tlfVertexDictionaryFileExport =
+      TLFIOTest.class.getResource("/data/tlf")
+        .toURI().getPath().concat("/dictionaries/io_test_output_vertex_dictionary");
+    file = new File(tlfFileExport);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+    String tlfEdgeDictionaryFileExport =
+      TLFIOTest.class.getResource("/data/tlf")
+        .toURI().getPath().concat("/dictionaries/io_test_output_edge_dictionary");
+    file = new File(tlfFileExport);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+
+    // read from inputfile
+    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(tlfFileImport, tlfVertexDictionaryFileImport,
+        tlfEdgeDictionaryFileImport, config);
+    // write to ouput path
+    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+      new TLFDataSink<>(tlfFileExport, tlfVertexDictionaryFileExport,
+        tlfEdgeDictionaryFileExport, getConfig());
     dataSink.write(dataSource.getGraphTransactions());
     // read from output path
     dataSource = new TLFDataSource<>(tlfFileExport, config);

@@ -17,52 +17,32 @@
 
 package org.gradoop.io.impl.tlf.functions;
 
-import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.configuration.Configuration;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Map function which sets the simple label from either the vertex labels or
- * the edge labels or both.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
- */
 public class GraphTransactionWithTLFDictionaryToSimpleLabels<G extends
-  EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> extends
-  RichMapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>> {
+  EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> implements
+  MapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>> {
 
   /**
-   * True if the vertices of the transaction as labels set by a dictionary.
+   * True if the vertices of the transaction as labels set by a dictionary;
    */
   private boolean hasVertexDictionary;
   /**
-   * True if the edges of the transaction as labels set by a dictionary.
+   * True if the edges of the transaction as labels set by a dictionary;
    */
   private boolean hasEdgeDictionary;
-  /**
-   * Map containing the vertex dictionary.
-   */
-  private Map<String, Integer> vertexDictionary;
-  /**
-   * Map containing the edge dictionary.
-   */
-  private Map<String, Integer> edgeDictionary;
 
   /**
-   * Creates a new map function which sets the simple label from either the
+   * Creates a new map function which sets the simple id from either the
    * vertex labels or the edge labels or both.
    * Changes labels from:
-   *    'dictionarylabel'
+   *    'dictionarylabel;simpleId'
    * to:
-   *    'simpleLabel' (Integer)
+   *    'simpleId'
    *
    * @param hasVertexDictionary set to true if vertex labels are set by a
    *                            dictionary
@@ -74,28 +54,13 @@ public class GraphTransactionWithTLFDictionaryToSimpleLabels<G extends
     this.hasEdgeDictionary = hasEdgeDictionary;
   }
 
-  @Override
-  public void open(Configuration parameters) throws Exception {
-    super.open(parameters);
-    //load the dictionaries if set
-    if (hasVertexDictionary) {
-      vertexDictionary = getRuntimeContext()
-        .<HashMap<String, Integer>>getBroadcastVariable(
-          TLFDictionaryConstants.BROADCAST_VERTEX_DICTIONARY).get(0);
-    }
-    if (hasEdgeDictionary) {
-      edgeDictionary = getRuntimeContext()
-        .<HashMap<String, Integer>>getBroadcastVariable(
-          TLFDictionaryConstants.BROADCAST_EDGE_DICTIONARY).get(0);
-    }
-  }
-
   /**
-   * Removes the dictionary labels and sets the simple labels (integer).
+   * Removes the part of the label which contains the dictionary content and
+   * keeps only the simple id.
    *
    * @param graphTransaction graph transaction with label format:
-   *                         'dictionarylabel'
-   * @return graph transaction with label format: 'simpleLabel' (Integer)
+   *                         'dictionarylabel;simpleId'
+   * @return graph transaction with label format: 'simpleId'
    * @throws Exception
    */
   @Override
@@ -103,12 +68,14 @@ public class GraphTransactionWithTLFDictionaryToSimpleLabels<G extends
     GraphTransaction<G, V, E> graphTransaction) throws Exception {
     if (hasVertexDictionary) {
       for (V vertex : graphTransaction.getVertices()) {
-        vertex.setLabel(vertexDictionary.get(vertex.getLabel()).toString());
+        vertex.setLabel(vertex.getLabel().split(TLFDictionaryConstants
+          .LABEL_SPLIT)[1]);
       }
     }
     if (hasEdgeDictionary) {
       for (E edge : graphTransaction.getEdges()) {
-        edge.setLabel(edgeDictionary.get(edge.getLabel()).toString());
+        edge.setLabel(edge.getLabel().split(TLFDictionaryConstants
+          .LABEL_SPLIT)[1]);
       }
     }
     return graphTransaction;

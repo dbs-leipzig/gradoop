@@ -22,16 +22,11 @@ package org.gradoop.io.impl.tlf.functions;
  */
 public class TLFDictionaryConstants {
 
-  /**
-   * String used to identify the vertex dictionary on broadcast.
-   */
-  public static final String BROADCAST_VERTEX_DICTIONARY =
-    "vertexDictionary";
+  public static final String LABEL_SPLIT = ";";
 
-  /**
-   * String used to identify the edge dictionary on broadcast.
-   */
-  public static final String BROADCAST_EDGE_DICTIONARY =
-    "edgeDictionary";
+  public static final int VERTEX_DICTIONARY = 1;
 
+  public static final int EDGE_DICTIONARY = -1;
+
+  public static final String TRANSACTION_BROADCAST = "transactionBroadcast";
 }
