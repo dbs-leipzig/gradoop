@@ -17,14 +17,21 @@
 
 package org.gradoop.io.impl.tlf;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.io.api.DataSink;
+import org.gradoop.io.impl.tlf.functions.GraphTransactionToTLFDictionaryFile;
+import org.gradoop.io.impl.tlf.functions
+  .GraphTransactionWithTLFDictionaryToSimpleLabels;
 import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFile;
+import org.gradoop.io.impl.tlf.functions.TLFDictionaryConstants;
+import org.gradoop.io.impl.tlf.functions.GraphTransactionToTLFDictionaryVertexOrEdge;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
@@ -76,7 +83,56 @@ public class TLFDataSink
 
   @Override
   public void write(GraphTransactions<G, V, E> graphTransactions) {
-    graphTransactions.getTransactions().writeAsFormattedText(getTLFPath
-      (), new GraphTransactionsToTLFFile<G, V, E>());
+    DataSet<GraphTransaction<G, V, E>> labeledTransactions = null;
+    // if the graph transaction vertex labels are set by a dictionary
+    if (hasVertexDictionary()) {
+      labeledTransactions = graphTransactions.getTransactions()
+        // add a ';simpleId' at the end of each vertex label
+        .map(new GraphTransactionToTLFDictionaryVertexOrEdge<G, V, E>
+          (TLFDictionaryConstants.VERTEX_DICTIONARY));
+      // write the vertex dictionary
+      labeledTransactions
+        .writeAsFormattedText(getTLFVertexDictionaryPath(),
+          new GraphTransactionToTLFDictionaryFile<G, V, E>
+            (TLFDictionaryConstants.VERTEX_DICTIONARY));
+    }
+    // if the graph transaction edge labels are set by a dictionary
+    if (hasEdgeDictionary()) {
+      // if there was no vertex dictionary the edge labels are set to the
+      // original transactions
+      if (labeledTransactions == null) {
+        labeledTransactions = graphTransactions.getTransactions()
+          // add a ';simpleId' at the end of each edge label
+          .map(new GraphTransactionToTLFDictionaryVertexOrEdge<G, V, E>(
+          TLFDictionaryConstants.EDGE_DICTIONARY));
+      // if there was a vertex dictionary, the already modified transactions
+      // are taken
+      } else {
+        labeledTransactions = labeledTransactions
+          // add a ';simpleId' at the end of each edge label
+          .map(new GraphTransactionToTLFDictionaryVertexOrEdge<G, V, E>(
+            TLFDictionaryConstants.EDGE_DICTIONARY));
+      }
+      // write the edge dictionary
+      labeledTransactions
+        .writeAsFormattedText(getTLFEdgeDictionaryPath(),
+          new GraphTransactionToTLFDictionaryFile<G, V, E>
+            (TLFDictionaryConstants.EDGE_DICTIONARY));
+    }
+    // if there was a vertex or an edge dictionary the labels have the form:
+    // 'dictionarylabel:simpleId' and have to be mapped to: 'simpleId'
+    if (hasVertexDictionary() || hasEdgeDictionary()) {
+      labeledTransactions
+        .map(new GraphTransactionWithTLFDictionaryToSimpleLabels<G, V, E>
+          (hasVertexDictionary(), hasEdgeDictionary()))
+        .writeAsFormattedText(getTLFPath(),
+          new GraphTransactionsToTLFFile<G, V, E>());
+    // if there were not any dictionaries used the transactions can be
+    // written normally
+    } else {
+      graphTransactions.getTransactions()
+        .writeAsFormattedText(getTLFPath(),
+          new GraphTransactionsToTLFFile<G, V, E>());
+    }
   }
 }
