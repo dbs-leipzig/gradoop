@@ -66,7 +66,7 @@ public class JSONToEdge<E extends EPGMEdge>
    * Creates an edge from JSON string representation.
    *
    * @param s json string
-   * @return Gelly edge storing gradoop edge data
+   * @return EPGMEdge storing edge data
    * @throws Exception
    */
   @Override

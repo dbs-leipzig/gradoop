@@ -65,7 +65,7 @@ public class JSONToVertex<V extends EPGMVertex>
    * Constructs a vertex from a given JSON string representation.
    *
    * @param s json string
-   * @return Gelly vertex storing gradoop vertex data
+   * @return EPGMVertex storing vertex data
    * @throws Exception
    */
   @Override
