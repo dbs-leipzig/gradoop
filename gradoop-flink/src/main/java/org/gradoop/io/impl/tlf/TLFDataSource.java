@@ -22,8 +22,11 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.TextInputFormat;
 import org.gradoop.io.api.DataSource;
 import org.gradoop.io.impl.tlf.functions.TLFDictionaryEdgeLabelToTransaction;
+import org.gradoop.io.impl.tlf.functions.TLFDictionaryStringToTuple;
+import org.gradoop.io.impl.tlf.functions.TLFDictionaryTupleToMapGroupReducer;
 import org.gradoop.io.impl.tlf.functions.TLFDictionaryVertexLabelToTransaction;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.io.impl.tlf.functions.TLFGraphCollectionToGraphTransactions;
@@ -77,6 +80,21 @@ public class TLFDataSource
     tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E>
     config) {
     super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
+    ExecutionEnvironment env = config.getExecutionEnvironment();
+    if (hasVertexDictionary()) {
+      setVertexDictionary(env
+        .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
+          .class, getTLFVertexDictionaryPath())
+        .map(new TLFDictionaryStringToTuple())
+        .reduceGroup(new TLFDictionaryTupleToMapGroupReducer()));
+    }
+    if (hasEdgeDictionary()) {
+      setEdgeDictionary(env
+        .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
+          .class, getTLFEdgeDictionaryPath())
+        .map(new TLFDictionaryStringToTuple())
+        .reduceGroup(new TLFDictionaryTupleToMapGroupReducer()));
+    }
   }
 
   @Override
