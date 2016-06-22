@@ -24,7 +24,7 @@ import org.gradoop.io.impl.tlf.functions.GraphTransactionToTLFDictionaryFileForm
 
 import org.gradoop.io.impl.tlf.functions
   .GraphTransactionWithTLFDictionaryToSimpleLabels;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFile;
+import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFileFormat;
 import org.gradoop.io.impl.tlf.functions.TLFDictionaryConstants;
 import org.gradoop.io.impl.tlf.functions.GraphTransactionToTLFDictionaryVertexMap;
 import org.gradoop.io.impl.tlf.functions.TLFDictionaryMapGroupReducer;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 /**
  * Writes an EPGM representation into one TLF file. The format
- * is documented at {@link GraphTransactionsToTLFFile}.
+ * is documented at {@link GraphTransactionsToTLFFileFormat}.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -146,12 +146,12 @@ public class TLFDataSink
       // write the TLF format adjusted graphs to file
       simpleLabelTransaction
         .writeAsFormattedText(getTLFPath(),
-          new GraphTransactionsToTLFFile<G, V, E>());
+          new GraphTransactionsToTLFFileFormat<G, V, E>());
     // if there was no dictionary used the graphs can simply be written
     } else {
       graphTransactions.getTransactions()
         .writeAsFormattedText(getTLFPath(),
-          new GraphTransactionsToTLFFile<G, V, E>());
+          new GraphTransactionsToTLFFileFormat<G, V, E>());
     }
   }
 }

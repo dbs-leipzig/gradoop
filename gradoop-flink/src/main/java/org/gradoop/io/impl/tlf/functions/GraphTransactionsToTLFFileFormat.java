@@ -40,7 +40,7 @@ import java.util.Map;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GraphTransactionsToTLFFile<G extends
+public class GraphTransactionsToTLFFileFormat<G extends
   EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> implements
   TextOutputFormat.TextFormatter<GraphTransaction<G, V, E>> {
 
