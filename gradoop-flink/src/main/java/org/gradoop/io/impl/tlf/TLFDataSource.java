@@ -30,7 +30,7 @@ import org.gradoop.io.impl.tlf.functions.TLFDictionaryTupleToMapGroupReducer;
 import org.gradoop.io.impl.tlf.functions.TLFDictionaryVertexLabelToTransaction;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.io.impl.tlf.functions.TLFGraphCollectionToGraphTransactions;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFile;
+import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFileFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -46,7 +46,7 @@ import java.io.IOException;
 /**
  * Creates an EPGM instance from one TLF file. The exact format is
  * documented in
- * {@link GraphTransactionsToTLFFile}.
+ * {@link GraphTransactionsToTLFFileFormat}.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
