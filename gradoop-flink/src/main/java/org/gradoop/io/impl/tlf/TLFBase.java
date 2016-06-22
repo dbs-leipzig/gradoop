@@ -18,12 +18,6 @@
 package org.gradoop.io.impl.tlf;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.TextInputFormat;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryStringToTuple;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryTupleToMapGroupReducer;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;

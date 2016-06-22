@@ -128,7 +128,7 @@ public class TLFDataSink
             TLFDictionaryConstants.BROADCAST_VERTEX_DICTIONARY)
           .withBroadcastSet(edgeDictionary,
             TLFDictionaryConstants.BROADCAST_EDGE_DICTIONARY);
-      }else if (hasVertexDictionary()) {
+      } else if (hasVertexDictionary()) {
         simpleLabelTransaction = graphTransactions.getTransactions()
           // map the simple integer-like labels
           .map(new GraphTransactionWithTLFDictionaryToSimpleLabels<G, V, E>(

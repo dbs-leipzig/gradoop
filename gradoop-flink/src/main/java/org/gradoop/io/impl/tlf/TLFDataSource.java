@@ -85,15 +85,15 @@ public class TLFDataSource
       setVertexDictionary(env
         .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
           .class, getTLFVertexDictionaryPath())
-        .map(new TLFDictionaryStringToTuple())
-        .reduceGroup(new TLFDictionaryTupleToMapGroupReducer()));
+          .map(new TLFDictionaryStringToTuple())
+          .reduceGroup(new TLFDictionaryTupleToMapGroupReducer()));
     }
     if (hasEdgeDictionary()) {
       setEdgeDictionary(env
         .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
           .class, getTLFEdgeDictionaryPath())
-        .map(new TLFDictionaryStringToTuple())
-        .reduceGroup(new TLFDictionaryTupleToMapGroupReducer()));
+          .map(new TLFDictionaryStringToTuple())
+          .reduceGroup(new TLFDictionaryTupleToMapGroupReducer()));
     }
   }
 
