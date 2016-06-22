@@ -68,16 +68,16 @@ public class TSVDataSource
     //--------------------------------------------------------------------------
 
     DataSet<Tuple6<String, GradoopId, String, String, GradoopId, String>>
-      lineTupel = env.readTextFile(getTsvPath()).map(new TSVToTuple());
+      lineTuple = env.readTextFile(getTsvPath()).map(new TSVToTuple());
 
     // reduces duplicates in source and target ids
-    lineTupel = lineTupel.reduceGroup(new TupleReducer());
+    lineTuple = lineTuple.reduceGroup(new TupleReducer());
 
     //--------------------------------------------------------------------------
     // compute edges
     //--------------------------------------------------------------------------
 
-    DataSet<E> edges = lineTupel
+    DataSet<E> edges = lineTuple
       .map(new TupleToEdge<>(getConfig().getEdgeFactory()))
       .returns(edgeTypeInfo);
 
@@ -85,7 +85,7 @@ public class TSVDataSource
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    DataSet<V> vertices = lineTupel
+    DataSet<V> vertices = lineTuple
       .flatMap(new TupleToVertex<>(getConfig().getVertexFactory()))
       .returns(vertexTypeInfo);
 
