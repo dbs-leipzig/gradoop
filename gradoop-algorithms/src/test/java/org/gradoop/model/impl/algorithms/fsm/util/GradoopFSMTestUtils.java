@@ -9,10 +9,10 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Either;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
-import org.gradoop.model.impl.algorithms.fsm.miners.gspan.common.comparators.DFSCodeComparator;
-import org.gradoop.model.impl.algorithms.fsm.miners.gspan.common.pojos.DFSStep;
-import org.gradoop.model.impl.algorithms.fsm.miners.gspan.common.pojos.DFSCode;
-import org.gradoop.model.impl.algorithms.fsm.miners.gspan.common.pojos.CompressedDFSCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.comparators.DFSCodeComparator;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.tuples.WithCount;
 
 import java.util.Collections;

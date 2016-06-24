@@ -25,18 +25,14 @@ import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.config.TransactionalFSMAlgorithm;
-import org.gradoop.model.impl.algorithms.fsm.decoders.gspan
-  .GSpanGraphCollectionDecoder;
-import org.gradoop.model.impl.algorithms.fsm.encoders.GraphCollectionTFSMEncoder;
-import org.gradoop.model.impl.algorithms.fsm.encoders.TransactionalFSMEncoder;
-import org.gradoop.model.impl.algorithms.fsm.encoders.tuples.EdgeTriple;
-import org.gradoop.model.impl.algorithms.fsm.miners.TransactionalFSMiner;
-import org.gradoop.model.impl.algorithms.fsm.miners.gspan.bulkiteration
-  .GSpanBulkIteration;
-import org.gradoop.model.impl.algorithms.fsm.miners.gspan.common.pojos
-  .CompressedDFSCode;
-import org.gradoop.model.impl.algorithms.fsm.miners.gspan.filterrefine
-  .GSpanFilterRefine;
+import org.gradoop.model.impl.algorithms.fsm.gspan.decoders.GSpanGraphCollectionDecoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GraphCollectionTFSMEncoder;
+import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
+import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMiner;
+import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
 import org.gradoop.model.impl.tuples.WithCount;
 
 /**
