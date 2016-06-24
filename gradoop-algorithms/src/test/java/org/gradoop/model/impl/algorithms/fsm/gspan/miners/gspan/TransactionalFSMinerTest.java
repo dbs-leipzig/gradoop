@@ -7,7 +7,6 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
-import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMiner;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GSpanGraphCollectionEncoder;
@@ -16,7 +15,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.tuples.WithCount;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
+
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.operators.count.Count;
 import org.gradoop.model.impl.pojo.EdgePojo;

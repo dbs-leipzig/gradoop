@@ -24,7 +24,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.impl.tuples.WithCount;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.GSpanBase;
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;

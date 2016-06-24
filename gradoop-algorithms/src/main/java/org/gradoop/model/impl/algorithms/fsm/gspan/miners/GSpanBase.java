@@ -18,14 +18,8 @@
 
 package org.gradoop.model.impl.algorithms.fsm.gspan.miners;
 
-import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
-import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMiner;
-import org.gradoop.model.impl.algorithms.fsm.gspan.functions.BuildGSpanGraph;
-import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 
 /**
  * Abstract superclass of Flink GSpan implementations.

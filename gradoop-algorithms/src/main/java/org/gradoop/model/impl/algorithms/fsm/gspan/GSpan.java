@@ -23,6 +23,8 @@ import org.apache.flink.hadoop.shaded.com.google.common.collect.Maps;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.comparators.DFSCodeSiblingComparator;
 
+
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.AdjacencyList;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.AdjacencyListEntry;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSEmbedding;
@@ -30,7 +32,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanEdge;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.FullEdgeTriple;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Collection;

@@ -19,6 +19,7 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.FullEdgeTriple;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithoutTargetLabel;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.VertexIdLabel;
 
@@ -33,7 +34,7 @@ public class AppendTargetLabel implements JoinFunction
   @Override
   public EdgeTriple join(
     EdgeTripleWithoutTargetLabel edge, VertexIdLabel target) throws Exception {
-    return new EdgeTriple(
+    return new FullEdgeTriple(
       edge.getGraphId(),
       edge.getSourceId(),
       edge.getTargetId(),

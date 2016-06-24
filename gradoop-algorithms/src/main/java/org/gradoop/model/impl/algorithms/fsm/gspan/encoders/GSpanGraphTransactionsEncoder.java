@@ -21,40 +21,35 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .AppendSourceLabel;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .AppendTargetLabel;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
   .Dictionary;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .EdgeLabelEncoder;
+  .EdgeLabelTranslator;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .GraphIdElementIdLabel;
+  .EdgeLabels;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
   .InverseDictionary;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
   .MinFrequency;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .VertexLabelEncoder;
+  .VertexLabelTranslator;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
+  .VertexLabels;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
-  .EdgeTripleWithoutVertexLabels;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
-  .VertexIdLabel;
-import org.gradoop.model.impl.algorithms.fsm.gspan.functions.BuildGSpanGraph;
+  .EdgeTripleWithStringEdgeLabel;
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.model.impl.functions.utils.AddCount;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.count.Count;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * Transactional FSM pre processing: Determine vertex and edge label
@@ -65,9 +60,9 @@ import java.util.Map;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GSpanGraphCollectionEncoder
+public class GSpanGraphTransactionsEncoder
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements GSpanEncoder<GraphCollection<G, V, E>> {
+  implements GSpanEncoder<GraphTransactions<G, V, E>> {
 
   /**
    * minimum support
@@ -88,37 +83,34 @@ public class GSpanGraphCollectionEncoder
    * label frequencies are used to relabel edges where higher frequency leads
    * to a smaller numeric label;
    *
-   * @param collection input collection
+   * @param transactions input transactions
    * @param fsmConfig FSM configuration
    * @return pruned and relabelled edges
    */
   @Override
   public DataSet<GSpanGraph> encode(
-    GraphCollection<G, V, E> collection, FSMConfig fsmConfig) {
+    GraphTransactions<G, V, E> transactions, FSMConfig fsmConfig) {
 
-    setMinFrequency(collection, fsmConfig);
+    setMinFrequency(transactions, fsmConfig);
 
-    DataSet<VertexIdLabel> encodedVertices =
-      encodeVertices(collection.getVertices());
+    DataSet<Collection<EdgeTripleWithStringEdgeLabel>> triplesWithStringLabel =
+      encodeVertices(transactions);
 
-    DataSet<EdgeTripleWithoutVertexLabels> encodedEdges =
-      encodeEdges(collection.getEdges());
-
-    return combine(encodedVertices, encodedEdges);
+    return encodeEdges(triplesWithStringLabel);
   }
 
   /**
    * Calculates and stores minimum frequency
    * (minimum support * collection size).
    *
-   * @param collection input graph collection
+   * @param transactions input graph transactions
    * @param fsmConfig FSM configuration
    */
   private void setMinFrequency(
-    GraphCollection<G, V, E> collection, FSMConfig fsmConfig) {
+    GraphTransactions<G, V, E> transactions, FSMConfig fsmConfig) {
 
     this.minFrequency = Count
-      .count(collection.getGraphHeads())
+      .count(transactions.getTransactions())
       .map(new MinFrequency(fsmConfig));
   }
 
@@ -126,16 +118,14 @@ public class GSpanGraphCollectionEncoder
    * Determines edge label frequency, creates edge label dictionary,
    * filters edges by label frequency and translates edge labels
    *
-   * @param edges input edges
+   * @param tripleCollections input edges
    * @return translated and filtered edges
    */
-  private DataSet<EdgeTripleWithoutVertexLabels> encodeEdges(
-    DataSet<E> edges) {
+  private DataSet<GSpanGraph> encodeEdges(
+    DataSet<Collection<EdgeTripleWithStringEdgeLabel>> tripleCollections) {
 
-    edgeLabelDictionary = edges
-      .flatMap(new GraphIdElementIdLabel<E>())
-      .distinct()
-      .map(new Value1Of2<GradoopId, String>())
+    edgeLabelDictionary = tripleCollections
+      .flatMap(new EdgeLabels())
       .map(new AddCount<String>())
       .groupBy(0)
       .sum(1)
@@ -146,8 +136,8 @@ public class GSpanGraphCollectionEncoder
     DataSet<Map<String, Integer>> reverseDictionary = edgeLabelDictionary
       .map(new InverseDictionary());
 
-    return edges
-      .flatMap(new EdgeLabelEncoder<E>())
+    return tripleCollections
+      .map(new EdgeLabelTranslator())
       .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
   }
 
@@ -156,15 +146,15 @@ public class GSpanGraphCollectionEncoder
    * label frequencies are used to relabel vertices where higher frequency leads
    * to a smaller numeric label;
    *
-   * @param vertices input vertex collection
+   * @param transactions input graph collection
    * @return pruned and relabelled edges
    */
-  private DataSet<VertexIdLabel> encodeVertices(DataSet<V> vertices) {
+  private DataSet<Collection<EdgeTripleWithStringEdgeLabel>> encodeVertices(
+    GraphTransactions<G, V, E> transactions) {
 
-    vertexLabelDictionary = vertices
-      .flatMap(new GraphIdElementIdLabel<V>())
-      .distinct()
-      .map(new Value1Of2<GradoopId, String>())
+    vertexLabelDictionary = transactions
+      .getTransactions()
+      .flatMap(new VertexLabels<G, V, E>())
       .map(new AddCount<String>())
       .groupBy(0)
       .sum(1)
@@ -175,30 +165,11 @@ public class GSpanGraphCollectionEncoder
     DataSet<Map<String, Integer>> reverseDictionary = vertexLabelDictionary
       .map(new InverseDictionary());
 
-    return vertices
-      .flatMap(new VertexLabelEncoder<V>())
+    return transactions
+      .getTransactions()
+      .map(new VertexLabelTranslator<G, V, E>())
       .withBroadcastSet(reverseDictionary, BroadcastNames.VERTEX_DICTIONARY);
   }
-
-  /**
-   * Combines encoded vertices and encoded edges to edge triples.
-   *
-   * @param encodedVertices vertices
-   * @param encodedEdges edges
-   * @return triples
-   */
-  private DataSet<GSpanGraph> combine(DataSet<VertexIdLabel> encodedVertices,
-    DataSet<EdgeTripleWithoutVertexLabels> encodedEdges) {
-
-    return encodedEdges
-      .join(encodedVertices).where(1).equalTo(0)
-      .with(new AppendSourceLabel())
-      .join(encodedVertices).where(2).equalTo(0)
-      .with(new AppendTargetLabel())
-      .groupBy(0)
-      .reduceGroup(new BuildGSpanGraph());
-  }
-
 
   public DataSet<Integer> getMinFrequency() {
     return minFrequency;

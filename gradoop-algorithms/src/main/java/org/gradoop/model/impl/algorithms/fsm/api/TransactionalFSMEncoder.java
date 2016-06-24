@@ -19,7 +19,6 @@ package org.gradoop.model.impl.algorithms.fsm.api;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 
 import java.util.List;
 

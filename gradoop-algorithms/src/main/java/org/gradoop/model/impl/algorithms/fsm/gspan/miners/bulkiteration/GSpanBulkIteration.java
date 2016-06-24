@@ -42,7 +42,6 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.SerializedDFSCode;
 import org.gradoop.model.impl.functions.utils.AddCount;
 import org.gradoop.model.impl.functions.utils.SumCount;
 import org.gradoop.model.impl.tuples.WithCount;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.pojos.IterationItem;
 
 import java.util.Collection;
