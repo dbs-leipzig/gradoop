@@ -16,39 +16,16 @@
  */
 
 
-package org.gradoop.model.impl.algorithms.fsm.gspan.miners;
+package org.gradoop.model.impl.algorithms.fsm.gspan.api;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMiner;
-import org.gradoop.model.impl.algorithms.fsm.gspan.functions.BuildGSpanGraph;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 
 /**
- * Abstract superclass of Flink GSpan implementations.
+ * Describes the core of a transactional FSM implementation.
  */
-public abstract class GSpanBase implements GSpanMiner {
-
-  /**
-   * Flink execution environment
-   */
-  private ExecutionEnvironment executionEnvironment;
-
-  @Override
-  public void setExecutionEnvironment(ExecutionEnvironment env) {
-    this.executionEnvironment = env;
-  }
-
-  /**
-   * Getter.
-   *
-   * @return Flink execution environment
-   */
-  protected ExecutionEnvironment getExecutionEnvironment() {
-    return executionEnvironment;
-  }
+public interface GSpanMiner
+  extends TransactionalFSMiner<GSpanGraph, CompressedDFSCode> {
 
 }

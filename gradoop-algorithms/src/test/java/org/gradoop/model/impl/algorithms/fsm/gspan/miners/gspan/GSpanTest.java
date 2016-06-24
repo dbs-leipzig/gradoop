@@ -4,13 +4,13 @@ import com.google.common.collect.Lists;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
-import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.GSpan;
+import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders
+  .GSpanGraphCollectionEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GraphCollectionTFSMEncoder;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
@@ -69,19 +69,17 @@ public class GSpanTest extends GradoopFlinkTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> searchSpace =
       loader.getGraphCollectionByVariables("g1");
 
-    TransactionalFSMEncoder<GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>>
-
-      encoder =
-      new GraphCollectionTFSMEncoder<>();
+    GSpanEncoder<GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>> encoder =
+      new GSpanGraphCollectionEncoder<>();
 
     FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.7f);
 
 
-    Collection<EdgeTriple> edges =
-      encoder.encode(searchSpace, fsmConfig).collect();
+    Collection<GSpanGraph> graphs = encoder
+      .encode(searchSpace, fsmConfig).collect();
 
     // create GSpanGraph
-    GSpanGraph transaction = GSpan.createGSpanGraph(edges);
+    GSpanGraph transaction = graphs.iterator().next();
 
     assertEquals(1, transaction.getSubgraphEmbeddings().size());
 

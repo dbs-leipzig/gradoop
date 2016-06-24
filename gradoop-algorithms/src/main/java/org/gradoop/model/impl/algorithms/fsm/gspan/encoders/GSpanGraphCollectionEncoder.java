@@ -24,7 +24,9 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.functions.BuildGSpanGraph;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.model.impl.functions.utils.AddCount;
 import org.gradoop.model.impl.id.GradoopId;
@@ -53,9 +55,9 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.VertexIdLabel
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GraphCollectionTFSMEncoder
+public class GSpanGraphCollectionEncoder
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements TransactionalFSMEncoder<GraphCollection<G, V, E>> {
+  implements GSpanEncoder<GraphCollection<G, V, E>> {
 
   /**
    * minimum support
@@ -81,7 +83,7 @@ public class GraphCollectionTFSMEncoder
    * @return pruned and relabelled edges
    */
   @Override
-  public DataSet<EdgeTriple> encode(
+  public DataSet<GSpanGraph> encode(
     GraphCollection<G, V, E> collection, FSMConfig fsmConfig) {
 
     setMinFrequency(collection, fsmConfig);
@@ -92,7 +94,9 @@ public class GraphCollectionTFSMEncoder
     DataSet<EdgeTripleWithoutVertexLabels> encodedEdges =
       encodeEdges(collection.getEdges());
 
-    return combine(encodedVertices, encodedEdges);
+    DataSet<EdgeTriple> edgeTriples = combine(encodedVertices, encodedEdges);
+
+    return createGraphs(edgeTriples);
   }
 
   /**
@@ -184,6 +188,19 @@ public class GraphCollectionTFSMEncoder
       .join(encodedVertices).where(2).equalTo(0)
       .with(new AppendTargetLabel());
   }
+  /**
+   * Creates mining graph representation from edge triples.
+   *
+   * @param edges edges
+   * @return graph transactions
+   */
+  protected DataSet<GSpanGraph> createGraphs(
+    DataSet<EdgeTriple> edges) {
+    return edges
+      .groupBy(0)
+      .reduceGroup(new BuildGSpanGraph());
+  }
+
 
   public DataSet<Integer> getMinFrequency() {
     return minFrequency;

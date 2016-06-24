@@ -15,32 +15,15 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.algorithms.fsm.api;
+package org.gradoop.model.impl.algorithms.fsm.gspan.api;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.impl.tuples.WithCount;
-
-import java.util.List;
+import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMDecoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 
 /**
  * Describes transactional FSM post processing.
  *
- * @param <I> subgraph representation
- * @param <O> output format
+ * @param <C> graph collection representation
  */
-public interface TransactionalFsmDecoder<I, O> {
-
-  /**
-   * Triggers the post processing.
-   *
-   * @param frequentSubgraphs frequent subgraphs
-   * @param vertexLabelDictionary vertex label dictionary
-   * @param edgeLabelDictionary edge label dictionary
-   * @return desired output
-   */
-  O decode(
-    DataSet<WithCount<I>> frequentSubgraphs,
-    DataSet<List<String>> vertexLabelDictionary,
-    DataSet<List<String>> edgeLabelDictionary
-  );
-}
+public interface GSpanDecoder<C>
+  extends TransactionalFSMDecoder<CompressedDFSCode, C> {}

@@ -25,14 +25,21 @@ import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.config.TransactionalFSMAlgorithm;
+import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
 import org.gradoop.model.impl.algorithms.fsm.gspan.decoders.GSpanGraphCollectionDecoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GraphCollectionTFSMEncoder;
-import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
+
+
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders
+  .GSpanGraphCollectionEncoder;
 import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMiner;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
-import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
+
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
+
+
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.tuples.WithCount;
 
 /**
@@ -54,11 +61,11 @@ public class TransactionalFSM
   /**
    * input encoder (pre processing)
    */
-  private final TransactionalFSMEncoder<GraphCollection<G, V, E>> encoder;
+  private final GSpanEncoder<GraphCollection<G, V, E>> encoder;
   /**
    * FSM implementation (actual algorithm)
    */
-  private final TransactionalFSMiner miner;
+  private final GSpanMiner miner;
 
   /**
    * constructor
@@ -68,7 +75,8 @@ public class TransactionalFSM
   public TransactionalFSM(FSMConfig fsmConfig, TransactionalFSMAlgorithm
     algorithm) {
     this.fsmConfig = fsmConfig;
-    this.encoder = new GraphCollectionTFSMEncoder<>();
+    this.encoder = new GSpanGraphCollectionEncoder<G, V, E>() {
+    };
     this.miner = getMiner(algorithm);
   }
 
@@ -82,10 +90,10 @@ public class TransactionalFSM
     GSpanGraphCollectionDecoder<G, V, E> decoder =
       new GSpanGraphCollectionDecoder<>(collection.getConfig());
 
-    DataSet<EdgeTriple> edges = encoder.encode(collection, fsmConfig);
+    DataSet<GSpanGraph> graphs = encoder.encode(collection, fsmConfig);
 
     DataSet<WithCount<CompressedDFSCode>> frequentDfsCodes = miner
-      .mine(edges, encoder.getMinFrequency(), fsmConfig);
+      .mine(graphs, encoder.getMinFrequency(), fsmConfig);
 
     return decoder.decode(
       frequentDfsCodes,
@@ -99,19 +107,19 @@ public class TransactionalFSM
    * @param algorithm enum
    * @return FSM implementation
    */
-  private TransactionalFSMiner getMiner(TransactionalFSMAlgorithm algorithm) {
-    TransactionalFSMiner algorithmMiner;
+  private GSpanMiner getMiner(TransactionalFSMAlgorithm algorithm) {
+    GSpanMiner miner;
 
     switch (algorithm) {
     case GSPAN_FILTERREFINE:
-      algorithmMiner = new GSpanFilterRefine();
+      miner = new GSpanFilterRefine();
       break;
     default:
-      algorithmMiner = new GSpanBulkIteration();
+      miner = new GSpanBulkIteration();
       break;
     }
 
-    return algorithmMiner;
+    return miner;
   }
 
   @Override

@@ -26,9 +26,10 @@ import java.util.List;
 /**
  * Describes transactional FSM pre processing.
  *
- * @param <T> input type
+ * @param <C> graph collection representation
+ * @param <G> graph representation
  */
-public interface TransactionalFSMEncoder<T> {
+public interface TransactionalFSMEncoder<C, G> {
 
   /**
    * Triggers pre processing
@@ -37,7 +38,7 @@ public interface TransactionalFSMEncoder<T> {
    * @param fsmConfig FSM configuration
    * @return edge triples with frequent labels
    */
-  DataSet<EdgeTriple> encode(T input, FSMConfig fsmConfig);
+  DataSet<G> encode(C input, FSMConfig fsmConfig);
 
   /**
    * Getter.

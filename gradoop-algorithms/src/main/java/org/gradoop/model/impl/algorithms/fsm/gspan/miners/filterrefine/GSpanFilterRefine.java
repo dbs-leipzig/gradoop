@@ -50,11 +50,9 @@ public class GSpanFilterRefine extends GSpanBase {
 
   @Override
   public DataSet<WithCount<CompressedDFSCode>> mine(
-    DataSet<EdgeTriple> edgeTriples,
+    DataSet<GSpanGraph> graphs,
     DataSet<Integer> minFrequency,
     FSMConfig fsmConfig) {
-
-    DataSet<GSpanGraph> graphs = createGraphs(edgeTriples);
 
     // distribute graphs to workers
     DataSet<Tuple2<Integer, Collection<GSpanGraph>>> partitions = graphs

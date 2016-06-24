@@ -36,6 +36,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.function
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.functions.PostPruneAndCompress;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.functions.ReportGrownSubgraphs;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.SerializedDFSCode;
 
 import org.gradoop.model.impl.functions.utils.AddCount;
@@ -53,11 +54,11 @@ public class GSpanBulkIteration extends GSpanBase {
 
   @Override
   public DataSet<WithCount<CompressedDFSCode>> mine(
-    DataSet<EdgeTriple> edgeTriples,
+    DataSet<GSpanGraph> graphs,
     DataSet<Integer> minFrequency,
     FSMConfig fsmConfig) {
 
-    DataSet<IterationItem> transactions = createGraphs(edgeTriples)
+    DataSet<IterationItem> transactions = graphs
       .map(new IterationItemWithTransaction());
 //      .map(new Print<IterationItem>(""));
 

@@ -15,38 +15,32 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package org.gradoop.model.impl.algorithms.fsm.api;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.model.impl.tuples.WithCount;
 
+import java.util.List;
+
 /**
- * Describes the core of a transactional FSM implementation.
+ * Describes transactional FSM post processing.
  *
- * @param <G> graph representation
  * @param <S> subgraph representation
+ * @param <C> graph collection representation
  */
-public interface TransactionalFSMiner<G, S> {
+public interface TransactionalFSMDecoder<S, C> {
 
   /**
-   * Triggers the mining process.
+   * Triggers the post processing.
    *
-   * @param graphs input edge triples
-   * @param minFrequency minimum frequency
-   * @param fsmConfig FSM configuration
-   * @return frequent subgraphs with frequency
+   * @param frequentSubgraphs frequent subgraphs
+   * @param vertexLabelDictionary vertex label dictionary
+   * @param edgeLabelDictionary edge label dictionary
+   * @return desired output
    */
-  DataSet<WithCount<S>> mine(DataSet<G> graphs,
-    DataSet<Integer> minFrequency, FSMConfig fsmConfig);
-
-  /**
-   * Sets the Flink execution environment.
-   *
-   * @param env execution environment
-   */
-  void setExecutionEnvironment(ExecutionEnvironment env);
+  C decode(
+    DataSet<WithCount<S>> frequentSubgraphs,
+    DataSet<List<String>> vertexLabelDictionary,
+    DataSet<List<String>> edgeLabelDictionary
+  );
 }
