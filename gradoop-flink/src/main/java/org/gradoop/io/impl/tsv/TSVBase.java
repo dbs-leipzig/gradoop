@@ -12,8 +12,8 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-abstract class TSVBase <G extends EPGMGraphHead, V extends EPGMVertex, E
-  extends EPGMEdge> {
+abstract class TSVBase
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
   /**
    * Gradoop Flink configuration
    */

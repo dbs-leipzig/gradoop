@@ -64,17 +64,17 @@ public class TSVDataSource
       .createTypeInfo(getConfig().getEdgeFactory().getType());
 
     //--------------------------------------------------------------------------
-    // create tuple that contains all information
+    // generate tuple that contains all information
     //--------------------------------------------------------------------------
 
     DataSet<Tuple6<String, GradoopId, String, String, GradoopId, String>>
       lineTuple = env.readTextFile(getTsvPath()).map(new TSVToTuple());
 
-    // reduces duplicates in source and target ids
+    // reduces duplicates in source and target ids and set unique GradoopId
     lineTuple = lineTuple.reduceGroup(new TupleReducer());
 
     //--------------------------------------------------------------------------
-    // compute edges
+    // generate edges
     //--------------------------------------------------------------------------
 
     DataSet<E> edges = lineTuple
@@ -82,7 +82,7 @@ public class TSVDataSource
       .returns(edgeTypeInfo);
 
     //--------------------------------------------------------------------------
-    // compute new graphs
+    // generate vertices
     //--------------------------------------------------------------------------
 
     DataSet<V> vertices = lineTuple

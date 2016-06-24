@@ -27,7 +27,18 @@ public class TSVToTuple implements MapFunction<String,
   /**
    * Separator token
    */
-  private static final Pattern FILE_SEPARATOR_TOKEN = Pattern.compile(" ");
+  private static final Pattern LINE_SEPARATOR_TOKEN = Pattern.compile(" ");
+  /**
+   * Reuse Tuple
+   */
+  private Tuple6<String, GradoopId, String, String, GradoopId, String> reuse;
+
+  /**
+   * Constructor
+   */
+  public TSVToTuple(){
+    this.reuse = new Tuple6<>();
+  }
 
   /**
    * Reads every line of the tsv document and creates a tuple6 that contains
@@ -41,8 +52,13 @@ public class TSVToTuple implements MapFunction<String,
   public Tuple6<String, GradoopId, String, String, GradoopId, String> map(
     String s)
     throws Exception {
-    String[] token = FILE_SEPARATOR_TOKEN.split(s);
-    return new Tuple6<>(token[0], GradoopId.get(), token[1], token[2],
-      GradoopId.get(), token[3]);
+    String[] token = LINE_SEPARATOR_TOKEN.split(s);
+    reuse.f0 = token[0];        // origin id vertex 1
+    reuse.f1 = GradoopId.get(); // generated GradoopId for vertex 1
+    reuse.f2 = token[1];        // language property vertex 1
+    reuse.f3 = token[2];        // origin id vertex 2
+    reuse.f4 = GradoopId.get(); //  generated GradoopId for vertex 2
+    reuse.f5 = token[3];        // language property vertex 2
+    return reuse;
   }
 }
