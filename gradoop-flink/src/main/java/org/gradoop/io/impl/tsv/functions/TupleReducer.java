@@ -15,6 +15,7 @@ import java.util.Map;
 public class TupleReducer implements GroupReduceFunction<Tuple6<String,
   GradoopId, String, String, GradoopId, String>, Tuple6<String,
     GradoopId, String, String, GradoopId, String>> {
+
   /**
    * For every duplicated (original) id one gradoopID will be set.
    *
@@ -27,35 +28,33 @@ public class TupleReducer implements GroupReduceFunction<Tuple6<String,
     Iterable<Tuple6<String, GradoopId, String, String, GradoopId, String>>
       iterable,
     Collector<Tuple6<String, GradoopId, String, String, GradoopId, String>>
-      collector) throws
-    Exception {
+      collector)
+    throws Exception {
 
     Map<String, GradoopId> sourceDuplicates = new HashMap<>();
     Map<String, GradoopId> targetDuplicates = new HashMap<>();
 
-    for (Tuple6<String, GradoopId, String, String, GradoopId, String> tup: iterable) {
+    for (Tuple6<String, GradoopId, String, String, GradoopId, String>
+      tuple: iterable) {
 
-      boolean s = sourceDuplicates.containsKey(tup.f0);
-      boolean t = targetDuplicates.containsKey(tup.f3);
+      boolean s = sourceDuplicates.containsKey(tuple.f0);
+      boolean t = targetDuplicates.containsKey(tuple.f3);
 
       if (!(s || t)){
-        collector.collect(tup);
+        collector.collect(tuple);
       }else{
         if(s){
-          collector
-            .collect(
-              new Tuple6<>(tup.f0, sourceDuplicates.get(tup.f0),
-                tup.f2, tup.f3, tup.f4, tup.f5));
+          tuple.f1 = sourceDuplicates.get(tuple.f0);
+          collector.collect(tuple);
         }
         if(t){
-          collector
-            .collect(
-              new Tuple6<>(tup.f0, tup.f1, tup.f2, tup.f3,
-                targetDuplicates.get(tup.f3), tup.f5));
+          tuple.f4 = targetDuplicates.get(tuple.f3);
+          collector.collect(tuple);
+
         }
       }
-      sourceDuplicates.put(tup.f0, tup.f1);
-      targetDuplicates.put(tup.f3, tup.f4);
+      sourceDuplicates.put(tuple.f0, tuple.f1);
+      targetDuplicates.put(tuple.f3, tuple.f4);
     }
   }
 }

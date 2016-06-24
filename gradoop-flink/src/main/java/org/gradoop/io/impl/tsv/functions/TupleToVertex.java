@@ -54,16 +54,16 @@ public class TupleToVertex <V extends EPGMVertex> implements
    * Method to initialize EPGMVertices
    *
    * @param vertexId    GradoopId
-   * @param origenid    original id read from tsv input
+   * @param originId    original id read from tsv input
    * @param language    language property read from tsv input
    * @return            initialized EPGMVertex
    */
-  private V createVertex(GradoopId vertexId, String origenid, String language){
+  private V createVertex(GradoopId vertexId, String originId, String language){
 
     java.lang.String label = "";
     HashMap<java.lang.String, Object> properties = new HashMap<>();
     properties.put("lan", language);
-    properties.put("id", origenid);
+    properties.put("id", originId);
     PropertyList propertyList = PropertyList.createFromMap(properties);
     GradoopIdSet graphs = GradoopIdSet.fromExisting(GradoopId.get());
 
