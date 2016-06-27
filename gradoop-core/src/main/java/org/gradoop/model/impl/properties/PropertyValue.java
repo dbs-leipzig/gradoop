@@ -405,7 +405,30 @@ public class PropertyValue
 
   @Override
   public int compareTo(PropertyValue o) {
-    return Bytes.compareTo(rawBytes, o.rawBytes);
+    int result;
+
+    if (this.isNull() && o.isNull()) {
+      result = 0;
+    } else if (this.isBoolean() && o.isBoolean()) {
+      result = Boolean.compare(this.getBoolean(), o.getBoolean());
+    } else if (this.isInt() && o.isInt()) {
+      result = Integer.compare(this.getInt(), o.getInt());
+    } else if (this.isLong() && o.isLong()) {
+      result = Long.compare(this.getLong(), o.getLong());
+    } else if (this.isFloat() && o.isFloat()) {
+      result = Float.compare(this.getFloat(), o.getFloat());
+    } else if (this.isDouble() && o.isDouble()) {
+      result = Double.compare(this.getDouble(), o.getDouble());
+    } else if (this.isString() && o.isString()) {
+      result = this.getString().compareTo(o.getString());
+    } else if (this.isBigDecimal() && o.isBigDecimal()) {
+      result = this.getBigDecimal().compareTo(o.getBigDecimal());
+    } else {
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", this.getClass(), o.getClass()));
+    }
+
+    return result;
   }
 
   /**

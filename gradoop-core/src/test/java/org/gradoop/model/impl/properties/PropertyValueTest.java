@@ -325,30 +325,35 @@ public class PropertyValueTest {
 
   @Test
   public void testCompareTo() throws Exception {
-    validateCompareTo(create(null), create(null),
-      create(true));
+    assertTrue(create(null).compareTo(create(null)) == 0);
 
-    validateCompareTo(create(false), create(false),
-      create(true));
+    validateCompareTo(create(false), create(false), create(true));
 
-    validateCompareTo(create(10), create(10),
-      create(12));
+    validateCompareTo(create(-10), create(-10), create(10));
+    validateCompareTo(create(10), create(10), create(12));
 
-    validateCompareTo(create(10L), create(10L),
-      create(12L));
+    validateCompareTo(create(-10L), create(-10L), create(12L));
+    validateCompareTo(create(10L), create(10L), create(12L));
 
-    validateCompareTo(create(10F), create(10F),
-      create(12F));
+    validateCompareTo(create(-10F), create(-10F), create(12F));
+    validateCompareTo(create(10F), create(10F), create(12F));
 
-    validateCompareTo(create(10.), create(10.),
-      create(12.));
+    validateCompareTo(create(-10.), create(-10.), create(12.));
+    validateCompareTo(create(10.), create(10.), create(12.));
 
-    validateCompareTo(create("10"), create("10"),
-      create("12"));
+    validateCompareTo(create("10"), create("10"), create("12"));
 
+    validateCompareTo(create(new BigDecimal(-10)),
+      create(new BigDecimal(-10)),
+      create(new BigDecimal(11)));
     validateCompareTo(create(new BigDecimal(10)),
       create(new BigDecimal(10)),
       create(new BigDecimal(11)));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCompareToWithIncompatibleTypes() {
+    create(10).compareTo(create(10L));
   }
 
   @Test
