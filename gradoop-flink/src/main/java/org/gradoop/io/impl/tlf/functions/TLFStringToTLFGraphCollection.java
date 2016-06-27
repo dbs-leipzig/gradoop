@@ -17,13 +17,13 @@
 
 package org.gradoop.io.impl.tlf.functions;
 
+import com.google.common.collect.Sets;
 import org.gradoop.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.io.impl.tlf.tuples.TLFGraphHead;
 import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * Generates a collection of 3-tuples which contain the graph head, the
@@ -45,7 +45,7 @@ public class TLFStringToTLFGraphCollection {
    * Constructor which initiates a new collection for 3-tuples
    */
   public TLFStringToTLFGraphCollection() {
-    graphCollection = new HashSet<>();
+    graphCollection = Sets.newHashSet();
   }
 
   /**
@@ -63,8 +63,8 @@ public class TLFStringToTLFGraphCollection {
       return graphCollection;
     }
     TLFGraphHead graphHead;
-    Collection<TLFVertex> vertices = new HashSet<>();
-    Collection<TLFEdge> edges = new HashSet<>();
+    Collection<TLFVertex> vertices = Sets.newHashSet();
+    Collection<TLFEdge> edges = Sets.newHashSet();
 
     //remove first tag so that split does not have empty first element
     String[] contentArray = content.trim().replaceFirst("t # ", "").split("t " +
@@ -78,8 +78,8 @@ public class TLFStringToTLFGraphCollection {
       graphCollection.add(new TLFGraph(graphHead, vertices,
         edges));
 
-      vertices = new HashSet<>();
-      edges = new HashSet<>();
+      vertices = Sets.newHashSet();
+      edges = Sets.newHashSet();
     }
     return graphCollection;
   }
@@ -91,7 +91,7 @@ public class TLFStringToTLFGraphCollection {
    * @return collection of vertices as tuples
    */
   protected Collection<TLFVertex> getVertices(String content) {
-    Collection<TLFVertex> vertexCollection = new HashSet<>();
+    Collection<TLFVertex> vertexCollection = Sets.newHashSet();
     String[] vertex;
     //-1 cause before e is \n
     content = content.substring(content.indexOf("v"), content.indexOf("e") - 1);
@@ -111,11 +111,9 @@ public class TLFStringToTLFGraphCollection {
    * @param content the TLF graph segment
    * @return collection of edges as tuples
    */
-  protected Collection<TLFEdge> getEdges(String
-    content) {
+  protected Collection<TLFEdge> getEdges(String content) {
 
-    Collection<TLFEdge> edgeCollection = new
-      HashSet<>();
+    Collection<TLFEdge> edgeCollection = Sets.newHashSet();
     String[] edge;
 
     content = content.substring(content.indexOf("e"), content.length());
