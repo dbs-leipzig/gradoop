@@ -21,14 +21,19 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.Collection;
 
+import static org.gradoop.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 
 public class TSVIOTest extends GradoopFlinkTestBase {
@@ -60,5 +65,32 @@ public class TSVIOTest extends GradoopFlinkTestBase {
     assertEquals("Wrong graph count", 1, graphHeads.size());
     assertEquals("Wrong vertex count", 20, vertices.size());
     assertEquals("Wrong edge count", 12, edges.size());
+  }
+
+  @Test
+  public void testTSVData() throws Exception {
+    String tsvFile =
+            TSVIOTest.class.getResource("/data/tsv/tsvFile").getFile();
+
+    String gdlFile =
+            TSVIOTest.class.getResource("/data/tsv/tsv.gdl").getFile();
+
+    // load from tsv file
+    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+            new TSVDataSource<>(tsvFile, config);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
+            tsvGraph = dataSource.getLogicalGraph();
+
+    // load from gdl
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+            getLoaderFromFile(gdlFile);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> resultGraph =
+            loader.getLogicalGraphByVariable("result");
+
+    // test element data
+    collectAndAssertTrue(resultGraph.equalsByElementData(tsvGraph));
+
   }
 }
