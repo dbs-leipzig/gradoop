@@ -15,43 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples;
-
-import org.gradoop.model.impl.id.GradoopId;
-
 /**
- * Describe the minimum features of an edge triple representation required to
- * build a gSpan graph representation.
+ * Interfaces related to frequent subgraph mining.
  */
-public interface EdgeTriple {
 
-  /**
-   * Getter.
-   * @return edge label
-   */
-  Integer getEdgeLabel();
-
-  /**
-   * Getter.
-   * @return source vertex id
-   */
-  GradoopId getSourceId();
-
-  /**
-   * Getter.
-   * @return source vertex label
-   */
-  Integer getSourceLabel();
-
-  /**
-   * Getter.
-   * @return target vertex id
-   */
-  GradoopId getTargetId();
-
-  /**
-   * Getter.
-   * @return target vertex label
-   */
-  Integer getTargetLabel();
-}
+package org.gradoop.model.impl.algorithms.fsm.api;

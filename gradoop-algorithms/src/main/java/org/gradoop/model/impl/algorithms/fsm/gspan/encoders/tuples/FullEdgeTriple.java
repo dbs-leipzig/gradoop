@@ -24,8 +24,8 @@ import org.gradoop.model.impl.id.GradoopId;
  * (graphId, sourceId, targetId, edgeLabel, sourceLabel, targetLabel)
  */
 public class FullEdgeTriple
-  extends Tuple6<GradoopId, GradoopId, GradoopId, Integer, Integer, Integer> implements
-  EdgeTriple {
+  extends Tuple6<GradoopId, GradoopId, GradoopId, Integer, Integer, Integer>
+  implements  EdgeTriple {
 
   /**
    * Default constructor.
@@ -43,7 +43,8 @@ public class FullEdgeTriple
    * @param sourceLabel source vertex label
    * @param targetLabel target vertex label
    */
-  public FullEdgeTriple(GradoopId graphId, GradoopId sourceId, GradoopId targetId,
+  public FullEdgeTriple(
+    GradoopId graphId, GradoopId sourceId, GradoopId targetId,
     Integer edgeLabel, Integer sourceLabel, Integer targetLabel) {
     super(graphId, sourceId, targetId, edgeLabel, sourceLabel, targetLabel);
 

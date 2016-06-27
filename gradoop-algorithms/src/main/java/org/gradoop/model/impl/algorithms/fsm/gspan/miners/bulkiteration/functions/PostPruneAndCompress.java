@@ -17,7 +17,6 @@
 
 package org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.functions;
 
-
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;

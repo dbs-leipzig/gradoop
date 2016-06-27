@@ -24,7 +24,6 @@ import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMDecoder;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanDecoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.decoders.functions.DFSDecoder;

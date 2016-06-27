@@ -15,7 +15,6 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package org.gradoop.model.impl.algorithms.fsm.api;
 
 import org.apache.flink.api.java.DataSet;

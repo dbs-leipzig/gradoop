@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.algorithms.fsm.gspan.miners.gspan;
+package org.gradoop.model.impl.algorithms.fsm.gspan.miners;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import java.util.Collection;
 
-public class TransactionalFSMinerTest extends GradoopFlinkTestBase {
+public class GSpanMinerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMinersSeparately() throws Exception {

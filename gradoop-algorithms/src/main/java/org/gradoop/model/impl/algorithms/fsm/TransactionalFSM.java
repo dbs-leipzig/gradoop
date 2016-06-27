@@ -28,16 +28,9 @@ import org.gradoop.model.impl.algorithms.fsm.config.TransactionalFSMAlgorithm;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
 import org.gradoop.model.impl.algorithms.fsm.gspan.decoders.GSpanGraphCollectionDecoder;
-
-
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders
-  .GSpanGraphCollectionEncoder;
-import org.gradoop.model.impl.algorithms.fsm.api.TransactionalFSMiner;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GSpanGraphCollectionEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
-
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
-
-
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.tuples.WithCount;
@@ -65,7 +58,7 @@ public class TransactionalFSM
   /**
    * FSM implementation (actual algorithm)
    */
-  private final GSpanMiner miner;
+  private GSpanMiner miner;
 
   /**
    * constructor
@@ -77,7 +70,7 @@ public class TransactionalFSM
     this.fsmConfig = fsmConfig;
     this.encoder = new GSpanGraphCollectionEncoder<G, V, E>() {
     };
-    this.miner = getMiner(algorithm);
+    setMiner(algorithm);
   }
 
   @Override
@@ -103,12 +96,10 @@ public class TransactionalFSM
   }
 
   /**
-   * returns FSM implementation by a given enum
+   * sets FSM implementation by a given enum
    * @param algorithm enum
-   * @return FSM implementation
    */
-  private GSpanMiner getMiner(TransactionalFSMAlgorithm algorithm) {
-    GSpanMiner miner;
+  private void setMiner(TransactionalFSMAlgorithm algorithm) {
 
     switch (algorithm) {
     case GSPAN_FILTERREFINE:
@@ -118,8 +109,6 @@ public class TransactionalFSM
       miner = new GSpanBulkIteration();
       break;
     }
-
-    return miner;
   }
 
   @Override

@@ -26,4 +26,6 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
  * @param <C> graph collection representation
  */
 public interface GSpanDecoder<C>
-  extends TransactionalFSMDecoder<CompressedDFSCode, C> {}
+  extends TransactionalFSMDecoder<CompressedDFSCode, C> {
+
+}

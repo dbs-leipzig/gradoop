@@ -22,17 +22,14 @@ import com.google.common.collect.Sets;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Maps;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.comparators.DFSCodeSiblingComparator;
-
-
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.AdjacencyList;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.AdjacencyListEntry;
-import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSEmbedding;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSEmbedding;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanEdge;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.FullEdgeTriple;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Collection;
@@ -57,9 +54,11 @@ public class GSpan {
    * given collection of Gradoop edge triples.
    *
    * @param triples the graphs edges
+   * @param <T> edge triple type
    * @return graph transaction
    */
-  public static GSpanGraph createGSpanGraph(Iterable<EdgeTriple> triples) {
+  public static <T extends EdgeTriple> GSpanGraph
+  createGSpanGraph(Iterable<T>  triples) {
 
     // replace GradoopIds by Integer Ids
     List<GSpanEdge> edges = Lists.newArrayList();
@@ -132,10 +131,11 @@ public class GSpan {
    *
    * @param iterable edge triples with GradoopIds
    * @param adjacencyLists adjacency lists
-   *@param edges  @return gSpan edges
+   * @param edges  @return gSpan edges
+   * @param <T> edge triple type
    */
-  private static void createAdjacencyListsAndEdges(
-    final Iterable<EdgeTriple> iterable,
+  private static <T extends EdgeTriple> void createAdjacencyListsAndEdges(
+    final Iterable<T> iterable,
     final List<AdjacencyList> adjacencyLists, final List<GSpanEdge> edges) {
 
     Map<GradoopId, Integer> vertexIdMap = Maps.newHashMap();
@@ -672,4 +672,6 @@ public class GSpan {
 
     return !parentEmbeddings.isEmpty();
   }
+
+
 }

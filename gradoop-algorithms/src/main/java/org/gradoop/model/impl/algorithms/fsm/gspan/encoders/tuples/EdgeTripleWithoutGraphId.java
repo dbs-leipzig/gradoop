@@ -18,15 +18,14 @@
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
-import org.apache.flink.api.java.tuple.Tuple6;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * (graphId, sourceId, targetId, edgeLabel, sourceLabel, targetLabel)
  */
 public class EdgeTripleWithoutGraphId
-  extends Tuple5<GradoopId, GradoopId, Integer, Integer, Integer> implements
-  EdgeTriple {
+  extends Tuple5<GradoopId, GradoopId, Integer, Integer, Integer>
+  implements EdgeTriple {
 
   /**
    * Default constructor.

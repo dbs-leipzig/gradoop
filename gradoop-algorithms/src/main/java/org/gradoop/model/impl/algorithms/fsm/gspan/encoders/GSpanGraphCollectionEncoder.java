@@ -25,27 +25,17 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .AppendSourceLabel;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .AppendTargetLabel;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .Dictionary;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .EdgeLabelEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .GraphIdElementIdLabel;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .InverseDictionary;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .MinFrequency;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .VertexLabelEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
-  .EdgeTripleWithoutVertexLabels;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
-  .VertexIdLabel;
-import org.gradoop.model.impl.algorithms.fsm.gspan.functions.BuildGSpanGraph;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.AppendSourceLabel;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.AppendTargetLabel;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.Dictionary;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.EdgeLabelEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.GraphIdElementIdLabel;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.InverseDictionary;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.MinFrequency;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.VertexLabelEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithoutVertexLabels;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.VertexIdLabel;
+import org.gradoop.model.impl.algorithms.fsm.gspan.functions.CombineGSpanGraph;
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.functions.tuple.Value1Of2;
@@ -196,7 +186,7 @@ public class GSpanGraphCollectionEncoder
       .join(encodedVertices).where(2).equalTo(0)
       .with(new AppendTargetLabel())
       .groupBy(0)
-      .reduceGroup(new BuildGSpanGraph());
+      .reduceGroup(new CombineGSpanGraph());
   }
 
 

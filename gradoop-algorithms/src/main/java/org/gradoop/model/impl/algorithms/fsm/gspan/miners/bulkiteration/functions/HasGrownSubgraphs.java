@@ -20,7 +20,6 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.functio
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.pojos.IterationItem;
 
-
 /**
  * Filters active search space items
  */

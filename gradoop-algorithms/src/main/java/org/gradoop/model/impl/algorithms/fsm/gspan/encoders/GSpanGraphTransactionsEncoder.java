@@ -25,22 +25,14 @@ import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .Dictionary;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .EdgeLabelTranslator;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .EdgeLabels;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .InverseDictionary;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .MinFrequency;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .VertexLabelTranslator;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .VertexLabels;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
-  .EdgeTripleWithStringEdgeLabel;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.Dictionary;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.EdgeLabelsEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.EdgeLabels;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.InverseDictionary;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.MinFrequency;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.VertexLabelsEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.VertexLabels;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.functions.utils.AddCount;
@@ -137,7 +129,7 @@ public class GSpanGraphTransactionsEncoder
       .map(new InverseDictionary());
 
     return tripleCollections
-      .map(new EdgeLabelTranslator())
+      .map(new EdgeLabelsEncoder())
       .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
   }
 
@@ -167,7 +159,7 @@ public class GSpanGraphTransactionsEncoder
 
     return transactions
       .getTransactions()
-      .map(new VertexLabelTranslator<G, V, E>())
+      .map(new VertexLabelsEncoder<G, V, E>())
       .withBroadcastSet(reverseDictionary, BroadcastNames.VERTEX_DICTIONARY);
   }
 

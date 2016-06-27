@@ -1,4 +1,4 @@
-package org.gradoop.model.impl.algorithms.fsm.gspan.miners.gspan;
+package org.gradoop.model.impl.algorithms.fsm.gspan;
 
 import com.google.common.collect.Lists;
 import org.gradoop.model.GradoopFlinkTestBase;
