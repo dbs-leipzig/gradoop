@@ -37,9 +37,7 @@ public class TLFEdge extends Tuple3<Integer, Integer, String> {
    * @param label edge label
    */
   public TLFEdge(Integer sourceId, Integer targetId, String label) {
-    setSourceId(sourceId);
-    setTargetId(targetId);
-    setLabel(label);
+    super(sourceId, targetId, label);
   }
 
   public Integer getSourceId() {

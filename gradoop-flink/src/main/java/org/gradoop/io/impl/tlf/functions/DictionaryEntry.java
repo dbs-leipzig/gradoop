@@ -27,7 +27,7 @@ import org.apache.hadoop.io.Text;
  * format its result text has to be split and formed into Tuple2<Integer,
  * String>.
  */
-public class TLFDictionaryStringToTuple implements
+public class DictionaryEntry implements
   MapFunction<Tuple2<LongWritable, Text>, Tuple2<Integer, String>> {
 
   /**

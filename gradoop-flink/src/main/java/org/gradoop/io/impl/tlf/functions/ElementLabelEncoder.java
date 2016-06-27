@@ -19,6 +19,7 @@ package org.gradoop.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.io.impl.tlf.constants.BroadcastNames;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -35,7 +36,7 @@ import java.util.Map;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GraphTransactionWithTLFDictionaryToSimpleLabels<G extends
+public class ElementLabelEncoder<G extends
   EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> extends
   RichMapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>> {
 
@@ -68,7 +69,7 @@ public class GraphTransactionWithTLFDictionaryToSimpleLabels<G extends
    *                            dictionary
    * @param hasEdgeDictionary set to true if edge labels are set by a dictionary
    */
-  public GraphTransactionWithTLFDictionaryToSimpleLabels(
+  public ElementLabelEncoder(
     boolean hasVertexDictionary, boolean hasEdgeDictionary) {
     this.hasVertexDictionary = hasVertexDictionary;
     this.hasEdgeDictionary = hasEdgeDictionary;
@@ -81,12 +82,12 @@ public class GraphTransactionWithTLFDictionaryToSimpleLabels<G extends
     if (hasVertexDictionary) {
       vertexDictionary = getRuntimeContext()
         .<HashMap<String, Integer>>getBroadcastVariable(
-          TLFDictionaryConstants.BROADCAST_VERTEX_DICTIONARY).get(0);
+          BroadcastNames.VERTEX_DICTIONARY).get(0);
     }
     if (hasEdgeDictionary) {
       edgeDictionary = getRuntimeContext()
         .<HashMap<String, Integer>>getBroadcastVariable(
-          TLFDictionaryConstants.BROADCAST_EDGE_DICTIONARY).get(0);
+          BroadcastNames.EDGE_DICTIONARY).get(0);
     }
   }
 
@@ -101,12 +102,12 @@ public class GraphTransactionWithTLFDictionaryToSimpleLabels<G extends
   @Override
   public GraphTransaction<G, V, E> map(
     GraphTransaction<G, V, E> graphTransaction) throws Exception {
-    if (hasVertexDictionary) {
+    if (vertexDictionary != null) {
       for (V vertex : graphTransaction.getVertices()) {
         vertex.setLabel(vertexDictionary.get(vertex.getLabel()).toString());
       }
     }
-    if (hasEdgeDictionary) {
+    if (edgeDictionary != null) {
       for (E edge : graphTransaction.getEdges()) {
         edge.setLabel(edgeDictionary.get(edge.getLabel()).toString());
       }

@@ -15,23 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.tlf.functions;
-
 /**
- * Constants needed for TLFDictionary functions
+ * Contains constants used for TLF.
  */
-public class TLFDictionaryConstants {
-
-  /**
-   * String used to identify the vertex dictionary on broadcast.
-   */
-  public static final String BROADCAST_VERTEX_DICTIONARY =
-    "vertexDictionary";
-
-  /**
-   * String used to identify the edge dictionary on broadcast.
-   */
-  public static final String BROADCAST_EDGE_DICTIONARY =
-    "edgeDictionary";
-
-}
+package org.gradoop.io.impl.tlf.constants;

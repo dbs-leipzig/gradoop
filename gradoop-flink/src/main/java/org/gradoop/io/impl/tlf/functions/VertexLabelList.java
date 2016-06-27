@@ -17,6 +17,7 @@
 
 package org.gradoop.io.impl.tlf.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
@@ -24,27 +25,25 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Creates a list containing all edge labels.
+ * Creates a list containing all vertex labels.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GraphTransactionToTLFDictionaryEdgeMap<G extends EPGMGraphHead, V
-  extends EPGMVertex, E extends EPGMEdge> implements
-  FlatMapFunction<GraphTransaction<G, V, E>, List<String>> {
+public class VertexLabelList
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements FlatMapFunction<GraphTransaction<G, V, E>, List<String>> {
 
   @Override
-  public void flatMap(
-    GraphTransaction<G, V, E> graphTransaction, Collector<List<String>>
-    collector) throws Exception {
-    List<String> list = new LinkedList<>();
-    for (E edge : graphTransaction.getEdges()) {
-      list.add(edge.getLabel());
+  public void flatMap(GraphTransaction<G, V, E> graphTransaction,
+    Collector<List<String>> collector) throws Exception {
+    List<String> list = Lists.newLinkedList();
+    for (V vertex : graphTransaction.getVertices()) {
+      list.add(vertex.getLabel());
     }
     collector.collect(list);
   }

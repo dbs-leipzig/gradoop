@@ -22,14 +22,14 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import java.util.Map;
 
 /**
- * Creates a dictionary format from a GraphTransaction as followed:
+ * Creates a dictionary format from a GraphTransaction as follows:
  * <p>
  *   label0 0
  *   label1 1
  *   ...
  * </p>
  */
-public class GraphTransactionToTLFDictionaryFileFormat implements
+public class TLFDictionaryFileFormat implements
   TextOutputFormat.TextFormatter<Map<String, Integer>> {
 
   /**

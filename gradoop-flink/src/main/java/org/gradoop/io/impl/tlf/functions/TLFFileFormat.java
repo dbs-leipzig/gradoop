@@ -17,6 +17,7 @@
 
 package org.gradoop.io.impl.tlf.functions;
 
+import com.google.common.collect.Maps;
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -24,7 +25,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -40,9 +40,9 @@ import java.util.Map;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GraphTransactionsToTLFFileFormat<G extends
-  EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> implements
-  TextOutputFormat.TextFormatter<GraphTransaction<G, V, E>> {
+public class TLFFileFormat
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements TextOutputFormat.TextFormatter<GraphTransaction<G, V, E>> {
 
   /**
    * Global counter for the graph id used for each single graph transaction.
@@ -57,7 +57,8 @@ public class GraphTransactionsToTLFFileFormat<G extends
    */
   @Override
   public String format(GraphTransaction<G, V, E> graphTransaction) {
-    Map<GradoopId, Integer> gradoopIdIntegerMapVertices = new HashMap<>();
+    Map<GradoopId, Integer> gradoopIdIntegerMapVertices = Maps
+      .newHashMapWithExpectedSize(graphTransaction.getVertices().size());
     Integer id = 0;
     StringBuilder graph = new StringBuilder();
 

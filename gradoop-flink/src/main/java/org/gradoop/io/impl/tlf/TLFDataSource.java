@@ -24,13 +24,13 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.gradoop.io.api.DataSource;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryEdgeLabelToTransaction;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryStringToTuple;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryTupleToMapGroupReducer;
-import org.gradoop.io.impl.tlf.functions.TLFDictionaryVertexLabelToTransaction;
+import org.gradoop.io.impl.tlf.functions.Dictionary;
+import org.gradoop.io.impl.tlf.functions.EdgeLabelDecoder;
+import org.gradoop.io.impl.tlf.functions.DictionaryEntry;
+import org.gradoop.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
-import org.gradoop.io.impl.tlf.functions.TLFGraphCollectionToGraphTransactions;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionsToTLFFileFormat;
+import org.gradoop.io.impl.tlf.functions.TLFGraphTransactions;
+import org.gradoop.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -46,7 +46,7 @@ import java.io.IOException;
 /**
  * Creates an EPGM instance from one TLF file. The exact format is
  * documented in
- * {@link GraphTransactionsToTLFFileFormat}.
+ * {@link TLFFileFormat}.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -63,8 +63,7 @@ public class TLFDataSource
    * @param tlfPath tlf data file
    * @param config Gradoop Flink configuration
    */
-  public TLFDataSource(String tlfPath, GradoopFlinkConfig<G, V, E>
-    config) {
+  public TLFDataSource(String tlfPath, GradoopFlinkConfig<G, V, E> config) {
     super(tlfPath, "", "", config);
   }
 
@@ -76,24 +75,23 @@ public class TLFDataSource
    * @param tlfEdgeDictionaryPath tlf edge dictionary file
    * @param config Gradoop Flink configuration
    */
-  public TLFDataSource(String tlfPath, String tlfVertexDictionaryPath, String
-    tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E>
-    config) {
+  public TLFDataSource(String tlfPath, String tlfVertexDictionaryPath,
+    String tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E> config) {
     super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
     ExecutionEnvironment env = config.getExecutionEnvironment();
     if (hasVertexDictionary()) {
       setVertexDictionary(env
         .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
           .class, getTLFVertexDictionaryPath())
-          .map(new TLFDictionaryStringToTuple())
-          .reduceGroup(new TLFDictionaryTupleToMapGroupReducer()));
+          .map(new DictionaryEntry())
+          .reduceGroup(new Dictionary()));
     }
     if (hasEdgeDictionary()) {
       setEdgeDictionary(env
         .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
           .class, getTLFEdgeDictionaryPath())
-          .map(new TLFDictionaryStringToTuple())
-          .reduceGroup(new TLFDictionaryTupleToMapGroupReducer()));
+          .map(new DictionaryEntry())
+          .reduceGroup(new Dictionary()));
     }
   }
 
@@ -113,34 +111,33 @@ public class TLFDataSource
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     // create the mapper
-    TLFGraphCollectionToGraphTransactions<G, V, E>
-      tlfCollectionToGraphTransactions = new
-      TLFGraphCollectionToGraphTransactions<G, V, E>(getConfig()
-        .getGraphHeadFactory(), getConfig().getVertexFactory(), getConfig()
-          .getEdgeFactory());
+    TLFGraphTransactions<G, V, E>
+      tlfCollectionToTLFGraphTransactions = new TLFGraphTransactions<G, V, E>(
+        getConfig().getGraphHeadFactory(),
+        getConfig().getVertexFactory(),
+        getConfig().getEdgeFactory());
     // get the mapper's produced type
     TypeInformation<GraphTransaction<G, V, E>> typeInformation =
-      tlfCollectionToGraphTransactions
-        .getProducedType();
+      tlfCollectionToTLFGraphTransactions.getProducedType();
 
     // map the file's content to transactions
     transactions = env.readHadoopFile(new TLFInputFormat(),
       LongWritable.class, Text.class, getTLFPath())
-        .flatMap(tlfCollectionToGraphTransactions)
+        .flatMap(tlfCollectionToTLFGraphTransactions)
         .returns(typeInformation);
 
     // map the integer valued labels to strings from dictionary
     if (hasVertexDictionary()) {
       transactions = transactions
-        .map(new TLFDictionaryVertexLabelToTransaction<G, V, E>())
+        .map(new VertexLabelDecoder<G, V, E>())
         .withBroadcastSet(getVertexDictionary(),
-          TLFDictionaryVertexLabelToTransaction.VERTEX_DICTIONARY);
+          VertexLabelDecoder.VERTEX_DICTIONARY);
     }
     if (hasEdgeDictionary()) {
       transactions = transactions
-        .map(new TLFDictionaryEdgeLabelToTransaction<G, V, E>())
+        .map(new EdgeLabelDecoder<G, V, E>())
         .withBroadcastSet(getEdgeDictionary(),
-          TLFDictionaryEdgeLabelToTransaction.EDGE_DICTIONARY);
+          EdgeLabelDecoder.EDGE_DICTIONARY);
     }
     return new GraphTransactions<G, V, E>(transactions, getConfig());
   }

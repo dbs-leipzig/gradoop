@@ -24,8 +24,8 @@ import java.util.Collection;
 /**
  *  Represents a graph used in a graph generation from TLF-files.
  */
-public class TLFGraph extends Tuple3<TLFGraphHead,
-  Collection<TLFVertex>, Collection<TLFEdge>> {
+public class TLFGraph
+  extends Tuple3<TLFGraphHead, Collection<TLFVertex>, Collection<TLFEdge>> {
 
   /**
    * default constructor
@@ -40,12 +40,9 @@ public class TLFGraph extends Tuple3<TLFGraphHead,
    * @param graphVertices collection containing TLFVertex
    * @param graphEdges collection containing TLFEdge
    */
-  public TLFGraph(TLFGraphHead graphHead,
-    Collection<TLFVertex> graphVertices, Collection<TLFEdge>
-    graphEdges) {
-    setGraphHead(graphHead);
-    setGraphVertices(graphVertices);
-    setGraphEdges(graphEdges);
+  public TLFGraph(TLFGraphHead graphHead, Collection<TLFVertex> graphVertices,
+    Collection<TLFEdge> graphEdges) {
+    super(graphHead, graphVertices, graphEdges);
   }
 
   public TLFGraphHead getGraphHead() {

@@ -16,8 +16,6 @@
  */
 
 /**
- * Contains all classes related to Transaction List Format (TLF) input and
- * output to Flink.
- * @see <a href="http://www.cse.ust.hk/graphgen/">GraphGen</a>
+ * Contains tuples representing TLF graph elements.
  */
 package org.gradoop.io.impl.tlf.tuples;

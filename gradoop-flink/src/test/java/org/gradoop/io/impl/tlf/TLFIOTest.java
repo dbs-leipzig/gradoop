@@ -40,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 public class TLFIOTest extends GradoopFlinkTestBase {
 
   @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  public TemporaryFolder currentFolder;
   /**
    * Test method for
    *
@@ -99,7 +99,7 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    * @throws Exception
    */
   @Test
-  public void testFromTLFFileWithDictionary() throws Exception {
+  public void testFromTLFFileWithDictionaries() throws Exception {
     String tlfFile =
       TLFIOTest.class
         .getResource("/data/tlf/io_test.tlf")
@@ -115,7 +115,8 @@ public class TLFIOTest extends GradoopFlinkTestBase {
 
     // create datasource
     DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFile, tlfVertexDictionaryFile, "", config);
+      new TLFDataSource<>(tlfFile, tlfVertexDictionaryFile,
+        tlfEdgeDictionaryFile, config);
     //get transactions
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
       = dataSource.getGraphTransactions();
@@ -136,68 +137,6 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     assertEquals("Wrong vertex label", "Vertex0", vertexArray[0].getLabel());
     assertEquals("Wrong vertex label", "Vertex1", vertexArray[1].getLabel());
   }
-
-
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSource#getGraphTransactions()}
-   * @throws Exception
-   */
-  @Test
-  public void testFromTLFFileWithVertexDictionaryYeast() throws Exception {
-    String tlfFileImport =
-      TLFIOTest.class.getResource
-        ("/data/tlf/io_test_yeast_active_output.tlf")
-        .getFile();
-    String tlfVertexDictionaryFileImport =
-      TLFIOTest.class.getResource
-        ("/data/tlf/io_test_yeast_mapping.tlf")
-        .getFile();
-
-    String tlfFileExport =
-      TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat("/io_test_output_yeast_active");
-    File file = new File(tlfFileExport);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
-    String tlfVertexDictionaryFileExport =
-      TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat
-        ("/dictionaries/io_test_output_yeast_mapping");
-    file = new File(tlfFileExport);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
-
-    // read from inputfile
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFileImport, tlfVertexDictionaryFileImport,
-        "", config);
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
-      = dataSource.getGraphTransactions();
-
-    //get first transaction which contains one complete graph
-    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
-      graphTransactions.getTransactions().collect().get(0);
-    //get vertices of the first transaction/graph
-    VertexPojo[] vertexArray = graphTransaction.getVertices()
-      .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
-    //sort vertices by label(alphabetically)
-    Arrays.sort(vertexArray, new Comparator<VertexPojo>() {
-      @Override
-      public int compare(VertexPojo vertex1, VertexPojo vertex2) {
-        return vertex1.getLabel().compareTo(vertex2.getLabel());
-      }
-    });
-    assertEquals("Wrong vertex label", "C", vertexArray[0].getLabel());
-    assertEquals("Wrong vertex label", "Cu", vertexArray[9].getLabel());
-    assertEquals("Wrong graph count", 9568, graphTransactions.getTransactions()
-      .count());
-  }
-
-
 
 
   /**
@@ -244,27 +183,26 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    * {@link TLFDataSink#write(GraphTransactions)}
    */
   @Test
-  public void testWriteAsTLFWithVertexDictionaryYeast() throws Exception {
+  public void testWriteAsTLFWithVertexDictionary() throws Exception {
     String tlfFileImport =
       TLFIOTest.class.getResource
-        ("/data/tlf/io_test_yeast_active_output.tlf")
+        ("/data/tlf/io_test.tlf")
         .getFile();
     String tlfVertexDictionaryFileImport =
       TLFIOTest.class.getResource
-        ("/data/tlf/io_test_yeast_mapping.tlf")
+        ("/data/tlf/io_test_vertex_dictionary.tlf")
         .getFile();
 
     String tlfFileExport =
       TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat("/io_test_output_yeast_active");
+        .toURI().getPath().concat("/io_test_output");
     File file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
     String tlfVertexDictionaryFileExport =
       TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat
-        ("/dictionaries/io_test_output_yeast_mapping");
+        .toURI().getPath().concat("/dictionaries/io_test_output_vertex_dictionary");
     file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
@@ -290,18 +228,19 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     //get vertices of the first transaction/graph
     VertexPojo[] vertexArray = graphTransaction.getVertices()
       .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
+    //sort vertices by label(alphabetically)
+    Arrays.sort(vertexArray, new Comparator<VertexPojo>() {
+      @Override
+      public int compare(VertexPojo vertex1, VertexPojo vertex2) {
+        return vertex1.getLabel().compareTo(vertex2.getLabel());
+      }
+    });
 
-    Integer[] countArray = {0, 0, 0, 0};
-    for (int i = 0; i < vertexArray.length; i++) {
-      countArray[Integer.parseInt(vertexArray[i].getLabel())]++;
-    }
-    Arrays.sort(countArray);
-    Integer[] compareArray = {1, 4, 4, 9};
-    assertArrayEquals("Wrong vertex label count", compareArray, countArray);
-    assertEquals("Wrong graph count", 9568, graphTransactions.getTransactions()
+    assertEquals("Wrong vertex label", "0", vertexArray[0].getLabel());
+    assertEquals("Wrong vertex label", "1", vertexArray[1].getLabel());
+    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
       .count());
   }
-
 
   /**
    * Test method for

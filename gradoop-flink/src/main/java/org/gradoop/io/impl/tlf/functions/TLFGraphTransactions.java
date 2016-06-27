@@ -17,7 +17,8 @@
 
 package org.gradoop.io.impl.tlf.functions;
 
-import org.apache.commons.collections.map.HashedMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -27,6 +28,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.gradoop.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.io.impl.tlf.tuples.TLFGraphHead;
 import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
@@ -39,7 +41,6 @@ import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,9 +53,10 @@ import java.util.Set;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class TLFGraphCollectionToGraphTransactions<G extends
-  EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> implements
-  FlatMapFunction<Tuple2<LongWritable, Text>, GraphTransaction<G, V, E>> {
+public class TLFGraphTransactions
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements FlatMapFunction<Tuple2<LongWritable, Text>,
+  GraphTransaction<G, V, E>> {
 
   /**
    * Creates graph data objects
@@ -83,24 +85,14 @@ public class TLFGraphCollectionToGraphTransactions<G extends
    * @param vertexFactory    vertex data factory
    * @param edgeFactory      edge data factory
    */
-  public TLFGraphCollectionToGraphTransactions(
+  public TLFGraphTransactions(
     EPGMGraphHeadFactory<G> graphHeadFactory, EPGMVertexFactory<V>
     vertexFactory, EPGMEdgeFactory<E> edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
 
-    //the following is needed to be able to return the produced type
-    Set<V> vertices = new HashSet<>();
-    Set<E> edges = new HashSet<>();
-    V source = this.vertexFactory.createVertex();
-    V target = this.vertexFactory.createVertex();
-    vertices.add(source);
-    vertices.add(target);
-    edges.add(this.edgeFactory.createEdge(source.getId(), target.getId()));
-
-    graphTransaction = new GraphTransaction<G, V, E>(this
-      .graphHeadFactory.initGraphHead(GradoopId.get()), vertices, edges);
+    prepareForProducedType();
   }
 
   /**
@@ -114,15 +106,10 @@ public class TLFGraphCollectionToGraphTransactions<G extends
   public void flatMap(Tuple2<LongWritable, Text> inputTuple,
     Collector<GraphTransaction<G, V, E>> collector) throws Exception {
     String graphString = inputTuple.getField(1).toString();
-    TLFStringToTLFGraphCollection
-      tlfStringToCollection = new TLFStringToTLFGraphCollection();
-    tlfStringToCollection.setContent(graphString);
+    Collection<TLFGraph> graphCollection = getGraphCollection(graphString);
 
-    Collection<TLFGraph> graphCollection;
-    graphCollection = tlfStringToCollection.getGraphCollection();
-
-    Set<V> vertices = new HashSet<>();
-    Set<E> edges = new HashSet<>();
+    Set<V> vertices = Sets.newHashSet();
+    Set<E> edges = Sets.newHashSet();
 
     GradoopId id;
     String label;
@@ -131,7 +118,7 @@ public class TLFGraphCollectionToGraphTransactions<G extends
     Map<Integer, GradoopId> integerGradoopIdMapVertices;
 
     for (TLFGraph graph : graphCollection) {
-      integerGradoopIdMapVertices = new HashedMap();
+      integerGradoopIdMapVertices = Maps.newHashMap();
       graphs.clear();
       vertices.clear();
       edges.clear();
@@ -165,5 +152,108 @@ public class TLFGraphCollectionToGraphTransactions<G extends
    */
   public TypeInformation<GraphTransaction<G, V, E>> getProducedType() {
     return TypeExtractor.getForObject(this.graphTransaction);
+  }
+
+  /**
+   * In order to return the produced type one GraphTransaction has to be
+   * initiated.
+   */
+  private void prepareForProducedType() {
+    Set<V> vertices = Sets.newHashSetWithExpectedSize(2);
+    Set<E> edges = Sets.newHashSetWithExpectedSize(1);
+    V source = this.vertexFactory.createVertex();
+    V target = this.vertexFactory.createVertex();
+    vertices.add(source);
+    vertices.add(target);
+    edges.add(this.edgeFactory.createEdge(source.getId(), target.getId()));
+
+    graphTransaction = new GraphTransaction<G, V, E>(this
+      .graphHeadFactory.initGraphHead(GradoopId.get()), vertices, edges);
+  }
+
+  /**
+   * Creates, or returns if already created, the collection of graphs as
+   * tuples from content.
+   *
+   * @return Collection of graphs as tuples
+   */
+  private Collection<TLFGraph> getGraphCollection(String content) {
+    if (content.isEmpty()) {
+      return null;
+    }
+    Collection<TLFGraph> graphCollection = Sets.newHashSet();
+    TLFGraphHead graphHead;
+    Collection<TLFVertex> vertices = Sets.newHashSet();
+    Collection<TLFEdge> edges = Sets.newHashSet();
+
+    //remove first tag so that split does not have empty first element
+    String[] contentArray = content.trim().replaceFirst("t # ", "").split("t " +
+      "# ");
+
+    for (int i = 0; i < contentArray.length; i++) {
+      vertices.addAll(getVertices(contentArray[i]));
+      edges.addAll(getEdges(contentArray[i]));
+      graphHead = getGraphHead(contentArray[i]);
+
+      graphCollection.add(new TLFGraph(graphHead, vertices,
+        edges));
+
+      vertices = Sets.newHashSet();
+      edges = Sets.newHashSet();
+    }
+    return graphCollection;
+  }
+
+  /**
+   * Reads the vertices of a complete TLF graph segment.
+   *
+   * @param content the TLF graph segment
+   * @return collection of vertices as tuples
+   */
+  private Collection<TLFVertex> getVertices(String content) {
+    Collection<TLFVertex> vertexCollection = Sets.newHashSet();
+    String[] vertex;
+    //-1 cause before e is \n
+    content = content.substring(content.indexOf("v"), content.indexOf("e") - 1);
+    String[] vertices = content.split("\n");
+
+    for (int i = 0; i < vertices.length; i++) {
+      vertex = vertices[i].split(" ");
+      vertexCollection.add(new TLFVertex(Integer.parseInt(
+        vertex[1].trim()), vertex[2].trim()));
+    }
+    return vertexCollection;
+  }
+
+  /**
+   * Reads the edges of a complete TLF graph segment.
+   *
+   * @param content the TLF graph segment
+   * @return collection of edges as tuples
+   */
+  private Collection<TLFEdge> getEdges(String content) {
+
+    Collection<TLFEdge> edgeCollection = Sets.newHashSet();
+    String[] edge;
+
+    content = content.substring(content.indexOf("e"), content.length());
+    String[] edges = content.split("\n");
+
+    for (int i = 0; i < edges.length; i++) {
+      edge = edges[i].split(" ");
+      edgeCollection.add(new TLFEdge(Integer
+        .parseInt(edge[1].trim()), Integer.parseInt(edge[2].trim()), edge[3]));
+    }
+    return edgeCollection;
+  }
+
+  /**
+   * Returns the graph head defined in content.
+   *
+   * @param content containing current graph as string
+   * @return returns the graph head defined in content
+   */
+  private TLFGraphHead getGraphHead(String content) {
+    return new TLFGraphHead(Long.parseLong(content.substring(0, 1)));
   }
 }

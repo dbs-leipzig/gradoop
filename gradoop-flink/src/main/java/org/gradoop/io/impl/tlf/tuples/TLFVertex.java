@@ -36,8 +36,7 @@ public class TLFVertex extends Tuple2<Integer, String> {
    * @param label vertex label
    */
   public TLFVertex(Integer id, String label) {
-    setId(id);
-    setLabel(label);
+    super(id, label);
   }
 
   public Integer getId() {

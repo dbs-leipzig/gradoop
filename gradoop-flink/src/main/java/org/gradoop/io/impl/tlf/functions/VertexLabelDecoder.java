@@ -37,7 +37,7 @@ import java.util.Map;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class TLFDictionaryVertexLabelToTransaction<G extends EPGMGraphHead,
+public class VertexLabelDecoder<G extends EPGMGraphHead,
   V extends EPGMVertex, E extends EPGMEdge> extends
   RichMapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>> {
   /**
@@ -48,7 +48,7 @@ public class TLFDictionaryVertexLabelToTransaction<G extends EPGMGraphHead,
    * Constant string which is added to those edges or vertices which do not
    * have an entry in the dictionary while others have one.
    */
-  private static final String NO_LABEL = " - no label";
+  private static final String EMPTY_LABEL = "";
   /**
    * Map which contains a vertex dictionary.
    */
@@ -77,7 +77,7 @@ public class TLFDictionaryVertexLabelToTransaction<G extends EPGMGraphHead,
       if (label != null) {
         vertex.setLabel(label);
       } else {
-        vertex.setLabel(vertex.getLabel() + NO_LABEL);
+        vertex.setLabel(vertex.getLabel() + EMPTY_LABEL);
       }
     }
     return graphTransaction;

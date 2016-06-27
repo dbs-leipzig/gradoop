@@ -51,14 +51,6 @@ abstract class TLFBase
    */
   private final String tlfEdgeDictionaryPath;
   /**
-   * True if tlfVertexDictionaryPath != ""
-   */
-  private boolean hasVertexDictionary;
-  /**
-   * True if tlfEdgeDictionaryPath != ""
-   */
-  private boolean hasEdgeDictionary;
-  /**
    * Dataset containing one entry which is the vertex dictionary.
    */
   private DataSet<Map<Integer, String>> vertexDictionary;
@@ -90,9 +82,6 @@ abstract class TLFBase
     this.tlfEdgeDictionaryPath = tlfEdgeDictionaryPath;
     this.config = config;
 
-    hasVertexDictionary = !tlfVertexDictionaryPath.equals("");
-    hasEdgeDictionary = !tlfEdgeDictionaryPath.equals("");
-
   }
 
   public GradoopFlinkConfig<G, V, E> getConfig() {
@@ -117,7 +106,7 @@ abstract class TLFBase
    * @return true if there is a vertex dictionary.
    */
   public boolean hasVertexDictionary() {
-    return hasVertexDictionary;
+    return !tlfVertexDictionaryPath.equals("");
   }
 
   /**
@@ -126,7 +115,7 @@ abstract class TLFBase
    * @return true if there is an edge dictionary.
    */
   public boolean hasEdgeDictionary() {
-    return hasEdgeDictionary;
+    return !tlfEdgeDictionaryPath.equals("");
   }
 
   public DataSet<Map<Integer, String>> getVertexDictionary() {

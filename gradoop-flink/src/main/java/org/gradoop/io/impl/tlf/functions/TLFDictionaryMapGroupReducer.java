@@ -18,10 +18,10 @@
 package org.gradoop.io.impl.tlf.functions;
 
 
+import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class TLFDictionaryMapGroupReducer implements
   @Override
   public void reduce(Iterable<List<String>> iterable,
     Collector<Map<String, Integer>> collector) throws Exception {
-    Map<String, Integer> newMap = new HashMap<>();
+    Map<String, Integer> newMap = Maps.newHashMap();
     int id = 0;
     for (List<String> list : iterable) {
       for (int i = 0; i < list.size(); i++) {

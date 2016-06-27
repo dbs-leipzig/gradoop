@@ -28,22 +28,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Creates a list containing all vertex labels.
+ * Creates a list containing all edge labels.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GraphTransactionToTLFDictionaryVertexMap<G extends EPGMGraphHead, V
-  extends EPGMVertex, E extends EPGMEdge> implements
-  FlatMapFunction<GraphTransaction<G, V, E>, List<String>> {
+public class EdgeLabelList
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements FlatMapFunction<GraphTransaction<G, V, E>, List<String>> {
 
   @Override
-  public void flatMap(GraphTransaction<G, V, E> graphTransaction,
-    Collector<List<String>> collector) throws Exception {
+  public void flatMap(
+    GraphTransaction<G, V, E> graphTransaction, Collector<List<String>>
+    collector) throws Exception {
     List<String> list = new LinkedList<>();
-    for (V vertex : graphTransaction.getVertices()) {
-      list.add(vertex.getLabel());
+    for (E edge : graphTransaction.getEdges()) {
+      list.add(edge.getLabel());
     }
     collector.collect(list);
   }

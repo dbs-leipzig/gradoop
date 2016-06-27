@@ -15,35 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.tlf.tuples;
-
-import org.apache.flink.api.java.tuple.Tuple1;
+package org.gradoop.io.impl.tlf.constants;
 
 /**
- * Represents a graph head used in a graph generation from TLF-files.
+ * Constants needed for Dictionary functions
  */
-public class TLFGraphHead extends Tuple1<Long> {
+public class BroadcastNames {
 
   /**
-   * default constructor
+   * String used to identify the vertex dictionary on broadcast.
    */
-  public TLFGraphHead() {
-  }
+  public static final String VERTEX_DICTIONARY = "vertexDictionary";
 
   /**
-   * valued constructor
-   * @param id graph head id
+   * String used to identify the edge dictionary on broadcast.
    */
-  public TLFGraphHead(Long id) {
-    super(id);
-  }
-
-  public Long getId() {
-    return this.f0;
-  }
-
-  public void setId(long id) {
-    this.f0 = id;
-  }
+  public static final String EDGE_DICTIONARY = "edgeDictionary";
 
 }
