@@ -235,7 +235,7 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    */
   @Override
   public void initialize(InputSplit split, TaskAttemptContext context)
-    throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
   }
 
   /**

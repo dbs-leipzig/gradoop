@@ -40,7 +40,7 @@ import java.util.Map;
 public class EdgeLabelDecoder
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends RichMapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>>
-  {
+{
   /**
    * Constant for broadcast set containing the edge dictionary.
    */

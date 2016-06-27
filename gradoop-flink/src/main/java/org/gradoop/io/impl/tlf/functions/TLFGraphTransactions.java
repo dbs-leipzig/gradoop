@@ -175,6 +175,7 @@ public class TLFGraphTransactions
    * Creates, or returns if already created, the collection of graphs as
    * tuples from content.
    *
+   * @param content string representation of a TLF graph
    * @return Collection of graphs as tuples
    */
   private Collection<TLFGraph> getGraphCollection(String content) {
