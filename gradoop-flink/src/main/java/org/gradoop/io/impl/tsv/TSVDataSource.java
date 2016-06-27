@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.io.impl.tsv;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -24,12 +41,16 @@ import org.gradoop.util.GradoopFlinkConfig;
 import java.io.IOException;
 
 /**
- * Class to create a LogicalGraph from TSV-Input source
+ * Class to create a GraphCollection from TSV-Input source
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class TSVDataSource
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends TSVBase<G,V,E>
-  implements DataSource<G,V,E> {
+  extends TSVBase<G, V, E>
+  implements DataSource<G, V, E> {
 
   /**
    * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
