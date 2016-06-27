@@ -1,0 +1,14 @@
+result[
+(a{id="0", lan="EN"})-->(b{id="1", lan="ZH"})
+(c{id="2", lan="EN"})-->(d{id="3", lan="JA"})
+(e{id="4", lan="EN"})-->(f{id="5", lan="SV"})
+(e{id="4", lan="EN"})-->(g{id="6", lan="SV"})
+(h{id="7", lan="EN"})-->(i{id="8", lan="JA"})
+(j{id="9", lan="EN"})-->(i{id="8", lan="JA"})
+(k{id="10", lan="EN"})-->(l{id="11", lan="FO"})
+(m{id="12", lan="AR"})-->(n{id="13", lan="DE"})
+(m{id="12", lan="AR"})-->(o{id="14", lan="DE"})
+(p{id="15", lan="EN"})-->(q{id="16", lan="HU"})
+(r{id="17", lan="EN"})-->(s{id="18", lan="BN"})
+(r{id="17", lan="EN"})-->(t{id="19", lan="BO"})
+]
