@@ -1,19 +1,32 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.io.impl.tsv;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.LogicalGraphTest;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
@@ -42,13 +55,10 @@ public class TSVIOTest extends GradoopFlinkTestBase {
     collection.getEdges()
       .output(new LocalCollectionOutputFormat<>(edges));
 
-
-
     getExecutionEnvironment().execute();
 
     assertEquals("Wrong graph count", 1, graphHeads.size());
     assertEquals("Wrong vertex count", 20, vertices.size());
     assertEquals("Wrong edge count", 12, edges.size());
   }
-
 }

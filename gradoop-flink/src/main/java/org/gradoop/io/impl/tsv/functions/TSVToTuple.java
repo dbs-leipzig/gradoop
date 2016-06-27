@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.io.impl.tsv.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
@@ -36,7 +53,7 @@ public class TSVToTuple implements MapFunction<String,
   /**
    * Constructor
    */
-  public TSVToTuple(){
+  public TSVToTuple() {
     this.reuse = new Tuple6<>();
   }
 
@@ -50,8 +67,7 @@ public class TSVToTuple implements MapFunction<String,
    */
   @Override
   public Tuple6<String, GradoopId, String, String, GradoopId, String> map(
-    String s)
-    throws Exception {
+    String s) throws Exception {
     String[] token = LINE_SEPARATOR_TOKEN.split(s);
     reuse.f0 = token[0];        // origin id vertex 1
     reuse.f1 = GradoopId.get(); // generated GradoopId for vertex 1
