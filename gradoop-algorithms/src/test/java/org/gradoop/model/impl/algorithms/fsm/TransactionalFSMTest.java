@@ -89,12 +89,13 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v1)-[:a]->(:A)]" +
       "g2[(v2:A)-[:a]->(v2)-[:a]->(:A)]" +
-      "g3[(:A)-[:a]->(:A)-[:a]->(:A)]" +
+      "g3[(v3:A)-[:a]->(v3)-[:a]->(:A)]" +
+      "g4[(:A)-[:a]->(:A)-[:a]->(:A)]" +
       "s1[(:A)-[:a]->(:A)]" +
       "s2[(v3:A)-[:a]->(v3)]" +
       "s3[(v4:A)-[:a]->(v4)-[:a]->(:A)]";
 
-    String[] searchSpaceVariables = {"g1", "g2", "g3"};
+    String[] searchSpaceVariables = {"g1", "g2", "g3", "g4"};
     String[] expectedResultVariables = {"s1", "s2", "s3"};
 
     for(UnaryCollectionToCollectionOperator<GraphHeadPojo, VertexPojo, EdgePojo>
