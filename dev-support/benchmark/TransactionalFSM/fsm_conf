@@ -1,0 +1,13 @@
+#TransactionalFSM Benchmark
+prefix:/usr/local/flink-1.0.0/bin/flink
+class:org.gradoop.examples.benchmark.TransactionalFSM.TransactionalFSMBenchmark
+jar:gradoop-examples.jar
+parallelism: 16
+rounds: 3
+input: /user/hduser/input/datagen/
+csv: /home/hduser/csv/fsm_csv
+ms: 0.2
+syn:
+bulk:
+
+
