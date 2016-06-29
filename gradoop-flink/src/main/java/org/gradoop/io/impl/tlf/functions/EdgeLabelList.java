@@ -25,7 +25,6 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
