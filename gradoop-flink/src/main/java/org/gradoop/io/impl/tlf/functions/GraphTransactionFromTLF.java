@@ -53,7 +53,7 @@ import java.util.Set;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class TLFGraphTransactions
+public class GraphTransactionFromTLF
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements FlatMapFunction<Tuple2<LongWritable, Text>,
   GraphTransaction<G, V, E>> {
@@ -85,7 +85,7 @@ public class TLFGraphTransactions
    * @param vertexFactory    vertex data factory
    * @param edgeFactory      edge data factory
    */
-  public TLFGraphTransactions(
+  public GraphTransactionFromTLF(
     EPGMGraphHeadFactory<G> graphHeadFactory, EPGMVertexFactory<V>
     vertexFactory, EPGMEdgeFactory<E> edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;

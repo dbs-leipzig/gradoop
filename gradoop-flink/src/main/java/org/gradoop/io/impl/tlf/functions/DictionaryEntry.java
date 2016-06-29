@@ -31,6 +31,18 @@ public class DictionaryEntry implements
   MapFunction<Tuple2<LongWritable, Text>, Tuple2<Integer, String>> {
 
   /**
+   * Tuple which is used as return variable for the mapping
+   */
+  private Tuple2<Integer, String> returnTuple;
+
+  /**
+   * Empty constructor which initializes the return tuple.
+   */
+  public DictionaryEntry() {
+    returnTuple = new Tuple2<>();
+  }
+
+  /**
    * Creates a tuple of integer and string from the input text.
    *
    * @param tuple tuple received from TextInputFormat, for each line
@@ -40,14 +52,9 @@ public class DictionaryEntry implements
   @Override
   public Tuple2<Integer, String> map(
     Tuple2<LongWritable, Text> tuple) throws Exception {
-    String label;
-    Integer id;
-    String[] stringArray;
-
-    stringArray = tuple.getField(1).toString().split(" ");
-    id = Integer.parseInt(stringArray[1]);
-    label = stringArray[0];
-
-    return new Tuple2<>(id, label);
+    String[] stringArray = tuple.getField(1).toString().split(" ");
+    returnTuple.f0 = Integer.parseInt(stringArray[1]);
+    returnTuple.f1 = stringArray[0];
+    return returnTuple;
   }
 }

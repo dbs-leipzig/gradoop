@@ -39,33 +39,6 @@ import static org.junit.Assert.assertEquals;
 
 public class TLFIOTest extends GradoopFlinkTestBase {
 
-  @Rule
-  public TemporaryFolder currentFolder;
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSource#getGraphTransactions()}
-   * @throws Exception
-   */
-  @Test
-  public void testFromTLFFile() throws Exception {
-    String tlfFile =
-      TLFIOTest.class
-        .getResource("/data/tlf/io_test.tlf")
-        .getFile();
-
-    // create datasource
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFile, config);
-    //get transactions
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
-      = dataSource.getGraphTransactions();
-
-    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
-      .count());
-
-  }
-
   /**
    * Test method for
    *
@@ -88,6 +61,8 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
     graphTransactions.getTransactions().collect().get(1);
 
+    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
+      .count());
     assertEquals("Wrong edge count", 2, graphTransaction.getEdges().size());
 
   }

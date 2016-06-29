@@ -29,7 +29,7 @@ import org.gradoop.io.impl.tlf.functions.EdgeLabelDecoder;
 import org.gradoop.io.impl.tlf.functions.DictionaryEntry;
 import org.gradoop.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
-import org.gradoop.io.impl.tlf.functions.TLFGraphTransactions;
+import org.gradoop.io.impl.tlf.functions.GraphTransactionFromTLF;
 import org.gradoop.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -111,19 +111,19 @@ public class TLFDataSource
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     // create the mapper
-    TLFGraphTransactions<G, V, E>
-      tlfCollectionToTLFGraphTransactions = new TLFGraphTransactions<G, V, E>(
+    GraphTransactionFromTLF<G, V, E>
+      graphTransactionFromTLF = new GraphTransactionFromTLF<G, V, E>(
         getConfig().getGraphHeadFactory(),
         getConfig().getVertexFactory(),
         getConfig().getEdgeFactory());
     // get the mapper's produced type
     TypeInformation<GraphTransaction<G, V, E>> typeInformation =
-      tlfCollectionToTLFGraphTransactions.getProducedType();
+      graphTransactionFromTLF.getProducedType();
 
     // map the file's content to transactions
     transactions = env.readHadoopFile(new TLFInputFormat(),
       LongWritable.class, Text.class, getTLFPath())
-        .flatMap(tlfCollectionToTLFGraphTransactions)
+        .flatMap(graphTransactionFromTLF)
         .returns(typeInformation);
 
     // map the integer valued labels to strings from dictionary

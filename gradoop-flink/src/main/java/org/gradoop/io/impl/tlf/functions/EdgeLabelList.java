@@ -17,6 +17,7 @@
 
 package org.gradoop.io.impl.tlf.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
@@ -42,7 +43,7 @@ public class EdgeLabelList
   public void flatMap(
     GraphTransaction<G, V, E> graphTransaction, Collector<List<String>>
     collector) throws Exception {
-    List<String> list = new LinkedList<>();
+    List<String> list = Lists.newLinkedList();
     for (E edge : graphTransaction.getEdges()) {
       list.add(edge.getLabel());
     }
