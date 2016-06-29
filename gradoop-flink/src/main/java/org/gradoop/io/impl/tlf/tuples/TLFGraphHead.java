@@ -15,17 +15,35 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
+package org.gradoop.io.impl.tlf.tuples;
 
-import java.io.Serializable;
+import org.apache.flink.api.java.tuple.Tuple1;
 
 /**
- * Base interface for all elements in the EPGM.
- *
- * @see EPGMGraphHead
- * @see EPGMVertex
- * @see EPGMEdge
+ * Represents a graph head used in a graph generation from TLF-files.
  */
-public interface EPGMElement
-  extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed, Serializable {
+public class TLFGraphHead extends Tuple1<Long> {
+
+  /**
+   * default constructor
+   */
+  public TLFGraphHead() {
+  }
+
+  /**
+   * valued constructor
+   * @param id graph head id
+   */
+  public TLFGraphHead(Long id) {
+    super(id);
+  }
+
+  public Long getId() {
+    return this.f0;
+  }
+
+  public void setId(long id) {
+    this.f0 = id;
+  }
+
 }

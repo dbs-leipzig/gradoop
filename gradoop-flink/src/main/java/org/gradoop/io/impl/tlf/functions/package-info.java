@@ -15,17 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
-
-import java.io.Serializable;
-
 /**
- * Base interface for all elements in the EPGM.
- *
- * @see EPGMGraphHead
- * @see EPGMVertex
- * @see EPGMEdge
+ * Contains all Flink functions related to TLF input and output.
  */
-public interface EPGMElement
-  extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed, Serializable {
-}
+package org.gradoop.io.impl.tlf.functions;
