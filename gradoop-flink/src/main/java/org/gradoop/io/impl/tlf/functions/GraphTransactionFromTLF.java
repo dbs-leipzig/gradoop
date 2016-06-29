@@ -106,7 +106,7 @@ public class GraphTransactionFromTLF
   public void flatMap(Tuple2<LongWritable, Text> inputTuple,
     Collector<GraphTransaction<G, V, E>> collector) throws Exception {
     String graphString = inputTuple.getField(1).toString();
-    Collection<TLFGraph> graphCollection = getGraphCollection(graphString);
+    Collection<TLFGraph> graphCollection = getTLFGraphCollection(graphString);
 
     Set<V> vertices = Sets.newHashSet();
     Set<E> edges = Sets.newHashSet();
@@ -172,13 +172,12 @@ public class GraphTransactionFromTLF
   }
 
   /**
-   * Creates, or returns if already created, the collection of graphs as
-   * tuples from content.
+   * Creates a collection of tlf graphs from content.
    *
    * @param content string representation of a TLF graph
    * @return Collection of graphs as tuples
    */
-  private Collection<TLFGraph> getGraphCollection(String content) {
+  private Collection<TLFGraph> getTLFGraphCollection(String content) {
     if (content.isEmpty()) {
       return null;
     }
