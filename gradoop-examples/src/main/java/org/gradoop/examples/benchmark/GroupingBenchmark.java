@@ -17,6 +17,7 @@
 
 package org.gradoop.examples.benchmark;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
@@ -36,13 +37,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
- * A dedicated program for parametrized graph grouping.
+ * A dedicated program for parametrized graph grouping benchmark.
  */
 public class GroupingBenchmark extends AbstractRunner
   implements ProgramDescription {
@@ -76,17 +76,37 @@ public class GroupingBenchmark extends AbstractRunner
    */
   public static final String OPTION_CSV_PATH = "csv";
   /**
-   * Use aggregator (min, max, count, none)
+   * Used vertex aggregator (min, max, count, none)
    */
-  private static final String OPTION_AGGREGATION = "agg";
+  private static final String OPTION_VERTEX_AGGREGATION = "vagg";
+  /**
+   * Used vertex aggregation keys
+   */
+  private static final String OPTION_VERTEX_AGGREGATION_KEYS = "vak";
+  /**
+   * Used Vertex aggregation result keys
+   */
+  private static final String OPTION_VERTEX_AGGREGATION_RESULT_KEYS = "vark";
+  /**
+   * Used Edge aggregator (min, max, count, none)
+   */
+  private static final String OPTION_EDGE_AGGREGATION = "eagg";
+  /**
+   * Used vertex aggregation keys
+   */
+  private static final String OPTION_EDGE_AGGREGATION_KEYS = "eak";
+  /**
+   * Used Vertex aggregation result keys
+   */
+  private static final String OPTION_EDGE_AGGREGATION_RESULT_KEYS = "eark";
   /**
    * Used VertexKey for grouping
    */
-  private static String VERTEX_KEYS;
+  private static String VERTEX_GROUPING_KEYS;
   /**
    * Used EdgeKey for grouping
    */
-  private static String EDGE_KEYS;
+  private static String EDGE_GROUPING_KEYS;
   /**
    * Used csv path
    */
@@ -100,6 +120,30 @@ public class GroupingBenchmark extends AbstractRunner
    */
   private static String OUTPUT_PATH;
   /**
+   * Used vertex aggregators
+   */
+  private static String VERTEX_AGGREGATORS;
+  /**
+   * Used vertex aggregator keys
+   */
+  private static String VERTEX_AGGREGATOR_KEYS;
+  /**
+   * Used vertex aggregator result keys
+   */
+  private static String VERTEX_AGGREGATOR_RESULT_KEYS;
+  /**
+   * Used edge aggregators
+   */
+  private static String EDGE_AGGREGATORS;
+  /**
+   * Used edge aggregator keys
+   */
+  private static String EDGE_AGGREGATOR_KEYS;
+  /**
+   * Used edge aggregator result keys
+   */
+  private static String EDGE_AGGREGATOR_RESULT_KEYS;
+  /**
    * Uses VertexLabels
    */
   private static boolean USE_VERTEX_LABELS;
@@ -107,6 +151,10 @@ public class GroupingBenchmark extends AbstractRunner
    * Uses EdgeLabels
    */
   private static boolean USE_EDGE_LABELS;
+  /**
+   * Token separator for input strings
+   */
+  private static final Pattern TOKEN_SEPARATOR = Pattern.compile(",");
 
 
   static {
@@ -114,18 +162,28 @@ public class GroupingBenchmark extends AbstractRunner
       "Path to vertex file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Path to write output files to");
-    OPTIONS.addOption(OPTION_VERTEX_GROUPING_KEY, "vertex-grouping-key", true,
-      "EPGMProperty key to group vertices on.");
-    OPTIONS.addOption(OPTION_EDGE_GROUPING_KEY, "edge-grouping-key", true,
-      "EPGMProperty key to group edges on.");
     OPTIONS.addOption(OPTION_USE_VERTEX_LABELS, "use-vertex-labels", false,
       "Group on vertex labels");
     OPTIONS.addOption(OPTION_USE_EDGE_LABELS, "use-edge-labels", false,
       "Group on edge labels");
+    OPTIONS.addOption(OPTION_VERTEX_GROUPING_KEY, "vertex-grouping-key", true,
+      "EPGMProperty key to group vertices on.");
+    OPTIONS.addOption(OPTION_EDGE_GROUPING_KEY, "edge-grouping-key", true,
+      "EPGMProperty key to group edges on.");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv-path", true, "Path of the " +
       "generated CSV-File");
-    OPTIONS.addOption(OPTION_AGGREGATION, "aggregation", true, "Applied " +
-      "aggregation function");
+    OPTIONS.addOption(OPTION_VERTEX_AGGREGATION, "vertex-aggregator", true,
+      "Applied aggregation function on vertices");
+    OPTIONS.addOption(OPTION_VERTEX_AGGREGATION_KEYS,
+      "vertex-aggregation-keys", true, "keys for vertex aggregation");
+    OPTIONS.addOption(OPTION_VERTEX_AGGREGATION_RESULT_KEYS,
+      "vertex-aggregation-result-keys", true, "keys for aggregation result");
+    OPTIONS.addOption(OPTION_EDGE_AGGREGATION, "edge-aggregator", true,
+      "Applied aggregation function on edges");
+    OPTIONS.addOption(OPTION_EDGE_AGGREGATION_KEYS, "edge-aggregation-keys",
+      true, "keys for edge aggregation");
+    OPTIONS.addOption(OPTION_EDGE_AGGREGATION_RESULT_KEYS,
+      "edge-aggregation-result-keys", true, "keys for aggregation result");
   }
 
   /**
@@ -140,54 +198,40 @@ public class GroupingBenchmark extends AbstractRunner
     if (cmd == null) {
       return;
     }
+    // test if minimum arguments are set
     performSanityCheck(cmd);
 
-    // read arguments from command line
-    INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
-    OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
-
-    boolean useVertexKey = cmd.hasOption(OPTION_VERTEX_GROUPING_KEY);
-    VERTEX_KEYS =
-      useVertexKey ? cmd.getOptionValue(OPTION_VERTEX_GROUPING_KEY) : null;
-    boolean useEdgeKey = cmd.hasOption(OPTION_EDGE_GROUPING_KEY);
-    EDGE_KEYS =
-      useEdgeKey ? cmd.getOptionValue(OPTION_EDGE_GROUPING_KEY) : null;
-    USE_VERTEX_LABELS = cmd.hasOption(OPTION_USE_VERTEX_LABELS);
-    USE_EDGE_LABELS = cmd.hasOption(OPTION_USE_EDGE_LABELS);
-    CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
-
-    String aggV =  cmd.getOptionValue(OPTION_AGGREGATION);
-
-    // set aggregator
-    PropertyValueAggregator agg;
-
-    switch (aggV) {
-    case "count" :
-      agg = new CountAggregator();
-      break;
-    case "max" :
-      agg = new MaxAggregator("*", "count");
-      break;
-    case "min" :
-      agg = new MinAggregator("*", "count");
-      break;
-    default:
-      agg = null;
-      break;
-    }
+    // read cmd arguments
+    readCMDArguments(cmd);
 
     // initialize EPGM database
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphDatabase =
       readLogicalGraph(INPUT_PATH, false);
 
-    VERTEX_KEYS = VERTEX_KEYS.replaceAll("\\s", "");
-    EDGE_KEYS = EDGE_KEYS.replaceAll("\\s", "");
-    List<String> vertexKeys = Arrays.asList(VERTEX_KEYS.split(","));
-    List<String> edgeKeys = Arrays.asList(EDGE_KEYS.split(","));
+    // initialize grouping keys
+    List<String> vertexKeys = getKeys(VERTEX_GROUPING_KEYS);
 
+    List<String> edgeKeys = getKeys(EDGE_GROUPING_KEYS);
+
+    // initialize aggregators
+    List<PropertyValueAggregator> vAggregators = Lists.newArrayList();
+    List<PropertyValueAggregator> eAggregators = Lists.newArrayList();
+
+    if (cmd.hasOption(OPTION_VERTEX_AGGREGATION_KEYS)) {
+      vAggregators =
+        getAggregators(VERTEX_AGGREGATORS, VERTEX_AGGREGATOR_KEYS,
+          VERTEX_AGGREGATOR_RESULT_KEYS);
+    }
+
+    if (cmd.hasOption(OPTION_EDGE_AGGREGATION_KEYS)) {
+      eAggregators =
+        getAggregators(EDGE_AGGREGATORS, EDGE_AGGREGATOR_KEYS,
+          EDGE_AGGREGATOR_RESULT_KEYS);
+    }
     // build grouping operator
     Grouping grouping = getOperator(
-      vertexKeys, edgeKeys, USE_VERTEX_LABELS, USE_EDGE_LABELS, agg);
+      vertexKeys, edgeKeys, USE_VERTEX_LABELS, USE_EDGE_LABELS, vAggregators,
+      eAggregators);
 
     // call grouping on whole database graph
     LogicalGraph summarizedGraph = graphDatabase.callForGraph(grouping);
@@ -197,44 +241,8 @@ public class GroupingBenchmark extends AbstractRunner
     } else {
       System.err.println("wrong parameter constellation");
     }
-
   }
 
-  /**
-   * Returns the grouping operator implementation based on the given strategy.
-   *
-   * @param vertexKeys            vertex property keys used for grouping
-   * @param edgeKeys              edge property keys used for grouping
-   * @param useVertexLabels       use vertex label for grouping, true/false
-   * @param useEdgeLabels         use edge label for grouping, true/false
-   * @param agg                   used aggregator
-   * @return grouping operator implementation
-   */
-  private static Grouping getOperator(List<String> vertexKeys,
-    List<String> edgeKeys, boolean useVertexLabels, boolean useEdgeLabels,
-    PropertyValueAggregator agg) {
-    Grouping.GroupingBuilder builder =
-      new Grouping.GroupingBuilder()
-        .setStrategy(GroupingStrategy.GROUP_REDUCE)
-        .useVertexLabel(useVertexLabels)
-        .useEdgeLabel(useEdgeLabels);
-
-    if (agg != null) {
-      builder
-        .addVertexAggregator(agg)
-        .addEdgeAggregator(agg);
-    }
-
-    for (String vKey : vertexKeys) {
-      builder.addVertexGroupingKey(vKey);
-    }
-
-    for (String eKey : edgeKeys) {
-      builder.addEdgeGroupingKey(eKey);
-    }
-    return builder.build();
-
-  }
 
   /**
    * Checks if the minimum of arguments is provided
@@ -253,18 +261,163 @@ public class GroupingBenchmark extends AbstractRunner
       throw new IllegalArgumentException(
         "Chose at least one vertex grouping key or use vertex labels.");
     }
-    if (cmd.hasOption(OPTION_AGGREGATION)) {
-      String aggV = cmd.getOptionValue(OPTION_AGGREGATION);
-      Set<String> validAggs = new HashSet<>(
-        Arrays.asList("min", "max", "count", "none"));
-      if (!validAggs.contains(aggV)) {
-        throw new IllegalArgumentException(
-          "Can't recognize aggregation function. Valid parameters are: " +
-            "{count, min, max, none}."
-        );
-      }
+    if (!cmd.hasOption(OPTION_VERTEX_AGGREGATION)) {
+      throw new IllegalArgumentException("Vertex aggregator need to be set! " +
+        "(max, min, count, none (or list of these)");
+    }
+    if (!cmd.hasOption(OPTION_EDGE_AGGREGATION)) {
+      throw new IllegalArgumentException("Edge aggregator need to be set! " +
+        "(max, min, count, none (or list of these)");
+    }
+
+  }
+
+  /**
+   * Reads the given arguments from command line
+   *
+   * @param cmd command line
+   */
+  private static void readCMDArguments(final CommandLine cmd) {
+    // read input output paths
+    INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
+    OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
+    CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
+
+    // read if vertex or edge keys should be used
+    boolean useVertexKey = cmd.hasOption(OPTION_VERTEX_GROUPING_KEY);
+    VERTEX_GROUPING_KEYS =
+      useVertexKey ? cmd.getOptionValue(OPTION_VERTEX_GROUPING_KEY) : null;
+    boolean useEdgeKey = cmd.hasOption(OPTION_EDGE_GROUPING_KEY);
+    EDGE_GROUPING_KEYS =
+      useEdgeKey ? cmd.getOptionValue(OPTION_EDGE_GROUPING_KEY) : null;
+
+    // read vertex and edge labels
+    USE_VERTEX_LABELS = cmd.hasOption(OPTION_USE_VERTEX_LABELS);
+    USE_EDGE_LABELS = cmd.hasOption(OPTION_USE_EDGE_LABELS);
+
+    // read aggregators
+    VERTEX_AGGREGATORS = cmd.getOptionValue(OPTION_VERTEX_AGGREGATION);
+    boolean vertexAggKeys = cmd.hasOption(OPTION_VERTEX_AGGREGATION_KEYS);
+    if (vertexAggKeys) {
+      VERTEX_AGGREGATOR_KEYS =
+        cmd.getOptionValue(OPTION_VERTEX_AGGREGATION_KEYS);
+      VERTEX_AGGREGATOR_RESULT_KEYS =
+        cmd.getOptionValue(OPTION_VERTEX_AGGREGATION_RESULT_KEYS);
+    }
+
+    EDGE_AGGREGATORS = cmd.getOptionValue(OPTION_EDGE_AGGREGATION);
+    boolean edgeAggKeys = cmd.hasOption(OPTION_EDGE_AGGREGATION_KEYS);
+    if (edgeAggKeys) {
+      EDGE_AGGREGATOR_KEYS = cmd.getOptionValue(OPTION_EDGE_AGGREGATION_KEYS);
+      EDGE_AGGREGATOR_RESULT_KEYS =
+        cmd.getOptionValue(OPTION_EDGE_AGGREGATION_RESULT_KEYS);
     }
   }
+
+  /**
+   * Method to get keys as list
+   *
+   * @param keys keys string
+   * @return keys as list
+   */
+  private static List<String> getKeys(String keys) {
+    keys = keys.replace("\\s", "");
+    return Arrays.asList(TOKEN_SEPARATOR.split(keys));
+  }
+
+  /**
+   * Method to build aggregators
+   *
+   * @param aggs        aggregators as whole string
+   * @param keys        aggregator keys as whole string
+   * @param resultKeys  aggregator result keys as whole string
+   * @return List of PropertyValueAggregators
+   */
+  private static List<PropertyValueAggregator> getAggregators(String
+    aggs, String keys, String resultKeys) {
+
+    List<PropertyValueAggregator> aggregatorList = Lists.newArrayList();
+
+    aggs = aggs.replace("\\s", "");
+    keys = keys.replace("\\s", "");
+    resultKeys = resultKeys.replace("\\s", "");
+
+
+    List<String> aggsList = Arrays.asList(TOKEN_SEPARATOR.split(aggs));
+    List<String> keyList = Arrays.asList(TOKEN_SEPARATOR.split(keys));
+    List<String> resultKeyList = Arrays.asList(TOKEN_SEPARATOR.split
+      (resultKeys));
+
+    if (!aggs.equals("none")) {
+      for (int i = 0; i < aggsList.size(); i++) {
+        switch (aggsList.get(i)) {
+        case "count" :
+          aggregatorList.add(new CountAggregator());
+          break;
+        case "max" :
+          aggregatorList.add(new MaxAggregator(keyList.get(i),
+            resultKeyList.get(i)));
+          break;
+        case "min" :
+          aggregatorList.add(new MinAggregator(keyList.get(i),
+            resultKeyList.get(i)));
+          break;
+        default:
+          aggregatorList.add(null);
+          break;
+        }
+      }
+    }
+    return aggregatorList;
+  }
+
+  /**
+   * Returns the grouping operator implementation based on the given strategy.
+   *
+   * @param vertexKeys            vertex property keys used for grouping
+   * @param edgeKeys              edge property keys used for grouping
+   * @param useVertexLabels       use vertex label for grouping, true/false
+   * @param useEdgeLabels         use edge label for grouping, true/false
+   * @param vAggs                 used vertex aggregators
+   * @param eAggs                 used edge aggregators
+   * @return grouping operator implementation
+   */
+  private static Grouping getOperator(List<String> vertexKeys,
+    List<String> edgeKeys, boolean useVertexLabels, boolean useEdgeLabels,
+    List<PropertyValueAggregator> vAggs, List<PropertyValueAggregator> eAggs) {
+
+    Grouping.GroupingBuilder builder =
+      new Grouping.GroupingBuilder()
+        .setStrategy(GroupingStrategy.GROUP_REDUCE)
+        .useVertexLabel(useVertexLabels)
+        .useEdgeLabel(useEdgeLabels);
+
+    if (vAggs.size() > 0) {
+      for (PropertyValueAggregator agg:vAggs) {
+        if (agg != null) {
+          builder.addVertexAggregator(agg);
+        }
+      }
+    }
+
+    if (eAggs.size() > 0) {
+      for (PropertyValueAggregator agg: eAggs) {
+        if (agg != null) {
+          builder.addEdgeAggregator(agg);
+        }
+      }
+    }
+
+    for (String vKey : vertexKeys) {
+      builder.addVertexGroupingKey(vKey);
+    }
+
+    for (String eKey : edgeKeys) {
+      builder.addEdgeGroupingKey(eKey);
+    }
+    return builder.build();
+  }
+
 
   /**
    * Method to create and add lines to a csv-file
@@ -272,13 +425,16 @@ public class GroupingBenchmark extends AbstractRunner
    */
   private static void writeCSV() throws IOException {
 
-    String head = String.format("%s|%s|%s|%s|%s|%s|%s%n", "Parallelism",
-      "dataset", "vertexKeys", "edgeKeys", "USE_VERTEX_LABELS",
-      "USE_EDGE_LABELS", "Runtime(s)");
+    String head = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n",
+      "Parallelism", "dataset", "vertexKeys", "edgeKeys", "USE_VERTEX_LABELS",
+      "USE_EDGE_LABELS", "Vertex Aggregators", "Vertex-Aggregator-Keys",
+      "Edge-Aggregators", "Edge-Aggregator-Keys", "Runtime(s)");
 
-    String tail = String.format("%s|%s|%s|%s|%s|%s|%s%n",
+    String tail = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n",
       getExecutionEnvironment().getParallelism(), INPUT_PATH,
-      VERTEX_KEYS, EDGE_KEYS, USE_VERTEX_LABELS, USE_EDGE_LABELS,
+      VERTEX_GROUPING_KEYS, EDGE_GROUPING_KEYS, USE_VERTEX_LABELS,
+      USE_EDGE_LABELS, VERTEX_AGGREGATORS, VERTEX_AGGREGATOR_KEYS,
+      EDGE_AGGREGATORS, EDGE_AGGREGATOR_KEYS,
       getExecutionEnvironment().getLastJobExecutionResult()
         .getNetRuntime(TimeUnit.SECONDS));
 
@@ -292,7 +448,6 @@ public class GroupingBenchmark extends AbstractRunner
       writer.close();
     }
   }
-
 
   /**
    * {@inheritDoc}

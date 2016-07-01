@@ -1,0 +1,16 @@
+#Grouping Benchmark
+prefix:/usr/local/flink-1.0.0/bin/flink
+class:org.gradoop.examples.GroupingBenchmark
+jar:gradoop-examples.jar
+parallelism: 16
+rounds: 3
+input: /user/hduser/input/1_json_merged/
+output: /user/hduser/output
+csv: /home/hduser/csv/grouping_csv
+vgk: city,age,university
+egk: since
+vagg: max
+vak: since
+vark: count(since)
+eagg: none
+#uvl, uel
