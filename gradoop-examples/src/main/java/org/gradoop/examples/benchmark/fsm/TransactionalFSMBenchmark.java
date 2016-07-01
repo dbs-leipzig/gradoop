@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.benchmark.TransactionalFSM;
+package org.gradoop.examples.benchmark.fsm;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
@@ -44,8 +44,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 
-public class TransactionalFSMBenchmark extends AbstractRunner implements
-  ProgramDescription {
+public class TransactionalFSMBenchmark
+  extends AbstractRunner
+  implements ProgramDescription {
   /**
    * Option to declare path to input graph
    */
@@ -73,15 +74,16 @@ public class TransactionalFSMBenchmark extends AbstractRunner implements
    */
   private static String inputPath;
   /**
-   * Used hdfs outputPath
+   * Minimum Supported frequency
    */
-  private static String outputPath;
-
-
   private static float minSupport;
-
+  /**
+   * Flag if the dataset is a real world dataset or not
+   */
   private static boolean synFlag;
-
+  /**
+   * Flag witch encoding algorithm should be used
+   */
   private static boolean bulkFlag;
 
 
@@ -108,6 +110,7 @@ public class TransactionalFSMBenchmark extends AbstractRunner implements
 
     // read cmd arguments
     inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
+    csvPath = cmd.getOptionValue(OPTION_CSV_PATH);
     minSupport = Float.parseFloat(cmd.getOptionValue(OPTION_MIN_SUP));
     synFlag = cmd.hasOption(OPTION_SYNTHETIC);
     bulkFlag = cmd.hasOption(OPTION_SYNTHETIC);
@@ -182,7 +185,7 @@ public class TransactionalFSMBenchmark extends AbstractRunner implements
         (TimeUnit.SECONDS));
 
     File f = new File(csvPath);
-    if (f.exists() && !f.isDirectory()){
+    if (f.exists() && !f.isDirectory()) {
       FileUtils.writeStringToFile(f, tail, true);
     } else {
       PrintWriter writer = new PrintWriter(csvPath, "UTF-8");
@@ -191,7 +194,6 @@ public class TransactionalFSMBenchmark extends AbstractRunner implements
       writer.close();
     }
   }
-
 
   @Override
   public String getDescription() {
