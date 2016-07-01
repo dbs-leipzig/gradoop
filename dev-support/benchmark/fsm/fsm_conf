@@ -1,0 +1,35 @@
+#################################################
+#Configuration file for TransactionalFSMBenchmark
+#################################################
+
+#Flink root directory
+prefix:/usr/local/flink-1.0.0/bin/flink
+
+#Benmarking class
+class:org.gradoop.examples.benchmark.TransactionalFSM.TransactionalFSMBenchmark
+
+#Used jar
+jar:gradoop-examples.jar
+
+#Parallelism parameter (can be a list e.g. 8, 16, 32, 64, 128)
+parallelism: 16
+
+#How many repeats
+rounds: 3
+
+#Input path (can be a list e.g. /user/hduser/input/input1, /user/hduser/input2)
+input: /user/hduser/input/datagen/
+
+#Output path for csv statistics file
+csv: /home/hduser/csv/fsm_csv
+
+#Minimum supported parameter for benchmark class
+ms: 0.2
+
+#Synthetic flag if used input dataset is a synthetic one
+syn:
+
+#Bulk iteration flag if fsm-bulk-iteration implementation should be used
+bulk:
+
+
