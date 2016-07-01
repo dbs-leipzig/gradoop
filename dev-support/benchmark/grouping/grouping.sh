@@ -16,7 +16,7 @@ EAK=""
 EARK=""
 
 JAR_FILE="gradoop-examples-0.2-SNAPSHOT.jar"
-CLASS="org.gradoop.examples.benchmark.GroupingBenchmark"
+CLASS="org.gradoop.examples.benchmark.grouping.GroupingBenchmark"
 
 while read LINE
 do 

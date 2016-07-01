@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.benchmark;
+package org.gradoop.examples.benchmark.grouping;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.CommandLine;
