@@ -17,10 +17,15 @@
 
 package org.gradoop.model.impl.tuples;
 
+import com.google.common.collect.Sets;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.config.GradoopConfig;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Set;
 
@@ -75,5 +80,31 @@ public class GraphTransaction
 
   public void  setEdges(Set<E> edges) {
     this.f2 = edges;
+  }
+
+  /**
+   * Returns the Flink type information of a graph transaction.
+   *
+   * @param config Gradoop configuration
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
+   * @return type information
+   */
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  TypeInformation<GraphTransaction<G, V, E>> getTypeInformation(
+    GradoopConfig<G, V, E> config) {
+
+    Set<V> vertices = Sets.newHashSetWithExpectedSize(1);
+    vertices.add(config.getVertexFactory().createVertex());
+
+    Set<E> edges = Sets.newHashSetWithExpectedSize(1);
+    edges.add(config.getEdgeFactory()
+      .createEdge(GradoopId.get(), GradoopId.get()));
+
+    return TypeExtractor.getForObject(
+      new GraphTransaction<>(
+        config.getGraphHeadFactory().createGraphHead(), vertices, edges));
   }
 }
