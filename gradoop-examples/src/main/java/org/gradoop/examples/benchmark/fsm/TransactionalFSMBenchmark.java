@@ -44,6 +44,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *
+ */
 public class TransactionalFSMBenchmark
   extends AbstractRunner
   implements ProgramDescription {
@@ -63,29 +66,30 @@ public class TransactionalFSMBenchmark
    * BulkIteration or FilterRefine flag
    */
   public static final String OPTION_GSPAN_BULK = "bulk";
-
+  /**
+   * Value of minimum supported frequency
+   */
   public static final String OPTION_MIN_SUP = "ms";
   /**
    * Used csv path
    */
-  private static String csvPath;
+  private static String CSV_PATH;
   /**
-   * Used hdfs inputPath
+   * Used hdfs INPUT_PATH
    */
-  private static String inputPath;
+  private static String INPUT_PATH;
   /**
    * Minimum Supported frequency
    */
-  private static float minSupport;
+  private static float MIN_SUPPORT;
   /**
    * Flag if the dataset is a real world dataset or not
    */
-  private static boolean synFlag;
+  private static boolean SYNTHETIC_FLAG;
   /**
    * Flag witch encoding algorithm should be used
    */
-  private static boolean bulkFlag;
-
+  private static boolean BULK_ITERATION_FLAG;
 
 
   static {
@@ -100,20 +104,27 @@ public class TransactionalFSMBenchmark
       "Support");
   }
 
+  /**
+   * Main program to run the benchmark. Arguments are the available options.
+   *
+   * @param args program arguments
+   * @throws Exception
+   */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, TransactionalFSMBenchmark.class.getName());
+    CommandLine cmd = parseArguments(args,
+      TransactionalFSMBenchmark.class.getName());
     if (cmd == null) {
       return;
     }
     performSanityCheck(cmd);
 
     // read cmd arguments
-    inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
-    csvPath = cmd.getOptionValue(OPTION_CSV_PATH);
-    minSupport = Float.parseFloat(cmd.getOptionValue(OPTION_MIN_SUP));
-    synFlag = cmd.hasOption(OPTION_SYNTHETIC);
-    bulkFlag = cmd.hasOption(OPTION_SYNTHETIC);
+    INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
+    CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
+    MIN_SUPPORT = Float.parseFloat(cmd.getOptionValue(OPTION_MIN_SUP));
+    SYNTHETIC_FLAG = cmd.hasOption(OPTION_SYNTHETIC);
+    BULK_ITERATION_FLAG = cmd.hasOption(OPTION_SYNTHETIC);
 
     // create gradoop conf
     GradoopFlinkConfig gradoopConfig =
@@ -121,7 +132,7 @@ public class TransactionalFSMBenchmark
 
     // read tlf graph
     DataSource<GraphHeadPojo, VertexPojo, EdgePojo> tlfSource =
-      new TLFDataSource<>(inputPath, gradoopConfig);
+      new TLFDataSource<>(INPUT_PATH, gradoopConfig);
 
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphs =
       tlfSource.getGraphTransactions();
@@ -132,11 +143,13 @@ public class TransactionalFSMBenchmark
     // set miner
     GSpanMiner miner;
 
-    miner = bulkFlag ? new GSpanBulkIteration() : new GSpanFilterRefine();
+    miner = BULK_ITERATION_FLAG ? new GSpanBulkIteration() :
+      new GSpanFilterRefine();
 
     // set config for synthetic or real world dataset
-    FSMConfig fsmConfig = synFlag ? new FSMConfig(minSupport, true, true) :
-      new FSMConfig(minSupport, false, false);
+    FSMConfig fsmConfig = SYNTHETIC_FLAG ?
+      new FSMConfig(MIN_SUPPORT, true, true) :
+      new FSMConfig(MIN_SUPPORT, false, false);
 
     // encode
     DataSet<GSpanGraph> gsGraph = encoder.encode(graphs, fsmConfig);
@@ -175,26 +188,29 @@ public class TransactionalFSMBenchmark
    */
   private static void writeCSV() throws IOException {
 
-    String head = String.format("%s|%s|%s|%s|%s|%s\n", "Parallelism",
-      "dataset", "synthetic", "bulk", "minSupport", "Runtime(s)");
+    String head = String.format("%s|%s|%s|%s|%s|%s%n", "Parallelism",
+      "dataset", "synthetic", "bulk", "MIN_SUPPORT", "Runtime(s)");
 
-    String tail = String.format("%s|%s|%s|%s|%s|%s\n",
-      getExecutionEnvironment().getParallelism(),
-      inputPath, synFlag,  bulkFlag, minSupport,
-      getExecutionEnvironment().getLastJobExecutionResult().getNetRuntime
-        (TimeUnit.SECONDS));
+    String tail = String.format("%s|%s|%s|%s|%s|%s%n",
+      getExecutionEnvironment().getParallelism(), INPUT_PATH, SYNTHETIC_FLAG,
+      BULK_ITERATION_FLAG, MIN_SUPPORT,
+      getExecutionEnvironment().getLastJobExecutionResult()
+        .getNetRuntime(TimeUnit.SECONDS));
 
-    File f = new File(csvPath);
+    File f = new File(CSV_PATH);
     if (f.exists() && !f.isDirectory()) {
       FileUtils.writeStringToFile(f, tail, true);
     } else {
-      PrintWriter writer = new PrintWriter(csvPath, "UTF-8");
+      PrintWriter writer = new PrintWriter(CSV_PATH, "UTF-8");
       writer.print(head);
       writer.print(tail);
       writer.close();
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getDescription() {
     return TransactionalFSMBenchmark.class.getName();

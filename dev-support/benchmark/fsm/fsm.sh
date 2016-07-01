@@ -1,14 +1,21 @@
 #!/bin/bash
 
+#Paralelism
 PARA=""
+#Rounds of each testing
 ROUNDS=""
+#CSV output path (directory must be existing)
 CSV=""
+#Minimum Support param
 MS=""
+#Flag is used dataset is a synthetic one
 SYN=""
+#Flag if bulk iteration encoding should be used
 BULK=""
-
-JAR_FILE="gradoop-examples-0.2-SNAPSHOT.jar"
-CLASS="org.gradoop.examples.benchmark.GroupingBenchmark"
+#Jar file witch should be used
+JAR_FILE=""
+*Class name of benchmark class
+CLASS=""
 
 while read LINE
 do 
@@ -19,6 +26,8 @@ KEY=${LINE[0]}
 
 case ${KEY} in
     prefix)	 PREFIX="${LINE[1]}";;
+    jar)     JAR_FILE="${LINE[1]}";;
+    class)   CLASS="${LINE[1]}";;
     parallelism) PARA="${LINE[1]}";;
     rounds)      ROUNDS=${LINE[1]};;
     input)	 IN="${LINE[1]}";;
@@ -26,10 +35,10 @@ case ${KEY} in
     csv)     CSV="${LINE[1]}";;
     ms)      MS="${LINE[1]}";;
     syn)     SYN="-syn";;
-    bulk)    BULK="-bulk";;
+    bulk)    BULK="-bulk";
 esac
 
-done < grouping_conf
+done < fsm_conf
 
 IFS=',' 
 read -ra PARA <<< "$PARA"
