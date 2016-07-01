@@ -26,7 +26,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 /**
  * Maps a GSpanGraph to its minimum DFS code.
  */
-public class MinDfsCode implements MapFunction<GSpanGraph, DFSCode> {
+public class MinDFSCode implements MapFunction<GSpanGraph, DFSCode> {
 
   /**
    * FSM configuration
@@ -38,7 +38,7 @@ public class MinDfsCode implements MapFunction<GSpanGraph, DFSCode> {
    *
    * @param fsmConfig FSM configuration
    */
-  public MinDfsCode(FSMConfig fsmConfig) {
+  public MinDFSCode(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }
 

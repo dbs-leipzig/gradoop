@@ -5,7 +5,7 @@ import org.gradoop.io.impl.tlf.TLFDataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.comparators.DFSCodeComparator;
-import org.gradoop.model.impl.algorithms.fsm.gspan.functions.MinDfsCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.functions.MinDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -35,12 +35,12 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     List<DFSCode> tGraphs = tEncoder
       .encode(dataSource.getGraphTransactions(), fsmConfig)
-      .map(new MinDfsCode(fsmConfig))
+      .map(new MinDFSCode(fsmConfig))
       .collect();
 
     List<DFSCode> cGraphs = cEncoder
       .encode(dataSource.getGraphCollection(), fsmConfig)
-      .map(new MinDfsCode(fsmConfig))
+      .map(new MinDFSCode(fsmConfig))
       .collect();
 
     DFSCodeComparator comparator =
