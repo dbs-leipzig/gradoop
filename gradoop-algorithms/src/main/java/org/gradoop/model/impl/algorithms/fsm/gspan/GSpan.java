@@ -541,8 +541,8 @@ public class GSpan {
    * @param fsmConfig FSM configuration
    * @return minimal subgraph
    */
-  public static DFSCode calculateMinDFSCode(GSpanGraph graph,
-    FSMConfig fsmConfig) {
+  public static DFSCode calculateMinDFSCode(
+    GSpanGraph graph, FSMConfig fsmConfig) {
 
     DFSCode minDfsCode = null;
 
