@@ -44,41 +44,42 @@ import java.util.regex.Pattern;
 /**
  * A dedicated program for parametrized graph grouping benchmark.
  */
-public class GroupingBenchmark extends AbstractRunner
+public class GroupingBenchmark
+  extends AbstractRunner
   implements ProgramDescription {
 
   /**
    * Option to declare path to input graph
    */
-  public static final String OPTION_INPUT_PATH = "i";
+  private static final String OPTION_INPUT_PATH = "i";
   /**
    * Option to declare path to output graph
    */
-  public static final String OPTION_OUTPUT_PATH = "o";
+  private static final String OPTION_OUTPUT_PATH = "o";
   /**
    * Vertex grouping key option
    */
-  public static final String OPTION_VERTEX_GROUPING_KEY = "vgk";
+  private static final String OPTION_VERTEX_GROUPING_KEY = "vgk";
   /**
    * Edge grouping key option
    */
-  public static final String OPTION_EDGE_GROUPING_KEY = "egk";
+  private static final String OPTION_EDGE_GROUPING_KEY = "egk";
   /**
    * Use vertex label option
    */
-  public static final String OPTION_USE_VERTEX_LABELS = "uvl";
+  private static final String OPTION_USE_VERTEX_LABELS = "uvl";
   /**
    * Use edge label option
    */
-  public static final String OPTION_USE_EDGE_LABELS = "uel";
+  private static final String OPTION_USE_EDGE_LABELS = "uel";
   /**
    * Path to CSV log file
    */
-  public static final String OPTION_CSV_PATH = "csv";
+  private static final String OPTION_CSV_PATH = "csv";
   /**
-   * Used vertex aggregator (min, max, count, none)
+   * Used vertex aggregator functions (min, max, count, none)
    */
-  private static final String OPTION_VERTEX_AGGREGATION = "vagg";
+  private static final String OPTION_VERTEX_AGGREGATION_FUNCS = "vagg";
   /**
    * Used vertex aggregation keys
    */
@@ -88,9 +89,9 @@ public class GroupingBenchmark extends AbstractRunner
    */
   private static final String OPTION_VERTEX_AGGREGATION_RESULT_KEYS = "vark";
   /**
-   * Used Edge aggregator (min, max, count, none)
+   * Used Edge aggregator functions (min, max, count, none)
    */
-  private static final String OPTION_EDGE_AGGREGATION = "eagg";
+  private static final String OPTION_EDGE_AGGREGATION_FUNCS = "eagg";
   /**
    * Used vertex aggregation keys
    */
@@ -172,13 +173,13 @@ public class GroupingBenchmark extends AbstractRunner
       "EPGMProperty key to group edges on.");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv-path", true, "Path of the " +
       "generated CSV-File");
-    OPTIONS.addOption(OPTION_VERTEX_AGGREGATION, "vertex-aggregator", true,
-      "Applied aggregation function on vertices");
+    OPTIONS.addOption(OPTION_VERTEX_AGGREGATION_FUNCS, "vertex-aggregator",
+      true, "Applied aggregation function on vertices");
     OPTIONS.addOption(OPTION_VERTEX_AGGREGATION_KEYS,
       "vertex-aggregation-keys", true, "keys for vertex aggregation");
     OPTIONS.addOption(OPTION_VERTEX_AGGREGATION_RESULT_KEYS,
       "vertex-aggregation-result-keys", true, "keys for aggregation result");
-    OPTIONS.addOption(OPTION_EDGE_AGGREGATION, "edge-aggregator", true,
+    OPTIONS.addOption(OPTION_EDGE_AGGREGATION_FUNCS, "edge-aggregator", true,
       "Applied aggregation function on edges");
     OPTIONS.addOption(OPTION_EDGE_AGGREGATION_KEYS, "edge-aggregation-keys",
       true, "keys for edge aggregation");
@@ -261,11 +262,11 @@ public class GroupingBenchmark extends AbstractRunner
       throw new IllegalArgumentException(
         "Chose at least one vertex grouping key or use vertex labels.");
     }
-    if (!cmd.hasOption(OPTION_VERTEX_AGGREGATION)) {
+    if (!cmd.hasOption(OPTION_VERTEX_AGGREGATION_FUNCS)) {
       throw new IllegalArgumentException("Vertex aggregator need to be set! " +
         "(max, min, count, none (or list of these)");
     }
-    if (!cmd.hasOption(OPTION_EDGE_AGGREGATION)) {
+    if (!cmd.hasOption(OPTION_EDGE_AGGREGATION_FUNCS)) {
       throw new IllegalArgumentException("Edge aggregator need to be set! " +
         "(max, min, count, none (or list of these)");
     }
@@ -296,7 +297,7 @@ public class GroupingBenchmark extends AbstractRunner
     USE_EDGE_LABELS = cmd.hasOption(OPTION_USE_EDGE_LABELS);
 
     // read aggregators
-    VERTEX_AGGREGATORS = cmd.getOptionValue(OPTION_VERTEX_AGGREGATION);
+    VERTEX_AGGREGATORS = cmd.getOptionValue(OPTION_VERTEX_AGGREGATION_FUNCS);
     boolean vertexAggKeys = cmd.hasOption(OPTION_VERTEX_AGGREGATION_KEYS);
     if (vertexAggKeys) {
       VERTEX_AGGREGATOR_KEYS =
@@ -305,7 +306,7 @@ public class GroupingBenchmark extends AbstractRunner
         cmd.getOptionValue(OPTION_VERTEX_AGGREGATION_RESULT_KEYS);
     }
 
-    EDGE_AGGREGATORS = cmd.getOptionValue(OPTION_EDGE_AGGREGATION);
+    EDGE_AGGREGATORS = cmd.getOptionValue(OPTION_EDGE_AGGREGATION_FUNCS);
     boolean edgeAggKeys = cmd.hasOption(OPTION_EDGE_AGGREGATION_KEYS);
     if (edgeAggKeys) {
       EDGE_AGGREGATOR_KEYS = cmd.getOptionValue(OPTION_EDGE_AGGREGATION_KEYS);

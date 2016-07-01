@@ -1,22 +1,37 @@
 #!/bin/bash
 
+#Paralelism
 PARA=""
+#Number of repeats
 ROUNDS=""
+#Output Path (hdfs)
 OUTPUT=""
+#CSV output path (directory must be existing)
 CSV=""
+#Vertex grouping keys
 VGK=""
+#Edge grouping keys
 EGK=""
+#Use vertex labels
 UVL=""
+#Use edge labels
 UEL=""
+#Vertex aggregate functions
 VAGG=""
+#Vertex aggregate keys
 VAK=""
+#Vertex aggregate result keys
 VARK=""
+#Edge aggregate functions
 EAGG=""
+#Edge aggregate keys
 EAK=""
+#Edge aggregate result keys
 EARK=""
-
-JAR_FILE="gradoop-examples-0.2-SNAPSHOT.jar"
-CLASS="org.gradoop.examples.benchmark.grouping.GroupingBenchmark"
+#Used jar file
+JAR_FILE=""
+#Used benchmarking class
+CLASS=""
 
 while read LINE
 do 
@@ -27,6 +42,8 @@ KEY=${LINE[0]}
 
 case ${KEY} in
     prefix)	 PREFIX="${LINE[1]}";;
+    class)   CLASS="${LINE[1]}";;
+    jar)     JAR_FILE="${LINE[1]}";;
     parallelism) PARA="${LINE[1]}";;
     rounds)      ROUNDS=${LINE[1]};;
     input)	 IN="${LINE[1]}";;
@@ -62,7 +79,7 @@ do
 		    echo "========="
 		    echo "INPUT: ${I}"
 		    echo "OUTPUT: ${OUT}"
-		    echo "PARALELLISM: ${P}"
+		    echo "PARALLELISM: ${P}"
  		    echo "========="
 		    /usr/local/hadoop-2.5.2/bin/hdfs dfs -rm -r ${OUT}
 		    INPUT="hdfs://${I}"
