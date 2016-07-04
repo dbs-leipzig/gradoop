@@ -1,7 +1,8 @@
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders;
 
-import org.gradoop.io.api.DataSource;
+
 import org.gradoop.io.impl.tlf.TLFDataSource;
+import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.comparators.DFSCodeComparator;
@@ -22,7 +23,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void encode() throws Exception {
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       getDataSource();
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
@@ -30,6 +31,8 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     GSpanGraphCollectionEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
       cEncoder = new GSpanGraphCollectionEncoder<>();
+
+    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
 
     FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.1f);
 
@@ -43,23 +46,32 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
       .map(new MinDFSCode(fsmConfig))
       .collect();
 
+    List<DFSCode> tlfGraphs = tlfEncoder
+      .encode(dataSource.getTLFGraphs(), fsmConfig)
+      .map(new MinDFSCode(fsmConfig))
+      .collect();
+
     DFSCodeComparator comparator =
       new DFSCodeComparator(fsmConfig.isDirected());
 
     Collections.sort(tGraphs, comparator);
     Collections.sort(cGraphs, comparator);
+    Collections.sort(tlfGraphs, comparator);
 
     Iterator<DFSCode> tIterator = tGraphs.iterator();
     Iterator<DFSCode> cIterator = cGraphs.iterator();
+    Iterator<DFSCode> cIterator2 = cGraphs.iterator();
+    Iterator<DFSCode> tlfIterator = cGraphs.iterator();
 
     while (tIterator.hasNext()) {
       assertEquals(tIterator.next(), cIterator.next());
+      assertEquals(cIterator2.next(), tlfIterator.next());
     }
   }
 
   @Test
   public void getMinFrequency() throws Exception {
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       getDataSource();
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
@@ -68,20 +80,27 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     GSpanGraphCollectionEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
       cEncoder = new GSpanGraphCollectionEncoder<>();
 
+    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
+
     FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);
+    tlfEncoder.encode(dataSource.getTLFGraphs(), fsmConfig);
 
     assertEquals(
       tEncoder.getMinFrequency().collect().get(0),
       cEncoder.getMinFrequency().collect().get(0)
     );
+    assertEquals(
+      cEncoder.getMinFrequency().collect().get(0),
+      tlfEncoder.getMinFrequency().collect().get(0)
+    );
   }
 
   @Test
   public void getVertexLabelDictionary() throws Exception {
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       getDataSource();
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
@@ -90,22 +109,28 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     GSpanGraphCollectionEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
       cEncoder = new GSpanGraphCollectionEncoder<>();
 
+    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
+
     FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);
+    tlfEncoder.encode(dataSource.getTLFGraphs(), fsmConfig);
 
     List<String> tDictionary = tEncoder
       .getVertexLabelDictionary().collect().get(0);
     List<String> cDictionary = cEncoder
       .getVertexLabelDictionary().collect().get(0);
+    List<String> tlfDictionary = (List<String>)tlfEncoder
+      .getVertexLabelDictionary().collect().get(0);
 
     assertEqualDictionaries(tDictionary, cDictionary);
+    assertEqualDictionaries(cDictionary, tlfDictionary);
   }
 
   @Test
   public void getEdgeLabelDictionary() throws Exception {
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       getDataSource();
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
@@ -114,17 +139,23 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     GSpanGraphCollectionEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
       cEncoder = new GSpanGraphCollectionEncoder<>();
 
+    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
+
     FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);
+    tlfEncoder.encode(dataSource.getTLFGraphs(), fsmConfig);
 
     List<String> tDictionary = tEncoder
       .getEdgeLabelDictionary().collect().get(0);
     List<String> cDictionary = cEncoder
       .getEdgeLabelDictionary().collect().get(0);
+    List<String> tlfDictionary = (List<String>)tlfEncoder
+      .getEdgeLabelDictionary().collect().get(0);
 
     assertEqualDictionaries(tDictionary, cDictionary);
+    assertEqualDictionaries(cDictionary, tlfDictionary);
   }
 
   private void assertEqualDictionaries(List<String> tDictionary,
@@ -139,7 +170,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     }
   }
 
-  private DataSource<GraphHeadPojo, VertexPojo, EdgePojo> getDataSource() {
+  private TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> getDataSource() {
     String tlfFile =
       GSpanEncoderTest.class.getResource("/data/tlf/graphs.tlf").getFile();
 
