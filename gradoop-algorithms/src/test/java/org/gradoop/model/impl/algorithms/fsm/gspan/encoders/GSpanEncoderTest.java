@@ -2,7 +2,6 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders;
 
 
 import org.gradoop.io.impl.tlf.TLFDataSource;
-import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.comparators.DFSCodeComparator;

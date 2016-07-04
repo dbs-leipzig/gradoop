@@ -53,7 +53,6 @@ public class TLFVertexLabelsEncoder
       getBroadcastVariable(BroadcastNames.VERTEX_DICTIONARY).get(0);
   }
 
-
   @Override
   public Collection<EdgeTripleWithStringEdgeLabel<Integer>> map(
     TLFGraph tlfGraph) throws Exception {

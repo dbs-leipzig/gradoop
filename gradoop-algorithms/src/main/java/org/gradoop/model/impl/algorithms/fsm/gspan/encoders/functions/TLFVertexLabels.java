@@ -30,8 +30,8 @@ import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 public class TLFVertexLabels implements FlatMapFunction<TLFGraph, String> {
 
   @Override
-  public void flatMap(TLFGraph tlfGraph, Collector<String> collector) throws
-    Exception {
+  public void flatMap(TLFGraph tlfGraph, Collector<String> collector)
+      throws Exception {
 
     for (TLFVertex vertex : tlfGraph.getGraphVertices()) {
       collector.collect(vertex.getLabel());

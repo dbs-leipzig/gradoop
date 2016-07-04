@@ -55,8 +55,8 @@ public class EdgeLabelsEncoder<IDT> extends RichMapFunction
 
   @Override
   public GSpanGraph map(
-    Collection<EdgeTripleWithStringEdgeLabel<IDT>> stringTriples) throws
-    Exception {
+    Collection<EdgeTripleWithStringEdgeLabel<IDT>> stringTriples)
+      throws Exception {
 
     Collection<EdgeTriple<IDT>> intTriples = Lists.newArrayList();
 
