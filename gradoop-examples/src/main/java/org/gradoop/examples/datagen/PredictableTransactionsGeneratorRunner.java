@@ -96,7 +96,7 @@ public class PredictableTransactionsGeneratorRunner
     // build result name
     String fileName;
     if (multiGraph) {
-      fileName = graphCount + "_" + graphSize + "_" + true + ".tlf";
+      fileName = graphCount + "_" + graphSize + "_" + "multigraph" + ".tlf";
     } else {
       fileName = graphCount + "_" + graphSize + ".tlf";
     }
