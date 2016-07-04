@@ -195,7 +195,7 @@ public class GroupingBenchmark
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = AbstractRunner.parseArguments(args,
+    CommandLine cmd = parseArguments(args,
       GroupingBenchmark.class.getName());
     if (cmd == null) {
       return;
@@ -208,7 +208,7 @@ public class GroupingBenchmark
 
     // initialize EPGM database
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphDatabase =
-      AbstractRunner.readLogicalGraph(INPUT_PATH, false);
+      readLogicalGraph(INPUT_PATH, false);
 
     // initialize grouping keys
     List<String> vertexKeys = getKeys(VERTEX_GROUPING_KEYS);
@@ -238,7 +238,7 @@ public class GroupingBenchmark
     // call grouping on whole database graph
     LogicalGraph summarizedGraph = graphDatabase.callForGraph(grouping);
     if (summarizedGraph != null) {
-      AbstractRunner.writeLogicalGraph(summarizedGraph, OUTPUT_PATH);
+      writeLogicalGraph(summarizedGraph, OUTPUT_PATH);
       writeCSV();
     } else {
       System.err.println("wrong parameter constellation");
@@ -433,11 +433,11 @@ public class GroupingBenchmark
       "Edge-Aggregators", "Edge-Aggregator-Keys", "Runtime(s)");
 
     String tail = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n",
-      AbstractRunner.getExecutionEnvironment().getParallelism(), INPUT_PATH,
+      getExecutionEnvironment().getParallelism(), INPUT_PATH,
       VERTEX_GROUPING_KEYS, EDGE_GROUPING_KEYS, USE_VERTEX_LABELS,
       USE_EDGE_LABELS, VERTEX_AGGREGATORS, VERTEX_AGGREGATOR_KEYS,
       EDGE_AGGREGATORS, EDGE_AGGREGATOR_KEYS,
-      AbstractRunner.getExecutionEnvironment().getLastJobExecutionResult()
+      getExecutionEnvironment().getLastJobExecutionResult()
         .getNetRuntime(TimeUnit.SECONDS));
 
     File f = new File(CSV_PATH);
