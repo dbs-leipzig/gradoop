@@ -36,6 +36,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWit
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.functions.utils.AddCount;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.count.Count;
 
 import java.util.Collection;
@@ -85,8 +86,8 @@ public class GSpanGraphTransactionsEncoder
 
     setMinFrequency(transactions, fsmConfig);
 
-    DataSet<Collection<EdgeTripleWithStringEdgeLabel>> triplesWithStringLabel =
-      encodeVertices(transactions);
+    DataSet<Collection<EdgeTripleWithStringEdgeLabel<GradoopId>>>
+      triplesWithStringLabel = encodeVertices(transactions);
 
     return encodeEdges(triplesWithStringLabel);
   }
@@ -114,10 +115,11 @@ public class GSpanGraphTransactionsEncoder
    * @return translated and filtered edges
    */
   private DataSet<GSpanGraph> encodeEdges(
-    DataSet<Collection<EdgeTripleWithStringEdgeLabel>> tripleCollections) {
+    DataSet<Collection<EdgeTripleWithStringEdgeLabel<GradoopId>>>
+      tripleCollections) {
 
     edgeLabelDictionary = tripleCollections
-      .flatMap(new EdgeLabels())
+      .flatMap(new EdgeLabels<GradoopId>())
       .map(new AddCount<String>())
       .groupBy(0)
       .sum(1)
@@ -129,7 +131,7 @@ public class GSpanGraphTransactionsEncoder
       .map(new InverseDictionary());
 
     return tripleCollections
-      .map(new EdgeLabelsEncoder())
+      .map(new EdgeLabelsEncoder<GradoopId>())
       .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
   }
 
@@ -141,8 +143,8 @@ public class GSpanGraphTransactionsEncoder
    * @param transactions input graph collection
    * @return pruned and relabelled edges
    */
-  private DataSet<Collection<EdgeTripleWithStringEdgeLabel>> encodeVertices(
-    GraphTransactions<G, V, E> transactions) {
+  private DataSet<Collection<EdgeTripleWithStringEdgeLabel<GradoopId>>>
+  encodeVertices(GraphTransactions<G, V, E> transactions) {
 
     vertexLabelDictionary = transactions
       .getTransactions()

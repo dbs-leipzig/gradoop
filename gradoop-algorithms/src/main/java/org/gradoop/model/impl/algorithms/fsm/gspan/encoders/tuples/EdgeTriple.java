@@ -17,13 +17,13 @@
 
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples;
 
-import org.gradoop.model.impl.id.GradoopId;
-
 /**
  * Describe the minimum features of an edge triple representation required to
  * build a gSpan graph representation.
+ *
+ * @param <T> Id type
  */
-public interface EdgeTriple {
+public interface  EdgeTriple<T> {
 
   /**
    * Getter.
@@ -35,7 +35,7 @@ public interface EdgeTriple {
    * Getter.
    * @return source vertex id
    */
-  GradoopId getSourceId();
+  T getSourceId();
 
   /**
    * Getter.
@@ -47,7 +47,7 @@ public interface EdgeTriple {
    * Getter.
    * @return target vertex id
    */
-  GradoopId getTargetId();
+  T getTargetId();
 
   /**
    * Getter.

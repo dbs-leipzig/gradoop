@@ -20,15 +20,11 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.gspan.GSpan;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithoutGraphId;
-
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
-  .TLFEdgeTriple;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 
 import java.util.Collection;
@@ -39,8 +35,8 @@ import java.util.Map;
  * with edges and graph in gSpan specific representation;
  * edge labels are translated from string to integer
  */
-public class TLFEdgeLabelsEncoder extends RichMapFunction
-  <Collection<TLFEdgeTriple>, GSpanGraph> {
+public class EdgeLabelsEncoderInteger extends RichMapFunction
+  <Collection<EdgeTripleWithStringEdgeLabel<Integer>>, GSpanGraph> {
 
   /**
    * edge label dictionary
@@ -57,15 +53,16 @@ public class TLFEdgeLabelsEncoder extends RichMapFunction
 
   @Override
   public GSpanGraph map(
-    Collection<TLFEdgeTriple> stringTriples) throws Exception {
+    Collection<EdgeTripleWithStringEdgeLabel<Integer>> stringTriples) throws
+    Exception {
 
-    Collection<EdgeTriple> intTriples = Lists.newArrayList();
+    Collection<EdgeTriple<Integer>> intTriples = Lists.newArrayList();
 
-    for (TLFEdgeTriple triple : stringTriples) {
+    for (EdgeTripleWithStringEdgeLabel<Integer> triple : stringTriples) {
       Integer edgeLabel = dictionary.get(triple.getEdgeLabel());
 
       if (edgeLabel != null) {
-        intTriples.add(new EdgeTripleWithoutGraphId(
+        intTriples.add(new EdgeTripleWithoutGraphId<Integer>(
           triple.getSourceId(),
           triple.getTargetId(),
           edgeLabel,
@@ -75,6 +72,6 @@ public class TLFEdgeLabelsEncoder extends RichMapFunction
       }
     }
 
-    return GSpan.createGSpanGraph(intTriples);
+    return GSpan.createGSpanGraphInteger(intTriples);
   }
 }

@@ -34,9 +34,11 @@ import java.util.Map;
  * [e0,..,eN] => G
  * with edges and graph in gSpan specific representation;
  * edge labels are translated from string to integer
+ *
+ * @param <IDT> Id type
  */
-public class EdgeLabelsEncoder extends RichMapFunction
-  <Collection<EdgeTripleWithStringEdgeLabel>, GSpanGraph> {
+public class EdgeLabelsEncoder<IDT> extends RichMapFunction
+  <Collection<EdgeTripleWithStringEdgeLabel<IDT>>, GSpanGraph> {
 
   /**
    * edge label dictionary
@@ -53,15 +55,16 @@ public class EdgeLabelsEncoder extends RichMapFunction
 
   @Override
   public GSpanGraph map(
-    Collection<EdgeTripleWithStringEdgeLabel> stringTriples) throws Exception {
+    Collection<EdgeTripleWithStringEdgeLabel<IDT>> stringTriples) throws
+    Exception {
 
-    Collection<EdgeTriple> intTriples = Lists.newArrayList();
+    Collection<EdgeTriple<IDT>> intTriples = Lists.newArrayList();
 
-    for (EdgeTripleWithStringEdgeLabel triple : stringTriples) {
+    for (EdgeTripleWithStringEdgeLabel<IDT> triple : stringTriples) {
       Integer edgeLabel = dictionary.get(triple.getEdgeLabel());
 
       if (edgeLabel != null) {
-        intTriples.add(new EdgeTripleWithoutGraphId(
+        intTriples.add(new EdgeTripleWithoutGraphId<IDT>(
           triple.getSourceId(),
           triple.getTargetId(),
           edgeLabel,
