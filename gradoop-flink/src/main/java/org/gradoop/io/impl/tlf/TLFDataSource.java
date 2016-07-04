@@ -147,4 +147,17 @@ public class TLFDataSource
     }
     return new GraphTransactions<G, V, E>(transactions, getConfig());
   }
+
+  /**
+   * Reads the input as dataset of TLFGraphs.
+   *
+   * @return tlf graphs
+   */
+  public DataSet<TLFGraph> getTLFGraphs() throws IOException {
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+
+    return env.readHadoopFile(new TLFInputFormat(),
+      LongWritable.class, Text.class, getTLFPath())
+      .map(new TLFGraphFromText());
+  }
 }
