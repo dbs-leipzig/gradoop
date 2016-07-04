@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.benchmark.grouping;
+package org.gradoop.benchmark.grouping;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.CommandLine;
@@ -195,7 +195,8 @@ public class GroupingBenchmark
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, GroupingBenchmark.class.getName());
+    CommandLine cmd = AbstractRunner.parseArguments(args,
+      GroupingBenchmark.class.getName());
     if (cmd == null) {
       return;
     }
@@ -207,7 +208,7 @@ public class GroupingBenchmark
 
     // initialize EPGM database
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphDatabase =
-      readLogicalGraph(INPUT_PATH, false);
+      AbstractRunner.readLogicalGraph(INPUT_PATH, false);
 
     // initialize grouping keys
     List<String> vertexKeys = getKeys(VERTEX_GROUPING_KEYS);
@@ -237,7 +238,7 @@ public class GroupingBenchmark
     // call grouping on whole database graph
     LogicalGraph summarizedGraph = graphDatabase.callForGraph(grouping);
     if (summarizedGraph != null) {
-      writeLogicalGraph(summarizedGraph, OUTPUT_PATH);
+      AbstractRunner.writeLogicalGraph(summarizedGraph, OUTPUT_PATH);
       writeCSV();
     } else {
       System.err.println("wrong parameter constellation");
@@ -432,11 +433,11 @@ public class GroupingBenchmark
       "Edge-Aggregators", "Edge-Aggregator-Keys", "Runtime(s)");
 
     String tail = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n",
-      getExecutionEnvironment().getParallelism(), INPUT_PATH,
+      AbstractRunner.getExecutionEnvironment().getParallelism(), INPUT_PATH,
       VERTEX_GROUPING_KEYS, EDGE_GROUPING_KEYS, USE_VERTEX_LABELS,
       USE_EDGE_LABELS, VERTEX_AGGREGATORS, VERTEX_AGGREGATOR_KEYS,
       EDGE_AGGREGATORS, EDGE_AGGREGATOR_KEYS,
-      getExecutionEnvironment().getLastJobExecutionResult()
+      AbstractRunner.getExecutionEnvironment().getLastJobExecutionResult()
         .getNetRuntime(TimeUnit.SECONDS));
 
     File f = new File(CSV_PATH);

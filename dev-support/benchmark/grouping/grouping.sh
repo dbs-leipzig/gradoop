@@ -32,6 +32,8 @@ EARK=""
 JAR_FILE=""
 #Used benchmarking class
 CLASS=""
+#HDFS prefix path
+HDFS="";
 
 while read LINE
 do 
@@ -41,7 +43,8 @@ IFS=':' read -ra LINE <<< "$LINE"
 KEY=${LINE[0]}
 
 case ${KEY} in
-    prefix)	 PREFIX="${LINE[1]}";;
+    flink)	 FLINK="${LINE[1]}";;
+    hdfs)  HDFS="${LINE[1]}";;
     class)   CLASS="${LINE[1]}";;
     jar)     JAR_FILE="${LINE[1]}";;
     parallelism) PARA="${LINE[1]}";;
@@ -61,7 +64,7 @@ case ${KEY} in
     eark)	 EARK="-eark ${LINE[1]}";
 esac
 
-done < grouping_conf
+done < grouping.conf
 
 IFS=',' 
 read -ra PARA <<< "$PARA"
@@ -81,12 +84,12 @@ do
 		    echo "OUTPUT: ${OUT}"
 		    echo "PARALLELISM: ${P}"
  		    echo "========="
-		    /usr/local/hadoop-2.5.2/bin/hdfs dfs -rm -r ${OUT}
+		    ${HDFS} dfs -rm -r ${OUT}
 		    INPUT="hdfs://${I}"
 		    OUTPUT="hdfs://${OUT}"
 		    AGGS="-vagg ${VAGG} ${VAK} ${VARK} -eagg ${EAGG} ${EAK} ${EARK}"
 		    ARGS="-csv ${CSV} -vgk ${VGK} -egk ${EGK} ${AGGS}"
-                    ${PREFIX} run -p ${P} -c ${CLASS} ${JAR_FILE} -i ${INPUT} -o ${OUTPUT} ${ARGS}
+            ${FLINK} run -p ${P} -c ${CLASS} ${JAR_FILE} -i ${INPUT} -o ${OUTPUT} ${ARGS}
 		done
 	done
 done
