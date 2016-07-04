@@ -34,8 +34,10 @@ EARK=""
 JAR_FILE=""
 #Used benchmarking class
 CLASS=""
-#HDFS prefix path
+#HDFS root directory
 HDFS="";
+#FLINK root directory
+FLINK=""
 
 while read LINE
 do 
@@ -45,8 +47,8 @@ IFS=':' read -ra LINE <<< "$LINE"
 KEY=${LINE[0]}
 
 case ${KEY} in
-    flink)	 FLINK="${LINE[1]}";;
-    hdfs)  HDFS="${LINE[1]}";;
+    flink_root)	 FLINK="${LINE[1]}";;
+    hdfs_root)  HDFS="${LINE[1]}";;
     class)   CLASS="${LINE[1]}";;
     jar)     JAR_FILE="${LINE[1]}";;
     parallelism) PARA="${LINE[1]}";;
@@ -54,8 +56,8 @@ case ${KEY} in
     input)	 I="${LINE[1]}";;
     output)	 OUT="${LINE[1]}";;
     csv)     	 CSV="${LINE[1]}";;
-    vgk)	 VGK="${LINE[1]}";;
-    egk)	 EGK="${LINE[1]}";;
+    vgk)	 VGK="-vgk ${LINE[1]}";;
+    egk)	 EGK="-egk ${LINE[1]}";;
     uvl) 	 UVL="-uvl";;
     uel)	 UEL="-uel";;
     vagg)     	 VAGG="${LINE[1]}";;
@@ -86,12 +88,12 @@ do
 		    echo "OUTPUT: ${OUT}"
 		    echo "PARALLELISM: ${P}"
  		    echo "========="
-		    ${HDFS} dfs -rm -r ${OUT}
+		    ${HDFS}/bin/hdfs dfs -rm -r ${OUT}
 		    INPUT="hdfs://${I}"
 		    OUTPUT="hdfs://${OUT}"
 		    AGGS="-vagg ${VAGG} ${VAK} ${VARK} -eagg ${EAGG} ${EAK} ${EARK}"
-		    ARGS="-csv ${CSV} -vgk ${VGK} -egk ${EGK} ${AGGS}"
-            ${FLINK} run -p ${P} -c ${CLASS} ${JAR_FILE} -i ${INPUT} -o ${OUTPUT} ${ARGS}
+		    ARGS="-csv ${CSV} ${VGK} ${EGK} ${AGGS}"
+            ${FLINK}/bin/flink run -p ${P} -c ${CLASS} ${JAR_FILE} -i ${INPUT} -o ${OUTPUT} ${ARGS}
 		done
 	done
 done
