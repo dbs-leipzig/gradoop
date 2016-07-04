@@ -5,7 +5,7 @@ PARA=""
 #Number of repeats
 ROUNDS=""
 #Input Path (will be converted to hdfs path)
-I=""
+IN=""
 #Output Path (will be converted to hdfs path)
 OUT=""
 #CSV output path (directory must be existing)
@@ -35,7 +35,7 @@ JAR_FILE=""
 #Used benchmarking class
 CLASS=""
 #HDFS root directory
-HDFS="";
+HDFS=""
 #FLINK root directory
 FLINK=""
 
@@ -52,8 +52,8 @@ case ${KEY} in
     class)   CLASS="${LINE[1]}";;
     jar)     JAR_FILE="${LINE[1]}";;
     parallelism) PARA="${LINE[1]}";;
-    rounds)      ROUNDS=${LINE[1]};;
-    input)	 I="${LINE[1]}";;
+    rounds)      ROUNDS="${LINE[1]}";;
+    input)	 IN="${LINE[1]}";;
     output)	 OUT="${LINE[1]}";;
     csv)     	 CSV="${LINE[1]}";;
     vgk)	 VGK="-vgk ${LINE[1]}";;

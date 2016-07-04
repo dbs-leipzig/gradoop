@@ -14,8 +14,12 @@ SYN=""
 BULK=""
 #Jar file witch should be used
 JAR_FILE=""
-*Class name of benchmark class
+#Class name of benchmark class
 CLASS=""
+#FLINK root directory
+FLINK=""
+#HDFS root directory
+HDFS=""
 
 while read LINE
 do 
@@ -25,11 +29,12 @@ IFS=':' read -ra LINE <<< "$LINE"
 KEY=${LINE[0]}
 
 case ${KEY} in
-    prefix)	 PREFIX="${LINE[1]}";;
+    flink_root)	 FLINK="${LINE[1]}";;
+    hdfs_root)   HDFS="${LINE[1]}";;
     jar)     JAR_FILE="${LINE[1]}";;
     class)   CLASS="${LINE[1]}";;
     parallelism) PARA="${LINE[1]}";;
-    rounds)      ROUNDS=${LINE[1]};;
+    rounds)      ROUNDS="${LINE[1]}";;
     input)	 IN="${LINE[1]}";;
     output)	 OUT="${LINE[1]}";;
     csv)     CSV="${LINE[1]}";;
@@ -38,7 +43,7 @@ case ${KEY} in
     bulk)    BULK="-bulk";
 esac
 
-done < fsm_conf
+done < fsm.conf
 
 IFS=',' 
 read -ra PARA <<< "$PARA"
@@ -57,10 +62,10 @@ do
 		    echo "INPUT: ${I}"
 		    echo "PARALLELISM: ${P}"
  		    echo "========="
-		    /usr/local/hadoop-2.5.2/bin/hdfs dfs -rm -r ${OUT}
+		    ${HDFS}/bin/hadoop dfs -rm -r ${OUT}
 		    INPUT="hdfs://${I}"
 		    ARGS="-csv ${CSV} -ms ${MS} ${SYN} ${BULK}"
-            ${PREFIX} run -p ${P} -c ${CLASS} ${JAR_FILE} -i ${INPUT} ${ARGS}
+            ${FLINK}/bin/flink run -p ${P} -c ${CLASS} ${JAR_FILE} -i ${INPUT} ${ARGS}
 		done
 	done
 done

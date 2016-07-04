@@ -17,4 +17,4 @@
 /**
  * Program to run parametrized Grouping on extended property graphs.
  */
-package org.gradoop.examples.benchmark.fsm;
+package org.gradoop.benchmark.fsm;
