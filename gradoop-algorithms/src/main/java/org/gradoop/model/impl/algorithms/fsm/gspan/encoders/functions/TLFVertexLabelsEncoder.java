@@ -26,7 +26,7 @@ import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
-  .TLFEdgeTriple;
+  .EdgeTripleWithStringEdgeLabel;
 
 import java.util.Collection;
 import java.util.Map;
@@ -34,11 +34,12 @@ import java.util.Map;
 /**
  * G => {e,..}
  * edges in gSpan specific representation;
- * vertex labels are translated from string to integer
+ * tlf vertex labels are translated from string to integer
  *
  */
 public class TLFVertexLabelsEncoder
-  extends RichMapFunction<TLFGraph, Collection<TLFEdgeTriple>> {
+  extends RichMapFunction
+    <TLFGraph, Collection<EdgeTripleWithStringEdgeLabel<Integer>>> {
 
   /**
    * vertex label dictionary
@@ -54,11 +55,11 @@ public class TLFVertexLabelsEncoder
 
 
   @Override
-  public Collection<TLFEdgeTriple> map(
+  public Collection<EdgeTripleWithStringEdgeLabel<Integer>> map(
     TLFGraph tlfGraph) throws Exception {
 
     Map<Integer, Integer> vertexLabels = Maps.newHashMap();
-    Collection<TLFEdgeTriple> triples =
+    Collection<EdgeTripleWithStringEdgeLabel<Integer>> triples =
       Lists.newArrayList();
 
     for (TLFVertex vertex : tlfGraph.getGraphVertices()) {
@@ -70,14 +71,11 @@ public class TLFVertexLabelsEncoder
     }
 
     for (TLFEdge edge : tlfGraph.getGraphEdges()) {
-
       Integer sourceLabel = vertexLabels.get(edge.getSourceId());
-
       if (sourceLabel != null) {
         Integer targetLabel = vertexLabels.get(edge.getTargetId());
-
         if (targetLabel != null) {
-          triples.add(new TLFEdgeTriple(
+          triples.add(new EdgeTripleWithStringEdgeLabel<Integer>(
             edge.getSourceId(),
             edge.getTargetId(),
             edge.getLabel(),
@@ -87,7 +85,6 @@ public class TLFVertexLabelsEncoder
         }
       }
     }
-
     return triples;
   }
 }

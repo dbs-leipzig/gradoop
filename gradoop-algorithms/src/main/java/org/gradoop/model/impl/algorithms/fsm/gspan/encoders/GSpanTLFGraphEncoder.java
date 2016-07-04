@@ -30,19 +30,16 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
   .EdgeLabels;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .EdgeLabelsEncoder;
+  .EdgeLabelsEncoderInteger;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
   .InverseDictionary;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
   .MinFrequency;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
-  .TLFEdgeLabels;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
   .TLFVertexLabels;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
   .TLFVertexLabelsEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
-  .TLFEdgeTriple;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.functions.utils.AddCount;
@@ -56,7 +53,7 @@ import java.util.Map;
 /**
  * Transactional FSM pre processing: Determine vertex and edge label
  * frequencies, create frequency based dictionaries and finally translate und
- * filter vertices and edges
+ * filter vertices and edges.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -65,12 +62,10 @@ import java.util.Map;
 public class GSpanTLFGraphEncoder
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements GSpanEncoder<DataSet<TLFGraph>> {
-
   /**
    * minimum support
    */
   private DataSet<Integer> minFrequency;
-
   /**
    * edge label dictionary
    */
@@ -81,11 +76,11 @@ public class GSpanTLFGraphEncoder
   private DataSet<List<String>> vertexLabelDictionary;
 
   /**
-   * determines edge label frequency and prunes by minimum frequency;
+   * Determines edge label frequency and prunes by minimum frequency;
    * label frequencies are used to relabel edges where higher frequency leads
-   * to a smaller numeric label;
+   * to a smaller numeric label.
    *
-   * @param graphs input graphs
+   * @param graphs input tlf graphs
    * @param fsmConfig FSM configuration
    * @return pruned and relabelled edges
    */
@@ -95,8 +90,8 @@ public class GSpanTLFGraphEncoder
 
     setMinFrequency(graphs, fsmConfig);
 
-    DataSet<Collection<TLFEdgeTriple>> triplesWithStringLabel =
-      encodeVertices(graphs);
+    DataSet<Collection<EdgeTripleWithStringEdgeLabel<Integer>>>
+      triplesWithStringLabel = encodeVertices(graphs);
 
     return encodeEdges(triplesWithStringLabel);
   }
@@ -118,16 +113,17 @@ public class GSpanTLFGraphEncoder
 
   /**
    * Determines edge label frequency, creates edge label dictionary,
-   * filters edges by label frequency and translates edge labels
+   * filters edges by label frequency and translates edge labels.
    *
    * @param tripleCollections input edges
    * @return translated and filtered edges
    */
   private DataSet<GSpanGraph> encodeEdges(
-    DataSet<Collection<TLFEdgeTriple>> tripleCollections) {
+          DataSet<Collection<EdgeTripleWithStringEdgeLabel<Integer>>>
+            tripleCollections) {
 
     edgeLabelDictionary = tripleCollections
-      .flatMap(new TLFEdgeLabels())
+      .flatMap(new EdgeLabels<Integer>())
       .map(new AddCount<String>())
       .groupBy(0)
       .sum(1)
@@ -139,20 +135,20 @@ public class GSpanTLFGraphEncoder
       .map(new InverseDictionary());
 
     return tripleCollections
-      .map(new EdgeLabelsEncoder())
+      .map(new EdgeLabelsEncoderInteger())
       .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
   }
 
   /**
-   * determines vertex label frequency and prunes by minimum frequency;
+   * Determines vertex label frequency and prunes by minimum frequency;
    * label frequencies are used to relabel vertices where higher frequency leads
-   * to a smaller numeric label;
+   * to a smaller numeric label.
    *
    * @param graphs input dataset of tlf graphs
    * @return pruned and relabelled edges
    */
-  private DataSet<Collection<TLFEdgeTriple>> encodeVertices(
-    DataSet<TLFGraph> graphs) {
+  private DataSet<Collection<EdgeTripleWithStringEdgeLabel<Integer>>>
+  encodeVertices(DataSet<TLFGraph> graphs) {
 
     vertexLabelDictionary = graphs
       .flatMap(new TLFVertexLabels())

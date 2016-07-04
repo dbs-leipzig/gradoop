@@ -43,8 +43,8 @@ import java.util.Map;
  */
 public class VertexLabelsEncoder
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends RichMapFunction
-  <GraphTransaction<G, V, E>, Collection<EdgeTripleWithStringEdgeLabel>> {
+  extends RichMapFunction<GraphTransaction<G, V, E>,
+    Collection<EdgeTripleWithStringEdgeLabel<GradoopId>>> {
 
   /**
    * vertex label dictionary
@@ -60,11 +60,11 @@ public class VertexLabelsEncoder
 
 
   @Override
-  public Collection<EdgeTripleWithStringEdgeLabel> map(
+  public Collection<EdgeTripleWithStringEdgeLabel<GradoopId>> map(
     GraphTransaction<G, V, E> transaction) throws Exception {
 
     Map<GradoopId, Integer> vertexLabels = Maps.newHashMap();
-    Collection<EdgeTripleWithStringEdgeLabel> triples =
+    Collection<EdgeTripleWithStringEdgeLabel<GradoopId>> triples =
       Lists.newArrayList();
 
     for (V vertex : transaction.getVertices()) {
@@ -83,7 +83,7 @@ public class VertexLabelsEncoder
         Integer targetLabel = vertexLabels.get(edge.getTargetId());
 
         if (targetLabel != null) {
-          triples.add(new EdgeTripleWithStringEdgeLabel(
+          triples.add(new EdgeTripleWithStringEdgeLabel<GradoopId>(
             edge.getSourceId(),
             edge.getTargetId(),
             edge.getLabel(),

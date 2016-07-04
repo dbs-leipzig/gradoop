@@ -30,7 +30,6 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSEmbedding;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanEdge;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -55,15 +54,33 @@ public class GSpan {
    *
    * @param triples the graphs edges
    * @param <T> edge triple type
+   * @param <IDT> id type
    * @return graph transaction
    */
-  public static <T extends EdgeTriple> GSpanGraph
+  public static <T extends EdgeTriple<IDT>, IDT> GSpanGraph
   createGSpanGraph(Iterable<T>  triples) {
 
     // replace GradoopIds by Integer Ids
     List<GSpanEdge> edges = Lists.newArrayList();
     List<AdjacencyList> adjacencyLists = Lists.newArrayList();
     createAdjacencyListsAndEdges(triples, adjacencyLists, edges);
+
+    return createGSpanGraph(adjacencyLists, edges);
+  }
+
+  /**
+   * Creates the gSpan mining representation of tlf graph edge triples.
+   *
+   * @param triples the graphs edges
+   * @param <T> edge triple type
+   * @return graph transaction
+   */
+  public static <T extends EdgeTriple<Integer>> GSpanGraph
+  createGSpanGraphInteger(Iterable<T>  triples) {
+
+    List<GSpanEdge> edges = Lists.newArrayList();
+    List<AdjacencyList> adjacencyLists = Lists.newArrayList();
+    createAdjacencyListsAndEdgesInteger(triples, adjacencyLists, edges);
 
     return createGSpanGraph(adjacencyLists, edges);
   }
@@ -133,20 +150,21 @@ public class GSpan {
    * @param adjacencyLists adjacency lists
    * @param edges  @return gSpan edges
    * @param <T> edge triple type
+   * @param <IDT> id type
    */
-  private static <T extends EdgeTriple> void createAdjacencyListsAndEdges(
-    final Iterable<T> iterable,
+  private static <T extends EdgeTriple<IDT>, IDT> void
+  createAdjacencyListsAndEdges(final Iterable<T> iterable,
     final List<AdjacencyList> adjacencyLists, final List<GSpanEdge> edges) {
 
-    Map<GradoopId, Integer> vertexIdMap = Maps.newHashMap();
+    Map<IDT, Integer> vertexIdMap = Maps.newHashMap();
     int vertexId = 0;
 
     int edgeId = 0;
-    for (EdgeTriple triple : iterable) {
+    for (EdgeTriple<IDT> triple : iterable) {
 
       Integer edgeLabel = triple.getEdgeLabel();
 
-      GradoopId sourceGradoopId = triple.getSourceId();
+      IDT sourceGradoopId = triple.getSourceId();
       Integer sourceId = vertexIdMap.get(sourceGradoopId);
       Integer sourceLabel = triple.getSourceLabel();
 
@@ -156,7 +174,7 @@ public class GSpan {
         vertexId++;
       }
 
-      GradoopId targetGradoopId = triple.getTargetId();
+      IDT targetGradoopId = triple.getTargetId();
       Integer targetId = vertexIdMap.get(targetGradoopId);
       Integer targetLabel = triple.getTargetLabel();
 
@@ -170,6 +188,27 @@ public class GSpan {
       addNewEdgeAndAdjacencyListEntries(edges, adjacencyLists,
         sourceId, sourceLabel, edgeId, edgeLabel, targetId, targetLabel);
 
+      edgeId++;
+    }
+  }
+
+  /**
+   * Turns edge triples into gSpan edges.
+   *
+   * @param iterable edge triples with GradoopIds
+   * @param adjacencyLists adjacency lists
+   * @param edges  @return gSpan edges
+   * @param <T> edge triple type
+   */
+  private static <T extends EdgeTriple<Integer>> void
+  createAdjacencyListsAndEdgesInteger(final Iterable<T> iterable,
+    final List<AdjacencyList> adjacencyLists, final List<GSpanEdge> edges) {
+
+    int edgeId = 0;
+    for (EdgeTriple<Integer> triple : iterable) {
+      addNewEdgeAndAdjacencyListEntries(edges, adjacencyLists,
+        triple.getSourceId(), triple.getSourceLabel(), edgeId,
+        triple.getEdgeLabel(), triple.getTargetId(), triple.getTargetLabel());
       edgeId++;
     }
   }
