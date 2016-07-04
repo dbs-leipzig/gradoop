@@ -27,10 +27,12 @@ import org.gradoop.io.api.DataSource;
 import org.gradoop.io.impl.tlf.functions.Dictionary;
 import org.gradoop.io.impl.tlf.functions.EdgeLabelDecoder;
 import org.gradoop.io.impl.tlf.functions.DictionaryEntry;
+import org.gradoop.io.impl.tlf.functions.TLFGraphFromText;
 import org.gradoop.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionFromTLF;
+import org.gradoop.io.impl.tlf.functions.GraphTransactionFromTLFGraph;
 import org.gradoop.io.impl.tlf.functions.TLFFileFormat;
+import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -107,23 +109,27 @@ public class TLFDataSource
 
   @Override
   public GraphTransactions<G, V, E> getGraphTransactions() throws IOException {
+    DataSet<TLFGraph> graphs;
     DataSet<GraphTransaction<G, V, E>> transactions;
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
+    // load tlf graphs from file
+    graphs = env.readHadoopFile(new TLFInputFormat(),
+      LongWritable.class, Text.class, getTLFPath())
+        .map(new TLFGraphFromText());
     // create the mapper
-    GraphTransactionFromTLF<G, V, E>
-      graphTransactionFromTLF = new GraphTransactionFromTLF<G, V, E>(
+    GraphTransactionFromTLFGraph<G, V, E>
+      graphTransactionFromTLFGraph = new GraphTransactionFromTLFGraph<G, V, E>(
         getConfig().getGraphHeadFactory(),
         getConfig().getVertexFactory(),
         getConfig().getEdgeFactory());
     // get the mapper's produced type
     TypeInformation<GraphTransaction<G, V, E>> typeInformation =
-      graphTransactionFromTLF.getProducedType();
+      graphTransactionFromTLFGraph.getProducedType();
 
-    // map the file's content to transactions
-    transactions = env.readHadoopFile(new TLFInputFormat(),
-      LongWritable.class, Text.class, getTLFPath())
-        .flatMap(graphTransactionFromTLF)
+    // map the tlf graph to transactions
+    transactions = graphs
+        .map(graphTransactionFromTLFGraph)
         .returns(typeInformation);
 
     // map the integer valued labels to strings from dictionary
@@ -140,5 +146,18 @@ public class TLFDataSource
           EdgeLabelDecoder.EDGE_DICTIONARY);
     }
     return new GraphTransactions<G, V, E>(transactions, getConfig());
+  }
+
+  /**
+   * Reads the input as dataset of TLFGraphs.
+   *
+   * @return tlf graphs
+   */
+  public DataSet<TLFGraph> getTLFGraphs() throws IOException {
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+
+    return env.readHadoopFile(new TLFInputFormat(),
+      LongWritable.class, Text.class, getTLFPath())
+      .map(new TLFGraphFromText());
   }
 }

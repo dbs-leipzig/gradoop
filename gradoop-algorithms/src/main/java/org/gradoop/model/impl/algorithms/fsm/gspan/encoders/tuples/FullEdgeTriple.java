@@ -25,7 +25,7 @@ import org.gradoop.model.impl.id.GradoopId;
  */
 public class FullEdgeTriple
   extends Tuple6<GradoopId, GradoopId, GradoopId, Integer, Integer, Integer>
-  implements  EdgeTriple {
+  implements  EdgeTriple<GradoopId> {
 
   /**
    * Default constructor.

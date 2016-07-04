@@ -18,25 +18,31 @@
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.Dictionary;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.EdgeLabelsEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.EdgeLabels;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.InverseDictionary;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.MinFrequency;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.VertexLabelsEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.VertexLabels;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
+  .Dictionary;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
+  .EdgeLabels;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
+  .EdgeLabelsEncoderInteger;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
+  .InverseDictionary;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
+  .MinFrequency;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
+  .TLFVertexLabels;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions
+  .TLFVertexLabelsEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.functions.utils.AddCount;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.count.Count;
 
 import java.util.Collection;
@@ -47,21 +53,19 @@ import java.util.Map;
 /**
  * Transactional FSM pre processing: Determine vertex and edge label
  * frequencies, create frequency based dictionaries and finally translate und
- * filter vertices and edges
+ * filter vertices and edges.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GSpanGraphTransactionsEncoder
+public class GSpanTLFGraphEncoder
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements GSpanEncoder<GraphTransactions<G, V, E>> {
-
+  implements GSpanEncoder<DataSet<TLFGraph>> {
   /**
    * minimum support
    */
   private DataSet<Integer> minFrequency;
-
   /**
    * edge label dictionary
    */
@@ -72,22 +76,22 @@ public class GSpanGraphTransactionsEncoder
   private DataSet<List<String>> vertexLabelDictionary;
 
   /**
-   * determines edge label frequency and prunes by minimum frequency;
+   * Determines edge label frequency and prunes by minimum frequency;
    * label frequencies are used to relabel edges where higher frequency leads
-   * to a smaller numeric label;
+   * to a smaller numeric label.
    *
-   * @param transactions input transactions
+   * @param graphs input tlf graphs
    * @param fsmConfig FSM configuration
    * @return pruned and relabelled edges
    */
   @Override
   public DataSet<GSpanGraph> encode(
-    GraphTransactions<G, V, E> transactions, FSMConfig fsmConfig) {
+    DataSet<TLFGraph> graphs, FSMConfig fsmConfig) {
 
-    setMinFrequency(transactions, fsmConfig);
+    setMinFrequency(graphs, fsmConfig);
 
-    DataSet<Collection<EdgeTripleWithStringEdgeLabel<GradoopId>>>
-      triplesWithStringLabel = encodeVertices(transactions);
+    DataSet<Collection<EdgeTripleWithStringEdgeLabel<Integer>>>
+      triplesWithStringLabel = encodeVertices(graphs);
 
     return encodeEdges(triplesWithStringLabel);
   }
@@ -96,30 +100,30 @@ public class GSpanGraphTransactionsEncoder
    * Calculates and stores minimum frequency
    * (minimum support * collection size).
    *
-   * @param transactions input graph transactions
+   * @param graphs input tlf graphs
    * @param fsmConfig FSM configuration
    */
   private void setMinFrequency(
-    GraphTransactions<G, V, E> transactions, FSMConfig fsmConfig) {
+    DataSet<TLFGraph> graphs, FSMConfig fsmConfig) {
 
     this.minFrequency = Count
-      .count(transactions.getTransactions())
+      .count(graphs)
       .map(new MinFrequency(fsmConfig));
   }
 
   /**
    * Determines edge label frequency, creates edge label dictionary,
-   * filters edges by label frequency and translates edge labels
+   * filters edges by label frequency and translates edge labels.
    *
    * @param tripleCollections input edges
    * @return translated and filtered edges
    */
   private DataSet<GSpanGraph> encodeEdges(
-    DataSet<Collection<EdgeTripleWithStringEdgeLabel<GradoopId>>>
-      tripleCollections) {
+          DataSet<Collection<EdgeTripleWithStringEdgeLabel<Integer>>>
+            tripleCollections) {
 
     edgeLabelDictionary = tripleCollections
-      .flatMap(new EdgeLabels<GradoopId>())
+      .flatMap(new EdgeLabels<Integer>())
       .map(new AddCount<String>())
       .groupBy(0)
       .sum(1)
@@ -131,24 +135,23 @@ public class GSpanGraphTransactionsEncoder
       .map(new InverseDictionary());
 
     return tripleCollections
-      .map(new EdgeLabelsEncoder<GradoopId>())
+      .map(new EdgeLabelsEncoderInteger())
       .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
   }
 
   /**
-   * determines vertex label frequency and prunes by minimum frequency;
+   * Determines vertex label frequency and prunes by minimum frequency;
    * label frequencies are used to relabel vertices where higher frequency leads
-   * to a smaller numeric label;
+   * to a smaller numeric label.
    *
-   * @param transactions input graph collection
+   * @param graphs input dataset of tlf graphs
    * @return pruned and relabelled edges
    */
-  private DataSet<Collection<EdgeTripleWithStringEdgeLabel<GradoopId>>>
-  encodeVertices(GraphTransactions<G, V, E> transactions) {
+  private DataSet<Collection<EdgeTripleWithStringEdgeLabel<Integer>>>
+  encodeVertices(DataSet<TLFGraph> graphs) {
 
-    vertexLabelDictionary = transactions
-      .getTransactions()
-      .flatMap(new VertexLabels<G, V, E>())
+    vertexLabelDictionary = graphs
+      .flatMap(new TLFVertexLabels())
       .map(new AddCount<String>())
       .groupBy(0)
       .sum(1)
@@ -159,9 +162,8 @@ public class GSpanGraphTransactionsEncoder
     DataSet<Map<String, Integer>> reverseDictionary = vertexLabelDictionary
       .map(new InverseDictionary());
 
-    return transactions
-      .getTransactions()
-      .map(new VertexLabelsEncoder<G, V, E>())
+    return graphs
+      .map(new TLFVertexLabelsEncoder())
       .withBroadcastSet(reverseDictionary, BroadcastNames.VERTEX_DICTIONARY);
   }
 

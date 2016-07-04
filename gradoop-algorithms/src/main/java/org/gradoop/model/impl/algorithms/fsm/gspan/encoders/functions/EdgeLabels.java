@@ -29,18 +29,20 @@ import java.util.Set;
  * {e0,..,eN} => le0,..,leM
  *
  * flatmaps an edge collection to distinct edge labels
+ *
+ * @param <IDT> Id type
  */
-public class EdgeLabels implements
-  FlatMapFunction<Collection<EdgeTripleWithStringEdgeLabel>, String> {
+public class EdgeLabels<IDT> implements
+  FlatMapFunction<Collection<EdgeTripleWithStringEdgeLabel<IDT>>, String> {
 
   @Override
   public void flatMap(
-    Collection<EdgeTripleWithStringEdgeLabel> edges,
+    Collection<EdgeTripleWithStringEdgeLabel<IDT>> edges,
     Collector<String> collector) throws Exception {
 
     Set<String> labels = Sets.newHashSet();
 
-    for (EdgeTripleWithStringEdgeLabel edge : edges) {
+    for (EdgeTripleWithStringEdgeLabel<IDT> edge : edges) {
       labels.add(edge.getEdgeLabel());
     }
 

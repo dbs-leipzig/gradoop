@@ -21,13 +21,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.io.impl.tlf.tuples.TLFEdge;
+import org.gradoop.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.tuples.GraphTransaction;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
+  .EdgeTripleWithStringEdgeLabel;
 
 import java.util.Collection;
 import java.util.Map;
@@ -35,16 +34,12 @@ import java.util.Map;
 /**
  * G => {e,..}
  * edges in gSpan specific representation;
- * vertex labels are translated from string to integer
+ * tlf vertex labels are translated from string to integer
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class VertexLabelsEncoder
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends RichMapFunction<GraphTransaction<G, V, E>,
-    Collection<EdgeTripleWithStringEdgeLabel<GradoopId>>> {
+public class TLFVertexLabelsEncoder
+  extends RichMapFunction
+    <TLFGraph, Collection<EdgeTripleWithStringEdgeLabel<Integer>>> {
 
   /**
    * vertex label dictionary
@@ -58,16 +53,15 @@ public class VertexLabelsEncoder
       getBroadcastVariable(BroadcastNames.VERTEX_DICTIONARY).get(0);
   }
 
-
   @Override
-  public Collection<EdgeTripleWithStringEdgeLabel<GradoopId>> map(
-    GraphTransaction<G, V, E> transaction) throws Exception {
+  public Collection<EdgeTripleWithStringEdgeLabel<Integer>> map(
+    TLFGraph tlfGraph) throws Exception {
 
-    Map<GradoopId, Integer> vertexLabels = Maps.newHashMap();
-    Collection<EdgeTripleWithStringEdgeLabel<GradoopId>> triples =
+    Map<Integer, Integer> vertexLabels = Maps.newHashMap();
+    Collection<EdgeTripleWithStringEdgeLabel<Integer>> triples =
       Lists.newArrayList();
 
-    for (V vertex : transaction.getVertices()) {
+    for (TLFVertex vertex : tlfGraph.getGraphVertices()) {
       Integer label = dictionary.get(vertex.getLabel());
 
       if (label != null) {
@@ -75,15 +69,12 @@ public class VertexLabelsEncoder
       }
     }
 
-    for (E edge : transaction.getEdges()) {
-
+    for (TLFEdge edge : tlfGraph.getGraphEdges()) {
       Integer sourceLabel = vertexLabels.get(edge.getSourceId());
-
       if (sourceLabel != null) {
         Integer targetLabel = vertexLabels.get(edge.getTargetId());
-
         if (targetLabel != null) {
-          triples.add(new EdgeTripleWithStringEdgeLabel<GradoopId>(
+          triples.add(new EdgeTripleWithStringEdgeLabel<Integer>(
             edge.getSourceId(),
             edge.getTargetId(),
             edge.getLabel(),
@@ -93,7 +84,6 @@ public class VertexLabelsEncoder
         }
       }
     }
-
     return triples;
   }
 }

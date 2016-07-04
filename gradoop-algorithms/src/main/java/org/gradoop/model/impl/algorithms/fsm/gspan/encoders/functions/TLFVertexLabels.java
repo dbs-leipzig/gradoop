@@ -15,43 +15,26 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples;
+package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 
 /**
- * Describe the minimum features of an edge triple representation required to
- * build a gSpan graph representation.
+ *  * {v0,..,vN} => lv0,..,lvM
  *
- * @param <T> Id type
+ * flatmaps a vertex collection to distinct vertex labels
  */
-public interface  EdgeTriple<T> {
+public class TLFVertexLabels implements FlatMapFunction<TLFGraph, String> {
 
-  /**
-   * Getter.
-   * @return edge label
-   */
-  Integer getEdgeLabel();
+  @Override
+  public void flatMap(TLFGraph tlfGraph, Collector<String> collector)
+      throws Exception {
 
-  /**
-   * Getter.
-   * @return source vertex id
-   */
-  T getSourceId();
-
-  /**
-   * Getter.
-   * @return source vertex label
-   */
-  Integer getSourceLabel();
-
-  /**
-   * Getter.
-   * @return target vertex id
-   */
-  T getTargetId();
-
-  /**
-   * Getter.
-   * @return target vertex label
-   */
-  Integer getTargetLabel();
+    for (TLFVertex vertex : tlfGraph.getGraphVertices()) {
+      collector.collect(vertex.getLabel());
+    }
+  }
 }
