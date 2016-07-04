@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.benchmark.grouping;
+package org.gradoop.benchmark.grouping;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.CommandLine;
@@ -195,7 +195,8 @@ public class GroupingBenchmark
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, GroupingBenchmark.class.getName());
+    CommandLine cmd = parseArguments(args,
+      GroupingBenchmark.class.getName());
     if (cmd == null) {
       return;
     }
@@ -210,9 +211,15 @@ public class GroupingBenchmark
       readLogicalGraph(INPUT_PATH, false);
 
     // initialize grouping keys
-    List<String> vertexKeys = getKeys(VERTEX_GROUPING_KEYS);
+    List<String> vertexKeys = Lists.newArrayList();
+    if (VERTEX_GROUPING_KEYS != null) {
+      vertexKeys = getKeys(VERTEX_GROUPING_KEYS);
+    }
 
-    List<String> edgeKeys = getKeys(EDGE_GROUPING_KEYS);
+    List<String> edgeKeys = Lists.newArrayList();
+    if (EDGE_GROUPING_KEYS != null) {
+      edgeKeys = getKeys(EDGE_GROUPING_KEYS);
+    }
 
     // initialize aggregators
     List<PropertyValueAggregator> vAggregators = Lists.newArrayList();
@@ -343,7 +350,6 @@ public class GroupingBenchmark
     keys = keys.replace("\\s", "");
     resultKeys = resultKeys.replace("\\s", "");
 
-
     List<String> aggsList = Arrays.asList(TOKEN_SEPARATOR.split(aggs));
     List<String> keyList = Arrays.asList(TOKEN_SEPARATOR.split(keys));
     List<String> resultKeyList = Arrays.asList(TOKEN_SEPARATOR.split
@@ -409,12 +415,16 @@ public class GroupingBenchmark
       }
     }
 
-    for (String vKey : vertexKeys) {
-      builder.addVertexGroupingKey(vKey);
+    if (vertexKeys.size() > 0) {
+      for (String vKey : vertexKeys) {
+        builder.addVertexGroupingKey(vKey);
+      }
     }
 
-    for (String eKey : edgeKeys) {
-      builder.addEdgeGroupingKey(eKey);
+    if (edgeKeys.size() > 0) {
+      for (String eKey : edgeKeys) {
+        builder.addEdgeGroupingKey(eKey);
+      }
     }
     return builder.build();
   }
