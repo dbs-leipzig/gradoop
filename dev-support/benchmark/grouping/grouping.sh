@@ -4,8 +4,10 @@
 PARA=""
 #Number of repeats
 ROUNDS=""
-#Output Path (hdfs)
-OUTPUT=""
+#Input Path (will be converted to hdfs path)
+I=""
+#Output Path (will be converted to hdfs path)
+OUT=""
 #CSV output path (directory must be existing)
 CSV=""
 #Vertex grouping keys
@@ -49,7 +51,7 @@ case ${KEY} in
     jar)     JAR_FILE="${LINE[1]}";;
     parallelism) PARA="${LINE[1]}";;
     rounds)      ROUNDS=${LINE[1]};;
-    input)	 IN="${LINE[1]}";;
+    input)	 I="${LINE[1]}";;
     output)	 OUT="${LINE[1]}";;
     csv)     	 CSV="${LINE[1]}";;
     vgk)	 VGK="${LINE[1]}";;
