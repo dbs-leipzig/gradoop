@@ -53,28 +53,27 @@ import java.util.concurrent.TimeUnit;
 public class TransactionalFSMBenchmark
   extends AbstractRunner
   implements ProgramDescription {
+
   /**
    * Option to declare path to input graph
    */
-  public static final String OPTION_INPUT_PATH = "i";
-
-  public static final String OPTION_OUTPUT_PATH = "o";
+  private static final String OPTION_INPUT_PATH = "i";
   /**
    * Path to CSV log file
    */
-  public static final String OPTION_CSV_PATH = "csv";
+  private static final String OPTION_CSV_PATH = "csv";
   /**
    * Synthetic dataset flag
    */
-  public static final String OPTION_SYNTHETIC = "syn";
+  private static final String OPTION_SYNTHETIC = "syn";
   /**
    * BulkIteration or FilterRefine flag
    */
-  public static final String OPTION_GSPAN_BULK = "bulk";
+  private static final String OPTION_GSPAN_BULK = "bulk";
   /**
    * Value of minimum supported frequency
    */
-  public static final String OPTION_MIN_SUP = "ms";
+  private static final String OPTION_MIN_SUP = "ms";
   /**
    * Used csv path
    */
@@ -83,8 +82,6 @@ public class TransactionalFSMBenchmark
    * Used hdfs INPUT_PATH
    */
   private static String INPUT_PATH;
-
-  private static String OUTPUT_PATH;
   /**
    * Minimum Supported frequency
    */
@@ -102,8 +99,6 @@ public class TransactionalFSMBenchmark
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
       "Path to graph files (hdfs)");
-    OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true, "Path to " +
-      "output file(hdfs)");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv-path", true, "Path of the " +
       "generated CSV-File");
     OPTIONS.addOption(OPTION_SYNTHETIC, "syn", false, "Boolean synthetic flag");
@@ -130,7 +125,6 @@ public class TransactionalFSMBenchmark
 
     // read cmd arguments
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
-    OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
     MIN_SUPPORT = Float.parseFloat(cmd.getOptionValue(OPTION_MIN_SUP));
     SYNTHETIC_FLAG = cmd.hasOption(OPTION_SYNTHETIC);
@@ -144,6 +138,7 @@ public class TransactionalFSMBenchmark
     TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> tlfSource =
       new TLFDataSource<>(INPUT_PATH, gradoopConfig);
 
+    // create input dataset
     DataSet<TLFGraph> graphs = tlfSource.getTLFGraphs();
 
     // set encoder
