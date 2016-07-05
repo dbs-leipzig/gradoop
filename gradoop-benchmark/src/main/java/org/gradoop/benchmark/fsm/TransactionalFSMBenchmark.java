@@ -17,7 +17,9 @@
 
 package org.gradoop.benchmark.fsm;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.datagen.transactions.predictable
@@ -47,6 +49,7 @@ import org.gradoop.util.GradoopFlinkConfig;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -60,53 +63,45 @@ public class TransactionalFSMBenchmark
    * Option to declare path to input graph
    */
   private static final String OPTION_INPUT_PATH = "i";
+
   /**
    * Path to CSV log file
    */
-  private static final String OPTION_CSV_PATH = "csv";
-  /**
-   * Synthetic dataset flag
-   */
-  private static final String OPTION_SYNTHETIC = "syn";
-  /**
-   * BulkIteration or FilterRefine flag
-   */
-  private static final String OPTION_GSPAN_BULK = "bulk";
-  /**
-   * Value of minimum supported frequency
-   */
-  private static final String OPTION_MIN_SUP = "ms";
-  /**
-   * Used csv path
-   */
-  private static String CSV_PATH;
-  /**
-   * Used hdfs INPUT_PATH
-   */
-  private static String INPUT_PATH;
-  /**
-   * Minimum Supported frequency
-   */
-  private static float MIN_SUPPORT;
-  /**
-   * Flag if the dataset is a real world dataset or not
-   */
-  private static boolean SYNTHETIC_FLAG;
-  /**
-   * Flag witch encoding algorithm should be used
-   */
-  private static boolean BULK_ITERATION_FLAG;
+  private static final String OPTION_LOG_PATH = "log";
 
+  /**
+   * directed flag
+   */
+  private static final String OPTION_DIRECTED = "d";
+
+  /**
+   * implementation parameter
+   */
+  private static final String OPTION_IMPLEMENTATION = "impl";
+
+  /**
+   * implementation parameter values
+   */
+  private static final Collection<String> VALUES_IMPLEMENTATION =
+    Lists.newArrayList(
+      "it", // iterative
+      "fr" // filter refinement
+    );
+
+  /**
+   * Minimum support threshold
+   */
+  private static final String OPTION_THRESHOLD = "t";
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
       "Path to graph files (hdfs)");
-    OPTIONS.addOption(OPTION_CSV_PATH, "csv-path", true, "Path of the " +
+    OPTIONS.addOption(OPTION_LOG_PATH, "csv-path", true, "Path of the " +
       "generated CSV-File");
-    OPTIONS.addOption(OPTION_SYNTHETIC, "syn", false, "Boolean synthetic flag");
-    OPTIONS.addOption(OPTION_GSPAN_BULK, "bulk iteration", false, "Boolean " +
+    OPTIONS.addOption(OPTION_DIRECTED, "syn", false, "Boolean synthetic flag");
+    OPTIONS.addOption(OPTION_IMPLEMENTATION, "bulk iteration", false, "Boolean " +
       "flag for BulkIteration or FilterRefine implementation");
-    OPTIONS.addOption(OPTION_MIN_SUP, "minimum-support", true, "Minimum " +
+    OPTIONS.addOption(OPTION_THRESHOLD, "minimum-support", true, "Minimum " +
       "Support");
   }
 
@@ -126,11 +121,11 @@ public class TransactionalFSMBenchmark
     performSanityCheck(cmd);
 
     // read cmd arguments
-    INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
-    CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
-    MIN_SUPPORT = Float.parseFloat(cmd.getOptionValue(OPTION_MIN_SUP));
-    SYNTHETIC_FLAG = cmd.hasOption(OPTION_SYNTHETIC);
-    BULK_ITERATION_FLAG = cmd.hasOption(OPTION_GSPAN_BULK);
+    String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
+    String logPath = cmd.getOptionValue(OPTION_LOG_PATH);
+    float threshold = Float.parseFloat(cmd.getOptionValue(OPTION_THRESHOLD));
+    boolean directed = cmd.hasOption(OPTION_DIRECTED);
+    String implementation = cmd.getOptionValue(OPTION_IMPLEMENTATION);
 
     // create gradoop conf
     GradoopFlinkConfig gradoopConfig =
@@ -138,7 +133,7 @@ public class TransactionalFSMBenchmark
 
     // read tlf graph
     TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> tlfSource =
-      new TLFDataSource<>(INPUT_PATH, gradoopConfig);
+      new TLFDataSource<>(inputPath, gradoopConfig);
 
     // create input dataset
     DataSet<TLFGraph> graphs = tlfSource.getTLFGraphs();
@@ -149,15 +144,14 @@ public class TransactionalFSMBenchmark
     // set miner
     GSpanMiner miner;
 
-    miner = BULK_ITERATION_FLAG ? new GSpanBulkIteration() :
+    miner = implementation.equals("it") ?
+      new GSpanBulkIteration() :
       new GSpanFilterRefine();
 
     miner.setExecutionEnvironment(getExecutionEnvironment());
 
     // set config for synthetic or real world dataset
-    FSMConfig fsmConfig = SYNTHETIC_FLAG ?
-      new FSMConfig(MIN_SUPPORT, true, true) :
-      new FSMConfig(MIN_SUPPORT, false, false);
+    FSMConfig fsmConfig = new FSMConfig(threshold, directed);
 
     // encode
     DataSet<GSpanGraph> gsGraph = encoder.encode(graphs, fsmConfig);
@@ -168,7 +162,7 @@ public class TransactionalFSMBenchmark
 
     long actualCount = countDataSet.count();
     long expectedCount =
-      PredictableTransactionsGenerator.containedFrequentSubgraphs(MIN_SUPPORT);
+      PredictableTransactionsGenerator.containedFrequentSubgraphs(threshold);
 
     String resultMessage = actualCount == expectedCount ?
       "met expected result" :
@@ -178,7 +172,7 @@ public class TransactionalFSMBenchmark
     System.out.println(resultMessage);
 
     // write statistics
-    writeCSV();
+    writeCSV(inputPath, directed, implementation , threshold, logPath);
   }
 
   /**
@@ -188,36 +182,58 @@ public class TransactionalFSMBenchmark
    */
   private static void performSanityCheck(final CommandLine cmd) {
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
-      throw new IllegalArgumentException("Define a graph input directory.");
+      throw new IllegalArgumentException("Input path must not be empty.");
     }
-    if (!cmd.hasOption(OPTION_CSV_PATH)) {
-      throw new IllegalArgumentException("Path to CSV-File needed");
+    if (!cmd.hasOption(OPTION_LOG_PATH)) {
+      throw new IllegalArgumentException("Log file path must not be empty.");
     }
-    if (!cmd.hasOption(OPTION_MIN_SUP)) {
-      throw new IllegalArgumentException("Minimum supp must not be null");
+    if (!cmd.hasOption(OPTION_THRESHOLD)) {
+      throw new IllegalArgumentException("Minimum support must be specified.");
+    }
+    if (cmd.hasOption(OPTION_IMPLEMENTATION) && !VALUES_IMPLEMENTATION
+      .contains(cmd.getOptionValue(OPTION_IMPLEMENTATION))) {
+      throw new IllegalArgumentException("Invalid Implementation specified. " +
+        "Must be on of " + VALUES_IMPLEMENTATION);
     }
   }
 
   /**
    * Method to create and add lines to a csv-file
    * @throws IOException
+   * @param inputPath input file path
+   * @param directed true, if directed graph
+   * @param implementation gSpan implementation
+   * @param threshold minimum support
+   * @param logPath log path
    */
-  private static void writeCSV() throws IOException {
+  private static void writeCSV(String inputPath, boolean directed,
+    String implementation, float threshold, String logPath) throws IOException {
 
-    String head = String.format("%s|%s|%s|%s|%s|%s%n", "Parallelism",
-      "dataset", "synthetic", "bulk", "MIN_SUPPORT", "Runtime(s)");
+    String head = String.format("%s|%s|%s|%s|%s|%s%n",
+      "Parallelism",
+      "Implementation",
+      "Dataset",
+      "Directed",
+      "Threshold",
+      "Runtime"
+    );
 
     String tail = String.format("%s|%s|%s|%s|%s|%s%n",
-      getExecutionEnvironment().getParallelism(), INPUT_PATH, SYNTHETIC_FLAG,
-      BULK_ITERATION_FLAG, MIN_SUPPORT,
-      getExecutionEnvironment().getLastJobExecutionResult()
-        .getNetRuntime(TimeUnit.SECONDS));
+      getExecutionEnvironment().getParallelism(),
+      implementation,
+      StringUtils.substringAfterLast(inputPath, "/"),
+      directed,
+      threshold,
+      getExecutionEnvironment()
+        .getLastJobExecutionResult()
+        .getNetRuntime(TimeUnit.SECONDS)
+    );
 
-    File f = new File(CSV_PATH);
+    File f = new File(logPath);
     if (f.exists() && !f.isDirectory()) {
       FileUtils.writeStringToFile(f, tail, true);
     } else {
-      PrintWriter writer = new PrintWriter(CSV_PATH, "UTF-8");
+      PrintWriter writer = new PrintWriter(logPath, "UTF-8");
       writer.print(head);
       writer.print(tail);
       writer.close();

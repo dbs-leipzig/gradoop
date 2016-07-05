@@ -4,14 +4,14 @@
 PARA=""
 #Rounds of each testing
 ROUNDS=""
-#CSV output path (directory must be existing)
-CSV=""
+#LOG output path (directory must be existing)
+LOG=""
 #Minimum Support param
-MS=""
-#Flag is used dataset is a synthetic one
-SYN=""
-#Flag if bulk iteration encoding should be used
-BULK=""
+T=""
+#Flag is used dataset is a dmgthetic one
+DIRECTED=""
+#Flag if iterative iteration encoding should be used
+IMPL=""
 #Jar file witch should be used
 JAR_FILE=""
 #Class name of benchmark class
@@ -37,10 +37,10 @@ case ${KEY} in
     rounds)      ROUNDS="${LINE[1]}";;
     input)	 IN="${LINE[1]}";;
     output)	 OUT="${LINE[1]}";;
-    csv)     CSV="${LINE[1]}";;
-    ms)      MS="${LINE[1]}";;
-    syn)     SYN="-syn";;
-    bulk)    BULK="-bulk";
+    log)     LOG="${LINE[1]}";;
+    t)      T="${LINE[1]}";;
+    d)     DIRECTED="-dmg";;
+    impl)    IMPL="-iterative";
 esac
 
 done < fsm.conf
@@ -64,7 +64,7 @@ do
  		    echo "========="
 		    ${HDFS}/bin/hadoop dfs -rm -r ${OUT}
 		    INPUT="hdfs://${I}"
-		    ARGS="-csv ${CSV} -ms ${MS} ${SYN} ${BULK}"
+		    ARGS="-log ${LOG} -impl ${IMPL} ${DIRECTED}  -t ${T}"
             ${FLINK}/bin/flink run -p ${P} -c ${CLASS} ${JAR_FILE} -i ${INPUT} ${ARGS}
 		done
 	done
