@@ -14,6 +14,6 @@ CLASS="org.gradoop.examples.datagen.PredictableTransactionsGeneratorRunner"
 OUTPUT="hdfs:///user/hduser/input/datagen/"
 
 #Running commands
-${FLINK}/bin/flink run -p 32 -c ${CLASS} ${JAR} -o ${OUTPUT} -gc 100 -gs 1
-${FLINK}/bin/flink run -p 32 -c ${CLASS} ${JAR} -o ${OUTPUT} -gc 1000 -gs 1
+${FLINK}/bin/flink run -p 32 -c ${CLASS} ${JAR} -o ${OUTPUT} -mg -gc 100 -gs 1
+${FLINK}/bin/flink run -p 32 -c ${CLASS} ${JAR} -o ${OUTPUT} -mg -gc 1000 -gs 1
 

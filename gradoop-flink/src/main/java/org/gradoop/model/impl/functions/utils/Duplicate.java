@@ -43,7 +43,7 @@ public class Duplicate<T> implements FlatMapFunction<T, T> {
 
   @Override
   public void flatMap(T original, Collector<T> duplicates) throws  Exception {
-    for (int i = 1; i <= multiplicand; i++ ) {
+    for (int i = 1; i <= multiplicand; i++) {
       duplicates.collect(original);
     }
   }

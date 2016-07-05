@@ -22,8 +22,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.datagen.transactions.predictable
-  .PredictableTransactionsGenerator;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.io.impl.tlf.TLFDataSource;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
@@ -53,7 +51,7 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A dedicated program for parametrized graph fsm benchmark.
+ * A dedicated program for parametrized transactional FSM benchmark.
  */
 public class TransactionalFSMBenchmark
   extends AbstractRunner
@@ -94,15 +92,16 @@ public class TransactionalFSMBenchmark
   private static final String OPTION_THRESHOLD = "t";
 
   static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
-      "Path to graph files (hdfs)");
-    OPTIONS.addOption(OPTION_LOG_PATH, "csv-path", true, "Path of the " +
-      "generated CSV-File");
-    OPTIONS.addOption(OPTION_DIRECTED, "syn", false, "Boolean synthetic flag");
-    OPTIONS.addOption(OPTION_IMPLEMENTATION, "bulk iteration", false, "Boolean " +
-      "flag for BulkIteration or FilterRefine implementation");
-    OPTIONS.addOption(OPTION_THRESHOLD, "minimum-support", true, "Minimum " +
-      "Support");
+    OPTIONS.addOption(OPTION_INPUT_PATH,
+      "input-path", true, "path of graph files (hdfs)");
+    OPTIONS.addOption(OPTION_LOG_PATH,
+      "log path", true, "path of the generated log file");
+    OPTIONS.addOption(OPTION_DIRECTED,
+      "directed", false, "Flag for directed graphs");
+    OPTIONS.addOption(OPTION_IMPLEMENTATION,
+      "implementation", true, "gSpan implementation");
+    OPTIONS.addOption(OPTION_THRESHOLD,
+      "minimum-support", true, "minimum support threshold");
   }
 
   /**
@@ -157,22 +156,12 @@ public class TransactionalFSMBenchmark
     DataSet<GSpanGraph> gsGraph = encoder.encode(graphs, fsmConfig);
 
     // mine
-    DataSet<WithCount<CompressedDFSCode>>
-      countDataSet = miner.mine(gsGraph, encoder.getMinFrequency(), fsmConfig);
-
-    long actualCount = countDataSet.count();
-    long expectedCount =
-      PredictableTransactionsGenerator.containedFrequentSubgraphs(threshold);
-
-    String resultMessage = actualCount == expectedCount ?
-      "met expected result" :
-      "expected " + expectedCount +
-        " but found " + actualCount + " frequent subgraphs";
-
-    System.out.println(resultMessage);
+    DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs =
+      miner.mine(gsGraph, encoder.getMinFrequency(), fsmConfig);
 
     // write statistics
-    writeCSV(inputPath, directed, implementation , threshold, logPath);
+    writeCSV(inputPath, directed, implementation , threshold, logPath,
+      frequentSubgraphs.count());
   }
 
   /**
@@ -205,25 +194,29 @@ public class TransactionalFSMBenchmark
    * @param implementation gSpan implementation
    * @param threshold minimum support
    * @param logPath log path
+   * @param subgraphCount subgraph count
    */
   private static void writeCSV(String inputPath, boolean directed,
-    String implementation, float threshold, String logPath) throws IOException {
+    String implementation, float threshold, String logPath, long subgraphCount)
+    throws IOException {
 
-    String head = String.format("%s|%s|%s|%s|%s|%s%n",
+    String head = String.format("%s|%s|%s|%s|%s|%s|%s%n",
       "Parallelism",
       "Implementation",
       "Dataset",
       "Directed",
       "Threshold",
+      "Subgraphs",
       "Runtime"
     );
 
-    String tail = String.format("%s|%s|%s|%s|%s|%s%n",
+    String tail = String.format("%s|%s|%s|%s|%s|%s|%s%n",
       getExecutionEnvironment().getParallelism(),
       implementation,
       StringUtils.substringAfterLast(inputPath, "/"),
       directed,
       threshold,
+      subgraphCount,
       getExecutionEnvironment()
         .getLastJobExecutionResult()
         .getNetRuntime(TimeUnit.SECONDS)

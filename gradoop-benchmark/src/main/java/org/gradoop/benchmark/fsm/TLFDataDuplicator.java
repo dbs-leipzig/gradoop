@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.benchmark.fsm;
 
 import org.apache.commons.cli.CommandLine;
@@ -15,6 +32,9 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
+/**
+ * A program to duplicate TLF data sets.
+ */
 public class TLFDataDuplicator
   extends AbstractRunner implements ProgramDescription {
 
@@ -28,6 +48,19 @@ public class TLFDataDuplicator
    */
   private static final String OPTION_MULTIPLICAND = "m";
 
+  static {
+    OPTIONS.addOption(OPTION_INPUT_PATH,
+      "input-path", true, "path of graph files (hdfs)");
+    OPTIONS.addOption(OPTION_MULTIPLICAND,
+      "multiplicand", true, "number of duplicates per graph");
+  }
+
+  /**
+   * Main program to run the duplications. Arguments are the available options.
+   *
+   * @param args program arguments
+   * @throws Exception
+   */
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args, TLFDataDuplicator.class.getName());
     if (cmd == null) {
@@ -39,10 +72,10 @@ public class TLFDataDuplicator
       GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment());
 
     String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
-    int multiplicand = Integer.valueOf(cmd.getOptionValue(OPTION_MULTIPLICAND));
+    Integer multiplicand =
+      Integer.valueOf(cmd.getOptionValue(OPTION_MULTIPLICAND));
 
     String outputPath = inputPath.replace(".tlf", "_" + multiplicand + ".tlf");
-
 
     DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(inputPath, config);
@@ -58,12 +91,14 @@ public class TLFDataDuplicator
         input
           .getTransactions()
           .flatMap(new Duplicate
-            <GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo>>
-            (multiplicand)),
+          <GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo>>
+          (multiplicand)),
         config
       );
 
     dataSink.write(output);
+
+    config.getExecutionEnvironment().execute();
   }
 
   /**

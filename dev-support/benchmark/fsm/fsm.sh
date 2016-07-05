@@ -39,8 +39,8 @@ case ${KEY} in
     output)	 OUT="${LINE[1]}";;
     log)     LOG="${LINE[1]}";;
     t)      T="${LINE[1]}";;
-    d)     DIRECTED="-dmg";;
-    impl)    IMPL="-iterative";
+    d)     DIRECTED="-d";;
+    impl)    IMPL="${LINE[1]}";
 esac
 
 done < fsm.conf
