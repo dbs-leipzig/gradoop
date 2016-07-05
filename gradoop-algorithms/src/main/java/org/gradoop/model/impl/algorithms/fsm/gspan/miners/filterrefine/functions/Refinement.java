@@ -57,6 +57,8 @@ public class Refinement implements FlatJoinFunction<
     Tuple2<Integer, Collection<GSpanGraph>> partitionGraphs,
     Collector<WithCount<CompressedDFSCode>> collector) throws Exception {
 
+    System.out.println("Refinement");
+
     Collection<CompressedDFSCode> refinementSubgraphs = partitionSubgraphs.f1;
     Collection<GSpanGraph> graphs = partitionGraphs.f1;
 

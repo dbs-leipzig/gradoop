@@ -20,6 +20,8 @@ package org.gradoop.benchmark.fsm;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.datagen.transactions.predictable
+  .PredictableTransactionsGenerator;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.io.impl.tlf.TLFDataSource;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
@@ -164,7 +166,16 @@ public class TransactionalFSMBenchmark
     DataSet<WithCount<CompressedDFSCode>>
       countDataSet = miner.mine(gsGraph, encoder.getMinFrequency(), fsmConfig);
 
-    System.out.println(countDataSet.count());
+    long actualCount = countDataSet.count();
+    long expectedCount =
+      PredictableTransactionsGenerator.containedFrequentSubgraphs(MIN_SUPPORT);
+
+    String resultMessage = actualCount == expectedCount ?
+      "met expected result" :
+      "expected " + expectedCount +
+        " but found " + actualCount + " frequent subgraphs";
+
+    System.out.println(resultMessage);
 
     // write statistics
     writeCSV();
