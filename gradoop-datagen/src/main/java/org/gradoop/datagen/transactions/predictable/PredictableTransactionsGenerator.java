@@ -100,6 +100,7 @@ public class PredictableTransactionsGenerator
    * @return number of frequent subgraphs
    */
   public static long containedFrequentSubgraphs(float threshold) {
-    return ((long) ((1.0 - threshold) / 0.1) + 2) * 702L;
+
+    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 702L;
   }
 }

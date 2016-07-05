@@ -28,7 +28,7 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
   @Test
   public void testMinersSeparately() throws Exception {
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
-      new PredictableTransactionsGenerator<>(100, 1, true, getConfig())
+      new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
         .execute();
 
     float threshold = 0.2f;
