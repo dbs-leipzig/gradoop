@@ -197,8 +197,8 @@ public class TransactionalFSMBenchmark
    * @param subgraphCount subgraph count
    */
   private static void writeCSV(String inputPath, boolean directed,
-    String implementation, float threshold, String logPath, long subgraphCount)
-    throws IOException {
+    String implementation, float threshold, String logPath, long subgraphCount
+  ) throws IOException {
 
     String head = String.format("%s|%s|%s|%s|%s|%s|%s%n",
       "Parallelism",
