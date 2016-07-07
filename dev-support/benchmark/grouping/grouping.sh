@@ -92,7 +92,7 @@ do
 		    INPUT="hdfs://${I}"
 		    OUTPUT="hdfs://${OUT}"
 		    AGGS="-vagg ${VAGG} ${VAK} ${VARK} -eagg ${EAGG} ${EAK} ${EARK}"
-		    ARGS="-csv ${CSV} ${VGK} ${EGK} ${AGGS}"
+		    ARGS="-csv ${CSV} ${UVL} ${UEL} ${VGK} ${EGK} ${AGGS}"
             ${FLINK}/bin/flink run -p ${P} -c ${CLASS} ${JAR_FILE} -i ${INPUT} -o ${OUTPUT} ${ARGS}
 		done
 	done
