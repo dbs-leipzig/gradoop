@@ -62,16 +62,15 @@ public class EdgeLabelsEncoderInteger extends RichMapFunction
       Integer edgeLabel = dictionary.get(triple.getEdgeLabel());
 
       if (edgeLabel != null) {
-        intTriples.add(new EdgeTripleWithoutGraphId<Integer>(
+        intTriples.add(new EdgeTripleWithoutGraphId<>(
           triple.getSourceId(),
           triple.getTargetId(),
           edgeLabel,
           triple.getSourceLabel(),
-          triple.getTargetLabel()
-        ));
+          triple.getTargetLabel()));
       }
     }
 
-    return GSpan.createGSpanGraphInteger(intTriples);
+    return GSpan.createGSpanGraph(intTriples);
   }
 }

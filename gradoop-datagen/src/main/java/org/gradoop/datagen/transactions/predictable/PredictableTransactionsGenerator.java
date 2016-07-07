@@ -92,4 +92,15 @@ public class PredictableTransactionsGenerator
   public String getName() {
     return this.getClass().getSimpleName();
   }
+
+  /**
+   * Returns the number of contained frequent subgraphs for a given threshold.
+   *
+   * @param threshold minimum support
+   * @return number of frequent subgraphs
+   */
+  public static long containedFrequentSubgraphs(float threshold) {
+
+    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 702L;
+  }
 }

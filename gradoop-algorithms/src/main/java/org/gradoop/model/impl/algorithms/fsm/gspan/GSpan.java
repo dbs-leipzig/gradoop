@@ -69,23 +69,6 @@ public class GSpan {
   }
 
   /**
-   * Creates the gSpan mining representation of tlf graph edge triples.
-   *
-   * @param triples the graphs edges
-   * @param <T> edge triple type
-   * @return graph transaction
-   */
-  public static <T extends EdgeTriple<Integer>> GSpanGraph
-  createGSpanGraphInteger(Iterable<T>  triples) {
-
-    List<GSpanEdge> edges = Lists.newArrayList();
-    List<AdjacencyList> adjacencyLists = Lists.newArrayList();
-    createAdjacencyListsAndEdgesInteger(triples, adjacencyLists, edges);
-
-    return createGSpanGraph(adjacencyLists, edges);
-  }
-
-  /**
    * Creates the gSpan mining representation of a graph transaction from an
    * existing encoded subgraph.
    *
@@ -188,27 +171,6 @@ public class GSpan {
       addNewEdgeAndAdjacencyListEntries(edges, adjacencyLists,
         sourceId, sourceLabel, edgeId, edgeLabel, targetId, targetLabel);
 
-      edgeId++;
-    }
-  }
-
-  /**
-   * Turns edge triples into gSpan edges.
-   *
-   * @param iterable edge triples with GradoopIds
-   * @param adjacencyLists adjacency lists
-   * @param edges  @return gSpan edges
-   * @param <T> edge triple type
-   */
-  private static <T extends EdgeTriple<Integer>> void
-  createAdjacencyListsAndEdgesInteger(final Iterable<T> iterable,
-    final List<AdjacencyList> adjacencyLists, final List<GSpanEdge> edges) {
-
-    int edgeId = 0;
-    for (EdgeTriple<Integer> triple : iterable) {
-      addNewEdgeAndAdjacencyListEntries(edges, adjacencyLists,
-        triple.getSourceId(), triple.getSourceLabel(), edgeId,
-        triple.getEdgeLabel(), triple.getTargetId(), triple.getTargetLabel());
       edgeId++;
     }
   }

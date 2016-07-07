@@ -28,10 +28,12 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
   @Test
   public void testMinersSeparately() throws Exception {
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
-      new PredictableTransactionsGenerator<>(100, 1, true, getConfig())
+      new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
         .execute();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(1.0f);
+    float threshold = 0.2f;
+
+    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(threshold);
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
       encoder = new GSpanGraphTransactionsEncoder<>();
@@ -44,7 +46,9 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
       DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs =
         miner.mine(edges, encoder.getMinFrequency(), fsmConfig);
 
-      Assert.assertEquals(702, frequentSubgraphs.count());
+      Assert.assertEquals(
+        PredictableTransactionsGenerator.containedFrequentSubgraphs(threshold),
+        frequentSubgraphs.count());
     }
   }
 
