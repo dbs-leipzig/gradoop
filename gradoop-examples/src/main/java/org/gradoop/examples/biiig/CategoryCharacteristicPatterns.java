@@ -75,14 +75,14 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
         new BusinessTransactionGraphs<GraphHeadPojo, VertexPojo, EdgePojo>());
 
     btgs = btgs.apply(new ApplyAggregation<>(
-      "isClosed", PropertyValue.create(0),
+      "isClosed",
       new IsClosedAggregateFunction
       ()));
 
     btgs = btgs.select(new IsClosedPredicateFunction());
 
     btgs = btgs.apply(new ApplyAggregation<>(
-      "soCount", PropertyValue.create(0),
+      "soCount",
       new CountSalesOrdersAggregateFunction()));
 
     out.add("Business Transaction Graphs with Measures", btgs);
@@ -175,6 +175,14 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
             }
           });
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Number getDefaultValue() {
+      return 0;
+    }
   }
 
   /**
@@ -227,6 +235,14 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
                 salesOrderCount.f0, PropertyValue.create(salesOrderCount.f1));
             }
           });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Number getDefaultValue() {
+      return 0;
     }
   }
 

@@ -34,17 +34,17 @@ public class MaxOfPropertyValues implements
   ReduceFunction<Tuple1<PropertyValue>> {
 
   /**
-   * Instance of Number, containing a user defined maximum of the same type as
+   * Instance of Number, containing a minimum of the same type as
    * the property values
    */
-  private final Number max;
+  private final Number min;
 
   /**
    * Constructor
-   * @param max maximum element
+   * @param min minimum element
    */
-  public MaxOfPropertyValues(Number max) {
-    this.max = max;
+  public MaxOfPropertyValues(Number min) {
+    this.min = min;
   }
   @Override
   public Tuple1<PropertyValue> reduce(Tuple1<PropertyValue> prop1,
@@ -62,6 +62,6 @@ public class MaxOfPropertyValues implements
       Math.max(value1.getDouble(), value2.getDouble()) :
         type.equals(BigDecimal.class) ?
       (value1.getBigDecimal().max(value2.getBigDecimal())) :
-        max));
+          min));
   }
 }

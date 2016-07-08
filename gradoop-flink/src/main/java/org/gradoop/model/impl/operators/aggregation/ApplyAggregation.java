@@ -55,11 +55,6 @@ public class ApplyAggregation<
   private final String aggregatePropertyKey;
 
   /**
-   * User-defined default property
-   */
-  private final PropertyValue defaultValue;
-
-  /**
    * User-defined aggregate function which is applied on a graph collection.
    */
   private final ApplyAggregateFunction<G, V, E> aggregateFunction;
@@ -69,14 +64,10 @@ public class ApplyAggregation<
    *
    * @param aggregatePropertyKey  property key to store aggregate value
    * @param aggregateFunction     function to compute aggregate value
-   * @param defaultValue     user-defined default value for graphs without
-   *                         vertices / edges
    */
   public ApplyAggregation(final String aggregatePropertyKey,
-    final PropertyValue defaultValue,
     final ApplyAggregateFunction<G, V, E> aggregateFunction) {
     this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
-    this.defaultValue = defaultValue;
     this.aggregateFunction = checkNotNull(aggregateFunction);
   }
 
@@ -88,7 +79,9 @@ public class ApplyAggregation<
     DataSet<G> graphHeads = collection.getGraphHeads()
       .coGroup(aggregateValues)
       .where(new Id<G>()).equalTo(0)
-      .with(new LeftOuterPropertySetter<G>(aggregatePropertyKey, defaultValue));
+      .with(new LeftOuterPropertySetter<G>(
+        aggregatePropertyKey,
+        PropertyValue.create(aggregateFunction.getDefaultValue())));
 
     return GraphCollection.fromDataSets(graphHeads,
       collection.getVertices(),

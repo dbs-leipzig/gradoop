@@ -41,7 +41,7 @@ public class Min {
    *
    * @param dataSet input dataset
    * @param propertyKey key of property
-   * @param max user defined maximum of the same type as the property value
+   * @param max maximum of the same type as the property value
    * @param <EL>     element type in input dataset
    * @return 1-element dataset with minimum of input dataset
    */
@@ -64,7 +64,7 @@ public class Min {
    *
    * @param dataSet input dataset
    * @param propertyKey key of property
-   * @param max user defined maximum, of the same type as the property value
+   * @param max maximum, of the same type as the property value
    * @param <EL>     element type in input dataset
    * @return {@code Tuple2} with group value and group minimum
    */

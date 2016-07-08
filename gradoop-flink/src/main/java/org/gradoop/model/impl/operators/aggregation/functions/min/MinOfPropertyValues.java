@@ -34,7 +34,7 @@ public class MinOfPropertyValues implements
   ReduceFunction<Tuple1<PropertyValue>> {
 
   /**
-   * Instance of Number, containing a user defined maximum of the same type as
+   * Instance of Number, containing a maximum of the same type as
    * the property values
    */
   private final Number max;

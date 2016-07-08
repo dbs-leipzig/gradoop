@@ -34,7 +34,7 @@ public class SumPropertyValuesGroups implements
     PropertyValue>> {
 
   /**
-   * Instance of Number, containing 0 of the same type as
+   * Instance of Number, containing a zero element of the same type as
    * the property values
    */
   private final Number zero;

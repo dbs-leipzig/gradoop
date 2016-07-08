@@ -34,7 +34,7 @@ public class MinOfPropertyValuesGroups implements
     PropertyValue>> {
 
   /**
-   * Instance of Number, containing maximum of the same type as
+   * Instance of Number, containing a maximum of the same type as
    * the property values
    */
   private final Number max;

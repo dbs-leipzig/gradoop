@@ -34,26 +34,26 @@ public class MaxOfPropertyValuesGroups implements
     PropertyValue>> {
 
   /**
-   * Instance of Number, containing maximum of the same type as
+   * Instance of Number, containing minimum of the same type as
    * the property values
    */
-  private final Number max;
+  private final Number min;
 
   /**
    * Constructor
-   * @param max maximum element
+   * @param min minimum element
    */
-  public MaxOfPropertyValuesGroups(Number max) {
-    this.max = max;
+  public MaxOfPropertyValuesGroups(Number min) {
+    this.min = min;
   }
 
   @Override
   public void reduce(
     Iterable<Tuple2<GradoopId, PropertyValue>> in,
     Collector<Tuple2<GradoopId, PropertyValue>> out) throws Exception {
-    Number result = max;
+    Class type = min.getClass();
+    Number result = min;
     GradoopId id = GradoopId.get();
-    Class type = result.getClass();
     for (Tuple2<GradoopId, PropertyValue> tuple : in) {
       id = tuple.f0;
       PropertyValue value = tuple.f1;
@@ -61,7 +61,7 @@ public class MaxOfPropertyValuesGroups implements
         type.equals(Integer.class) ?
           Math.max((Integer) result, value.getInt()) :
         type.equals(Long.class) ?
-          Math.max((Long) result, value.getInt()) :
+          Math.max((Long) result, value.getLong()) :
         type.equals(Float.class) ?
           Math.max((Float) result, value.getFloat()) :
         type.equals(Double.class) ?

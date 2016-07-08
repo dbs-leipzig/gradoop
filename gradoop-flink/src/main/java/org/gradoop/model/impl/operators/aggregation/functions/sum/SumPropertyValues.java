@@ -34,8 +34,8 @@ public class SumPropertyValues implements
   ReduceFunction<Tuple1<PropertyValue>> {
 
   /**
-   * Instance of Number, containing a user defined zero element of the same
-   * type as the property values
+   * Instance of Number, containing a zero element of the same type as
+   * the property values
    */
   private final Number zero;
 
