@@ -75,4 +75,13 @@ public class EdgeCount
           .flatMap(new ExpandGraphsToIds<E>())
     ).map(new GroupCountToPropertyValue());
   }
+
+  /**
+   * Return default property value, in this case 0L.
+   * @return default property value of this aggregation function
+   */
+  @Override
+  public Number getDefaultValue() {
+    return 0L;
+  }
 }

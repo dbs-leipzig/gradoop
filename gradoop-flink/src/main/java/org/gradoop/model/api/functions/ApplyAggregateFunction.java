@@ -48,4 +48,11 @@ public interface ApplyAggregateFunction
    */
   DataSet<Tuple2<GradoopId, PropertyValue>> execute(
     GraphCollection<G, V, E> collection);
+
+  /**
+   * Return the default value that will be used when a graph has no vertices
+   * or edges with the specified property.
+   * @return default value
+   */
+  Number getDefaultValue();
 }

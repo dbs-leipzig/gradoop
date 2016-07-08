@@ -73,7 +73,8 @@ public class Sum {
     DataSet<EL> dataSet,
     String propertyKey,
     Number zero) {
-    return dataSet.flatMap(new GraphIdsWithPropertyValue<EL>(propertyKey))
+    return dataSet
+      .flatMap(new GraphIdsWithPropertyValue<EL>(propertyKey))
       .groupBy(0)
       .reduceGroup(new SumPropertyValuesGroups(zero));
   }
