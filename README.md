@@ -3,15 +3,14 @@
 ## Gradoop: Distributed Graph Analytics on Hadoop
 
 [Gradoop](http://www.gradoop.com) is an open source (GPLv3) research framework 
-for scalable graph analytics built on top of [Apache Flink](http://flink.apache.org/)
-and [Apache HBase](http://hbase.apache.org/). It offers a graph data model which 
-extends the widespread 
-[property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
+for scalable graph analytics built on top of [Apache Flink&trade;](http://flink.apache.org/) 
+and [Apache HBase&trade;](http://hbase.apache.org/). It offers a graph data model which 
+extends the widespread [property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
 by the concept of logical graphs and further provides operators that can be applied 
 on single logical graphs and collections of logical graphs. The combination of these 
 operators allows the flexible, declarative definition of graph analytical workflows.
-Gradoop can be easily integrated in a workflow which already uses Flink operators
-and Flink libraries (i.e. Gelly, ML and Table).
+Gradoop can be easily integrated in a workflow which already uses Flink&trade; operators
+and Flink&trade; libraries (i.e. Gelly, ML and Table).
 
 Gradoop is **work in progress** which means APIs may change. It is currently used
 as a proof of concept implementation and far from production ready.
@@ -132,14 +131,14 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 ### gradoop-core
 
 The main contents of that module are the EPGM data model and a corresponding POJO 
-implementation which is used in Flink. The persistent representation of the EPGM
-is also contained in gradoop-core and together with its mapping to Apache HBase.
+implementation which is used in Flink&trade;. The persistent representation of the EPGM
+is also contained in gradoop-core and together with its mapping to HBase&trade;.
 
 ### gradoop-flink
 
 This module contains reference implementations of the EPGM operators. The 
-concepts of the EPGM are mapped to Flink DataSets and processed using Flink 
-operators.
+EPGM is mapped to Flink&trade; DataSets while the operators are implemented
+using DataSet transformations.
 
 ### gradoop-algorithms
 
@@ -165,6 +164,12 @@ Used to maintain the code style for the whole project.
 * 0.0.3 Apache Flink replaces MapReduce and Giraph as operator implementation
  layer and distributed execution engine
 * 0.1 Major refactoring of internal EPGM representation (e.g. ID and property handling), Equality Operators, GDL-based unit testing
+
+### Disclaimer
+
+Apache®, Apache Flink&trade;, Flink&trade;, Apache HBase&trade; and HBase&trade; 
+are either registered trademarks or trademarks of the Apache Software Foundation 
+in the United States and/or other countries.
 
 
 
