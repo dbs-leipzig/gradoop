@@ -42,11 +42,6 @@ public class FSMConfig implements Serializable {
   private final boolean directed;
 
   /**
-   * Edge mode, true for multigraphs and false for simple graphs.
-   */
-  private final boolean  multiGraph;
-
-  /**
    * Maximum subgraph size by edge count.
    */
   private int maxEdgeCount;
@@ -62,22 +57,16 @@ public class FSMConfig implements Serializable {
    * valued constructor
    * @param minSupport minimum relative support of a subgraph
    * @param directed direction mode
-   * @param multiGraph multigraph mode
    */
-  public FSMConfig(float minSupport, boolean directed, boolean multiGraph) {
+  public FSMConfig(float minSupport, boolean directed) {
     this.minSupport = minSupport;
     this.directed = directed;
-    this.multiGraph = multiGraph;
     this.maxEdgeCount = 1000;
     this.minEdgeCount = 0;
   }
 
   public float getMinSupport() {
     return minSupport;
-  }
-
-  public boolean isMultigraph() {
-    return multiGraph;
   }
 
   public boolean isDirected() {
@@ -106,7 +95,7 @@ public class FSMConfig implements Serializable {
    * @return configuration for directed multigraphs
    */
   public static FSMConfig forDirectedMultigraph(float threshold) {
-    return new FSMConfig(threshold, true, true);
+    return new FSMConfig(threshold, true);
   }
 
   public float getLikelinessThreshold() {
