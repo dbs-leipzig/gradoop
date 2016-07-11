@@ -18,6 +18,7 @@
 package org.gradoop.benchmark.fsm;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
@@ -28,19 +29,17 @@ import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
-
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GSpanTLFGraphEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
-import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
-
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders
+  .GSpanTLFGraphEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration
+  .GSpanBulkIteration;
+import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine
+  .GSpanFilterRefine;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-
-
-import org.apache.commons.cli.CommandLine;
 import org.gradoop.model.impl.tuples.WithCount;
 import org.gradoop.util.GradoopFlinkConfig;
 

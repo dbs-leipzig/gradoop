@@ -20,51 +20,64 @@ package org.gradoop.io.impl.tlf;
 import org.gradoop.io.api.DataSink;
 import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.tuples.GraphTransaction;
-import org.junit.Rule;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 
 public class TLFIOTest extends GradoopFlinkTestBase {
 
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSource#getGraphTransactions()}
-   * @throws Exception
-   */
   @Test
-  public void testFromTLFFileWithEdgeCheck() throws Exception {
-    String tlfFile =
-      TLFIOTest.class
-        .getResource("/data/tlf/io_test.tlf")
-        .getFile();
-    // create datasource
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFile, config);
+  public void testReadWrite() throws Exception {
+
+    String asciiGraphs = "" +
+      "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
+      "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
+
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(asciiGraphs);
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+      originalCollection =
+      loader.getGraphCollectionByVariables("g1", "g2");
+
+    String filePath =
+      TLFIOTest.class.getResource("/data/tlf").getFile() + "/io_test_rw.tlf";
+
+    new File(filePath).createNewFile();
+
+    // create data sink
+    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+      new TLFDataSink<>(filePath, config);
+
+    dataSink.write(originalCollection);
+
+    getExecutionEnvironment().execute();
+
+    // create data source
+    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(filePath, config);
+
     //get transactions
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions
       = dataSource.getGraphTransactions();
-    //get first transaction which contains one complete graph
-    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
-    graphTransactions.getTransactions().collect().get(1);
 
-    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
-      .count());
-    assertEquals("Wrong edge count", 2, graphTransaction.getEdges().size());
-
+    collectAndAssertTrue(
+      originalCollection.equalsByGraphData(
+        GraphCollection.fromTransactions(transactions)
+      )
+    );
   }
 
   /**
@@ -74,7 +87,39 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    * @throws Exception
    */
   @Test
-  public void testFromTLFFileWithDictionaries() throws Exception {
+  public void testRead() throws Exception {
+    String tlfFile =
+      TLFIOTest.class.getResource("/data/tlf/io_test_string.tlf").getFile();
+
+    // create datasource
+    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(tlfFile, config);
+    //get transactions
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions
+      = dataSource.getGraphTransactions();
+
+    String asciiGraphs = "" +
+      "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
+      "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
+
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(asciiGraphs);
+
+    collectAndAssertTrue(
+      loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+        GraphCollection.fromTransactions(transactions)
+      )
+    );
+  }
+
+  /**
+   * Test method for
+   *
+   * {@link TLFDataSource#getGraphTransactions()}
+   * @throws Exception
+   */
+  @Test
+  public void testReadWithDictionary() throws Exception {
     String tlfFile =
       TLFIOTest.class
         .getResource("/data/tlf/io_test.tlf")
@@ -93,24 +138,21 @@ public class TLFIOTest extends GradoopFlinkTestBase {
       new TLFDataSource<>(tlfFile, tlfVertexDictionaryFile,
         tlfEdgeDictionaryFile, config);
     //get transactions
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions
       = dataSource.getGraphTransactions();
-    //get first transaction which contains one complete graph
-    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
-      graphTransactions.getTransactions().collect().get(0);
-    //get vertices of the first transaction/graph
-    VertexPojo[] vertexArray = graphTransaction.getVertices()
-      .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
-    //sort vertices by label(alphabetically)
-    Arrays.sort(vertexArray, new Comparator<VertexPojo>() {
-      @Override
-      public int compare(VertexPojo vertex1, VertexPojo vertex2) {
-        return vertex1.getLabel().compareTo(vertex2.getLabel());
-      }
-    });
 
-    assertEquals("Wrong vertex label", "Vertex0", vertexArray[0].getLabel());
-    assertEquals("Wrong vertex label", "Vertex1", vertexArray[1].getLabel());
+    String asciiGraphs = "" +
+      "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
+      "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
+
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString(asciiGraphs);
+
+    collectAndAssertTrue(
+      loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+        GraphCollection.fromTransactions(transactions)
+      )
+    );
   }
 
 

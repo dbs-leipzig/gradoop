@@ -25,6 +25,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
 public class TLFVertex extends Tuple2<Integer, String> {
 
   /**
+   * Symbol identifying a line to represent a vertex.
+   */
+  public static final String SYMBOL = "v";
+
+  /**
    * default constructor
    */
   public TLFVertex() {

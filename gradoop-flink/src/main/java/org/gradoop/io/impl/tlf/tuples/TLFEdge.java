@@ -25,6 +25,11 @@ import org.apache.flink.api.java.tuple.Tuple3;
 public class TLFEdge extends Tuple3<Integer, Integer, String> {
 
   /**
+   * Symbol identifying a line to represent an edge.
+   */
+  public static final String SYMBOL = "e";
+
+  /**
    * default constructor
    */
   public TLFEdge() {
