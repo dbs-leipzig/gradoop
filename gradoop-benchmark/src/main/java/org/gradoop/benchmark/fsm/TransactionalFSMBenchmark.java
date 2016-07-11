@@ -29,12 +29,9 @@ import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders
-  .GSpanTLFGraphEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration
-  .GSpanBulkIteration;
-import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine
-  .GSpanFilterRefine;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GSpanTLFGraphEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
+import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
