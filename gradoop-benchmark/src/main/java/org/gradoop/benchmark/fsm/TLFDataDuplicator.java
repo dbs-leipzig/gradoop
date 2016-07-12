@@ -92,7 +92,8 @@ public class TLFDataDuplicator
           .getTransactions()
           .flatMap(new Duplicate
           <GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo>>
-          (multiplicand)),
+          (multiplicand))
+          .returns(GraphTransaction.getTypeInformation(config)),
         config
       );
 
