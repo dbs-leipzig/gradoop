@@ -33,10 +33,7 @@ import static org.junit.Assert.assertEquals;
 public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testBenchmark() throws Exception {
-
-    getExecutionEnvironment().setParallelism(1);
-
+  public void testPredictableBenchmark() throws Exception {
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
       new PredictableTransactionsGenerator<>(2, 1, true, getConfig())
       .execute();
@@ -77,7 +74,39 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     assertEquals(tlfFrequentSubgraphs.count(), tnsFrequentSubgraphs.count());
 
+  }
 
+  @Test
+  public void testYeastBenchmark() throws Exception {
+
+    String tlfFile =  GSpanEncoderTest
+      .class.getResource("/data/tlf").getFile() + "/yeast.tlf";
+
+    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(tlfFile, config);
+
+    GSpanEncoder tlfEncoder = new GSpanTLFGraphEncoder<>();
+    GSpanEncoder tnsEncoder = new GSpanGraphTransactionsEncoder<>();
+    GSpanMiner miner = new GSpanBulkIteration();
+
+    miner.setExecutionEnvironment(getExecutionEnvironment());
+    FSMConfig fsmConfig = new FSMConfig(0.5f, false);
+
+    DataSet<GSpanGraph> tlfSearchSpace = tlfEncoder
+      .encode(dataSource.getTLFGraphs(), fsmConfig);
+    DataSet<GSpanGraph> tnsSearchSpace = tnsEncoder
+      .encode(dataSource.getGraphTransactions(),
+      fsmConfig);
+
+    assertEquals(tlfSearchSpace.count(), tnsSearchSpace.count());
+
+    // mine
+    DataSet<WithCount<CompressedDFSCode>> tlfFrequentSubgraphs =
+      miner.mine(tlfSearchSpace, tlfEncoder.getMinFrequency(), fsmConfig);
+    DataSet<WithCount<CompressedDFSCode>> tnsFrequentSubgraphs =
+      miner.mine(tnsSearchSpace, tlfEncoder.getMinFrequency(), fsmConfig);
+
+    assertEquals(tlfFrequentSubgraphs.count(), tnsFrequentSubgraphs.count());
   }
 
   @Test

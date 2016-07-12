@@ -96,33 +96,43 @@ public class GSpan {
    */
   private static GSpanGraph createGSpanGraph(
     List<AdjacencyList> adjacencyLists, List<GSpanEdge> edges) {
-    // sort by min vertex label
-    Collections.sort(edges);
 
-    // create adjacency lists and 1-edge subgraphs with their embeddings
+    GSpanGraph gSpanGraph;
 
-    Map<DFSCode, Collection<DFSEmbedding>> codeEmbeddings =
-      Maps.newHashMap();
+    if (edges.isEmpty()) {
+      gSpanGraph = new GSpanGraph();
 
-    Iterator<GSpanEdge> iterator = edges.iterator();
-    GSpanEdge lastEdge = iterator.next();
+    } else {
+      // sort by min vertex label
+      Collections.sort(edges);
 
-    Collection<DFSEmbedding> embeddings =
-      createSingleEdgeSubgraphEmbeddings(codeEmbeddings, lastEdge);
+      // create adjacency lists and 1-edge subgraphs with their embeddings
 
-    while (iterator.hasNext()) {
-      GSpanEdge edge = iterator.next();
+      Map<DFSCode, Collection<DFSEmbedding>> codeEmbeddings =
+        Maps.newHashMap();
 
-      // add embedding of 1-edge code
-      if (edge.compareTo(lastEdge) == 0) {
-        embeddings.add(createSingleEdgeEmbedding(edge));
-      } else {
-        embeddings = createSingleEdgeSubgraphEmbeddings(codeEmbeddings, edge);
-        lastEdge = edge;
+      Iterator<GSpanEdge> iterator = edges.iterator();
+      GSpanEdge lastEdge = iterator.next();
+
+      Collection<DFSEmbedding> embeddings =
+        createSingleEdgeSubgraphEmbeddings(codeEmbeddings, lastEdge);
+
+      while (iterator.hasNext()) {
+        GSpanEdge edge = iterator.next();
+
+        // add embedding of 1-edge code
+        if (edge.compareTo(lastEdge) == 0) {
+          embeddings.add(createSingleEdgeEmbedding(edge));
+        } else {
+          embeddings = createSingleEdgeSubgraphEmbeddings(codeEmbeddings, edge);
+          lastEdge = edge;
+        }
       }
+
+      gSpanGraph = new GSpanGraph(adjacencyLists, codeEmbeddings);
     }
 
-    return new GSpanGraph(adjacencyLists, codeEmbeddings);
+    return gSpanGraph;
   }
 
   /**
