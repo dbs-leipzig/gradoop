@@ -24,4 +24,7 @@ ${HADOOP} dfs -put yeast.tlf ${HDFS}/yeast.tlf
 ${HADOOP} dfs -ls ${HDFS}/
 
 ./data/yeast.sh "${FLINK}" "${JAR}" "${HADOOP}" "${HDFS}" ${PARA}
+./data/predictable.sh "${FLINK}" "${JAR}" "${HADOOP}" "${HDFS}" ${PARA}
+
+${HADOOP} dfs -ls ${HDFS}/
 

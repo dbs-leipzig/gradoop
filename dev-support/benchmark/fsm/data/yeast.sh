@@ -24,5 +24,3 @@ for SIZE in 1 10
 do
   ${FLINK}/bin/flink run -p ${PARA} -c ${CLASS} ${JAR} -i hdfs://${HDFS}/yeast.tlf -m ${SIZE}
 done
-
-${HADOOP} dfs -ls ${HDFS}/

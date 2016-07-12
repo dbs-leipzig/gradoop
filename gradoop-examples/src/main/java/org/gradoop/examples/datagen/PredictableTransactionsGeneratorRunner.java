@@ -94,12 +94,13 @@ public class PredictableTransactionsGeneratorRunner
       dataGen.execute();
 
     // build result name
-    String fileName;
-    if (multiGraph) {
-      fileName = graphCount + "_" + graphSize + "_" + "multigraph" + ".tlf";
-    } else {
-      fileName = graphCount + "_" + graphSize + ".tlf";
+    String fileName = "predictable_" + graphCount + "_" + graphSize;
+
+    if (!multiGraph) {
+      fileName += "_simple";
     }
+
+    fileName += ".tlf";
 
     // write output
     DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
