@@ -95,8 +95,8 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(tlfFile, config);
     //get transactions
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions
-      = dataSource.getGraphTransactions();
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
+      dataSource.getGraphTransactions();
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +

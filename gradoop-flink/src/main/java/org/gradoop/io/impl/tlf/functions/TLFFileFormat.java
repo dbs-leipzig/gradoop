@@ -32,7 +32,6 @@ import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Converts a GraphTransaction to the following format:
@@ -54,7 +53,7 @@ public class TLFFileFormat
   /**
    * Global counter for the graph id used for each single graph transaction.
    */
-  private AtomicInteger graphID = new AtomicInteger(0);
+  private int graphId = 0;
 
   /**
    * Creates a TLF string representation of a given graph transaction.
@@ -64,6 +63,8 @@ public class TLFFileFormat
    */
   @Override
   public String format(GraphTransaction<G, V, E> graphTransaction) {
+    graphId++;
+
     Map<GradoopId, Integer> vertexIdMap = Maps
       .newHashMapWithExpectedSize(graphTransaction.getVertices().size());
 
@@ -73,7 +74,7 @@ public class TLFFileFormat
     );
 
     // GRAPH HEAD
-    lines.add(TLFGraph.SYMBOL + " # " + graphID.getAndIncrement());
+    lines.add(TLFGraph.SYMBOL + " # " + graphId);
 
     // VERTICES
     int vertexId = 0;
