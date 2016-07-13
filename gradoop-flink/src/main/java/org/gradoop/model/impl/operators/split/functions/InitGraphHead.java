@@ -61,7 +61,7 @@ public class InitGraphHead<G extends EPGMGraphHead>
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<G> getProducedType() {
-    return (TypeInformation<G>) TypeExtractor
+    return TypeExtractor
       .createTypeInfo(graphHeadFactory.getType());
   }
 }

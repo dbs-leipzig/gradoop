@@ -407,9 +407,12 @@ public interface LogicalGraphOperators
    * not have this property will be removed from the resulting collection.
    *
    * @param propertyKey split property key
+   * @param preserveInterEdges if edges between created graphs should be
+   *                           preserved in an additional graph
    * @return graph collection
    */
-  GraphCollection<G, V, E> splitBy(String propertyKey);
+  GraphCollection<G, V, E> splitBy(
+    String propertyKey, boolean preserveInterEdges);
 
   /**
    * Creates a logical graph using the given unary graph operator.

@@ -226,7 +226,7 @@ public class SNABenchmark2
         new GellyLabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(
           maxIterations, label))
       // 3b) separate communities
-      .splitBy(label)
+      .splitBy(label, false)
       // 4) compute vertex count per community
       .apply(new ApplyAggregation<>(
         vertexCount,
