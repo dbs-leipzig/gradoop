@@ -28,6 +28,11 @@ public class TLFGraph
   extends Tuple3<TLFGraphHead, Collection<TLFVertex>, Collection<TLFEdge>> {
 
   /**
+   * Symbol identifying a line to represent a graph start.
+   */
+  public static final String SYMBOL = "t";
+
+  /**
    * default constructor
    */
   public TLFGraph() {
@@ -37,12 +42,12 @@ public class TLFGraph
    * valued constructor
    *
    * @param graphHead the graph head
-   * @param graphVertices collection containing TLFVertex
-   * @param graphEdges collection containing TLFEdge
+   * @param vertices collection containing TLFVertex
+   * @param edges collection containing TLFEdge
    */
-  public TLFGraph(TLFGraphHead graphHead, Collection<TLFVertex> graphVertices,
-    Collection<TLFEdge> graphEdges) {
-    super(graphHead, graphVertices, graphEdges);
+  public TLFGraph(TLFGraphHead graphHead, Collection<TLFVertex> vertices,
+    Collection<TLFEdge> edges) {
+    super(graphHead, vertices, edges);
   }
 
   public TLFGraphHead getGraphHead() {

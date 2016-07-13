@@ -17,7 +17,7 @@
 
 package org.gradoop.io.impl.tlf.functions;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.io.LongWritable;
@@ -46,70 +46,36 @@ public class TLFGraphFromText
    */
   @Override
   public TLFGraph map(Tuple2<LongWritable, Text> inputTuple) throws Exception {
-    String graphString = inputTuple.getField(1).toString();
+    String[] lines = inputTuple.getField(1).toString().split("\n");
 
-    TLFGraphHead graphHead;
-    Collection<TLFVertex> vertices = Sets.newHashSet();
-    Collection<TLFEdge> edges = Sets.newHashSet();
+    boolean firstLine = true;
 
-    graphHead = getGraphHead(graphString);
-    vertices.addAll(getVertices(graphString));
-    edges.addAll(getEdges(graphString));
+    TLFGraphHead graphHead = null;
+    Collection<TLFVertex> vertices = Lists.newArrayList();
+    Collection<TLFEdge> edges = Lists.newArrayList();
+
+    for (String line :lines) {
+      if (firstLine) {
+        graphHead = new TLFGraphHead(inputTuple.f0.get());
+        firstLine = false;
+      } else {
+        String[] fields = line.split(" ");
+
+        if (fields[0].equals(TLFVertex.SYMBOL)) {
+          vertices.add(new TLFVertex(
+            Integer.valueOf(fields[1]),
+            fields[2])
+          );
+        } else {
+          edges.add(new TLFEdge(
+            Integer.valueOf(fields[1]),
+            Integer.valueOf(fields[2]),
+            fields[3]
+          ));
+        }
+      }
+    }
 
     return new TLFGraph(graphHead, vertices, edges);
-  }
-
-  /**
-   * Returns the graph head defined in content.
-   *
-   * @param content containing current graph as string
-   * @return returns the graph head defined in content
-   */
-  private TLFGraphHead getGraphHead(String content) {
-    //Position of id which is between 't # ' and the end of the line
-    return new TLFGraphHead(Long.parseLong(content.substring(content.indexOf
-      ("t # ") + 4, content.indexOf("\n")).trim()));
-  }
-
-  /**
-   * Reads the vertices of a complete TLF graph segment.
-   *
-   * @param content the TLF graph segment
-   * @return collection of vertices as tuples
-   */
-  private Collection<TLFVertex> getVertices(String content) {
-    Collection<TLFVertex> vertexCollection = Sets.newHashSet();
-    String[] vertex;
-    //-1 cause before e is \n
-    content = content.substring(content.indexOf("v"), content.indexOf("e") - 1);
-    String[] vertices = content.split("\n");
-
-    for (int i = 0; i < vertices.length; i++) {
-      vertex = vertices[i].split(" ");
-      vertexCollection.add(new TLFVertex(Integer.parseInt(
-        vertex[1].trim()), vertex[2].trim()));
-    }
-    return vertexCollection;
-  }
-
-  /**
-   * Reads the edges of a complete TLF graph segment.
-   *
-   * @param content the TLF graph segment
-   * @return collection of edges as tuples
-   */
-  private Collection<TLFEdge> getEdges(String content) {
-    Collection<TLFEdge> edgeCollection = Sets.newHashSet();
-    String[] edge;
-
-    content = content.substring(content.indexOf("e"), content.length());
-    String[] edges = content.split("\n");
-
-    for (int i = 0; i < edges.length; i++) {
-      edge = edges[i].split(" ");
-      edgeCollection.add(new TLFEdge(Integer
-        .parseInt(edge[1].trim()), Integer.parseInt(edge[2].trim()), edge[3]));
-    }
-    return edgeCollection;
   }
 }

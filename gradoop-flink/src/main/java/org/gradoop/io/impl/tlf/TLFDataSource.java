@@ -17,7 +17,6 @@
 
 package org.gradoop.io.impl.tlf;
 
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.io.LongWritable;
@@ -25,13 +24,13 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.gradoop.io.api.DataSource;
 import org.gradoop.io.impl.tlf.functions.Dictionary;
-import org.gradoop.io.impl.tlf.functions.EdgeLabelDecoder;
 import org.gradoop.io.impl.tlf.functions.DictionaryEntry;
+import org.gradoop.io.impl.tlf.functions.EdgeLabelDecoder;
+import org.gradoop.io.impl.tlf.functions.GraphTransactionFromTLFGraph;
+import org.gradoop.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.io.impl.tlf.functions.TLFGraphFromText;
 import org.gradoop.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
-import org.gradoop.io.impl.tlf.functions.GraphTransactionFromTLFGraph;
-import org.gradoop.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
@@ -114,38 +113,32 @@ public class TLFDataSource
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     // load tlf graphs from file
-    graphs = env.readHadoopFile(new TLFInputFormat(),
-      LongWritable.class, Text.class, getTLFPath())
-        .map(new TLFGraphFromText());
-    // create the mapper
-    GraphTransactionFromTLFGraph<G, V, E>
-      graphTransactionFromTLFGraph = new GraphTransactionFromTLFGraph<G, V, E>(
-        getConfig().getGraphHeadFactory(),
-        getConfig().getVertexFactory(),
-        getConfig().getEdgeFactory());
-    // get the mapper's produced type
-    TypeInformation<GraphTransaction<G, V, E>> typeInformation =
-      graphTransactionFromTLFGraph.getProducedType();
+    graphs = env.readHadoopFile(
+      new TLFInputFormat(), LongWritable.class, Text.class, getTLFPath())
+      .map(new TLFGraphFromText());
 
     // map the tlf graph to transactions
     transactions = graphs
-        .map(graphTransactionFromTLFGraph)
-        .returns(typeInformation);
+      .map(new GraphTransactionFromTLFGraph<>(
+        getConfig().getGraphHeadFactory(),
+        getConfig().getVertexFactory(),
+        getConfig().getEdgeFactory()))
+        .returns(GraphTransaction.getTypeInformation(getConfig()));
 
     // map the integer valued labels to strings from dictionary
     if (hasVertexDictionary()) {
       transactions = transactions
         .map(new VertexLabelDecoder<G, V, E>())
-        .withBroadcastSet(getVertexDictionary(),
-          VertexLabelDecoder.VERTEX_DICTIONARY);
+        .withBroadcastSet(
+          getVertexDictionary(), VertexLabelDecoder.VERTEX_DICTIONARY);
     }
     if (hasEdgeDictionary()) {
       transactions = transactions
         .map(new EdgeLabelDecoder<G, V, E>())
-        .withBroadcastSet(getEdgeDictionary(),
-          EdgeLabelDecoder.EDGE_DICTIONARY);
+        .withBroadcastSet(
+          getEdgeDictionary(), EdgeLabelDecoder.EDGE_DICTIONARY);
     }
-    return new GraphTransactions<G, V, E>(transactions, getConfig());
+    return new GraphTransactions<>(transactions, getConfig());
   }
 
   /**

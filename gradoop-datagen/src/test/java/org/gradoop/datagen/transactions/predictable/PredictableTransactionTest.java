@@ -30,7 +30,7 @@ public class PredictableTransactionTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMaxVertexLabel() throws Exception {
-    for(long maxVertexLabel = 1; maxVertexLabel <= 10; maxVertexLabel++) {
+    for(long maxVertexLabel = 0; maxVertexLabel < 10; maxVertexLabel++) {
       // multigraph
       GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graph =
         new PredictableTransaction<>(1, true, getConfig()).map(maxVertexLabel);

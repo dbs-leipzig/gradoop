@@ -1,0 +1,10 @@
+t # 0
+v 0 A
+v 1 B
+e 0 1 a
+e 0 1 b
+t # 1
+v 0 A
+v 1 B
+e 0 1 a
+e 1 0 b

@@ -17,14 +17,20 @@
 
 package org.gradoop.io.impl.tlf.functions;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.java.io.TextOutputFormat;
+import org.gradoop.io.impl.tlf.tuples.TLFEdge;
+import org.gradoop.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -47,7 +53,7 @@ public class TLFFileFormat
   /**
    * Global counter for the graph id used for each single graph transaction.
    */
-  private Integer graphID = 0;
+  private int graphId = 0;
 
   /**
    * Creates a TLF string representation of a given graph transaction.
@@ -57,36 +63,35 @@ public class TLFFileFormat
    */
   @Override
   public String format(GraphTransaction<G, V, E> graphTransaction) {
-    Map<GradoopId, Integer> gradoopIdIntegerMapVertices = Maps
+    graphId++;
+
+    Map<GradoopId, Integer> vertexIdMap = Maps
       .newHashMapWithExpectedSize(graphTransaction.getVertices().size());
-    Integer id = 0;
-    StringBuilder graph = new StringBuilder();
 
-    //map GradoopIds to 'easy to read' Integer ids
+    Collection<String> lines = Lists.newArrayListWithExpectedSize(
+      graphTransaction.getVertices().size() +
+        graphTransaction.getEdges().size() + 1
+    );
+
+    // GRAPH HEAD
+    lines.add(TLFGraph.SYMBOL + " # " + graphId);
+
+    // VERTICES
+    int vertexId = 0;
     for (V vertex : graphTransaction.getVertices()) {
-      gradoopIdIntegerMapVertices.put(vertex.getId(), id);
-      id++;
+      vertexIdMap.put(vertex.getId(), vertexId);
+      lines.add(TLFVertex.SYMBOL + " " + vertexId + " " + vertex.getLabel());
+      vertexId++;
     }
 
-    //add head to string
-    graph.append("t # " + graphID + "\n");
-    graphID++;
-    //add vertices to string
-    for (V vertex : graphTransaction.getVertices()) {
-      graph.append("v " + gradoopIdIntegerMapVertices.get(vertex.getId()) +
-        " " + vertex.getLabel() + "\n");
-    }
-    //add edges to string
-    int i = 0;
+    // EDGES
     for (E edge : graphTransaction.getEdges()) {
-      graph.append("e " + gradoopIdIntegerMapVertices.get(edge.getSourceId
-        ()) + " " + gradoopIdIntegerMapVertices.get(edge.getTargetId()) + "" +
-        " " + edge.getLabel());
-      if (i < graphTransaction.getEdges().size() - 1) {
-        graph.append("\n");
-      }
-      i++;
+      Integer sourceId = vertexIdMap.get(edge.getSourceId());
+      Integer targetId = vertexIdMap.get(edge.getTargetId());
+
+      lines.add(TLFEdge.SYMBOL +
+        " " + sourceId + " " + targetId + "" +  " " + edge.getLabel());
     }
-    return graph.toString();
+    return StringUtils.join(lines, "\n") + "\n";
   }
 }

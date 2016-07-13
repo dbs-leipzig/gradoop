@@ -1,15 +1,27 @@
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders;
 
 
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.datagen.transactions.predictable.PredictableTransactionsGenerator;
+import org.gradoop.io.api.DataSink;
+import org.gradoop.io.impl.tlf.TLFDataSink;
 import org.gradoop.io.impl.tlf.TLFDataSource;
+import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
+import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
 import org.gradoop.model.impl.algorithms.fsm.gspan.comparators.DFSCodeComparator;
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.MinDFSCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.model.impl.tuples.WithCount;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -19,6 +31,54 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class GSpanEncoderTest extends GradoopFlinkTestBase {
+
+  @Test
+  public void testBenchmark() throws Exception {
+
+    getExecutionEnvironment().setParallelism(1);
+
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
+      new PredictableTransactionsGenerator<>(2, 1, true, getConfig())
+      .execute();
+
+    String tlfFile =  GSpanEncoderTest
+      .class.getResource("/data/tlf").getFile() + "/benchmark.tlf";
+
+    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+      new TLFDataSink<>(tlfFile, config);
+
+    dataSink.write(transactions);
+
+    getExecutionEnvironment().execute();
+
+    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+      new TLFDataSource<>(tlfFile, config);
+
+    DataSet<TLFGraph> graphs = dataSource.getTLFGraphs();
+
+    GSpanEncoder tlfEncoder = new GSpanTLFGraphEncoder<>();
+    GSpanEncoder tnsEncoder = new GSpanGraphTransactionsEncoder<>();
+    GSpanMiner miner = new GSpanBulkIteration();
+
+    miner.setExecutionEnvironment(getExecutionEnvironment());
+    FSMConfig fsmConfig = new FSMConfig(1.0f, true);
+
+    DataSet<GSpanGraph> tlfSearchSpace = tlfEncoder.encode(graphs, fsmConfig);
+    DataSet<GSpanGraph> tnsSearchSpace = tnsEncoder.encode(transactions, fsmConfig);
+
+    assertEquals(tlfSearchSpace.count(), tnsSearchSpace.count());
+
+    // mine
+    DataSet<WithCount<CompressedDFSCode>> tlfFrequentSubgraphs =
+      miner.mine(tlfSearchSpace, tlfEncoder.getMinFrequency(), fsmConfig);
+    DataSet<WithCount<CompressedDFSCode>> tnsFrequentSubgraphs =
+      miner.mine(tnsSearchSpace, tlfEncoder.getMinFrequency(), fsmConfig);
+
+
+    assertEquals(tlfFrequentSubgraphs.count(), tnsFrequentSubgraphs.count());
+
+
+  }
 
   @Test
   public void encode() throws Exception {

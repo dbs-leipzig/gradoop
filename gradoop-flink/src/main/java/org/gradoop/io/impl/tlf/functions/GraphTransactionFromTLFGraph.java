@@ -95,36 +95,41 @@ public class GraphTransactionFromTLFGraph
    */
   @Override
   public GraphTransaction<G, V, E> map(TLFGraph graph) throws Exception {
+
+    G graphHead = this.graphHeadFactory.createGraphHead();
     Set<V> vertices = Sets.newHashSet();
     Set<E> edges = Sets.newHashSet();
 
-    GradoopId id;
-    String label;
-    GradoopId targetId;
-    GradoopIdSet graphs = new GradoopIdSet();
-    Map<Integer, GradoopId> integerGradoopIdMapVertices;
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
-    integerGradoopIdMapVertices = Maps.newHashMap();
+    Map<Integer, GradoopId> vertexIdMap;
 
-    id = GradoopId.get();
-    graphs.add(id);
+    vertexIdMap = Maps.newHashMap();
 
-    for (TLFVertex vertex : graph.getGraphVertices()) {
-      id = GradoopId.get();
-      integerGradoopIdMapVertices.put(vertex.getId(), id);
-      label = vertex.getLabel();
-      vertices.add(this.vertexFactory.initVertex(id, label, graphs));
+    for (TLFVertex tlfVertex : graph.getGraphVertices()) {
+
+      V vertex = vertexFactory.createVertex(
+        tlfVertex.getLabel(),
+        graphIds
+      );
+
+      vertices.add(vertex);
+      vertexIdMap.put(tlfVertex.getId(), vertex.getId());
     }
 
-    for (TLFEdge edge :graph.getGraphEdges()) {
-      id = integerGradoopIdMapVertices.get(edge.getSourceId());
-      targetId = integerGradoopIdMapVertices.get(edge.getTargetId());
-      label = edge.getLabel();
-      edges.add(this.edgeFactory.createEdge(label, id, targetId, graphs));
+    for (TLFEdge tlfEdge :graph.getGraphEdges()) {
+      GradoopId sourceId = vertexIdMap.get(tlfEdge.getSourceId());
+      GradoopId targetId = vertexIdMap.get(tlfEdge.getTargetId());
+
+      edges.add(edgeFactory.createEdge(
+        tlfEdge.getLabel(),
+        sourceId,
+        targetId,
+        graphIds
+      ));
     }
 
-    return new GraphTransaction<G, V, E>(
-      this.graphHeadFactory.initGraphHead(id), vertices, edges);
+    return new GraphTransaction<>(graphHead, vertices, edges);
   }
 
   /**

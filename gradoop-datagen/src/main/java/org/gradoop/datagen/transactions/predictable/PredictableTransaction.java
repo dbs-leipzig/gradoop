@@ -100,7 +100,7 @@ public class PredictableTransaction
     Long maxVertexLabelIndex = graphNumber % 10;
 
     G graphHead = graphHeadFactory
-      .createGraphHead(String.valueOf(maxVertexLabelIndex + 1));
+      .createGraphHead(String.valueOf(maxVertexLabelIndex));
 
     Set<V> vertices = Sets.newHashSet();
     Set<E> edges = Sets.newHashSet();
@@ -115,7 +115,7 @@ public class PredictableTransaction
       String vertexLabel = VERTEX_LABELS.get(vertexLabelIndex);
 
       for (int patternCopy = 1; patternCopy <= graphSize; patternCopy++) {
-        addPattern(vertexLabel, centerVertex, vertices, edges);
+        addPattern(graphNumber, vertexLabel, centerVertex, vertices, edges);
       }
     }
     for (V vertex : vertices) {
@@ -124,7 +124,6 @@ public class PredictableTransaction
     for (E edge : edges) {
       edge.setGraphIds(graphIds);
     }
-
     return new GraphTransaction<>(graphHead, vertices, edges);
   }
 
@@ -133,17 +132,18 @@ public class PredictableTransaction
    * will have a specified vertex label and the pattern will be connected to
    * the center vertex by an unique labelled edge.
    *
+   * @param graphNumber numeric graph identifier
    * @param vertexLabel label of pattern vertices
    * @param centerVertex center vertex
    * @param vertices stores created vertices
    * @param edges stores created edges
    */
-  private void addPattern(
+  private void addPattern(long graphNumber,
     String vertexLabel, V centerVertex, Set<V> vertices, Set<E> edges) {
 
     GradoopId multiBottomId = createVertex(vertexLabel, vertices);
     createEdge(
-      centerVertex.getId(), multiBottomId.toString(), multiBottomId, edges);
+      centerVertex.getId(), String.valueOf(graphNumber), multiBottomId, edges);
 
     if (multigraph) {
       // parallel edges and loop
