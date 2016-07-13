@@ -10,10 +10,21 @@ FLINK="/usr/local/flink-1.0.0"
 JAR="gradoop-benchmark-0.2-SNAPSHOT.jar"
 #Used generator running class
 CLASS="org.gradoop.benchmark.fsm.TLFDataDuplicator"
-#Input directory in hdfs
-INPUT="hdfs:///user/hduser/input/datagen/100_1.tlf"
+
+HDFS="/user/hduser/input"
+
+PARA=32
+
+HADOOP="$HADOOP_PREFIX/bin/hdfs"
 
 #Running commands
-${FLINK}/bin/flink run -p 32 -c ${CLASS} ${JAR} -i ${INPUT} -m 10
-${FLINK}/bin/flink run -p 32 -c ${CLASS} ${JAR} -i ${INPUT} -m 100
+${HADOOP} dfs -rm -r ${HDFS}
+${HADOOP} dfs -mkdir ${HDFS}
+${HADOOP} dfs -put yeast.tlf ${HDFS}/yeast.tlf
+${HADOOP} dfs -ls ${HDFS}/
+
+./data/yeast.sh "${FLINK}" "${JAR}" "${HADOOP}" "${HDFS}" ${PARA}
+./data/predictable.sh "${FLINK}" "${JAR}" "${HADOOP}" "${HDFS}" ${PARA}
+
+${HADOOP} dfs -ls ${HDFS}/
 
