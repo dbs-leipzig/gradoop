@@ -17,24 +17,24 @@
 
 package org.gradoop.io.impl.tsv;
 
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple6;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.utils.DataSetUtils;
 import org.gradoop.io.api.DataSource;
-import org.gradoop.io.impl.tsv.functions.TSVToTuple;
-import org.gradoop.io.impl.tsv.functions.TupleReducer;
-import org.gradoop.io.impl.tsv.functions.VertexReducer;
-import org.gradoop.io.impl.tsv.functions.TupleToEdge;
-import org.gradoop.io.impl.tsv.functions.TupleToVertex;
+import org.gradoop.io.impl.graph.GraphDataSource;
+import org.gradoop.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.io.impl.tsv.functions.TupleToEdgeTuple;
+import org.gradoop.io.impl.tsv.functions.TupleToImportVertex;
+import org.gradoop.io.impl.tsv.functions.UniqueEdgeIdsToImportEdge;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -53,13 +53,36 @@ public class TSVDataSource
   implements DataSource<G, V, E> {
 
   /**
+   * Separator token of the tsv file
+   */
+  private String tokenSeparator;
+
+  /**
+   * Label of the vertices
+   */
+  private String vertexLabel;
+
+  /**
+   * PropertyKey witch should be used for storing the property information
+   */
+  private String propertyKey;
+
+  /**
    * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
    *
-   * @param tsvPath       Path to TSV-File
-   * @param config        Gradoop Flink configuration
+   * @param tsvPath         Path to TSV-File
+   * @param tokenSeparator  separator token
+   * @param vertexLabel     label of the vertices
+   * @param propertyKey     property key for property value
+   * @param config          Gradoop Flink configuration
    */
-  public TSVDataSource(String tsvPath, GradoopFlinkConfig<G, V, E> config) {
+  public TSVDataSource(String tsvPath, String tokenSeparator,
+    String vertexLabel, String propertyKey,
+    GradoopFlinkConfig<G, V, E> config) {
     super(tsvPath, config);
+    this.tokenSeparator = tokenSeparator;
+    this.vertexLabel = vertexLabel;
+    this.propertyKey = propertyKey;
   }
 
 
@@ -74,54 +97,45 @@ public class TSVDataSource
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     //--------------------------------------------------------------------------
-    // create type information
-    //--------------------------------------------------------------------------
-
-    // used for type hinting when loading vertex data
-    TypeInformation<V> vertexTypeInfo = TypeExtractor
-      .createTypeInfo(getConfig().getVertexFactory().getType());
-    // used for type hinting when loading edge data
-    TypeInformation<E> edgeTypeInfo = TypeExtractor
-      .createTypeInfo(getConfig().getEdgeFactory().getType());
-
-    //--------------------------------------------------------------------------
     // generate tuple that contains all information
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple6<String, GradoopId, String, String, GradoopId, String>>
-      lineTuple = env.readTextFile(getTsvPath()).map(new TSVToTuple());
+    DataSet<Tuple4<Long, String, Long, String>> lineTuple =
+            env.readCsvFile(getTsvPath())
+                    .fieldDelimiter(tokenSeparator)
+                    .types(Long.class, String.class, Long.class, String.class);
 
-    // reduces duplicates in source and target ids and set unique GradoopId
-    lineTuple = lineTuple.reduceGroup(new TupleReducer());
-
-    //--------------------------------------------------------------------------
-    // generate edges
-    //--------------------------------------------------------------------------
-
-    DataSet<E> edges = lineTuple
-      .map(new TupleToEdge<>(getConfig().getEdgeFactory()))
-      .returns(edgeTypeInfo);
 
     //--------------------------------------------------------------------------
     // generate vertices
     //--------------------------------------------------------------------------
 
-    DataSet<V> vertices = lineTuple
-      .flatMap(new TupleToVertex<>(getConfig().getVertexFactory()))
-      .returns(vertexTypeInfo);
+    DataSet<ImportVertex<Long>> importVertices =
+      lineTuple.flatMap(new TupleToImportVertex(vertexLabel, propertyKey));
 
-    // remove vertex duplicates
-    vertices = vertices.reduceGroup(new VertexReducer<V>());
+    importVertices = importVertices.distinct(0);
 
     //--------------------------------------------------------------------------
-    // generate new graphs
+    // generate edges
     //--------------------------------------------------------------------------
 
-    DataSet<G> graphHeads =  env.fromElements(
-      getConfig().getGraphHeadFactory().createGraphHead());
+    DataSet<Tuple2<Long, Long>> edgeTuple =
+      lineTuple.map(new TupleToEdgeTuple());
 
-    return GraphCollection.fromDataSets(graphHeads, vertices, edges,
-      getConfig());
+    DataSet<Tuple2<Long, Tuple2<Long, Long>>> edgeIdsWithUniqueId =
+      DataSetUtils.zipWithUniqueId(edgeTuple);
+
+    DataSet<ImportEdge<Long>> importEdges =
+      edgeIdsWithUniqueId.map(new UniqueEdgeIdsToImportEdge());
+
+    //--------------------------------------------------------------------------
+    // create graph data source
+    //--------------------------------------------------------------------------
+
+    GraphDataSource<G, V, E, Long> source =
+      new GraphDataSource<>(importVertices, importEdges, getConfig());
+
+    return source.getGraphCollection();
   }
 
   @Override
