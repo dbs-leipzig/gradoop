@@ -25,7 +25,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.aggregation.functions.AggregateWithDefaultFunction;
+import org.gradoop.model.impl.operators.aggregation.functions.AggregateWithDefaultValueFunction;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
@@ -38,7 +38,7 @@ import org.gradoop.model.impl.properties.PropertyValue;
  */
 public class MinEdgeProperty
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends AggregateWithDefaultFunction<G, V, E> {
+  extends AggregateWithDefaultValueFunction<G, V, E> {
 
   /**
    * Property key to retrieve property values

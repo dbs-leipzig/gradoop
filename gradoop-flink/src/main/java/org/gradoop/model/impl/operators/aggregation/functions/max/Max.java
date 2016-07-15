@@ -48,7 +48,8 @@ public class Max {
     DataSet<EL> dataSet,
     String propertyKey,
     Number min) {
-    return dataSet.map(new GetPropertyValue<EL>(propertyKey, min))
+    return dataSet
+      .map(new GetPropertyValue<EL>(propertyKey, min))
       .reduce(new MaxOfPropertyValues(min))
       .map(new ValueOf1<PropertyValue>());
   }

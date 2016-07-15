@@ -31,7 +31,7 @@ import org.gradoop.model.api.functions.ApplyAggregateFunction;
  * @param <V> vertex type
  * @param <E> edge type
  */
-public abstract class AggregateWithDefaultFunction
+public abstract class AggregateWithDefaultValueFunction
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements AggregateFunction<G, V, E>,  ApplyAggregateFunction<G, V, E> {
 
@@ -44,7 +44,7 @@ public abstract class AggregateWithDefaultFunction
    * Constructor
    * @param defaultValue user defined default value
    */
-  public AggregateWithDefaultFunction(Number defaultValue) {
+  public AggregateWithDefaultValueFunction(Number defaultValue) {
     this.defaultValue = defaultValue;
   }
 

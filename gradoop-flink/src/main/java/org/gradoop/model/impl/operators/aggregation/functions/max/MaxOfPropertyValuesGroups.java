@@ -18,9 +18,11 @@
 package org.gradoop.model.impl.operators.aggregation.functions.max;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.intersection.Intersection;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 import java.math.BigDecimal;
@@ -39,6 +41,8 @@ public class MaxOfPropertyValuesGroups implements
    */
   private final Number min;
 
+  private Tuple2<GradoopId, PropertyValue> reuseTuple = new Tuple2<>();
+
   /**
    * Constructor
    * @param min minimum element
@@ -51,28 +55,37 @@ public class MaxOfPropertyValuesGroups implements
   public void reduce(
     Iterable<Tuple2<GradoopId, PropertyValue>> in,
     Collector<Tuple2<GradoopId, PropertyValue>> out) throws Exception {
-    Class type = min.getClass();
+    Class resultType = min.getClass();
     Number result = min;
-    GradoopId id = GradoopId.get();
+    reuseTuple.f0 = GradoopId.get();
     for (Tuple2<GradoopId, PropertyValue> tuple : in) {
-      id = tuple.f0;
+      reuseTuple.f0 = tuple.f0;
       PropertyValue value = tuple.f1;
-      result =
-        type.equals(Integer.class) ?
-          Math.max((Integer) result, value.getInt()) :
-        type.equals(Long.class) ?
-          Math.max((Long) result, value.getLong()) :
-        type.equals(Float.class) ?
-          Math.max((Float) result, value.getFloat()) :
-        type.equals(Double.class) ?
-          Math.max((Double) result, value.getDouble()) :
-        type.equals(BigDecimal.class) ?
-          ((BigDecimal) result).max(value.getBigDecimal()) :
-        result;
+      // this is necessary to allow aggregation over a property that contains
+      // values of different types (e.g. Integer and String)
+      if (resultType == Integer.class && value.isInt()) {
+        result = Math.max((Integer) result, value.getInt());
+      } else {
+        if (resultType == Long.class && value.isLong()) {
+          result = Math.max((Long) result, value.getLong());
+        } else {
+          if (resultType == Float.class && value.isFloat()) {
+            result = Math.max((Float) result, value.getFloat());
+          } else {
+            if (resultType == Double.class && value.isDouble()) {
+              result = Math.max((Double) result, value.getDouble());
+            } else {
+              if (resultType == BigDecimal.class && value.isBigDecimal()) {
+                result = ((BigDecimal) result).max(value.getBigDecimal());
+              } else {
+                reuseTuple.f1 = PropertyValue.create(min);
+              }
+            }
+          }
+        }
+      }
     }
-    out.collect(new Tuple2<>(
-      id,
-      PropertyValue.create(result)
-    ));
+    reuseTuple.f1 = PropertyValue.create(result);
+    out.collect(reuseTuple);
   }
 }

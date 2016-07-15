@@ -39,29 +39,54 @@ public class MaxOfPropertyValues implements
    */
   private final Number min;
 
+  private Tuple1<PropertyValue> reuseTuple;
+
   /**
    * Constructor
    * @param min minimum element
    */
   public MaxOfPropertyValues(Number min) {
+    this.reuseTuple = new Tuple1<>();
     this.min = min;
   }
   @Override
   public Tuple1<PropertyValue> reduce(Tuple1<PropertyValue> prop1,
     Tuple1<PropertyValue> prop2) throws Exception {
-    Class type = prop1.f0.getType();
     PropertyValue value1 = prop1.f0;
     PropertyValue value2 = prop2.f0;
-    return new Tuple1<>(PropertyValue.create(type.equals(Integer.class) ?
-      Math.max(value1.getInt(), value2.getInt()) :
-        type.equals(Long.class) ?
-      Math.max(value1.getLong(), value2.getLong()) :
-        type.equals(Float.class) ?
-      Math.max(value1.getFloat(), value2.getFloat()) :
-        type.equals(Double.class) ?
-      Math.max(value1.getDouble(), value2.getDouble()) :
-        type.equals(BigDecimal.class) ?
-      (value1.getBigDecimal().max(value2.getBigDecimal())) :
-          min));
+    // this is necessary to allow aggregation over a property that contains
+    // values of different types (e.g. Integer and String)
+    if (value1.isInt() && value2.isInt()) {
+      reuseTuple.f0 =
+        PropertyValue.create(
+          Math.max(value1.getInt(), value2.getInt()));
+    } else {
+      if (value1.isLong() && value2.isLong()) {
+        reuseTuple.f0 =
+          PropertyValue.create(
+            Math.max(value1.getLong(), value2.getLong()));
+      } else {
+        if (value1.isFloat() && value2.isFloat()) {
+          reuseTuple.f0 =
+            PropertyValue.create(
+              Math.max(value1.getFloat(), value2.getFloat()));
+        } else {
+          if (value1.isDouble() && value2.isDouble()) {
+            reuseTuple.f0 =
+              PropertyValue.create(
+                Math.max(value1.getDouble(), value2.getDouble()));
+          } else {
+            if (value1.isBigDecimal() && value2.isBigDecimal()) {
+              reuseTuple.f0 =
+                PropertyValue.create(
+                  value1.getBigDecimal().max(value2.getBigDecimal()));
+            } else {
+              reuseTuple.f0 = PropertyValue.create(min);
+            }
+          }
+        }
+      }
+    }
+    return reuseTuple;
   }
 }
