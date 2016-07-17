@@ -60,8 +60,8 @@ public class EdgeListExample implements ProgramDescription {
    * Reads the edge list from the given file and transforms it into an
    * {@link org.gradoop.model.impl.LogicalGraph}.
    *
-   * args[0] path to ede list file (can be stored in local FS or HDFS)
-   * args[1] token separator (optional, default is single whitespace)
+   * args[0]: path to ede list file (can be stored in local FS or HDFS)
+   * args[1]: token separator (optional, default is single whitespace)
    *
    * @param args program arguments
    */
@@ -136,7 +136,7 @@ public class EdgeListExample implements ProgramDescription {
     // Create logical graph
     //--------------------------------------------------------------------------
 
-    // create default config
+    // create default Gradoop config
     GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
       GradoopFlinkConfig.createDefaultConfig(env);
 
