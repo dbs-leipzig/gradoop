@@ -19,6 +19,7 @@ package org.gradoop.io.impl.graph.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.model.impl.properties.PropertyList;
+import org.gradoop.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,21 +45,41 @@ public class ImportEdge<K extends Comparable<K>>
   /**
    * Creates a new import edge.
    *
-   * @param edgeId          import edge id (i.e. identifier in source system)
-   * @param sourceVertexId  import source vertex id
-   * @param targetVertexId  import target vertex id
-   * @param label           edge label
-   * @param properties      edge properties
+   * @param edgeId    import edge id (i.e. identifier in source system)
+   * @param sourceId  import source vertex id
+   * @param targetId  import target vertex id
    */
-  public ImportEdge(K edgeId,
-    K sourceVertexId,
-    K targetVertexId,
-    String label,
-    PropertyList properties) {
+  public ImportEdge(K edgeId, K sourceId, K targetId) {
+    this(edgeId, sourceId, targetId, GConstants.DEFAULT_EDGE_LABEL);
+  }
 
+  /**
+   * Creates a new import edge.
+   *
+   * @param edgeId    import edge id (i.e. identifier in source system)
+   * @param sourceId  import source vertex id
+   * @param targetId  import target vertex id
+   * @param label     edge label
+   */
+  public ImportEdge(K edgeId, K sourceId, K targetId, String label) {
+    this(edgeId, sourceId, targetId, label,
+      PropertyList.createWithCapacity(0));
+  }
+
+  /**
+   * Creates a new import edge.
+   *
+   * @param edgeId      import edge id (i.e. identifier in source system)
+   * @param sourceId    import source vertex id
+   * @param targetId    import target vertex id
+   * @param label       edge label
+   * @param properties  edge properties
+   */
+  public ImportEdge(K edgeId, K sourceId, K targetId, String label,
+    PropertyList properties) {
     setId(edgeId);
-    setSourceVertexId(sourceVertexId);
-    setTargetVertexId(targetVertexId);
+    setSourceId(sourceId);
+    setTargetId(targetId);
     setLabel(label);
     setProperties(properties);
   }
@@ -71,20 +92,20 @@ public class ImportEdge<K extends Comparable<K>>
     this.f0 = checkNotNull(id, "id was null");
   }
 
-  public K getSourceVertexId() {
+  public K getSourceId() {
     return f1;
   }
 
-  public void setSourceVertexId(K sourceVertexId) {
-    f1 = checkNotNull(sourceVertexId, "sourceVertexId was null");
+  public void setSourceId(K sourceVertexId) {
+    f1 = checkNotNull(sourceVertexId, "sourceId was null");
   }
 
-  public K getTargetVertexId() {
+  public K getTargetId() {
     return f2;
   }
 
-  public void setTargetVertexId(K targetVertexId) {
-    f2 = checkNotNull(targetVertexId, "targetVertexId was null");
+  public void setTargetId(K targetVertexId) {
+    f2 = checkNotNull(targetVertexId, "targetId was null");
   }
 
   public String getLabel() {

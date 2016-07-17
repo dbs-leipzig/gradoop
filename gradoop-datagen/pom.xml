@@ -15,8 +15,7 @@
     <packaging>jar</packaging>
 
     <name>Gradoop Datagen</name>
-    <description>Gradoop Data Generators.
-    </description>
+    <description>Gradoop Data Generators.</description>
 
     <build>
         <plugins>
