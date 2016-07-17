@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <name>Gradoop Examples</name>
-    <description>Contains possible use cases for Gradoop.</description>
+    <description>Contains examples for Gradoop programs.</description>
 
     <build>
         <plugins>

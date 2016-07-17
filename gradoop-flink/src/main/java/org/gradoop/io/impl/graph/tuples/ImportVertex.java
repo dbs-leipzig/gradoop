@@ -19,6 +19,7 @@ package org.gradoop.io.impl.graph.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.model.impl.properties.PropertyList;
+import org.gradoop.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,6 +39,26 @@ public class ImportVertex<K extends Comparable<K>>
    * Default constructor for (de-)serialization.
    */
   public ImportVertex() { }
+
+  /**
+   * Creates a new import vertex.
+   *
+   * @param id import vertex id (i.e. identifier in the source system)
+   */
+  public ImportVertex(K id) {
+    this(id, GConstants.DEFAULT_VERTEX_LABEL);
+  }
+
+  /**
+   * Creates a new import vertex.
+   *
+   * @param id    import vertex id (i.e. identifier in the source system)*
+   * @param label vertex label
+   */
+  public ImportVertex(K id, String label) {
+    this(id, label, PropertyList.createWithCapacity(0));
+  }
+
 
   /**
    * Creates a new import vertex.

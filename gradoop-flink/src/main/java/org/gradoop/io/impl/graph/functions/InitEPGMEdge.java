@@ -84,7 +84,7 @@ public class InitEPGMEdge<E extends EPGMEdge, K extends Comparable<K>>
   @Override
   public Tuple2<K, E> join(ImportEdge<K> importEdge,
     Tuple2<K, GradoopId> vertexIdPair) throws Exception {
-    reuseTuple.f0 = importEdge.getTargetVertexId();
+    reuseTuple.f0 = importEdge.getTargetId();
 
     E edge = edgeFactory.createEdge(importEdge.getLabel(),
       vertexIdPair.f1, GradoopId.get(), importEdge.getProperties());
