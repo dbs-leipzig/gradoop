@@ -15,7 +15,7 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.tsv;
+package org.gradoop.io.impl.edgelist;
 
 import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
@@ -26,19 +26,21 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class TSVIOTest extends GradoopFlinkTestBase {
+public class EdgeListIOTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testTSVData() throws Exception {
-    String tsvFile =
-            TSVIOTest.class.getResource("/data/tsv/tsvFile").getFile();
+  public void testEdgeListData() throws Exception {
+    String edgeListFile =
+            EdgeListIOTest.class.getResource("/data/edgelist/edgeListFile")
+              .getFile();
 
     String gdlFile =
-            TSVIOTest.class.getResource("/data/tsv/tsv.gdl").getFile();
+            EdgeListIOTest.class.getResource("/data/edgelist/edgeListTest.gdl")
+              .getFile();
 
     // load from tsv file
     DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-            new TSVDataSource<>(tsvFile, " ", "",  "lan", config);
+            new EdgeListDataSource<>(edgeListFile, " ", "lan", config);
 
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
             tsvGraph = dataSource.getLogicalGraph();
