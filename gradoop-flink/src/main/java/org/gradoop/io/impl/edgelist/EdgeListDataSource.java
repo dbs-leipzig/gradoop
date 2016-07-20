@@ -44,10 +44,16 @@ import java.io.IOException;
  *
  * e.g.
  * 0 EN 1 ZH
+ * 2 DE 0 EN
  *
  * The example line denotes an edge between two vertices:
- * vertex1: with id = 0 and vertex value "EN" and
- * vertex2: with id = 1 and vertex value "ZH".
+ * First edge:
+ * source: with id = 0 and vertex value "EN" and
+ * target: with id = 1 and vertex value "ZH".
+ *
+ * Second edge:
+ * source: with id = 2 and vertex value "DE" and
+ * target: with id = 0 and vertex value "EN".
  *
  * This DataSource will create EPGMEdges based on the given lines.
  * EPGMVertices will be created using the given id's + values will be
@@ -117,7 +123,6 @@ public class EdgeListDataSource
                     .fieldDelimiter(tokenSeparator)
                     .types(Long.class, String.class, Long.class, String.class);
 
-
     //--------------------------------------------------------------------------
     // generate vertices
     //--------------------------------------------------------------------------
@@ -125,18 +130,15 @@ public class EdgeListDataSource
     DataSet<ImportVertex<Long>> importVertices = lineTuples
       .<Tuple2<Long, String>>project(0, 1)
       .union(lineTuples.<Tuple2<Long, String>>project(2, 3))
-      .distinct()
+      .distinct(0)
       .map(new CreateImportVertex(propertyKey));
 
     //--------------------------------------------------------------------------
     // generate edges
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<Long, Tuple2<Long, Long>>> edgeIdsWithUniqueId =
-      DataSetUtils.zipWithUniqueId(lineTuples
-        .<Tuple2<Long, Long>>project(0, 2));
-
-    DataSet<ImportEdge<Long>> importEdges = edgeIdsWithUniqueId
+    DataSet<ImportEdge<Long>> importEdges = DataSetUtils
+      .zipWithUniqueId(lineTuples.<Tuple2<Long, Long>>project(0, 2))
       .map(new CreateImportEdge());
 
     //--------------------------------------------------------------------------

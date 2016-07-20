@@ -57,8 +57,8 @@ public class CreateImportEdge
       throws Exception {
     reuseEdge.setId(idTuple.f0);
     reuseEdge.setProperties(PropertyList.create());
-    reuseEdge.setSourceVertexId(idTuple.f1.f0);
-    reuseEdge.setTargetVertexId(idTuple.f1.f1);
+    reuseEdge.setSourceId(idTuple.f1.f0);
+    reuseEdge.setTargetId(idTuple.f1.f1);
     return reuseEdge;
   }
 }
