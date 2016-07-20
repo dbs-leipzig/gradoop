@@ -25,7 +25,13 @@ import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
 
 /**
- * MapFunction to create ImportEdges
+ * (edgeId, (sourceId, targetId)) => ImportEdge
+ *
+ * Forwarded fields:
+ *
+ * f0:        edgeId
+ * f1.f0->f1: sourceId
+ * f1.f1->f2: targetId
  */
 @FunctionAnnotation.ForwardedFields("f0; f1.f0->f1; f1.f1->f2")
 public class CreateImportEdge

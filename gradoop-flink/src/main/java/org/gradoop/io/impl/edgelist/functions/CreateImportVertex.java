@@ -25,7 +25,11 @@ import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
 
 /**
- * Class to create ImportVertices
+ * (vertexId, label) => ImportVertex
+ *
+ * Forwarded fields:
+ *
+ * f0: vertexId
  */
 @FunctionAnnotation.ForwardedFields("f0")
 public class CreateImportVertex
