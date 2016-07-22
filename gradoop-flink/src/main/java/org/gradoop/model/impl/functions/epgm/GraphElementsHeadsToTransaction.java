@@ -29,6 +29,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -55,20 +56,24 @@ public class GraphElementsHeadsToTransaction
     Iterable<G> graphHeads,
     Collector<GraphTransaction<G, V, E>> out) throws Exception {
 
-    Set<V> vertices = Sets.newHashSet();
-    Set<E> edges    = Sets.newHashSet();
-    G graphHead     = graphHeads.iterator().next();
+    Iterator<G> graphHeadIter = graphHeads.iterator();
 
-    for (Tuple2<GradoopId, EPGMGraphElement> graphElement : graphElements) {
+    if (graphHeadIter.hasNext()) {
+      Set<V> vertices = Sets.newHashSet();
+      Set<E> edges = Sets.newHashSet();
+      G graphHead = graphHeadIter.next();
 
-      EPGMGraphElement el = graphElement.f1;
-      if (el instanceof EPGMVertex) {
-        vertices.add((V) el);
-      } else if (el instanceof EPGMEdge) {
-        edges.add((E) el);
+      for (Tuple2<GradoopId, EPGMGraphElement> graphElement : graphElements) {
+
+        EPGMGraphElement el = graphElement.f1;
+        if (el instanceof EPGMVertex) {
+          vertices.add((V) el);
+        } else if (el instanceof EPGMEdge) {
+          edges.add((E) el);
+        }
       }
-    }
 
-    out.collect(new GraphTransaction<>(graphHead, vertices, edges));
+      out.collect(new GraphTransaction<>(graphHead, vertices, edges));
+    }
   }
 }
