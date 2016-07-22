@@ -63,4 +63,31 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
       originalCollection.equalsByGraphData(restoredCollection));
   }
 
+  @Test
+  public void regressionTest273() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+      loader = getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString("g1[(eve)]");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> originalCollection =
+      loader.getGraphCollectionByVariables("g1");
+
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
+      originalCollection.toTransactions();
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> restoredCollection =
+      GraphCollection.fromTransactions(transactions,
+        new First<VertexPojo>(), new First<EdgePojo>());
+
+    collectAndAssertTrue(
+      originalCollection.equalsByGraphIds(restoredCollection));
+
+    collectAndAssertTrue(
+      originalCollection.equalsByGraphElementIds(restoredCollection));
+
+    collectAndAssertTrue(
+      originalCollection.equalsByGraphData(restoredCollection));
+  }
+
 }
