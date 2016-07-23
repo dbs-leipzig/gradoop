@@ -17,16 +17,40 @@ import org.gradoop.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
+/**
+ * DataSource for Gelly Graphs
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ */
 public class GellyGraphDataSource
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements DataSource<G, V, E> {
 
+  /**
+   * Gelly Graph
+   */
   private final Graph<GradoopId, V, E> graph;
 
+  /**
+   * EPGM graph head for the logical graph
+   */
   private final G graphHead;
 
+  /**
+   * Gradoop Flink Configuration
+   */
   private final GradoopFlinkConfig<G, V, E> config;
 
+  /**
+   * Creates a logical graph from the given Gelly graph. All vertices and edges
+   * will be assigned to the given graph head.
+   *
+   * @param graph     Flink Gelly graph
+   * @param graphHead EPGM graph head for the logical graph
+   * @param config    Gradoop Flink configuration
+   */
   public GellyGraphDataSource(final Graph<GradoopId, V, E> graph,
     final G graphHead,
     final GradoopFlinkConfig<G, V, E> config) {
@@ -35,6 +59,13 @@ public class GellyGraphDataSource
     this.config = config;
   }
 
+  /**
+   * Creates a logical graph from the given Gelly graph. A new graph head will
+   * created, all vertices and edges will be assigned to that logical graph.
+   *
+   * @param graph     Flink Gelly graph
+   * @param config    Gradoop Flink configuration
+   */
   public GellyGraphDataSource(final Graph<GradoopId, V, E> graph,
     final GradoopFlinkConfig<G, V, E> config) {
     this(graph, null, config);
@@ -45,7 +76,7 @@ public class GellyGraphDataSource
     DataSet<V> vertices = graph.getVertices()
       .map(new MapFunction<Vertex<GradoopId, V>, V>() {
         @Override
-        public V map(Vertex<GradoopId, V> gellyVertex) throws Exception {
+        public V map(final Vertex<GradoopId, V> gellyVertex) throws Exception {
           return gellyVertex.getValue();
         }
       }).withForwardedFields("f1->*");
@@ -53,7 +84,7 @@ public class GellyGraphDataSource
     DataSet<E> edges = graph.getEdges()
       .map(new MapFunction<Edge<GradoopId, E>, E>() {
         @Override
-        public E map(Edge<GradoopId, E> gellyEdge) throws Exception {
+        public E map(final Edge<GradoopId, E> gellyEdge) throws Exception {
           return gellyEdge.getValue();
         }
       }).withForwardedFields("f2->*");
