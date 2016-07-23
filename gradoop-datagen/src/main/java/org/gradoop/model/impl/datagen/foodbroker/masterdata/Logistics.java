@@ -29,7 +29,7 @@ import java.util.Random;
 public class Logistics<V extends EPGMVertex>
   extends RichMapFunction<MasterDataSeed, V> {
 
-  private static final String CLASS_NAME = "Logistics";
+  public static final String CLASS_NAME = "Logistics";
   private static final String ACRONYM = "LOG";
   private List<String> adjectives;
   private List<String> nouns;
