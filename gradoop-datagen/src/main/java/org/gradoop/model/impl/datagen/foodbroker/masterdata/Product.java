@@ -16,6 +16,8 @@
  */
 package org.gradoop.model.impl.datagen.foodbroker.masterdata;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
@@ -24,6 +26,7 @@ import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 
@@ -73,7 +76,26 @@ public class Product<V extends EPGMVertex>
     properties.set("name",
       adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nameGroupPair.f0);
+    this.setPrice(properties);
 
     return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
+  }
+
+  private void setPrice(PropertyList properties) {
+    PropertiesConfiguration config = null;
+    try {
+      config = new PropertiesConfiguration("config.properties");
+    } catch (ConfigurationException e) {
+      e.printStackTrace();
+    }
+
+    float minPrice = config.getFloat("ProductMinPrice");
+    float maxPrice = config.getFloat("ProductMaxPrice");
+
+    BigDecimal price = BigDecimal.valueOf(
+      minPrice + (float) (Math.random() * ((1 + maxPrice) - minPrice))
+    ).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+    properties.set("price",price);
   }
 }
