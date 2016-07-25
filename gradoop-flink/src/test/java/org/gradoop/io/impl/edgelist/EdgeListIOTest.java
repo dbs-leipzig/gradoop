@@ -31,11 +31,11 @@ public class EdgeListIOTest extends GradoopFlinkTestBase {
   @Test
   public void testEdgeListData() throws Exception {
     String edgeListFile =
-            EdgeListIOTest.class.getResource("/data/edgelist/edgeListFile")
+            EdgeListIOTest.class.getResource("/data/edgelist/input")
               .getFile();
 
     String gdlFile =
-            EdgeListIOTest.class.getResource("/data/edgelist/edgeListTest.gdl")
+            EdgeListIOTest.class.getResource("/data/edgelist/expected.gdl")
               .getFile();
 
     // load from tsv file
