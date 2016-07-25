@@ -63,8 +63,6 @@ public class TLFFileFormat
    */
   @Override
   public String format(GraphTransaction<G, V, E> graphTransaction) {
-    graphId++;
-
     Map<GradoopId, Integer> vertexIdMap = Maps
       .newHashMapWithExpectedSize(graphTransaction.getVertices().size());
 
@@ -75,6 +73,7 @@ public class TLFFileFormat
 
     // GRAPH HEAD
     lines.add(TLFGraph.SYMBOL + " # " + graphId);
+    graphId++;
 
     // VERTICES
     int vertexId = 0;
@@ -92,6 +91,6 @@ public class TLFFileFormat
       lines.add(TLFEdge.SYMBOL +
         " " + sourceId + " " + targetId + "" +  " " + edge.getLabel());
     }
-    return StringUtils.join(lines, "\n") + "\n";
+    return StringUtils.join(lines, "\n");
   }
 }
