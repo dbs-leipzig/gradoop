@@ -46,35 +46,48 @@ public class TLFGraphFromText
    */
   @Override
   public TLFGraph map(Tuple2<LongWritable, Text> inputTuple) throws Exception {
-    String[] lines = inputTuple.getField(1).toString().split("\n");
-
     boolean firstLine = true;
+    boolean vertexLine = true;
+    String graph = inputTuple.f1.toString();
+    StringBuilder stringBuilder = new StringBuilder();
+    int cursor = 0;
+    char currChar;
 
     TLFGraphHead graphHead = null;
     Collection<TLFVertex> vertices = Lists.newArrayList();
     Collection<TLFEdge> edges = Lists.newArrayList();
 
-    for (String line :lines) {
-      if (firstLine) {
-        graphHead = new TLFGraphHead(inputTuple.f0.get());
-        firstLine = false;
-      } else {
-        String[] fields = line.split(" ");
-
-        if (fields[0].equals(TLFVertex.SYMBOL)) {
-          vertices.add(new TLFVertex(
-            Integer.valueOf(fields[1]),
-            fields[2])
-          );
+    do {
+      currChar = graph.charAt(cursor);
+      if (currChar == '\n') {
+        String[] fields = stringBuilder.toString().split(" ");
+        if (firstLine) {
+          graphHead = new TLFGraphHead(Long.valueOf(fields[2]));
+          firstLine = false;
         } else {
-          edges.add(new TLFEdge(
-            Integer.valueOf(fields[1]),
-            Integer.valueOf(fields[2]),
-            fields[3]
-          ));
+          if (vertexLine) {
+            vertices.add(new TLFVertex(
+              Integer.valueOf(fields[1]),
+              fields[2])
+            );
+            if (TLFEdge.SYMBOL.equals(String.valueOf(graph
+              .charAt(cursor + 1)))) {
+              vertexLine = false;
+            }
+          } else {
+            edges.add(new TLFEdge(
+              Integer.valueOf(fields[1]),
+              Integer.valueOf(fields[2]),
+              fields[3]
+            ));
+          }
         }
+        stringBuilder.setLength(0);
+      } else {
+        stringBuilder.append(currChar);
       }
-    }
+      cursor++;
+    } while (cursor != graph.length());
 
     return new TLFGraph(graphHead, vertices, edges);
   }
