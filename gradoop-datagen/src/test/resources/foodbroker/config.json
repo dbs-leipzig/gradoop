@@ -34,14 +34,55 @@
     }
   },
   "Process" : {
-    "casesPerScaleFactor" : 10000
+    "casesPerScaleFactor" : 10000,
+    "startDate" : "2014-01-01",
+    "endDate" : "2014-12-31"
   },
+  //TODO check wether higherIsBetter is needed
   "TransactionalData" : {
     "SalesQuotation" : {
       "minLines" : 1,
       "maxLines" : 20,
-      "probability" : 0.6,
-      "probabilityInfluence" : 0.2
+      "minLineQuantity" : 1,
+      "maxLineQuantity" : 100,
+      "salesMarginBase" : 0.05, //higherIsBetter : true
+      "salesMarginInfluence" : 0.02,
+      "confirmationProbability" : 0.6, //higherIsBetter : true
+      "confirmationProbabilityInfluence" : 0.2,
+      "lineConfirmationProbabilityMin" : 0,
+      "lineConfirmationProbabilityMax" : 9,
+      "confirmationDelayMin" : 0,
+      "confirmationDelayMax" : 20,
+      "confirmationDelayInfluence" : 5 //higherIsBetter : false
+    },
+    "SalesOrder" : {
+      "deliveryAgreementDelayMin" : 2, //higherIsBetter : true
+      "deliveryAgreementDelayMax" : 4,
+      "deliveryAgreementDelayInfluence" : 1,
+      "purchaseDelayMin" : 0,  //higherIsBetter : false
+      "purchaseDelayMax" : 2,
+      "purchaseDelayInfluence" : 2,
+      "invoiceDelayMin" : 0, //higherIsBetter : false
+      "invoiceDelayMax" : 3,
+      "invoiceDelayInfluence" : -2
+    },
+    "PurchOrder" : {
+      "priceVariation" : 0.01, //higherIsBetter : false
+      "priceVariationInfluence" : -0.02,
+      "deliveryDelayMin" : 0, //higherIsBetter : false
+      "deliveryDelayMax" : 1,
+      "deliveryDelayInfluence" : 1,
+      "invoiceDelayMin" : 2, //higherIsBetter : true
+      "invoiceDelayMax" : 5,
+      "invoiceDelayInfluence" : 3
+    },
+    "Ticket" : {
+      "badQualityProbability" : 0.05, //higherIsBetter : false
+      "badQualityProbabilityInfluence" : -0.1,
+      "salesRefund" : 0.1, //higherIsBetter : false
+      "salesRefundInfluence" : -0.05,
+      "purchRefund" : 0.1, //higherIsBetter : true
+      "purchRefundInfluence" : 0.05
     }
   },
   "Quality" : {
@@ -49,90 +90,8 @@
     "normal" : 0.33,
     "bad" : 0.01
   },
-  "BusinessMeasures" : {
-    "FoodBrokerage" : {
-      "ConfirmationProbability": {
-        "base": 0.6,        //entspricht dem oben in der salesquotation, also
-        //den rest der ganzen werte auch nach transdata verschieben
-        "influence": 0.2,
-        "higherIsBetter": true
-      },
-      "SalesMargin": {
-        "base": 0.05,
-        "influence": 0.02,
-        "higherIsBetter": true
-      },
-      "PurchPriceVariation": {
-        "base": 0.01,
-        "influence": 0.02,
-        "higherIsBetter": false
-      }
-    },
-    "ComplaintHandling" : {
-      "BadQualityProbability" : {
-        "base" : 0.05,
-        "influence" : 0.1,
-        "higherIsBetter" : false
-      },
-      "SalesRefund" : {
-        "base" : 0.1,
-        "influence" : 0.05,
-        "higherIsBetter" : false
-      },
-      "PurchRefund" : {
-        "base" : 0.1,
-        "influence" : 0.05,
-        "higherIsBetter" : true
-      }
-    }
-  },
-  "Delays" : {
-    "ConfirmationDelay" : {
-      "min" : 0,
-      "max" : 20,
-      "influence" : 5,
-      "higherIsBetter" : false
-    },
-    "DeliveryAgreementDelay" : {
-      "min" : 2,
-      "max" : 4,
-      "influence" : 1,
-      "higherIsBetter" : true
-    },
-    "PurchDelay" : {
-      "min" : 0,
-      "max" : 2,
-      "influence" : 1,
-      "higherIsBetter" : false
-    },
-    "PurchDeliveryDelay" : {
-      "min" : 0,
-      "max" : 1,
-      "influence" : 1,
-      "higherIsBetter" : false
-    },
-    "PurchInvoiceDelay" : {
-      "min" : 2,
-      "max" : 5,
-      "influence" : 3,
-      "higherIsBetter" : true
-    },
-    "SalesInvoiceDelay" : {
-      "min" : 0,
-      "max" : 3,
-      "influence" : 2,
-      "higherIsBetter" : false
-    }
-  },
+  //TODO check where needed
   "Amounts" : {
-    "NumberOfQuotationLines" : {
-      "min" : 1,
-      "max" : 20
-    },
-    "NumberOfQuotedProducts" : {
-      "min" : 1,
-      "max" : 100
-    },
     "NumberOfVendors" : {
       "min" : 1,
       "max" : 3
