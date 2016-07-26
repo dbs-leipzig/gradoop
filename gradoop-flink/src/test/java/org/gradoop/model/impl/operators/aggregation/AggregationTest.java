@@ -99,7 +99,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
         "(va {vp=0.5});" +
         "(vb {vp=0.3});" +
         "(vc {vp=0.1});" +
-        "(va)-[ea {ep=2}]->(vb);" +
+        "(va)-[ea {ep=2L}]->(vb);" +
         "(vb)-[eb]->(vc)" +
         "]" +
         "g1[" +
@@ -113,12 +113,10 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
       inputCollection
         .apply(new ApplyAggregation<>(VERTEX_MIN,
-          PropertyValue.create(Float.MAX_VALUE),
           new MinVertexProperty<GraphHeadPojo, VertexPojo, EdgePojo>(
             VERTEX_PROPERTY,
             Float.MAX_VALUE)))
         .apply(new ApplyAggregation<>(EDGE_MIN,
-          PropertyValue.create(Long.MAX_VALUE),
           new MinEdgeProperty<GraphHeadPojo, VertexPojo, EdgePojo>(
             EDGE_PROPERTY,
             Long.MAX_VALUE)));
@@ -199,10 +197,10 @@ public class AggregationTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "g0[" +
-        "(va {vp=0.5});" +
-        "(vb {vp=0.3});" +
-        "(vc {vp=0.1});" +
-        "(va)-[ea {ep=2}]->(vb);" +
+        "(va {vp=0.5f});" +
+        "(vb {vp=0.3f});" +
+        "(vc {vp=0.1f});" +
+        "(va)-[ea {ep=2L}]->(vb);" +
         "(vb)-[eb]->(vc)" +
         "]" +
         "g1[" +
@@ -216,12 +214,10 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
       inputCollection
         .apply(new ApplyAggregation<>(VERTEX_MAX,
-          PropertyValue.create(0f),
           new MaxVertexProperty<GraphHeadPojo, VertexPojo, EdgePojo>(
             VERTEX_PROPERTY,
             Float.MIN_VALUE)))
         .apply(new ApplyAggregation<>(EDGE_MAX,
-          PropertyValue.create(Long.MIN_VALUE),
           new MaxEdgeProperty<GraphHeadPojo, VertexPojo, EdgePojo>(
             EDGE_PROPERTY,
             Long.MIN_VALUE)));
@@ -235,7 +231,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       assertTrue("vertex maximum not set", graphHead.hasProperty(VERTEX_MAX));
       if (graphHead.getId().equals(g0Id)) {
         assertEquals(
-          2,
+          2L,
           graphHead.getPropertyValue(EDGE_MAX).getLong());
         assertEquals(
           0.5f,
@@ -243,7 +239,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
           0.00001);
       } else if (graphHead.getId().equals(g1Id)) {
         assertEquals(
-          2,
+          2L,
           graphHead.getPropertyValue(EDGE_MAX).getLong());
         assertEquals(
           0.5f,
@@ -255,8 +251,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
           graphHead.getPropertyValue(EDGE_MAX).getLong());
         assertEquals(
           Float.MIN_VALUE,
-          graphHead.getPropertyValue(VERTEX_MAX)
-            .getFloat(),
+          graphHead.getPropertyValue(VERTEX_MAX).getFloat(),
           0.00001);
       }  else {
         Assert.fail("unexpected graph head: " + graphHead);
@@ -306,7 +301,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
         "(va {vp=0.5});" +
         "(vb {vp=0.3});" +
         "(vc {vp=0.1});" +
-        "(va)-[ea {ep=2}]->(vb);" +
+        "(va)-[ea {ep=2L}]->(vb);" +
         "(vb)-[eb]->(vc)" +
         "]" +
         "g1[" +
@@ -321,13 +316,11 @@ public class AggregationTest extends GradoopFlinkTestBase {
       inputCollection
         .apply(new ApplyAggregation<>(
           VERTEX_SUM,
-          PropertyValue.create(0f),
           new SumVertexProperty<GraphHeadPojo, VertexPojo, EdgePojo>(
             VERTEX_PROPERTY,
             0.0f)))
         .apply(new ApplyAggregation<>(
           EDGE_SUM,
-          PropertyValue.create(0L),
           new SumEdgeProperty<GraphHeadPojo, VertexPojo, EdgePojo>(
             EDGE_PROPERTY,
             0L)));
@@ -353,6 +346,75 @@ public class AggregationTest extends GradoopFlinkTestBase {
           graphHead.getPropertyValue(EDGE_SUM).getLong());
         assertEquals(
           0.8f,
+          graphHead.getPropertyValue(VERTEX_SUM).getFloat(),
+          0.00001);
+      } else if (graphHead.getId().equals(g2Id)) {
+        assertEquals(
+          0,
+          graphHead.getPropertyValue(EDGE_SUM).getInt());
+        assertEquals(
+          0f,
+          graphHead.getPropertyValue(VERTEX_SUM).getFloat(),
+          0.00001);
+      }  else {
+        Assert.fail("unexpected graph head: " + graphHead);
+      }
+    }
+  }
+
+  @Test
+  public void testWithMixedTypePropertyValues() throws Exception{
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("" +
+        "g0[" +
+        "(va {vp=0.5});" +
+        "(vb {vp=\"test\"});" +
+        "(vc {vp=0.1});" +
+        "(va)-[ea {ep=2L}]->(vb);" +
+        "(vb)-[eb {ep=2.0F}]->(vc)" +
+        "]" +
+        "g1[" +
+        "(va)-[ea]->(vb);" +
+        "]" +
+        "g2[]");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> inputCollection =
+      loader.getGraphCollectionByVariables("g0", "g1", "g2");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
+      inputCollection
+        .apply(new ApplyAggregation<>(
+          VERTEX_SUM,
+          new SumVertexProperty<GraphHeadPojo, VertexPojo, EdgePojo>(
+            VERTEX_PROPERTY,
+            0.0f)))
+        .apply(new ApplyAggregation<>(
+          EDGE_SUM,
+          new SumEdgeProperty<GraphHeadPojo, VertexPojo, EdgePojo>(
+            EDGE_PROPERTY,
+            0L)));
+
+    GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();
+    GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
+    GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
+
+    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+      assertTrue("edge sum not set", graphHead.hasProperty(EDGE_SUM));
+      assertTrue("vertex sum not set", graphHead.hasProperty(VERTEX_SUM));
+      if (graphHead.getId().equals(g0Id)) {
+        assertEquals(
+          2,
+          graphHead.getPropertyValue(EDGE_SUM).getLong());
+        assertEquals(
+          0.6f,
+          graphHead.getPropertyValue(VERTEX_SUM).getFloat(),
+          0.00001);
+      } else if (graphHead.getId().equals(g1Id)) {
+        assertEquals(
+          2,
+          graphHead.getPropertyValue(EDGE_SUM).getLong());
+        assertEquals(
+          0.5f,
           graphHead.getPropertyValue(VERTEX_SUM).getFloat(),
           0.00001);
       } else if (graphHead.getId().equals(g2Id)) {
@@ -436,10 +498,8 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> outputCollection =
       inputCollection
         .apply(new ApplyAggregation<>(VERTEX_COUNT,
-          PropertyValue.create(0L),
           new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>()))
         .apply(new ApplyAggregation<>(EDGE_COUNT,
-          PropertyValue.create(0L),
           new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>()));
 
     GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();

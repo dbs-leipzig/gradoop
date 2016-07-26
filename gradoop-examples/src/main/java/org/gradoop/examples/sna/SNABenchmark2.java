@@ -35,7 +35,6 @@ import org.gradoop.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -230,7 +229,6 @@ public class SNABenchmark2
       // 4) compute vertex count per community
       .apply(new ApplyAggregation<>(
         vertexCount,
-        PropertyValue.create(0L),
         new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>()))
       // 5) select graphs with more than minClusterSize vertices
       .select(new FilterFunction<GraphHeadPojo>() {
