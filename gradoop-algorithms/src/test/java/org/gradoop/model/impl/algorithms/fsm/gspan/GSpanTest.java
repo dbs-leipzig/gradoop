@@ -4,10 +4,8 @@ import com.google.common.collect.Lists;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
-import org.gradoop.model.impl.algorithms.fsm.gspan.GSpan;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
-import org.gradoop.model.impl.algorithms.fsm.gspan.encoders
-  .GSpanGraphCollectionEncoder;
+import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GSpanGraphCollectionEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
@@ -27,7 +25,8 @@ public class GSpanTest extends GradoopFlinkTestBase {
   @Test
   public void testMinDfsCodeCalculation() {
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.7f);
+    float threshold = 0.7f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     //       -a->
     //  (0:A)    (1:A)
@@ -72,8 +71,8 @@ public class GSpanTest extends GradoopFlinkTestBase {
     GSpanEncoder<GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>> encoder =
       new GSpanGraphCollectionEncoder<>();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.7f);
-
+    float threshold = 0.7f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     Collection<GSpanGraph> graphs = encoder
       .encode(searchSpace, fsmConfig).collect();

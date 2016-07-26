@@ -93,7 +93,8 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.1f);
+    float threshold = 0.1f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     List<DFSCode> tGraphs = tEncoder
       .encode(dataSource.getGraphTransactions(), fsmConfig)
@@ -141,7 +142,8 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
+    float threshold = 0.4f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);
@@ -170,7 +172,8 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
+    float threshold = 0.4f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);
@@ -200,7 +203,8 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
+    float threshold = 0.4f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);

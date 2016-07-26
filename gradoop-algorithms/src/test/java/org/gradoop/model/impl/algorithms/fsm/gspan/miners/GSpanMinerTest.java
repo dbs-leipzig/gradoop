@@ -26,14 +26,14 @@ import java.util.Collection;
 public class GSpanMinerTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testMinersSeparately() throws Exception {
+  public void testMinersSeparatelyDirected() throws Exception {
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
       new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
         .execute();
 
     float threshold = 0.2f;
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(threshold);
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
       encoder = new GSpanGraphTransactionsEncoder<>();
@@ -52,6 +52,35 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
     }
   }
 
+  @Test
+  public void testMinersSeparatelyUndirected() throws Exception {
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
+      new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
+        .execute();
+
+    float threshold = 0.6f;
+
+    FSMConfig fsmConfig = new FSMConfig(threshold, false);
+
+    GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
+      encoder = new GSpanGraphTransactionsEncoder<>();
+
+    DataSet<GSpanGraph> edges = encoder.encode(transactions, fsmConfig);
+
+    for (GSpanMiner miner : getTransactionalFSMiners()) {
+      miner.setExecutionEnvironment(
+        transactions.getConfig().getExecutionEnvironment());
+      DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs =
+        miner.mine(edges, encoder.getMinFrequency(), fsmConfig);
+
+      System.out.println(frequentSubgraphs.count());
+
+//      Assert.assertEquals(
+//        PredictableTransactionsGenerator.containedFrequentSubgraphs(threshold),
+//        frequentSubgraphs.count());
+    }
+  }
+
   private Collection<GSpanMiner> getTransactionalFSMiners() {
     Collection<GSpanMiner> miners = Lists.newArrayList();
 
@@ -66,7 +95,8 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
       new PredictableTransactionsGenerator<>(30, 1, true, getConfig())
         .execute();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
+    float threshold = 0.4f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
       encoder = new GSpanGraphTransactionsEncoder<>();
