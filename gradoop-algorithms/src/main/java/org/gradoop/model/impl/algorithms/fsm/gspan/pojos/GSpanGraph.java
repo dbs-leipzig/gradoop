@@ -17,6 +17,9 @@
 
 package org.gradoop.model.impl.algorithms.fsm.gspan.pojos;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +53,13 @@ public class GSpanGraph implements Serializable {
     this.subgraphEmbeddings = subgraphEmbeddings;
   }
 
+  /**
+   * default constructor
+   */
+  public GSpanGraph() {
+    this.adjacencyLists = Lists.newArrayListWithCapacity(0);
+    this.subgraphEmbeddings = Maps.newHashMapWithExpectedSize(0);
+  }
 
   /**
    * Convenience method to check further ability to grow frequent subgraphs.

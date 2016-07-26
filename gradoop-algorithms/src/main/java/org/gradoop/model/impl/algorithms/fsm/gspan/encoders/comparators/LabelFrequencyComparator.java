@@ -35,6 +35,8 @@ public class LabelFrequencyComparator
 
     if (label1.getCount() > label2.getCount()) {
       comparison = -1;
+    } else if (label1.getCount() < label2.getCount()) {
+      comparison = 1;
     } else {
       comparison = label1.getObject().compareTo(label2.getObject());
     }
