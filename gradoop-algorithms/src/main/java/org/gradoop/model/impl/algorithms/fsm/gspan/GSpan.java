@@ -57,7 +57,7 @@ public class GSpan {
    * @param <T> edge triple type
    * @param <IDT> id type
    * @param triples the graphs edges
-   * @param fsmConfig
+   * @param fsmConfig FSM configuration
    * @return graph transaction
    */
   public static <T extends EdgeTriple<IDT>, IDT> GSpanGraph
@@ -76,7 +76,7 @@ public class GSpan {
    * existing encoded subgraph.
    *
    * @param subgraph encodes subgraph
-   * @param fsmConfig
+   * @param fsmConfig FSM configuration
    * @return graph transaction
    */
   private static GSpanGraph createGSpanGraph(DFSCode subgraph,
@@ -97,7 +97,7 @@ public class GSpan {
    *
    * @param adjacencyLists adjacency lists
    * @param edges edges
-   * @param fsmConfig
+   * @param fsmConfig FSM configuration
    * @return graph transaction
    */
   private static GSpanGraph createGSpanGraph(List<AdjacencyList> adjacencyLists,
@@ -297,7 +297,7 @@ public class GSpan {
    *
    * @param subgraphEmbeddings subgraph-embeddings map
    * @param edge edge
-   * @param fsmConfig
+   * @param fsmConfig FSM configuration
    * @return collection of embeddings
    */
   private static Collection<DFSEmbedding> createSingleEdgeSubgraphEmbeddings(
@@ -336,7 +336,7 @@ public class GSpan {
    * Create a single edge Subgraph for a given edge.
    *
    * @param edge edge
-   * @param fsmConfig
+   * @param fsmConfig FSM configuration
    * @return subgraph
    */
   private static DFSCode createSingleEdgeSubgraph(final GSpanEdge edge,
@@ -348,21 +348,27 @@ public class GSpan {
 
     DFSStep step;
 
-    if(fsmConfig.isDirected()) {
+    if (fsmConfig.isDirected()) {
       if (edge.isLoop()) {
-        step = new DirectedDFSStep(0, sourceLabel, true, edgeLabel, 0, sourceLabel);
+        step = new DirectedDFSStep(
+          0, sourceLabel, true, edgeLabel, 0, sourceLabel);
       } else if (edge.sourceIsMinimumLabel()) {
-        step = new DirectedDFSStep(0, sourceLabel, true, edgeLabel, 1, targetLabel);
+        step = new DirectedDFSStep(
+          0, sourceLabel, true, edgeLabel, 1, targetLabel);
       } else {
-        step = new DirectedDFSStep(0, targetLabel, false, edgeLabel, 1, sourceLabel);
+        step = new DirectedDFSStep(
+          0, targetLabel, false, edgeLabel, 1, sourceLabel);
       }
     } else {
       if (edge.isLoop()) {
-        step = new UndirectedDFSStep(0, sourceLabel, edgeLabel, 0, sourceLabel);
+        step = new UndirectedDFSStep(
+          0, sourceLabel, edgeLabel, 0, sourceLabel);
       } else if (edge.sourceIsMinimumLabel()) {
-        step = new UndirectedDFSStep(0, sourceLabel, edgeLabel, 1, targetLabel);
+        step = new UndirectedDFSStep(
+          0, sourceLabel, edgeLabel, 1, targetLabel);
       } else {
-        step = new UndirectedDFSStep(0, targetLabel, edgeLabel, 1, sourceLabel);
+        step = new UndirectedDFSStep(
+          0, targetLabel, edgeLabel, 1, sourceLabel);
       }
     }
 
@@ -700,6 +706,5 @@ public class GSpan {
 
     return !parentEmbeddings.isEmpty();
   }
-
 
 }

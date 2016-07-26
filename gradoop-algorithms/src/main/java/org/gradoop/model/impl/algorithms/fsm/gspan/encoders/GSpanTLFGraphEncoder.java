@@ -74,8 +74,16 @@ public class GSpanTLFGraphEncoder
    * vertex label dictionary
    */
   private DataSet<List<String>> vertexLabelDictionary;
+  /**
+   * FSM configuration
+   */
   private final FSMConfig fsmConfig;
 
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration
+   */
   public GSpanTLFGraphEncoder(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }

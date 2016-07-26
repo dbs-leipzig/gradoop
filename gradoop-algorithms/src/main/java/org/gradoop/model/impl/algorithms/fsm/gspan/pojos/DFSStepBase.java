@@ -1,7 +1,24 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.model.impl.algorithms.fsm.gspan.pojos;
 
 /**
- * Created by peet on 26.07.16.
+ * abstract class for representing a DFS traversal step
  */
 public abstract class DFSStepBase implements DFSStep {
   /**
@@ -25,6 +42,15 @@ public abstract class DFSStepBase implements DFSStep {
    */
   protected final int toLabel;
 
+  /**
+   * Constructor
+   *
+   * @param fromLabel label of traversal start vertex
+   * @param edgeLabel label of the traversed edge
+   * @param toLabel label of traversal end vertex
+   * @param toTime discovery time of traversal end vertex
+   * @param fromTime discovery time of traversal start vertex
+   */
   public DFSStepBase(Integer fromLabel, Integer edgeLabel, Integer toLabel,
     int toTime, int fromTime) {
     this.fromLabel = fromLabel;

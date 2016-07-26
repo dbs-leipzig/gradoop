@@ -21,12 +21,13 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * pojo representing an DFS traversal step
+ * pojo representing an undirected DFS traversal step
  */
 public class UndirectedDFSStep extends DFSStepBase {
 
   /**
-   * constructor
+   * Constructor
+   *
    * @param fromTime discovery time of traversal start vertex
    * @param fromLabel label of traversal start vertex
    * @param edgeLabel label of the traversed edge

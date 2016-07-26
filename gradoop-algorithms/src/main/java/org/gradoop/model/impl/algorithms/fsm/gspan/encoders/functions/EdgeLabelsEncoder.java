@@ -45,8 +45,16 @@ public class EdgeLabelsEncoder<IDT> extends RichMapFunction
    * edge label dictionary
    */
   private Map<String, Integer> dictionary;
+  /**
+   * FSM configuration
+   */
   private final FSMConfig fsmConfig;
 
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration
+   */
   public EdgeLabelsEncoder(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }

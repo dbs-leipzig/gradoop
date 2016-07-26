@@ -70,8 +70,16 @@ public class GSpanGraphTransactionsEncoder
    * vertex label dictionary
    */
   private DataSet<List<String>> vertexLabelDictionary;
+  /**
+   * FSM configuration
+   */
   private final FSMConfig fsmConfig;
 
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration
+   */
   public GSpanGraphTransactionsEncoder(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }

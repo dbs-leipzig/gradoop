@@ -30,8 +30,16 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.FullEdgeTripl
 public class CombineGSpanGraph
   implements GroupReduceFunction<FullEdgeTriple, GSpanGraph> {
 
+  /**
+   * FSM configuration
+   */
   private final FSMConfig fsmConfig;
 
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration
+   */
   public CombineGSpanGraph(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }

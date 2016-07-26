@@ -150,5 +150,5 @@ public class DFSStepComparator implements Comparator<DFSStep>, Serializable {
     }
     return comparison;
   }
-  
+
 }

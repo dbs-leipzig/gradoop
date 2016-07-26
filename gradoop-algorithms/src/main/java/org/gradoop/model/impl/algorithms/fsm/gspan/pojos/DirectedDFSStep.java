@@ -21,7 +21,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * pojo representing an DFS traversal step
+ * pojo representing a directed DFS traversal step
  */
 public class DirectedDFSStep extends DFSStepBase {
   /**
@@ -30,7 +30,8 @@ public class DirectedDFSStep extends DFSStepBase {
   private final boolean outgoing;
 
   /**
-   * constructor
+   * Constructor
+   *
    * @param fromTime discovery time of traversal start vertex
    * @param fromLabel label of traversal start vertex
    * @param outgoing true, if edge was traversed in direction
