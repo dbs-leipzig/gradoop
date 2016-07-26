@@ -133,8 +133,11 @@ public class TransactionalFSMBenchmark
     // create input dataset
     DataSet<TLFGraph> graphs = tlfSource.getTLFGraphs();
 
+    // set config for synthetic or real world dataset
+    FSMConfig fsmConfig = new FSMConfig(threshold, directed);
+
     // set encoder
-    GSpanEncoder encoder = new GSpanTLFGraphEncoder<>();
+    GSpanEncoder encoder = new GSpanTLFGraphEncoder<>(fsmConfig);
 
     // set miner
     GSpanMiner miner;
@@ -144,9 +147,6 @@ public class TransactionalFSMBenchmark
       new GSpanFilterRefine();
 
     miner.setExecutionEnvironment(getExecutionEnvironment());
-
-    // set config for synthetic or real world dataset
-    FSMConfig fsmConfig = new FSMConfig(threshold, directed);
 
     // encode
     DataSet<GSpanGraph> gsGraph = encoder.encode(graphs, fsmConfig);

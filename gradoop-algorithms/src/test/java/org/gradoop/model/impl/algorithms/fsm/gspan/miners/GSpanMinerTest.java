@@ -26,17 +26,17 @@ import java.util.Collection;
 public class GSpanMinerTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testMinersSeparately() throws Exception {
+  public void testMinersSeparatelyDirected() throws Exception {
     GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
       new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
         .execute();
 
     float threshold = 0.2f;
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(threshold);
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      encoder = new GSpanGraphTransactionsEncoder<>();
+      encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     DataSet<GSpanGraph> edges = encoder.encode(transactions, fsmConfig);
 
@@ -47,7 +47,36 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
         miner.mine(edges, encoder.getMinFrequency(), fsmConfig);
 
       Assert.assertEquals(
-        PredictableTransactionsGenerator.containedFrequentSubgraphs(threshold),
+        PredictableTransactionsGenerator
+          .containedDirectedFrequentSubgraphs(threshold),
+        frequentSubgraphs.count());
+    }
+  }
+
+  @Test
+  public void testMinersSeparatelyUndirected() throws Exception {
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
+      new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
+        .execute();
+
+    float threshold = 0.2f;
+
+    FSMConfig fsmConfig = new FSMConfig(threshold, false);
+
+    GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
+      encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
+
+    DataSet<GSpanGraph> edges = encoder.encode(transactions, fsmConfig);
+
+    for (GSpanMiner miner : getTransactionalFSMiners()) {
+      miner.setExecutionEnvironment(
+        transactions.getConfig().getExecutionEnvironment());
+      DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs =
+        miner.mine(edges, encoder.getMinFrequency(), fsmConfig);
+
+      Assert.assertEquals(
+        PredictableTransactionsGenerator
+          .containedUndirectedFrequentSubgraphs(threshold),
         frequentSubgraphs.count());
     }
   }
@@ -66,10 +95,11 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
       new PredictableTransactionsGenerator<>(30, 1, true, getConfig())
         .execute();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
+    float threshold = 0.4f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      encoder = new GSpanGraphTransactionsEncoder<>();
+      encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     DataSet<GSpanGraph> graphs = encoder.encode(transactions, fsmConfig);
 

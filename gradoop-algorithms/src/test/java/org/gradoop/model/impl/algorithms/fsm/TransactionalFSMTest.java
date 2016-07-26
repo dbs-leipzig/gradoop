@@ -195,7 +195,8 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     Collection<UnaryCollectionToCollectionOperator
       <GraphHeadPojo, VertexPojo, EdgePojo>> miners = new ArrayList<>();
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.7f);
+    float threshold = 0.7f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     miners.add(new TransactionalFSM<GraphHeadPojo, VertexPojo, EdgePojo>(
         fsmConfig, TransactionalFSMAlgorithm.GSPAN_BULKITERATION));

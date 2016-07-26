@@ -17,140 +17,80 @@
 
 package org.gradoop.model.impl.algorithms.fsm.gspan.pojos;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import java.io.Serializable;
 
 /**
- * pojo representing an DFS traversal step
+ * interface for representing a DFS traversal step
  */
-public class DFSStep implements Serializable {
-  /**
-   * discovery time of traversal start vertex
-   */
-  private final int fromTime;
-  /**
-   * label of traversal start vertex
-   */
-  private final int fromLabel;
-  /**
-   * true, if edge was traversed in direction
-   */
-  private final boolean outgoing;
-  /**
-   * label of the traversed edge
-   */
-  private final int edgeLabel;
-  /**
-   * discovery time of traversal end vertex
-   */
-  private final int toTime;
-  /**
-   * label of traversal end vertex
-   */
-  private final int toLabel;
+public interface DFSStep extends Serializable {
 
   /**
-   * constructor
-   * @param fromTime discovery time of traversal start vertex
-   * @param fromLabel label of traversal start vertex
-   * @param outgoing true, if edge was traversed in direction
-   * @param edgeLabel label of the traversed edge
-   * @param toTime discovery time of traversal end vertex
-   * @param toLabel label of traversal end vertex
+   * Getter
+   *
+   * @return discovery time of traversal start vertex
    */
-  public DFSStep(int fromTime, Integer fromLabel, Boolean outgoing,
-    Integer edgeLabel, int toTime, Integer toLabel) {
-    this.fromTime = fromTime;
-    this.fromLabel = fromLabel;
-    this.outgoing = outgoing;
-    this.edgeLabel = edgeLabel;
-    this.toTime = toTime;
-    this.toLabel = toLabel;
-  }
+  int getFromTime();
 
-  @Override
-  public String toString() {
-    return "(" + fromTime + ":" + fromLabel + ")" +
-      (outgoing ? "" : "<") + "-" + edgeLabel + "-" + (outgoing ? ">" : "") +
-      "(" + toTime + ":" + toLabel + ")";
-  }
+  /**
+   * Getter
+   *
+   * @return label of traversal start vertex
+   */
+  Integer getFromLabel();
 
-  public int getFromTime() {
-    return fromTime;
-  }
+  /**
+   * Getter
+   *
+   * @return true, if edge was traversed in direction
+   */
+  Boolean isOutgoing();
 
-  public Integer getFromLabel() {
-    return fromLabel;
-  }
+  /**
+   * Getter
+   *
+   * @return label of the traversed edge
+   */
+  Integer getEdgeLabel();
 
-  public Boolean isOutgoing() {
-    return outgoing;
-  }
+  /**
+   * Getter
+   *
+   * @return discovery time of traversal end vertex
+   */
+  int getToTime();
 
-  public Integer getEdgeLabel() {
-    return edgeLabel;
-  }
+  /**
+   * Getter
+   *
+   * @return label of traversal end vertex
+   */
+  Integer getToLabel();
 
-  public int getToTime() {
-    return toTime;
-  }
+  /**
+   * Getter
+   *
+   * @return true, if fromTime equals toTime
+   */
+  Boolean isLoop();
 
-  public Integer getToLabel() {
-    return toLabel;
-  }
+  /**
+   * Getter
+   *
+   * @return true, if fromTime before toTime
+   */
+  Boolean isForward();
 
-  @Override
-  public boolean equals(Object obj) {
-    boolean equals = obj == this;
+  /**
+   * Getter
+   *
+   * @return true, if toTome before fromTime
+   */
+  Boolean isBackward();
 
-    if (!equals && obj != null && obj.getClass() == getClass()) {
-
-      DFSStep other = (DFSStep) obj;
-
-      EqualsBuilder builder = new EqualsBuilder();
-
-      builder.append(this.isOutgoing(), other.isOutgoing());
-      builder.append(this.getFromTime(), other.getFromTime());
-      builder.append(this.getToTime(), other.getToTime());
-      builder.append(this.getFromLabel(), other.getFromLabel());
-      builder.append(this.getEdgeLabel(), other.getEdgeLabel());
-      builder.append(this.getToLabel(), other.getToLabel());
-
-      equals = builder.isEquals();
-    }
-
-    return equals;
-  }
-
-  @Override
-  public int hashCode() {
-    HashCodeBuilder builder = new HashCodeBuilder();
-
-    builder.append(isOutgoing());
-    builder.append(getFromTime());
-    builder.append(getToTime());
-    builder.append(getFromLabel());
-    builder.append(getEdgeLabel());
-    builder.append(getToLabel());
-
-    return builder.hashCode();
-  }
-
-  public Boolean isLoop() {
-    return fromTime == toTime;
-  }
-
-  public Boolean isForward() {
-    return getFromTime() < getToTime();
-  }
-
-  public Boolean isBackward() {
-    return !isForward();
-  }
-
-  public int getMinVertexLabel() {
-    return fromLabel < toLabel ? fromLabel : toLabel;
-  }
+  /**
+   * Getter
+   *
+   * @return minimal vertex label
+   */
+  int getMinVertexLabel();
 }

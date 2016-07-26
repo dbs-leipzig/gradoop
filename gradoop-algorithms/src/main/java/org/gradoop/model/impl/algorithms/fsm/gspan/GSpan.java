@@ -28,8 +28,10 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.AdjacencyListEntry;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSEmbedding;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DirectedDFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanEdge;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.UndirectedDFSStep;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,20 +54,21 @@ public class GSpan {
    * Creates the gSpan mining representation of a graph transaction from a
    * given collection of Gradoop edge triples.
    *
-   * @param triples the graphs edges
    * @param <T> edge triple type
    * @param <IDT> id type
+   * @param triples the graphs edges
+   * @param fsmConfig FSM configuration
    * @return graph transaction
    */
   public static <T extends EdgeTriple<IDT>, IDT> GSpanGraph
-  createGSpanGraph(Iterable<T>  triples) {
+  createGSpanGraph(Iterable<T> triples, FSMConfig fsmConfig) {
 
     // replace GradoopIds by Integer Ids
     List<GSpanEdge> edges = Lists.newArrayList();
     List<AdjacencyList> adjacencyLists = Lists.newArrayList();
     createAdjacencyListsAndEdges(triples, adjacencyLists, edges);
 
-    return createGSpanGraph(adjacencyLists, edges);
+    return createGSpanGraph(adjacencyLists, edges, fsmConfig);
   }
 
   /**
@@ -73,9 +76,11 @@ public class GSpan {
    * existing encoded subgraph.
    *
    * @param subgraph encodes subgraph
+   * @param fsmConfig FSM configuration
    * @return graph transaction
    */
-  private static GSpanGraph createGSpanGraph(DFSCode subgraph) {
+  private static GSpanGraph createGSpanGraph(DFSCode subgraph,
+    FSMConfig fsmConfig) {
 
     // turn DFS edges into gSpan edges
     List<DFSStep> steps = subgraph.getSteps();
@@ -83,7 +88,7 @@ public class GSpan {
     List<GSpanEdge> edges = Lists.newArrayListWithExpectedSize(steps.size());
     createAdjacencyListsAndEdges(steps, adjacencyLists, edges);
 
-    return createGSpanGraph(adjacencyLists, edges);
+    return createGSpanGraph(adjacencyLists, edges, fsmConfig);
   }
 
   /**
@@ -92,10 +97,11 @@ public class GSpan {
    *
    * @param adjacencyLists adjacency lists
    * @param edges edges
+   * @param fsmConfig FSM configuration
    * @return graph transaction
    */
-  private static GSpanGraph createGSpanGraph(
-    List<AdjacencyList> adjacencyLists, List<GSpanEdge> edges) {
+  private static GSpanGraph createGSpanGraph(List<AdjacencyList> adjacencyLists,
+    List<GSpanEdge> edges, FSMConfig fsmConfig) {
     // sort by min vertex label
     Collections.sort(edges);
 
@@ -108,7 +114,7 @@ public class GSpan {
     GSpanEdge lastEdge = iterator.next();
 
     Collection<DFSEmbedding> embeddings =
-      createSingleEdgeSubgraphEmbeddings(codeEmbeddings, lastEdge);
+      createSingleEdgeSubgraphEmbeddings(codeEmbeddings, lastEdge, fsmConfig);
 
     while (iterator.hasNext()) {
       GSpanEdge edge = iterator.next();
@@ -117,7 +123,8 @@ public class GSpan {
       if (edge.compareTo(lastEdge) == 0) {
         embeddings.add(createSingleEdgeEmbedding(edge));
       } else {
-        embeddings = createSingleEdgeSubgraphEmbeddings(codeEmbeddings, edge);
+        embeddings = createSingleEdgeSubgraphEmbeddings(codeEmbeddings, edge,
+          fsmConfig);
         lastEdge = edge;
       }
     }
@@ -247,8 +254,7 @@ public class GSpan {
 
   /**
    * Creates adjacency lists and gSpan edges for a list of DFS steps.
-   *
-   * @param steps DFS steps
+   *  @param steps DFS steps
    * @param adjacencyLists adjacency lists
    * @param edges edges
    */
@@ -291,12 +297,14 @@ public class GSpan {
    *
    * @param subgraphEmbeddings subgraph-embeddings map
    * @param edge edge
+   * @param fsmConfig FSM configuration
    * @return collection of embeddings
    */
   private static Collection<DFSEmbedding> createSingleEdgeSubgraphEmbeddings(
-    Map<DFSCode, Collection<DFSEmbedding>> subgraphEmbeddings, GSpanEdge edge) {
+    Map<DFSCode, Collection<DFSEmbedding>> subgraphEmbeddings, GSpanEdge edge,
+    FSMConfig fsmConfig) {
 
-    DFSCode subgraph = createSingleEdgeSubgraph(edge);
+    DFSCode subgraph = createSingleEdgeSubgraph(edge, fsmConfig);
     DFSEmbedding embedding = createSingleEdgeEmbedding(edge);
     Collection<DFSEmbedding> embeddings = Lists.newArrayList(embedding);
     subgraphEmbeddings.put(subgraph, embeddings);
@@ -328,9 +336,11 @@ public class GSpan {
    * Create a single edge Subgraph for a given edge.
    *
    * @param edge edge
+   * @param fsmConfig FSM configuration
    * @return subgraph
    */
-  private static DFSCode createSingleEdgeSubgraph(final GSpanEdge edge) {
+  private static DFSCode createSingleEdgeSubgraph(final GSpanEdge edge,
+    FSMConfig fsmConfig) {
 
     int sourceLabel = edge.getSourceLabel();
     int edgeLabel = edge.getLabel();
@@ -338,12 +348,28 @@ public class GSpan {
 
     DFSStep step;
 
-    if (edge.isLoop()) {
-      step = new DFSStep(0, sourceLabel, true, edgeLabel, 0, sourceLabel);
-    } else if (edge.sourceIsMinimumLabel()) {
-      step = new DFSStep(0, sourceLabel, true, edgeLabel, 1, targetLabel);
+    if (fsmConfig.isDirected()) {
+      if (edge.isLoop()) {
+        step = new DirectedDFSStep(
+          0, sourceLabel, true, edgeLabel, 0, sourceLabel);
+      } else if (edge.sourceIsMinimumLabel()) {
+        step = new DirectedDFSStep(
+          0, sourceLabel, true, edgeLabel, 1, targetLabel);
+      } else {
+        step = new DirectedDFSStep(
+          0, targetLabel, false, edgeLabel, 1, sourceLabel);
+      }
     } else {
-      step = new DFSStep(0, targetLabel, false, edgeLabel, 1, sourceLabel);
+      if (edge.isLoop()) {
+        step = new UndirectedDFSStep(
+          0, sourceLabel, edgeLabel, 0, sourceLabel);
+      } else if (edge.sourceIsMinimumLabel()) {
+        step = new UndirectedDFSStep(
+          0, sourceLabel, edgeLabel, 1, targetLabel);
+      } else {
+        step = new UndirectedDFSStep(
+          0, targetLabel, edgeLabel, 1, sourceLabel);
+      }
     }
 
     return new DFSCode(step);
@@ -429,14 +455,21 @@ public class GSpan {
                       toVertexTime = vertexIdTime.size();
                     }
 
-                    childCode.getSteps().add(new DFSStep(
-                      fromVertexTime,
-                      fromVertexLabel,
-                      entry.isOutgoing(),
-                      entry.getEdgeLabel(),
-                      toVertexTime,
-                      toVertexLabel
-                    ));
+                    DFSStep dfsStep;
+
+                    if (fsmConfig.isDirected()) {
+                      dfsStep = new DirectedDFSStep(
+                        fromVertexTime, fromVertexLabel,
+                        entry.isOutgoing(), entry.getEdgeLabel(),
+                        toVertexTime, toVertexLabel);
+                    } else {
+                      dfsStep = new UndirectedDFSStep(
+                        fromVertexTime, fromVertexLabel,
+                        entry.getEdgeLabel(),
+                        toVertexTime, toVertexLabel);
+                    }
+
+                    childCode.getSteps().add(dfsStep);
 
                     childEmbedding.getEdgeTimes().add(edgeId);
 
@@ -529,7 +562,7 @@ public class GSpan {
   public static boolean isMinimal(
     DFSCode subgraph, FSMConfig fsmConfig) {
 
-    GSpanGraph graph = createGSpanGraph(subgraph);
+    GSpanGraph graph = createGSpanGraph(subgraph, fsmConfig);
     DFSCode minDfsCode = calculateMinDFSCode(graph, fsmConfig);
 
     return subgraph.equals(minDfsCode);
@@ -673,6 +706,5 @@ public class GSpan {
 
     return !parentEmbeddings.isEmpty();
   }
-
 
 }

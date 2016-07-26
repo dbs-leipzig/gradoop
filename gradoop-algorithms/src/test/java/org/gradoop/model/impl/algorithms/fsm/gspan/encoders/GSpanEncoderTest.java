@@ -56,12 +56,13 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     DataSet<TLFGraph> graphs = dataSource.getTLFGraphs();
 
-    GSpanEncoder tlfEncoder = new GSpanTLFGraphEncoder<>();
-    GSpanEncoder tnsEncoder = new GSpanGraphTransactionsEncoder<>();
+    FSMConfig fsmConfig = new FSMConfig(1.0f, true);
+
+    GSpanEncoder tlfEncoder = new GSpanTLFGraphEncoder<>(fsmConfig);
+    GSpanEncoder tnsEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
     GSpanMiner miner = new GSpanBulkIteration();
 
     miner.setExecutionEnvironment(getExecutionEnvironment());
-    FSMConfig fsmConfig = new FSMConfig(1.0f, true);
 
     DataSet<GSpanGraph> tlfSearchSpace = tlfEncoder.encode(graphs, fsmConfig);
     DataSet<GSpanGraph> tnsSearchSpace = tnsEncoder.encode(transactions, fsmConfig);
@@ -85,15 +86,16 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       getDataSource();
 
+    float threshold = 0.1f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
+
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      tEncoder = new GSpanGraphTransactionsEncoder<>();
+      tEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     GSpanGraphCollectionEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      cEncoder = new GSpanGraphCollectionEncoder<>();
+      cEncoder = new GSpanGraphCollectionEncoder<>(fsmConfig);
 
-    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
-
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.1f);
+    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder(fsmConfig);
 
     List<DFSCode> tGraphs = tEncoder
       .encode(dataSource.getGraphTransactions(), fsmConfig)
@@ -133,15 +135,16 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       getDataSource();
 
+    float threshold = 0.4f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
+
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      tEncoder = new GSpanGraphTransactionsEncoder<>();
+      tEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     GSpanGraphCollectionEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      cEncoder = new GSpanGraphCollectionEncoder<>();
+      cEncoder = new GSpanGraphCollectionEncoder<>(fsmConfig);
 
-    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
-
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
+    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder(fsmConfig);
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);
@@ -162,15 +165,16 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       getDataSource();
 
+    float threshold = 0.4f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
+
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      tEncoder = new GSpanGraphTransactionsEncoder<>();
+      tEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     GSpanGraphCollectionEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      cEncoder = new GSpanGraphCollectionEncoder<>();
+      cEncoder = new GSpanGraphCollectionEncoder<>(fsmConfig);
 
-    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
-
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
+    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder(fsmConfig);
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);
@@ -192,15 +196,18 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
       getDataSource();
 
+    float threshold = 0.4f;
+    FSMConfig fsmConfig = new FSMConfig(threshold, true);
+
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      tEncoder = new GSpanGraphTransactionsEncoder<>();
+      tEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     GSpanGraphCollectionEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      cEncoder = new GSpanGraphCollectionEncoder<>();
+      cEncoder = new GSpanGraphCollectionEncoder<>(fsmConfig);
 
-    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder();
+    GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder(fsmConfig);
 
-    FSMConfig fsmConfig = FSMConfig.forDirectedMultigraph(0.4f);
+
 
     tEncoder.encode(dataSource.getGraphTransactions(), fsmConfig);
     cEncoder.encode(dataSource.getGraphCollection(), fsmConfig);
