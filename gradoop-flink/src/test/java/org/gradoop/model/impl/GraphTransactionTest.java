@@ -63,4 +63,41 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
       originalCollection.equalsByGraphData(restoredCollection));
   }
 
+  /**
+   * There was a bug on converting a {@link GraphCollection} to
+   * {@link GraphTransactions} when there was a HeaderId in one of the Vertex
+   * headIds which is not present in the GraphHeads of the Collection.
+   *
+   * @see <a href="https://github.com/dbs-leipzig/gradoop/issues/273">
+   *   Github Gradoop #273</a>
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testWithSubsetGraphContainment() throws Exception {
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+      loader = getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString("g1[(eve)]");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> originalCollection =
+      loader.getGraphCollectionByVariables("g1");
+
+    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
+      originalCollection.toTransactions();
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> restoredCollection =
+      GraphCollection.fromTransactions(transactions,
+        new First<VertexPojo>(), new First<EdgePojo>());
+
+    collectAndAssertTrue(
+      originalCollection.equalsByGraphIds(restoredCollection));
+
+    collectAndAssertTrue(
+      originalCollection.equalsByGraphElementIds(restoredCollection));
+
+    collectAndAssertTrue(
+      originalCollection.equalsByGraphData(restoredCollection));
+  }
+
 }
