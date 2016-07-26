@@ -102,34 +102,44 @@ public class GSpan {
    */
   private static GSpanGraph createGSpanGraph(List<AdjacencyList> adjacencyLists,
     List<GSpanEdge> edges, FSMConfig fsmConfig) {
-    // sort by min vertex label
-    Collections.sort(edges);
 
-    // create adjacency lists and 1-edge subgraphs with their embeddings
+    GSpanGraph gSpanGraph;
 
-    Map<DFSCode, Collection<DFSEmbedding>> codeEmbeddings =
-      Maps.newHashMap();
+    if (! edges.isEmpty()) {
+      // sort by min vertex label
+      Collections.sort(edges);
 
-    Iterator<GSpanEdge> iterator = edges.iterator();
-    GSpanEdge lastEdge = iterator.next();
+      // create adjacency lists and 1-edge subgraphs with their embeddings
 
-    Collection<DFSEmbedding> embeddings =
-      createSingleEdgeSubgraphEmbeddings(codeEmbeddings, lastEdge, fsmConfig);
+      Map<DFSCode, Collection<DFSEmbedding>> codeEmbeddings =
+        Maps.newHashMap();
 
-    while (iterator.hasNext()) {
-      GSpanEdge edge = iterator.next();
+      Iterator<GSpanEdge> iterator = edges.iterator();
+      GSpanEdge lastEdge = iterator.next();
 
-      // add embedding of 1-edge code
-      if (edge.compareTo(lastEdge) == 0) {
-        embeddings.add(createSingleEdgeEmbedding(edge));
-      } else {
-        embeddings = createSingleEdgeSubgraphEmbeddings(codeEmbeddings, edge,
-          fsmConfig);
-        lastEdge = edge;
+      Collection<DFSEmbedding> embeddings =
+        createSingleEdgeSubgraphEmbeddings(codeEmbeddings, lastEdge, fsmConfig);
+
+      while (iterator.hasNext()) {
+        GSpanEdge edge = iterator.next();
+
+        // add embedding of 1-edge code
+        if (edge.compareTo(lastEdge) == 0) {
+          embeddings.add(createSingleEdgeEmbedding(edge));
+        } else {
+          embeddings = createSingleEdgeSubgraphEmbeddings(codeEmbeddings, edge,
+            fsmConfig);
+          lastEdge = edge;
+        }
       }
+      gSpanGraph = new GSpanGraph(adjacencyLists, codeEmbeddings);
+
+    } else {
+      gSpanGraph = new GSpanGraph();
     }
 
-    return new GSpanGraph(adjacencyLists, codeEmbeddings);
+
+    return gSpanGraph;
   }
 
   /**

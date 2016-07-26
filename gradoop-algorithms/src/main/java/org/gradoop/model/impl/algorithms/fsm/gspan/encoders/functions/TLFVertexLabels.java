@@ -17,10 +17,13 @@
 
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.io.impl.tlf.tuples.TLFVertex;
+
+import java.util.Set;
 
 /**
  *  * {v0,..,vN} => lv0,..,lvM
@@ -33,8 +36,14 @@ public class TLFVertexLabels implements FlatMapFunction<TLFGraph, String> {
   public void flatMap(TLFGraph tlfGraph, Collector<String> collector)
       throws Exception {
 
+    Set<String> labels = Sets.newHashSet();
+
     for (TLFVertex vertex : tlfGraph.getGraphVertices()) {
-      collector.collect(vertex.getLabel());
+      labels.add(vertex.getLabel());
+    }
+
+    for (String label : labels) {
+      collector.collect(label);
     }
   }
 }

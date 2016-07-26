@@ -83,13 +83,12 @@ public class VertexLabelsEncoder
         Integer targetLabel = vertexLabels.get(edge.getTargetId());
 
         if (targetLabel != null) {
-          triples.add(new EdgeTripleWithStringEdgeLabel<GradoopId>(
+          triples.add(new EdgeTripleWithStringEdgeLabel<>(
             edge.getSourceId(),
             edge.getTargetId(),
             edge.getLabel(),
             sourceLabel,
-            targetLabel
-          ));
+            targetLabel));
         }
       }
     }
