@@ -92,22 +92,20 @@ public class DotFileFormat
    * .DOT attribute close string
    */
   private static final String DOT_ATTRIBUTE_CLOSE = "\"";
-  /**
-   * Global counter for the graph id used for each single graph transaction
-   */
-  private int graphId = 0;
 
   @Override
   public String format(GraphTransaction<G, V, E> transaction) {
-    graphId++;
     Collection<String> lines = Lists.newArrayList();
     //--------------------------------------------------------------------------
     // write dot head lines and open block
     //--------------------------------------------------------------------------
 
+    String graphHeadId = transaction.getGraphHead()
+      .getId().toString().replace("-", "");
+
     lines.add(String.format("%s%s%n%s",
       DOT_DIGRAPH_HEADER,
-      graphId,
+      graphHeadId,
       DOT_BLOCK_OPEN));
 
     //--------------------------------------------------------------------------
@@ -192,6 +190,10 @@ public class DotFileFormat
     //--------------------------------------------------------------------------
 
     lines.add(String.format("%s%n", DOT_BLOCK_CLOSE));
+
+    for (String line: lines){
+      System.out.println(line);
+    }
     return StringUtils.join(lines, "\n") + "\n";
   }
 }
