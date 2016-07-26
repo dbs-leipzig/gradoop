@@ -126,39 +126,84 @@ public class FoodBrokerConfig {
       (getMasterDataGrowth(className) * scaleFactor);
   }
 
+
+  protected JSONObject getTransactionalNodes() throws JSONException {
+    return root.getJSONObject("TransactionalData");
+  }
+
+ // SalesQuotation
+
+  protected JSONObject getSalesQuotationNode() throws JSONException {
+    return getTransactionalNodes().getJSONObject("SalesQuotation");
+  }
+
   public Integer getMinSalesQuotationLines() {
     int minLines = 0;
     try {
-      minLines = getSalesQuotationNode().getInt("minLines");
+      minLines = getSalesQuotationNode().getInt("linesMin");
     } catch (JSONException e) {
       e.printStackTrace();
     }
     return minLines;
   }
 
-  protected JSONObject getSalesQuotationNode() throws JSONException {
-    return getTransactionalNodes().getJSONObject("SalesQuotation");
-  }
-
-  protected JSONObject getTransactionalNodes() throws JSONException {
-    return root.getJSONObject("TransactionalData");
-  }
-
-  public Integer getMaxQuotationLines() {
+  public Integer getMaxSalesQuotationLines() {
     int maxLines = 0;
     try {
-      maxLines = getSalesQuotationNode().getInt("maxLines");
+      maxLines = getSalesQuotationNode().getInt("linesMax");
     } catch (JSONException e) {
       e.printStackTrace();
     }
     return maxLines;
   }
 
+  public Integer getMinSalesQuotationLineQuantity() {
+    int minQuantity = 0;
+    try {
+      minQuantity = getSalesQuotationNode().getInt("lineQuantityMin");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return minQuantity;
+  }
+
+  public Integer getMaxSalesQuotationLineQuantity() {
+    int maxQuantity = 0;
+    try {
+      maxQuantity = getSalesQuotationNode().getInt("lineQuantityMax");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return maxQuantity;
+  }
+
+  public Float getSalesQuotationMargin() {
+    Float margin = null;
+    try {
+      margin = (float)
+        getSalesQuotationNode().getDouble("salesMargin");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return margin;
+  }
+
+  public Float getSalesQuotationMarginInfluence() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getSalesQuotationNode().getDouble("salesMarginInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
   public Float getSalesQuotationConfirmationProbability() {
     Float probability = null;
     try {
       probability = (float)
-        getSalesQuotationNode().getDouble("probability");
+        getSalesQuotationNode().getDouble("confirmationProbability");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -169,10 +214,350 @@ public class FoodBrokerConfig {
     Float influence = null;
     try {
       influence = (float)
-        getSalesQuotationNode().getDouble("probabilityInfluence");
+        getSalesQuotationNode().getDouble("confirmationProbabilityInfluence");
     } catch (JSONException e) {
       e.printStackTrace();
     }
     return influence;
   }
+
+  public Float getSalesQuotationLineConfirmationProbability() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getSalesQuotationNode().getDouble("lineConfirmationProbability");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMinSalesQuotationConfirmationDelay() {
+    int influence = 0;
+    try {
+      influence = getSalesQuotationNode().getInt("confirmationDelayMin");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMaxSalesQuotationConfirmationDelay() {
+    int influence = 0;
+    try {
+      influence = getSalesQuotationNode().getInt("confirmationDelayMax");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getSalesQuotationConfirmationDelayInfluence() {
+    int influence = 0;
+    try {
+      influence = getSalesQuotationNode().getInt("confirmationDelayInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+// SalesOrder
+
+  protected JSONObject getSalesOrderNode() throws JSONException {
+    return getTransactionalNodes().getJSONObject("SalesOrder");
+  }
+
+  public Integer getMinSalesOrderDeliveryAgreementDelay() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("deliveryAgreementDelayMin");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMaxSalesOrderDeliveryAgreementDelay() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("deliveryAgreementDelayMax");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getSalesOrderDeliveryAgreementDelayInfluence() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("deliveryAgreementDelayInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMinSalesOrderPurchaseDelay() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("purchaseDelayMin");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMaxSalesOrderPurchaseDelay() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("purchaseDelayMax");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getSalesOrderPurchaseDelayInfluence() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("purchaseDelayInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMinSalesOrderInvoiceDelay() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("invoiceDelayMin");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMaxSalesOrderInvoiceDelay() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("invoiceDelayMax");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getSalesOrderInvoiceDelayInfluence() {
+    int influence = 0;
+    try {
+      influence = getSalesOrderNode().getInt("invoiceDelayInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+// PurchOrder
+
+  protected JSONObject getPurchOrderNode() throws JSONException {
+    return getTransactionalNodes().getJSONObject("PurchOrder");
+  }
+
+  public Float getPurchOrderPriceVariation() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getSalesQuotationNode().getDouble("priceVariation");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Float getPurchOrderPriceVariationInfluence() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getSalesQuotationNode().getDouble("priceVariationInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMinPurchOrderDeliveryDelay() {
+    int influence = 0;
+    try {
+      influence = getPurchOrderNode().getInt("deliveryDelayMin");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMaxPurchOrderDeliveryDelay() {
+    int influence = 0;
+    try {
+      influence = getPurchOrderNode().getInt("deliveryDelayMax");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getSalesPurchDeliveryDelayInfluence() {
+    int influence = 0;
+    try {
+      influence = getPurchOrderNode().getInt("deliveryDelayInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMinPurchOrderInvoiceDelay() {
+    int influence = 0;
+    try {
+      influence = getPurchOrderNode().getInt("invoiceDelayMin");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getMaxPurchOrderInvoiceDelay() {
+    int influence = 0;
+    try {
+      influence = getPurchOrderNode().getInt("invoiceDelayMax");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Integer getSalesPurchInvoiceDelayInfluence() {
+    int influence = 0;
+    try {
+      influence = getPurchOrderNode().getInt("invoiceDelayInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+
+// Ticket
+
+  protected JSONObject getTicketNode() throws JSONException {
+    return getTransactionalNodes().getJSONObject("Ticket");
+  }
+
+  public Float getTicketBadQualityProbability() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getTicketNode().getDouble("badQualityProbability");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Float getTicketBadQualityProbabilityInfluence() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getTicketNode().getDouble("badQualityProbabilityInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Float getTicketSalesRefund() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getTicketNode().getDouble("salesRefund");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Float getTicketSalesRefundInfluence() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getTicketNode().getDouble("salesRefundInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Float getTicketPurchRefund() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getTicketNode().getDouble("purchRefund");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+  public Float getTicketPurchRefundInfluence() {
+    Float influence = null;
+    try {
+      influence = (float)
+        getTicketNode().getDouble("salesRefundInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return influence;
+  }
+
+// Quality
+
+  protected JSONObject getQualityNode() throws JSONException {
+    return root.getJSONObject("Quality");
+  }
+
+  public Float getQualityGood() {
+    Float quality = null;
+    try {
+      quality = (float)
+        getTicketNode().getDouble("good");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return quality;
+  }
+
+  public Float getQualityNormal() {
+    Float quality = null;
+    try {
+      quality = (float)
+        getTicketNode().getDouble("normal");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return quality;
+  }
+
+  public Float getQualityBad() {
+    Float quality = null;
+    try {
+      quality = (float)
+        getTicketNode().getDouble("bad");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return quality;
+  }
+
+
+
 }
