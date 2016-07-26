@@ -43,6 +43,100 @@
       "probability" : 0.6,
       "probabilityInfluence" : 0.2
     }
+  },
+  "Quality" : {
+    "good" : 0.66,
+    "normal" : 0.33,
+    "bad" : 0.01
+  },
+  "BusinessMeasures" : {
+    "FoodBrokerage" : {
+      "ConfirmationProbability": {
+        "base": 0.6,        //entspricht dem oben in der salesquotation, also
+        //den rest der ganzen werte auch nach transdata verschieben
+        "influence": 0.2,
+        "higherIsBetter": true
+      },
+      "SalesMargin": {
+        "base": 0.05,
+        "influence": 0.02,
+        "higherIsBetter": true
+      },
+      "PurchPriceVariation": {
+        "base": 0.01,
+        "influence": 0.02,
+        "higherIsBetter": false
+      }
+    },
+    "ComplaintHandling" : {
+      "BadQualityProbability" : {
+        "base" : 0.05,
+        "influence" : 0.1,
+        "higherIsBetter" : false
+      },
+      "SalesRefund" : {
+        "base" : 0.1,
+        "influence" : 0.05,
+        "higherIsBetter" : false
+      },
+      "PurchRefund" : {
+        "base" : 0.1,
+        "influence" : 0.05,
+        "higherIsBetter" : true
+      }
+    }
+  },
+  "Delays" : {
+    "ConfirmationDelay" : {
+      "min" : 0,
+      "max" : 20,
+      "influence" : 5,
+      "higherIsBetter" : false
+    },
+    "DeliveryAgreementDelay" : {
+      "min" : 2,
+      "max" : 4,
+      "influence" : 1,
+      "higherIsBetter" : true
+    },
+    "PurchDelay" : {
+      "min" : 0,
+      "max" : 2,
+      "influence" : 1,
+      "higherIsBetter" : false
+    },
+    "PurchDeliveryDelay" : {
+      "min" : 0,
+      "max" : 1,
+      "influence" : 1,
+      "higherIsBetter" : false
+    },
+    "PurchInvoiceDelay" : {
+      "min" : 2,
+      "max" : 5,
+      "influence" : 3,
+      "higherIsBetter" : true
+    },
+    "SalesInvoiceDelay" : {
+      "min" : 0,
+      "max" : 3,
+      "influence" : 2,
+      "higherIsBetter" : false
+    }
+  },
+  "Amounts" : {
+    "NumberOfQuotationLines" : {
+      "min" : 1,
+      "max" : 20
+    },
+    "NumberOfQuotedProducts" : {
+      "min" : 1,
+      "max" : 100
+    },
+    "NumberOfVendors" : {
+      "min" : 1,
+      "max" : 3
+    }
   }
 
 }
