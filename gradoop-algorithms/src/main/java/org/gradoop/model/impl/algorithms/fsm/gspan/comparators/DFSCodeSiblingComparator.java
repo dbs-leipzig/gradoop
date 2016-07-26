@@ -19,6 +19,7 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.comparators;
 
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DirectedDFSStep;
 
 import java.io.Serializable;
 import java.util.Comparator;

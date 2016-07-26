@@ -68,7 +68,7 @@ public class TransactionalFSM
   public TransactionalFSM(FSMConfig fsmConfig, TransactionalFSMAlgorithm
     algorithm) {
     this.fsmConfig = fsmConfig;
-    this.encoder = new GSpanGraphCollectionEncoder<G, V, E>() {
+    this.encoder = new GSpanGraphCollectionEncoder<G, V, E>(fsmConfig) {
     };
     setMiner(algorithm);
   }

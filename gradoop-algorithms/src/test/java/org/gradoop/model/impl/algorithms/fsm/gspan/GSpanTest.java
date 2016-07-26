@@ -8,6 +8,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GSpanGraphCollectionEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
+import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DirectedDFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -32,9 +33,9 @@ public class GSpanTest extends GradoopFlinkTestBase {
     //  (0:A)    (1:A)
     //       -a->
 
-    DFSStep firstStep = new DFSStep(0, 0, true, 0, 1, 0);
-    DFSStep backwardStep = new DFSStep(1, 0, false, 0, 0, 0);
-    DFSStep branchStep = new DFSStep(0, 0, true, 0, 1, 0);
+    DFSStep firstStep = new DirectedDFSStep(0, 0, true, 0, 1, 0);
+    DFSStep backwardStep = new DirectedDFSStep(1, 0, false, 0, 0, 0);
+    DFSStep branchStep = new DirectedDFSStep(0, 0, true, 0, 1, 0);
 
     DFSCode minCode = new DFSCode(Lists.newArrayList(firstStep, backwardStep));
     DFSCode wrongCode = new DFSCode(Lists.newArrayList(firstStep, branchStep));
@@ -68,11 +69,11 @@ public class GSpanTest extends GradoopFlinkTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> searchSpace =
       loader.getGraphCollectionByVariables("g1");
 
-    GSpanEncoder<GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>> encoder =
-      new GSpanGraphCollectionEncoder<>();
-
     float threshold = 0.7f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
+
+    GSpanEncoder<GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>> encoder =
+      new GSpanGraphCollectionEncoder<>(fsmConfig);
 
     Collection<GSpanGraph> graphs = encoder
       .encode(searchSpace, fsmConfig).collect();
@@ -94,7 +95,7 @@ public class GSpanTest extends GradoopFlinkTestBase {
     DFSCode singleEdgeCode =
       singleEdgeCodes.iterator().next();
 
-    assertEquals(singleEdgeCode, new DFSCode(new DFSStep(0, 0, true, 0, 1, 0)));
+    assertEquals(singleEdgeCode, new DFSCode(new DirectedDFSStep(0, 0, true, 0, 1, 0)));
 
     // N=2
     assertEquals(0, singleEdgeCode.getMinVertexLabel());

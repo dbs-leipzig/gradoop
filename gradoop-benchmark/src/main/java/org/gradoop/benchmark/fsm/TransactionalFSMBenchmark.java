@@ -134,7 +134,7 @@ public class TransactionalFSMBenchmark
     DataSet<TLFGraph> graphs = tlfSource.getTLFGraphs();
 
     // set encoder
-    GSpanEncoder encoder = new GSpanTLFGraphEncoder<>();
+    GSpanEncoder encoder = new GSpanTLFGraphEncoder<>(fsmConfig);
 
     // set miner
     GSpanMiner miner;

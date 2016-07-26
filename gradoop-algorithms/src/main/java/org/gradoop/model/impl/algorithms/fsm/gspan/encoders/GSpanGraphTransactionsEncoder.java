@@ -70,6 +70,11 @@ public class GSpanGraphTransactionsEncoder
    * vertex label dictionary
    */
   private DataSet<List<String>> vertexLabelDictionary;
+  private final FSMConfig fsmConfig;
+
+  public GSpanGraphTransactionsEncoder(FSMConfig fsmConfig) {
+    this.fsmConfig = fsmConfig;
+  }
 
   /**
    * determines edge label frequency and prunes by minimum frequency;
@@ -131,7 +136,7 @@ public class GSpanGraphTransactionsEncoder
       .map(new InverseDictionary());
 
     return tripleCollections
-      .map(new EdgeLabelsEncoder<GradoopId>())
+      .map(new EdgeLabelsEncoder<GradoopId>(fsmConfig))
       .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
   }
 

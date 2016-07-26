@@ -94,13 +94,26 @@ public class PredictableTransactionsGenerator
   }
 
   /**
-   * Returns the number of contained frequent subgraphs for a given threshold.
+   * Returns the number of contained directed frequent subgraphs for a given
+   * threshold.
    *
    * @param threshold minimum support
    * @return number of frequent subgraphs
    */
-  public static long containedFrequentSubgraphs(float threshold) {
+  public static long containedDirectedFrequentSubgraphs(float threshold) {
 
     return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 702L;
+  }
+
+  /**
+   * Returns the number of contained undirected frequent subgraphs for a given
+   * threshold.
+   *
+   * @param threshold minimum support
+   * @return number of frequent subgraphs
+   */
+  public static long containedUndirectedFrequentSubgraphs(float threshold) {
+
+    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 230L;
   }
 }

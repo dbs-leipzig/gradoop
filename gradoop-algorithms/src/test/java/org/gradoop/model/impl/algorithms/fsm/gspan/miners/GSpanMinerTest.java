@@ -36,7 +36,7 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      encoder = new GSpanGraphTransactionsEncoder<>();
+      encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     DataSet<GSpanGraph> edges = encoder.encode(transactions, fsmConfig);
 
@@ -47,7 +47,8 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
         miner.mine(edges, encoder.getMinFrequency(), fsmConfig);
 
       Assert.assertEquals(
-        PredictableTransactionsGenerator.containedFrequentSubgraphs(threshold),
+        PredictableTransactionsGenerator
+          .containedDirectedFrequentSubgraphs(threshold),
         frequentSubgraphs.count());
     }
   }
@@ -58,12 +59,12 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
       new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
         .execute();
 
-    float threshold = 0.6f;
+    float threshold = 0.2f;
 
     FSMConfig fsmConfig = new FSMConfig(threshold, false);
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      encoder = new GSpanGraphTransactionsEncoder<>();
+      encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     DataSet<GSpanGraph> edges = encoder.encode(transactions, fsmConfig);
 
@@ -73,11 +74,10 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
       DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs =
         miner.mine(edges, encoder.getMinFrequency(), fsmConfig);
 
-      System.out.println(frequentSubgraphs.count());
-
-//      Assert.assertEquals(
-//        PredictableTransactionsGenerator.containedFrequentSubgraphs(threshold),
-//        frequentSubgraphs.count());
+      Assert.assertEquals(
+        PredictableTransactionsGenerator
+          .containedUndirectedFrequentSubgraphs(threshold),
+        frequentSubgraphs.count());
     }
   }
 
@@ -99,7 +99,7 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     GSpanGraphTransactionsEncoder<GraphHeadPojo, VertexPojo, EdgePojo>
-      encoder = new GSpanGraphTransactionsEncoder<>();
+      encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     DataSet<GSpanGraph> graphs = encoder.encode(transactions, fsmConfig);
 

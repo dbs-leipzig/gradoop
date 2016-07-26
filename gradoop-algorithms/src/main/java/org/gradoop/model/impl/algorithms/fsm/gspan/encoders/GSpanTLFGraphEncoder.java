@@ -74,6 +74,11 @@ public class GSpanTLFGraphEncoder
    * vertex label dictionary
    */
   private DataSet<List<String>> vertexLabelDictionary;
+  private final FSMConfig fsmConfig;
+
+  public GSpanTLFGraphEncoder(FSMConfig fsmConfig) {
+    this.fsmConfig = fsmConfig;
+  }
 
   /**
    * Determines edge label frequency and prunes by minimum frequency;
@@ -135,7 +140,7 @@ public class GSpanTLFGraphEncoder
       .map(new InverseDictionary());
 
     return tripleCollections
-      .map(new EdgeLabelsEncoderInteger())
+      .map(new EdgeLabelsEncoderInteger(fsmConfig))
       .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
   }
 

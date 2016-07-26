@@ -72,6 +72,11 @@ public class GSpanGraphCollectionEncoder
    * vertex label dictionary
    */
   private DataSet<List<String>> vertexLabelDictionary;
+  private final FSMConfig fsmConfig;
+
+  public GSpanGraphCollectionEncoder(FSMConfig fsmConfig) {
+    this.fsmConfig = fsmConfig;
+  }
 
   /**
    * determines edge label frequency and prunes by minimum frequency;
@@ -186,7 +191,7 @@ public class GSpanGraphCollectionEncoder
       .join(encodedVertices).where(2).equalTo(0)
       .with(new AppendTargetLabel())
       .groupBy(0)
-      .reduceGroup(new CombineGSpanGraph());
+      .reduceGroup(new CombineGSpanGraph(fsmConfig));
   }
 
 

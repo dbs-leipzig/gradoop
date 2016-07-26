@@ -19,6 +19,7 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
+import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.GSpan;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.FullEdgeTriple;
@@ -29,10 +30,16 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.FullEdgeTripl
 public class CombineGSpanGraph
   implements GroupReduceFunction<FullEdgeTriple, GSpanGraph> {
 
+  private final FSMConfig fsmConfig;
+
+  public CombineGSpanGraph(FSMConfig fsmConfig) {
+    this.fsmConfig = fsmConfig;
+  }
+
   @Override
   public void reduce(Iterable<FullEdgeTriple> iterable,
     Collector<GSpanGraph> collector) throws Exception {
 
-    collector.collect(GSpan.createGSpanGraph(iterable));
+    collector.collect(GSpan.createGSpanGraph(iterable, fsmConfig));
   }
 }
