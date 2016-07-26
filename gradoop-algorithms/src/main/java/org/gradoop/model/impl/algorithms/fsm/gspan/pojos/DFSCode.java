@@ -48,7 +48,7 @@ public class DFSCode implements Serializable {
    * constructor
    * @param steps initial steps
    */
-  public DFSCode(ArrayList<DFSStep> steps) {
+  public DFSCode(List<DFSStep> steps) {
     this.steps = steps;
   }
 

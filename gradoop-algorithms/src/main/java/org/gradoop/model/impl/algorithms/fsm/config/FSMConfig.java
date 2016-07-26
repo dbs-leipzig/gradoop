@@ -89,15 +89,6 @@ public class FSMConfig implements Serializable {
     this.minEdgeCount = minEdgeCount;
   }
 
-  /**
-   * convenience factory method for directed multigraphs
-   * @param threshold minimum relative support of a subgraph
-   * @return configuration for directed multigraphs
-   */
-  public static FSMConfig forDirectedMultigraph(float threshold) {
-    return new FSMConfig(threshold, true);
-  }
-
   public float getLikelinessThreshold() {
     return likelinessThreshold;
   }
