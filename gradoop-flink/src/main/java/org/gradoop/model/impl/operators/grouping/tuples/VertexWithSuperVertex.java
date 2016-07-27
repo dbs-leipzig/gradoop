@@ -15,19 +15,29 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.grouping;
+package org.gradoop.model.impl.operators.grouping.tuples;
+
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Used to define the grouping strategy which is used for computing the summary
- * graph.
+ * Representation of a vertex id and its corresponding vertex group
+ * representative.
+ *
+ * f0: vertex id
+ * f1: group representative vertex id
  */
-public enum GroupingStrategy {
-  /**
-   * {@see GroupingGroupReduce}
-   */
-  GROUP_REDUCE,
-  /**
-   * {@see GroupingGroupCombine}
-   */
-  GROUP_COMBINE
+public class VertexWithSuperVertex extends Tuple2<GradoopId, GradoopId> {
+
+  public void setVertexId(GradoopId vertexId) {
+    f0 = vertexId;
+  }
+
+  public GradoopId getSuperVertexId() {
+    return f1;
+  }
+
+  public void setSuperVertexId(GradoopId superVertexId) {
+    f1 = superVertexId;
+  }
 }

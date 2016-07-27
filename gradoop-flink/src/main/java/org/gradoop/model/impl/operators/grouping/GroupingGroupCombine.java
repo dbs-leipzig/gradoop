@@ -18,27 +18,31 @@
 package org.gradoop.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.grouping.functions.BuildVertexGroupItem;
-import org.gradoop.model.impl.operators.grouping.functions.FilterRegularVertices;
-import org.gradoop.model.impl.operators.grouping.functions.FilterSuperVertices;
+import org.gradoop.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.model.impl.operators.grouping.functions.BuildSuperVertex;
-import org.gradoop.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
-import org.gradoop.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
+import org.gradoop.model.impl.operators.grouping.functions.BuildVertexGroupItem;
+import org.gradoop.model.impl.operators.grouping.functions.BuildVertexWithSuperVertexBC;
+import org.gradoop.model.impl.operators.grouping.functions.CombineVertexGroupItems;
+import org.gradoop.model.impl.operators.grouping.functions.FilterSuperVertices;
+import org.gradoop.model.impl.operators.grouping.functions.FilterRegularVertices;
+import org.gradoop.model.impl.operators.grouping.functions.TransposeVertexGroupItems;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
+import org.gradoop.model.impl.tuples.IdWithIdSet;
 
 import java.util.List;
 
 /**
- * Grouping implementation that uses group + groupReduce for building super
- * vertices and updating the original vertices.
+ * Grouping implementation that uses group + groupCombine + groupReduce for
+ * building super vertices and updating the original vertices.
  *
  * Algorithmic idea:
  *
@@ -62,64 +66,71 @@ import java.util.List;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GroupingGroupReduce<
+public class GroupingGroupCombine<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge>
   extends Grouping<G, V, E> {
+
   /**
    * Creates grouping operator instance.
    *
-   * @param vertexGroupingKeys  property key to group vertices
-   * @param useVertexLabels     group on vertex label true/false
-   * @param vertexAggregators   aggregate functions for grouped vertices
-   * @param edgeGroupingKeys    property key to group edges
-   * @param useEdgeLabels       group on edge label true/false
-   * @param edgeAggregators     aggregate functions for grouped edges
+   * @param vertexGroupingKeys property keys to group vertices
+   * @param useVertexLabels    group on vertex label true/false
+   * @param vertexAggregators  aggregate functions for grouped vertices
+   * @param edgeGroupingKeys   property keys to group edges
+   * @param useEdgeLabels      group on edge label true/false
+   * @param edgeAggregators    aggregate functions for grouped edges
    */
-  GroupingGroupReduce(
-    List<String> vertexGroupingKeys,
-    boolean useVertexLabels,
+  GroupingGroupCombine(List<String> vertexGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> vertexAggregators,
-    List<String> edgeGroupingKeys,
-    boolean useEdgeLabels,
+    List<String> edgeGroupingKeys, boolean useEdgeLabels,
     List<PropertyValueAggregator> edgeAggregators) {
-    super(
-      vertexGroupingKeys, useVertexLabels, vertexAggregators,
+    super(vertexGroupingKeys, useVertexLabels, vertexAggregators,
       edgeGroupingKeys, useEdgeLabels, edgeAggregators);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   protected LogicalGraph<G, V, E> groupInternal(LogicalGraph<G, V, E> graph) {
-
+    // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      // map vertex to vertex group item
-      .map(new BuildVertexGroupItem<V>(
-        getVertexGroupingKeys(), useVertexLabels(), getVertexAggregators()));
+      .map(new BuildVertexGroupItem<V>(getVertexGroupingKeys(),
+        useVertexLabels(), getVertexAggregators()));
 
-    DataSet<VertexGroupItem> vertexGroupItems =
+    DataSet<VertexGroupItem> combinedVertexGroupItems =
       // group vertices by label / properties / both
       groupVertices(verticesForGrouping)
-        // apply aggregate function
-        .reduceGroup(new ReduceVertexGroupItems(
+        // apply aggregate function per combined partition
+        .combineGroup(new CombineVertexGroupItems(
           useVertexLabels(), getVertexAggregators()));
 
-    DataSet<V> superVertices = vertexGroupItems
-      // filter group representative tuples
-      .filter(new FilterSuperVertices())
-      // build super vertices
-      .map(new BuildSuperVertex<>(getVertexGroupingKeys(),
-        useVertexLabels(), getVertexAggregators(), config.getVertexFactory()));
+    // filter super vertex tuples (1..n per partition/group)
+    // group  super vertex tuples
+    // create super vertex tuple (1 per group) + previous super vertex ids
+    DataSet<Tuple2<VertexGroupItem, IdWithIdSet>>
+      superVertexTuples = groupVertices(
+        combinedVertexGroupItems.filter(new FilterSuperVertices()))
+        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels(),
+          getVertexAggregators()));
 
+    // build super vertices from super vertex tuples
+    DataSet<V> superVertices = superVertexTuples
+      .map(new Value0Of2<VertexGroupItem, IdWithIdSet>())
+      .map(new BuildSuperVertex<>(getVertexGroupingKeys(), useVertexLabels(),
+        getVertexAggregators(), config.getVertexFactory()));
+
+    // extract mapping
+    DataSet<IdWithIdSet> mapping = superVertexTuples
+      .map(new Value1Of2<VertexGroupItem, IdWithIdSet>());
+
+    // filter non-candidates from combiner output
+    // update their vertex representative according to the mapping
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap =
-      vertexGroupItems
-        // filter group element tuples
+      combinedVertexGroupItems
         .filter(new FilterRegularVertices())
-        // build vertex to group representative tuple
-        .map(new BuildVertexWithSuperVertex());
+        .map(new BuildVertexWithSuperVertexBC())
+        .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);
 
     // build super edges
     DataSet<E> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
@@ -128,11 +139,8 @@ public class GroupingGroupReduce<
       superVertices, superEdges, graph.getConfig());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
-    return GroupingGroupReduce.class.getName();
+    return GroupingGroupCombine.class.getName();
   }
 }

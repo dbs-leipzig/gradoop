@@ -59,8 +59,8 @@ public class BuildVertexGroupItem<V extends EPGMVertex>
     super(groupPropertyKeys, useLabel, vertexAggregators);
 
     this.reuseVertexGroupItem = new VertexGroupItem();
-    this.reuseVertexGroupItem.setGroupRepresentative(GradoopId.NULL_VALUE);
-    this.reuseVertexGroupItem.setCandidate(false);
+    this.reuseVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);
+    this.reuseVertexGroupItem.setSuperVertex(false);
     if (!doAggregate()) {
       this.reuseVertexGroupItem.setAggregateValues(
         PropertyValueList.createEmptyList());

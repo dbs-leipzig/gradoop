@@ -23,24 +23,21 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
 import org.gradoop.model.impl.properties.PropertyValueList;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
  * Reduces a group of {@link VertexGroupItem} instances.
  */
-@FunctionAnnotation.ForwardedFields("f0;f3;f4") // vertexId, label, properties
+@FunctionAnnotation.ForwardedFields(
+    "f0;" + // vertex id
+    "f3;" + // label
+    "f4"    // properties
+)
 public class ReduceVertexGroupItems
-  extends BuildBase
+  extends ReduceVertexGroupItemBase
   implements GroupReduceFunction<VertexGroupItem, VertexGroupItem> {
-
-  /**
-   * Reduce object instantiations.
-   */
-  private final VertexGroupItem reuseVertexGroupItem;
 
   /**
    * Creates group reduce function.
@@ -51,39 +48,41 @@ public class ReduceVertexGroupItems
   public ReduceVertexGroupItems(boolean useLabel,
     List<PropertyValueAggregator> vertexAggregators) {
     super(null, useLabel, vertexAggregators);
-    this.reuseVertexGroupItem = new VertexGroupItem();
   }
 
   @Override
   public void reduce(Iterable<VertexGroupItem> vertexGroupItems,
     Collector<VertexGroupItem> collector) throws Exception {
 
-    GradoopId groupRepresentative         = null;
+    GradoopId superVertexId               = null;
     String groupLabel                     = null;
     PropertyValueList groupPropertyValues = null;
 
-    boolean firstElement                  = true;
+    VertexGroupItem reuseTuple = getReuseVertexGroupItem();
+
+    boolean isFirst = true;
 
     for (VertexGroupItem groupItem : vertexGroupItems) {
-      if (firstElement) {
-        groupRepresentative = GradoopId.get();
+      if (isFirst) {
+        superVertexId       = GradoopId.get();
         groupLabel          = groupItem.getGroupLabel();
         groupPropertyValues = groupItem.getGroupingValues();
 
         if (useLabel()) {
-          reuseVertexGroupItem.setGroupLabel(groupLabel);
+          reuseTuple.setGroupLabel(groupLabel);
         }
 
-        reuseVertexGroupItem.setGroupingValues(groupPropertyValues);
-        reuseVertexGroupItem.setGroupRepresentative(groupRepresentative);
-        reuseVertexGroupItem.setAggregateValues(groupItem.getAggregateValues());
-        reuseVertexGroupItem.setCandidate(groupItem.isCandidate());
+        reuseTuple.setGroupingValues(groupPropertyValues);
+        reuseTuple.setSuperVertexId(superVertexId);
+        reuseTuple.setAggregateValues(groupItem.getAggregateValues());
+        reuseTuple.setSuperVertex(groupItem.isSuperVertex());
 
-        firstElement = false;
+        isFirst = false;
       }
-      reuseVertexGroupItem.setVertexId(groupItem.getVertexId());
+      reuseTuple.setVertexId(groupItem.getVertexId());
 
-      collector.collect(reuseVertexGroupItem);
+      // collect updated vertex item
+      collector.collect(reuseTuple);
 
       if (doAggregate()) {
         aggregate(groupItem.getAggregateValues());
@@ -91,31 +90,11 @@ public class ReduceVertexGroupItems
     }
 
     // collect single item representing the whole group
-    collector.collect(createCandidateTuple(
-      groupRepresentative,
+    collector.collect(createSuperVertexTuple(
+      superVertexId,
       groupLabel,
       groupPropertyValues));
 
     resetAggregators();
-  }
-
-  /**
-   * Creates one tuple representing the whole group. This tuple is later
-   * used to create a summarized vertex for each group.
-   *
-   * @param groupRepresentative group representative vertex id
-   * @param groupLabel          group label
-   * @param groupPropertyValues group property values
-   * @return vertex group item
-   */
-  private VertexGroupItem createCandidateTuple(GradoopId groupRepresentative,
-    String groupLabel, PropertyValueList groupPropertyValues)
-      throws IOException {
-    reuseVertexGroupItem.setVertexId(groupRepresentative);
-    reuseVertexGroupItem.setGroupLabel(groupLabel);
-    reuseVertexGroupItem.setGroupingValues(groupPropertyValues);
-    reuseVertexGroupItem.setAggregateValues(getAggregateValues());
-    reuseVertexGroupItem.setCandidate(true);
-    return reuseVertexGroupItem;
   }
 }

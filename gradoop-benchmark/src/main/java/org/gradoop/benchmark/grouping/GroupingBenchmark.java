@@ -57,6 +57,10 @@ public class GroupingBenchmark
    */
   private static final String OPTION_OUTPUT_PATH = "o";
   /**
+   * Option to set the grouping strategy
+   */
+  private static final String OPTION_GROUPING_STRATEGY = "s";
+  /**
    * Vertex grouping key option
    */
   private static final String OPTION_VERTEX_GROUPING_KEY = "vgk";
@@ -100,6 +104,10 @@ public class GroupingBenchmark
    * Used Vertex aggregation result keys
    */
   private static final String OPTION_EDGE_AGGREGATION_RESULT_KEYS = "eark";
+  /**
+   * Grouping strategy
+   */
+  private static GroupingStrategy STRATEGY = GroupingStrategy.GROUP_REDUCE;
   /**
    * Used VertexKey for grouping
    */
@@ -163,6 +171,8 @@ public class GroupingBenchmark
       "Path to vertex file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Path to write output files to");
+    OPTIONS.addOption(OPTION_GROUPING_STRATEGY, "strategy", true,
+      "Grouping strategy (GR, GC)");
     OPTIONS.addOption(OPTION_USE_VERTEX_LABELS, "use-vertex-labels", false,
       "Group on vertex labels");
     OPTIONS.addOption(OPTION_USE_EDGE_LABELS, "use-edge-labels", false,
@@ -237,7 +247,7 @@ public class GroupingBenchmark
           EDGE_AGGREGATOR_RESULT_KEYS);
     }
     // build grouping operator
-    Grouping grouping = getOperator(
+    Grouping grouping = getOperator(STRATEGY,
       vertexKeys, edgeKeys, USE_VERTEX_LABELS, USE_EDGE_LABELS, vAggregators,
       eAggregators);
 
@@ -290,6 +300,14 @@ public class GroupingBenchmark
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
+
+    // initialize grouping strategy
+    if (cmd.hasOption(OPTION_GROUPING_STRATEGY)) {
+      String value = cmd.getOptionValue(OPTION_GROUPING_STRATEGY);
+      if (value.toUpperCase().equals("GC")) {
+        STRATEGY = GroupingStrategy.GROUP_COMBINE;
+      }
+    }
 
     // read if vertex or edge keys should be used
     boolean useVertexKey = cmd.hasOption(OPTION_VERTEX_GROUPING_KEY);
@@ -381,21 +399,23 @@ public class GroupingBenchmark
   /**
    * Returns the grouping operator implementation based on the given strategy.
    *
-   * @param vertexKeys            vertex property keys used for grouping
-   * @param edgeKeys              edge property keys used for grouping
-   * @param useVertexLabels       use vertex label for grouping, true/false
-   * @param useEdgeLabels         use edge label for grouping, true/false
-   * @param vAggs                 used vertex aggregators
-   * @param eAggs                 used edge aggregators
+   * @param strategy        grouping strategy to use
+   * @param vertexKeys      vertex property keys used for grouping
+   * @param edgeKeys        edge property keys used for grouping
+   * @param useVertexLabels use vertex label for grouping, true/false
+   * @param useEdgeLabels   use edge label for grouping, true/false
+   * @param vAggs           used vertex aggregators
+   * @param eAggs           used edge aggregators
    * @return grouping operator implementation
    */
-  private static Grouping getOperator(List<String> vertexKeys,
-    List<String> edgeKeys, boolean useVertexLabels, boolean useEdgeLabels,
+  private static Grouping getOperator(GroupingStrategy strategy,
+    List<String> vertexKeys, List<String> edgeKeys,
+    boolean useVertexLabels, boolean useEdgeLabels,
     List<PropertyValueAggregator> vAggs, List<PropertyValueAggregator> eAggs) {
 
     Grouping.GroupingBuilder builder =
       new Grouping.GroupingBuilder()
-        .setStrategy(GroupingStrategy.GROUP_REDUCE)
+        .setStrategy(strategy)
         .useVertexLabel(useVertexLabels)
         .useEdgeLabel(useEdgeLabels);
 

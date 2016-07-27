@@ -18,6 +18,7 @@
 package org.gradoop.model.impl.operators.grouping;
 
 import com.google.common.collect.Lists;
+import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.model.api.EPGMEdge;
@@ -30,7 +31,7 @@ import org.gradoop.model.impl.operators.grouping.functions.CombineEdgeGroupItems
 import org.gradoop.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
 import org.gradoop.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.model.impl.operators.grouping.tuples.VertexWithRepresentative;
+import org.gradoop.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
@@ -284,7 +285,7 @@ public abstract class Grouping<
    */
   protected DataSet<E> buildSuperEdges(
     LogicalGraph<G, V, E> graph,
-    DataSet<VertexWithRepresentative> vertexToRepresentativeMap) {
+    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 
     DataSet<EdgeGroupItem> edges = graph.getEdges()
       // build edge group items
@@ -510,13 +511,26 @@ public abstract class Grouping<
           "Provide vertex key(s) and/or use vertex labels for grouping.");
       }
 
-      if (strategy == GroupingStrategy.GROUP_REDUCE) {
-        return new GroupingGroupReduce<>(
-          vertexGroupingKeys, useVertexLabel, vertexValueAggregators,
-          edgeGroupingKeys, useEdgeLabel, edgeValueAggregators);
-      } else {
+      Grouping<G, V, E> groupingOperator;
+
+      switch (strategy) {
+      case GROUP_REDUCE:
+        groupingOperator =
+          new GroupingGroupReduce<>(vertexGroupingKeys, useVertexLabel,
+            vertexValueAggregators, edgeGroupingKeys, useEdgeLabel,
+            edgeValueAggregators);
+        break;
+      case GROUP_COMBINE:
+        groupingOperator =
+          new GroupingGroupCombine<>(vertexGroupingKeys, useVertexLabel,
+            vertexValueAggregators, edgeGroupingKeys, useEdgeLabel,
+            edgeValueAggregators);
+        break;
+      default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);
       }
+
+      return groupingOperator;
     }
   }
 }

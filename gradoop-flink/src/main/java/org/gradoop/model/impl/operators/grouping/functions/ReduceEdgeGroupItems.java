@@ -64,7 +64,7 @@ public class ReduceEdgeGroupItems<E extends EPGMEdge>
 
   /**
    * Reduces edge group items to a single edge group item, creates a new
-   * summarized EPGM edge and collects it.
+   * super EPGM edge and collects it.
    *
    * @param edgeGroupItems  edge group items
    * @param collector       output collector
@@ -76,16 +76,16 @@ public class ReduceEdgeGroupItems<E extends EPGMEdge>
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
 
-    E supEdge = edgeFactory.createEdge(
+    E superEdge = edgeFactory.createEdge(
       edgeGroupItem.getGroupLabel(),
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
 
-    setGroupProperties(supEdge, edgeGroupItem.getGroupingValues());
-    setAggregateValues(supEdge);
+    setGroupProperties(superEdge, edgeGroupItem.getGroupingValues());
+    setAggregateValues(superEdge);
     resetAggregators();
 
-    collector.collect(supEdge);
+    collector.collect(superEdge);
   }
 
   /**

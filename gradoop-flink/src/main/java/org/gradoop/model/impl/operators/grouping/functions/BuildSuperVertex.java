@@ -75,7 +75,7 @@ public class BuildSuperVertex<V extends EPGMVertex>
   @Override
   public V map(VertexGroupItem groupItem) throws
     Exception {
-    V supVertex = vertexFactory.initVertex(groupItem.getGroupRepresentative());
+    V supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
     setLabel(supVertex, groupItem.getGroupLabel());
     setGroupProperties(supVertex, groupItem.getGroupingValues());
