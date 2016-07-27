@@ -190,10 +190,6 @@ public class DotFileFormat
     //--------------------------------------------------------------------------
 
     lines.add(String.format("%s%n", DOT_BLOCK_CLOSE));
-
-    for (String line: lines){
-      System.out.println(line);
-    }
     return StringUtils.join(lines, "\n") + "\n";
   }
 }
