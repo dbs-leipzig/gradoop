@@ -43,14 +43,20 @@ public class DotDataSink
    * Destination path of the dot file
    */
   private final String path;
+  /**
+   * Flag to print graph head information
+   */
+  private final boolean graphInformation;
 
   /**
    * Creates a new data sink. Path can be local (file://) or HDFS (hdfs://).
    *
-   * @param path dot data file
+   * @param path              dot data file
+   * @param graphInformation  flag to print graph head information
    */
-  public DotDataSink(String path) {
+  public DotDataSink(String path, boolean graphInformation) {
     this.path = path;
+    this.graphInformation = graphInformation;
   }
 
 
@@ -69,6 +75,6 @@ public class DotDataSink
   public void write(GraphTransactions<G, V, E> graphTransactions) throws
     IOException {
     graphTransactions.getTransactions()
-      .writeAsFormattedText(path, new DotFileFormat<G, V, E>());
+      .writeAsFormattedText(path, new DotFileFormat<G, V, E>(graphInformation));
   }
 }

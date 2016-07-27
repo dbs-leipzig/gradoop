@@ -2,12 +2,12 @@ package org.gradoop.io.impl.dot;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.io.api.DataSink;
-import org.gradoop.io.api.DataSource;
-import org.gradoop.io.impl.json.JSONDataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
 import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -20,26 +20,26 @@ public class DotIOTest extends GradoopFlinkTestBase {
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Test
-  public void testDotDataSink() throws Exception {
+  public void testLogicalGraphAsDot() throws Exception {
 
-    String vertexFile =
-      DotIOTest.class.getResource("/data/json/sna/nodes.json").getFile();
-    String edgeFile =
-      DotIOTest.class.getResource("/data/json/sna/edges.json").getFile();
-    String graphFile =
-      DotIOTest.class.getResource("/data/json/sna/graphs.json").getFile();
+    String gdlFile =
+      DotIOTest.class.getResource("/data/dot/input.gdl").getFile();
 
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new JSONDataSource<>(graphFile, vertexFile, edgeFile, config);
+    // load from gdl
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromFile(gdlFile);
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> resultGraph =
+      loader.getLogicalGraphByVariable("singleGraph");
 
     String tmpDir = temporaryFolder.getRoot().toString();
 
     final String dotFile = tmpDir + "/test.dot";
 
     DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
-      new DotDataSink<>(dotFile);
+      new DotDataSink<>(dotFile, false);
 
-    dataSink.write(dataSource.getGraphTransactions());
+    dataSink.write(resultGraph);
 
     getExecutionEnvironment().execute();
 

@@ -18,16 +18,13 @@
 
 package org.gradoop.io.impl.dot.functions;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.properties.Property;
+import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.model.impl.tuples.GraphTransaction;
-
-import java.util.Collection;
 
 
 /**
@@ -35,12 +32,12 @@ import java.util.Collection;
  * <p>
  *   digraph 0
  *   {
- *   gradoopId1 [label="person", name="Bob", age="20", ...];
- *   gradoopId2 [label="person", name="Alice", age="20", ...];
+ *   gradoopId1 [label="person",name="Bob",age="20",...];
+ *   gradoopId2 [label="person",name="Alice",age="20",...];
  *   gradoopID3
  *   gradoopID4
- *   gradoopId1->gradoopId2 [label="knows", since="2003", ...];
- *   gradoopId2->gradoopId1 [label="knows", since="2003", ...];
+ *   gradoopId1->gradoopId2 [label="knows",since="2003",...];
+ *   gradoopId2->gradoopId1 [label="knows",since="2003",...];
  *   gradoopId3->gradoopId4
  *   }
  * </p>
@@ -52,14 +49,21 @@ import java.util.Collection;
 public class DotFileFormat
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements TextOutputFormat.TextFormatter<GraphTransaction<G, V, E>> {
+
+
+  private static final String WHITESPACE = " ";
   /**
    * .DOT header string
    */
-  private static final String DOT_DIGRAPH_HEADER = "digraph ";
+  private static final String DOT_DIGRAPH_HEADER = "digraph";
   /**
    * .DOT block open string
    */
   private static final String DOT_BLOCK_OPEN = "{";
+  /**
+   * .DOT graph block open
+   */
+  private static final String DOT_GRAPH_TAG = "graph";
   /**
    * .DOT block close string
    */
@@ -71,7 +75,7 @@ public class DotFileFormat
   /**
    * .DOT attributes open string
    */
-  private static final String DOT_ATTRIBUTES_OPEN = " [label=\"";
+  private static final String DOT_ATTRIBUTES_OPEN = "[label=\"";
   /**
    * .DOT attributes close string
    */
@@ -83,7 +87,7 @@ public class DotFileFormat
   /**
    * .DOT attribute separator string
    */
-  private static final String DOT_ATTRIBUTE_SEPARATOR = ", ";
+  private static final String DOT_ATTRIBUTE_SEPARATOR = ",";
   /**
    * .DOT attribute open string
    */
@@ -92,21 +96,69 @@ public class DotFileFormat
    * .DOT attribute close string
    */
   private static final String DOT_ATTRIBUTE_CLOSE = "\"";
+  /**
+   * flag to print graph head information to dot
+   */
+  private boolean graphInformation;
+
+  /**
+   * Constructor
+   *
+   * @param graphInformation flag to print graph head information
+   */
+  public DotFileFormat(Boolean graphInformation){
+    this.graphInformation = graphInformation;
+  }
 
   @Override
   public String format(GraphTransaction<G, V, E> transaction) {
-    Collection<String> lines = Lists.newArrayList();
+
+    StringBuilder builder = new StringBuilder();
+
     //--------------------------------------------------------------------------
     // write dot head lines and open block
     //--------------------------------------------------------------------------
 
+    // remove "-" (reserved character in dot format)
     String graphHeadId = transaction.getGraphHead()
       .getId().toString().replace("-", "");
 
-    lines.add(String.format("%s%s%n%s",
+    // writes for each graph:
+    // digraph graphHeadId
+    // {
+    builder.append(String.format("%s%s%s%n%s%n",
       DOT_DIGRAPH_HEADER,
+      WHITESPACE,
       graphHeadId,
       DOT_BLOCK_OPEN));
+
+    //--------------------------------------------------------------------------
+    // write graph information (optional)
+    //--------------------------------------------------------------------------
+
+    if (graphInformation){
+      G graphHead = transaction.getGraphHead();
+
+      // writes:
+      // graph [label="graphHeadLabel"
+      builder.append(String.format("%s%s%s%s%s",
+        DOT_GRAPH_TAG,
+        WHITESPACE,
+        DOT_ATTRIBUTES_OPEN,
+        graphHead.getLabel(),
+        DOT_ATTRIBUTE_CLOSE));
+
+      // write properties
+      if (graphHead.getProperties().size() > 0) {
+        builder.append(writeProperties(graphHead.getProperties()));
+      }
+
+      // writes:
+      // ...];
+      builder.append(String.format("%s%s%n",
+        DOT_ATTRIBUTES_CLOSE,
+        DOT_LINE_ENDING));
+    }
 
     //--------------------------------------------------------------------------
     // write vertex lines
@@ -115,34 +167,28 @@ public class DotFileFormat
 
     for (V vertex: transaction.getVertices()) {
 
+      // remove "-" (reserved character in dot format)
       String vertexId = vertex.getId().toString().replace("-", "");
 
-      String vertexLine = String.format("%s%s%s%s",
+      // writes for each vertex:
+      // vertexId [label="vertexLabel",
+      builder.append(String.format("%s%s%s%s%s",
         vertexId,
+        WHITESPACE,
         DOT_ATTRIBUTES_OPEN,
         vertex.getLabel(),
-        DOT_ATTRIBUTE_CLOSE);
-
-      StringBuilder vertexBuilder = new StringBuilder(vertexLine);
+        DOT_ATTRIBUTE_CLOSE));
 
       // write properties
       if (vertex.getProperties().size() > 0) {
-        for (Property property : vertex.getProperties()) {
-
-          vertexBuilder.append(String.format("%s%s%s%s%s",
-            DOT_ATTRIBUTE_SEPARATOR,
-            property.getKey(),
-            DOT_ATTRIBUTE_OPEN,
-            property.getValue(),
-            DOT_ATTRIBUTE_CLOSE));
-        }
+        builder.append(writeProperties(vertex.getProperties()));
       }
 
-      vertexBuilder.append(String.format("%s%s",
+      // writes:
+      // ...];
+      builder.append(String.format("%s%s%n",
         DOT_ATTRIBUTES_CLOSE,
         DOT_LINE_ENDING));
-
-      lines.add(vertexBuilder.toString());
     }
 
     //--------------------------------------------------------------------------
@@ -152,44 +198,65 @@ public class DotFileFormat
 
     for (E edge: transaction.getEdges()) {
 
+      // remove "-" (reserved character in dot format)
       String sourceId = edge.getSourceId().toString().replace("-", "");
       String targetId = edge.getTargetId().toString().replace("-", "");
 
-      String edgeLine = String.format("%s%s%s%s%s%s",
+      // writes for each edge:
+      // sourceId -> targetId [label="edgeLabel"
+      builder.append(String.format("%s%s%s%s%s%s%s",
         sourceId,
         DOT_OUT_EDGE,
         targetId,
+        WHITESPACE,
         DOT_ATTRIBUTES_OPEN,
         edge.getLabel(),
-        DOT_ATTRIBUTE_CLOSE);
-
-      StringBuilder edgeBuilder = new StringBuilder(edgeLine);
+        DOT_ATTRIBUTE_CLOSE));
 
       // write properties
       if (edge.getProperties().size() > 0) {
-        for (Property property :edge.getProperties()) {
-
-          edgeBuilder.append(String.format("%s%s%s%s%s",
-            DOT_ATTRIBUTE_SEPARATOR,
-            property.getKey(),
-            DOT_ATTRIBUTE_OPEN,
-            property.getValue(),
-            DOT_ATTRIBUTE_CLOSE));
-        }
+        builder.append(writeProperties(edge.getProperties()));
       }
 
-      edgeBuilder.append(String.format("%s%s",
+      builder.append(String.format("%s%s%n",
         DOT_ATTRIBUTES_CLOSE,
         DOT_LINE_ENDING));
-
-      lines.add(edgeBuilder.toString());
     }
 
     //--------------------------------------------------------------------------
     // close dot block
     //--------------------------------------------------------------------------
 
-    lines.add(String.format("%s%n", DOT_BLOCK_CLOSE));
-    return StringUtils.join(lines, "\n") + "\n";
+    builder.append(String.format("%s", DOT_BLOCK_CLOSE));
+
+    String end = builder.toString();
+
+    System.out.println(end);
+
+    return end;
+  }
+
+  /**
+   * Writes all properties as string
+   *
+   * @param propertyList  List of properties
+   * @return              properties as string
+   */
+  private String writeProperties(PropertyList propertyList) {
+
+    StringBuilder propertyBuilder = new StringBuilder();
+
+    // writes for each property:
+    // ..., propertyKey1=propertyValue1, propertyKey2=propertyValue2,...
+    for (Property property : propertyList) {
+      propertyBuilder.append(String.format("%s%s%s%s%s",
+        DOT_ATTRIBUTE_SEPARATOR,
+        property.getKey(),
+        DOT_ATTRIBUTE_OPEN,
+        property.getValue(),
+        DOT_ATTRIBUTE_CLOSE));
+    }
+
+    return propertyBuilder.toString();
   }
 }
