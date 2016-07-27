@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.json.csv.inputformats;
+package org.gradoop.io.impl.csv.inputformats;
 
 
 import org.apache.hadoop.io.LongWritable;
@@ -42,7 +42,7 @@ public class CSVInputFormat extends TextInputFormat{
   public RecordReader<LongWritable, Text> createRecordReader(InputSplit
     split, TaskAttemptContext context) {
     try {
-      return new TLFRecordReader((FileSplit) split, context
+      return new CSVRecordReader((FileSplit) split, context
         .getConfiguration());
     } catch (IOException ioe) {
       System.err.println("Error while creating TLFRecordReader: " + ioe);

@@ -15,17 +15,24 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.json.csv.inputformats;
+package org.gradoop.io.impl.csv.inputformats;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 import java.io.IOException;
 
 public class CSVRecordReader extends RecordReader<LongWritable, Text> {
+
+  public CSVRecordReader(FileSplit split, Configuration conf) throws
+    IOException {
+  }
+
   @Override
   public void initialize(InputSplit inputSplit,
     TaskAttemptContext taskAttemptContext) throws IOException,
