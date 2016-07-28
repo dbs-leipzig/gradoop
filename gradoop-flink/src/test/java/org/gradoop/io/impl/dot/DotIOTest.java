@@ -27,9 +27,6 @@ public class DotIOTest extends GradoopFlinkTestBase {
     String gdlFile =
       DotIOTest.class.getResource("/data/dot/input.gdl").getFile();
 
-    String expectedDot =
-      DotIOTest.class.getResource("/data/dot/expected.dot").getFile();
-
     // load from gdl
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromFile(gdlFile);
@@ -53,13 +50,30 @@ public class DotIOTest extends GradoopFlinkTestBase {
     // execute
     getExecutionEnvironment().execute();
 
-    // compare written file with expected file
-    List<String> input = getExecutionEnvironment()
-      .readTextFile(dotFile).collect();
+    int vertexLines = 0;
+    int edgeLines = 0;
 
-    List<String> expected = getExecutionEnvironment()
-      .readTextFile(expectedDot).collect();
+    // read written file
+    List<String> dotLines = getExecutionEnvironment()
+      .readTextFile(dotFile)
+      .collect();
 
-    assertEquals("Differ number of lines", expected.size(), input.size());
+    // count vertex and edge lines
+    for (String line : dotLines){
+
+      if (line.contains("->")){
+        edgeLines++;
+      } else if (
+          !line.contains("di") &&
+          !line.contains("{") &&
+          !line.contains("}")){
+        vertexLines++;
+      }
+
+    }
+
+    // assert
+    assertEquals("Wrong number of edge lines", 4, edgeLines);
+    assertEquals("Wrong number of vertex lines", 3, vertexLines);
  }
 }
