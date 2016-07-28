@@ -705,10 +705,12 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> splitBy(String propertyKey) {
+  public GraphCollection<G, V, E> splitBy(
+    String propertyKey, boolean preserveInterEdges) {
     return callForCollection(
       new Split<G, V, E>(
-        new PropertyGetter<V>(Lists.newArrayList(propertyKey))));
+        new PropertyGetter<V>(Lists.newArrayList(propertyKey)),
+        preserveInterEdges));
   }
 
   //----------------------------------------------------------------------------
