@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators.aggregation.functions.sum;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -32,47 +31,49 @@ import java.math.BigDecimal;
 public class SumPropertyValuesGroups implements
   GroupReduceFunction<Tuple2<GradoopId, PropertyValue>, Tuple2<GradoopId,
     PropertyValue>> {
-
   /**
-   * Instance of Number, containing 0 of the same type as
+   * Instance of Number, containing a zero element of the same type as
    * the property values
    */
   private final Number zero;
+  /**
+   * Reduce object instantiation
+   */
+  private Tuple2<GradoopId, PropertyValue> reuseTuple;
 
   /**
    * Constructor
+   *
    * @param zero zero element
    */
   public SumPropertyValuesGroups(Number zero) {
+    this.reuseTuple = new Tuple2<>();
     this.zero = zero;
   }
 
   @Override
-  public void reduce(
-    Iterable<Tuple2<GradoopId, PropertyValue>> in,
+  public void reduce(Iterable<Tuple2<GradoopId, PropertyValue>> in,
     Collector<Tuple2<GradoopId, PropertyValue>> out) throws Exception {
     Number result = zero;
-    GradoopId id = GradoopId.get();
-    Class type = result.getClass();
+    Class resultType = result.getClass();
     for (Tuple2<GradoopId, PropertyValue> tuple : in) {
-      id = tuple.f0;
+      reuseTuple.f0 = tuple.f0;
       PropertyValue value = tuple.f1;
-      result =
-        type.equals(Integer.class) ?
-          (Integer) result + value.getInt() :
-        type.equals(Long.class) ?
-          (Long) result + value.getInt() :
-        type.equals(Float.class) ?
-          (Float) result + value.getFloat() :
-        type.equals(Double.class) ?
-          (Double) result + value.getDouble() :
-        type.equals(BigDecimal.class) ?
-          ((BigDecimal) result).add(value.getBigDecimal()) :
-        result;
+      // this is necessary to allow aggregation over a property that contains
+      // values of different types (e.g. Integer and String)
+      if (resultType == Integer.class && value.isInt()) {
+        result = (Integer) result + value.getInt();
+      } else if (resultType == Long.class && value.isLong()) {
+        result = (Long) result + value.getLong();
+      } else if (resultType == Float.class && value.isFloat()) {
+        result = (Float) result + value.getFloat();
+      } else if (resultType == Double.class && value.isDouble()) {
+        result = (Double) result + value.getDouble();
+      } else if (resultType == BigDecimal.class && value.isBigDecimal()) {
+        result = ((BigDecimal) result).add(value.getBigDecimal());
+      }
     }
-    out.collect(new Tuple2<>(
-      id,
-      PropertyValue.create(result)
-    ));
+    reuseTuple.f1 = PropertyValue.create(result);
+    out.collect(reuseTuple);
   }
 }

@@ -22,11 +22,10 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.functions.AggregateFunction;
-import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.aggregation.functions.AggregateWithDefaultValueFunction;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
@@ -39,27 +38,23 @@ import org.gradoop.model.impl.properties.PropertyValue;
  */
 public class MaxEdgeProperty
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements
-  AggregateFunction<G, V, E>, ApplyAggregateFunction<G, V, E> {
+  extends AggregateWithDefaultValueFunction<G, V, E> {
 
   /**
    * Property key to retrieve property values
    */
   private String propertyKey;
-  /**
-   * User defined maximum of same type as the property values,
-   * needed to specify the type of the property
-   */
-  private Number maximum;
 
   /**
    * Constructor
    * @param propertyKey Property key to retrieve property values
-   * @param maximum user defined maximum
+   * @param min user defined minimum, used as default property value
    */
-  public MaxEdgeProperty(String propertyKey, Number maximum) {
+  public MaxEdgeProperty(
+    String propertyKey,
+    Number min) {
+    super(min);
     this.propertyKey = propertyKey;
-    this.maximum = maximum;
   }
 
   /**
@@ -71,8 +66,9 @@ public class MaxEdgeProperty
    */
   @Override
   public DataSet<PropertyValue> execute(LogicalGraph<G, V, E> graph) {
-    return Max
-      .max(graph.getEdges(), propertyKey, maximum);
+    return Max.max(graph.getEdges(),
+      propertyKey,
+      getDefaultValue());
   }
 
   /**
@@ -85,6 +81,8 @@ public class MaxEdgeProperty
   @Override
   public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
     GraphCollection<G, V, E> collection) {
-    return Max.groupBy(collection.getEdges(), propertyKey, maximum);
+    return Max.groupBy(collection.getEdges(),
+      propertyKey,
+      getDefaultValue());
   }
 }

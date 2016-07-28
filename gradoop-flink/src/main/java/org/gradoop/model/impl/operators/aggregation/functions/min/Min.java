@@ -41,7 +41,7 @@ public class Min {
    *
    * @param dataSet input dataset
    * @param propertyKey key of property
-   * @param max user defined maximum of the same type as the property value
+   * @param max maximum of the same type as the property value
    * @param <EL>     element type in input dataset
    * @return 1-element dataset with minimum of input dataset
    */
@@ -49,7 +49,8 @@ public class Min {
     DataSet<EL> dataSet,
     String propertyKey,
     Number max) {
-    return dataSet.map(new GetPropertyValue<EL>(propertyKey, max))
+    return dataSet
+      .map(new GetPropertyValue<EL>(propertyKey, max))
       .union(dataSet.getExecutionEnvironment()
         .fromElements(new Tuple1<>(PropertyValue.create(max))))
       .reduce(new MinOfPropertyValues(max))
@@ -64,7 +65,7 @@ public class Min {
    *
    * @param dataSet input dataset
    * @param propertyKey key of property
-   * @param max user defined maximum, of the same type as the property value
+   * @param max maximum, of the same type as the property value
    * @param <EL>     element type in input dataset
    * @return {@code Tuple2} with group value and group minimum
    */
@@ -73,7 +74,8 @@ public class Min {
     DataSet<EL> dataSet,
     String propertyKey,
     Number max) {
-    return dataSet.flatMap(new GraphIdsWithPropertyValue<EL>(propertyKey))
+    return dataSet
+      .flatMap(new GraphIdsWithPropertyValue<EL>(propertyKey))
       .groupBy(0)
       .reduceGroup(new MinOfPropertyValuesGroups(max));
   }
