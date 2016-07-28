@@ -12,6 +12,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public class DotIOTest extends GradoopFlinkTestBase {
@@ -25,26 +27,39 @@ public class DotIOTest extends GradoopFlinkTestBase {
     String gdlFile =
       DotIOTest.class.getResource("/data/dot/input.gdl").getFile();
 
+    String expectedDot =
+      DotIOTest.class.getResource("/data/dot/expected.dot").getFile();
+
     // load from gdl
     FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
       getLoaderFromFile(gdlFile);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> resultGraph =
+    // load input graph
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph =
       loader.getLogicalGraphByVariable("singleGraph");
 
+    // create temp directory
     String tmpDir = temporaryFolder.getRoot().toString();
 
     final String dotFile = tmpDir + "/test.dot";
 
+    // create datasink
     DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
       new DotDataSink<>(dotFile, false);
 
-    dataSink.write(resultGraph);
+    // write graph
+    dataSink.write(inputGraph);
 
+    // execute
     getExecutionEnvironment().execute();
 
-    DataSet<String> input = getExecutionEnvironment().readTextFile(dotFile);
+    // compare written file with expected file
+    List<String> input = getExecutionEnvironment()
+      .readTextFile(dotFile).collect();
 
-    assertEquals("wrong number of lines", 51, input.count());
-  }
+    List<String> expected = getExecutionEnvironment()
+      .readTextFile(expectedDot).collect();
+
+    assertEquals("Differ number of lines", expected.size(), input.size());
+ }
 }

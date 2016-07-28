@@ -1,16 +1,6 @@
-singleGraph[
-(a:Person{name="Anna",age="20"})-->(b:Person{name="Tom",age="25"})
-(b-->a)
-(c:Forum{topic="cats! becaus everyone love cats",lan="EN"})-->(a)
-(c)-->(a)
-(e:Person{lan="EN"})-->(f:Person{lan="SV"})
-(e{lan="EN"})-->(g:Person{lan="SV"})
-(h:Person{lan="EN"})-->(i:Person{lan="JA"})
-(j:Person{lan="EN"})-->(i{lan="JA"})
-(k:Person{lan="EN"})-->(l:Person{lan="FO"})
-(m:Person{lan="AR"})-->(n:Person{lan="DE"})
-(m{lan="AR"})-->(o:Person{lan="DE"})
-(p:Person{lan="EN"})-->(q:Person{lan="HU"})
-(r:Person{lan="EN"})-->(s:Person{lan="BN"})
-(r{lan="EN"})-->(t:Person{lan="BO"})
+singleGraph:Network{from="2006"}[
+(a:Person{name="Anna",age="20"})-[:knows{since="2012"}]->(b:Person{name="Tom",age="25"})
+(b)-[:knows{since="2012"}]->(a)
+(c:Forum{topic="Apache Flink",lan="EN"})-[:hasModerator{since="2002"}]->(b)
+(c)-[:hasMember{since="2008"}]->(a)
 ]

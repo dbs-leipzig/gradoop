@@ -25,7 +25,7 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.properties.Property;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.model.impl.tuples.GraphTransaction;
-
+import org.gradoop.util.GConstants;
 
 /**
  * Converts a GraphTransaction to the following .dot format:
@@ -34,11 +34,11 @@ import org.gradoop.model.impl.tuples.GraphTransaction;
  *   {
  *   gradoopId1 [label="person",name="Bob",age="20",...];
  *   gradoopId2 [label="person",name="Alice",age="20",...];
- *   gradoopID3
- *   gradoopID4
+ *   gradoopID3;
+ *   gradoopID4;
  *   gradoopId1->gradoopId2 [label="knows",since="2003",...];
  *   gradoopId2->gradoopId1 [label="knows",since="2003",...];
- *   gradoopId3->gradoopId4
+ *   gradoopId3->gradoopId4;
  *   }
  * </p>
  *
@@ -49,8 +49,9 @@ import org.gradoop.model.impl.tuples.GraphTransaction;
 public class DotFileFormat
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements TextOutputFormat.TextFormatter<GraphTransaction<G, V, E>> {
-
-
+  /**
+   * Whitespace
+   */
   private static final String WHITESPACE = " ";
   /**
    * .DOT header string
@@ -75,7 +76,11 @@ public class DotFileFormat
   /**
    * .DOT attributes open string
    */
-  private static final String DOT_ATTRIBUTES_OPEN = "[label=\"";
+  private static final String DOT_ATTRIBUTES_OPEN = "[";
+  /**
+   * .DOT label open tag
+   */
+  private static final String DOT_LABEL_TAG = "label=\"";
   /**
    * .DOT attributes close string
    */
@@ -106,12 +111,13 @@ public class DotFileFormat
    *
    * @param graphInformation flag to print graph head information
    */
-  public DotFileFormat(Boolean graphInformation){
+  public DotFileFormat(Boolean graphInformation) {
     this.graphInformation = graphInformation;
   }
 
   @Override
   public String format(GraphTransaction<G, V, E> transaction) {
+
 
     StringBuilder builder = new StringBuilder();
 
@@ -119,7 +125,7 @@ public class DotFileFormat
     // write dot head lines and open block
     //--------------------------------------------------------------------------
 
-    // remove "-" (reserved character in dot format)
+    // remove "-" from GradoopId (reserved character in dot format)
     String graphHeadId = transaction.getGraphHead()
       .getId().toString().replace("-", "");
 
@@ -134,92 +140,88 @@ public class DotFileFormat
 
     //--------------------------------------------------------------------------
     // write graph information (optional)
+    // graph [label="label", property1="value1", ...];
     //--------------------------------------------------------------------------
 
-    if (graphInformation){
+    if (graphInformation) {
       G graphHead = transaction.getGraphHead();
 
       // writes:
-      // graph [label="graphHeadLabel"
-      builder.append(String.format("%s%s%s%s%s",
-        DOT_GRAPH_TAG,
-        WHITESPACE,
-        DOT_ATTRIBUTES_OPEN,
-        graphHead.getLabel(),
-        DOT_ATTRIBUTE_CLOSE));
+      // "graph"
+      builder.append(String.format("%s",
+        DOT_GRAPH_TAG));
 
-      // write properties
-      if (graphHead.getProperties().size() > 0) {
-        builder.append(writeProperties(graphHead.getProperties()));
+      // write dot attributes if existent
+      if (!graphHead.getLabel().equals(GConstants.DEFAULT_GRAPH_LABEL) ||
+        graphHead.getProperties().size() > 0) {
+
+        builder.append(writeDOTAttributes(
+          graphHead.getLabel(), graphHead.getProperties()));
       }
 
       // writes:
-      // ...];
-      builder.append(String.format("%s%s%n",
-        DOT_ATTRIBUTES_CLOSE,
+      // ";"
+      builder.append(String.format("%s%n",
         DOT_LINE_ENDING));
     }
 
     //--------------------------------------------------------------------------
     // write vertex lines
-    // gradoopId1 [label="label", property1="value1", ...];
+    // vertexId [label="label", property1="value1", ...];
     //--------------------------------------------------------------------------
 
     for (V vertex: transaction.getVertices()) {
 
-      // remove "-" (reserved character in dot format)
+      // remove "-" from GradoopId (reserved character in dot format)
       String vertexId = vertex.getId().toString().replace("-", "");
 
       // writes for each vertex:
-      // vertexId [label="vertexLabel",
-      builder.append(String.format("%s%s%s%s%s",
-        vertexId,
-        WHITESPACE,
-        DOT_ATTRIBUTES_OPEN,
-        vertex.getLabel(),
-        DOT_ATTRIBUTE_CLOSE));
+      // "vertexId",
+      builder.append(String.format("%s",
+        vertexId));
 
-      // write properties
-      if (vertex.getProperties().size() > 0) {
-        builder.append(writeProperties(vertex.getProperties()));
+      // write dot attributes if existent
+      if (!vertex.getLabel().equals(GConstants.DEFAULT_VERTEX_LABEL) ||
+        vertex.getProperties().size() > 0) {
+
+        builder.append(writeDOTAttributes(
+          vertex.getLabel(), vertex.getProperties()));
       }
 
       // writes:
-      // ...];
-      builder.append(String.format("%s%s%n",
-        DOT_ATTRIBUTES_CLOSE,
+      // ";"
+      builder.append(String.format("%s%n",
         DOT_LINE_ENDING));
     }
 
     //--------------------------------------------------------------------------
     // write edge lines
-    // gradoopId1->gradoopId2 [label="label", property1="value1", ...];
+    // sourceId->targetId [label="label", property1="value1", ...];
     //--------------------------------------------------------------------------
 
     for (E edge: transaction.getEdges()) {
 
-      // remove "-" (reserved character in dot format)
+      // remove "-" from GradoopId (reserved character in dot format)
       String sourceId = edge.getSourceId().toString().replace("-", "");
       String targetId = edge.getTargetId().toString().replace("-", "");
 
       // writes for each edge:
-      // sourceId -> targetId [label="edgeLabel"
-      builder.append(String.format("%s%s%s%s%s%s%s",
+      // "sourceId->targetId"
+      builder.append(String.format("%s%s%s",
         sourceId,
         DOT_OUT_EDGE,
-        targetId,
-        WHITESPACE,
-        DOT_ATTRIBUTES_OPEN,
-        edge.getLabel(),
-        DOT_ATTRIBUTE_CLOSE));
+        targetId));
 
-      // write properties
-      if (edge.getProperties().size() > 0) {
-        builder.append(writeProperties(edge.getProperties()));
+      // write dot attributes if existent
+      if (!edge.getLabel().equals(GConstants.DEFAULT_EDGE_LABEL) ||
+        edge.getProperties().size() > 0) {
+        builder.append(writeDOTAttributes(
+          edge.getLabel(), edge.getProperties()));
       }
 
-      builder.append(String.format("%s%s%n",
-        DOT_ATTRIBUTES_CLOSE,
+      // writes:
+      // ";"
+      builder.append(String.format("%s%n",
         DOT_LINE_ENDING));
     }
 
@@ -229,34 +231,53 @@ public class DotFileFormat
 
     builder.append(String.format("%s", DOT_BLOCK_CLOSE));
 
-    String end = builder.toString();
-
-    System.out.println(end);
-
-    return end;
+    return builder.toString();
   }
 
   /**
-   * Writes all properties as string
+   * Writes all attributes of the epgm element as string
    *
+   * @param label         label of the epgm element
    * @param propertyList  List of properties
    * @return              properties as string
    */
-  private String writeProperties(PropertyList propertyList) {
+  private String writeDOTAttributes(String label, PropertyList propertyList) {
 
-    StringBuilder propertyBuilder = new StringBuilder();
+    StringBuilder attributeBuilder = new StringBuilder();
 
-    // writes for each property:
-    // ..., propertyKey1=propertyValue1, propertyKey2=propertyValue2,...
-    for (Property property : propertyList) {
-      propertyBuilder.append(String.format("%s%s%s%s%s",
-        DOT_ATTRIBUTE_SEPARATOR,
-        property.getKey(),
-        DOT_ATTRIBUTE_OPEN,
-        property.getValue(),
+    // write:
+    // " ["
+    attributeBuilder.append(String.format("%s%s",
+      WHITESPACE,
+      DOT_ATTRIBUTES_OPEN));
+
+    // writes:
+    // "label="label""
+    if (!label.equals(GConstants.DEFAULT_GRAPH_LABEL)) {
+      attributeBuilder.append(String.format("%s%s%s",
+        DOT_LABEL_TAG,
+        label,
         DOT_ATTRIBUTE_CLOSE));
     }
 
-    return propertyBuilder.toString();
+    // writes for each property:
+    // ",propertyKey1=propertyValue1,propertyKey2=propertyValue2,..."
+    if (propertyList.size() > 0) {
+      for (Property property : propertyList) {
+        attributeBuilder.append(String.format("%s%s%s%s%s",
+          DOT_ATTRIBUTE_SEPARATOR,
+          property.getKey(),
+          DOT_ATTRIBUTE_OPEN,
+          property.getValue(),
+          DOT_ATTRIBUTE_CLOSE));
+      }
+    }
+
+    // writes:
+    // "]"
+    attributeBuilder.append(String.format("%s",
+      DOT_ATTRIBUTES_CLOSE));
+
+    return attributeBuilder.toString();
   }
 }
