@@ -24,4 +24,6 @@ public class Constants {
    * property key for master data quality
    */
   public static final String QUALITY = "quality";
+
+  //TODO constants für alle configzugriffe
 }

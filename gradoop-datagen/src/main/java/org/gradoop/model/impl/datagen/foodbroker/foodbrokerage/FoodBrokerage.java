@@ -17,6 +17,7 @@
 
 package org.gradoop.model.impl.datagen.foodbroker.foodbrokerage;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapPartitionFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
@@ -25,7 +26,9 @@ import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.*;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -45,14 +48,15 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   extends EPGMEdge> extends RichMapPartitionFunction<Long,
   GraphTransaction<G, V, E>> {
 
+  private FoodBrokerConfig config;
 
   // nur die benötigten daten übergeben id,quality eine klasse extends tuple2
 
-  private List<V> customers;
-  private List<V> vendors;
-  private List<V> logistics;
-  private List<V> employees;
-  private List<V> products;
+  private List<MasterDataTuple> customers;
+  private List<MasterDataTuple> vendors;
+  private List<MasterDataTuple> logistics;
+  private List<MasterDataTuple> employees;
+  private List<MasterDataTuple> products;
   //caseseeds als input
 
   private G graphHead;
@@ -64,11 +68,12 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   private Set<E> edges;
 
   public FoodBrokerage(G graphHead, EPGMVertexFactory<V> vertexFactory,
-    EPGMEdgeFactory<E> edgeFactory) {
+    EPGMEdgeFactory<E> edgeFactory, FoodBrokerConfig config) {
     this.graphHead = graphHead;
     this.graphIds.add(this.graphHead.getId());
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
+    this.config = config;
 
     this.vertices = new HashSet<>();
     this.edges = new HashSet<>();
@@ -162,7 +167,11 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
   private boolean confirmed(V salesQuotation) {
     //TODO get via config with sentBy, sentTo
-    return (Math.random() > 0.4);
+    List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
+
+    
+    return config.happensTransitionConfiguration(influencingMasterData,
+      "SalesQuotation", "confirmationProbability");
   }
 
   // SalesQuotation
@@ -176,10 +185,14 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     V salesQuotation = this.vertexFactory.createVertex(label, properties,
       this.graphIds);
 
-    edges.add(this.newEdge("sentBy", salesQuotation, this.getRandom(this
-      .employees)));
-    edges.add(this.newEdge("sentTo", salesQuotation, this.getRandom(this
-      .customers)));
+    edges.add(edgeFactory.createEdge("sentBy", salesQuotation.getId(),
+      getRandomTuple(employees).getId()));
+//    edges.add(this.newEdge("sentBy", salesQuotation, this.getRandom(this
+//      .employees)));
+    edges.add(edgeFactory.createEdge("sentTo",salesQuotation.getId(),
+      getRandomTuple(customers).getId()));
+//    edges.add(this.newEdge("sentTo", salesQuotation, this.getRandom(this
+//      .customers)));
     vertices.add(salesQuotation);
 
     return salesQuotation;
@@ -342,10 +355,16 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     purchOrder = this.vertexFactory.createVertex(label, properties, this
       .graphIds);
 
-    rndVendor = this.getRandom(this.vendors);
-    edges.add(this.newEdge("serves", purchOrder, salesOrder));
-    edges.add(this.newEdge("placedAt", purchOrder, rndVendor));
-    edges.add(this.newEdge("processedBy", purchOrder, processedBy));
+//    rndVendor = this.getRandom(this.vendors);
+    edges.add(edgeFactory.createEdge("serves", purchOrder.getId(),
+      salesOrder.getId()));
+//    edges.add(this.newEdge("serves", purchOrder, salesOrder));
+    edges.add(edgeFactory.createEdge("placedAt", purchOrder.getId(),
+      getRandomTuple(vendors).getId()));
+//    edges.add(this.newEdge("placedAt", purchOrder, rndVendor));
+    edges.add(edgeFactory.createEdge("processedBy", purchOrder.getId(),
+      processedBy.getId()));
+//    edges.add(this.newEdge("processedBy", purchOrder, processedBy));
 
     return purchOrder;
   }
@@ -539,9 +558,9 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
   // Utilities
   // Edges: sentBy, sentTo, partOf, contains, receivedFrom, processedBy,
-  private E newEdge(String label, V source, V target) {
-    return this.edgeFactory.createEdge(label, source.getId(), target.getId());
-  }
+//  private E newEdge(String label, V source, V target) {
+//    return this.edgeFactory.createEdge(label, source.getId(), target.getId());
+//  }
 
   private V getEdgeTarget(String label, V source) {
     for(E edge : edges) {
@@ -565,5 +584,10 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   private V getRandom(List<V> liste) {
     //TODO rnd verbessern
     return liste.get((int)Math.round(Math.random() * (liste.size()-1)));
+  }
+
+  private MasterDataTuple getRandomTuple (List<MasterDataTuple> list){
+    //TODO rnd verbessern
+    return list.get((int)Math.round(Math.random() * (list.size()-1)));
   }
 }

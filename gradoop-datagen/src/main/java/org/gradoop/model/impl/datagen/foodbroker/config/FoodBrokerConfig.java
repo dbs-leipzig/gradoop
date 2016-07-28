@@ -19,9 +19,15 @@ package org.gradoop.model.impl.datagen.foodbroker.config;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class FoodBrokerConfig {
   private final JSONObject root;
@@ -131,394 +137,6 @@ public class FoodBrokerConfig {
     return root.getJSONObject("TransactionalData");
   }
 
- // SalesQuotation
-
-  protected JSONObject getSalesQuotationNode() throws JSONException {
-    return getTransactionalNodes().getJSONObject("SalesQuotation");
-  }
-
-  public Integer getMinSalesQuotationLines() {
-    int minLines = 0;
-    try {
-      minLines = getSalesQuotationNode().getInt("linesMin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return minLines;
-  }
-
-  public Integer getMaxSalesQuotationLines() {
-    int maxLines = 0;
-    try {
-      maxLines = getSalesQuotationNode().getInt("linesMax");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return maxLines;
-  }
-
-  public Integer getMinSalesQuotationLineQuantity() {
-    int minQuantity = 0;
-    try {
-      minQuantity = getSalesQuotationNode().getInt("lineQuantityMin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return minQuantity;
-  }
-
-  public Integer getMaxSalesQuotationLineQuantity() {
-    int maxQuantity = 0;
-    try {
-      maxQuantity = getSalesQuotationNode().getInt("lineQuantityMax");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return maxQuantity;
-  }
-
-  public Float getSalesQuotationMargin() {
-    Float margin = null;
-    try {
-      margin = (float)
-        getSalesQuotationNode().getDouble("salesMargin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return margin;
-  }
-
-  public Float getSalesQuotationMarginInfluence() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getSalesQuotationNode().getDouble("salesMarginInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Float getSalesQuotationConfirmationProbability() {
-    Float probability = null;
-    try {
-      probability = (float)
-        getSalesQuotationNode().getDouble("confirmationProbability");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return probability;
-  }
-
-  public Float getSalesQuotationConfirmationProbabilityInfluence() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getSalesQuotationNode().getDouble("confirmationProbabilityInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Float getSalesQuotationLineConfirmationProbability() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getSalesQuotationNode().getDouble("lineConfirmationProbability");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMinSalesQuotationConfirmationDelay() {
-    int influence = 0;
-    try {
-      influence = getSalesQuotationNode().getInt("confirmationDelayMin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMaxSalesQuotationConfirmationDelay() {
-    int influence = 0;
-    try {
-      influence = getSalesQuotationNode().getInt("confirmationDelayMax");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getSalesQuotationConfirmationDelayInfluence() {
-    int influence = 0;
-    try {
-      influence = getSalesQuotationNode().getInt("confirmationDelayInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-// SalesOrder
-
-  protected JSONObject getSalesOrderNode() throws JSONException {
-    return getTransactionalNodes().getJSONObject("SalesOrder");
-  }
-
-  public Integer getMinSalesOrderDeliveryAgreementDelay() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("deliveryAgreementDelayMin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMaxSalesOrderDeliveryAgreementDelay() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("deliveryAgreementDelayMax");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getSalesOrderDeliveryAgreementDelayInfluence() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("deliveryAgreementDelayInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMinSalesOrderPurchaseDelay() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("purchaseDelayMin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMaxSalesOrderPurchaseDelay() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("purchaseDelayMax");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getSalesOrderPurchaseDelayInfluence() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("purchaseDelayInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMinSalesOrderInvoiceDelay() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("invoiceDelayMin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMaxSalesOrderInvoiceDelay() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("invoiceDelayMax");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getSalesOrderInvoiceDelayInfluence() {
-    int influence = 0;
-    try {
-      influence = getSalesOrderNode().getInt("invoiceDelayInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-// PurchOrder
-
-  protected JSONObject getPurchOrderNode() throws JSONException {
-    return getTransactionalNodes().getJSONObject("PurchOrder");
-  }
-
-  public Float getPurchOrderPriceVariation() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getSalesQuotationNode().getDouble("priceVariation");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Float getPurchOrderPriceVariationInfluence() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getSalesQuotationNode().getDouble("priceVariationInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMinPurchOrderDeliveryDelay() {
-    int influence = 0;
-    try {
-      influence = getPurchOrderNode().getInt("deliveryDelayMin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMaxPurchOrderDeliveryDelay() {
-    int influence = 0;
-    try {
-      influence = getPurchOrderNode().getInt("deliveryDelayMax");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getSalesPurchDeliveryDelayInfluence() {
-    int influence = 0;
-    try {
-      influence = getPurchOrderNode().getInt("deliveryDelayInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMinPurchOrderInvoiceDelay() {
-    int influence = 0;
-    try {
-      influence = getPurchOrderNode().getInt("invoiceDelayMin");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getMaxPurchOrderInvoiceDelay() {
-    int influence = 0;
-    try {
-      influence = getPurchOrderNode().getInt("invoiceDelayMax");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Integer getSalesPurchInvoiceDelayInfluence() {
-    int influence = 0;
-    try {
-      influence = getPurchOrderNode().getInt("invoiceDelayInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-
-// Ticket
-
-  protected JSONObject getTicketNode() throws JSONException {
-    return getTransactionalNodes().getJSONObject("Ticket");
-  }
-
-  public Float getTicketBadQualityProbability() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getTicketNode().getDouble("badQualityProbability");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Float getTicketBadQualityProbabilityInfluence() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getTicketNode().getDouble("badQualityProbabilityInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Float getTicketSalesRefund() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getTicketNode().getDouble("salesRefund");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Float getTicketSalesRefundInfluence() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getTicketNode().getDouble("salesRefundInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Float getTicketPurchRefund() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getTicketNode().getDouble("purchRefund");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
-  public Float getTicketPurchRefundInfluence() {
-    Float influence = null;
-    try {
-      influence = (float)
-        getTicketNode().getDouble("salesRefundInfluence");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return influence;
-  }
-
 // Quality
 
   protected JSONObject getQualityNode() throws JSONException {
@@ -529,7 +147,7 @@ public class FoodBrokerConfig {
     Float quality = null;
     try {
       quality = (float)
-        getTicketNode().getDouble("good");
+        getQualityNode().getDouble("good");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -540,7 +158,7 @@ public class FoodBrokerConfig {
     Float quality = null;
     try {
       quality = (float)
-        getTicketNode().getDouble("normal");
+        getQualityNode().getDouble("normal");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -551,7 +169,7 @@ public class FoodBrokerConfig {
     Float quality = null;
     try {
       quality = (float)
-        getTicketNode().getDouble("bad");
+        getQualityNode().getDouble("bad");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -559,5 +177,133 @@ public class FoodBrokerConfig {
   }
 
 
+  private Float getValue(List<MasterDataTuple> influencedMasterDataObjects,
+    boolean higherIsBetter, Float influence, Float startValue) {
+    Float value = startValue;
+
+    for (MasterDataTuple tuple : influencedMasterDataObjects) {
+      if (tuple.getQuality() == getQualityGood()){
+        if(higherIsBetter){
+          value += influence;
+        }
+        else{
+          value -= influence;
+        }
+      }
+      else if (tuple.getQuality() == getQualityBad()){
+        if(higherIsBetter){
+          value -= influence;
+        }
+        else{
+          value += influence;
+        }
+      }
+    }
+    return value;
+  }
+
+  // getIntRangeConfigurationValue(liste, "SalesQuotation",
+  // "confirmationDelay")
+  public Integer getIntRangeConfigurationValue(List<MasterDataTuple>
+    influencedMasterDataObjects, String node, String key) {
+    Integer min = 0;
+    Integer max = 0;
+    Boolean higherIsBetter = null;
+    Float influence = null;
+
+    try {
+      min = getTransactionalNodes().getJSONObject(node).getInt(key + "Min");
+      max = getTransactionalNodes().getJSONObject(node).getInt(key + "Max");
+      higherIsBetter = getTransactionalNodes().getJSONObject(node)
+        .getBoolean(key + "HigherIsBetter");;
+      influence = (float)getTransactionalNodes().getJSONObject(node)
+        .getDouble(key
+        + "Influence");
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    Integer startValue = 1 + (int)((double)(max - min) * Math.random()) +
+      min;
+
+    Integer value = getValue(influencedMasterDataObjects, higherIsBetter,
+      influence, startValue.floatValue()).intValue();
+
+    if(value < min){
+      value = min;
+    }
+    else if (value > max ){
+      value = max;
+    }
+
+    return value;
+  }
+
+  public BigDecimal getDecimalVariationConfigurationValue(
+    List<MasterDataTuple> influencedMasterDataObjects, String node, String key)
+    {
+    Float baseValue = null;
+    Boolean higherIsBetter = null;
+    Float influence = null;
+
+    try {
+      baseValue = (float) getTransactionalNodes().getJSONObject(node)
+        .getDouble(key);
+      higherIsBetter = getTransactionalNodes().getJSONObject(node)
+        .getBoolean(key + "HigherIsBetter");
+      influence = (float) getTransactionalNodes().getJSONObject(node)
+        .getDouble(key + "Influence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+     Float value = getValue(influencedMasterDataObjects, higherIsBetter,
+       influence, baseValue);
+
+    return BigDecimal.valueOf(value).setScale(2, BigDecimal.ROUND_HALF_UP);
+  }
+
+  public boolean happensTransitionConfiguration(
+    List<MasterDataTuple> influencedMasterDataObjects, String node, String key)
+    {
+      Float baseValue = null;
+      Boolean higherIsBetter = null;
+      Float influence = null;
+
+      try {
+        baseValue = (float) getTransactionalNodes().getJSONObject(node)
+          .getDouble(key);
+        higherIsBetter = getTransactionalNodes().getJSONObject(node)
+          .getBoolean(key + "HigherIsBetter");
+        influence = (float) getTransactionalNodes().getJSONObject(node)
+          .getDouble(key + "Influence");
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+      Float value = getValue(influencedMasterDataObjects, higherIsBetter,
+        influence, baseValue);
+
+      return (float) Math.random() <= value;
+  }
+
+
+  public Date delayDelayConfiguration (Date date, List<MasterDataTuple>
+    influencingMasterDataObjects, String node, String key){
+    int delay = getIntRangeConfigurationValue(influencingMasterDataObjects,
+      node, key);
+
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.add(Calendar.DATE,delay);
+
+    return calendar.getTime();
+  }
+
+  public Date delayDelayConfiguration (Date date,
+    MasterDataTuple influencingMasterDataObject, String node, String key) {
+    List <MasterDataTuple> influencingMasterDataObjects = new ArrayList<>();
+    influencingMasterDataObjects.add(influencingMasterDataObject);
+    return delayDelayConfiguration(date,influencingMasterDataObjects, node, key);
+  }
 
 }
