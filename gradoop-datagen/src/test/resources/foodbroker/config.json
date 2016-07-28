@@ -38,51 +38,61 @@
     "startDate" : "2014-01-01",
     "endDate" : "2014-12-31"
   },
-  //TODO check wether higherIsBetter is needed
   "TransactionalData" : {
     "SalesQuotation" : {
-      "minLines" : 1,
-      "maxLines" : 20,
-      "minLineQuantity" : 1,
-      "maxLineQuantity" : 100,
-      "salesMarginBase" : 0.05, //higherIsBetter : true
+      "linesMin" : 1,
+      "linesMax" : 20,
+      "lineQuantityMin" : 1,
+      "lineQuantityMax" : 100,
+      "salesMargin" : 0.05,
       "salesMarginInfluence" : 0.02,
-      "confirmationProbability" : 0.6, //higherIsBetter : true
+      "salesMarginHigherIsBetter" : true,
+      "confirmationProbability" : 0.6,
       "confirmationProbabilityInfluence" : 0.2,
-      "lineConfirmationProbabilityMin" : 0,
-      "lineConfirmationProbabilityMax" : 9,
+      "confirmationProbabilityHigherIsBetter" : true,
+      "lineConfirmationProbability" : 0.9,
       "confirmationDelayMin" : 0,
-      "confirmationDelayMax" : 20,
-      "confirmationDelayInfluence" : 5 //higherIsBetter : false
+      "ConfirmationDelayMax" : 20,
+      "confirmationDelayInfluence" : 5,
+      "confirmationDelayHigherIsBetter" : false
     },
     "SalesOrder" : {
-      "deliveryAgreementDelayMin" : 2, //higherIsBetter : true
+      "deliveryAgreementDelayMin" : 2,
       "deliveryAgreementDelayMax" : 4,
       "deliveryAgreementDelayInfluence" : 1,
-      "purchaseDelayMin" : 0,  //higherIsBetter : false
+      "deliveryAgreementDelayHigherIsBetter" : true,
+      "purchaseDelayMin" : 0,
       "purchaseDelayMax" : 2,
       "purchaseDelayInfluence" : 2,
-      "invoiceDelayMin" : 0, //higherIsBetter : false
+      "purchaseDelayHigherIsBetter" : false,
+      "invoiceDelayMin" : 0,
       "invoiceDelayMax" : 3,
-      "invoiceDelayInfluence" : -2
+      "invoiceDelayInfluence" : -2,
+      "invoiceDelayHigherIsBetter" : false
     },
     "PurchOrder" : {
-      "priceVariation" : 0.01, //higherIsBetter : false
+      "priceVariation" : 0.01,
       "priceVariationInfluence" : -0.02,
-      "deliveryDelayMin" : 0, //higherIsBetter : false
+      "priceVariationHigherIsBetter" : false,
+      "deliveryDelayMin" : 0,
       "deliveryDelayMax" : 1,
       "deliveryDelayInfluence" : 1,
-      "invoiceDelayMin" : 2, //higherIsBetter : true
+      "deliveryDelayHigherIsBetter" : false,
+      "invoiceDelayMin" : 2,
       "invoiceDelayMax" : 5,
-      "invoiceDelayInfluence" : 3
+      "invoiceDelayInfluence" : 3,
+      "invoiceDelayHigherIsBetter" : true
     },
     "Ticket" : {
-      "badQualityProbability" : 0.05, //higherIsBetter : false
+      "badQualityProbability" : 0.05,
       "badQualityProbabilityInfluence" : -0.1,
-      "salesRefund" : 0.1, //higherIsBetter : false
+      "badQualityProbabilityHigherIsBetter" : false,
+      "salesRefund" : 0.1,
       "salesRefundInfluence" : -0.05,
-      "purchRefund" : 0.1, //higherIsBetter : true
-      "purchRefundInfluence" : 0.05
+      "salesRefundHigherIsBetter" : false,
+      "purchRefund" : 0.1,
+      "purchRefundInfluence" : 0.05,
+      "purchRefundHigherIsBetter" : true
     }
   },
   "Quality" : {
