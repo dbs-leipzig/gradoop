@@ -1,5 +1,7 @@
 package org.gradoop.model.impl.operators.split;
 
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.apache.hadoop.security.SaslOutputStream;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
@@ -10,8 +12,11 @@ import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
+import sun.security.provider.certpath.Vertex;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 public class SplitTest extends GradoopFlinkTestBase {
@@ -43,7 +48,7 @@ public class SplitTest extends GradoopFlinkTestBase {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
       input.callForCollection(new Split<GraphHeadPojo,
-            VertexPojo, EdgePojo>(new SelectKeyValues()));
+            VertexPojo, EdgePojo>(new SelectKeyValues(), false));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
@@ -82,11 +87,11 @@ public class SplitTest extends GradoopFlinkTestBase {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
       input.callForCollection(new Split<GraphHeadPojo,
-        VertexPojo, EdgePojo>(new SelectKeyValues()));
+        VertexPojo, EdgePojo>(new SelectKeyValues(), false));
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
-      expectation = loader.getGraphCollectionByVariables(
-      "graph1", "graph2", "graph3");
+      expectation = loader.getGraphCollectionByVariables("graph1", "graph2",
+      "graph3");
 
     collectAndAssertTrue(result.equalsByGraphElementIds(expectation));
   }
@@ -120,7 +125,7 @@ public class SplitTest extends GradoopFlinkTestBase {
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
       input.callForCollection(new Split<GraphHeadPojo,
-        VertexPojo, EdgePojo>(new SelectKeyValues()));
+        VertexPojo, EdgePojo>(new SelectKeyValues(), false));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
@@ -152,12 +157,58 @@ public class SplitTest extends GradoopFlinkTestBase {
       loader.getLogicalGraphByVariable("g1");
 
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      input.splitBy("id");
+      input.splitBy("id", false);
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("g2")));
     collectAndAssertTrue(result.equalsByGraphElementData(
       loader.getGraphCollectionByVariables("g2")));
+  }
+
+  @Test
+  public void testSplitWithInterEdges() throws Exception{
+
+    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+      getLoaderFromString("" +
+          "input[" +
+          "(v0 {key1 = 0})" +
+          "(v1 {key1 = 1})" +
+          "(v2 {key1 = 1})" +
+          "(v3 {key1 = 0})" +
+          "(v4 {key1 = 2})" +
+          "(v5 {key1 = 2})" +
+          "(v1)-[e1]->(v2)" +
+          "(v3)-[e2]->(v0)" +
+          "(v2)-[e3]->(v0)" +
+          "]" +
+          "graph1[" +
+          "(v1)-[e1]->(v2)" +
+          "]" +
+          "graph2[" +
+          "(v3)-[e2]->(v0)" +
+          "]" +
+          "graph3[" +
+          "(v4)" +
+          "(v5)" +
+          "]" +
+          "interGraph[" +
+          "(v2)-[e3]->(v0)" +
+          "]"
+      );
+
+    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+      loader.getLogicalGraphByVariable("input");
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+      input.callForCollection(
+        new Split<GraphHeadPojo, VertexPojo, EdgePojo>(
+          new SelectKeyValues(), true));
+
+    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+      expectation = loader.getGraphCollectionByVariables("graph1", "graph2",
+      "graph3", "interGraph");
+
+    collectAndAssertTrue(result.equalsByGraphElementIds(expectation));
   }
 
   public static class SelectKeyValues
