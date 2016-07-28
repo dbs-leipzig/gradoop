@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators.aggregation.functions.max;
 
 import org.apache.flink.api.common.functions.ReduceFunction;
@@ -30,13 +29,11 @@ import org.gradoop.model.impl.properties.PropertyValue;
 @FunctionAnnotation.ReadFieldsSecond("f0")
 public class MaxOfPropertyValues implements
   ReduceFunction<Tuple1<PropertyValue>> {
-
   /**
    * Instance of Number, containing a minimum of the same type as
    * the property values
    */
   private final Number min;
-
   /**
    * Reduce object instantiation
    */
@@ -44,12 +41,14 @@ public class MaxOfPropertyValues implements
 
   /**
    * Constructor
+   *
    * @param min minimum element
    */
   public MaxOfPropertyValues(Number min) {
     this.reuseTuple = new Tuple1<>();
     this.min = min;
   }
+
   @Override
   public Tuple1<PropertyValue> reduce(Tuple1<PropertyValue> prop1,
     Tuple1<PropertyValue> prop2) throws Exception {
@@ -59,34 +58,21 @@ public class MaxOfPropertyValues implements
     // values of different types (e.g. Integer and String)
     if (value1.isInt() && value2.isInt()) {
       reuseTuple.f0 =
-        PropertyValue.create(
-          Math.max(value1.getInt(), value2.getInt()));
+        PropertyValue.create(Math.max(value1.getInt(), value2.getInt()));
+    } else if (value1.isLong() && value2.isLong()) {
+      reuseTuple.f0 =
+        PropertyValue.create(Math.max(value1.getLong(), value2.getLong()));
+    } else if (value1.isFloat() && value2.isFloat()) {
+      reuseTuple.f0 =
+        PropertyValue.create(Math.max(value1.getFloat(), value2.getFloat()));
+    } else if (value1.isDouble() && value2.isDouble()) {
+      reuseTuple.f0 =
+        PropertyValue.create(Math.max(value1.getDouble(), value2.getDouble()));
+    } else if (value1.isBigDecimal() && value2.isBigDecimal()) {
+      reuseTuple.f0 = PropertyValue
+        .create(value1.getBigDecimal().max(value2.getBigDecimal()));
     } else {
-      if (value1.isLong() && value2.isLong()) {
-        reuseTuple.f0 =
-          PropertyValue.create(
-            Math.max(value1.getLong(), value2.getLong()));
-      } else {
-        if (value1.isFloat() && value2.isFloat()) {
-          reuseTuple.f0 =
-            PropertyValue.create(
-              Math.max(value1.getFloat(), value2.getFloat()));
-        } else {
-          if (value1.isDouble() && value2.isDouble()) {
-            reuseTuple.f0 =
-              PropertyValue.create(
-                Math.max(value1.getDouble(), value2.getDouble()));
-          } else {
-            if (value1.isBigDecimal() && value2.isBigDecimal()) {
-              reuseTuple.f0 =
-                PropertyValue.create(
-                  value1.getBigDecimal().max(value2.getBigDecimal()));
-            } else {
-              reuseTuple.f0 = PropertyValue.create(min);
-            }
-          }
-        }
-      }
+      reuseTuple.f0 = PropertyValue.create(min);
     }
     return reuseTuple;
   }

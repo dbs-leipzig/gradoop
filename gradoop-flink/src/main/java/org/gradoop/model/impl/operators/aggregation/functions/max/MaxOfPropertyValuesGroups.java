@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.model.impl.operators.aggregation.functions.max;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -32,13 +31,11 @@ import java.math.BigDecimal;
 public class MaxOfPropertyValuesGroups implements
   GroupReduceFunction<Tuple2<GradoopId, PropertyValue>, Tuple2<GradoopId,
     PropertyValue>> {
-
   /**
    * Instance of Number, containing minimum of the same type as
    * the property values
    */
   private final Number min;
-
   /**
    * Reduce object instantiation
    */
@@ -46,6 +43,7 @@ public class MaxOfPropertyValuesGroups implements
 
   /**
    * Constructor
+   *
    * @param min minimum element
    */
   public MaxOfPropertyValuesGroups(Number min) {
@@ -53,8 +51,7 @@ public class MaxOfPropertyValuesGroups implements
   }
 
   @Override
-  public void reduce(
-    Iterable<Tuple2<GradoopId, PropertyValue>> in,
+  public void reduce(Iterable<Tuple2<GradoopId, PropertyValue>> in,
     Collector<Tuple2<GradoopId, PropertyValue>> out) throws Exception {
     Class resultType = min.getClass();
     Number result = min;
@@ -66,24 +63,16 @@ public class MaxOfPropertyValuesGroups implements
       // values of different types (e.g. Integer and String)
       if (resultType == Integer.class && value.isInt()) {
         result = Math.max((Integer) result, value.getInt());
+      } else if (resultType == Long.class && value.isLong()) {
+        result = Math.max((Long) result, value.getLong());
+      } else if (resultType == Float.class && value.isFloat()) {
+        result = Math.max((Float) result, value.getFloat());
+      } else if (resultType == Double.class && value.isDouble()) {
+        result = Math.max((Double) result, value.getDouble());
+      } else if (resultType == BigDecimal.class && value.isBigDecimal()) {
+        result = ((BigDecimal) result).max(value.getBigDecimal());
       } else {
-        if (resultType == Long.class && value.isLong()) {
-          result = Math.max((Long) result, value.getLong());
-        } else {
-          if (resultType == Float.class && value.isFloat()) {
-            result = Math.max((Float) result, value.getFloat());
-          } else {
-            if (resultType == Double.class && value.isDouble()) {
-              result = Math.max((Double) result, value.getDouble());
-            } else {
-              if (resultType == BigDecimal.class && value.isBigDecimal()) {
-                result = ((BigDecimal) result).max(value.getBigDecimal());
-              } else {
-                reuseTuple.f1 = PropertyValue.create(min);
-              }
-            }
-          }
-        }
+        reuseTuple.f1 = PropertyValue.create(min);
       }
     }
     reuseTuple.f1 = PropertyValue.create(result);
