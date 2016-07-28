@@ -47,20 +47,24 @@ import java.util.List;
  * Algorithmic idea:
  *
  * 1) Map vertices to a minimal representation, i.e. {@link VertexGroupItem}.
- * 2) Group vertices on label and/or property.
- * 3) Create a group representative for each group and collect a non-candidate
- *    {@link VertexGroupItem} for each group element and one additional
- *    candidate {@link VertexGroupItem} that holds the group aggregate.
+ * 2) Group vertices on label and/or property
+ * 3) Use groupCombine to process the grouped partitions. Creates a super vertex
+ *    tuple for each group partition, including the local aggregates.
+ *    Update each vertex tuple with their super vertex id and forward them.
  * 4) Filter output of 3)
- *    a) non-candidate tuples are mapped to {@link VertexWithSuperVertex}
- *    b) candidate tuples are used to build final summarized vertices
+ *    a) super vertex tuples are filtered, grouped and merged via groupReduce to
+ *       create a final super vertex representing the group. An additional
+ *       mapping from the final super vertex id to the super vertex ids of the
+ *       original partitions is also created.
+ *    b) non-candidate tuples are mapped to {@link VertexWithSuperVertex} using
+ *       the broadcasted mapping output of 4a)
  * 5) Map edges to a minimal representation, i.e. {@link EdgeGroupItem}
- * 6) Join edges with output of 4a) and replace source/target id with group
- *    representative.
+ * 6) Join edges with output of 4b) and replace source/target id with super
+ *    vertex id.
  * 7) Updated edges are grouped by source and target id and optionally by label
  *    and/or edge property.
  * 8) Group combine on the workers and compute aggregate.
- * 9) Group reduce globally and create final summarized edges.
+ * 9) Group reduce globally and create final super edges.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type

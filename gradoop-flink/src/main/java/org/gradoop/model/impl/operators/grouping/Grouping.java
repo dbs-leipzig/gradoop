@@ -42,9 +42,9 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The grouping operator determines a structural grouping of similar vertices
- * and edges to condense a graph and thus help to uncover insights about
- * patterns hidden in the graph.
+ * The grouping operator determines a structural grouping of vertices and edges
+ * to condense a graph and thus help to uncover insights about patterns and
+ * statistics hidden in the graph.
  * <p>
  * The graph grouping operator represents every vertex group by a single super
  * vertex in the resulting graph; (super) edges between vertices in the
