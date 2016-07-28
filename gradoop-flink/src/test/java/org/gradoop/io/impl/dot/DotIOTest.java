@@ -1,6 +1,5 @@
 package org.gradoop.io.impl.dot;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.io.api.DataSink;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
@@ -69,7 +68,6 @@ public class DotIOTest extends GradoopFlinkTestBase {
           !line.contains("}")){
         vertexLines++;
       }
-
     }
 
     // assert
