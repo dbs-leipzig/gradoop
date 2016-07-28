@@ -18,7 +18,6 @@
 package org.gradoop.model.impl.operators.grouping;
 
 import com.google.common.collect.Lists;
-import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.model.api.EPGMEdge;
