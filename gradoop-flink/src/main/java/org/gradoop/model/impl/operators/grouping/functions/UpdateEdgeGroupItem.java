@@ -18,8 +18,7 @@
 package org.gradoop.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.model.impl.operators.grouping.tuples
-  .VertexWithRepresentative;
+import org.gradoop.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
 /**
@@ -27,7 +26,7 @@ import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
  * and replaces the edge-target-id with the group-representative.
  */
 public class UpdateEdgeGroupItem implements
-  JoinFunction<EdgeGroupItem, VertexWithRepresentative, EdgeGroupItem> {
+  JoinFunction<EdgeGroupItem, VertexWithSuperVertex, EdgeGroupItem> {
 
   /**
    * Field in {@link EdgeGroupItem} which is overridden by the group
@@ -48,9 +47,9 @@ public class UpdateEdgeGroupItem implements
    * {@inheritDoc}
    */
   @Override
-  public EdgeGroupItem join(EdgeGroupItem edge,
-    VertexWithRepresentative vertexRepresentative) throws Exception {
-    edge.setField(vertexRepresentative.getGroupRepresentative(), field);
+  public EdgeGroupItem join(EdgeGroupItem edge, VertexWithSuperVertex idTuple)
+      throws Exception {
+    edge.setField(idTuple.getSuperVertexId(), field);
     return edge;
   }
 }

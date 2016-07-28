@@ -16,7 +16,7 @@
  */
 
 /**
- * Contains all tuple classes related to the graph summarization operator
+ * Contains all tuple classes related to the graph grouping operator
  * implementations.
  */
 package org.gradoop.model.impl.operators.grouping.tuples;

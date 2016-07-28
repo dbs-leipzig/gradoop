@@ -25,11 +25,11 @@ import org.gradoop.model.impl.properties.PropertyValueList;
  * Vertex representation used for grouping vertices to super vertices.
  *
  * f0: vertex id
- * f1: group representative vertex id
+ * f1: super vertex id
  * f2: vertex group label
  * f3: vertex group properties
  * f4: vertex group aggregate values
- * f5: candidate tuple yes/no
+ * f5: super vertex tuple true/false
  */
 public class VertexGroupItem
   extends Tuple6<GradoopId, GradoopId, String,
@@ -43,13 +43,12 @@ public class VertexGroupItem
     f0 = vertexId;
   }
 
-  public GradoopId getGroupRepresentative() {
+  public GradoopId getSuperVertexId() {
     return f1;
   }
 
-  public void setGroupRepresentative(
-    GradoopId groupRepresentativeVertexId) {
-    f1 = groupRepresentativeVertexId;
+  public void setSuperVertexId(GradoopId superVertexId) {
+    f1 = superVertexId;
   }
 
   public String getGroupLabel() {
@@ -76,11 +75,11 @@ public class VertexGroupItem
     f4 = groupCount;
   }
 
-  public Boolean isCandidate() {
+  public Boolean isSuperVertex() {
     return f5;
   }
 
-  public void setCandidate(Boolean isCandidate) {
-    f5 = isCandidate;
+  public void setSuperVertex(Boolean isSuperVertex) {
+    f5 = isSuperVertex;
   }
 }

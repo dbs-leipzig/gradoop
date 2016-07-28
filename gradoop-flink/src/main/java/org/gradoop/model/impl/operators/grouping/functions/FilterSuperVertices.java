@@ -15,29 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.grouping.tuples;
+package org.gradoop.model.impl.operators.grouping.functions;
 
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.impl.id.GradoopId;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 /**
- * Representation of a vertex id and its corresponding vertex group
- * representative.
- *
- * f0: vertex id
- * f1: group representative vertex id
+ * Filter those tuples which are used to create new super vertices.
  */
-public class VertexWithRepresentative extends Tuple2<GradoopId, GradoopId> {
+@FunctionAnnotation.ReadFields("f5")
+public class FilterSuperVertices implements FilterFunction<VertexGroupItem> {
 
-  public void setVertexId(GradoopId vertexId) {
-    f0 = vertexId;
-  }
-
-  public GradoopId getGroupRepresentative() {
-    return f1;
-  }
-
-  public void setGroupRepresentative(GradoopId groupRepresentative) {
-    f1 = groupRepresentative;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
+    return vertexGroupItem.isSuperVertex();
   }
 }

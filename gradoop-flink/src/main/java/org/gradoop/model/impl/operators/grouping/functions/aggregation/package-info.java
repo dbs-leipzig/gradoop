@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains all aggregate functions that can be applied during summarization.
+ * Contains all aggregate functions that can be applied during grouping.
  */
 package org.gradoop.model.impl.operators.grouping.functions.aggregation;

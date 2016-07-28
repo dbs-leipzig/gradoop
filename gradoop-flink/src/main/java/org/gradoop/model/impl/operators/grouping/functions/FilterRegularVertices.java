@@ -17,39 +17,21 @@
 
 package org.gradoop.model.impl.operators.grouping.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.impl.operators.grouping.tuples
-  .VertexWithRepresentative;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 /**
- * Maps a {@link VertexGroupItem} to a {@link VertexWithRepresentative}.
+ * Filter those tuples which only contain a vertex and its representative.
  */
-@FunctionAnnotation.ForwardedFields("f0;f1")
-public class BuildVertexWithRepresentative
-  implements MapFunction<VertexGroupItem, VertexWithRepresentative> {
-
-  /**
-   * Avoid object instantiation.
-   */
-  private final VertexWithRepresentative reuseTuple;
-
-  /**
-   * Creates mapper.
-   */
-  public BuildVertexWithRepresentative() {
-    this.reuseTuple = new VertexWithRepresentative();
-  }
+@FunctionAnnotation.ReadFields("f5")
+public class FilterRegularVertices implements FilterFunction<VertexGroupItem> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public VertexWithRepresentative map(VertexGroupItem vertexGroupItem) throws
-    Exception {
-    reuseTuple.setVertexId(vertexGroupItem.getVertexId());
-    reuseTuple.setGroupRepresentative(vertexGroupItem.getGroupRepresentative());
-    return reuseTuple;
+  public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
+    return !vertexGroupItem.isSuperVertex();
   }
 }

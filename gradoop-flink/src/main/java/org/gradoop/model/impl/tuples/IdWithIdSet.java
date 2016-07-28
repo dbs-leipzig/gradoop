@@ -15,23 +15,30 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.operators.grouping.functions;
+package org.gradoop.model.impl.tuples;
 
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
- * Filter those tuples which are used to create new summarized vertices.
+ * (id, {id, id, ...})
  */
-@FunctionAnnotation.ReadFields("f5")
-public class FilterCandidates implements FilterFunction<VertexGroupItem> {
+public class IdWithIdSet extends Tuple2<GradoopId, GradoopIdSet> {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
-    return vertexGroupItem.isCandidate();
+  public GradoopId getId() {
+    return f0;
+  }
+
+  public void setId(GradoopId id) {
+    f0 = id;
+  }
+
+  public GradoopIdSet getIdSet() {
+    return f1;
+  }
+
+  public void setIdSet(GradoopIdSet idSet) {
+    f1 = idSet;
   }
 }

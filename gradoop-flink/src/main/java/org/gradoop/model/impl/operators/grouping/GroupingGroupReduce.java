@@ -23,39 +23,40 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.grouping.functions.BuildVertexGroupItem;
-import org.gradoop.model.impl.operators.grouping.functions.FilterNonCandidates;
-import org.gradoop.model.impl.operators.grouping.functions.FilterCandidates;
+import org.gradoop.model.impl.operators.grouping.functions.FilterRegularVertices;
+import org.gradoop.model.impl.operators.grouping.functions.FilterSuperVertices;
 import org.gradoop.model.impl.operators.grouping.functions.BuildSuperVertex;
-import org.gradoop.model.impl.operators.grouping.functions.BuildVertexWithRepresentative;
+import org.gradoop.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
 import org.gradoop.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.model.impl.operators.grouping.tuples.VertexWithRepresentative;
+import org.gradoop.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 import java.util.List;
 
 /**
- * Grouping implementation that does not require sorting of vertex groups.
+ * Grouping implementation that uses group + groupReduce for building super
+ * vertices and updating the original vertices.
  *
  * Algorithmic idea:
  *
  * 1) Map vertices to a minimal representation, i.e. {@link VertexGroupItem}.
  * 2) Group vertices on label and/or property.
- * 3) Create a group representative for each group and collect a non-candidate
+ * 3) Create a super vertex id for each group and collect a non-candidate
  *    {@link VertexGroupItem} for each group element and one additional
- *    candidate {@link VertexGroupItem} that holds the group aggregate.
+ *    super vertex tuple that holds the group aggregate.
  * 4) Filter output of 3)
- *    a) non-candidate tuples are mapped to {@link VertexWithRepresentative}
- *    b) candidate tuples are used to build final summarized vertices
+ *    a) non-candidate tuples are mapped to {@link VertexWithSuperVertex}
+ *    b) super vertex tuples are used to build final super vertices
  * 5) Map edges to a minimal representation, i.e. {@link EdgeGroupItem}
- * 6) Join edges with output of 4a) and replace source/target id with group
- *    representative.
+ * 6) Join edges with output of 4a) and replace source/target id with super
+ *    vertex id.
  * 7) Updated edges are grouped by source and target id and optionally by label
  *    and/or edge property.
  * 8) Group combine on the workers and compute aggregate.
- * 9) Group reduce globally and create final summarized edges.
+ * 9) Group reduce globally and create final super edges.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
@@ -108,17 +109,17 @@ public class GroupingGroupReduce<
 
     DataSet<V> superVertices = vertexGroupItems
       // filter group representative tuples
-      .filter(new FilterCandidates())
+      .filter(new FilterSuperVertices())
       // build super vertices
       .map(new BuildSuperVertex<>(getVertexGroupingKeys(),
         useVertexLabels(), getVertexAggregators(), config.getVertexFactory()));
 
-    DataSet<VertexWithRepresentative> vertexToRepresentativeMap =
+    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap =
       vertexGroupItems
         // filter group element tuples
-        .filter(new FilterNonCandidates())
+        .filter(new FilterRegularVertices())
         // build vertex to group representative tuple
-        .map(new BuildVertexWithRepresentative());
+        .map(new BuildVertexWithSuperVertex());
 
     // build super edges
     DataSet<E> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);

@@ -71,7 +71,7 @@ abstract class BuildBase implements Serializable {
     boolean useLabel, List<PropertyValueAggregator> valueAggregators) {
     this.groupPropertyKeys  = groupPropertyKeys;
     this.useLabel           = useLabel;
-    this.valueAggregators = valueAggregators;
+    this.valueAggregators   = valueAggregators;
   }
 
   /**
