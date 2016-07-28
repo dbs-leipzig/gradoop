@@ -34,17 +34,22 @@ import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.tuple.Project2To1;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.operators.split.functions.InitGraphHead;
+import org.gradoop.model.impl.operators.split.functions.AddInterGraphToEdges;
+import org.gradoop.model.impl.operators.split.functions.AddInterGraphToVertices;
 import org.gradoop.model.impl.operators.split.functions.AddNewGraphsToVertex;
-import org.gradoop.model.impl.operators.split.functions.SplitValues;
+import org.gradoop.model.impl.operators.split.functions.InitGraphHead;
 import org.gradoop.model.impl.operators.split.functions.JoinEdgeTupleWithSourceGraphs;
+import org.gradoop.model.impl.operators.split.functions.SourceAndTargetId;
+import org.gradoop.model.impl.operators.split.functions.AddNewGraphsToEdge;
 import org.gradoop.model.impl.operators.split.functions.JoinEdgeTupleWithTargetGraphs;
 import org.gradoop.model.impl.operators.split.functions.JoinVertexIdWithGraphIds;
 import org.gradoop.model.impl.operators.split.functions.MultipleGraphIdsGroupReducer;
-import org.gradoop.model.impl.operators.split.functions.AddNewGraphsToEdge;
+import org.gradoop.model.impl.operators.split.functions.SplitValues;
+
 import org.gradoop.model.impl.properties.PropertyValue;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,11 +72,21 @@ public class Split
   private final UnaryFunction<V, List<PropertyValue>> function;
 
   /**
+   * Boolean flag, determines if the edges between the created graphs, that
+   * would be removed otherwise, should be preserved in an additional graph.
+   */
+  private boolean preserveInterEdges;
+
+  /**
    * Constructor
    *
    * @param function user-defined function
+   * @param preserveInterEdges if edges between graphs should be preserved
    */
-  public Split(UnaryFunction<V, List<PropertyValue>> function) {
+  public Split(
+    UnaryFunction<V, List<PropertyValue>> function,
+    boolean preserveInterEdges) {
+    this.preserveInterEdges = preserveInterEdges;
     this.function = function;
   }
 
@@ -145,9 +160,43 @@ public class Split
 
     // add new graph ids to the edges iff source and target are contained in the
     // same graph
+
     DataSet<E> edges = edgeGraphIdsGraphIds
       .flatMap(new AddNewGraphsToEdge<E>());
 
+    // if the user chooses to preserve edges between the newly created
+    // graphs, an additional graph is constructed to contain these
+    if (preserveInterEdges) {
+
+      // get an unique id for this new graph
+      DataSet<Tuple1<GradoopId>> interGraphId = graph.getConfig()
+        .getExecutionEnvironment()
+        .fromCollection(
+          Collections.singletonList(new Tuple1<>(GradoopId.get())));
+
+      // add the inter graph id to all edges, whose source and target are not
+      // in the same result graph
+      DataSet<E> interEdges = edgeGraphIdsGraphIds
+        .flatMap(new AddInterGraphToEdges<E>())
+        .withBroadcastSet(interGraphId, AddInterGraphToEdges.INTER_GRAPH_ID);
+
+      // add the inter graph id to all vertices that are either source or target
+      // of one of the inter edges
+      vertices = interEdges
+        .flatMap(new SourceAndTargetId<E>())
+        .coGroup(vertices)
+        .where(0).equalTo("id")
+        .with(new AddInterGraphToVertices<V>())
+        .withBroadcastSet(interGraphId, AddInterGraphToVertices.INTER_GRAPH_ID);
+
+      // create the inter graph
+      DataSet<G> interGraph = interGraphId.map(new InitGraphHead<>(
+        graph.getConfig().getGraphHeadFactory()));
+
+      // add edges and the new graph to the result collection
+      newGraphs = newGraphs.union(interGraph);
+      edges = edges.union(interEdges);
+    }
     //--------------------------------------------------------------------------
     // return new graph collection
     //--------------------------------------------------------------------------
