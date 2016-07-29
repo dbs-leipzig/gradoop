@@ -22,7 +22,7 @@ import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -37,14 +37,14 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
       .getLogicalGraphByVariable("expected");
 
     assertTrue("exclusion of same graph failed",
@@ -53,20 +53,20 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("" +
       "expected1[(eve)];" +
       "expected2[(carol)-[ckd]->(dave)-[dkc]->(carol)]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected1 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected1 = loader
       .getLogicalGraphByVariable("expected1");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected2 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected2 = loader
       .getLogicalGraphByVariable("expected2");
 
     assertTrue("excluding overlapping graphs failed",
@@ -77,12 +77,12 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testNonOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g1 = loader
       .getLogicalGraphByVariable("g1");
 
     assertTrue("excluding non overlapping graphs failed",
@@ -93,12 +93,12 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testGraphContainment() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
 
     // use collections as data sink
@@ -109,7 +109,7 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
     Collection<VertexPojo> resVertices = new HashSet<>();
     Collection<EdgePojo> resEdges = new HashSet<>();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = g2.exclude(g0);
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> res = g2.exclude(g0);
 
     g0.getVertices().output(new LocalCollectionOutputFormat<>(vertices0));
     g0.getEdges().output(new LocalCollectionOutputFormat<>(edges0));
@@ -144,7 +144,7 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testReduceCollection() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
         "g3[(c)-[e3]->(d)];g4[(a)-[e4]->(b)];" +
@@ -153,7 +153,7 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
         "exp14[]");
 
     checkExpectationsEqualResults(
-      loader, new ReduceExclusion<GraphHeadPojo, VertexPojo, EdgePojo>(
+      loader, new ReduceExclusion<GraphHead, VertexPojo, EdgePojo>(
         loader.getGraphHeadByVariable("g1").getId()
       ));
   }

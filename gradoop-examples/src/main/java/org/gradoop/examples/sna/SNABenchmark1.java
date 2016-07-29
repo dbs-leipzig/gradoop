@@ -26,7 +26,7 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
 /**
@@ -68,10 +68,10 @@ public class SNABenchmark1
     String inputDir  = args[0];
     String outputDir = args[1];
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> epgmDatabase =
       readLogicalGraph(inputDir);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> result =
       execute(epgmDatabase);
 
     writeLogicalGraph(result, outputDir);
@@ -83,8 +83,8 @@ public class SNABenchmark1
    * @param socialNetwork social network graph
    * @return summarized, aggregated graph
    */
-  private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-  execute(LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> socialNetwork) {
+  private static LogicalGraph<GraphHead, VertexPojo, EdgePojo>
+  execute(LogicalGraph<GraphHead, VertexPojo, EdgePojo> socialNetwork) {
     return socialNetwork
       .subgraph(
         new FilterFunction<VertexPojo>() {
@@ -102,10 +102,10 @@ public class SNABenchmark1
       .groupBy(Lists.newArrayList("gender", "city"))
       .aggregate(
         "vertexCount",
-        new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>())
+        new VertexCount<GraphHead, VertexPojo, EdgePojo>())
       .aggregate(
         "edgeCount",
-        new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>());
+        new EdgeCount<GraphHead, VertexPojo, EdgePojo>());
   }
 
   @Override

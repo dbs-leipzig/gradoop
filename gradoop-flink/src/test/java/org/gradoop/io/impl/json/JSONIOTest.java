@@ -24,7 +24,7 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
@@ -45,7 +45,7 @@ public class JSONIOTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetDatabaseGraph() throws Exception {
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dbGraph =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> dbGraph =
       getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
     assertNotNull("database graph was null", dbGraph);
@@ -71,13 +71,13 @@ public class JSONIOTest extends GradoopFlinkTestBase {
     String graphFile =
       JSONIOTest.class.getResource("/data/json/sna/graphs.json").getFile();
 
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new JSONDataSource<>(graphFile, vertexFile, edgeFile, config);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+    GraphCollection<GraphHead, VertexPojo, EdgePojo>
       collection = dataSource.getGraphCollection();
 
-    Collection<GraphHeadPojo> graphHeads = Lists.newArrayList();
+    Collection<GraphHead> graphHeads = Lists.newArrayList();
     Collection<VertexPojo> vertices = Lists.newArrayList();
     Collection<EdgePojo> edges = Lists.newArrayList();
 
@@ -102,7 +102,7 @@ public class JSONIOTest extends GradoopFlinkTestBase {
     final String edgeFile   = tmpDir + "/edges.json";
     final String graphFile  = tmpDir + "/graphs.json";
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     // write to JSON
@@ -112,15 +112,15 @@ public class JSONIOTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
 
     // read from JSON
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collection =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> collection =
       new JSONDataSource<>(graphFile, vertexFile, edgeFile, getConfig())
         .getGraphCollection();
 
-    Collection<GraphHeadPojo> expectedGraphHeads  = loader.getGraphHeads();
+    Collection<GraphHead> expectedGraphHeads  = loader.getGraphHeads();
     Collection<VertexPojo>    expectedVertices    = loader.getVertices();
     Collection<EdgePojo>      expectedEdges       = loader.getEdges();
 
-    Collection<GraphHeadPojo> loadedGraphHeads    = Lists.newArrayList();
+    Collection<GraphHead> loadedGraphHeads    = Lists.newArrayList();
     Collection<VertexPojo>    loadedVertices      = Lists.newArrayList();
     Collection<EdgePojo>      loadedEdges         = Lists.newArrayList();
 

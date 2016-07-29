@@ -31,7 +31,7 @@ import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -137,19 +137,19 @@ public class EdgeListExample implements ProgramDescription {
     //--------------------------------------------------------------------------
 
     // create default Gradoop config
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
+    GradoopFlinkConfig<GraphHead, VertexPojo, EdgePojo> config =
       GradoopFlinkConfig.createDefaultConfig(env);
 
     // create datasource
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new GraphDataSource<>(importVertices, importEdges, config);
 
     // read logical graph
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> logicalGraph =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> logicalGraph =
       dataSource.getLogicalGraph();
 
     // do some analytics (e.g. match two-node cycles)
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> matches = logicalGraph
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> matches = logicalGraph
       .match("(a:Node)-[:link]->(b:Node)-[:link]->(a)");
 
     // print number of matching subgraphs

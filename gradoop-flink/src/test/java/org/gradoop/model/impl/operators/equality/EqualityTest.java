@@ -12,7 +12,7 @@ import org.gradoop.model.impl.operators.tostring.functions
 import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -21,19 +21,19 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionEqualityByGraphIds() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    CollectionEqualityByGraphIds<GraphHeadPojo, VertexPojo, EdgePojo>
+    CollectionEqualityByGraphIds<GraphHead, VertexPojo, EdgePojo>
       equality = new CollectionEqualityByGraphIds<>();
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gRef1 = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gRef1 = loader
       .getGraphCollectionByVariables("gRef");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gRef2 = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gRef2 = loader
       .getGraphCollectionByVariables("gRef");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gClone = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gClone = loader
       .getGraphCollectionByVariables("gClone");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gEmpty =
       GraphCollection.createEmptyCollection(gRef1.getConfig());
 
     // direct operator call
@@ -49,26 +49,26 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionEqualityByGraphElementIds() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    CollectionEquality<GraphHeadPojo, VertexPojo, EdgePojo> equality =
+    CollectionEquality<GraphHead, VertexPojo, EdgePojo> equality =
       new CollectionEquality<>(
-        new GraphHeadToEmptyString<GraphHeadPojo>(),
+        new GraphHeadToEmptyString<GraphHead>(),
         new VertexToIdString<VertexPojo>(),
         new EdgeToIdString<EdgePojo>(),
         true
       );
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gRef = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gRef = loader
       .getGraphCollectionByVariables("gRef", "gClone", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gClone = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gClone = loader
       .getGraphCollectionByVariables("gClone", "gRef", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gSmall = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gSmall = loader
       .getGraphCollectionByVariables("gRef", "gRef");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gDiffId = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gDiffId = loader
       .getGraphCollectionByVariables("gRef", "gDiffId", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gEmpty =
       GraphCollection.createEmptyCollection(gRef.getConfig());
 
     // direct operator call
@@ -86,26 +86,26 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionEqualityByGraphElementData() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    CollectionEquality<GraphHeadPojo, VertexPojo, EdgePojo> equality =
+    CollectionEquality<GraphHead, VertexPojo, EdgePojo> equality =
       new CollectionEquality<>(
-        new GraphHeadToEmptyString<GraphHeadPojo>(),
+        new GraphHeadToEmptyString<GraphHead>(),
         new VertexToDataString<VertexPojo>(),
         new EdgeToDataString<EdgePojo>(),
         true
       );
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gRef = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gRef = loader
       .getGraphCollectionByVariables("gRef", "gClone", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gClone = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gClone = loader
       .getGraphCollectionByVariables("gClone", "gRef", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gSmall = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gSmall = loader
       .getGraphCollectionByVariables("gRef", "gRef");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gDiffData = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gDiffData = loader
       .getGraphCollectionByVariables("gRef", "gDiffData", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gEmpty =
       GraphCollection.createEmptyCollection(gRef.getConfig());
 
     // direct operator call
@@ -123,28 +123,28 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionEqualityByGraphData() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    CollectionEquality<GraphHeadPojo, VertexPojo, EdgePojo> equality =
+    CollectionEquality<GraphHead, VertexPojo, EdgePojo> equality =
       new CollectionEquality<>(
-        new GraphHeadToDataString<GraphHeadPojo>(),
+        new GraphHeadToDataString<GraphHead>(),
         new VertexToDataString<VertexPojo>(),
         new EdgeToDataString<EdgePojo>(),
         true
       );
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gRef = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gRef = loader
       .getGraphCollectionByVariables("gRef", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gDiffId = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gDiffId = loader
       .getGraphCollectionByVariables("gDiffId", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gClone = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gClone = loader
       .getGraphCollectionByVariables("gClone", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gSmall = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gSmall = loader
       .getGraphCollectionByVariables("gRef");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gDiffData = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gDiffData = loader
       .getGraphCollectionByVariables("gDiffData", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gEmpty =
       GraphCollection.createEmptyCollection(gRef.getConfig());
 
     // direct operator call
@@ -164,30 +164,30 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testUndirectedCollectionEquality() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    CollectionEquality<GraphHeadPojo, VertexPojo, EdgePojo> equality =
+    CollectionEquality<GraphHead, VertexPojo, EdgePojo> equality =
       new CollectionEquality<>(
-        new GraphHeadToDataString<GraphHeadPojo>(),
+        new GraphHeadToDataString<GraphHead>(),
         new VertexToDataString<VertexPojo>(),
         new EdgeToDataString<EdgePojo>(),
         false
       );
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gRef = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gRef = loader
       .getGraphCollectionByVariables("gRef", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gDiffId = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gDiffId = loader
       .getGraphCollectionByVariables("gDiffId", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gClone = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gClone = loader
       .getGraphCollectionByVariables("gClone", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gRev = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gRev = loader
       .getGraphCollectionByVariables("gRev", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gSmall = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gSmall = loader
       .getGraphCollectionByVariables("gRef");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gDiffData = loader
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gDiffData = loader
       .getGraphCollectionByVariables("gDiffData", "gEmpty");
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> gEmpty =
       GraphCollection.createEmptyCollection(gRef.getConfig());
 
     // direct operator call
@@ -201,24 +201,24 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGraphEqualityByElementIds() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    GraphEquality<GraphHeadPojo, VertexPojo, EdgePojo> equality =
+    GraphEquality<GraphHead, VertexPojo, EdgePojo> equality =
       new GraphEquality<>(
-        new GraphHeadToEmptyString<GraphHeadPojo>(),
+        new GraphHeadToEmptyString<GraphHead>(),
         new VertexToIdString<VertexPojo>(),
         new EdgeToIdString<EdgePojo>(),
         true
       );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gRef = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gRef = loader
       .getLogicalGraphByVariable("gRef");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gClone = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gClone = loader
       .getLogicalGraphByVariable("gClone");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gDiffId = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gDiffId = loader
       .getLogicalGraphByVariable("gDiffId");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gEmpty = loader
       .getLogicalGraphByVariable("gEmpty");
 
     // direct operator call
@@ -234,24 +234,24 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGraphEqualityByElementData() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    GraphEquality<GraphHeadPojo, VertexPojo, EdgePojo> equality =
+    GraphEquality<GraphHead, VertexPojo, EdgePojo> equality =
       new GraphEquality<>(
-        new GraphHeadToEmptyString<GraphHeadPojo>(),
+        new GraphHeadToEmptyString<GraphHead>(),
         new VertexToDataString<VertexPojo>(),
         new EdgeToDataString<EdgePojo>(),
         true
       );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gRef = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gRef = loader
       .getLogicalGraphByVariable("gRef");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gDiffId = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gDiffId = loader
       .getLogicalGraphByVariable("gDiffId");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gDiffData = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gDiffData = loader
       .getLogicalGraphByVariable("gDiffData");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gEmpty = loader
       .getLogicalGraphByVariable("gEmpty");
 
     // direct operator call
@@ -267,26 +267,26 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGraphEqualityByData() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    GraphEquality<GraphHeadPojo, VertexPojo, EdgePojo> equality =
+    GraphEquality<GraphHead, VertexPojo, EdgePojo> equality =
       new GraphEquality<>(
-        new GraphHeadToDataString<GraphHeadPojo>(),
+        new GraphHeadToDataString<GraphHead>(),
         new VertexToDataString<VertexPojo>(),
         new EdgeToDataString<EdgePojo>(),
         true
       );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gRef = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gRef = loader
       .getLogicalGraphByVariable("gRef");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gClone = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gClone = loader
       .getLogicalGraphByVariable("gClone");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gDiffId = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gDiffId = loader
       .getLogicalGraphByVariable("gDiffId");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gDiffData = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gDiffData = loader
       .getLogicalGraphByVariable("gDiffData");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gEmpty = loader
       .getLogicalGraphByVariable("gEmpty");
 
     // direct operator call
@@ -304,28 +304,28 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testUndirectedGraphEquality() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getTestGraphLoader();
 
-    GraphEquality<GraphHeadPojo, VertexPojo, EdgePojo> equality =
+    GraphEquality<GraphHead, VertexPojo, EdgePojo> equality =
       new GraphEquality<>(
-        new GraphHeadToDataString<GraphHeadPojo>(),
+        new GraphHeadToDataString<GraphHead>(),
         new VertexToDataString<VertexPojo>(),
         new EdgeToDataString<EdgePojo>(),
         false
       );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gRef = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gRef = loader
       .getLogicalGraphByVariable("gRef");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gClone = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gClone = loader
       .getLogicalGraphByVariable("gClone");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gDiffId = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gDiffId = loader
       .getLogicalGraphByVariable("gDiffId");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gDiffData = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gDiffData = loader
       .getLogicalGraphByVariable("gDiffData");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gRev = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gRev = loader
       .getLogicalGraphByVariable("gRev");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> gEmpty = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> gEmpty = loader
       .getLogicalGraphByVariable("gEmpty");
 
     // direct operator call
@@ -336,7 +336,7 @@ public class EqualityTest extends GradoopFlinkTestBase {
     collectAndAssertFalse(equality.execute(gRef, gEmpty));
   }
 
-  private FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+  private FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
   getTestGraphLoader() {
     String asciiGraphs = "gEmpty[];" +
 

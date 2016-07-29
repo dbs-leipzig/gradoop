@@ -29,7 +29,7 @@ import org.gradoop.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
 import org.gradoop.model.impl.operators.matching.simulation.dual.DualSimulation;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
 import java.util.concurrent.TimeUnit;
@@ -122,10 +122,10 @@ public class PatternMatchingRunner extends AbstractRunner
     String algorithm    = cmd.getOptionValue(OPTION_ALGORITHM);
     boolean attachData  = cmd.hasOption(OPTION_ATTACH_DATA);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> epgmDatabase =
       readLogicalGraph(inputDir);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
       execute(epgmDatabase, query, attachData, algorithm);
 
     writeGraphCollection(result, outputDir);
@@ -165,11 +165,11 @@ public class PatternMatchingRunner extends AbstractRunner
    * @param algorithm     algorithm to use for pattern matching
    * @return result match graph
    */
-  private static GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> execute(
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> databaseGraph,
+  private static GraphCollection<GraphHead, VertexPojo, EdgePojo> execute(
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> databaseGraph,
     String query, boolean attachData, String algorithm) {
 
-    PatternMatching<GraphHeadPojo, VertexPojo, EdgePojo> op;
+    PatternMatching<GraphHead, VertexPojo, EdgePojo> op;
 
     switch (algorithm) {
     case ALGO_DUAL_BULK:

@@ -25,7 +25,7 @@ import org.gradoop.io.api.DataSink;
 import org.gradoop.io.impl.tlf.TLFDataSink;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -90,7 +90,7 @@ public class PredictableTransactionsGeneratorRunner
       GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
 
     // execute generator
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> generatedGraph =
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> generatedGraph =
       dataGen.execute();
 
     // build result name
@@ -103,7 +103,7 @@ public class PredictableTransactionsGeneratorRunner
     fileName += ".tlf";
 
     // write output
-    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
       new TLFDataSink<>(outputPath + fileName, GradoopFlinkConfig
         .createDefaultConfig(getExecutionEnvironment()));
 

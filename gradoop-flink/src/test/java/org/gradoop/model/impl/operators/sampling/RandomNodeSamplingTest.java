@@ -22,7 +22,7 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
 
@@ -36,10 +36,10 @@ public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
 
   @Test
   public void randomNodeSamplingTest() throws Exception {
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dbGraph =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> dbGraph =
       getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo>
       newGraph = dbGraph.sampleRandomNodes(0.272f);
 
     validateResult(dbGraph, newGraph);
@@ -47,20 +47,20 @@ public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
 
   @Test
   public void randomNodeSamplingTestWithSeed() throws Exception {
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> dbGraph =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> dbGraph =
       getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo>
       newGraph = dbGraph.callForGraph(
-      new RandomNodeSampling<GraphHeadPojo, VertexPojo, EdgePojo>(
+      new RandomNodeSampling<GraphHead, VertexPojo, EdgePojo>(
         0.272f, -4181668494294894490L));
 
     validateResult(dbGraph, newGraph);
   }
 
   private void validateResult(
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input,
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output)
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input,
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output)
     throws Exception {
     List<VertexPojo> dbVertices = Lists.newArrayList();
     List<EdgePojo> dbEdges = Lists.newArrayList();

@@ -29,21 +29,14 @@ import java.util.Iterator;
 /**
  * The EPGM store is responsible for writing and reading graph heads, vertices
  * and edges.
- *
- * @param <PG>  persistent graph head type
- * @param <PV>  persistent vertex type
- * @param <PE>  persistent edge type
  */
-public interface EPGMStore<
-  PG extends PersistentGraphHead,
-  PV extends PersistentVertex,
-  PE extends PersistentEdge> {
+public interface EPGMStore {
   /**
    * Returns the Gradoop configuration associated with that EPGM Store,
    *
    * @return Gradoop Configuration
    */
-  GradoopStoreConfig<PG, PV, PE> getConfig();
+  GradoopStoreConfig getConfig();
 
   /**
    * Returns the HBase table name where vertex data is stored.

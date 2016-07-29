@@ -28,7 +28,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.functions.epgm.IdSetCombiner;
 import org.gradoop.model.impl.functions.epgm.IdAsIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class CloningTest extends GradoopFlinkTestBase {
   @Test
   public void testCloning() throws Exception {
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "org:Ga{k=0}[(:Va{k=0, l=0})-[:ea{l=1}]->(:Va{l=1, m=2})]"
       );
@@ -53,10 +53,10 @@ public class CloningTest extends GradoopFlinkTestBase {
     List<GradoopId> expectedEdgeIds = Lists.newArrayList();
 
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> original = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> original = loader
       .getLogicalGraphByVariable("org");
 
-    original.getGraphHead().map(new Id<GraphHeadPojo>()).output(
+    original.getGraphHead().map(new Id<GraphHead>()).output(
       new LocalCollectionOutputFormat<>(expectedGraphHeadIds));
     original.getVertices().map(new Id<VertexPojo>()).output(
       new LocalCollectionOutputFormat<>(expectedVertexIds));
@@ -64,7 +64,7 @@ public class CloningTest extends GradoopFlinkTestBase {
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo>
       result = original.copy();
 
     collectAndAssertTrue(result.equalsByElementData(original));
@@ -74,7 +74,7 @@ public class CloningTest extends GradoopFlinkTestBase {
     List<GradoopId> resultEdgeIds = Lists.newArrayList();
 
     result.getGraphHead()
-      .map(new Id<GraphHeadPojo>())
+      .map(new Id<GraphHead>())
       .output(new LocalCollectionOutputFormat<>(resultGraphHeadIds));
     result.getVertices()
       .map(new Id<VertexPojo>())
@@ -91,7 +91,7 @@ public class CloningTest extends GradoopFlinkTestBase {
       .union(result.getEdges()
         .map(new ExpandGraphsToIdSet<EdgePojo>()))
       .union(result.getGraphHead()
-        .map(new IdAsIdSet<GraphHeadPojo>()))
+        .map(new IdAsIdSet<GraphHead>()))
       .reduce(new IdSetCombiner())
       .output(new LocalCollectionOutputFormat<>(resultGraphIds));
 

@@ -6,7 +6,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.config.TransactionalFSMAlgorithm;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3", "g4"};
     String[] expectedResultVariables = {"s1"};
 
-    for(UnaryCollectionToCollectionOperator<GraphHeadPojo, VertexPojo, EdgePojo>
+    for(UnaryCollectionToCollectionOperator<GraphHead, VertexPojo, EdgePojo>
       miner : getDirectedMultigraphMiners()) {
 
       compareExpectationAndResult(
@@ -53,7 +53,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3"};
     String[] expectedResultVariables = {"s1", "s2", "s3", "s4", "s5"};
 
-    for(UnaryCollectionToCollectionOperator<GraphHeadPojo, VertexPojo, EdgePojo>
+    for(UnaryCollectionToCollectionOperator<GraphHead, VertexPojo, EdgePojo>
       miner : getDirectedMultigraphMiners()) {
 
       compareExpectationAndResult(
@@ -75,7 +75,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] expectedResultVariables = {"s1", "s2"};
 
 
-    for(UnaryCollectionToCollectionOperator<GraphHeadPojo, VertexPojo, EdgePojo>
+    for(UnaryCollectionToCollectionOperator<GraphHead, VertexPojo, EdgePojo>
       miner : getDirectedMultigraphMiners()) {
 
       compareExpectationAndResult(
@@ -98,7 +98,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3", "g4"};
     String[] expectedResultVariables = {"s1", "s2", "s3"};
 
-    for(UnaryCollectionToCollectionOperator<GraphHeadPojo, VertexPojo, EdgePojo>
+    for(UnaryCollectionToCollectionOperator<GraphHead, VertexPojo, EdgePojo>
       miner : getDirectedMultigraphMiners()) {
 
       compareExpectationAndResult(
@@ -128,7 +128,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
       {"s1", "s2", "s3", "s4", "s5", "s6", "s7"};
 
 
-    for(UnaryCollectionToCollectionOperator<GraphHeadPojo, VertexPojo, EdgePojo>
+    for(UnaryCollectionToCollectionOperator<GraphHead, VertexPojo, EdgePojo>
       miner : getDirectedMultigraphMiners()) {
 
       compareExpectationAndResult(
@@ -162,7 +162,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] expectedResultVariables =
       {"s11", "s12", "s21", "s22", "s23", "s31", "s32", "s33", "s34", "s41"};
 
-    for(UnaryCollectionToCollectionOperator<GraphHeadPojo, VertexPojo, EdgePojo>
+    for(UnaryCollectionToCollectionOperator<GraphHead, VertexPojo, EdgePojo>
       miner : getDirectedMultigraphMiners()) {
 
       compareExpectationAndResult(
@@ -171,37 +171,37 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
   }
 
   private void compareExpectationAndResult(
-    UnaryCollectionToCollectionOperator<GraphHeadPojo, VertexPojo, EdgePojo> gSpan, String asciiGraphs,
+    UnaryCollectionToCollectionOperator<GraphHead, VertexPojo, EdgePojo> gSpan, String asciiGraphs,
     String[] searchSpaceVariables, String[] expectedResultVariables) throws
     Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> searchSpace =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> searchSpace =
       loader.getGraphCollectionByVariables(searchSpaceVariables);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> expectation =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> expectation =
       loader.getGraphCollectionByVariables(expectedResultVariables);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
       gSpan.execute(searchSpace);
 
     collectAndAssertTrue(expectation.equalsByGraphElementData(result));
   }
 
   private Collection<UnaryCollectionToCollectionOperator
-    <GraphHeadPojo, VertexPojo, EdgePojo>> getDirectedMultigraphMiners() {
+    <GraphHead, VertexPojo, EdgePojo>> getDirectedMultigraphMiners() {
 
     Collection<UnaryCollectionToCollectionOperator
-      <GraphHeadPojo, VertexPojo, EdgePojo>> miners = new ArrayList<>();
+      <GraphHead, VertexPojo, EdgePojo>> miners = new ArrayList<>();
 
     float threshold = 0.7f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    miners.add(new TransactionalFSM<GraphHeadPojo, VertexPojo, EdgePojo>(
+    miners.add(new TransactionalFSM<GraphHead, VertexPojo, EdgePojo>(
         fsmConfig, TransactionalFSMAlgorithm.GSPAN_BULKITERATION));
 
-    miners.add(new TransactionalFSM<GraphHeadPojo, VertexPojo, EdgePojo>(
+    miners.add(new TransactionalFSM<GraphHead, VertexPojo, EdgePojo>(
       fsmConfig, TransactionalFSMAlgorithm.GSPAN_FILTERREFINE));
 
     return miners;

@@ -20,11 +20,10 @@ package org.gradoop.util;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.config.GradoopConfig;
 import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.GraphHeadPojoFactory;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
@@ -43,7 +42,7 @@ import org.gradoop.storage.impl.hbase.HBaseVertexHandler;
  * @param <E>  EPGM edge type
  */
 public class GradoopFlinkConfig<
-  G extends GraphHead,
+  G extends org.gradoop.model.api.epgm.GraphHead,
   V extends Vertex,
   E extends Edge>
   extends GradoopConfig<G, V, E> {
@@ -94,13 +93,13 @@ public class GradoopFlinkConfig<
    *
    * @return Gradoop Flink configuration
    */
-  public static GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo>
+  public static GradoopFlinkConfig<GraphHead, VertexPojo, EdgePojo>
   createDefaultConfig(ExecutionEnvironment env) {
     HBaseVertexHandler<VertexPojo, EdgePojo> vertexHandler =
       new HBaseVertexHandler<>(new VertexPojoFactory());
     HBaseEdgeHandler<VertexPojo, EdgePojo> edgeHandler =
       new HBaseEdgeHandler<>(new EdgePojoFactory());
-    HBaseGraphHeadHandler<GraphHeadPojo> graphHandler =
+    HBaseGraphHeadHandler<GraphHead> graphHandler =
       new HBaseGraphHeadHandler<>(new GraphHeadPojoFactory());
     return new GradoopFlinkConfig<>(graphHandler, vertexHandler, edgeHandler,
       env);
@@ -118,7 +117,7 @@ public class GradoopFlinkConfig<
    * @return Gradoop Flink configuration
    */
   public static <
-    G extends GraphHead,
+    G extends org.gradoop.model.api.epgm.GraphHead,
     V extends Vertex,
     E extends Edge> GradoopFlinkConfig<G, V, E> createConfig(
     GradoopConfig<G, V, E> config, ExecutionEnvironment environment) {

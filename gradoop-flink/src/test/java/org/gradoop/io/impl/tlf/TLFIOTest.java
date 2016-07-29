@@ -23,7 +23,7 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.FlinkAsciiGraphLoader;
@@ -45,10 +45,10 @@ public class TLFIOTest extends GradoopFlinkTestBase {
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
       "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+    GraphCollection<GraphHead, VertexPojo, EdgePojo>
       originalCollection =
       loader.getGraphCollectionByVariables("g1", "g2");
 
@@ -58,7 +58,7 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     new File(filePath).createNewFile();
 
     // create data sink
-    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
       new TLFDataSink<>(filePath, config);
 
     dataSink.write(originalCollection);
@@ -66,11 +66,11 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
 
     // create data source
-    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(filePath, config);
 
     //get transactions
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions
       = dataSource.getGraphTransactions();
 
     collectAndAssertTrue(
@@ -92,17 +92,17 @@ public class TLFIOTest extends GradoopFlinkTestBase {
       TLFIOTest.class.getResource("/data/tlf/io_test_string.tlf").getFile();
 
     // create datasource
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(tlfFile, config);
     //get transactions
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions =
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions =
       dataSource.getGraphTransactions();
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
       "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
@@ -134,18 +134,18 @@ public class TLFIOTest extends GradoopFlinkTestBase {
         .getFile();
 
     // create datasource
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(tlfFile, tlfVertexDictionaryFile,
         tlfEdgeDictionaryFile, config);
     //get transactions
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> transactions
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions
       = dataSource.getGraphTransactions();
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
       "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
@@ -177,15 +177,15 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     }
 
     // read from inputfile
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(tlfFileImport, config);
     // write to ouput path
-    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
       new TLFDataSink<>(tlfFileExport,getConfig());
     dataSink.write(dataSource.getGraphTransactions());
     // read from output path
     dataSource = new TLFDataSource<>(tlfFileExport, config);
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> graphTransactions
       = dataSource.getGraphTransactions();
 
     getExecutionEnvironment().execute();
@@ -226,21 +226,21 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     }
 
     // read from inputfile
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(tlfFileImport, tlfVertexDictionaryFileImport,
         "", config);
     // write to ouput path
-    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
       new TLFDataSink<>(tlfFileExport, tlfVertexDictionaryFileExport,
         "", getConfig());
     dataSink.write(dataSource.getGraphTransactions());
     // read from output path
     dataSource = new TLFDataSource<>(tlfFileExport, config);
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> graphTransactions
       = dataSource.getGraphTransactions();
 
     //get first transaction which contains one complete graph
-    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
+    GraphTransaction<GraphHead, VertexPojo, EdgePojo> graphTransaction =
       graphTransactions.getTransactions().collect().get(0);
     //get vertices of the first transaction/graph
     VertexPojo[] vertexArray = graphTransaction.getVertices()
@@ -302,21 +302,21 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     }
 
     // read from inputfile
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(tlfFileImport, tlfVertexDictionaryFileImport,
         tlfEdgeDictionaryFileImport, config);
     // write to ouput path
-    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
       new TLFDataSink<>(tlfFileExport, tlfVertexDictionaryFileExport,
         tlfEdgeDictionaryFileExport, getConfig());
     dataSink.write(dataSource.getGraphTransactions());
     // read from output path
     dataSource = new TLFDataSource<>(tlfFileExport, config);
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> graphTransactions
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> graphTransactions
       = dataSource.getGraphTransactions();
 
     //get first transaction which contains one complete graph
-    GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo> graphTransaction =
+    GraphTransaction<GraphHead, VertexPojo, EdgePojo> graphTransaction =
       graphTransactions.getTransactions().collect().get(0);
     //get vertices of the first transaction/graph
     VertexPojo[] vertexArray = graphTransaction.getVertices()

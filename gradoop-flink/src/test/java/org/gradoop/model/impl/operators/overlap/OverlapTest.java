@@ -22,7 +22,7 @@ import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -37,12 +37,12 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graph = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graph = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> overlap = graph
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> overlap = graph
       .overlap(graph);
 
     assertTrue("overlap of same graph failed",
@@ -51,18 +51,18 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString(
       "expected[(alice)-[akb]->(bob)-[bka]->(alice)]"
     );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
       .getLogicalGraphByVariable("expected");
 
     assertTrue("combining overlapping graphs failed",
@@ -73,16 +73,16 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testNonOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g1 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g1 = loader
       .getLogicalGraphByVariable("g1");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
       .getLogicalGraphByVariable("expected");
 
     assertTrue("overlap non overlapping graphs failed",
@@ -93,12 +93,12 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testGraphContainment() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
       .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g2 = loader
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g2 = loader
       .getLogicalGraphByVariable("g2");
 
     // use collections as data sink
@@ -109,7 +109,7 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
     Collection<VertexPojo> resVertices = new HashSet<>();
     Collection<EdgePojo> resEdges = new HashSet<>();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> res = g0.overlap(g2);
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> res = g0.overlap(g2);
 
     g0.getVertices().output(new LocalCollectionOutputFormat<>(vertices0));
     g0.getEdges().output(new LocalCollectionOutputFormat<>(edges0));
@@ -144,7 +144,7 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testReduceCollection() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
         "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)];" +
@@ -154,6 +154,6 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
       );
 
     checkExpectationsEqualResults(
-      loader, new ReduceOverlap<GraphHeadPojo, VertexPojo, EdgePojo>());
+      loader, new ReduceOverlap<GraphHead, VertexPojo, EdgePojo>());
   }
 }

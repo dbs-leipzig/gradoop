@@ -6,10 +6,9 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.junit.Test;
@@ -33,17 +32,17 @@ public class GraphIOTest extends GradoopFlinkTestBase {
       new ImportEdge<>(0L, 0L, 1L, "a", PropertyList.createFromMap(properties)),
       new ImportEdge<>(1L, 1L, 0L, "b", PropertyList.createFromMap(properties)));
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected =
       getLoaderFromString("expected[" +
         "(a:A {foo = 42, __L = 0L});" +
         "(b:B {foo = 42, __L = 1L});" +
         "(a)-[:a {foo=42, __L = 0L}]->(b)-[:b {foo=42, __L = 1L}]->(a);" +
         "]").getLogicalGraphByVariable("expected");
 
-    GraphDataSource<GraphHeadPojo, VertexPojo, EdgePojo, Long> dataSource =
+    GraphDataSource<GraphHead, VertexPojo, EdgePojo, Long> dataSource =
       new GraphDataSource<>(importVertices, importEdges, "__L", getConfig());
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output = dataSource
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output = dataSource
       .getLogicalGraph();
 
     collectAndAssertTrue(output.equalsByElementData(expected));
@@ -64,17 +63,17 @@ public class GraphIOTest extends GradoopFlinkTestBase {
       new ImportEdge<>(0L, 0L, 1L, "a", PropertyList.createFromMap(properties)),
       new ImportEdge<>(1L, 1L, 0L, "b", PropertyList.createFromMap(properties)));
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected =
       getLoaderFromString("expected[" +
         "(a:A {foo = 42});" +
         "(b:B {foo = 42});" +
         "(a)-[:a {foo=42}]->(b)-[:b {foo=42}]->(a);" +
         "]").getLogicalGraphByVariable("expected");
 
-    GraphDataSource<GraphHeadPojo, VertexPojo, EdgePojo, Long> dataSource =
+    GraphDataSource<GraphHead, VertexPojo, EdgePojo, Long> dataSource =
       new GraphDataSource<>(importVertices, importEdges, getConfig());
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output = dataSource
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output = dataSource
       .getLogicalGraph();
 
     collectAndAssertTrue(output.equalsByElementData(expected));

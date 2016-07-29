@@ -25,7 +25,7 @@ import org.gradoop.model.impl.operators.grouping.Grouping;
 import org.gradoop.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
 /**
@@ -103,7 +103,7 @@ public class GroupingRunner
     boolean useEdgeLabels = cmd.hasOption(OPTION_USE_EDGE_LABELS);
 
     // initialize EPGM database
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphDatabase =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graphDatabase =
       readLogicalGraph(inputPath, false);
 
     // initialize grouping method

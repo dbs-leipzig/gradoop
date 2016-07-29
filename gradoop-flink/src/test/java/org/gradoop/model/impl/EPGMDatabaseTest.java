@@ -2,12 +2,11 @@ package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -20,22 +19,22 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetExistingGraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     String graphVariable = "g0";
 
-    GraphHead g = loader.getGraphHeadByVariable(graphVariable);
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphFromLoader =
+    org.gradoop.model.api.epgm.GraphHead g = loader.getGraphHeadByVariable(graphVariable);
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graphFromLoader =
       loader.getLogicalGraphByVariable(graphVariable);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphFromDB =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graphFromDB =
       loader.getDatabase().getGraph(g.getId());
 
     // head <> head
     collectAndAssertTrue(graphFromLoader.getGraphHead()
       .cross(graphFromDB.getGraphHead())
-      .with(new Equals<GraphHeadPojo>())
+      .with(new Equals<GraphHead>())
     );
 
     // elements <> elements
@@ -50,7 +49,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetGraphs() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
     String[] graphVariables = new String[]{"g0", "g1", "g2"};
@@ -62,14 +61,14 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
     GradoopIdSet graphIdSet = GradoopIdSet.fromExisting(graphIds);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collectionFromLoader =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> collectionFromLoader =
       loader.getGraphCollectionByVariables(graphVariables);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+    GraphCollection<GraphHead, VertexPojo, EdgePojo>
       collectionFromDbViaArray =
       loader.getDatabase().getCollection().getGraphs(graphIdSet);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+    GraphCollection<GraphHead, VertexPojo, EdgePojo>
       collectionFromDbViaSet =
       loader.getDatabase().getCollection().getGraphs(graphIdSet);
 
@@ -88,13 +87,13 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetCollection() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getSocialNetworkLoader();
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collectionFromLoader =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> collectionFromLoader =
       loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3");
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collectionFromDb =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> collectionFromDb =
       loader.getDatabase().getCollection();
 
     // heads <> heads

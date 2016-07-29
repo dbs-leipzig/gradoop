@@ -1,11 +1,11 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.GradoopTestUtils;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentEdgeFactory;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -39,8 +39,8 @@ public class GradoopHBaseTestUtils {
    * @return collection of persistent graph heads
    * @throws IOException
    */
-  public static Collection<PersistentGraphHead>
-  getSocialPersistentGraphHeads() throws IOException {
+  public static Collection<PersistentGraphHead> getSocialPersistentGraphHeads()
+    throws IOException {
     return getPersistentGraphHeads(GradoopTestUtils.getSocialNetworkLoader());
   }
 
@@ -51,8 +51,8 @@ public class GradoopHBaseTestUtils {
    * @return collection of persistent vertices
    * @throws IOException
    */
-  public static Collection<PersistentVertex<EdgePojo>>
-  getSocialPersistentVertices() throws IOException {
+  public static Collection<PersistentVertex> getSocialPersistentVertices()
+    throws IOException {
     return getPersistentVertices(GradoopTestUtils.getSocialNetworkLoader());
   }
 
@@ -63,8 +63,8 @@ public class GradoopHBaseTestUtils {
    * @return collection of persistent edges
    * @throws IOException
    */
-  public static Collection<PersistentEdge<VertexPojo>>
-  getSocialPersistentEdges() throws IOException {
+  public static Collection<PersistentEdge> getSocialPersistentEdges()
+    throws IOException {
     return getPersistentEdges(GradoopTestUtils.getSocialNetworkLoader());
   }
 
@@ -73,25 +73,23 @@ public class GradoopHBaseTestUtils {
   //----------------------------------------------------------------------------
 
   private static Collection<PersistentGraphHead> getPersistentGraphHeads(
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) {
+    AsciiGraphLoader loader) {
 
-    PersistentGraphHeadFactory<GraphHeadPojo, HBaseGraphHead>
-      graphDataFactory = new HBaseGraphHeadFactory<>();
-
+    PersistentGraphHeadFactory graphDataFactory = new HBaseGraphHeadFactory();
     List<PersistentGraphHead> persistentGraphData = new ArrayList<>();
 
-    for(GraphHeadPojo graphHead : loader.getGraphHeads()) {
+    for(GraphHead graphHead : loader.getGraphHeads()) {
 
       GradoopId graphId = graphHead.getId();
       GradoopIdSet vertexIds = new GradoopIdSet();
       GradoopIdSet edgeIds = new GradoopIdSet();
 
-      for (VertexPojo vertex : loader.getVertices()) {
+      for (Vertex vertex : loader.getVertices()) {
         if (vertex.getGraphIds().contains(graphId)) {
           vertexIds.add(vertex.getId());
         }
       }
-      for (EdgePojo edge : loader.getEdges()) {
+      for (Edge edge : loader.getEdges()) {
         if (edge.getGraphIds().contains(graphId)) {
           edgeIds.add(edge.getId());
         }
@@ -104,19 +102,18 @@ public class GradoopHBaseTestUtils {
     return persistentGraphData;
   }
 
-  private static List<PersistentVertex<EdgePojo>> getPersistentVertices(
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) {
-    PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex<EdgePojo>>
-      vertexDataFactory = new HBaseVertexFactory<>();
+  private static List<PersistentVertex> getPersistentVertices(
+    AsciiGraphLoader loader) {
 
-    List<PersistentVertex<EdgePojo>> persistentVertexData = new ArrayList<>();
+    PersistentVertexFactory vertexDataFactory = new HBaseVertexFactory();
+    List<PersistentVertex> persistentVertexData = new ArrayList<>();
 
-    for(VertexPojo vertex : loader.getVertices()) {
+    for(Vertex vertex : loader.getVertices()) {
 
-      Set<EdgePojo> outEdges = new HashSet<>();
-      Set<EdgePojo> inEdges = new HashSet<>();
+      Set<Edge> outEdges = new HashSet<>();
+      Set<Edge> inEdges = new HashSet<>();
 
-      for(EdgePojo edge : loader.getEdges()) {
+      for(Edge edge : loader.getEdges()) {
         if(edge.getSourceId().equals(vertex.getId())) {
           outEdges.add(edge);
         }
@@ -126,23 +123,24 @@ public class GradoopHBaseTestUtils {
       }
       persistentVertexData.add(
         vertexDataFactory.createVertex(vertex, outEdges, inEdges));
-    } return persistentVertexData;
+    }
+
+    return persistentVertexData;
   }
 
-  private static List<PersistentEdge<VertexPojo>> getPersistentEdges(
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader) {
-    PersistentEdgeFactory<VertexPojo, EdgePojo, HBaseEdge<VertexPojo>>
-      edgeDataFactory = new HBaseEdgeFactory<>();
+  private static List<PersistentEdge> getPersistentEdges(
+    AsciiGraphLoader loader) {
 
-    List<PersistentEdge<VertexPojo>> persistentEdgeData = new ArrayList<>();
+    PersistentEdgeFactory edgeDataFactory = new HBaseEdgeFactory();
+    List<PersistentEdge> persistentEdgeData = new ArrayList<>();
 
-    Map<GradoopId, VertexPojo> vertexById = new HashMap<>();
+    Map<GradoopId, Vertex> vertexById = new HashMap<>();
 
-    for(VertexPojo vertex : loader.getVertices()) {
+    for(Vertex vertex : loader.getVertices()) {
       vertexById.put(vertex.getId(), vertex);
     }
 
-    for(EdgePojo edge : loader.getEdges()) {
+    for(Edge edge : loader.getEdges()) {
       persistentEdgeData.add(
         edgeDataFactory.createEdge(
           edge,

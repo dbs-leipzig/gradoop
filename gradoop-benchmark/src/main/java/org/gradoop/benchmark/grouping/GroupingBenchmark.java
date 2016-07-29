@@ -30,7 +30,7 @@ import org.gradoop.model.impl.operators.grouping.functions.aggregation.MaxAggreg
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.MinAggregator;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
 import java.io.File;
@@ -217,7 +217,7 @@ public class GroupingBenchmark
     readCMDArguments(cmd);
 
     // initialize EPGM database
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphDatabase =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graphDatabase =
       readLogicalGraph(INPUT_PATH, false);
 
     // initialize grouping keys

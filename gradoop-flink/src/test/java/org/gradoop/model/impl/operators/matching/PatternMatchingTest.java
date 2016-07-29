@@ -3,7 +3,7 @@ package org.gradoop.model.impl.operators.matching;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -35,16 +35,16 @@ public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
     this.expectedCollection = expectedCollection;
   }
 
-  public abstract PatternMatching<GraphHeadPojo, VertexPojo, EdgePojo>
+  public abstract PatternMatching<GraphHead, VertexPojo, EdgePojo>
   getImplementation(String queryGraph, boolean attachData);
 
   @Test
   public void testGraphElementIdEquality() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString(dataGraph);
 
     // initialize with data graph
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> db =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> db =
       loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
     // append the expected result
@@ -58,11 +58,11 @@ public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGraphElementEquality() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString(dataGraph);
 
     // initialize with data graph
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> db =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> db =
       loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
     // append the expected result

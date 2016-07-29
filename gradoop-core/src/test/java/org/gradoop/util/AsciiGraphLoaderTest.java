@@ -1,10 +1,10 @@
 package org.gradoop.util;
 
 import org.gradoop.config.GradoopConfig;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -13,12 +13,11 @@ import static org.junit.Assert.*;
 
 public class AsciiGraphLoaderTest {
 
-  private GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
-    GradoopConfig.getDefaultConfig();
+  private GradoopConfig config = GradoopConfig.getDefaultConfig();
 
   @Test
   public void testFromString() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
@@ -28,7 +27,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testFromFile() throws Exception {
     String file = getClass().getResource("/data/gdl/example.gdl").getFile();
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromFile(file, config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
@@ -37,28 +36,28 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetGraphHeads() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("[()]", config);
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
     validateCaches(asciiGraphLoader, 0, 0, 0);
 
-    for (GraphHeadPojo graphHeadPojo : asciiGraphLoader.getGraphHeads()) {
+    for (GraphHead graphHead : asciiGraphLoader.getGraphHeads()) {
       assertEquals("Graph has wrong label",
-        GConstants.DEFAULT_GRAPH_LABEL, graphHeadPojo.getLabel());
+        GConstants.DEFAULT_GRAPH_LABEL, graphHead.getLabel());
     }
   }
 
   @Test
   public void testGetGraphHeadByVariable() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()];h[()]", config);
 
     validateCollections(asciiGraphLoader, 2, 2, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);
 
-    GraphHeadPojo g = asciiGraphLoader.getGraphHeadByVariable("g");
-    GraphHeadPojo h = asciiGraphLoader.getGraphHeadByVariable("h");
+    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
     assertNotNull("graphHead was null", g);
     assertNotNull("graphHead was null", h);
     assertNotEquals("graphHeads were equal", g, h);
@@ -66,10 +65,10 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetGraphHeadsByVariables() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()];h[()]", config);
 
-    Collection<GraphHeadPojo> graphHeadPojos = asciiGraphLoader
+    Collection<GraphHead> graphHeadPojos = asciiGraphLoader
       .getGraphHeadsByVariables("g", "h");
 
     assertEquals("Wrong number of graphs", 2, graphHeadPojos.size());
@@ -77,27 +76,27 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVertices() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("[()]", config);
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
     validateCaches(asciiGraphLoader, 0, 0, 0);
 
-    for (VertexPojo vertexPojo : asciiGraphLoader.getVertices()) {
+    for (Vertex vertex : asciiGraphLoader.getVertices()) {
       assertEquals("Vertex has wrong label",
-        GConstants.DEFAULT_VERTEX_LABEL, vertexPojo.getLabel());
+        GConstants.DEFAULT_VERTEX_LABEL, vertex.getLabel());
     }
   }
 
   @Test
   public void testGetVertexByVariable() {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("(a)", config);
 
     validateCollections(asciiGraphLoader, 0, 1, 0);
     validateCaches(asciiGraphLoader, 0, 1, 0);
 
-    VertexPojo v = asciiGraphLoader.getVertexByVariable("a");
+    Vertex v = asciiGraphLoader.getVertexByVariable("a");
     assertEquals("Vertex has wrong label",
       GConstants.DEFAULT_VERTEX_LABEL, v.getLabel());
     assertNotNull("Vertex was null", v);
@@ -105,214 +104,214 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVerticesByVariables() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("[(a);(b);(a)]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 0);
     validateCaches(asciiGraphLoader, 0, 2, 0);
 
-    Collection<VertexPojo> vertexPojos = asciiGraphLoader
+    Collection<Vertex> vertexs = asciiGraphLoader
       .getVerticesByVariables("a", "b");
 
-    VertexPojo a = asciiGraphLoader.getVertexByVariable("a");
-    VertexPojo b = asciiGraphLoader.getVertexByVariable("b");
+    Vertex a = asciiGraphLoader.getVertexByVariable("a");
+    Vertex b = asciiGraphLoader.getVertexByVariable("b");
 
-    assertEquals("Wrong number of vertices", 2, vertexPojos.size());
-    assertTrue("Vertex was not contained in result", vertexPojos.contains(a));
-    assertTrue("Vertex was not contained in result", vertexPojos.contains(b));
+    assertEquals("Wrong number of vertices", 2, vertexs.size());
+    assertTrue("Vertex was not contained in result", vertexs.contains(a));
+    assertTrue("Vertex was not contained in result", vertexs.contains(b));
   }
 
   @Test
   public void testGetVerticesByGraphIds() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[(a);(b)];h[(a);(c)]", config);
 
     validateCollections(asciiGraphLoader, 2, 3, 0);
     validateCaches(asciiGraphLoader, 2, 3, 0);
 
-    GraphHeadPojo g = asciiGraphLoader.getGraphHeadByVariable("g");
-    GraphHeadPojo h = asciiGraphLoader.getGraphHeadByVariable("h");
+    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
-    Collection<VertexPojo> vertexPojosG = asciiGraphLoader
+    Collection<Vertex> vertexsG = asciiGraphLoader
       .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
-    Collection<VertexPojo> vertexPojosH = asciiGraphLoader
+    Collection<Vertex> vertexsH = asciiGraphLoader
       .getVerticesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
-    Collection<VertexPojo> vertexPojosGH = asciiGraphLoader
+    Collection<Vertex> vertexsGH = asciiGraphLoader
       .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
-    VertexPojo a = asciiGraphLoader.getVertexByVariable("a");
-    VertexPojo b = asciiGraphLoader.getVertexByVariable("b");
-    VertexPojo c = asciiGraphLoader.getVertexByVariable("c");
+    Vertex a = asciiGraphLoader.getVertexByVariable("a");
+    Vertex b = asciiGraphLoader.getVertexByVariable("b");
+    Vertex c = asciiGraphLoader.getVertexByVariable("c");
 
-    assertEquals("Wrong number of vertices", 2, vertexPojosG.size());
-    assertEquals("Wrong number of vertices", 2, vertexPojosH.size());
-    assertEquals("Wrong number of vertices", 3, vertexPojosGH.size());
-    assertTrue("Vertex was not contained in graph", vertexPojosG.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexPojosG.contains(b));
-    assertTrue("Vertex was not contained in graph", vertexPojosH.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexPojosH.contains(c));
-    assertTrue("Vertex was not contained in graph", vertexPojosGH.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexPojosGH.contains(b));
-    assertTrue("Vertex was not contained in graph", vertexPojosGH.contains(c));
+    assertEquals("Wrong number of vertices", 2, vertexsG.size());
+    assertEquals("Wrong number of vertices", 2, vertexsH.size());
+    assertEquals("Wrong number of vertices", 3, vertexsGH.size());
+    assertTrue("Vertex was not contained in graph", vertexsG.contains(a));
+    assertTrue("Vertex was not contained in graph", vertexsG.contains(b));
+    assertTrue("Vertex was not contained in graph", vertexsH.contains(a));
+    assertTrue("Vertex was not contained in graph", vertexsH.contains(c));
+    assertTrue("Vertex was not contained in graph", vertexsGH.contains(a));
+    assertTrue("Vertex was not contained in graph", vertexsGH.contains(b));
+    assertTrue("Vertex was not contained in graph", vertexsGH.contains(c));
   }
 
   @Test
   public void testGetVerticesByGraphVariables() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[(a);(b)];h[(a);(c)]", config);
 
     validateCollections(asciiGraphLoader, 2, 3, 0);
     validateCaches(asciiGraphLoader, 2, 3, 0);
 
-    Collection<VertexPojo> vertexPojosG = asciiGraphLoader
+    Collection<Vertex> vertexsG = asciiGraphLoader
       .getVerticesByGraphVariables("g");
 
-    Collection<VertexPojo> vertexPojosH = asciiGraphLoader
+    Collection<Vertex> vertexsH = asciiGraphLoader
       .getVerticesByGraphVariables("h");
 
-    Collection<VertexPojo> vertexPojosGH = asciiGraphLoader
+    Collection<Vertex> vertexsGH = asciiGraphLoader
       .getVerticesByGraphVariables("g", "h");
 
-    VertexPojo a = asciiGraphLoader.getVertexByVariable("a");
-    VertexPojo b = asciiGraphLoader.getVertexByVariable("b");
-    VertexPojo c = asciiGraphLoader.getVertexByVariable("c");
+    Vertex a = asciiGraphLoader.getVertexByVariable("a");
+    Vertex b = asciiGraphLoader.getVertexByVariable("b");
+    Vertex c = asciiGraphLoader.getVertexByVariable("c");
 
-    assertEquals("Wrong number of vertices", 2, vertexPojosG.size());
-    assertEquals("Wrong number of vertices", 2, vertexPojosH.size());
-    assertEquals("Wrong number of vertices", 3, vertexPojosGH.size());
-    assertTrue("Vertex was not contained in graph", vertexPojosG.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexPojosG.contains(b));
-    assertTrue("Vertex was not contained in graph", vertexPojosH.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexPojosH.contains(c));
-    assertTrue("Vertex was not contained in graph", vertexPojosGH.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexPojosGH.contains(b));
-    assertTrue("Vertex was not contained in graph", vertexPojosGH.contains(c));
+    assertEquals("Wrong number of vertices", 2, vertexsG.size());
+    assertEquals("Wrong number of vertices", 2, vertexsH.size());
+    assertEquals("Wrong number of vertices", 3, vertexsGH.size());
+    assertTrue("Vertex was not contained in graph", vertexsG.contains(a));
+    assertTrue("Vertex was not contained in graph", vertexsG.contains(b));
+    assertTrue("Vertex was not contained in graph", vertexsH.contains(a));
+    assertTrue("Vertex was not contained in graph", vertexsH.contains(c));
+    assertTrue("Vertex was not contained in graph", vertexsGH.contains(a));
+    assertTrue("Vertex was not contained in graph", vertexsGH.contains(b));
+    assertTrue("Vertex was not contained in graph", vertexsGH.contains(c));
   }
 
   @Test
   public void testGetEdges() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
 
-    for (EdgePojo edgePojo : asciiGraphLoader.getEdges()) {
+    for (Edge edge : asciiGraphLoader.getEdges()) {
       assertEquals("Edge has wrong label",
-        GConstants.DEFAULT_EDGE_LABEL, edgePojo.getLabel());
+        GConstants.DEFAULT_EDGE_LABEL, edge.getLabel());
     }
   }
 
   @Test
   public void testGetEdgesByVariables() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-[e]->()<-[f]-()]", config);
 
     validateCollections(asciiGraphLoader, 1, 3, 2);
     validateCaches(asciiGraphLoader, 0, 0, 2);
 
-    Collection<EdgePojo> edgePojos = asciiGraphLoader
+    Collection<Edge> edges = asciiGraphLoader
       .getEdgesByVariables("e", "f");
 
-    EdgePojo e = asciiGraphLoader.getEdgeByVariable("e");
-    EdgePojo f = asciiGraphLoader.getEdgeByVariable("f");
+    Edge e = asciiGraphLoader.getEdgeByVariable("e");
+    Edge f = asciiGraphLoader.getEdgeByVariable("f");
 
-    assertEquals("Wrong number of edges", 2, edgePojos.size());
-    assertTrue("Edge was not contained in result", edgePojos.contains(e));
-    assertTrue("Edge was not contained in result", edgePojos.contains(f));
+    assertEquals("Wrong number of edges", 2, edges.size());
+    assertTrue("Edge was not contained in result", edges.contains(e));
+    assertTrue("Edge was not contained in result", edges.contains(f));
   }
 
   @Test
   public void testGetEdgesByGraphIds() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()];h[()-[c]->()-[d]->()]",
         config);
 
     validateCollections(asciiGraphLoader, 2, 6, 4);
     validateCaches(asciiGraphLoader, 2, 0, 4);
 
-    GraphHeadPojo g = asciiGraphLoader.getGraphHeadByVariable("g");
-    GraphHeadPojo h = asciiGraphLoader.getGraphHeadByVariable("h");
+    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
-    Collection<EdgePojo> edgePojosG = asciiGraphLoader
+    Collection<Edge> edgesG = asciiGraphLoader
       .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
-    Collection<EdgePojo> edgePojosH = asciiGraphLoader
+    Collection<Edge> edgesH = asciiGraphLoader
       .getEdgesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
-    Collection<EdgePojo> edgePojosGH = asciiGraphLoader
+    Collection<Edge> edgesGH = asciiGraphLoader
       .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
-    EdgePojo a = asciiGraphLoader.getEdgeByVariable("a");
-    EdgePojo b = asciiGraphLoader.getEdgeByVariable("b");
-    EdgePojo c = asciiGraphLoader.getEdgeByVariable("c");
-    EdgePojo d = asciiGraphLoader.getEdgeByVariable("d");
+    Edge a = asciiGraphLoader.getEdgeByVariable("a");
+    Edge b = asciiGraphLoader.getEdgeByVariable("b");
+    Edge c = asciiGraphLoader.getEdgeByVariable("c");
+    Edge d = asciiGraphLoader.getEdgeByVariable("d");
 
-    assertEquals("Wrong number of edges", 2, edgePojosG.size());
-    assertEquals("Wrong number of edges", 2, edgePojosH.size());
-    assertEquals("Wrong number of edges", 4, edgePojosGH.size());
-    assertTrue("Edge was not contained in graph", edgePojosG.contains(a));
-    assertTrue("Edge was not contained in graph", edgePojosG.contains(b));
-    assertTrue("Edge was not contained in graph", edgePojosH.contains(c));
-    assertTrue("Edge was not contained in graph", edgePojosH.contains(d));
-    assertTrue("Edge was not contained in graph", edgePojosGH.contains(a));
-    assertTrue("Edge was not contained in graph", edgePojosGH.contains(b));
-    assertTrue("Edge was not contained in graph", edgePojosGH.contains(c));
-    assertTrue("Edge was not contained in graph", edgePojosGH.contains(d));
+    assertEquals("Wrong number of edges", 2, edgesG.size());
+    assertEquals("Wrong number of edges", 2, edgesH.size());
+    assertEquals("Wrong number of edges", 4, edgesGH.size());
+    assertTrue("Edge was not contained in graph", edgesG.contains(a));
+    assertTrue("Edge was not contained in graph", edgesG.contains(b));
+    assertTrue("Edge was not contained in graph", edgesH.contains(c));
+    assertTrue("Edge was not contained in graph", edgesH.contains(d));
+    assertTrue("Edge was not contained in graph", edgesGH.contains(a));
+    assertTrue("Edge was not contained in graph", edgesGH.contains(b));
+    assertTrue("Edge was not contained in graph", edgesGH.contains(c));
+    assertTrue("Edge was not contained in graph", edgesGH.contains(d));
   }
 
   @Test
   public void testGetEdgesByGraphVariables() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()];h[()-[c]->()-[d]->()]",
         config);
 
     validateCollections(asciiGraphLoader, 2, 6, 4);
     validateCaches(asciiGraphLoader, 2, 0, 4);
 
-    Collection<EdgePojo> edgePojosG = asciiGraphLoader
+    Collection<Edge> edgesG = asciiGraphLoader
       .getEdgesByGraphVariables("g");
 
-    Collection<EdgePojo> edgePojosH = asciiGraphLoader
+    Collection<Edge> edgesH = asciiGraphLoader
       .getEdgesByGraphVariables("h");
 
-    Collection<EdgePojo> edgePojosGH = asciiGraphLoader
+    Collection<Edge> edgesGH = asciiGraphLoader
       .getEdgesByGraphVariables("g", "h");
 
-    EdgePojo a = asciiGraphLoader.getEdgeByVariable("a");
-    EdgePojo b = asciiGraphLoader.getEdgeByVariable("b");
-    EdgePojo c = asciiGraphLoader.getEdgeByVariable("c");
-    EdgePojo d = asciiGraphLoader.getEdgeByVariable("d");
+    Edge a = asciiGraphLoader.getEdgeByVariable("a");
+    Edge b = asciiGraphLoader.getEdgeByVariable("b");
+    Edge c = asciiGraphLoader.getEdgeByVariable("c");
+    Edge d = asciiGraphLoader.getEdgeByVariable("d");
 
-    assertEquals("Wrong number of edges", 2, edgePojosG.size());
-    assertEquals("Wrong number of edges", 2, edgePojosH.size());
-    assertEquals("Wrong number of edges", 4, edgePojosGH.size());
-    assertTrue("Edge was not contained in graph", edgePojosG.contains(a));
-    assertTrue("Edge was not contained in graph", edgePojosG.contains(b));
-    assertTrue("Edge was not contained in graph", edgePojosH.contains(c));
-    assertTrue("Edge was not contained in graph", edgePojosH.contains(d));
-    assertTrue("Edge was not contained in graph", edgePojosGH.contains(a));
-    assertTrue("Edge was not contained in graph", edgePojosGH.contains(b));
-    assertTrue("Edge was not contained in graph", edgePojosGH.contains(c));
-    assertTrue("Edge was not contained in graph", edgePojosGH.contains(d));
+    assertEquals("Wrong number of edges", 2, edgesG.size());
+    assertEquals("Wrong number of edges", 2, edgesH.size());
+    assertEquals("Wrong number of edges", 4, edgesGH.size());
+    assertTrue("Edge was not contained in graph", edgesG.contains(a));
+    assertTrue("Edge was not contained in graph", edgesG.contains(b));
+    assertTrue("Edge was not contained in graph", edgesH.contains(c));
+    assertTrue("Edge was not contained in graph", edgesH.contains(d));
+    assertTrue("Edge was not contained in graph", edgesGH.contains(a));
+    assertTrue("Edge was not contained in graph", edgesGH.contains(b));
+    assertTrue("Edge was not contained in graph", edgesGH.contains(c));
+    assertTrue("Edge was not contained in graph", edgesGH.contains(d));
   }
 
   @Test
   public void testGetGraphHeadCache() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()];h[()];[()]",
         config);
 
     validateCollections(asciiGraphLoader, 3, 3, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);
 
-    GraphHeadPojo g = asciiGraphLoader.getGraphHeadByVariable("g");
-    GraphHeadPojo h = asciiGraphLoader.getGraphHeadByVariable("h");
+    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
-    GraphHeadPojo gCache = asciiGraphLoader.getGraphHeadCache().get("g");
-    GraphHeadPojo hCache = asciiGraphLoader.getGraphHeadCache().get("h");
+    GraphHead gCache = asciiGraphLoader.getGraphHeadCache().get("g");
+    GraphHead hCache = asciiGraphLoader.getGraphHeadCache().get("h");
 
     assertEquals("Graphs were not equal", g, gCache);
     assertEquals("Graphs were not equal", h, hCache);
@@ -320,18 +319,18 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetVertexCache() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("(a);(b);()",
         config);
 
     validateCollections(asciiGraphLoader, 0, 3, 0);
     validateCaches(asciiGraphLoader, 0, 2, 0);
 
-    VertexPojo a = asciiGraphLoader.getVertexByVariable("a");
-    VertexPojo b = asciiGraphLoader.getVertexByVariable("b");
+    Vertex a = asciiGraphLoader.getVertexByVariable("a");
+    Vertex b = asciiGraphLoader.getVertexByVariable("b");
 
-    VertexPojo aCache = asciiGraphLoader.getVertexCache().get("a");
-    VertexPojo bCache = asciiGraphLoader.getVertexCache().get("b");
+    Vertex aCache = asciiGraphLoader.getVertexCache().get("a");
+    Vertex bCache = asciiGraphLoader.getVertexCache().get("b");
 
     assertEquals("Vertices were not equal", a, aCache);
     assertEquals("Vertices were not equal", b, bCache);
@@ -339,18 +338,18 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testGetEdgeCache() throws Exception {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("()-[e]->()<-[f]-()-->()",
         config);
 
     validateCollections(asciiGraphLoader, 0, 4, 3);
     validateCaches(asciiGraphLoader, 0, 0, 2);
 
-    EdgePojo e = asciiGraphLoader.getEdgeByVariable("e");
-    EdgePojo f = asciiGraphLoader.getEdgeByVariable("f");
+    Edge e = asciiGraphLoader.getEdgeByVariable("e");
+    Edge f = asciiGraphLoader.getEdgeByVariable("f");
 
-    EdgePojo eCache = asciiGraphLoader.getEdgeCache().get("e");
-    EdgePojo fCache = asciiGraphLoader.getEdgeCache().get("f");
+    Edge eCache = asciiGraphLoader.getEdgeCache().get("e");
+    Edge fCache = asciiGraphLoader.getEdgeCache().get("f");
 
     assertEquals("Edges were not equal", e, eCache);
     assertEquals("Edges were not equal", f, fCache);
@@ -358,7 +357,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testAppendFromString() {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]",
         config);
 
@@ -372,7 +371,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testAppendFromString2() {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]",
         config);
 
@@ -386,7 +385,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testAppendFromStringWithVariables() {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g0[(a)-[e]->(b)]",
         config);
 
@@ -397,10 +396,10 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 2, 2, 1);
     validateCaches(asciiGraphLoader, 2, 2, 1);
 
-    GraphHeadPojo g1 = asciiGraphLoader.getGraphHeadByVariable("g0");
-    GraphHeadPojo g2 = asciiGraphLoader.getGraphHeadByVariable("g1");
-    VertexPojo a = asciiGraphLoader.getVertexByVariable("a");
-    EdgePojo e = asciiGraphLoader.getEdgeByVariable("e");
+    GraphHead g1 = asciiGraphLoader.getGraphHeadByVariable("g0");
+    GraphHead g2 = asciiGraphLoader.getGraphHeadByVariable("g1");
+    Vertex a = asciiGraphLoader.getVertexByVariable("a");
+    Edge e = asciiGraphLoader.getEdgeByVariable("e");
 
     assertEquals("Vertex has wrong graph count", 2, a.getGraphCount());
     assertTrue("Vertex was not in g1", a.getGraphIds().contains(g1.getId()));
@@ -413,7 +412,7 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testUpdateFromStringWithVariables2() {
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader =
+    AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[(a)-[e]->(b)]",
         config);
 
@@ -424,16 +423,16 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 1, 3, 2);
     validateCaches(asciiGraphLoader, 1, 3, 2);
 
-    GraphHeadPojo g = asciiGraphLoader.getGraphHeadByVariable("g");
-    VertexPojo c = asciiGraphLoader.getVertexByVariable("c");
-    EdgePojo f = asciiGraphLoader.getEdgeByVariable("f");
+    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    Vertex c = asciiGraphLoader.getVertexByVariable("c");
+    Edge f = asciiGraphLoader.getEdgeByVariable("f");
 
     assertTrue("Vertex not in graph", c.getGraphIds().contains(g.getId()));
     assertTrue("Edge not in graph", f.getGraphIds().contains(g.getId()));
   }
 
   private void validateCollections(
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader,
+    AsciiGraphLoader asciiGraphLoader,
     int expectedGraphHeadCount,
     int expectedVertexCount,
     int expectedEdgeCount) {
@@ -446,7 +445,7 @@ public class AsciiGraphLoaderTest {
   }
 
   private void validateCaches(
-    AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> asciiGraphLoader,
+    AsciiGraphLoader asciiGraphLoader,
     int expectedGraphHeadCacheCount,
     int expectedVertexCacheCount,
     int expectedEdgeCacheCount) {

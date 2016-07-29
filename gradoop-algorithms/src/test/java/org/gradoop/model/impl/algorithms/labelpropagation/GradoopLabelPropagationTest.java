@@ -3,7 +3,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -70,12 +70,12 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
       "(v13)-[e31]->(v12);" +
       "]";
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString(graph);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> outputGraph =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> outputGraph =
       loader.getLogicalGraphByVariable("input").callForGraph(
-        new GradoopLabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(
+        new GradoopLabelPropagation<GraphHead, VertexPojo, EdgePojo>(
           10, "value"));
 
     collectAndAssertTrue(outputGraph.equalsByElementData(
@@ -136,12 +136,12 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
       "(v6)-[e15]->(v5);" +
       "]";
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString(graph);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> outputGraph =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> outputGraph =
       loader.getLogicalGraphByVariable("input").callForGraph(
-        new GradoopLabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(10,
+        new GradoopLabelPropagation<GraphHead, VertexPojo, EdgePojo>(10,
           "value"));
 
     collectAndAssertTrue(outputGraph.equalsByElementIds(

@@ -2,7 +2,7 @@ package org.gradoop.model.impl.operators.matching.simulation.dual;
 
 import org.gradoop.model.impl.operators.matching.PatternMatching;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 
 /**
@@ -19,7 +19,7 @@ public class DualSimulationBulkTest extends DualSimulationTest {
   }
 
   @Override
-  public PatternMatching<GraphHeadPojo, VertexPojo, EdgePojo> getImplementation(
+  public PatternMatching<GraphHead, VertexPojo, EdgePojo> getImplementation(
     String queryGraph, boolean attachData) {
     return new DualSimulation<>(queryGraph, attachData, true);
   }

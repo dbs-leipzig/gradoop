@@ -27,7 +27,7 @@ import org.gradoop.io.impl.tlf.TLFDataSource;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.functions.utils.Duplicate;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -68,7 +68,7 @@ public class TLFDataDuplicator
     }
     performSanityCheck(cmd);
 
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
+    GradoopFlinkConfig<GraphHead, VertexPojo, EdgePojo> config =
       GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment());
 
     String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
@@ -77,21 +77,21 @@ public class TLFDataDuplicator
 
     String outputPath = inputPath.replace(".tlf", "_" + multiplicand + ".tlf");
 
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new TLFDataSource<>(inputPath, config);
 
-    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
       new TLFDataSink<>(outputPath, config);
 
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> input =
       dataSource.getGraphTransactions();
 
-    GraphTransactions<GraphHeadPojo, VertexPojo, EdgePojo> output =
+    GraphTransactions<GraphHead, VertexPojo, EdgePojo> output =
       new GraphTransactions<>(
         input
           .getTransactions()
           .flatMap(new Duplicate
-          <GraphTransaction<GraphHeadPojo, VertexPojo, EdgePojo>>
+          <GraphTransaction<GraphHead, VertexPojo, EdgePojo>>
           (multiplicand))
           .returns(GraphTransaction.getTypeInformation(config)),
         config

@@ -30,7 +30,7 @@ import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.io.impl.json.JSONDataSink;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -108,7 +108,7 @@ public class PokecExample {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     // create default Gradoop config
-    final GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
+    final GradoopFlinkConfig<GraphHead, VertexPojo, EdgePojo> config =
       GradoopFlinkConfig.createDefaultConfig(env);
 
     final String profiles = inputDir + PROFILES;

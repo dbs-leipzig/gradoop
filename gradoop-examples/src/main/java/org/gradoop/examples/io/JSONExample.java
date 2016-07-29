@@ -26,7 +26,7 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.GradoopFlinkConfig;
 
@@ -97,20 +97,20 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     // create default Gradoop config
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
+    GradoopFlinkConfig<GraphHead, VertexPojo, EdgePojo> config =
       GradoopFlinkConfig.createDefaultConfig(env);
 
     // create DataSource
-    JSONDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    JSONDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
       new JSONDataSource<>(graphHeadFile, vertexFile, edgeFile, config);
 
     // read graph collection from DataSource
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> graphCollection =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> graphCollection =
       dataSource.getGraphCollection();
 
     // do some analytics
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> schema = graphCollection
-      .reduce(new ReduceCombination<GraphHeadPojo, VertexPojo, EdgePojo>())
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> schema = graphCollection
+      .reduce(new ReduceCombination<GraphHead, VertexPojo, EdgePojo>())
       .groupByVertexAndEdgeLabel();
 
     // write resulting graph to DataSink

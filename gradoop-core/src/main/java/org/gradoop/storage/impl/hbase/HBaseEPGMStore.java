@@ -45,8 +45,7 @@ import java.util.Iterator;
  * Default HBase graph store that handles reading and writing vertices and
  * graphs from and to HBase.
  */
-public class HBaseEPGMStore
-  implements EPGMStore<HBaseGraphHead, HBaseVertex, HBaseEdge> {
+public class HBaseEPGMStore implements EPGMStore {
   /**
    * Default value for clearing buffer on fail.
    */

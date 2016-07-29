@@ -25,9 +25,6 @@ import org.gradoop.model.api.epgm.Element;
 import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.api.epgm.Identifiable;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.AsciiGraphLoader;
 import org.gradoop.config.GradoopConfig;
 
@@ -94,13 +91,11 @@ public class GradoopTestUtils {
    *
    * @return graph store containing a simple social network for tests.
    */
-  public static AsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
-  getSocialNetworkLoader() throws IOException {
-    GradoopConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
-      GradoopConfig.getDefaultConfig();
+  public static AsciiGraphLoader getSocialNetworkLoader() throws IOException {
+    GradoopConfig config = GradoopConfig.getDefaultConfig();
 
-    InputStream inputStream =
-      GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
+    InputStream inputStream = GradoopTestUtils.class
+      .getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
     return AsciiGraphLoader.fromStream(inputStream, config);
   }
 

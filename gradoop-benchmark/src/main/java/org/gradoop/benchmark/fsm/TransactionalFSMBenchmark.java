@@ -35,7 +35,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilt
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.tuples.WithCount;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -127,7 +127,7 @@ public class TransactionalFSMBenchmark
       GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment());
 
     // read tlf graph
-    TLFDataSource<GraphHeadPojo, VertexPojo, EdgePojo> tlfSource =
+    TLFDataSource<GraphHead, VertexPojo, EdgePojo> tlfSource =
       new TLFDataSource<>(inputPath, gradoopConfig);
 
     // create input dataset

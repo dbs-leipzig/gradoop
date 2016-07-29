@@ -5,7 +5,7 @@ import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.FlinkAsciiGraphLoader;
@@ -19,7 +19,7 @@ public class SplitTest extends GradoopFlinkTestBase {
   @Test
   public void testSplit() throws Exception {
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
           "input[" +
             "(v0 {key1 = 0})" +
@@ -38,11 +38,11 @@ public class SplitTest extends GradoopFlinkTestBase {
           "]"
       );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getLogicalGraphByVariable("input");
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      input.callForCollection(new Split<GraphHeadPojo,
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
+      input.callForCollection(new Split<GraphHead,
             VertexPojo, EdgePojo>(new SelectKeyValues()));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
@@ -52,7 +52,7 @@ public class SplitTest extends GradoopFlinkTestBase {
   @Test
   public void testSplit2() throws Exception {
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "input[" +
         "(v0 {key1 = 0})" +
@@ -77,14 +77,14 @@ public class SplitTest extends GradoopFlinkTestBase {
         "]"
       );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getLogicalGraphByVariable("input");
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      input.callForCollection(new Split<GraphHeadPojo,
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
+      input.callForCollection(new Split<GraphHead,
         VertexPojo, EdgePojo>(new SelectKeyValues()));
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo>
+    GraphCollection<GraphHead, VertexPojo, EdgePojo>
       expectation = loader.getGraphCollectionByVariables(
       "graph1", "graph2", "graph3");
 
@@ -95,7 +95,7 @@ public class SplitTest extends GradoopFlinkTestBase {
   @Test
   public void testSplitWithMultipleKeys() throws Exception {
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
         "input[" +
         "(v0 {key1 = 0})" +
@@ -115,11 +115,11 @@ public class SplitTest extends GradoopFlinkTestBase {
         "]"
       );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getLogicalGraphByVariable("input");
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      input.callForCollection(new Split<GraphHeadPojo,
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
+      input.callForCollection(new Split<GraphHead,
         VertexPojo, EdgePojo>(new SelectKeyValues()));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
@@ -128,7 +128,7 @@ public class SplitTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSplitWithSingleResultGraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
       getLoaderFromString("" +
           "g1:Persons [" +
           "(v0:Person {id = 0, author = \"value0\"})" +
@@ -148,10 +148,10 @@ public class SplitTest extends GradoopFlinkTestBase {
           "]"
       );
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getLogicalGraphByVariable("g1");
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
       input.splitBy("id");
 
     collectAndAssertTrue(result.equalsByGraphElementIds(

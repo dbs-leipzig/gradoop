@@ -21,7 +21,7 @@ import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -39,17 +39,17 @@ public class EdgeListIOTest extends GradoopFlinkTestBase {
               .getFile();
 
     // load from tsv file
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
+    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
             new EdgeListDataSource<>(edgeListFile, " ", "lan", config);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo>
             tsvGraph = dataSource.getLogicalGraph();
 
     // load from gdl
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
             getLoaderFromFile(gdlFile);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> resultGraph =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> resultGraph =
             loader.getLogicalGraphByVariable("result");
 
     // test element data

@@ -5,15 +5,13 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
+import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.properties.Property;
 import org.gradoop.model.impl.properties.PropertyValue;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class SubgraphTest extends GradoopFlinkTestBase {
 
@@ -24,7 +22,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testExistingSubgraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
@@ -36,10 +34,10 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       "(frank)-[fkd]->(dave);" +
       "]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected =
       loader.getLogicalGraphByVariable("expected");
 
     FilterFunction<VertexPojo> vertexFilterFunction = new FilterFunction<VertexPojo>() {
@@ -56,7 +54,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       }
     };
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
       input.subgraph(vertexFilterFunction, edgeFilterFunction);
 
     collectAndAssertTrue(output.equalsByElementData(expected));
@@ -67,17 +65,17 @@ public class SubgraphTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testPartialSubgraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
       "(alice);(bob);(carol);(dave);(eve);(frank);" +
       "]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected =
       loader.getLogicalGraphByVariable("expected");
 
     FilterFunction<VertexPojo> vertexFilterFunction = new FilterFunction<VertexPojo>() {
@@ -94,7 +92,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       }
     };
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
       input.subgraph(vertexFilterFunction, edgeFilterFunction);
 
     collectAndAssertTrue(output.equalsByElementData(expected));
@@ -107,15 +105,15 @@ public class SubgraphTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testEmptySubgraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected =
       loader.getLogicalGraphByVariable("expected");
 
     FilterFunction<VertexPojo> vertexFilterFunction = new FilterFunction<VertexPojo>() {
@@ -132,7 +130,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       }
     };
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
       input.subgraph(vertexFilterFunction, edgeFilterFunction);
 
     collectAndAssertTrue(output.equalsByElementData(expected));
@@ -140,7 +138,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexInducedSubgraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
@@ -148,10 +146,10 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop);" +
       "]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected =
       loader.getLogicalGraphByVariable("expected");
 
     FilterFunction<VertexPojo> vertexFilterFunction = new FilterFunction<VertexPojo>() {
@@ -162,7 +160,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       }
     };
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
       input.vertexInducedSubgraph(vertexFilterFunction);
 
     collectAndAssertTrue(output.equalsByElementData(expected));
@@ -170,7 +168,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testEdgeInducedSubgraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
@@ -178,10 +176,10 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop);" +
       "]");
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input =
       loader.getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> expected =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected =
       loader.getLogicalGraphByVariable("expected");
 
     FilterFunction<EdgePojo> edgeFilterFunction = new FilterFunction<EdgePojo>() {
@@ -191,7 +189,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       }
     };
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> output =
+    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
       input.edgeInducedSubgraph(edgeFilterFunction);
 
     collectAndAssertTrue(output.equalsByElementData(expected));
@@ -199,7 +197,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionSubgraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString(
@@ -228,7 +226,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     );
 
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> input =
       loader.getGraphCollectionByVariables("g0","g1","g4");
 
 
@@ -253,9 +251,9 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       }
     };
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
     input.apply(
-      new ApplySubgraph<GraphHeadPojo, VertexPojo, EdgePojo>(
+      new ApplySubgraph<GraphHead, VertexPojo, EdgePojo>(
         vertexFilterFunction, edgeFilterFunction));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
@@ -268,7 +266,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionVertexInducedSubgraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString(
@@ -295,7 +293,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
         "]"
     );
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> input =
       loader.getGraphCollectionByVariables("g0","g1","g4");
 
 
@@ -307,9 +305,9 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       }
     };
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
       input.apply(
-        new ApplySubgraph<GraphHeadPojo, VertexPojo, EdgePojo>(
+        new ApplySubgraph<GraphHead, VertexPojo, EdgePojo>(
           vertexFilterFunction, null));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
@@ -322,7 +320,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionEdgeInducedSubgraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
       loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString(
@@ -342,7 +340,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       "expected2[]"
     );
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> input =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> input =
       loader.getGraphCollectionByVariables("g0","g1","g2");
 
 
@@ -354,9 +352,9 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       }
     };
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
+    GraphCollection<GraphHead, VertexPojo, EdgePojo> result =
       input.apply(
-        new ApplySubgraph<GraphHeadPojo, VertexPojo, EdgePojo>(
+        new ApplySubgraph<GraphHead, VertexPojo, EdgePojo>(
           null, edgeFilterFunction));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
