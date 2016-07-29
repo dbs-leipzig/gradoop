@@ -17,19 +17,28 @@
 
 package org.gradoop.io.impl.csv.inputformats;
 
-
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.gradoop.io.impl.tlf.inputformats.TLFRecordReader;
 
 import java.io.IOException;
 
-public class CSVInputFormat extends TextInputFormat{
+/**
+ * This input format is used to extract csv data from distributed hdfs files.
+ */
+public class CSVInputFormat extends FileInputFormat<LongWritable, String[]> {
+
+  private String delimiter;
+
+  public CSVInputFormat(String delimiter) {
+    this.delimiter = delimiter;
+  }
 
   /**
    * Returns the actual file reader which handles the file split.
@@ -39,11 +48,11 @@ public class CSVInputFormat extends TextInputFormat{
    * @return the TLFRecordReader
    */
   @Override
-  public RecordReader<LongWritable, Text> createRecordReader(InputSplit
+  public RecordReader<LongWritable, String[]> createRecordReader(InputSplit
     split, TaskAttemptContext context) {
     try {
       return new CSVRecordReader((FileSplit) split, context
-        .getConfiguration());
+        .getConfiguration(), delimiter);
     } catch (IOException ioe) {
       System.err.println("Error while creating TLFRecordReader: " + ioe);
       return null;
