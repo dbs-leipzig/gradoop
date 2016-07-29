@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -35,7 +35,7 @@ import org.gradoop.storage.api.PersistentGraphHead;
  * @param <PG> EPGM persistent graph type
  */
 public class BuildGraphHeadMutation
-  <G extends EPGMGraphHead, PG extends PersistentGraphHead>
+  <G extends GraphHead, PG extends PersistentGraphHead>
   extends RichMapFunction<PG, Tuple2<GradoopId, Mutation>> {
 
   /**

@@ -24,12 +24,12 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.tuples.GraphTransaction;
@@ -46,7 +46,7 @@ import java.util.Set;
  * @param <E> edge type
  */
 public class PredictableTransaction
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements MapFunction<Long, GraphTransaction<G, V, E>>
   , ResultTypeQueryable<GraphTransaction<G, V, E>> {
 
@@ -67,15 +67,15 @@ public class PredictableTransaction
   /**
    * EPGM graph head factory
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
   /**
    * EPGM vertex factory
    */
-  private final EPGMVertexFactory<V> vertexFactory;
+  private final VertexFactory<V> vertexFactory;
   /**
    * EPGM edge factory
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * constructor

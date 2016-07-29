@@ -35,8 +35,8 @@
 package org.gradoop.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
@@ -48,7 +48,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @see Overlap
  * @see ReduceOverlap
  */
-public abstract class OverlapBase<V extends EPGMVertex, E extends EPGMEdge> {
+public abstract class OverlapBase<V extends Vertex, E extends Edge> {
 
   /**
    * Filters vertices based on the given graph identifiers.

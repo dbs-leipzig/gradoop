@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.pojo;
 
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
@@ -31,7 +31,7 @@ public class GraphHeadPojoTest {
   @Test
   public void createWithIDTest() {
     GradoopId graphID = GradoopId.get();
-    EPGMGraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
+    GraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
     assertThat(g.getId(), is(graphID));
     assertThat(g.getPropertyCount(), is(0));
   }
@@ -44,7 +44,7 @@ public class GraphHeadPojoTest {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMGraphHead graphHead =
+    GraphHead graphHead =
       new GraphHeadPojoFactory().initGraphHead(graphID, label, props);
 
     assertThat(graphHead.getId(), is(graphID));
@@ -57,7 +57,7 @@ public class GraphHeadPojoTest {
   @Test
   public void createWithMissingLabelTest() {
     GradoopId graphID = GradoopId.get();
-    EPGMGraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
+    GraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
     assertThat(g.getLabel(), is(GConstants.DEFAULT_GRAPH_LABEL));
   }
 

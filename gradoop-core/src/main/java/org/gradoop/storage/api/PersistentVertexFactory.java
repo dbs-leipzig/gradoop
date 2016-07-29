@@ -17,8 +17,8 @@
 
 package org.gradoop.storage.api;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -26,14 +26,8 @@ import java.util.Set;
 /**
  * Base interface for creating persistent vertex data from transient vertex
  * data.
- *
- * @param <V>  EPGM vertex type
- * @param <E>  EPGM edge type
- * @param <PV> persistent vertex type
  */
-public interface PersistentVertexFactory
-  <V extends EPGMVertex, E extends EPGMEdge, PV extends PersistentVertex>
-  extends Serializable {
+public interface PersistentVertexFactory extends Serializable {
 
   /**
    * Creates vertex data based on the given parameters.
@@ -43,6 +37,6 @@ public interface PersistentVertexFactory
    * @param incomingEdges   incoming edge identifiers
    * @return persistent vertex data
    */
-  PV createVertex(
-    V inputVertexData, Set<E> outgoingEdges, Set<E> incomingEdges);
+  PersistentVertex createVertex(Vertex inputVertexData, Set<Edge> outgoingEdges,
+    Set<Edge> incomingEdges);
 }

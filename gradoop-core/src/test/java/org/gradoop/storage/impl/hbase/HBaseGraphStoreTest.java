@@ -19,10 +19,10 @@ package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -184,7 +184,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex<EdgePojo>>
       persistentVertexFactory = new HBaseVertexFactory<>();
-    EPGMVertexFactory<VertexPojo> vertexFactory =
+    VertexFactory<VertexPojo> vertexFactory =
       new VertexPojoFactory();
 
     // list is not supported by
@@ -216,7 +216,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     PersistentVertexFactory<VertexPojo, EdgePojo, HBaseVertex<EdgePojo>>
       persistentVertexFactory = new HBaseVertexFactory<>();
-    EPGMVertexFactory<VertexPojo> vertexFactory =
+    VertexFactory<VertexPojo> vertexFactory =
       new VertexPojoFactory();
 
     final GradoopId vertexID = GradoopId.get();
@@ -236,7 +236,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     graphStore.flush();
 
     // read from store
-    EPGMVertex v = graphStore.readVertex(vertexID);
+    Vertex v = graphStore.readVertex(vertexID);
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
     assertEquals(properties.size(), propertyKeys.size());
 
@@ -328,7 +328,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     GraphHeadPojo originalGraphHead) {
 
-    EPGMGraphHead loadedGraphHead = graphStore
+    GraphHead loadedGraphHead = graphStore
       .readGraph(originalGraphHead.getId());
 
     validateEPGMElements(originalGraphHead, loadedGraphHead);
@@ -338,7 +338,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     VertexPojo originalVertex) {
 
-    EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
+    Vertex loadedVertex = graphStore.readVertex(originalVertex.getId());
 
     validateEPGMElements(originalVertex, loadedVertex);
     validateEPGMGraphElements(originalVertex, loadedVertex);
@@ -348,7 +348,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     HBaseEPGMStore<GraphHeadPojo, VertexPojo, EdgePojo> graphStore,
     EdgePojo originalEdge) {
 
-    EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());
+    Edge loadedEdge = graphStore.readEdge(originalEdge.getId());
 
     validateEPGMElements(originalEdge, loadedEdge);
     validateEPGMGraphElements(originalEdge, loadedEdge);

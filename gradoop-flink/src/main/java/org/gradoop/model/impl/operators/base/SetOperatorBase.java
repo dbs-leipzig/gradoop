@@ -19,9 +19,9 @@ package org.gradoop.model.impl.operators.base;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.utils.LeftSide;
 import org.gradoop.model.impl.functions.graphcontainment.PairVertexWithGraphs;
@@ -37,18 +37,12 @@ import org.gradoop.model.impl.operators.union.Union;
  * Base class for set operations that share common methods to build vertex,
  * edge and data sets.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  * @see Difference
  * @see Intersection
  * @see Union
  */
-public abstract class SetOperatorBase<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends BinaryCollectionToCollectionOperatorBase<G, V, E> {
+public abstract class SetOperatorBase 
+  extends BinaryCollectionToCollectionOperatorBase {
 
   /**
    * Computes new vertices based on the new subgraphs. For each vertex, each
@@ -59,18 +53,18 @@ public abstract class SetOperatorBase<
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<V> computeNewVertices(DataSet<G> newGraphHeads) {
+  protected DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newGraphHeads) {
 
-    DataSet<Tuple2<V, GradoopId>> verticesWithGraphs =
-      firstCollection.getVertices().flatMap(new PairVertexWithGraphs<V>());
+    DataSet<Tuple2<Vertex, GradoopId>> verticesWithGraphs =
+      firstCollection.getVertices().flatMap(new PairVertexWithGraphs<>());
 
     return verticesWithGraphs
       .join(newGraphHeads)
       .where(1)
-      .equalTo(new Id<G>())
-      .with(new LeftJoin0OfTuple2<V, G>())
+      .equalTo(new Id<GraphHead>())
+      .with(new LeftJoin0OfTuple2<Vertex, GraphHead>())
       .withForwardedFieldsFirst("f0->*")
-      .distinct(new Id<V>());
+      .distinct(new Id<Vertex>());
   }
 
   /**
@@ -83,15 +77,15 @@ public abstract class SetOperatorBase<
    * @see Intersection
    */
   @Override
-  protected DataSet<E> computeNewEdges(DataSet<V> newVertices) {
+  protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
     return firstCollection.getEdges().join(newVertices)
-      .where(new SourceId<E>())
-      .equalTo(new Id<V>())
-      .with(new LeftSide<E, V>())
+      .where(new SourceId<>())
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
       .join(newVertices)
-      .where(new TargetId<E>())
-      .equalTo(new Id<V>())
-      .with(new LeftSide<E, V>())
-      .distinct(new Id<E>());
+      .where(new TargetId<>())
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
+      .distinct(new Id<Edge>());
   }
 }

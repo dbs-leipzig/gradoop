@@ -20,8 +20,8 @@ package org.gradoop.model.impl.operators.aggregation.functions.min;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.Element;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.aggregation.functions.GetPropertyValue;
@@ -45,7 +45,7 @@ public class Min {
    * @param <EL>     element type in input dataset
    * @return 1-element dataset with minimum of input dataset
    */
-  public static <EL extends EPGMElement> DataSet<PropertyValue> min(
+  public static <EL extends Element> DataSet<PropertyValue> min(
     DataSet<EL> dataSet,
     String propertyKey,
     Number max) {
@@ -69,7 +69,7 @@ public class Min {
    * @param <EL>     element type in input dataset
    * @return {@code Tuple2} with group value and group minimum
    */
-  public static <EL extends EPGMGraphElement>
+  public static <EL extends GraphElement>
   DataSet<Tuple2<GradoopId, PropertyValue>> groupBy(
     DataSet<EL> dataSet,
     String propertyKey,

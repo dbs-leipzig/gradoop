@@ -22,8 +22,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -31,19 +31,19 @@ import org.gradoop.model.impl.id.GradoopId;
  *
  * @param <G> EPGM graph head type
  */
-public class InitGraphHead<G extends EPGMGraphHead>
+public class InitGraphHead<G extends GraphHead>
   implements MapFunction<Tuple1<GradoopId>, G>, ResultTypeQueryable<G> {
   /**
    * EPGMGraphHeadFactory
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Constructor
    *
    * @param graphHeadFactory graph head factory
    */
-  public InitGraphHead(EPGMGraphHeadFactory<G> graphHeadFactory) {
+  public InitGraphHead(GraphHeadFactory<G> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 

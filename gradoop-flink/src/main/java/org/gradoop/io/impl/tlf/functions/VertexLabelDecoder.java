@@ -19,9 +19,9 @@ package org.gradoop.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.util.HashMap;
@@ -37,8 +37,8 @@ import java.util.Map;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class VertexLabelDecoder<G extends EPGMGraphHead,
-  V extends EPGMVertex, E extends EPGMEdge> extends
+public class VertexLabelDecoder<G extends GraphHead,
+  V extends Vertex, E extends Edge> extends
   RichMapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>> {
   /**
    * Constant for broadcast set containing the vertex dictionary.

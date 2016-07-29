@@ -16,7 +16,7 @@
  */
 package org.gradoop.model.impl.operators.tostring.functions;
 
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.model.impl.operators.tostring.tuples.GraphHeadString;
 
@@ -24,7 +24,7 @@ import org.gradoop.model.impl.operators.tostring.tuples.GraphHeadString;
  * represents a graph head by an empty string
  * @param <G> graph head type
  */
-public class GraphHeadToEmptyString<G extends EPGMGraphHead>
+public class GraphHeadToEmptyString<G extends GraphHead>
   implements GraphHeadToString<G> {
 
   @Override

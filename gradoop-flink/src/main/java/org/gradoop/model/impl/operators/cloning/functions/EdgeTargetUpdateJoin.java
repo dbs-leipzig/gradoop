@@ -20,7 +20,7 @@ package org.gradoop.model.impl.operators.cloning.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -32,7 +32,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFieldsSecond("f1->targetId")
-public class EdgeTargetUpdateJoin<E extends EPGMEdge>
+public class EdgeTargetUpdateJoin<E extends Edge>
   implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
 
   /**

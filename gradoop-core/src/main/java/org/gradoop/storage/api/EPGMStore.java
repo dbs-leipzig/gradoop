@@ -18,9 +18,9 @@
 package org.gradoop.storage.api;
 
 import org.gradoop.config.GradoopStoreConfig;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.io.IOException;
@@ -30,26 +30,20 @@ import java.util.Iterator;
  * The EPGM store is responsible for writing and reading graph heads, vertices
  * and edges.
  *
- * @param <G>   EPGM graph head type
- * @param <V>   EPGM vertex type
- * @param <E>   EPGM edge type
  * @param <PG>  persistent graph head type
  * @param <PV>  persistent vertex type
  * @param <PE>  persistent edge type
  */
 public interface EPGMStore<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
   PG extends PersistentGraphHead,
-  PV extends PersistentVertex<E>,
-  PE extends PersistentEdge<V>> {
+  PV extends PersistentVertex,
+  PE extends PersistentEdge> {
   /**
    * Returns the Gradoop configuration associated with that EPGM Store,
    *
    * @return Gradoop Configuration
    */
-  GradoopStoreConfig<G, V, E, PG, PV, PE> getConfig();
+  GradoopStoreConfig<PG, PV, PE> getConfig();
 
   /**
    * Returns the HBase table name where vertex data is stored.
@@ -84,14 +78,14 @@ public interface EPGMStore<
    *
    * @param vertexData vertex data to write
    */
-  void writeVertex(final PersistentVertex<E> vertexData);
+  void writeVertex(final PersistentVertex vertexData);
 
   /**
    * Writes the given edge data into the graph store.
    *
    * @param edgeData edge data to write
    */
-  void writeEdge(final PersistentEdge<V> edgeData);
+  void writeEdge(final PersistentEdge edgeData);
 
   /**
    * Reads a graph data entity from the EPGM store using the given graph
@@ -101,7 +95,7 @@ public interface EPGMStore<
    * @return graph data entity or {@code null} if there is no entity with the
    * given {@code graphId}
    */
-  G readGraph(final GradoopId graphId);
+  GraphHead readGraph(final GradoopId graphId);
 
   /**
    * Reads a vertex data entity from the EPGM store using the given vertex
@@ -111,7 +105,7 @@ public interface EPGMStore<
    * @return vertex data entity or {@code null} if there is no entity with the
    * given {@code vertexId}
    */
-  V readVertex(final GradoopId vertexId);
+  Vertex readVertex(final GradoopId vertexId);
 
   /**
    * Reads an edge data entity from the EPGM store using the given edge
@@ -121,7 +115,7 @@ public interface EPGMStore<
    * @return edge data entity or {@code null} if there is no entity with the
    * given {@code edgeId}
    */
-  E readEdge(final GradoopId edgeId);
+  Edge readEdge(final GradoopId edgeId);
 
   /**
    * Reads all vertices from the EPGM store. If EPGM store is empty, {@code
@@ -129,7 +123,7 @@ public interface EPGMStore<
    *
    * @return all vertices or {@code null} if EPGM store is empty
    */
-  Iterator<V> getVertexSpace() throws InterruptedException, IOException,
+  Iterator<Vertex> getVertexSpace() throws InterruptedException, IOException,
     ClassNotFoundException;
 
   /**
@@ -139,7 +133,7 @@ public interface EPGMStore<
    * @param cacheSize cache size for HBase scan
    * @return all vertices or {@code null} if EPGM store is empty
    */
-  Iterator<V> getVertexSpace(int cacheSize) throws InterruptedException,
+  Iterator<Vertex> getVertexSpace(int cacheSize) throws InterruptedException,
     IOException, ClassNotFoundException;
 
   /**
@@ -148,7 +142,7 @@ public interface EPGMStore<
    *
    * @return all edges or {@code null} if no edges exist
    */
-  Iterator<E> getEdgeSpace() throws InterruptedException, IOException,
+  Iterator<Edge> getEdgeSpace() throws InterruptedException, IOException,
     ClassNotFoundException;
 
   /**
@@ -158,7 +152,7 @@ public interface EPGMStore<
    * @param cacheSize cache size for HBase scan
    * @return all edges or {@code null} if no edges exist
    */
-  Iterator<E> getEdgeSpace(int cacheSize) throws InterruptedException,
+  Iterator<Edge> getEdgeSpace(int cacheSize) throws InterruptedException,
     IOException, ClassNotFoundException;
 
   /**
@@ -167,7 +161,7 @@ public interface EPGMStore<
    *
    * @return all graphs or {@code null} if EPGM store is empty
    */
-  Iterator<G> getGraphSpace() throws InterruptedException, IOException,
+  Iterator<GraphHead> getGraphSpace() throws InterruptedException, IOException,
     ClassNotFoundException;
 
   /**
@@ -177,7 +171,7 @@ public interface EPGMStore<
    * @param cacheSize cache size for HBase scan
    * @return all graphs or {@code null} if EPGM store is empty
    */
-  Iterator<G> getGraphSpace(int cacheSize) throws InterruptedException,
+  Iterator<GraphHead> getGraphSpace(int cacheSize) throws InterruptedException,
     IOException, ClassNotFoundException;
 
   /**

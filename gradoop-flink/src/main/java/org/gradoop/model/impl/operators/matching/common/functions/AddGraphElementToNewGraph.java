@@ -20,9 +20,9 @@ package org.gradoop.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.epgm.GraphElement;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
 
 /**
  * (GE) -> (GE (+ GraphHead), GraphHead)
@@ -36,12 +36,12 @@ import org.gradoop.model.api.EPGMGraphHeadFactory;
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
 public class AddGraphElementToNewGraph
-  <GE extends EPGMGraphElement, G extends EPGMGraphHead>
+  <GE extends GraphElement, G extends GraphHead>
   implements MapFunction<GE, Tuple2<GE, G>> {
   /**
    * EPGM graph head factory
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
   /**
    * Reduce instantiations
    */
@@ -52,7 +52,7 @@ public class AddGraphElementToNewGraph
    *
    * @param graphHeadFactory EPGM graph head factory
    */
-  public AddGraphElementToNewGraph(EPGMGraphHeadFactory<G> graphHeadFactory) {
+  public AddGraphElementToNewGraph(GraphHeadFactory<G> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
     reuseTuple = new Tuple2<>();
   }

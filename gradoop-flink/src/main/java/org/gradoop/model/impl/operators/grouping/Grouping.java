@@ -20,9 +20,7 @@ package org.gradoop.model.impl.operators.grouping;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
@@ -31,7 +29,6 @@ import org.gradoop.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
 import org.gradoop.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
-
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -77,21 +74,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>
  * In addition to vertex properties, grouping is also possible on edge
  * properties, vertex- and edge labels as well as combinations of those.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public abstract class Grouping<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  implements UnaryGraphToGraphOperator<G, V, E> {
+public abstract class Grouping implements UnaryGraphToGraphOperator {
 
   /**
    * Gradoop Flink configuration.
    */
-  protected GradoopFlinkConfig<G, V, E> config;
+  protected GradoopFlinkConfig config;
   /**
    * Used to group vertices.
    */
@@ -146,8 +135,8 @@ public abstract class Grouping<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
-    LogicalGraph<G, V, E> result;
+  public LogicalGraph execute(LogicalGraph graph) {
+    LogicalGraph result;
 
     config = graph.getConfig();
 
@@ -282,13 +271,13 @@ public abstract class Grouping<
    *                                  and super vertex id
    * @return super edges
    */
-  protected DataSet<E> buildSuperEdges(
-    LogicalGraph<G, V, E> graph,
+  protected DataSet<Edge> buildSuperEdges(
+    LogicalGraph graph,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 
     DataSet<EdgeGroupItem> edges = graph.getEdges()
       // build edge group items
-      .map(new BuildEdgeGroupItem<E>(
+      .map(new BuildEdgeGroupItem<>(
         getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators()))
       // join edges with vertex-group-map on source-id == vertex-id
       .join(vertexToRepresentativeMap)
@@ -322,20 +311,13 @@ public abstract class Grouping<
    * @param graph input graph
    * @return grouped output graph
    */
-  protected abstract LogicalGraph<G, V, E> groupInternal(
-    LogicalGraph<G, V, E> graph);
+  protected abstract LogicalGraph groupInternal(
+    LogicalGraph graph);
 
   /**
    * Used for building a grouping operator instance.
-   *
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
    */
-  public static final class GroupingBuilder<
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> {
+  public static final class GroupingBuilder {
 
     /**
      * Grouping strategy
@@ -391,7 +373,7 @@ public abstract class Grouping<
      * @see {@link GroupingStrategy}
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> setStrategy(GroupingStrategy strategy) {
+    public GroupingBuilder setStrategy(GroupingStrategy strategy) {
       this.strategy = strategy;
       return this;
     }
@@ -402,7 +384,7 @@ public abstract class Grouping<
      * @param key property key
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> addVertexGroupingKey(String key) {
+    public GroupingBuilder addVertexGroupingKey(String key) {
       checkNotNull(key);
       this.vertexGroupingKeys.add(key);
       return this;
@@ -414,7 +396,7 @@ public abstract class Grouping<
      * @param keys property keys
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> addVertexGroupingKeys(
+    public GroupingBuilder addVertexGroupingKeys(
       List<String> keys) {
       checkNotNull(keys);
       this.vertexGroupingKeys.addAll(keys);
@@ -427,7 +409,7 @@ public abstract class Grouping<
      * @param key property key
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> addEdgeGroupingKey(String key) {
+    public GroupingBuilder addEdgeGroupingKey(String key) {
       checkNotNull(key);
       this.edgeGroupingKeys.add(key);
       return this;
@@ -439,7 +421,7 @@ public abstract class Grouping<
      * @param keys property keys
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> addEdgeGroupingKeys(
+    public GroupingBuilder addEdgeGroupingKeys(
       List<String> keys) {
       checkNotNull(keys);
       this.edgeGroupingKeys.addAll(keys);
@@ -452,7 +434,7 @@ public abstract class Grouping<
      * @param useVertexLabel true, iff vertex label shall be used for grouping
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> useVertexLabel(
+    public GroupingBuilder useVertexLabel(
       boolean useVertexLabel) {
       this.useVertexLabel = useVertexLabel;
       return this;
@@ -464,7 +446,7 @@ public abstract class Grouping<
      * @param useEdgeLabel true, iff edge label shall be used for grouping
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> useEdgeLabel(
+    public GroupingBuilder useEdgeLabel(
       boolean useEdgeLabel) {
       this.useEdgeLabel = useEdgeLabel;
       return this;
@@ -477,7 +459,7 @@ public abstract class Grouping<
      * @param aggregator vertex aggregator
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> addVertexAggregator(
+    public GroupingBuilder addVertexAggregator(
       PropertyValueAggregator aggregator) {
       checkNotNull(aggregator, "Aggregator must not be null");
       this.vertexValueAggregators.add(aggregator);
@@ -491,7 +473,7 @@ public abstract class Grouping<
      * @param aggregator edge aggregator
      * @return this builder
      */
-    public GroupingBuilder<G, V, E> addEdgeAggregator(
+    public GroupingBuilder addEdgeAggregator(
       PropertyValueAggregator aggregator) {
       checkNotNull(aggregator, "Aggregator must not be null");
       this.edgeValueAggregators.add(aggregator);
@@ -504,24 +486,24 @@ public abstract class Grouping<
      *
      * @return grouping operator instance
      */
-    public Grouping<G, V, E> build() {
+    public Grouping build() {
       if (vertexGroupingKeys.isEmpty() && !useVertexLabel) {
         throw new IllegalArgumentException(
           "Provide vertex key(s) and/or use vertex labels for grouping.");
       }
 
-      Grouping<G, V, E> groupingOperator;
+      Grouping groupingOperator;
 
       switch (strategy) {
       case GROUP_REDUCE:
         groupingOperator =
-          new GroupingGroupReduce<>(vertexGroupingKeys, useVertexLabel,
+          new GroupingGroupReduce(vertexGroupingKeys, useVertexLabel,
             vertexValueAggregators, edgeGroupingKeys, useEdgeLabel,
             edgeValueAggregators);
         break;
       case GROUP_COMBINE:
         groupingOperator =
-          new GroupingGroupCombine<>(vertexGroupingKeys, useVertexLabel,
+          new GroupingGroupCombine(vertexGroupingKeys, useVertexLabel,
             vertexValueAggregators, edgeGroupingKeys, useEdgeLabel,
             edgeValueAggregators);
         break;

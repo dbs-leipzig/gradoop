@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.functions.epgm;
 
 import com.google.common.collect.Lists;
-import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.epgm.Element;
 import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.properties.PropertyValue;
 
@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <EL> EPGM element
  */
-public class PropertyGetter<EL extends EPGMElement>
+public class PropertyGetter<EL extends Element>
   implements UnaryFunction<EL, List<PropertyValue>> {
 
   /**

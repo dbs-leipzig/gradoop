@@ -17,9 +17,9 @@
 
 package org.gradoop.model.impl.operators.transformation;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
@@ -34,7 +34,7 @@ import org.gradoop.model.impl.LogicalGraph;
  * @param <E> EPGM edge type
  */
 public class ApplyTransformation
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   extends Transformation<G, V, E>
   implements ApplicableUnaryGraphToGraphOperator<G, V, E> {
 

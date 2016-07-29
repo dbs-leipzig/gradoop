@@ -1,7 +1,7 @@
 package org.gradoop.model.impl.operators.base;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 
 import java.util.Set;
 
@@ -9,14 +9,14 @@ import static org.junit.Assert.*;
 
 public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
 
-  protected void checkElementMatches(Set<EPGMGraphElement> inElements,
-    Set<EPGMGraphElement> outElements) {
-    for(EPGMGraphElement outElement : outElements) {
+  protected void checkElementMatches(Set<GraphElement> inElements,
+    Set<GraphElement> outElements) {
+    for(GraphElement outElement : outElements) {
       boolean match = false;
 
       String elementClassName = outElement.getClass().getSimpleName();
 
-      for(EPGMGraphElement inVertex : inElements) {
+      for(GraphElement inVertex : inElements) {
         if (outElement.getId().equals(inVertex.getId())) {
           assertEquals(
             "wrong number of graphs for " + elementClassName,

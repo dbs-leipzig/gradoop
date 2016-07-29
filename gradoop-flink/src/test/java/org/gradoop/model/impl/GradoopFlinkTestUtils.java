@@ -4,9 +4,9 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -27,9 +27,9 @@ public class GradoopFlinkTestUtils {
   }
 
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> void printLogicalGraph(LogicalGraph<G, V, E> graph) throws
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> void printLogicalGraph(LogicalGraph<G, V, E> graph) throws
     Exception {
     Collection<G> graphHeadCollection = Lists.newArrayList();
     Collection<V> vertexCollection = Lists.newArrayList();
@@ -61,9 +61,9 @@ public class GradoopFlinkTestUtils {
   }
 
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> void printGraphCollection(
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> void printGraphCollection(
     GraphCollection<G, V, E> collection) throws Exception {
 
     Collection<G> graphHeadCollection = Lists.newArrayList();
@@ -96,18 +96,18 @@ public class GradoopFlinkTestUtils {
   }
 
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> void printDirectedCanonicalAdjacencyMatrix(
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> void printDirectedCanonicalAdjacencyMatrix(
     LogicalGraph<G, V,E> graph) throws Exception {
 
     printDirectedCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
   }
 
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> void printDirectedCanonicalAdjacencyMatrix(
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> void printDirectedCanonicalAdjacencyMatrix(
     GraphCollection<G, V, E> collection) throws Exception {
 
     new CanonicalAdjacencyMatrixBuilder<>(
@@ -117,18 +117,18 @@ public class GradoopFlinkTestUtils {
   }
 
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> void printUndirectedCanonicalAdjacencyMatrix(
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> void printUndirectedCanonicalAdjacencyMatrix(
     LogicalGraph<G, V,E> graph) throws Exception {
 
     printUndirectedCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
   }
 
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> void printUndirectedCanonicalAdjacencyMatrix(
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> void printUndirectedCanonicalAdjacencyMatrix(
     GraphCollection<G, V, E> collection) throws Exception {
 
     new CanonicalAdjacencyMatrixBuilder<>(

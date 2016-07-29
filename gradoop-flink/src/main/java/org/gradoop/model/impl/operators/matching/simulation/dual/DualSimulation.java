@@ -22,9 +22,9 @@ import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -62,7 +62,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @param <E> EPGM edge type
  */
 public class DualSimulation
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   extends PatternMatching<G, V, E> {
 
   /**

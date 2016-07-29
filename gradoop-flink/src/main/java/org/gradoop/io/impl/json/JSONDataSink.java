@@ -21,9 +21,9 @@ import org.gradoop.io.api.DataSink;
 import org.gradoop.io.impl.json.functions.EdgeToJSON;
 import org.gradoop.io.impl.json.functions.GraphHeadToJSON;
 import org.gradoop.io.impl.json.functions.VertexToJSON;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -39,7 +39,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @param <E> EPGM edge type
  */
 public class JSONDataSink
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   extends JSONBase<G, V, E>
   implements DataSink<G, V, E> {
 

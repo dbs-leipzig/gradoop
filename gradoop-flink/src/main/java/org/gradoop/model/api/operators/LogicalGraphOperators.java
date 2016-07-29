@@ -19,9 +19,9 @@ package org.gradoop.model.api.operators;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.LogicalGraph;
@@ -33,14 +33,8 @@ import java.util.List;
 /**
  * Describes all operators that can be applied on a single logical graph in the
  * EPGM.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
-public interface LogicalGraphOperators
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends GraphBaseOperators<G, V, E> {
+public interface LogicalGraphOperators extends GraphBaseOperators {
 
   /**
    * Returns a dataset containing a single graph head associated with that
@@ -48,7 +42,7 @@ public interface LogicalGraphOperators
    *
    * @return 1-element dataset
    */
-  DataSet<G> getGraphHead();
+  DataSet<GraphHead> getGraphHead();
 
   //----------------------------------------------------------------------------
   // Unary Operators
@@ -62,7 +56,7 @@ public interface LogicalGraphOperators
    *
    * @return subgraphs of the input graph that match the given graph pattern
    */
-  GraphCollection<G, V, E> match(String pattern);
+  GraphCollection match(String pattern);
 
   /**
    * Returns a graph collection containing all subgraphs of the input graph
@@ -76,7 +70,7 @@ public interface LogicalGraphOperators
    * @param attachData  attach original vertex and edge data to the result
    * @return subgraphs of the input graph that match the given graph pattern
    */
-  GraphCollection<G, V, E> match(String pattern, boolean attachData);
+  GraphCollection match(String pattern, boolean attachData);
 
   /**
    * Creates a copy of the logical graph.
@@ -85,7 +79,7 @@ public interface LogicalGraphOperators
    *
    * @return projected logical graph
    */
-  LogicalGraph<G, V, E> copy();
+  LogicalGraph copy();
 
   /**
    * Transforms the elements of the logical graph using the given transformation
@@ -96,10 +90,10 @@ public interface LogicalGraphOperators
    * @param edgeTransformationFunction      edge transformation function
    * @return transformed logical graph
    */
-  LogicalGraph<G, V, E> transform(
-    TransformationFunction<G> graphHeadTransformationFunction,
-    TransformationFunction<V> vertexTransformationFunction,
-    TransformationFunction<E> edgeTransformationFunction);
+  LogicalGraph transform(
+    TransformationFunction<GraphHead> graphHeadTransformationFunction,
+    TransformationFunction<Vertex> vertexTransformationFunction,
+    TransformationFunction<Edge> edgeTransformationFunction);
 
   /**
    * Transforms the graph head of the logical graph using the given
@@ -108,8 +102,8 @@ public interface LogicalGraphOperators
    * @param graphHeadTransformationFunction graph head transformation function
    * @return transformed logical graph
    */
-  LogicalGraph<G, V, E> transformGraphHead(
-    TransformationFunction<G> graphHeadTransformationFunction);
+  LogicalGraph transformGraphHead(
+    TransformationFunction<GraphHead> graphHeadTransformationFunction);
 
   /**
    * Transforms the vertices of the logical graph using the given transformation
@@ -118,8 +112,8 @@ public interface LogicalGraphOperators
    * @param vertexTransformationFunction vertex transformation function
    * @return transformed logical graph
    */
-  LogicalGraph<G, V, E> transformVertices(
-    TransformationFunction<V> vertexTransformationFunction);
+  LogicalGraph transformVertices(
+    TransformationFunction<Vertex> vertexTransformationFunction);
 
   /**
    * Transforms the edges of the logical graph using the given transformation
@@ -128,8 +122,8 @@ public interface LogicalGraphOperators
    * @param edgeTransformationFunction edge transformation function
    * @return transformed logical graph
    */
-  LogicalGraph<G, V, E> transformEdges(
-    TransformationFunction<E> edgeTransformationFunction);
+  LogicalGraph transformEdges(
+    TransformationFunction<Edge> edgeTransformationFunction);
 
   /**
    * Returns the subgraph that is induced by the vertices which fulfill the
@@ -138,8 +132,8 @@ public interface LogicalGraphOperators
    * @param vertexFilterFunction vertex filter function
    * @return vertex-induced subgraph as a new logical graph
    */
-  LogicalGraph<G, V, E> vertexInducedSubgraph(
-    FilterFunction<V> vertexFilterFunction);
+  LogicalGraph vertexInducedSubgraph(
+    FilterFunction<Vertex> vertexFilterFunction);
 
   /**
    * Returns the subgraph that is induced by the edges which fulfill the given
@@ -148,8 +142,8 @@ public interface LogicalGraphOperators
    * @param edgeFilterFunction edge filter function
    * @return edge-induced subgraph as a new logical graph
    */
-  LogicalGraph<G, V, E> edgeInducedSubgraph(
-    FilterFunction<E> edgeFilterFunction);
+  LogicalGraph edgeInducedSubgraph(
+    FilterFunction<Edge> edgeFilterFunction);
 
   /**
    * Returns a subgraph of the logical graph which contains only those vertices
@@ -164,8 +158,8 @@ public interface LogicalGraphOperators
    * @return  logical graph which fulfils the given predicates and is a subgraph
    *          of that graph
    */
-  LogicalGraph<G, V, E> subgraph(FilterFunction<V> vertexFilterFunction,
-    FilterFunction<E> edgeFilterFunction);
+  LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
+    FilterFunction<Edge> edgeFilterFunction);
 
   /**
    * Applies the given aggregate function to the logical graph and stores the
@@ -176,8 +170,8 @@ public interface LogicalGraphOperators
    * @param aggregateFunc computes an aggregate on the logical graph
    * @return logical graph with additional property storing the aggregate
    */
-  LogicalGraph<G, V, E> aggregate(String propertyKey,
-    AggregateFunction<G, V, E> aggregateFunc);
+  LogicalGraph aggregate(String propertyKey,
+    AggregateFunction aggregateFunc);
 
   /**
    * Creates a new graph from a randomly chosen subset of nodes and their
@@ -186,7 +180,7 @@ public interface LogicalGraphOperators
    * @param sampleSize relative amount of nodes in the result graph
    * @return logical graph with random nodes and their associated edges
    */
-  LogicalGraph<G, V, E> sampleRandomNodes(Float sampleSize);
+  LogicalGraph sampleRandomNodes(Float sampleSize);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -200,7 +194,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupBy(List<String> vertexGroupingKeys);
+  LogicalGraph groupBy(List<String> vertexGroupingKeys);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -215,7 +209,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupBy(List<String> vertexGroupingKeys,
+  LogicalGraph groupBy(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys);
 
   /**
@@ -227,7 +221,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupByVertexLabel();
+  LogicalGraph groupByVertexLabel();
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -241,7 +235,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupByVertexLabelAndVertexProperties(
+  LogicalGraph groupByVertexLabelAndVertexProperties(
     List<String> vertexGroupingKeys);
 
   /**
@@ -256,7 +250,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupByVertexLabelAndEdgeProperties(
+  LogicalGraph groupByVertexLabelAndEdgeProperties(
     List<String> edgeGroupingKeys);
 
   /**
@@ -273,7 +267,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupByVertexLabel(List<String> vertexGroupingKeys,
+  LogicalGraph groupByVertexLabel(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys);
 
   /**
@@ -285,7 +279,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupByVertexAndEdgeLabel();
+  LogicalGraph groupByVertexAndEdgeLabel();
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices
@@ -299,7 +293,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupByVertexAndEdgeLabelAndVertexProperties(
+  LogicalGraph groupByVertexAndEdgeLabelAndVertexProperties(
     List<String> vertexGroupingKeys);
 
   /**
@@ -314,7 +308,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupByVertexAndEdgeLabelAndEdgeProperties(
+  LogicalGraph groupByVertexAndEdgeLabelAndEdgeProperties(
     List<String> edgeGroupingKeys);
 
   /**
@@ -330,7 +324,7 @@ public interface LogicalGraphOperators
    * @return grouped logical graph
    * @see Grouping
    */
-  LogicalGraph<G, V, E> groupByVertexAndEdgeLabel(
+  LogicalGraph groupByVertexAndEdgeLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
 
   /**
@@ -340,7 +334,7 @@ public interface LogicalGraphOperators
    * @param other other graph
    * @return 1-element dataset containing true, if equal by element ids
    */
-  DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other);
+  DataSet<Boolean> equalsByElementIds(LogicalGraph other);
 
   /**
    * Checks, if another logical graph contains vertices and edges with the same
@@ -349,7 +343,7 @@ public interface LogicalGraphOperators
    * @param other other graph
    * @return 1-element dataset containing true, iff equal by element data
    */
-  DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other);
+  DataSet<Boolean> equalsByElementData(LogicalGraph other);
 
   /**
    * Checks, if another logical graph has the same attached data and contains
@@ -358,7 +352,7 @@ public interface LogicalGraphOperators
    * @param other other graph
    * @return 1-element dataset containing true, iff equal by element data
    */
-  DataSet<Boolean> equalsByData(LogicalGraph<G, V, E> other);
+  DataSet<Boolean> equalsByData(LogicalGraph other);
 
   //----------------------------------------------------------------------------
   // Binary Operators
@@ -373,7 +367,7 @@ public interface LogicalGraphOperators
    * @return logical graph containing all vertices and edges of the
    * input graphs
    */
-  LogicalGraph<G, V, E> combine(LogicalGraph<G, V, E> otherGraph);
+  LogicalGraph combine(LogicalGraph otherGraph);
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
@@ -384,7 +378,7 @@ public interface LogicalGraphOperators
    * @return logical graph that contains all vertices and edges that exist in
    * both input graphs
    */
-  LogicalGraph<G, V, E> overlap(LogicalGraph<G, V, E> otherGraph);
+  LogicalGraph overlap(LogicalGraph otherGraph);
 
   /**
    * Creates a new logical graph containing only vertices and edges that
@@ -395,7 +389,7 @@ public interface LogicalGraphOperators
    * @return logical that contains only vertices and edges that are not in
    * the other graph
    */
-  LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph);
+  LogicalGraph exclude(LogicalGraph otherGraph);
 
   //----------------------------------------------------------------------------
   // Auxiliary Operators
@@ -409,7 +403,7 @@ public interface LogicalGraphOperators
    * @param propertyKey split property key
    * @return graph collection
    */
-  GraphCollection<G, V, E> splitBy(String propertyKey);
+  GraphCollection splitBy(String propertyKey);
 
   /**
    * Creates a logical graph using the given unary graph operator.
@@ -417,8 +411,8 @@ public interface LogicalGraphOperators
    * @param operator unary graph to graph operator
    * @return result of given operator
    */
-  LogicalGraph<G, V, E> callForGraph(
-    UnaryGraphToGraphOperator<G, V, E> operator);
+  LogicalGraph callForGraph(
+    UnaryGraphToGraphOperator operator);
 
   /**
    * Creates a logical graph from that graph and the input graph using the
@@ -428,9 +422,9 @@ public interface LogicalGraphOperators
    * @param otherGraph other graph
    * @return result of given operator
    */
-  LogicalGraph<G, V, E> callForGraph(
-    BinaryGraphToGraphOperator<G, V, E> operator,
-    LogicalGraph<G, V, E> otherGraph);
+  LogicalGraph callForGraph(
+    BinaryGraphToGraphOperator operator,
+    LogicalGraph otherGraph);
 
   /**
    * Creates a graph collection from that grpah using the given unary graph
@@ -439,6 +433,6 @@ public interface LogicalGraphOperators
    * @param operator unary graph to collection operator
    * @return result of given operator
    */
-  GraphCollection<G, V, E> callForCollection(
-    UnaryGraphToCollectionOperator<G, V, E> operator);
+  GraphCollection callForCollection(
+    UnaryGraphToCollectionOperator operator);
 }

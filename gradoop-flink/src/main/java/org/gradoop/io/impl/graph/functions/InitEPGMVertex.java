@@ -25,8 +25,8 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -40,7 +40,7 @@ import org.gradoop.model.impl.id.GradoopId;
   "f1->f2.label;" + // vertex label
   "f2->f2.properties" // vertex properties
 )
-public class InitEPGMVertex<V extends EPGMVertex, K extends Comparable<K>>
+public class InitEPGMVertex<V extends Vertex, K extends Comparable<K>>
   extends InitEPGMElement<V, K>
   implements MapFunction<ImportVertex<K>, Tuple3<K, GradoopId, V>>,
   ResultTypeQueryable<Tuple3<K, GradoopId, V>> {
@@ -48,7 +48,7 @@ public class InitEPGMVertex<V extends EPGMVertex, K extends Comparable<K>>
   /**
    * Used to create new EPGM vertex.
    */
-  private final EPGMVertexFactory<V> vertexFactory;
+  private final VertexFactory<V> vertexFactory;
 
   /**
    * Reduce object instantiation.
@@ -62,7 +62,7 @@ public class InitEPGMVertex<V extends EPGMVertex, K extends Comparable<K>>
    *                            (can be {@code null})
    * @param keyTypeInfo         type info for the import vertex identifier
    */
-  public InitEPGMVertex(EPGMVertexFactory<V> vertexFactory,
+  public InitEPGMVertex(VertexFactory<V> vertexFactory,
     String lineagePropertyKey, TypeInformation<K> keyTypeInfo) {
     super(lineagePropertyKey, keyTypeInfo);
     this.vertexFactory      = vertexFactory;

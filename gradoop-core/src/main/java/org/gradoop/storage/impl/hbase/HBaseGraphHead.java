@@ -17,7 +17,7 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -26,7 +26,7 @@ import org.gradoop.storage.api.PersistentGraphHead;
  * Represents a persistent vertex data object.
  */
 public class HBaseGraphHead
-  extends HBaseElement<EPGMGraphHead>
+  extends HBaseElement<GraphHead>
   implements PersistentGraphHead {
 
   /**
@@ -46,7 +46,7 @@ public class HBaseGraphHead
    * @param vertexIds  vertexIds contained in that graph
    * @param edgeIds     edgeIds contained in that graph
    */
-  HBaseGraphHead(EPGMGraphHead graphHead, GradoopIdSet vertexIds,
+  HBaseGraphHead(GraphHead graphHead, GradoopIdSet vertexIds,
     GradoopIdSet edgeIds) {
     super(graphHead);
     this.vertexIds = vertexIds;

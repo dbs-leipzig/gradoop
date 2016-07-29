@@ -17,14 +17,14 @@
 package org.gradoop.model.impl.operators.tostring.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.model.api.EPGMLabeled;
+import org.gradoop.model.api.epgm.Labeled;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * (graphId, vertexId, label)
  */
 public class VertexString extends Tuple3<GradoopId, GradoopId, String>
-  implements EPGMLabeled {
+  implements Labeled {
 
   /**
    * default constructor

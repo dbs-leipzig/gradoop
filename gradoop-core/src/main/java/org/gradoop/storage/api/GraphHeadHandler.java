@@ -19,8 +19,8 @@ package org.gradoop.storage.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
 
 import java.io.IOException;
 import java.util.Set;
@@ -28,12 +28,8 @@ import java.util.Set;
 /**
  * This class is responsible for reading and writing EPGM graph heads from
  * and to HBase.
- *
- * @param <G> EPGM graph head type
  */
-public interface GraphHeadHandler<
-  G extends EPGMGraphHead>
-  extends ElementHandler {
+public interface GraphHeadHandler extends ElementHandler {
   /**
    * Adds all vertex identifiers of the given graph to the given {@link Put}
    * and returns it.
@@ -88,12 +84,12 @@ public interface GraphHeadHandler<
    * @param res HBase row
    * @return graph entity
    */
-  G readGraphHead(final Result res);
+  GraphHead readGraphHead(final Result res);
 
   /**
    * Returns the graph data factory used by this handler.
    *
    * @return graph data factory
    */
-  EPGMGraphHeadFactory<G> getGraphHeadFactory();
+  GraphHeadFactory getGraphHeadFactory();
 }

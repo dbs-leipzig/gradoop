@@ -18,33 +18,24 @@
 package org.gradoop.model.impl;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.GraphTransactionsOperators;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * Represents a logical graph inside the EPGM.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class GraphTransactions
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements GraphTransactionsOperators<G, V, E> {
+public class GraphTransactions implements GraphTransactionsOperators {
 
   /**
    * Graph data associated with the logical graphs in that collection.
    */
-  private final DataSet<GraphTransaction<G, V, E>> transactions;
+  private final DataSet<GraphTransaction> transactions;
 
   /**
    * Gradoop Flink configuration.
    */
-  private final GradoopFlinkConfig<G, V, E> config;
+  private final GradoopFlinkConfig config;
 
   /**
    * Creates a new graph transactions based on the given parameters.
@@ -52,18 +43,18 @@ public class GraphTransactions
    * @param transactions transaction data set
    * @param config Gradoop Flink configuration
    */
-  public GraphTransactions(DataSet<GraphTransaction<G, V, E>> transactions,
-    GradoopFlinkConfig<G, V, E> config) {
+  public GraphTransactions(DataSet<GraphTransaction> transactions,
+    GradoopFlinkConfig config) {
     this.transactions = transactions;
     this.config = config;
   }
 
   @Override
-  public DataSet<GraphTransaction<G, V, E>> getTransactions() {
+  public DataSet<GraphTransaction> getTransactions() {
     return this.transactions;
   }
 
-  public GradoopFlinkConfig<G, V, E> getConfig() {
+  public GradoopFlinkConfig getConfig() {
     return config;
   }
 }

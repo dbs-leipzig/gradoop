@@ -20,7 +20,7 @@ package org.gradoop.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyValue;
 
@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * graph id and property value per graph the vertex is contained in.
  * @param <GE> epgm graph element
  */
-public class GraphIdsWithPropertyValue<GE extends EPGMGraphElement>
+public class GraphIdsWithPropertyValue<GE extends GraphElement>
   implements FlatMapFunction<GE, Tuple2<GradoopId, PropertyValue>> {
 
 

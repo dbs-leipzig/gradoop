@@ -18,13 +18,11 @@
 package org.gradoop.model.impl.algorithms.labelpropagation;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.EdgeToGellyEdgeMapper;
@@ -55,7 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <E> EPGM edge type
  */
 public abstract class LabelPropagation
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements UnaryGraphToGraphOperator<G, V, E> {
 
   /**
@@ -85,12 +83,12 @@ public abstract class LabelPropagation
   @Override
   public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> logicalGraph) {
     // prepare vertex set for Gelly vertex centric iteration
-    DataSet<Vertex<GradoopId, PropertyValue>> vertices =
+    DataSet<org.apache.flink.graph.Vertex> vertices =
       logicalGraph.getVertices()
         .map(new VertexToGellyVertexMapper<V>(propertyKey));
 
     // prepare edge set for Gelly vertex centric iteration
-    DataSet<Edge<GradoopId, NullValue>> edges = logicalGraph.getEdges()
+    DataSet<org.apache.flink.graph.Edge> edges = logicalGraph.getEdges()
       .map(new EdgeToGellyEdgeMapper<E>());
 
     // create Gelly graph
@@ -113,7 +111,7 @@ public abstract class LabelPropagation
    * @param gellyGraph gelly graph with initialized vertices
    * @return updated vertex set
    */
-  protected abstract DataSet<Vertex<GradoopId, PropertyValue>>
+  protected abstract DataSet<org.apache.flink.graph.Vertex>
   executeInternal(Graph<GradoopId, PropertyValue, NullValue> gellyGraph);
 
   /**

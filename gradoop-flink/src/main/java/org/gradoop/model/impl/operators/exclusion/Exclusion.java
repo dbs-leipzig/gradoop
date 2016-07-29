@@ -35,9 +35,9 @@
 package org.gradoop.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -49,14 +49,8 @@ import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Computes the exclusion graph from two logical graphs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Exclusion
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements BinaryGraphToGraphOperator<G, V, E> {
+public class Exclusion implements BinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph containing only vertices and edges that exist
@@ -68,26 +62,27 @@ public class Exclusion
    * @return first graph without elements from second graph
    */
   @Override
-  public LogicalGraph<G, V, E> execute(
-    LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
+  public LogicalGraph execute(
+    LogicalGraph firstGraph, LogicalGraph secondGraph) {
 
-    DataSet<GradoopId> graphId = secondGraph.getGraphHead().map(new Id<G>());
+    DataSet<GradoopId> graphId = secondGraph.getGraphHead()
+      .map(new Id<GraphHead>());
 
-    DataSet<V> newVertexSet = firstGraph.getVertices()
-      .filter(new NotInGraphBroadcast<V>())
+    DataSet<Vertex> newVertexSet = firstGraph.getVertices()
+      .filter(new NotInGraphBroadcast<Vertex>())
       .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID);
 
-    DataSet<E> newEdgeSet = firstGraph.getEdges()
-      .filter(new NotInGraphBroadcast<E>())
+    DataSet<Edge> newEdgeSet = firstGraph.getEdges()
+      .filter(new NotInGraphBroadcast<Edge>())
       .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID)
       .join(newVertexSet)
-      .where(new SourceId<E>())
-      .equalTo(new Id<V>())
-      .with(new LeftSide<E, V>())
+      .where(new SourceId<>())
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
       .join(newVertexSet)
-      .where(new TargetId<E>())
-      .equalTo(new Id<V>())
-      .with(new LeftSide<E, V>());
+      .where(new TargetId<>())
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>());
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

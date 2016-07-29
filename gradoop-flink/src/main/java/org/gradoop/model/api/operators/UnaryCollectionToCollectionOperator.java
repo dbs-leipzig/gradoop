@@ -17,26 +17,18 @@
 
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 
 /**
  * Creates a {@link GraphCollection} based on one input collection.
  *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  */
-public interface UnaryCollectionToCollectionOperator
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends Operator {
+public interface UnaryCollectionToCollectionOperator extends Operator {
   /**
    * Executes the operator.
    *
    * @param collection input collection
    * @return operator result
    */
-  GraphCollection<G, V, E> execute(GraphCollection<G, V, E> collection);
+  GraphCollection execute(GraphCollection collection);
 }

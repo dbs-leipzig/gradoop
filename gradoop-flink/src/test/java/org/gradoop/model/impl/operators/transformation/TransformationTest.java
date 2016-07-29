@@ -3,9 +3,9 @@ package org.gradoop.model.impl.operators.transformation;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -174,7 +174,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
-  public static class GraphHeadModifier<G extends EPGMGraphHead>
+  public static class GraphHeadModifier<G extends GraphHead>
     implements TransformationFunction<G> {
 
     @Override
@@ -185,7 +185,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
     }
   }
 
-  public static class VertexModifier<V extends EPGMVertex>
+  public static class VertexModifier<V extends Vertex>
     implements TransformationFunction<V> {
 
     @Override
@@ -201,7 +201,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
     }
   }
 
-  public static class EdgeModifier<E extends EPGMEdge>
+  public static class EdgeModifier<E extends Edge>
     implements TransformationFunction<E> {
 
     @Override

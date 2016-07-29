@@ -21,10 +21,10 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.io.impl.json.JSONConstants;
-import org.gradoop.model.api.EPGMAttributed;
-import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMLabeled;
+import org.gradoop.model.api.epgm.Attributed;
+import org.gradoop.model.api.epgm.GraphElement;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Labeled;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
@@ -40,7 +40,7 @@ public class EntityToJSON {
    * @return json object containing the properties
    * @throws JSONException
    */
-  protected JSONObject writeProperties(EPGMAttributed entity) throws
+  protected JSONObject writeProperties(Attributed entity) throws
     JSONException {
     JSONObject data = new JSONObject();
     if (entity.getPropertyCount() > 0) {
@@ -61,7 +61,7 @@ public class EntityToJSON {
    * @return json object containing meta information
    * @throws JSONException
    */
-  protected <T extends EPGMLabeled & EPGMGraphElement> JSONObject
+  protected <T extends Labeled & GraphElement> JSONObject
   writeGraphElementMeta(
     T entity) throws JSONException {
     JSONObject meta = writeMeta(entity);
@@ -80,7 +80,7 @@ public class EntityToJSON {
    * @return json object with graph meta data
    * @throws JSONException
    */
-  protected <T extends EPGMGraphHead> JSONObject
+  protected <T extends GraphHead> JSONObject
   writeGraphMeta(T entity) throws JSONException {
     return writeMeta(entity);
   }
@@ -92,7 +92,7 @@ public class EntityToJSON {
    * @return json object with meta data containing the label
    * @throws JSONException
    */
-  private JSONObject writeMeta(EPGMLabeled entity) throws JSONException {
+  private JSONObject writeMeta(Labeled entity) throws JSONException {
     JSONObject meta = new JSONObject();
     meta.put(JSONConstants.LABEL, entity.getLabel());
     return meta;

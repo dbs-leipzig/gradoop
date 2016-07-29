@@ -22,12 +22,12 @@ import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.VertexFactory;
 
 /**
  * Factory for creating vertex POJOs.
  */
-public class VertexPojoFactory implements EPGMVertexFactory<VertexPojo> {
+public class VertexPojoFactory implements VertexFactory {
 
   /**
    * serial version uid

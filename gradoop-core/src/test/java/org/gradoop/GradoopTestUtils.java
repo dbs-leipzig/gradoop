@@ -21,9 +21,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.hadoop.io.Writable;
-import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.api.EPGMIdentifiable;
+import org.gradoop.model.api.epgm.Element;
+import org.gradoop.model.api.epgm.GraphElement;
+import org.gradoop.model.api.epgm.Identifiable;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -154,19 +154,19 @@ public class GradoopTestUtils {
    * @param collection2 second collection
    */
   public static void validateEPGMElementCollections(
-    Collection<? extends EPGMElement> collection1,
-    Collection<? extends EPGMElement> collection2) {
+    Collection<? extends Element> collection1,
+    Collection<? extends Element> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
 
-    List<? extends EPGMElement> list1 = Lists.newArrayList(collection1);
-    List<? extends EPGMElement> list2 = Lists.newArrayList(collection2);
+    List<? extends Element> list1 = Lists.newArrayList(collection1);
+    List<? extends Element> list2 = Lists.newArrayList(collection2);
 
     Collections.sort(list1, ID_COMPARATOR);
     Collections.sort(list2, ID_COMPARATOR);
 
-    Iterator<? extends EPGMElement> it1 = list1.iterator();
-    Iterator<? extends EPGMElement> it2 = list2.iterator();
+    Iterator<? extends Element> it1 = list1.iterator();
+    Iterator<? extends Element> it2 = list2.iterator();
 
     while(it1.hasNext()) {
       validateEPGMElements(
@@ -185,19 +185,19 @@ public class GradoopTestUtils {
    * @param collection2 second collection
    */
   public static void validateEPGMGraphElementCollections(
-    Collection<? extends EPGMGraphElement> collection1,
-    Collection<? extends EPGMGraphElement> collection2) {
+    Collection<? extends GraphElement> collection1,
+    Collection<? extends GraphElement> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
 
-    List<? extends EPGMGraphElement> list1 = Lists.newArrayList(collection1);
-    List<? extends EPGMGraphElement> list2 = Lists.newArrayList(collection2);
+    List<? extends GraphElement> list1 = Lists.newArrayList(collection1);
+    List<? extends GraphElement> list2 = Lists.newArrayList(collection2);
 
     Collections.sort(list1, ID_COMPARATOR);
     Collections.sort(list2, ID_COMPARATOR);
 
-    Iterator<? extends EPGMGraphElement> it1 = list1.iterator();
-    Iterator<? extends EPGMGraphElement> it2 = list2.iterator();
+    Iterator<? extends GraphElement> it1 = list1.iterator();
+    Iterator<? extends GraphElement> it2 = list2.iterator();
 
     while(it1.hasNext()) {
       validateEPGMGraphElements(
@@ -215,8 +215,8 @@ public class GradoopTestUtils {
    * @param element1 first element
    * @param element2 second element
    */
-  public static void validateEPGMElements(EPGMElement element1,
-    EPGMElement element2) {
+  public static void validateEPGMElements(Element element1,
+    Element element2) {
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
 
@@ -257,8 +257,8 @@ public class GradoopTestUtils {
    * @param element2 second element
    */
   public static void validateEPGMGraphElements(
-    EPGMGraphElement element1,
-    EPGMGraphElement element2) {
+    GraphElement element1,
+    GraphElement element2) {
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
     assertTrue(
@@ -296,10 +296,10 @@ public class GradoopTestUtils {
   /**
    * Compares to EPGM elements based on their ID.
    */
-  private static Comparator<EPGMIdentifiable> ID_COMPARATOR =
-    new Comparator<EPGMIdentifiable>() {
+  private static Comparator<Identifiable> ID_COMPARATOR =
+    new Comparator<Identifiable>() {
       @Override
-      public int compare(EPGMIdentifiable o1, EPGMIdentifiable o2) {
+      public int compare(Identifiable o1, Identifiable o2) {
         return o1.getId().compareTo(o2.getId());
       }
     };

@@ -19,19 +19,18 @@ package org.gradoop.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphElement;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.operators.tostring.functions
+  .EPGMElementToDataString;
 
 /**
  * Adds the given graph head identifier to the graph element.
- *
- * @param <G>   EPGM graph head type
- * @param <GE>  EPGM graph element type
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class AddToGraph
-  <G extends EPGMGraphHead, GE extends EPGMGraphElement>
+public class AddToGraph<GE extends GraphElement>
   implements MapFunction<GE, GE> {
 
   /**
@@ -44,7 +43,7 @@ public class AddToGraph
    *
    * @param graphHead graph head used for updating
    */
-  public AddToGraph(G graphHead) {
+  public AddToGraph(GraphHead graphHead) {
     this.graphHeadId = graphHead.getId();
   }
 

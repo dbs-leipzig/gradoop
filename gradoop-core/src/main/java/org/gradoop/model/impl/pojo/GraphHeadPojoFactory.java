@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
@@ -26,8 +26,7 @@ import org.gradoop.util.GConstants;
 /**
  * Factory for creating graph head POJOs.
  */
-public class GraphHeadPojoFactory
-  implements EPGMGraphHeadFactory<GraphHeadPojo> {
+public class GraphHeadPojoFactory implements GraphHeadFactory {
 
   /**
    * serial version uid

@@ -21,9 +21,9 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.io.api.DataSink;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
@@ -44,9 +44,9 @@ import java.util.Collection;
  */
 @Deprecated
 public class EPGMDatabase<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge> {
 
   /**
    * Gradoop Flink configuration.
@@ -101,7 +101,7 @@ public class EPGMDatabase<
   @SuppressWarnings("unchecked")
   @Deprecated
   public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   EPGMDatabase fromCollections(
     Collection<G> graphDataCollection,
     Collection<V> vertexDataCollection,

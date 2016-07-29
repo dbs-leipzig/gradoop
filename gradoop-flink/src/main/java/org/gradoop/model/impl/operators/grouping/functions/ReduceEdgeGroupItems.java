@@ -23,8 +23,8 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
@@ -37,14 +37,14 @@ import java.util.List;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId")
-public class ReduceEdgeGroupItems<E extends EPGMEdge>
+public class ReduceEdgeGroupItems<E extends Edge>
   extends BuildSuperEdge
   implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
 
   /**
    * Edge factory.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Creates group reducer
@@ -57,7 +57,7 @@ public class ReduceEdgeGroupItems<E extends EPGMEdge>
   public ReduceEdgeGroupItems(List<String> groupPropertyKeys,
     boolean useLabel,
     List<PropertyValueAggregator> valueAggregators,
-    EPGMEdgeFactory<E> edgeFactory) {
+    EdgeFactory<E> edgeFactory) {
     super(groupPropertyKeys, useLabel, valueAggregators);
     this.edgeFactory = edgeFactory;
   }

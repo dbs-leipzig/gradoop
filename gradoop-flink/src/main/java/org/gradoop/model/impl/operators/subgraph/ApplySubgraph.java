@@ -20,10 +20,10 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -56,8 +56,8 @@ import org.gradoop.model.impl.operators.subgraph.functions.SourceTargetIdGraphsT
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class ApplySubgraph<G extends EPGMGraphHead, V extends EPGMVertex, E
-  extends EPGMEdge> implements
+public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
+  extends Edge> implements
   ApplicableUnaryGraphToGraphOperator<G, V, E> {
   /**
    * Used to filter vertices from the logical graph.
@@ -123,7 +123,7 @@ public class ApplySubgraph<G extends EPGMGraphHead, V extends EPGMVertex, E
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<G> graphFactory =
+    GraphHeadFactory<G> graphFactory =
       collection.getConfig().getGraphHeadFactory();
 
     DataSet<G> newGraphHeads = graphIdDictionary
@@ -227,7 +227,7 @@ public class ApplySubgraph<G extends EPGMGraphHead, V extends EPGMVertex, E
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<G> graphFactory =
+    GraphHeadFactory<G> graphFactory =
       collection.getConfig().getGraphHeadFactory();
 
     DataSet<G> newGraphHeads = graphIdDictionary
@@ -302,7 +302,7 @@ public class ApplySubgraph<G extends EPGMGraphHead, V extends EPGMVertex, E
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<G> graphFactory =
+    GraphHeadFactory<G> graphFactory =
       collection.getConfig().getGraphHeadFactory();
 
     DataSet<G> newGraphHeads = graphIdDictionary

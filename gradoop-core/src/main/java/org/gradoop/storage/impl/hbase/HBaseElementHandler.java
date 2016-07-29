@@ -22,7 +22,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
-import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.epgm.Element;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.Property;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -83,7 +83,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeLabel(final Put put, final EPGMElement entity) {
+  public Put writeLabel(final Put put, final Element entity) {
     return (entity.getLabel() == null) ? put :
       put.add(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
   }
@@ -104,7 +104,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeProperties(final Put put, final EPGMElement entity)
+  public Put writeProperties(final Put put, final Element entity)
       throws IOException {
     if (entity.getPropertyCount() > 0) {
       for (Property property : entity.getProperties()) {

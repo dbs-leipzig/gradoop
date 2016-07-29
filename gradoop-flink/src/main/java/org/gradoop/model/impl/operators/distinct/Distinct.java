@@ -17,9 +17,7 @@
 
 package org.gradoop.model.impl.operators.distinct;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -27,19 +25,13 @@ import org.gradoop.model.impl.functions.epgm.Id;
 /**
  * Returns a distinct collection of logical graphs. Graph heads are compared
  * based on their identifier.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Distinct
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryCollectionToCollectionOperator<G, V, E> {
+public class Distinct implements UnaryCollectionToCollectionOperator {
 
   @Override
-  public GraphCollection<G, V, E> execute(GraphCollection<G, V, E> collection) {
+  public GraphCollection execute(GraphCollection collection) {
     return GraphCollection.fromDataSets(
-      collection.getGraphHeads().distinct(new Id<G>()),
+      collection.getGraphHeads().distinct(new Id<GraphHead>()),
       collection.getVertices(),
       collection.getEdges(),
       collection.getConfig()

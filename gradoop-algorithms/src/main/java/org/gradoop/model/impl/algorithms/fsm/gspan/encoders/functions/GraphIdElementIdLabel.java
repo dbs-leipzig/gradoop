@@ -20,14 +20,14 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * EPGMVertex => (graphId, vertexId, vertexLabel),..
  * @param <EL> vertex type
  */
-public class GraphIdElementIdLabel<EL extends EPGMGraphElement>
+public class GraphIdElementIdLabel<EL extends GraphElement>
   implements FlatMapFunction<EL, Tuple2<GradoopId, String>> {
 
   @Override

@@ -22,8 +22,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.VertexHandler;
@@ -37,7 +37,7 @@ import org.gradoop.storage.api.VertexHandler;
  * @param <PV> EPGM persistent vertex type
  */
 public class BuildVertexMutation
-  <V extends EPGMVertex, E extends EPGMEdge, PV extends PersistentVertex<E>>
+  <V extends Vertex, E extends Edge, PV extends PersistentVertex<E>>
   extends RichMapFunction<PV, Tuple2<GradoopId, Mutation>> {
 
   /**

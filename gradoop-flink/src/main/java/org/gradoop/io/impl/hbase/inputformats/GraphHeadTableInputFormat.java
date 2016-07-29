@@ -21,7 +21,7 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.util.GConstants;
 
@@ -30,7 +30,7 @@ import org.gradoop.util.GConstants;
  *
  * @param <G> EPGM graph head type
  */
-public class GraphHeadTableInputFormat<G extends EPGMGraphHead>
+public class GraphHeadTableInputFormat<G extends GraphHead>
   extends TableInputFormat<Tuple1<G>> {
 
   /**

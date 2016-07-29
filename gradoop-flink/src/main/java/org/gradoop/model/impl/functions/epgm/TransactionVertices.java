@@ -20,9 +20,9 @@ package org.gradoop.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 
 import java.util.Set;
 
@@ -34,7 +34,7 @@ import java.util.Set;
  * @param <E> edge type
  */
 public class TransactionVertices
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements FlatMapFunction<Tuple3<G, Set<V>, Set<E>>, V> {
 
   @Override

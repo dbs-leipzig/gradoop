@@ -19,7 +19,7 @@ package org.gradoop.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.epgm.Element;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyValue;
 
@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * element with the specified property key.
  * @param <G> epgm element type
  */
-public class LeftOuterPropertySetter<G extends EPGMElement> implements
+public class LeftOuterPropertySetter<G extends Element> implements
   CoGroupFunction<G, Tuple2<GradoopId, PropertyValue>, G> {
 
   /**

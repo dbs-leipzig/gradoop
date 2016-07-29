@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Set;
@@ -30,7 +30,7 @@ import java.util.Set;
  * (graphId, element),.. => (graphId, {element,..})
  * @param <EL> graph element type
  */
-public class GraphElementSet<EL extends EPGMGraphElement> implements
+public class GraphElementSet<EL extends GraphElement> implements
   GroupReduceFunction<Tuple2<GradoopId, EL>, Tuple2<GradoopId, Set<EL>>> {
 
   @Override

@@ -17,7 +17,7 @@
 package org.gradoop.model.impl.operators.tostring.functions;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.tostring.api.VertexToString;
 import org.gradoop.model.impl.operators.tostring.tuples.VertexString;
@@ -26,7 +26,7 @@ import org.gradoop.model.impl.operators.tostring.tuples.VertexString;
  * represents a vertex by an id string
  * @param <V> vertex type
  */
-public class VertexToIdString<V extends EPGMVertex>
+public class VertexToIdString<V extends Vertex>
   extends EPGMElementToDataString<V> implements VertexToString<V> {
 
   @Override

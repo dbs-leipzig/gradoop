@@ -19,7 +19,7 @@ package org.gradoop.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Collection;
@@ -30,7 +30,7 @@ import java.util.Collection;
  * @param <GE> graph element type
  */
 public abstract class GraphsContainmentFilterBroadcast
-  <GE extends EPGMGraphElement> extends RichFilterFunction<GE> {
+  <GE extends GraphElement> extends RichFilterFunction<GE> {
 
   /**
    * constant string for "graph ids"

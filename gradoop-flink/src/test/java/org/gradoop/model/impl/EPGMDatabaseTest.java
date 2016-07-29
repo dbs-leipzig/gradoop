@@ -2,7 +2,7 @@ package org.gradoop.model.impl;
 
 import com.google.common.collect.Lists;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.functions.bool.Equals;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
@@ -25,7 +25,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
     String graphVariable = "g0";
 
-    EPGMGraphHead g = loader.getGraphHeadByVariable(graphVariable);
+    GraphHead g = loader.getGraphHeadByVariable(graphVariable);
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphFromLoader =
       loader.getLogicalGraphByVariable(graphVariable);
 

@@ -19,7 +19,7 @@ package org.gradoop.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.model.impl.properties.PropertyValueList;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1;")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildEdgeGroupItem<E extends EPGMEdge>
+public class BuildEdgeGroupItem<E extends Edge>
   extends BuildBase
   implements MapFunction<E, EdgeGroupItem> {
 

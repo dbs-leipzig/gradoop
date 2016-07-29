@@ -35,9 +35,9 @@
 package org.gradoop.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -52,7 +52,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <E> EPGM edge type
  */
 public class ReduceOverlap
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   extends OverlapBase<V, E>
   implements ReducibleBinaryGraphToGraphOperator<G, V, E> {
 

@@ -20,8 +20,8 @@ package org.gradoop.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Set;
@@ -33,7 +33,7 @@ import java.util.Set;
  * @param <V> vertex type
  * @param <E> edge type
  */
-public class GraphVerticesEdges<V extends EPGMVertex, E extends EPGMEdge>
+public class GraphVerticesEdges<V extends Vertex, E extends Edge>
   implements JoinFunction<Tuple2<GradoopId, Set<V>>, Tuple2<GradoopId, Set<E>>,
   Tuple3<GradoopId, Set<V>, Set<E>>> {
 

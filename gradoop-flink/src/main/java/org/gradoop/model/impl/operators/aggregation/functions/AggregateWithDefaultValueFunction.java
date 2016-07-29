@@ -17,23 +17,15 @@
 
 package org.gradoop.model.impl.operators.aggregation.functions;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.ApplyAggregateFunction;
 
 /**
  * Aggregation function for which a default value can be
  * specified in the constructor.
- *
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
 public abstract class AggregateWithDefaultValueFunction
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements AggregateFunction<G, V, E>,  ApplyAggregateFunction<G, V, E> {
+  implements AggregateFunction,  ApplyAggregateFunction {
 
   /**
    * User defined default value.

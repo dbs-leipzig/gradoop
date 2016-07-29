@@ -17,9 +17,9 @@
 
 package org.gradoop.io.impl.json;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
@@ -30,7 +30,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @param <E> EPGM edge type
  */
 abstract class JSONBase
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+  <G extends GraphHead, V extends Vertex, E extends Edge> {
   /**
    * Gradoop Flink configuration
    */

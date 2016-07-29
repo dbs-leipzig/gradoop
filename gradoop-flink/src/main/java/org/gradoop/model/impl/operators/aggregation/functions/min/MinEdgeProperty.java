@@ -19,9 +19,6 @@ package org.gradoop.model.impl.operators.aggregation.functions.min;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
@@ -31,14 +28,8 @@ import org.gradoop.model.impl.properties.PropertyValue;
 /**
  * Aggregate function returning the minimum of a specified property over all
  * edges.
- *
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class MinEdgeProperty
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends AggregateWithDefaultValueFunction<G, V, E> {
+public class MinEdgeProperty extends AggregateWithDefaultValueFunction {
 
   /**
    * Property key to retrieve property values
@@ -65,7 +56,7 @@ public class MinEdgeProperty
    * @return 1-element dataset with vertex count
    */
   @Override
-  public DataSet<PropertyValue> execute(LogicalGraph<G, V, E> graph) {
+  public DataSet<PropertyValue> execute(LogicalGraph graph) {
     return Min.min(graph.getEdges(),
       propertyKey,
       getDefaultValue());
@@ -80,7 +71,7 @@ public class MinEdgeProperty
    */
   @Override
   public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection<G, V, E> collection) {
+    GraphCollection collection) {
     return Min.groupBy(collection.getEdges(),
       propertyKey,
       getDefaultValue());

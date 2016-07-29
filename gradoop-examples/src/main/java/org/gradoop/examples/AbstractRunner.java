@@ -25,9 +25,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.io.impl.json.JSONDataSink;
 import org.gradoop.io.impl.json.JSONDataSource;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.util.GradoopFlinkConfig;
@@ -86,7 +86,7 @@ public abstract class AbstractRunner {
    */
   @SuppressWarnings("unchecked")
   protected static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   LogicalGraph<G, V, E> readLogicalGraph(String directory) {
     return readLogicalGraph(directory, true);
   }
@@ -103,7 +103,7 @@ public abstract class AbstractRunner {
    */
   @SuppressWarnings("unchecked")
   protected static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   LogicalGraph<G, V, E> readLogicalGraph(String directory,
     boolean readGraphHeads) {
     directory = appendSeparator(directory);
@@ -126,7 +126,7 @@ public abstract class AbstractRunner {
    * @throws Exception
    */
   protected static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   void writeLogicalGraph(LogicalGraph<G, V, E> graph, String directory) throws
     Exception {
     directory = appendSeparator(directory);
@@ -150,7 +150,7 @@ public abstract class AbstractRunner {
    * @throws Exception
    */
   protected static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   void writeGraphCollection(GraphCollection<G, V, E> collection,
     String directory) throws Exception {
     directory = appendSeparator(directory);

@@ -19,7 +19,7 @@ package org.gradoop.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
 /**
@@ -31,7 +31,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
  * @param <GE> EPGM graph element (i.e. vertex / edge)
  */
 @FunctionAnnotation.ForwardedFields("graphIds->*")
-public class ExpandGraphsToIdSet<GE extends EPGMGraphElement>
+public class ExpandGraphsToIdSet<GE extends GraphElement>
   implements MapFunction<GE, GradoopIdSet> {
 
   @Override

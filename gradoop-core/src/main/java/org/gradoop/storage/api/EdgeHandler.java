@@ -19,24 +19,17 @@ package org.gradoop.storage.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.io.IOException;
 
 /**
  * Responsible for reading and writing edge data from and to HBase.
- *
- * @param <E> EPGM edge type
- * @param <V> EPGM vertex type
  */
-public interface EdgeHandler<
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends
-  GraphElementHandler {
+public interface EdgeHandler extends GraphElementHandler {
 
   /**
    * Adds the source vertex data to the given {@link Put} and returns it.
@@ -45,7 +38,7 @@ public interface EdgeHandler<
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeSource(final Put put, final V vertexData) throws IOException;
+  Put writeSource(final Put put, final Vertex vertexData) throws IOException;
 
   /**
    * Reads the source vertex identifier from the given {@link Result}.
@@ -62,7 +55,7 @@ public interface EdgeHandler<
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeTarget(final Put put, final V vertexData) throws IOException;
+  Put writeTarget(final Put put, final Vertex vertexData) throws IOException;
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -79,7 +72,7 @@ public interface EdgeHandler<
    * @param edgeData edge data to be written
    * @return put with edge data
    */
-  Put writeEdge(final Put put, final PersistentEdge<V> edgeData) throws
+  Put writeEdge(final Put put, final PersistentEdge edgeData) throws
     IOException;
 
   /**
@@ -88,12 +81,12 @@ public interface EdgeHandler<
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  E readEdge(final Result res);
+  Edge readEdge(final Result res);
 
   /**
    * Returns the edge data factory used by this handler.
    *
    * @return edge data factory
    */
-  EPGMEdgeFactory<E> getEdgeFactory();
+  EdgeFactory getEdgeFactory();
 }

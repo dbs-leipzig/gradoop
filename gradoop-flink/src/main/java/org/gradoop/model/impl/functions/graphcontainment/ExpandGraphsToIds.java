@@ -20,7 +20,7 @@ package org.gradoop.model.impl.functions.graphcontainment;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -32,7 +32,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <GE> EPGM graph element (i.e. vertex / edge)
  */
 @FunctionAnnotation.ReadFields("graphIds")
-public class ExpandGraphsToIds<GE extends EPGMGraphElement>
+public class ExpandGraphsToIds<GE extends GraphElement>
   implements FlatMapFunction<GE, GradoopId> {
 
   @Override

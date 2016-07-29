@@ -19,12 +19,11 @@ package org.gradoop.model.impl.algorithms.btgs;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -58,7 +57,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
  * @param <E> edge type
  */
 public class BusinessTransactionGraphs
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements UnaryGraphToCollectionOperator<G, V, E> {
 
   /**
@@ -94,7 +93,7 @@ public class BusinessTransactionGraphs
     DataSet<V> transVertices = transGraph
       .getVertices();
 
-    DataSet<Edge<GradoopId, NullValue>> transEdges = transGraph
+    DataSet<org.apache.flink.graph.Edge> transEdges = transGraph
       .getEdges()
       .map(new ToGellyEdgeWithNullValue<E>());
 

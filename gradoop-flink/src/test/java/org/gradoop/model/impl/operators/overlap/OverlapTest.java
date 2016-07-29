@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -120,22 +120,22 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
 
     getExecutionEnvironment().execute();
 
-    Set<EPGMGraphElement> inVertices = new HashSet<>();
+    Set<GraphElement> inVertices = new HashSet<>();
     for(VertexPojo vertex : vertices0) {
       if (vertices2.contains(vertex)) {
         inVertices.add(vertex);
       }
     }
-    Set<EPGMGraphElement> inEdges = new HashSet<>();
+    Set<GraphElement> inEdges = new HashSet<>();
     for(EdgePojo edge : edges0) {
       if (edges2.contains(edge)) {
         inVertices.add(edge);
       }
     }
 
-    Set<EPGMGraphElement> outVertices = new HashSet<>();
+    Set<GraphElement> outVertices = new HashSet<>();
     inVertices.addAll(outVertices);
-    Set<EPGMGraphElement> outEdges = new HashSet<>();
+    Set<GraphElement> outEdges = new HashSet<>();
     inEdges.addAll(resEdges);
 
     checkElementMatches(inVertices, outVertices);

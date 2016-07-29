@@ -19,9 +19,6 @@ package org.gradoop.model.api.functions;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyValue;
@@ -30,13 +27,9 @@ import org.gradoop.model.impl.properties.PropertyValue;
  * Describes an aggregate function that can be applied on a collection of graphs
  * and computes an aggregate value for each graph contained in the collection.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  * @see ApplyAggregateFunction
  */
-public interface ApplyAggregateFunction
-  <G extends EPGMGraphHead,  V extends EPGMVertex, E extends EPGMEdge> {
+public interface ApplyAggregateFunction {
 
   /**
    * Defines the aggregate function. The input is a graph collection, the output
@@ -46,8 +39,7 @@ public interface ApplyAggregateFunction
    * @param collection input graph collection
    * @return data set containing graph id + aggregate tuples
    */
-  DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection<G, V, E> collection);
+  DataSet<Tuple2<GradoopId, PropertyValue>> execute(GraphCollection collection);
 
   /**
    * Return the default value that will be used when a graph has no vertices

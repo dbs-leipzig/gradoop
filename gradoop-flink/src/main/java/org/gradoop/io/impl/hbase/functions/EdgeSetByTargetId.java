@@ -17,7 +17,7 @@
 
 package org.gradoop.io.impl.hbase.functions;
 
-import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.epgm.Edge;
 
 /**
  * Takes grouped edges as input and outputs a tuple containing target vertex id
@@ -27,7 +27,7 @@ import org.gradoop.model.api.EPGMEdge;
  *
  * @param <E> EPGM edge type
  */
-public class EdgeSetByTargetId<E extends EPGMEdge>
+public class EdgeSetByTargetId<E extends Edge>
   extends EdgeSet<E> {
 
   /**

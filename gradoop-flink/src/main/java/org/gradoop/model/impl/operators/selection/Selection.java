@@ -19,9 +19,9 @@ package org.gradoop.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <E> EPGM edge type
  */
 public class Selection
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements UnaryCollectionToCollectionOperator<G, V, E> {
 
   /**

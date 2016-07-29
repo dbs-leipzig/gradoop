@@ -18,13 +18,13 @@
 package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.model.api.EPGMLabeled;
+import org.gradoop.model.api.epgm.Labeled;
 
 /**
  * concatenates the labels of labeled things
  * @param <L> labeled type
  */
-public class LabelCombiner<L extends EPGMLabeled> implements
+public class LabelCombiner<L extends Labeled> implements
   JoinFunction<L, L, L> {
 
   @Override

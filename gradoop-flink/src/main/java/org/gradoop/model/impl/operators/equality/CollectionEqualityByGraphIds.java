@@ -18,9 +18,7 @@ package org.gradoop.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.Not;
@@ -32,27 +30,23 @@ import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Operator to determine if two collections contain the same graphs by id.
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
 public class CollectionEqualityByGraphIds
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements BinaryCollectionToValueOperator<G, V, E, Boolean> {
+  implements BinaryCollectionToValueOperator<Boolean> {
 
   @Override
-  public DataSet<Boolean> execute(GraphCollection<G, V, E> firstCollection,
-    GraphCollection<G, V, E> secondCollection) {
+  public DataSet<Boolean> execute(GraphCollection firstCollection,
+    GraphCollection secondCollection) {
 
     DataSet<Tuple1<GradoopId>> distinctFirstGraphIds = firstCollection
       .getGraphHeads()
-      .map(new Id<G>())
+      .map(new Id<GraphHead>())
       .distinct()
       .map(new ValueInTuple1<GradoopId>());
 
     DataSet<Tuple1<GradoopId>> distinctSecondGraphIds = secondCollection
       .getGraphHeads()
-      .map(new Id<G>())
+      .map(new Id<GraphHead>())
       .distinct()
       .map(new ValueInTuple1<GradoopId>());
 

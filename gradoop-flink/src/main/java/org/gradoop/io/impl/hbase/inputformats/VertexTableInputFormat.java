@@ -21,8 +21,8 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
 
@@ -33,7 +33,7 @@ import org.gradoop.util.GConstants;
  * @param <E> EPGM edge type
  */
 public class VertexTableInputFormat
-  <V extends EPGMVertex, E extends EPGMEdge>
+  <V extends Vertex, E extends Edge>
   extends TableInputFormat<Tuple1<V>> {
 
   /**

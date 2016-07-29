@@ -19,10 +19,9 @@ package org.gradoop.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
 import org.gradoop.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.s1ck.gdl.model.Vertex;
 
 import java.util.Collection;
 
@@ -38,7 +37,7 @@ import java.util.Collection;
  * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
-public class BuildIdWithCandidates<V extends EPGMVertex>
+public class BuildIdWithCandidates<V extends Vertex>
   extends AbstractBuilder<V, IdWithCandidates> {
   /**
    * serial version uid
@@ -47,7 +46,7 @@ public class BuildIdWithCandidates<V extends EPGMVertex>
   /**
    * Query vertices to match against.
    */
-  private transient Collection<Vertex> queryVertices;
+  private transient Collection<org.s1ck.gdl.model.Vertex> queryVertices;
   /**
    * Number of vertices in the query graph
    */

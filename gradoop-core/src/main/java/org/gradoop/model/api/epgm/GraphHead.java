@@ -15,25 +15,11 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
-
-import org.gradoop.model.impl.id.GradoopId;
+package org.gradoop.model.api.epgm;
 
 /**
- * Describes an identifiable entity.
+ * Describes data specifically assigned to a logical graph in the EPGM.
  */
-public interface EPGMIdentifiable {
-  /**
-   * Returns the identifier of that entity.
-   *
-   * @return identifier
-   */
-  GradoopId getId();
+public interface GraphHead extends Element {
 
-  /**
-   * Sets the identifier of that entity.
-   *
-   * @param id identifier
-   */
-  void setId(GradoopId id);
 }

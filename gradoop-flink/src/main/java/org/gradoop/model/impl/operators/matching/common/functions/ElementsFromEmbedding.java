@@ -21,13 +21,13 @@ import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
+import org.gradoop.model.api.epgm.Element;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.matching.common.query.Step;
 import org.gradoop.model.impl.operators.matching.common.query.TraversalCode;
@@ -37,15 +37,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Extracts {@link EPGMElement} instances from an {@link Embedding}.
+ * Extracts {@link Element} instances from an {@link Embedding}.
  *
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
 public class ElementsFromEmbedding
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements FlatMapFunction<Tuple1<Embedding>, EPGMElement> {
+  <G extends GraphHead, V extends Vertex, E extends Edge>
+  implements FlatMapFunction<Tuple1<Embedding>, Element> {
 
   /**
    * Maps edge candidates to the step in which they are traversed
@@ -54,15 +54,15 @@ public class ElementsFromEmbedding
   /**
    * Constructs EPGM graph heads
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
   /**
    * Constructs EPGM vertices
    */
-  private final EPGMVertexFactory<V> vertexFactory;
+  private final VertexFactory<V> vertexFactory;
   /**
    * Constructs EPGM edges
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Constructor
@@ -73,9 +73,9 @@ public class ElementsFromEmbedding
    * @param edgeFactory       EPGM edge factory
    */
   public ElementsFromEmbedding(TraversalCode traversalCode,
-    EPGMGraphHeadFactory<G> graphHeadFactory,
-    EPGMVertexFactory<V> vertexFactory,
-    EPGMEdgeFactory<E> edgeFactory) {
+    GraphHeadFactory<G> graphHeadFactory,
+    VertexFactory<V> vertexFactory,
+    EdgeFactory<E> edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
@@ -88,7 +88,7 @@ public class ElementsFromEmbedding
   }
 
   @Override
-  public void flatMap(Tuple1<Embedding> embedding, Collector<EPGMElement> out)
+  public void flatMap(Tuple1<Embedding> embedding, Collector<Element> out)
       throws Exception {
     GradoopId[] vertexEmbeddings  = embedding.f0.getVertexMappings();
     GradoopId[] edgeEmbeddings    = embedding.f0.getEdgeMappings();

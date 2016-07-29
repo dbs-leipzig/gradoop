@@ -20,9 +20,9 @@ package org.gradoop.model.api.operators;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.gradoop.io.api.DataSink;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.GraphCollection;
@@ -32,15 +32,10 @@ import java.io.IOException;
 /**
  * Operators that are available at all graph structures.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
- *
  * @see LogicalGraph
  * @see GraphCollection
  */
-public interface GraphBaseOperators
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+public interface GraphBaseOperators {
 
   //----------------------------------------------------------------------------
   // Containment methods
@@ -51,14 +46,14 @@ public interface GraphBaseOperators
    *
    * @return vertices
    */
-  DataSet<V> getVertices();
+  DataSet<Vertex> getVertices();
 
   /**
    * Returns all edge data associated with that logical graph.
    *
    * @return edges
    */
-  DataSet<E> getEdges();
+  DataSet<Edge> getEdges();
 
   /**
    * Returns the edge data associated with the outgoing edges of the given
@@ -68,7 +63,7 @@ public interface GraphBaseOperators
    * @return outgoing edge data of given vertex
    */
   @Deprecated
-  DataSet<E> getOutgoingEdges(final GradoopId vertexID);
+  DataSet<Edge> getOutgoingEdges(final GradoopId vertexID);
 
   /**
    * Returns the edge data associated with the incoming edges of the given
@@ -78,14 +73,14 @@ public interface GraphBaseOperators
    * @return incoming edge data of given vertex
    */
   @Deprecated
-  DataSet<E> getIncomingEdges(final GradoopId vertexID);
+  DataSet<Edge> getIncomingEdges(final GradoopId vertexID);
 
   /**
    * Transforms the EPGM graph to a Gelly Graph.
    *
    * @return Gelly Graph
    */
-  Graph<GradoopId, V, E> toGellyGraph();
+  Graph<GradoopId, Vertex, Edge> toGellyGraph();
 
   //----------------------------------------------------------------------------
   // Utility methods
@@ -107,5 +102,5 @@ public interface GraphBaseOperators
    *
    * @param dataSink data sing
    */
-  void writeTo(DataSink<G, V, E> dataSink) throws IOException;
+  void writeTo(DataSink dataSink) throws IOException;
 }

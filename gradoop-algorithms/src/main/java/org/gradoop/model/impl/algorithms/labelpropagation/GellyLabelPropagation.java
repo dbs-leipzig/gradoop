@@ -19,11 +19,10 @@ package org.gradoop.model.impl.algorithms.labelpropagation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyValue;
 
@@ -35,7 +34,7 @@ import org.gradoop.model.impl.properties.PropertyValue;
  * @param <E> EPGM edge type
  */
 public class GellyLabelPropagation
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   extends LabelPropagation<G, V, E> {
 
   /**
@@ -49,7 +48,7 @@ public class GellyLabelPropagation
   }
 
   @Override
-  protected DataSet<Vertex<GradoopId, PropertyValue>> executeInternal(
+  protected DataSet<org.apache.flink.graph.Vertex> executeInternal(
     Graph<GradoopId, PropertyValue, NullValue> gellyGraph) {
     return new org.apache.flink.graph.library.LabelPropagation
       <GradoopId, PropertyValue, NullValue>(getMaxIterations()).run(gellyGraph);

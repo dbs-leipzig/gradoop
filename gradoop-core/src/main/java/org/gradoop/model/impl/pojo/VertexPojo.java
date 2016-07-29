@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.pojo;
 
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -25,7 +25,7 @@ import org.gradoop.model.impl.properties.PropertyList;
 /**
  * POJO Implementation of an EPGM vertex.
  */
-public class VertexPojo extends GraphElementPojo implements EPGMVertex {
+public class VertexPojo extends GraphElementPojo implements Vertex {
 
   /**
    * Default constructor.

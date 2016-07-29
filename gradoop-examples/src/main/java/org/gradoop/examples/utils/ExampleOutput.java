@@ -21,9 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
  * @param <E> edge type
  */
 public class ExampleOutput
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+  <G extends GraphHead, V extends Vertex, E extends Edge> {
 
   /**
    * Flink dataset, collecting the output lines

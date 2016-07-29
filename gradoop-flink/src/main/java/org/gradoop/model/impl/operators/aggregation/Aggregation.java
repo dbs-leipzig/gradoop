@@ -18,9 +18,7 @@
 package org.gradoop.model.impl.operators.aggregation;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
@@ -34,17 +32,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  * @param <N> output type of aggregate function
  */
-public class Aggregation<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
-  N extends Number>
-  implements UnaryGraphToGraphOperator<G, V, E> {
+public class Aggregation<N extends Number>
+  implements UnaryGraphToGraphOperator {
 
   /**
    * Used to store aggregate result.
@@ -54,7 +45,7 @@ public class Aggregation<
   /**
    * User-defined aggregate function which is applied on a single logical graph.
    */
-  private final AggregateFunction<G, V, E> aggregationFunction;
+  private final AggregateFunction aggregationFunction;
 
   /**
    * Creates new aggregation.
@@ -65,7 +56,7 @@ public class Aggregation<
    *                             called on the input graph
    */
   public Aggregation(final String aggregatePropertyKey,
-    final AggregateFunction<G, V, E> aggregationFunction) {
+    final AggregateFunction aggregationFunction) {
     this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
     this.aggregationFunction = checkNotNull(aggregationFunction);
   }
@@ -74,12 +65,12 @@ public class Aggregation<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+  public LogicalGraph execute(LogicalGraph graph) {
 
     DataSet<PropertyValue> aggregateValue = aggregationFunction.execute(graph);
 
-    DataSet<G> graphHead = graph.getGraphHead()
-      .map(new PropertySetterBroadcast<G>(aggregatePropertyKey))
+    DataSet<GraphHead> graphHead = graph.getGraphHead()
+      .map(new PropertySetterBroadcast<GraphHead>(aggregatePropertyKey))
       .withBroadcastSet(aggregateValue, PropertySetterBroadcast.VALUE);
 
     return LogicalGraph.fromDataSets(

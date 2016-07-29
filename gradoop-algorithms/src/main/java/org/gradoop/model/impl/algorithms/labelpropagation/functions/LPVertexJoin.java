@@ -19,10 +19,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.model.api.epgm.Vertex;
 
 /**
  * Updates the vertex on the left side with the property value on the right side
@@ -31,8 +28,8 @@ import org.gradoop.model.impl.properties.PropertyValue;
  */
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
 @FunctionAnnotation.ReadFieldsFirst("f1")
-public class LPVertexJoin<V extends EPGMVertex>
-  implements JoinFunction<Vertex<GradoopId, PropertyValue>, V, V> {
+public class LPVertexJoin<V extends Vertex>
+  implements JoinFunction<org.apache.flink.graph.Vertex, V, V> {
 
   /**
    * Property key to access the value which will be propagated
@@ -49,7 +46,7 @@ public class LPVertexJoin<V extends EPGMVertex>
   }
 
   @Override
-  public V join(Vertex<GradoopId, PropertyValue> gellyVertex, V epgmVertex)
+  public V join(org.apache.flink.graph.Vertex gellyVertex, V epgmVertex)
       throws Exception {
     epgmVertex.setProperty(propertyKey, gellyVertex.getValue());
     return epgmVertex;

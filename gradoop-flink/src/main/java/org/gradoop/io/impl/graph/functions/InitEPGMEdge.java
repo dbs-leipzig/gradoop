@@ -25,8 +25,8 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -42,7 +42,7 @@ import org.gradoop.model.impl.id.GradoopId;
 @FunctionAnnotation.ForwardedFieldsSecond(
   "f1->f1.sourceId"     // EPGM source vertex id
 )
-public class InitEPGMEdge<E extends EPGMEdge, K extends Comparable<K>>
+public class InitEPGMEdge<E extends Edge, K extends Comparable<K>>
   extends InitEPGMElement<E, K>
   implements JoinFunction<ImportEdge<K>, Tuple2<K, GradoopId>, Tuple2<K, E>>,
   ResultTypeQueryable<Tuple2<K, E>> {
@@ -50,7 +50,7 @@ public class InitEPGMEdge<E extends EPGMEdge, K extends Comparable<K>>
   /**
    * Used to create new EPGM edge.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Reduce object instantiation.
@@ -65,7 +65,7 @@ public class InitEPGMEdge<E extends EPGMEdge, K extends Comparable<K>>
    *                            (can be {@code null})
    * @param keyTypeInfo         type info for the import edge identifier
    */
-  public InitEPGMEdge(EPGMEdgeFactory<E> edgeFactory, String lineagePropertyKey,
+  public InitEPGMEdge(EdgeFactory<E> edgeFactory, String lineagePropertyKey,
     TypeInformation<K> keyTypeInfo) {
     super(lineagePropertyKey, keyTypeInfo);
     this.edgeFactory        = edgeFactory;

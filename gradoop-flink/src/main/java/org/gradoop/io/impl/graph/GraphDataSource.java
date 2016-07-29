@@ -28,9 +28,9 @@ import org.gradoop.io.impl.graph.functions.InitEPGMEdge;
 import org.gradoop.io.impl.graph.functions.UpdateEPGMEdge;
 import org.gradoop.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -55,7 +55,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <K> External vertex/edge identifier type
  */
 public class GraphDataSource
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge,
+  <G extends GraphHead, V extends Vertex, E extends Edge,
     K extends Comparable<K>>
   implements DataSource<G, V, E> {
 

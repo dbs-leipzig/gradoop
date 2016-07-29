@@ -17,7 +17,7 @@
 package org.gradoop.model.impl.operators.tostring.functions;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.epgm.Element;
 import org.gradoop.model.impl.properties.Property;
 import org.gradoop.model.impl.properties.PropertyList;
 
@@ -30,7 +30,7 @@ import java.util.List;
  * such including label and properties
  * @param <EL> EPGM element type
  */
-public abstract class EPGMElementToDataString<EL extends EPGMElement> {
+public abstract class EPGMElementToDataString<EL extends Element> {
 
   /**
    * generalization of label and properties string concatenation

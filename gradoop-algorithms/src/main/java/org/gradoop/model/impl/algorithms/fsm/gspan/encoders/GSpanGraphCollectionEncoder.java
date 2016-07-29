@@ -18,9 +18,9 @@
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
@@ -56,7 +56,7 @@ import java.util.Map;
  * @param <E> EPGM edge type
  */
 public class GSpanGraphCollectionEncoder
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements GSpanEncoder<GraphCollection<G, V, E>> {
 
   /**

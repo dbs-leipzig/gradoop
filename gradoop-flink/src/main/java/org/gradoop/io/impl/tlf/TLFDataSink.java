@@ -26,9 +26,9 @@ import org.gradoop.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.io.impl.tlf.constants.BroadcastNames;
 import org.gradoop.io.impl.tlf.functions.VertexLabelList;
 import org.gradoop.io.impl.tlf.functions.TLFDictionaryMapGroupReducer;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -47,7 +47,7 @@ import java.util.Map;
  * @param <E> EPGM edge type
  */
 public class TLFDataSink
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   extends TLFBase<G, V, E>
   implements DataSink<G, V, E> {
 

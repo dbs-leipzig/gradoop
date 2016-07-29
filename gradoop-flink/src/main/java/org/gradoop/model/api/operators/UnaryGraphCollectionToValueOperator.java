@@ -18,26 +18,19 @@
 package org.gradoop.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 
 /**
  * Creates a value from one input collection.
  *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
- * @param <G> EPGM graph head type
  * @param <T> result type
  */
-public interface UnaryGraphCollectionToValueOperator
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge, T> {
+public interface UnaryGraphCollectionToValueOperator<T> {
   /**
    * Executes the operator.
    *
    * @param collection input collection
    * @return operator result
    */
-  DataSet<T> execute(GraphCollection<G, V, E> collection);
+  DataSet<T> execute(GraphCollection collection);
 }

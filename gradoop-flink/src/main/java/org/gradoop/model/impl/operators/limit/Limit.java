@@ -18,9 +18,9 @@
 package org.gradoop.model.impl.operators.limit;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.Id;
@@ -33,14 +33,8 @@ import org.gradoop.model.impl.id.GradoopId;
  *
  * Note that this operator uses broadcasting to distribute the relevant graph
  * identifiers.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Limit
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryCollectionToCollectionOperator<G, V, E> {
+public class Limit implements UnaryCollectionToCollectionOperator {
 
   /**
    * Number of graphs that are retrieved from the collection.
@@ -57,18 +51,18 @@ public class Limit
   }
 
   @Override
-  public GraphCollection<G, V, E> execute(GraphCollection<G, V, E> collection) {
+  public GraphCollection execute(GraphCollection collection) {
 
-    DataSet<G> graphHeads = collection.getGraphHeads().first(limit);
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads().first(limit);
 
-    DataSet<GradoopId> firstIds = graphHeads.map(new Id<G>());
+    DataSet<GradoopId> firstIds = graphHeads.map(new Id<GraphHead>());
 
-    DataSet<V> filteredVertices = collection.getVertices()
-      .filter(new InAllGraphsBroadcast<V>())
+    DataSet<Vertex> filteredVertices = collection.getVertices()
+      .filter(new InAllGraphsBroadcast<Vertex>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<E> filteredEdges = collection.getEdges()
-      .filter(new InAllGraphsBroadcast<E>())
+    DataSet<Edge> filteredEdges = collection.getEdges()
+      .filter(new InAllGraphsBroadcast<Edge>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return GraphCollection.fromDataSets(graphHeads,

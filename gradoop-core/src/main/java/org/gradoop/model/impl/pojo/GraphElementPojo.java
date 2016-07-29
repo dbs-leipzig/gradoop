@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.pojo;
 
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -28,7 +28,7 @@ import org.gradoop.model.impl.properties.PropertyList;
  */
 public abstract class GraphElementPojo
   extends ElementPojo
-  implements EPGMGraphElement {
+  implements GraphElement {
 
   /**
    * Set of graph identifiers that element is contained in

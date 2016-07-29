@@ -21,7 +21,7 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.epgm.Element;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.Property;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -59,7 +59,7 @@ public interface ElementHandler extends Serializable {
    * @param entity entity to use the label from
    * @return put with label
    */
-  Put writeLabel(final Put put, final EPGMElement entity);
+  Put writeLabel(final Put put, final Element entity);
 
   /**
    * Adds the given property to the {@link Put} and returns it.
@@ -79,7 +79,7 @@ public interface ElementHandler extends Serializable {
    * @param entity entity to use properties from
    * @return put with properties
    */
-  Put writeProperties(final Put put, final EPGMElement entity) throws
+  Put writeProperties(final Put put, final Element entity) throws
     IOException;
 
   /**

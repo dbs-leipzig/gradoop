@@ -24,9 +24,9 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import org.gradoop.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.io.impl.tlf.tuples.TLFVertex;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
@@ -47,7 +47,7 @@ import java.util.Map;
  * @param <E> EPGM edge type
  */
 public class TLFFileFormat
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements TextOutputFormat.TextFormatter<GraphTransaction<G, V, E>> {
 
   /**

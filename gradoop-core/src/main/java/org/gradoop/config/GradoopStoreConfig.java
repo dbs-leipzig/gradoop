@@ -17,16 +17,10 @@
 
 package org.gradoop.config;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
-import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentEdgeFactory;
-import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentGraphHeadFactory;
-import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.PersistentVertexFactory;
 import org.gradoop.storage.api.VertexHandler;
 
@@ -34,35 +28,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Basic configuration for Gradoop Stores
- *
- * @param <G>   EPGM graph head type
- * @param <V>   EPGM vertex type
- * @param <E>   EPGM edge type
- * @param <PG>  persistent graph head type
- * @param <PV>  persistent vertex type
- * @param <PE>  persistent edge type
  */
-public abstract class GradoopStoreConfig<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
-  PG extends PersistentGraphHead,
-  PV extends PersistentVertex<E>,
-  PE extends PersistentEdge<V>>
-  extends GradoopConfig<G, V, E> {
+public abstract class GradoopStoreConfig extends GradoopConfig {
 
   /**
    * Graph head handler.
    */
-  private final PersistentGraphHeadFactory<G, PG> persistentGraphHeadFactory;
+  private final PersistentGraphHeadFactory persistentGraphHeadFactory;
   /**
    * Vertex handler.
    */
-  private final PersistentVertexFactory<V, E, PV> persistentVertexFactory;
+  private final PersistentVertexFactory persistentVertexFactory;
   /**
    * Edge handler.
    */
-  private final PersistentEdgeFactory<V, E, PE> persistentEdgeFactory;
+  private final PersistentEdgeFactory persistentEdgeFactory;
 
   /**
    * Creates a new Configuration.
@@ -75,12 +55,12 @@ public abstract class GradoopStoreConfig<
    * @param persistentEdgeFactory       persistent edge factory
    */
   protected GradoopStoreConfig(
-    GraphHeadHandler<G> graphHeadHandler,
-    VertexHandler<V, E> vertexHandler,
-    EdgeHandler<V, E> edgeHandler,
-    PersistentGraphHeadFactory<G, PG> persistentGraphHeadFactory,
-    PersistentVertexFactory<V, E, PV> persistentVertexFactory,
-    PersistentEdgeFactory<V, E, PE> persistentEdgeFactory) {
+    GraphHeadHandler graphHeadHandler,
+    VertexHandler vertexHandler,
+    EdgeHandler edgeHandler,
+    PersistentGraphHeadFactory persistentGraphHeadFactory,
+    PersistentVertexFactory persistentVertexFactory,
+    PersistentEdgeFactory persistentEdgeFactory) {
     super(graphHeadHandler, vertexHandler, edgeHandler);
 
     this.persistentGraphHeadFactory =
@@ -94,15 +74,15 @@ public abstract class GradoopStoreConfig<
         "PersistentEdgeFactory was null");
   }
 
-  public PersistentGraphHeadFactory<G, PG> getPersistentGraphHeadFactory() {
+  public PersistentGraphHeadFactory getPersistentGraphHeadFactory() {
     return persistentGraphHeadFactory;
   }
 
-  public PersistentVertexFactory<V, E, PV> getPersistentVertexFactory() {
+  public PersistentVertexFactory getPersistentVertexFactory() {
     return persistentVertexFactory;
   }
 
-  public PersistentEdgeFactory<V, E, PE> getPersistentEdgeFactory() {
+  public PersistentEdgeFactory getPersistentEdgeFactory() {
     return persistentEdgeFactory;
   }
 }

@@ -17,7 +17,7 @@
 
 package org.gradoop.storage.api;
 
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
@@ -25,7 +25,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
  * Representation of vertex data on the storage level. We additionally store
  * vertices and edges contained in the graph for faster graph retrieval.
  */
-public interface PersistentGraphHead extends EPGMGraphHead {
+public interface PersistentGraphHead extends GraphHead {
   /**
    * Returns all vertex identifiers that are contained in that graph.
    *

@@ -21,13 +21,11 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.io.api.DataSink;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
@@ -72,15 +70,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a logical graph inside the EPGM.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class LogicalGraph
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends GraphBase<G, V, E>
-  implements LogicalGraphOperators<G, V, E> {
+public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
 
   /**
    * Creates a new logical graph based on the given parameters.
@@ -91,9 +82,8 @@ public class LogicalGraph
    * @param config    Gradoop Flink configuration
    */
   private LogicalGraph(
-    DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges,
-    GradoopFlinkConfig<G, V, E> config) {
-
+    DataSet<GraphHead> graphHead, DataSet<Vertex> vertices, DataSet<Edge> edges,
+    GradoopFlinkConfig config) {
     super(graphHead, vertices, edges, config);
   }
 
@@ -107,31 +97,13 @@ public class LogicalGraph
    *
    * @param graph     Flink Gelly graph
    * @param config    Gradoop Flink configuration
-   * @param <G>       EPGM graph head type
-   * @param <V>       EPGM vertex type
-   * @param <E>       EPGM edge type
    * @return Logical Graph
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> LogicalGraph<G, V, E> fromGellyGraph(
-    Graph<GradoopId, V, E> graph,
-    GradoopFlinkConfig<G, V, E> config) {
+  public static LogicalGraph fromGellyGraph(
+    Graph<GradoopId, Vertex, Edge> graph, GradoopFlinkConfig config) {
 
-    return fromDataSets(
-      graph.getVertices().map(new MapFunction<Vertex<GradoopId, V>, V>() {
-        @Override
-        public V map(Vertex<GradoopId, V> gellyVertex) throws Exception {
-          return gellyVertex.getValue();
-        }
-      }).withForwardedFields("f1->*"),
-      graph.getEdges().map(new MapFunction<Edge<GradoopId, E>, E>() {
-        @Override
-        public E map(Edge<GradoopId, E> gellyEdge) throws Exception {
-          return gellyEdge.getValue();
-        }
-      }).withForwardedFields("f2->*"), config);
+    return fromGellyGraph(graph, config.getGraphHeadFactory().createGraphHead(),
+      config);
   }
 
   /**
@@ -141,32 +113,30 @@ public class LogicalGraph
    * @param graph     Flink Gelly graph
    * @param graphHead EPGM graph head for the logical graph
    * @param config    Gradoop Flink configuration
-   * @param <G>       EPGM graph head type
-   * @param <V>       EPGM vertex type
-   * @param <E>       EPGM edge type
    * @return Logical Graph
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> LogicalGraph<G, V, E> fromGellyGraph(
-    Graph<GradoopId, V, E> graph,
-    G graphHead,
-    GradoopFlinkConfig<G, V, E> config) {
+  public static LogicalGraph fromGellyGraph(
+    Graph<GradoopId, Vertex, Edge> graph, GraphHead graphHead,
+    GradoopFlinkConfig config) {
+
     return fromDataSets(
       config.getExecutionEnvironment().fromElements(graphHead),
-      graph.getVertices().map(new MapFunction<Vertex<GradoopId, V>, V>() {
-        @Override
-        public V map(Vertex<GradoopId, V> gellyVertex) throws Exception {
-          return gellyVertex.getValue();
-        }
-      }).withForwardedFields("f1->*"),
-      graph.getEdges().map(new MapFunction<Edge<GradoopId, E>, E>() {
-        @Override
-        public E map(Edge<GradoopId, E> gellyEdge) throws Exception {
-          return gellyEdge.getValue();
-        }
-      }).withForwardedFields("f2->*"), config);
+      graph.getVertices()
+        .map(new MapFunction<org.apache.flink.graph.Vertex<GradoopId, Vertex>, Vertex>() {
+          @Override
+          public Vertex map(org.apache.flink.graph.Vertex<GradoopId, Vertex> v)
+            throws Exception {
+            return v.getValue();
+          }
+        }).withForwardedFields("f1->*"),
+      graph.getEdges()
+        .map(new MapFunction<org.apache.flink.graph.Edge<GradoopId, Edge>, Edge>() {
+          @Override
+          public Edge map(org.apache.flink.graph.Edge<GradoopId, Edge> e)
+            throws Exception {
+            return e.getValue();
+          }
+        }).withForwardedFields("f2->*"), config);
   }
 
   /**
@@ -174,18 +144,13 @@ public class LogicalGraph
    *
    * @param vertices  Vertex dataset
    * @param config    Gradoop Flink configuration
-   * @param <G>       EPGM graph head graph head type
-   * @param <V>       EPGM vertex type
-   * @param <E>       EPGM edge type
    * @return Logical graph
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> LogicalGraph<G, V, E> fromDataSets(
-    DataSet<V> vertices, GradoopFlinkConfig<G, V, E> config) {
+  public static LogicalGraph fromDataSets(DataSet<Vertex> vertices, 
+    GradoopFlinkConfig config) {
     return fromDataSets(vertices,
-      createEdgeDataSet(Lists.<E>newArrayListWithCapacity(0), config), config);
+      createEdgeDataSet(Lists.<Edge>newArrayListWithCapacity(0), config), 
+      config);
   }
 
   /**
@@ -198,18 +163,11 @@ public class LogicalGraph
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
-   * @param <G>         EPGM graph head graph head type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
    * @return Logical graph
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> LogicalGraph<G, V, E> fromDataSets(
-    DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges,
-    GradoopFlinkConfig<G, V, E> config) {
-    return new LogicalGraph<>(graphHead, vertices, edges, config);
+  public static LogicalGraph fromDataSets(DataSet<GraphHead> graphHead, 
+    DataSet<Vertex> vertices, DataSet<Edge> edges, GradoopFlinkConfig config) {
+    return new LogicalGraph(graphHead, vertices, edges, config);
   }
 
   /**
@@ -221,46 +179,31 @@ public class LogicalGraph
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
-   * @param <G>         EPGM graph head graph head type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
    * @return Logical graph
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> LogicalGraph<G, V, E> fromDataSets(
-    DataSet<V> vertices, DataSet<E> edges,
-    GradoopFlinkConfig<G, V, E> config) {
+  public static LogicalGraph fromDataSets(DataSet<Vertex> vertices, 
+    DataSet<Edge> edges, GradoopFlinkConfig config) {
 
     checkNotNull(vertices, "Vertex DataSet was null");
     checkNotNull(edges, "Edge DataSet was null");
     checkNotNull(config, "Config was null");
-    G graphHead = config
+    GraphHead graphHead = config
       .getGraphHeadFactory()
       .createGraphHead();
 
-    DataSet<G> graphHeadSet = config.getExecutionEnvironment()
+    DataSet<GraphHead> graphHeadSet = config.getExecutionEnvironment()
       .fromElements(graphHead);
 
     // update vertices and edges with new graph head id
-    vertices = vertices.map(new AddToGraph<G, V>(graphHead));
-    edges = edges.map(new AddToGraph<G, E>(graphHead));
+    vertices = vertices.map(new AddToGraph<Vertex>(graphHead));
+    edges = edges.map(new AddToGraph<Edge>(graphHead));
 
-    return new LogicalGraph<>(
-      graphHeadSet,
-      vertices,
-      edges,
-      config
-    );
+    return new LogicalGraph(graphHeadSet, vertices, edges, config);
   }
 
   /**
    * Creates a logical graph from the given arguments.
    *
-   * @param <G>         EPGM graph type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
    * @param graphHead   Graph head associated with the logical graph
    * @param vertices    Vertex collection
    * @param edges       Edge collection
@@ -268,15 +211,11 @@ public class LogicalGraph
    * @return Logical graph
    */
   @SuppressWarnings("unchecked")
-  public static
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
-  LogicalGraph<G, V, E> fromCollections(
-    G graphHead,
-    Collection<V> vertices,
-    Collection<E> edges,
-    GradoopFlinkConfig<G, V, E> config) {
+  public static LogicalGraph fromCollections(GraphHead graphHead, 
+    Collection<Vertex> vertices, Collection<Edge> edges, 
+    GradoopFlinkConfig config) {
 
-    List<G> graphHeads;
+    List<GraphHead> graphHeads;
     if (graphHead == null) {
       graphHeads = Lists.newArrayListWithCapacity(0);
     } else {
@@ -302,38 +241,29 @@ public class LogicalGraph
    * Creates a logical graph from the given arguments. A new graph head is
    * created and all vertices and edges are assigned to that graph.
    *
-   * @param <G>         EPGM graph type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
    * @param vertices    Vertex collection
    * @param edges       Edge collection
    * @param config      Gradoop Flink configuration
    * @return Logical graph
    */
-  public static
-  <V extends EPGMVertex, E extends EPGMEdge, G extends EPGMGraphHead>
-  LogicalGraph<G, V, E> fromCollections(
-    Collection<V> vertices,
-    Collection<E> edges,
-    GradoopFlinkConfig<G, V, E> config) {
+  public static LogicalGraph fromCollections(Collection<Vertex> vertices,
+    Collection<Edge> edges, GradoopFlinkConfig config) {
 
     checkNotNull(vertices, "Vertex collection was null");
     checkNotNull(edges, "Edge collection was null");
     checkNotNull(config, "Config was null");
 
-    G graphHead = config.getGraphHeadFactory().createGraphHead();
+    GraphHead graphHead = config.getGraphHeadFactory().createGraphHead();
 
-    DataSet<V> vertexDataSet = createVertexDataSet(vertices, config)
-      .map(new AddToGraph<G, V>(graphHead));
+    DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices, config)
+      .map(new AddToGraph<Vertex>(graphHead));
 
-    DataSet<E> edgeDataSet = createEdgeDataSet(edges, config)
-      .map(new AddToGraph<G, E>(graphHead));
+    DataSet<Edge> edgeDataSet = createEdgeDataSet(edges, config)
+      .map(new AddToGraph<Edge>(graphHead));
 
     return fromDataSets(
-      createGraphHeadDataSet(new ArrayList<G>(0), config),
-      vertexDataSet,
-      edgeDataSet,
-      config
+      createGraphHeadDataSet(new ArrayList<GraphHead>(0), config),
+      vertexDataSet, edgeDataSet, config
     );
   }
 
@@ -341,18 +271,13 @@ public class LogicalGraph
    * Creates an empty graph collection.
    *
    * @param config  Gradoop Flink configuration
-   * @param <G>     EPGM graph head type
-   * @param <V>     EPGM vertex type
-   * @param <E>     EPGM edge type
    * @return empty graph collection
    */
-  public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  LogicalGraph<G, V, E> createEmptyGraph(GradoopFlinkConfig<G, V, E> config) {
+  public static LogicalGraph createEmptyGraph(GradoopFlinkConfig config) {
     checkNotNull(config, "Config was null");
 
-    Collection<V> vertices = new ArrayList<>(0);
-    Collection<E> edges = new ArrayList<>(0);
+    Collection<Vertex> vertices = new ArrayList<>(0);
+    Collection<Edge> edges = new ArrayList<>(0);
     return fromCollections(null, vertices, edges, config);
   }
 
@@ -363,7 +288,7 @@ public class LogicalGraph
   /**
    * {@inheritDoc}
    */
-  public DataSet<G> getGraphHead() {
+  public DataSet<GraphHead> getGraphHead() {
     return this.graphHeads;
   }
 
@@ -375,7 +300,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> match(String pattern) {
+  public GraphCollection match(String pattern) {
     return match(pattern, true);
   }
 
@@ -383,8 +308,8 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> match(String pattern, boolean attachData) {
-    return callForCollection(new ExplorativeSubgraphIsomorphism<G, V, E>(
+  public GraphCollection match(String pattern, boolean attachData) {
+    return callForCollection(new ExplorativeSubgraphIsomorphism(
       pattern, attachData, new DFSTraverser()));
   }
 
@@ -392,19 +317,19 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> copy() {
+  public LogicalGraph copy() {
     return callForGraph(
-      new Cloning<G, V, E>());
+      new Cloning());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> transform(
-    TransformationFunction<G> graphHeadTransformationFunction,
-    TransformationFunction<V> vertexTransformationFunction,
-    TransformationFunction<E> edgeTransformationFunction) {
+  public LogicalGraph transform(
+    TransformationFunction<GraphHead> graphHeadTransformationFunction,
+    TransformationFunction<Vertex> vertexTransformationFunction,
+    TransformationFunction<Edge> edgeTransformationFunction) {
     return callForGraph(new Transformation<>(
       graphHeadTransformationFunction,
       vertexTransformationFunction,
@@ -412,20 +337,20 @@ public class LogicalGraph
   }
 
   @Override
-  public LogicalGraph<G, V, E> transformGraphHead(
-    TransformationFunction<G> graphHeadTransformationFunction) {
+  public LogicalGraph transformGraphHead(
+    TransformationFunction<GraphHead> graphHeadTransformationFunction) {
     return transform(graphHeadTransformationFunction, null, null);
   }
 
   @Override
-  public LogicalGraph<G, V, E> transformVertices(
-    TransformationFunction<V> vertexTransformationFunction) {
+  public LogicalGraph transformVertices(
+    TransformationFunction<Vertex> vertexTransformationFunction) {
     return transform(null, vertexTransformationFunction, null);
   }
 
   @Override
-  public LogicalGraph<G, V, E> transformEdges(
-    TransformationFunction<E> edgeTransformationFunction) {
+  public LogicalGraph transformEdges(
+    TransformationFunction<Edge> edgeTransformationFunction) {
     return transform(null, null, edgeTransformationFunction);
   }
 
@@ -433,40 +358,40 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> vertexInducedSubgraph(
-    FilterFunction<V> vertexFilterFunction) {
+  public LogicalGraph vertexInducedSubgraph(
+    FilterFunction<Vertex> vertexFilterFunction) {
     checkNotNull(vertexFilterFunction);
-    return callForGraph(new Subgraph<G, V, E>(vertexFilterFunction, null));
+    return callForGraph(new Subgraph(vertexFilterFunction, null));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> edgeInducedSubgraph(
-    FilterFunction<E> edgeFilterFunction) {
+  public LogicalGraph edgeInducedSubgraph(
+    FilterFunction<Edge> edgeFilterFunction) {
     checkNotNull(edgeFilterFunction);
-    return callForGraph(new Subgraph<G, V, E>(null, edgeFilterFunction));
+    return callForGraph(new Subgraph(null, edgeFilterFunction));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> subgraph(FilterFunction<V> vertexFilterFunction,
-    FilterFunction<E> edgeFilterFunction) {
+  public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
+    FilterFunction<Edge> edgeFilterFunction) {
     checkNotNull(vertexFilterFunction);
     checkNotNull(edgeFilterFunction);
     return callForGraph(
-      new Subgraph<G, V, E>(vertexFilterFunction, edgeFilterFunction));
+      new Subgraph(vertexFilterFunction, edgeFilterFunction));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> aggregate(String propertyKey,
-    AggregateFunction<G, V, E> aggregateFunc) {
+  public LogicalGraph aggregate(String propertyKey,
+    AggregateFunction aggregateFunc) {
     return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
   }
 
@@ -474,15 +399,15 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> sampleRandomNodes(Float sampleSize) {
-    return callForGraph(new RandomNodeSampling<G, V, E>(sampleSize));
+  public LogicalGraph sampleRandomNodes(Float sampleSize) {
+    return callForGraph(new RandomNodeSampling(sampleSize));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupBy(List<String> vertexGroupingKeys) {
+  public LogicalGraph groupBy(List<String> vertexGroupingKeys) {
     return groupBy(vertexGroupingKeys, null);
   }
 
@@ -490,9 +415,9 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupBy(List<String> vertexGroupingKeys,
+  public LogicalGraph groupBy(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys) {
-    GroupingBuilder<G, V, E> builder = new GroupingBuilder<>();
+    GroupingBuilder builder = new GroupingBuilder<>();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -514,7 +439,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupByVertexLabel() {
+  public LogicalGraph groupByVertexLabel() {
     return groupByVertexLabel(null, null);
   }
 
@@ -522,7 +447,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupByVertexLabelAndVertexProperties(
+  public LogicalGraph groupByVertexLabelAndVertexProperties(
     List<String> vertexGroupingKeys) {
     return groupByVertexLabel(vertexGroupingKeys, null);
   }
@@ -531,7 +456,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupByVertexLabelAndEdgeProperties(
+  public LogicalGraph groupByVertexLabelAndEdgeProperties(
     List<String> edgeGroupingKeys) {
     return groupByVertexLabel(null, edgeGroupingKeys);
   }
@@ -540,9 +465,9 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupByVertexLabel(
+  public LogicalGraph groupByVertexLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    GroupingBuilder<G, V, E> builder = new GroupingBuilder<>();
+    GroupingBuilder builder = new GroupingBuilder<>();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -563,7 +488,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupByVertexAndEdgeLabel() {
+  public LogicalGraph groupByVertexAndEdgeLabel() {
     return groupByVertexAndEdgeLabel(null, null);
   }
 
@@ -571,7 +496,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupByVertexAndEdgeLabelAndVertexProperties(
+  public LogicalGraph groupByVertexAndEdgeLabelAndVertexProperties(
     List<String> vertexGroupingKeys) {
     return groupByVertexAndEdgeLabel(vertexGroupingKeys, null);
   }
@@ -580,7 +505,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupByVertexAndEdgeLabelAndEdgeProperties(
+  public LogicalGraph groupByVertexAndEdgeLabelAndEdgeProperties(
     List<String> edgeGroupingKeys) {
     return groupByVertexAndEdgeLabel(null, edgeGroupingKeys);
   }
@@ -589,9 +514,9 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> groupByVertexAndEdgeLabel(
+  public LogicalGraph groupByVertexAndEdgeLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    GroupingBuilder<G, V, E> builder = new GroupingBuilder<>();
+    GroupingBuilder builder = new GroupingBuilder<>();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -616,57 +541,57 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> combine(LogicalGraph<G, V, E> otherGraph) {
-    return callForGraph(new Combination<G, V, E>(), otherGraph);
+  public LogicalGraph combine(LogicalGraph otherGraph) {
+    return callForGraph(new Combination(), otherGraph);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> overlap(LogicalGraph<G, V, E> otherGraph) {
-    return callForGraph(new Overlap<G, V, E>(), otherGraph);
+  public LogicalGraph overlap(LogicalGraph otherGraph) {
+    return callForGraph(new Overlap(), otherGraph);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> exclude(LogicalGraph<G, V, E> otherGraph) {
-    return callForGraph(new Exclusion<G, V, E>(), otherGraph);
+  public LogicalGraph exclude(LogicalGraph otherGraph) {
+    return callForGraph(new Exclusion(), otherGraph);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Boolean> equalsByElementIds(LogicalGraph<G, V, E> other) {
+  public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
     return new GraphEquality<>(
-      new GraphHeadToEmptyString<G>(),
-      new VertexToIdString<V>(),
-      new EdgeToIdString<E>(), true).execute(this, other);
+      new GraphHeadToEmptyString<GraphHead>(),
+      new VertexToIdString<Vertex>(),
+      new EdgeToIdString<Edge>(), true).execute(this, other);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Boolean> equalsByElementData(LogicalGraph<G, V, E> other) {
+  public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
     return new GraphEquality<>(
-      new GraphHeadToEmptyString<G>(),
-      new VertexToDataString<V>(),
-      new EdgeToDataString<E>(), true).execute(this, other);
+      new GraphHeadToEmptyString<GraphHead>(),
+      new VertexToDataString<Vertex>(),
+      new EdgeToDataString<Edge>(), true).execute(this, other);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Boolean> equalsByData(LogicalGraph<G, V, E> other) {
+  public DataSet<Boolean> equalsByData(LogicalGraph other) {
     return new GraphEquality<>(
-      new GraphHeadToDataString<G>(),
-      new VertexToDataString<V>(),
-      new EdgeToDataString<E>(), true).execute(this, other);
+      new GraphHeadToDataString<GraphHead>(),
+      new VertexToDataString<Vertex>(),
+      new EdgeToDataString<Edge>(), true).execute(this, other);
   }
 
   //----------------------------------------------------------------------------
@@ -677,8 +602,8 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> callForGraph(
-    UnaryGraphToGraphOperator<G, V, E> operator) {
+  public LogicalGraph callForGraph(
+    UnaryGraphToGraphOperator operator) {
     return operator.execute(this);
   }
 
@@ -686,9 +611,9 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> callForGraph(
-    BinaryGraphToGraphOperator<G, V, E> operator,
-    LogicalGraph<G, V, E> otherGraph) {
+  public LogicalGraph callForGraph(
+    BinaryGraphToGraphOperator operator,
+    LogicalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
@@ -696,8 +621,8 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> callForCollection(
-    UnaryGraphToCollectionOperator<G, V, E> operator) {
+  public GraphCollection callForCollection(
+    UnaryGraphToCollectionOperator operator) {
     return operator.execute(this);
   }
 
@@ -705,10 +630,10 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> splitBy(String propertyKey) {
+  public GraphCollection splitBy(String propertyKey) {
     return callForCollection(
-      new Split<G, V, E>(
-        new PropertyGetter<V>(Lists.newArrayList(propertyKey))));
+      new Split(
+        new PropertyGetter<Vertex>(Lists.newArrayList(propertyKey))));
   }
 
   //----------------------------------------------------------------------------
@@ -721,7 +646,7 @@ public class LogicalGraph
   @Override
   public DataSet<Boolean> isEmpty() {
     return getVertices()
-      .map(new True<V>())
+      .map(new True<Vertex>())
       .distinct()
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
@@ -732,7 +657,7 @@ public class LogicalGraph
    * {@inheritDoc}
    */
   @Override
-  public void writeTo(DataSink<G, V, E> dataSink) throws IOException {
+  public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
   }
 }

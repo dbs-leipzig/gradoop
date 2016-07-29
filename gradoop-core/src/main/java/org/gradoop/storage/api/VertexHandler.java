@@ -19,23 +19,17 @@ package org.gradoop.storage.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 
 import java.io.IOException;
 import java.util.Set;
 
 /**
  * Responsible for reading and writing vertex data from and to HBase.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public interface VertexHandler<
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends GraphElementHandler {
+public interface VertexHandler extends GraphElementHandler {
 
   /**
    * Adds the given outgoing edge data to the given {@link Put} and
@@ -45,7 +39,8 @@ public interface VertexHandler<
    * @param edges edges to add
    * @return put with edge identifiers
    */
-  Put writeOutgoingEdges(final Put put, final Set<E> edges) throws IOException;
+  Put writeOutgoingEdges(final Put put, final Set<Edge> edges)
+    throws IOException;
 
   /**
    * Adds the given incoming edge data to the given {@link Put} and
@@ -55,7 +50,8 @@ public interface VertexHandler<
    * @param edges edge identifiers to add
    * @return put with edge identifiers
    */
-  Put writeIncomingEdges(final Put put, final Set<E> edges) throws IOException;
+  Put writeIncomingEdges(final Put put, final Set<Edge> edges)
+    throws IOException;
 
   /**
    * Reads the outgoing edge identifiers from the given {@link Result}.
@@ -80,7 +76,7 @@ public interface VertexHandler<
    * @param vertexData vertex data to be written
    * @return put with vertex data
    */
-  Put writeVertex(final Put put, final PersistentVertex<E> vertexData) throws
+  Put writeVertex(final Put put, final PersistentVertex vertexData) throws
     IOException;
 
   /**
@@ -89,12 +85,12 @@ public interface VertexHandler<
    * @param res HBase row
    * @return vertex data contained in the given result.
    */
-  V readVertex(final Result res);
+  Vertex readVertex(final Result res);
 
   /**
    * Returns the vertex data factory used by this handler.
    *
    * @return vertex data factory
    */
-  EPGMVertexFactory<V> getVertexFactory();
+  VertexFactory getVertexFactory();
 }

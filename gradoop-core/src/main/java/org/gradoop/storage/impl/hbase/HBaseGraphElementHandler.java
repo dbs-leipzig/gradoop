@@ -23,7 +23,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.util.GConstants;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.storage.api.GraphElementHandler;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) throws
+  public Put writeGraphIds(Put put, GraphElement graphElement) throws
     IOException {
 
     if (graphElement.getGraphCount() > 0) {

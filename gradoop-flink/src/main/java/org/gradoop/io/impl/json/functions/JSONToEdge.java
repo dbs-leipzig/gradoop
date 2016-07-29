@@ -21,8 +21,8 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.io.impl.json.JSONConstants;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -45,20 +45,20 @@ import org.gradoop.model.impl.properties.PropertyList;
  *
  * @param <E> EPGM edge type
  */
-public class JSONToEdge<E extends EPGMEdge>
+public class JSONToEdge<E extends Edge>
   extends JSONToEntity
   implements MapFunction<String, E> {
   /**
    * Edge data factory.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Creates map function.
    *
    * @param edgeFactory edge data factory
    */
-  public JSONToEdge(EPGMEdgeFactory<E> edgeFactory) {
+  public JSONToEdge(EdgeFactory<E> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 

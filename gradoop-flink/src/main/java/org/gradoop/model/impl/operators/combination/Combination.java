@@ -18,23 +18,16 @@
 package org.gradoop.model.impl.operators.combination;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 
 /**
  * Computes the combined graph from two logical graphs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Combination
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements BinaryGraphToGraphOperator<G, V, E> {
+public class Combination implements BinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph by union the vertex and edge sets of two
@@ -46,16 +39,16 @@ public class Combination
    * @return combined graph
    */
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> firstGraph,
-    LogicalGraph<G, V, E> secondGraph) {
+  public LogicalGraph execute(LogicalGraph firstGraph,
+    LogicalGraph secondGraph) {
 
-    DataSet<V> newVertexSet = firstGraph.getVertices()
+    DataSet<Vertex> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
-      .distinct(new Id<V>());
+      .distinct(new Id<Vertex>());
 
-    DataSet<E> newEdgeSet = firstGraph.getEdges()
+    DataSet<Edge> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
-      .distinct(new Id<E>());
+      .distinct(new Id<Edge>());
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

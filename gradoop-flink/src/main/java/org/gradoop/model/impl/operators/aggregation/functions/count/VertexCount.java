@@ -19,9 +19,7 @@ package org.gradoop.model.impl.operators.aggregation.functions.count;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
@@ -29,22 +27,15 @@ import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.ToPropertyValue;
 import org.gradoop.model.impl.functions.graphcontainment.ExpandGraphsToIds;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.aggregation.functions
-  .GroupCountToPropertyValue;
+import org.gradoop.model.impl.operators.aggregation.functions.GroupCountToPropertyValue;
 import org.gradoop.model.impl.operators.count.Count;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Aggregate function returning the vertex count of a graph / graph collection.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class VertexCount
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements
-  AggregateFunction<G, V, E>, ApplyAggregateFunction<G, V, E> {
+public class VertexCount implements AggregateFunction, ApplyAggregateFunction {
 
   /**
    * Returns a 1-element dataset containing the vertex count of the given graph.
@@ -53,7 +44,7 @@ public class VertexCount
    * @return 1-element dataset with vertex count
    */
   @Override
-  public DataSet<PropertyValue> execute(LogicalGraph<G, V, E> graph) {
+  public DataSet<PropertyValue> execute(LogicalGraph graph) {
     return Count
       .count(graph.getVertices())
       .map(new ToPropertyValue<Long>());
@@ -68,10 +59,9 @@ public class VertexCount
    */
   @Override
   public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection<G, V, E> collection) {
-    return Count.groupBy(collection
-      .getVertices()
-        .flatMap(new ExpandGraphsToIds<V>())
+    GraphCollection collection) {
+    return Count.groupBy(collection.getVertices()
+      .flatMap(new ExpandGraphsToIds<Vertex>())
     ).map(new GroupCountToPropertyValue());
   }
 

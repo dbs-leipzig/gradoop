@@ -19,7 +19,7 @@ package org.gradoop.model.impl.functions.epgm;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
@@ -28,7 +28,7 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("sourceId->*")
-public class SourceId<E extends EPGMEdge>
+public class SourceId<E extends Edge>
   implements KeySelector<E, GradoopId> {
   @Override
   public GradoopId getKey(E edge) throws Exception {

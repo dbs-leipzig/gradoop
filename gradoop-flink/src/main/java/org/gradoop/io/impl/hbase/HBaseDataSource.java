@@ -26,9 +26,9 @@ import org.gradoop.io.api.DataSource;
 import org.gradoop.io.impl.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.io.impl.hbase.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.io.impl.hbase.inputformats.VertexTableInputFormat;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -45,9 +45,9 @@ import org.gradoop.util.GradoopFlinkConfig;
  * @param <E>  EPGM edge type
  */
 public class HBaseDataSource<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge>
   extends HBaseBase<G, V, E>
   implements DataSource<G, V, E> {
 

@@ -17,7 +17,7 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.api.PersistentGraphHeadFactory;
 
@@ -25,11 +25,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default factory for creating persistent graph data representation.
- *
- * @param <G> EPGM graph head type
  */
-public class HBaseGraphHeadFactory<G extends EPGMGraphHead>
-  implements PersistentGraphHeadFactory<G, HBaseGraphHead> {
+public class HBaseGraphHeadFactory implements PersistentGraphHeadFactory {
 
   /**
    * serial version uid
@@ -40,7 +37,7 @@ public class HBaseGraphHeadFactory<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public HBaseGraphHead createGraphHead(G inputGraphHead,
+  public HBaseGraphHead createGraphHead(GraphHead inputGraphHead,
     GradoopIdSet vertices, GradoopIdSet edges) {
     checkNotNull(inputGraphHead, "GraphHead was null");
     checkNotNull(vertices, "Vertex identifiers were null");

@@ -17,19 +17,10 @@
 
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
-
 /**
  * A marker interface for instances of {@link UnaryGraphToGraphOperator} that
  * support the application on each element in a graph collection.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
 public interface ApplicableUnaryGraphToGraphOperator
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends UnaryCollectionToCollectionOperator<G, V, E> {
+  extends UnaryCollectionToCollectionOperator {
 }

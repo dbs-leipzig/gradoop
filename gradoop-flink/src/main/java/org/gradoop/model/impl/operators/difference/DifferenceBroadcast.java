@@ -18,12 +18,10 @@
 package org.gradoop.model.impl.operators.difference;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.functions.graphcontainment
-  .GraphsContainmentFilterBroadcast;
+import org.gradoop.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.model.impl.id.GradoopId;
 
@@ -34,16 +32,8 @@ import org.gradoop.model.impl.id.GradoopId;
  * <p>
  * This operator implementation requires that a list of subgraph identifiers
  * in the resulting graph collections fits into the workers main memory.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class DifferenceBroadcast<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends Difference<G, V, E> {
+public class DifferenceBroadcast extends Difference {
 
   /**
    * Computes the resulting vertices by collecting a list of resulting
@@ -53,12 +43,14 @@ public class DifferenceBroadcast<
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<V> computeNewVertices(DataSet<G> newGraphHeads) {
+  protected DataSet<Vertex> computeNewVertices(
+    DataSet<GraphHead> newGraphHeads) {
+
     DataSet<GradoopId> identifiers = newGraphHeads
-      .map(new Id<G>());
+      .map(new Id<GraphHead>());
 
     return firstCollection.getVertices()
-      .filter(new InAnyGraphBroadcast<V>())
+      .filter(new InAnyGraphBroadcast<Vertex>())
       .withBroadcastSet(identifiers,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }

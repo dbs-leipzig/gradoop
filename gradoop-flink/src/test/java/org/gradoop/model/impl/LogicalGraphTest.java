@@ -23,10 +23,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.GraphElement;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -58,13 +57,13 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
       loader = getLoaderFromString("()-->()<--()-->()");
 
     // transform EPGM vertices to Gelly vertices
-    DataSet<Vertex<GradoopId, VertexPojo>> gellyVertices =
+    DataSet<org.apache.flink.graph.Vertex> gellyVertices =
       getExecutionEnvironment().fromCollection(loader.getVertices())
-        .map(new MapFunction<VertexPojo, Vertex<GradoopId, VertexPojo>>() {
+        .map(new MapFunction<VertexPojo, org.apache.flink.graph.Vertex>() {
           @Override
-          public Vertex<GradoopId, VertexPojo> map(VertexPojo vertexPojo) throws
+          public org.apache.flink.graph.Vertex map(VertexPojo vertexPojo) throws
             Exception {
-            return new Vertex<>(vertexPojo.getId(), vertexPojo);
+            return new org.apache.flink.graph.Vertex(vertexPojo.getId(), vertexPojo);
           }
         });
 
@@ -104,11 +103,11 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     validateEPGMElementCollections(loadedVertices, loader.getVertices());
     validateEPGMElementCollections(loadedEdges, loader.getEdges());
 
-    Collection<EPGMGraphElement> epgmElements = new ArrayList<>();
+    Collection<GraphElement> epgmElements = new ArrayList<>();
     epgmElements.addAll(loadedVertices);
     epgmElements.addAll(loadedEdges);
 
-    for (EPGMGraphElement loadedVertex : epgmElements) {
+    for (GraphElement loadedVertex : epgmElements) {
       assertEquals("graph element has wrong graph count",
         1, loadedVertex.getGraphCount());
       assertTrue("graph element was not in new graph",
@@ -129,13 +128,13 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
       loader = getLoaderFromString("g[()-->()<--()-->()]");
 
     // transform EPGM vertices to Gelly vertices
-    DataSet<Vertex<GradoopId, VertexPojo>> gellyVertices =
+    DataSet<org.apache.flink.graph.Vertex> gellyVertices =
       getExecutionEnvironment().fromCollection(loader.getVertices())
-        .map(new MapFunction<VertexPojo, Vertex<GradoopId, VertexPojo>>() {
+        .map(new MapFunction<VertexPojo, org.apache.flink.graph.Vertex>() {
           @Override
-          public Vertex<GradoopId, VertexPojo> map(VertexPojo vertexPojo) throws
+          public org.apache.flink.graph.Vertex map(VertexPojo vertexPojo) throws
             Exception {
-            return new Vertex<>(vertexPojo.getId(), vertexPojo);
+            return new org.apache.flink.graph.Vertex(vertexPojo.getId(), vertexPojo);
           }
         });
 
@@ -295,11 +294,11 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     validateEPGMElementCollections(loadedVertices, loader.getVertices());
     validateEPGMElementCollections(loadedEdges, loader.getEdges());
 
-    Collection<EPGMGraphElement> epgmElements = new ArrayList<>();
+    Collection<GraphElement> epgmElements = new ArrayList<>();
     epgmElements.addAll(loadedVertices);
     epgmElements.addAll(loadedEdges);
 
-    for (EPGMGraphElement loadedVertex : epgmElements) {
+    for (GraphElement loadedVertex : epgmElements) {
       assertEquals("graph element has wrong graph count",
         1, loadedVertex.getGraphCount());
       assertTrue("graph element was not in new graph",
@@ -385,7 +384,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> g0 =
       loader.getLogicalGraphByVariable(graphVariable);
 
-    EPGMVertex v = loader.getVertexByVariable(vertexVariable);
+    Vertex v = loader.getVertexByVariable(vertexVariable);
 
     Collection<EdgePojo> inputE =
       Lists.newArrayListWithCapacity(edgeVariables.length);

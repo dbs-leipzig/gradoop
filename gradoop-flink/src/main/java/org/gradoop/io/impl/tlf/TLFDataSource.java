@@ -32,9 +32,9 @@ import org.gradoop.io.impl.tlf.functions.TLFGraphFromText;
 import org.gradoop.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -54,7 +54,7 @@ import java.io.IOException;
  * @param <E> EPGM edge type
  */
 public class TLFDataSource
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   extends TLFBase<G, V, E>
   implements DataSource<G, V, E> {
 

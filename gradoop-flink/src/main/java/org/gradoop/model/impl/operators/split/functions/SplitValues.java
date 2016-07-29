@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.functions.UnaryFunction;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyValue;
@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("properties")
-public class SplitValues<V extends EPGMVertex>
+public class SplitValues<V extends Vertex>
   implements FlatMapFunction<V, Tuple2<GradoopId, PropertyValue>> {
   /**
    * Self defined Function

@@ -17,9 +17,9 @@
 package org.gradoop.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.BinaryGraphToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -30,19 +30,14 @@ import org.gradoop.model.impl.operators.tostring.api.VertexToString;
 /**
  * Operator to determine if two graph are equal according to given string
  * representations of graph heads, vertices and edges.
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class GraphEquality
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements BinaryGraphToValueOperator<G, V, E, Boolean> {
+public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
 
   /**
    * collection equality operator, wrapped by graph equality
    * (graph are considered to be a 1-graph collection)
    */
-  private final CollectionEquality<G, V, E> collectionEquality;
+  private final CollectionEquality collectionEquality;
   /**
    * sets mode for directed or undirected graphs
    */
@@ -55,18 +50,18 @@ public class GraphEquality
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public GraphEquality(GraphHeadToString<G> graphHeadToString,
-    VertexToString<V> vertexToString, EdgeToString<E> edgeToString,
+  public GraphEquality(GraphHeadToString<GraphHead> graphHeadToString,
+    VertexToString<Vertex> vertexToString, EdgeToString<Edge> edgeToString,
     boolean directed) {
     this.directed = directed;
 
-    this.collectionEquality = new CollectionEquality<>(
+    this.collectionEquality = new CollectionEquality(
       graphHeadToString, vertexToString, edgeToString, this.directed);
   }
 
   @Override
   public DataSet<Boolean> execute(
-    LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
+    LogicalGraph firstGraph, LogicalGraph secondGraph) {
     return collectionEquality.execute(
       GraphCollection.fromGraph(firstGraph),
       GraphCollection.fromGraph(secondGraph)

@@ -24,8 +24,8 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -46,12 +46,9 @@ import java.util.Set;
  * |         |-------------|----------|-----------|---|---|---|
  * |         | "Community" | v1  | v2 |   |   |   |   |   |   |
  * |---------|-------------|----------|-----------|---|---|---|
- *
- * @param <G> EPGM graph head type
  */
-public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
-  extends HBaseElementHandler
-  implements GraphHeadHandler<G> {
+public class HBaseGraphHeadHandler extends HBaseElementHandler
+  implements GraphHeadHandler {
 
   /**
    * serial version uid
@@ -73,14 +70,14 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
   /**
    * Creates graph data objects from the rows.
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
 
   /**
    * Creates a graph handler.
    *
    * @param graphHeadFactory used to create runtime graph data objects
    */
-  public HBaseGraphHeadHandler(EPGMGraphHeadFactory<G> graphHeadFactory) {
+  public HBaseGraphHeadHandler(GraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -156,8 +153,8 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public G readGraphHead(final Result res) {
-    G graphHead = null;
+  public GraphHead readGraphHead(final Result res) {
+    GraphHead graphHead = null;
     try {
       graphHead = graphHeadFactory
         .initGraphHead(readId(res), readLabel(res), readProperties(res));
@@ -171,7 +168,7 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public EPGMGraphHeadFactory<G> getGraphHeadFactory() {
+  public GraphHeadFactory getGraphHeadFactory() {
     return graphHeadFactory;
   }
 }

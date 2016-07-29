@@ -18,22 +18,14 @@
 package org.gradoop.model.api.functions;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Describes an aggregate function as input for the
  * {@link org.gradoop.model.impl.operators.aggregation.Aggregation} operator.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public interface AggregateFunction<G extends EPGMGraphHead,
-  V extends EPGMVertex, E extends EPGMEdge> {
+public interface AggregateFunction {
 
   /**
    * Defines the aggregate function.
@@ -41,6 +33,6 @@ public interface AggregateFunction<G extends EPGMGraphHead,
    * @param graph input graph
    * @return aggregated value as 1-element dataset
    */
-  DataSet<PropertyValue> execute(LogicalGraph<G, V, E> graph);
+  DataSet<PropertyValue> execute(LogicalGraph graph);
 
 }

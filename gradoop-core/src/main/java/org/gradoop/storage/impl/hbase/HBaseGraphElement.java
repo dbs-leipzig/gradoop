@@ -17,7 +17,7 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
@@ -26,8 +26,8 @@ import org.gradoop.model.impl.id.GradoopIdSet;
  *
  * @param <T> entity type
  */
-public abstract class HBaseGraphElement<T extends EPGMGraphElement> extends
-  HBaseElement<T> implements EPGMGraphElement {
+public abstract class HBaseGraphElement<T extends GraphElement> extends
+  HBaseElement<T> implements GraphElement {
 
   /**
    * Creates an EPGM graph element.

@@ -23,13 +23,13 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Initializes an {@link EPGMVertex} from a given {@link GradoopId} triple.
+ * Initializes an {@link Vertex} from a given {@link GradoopId} triple.
  *
  * (edgeId, sourceId, targetId) -> edge
  *
@@ -42,26 +42,26 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("f0->id;f1->sourceId;f2->targetId")
-public class EdgeFromIds<E extends EPGMEdge>
+public class EdgeFromIds<E extends Edge>
   implements MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, E>,
   ResultTypeQueryable<E> {
 
   /**
    * EPGM edge factory
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Constructor
    *
    * @param edgeFactory EPGM edge factory
    */
-  public EdgeFromIds(EPGMEdgeFactory<E> edgeFactory) {
+  public EdgeFromIds(EdgeFactory<E> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
   /**
-   * Initializes an {@link EPGMEdge} from a given {@link GradoopId} triple. The
+   * Initializes an {@link Edge} from a given {@link GradoopId} triple. The
    * triple consists of edge id, source vertex id and target vertex id.
    *
    * @param idTriple triple containing (in that order) edge id, source vertex

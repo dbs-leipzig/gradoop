@@ -19,10 +19,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.model.api.epgm.Vertex;
 
 /**
  * Maps EPGM vertex to a Gelly vertex consisting of the EPGM identifier and the
@@ -32,8 +29,8 @@ import org.gradoop.model.impl.properties.PropertyValue;
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("properties")
-public class VertexToGellyVertexMapper<V extends EPGMVertex>
-  implements MapFunction<V, Vertex<GradoopId, PropertyValue>> {
+public class VertexToGellyVertexMapper<V extends Vertex>
+  implements MapFunction<V, org.apache.flink.graph.Vertex> {
   /**
    * Property key to access the label value which will be propagated
    */
@@ -42,7 +39,7 @@ public class VertexToGellyVertexMapper<V extends EPGMVertex>
   /**
    * Reduce object instantiations
    */
-  private final Vertex<GradoopId, PropertyValue> reuseVertex;
+  private final org.apache.flink.graph.Vertex reuseVertex;
 
   /**
    * Constructor
@@ -51,11 +48,11 @@ public class VertexToGellyVertexMapper<V extends EPGMVertex>
    */
   public VertexToGellyVertexMapper(String propertyKey) {
     this.propertyKey = propertyKey;
-    this.reuseVertex = new Vertex<>();
+    this.reuseVertex = new org.apache.flink.graph.Vertex();
   }
 
   @Override
-  public Vertex<GradoopId, PropertyValue> map(V epgmVertex) throws Exception {
+  public org.apache.flink.graph.Vertex map(V epgmVertex) throws Exception {
     reuseVertex.setId(epgmVertex.getId());
     reuseVertex.setValue(epgmVertex.getPropertyValue(propertyKey));
     return reuseVertex;

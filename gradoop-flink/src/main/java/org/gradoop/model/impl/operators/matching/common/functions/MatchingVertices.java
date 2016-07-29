@@ -19,9 +19,8 @@ package org.gradoop.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.operators.matching.common.matching.EntityMatcher;
-import org.s1ck.gdl.model.Vertex;
 
 import java.util.Collection;
 
@@ -31,7 +30,7 @@ import java.util.Collection;
  * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ReadFields("label;properties")
-public class MatchingVertices<V extends EPGMVertex> extends AbstractFilter<V> {
+public class MatchingVertices<V extends Vertex> extends AbstractFilter<V> {
 
   /**
    * serial version uid
@@ -41,7 +40,7 @@ public class MatchingVertices<V extends EPGMVertex> extends AbstractFilter<V> {
   /**
    * Query vertices to match against.
    */
-  private transient Collection<Vertex> queryVertices;
+  private transient Collection<org.s1ck.gdl.model.Vertex> queryVertices;
 
   /**
    * Create new filter.

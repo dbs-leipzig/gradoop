@@ -19,8 +19,8 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.decoders.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
@@ -29,20 +29,20 @@ import org.gradoop.model.impl.id.GradoopIdSet;
  *
  * @param <V> vertex type
  */
-public class FullVertex<V extends EPGMVertex> implements
+public class FullVertex<V extends Vertex> implements
   MapFunction<Tuple3<GradoopId, GradoopId, String>, V> {
 
   /**
    * vertex factory
    */
-  private final EPGMVertexFactory<V> vertexFactory;
+  private final VertexFactory<V> vertexFactory;
 
   /**
    * constructor
    *
    * @param vertexFactory vertex factory
    */
-  public FullVertex(EPGMVertexFactory<V> vertexFactory) {
+  public FullVertex(VertexFactory<V> vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 

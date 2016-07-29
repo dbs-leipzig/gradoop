@@ -17,20 +17,16 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.storage.api.PersistentEdgeFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default factory for creating persistent edge representations.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class HBaseEdgeFactory<V extends EPGMVertex, E extends EPGMEdge>
-  implements PersistentEdgeFactory<V, E, HBaseEdge<V>> {
+public class HBaseEdgeFactory implements PersistentEdgeFactory {
 
   /**
    * serial version uid
@@ -41,10 +37,11 @@ public class HBaseEdgeFactory<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public HBaseEdge<V> createEdge(E inputEdge, V sourceVertex, V targetVertex) {
+  public HBaseEdge createEdge(Edge inputEdge, Vertex sourceVertex,
+    Vertex targetVertex) {
     checkNotNull(inputEdge, "Edge was null");
     checkNotNull(sourceVertex, "Source vertex was null");
     checkNotNull(targetVertex, "Target vertex was null");
-    return new HBaseEdge<>(inputEdge, sourceVertex, targetVertex);
+    return new HBaseEdge(inputEdge, sourceVertex, targetVertex);
   }
 }

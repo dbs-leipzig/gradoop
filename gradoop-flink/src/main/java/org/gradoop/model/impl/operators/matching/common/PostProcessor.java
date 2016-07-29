@@ -21,12 +21,12 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
+import org.gradoop.model.api.epgm.Element;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.EdgeFromIds;
@@ -47,7 +47,7 @@ import org.gradoop.util.GradoopFlinkConfig;
 public class PostProcessor {
 
   /**
-   * Extracts a {@link GraphCollection} from a set of {@link EPGMElement}.
+   * Extracts a {@link GraphCollection} from a set of {@link Element}.
    *
    * @param epgmElements  EPGM elements
    * @param config        Gradoop Flink config
@@ -57,14 +57,14 @@ public class PostProcessor {
    * @return Graph collection
    */
   public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   GraphCollection<G, V, E> extractGraphCollection(
-    DataSet<EPGMElement> epgmElements, GradoopFlinkConfig<G, V, E> config) {
+    DataSet<Element> epgmElements, GradoopFlinkConfig<G, V, E> config) {
     return extractGraphCollection(epgmElements, config, true);
   }
 
   /**
-   * Extracts a {@link GraphCollection} from a set of {@link EPGMElement}.
+   * Extracts a {@link GraphCollection} from a set of {@link Element}.
    *
    * @param epgmElements  EPGM elements
    * @param config        Gradoop Flink config
@@ -75,9 +75,9 @@ public class PostProcessor {
    * @return Graph collection
    */
   public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   GraphCollection<G, V, E> extractGraphCollection(
-    DataSet<EPGMElement> epgmElements, GradoopFlinkConfig<G, V, E> config,
+    DataSet<Element> epgmElements, GradoopFlinkConfig<G, V, E> config,
     boolean mayOverlap) {
     Class<G> graphHeadType  = config.getGraphHeadFactory().getType();
     Class<V> vertexType     = config.getVertexFactory().getType();
@@ -91,7 +91,7 @@ public class PostProcessor {
   }
 
   /**
-   * Extracts a {@link GraphCollection} from a set of {@link EPGMElement} and
+   * Extracts a {@link GraphCollection} from a set of {@link Element} and
    * attaches the original data from the input {@link LogicalGraph}.
    *
    * @param epgmElements  EPGM elements
@@ -103,9 +103,9 @@ public class PostProcessor {
    * @return Graph collection
    */
   public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   GraphCollection<G, V, E> extractGraphCollectionWithData(
-    DataSet<EPGMElement> epgmElements, LogicalGraph<G, V, E> inputGraph,
+    DataSet<Element> epgmElements, LogicalGraph<G, V, E> inputGraph,
     boolean mayOverlap) {
     GradoopFlinkConfig<G, V, E> config = inputGraph.getConfig();
 
@@ -153,19 +153,19 @@ public class PostProcessor {
   }
 
   /**
-   * Filters and casts EPGM graph heads from a given set of {@link EPGMElement}
+   * Filters and casts EPGM graph heads from a given set of {@link Element}
    *
    * @param epgmElements  EPGM elements
    * @param graphHeadType graph head type
    * @param <G>           EPGM graph head type
    * @return EPGM graph heads
    */
-  public static <G extends EPGMGraphHead>
-  DataSet<G> extractGraphHeads(DataSet<EPGMElement> epgmElements,
+  public static <G extends GraphHead>
+  DataSet<G> extractGraphHeads(DataSet<Element> epgmElements,
     Class<G> graphHeadType) {
     return epgmElements
-      .filter(new IsInstance<EPGMElement, G>(graphHeadType))
-      .map(new Cast<EPGMElement, G>(graphHeadType))
+      .filter(new IsInstance<Element, G>(graphHeadType))
+      .map(new Cast<Element, G>(graphHeadType))
       .returns(TypeExtractor.createTypeInfo(graphHeadType));
   }
 
@@ -177,14 +177,14 @@ public class PostProcessor {
    * @param <V>           EPGM vertex type
    * @return EPGM vertices
    */
-  public static <V extends EPGMVertex>
+  public static <V extends Vertex>
   DataSet<V> extractVertices(DataSet<FatVertex> result,
-    EPGMVertexFactory<V> vertexFactory) {
+    VertexFactory<V> vertexFactory) {
     return extractVertexIds(result).map(new VertexFromId<>(vertexFactory));
   }
 
   /**
-   * Filters and casts EPGM vertices from a given set of {@link EPGMElement}
+   * Filters and casts EPGM vertices from a given set of {@link Element}
    *
    * @param epgmElements  EPGM elements
    * @param vertexType    vertex type
@@ -192,12 +192,12 @@ public class PostProcessor {
    * @param <V>           EPGM vertex type
    * @return EPGM vertices
    */
-  public static <V extends EPGMVertex>
-  DataSet<V> extractVertices(DataSet<EPGMElement> epgmElements,
+  public static <V extends Vertex>
+  DataSet<V> extractVertices(DataSet<Element> epgmElements,
     Class<V> vertexType, boolean mayOverlap) {
     DataSet<V> result = epgmElements
-      .filter(new IsInstance<EPGMElement, V>(vertexType))
-      .map(new Cast<EPGMElement, V>(vertexType))
+      .filter(new IsInstance<Element, V>(vertexType))
+      .map(new Cast<Element, V>(vertexType))
       .returns(TypeExtractor.createTypeInfo(vertexType));
     return mayOverlap ? result
       .groupBy(new Id<V>())
@@ -214,14 +214,14 @@ public class PostProcessor {
    * @param <E>         EPGM edge type
    * @return EPGM edges
    */
-  public static <E extends EPGMEdge>
+  public static <E extends Edge>
   DataSet<E> extractEdges(DataSet<FatVertex> result,
-    EPGMEdgeFactory<E> edgeFactory) {
+    EdgeFactory<E> edgeFactory) {
     return extractEdgeIds(result).map(new EdgeFromIds<>(edgeFactory));
   }
 
   /**
-   * Filters and casts EPGM edges from a given set of {@link EPGMElement}
+   * Filters and casts EPGM edges from a given set of {@link Element}
    *
    * @param epgmElements  EPGM elements
    * @param edgeType      edge type
@@ -229,12 +229,12 @@ public class PostProcessor {
    * @param <E>           EPGM edge type
    * @return EPGM edges
    */
-  public static <E extends EPGMEdge>
-  DataSet<E> extractEdges(DataSet<EPGMElement> epgmElements,
+  public static <E extends Edge>
+  DataSet<E> extractEdges(DataSet<Element> epgmElements,
     Class<E> edgeType, boolean mayOverlap) {
     DataSet<E> result = epgmElements
-      .filter(new IsInstance<EPGMElement, E>(edgeType))
-      .map(new Cast<EPGMElement, E>(edgeType))
+      .filter(new IsInstance<Element, E>(edgeType))
+      .map(new Cast<Element, E>(edgeType))
       .returns(TypeExtractor.createTypeInfo(edgeType));
 
     return mayOverlap ? result
@@ -252,7 +252,7 @@ public class PostProcessor {
    * @param <V>           EPGM vertex type
    * @return EPGM vertices including data
    */
-  public static <V extends EPGMVertex>
+  public static <V extends Vertex>
   DataSet<V> extractVerticesWithData(DataSet<FatVertex> result,
     DataSet<V> inputVertices) {
     return extractVertexIds(result)
@@ -270,7 +270,7 @@ public class PostProcessor {
    * @param <E>         EPGM edge type
    * @return EPGM edges including data
    */
-  public static <E extends EPGMEdge>
+  public static <E extends Edge>
   DataSet<E> extractEdgesWithData(DataSet<FatVertex> result,
     DataSet<E> inputEdges) {
     return extractEdgeIds(result)

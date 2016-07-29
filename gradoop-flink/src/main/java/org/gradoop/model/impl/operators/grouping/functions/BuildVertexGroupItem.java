@@ -19,7 +19,7 @@ package org.gradoop.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
@@ -33,14 +33,12 @@ import java.util.List;
  * The output of that mapper is {@link VertexGroupItem} that contains
  * the vertex id, vertex label, vertex group properties and vertex aggregate
  * properties.
- *
- * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildVertexGroupItem<V extends EPGMVertex>
+public class BuildVertexGroupItem
   extends BuildBase
-  implements MapFunction<V, VertexGroupItem> {
+  implements MapFunction<Vertex, VertexGroupItem> {
 
   /**
    * Reduce object instantiations.
@@ -71,7 +69,7 @@ public class BuildVertexGroupItem<V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public VertexGroupItem map(V vertex) throws Exception {
+  public VertexGroupItem map(Vertex vertex) throws Exception {
     reuseVertexGroupItem.setVertexId(vertex.getId());
     reuseVertexGroupItem.setGroupLabel(getLabel(vertex));
     reuseVertexGroupItem.setGroupingValues(getGroupProperties(vertex));

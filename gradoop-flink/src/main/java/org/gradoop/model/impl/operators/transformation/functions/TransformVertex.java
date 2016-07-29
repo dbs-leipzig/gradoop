@@ -18,8 +18,8 @@
 package org.gradoop.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.util.GConstants;
 
@@ -31,12 +31,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("id;graphIds")
-public class TransformVertex<V extends EPGMVertex> extends TransformBase<V> {
+public class TransformVertex<V extends Vertex> extends TransformBase<V> {
 
   /**
    * Factory to init modified vertex.
    */
-  private final EPGMVertexFactory<V> vertexFactory;
+  private final VertexFactory<V> vertexFactory;
 
   /**
    * Constructor
@@ -45,7 +45,7 @@ public class TransformVertex<V extends EPGMVertex> extends TransformBase<V> {
    * @param vertexFactory         vertex factory
    */
   public TransformVertex(TransformationFunction<V> transformationFunction,
-    EPGMVertexFactory<V> vertexFactory) {
+    VertexFactory<V> vertexFactory) {
     super(transformationFunction);
     this.vertexFactory = checkNotNull(vertexFactory);
   }

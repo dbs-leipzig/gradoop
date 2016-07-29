@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.pojo;
 
-import org.gradoop.model.api.EPGMEdgeFactory;
+import org.gradoop.model.api.epgm.EdgeFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory for creating edge POJOs.
  */
-public class EdgePojoFactory implements EPGMEdgeFactory<EdgePojo> {
+public class EdgePojoFactory implements EdgeFactory {
 
   /**
    * serial version uid

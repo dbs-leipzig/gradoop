@@ -17,9 +17,6 @@
 
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.combination.Combination;
 import org.gradoop.model.impl.operators.exclusion.Exclusion;
@@ -28,15 +25,11 @@ import org.gradoop.model.impl.operators.overlap.Overlap;
 /**
  * Creates a {@link LogicalGraph} based on two input graphs.
  *
- * @param <VD> EPGM vertex type
- * @param <ED> EPGM edge type
- * @param <GD> EPGM graph head type
  * @see Combination
  * @see Exclusion
  * @see Overlap
  */
-public interface BinaryGraphToGraphOperator<GD extends EPGMGraphHead, VD extends EPGMVertex, ED extends EPGMEdge> extends
-  Operator {
+public interface BinaryGraphToGraphOperator extends Operator {
   /**
    * Executes the operator.
    *
@@ -44,6 +37,5 @@ public interface BinaryGraphToGraphOperator<GD extends EPGMGraphHead, VD extends
    * @param secondGraph second input graph
    * @return operator result
    */
-  LogicalGraph<GD, VD, ED> execute(LogicalGraph<GD, VD, ED> firstGraph,
-    LogicalGraph<GD, VD, ED> secondGraph);
+  LogicalGraph execute(LogicalGraph firstGraph, LogicalGraph secondGraph);
 }

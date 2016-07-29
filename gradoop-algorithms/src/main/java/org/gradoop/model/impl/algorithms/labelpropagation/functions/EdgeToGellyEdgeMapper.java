@@ -19,10 +19,8 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.api.epgm.Edge;
 
 /**
  * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
@@ -31,23 +29,23 @@ import org.gradoop.model.impl.id.GradoopId;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
-public class EdgeToGellyEdgeMapper<E extends EPGMEdge>
-  implements MapFunction<E, Edge<GradoopId, NullValue>> {
+public class EdgeToGellyEdgeMapper<E extends Edge>
+  implements MapFunction<E, org.apache.flink.graph.Edge> {
   /**
    * Reduce object instantiations
    */
-  private final Edge<GradoopId, NullValue> reuseEdge;
+  private final org.apache.flink.graph.Edge reuseEdge;
 
   /**
    * Constructor
    */
   public EdgeToGellyEdgeMapper() {
-    reuseEdge = new Edge<>();
+    reuseEdge = new org.apache.flink.graph.Edge();
     reuseEdge.setValue(NullValue.getInstance());
   }
 
   @Override
-  public Edge<GradoopId, NullValue> map(E epgmEdge) throws Exception {
+  public org.apache.flink.graph.Edge map(E epgmEdge) throws Exception {
     reuseEdge.setSource(epgmEdge.getSourceId());
     reuseEdge.setTarget(epgmEdge.getTargetId());
     return reuseEdge;

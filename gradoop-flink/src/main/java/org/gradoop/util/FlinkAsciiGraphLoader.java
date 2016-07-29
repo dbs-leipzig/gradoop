@@ -17,9 +17,9 @@
 
 package org.gradoop.util;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -39,9 +39,9 @@ import java.util.Collection;
  * @see <a href="https://github.com/s1ck/gdl">GDL on GitHub</a>
  */
 public class FlinkAsciiGraphLoader<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge> {
 
   /**
    * Gradoop Flink configuration

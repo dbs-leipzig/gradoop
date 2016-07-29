@@ -34,9 +34,9 @@ import org.gradoop.io.impl.hbase.functions.BuildVertexDataWithEdges;
 import org.gradoop.io.impl.hbase.functions.BuildVertexMutation;
 import org.gradoop.io.impl.hbase.functions.EdgeSetBySourceId;
 import org.gradoop.io.impl.hbase.functions.EdgeSetByTargetId;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -64,7 +64,7 @@ import java.util.Set;
  * @param <E> EPGM edge type
  */
 public class HBaseDataSink
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   extends HBaseBase<G, V, E>
   implements DataSink<G, V, E> {
 

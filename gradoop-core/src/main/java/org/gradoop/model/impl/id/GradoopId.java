@@ -23,6 +23,7 @@ import org.apache.flink.core.memory.MemorySegment;
 import org.apache.flink.types.NormalizableKey;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
+import org.gradoop.model.api.epgm.Identifiable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -39,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * inside its domain, i.e. a graph is unique among all graphs, a vertex among
  * all vertices and an edge among all edges.
  *
- * @see org.gradoop.model.api.EPGMIdentifiable
+ * @see Identifiable
  */
 public class GradoopId
   implements WritableComparable<GradoopId>, NormalizableKey<GradoopId> {

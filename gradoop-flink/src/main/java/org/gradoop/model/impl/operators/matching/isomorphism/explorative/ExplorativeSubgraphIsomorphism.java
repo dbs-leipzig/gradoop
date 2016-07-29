@@ -25,12 +25,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMElement;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Element;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -78,16 +78,9 @@ import static org.gradoop.model.impl.operators.matching.common.PostProcessor.ext
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a
  * given traversal code which is derived from the query pattern.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
- *
  */
-public class ExplorativeSubgraphIsomorphism
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends PatternMatching<G, V, E>
-  implements UnaryGraphToCollectionOperator<G, V, E> {
+public class ExplorativeSubgraphIsomorphism extends PatternMatching
+  implements UnaryGraphToCollectionOperator {
   /**
    * Name for broadcast set which contains the superstep id.
    */
@@ -155,11 +148,11 @@ public class ExplorativeSubgraphIsomorphism
   }
 
   @Override
-  protected GraphCollection<G, V, E> executeForVertex(
-    LogicalGraph<G, V, E> graph) {
-    GradoopFlinkConfig<G, V, E> config = graph.getConfig();
-    EPGMGraphHeadFactory<G> graphHeadFactory = config.getGraphHeadFactory();
-    EPGMVertexFactory<V> vertexFactory = config.getVertexFactory();
+  protected GraphCollection executeForVertex(
+    LogicalGraph graph) {
+    GradoopFlinkConfig config = graph.getConfig();
+    GraphHeadFactory<GraphHead> graphHeadFactory = config.getGraphHeadFactory();
+    VertexFactory<Vertex> vertexFactory = config.getVertexFactory();
 
     DataSet<V> matchingVertices = graph.getVertices()
       .filter(new MatchingVertices<V>(getQuery()));
@@ -184,8 +177,8 @@ public class ExplorativeSubgraphIsomorphism
   }
 
   @Override
-  protected GraphCollection<G, V, E> executeForPattern(
-    LogicalGraph<G, V, E> graph) {
+  protected GraphCollection executeForPattern(
+    LogicalGraph graph) {
 
     //--------------------------------------------------------------------------
     // Pre-processing (filter candidates + build initial embeddings)
@@ -221,7 +214,7 @@ public class ExplorativeSubgraphIsomorphism
     // Post-Processing (build Graph Collection from embeddings)
     //--------------------------------------------------------------------------
 
-    DataSet<EPGMElement> epgmElements = result
+    DataSet<Element> epgmElements = result
       .<Tuple1<Embedding>>project(0)
       .flatMap(new ElementsFromEmbedding<>(traversalCode,
         graph.getConfig().getGraphHeadFactory(),

@@ -20,7 +20,7 @@ package org.gradoop.model.impl.operators.cloning.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
@@ -31,7 +31,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
  * @param <EL> EPGM element type
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class ElementGraphUpdater<EL extends EPGMGraphElement>
+public class ElementGraphUpdater<EL extends GraphElement>
   extends RichMapFunction<EL, EL> {
 
   /**

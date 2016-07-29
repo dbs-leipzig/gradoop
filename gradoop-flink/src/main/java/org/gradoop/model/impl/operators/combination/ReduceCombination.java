@@ -17,23 +17,14 @@
 
 package org.gradoop.model.impl.operators.combination;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
 
 /**
  * Computes the combined graph from a collection of logical graphs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class ReduceCombination
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements ReducibleBinaryGraphToGraphOperator<G, V, E> {
+public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph by union the vertex and edge sets of all graph
@@ -43,7 +34,7 @@ public class ReduceCombination
    * @return combined graph
    */
   @Override
-  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
+  public LogicalGraph execute(GraphCollection collection) {
     return LogicalGraph.fromDataSets(
       collection.getVertices(),
       collection.getEdges(),

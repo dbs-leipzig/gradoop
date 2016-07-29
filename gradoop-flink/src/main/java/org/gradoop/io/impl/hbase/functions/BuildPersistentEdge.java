@@ -19,8 +19,8 @@ package org.gradoop.io.impl.hbase.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentEdgeFactory;
 
@@ -33,7 +33,7 @@ import org.gradoop.storage.api.PersistentEdgeFactory;
  * @param <PE> EPGM persistent edge type
  */
 public class BuildPersistentEdge
-  <V extends EPGMVertex, E extends EPGMEdge, PE extends PersistentEdge<V>>
+  <V extends Vertex, E extends Edge, PE extends PersistentEdge<V>>
   implements JoinFunction<Tuple2<V, E>, V, PersistentEdge<V>> {
 
   /**

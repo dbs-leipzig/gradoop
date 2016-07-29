@@ -22,23 +22,18 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.config.GradoopConfig;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.Set;
 
 /**
  * An encapsulated representation of a logical graph with duplicated elements.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class GraphTransaction
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends Tuple3<G, Set<V>, Set<E>> {
+public class GraphTransaction 
+  extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>> {
 
   /**
    * default constructor
@@ -52,33 +47,34 @@ public class GraphTransaction
    * @param vertices set of vertices
    * @param edges set of edges
    */
-  public GraphTransaction(G graphHead, Set<V> vertices, Set<E> edges) {
+  public GraphTransaction(GraphHead graphHead, Set<Vertex> vertices, 
+    Set<Edge> edges) {
     setGraphHead(graphHead);
     setVertices(vertices);
     setEdges(edges);
   }
 
-  public G getGraphHead() {
+  public GraphHead getGraphHead() {
     return this.f0;
   }
 
-  public void setGraphHead(G graphHead) {
+  public void setGraphHead(GraphHead graphHead) {
     this.f0 = graphHead;
   }
 
-  public Set<V> getVertices() {
+  public Set<Vertex> getVertices() {
     return this.f1;
   }
 
-  public void setVertices(Set<V> vertices) {
+  public void setVertices(Set<Vertex> vertices) {
     this.f1 = vertices;
   }
 
-  public Set<E> getEdges() {
+  public Set<Edge> getEdges() {
     return this.f2;
   }
 
-  public void  setEdges(Set<E> edges) {
+  public void  setEdges(Set<Edge> edges) {
     this.f2 = edges;
   }
 
@@ -86,25 +82,20 @@ public class GraphTransaction
    * Returns the Flink type information of a graph transaction.
    *
    * @param config Gradoop configuration
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
    * @return type information
    */
-  public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  TypeInformation<GraphTransaction<G, V, E>> getTypeInformation(
-    GradoopConfig<G, V, E> config) {
+  public static TypeInformation<GraphTransaction> getTypeInformation(
+    GradoopConfig config) {
 
-    Set<V> vertices = Sets.newHashSetWithExpectedSize(1);
+    Set<Vertex> vertices = Sets.newHashSetWithExpectedSize(1);
     vertices.add(config.getVertexFactory().createVertex());
 
-    Set<E> edges = Sets.newHashSetWithExpectedSize(1);
+    Set<Edge> edges = Sets.newHashSetWithExpectedSize(1);
     edges.add(config.getEdgeFactory()
       .createEdge(GradoopId.get(), GradoopId.get()));
 
     return TypeExtractor.getForObject(
-      new GraphTransaction<>(
-        config.getGraphHeadFactory().createGraphHead(), vertices, edges));
+      new GraphTransaction(config.getGraphHeadFactory().createGraphHead(),
+        vertices, edges));
   }
 }

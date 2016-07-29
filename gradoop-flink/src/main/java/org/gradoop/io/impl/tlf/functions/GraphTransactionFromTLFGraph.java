@@ -25,12 +25,12 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.io.impl.tlf.tuples.TLFVertex;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMEdgeFactory;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.EdgeFactory;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.tuples.GraphTransaction;
@@ -46,23 +46,23 @@ import java.util.Set;
  * @param <E> EPGM edge type
  */
 public class GraphTransactionFromTLFGraph
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements MapFunction<TLFGraph, GraphTransaction<G, V, E>> {
 
   /**
    * Creates graph data objects
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Creates graph data objects
    */
-  private final EPGMVertexFactory<V> vertexFactory;
+  private final VertexFactory<V> vertexFactory;
 
   /**
    * Creates graph data objects
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Reduce object instantiation.
@@ -77,8 +77,8 @@ public class GraphTransactionFromTLFGraph
    * @param edgeFactory      edge data factory
    */
   public GraphTransactionFromTLFGraph(
-    EPGMGraphHeadFactory<G> graphHeadFactory, EPGMVertexFactory<V>
-    vertexFactory, EPGMEdgeFactory<E> edgeFactory) {
+    GraphHeadFactory<G> graphHeadFactory, VertexFactory<V>
+    vertexFactory, EdgeFactory<E> edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;

@@ -15,25 +15,22 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
+package org.gradoop.model.api.epgm;
 
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyList;
 
 /**
- * Initializes {@link EPGMGraphHead} objects of a given type.
- *
- * @param <G> EPGM graph head type
+ * Initializes {@link GraphHead} objects of a given type.
  */
-public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
-  extends EPGMElementFactory<G> {
+public interface GraphHeadFactory extends ElementFactory {
 
   /**
    * Creates a new graph head based.
    *
    * @return graph data
    */
-  G createGraphHead();
+  GraphHead createGraphHead();
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -41,7 +38,7 @@ public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
    * @param id graph identifier
    * @return graph data
    */
-  G initGraphHead(GradoopId id);
+  GraphHead initGraphHead(GradoopId id);
 
   /**
    * Creates a new graph head based on the given parameters.
@@ -49,7 +46,7 @@ public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
    * @param label graph label
    * @return graph data
    */
-  G createGraphHead(String label);
+  GraphHead createGraphHead(String label);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -58,7 +55,7 @@ public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
    * @param label graph label
    * @return graph data
    */
-  G initGraphHead(GradoopId id, String label);
+  GraphHead initGraphHead(GradoopId id, String label);
 
   /**
    * Creates a new graph head based on the given parameters.
@@ -67,7 +64,7 @@ public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
    * @param properties graph attributes
    * @return graph data
    */
-  G createGraphHead(String label, PropertyList properties);
+  GraphHead createGraphHead(String label, PropertyList properties);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -77,5 +74,5 @@ public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
    * @param properties graph attributes
    * @return graph data
    */
-  G initGraphHead(GradoopId id, String label, PropertyList properties);
+  GraphHead initGraphHead(GradoopId id, String label, PropertyList properties);
 }

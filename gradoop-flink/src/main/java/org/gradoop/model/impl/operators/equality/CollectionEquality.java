@@ -17,9 +17,9 @@
 package org.gradoop.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.bool.Equals;
@@ -31,20 +31,15 @@ import org.gradoop.model.impl.operators.tostring.api.VertexToString;
 /**
  * Operator to determine if two graph collections are equal according to given
  * string representations of graph heads, vertices and edges.
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
 public class CollectionEquality
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements BinaryCollectionToValueOperator<G, V, E, Boolean> {
+  implements BinaryCollectionToValueOperator<Boolean> {
 
   /**
    * builder to create the string representations of graph collections used for
    * comparison.
    */
-  private final
-  CanonicalAdjacencyMatrixBuilder<G, V, E> canonicalAdjacencyMatrixBuilder;
+  private final CanonicalAdjacencyMatrixBuilder canonicalAdjacencyMatrixBuilder;
 
   /**
    * constructor to set string representations
@@ -53,20 +48,19 @@ public class CollectionEquality
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public CollectionEquality(GraphHeadToString<G> graphHeadToString,
-    VertexToString<V> vertexToString, EdgeToString<E> edgeToString,
+  public CollectionEquality(GraphHeadToString<GraphHead> graphHeadToString,
+    VertexToString<Vertex> vertexToString, EdgeToString<Edge> edgeToString,
     boolean directed) {
     /*
     sets mode for directed or undirected graphs
    */
-    this.canonicalAdjacencyMatrixBuilder =
-      new CanonicalAdjacencyMatrixBuilder<>(
+    this.canonicalAdjacencyMatrixBuilder = new CanonicalAdjacencyMatrixBuilder(
         graphHeadToString, vertexToString, edgeToString, directed);
   }
 
   @Override
-  public DataSet<Boolean> execute(GraphCollection<G, V, E> firstCollection,
-    GraphCollection<G, V, E> secondCollection) {
+  public DataSet<Boolean> execute(GraphCollection firstCollection,
+    GraphCollection secondCollection) {
     return Equals.cross(
       canonicalAdjacencyMatrixBuilder.execute(firstCollection),
       canonicalAdjacencyMatrixBuilder.execute(secondCollection)

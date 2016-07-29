@@ -20,8 +20,8 @@ package org.gradoop.io.impl.hbase.functions;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.PersistentVertexFactory;
@@ -37,7 +37,7 @@ import java.util.Set;
  * @param <PV>  EPGM persistent vertex type
  */
 public class BuildPersistentVertex
-  <V extends EPGMVertex, E extends EPGMEdge, PV extends PersistentVertex<E>>
+  <V extends Vertex, E extends Edge, PV extends PersistentVertex<E>>
   implements CoGroupFunction<Tuple2<V, Set<E>>, Tuple2<GradoopId, Set<E>>,
     PersistentVertex<E>> {
 

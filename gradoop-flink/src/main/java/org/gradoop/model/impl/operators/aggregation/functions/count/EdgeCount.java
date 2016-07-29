@@ -19,9 +19,9 @@ package org.gradoop.model.impl.operators.aggregation.functions.count;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.functions.AggregateFunction;
 import org.gradoop.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.model.impl.GraphCollection;
@@ -36,15 +36,8 @@ import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Aggregate function returning the edge count of a graph / collection.
- *
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class EdgeCount
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements
-  AggregateFunction<G, V, E>, ApplyAggregateFunction<G, V, E> {
+public class EdgeCount implements AggregateFunction, ApplyAggregateFunction {
 
   /**
    * Returns a 1-element dataset containing the edge count of the given graph.
@@ -53,7 +46,7 @@ public class EdgeCount
    * @return 1-element dataset with vertex count
    */
   @Override
-  public DataSet<PropertyValue> execute(LogicalGraph<G, V, E> graph) {
+  public DataSet<PropertyValue> execute(LogicalGraph graph) {
     return Count
       .count(graph.getEdges())
       .map(new ToPropertyValue<Long>());
@@ -68,11 +61,10 @@ public class EdgeCount
    */
   @Override
   public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection<G, V, E> collection) {
+    GraphCollection collection) {
     return Count.groupBy(
-      collection
-        .getEdges()
-          .flatMap(new ExpandGraphsToIds<E>())
+      collection.getEdges()
+        .flatMap(new ExpandGraphsToIds<Edge>())
     ).map(new GroupCountToPropertyValue());
   }
 

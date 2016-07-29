@@ -19,7 +19,7 @@ package org.gradoop.io.impl.hbase.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -32,7 +32,7 @@ import org.gradoop.storage.api.PersistentGraphHeadFactory;
  * @param <PG>  EPGM persistent graph head type
  */
 public class BuildPersistentGraphHead
-  <G extends EPGMGraphHead, PG extends PersistentGraphHead>
+  <G extends GraphHead, PG extends PersistentGraphHead>
   implements JoinFunction
   <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, G, PersistentGraphHead> {
 

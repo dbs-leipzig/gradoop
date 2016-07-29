@@ -20,7 +20,7 @@ package org.gradoop.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.epgm.Element;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <EL> element type
  */
 @FunctionAnnotation.ForwardedFields("id")
-public class PropertySetterBroadcast<EL extends EPGMElement>
+public class PropertySetterBroadcast<EL extends Element>
   extends RichMapFunction<EL, EL> {
 
   /**

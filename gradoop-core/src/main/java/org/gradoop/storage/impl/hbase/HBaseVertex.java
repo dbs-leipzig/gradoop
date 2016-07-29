@@ -17,29 +17,26 @@
 
 package org.gradoop.storage.impl.hbase;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.storage.api.PersistentVertex;
 
 import java.util.Set;
 
 /**
  * Represents a persistent vertex data object.
- *
- * @param <E> EPGM edge type
  */
-public class HBaseVertex<E extends EPGMEdge> extends
-  HBaseGraphElement<EPGMVertex> implements PersistentVertex<E> {
+public class HBaseVertex extends HBaseGraphElement<Vertex> implements PersistentVertex {
 
   /**
    * Outgoing edge set
    */
-  private Set<E> outgoingEdges;
+  private Set<Edge> outgoingEdges;
 
   /**
    * Incoming edge set
    */
-  private Set<E> incomingEdges;
+  private Set<Edge> incomingEdges;
 
   /**
    * Creates persistent vertex data.
@@ -48,7 +45,7 @@ public class HBaseVertex<E extends EPGMEdge> extends
    * @param incomingEdges incoming edge
    * @param outgoingEdges outgoing edge
    */
-  HBaseVertex(EPGMVertex vertex, Set<E> outgoingEdges, Set<E> incomingEdges) {
+  HBaseVertex(Vertex vertex, Set<Edge> outgoingEdges, Set<Edge> incomingEdges) {
     super(vertex);
     this.outgoingEdges = outgoingEdges;
     this.incomingEdges = incomingEdges;
@@ -58,7 +55,7 @@ public class HBaseVertex<E extends EPGMEdge> extends
    * {@inheritDoc}
    */
   @Override
-  public Set<E> getOutgoingEdges() {
+  public Set<Edge> getOutgoingEdges() {
     return outgoingEdges;
   }
 
@@ -66,7 +63,7 @@ public class HBaseVertex<E extends EPGMEdge> extends
    * {@inheritDoc}
    */
   @Override
-  public void setOutgoingEdges(Set<E> outgoingEdgeIds) {
+  public void setOutgoingEdges(Set<Edge> outgoingEdgeIds) {
     this.outgoingEdges = outgoingEdgeIds;
   }
 
@@ -74,7 +71,7 @@ public class HBaseVertex<E extends EPGMEdge> extends
    * {@inheritDoc}
    */
   @Override
-  public Set<E> getIncomingEdges() {
+  public Set<Edge> getIncomingEdges() {
     return incomingEdges;
   }
 
@@ -82,7 +79,7 @@ public class HBaseVertex<E extends EPGMEdge> extends
    * {@inheritDoc}
    */
   @Override
-  public void setIncomingEdges(Set<E> incomingEdgeData) {
+  public void setIncomingEdges(Set<Edge> incomingEdgeData) {
     this.incomingEdges = incomingEdgeData;
   }
 

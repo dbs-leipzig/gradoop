@@ -15,11 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
+package org.gradoop.model.api.epgm;
+
+import java.io.Serializable;
 
 /**
- * Describes data specifically assigned to a logical graph in the EPGM.
+ * Base interface for all EPGM element factories.
  */
-public interface EPGMGraphHead extends EPGMElement {
-
+public interface ElementFactory extends Serializable {
+  /**
+   * Returns the type of the objects, the factory is creating. This is necessary
+   * for type hinting in Apache Flink.
+   *
+   * @return type of the created objects
+   */
+  Class getType();
 }

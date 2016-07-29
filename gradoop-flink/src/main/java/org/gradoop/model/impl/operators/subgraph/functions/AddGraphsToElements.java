@@ -20,7 +20,7 @@ package org.gradoop.model.impl.operators.subgraph.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMGraphElement;
+import org.gradoop.model.api.epgm.GraphElement;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 
@@ -31,7 +31,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
-public class AddGraphsToElements<EL extends EPGMGraphElement>
+public class AddGraphsToElements<EL extends GraphElement>
   implements JoinFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
 
   @Override

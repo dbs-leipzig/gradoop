@@ -19,9 +19,8 @@ package org.gradoop.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.model.impl.functions.tuple.Value1Of2;
@@ -65,16 +64,8 @@ import java.util.List;
  *    and/or edge property.
  * 8) Group combine on the workers and compute aggregate.
  * 9) Group reduce globally and create final super edges.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class GroupingGroupCombine<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends Grouping<G, V, E> {
+public class GroupingGroupCombine extends Grouping {
 
   /**
    * Creates grouping operator instance.
@@ -96,10 +87,10 @@ public class GroupingGroupCombine<
 
 
   @Override
-  protected LogicalGraph<G, V, E> groupInternal(LogicalGraph<G, V, E> graph) {
+  protected LogicalGraph groupInternal(LogicalGraph graph) {
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      .map(new BuildVertexGroupItem<V>(getVertexGroupingKeys(),
+      .map(new BuildVertexGroupItem<Vertex>(getVertexGroupingKeys(),
         useVertexLabels(), getVertexAggregators()));
 
     DataSet<VertexGroupItem> combinedVertexGroupItems =
@@ -119,9 +110,9 @@ public class GroupingGroupCombine<
           getVertexAggregators()));
 
     // build super vertices from super vertex tuples
-    DataSet<V> superVertices = superVertexTuples
+    DataSet<Vertex> superVertices = superVertexTuples
       .map(new Value0Of2<VertexGroupItem, IdWithIdSet>())
-      .map(new BuildSuperVertex<>(getVertexGroupingKeys(), useVertexLabels(),
+      .map(new BuildSuperVertex(getVertexGroupingKeys(), useVertexLabels(),
         getVertexAggregators(), config.getVertexFactory()));
 
     // extract mapping
@@ -137,7 +128,8 @@ public class GroupingGroupCombine<
         .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);
 
     // build super edges
-    DataSet<E> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
+    DataSet<Edge> superEdges = buildSuperEdges(graph,
+      vertexToRepresentativeMap);
 
     return LogicalGraph.fromDataSets(
       superVertices, superEdges, graph.getConfig());

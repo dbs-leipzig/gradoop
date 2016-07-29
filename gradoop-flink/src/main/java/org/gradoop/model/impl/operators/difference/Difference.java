@@ -19,9 +19,7 @@ package org.gradoop.model.impl.operators.difference;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.operators.base.SetOperatorBase;
 import org.gradoop.model.impl.operators.difference.functions.CreateTuple2WithLong;
 import org.gradoop.model.impl.operators.difference.functions.IdOf0InTuple2;
@@ -32,16 +30,9 @@ import org.gradoop.model.impl.operators.difference.functions.RemoveCut;
  * first input collection but not in the second.
  * Graph equality is based on their respective identifiers.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  * @see DifferenceBroadcast
  */
-public class Difference<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends SetOperatorBase<G, V, E> {
+public class Difference extends SetOperatorBase {
 
   /**
    * Computes the logical graph dataset for the resulting collection.
@@ -49,20 +40,20 @@ public class Difference<
    * @return logical graph dataset of the resulting collection
    */
   @Override
-  protected DataSet<G> computeNewGraphHeads() {
+  protected DataSet<GraphHead> computeNewGraphHeads() {
     // assign 1L to each logical graph in the first collection
-    DataSet<Tuple2<G, Long>> thisGraphs = firstCollection.getGraphHeads()
-      .map(new CreateTuple2WithLong<G>(1L));
+    DataSet<Tuple2<GraphHead, Long>> thisGraphs = firstCollection.getGraphHeads()
+      .map(new CreateTuple2WithLong<GraphHead>(1L));
     // assign 2L to each logical graph in the second collection
-    DataSet<Tuple2<G, Long>> otherGraphs = secondCollection.getGraphHeads()
-      .map(new CreateTuple2WithLong<G>(2L));
+    DataSet<Tuple2<GraphHead, Long>> otherGraphs = secondCollection.getGraphHeads()
+      .map(new CreateTuple2WithLong<GraphHead>(2L));
 
     // union the logical graphs, group them by their identifier and check that
     // there is no graph in the group that belongs to the second collection
     return thisGraphs
       .union(otherGraphs)
-      .groupBy(new IdOf0InTuple2<G, Long>())
-      .reduceGroup(new RemoveCut<G>());
+      .groupBy(new IdOf0InTuple2<GraphHead, Long>())
+      .reduceGroup(new RemoveCut<GraphHead>());
   }
 
   /**

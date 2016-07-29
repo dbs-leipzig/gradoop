@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.EPGMElement;
+import org.gradoop.model.api.epgm.Element;
 import org.gradoop.model.api.functions.TransformationFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <EL> EPGM element type
  */
-public abstract class TransformBase<EL extends EPGMElement>
+public abstract class TransformBase<EL extends Element>
   implements MapFunction<EL, EL> {
 
   /**

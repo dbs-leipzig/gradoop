@@ -16,24 +16,16 @@
  */
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 
 /**
  * Generates a logical graph
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public interface GraphGenerator
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends Operator {
+public interface GraphGenerator extends Operator {
 
   /**
    * generates the graph
    * @return graph collection
    */
-  LogicalGraph<G, V, E> execute();
+  LogicalGraph execute();
 }

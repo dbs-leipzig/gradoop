@@ -22,9 +22,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.graph.Vertex;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.model.api.epgm.VertexFactory;
 import org.gradoop.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
@@ -34,19 +33,17 @@ import java.util.List;
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
  * group label, the group property value and the aggregate values for its group.
- *
- * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("f1->id")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4")
-public class BuildSuperVertex<V extends EPGMVertex>
+public class BuildSuperVertex
   extends BuildBase
-  implements MapFunction<VertexGroupItem, V>, ResultTypeQueryable<V> {
+  implements MapFunction<VertexGroupItem, Vertex>, ResultTypeQueryable<Vertex> {
 
   /**
    * Vertex vertexFactory.
    */
-  private final EPGMVertexFactory<V> vertexFactory;
+  private final VertexFactory vertexFactory;
 
   /**
    * Creates map function.
@@ -59,23 +56,23 @@ public class BuildSuperVertex<V extends EPGMVertex>
   public BuildSuperVertex(List<String> groupPropertyKeys,
     boolean useLabel,
     List<PropertyValueAggregator> valueAggregators,
-    EPGMVertexFactory<V> vertexFactory) {
+    VertexFactory vertexFactory) {
     super(groupPropertyKeys, useLabel, valueAggregators);
     this.vertexFactory = vertexFactory;
   }
 
   /**
-   * Creates a {@link EPGMVertex} object from the given {@link
-   * VertexGroupItem} and returns a new {@link Vertex}.
+   * Creates a {@link Vertex} object from the given {@link
+   * VertexGroupItem} and returns a new {@link org.apache.flink.graph.Vertex}.
    *
    * @param groupItem vertex group item
    * @return vertex including new vertex data
    * @throws Exception
    */
   @Override
-  public V map(VertexGroupItem groupItem) throws
+  public Vertex map(VertexGroupItem groupItem) throws
     Exception {
-    V supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
+    Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
     setLabel(supVertex, groupItem.getGroupLabel());
     setGroupProperties(supVertex, groupItem.getGroupingValues());
@@ -88,7 +85,7 @@ public class BuildSuperVertex<V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public TypeInformation<V> getProducedType() {
+  public TypeInformation<Vertex> getProducedType() {
     return TypeExtractor.createTypeInfo(vertexFactory.getType());
   }
 }

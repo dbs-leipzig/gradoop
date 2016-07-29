@@ -17,27 +17,17 @@
 
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.LogicalGraph;
 
 /**
  * Creates a {@link LogicalGraph} based on one input {@link LogicalGraph}.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public interface UnaryGraphToGraphOperator<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> extends Operator {
+public interface UnaryGraphToGraphOperator extends Operator {
   /**
    * Executes the operator.
    *
    * @param graph input graph
    * @return operator result
    */
-  LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph);
+  LogicalGraph execute(LogicalGraph graph);
 }

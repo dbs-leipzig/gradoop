@@ -20,7 +20,7 @@ package org.gradoop.io.impl.hbase.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.impl.id.GradoopId;
 
 import java.util.HashSet;
@@ -35,7 +35,7 @@ import java.util.Set;
  *
  * @param <E> EPGM edge type
  */
-public abstract class EdgeSet<E extends EPGMEdge>
+public abstract class EdgeSet<E extends Edge>
   implements GroupReduceFunction<E, Tuple2<GradoopId, Set<E>>> {
 
   /**

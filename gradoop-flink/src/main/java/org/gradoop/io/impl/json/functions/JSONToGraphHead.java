@@ -19,8 +19,8 @@ package org.gradoop.io.impl.json.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMGraphHeadFactory;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.GraphHeadFactory;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.properties.PropertyList;
 
@@ -41,21 +41,21 @@ import org.gradoop.model.impl.properties.PropertyList;
  *
  * @param <G> EPGM graph head type
  */
-public class JSONToGraphHead<G extends EPGMGraphHead>
+public class JSONToGraphHead<G extends GraphHead>
   extends JSONToEntity
   implements MapFunction<String, G> {
 
   /**
    * Creates graph data objects
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Creates map function
    *
    * @param graphHeadFactory graph data factory
    */
-  public JSONToGraphHead(EPGMGraphHeadFactory<G> graphHeadFactory) {
+  public JSONToGraphHead(GraphHeadFactory<G> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 

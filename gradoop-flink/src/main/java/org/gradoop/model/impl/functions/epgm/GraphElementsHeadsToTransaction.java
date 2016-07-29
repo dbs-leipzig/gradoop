@@ -22,10 +22,10 @@ import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphElement;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
@@ -46,13 +46,13 @@ import java.util.Set;
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
 public class GraphElementsHeadsToTransaction
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements CoGroupFunction<
-  Tuple2<GradoopId, EPGMGraphElement>, G, GraphTransaction<G, V, E>> {
+  Tuple2<GradoopId, GraphElement>, G, GraphTransaction<G, V, E>> {
 
   @Override
   public void coGroup(
-    Iterable<Tuple2<GradoopId, EPGMGraphElement>> graphElements,
+    Iterable<Tuple2<GradoopId, GraphElement>> graphElements,
     Iterable<G> graphHeads,
     Collector<GraphTransaction<G, V, E>> out) throws Exception {
 
@@ -63,12 +63,12 @@ public class GraphElementsHeadsToTransaction
       Set<E> edges = Sets.newHashSet();
       G graphHead = graphHeadIter.next();
 
-      for (Tuple2<GradoopId, EPGMGraphElement> graphElement : graphElements) {
+      for (Tuple2<GradoopId, GraphElement> graphElement : graphElements) {
 
-        EPGMGraphElement el = graphElement.f1;
-        if (el instanceof EPGMVertex) {
+        GraphElement el = graphElement.f1;
+        if (el instanceof Vertex) {
           vertices.add((V) el);
-        } else if (el instanceof EPGMEdge) {
+        } else if (el instanceof Edge) {
           edges.add((E) el);
         }
       }

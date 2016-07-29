@@ -15,39 +15,25 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
+package org.gradoop.model.api.epgm;
 
 import org.gradoop.model.impl.id.GradoopId;
 
 /**
- * Describes data assigned to an edge in the EPGM.
+ * Describes an identifiable entity.
  */
-public interface EPGMEdge extends EPGMGraphElement {
+public interface Identifiable {
   /**
-   * Returns the source vertex identifier.
+   * Returns the identifier of that entity.
    *
-   * @return source vertex id
+   * @return identifier
    */
-  GradoopId getSourceId();
+  GradoopId getId();
 
   /**
-   * Sets the source vertex identifier.
+   * Sets the identifier of that entity.
    *
-   * @param sourceId source vertex id
+   * @param id identifier
    */
-  void setSourceId(GradoopId sourceId);
-
-  /**
-   * Returns the target vertex identifier.
-   *
-   * @return target vertex id
-   */
-  GradoopId getTargetId();
-
-  /**
-   * Sets the target vertex identifier.
-   *
-   * @param targetId target vertex id.
-   */
-  void setTargetId(GradoopId targetId);
+  void setId(GradoopId id);
 }

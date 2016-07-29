@@ -19,9 +19,9 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
@@ -60,7 +60,7 @@ import java.util.Map;
  * @param <E> EPGM edge type
  */
 public class GSpanTLFGraphEncoder
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements GSpanEncoder<DataSet<TLFGraph>> {
   /**
    * minimum support

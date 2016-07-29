@@ -18,9 +18,9 @@
 package org.gradoop.model.impl.operators.tostring;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.UnaryGraphCollectionToValueOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.functions.epgm.LabelCombiner;
@@ -36,8 +36,7 @@ import org.gradoop.model.impl.operators.tostring.functions.OutgoingAdjacencyList
 import org.gradoop.model.impl.operators.tostring.functions.SourceStringUpdater;
 import org.gradoop.model.impl.operators.tostring.functions.SwitchSourceTargetIds;
 import org.gradoop.model.impl.operators.tostring.functions.TargetStringUpdater;
-import org.gradoop.model.impl.operators.tostring.functions
-  .UndirectedAdjacencyList;
+import org.gradoop.model.impl.operators.tostring.functions.UndirectedAdjacencyList;
 import org.gradoop.model.impl.operators.tostring.tuples.EdgeString;
 import org.gradoop.model.impl.operators.tostring.tuples.GraphHeadString;
 import org.gradoop.model.impl.operators.tostring.tuples.VertexString;
@@ -45,26 +44,22 @@ import org.gradoop.model.impl.operators.tostring.tuples.VertexString;
 /**
  * Operator deriving a string representation from a graph collection.
  * The representation follows the concept of a canonical adjacency matrix.
- * @param <G> graph type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class CanonicalAdjacencyMatrixBuilder
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryGraphCollectionToValueOperator<G, V, E, String> {
+public class CanonicalAdjacencyMatrixBuilder 
+  implements UnaryGraphCollectionToValueOperator<String> {
 
   /**
    * function describing string representation of graph heads
    */
-  private final GraphHeadToString<G> graphHeadToString;
+  private final GraphHeadToString<GraphHead> graphHeadToString;
   /**
    * function describing string representation of vertices
    */
-  private final VertexToString<V> vertexToString;
+  private final VertexToString<Vertex> vertexToString;
   /**
    * function describing string representation of edges
    */
-  private final EdgeToString<E> egeLabelingFunction;
+  private final EdgeToString<Edge> egeLabelingFunction;
   /**
    * sets mode for either directed or undirected graph
    */
@@ -78,9 +73,9 @@ public class CanonicalAdjacencyMatrixBuilder
    * @param directed sets mode for either directed or undirected graph
    */
   public CanonicalAdjacencyMatrixBuilder(
-    GraphHeadToString<G> graphHeadToString,
-    VertexToString<V> vertexToString,
-    EdgeToString<E> edgeLabelingFunction,
+    GraphHeadToString<GraphHead> graphHeadToString,
+    VertexToString<Vertex> vertexToString,
+    EdgeToString<Edge> edgeLabelingFunction,
     boolean directed
   ) {
     this.graphHeadToString = graphHeadToString;
@@ -90,7 +85,7 @@ public class CanonicalAdjacencyMatrixBuilder
   }
 
   @Override
-  public DataSet<String> execute(GraphCollection<G, V, E> collection) {
+  public DataSet<String> execute(GraphCollection collection) {
 
     // 1. label graph heads
     DataSet<GraphHeadString> graphHeadLabels = collection.getGraphHeads()

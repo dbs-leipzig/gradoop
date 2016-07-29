@@ -17,8 +17,8 @@
 
 package org.gradoop.model.api.functions;
 
-import org.gradoop.model.api.EPGMAttributed;
-import org.gradoop.model.api.EPGMLabeled;
+import org.gradoop.model.api.epgm.Attributed;
+import org.gradoop.model.api.epgm.Labeled;
 
 /**
  * A transformation function is applied on an EPGM element (i.e. graph head,
@@ -26,7 +26,7 @@ import org.gradoop.model.api.EPGMLabeled;
  *
  * @param <EL> EPGM attributed / labeled element
  */
-public interface TransformationFunction<EL extends EPGMAttributed & EPGMLabeled>
+public interface TransformationFunction<EL extends Attributed & Labeled>
   extends BinaryFunction<EL, EL, EL> {
 
   /**

@@ -20,9 +20,9 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.util.Set;
@@ -37,7 +37,7 @@ import java.util.Set;
  * @param <E> EPGM edge type
  */
 public class VertexLabels
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   implements FlatMapFunction<GraphTransaction<G, V, E>, String> {
 
   @Override

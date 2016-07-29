@@ -17,9 +17,6 @@
 
 package org.gradoop.model.api.operators;
 
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.operators.difference.Difference;
 import org.gradoop.model.impl.operators.intersection.Intersection;
@@ -28,18 +25,11 @@ import org.gradoop.model.impl.operators.union.Union;
 /**
  * Creates a {@link GraphCollection} based on two input collections.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  * @see Union
  * @see Intersection
  * @see Difference
  */
-public interface BinaryCollectionToCollectionOperator<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  extends Operator {
+public interface BinaryCollectionToCollectionOperator extends Operator {
   /**
    * Executes the operator.
    *
@@ -47,6 +37,6 @@ public interface BinaryCollectionToCollectionOperator<
    * @param secondCollection second input collection
    * @return operator result
    */
-  GraphCollection<G, V, E> execute(GraphCollection<G, V, E> firstCollection,
-    GraphCollection<G, V, E> secondCollection);
+  GraphCollection execute(GraphCollection firstCollection,
+    GraphCollection secondCollection);
 }

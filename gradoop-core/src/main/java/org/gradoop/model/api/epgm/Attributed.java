@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
+package org.gradoop.model.api.epgm;
 
 import org.gradoop.model.impl.properties.Property;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -24,7 +24,7 @@ import org.gradoop.model.impl.properties.PropertyValue;
 /**
  * Used to describe entities that can have properties.
  */
-public interface EPGMAttributed {
+public interface Attributed {
 
   /**
    * Returns all properties of that entity.

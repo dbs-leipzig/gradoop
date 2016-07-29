@@ -19,9 +19,9 @@ package org.gradoop.util;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.config.GradoopConfig;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.model.impl.pojo.GraphHeadPojo;
@@ -43,9 +43,9 @@ import org.gradoop.storage.impl.hbase.HBaseVertexHandler;
  * @param <E>  EPGM edge type
  */
 public class GradoopFlinkConfig<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge>
   extends GradoopConfig<G, V, E> {
 
   /**
@@ -118,9 +118,9 @@ public class GradoopFlinkConfig<
    * @return Gradoop Flink configuration
    */
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge> GradoopFlinkConfig<G, V, E> createConfig(
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> GradoopFlinkConfig<G, V, E> createConfig(
     GradoopConfig<G, V, E> config, ExecutionEnvironment environment) {
     return new GradoopFlinkConfig<>(config, environment);
   }

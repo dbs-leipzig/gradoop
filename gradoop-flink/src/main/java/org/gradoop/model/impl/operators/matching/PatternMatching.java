@@ -22,9 +22,8 @@ import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.log4j.Logger;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -40,14 +39,8 @@ import org.gradoop.model.impl.properties.PropertyValue;
 
 /**
  * Base class for pattern matching implementations.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public abstract class PatternMatching
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements UnaryGraphToCollectionOperator<G, V, E> {
+public abstract class PatternMatching implements UnaryGraphToCollectionOperator {
   /**
    * GDL based query string
    */
@@ -91,12 +84,12 @@ public abstract class PatternMatching
   }
 
   @Override
-  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+  public GraphCollection execute(LogicalGraph graph) {
     if (log.isDebugEnabled()) {
       initDebugMappings(graph);
     }
 
-    GraphCollection<G, V, E> result;
+    GraphCollection result;
 
     if (queryHandler.isSingleVertexGraph()) {
       result = executeForVertex(graph);
@@ -113,8 +106,8 @@ public abstract class PatternMatching
    * @param graph data graph
    * @return result collection
    */
-  protected abstract GraphCollection<G, V, E> executeForVertex(
-    LogicalGraph<G, V, E> graph);
+  protected abstract GraphCollection executeForVertex(
+    LogicalGraph graph);
 
   /**
    * Computes the result for pattern query graph.
@@ -122,8 +115,8 @@ public abstract class PatternMatching
    * @param graph data graph
    * @return result collection
    */
-  protected abstract GraphCollection<G, V, E> executeForPattern(
-    LogicalGraph<G, V, E> graph);
+  protected abstract GraphCollection executeForPattern(
+    LogicalGraph graph);
 
   /**
    * Returns the query handler used by the concrete implementation.
@@ -202,10 +195,10 @@ public abstract class PatternMatching
    *
    * @param graph data graph
    */
-  private void initDebugMappings(LogicalGraph<G, V, E> graph) {
+  private void initDebugMappings(LogicalGraph graph) {
     vertexMapping = graph.getVertices()
-      .map(new PairElementWithPropertyValue<V>("id"));
+      .map(new PairElementWithPropertyValue<Vertex>("id"));
     edgeMapping = graph.getEdges()
-      .map(new PairElementWithPropertyValue<E>("id"));
+      .map(new PairElementWithPropertyValue<Edge>("id"));
   }
 }

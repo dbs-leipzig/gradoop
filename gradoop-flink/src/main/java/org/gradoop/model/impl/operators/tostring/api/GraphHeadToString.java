@@ -17,13 +17,13 @@
 package org.gradoop.model.impl.operators.tostring.api;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
  * string representation of a graph head
  * @param <G> graph head type
  */
-public interface GraphHeadToString<G extends EPGMGraphHead>
+public interface GraphHeadToString<G extends GraphHead>
   extends MapFunction<G, GraphHeadString> {
 }

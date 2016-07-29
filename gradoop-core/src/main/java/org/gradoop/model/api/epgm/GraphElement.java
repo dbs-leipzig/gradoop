@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.api;
+package org.gradoop.model.api.epgm;
 
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
@@ -24,7 +24,7 @@ import org.gradoop.model.impl.id.GradoopIdSet;
  * A graph element is part of a logical graph. An element can be part of more
  * than one logical graph. This applies to vertices and edges in the EPGM.
  */
-public interface EPGMGraphElement extends EPGMElement {
+public interface GraphElement extends Element {
   /**
    * Returns all graphs that element belongs to.
    *

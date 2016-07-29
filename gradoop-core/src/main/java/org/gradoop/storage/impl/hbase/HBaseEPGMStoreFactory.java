@@ -22,9 +22,6 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
@@ -52,19 +49,12 @@ public class HBaseEPGMStoreFactory {
    * @param config        Hadoop cluster configuration
    * @param gradoopHBaseConfig Gradoop configuration
    * @param prefix        prefix for HBase table name
-   * @param <G>           EPGM graph head type
-   * @param <V>           EPGM vertex type
-   * @param <E>           EPGM edge type
    *
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge>
-  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
+  public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig,
+    final GradoopHBaseConfig gradoopHBaseConfig,
     final String prefix) {
     return createOrOpenEPGMStore(config,
       GradoopHBaseConfig.createConfig(gradoopHBaseConfig,
@@ -82,19 +72,12 @@ public class HBaseEPGMStoreFactory {
    * @param graphTableName      graph table name
    * @param vertexTableName     vertex table name
    * @param edgeTableName       edge table name
-   * @param <G>                 EPGM graph head type
-   * @param <V>                 EPGM vertex type
-   * @param <E>                 EPGM edge type
    *
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge>
-  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
+  public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig,
+    final GradoopHBaseConfig gradoopHBaseConfig,
     final String graphTableName,
     final String vertexTableName,
     final String edgeTableName) {
@@ -109,18 +92,11 @@ public class HBaseEPGMStoreFactory {
    *
    * @param config              Hadoop cluster configuration
    * @param gradoopHBaseConfig  Gradoop HBase configuration
-   * @param <G>                 EPGM graph head type
-   * @param <V>                 EPGM vertex type
-   * @param <E>                 EPGM edge type
    * @return EPGM store instance or {@code null in the case of errors}
    */
-  public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge>
-  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
+  public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig) {
+    final GradoopHBaseConfig gradoopHBaseConfig) {
     try {
       createTablesIfNotExists(config, gradoopHBaseConfig.getVertexHandler(),
         gradoopHBaseConfig.getEdgeHandler(),
@@ -136,8 +112,8 @@ public class HBaseEPGMStoreFactory {
       HTable edgeDataTable = new HTable(config,
         gradoopHBaseConfig.getEdgeTableName());
 
-      return new HBaseEPGMStore<>(
-        graphDataTable, vertexDataTable, edgeDataTable, gradoopHBaseConfig);
+      return new HBaseEPGMStore(graphDataTable, vertexDataTable, edgeDataTable,
+        gradoopHBaseConfig);
     } catch (IOException e) {
       e.printStackTrace();
       return null;

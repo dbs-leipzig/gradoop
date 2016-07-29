@@ -17,13 +17,13 @@
 package org.gradoop.model.impl.operators.tostring.api;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.operators.tostring.tuples.VertexString;
 
 /**
  * string representation of a vertex
  * @param <V> graph head type
  */
-public interface VertexToString<V extends EPGMVertex>
+public interface VertexToString<V extends Vertex>
   extends FlatMapFunction<V, VertexString> {
 }

@@ -25,9 +25,9 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Writables;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.EPGMStore;
 import org.gradoop.storage.api.EdgeHandler;
@@ -44,19 +44,9 @@ import java.util.Iterator;
 /**
  * Default HBase graph store that handles reading and writing vertices and
  * graphs from and to HBase.
- *
- * @param <G>   EPGM graph head type
- * @param <V>   EPGM vertex type
- * @param <E>   EPGM edge type
  */
-public class HBaseEPGMStore<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge>
-  implements EPGMStore<G, V, E,
-  HBaseGraphHead,
-  HBaseVertex<E>,
-  HBaseEdge<V>> {
+public class HBaseEPGMStore
+  implements EPGMStore<HBaseGraphHead, HBaseVertex, HBaseEdge> {
   /**
    * Default value for clearing buffer on fail.
    */
@@ -69,7 +59,7 @@ public class HBaseEPGMStore<
   /**
    * Gradoop configuration.
    */
-  private final GradoopHBaseConfig<G, V, E> config;
+  private final GradoopHBaseConfig config;
 
   /**
    * HBase table for storing graphs.
@@ -96,7 +86,7 @@ public class HBaseEPGMStore<
   HBaseEPGMStore(final HTable graphHeadTable,
     final HTable vertexTable,
     final HTable edgeTable,
-    final GradoopHBaseConfig<G, V, E> config) {
+    final GradoopHBaseConfig config) {
     this.graphHeadTable = Preconditions.checkNotNull(graphHeadTable);
     this.vertexTable = Preconditions.checkNotNull(vertexTable);
     this.edgeTable = Preconditions.checkNotNull(edgeTable);
@@ -114,7 +104,7 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public GradoopHBaseConfig<G, V, E> getConfig() {
+  public GradoopHBaseConfig getConfig() {
     return config;
   }
 
@@ -164,9 +154,9 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public void writeVertex(final PersistentVertex<E> vertexData) {
+  public void writeVertex(final PersistentVertex vertexData) {
     try {
-      VertexHandler<V, E> vertexHandler = config.getVertexHandler();
+      VertexHandler vertexHandler = config.getVertexHandler();
       // vertex id
       Put put = new Put(vertexHandler.getRowKey(vertexData.getId()));
       // write vertex data to Put
@@ -182,10 +172,10 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public void writeEdge(final PersistentEdge<V> edgeData) {
+  public void writeEdge(final PersistentEdge edgeData) {
     // write to table
     try {
-      EdgeHandler<V, E> edgeHandler = config.getEdgeHandler();
+      EdgeHandler edgeHandler = config.getEdgeHandler();
       // edge id
       Put put = new Put(edgeHandler.getRowKey(edgeData.getId()));
       // write edge data to Put
@@ -200,10 +190,10 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public G readGraph(final GradoopId graphId) {
-    G graphData = null;
+  public GraphHead readGraph(final GradoopId graphId) {
+    GraphHead graphData = null;
     try {
-      GraphHeadHandler<G> graphHeadHandler = config.getGraphHeadHandler();
+      GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();
       Result res = graphHeadTable.get(new Get(Writables.getBytes(graphId)));
       if (!res.isEmpty()) {
         graphData = graphHeadHandler.readGraphHead(res);
@@ -218,10 +208,10 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public V readVertex(final GradoopId vertexId) {
-    V vertexData = null;
+  public Vertex readVertex(final GradoopId vertexId) {
+    Vertex vertexData = null;
     try {
-      VertexHandler<V, E> vertexHandler = config.getVertexHandler();
+      VertexHandler vertexHandler = config.getVertexHandler();
       byte[] rowKey = vertexHandler.getRowKey(vertexId);
       Result res = vertexTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
@@ -237,10 +227,10 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public E readEdge(final GradoopId edgeId) {
-    E edgeData = null;
+  public Edge readEdge(final GradoopId edgeId) {
+    Edge edgeData = null;
     try {
-      EdgeHandler<V, E> edgeHandler = config.getEdgeHandler();
+      EdgeHandler edgeHandler = config.getEdgeHandler();
       byte[] rowKey = edgeHandler.getRowKey(edgeId);
       Result res = edgeTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
@@ -256,7 +246,7 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public Iterator<G> getGraphSpace() throws IOException {
+  public Iterator<GraphHead> getGraphSpace() throws IOException {
     return getGraphSpace(GConstants.HBASE_DEFAULT_SCAN_CACHE_SIZE);
   }
 
@@ -264,7 +254,7 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public Iterator<G> getGraphSpace(int cacheSize) throws IOException {
+  public Iterator<GraphHead> getGraphSpace(int cacheSize) throws IOException {
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
@@ -275,7 +265,7 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public Iterator<V> getVertexSpace() throws IOException {
+  public Iterator<Vertex> getVertexSpace() throws IOException {
     return getVertexSpace(GConstants.HBASE_DEFAULT_SCAN_CACHE_SIZE);
   }
 
@@ -283,7 +273,7 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public Iterator<V> getVertexSpace(int cacheSize) throws IOException {
+  public Iterator<Vertex> getVertexSpace(int cacheSize) throws IOException {
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
@@ -294,7 +284,7 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public Iterator<E> getEdgeSpace() throws IOException {
+  public Iterator<Edge> getEdgeSpace() throws IOException {
     return getEdgeSpace(GConstants.HBASE_DEFAULT_SCAN_CACHE_SIZE);
   }
 
@@ -302,7 +292,7 @@ public class HBaseEPGMStore<
    * {@inheritDoc}
    */
   @Override
-  public Iterator<E> getEdgeSpace(int cacheSize) throws IOException {
+  public Iterator<Edge> getEdgeSpace(int cacheSize) throws IOException {
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
@@ -351,7 +341,7 @@ public class HBaseEPGMStore<
    * Iterator helper class for iterating over HBase result scanner containing
    * graph data.
    */
-  public class GraphHeadIterator implements Iterator<G> {
+  public class GraphHeadIterator implements Iterator<GraphHead> {
     /**
      * HBase result
      */
@@ -388,7 +378,7 @@ public class HBaseEPGMStore<
      * {@inheritDoc}
      */
     @Override
-    public G next() {
+    public GraphHead next() {
       return config.getGraphHeadHandler().readGraphHead(result);
     }
 
@@ -404,7 +394,7 @@ public class HBaseEPGMStore<
    * Iterator helper class for iterating over HBase result scanner containing
    * vertex data.
    */
-  public class VertexIterator implements Iterator<V> {
+  public class VertexIterator implements Iterator<Vertex> {
     /**
      * HBase result
      */
@@ -441,7 +431,7 @@ public class HBaseEPGMStore<
      * {@inheritDoc}
      */
     @Override
-    public V next() {
+    public Vertex next() {
       return config.getVertexHandler().readVertex(result);
     }
 
@@ -457,7 +447,7 @@ public class HBaseEPGMStore<
    * Iterator helper class for iterating over HBase result scanner containing
    * edge data.
    */
-  public class EdgeIterator implements Iterator<E> {
+  public class EdgeIterator implements Iterator<Edge> {
     /**
      * HBase result
      */
@@ -494,7 +484,7 @@ public class HBaseEPGMStore<
      * {@inheritDoc}
      */
     @Override
-    public E next() {
+    public Edge next() {
       return config.getEdgeHandler().readEdge(result);
     }
 

@@ -17,9 +17,6 @@
 
 package org.gradoop.io.api;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -28,32 +25,27 @@ import java.io.IOException;
 
 /**
  * Data source in analytical programs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public interface DataSource
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+public interface DataSource {
 
   /**
    * Reads the input as logical graph.
    *
    * @return logial graph
    */
-  LogicalGraph<G, V, E> getLogicalGraph() throws IOException;
+  LogicalGraph getLogicalGraph() throws IOException;
 
   /**
    * Reads the input as graph collection.
    *
    * @return graph collection
    */
-  GraphCollection<G, V, E> getGraphCollection() throws IOException;
+  GraphCollection getGraphCollection() throws IOException;
 
   /**
    * Reads the input as graph transactions.
    *
    * @return graph transactions
    */
-  GraphTransactions<G, V, E> getGraphTransactions() throws IOException;
+  GraphTransactions getGraphTransactions() throws IOException;
 }

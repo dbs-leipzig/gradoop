@@ -21,7 +21,7 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.io.impl.json.JSONConstants;
-import org.gradoop.model.api.EPGMEdge;
+import org.gradoop.model.api.epgm.Edge;
 
 /**
  * Converts an edge into the following format:
@@ -36,7 +36,7 @@ import org.gradoop.model.api.EPGMEdge;
  *
  * @param <E> EPGM edge type
  */
-public class EdgeToJSON<E extends EPGMEdge>
+public class EdgeToJSON<E extends Edge>
   extends EntityToJSON
   implements TextOutputFormat.TextFormatter<E> {
 
