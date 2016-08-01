@@ -25,7 +25,6 @@ import org.gradoop.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.tuples.GraphTransaction;
@@ -41,14 +40,9 @@ import java.util.Map;
  *   v 1 vertexLabel1
  *   e 0 1 edgeLabel
  * </p>
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class TLFFileFormat
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements TextOutputFormat.TextFormatter<GraphTransaction<G, V, E>> {
+public class TLFFileFormat implements
+  TextOutputFormat.TextFormatter<GraphTransaction> {
 
   /**
    * Global counter for the graph id used for each single graph transaction.
@@ -62,7 +56,7 @@ public class TLFFileFormat
    * @return TLF string representation
    */
   @Override
-  public String format(GraphTransaction<G, V, E> graphTransaction) {
+  public String format(GraphTransaction graphTransaction) {
     Map<GradoopId, Integer> vertexIdMap = Maps
       .newHashMapWithExpectedSize(graphTransaction.getVertices().size());
 
@@ -77,14 +71,14 @@ public class TLFFileFormat
 
     // VERTICES
     int vertexId = 0;
-    for (V vertex : graphTransaction.getVertices()) {
+    for (Vertex vertex : graphTransaction.getVertices()) {
       vertexIdMap.put(vertex.getId(), vertexId);
       lines.add(TLFVertex.SYMBOL + " " + vertexId + " " + vertex.getLabel());
       vertexId++;
     }
 
     // EDGES
-    for (E edge : graphTransaction.getEdges()) {
+    for (Edge edge : graphTransaction.getEdges()) {
       Integer sourceId = vertexIdMap.get(edge.getSourceId());
       Integer targetId = vertexIdMap.get(edge.getTargetId());
 

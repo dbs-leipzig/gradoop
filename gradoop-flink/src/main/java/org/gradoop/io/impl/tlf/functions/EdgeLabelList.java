@@ -21,29 +21,22 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.util.List;
 
 /**
  * Creates a list containing all edge labels.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class EdgeLabelList
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements FlatMapFunction<GraphTransaction<G, V, E>, List<String>> {
+public class EdgeLabelList implements
+  FlatMapFunction<GraphTransaction, List<String>> {
 
   @Override
   public void flatMap(
-    GraphTransaction<G, V, E> graphTransaction, Collector<List<String>>
+    GraphTransaction graphTransaction, Collector<List<String>>
     collector) throws Exception {
     List<String> list = Lists.newLinkedList();
-    for (E edge : graphTransaction.getEdges()) {
+    for (Edge edge : graphTransaction.getEdges()) {
       list.add(edge.getLabel());
     }
     collector.collect(list);

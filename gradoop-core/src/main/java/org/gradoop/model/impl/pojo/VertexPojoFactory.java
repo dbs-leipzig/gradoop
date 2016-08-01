@@ -18,16 +18,20 @@
 package org.gradoop.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
+import org.gradoop.model.api.epgm.Element;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
 import org.gradoop.util.GConstants;
 import org.gradoop.model.api.epgm.VertexFactory;
 
+import java.io.Serializable;
+
 /**
  * Factory for creating vertex POJOs.
  */
-public class VertexPojoFactory implements VertexFactory {
+public class VertexPojoFactory implements VertexFactory, Serializable {
 
   /**
    * serial version uid
@@ -120,11 +124,8 @@ public class VertexPojoFactory implements VertexFactory {
     return new VertexPojo(id, label, properties, graphs);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public Class<VertexPojo> getType() {
+  public Class<? extends Vertex> getType() {
     return VertexPojo.class;
   }
 }

@@ -84,8 +84,10 @@ public class BuildSuperVertex
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Vertex> getProducedType() {
-    return TypeExtractor.createTypeInfo(vertexFactory.getType());
+    return (TypeInformation<Vertex>) TypeExtractor
+      .createTypeInfo(vertexFactory.getType());
   }
 }

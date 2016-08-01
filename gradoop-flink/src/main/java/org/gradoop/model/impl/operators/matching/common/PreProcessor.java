@@ -18,9 +18,6 @@
 package org.gradoop.model.impl.operators.matching.common;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.matching.common.functions.BuildIdWithCandidates;
 import org.gradoop.model.impl.operators.matching.common.functions.BuildTripleWithCandidates;
@@ -45,18 +42,13 @@ public class PreProcessor {
    *
    * @param graph data graph
    * @param query query graph
-   * @param <G>   EPGM graph head type
-   * @param <V>   EPGM vertex type
-   * @param <E>   EPGM edge type
    * @return dataset with matching vertex ids and their candidates
    */
-  public static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  DataSet<IdWithCandidates> filterVertices(LogicalGraph<G, V, E> graph,
+  public static DataSet<IdWithCandidates> filterVertices(LogicalGraph graph,
     final String query) {
     return graph.getVertices()
-      .filter(new MatchingVertices<V>(query))
-      .map(new BuildIdWithCandidates<V>(query));
+      .filter(new MatchingVertices<>(query))
+      .map(new BuildIdWithCandidates<>(query));
   }
 
   /**
@@ -65,18 +57,13 @@ public class PreProcessor {
    *
    * @param graph data graph
    * @param query query graph
-   * @param <G>   EPGM graph head type
-   * @param <V>   EPGM vertex type
-   * @param <E>   EPGM edge type
    * @return dataset with matching edge triples and their candidates
    */
-  public static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  DataSet<TripleWithCandidates> filterEdges(LogicalGraph<G, V, E> graph,
+  public static DataSet<TripleWithCandidates> filterEdges(LogicalGraph graph,
     final String query) {
     return graph.getEdges()
-      .filter(new MatchingEdges<E>(query))
-      .map(new BuildTripleWithCandidates<E>(query));
+      .filter(new MatchingEdges<>(query))
+      .map(new BuildTripleWithCandidates<>(query));
   }
 
   /**
@@ -86,14 +73,10 @@ public class PreProcessor {
    *
    * @param g     data graph
    * @param query query graph
-   * @param <G>   EPGM graph head type
-   * @param <V>   EPGM vertex type
-   * @param <E>   EPGM edge type
    * @return dataset with matching vertex-edge pairs
    */
   public static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  DataSet<TripleWithSourceEdgeCandidates> filterPairs(LogicalGraph<G, V, E> g,
+  DataSet<TripleWithSourceEdgeCandidates> filterPairs(LogicalGraph g,
     final String query) {
     return filterPairs(g, query, filterVertices(g, query));
   }
@@ -106,17 +89,12 @@ public class PreProcessor {
    * @param graph             data graph
    * @param query             query graph
    * @param filteredVertices  used for the edge join
-   * @param <G>               EPGM graph head type
-   * @param <V>               EPGM vertex type
-   * @param <E>               EPGM edge type
 
    * @return dataset with matching vertex-edge pairs and their candidates
    */
   public static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  DataSet<TripleWithSourceEdgeCandidates> filterPairs(
-    LogicalGraph<G, V, E> graph, final String query,
-    DataSet<IdWithCandidates> filteredVertices) {
+  DataSet<TripleWithSourceEdgeCandidates> filterPairs(LogicalGraph graph,
+    final String query, DataSet<IdWithCandidates> filteredVertices) {
     return filteredVertices
       .join(filterEdges(graph, query))
       .where(0).equalTo(1)
@@ -130,14 +108,10 @@ public class PreProcessor {
    *
    * @param graph data graph
    * @param query query graph
-   * @param <G>   EPGM graph head type
-   * @param <V>   EPGM vertex type
-   * @param <E>   EPGM edge type
    * @return dataset with matching triples
    */
   public static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  DataSet<TripleWithCandidates> filterTriplets(LogicalGraph<G, V, E> graph,
+  DataSet<TripleWithCandidates> filterTriplets(LogicalGraph graph,
     final String query) {
     return filterTriplets(graph, query, filterVertices(graph, query));
   }
@@ -150,14 +124,9 @@ public class PreProcessor {
    * @param graph             data graph
    * @param query             query graph
    * @param filteredVertices  used for the edge join
-   * @param <G>               EPGM graph head type
-   * @param <V>               EPGM vertex type
-   * @param <E>               EPGM edge type
    * @return dataset with matching triples and their candidates
    */
-  public static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  DataSet<TripleWithCandidates> filterTriplets(LogicalGraph<G, V, E> graph,
+  public static DataSet<TripleWithCandidates> filterTriplets(LogicalGraph graph,
     final String query, DataSet<IdWithCandidates> filteredVertices) {
     return filterPairs(graph, query, filteredVertices)
       .join(filteredVertices)

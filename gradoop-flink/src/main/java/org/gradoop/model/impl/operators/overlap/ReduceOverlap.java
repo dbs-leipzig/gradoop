@@ -46,15 +46,9 @@ import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Computes the overlap graph from a collection of logical graphs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class ReduceOverlap
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  extends OverlapBase<V, E>
-  implements ReducibleBinaryGraphToGraphOperator<G, V, E> {
+public class ReduceOverlap extends OverlapBase 
+  implements ReducibleBinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge sets
@@ -65,10 +59,10 @@ public class ReduceOverlap
    * @return graph with overlapping elements from the input collection
    */
   @Override
-  public LogicalGraph<G, V, E> execute(GraphCollection<G, V, E> collection) {
-    DataSet<G> graphHeads = collection.getGraphHeads();
+  public LogicalGraph execute(GraphCollection collection) {
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads();
 
-    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<G>());
+    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<GraphHead>());
 
     return LogicalGraph.fromDataSets(
       getVertices(collection.getVertices(), graphIDs),

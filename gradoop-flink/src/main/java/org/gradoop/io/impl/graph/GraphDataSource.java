@@ -29,7 +29,6 @@ import org.gradoop.io.impl.graph.functions.UpdateEPGMEdge;
 import org.gradoop.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
@@ -49,15 +48,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link ImportEdge}. This class transforms the external graph into an EPGM
  * {@link LogicalGraph}.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  * @param <K> External vertex/edge identifier type
  */
-public class GraphDataSource
-  <G extends GraphHead, V extends Vertex, E extends Edge,
-    K extends Comparable<K>>
-  implements DataSource<G, V, E> {
+public class GraphDataSource<K extends Comparable<K>> implements DataSource {
 
   /**
    * Vertices to import.
@@ -77,7 +70,7 @@ public class GraphDataSource
   /**
    * Gradoop config
    */
-  private final GradoopFlinkConfig<G, V, E> config;
+  private final GradoopFlinkConfig config;
 
 
   /**
@@ -89,8 +82,7 @@ public class GraphDataSource
    * @param config          gradoop config
    */
   public GraphDataSource(DataSet<ImportVertex<K>> importVertices,
-    DataSet<ImportEdge<K>> importEdges,
-    GradoopFlinkConfig<G, V, E> config) {
+    DataSet<ImportEdge<K>> importEdges, GradoopFlinkConfig config) {
     this(importVertices, importEdges, null, config);
   }
 
@@ -107,9 +99,8 @@ public class GraphDataSource
    * @param config              gradoop config
    */
   public GraphDataSource(DataSet<ImportVertex<K>> importVertices,
-    DataSet<ImportEdge<K>> importEdges,
-    String lineagePropertyKey,
-    GradoopFlinkConfig<G, V, E> config) {
+    DataSet<ImportEdge<K>> importEdges, String lineagePropertyKey, 
+    GradoopFlinkConfig config) {
     this.importVertices     = checkNotNull(importVertices);
     this.importEdges        = checkNotNull(importEdges);
     this.lineagePropertyKey = lineagePropertyKey;
@@ -122,40 +113,40 @@ public class GraphDataSource
    * @return logical graph
    */
   @Override
-  public LogicalGraph<G, V, E> getLogicalGraph() {
+  public LogicalGraph getLogicalGraph() {
 
     TypeInformation<K> externalIdType = ((TupleTypeInfo<?>) importVertices
       .getType()).getTypeAt(0);
 
-    DataSet<Tuple3<K, GradoopId, V>> vertexTriples = importVertices
+    DataSet<Tuple3<K, GradoopId, Vertex>> vertexTriples = importVertices
       .map(new InitEPGMVertex<>(
         config.getVertexFactory(), lineagePropertyKey, externalIdType));
 
-    DataSet<V> epgmVertices = vertexTriples
-      .map(new Value2Of3<K, GradoopId, V>());
+    DataSet<Vertex> epgmVertices = vertexTriples
+      .map(new Value2Of3<K, GradoopId, Vertex>());
 
     DataSet<Tuple2<K, GradoopId>> vertexIdPair = vertexTriples
-      .map(new Project3To0And1<K, GradoopId, V>());
+      .map(new Project3To0And1<K, GradoopId, Vertex>());
 
-    DataSet<E> epgmEdges = importEdges
+    DataSet<Edge> epgmEdges = importEdges
       .join(vertexIdPair)
       .where(1).equalTo(0)
       .with(new InitEPGMEdge<>(
         config.getEdgeFactory(), lineagePropertyKey, externalIdType))
       .join(vertexIdPair)
       .where(0).equalTo(0)
-      .with(new UpdateEPGMEdge<E, K>());
+      .with(new UpdateEPGMEdge<Edge, K>());
 
     return LogicalGraph.fromDataSets(epgmVertices, epgmEdges, config);
   }
 
   @Override
-  public GraphCollection<G, V, E> getGraphCollection() throws IOException {
+  public GraphCollection getGraphCollection() throws IOException {
     return GraphCollection.fromGraph(getLogicalGraph());
   }
 
   @Override
-  public GraphTransactions<G, V, E> getGraphTransactions() throws IOException {
+  public GraphTransactions getGraphTransactions() throws IOException {
     return getGraphCollection().toTransactions();
   }
 }

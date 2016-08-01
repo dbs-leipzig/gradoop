@@ -299,7 +299,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
     // group + reduce + build final edges
     return groupEdges(combinedEdges)
-      .reduceGroup(new ReduceEdgeGroupItems<>(getEdgeGroupingKeys(),
+      .reduceGroup(new ReduceEdgeGroupItems(getEdgeGroupingKeys(),
         useEdgeLabels(),
         getEdgeAggregators(),
         config.getEdgeFactory()));

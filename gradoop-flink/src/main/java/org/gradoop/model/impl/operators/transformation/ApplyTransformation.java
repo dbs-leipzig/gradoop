@@ -28,15 +28,9 @@ import org.gradoop.model.impl.LogicalGraph;
 /**
  * Applies the transformation operator on on all logical graphs in a graph
  * collection.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class ApplyTransformation
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  extends Transformation<G, V, E>
-  implements ApplicableUnaryGraphToGraphOperator<G, V, E> {
+public class ApplyTransformation extends Transformation
+  implements ApplicableUnaryGraphToGraphOperator {
 
   /**
    * Creates a new operator instance.
@@ -45,16 +39,16 @@ public class ApplyTransformation
    * @param vertexModFunc    vertex transformation function
    * @param edgeModFunc      edge transformation function
    */
-  public ApplyTransformation(TransformationFunction<G> graphHeadModFunc,
-    TransformationFunction<V> vertexModFunc,
-    TransformationFunction<E> edgeModFunc) {
+  public ApplyTransformation(TransformationFunction<GraphHead> graphHeadModFunc,
+    TransformationFunction<Vertex> vertexModFunc,
+    TransformationFunction<Edge> edgeModFunc) {
     super(graphHeadModFunc, vertexModFunc, edgeModFunc);
   }
 
   @Override
-  public GraphCollection<G, V, E> execute(GraphCollection<G, V, E> collection) {
+  public GraphCollection execute(GraphCollection collection) {
     // the resulting logical graph holds multiple graph heads
-    LogicalGraph<G, V, E> modifiedGraph = executeInternal(
+    LogicalGraph modifiedGraph = executeInternal(
       collection.getGraphHeads(),
       collection.getVertices(),
       collection.getEdges(),

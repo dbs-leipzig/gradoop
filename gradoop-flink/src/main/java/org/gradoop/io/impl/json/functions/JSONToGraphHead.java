@@ -38,24 +38,21 @@ import org.gradoop.model.impl.properties.PropertyList;
  * "data":{"title":"Graph Databases"},
  * "meta":{"label":"Community","vertices":[0,1,2],"edges":[4,5,6]}
  * }
- *
- * @param <G> EPGM graph head type
  */
-public class JSONToGraphHead<G extends GraphHead>
-  extends JSONToEntity
-  implements MapFunction<String, G> {
+public class JSONToGraphHead extends JSONToEntity
+  implements MapFunction<String, GraphHead> {
 
   /**
    * Creates graph data objects
    */
-  private final GraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
 
   /**
    * Creates map function
    *
    * @param graphHeadFactory graph data factory
    */
-  public JSONToGraphHead(GraphHeadFactory<G> graphHeadFactory) {
+  public JSONToGraphHead(GraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -67,7 +64,7 @@ public class JSONToGraphHead<G extends GraphHead>
    * @throws Exception
    */
   @Override
-  public G map(String s) throws Exception {
+  public GraphHead map(String s) throws Exception {
     JSONObject jsonGraph = new JSONObject(s);
     GradoopId graphID = getID(jsonGraph);
     String label = getLabel(jsonGraph);

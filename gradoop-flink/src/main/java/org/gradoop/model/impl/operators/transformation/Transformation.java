@@ -17,7 +17,9 @@
 
 package org.gradoop.model.impl.operators.transformation;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
@@ -35,29 +37,23 @@ import org.gradoop.util.GradoopFlinkConfig;
  * elements of that graph as well as on its graph head.
  *
  * The identity of the elements is preserved.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Transformation
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements UnaryGraphToGraphOperator<G, V, E> {
+public class Transformation implements UnaryGraphToGraphOperator {
 
   /**
    * Modification function for graph heads
    */
-  private final TransformationFunction<G> graphHeadTransFunc;
+  private final TransformationFunction<GraphHead> graphHeadTransFunc;
 
   /**
    * Modification function for vertices
    */
-  private final TransformationFunction<V> vertexTransFunc;
+  private final TransformationFunction<Vertex> vertexTransFunc;
 
   /**
    * Modification function for edges
    */
-  private final TransformationFunction<E> edgeTransFunc;
+  private final TransformationFunction<Edge> edgeTransFunc;
 
   /**
    * Creates a new operator instance.
@@ -66,9 +62,9 @@ public class Transformation
    * @param vertexTransFunc     vertex transformation function
    * @param edgeTransFunc       edge transformation function
    */
-  public Transformation(TransformationFunction<G> graphHeadTransFunc,
-    TransformationFunction<V> vertexTransFunc,
-    TransformationFunction<E> edgeTransFunc) {
+  public Transformation(TransformationFunction<GraphHead> graphHeadTransFunc,
+    TransformationFunction<Vertex> vertexTransFunc,
+    TransformationFunction<Edge> edgeTransFunc) {
 
     if (graphHeadTransFunc == null &&
       vertexTransFunc == null &&
@@ -82,7 +78,7 @@ public class Transformation
   }
 
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+  public LogicalGraph execute(LogicalGraph graph) {
     return executeInternal(
       graph.getGraphHead(),
       graph.getVertices(),
@@ -99,22 +95,29 @@ public class Transformation
    * @param config      gradoop flink config
    * @return transformed logical graph
    */
-  protected LogicalGraph<G, V, E> executeInternal(DataSet<G> graphHeads,
-    DataSet<V> vertices, DataSet<E> edges, GradoopFlinkConfig<G, V, E> config) {
+  @SuppressWarnings("unchecked")
+  protected LogicalGraph executeInternal(DataSet<GraphHead> graphHeads,
+    DataSet<Vertex> vertices, DataSet<Edge> edges, GradoopFlinkConfig config) {
 
-    DataSet<G> transformedGraphHeads = graphHeadTransFunc != null ?
-      graphHeads.map(new TransformGraphHead<>(
-          graphHeadTransFunc, config.getGraphHeadFactory())) :
+    DataSet<GraphHead> transformedGraphHeads = graphHeadTransFunc != null ?
+      graphHeads.map(new TransformGraphHead(
+        graphHeadTransFunc, config.getGraphHeadFactory()))
+      .returns((TypeInformation<GraphHead>) TypeExtractor
+        .createTypeInfo(config.getGraphHeadFactory().getType())):
       graphHeads;
 
-    DataSet<V> transformedVertices = vertexTransFunc != null ?
-      vertices.map(new TransformVertex<>(
-        vertexTransFunc, config.getVertexFactory())) :
+    DataSet<Vertex> transformedVertices = vertexTransFunc != null ?
+      vertices.map(new TransformVertex(
+        vertexTransFunc, config.getVertexFactory()))
+      .returns((TypeInformation<Vertex>) TypeExtractor
+        .createTypeInfo(config.getVertexFactory().getType())):
       vertices;
 
-    DataSet<E> transformedEdges = edgeTransFunc != null ?
-      edges.map(new TransformEdge<>(
-        edgeTransFunc, config.getEdgeFactory())) :
+    DataSet<Edge> transformedEdges = edgeTransFunc != null ?
+      edges.map(new TransformEdge(
+        edgeTransFunc, config.getEdgeFactory()))
+      .returns((TypeInformation<Edge>) TypeExtractor
+        .createTypeInfo(config.getEdgeFactory().getType())):
       edges;
 
     return LogicalGraph.fromDataSets(

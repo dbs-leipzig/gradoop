@@ -39,41 +39,35 @@ import java.util.Set;
  * Read fields first:
  *
  * f1: graph element
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
-public class GraphElementsHeadsToTransaction
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements CoGroupFunction<
-  Tuple2<GradoopId, GraphElement>, G, GraphTransaction<G, V, E>> {
+public class GraphElementsHeadsToTransaction implements CoGroupFunction
+  <Tuple2<GradoopId, GraphElement>, GraphHead, GraphTransaction> {
 
   @Override
   public void coGroup(
     Iterable<Tuple2<GradoopId, GraphElement>> graphElements,
-    Iterable<G> graphHeads,
-    Collector<GraphTransaction<G, V, E>> out) throws Exception {
+    Iterable<GraphHead> graphHeads,
+    Collector<GraphTransaction> out) throws Exception {
 
-    Iterator<G> graphHeadIter = graphHeads.iterator();
+    Iterator<GraphHead> graphHeadIter = graphHeads.iterator();
 
     if (graphHeadIter.hasNext()) {
-      Set<V> vertices = Sets.newHashSet();
-      Set<E> edges = Sets.newHashSet();
-      G graphHead = graphHeadIter.next();
+      Set<Vertex> vertices = Sets.newHashSet();
+      Set<Edge> edges = Sets.newHashSet();
+      GraphHead graphHead = graphHeadIter.next();
 
       for (Tuple2<GradoopId, GraphElement> graphElement : graphElements) {
 
         GraphElement el = graphElement.f1;
         if (el instanceof Vertex) {
-          vertices.add((V) el);
+          vertices.add((Vertex) el);
         } else if (el instanceof Edge) {
-          edges.add((E) el);
+          edges.add((Edge) el);
         }
       }
 
-      out.collect(new GraphTransaction<>(graphHead, vertices, edges));
+      out.collect(new GraphTransaction(graphHead, vertices, edges));
     }
   }
 }

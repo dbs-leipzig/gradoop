@@ -18,12 +18,11 @@
 package org.gradoop.model.impl.operators.combination;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.api.epgm.GraphElement;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -37,13 +36,10 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
-      .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> combination = g0
-      .combine(g0);
+    LogicalGraph g0 = loader.getLogicalGraphByVariable("g0");
+    LogicalGraph combination = g0.combine(g0);
 
     assertTrue("combining same graph failed",
       g0.equalsByElementIds(combination).collect().get(0));
@@ -51,8 +47,7 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
       "(alice)-[akb]->(bob);" +
@@ -65,12 +60,9 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
       "(eve)-[ekb]->(bob)]"
     );
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
-      .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g2 = loader
-      .getLogicalGraphByVariable("g2");
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
-      .getLogicalGraphByVariable("expected");
+    LogicalGraph g0 = loader.getLogicalGraphByVariable("g0");
+    LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
     assertTrue("combining overlapping graphs failed",
       expected.equalsByElementIds(g0.combine(g2)).collect().get(0));
@@ -80,8 +72,7 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testNonOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
       "(alice)-[akb]->(bob);" +
@@ -94,12 +85,9 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
       "(frank)-[fkd]->(dave)]"
     );
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
-      .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g1 = loader
-      .getLogicalGraphByVariable("g1");
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
-      .getLogicalGraphByVariable("expected");
+    LogicalGraph g0 = loader.getLogicalGraphByVariable("g0");
+    LogicalGraph g1 = loader.getLogicalGraphByVariable("g1");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
     assertTrue("combining non overlapping graphs failed",
       expected.equalsByElementIds(g0.combine(g1)).collect().get(0));
@@ -109,23 +97,21 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testGraphContainment() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader loader =
       getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 = loader
-      .getLogicalGraphByVariable("g0");
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g2 = loader
-      .getLogicalGraphByVariable("g2");
+    LogicalGraph g0 = loader.getLogicalGraphByVariable("g0");
+    LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
 
     // use collections as data sink
-    Collection<VertexPojo> vertices0 = new HashSet<>();
-    Collection<EdgePojo> edges0 = new HashSet<>();
-    Collection<VertexPojo> vertices2 = new HashSet<>();
-    Collection<EdgePojo> edges2 = new HashSet<>();
-    Collection<VertexPojo> resVertices = new HashSet<>();
-    Collection<EdgePojo> resEdges = new HashSet<>();
+    Collection<Vertex> vertices0 = new HashSet<>();
+    Collection<Edge> edges0 = new HashSet<>();
+    Collection<Vertex> vertices2 = new HashSet<>();
+    Collection<Edge> edges2 = new HashSet<>();
+    Collection<Vertex> resVertices = new HashSet<>();
+    Collection<Edge> resEdges = new HashSet<>();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = g0.combine(g2);
+    LogicalGraph expected = g0.combine(g2);
 
     g0.getVertices().output(new LocalCollectionOutputFormat<>(vertices0));
     g0.getEdges().output(new LocalCollectionOutputFormat<>(edges0));
@@ -155,7 +141,7 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
   @Test
   public void testReduceCollection() throws Exception {
 
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader loader =
       getLoaderFromString("" +
         "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
         "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)];" +
@@ -165,6 +151,6 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
       );
 
     checkExpectationsEqualResults(
-      loader, new ReduceCombination<GraphHead, VertexPojo, EdgePojo>());
+      loader, new ReduceCombination());
   }
 }

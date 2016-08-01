@@ -24,7 +24,7 @@ import org.gradoop.model.impl.properties.PropertyList;
 /**
  * Initializes {@link Edge} objects of a given type.
  */
-public interface EdgeFactory extends ElementFactory {
+public interface EdgeFactory {
 
   /**
    * Creates a new edge based on the given parameters.
@@ -167,4 +167,11 @@ public interface EdgeFactory extends ElementFactory {
     GradoopId targetVertexId,
     PropertyList properties,
     GradoopIdSet graphIds);
+
+  /**
+   * Return the type of the objects created by that factory.
+   *
+   * @return object type
+   */
+  Class<? extends Edge> getType();
 }

@@ -21,25 +21,19 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.storage.api.VertexHandler;
 import org.gradoop.util.GConstants;
 
 /**
  * Reads vertex data from HBase.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class VertexTableInputFormat
-  <V extends Vertex, E extends Edge>
-  extends TableInputFormat<Tuple1<V>> {
+public class VertexTableInputFormat extends TableInputFormat<Tuple1<Vertex>> {
 
   /**
    * Handles reading of persistent vertex data.
    */
-  private final VertexHandler<V, E> vertexHandler;
+  private final VertexHandler vertexHandler;
 
   /**
    * Table to read from.
@@ -52,7 +46,7 @@ public class VertexTableInputFormat
    * @param vertexHandler   vertex data handler
    * @param vertexTableName vertex data table name
    */
-  public VertexTableInputFormat(VertexHandler<V, E> vertexHandler,
+  public VertexTableInputFormat(VertexHandler vertexHandler,
     String vertexTableName) {
     this.vertexHandler = vertexHandler;
     this.vertexTableName = vertexTableName;
@@ -80,7 +74,7 @@ public class VertexTableInputFormat
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<V> mapResultToTuple(Result result) {
+  protected Tuple1<Vertex> mapResultToTuple(Result result) {
     return new Tuple1<>(vertexHandler.readVertex(result));
   }
 }

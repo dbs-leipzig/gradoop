@@ -4,14 +4,12 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.functions.TransformationFunction;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -39,7 +37,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
   @Test(expected = IllegalArgumentException.class)
   public void testMissingFunctions() {
-    new Transformation<>(null, null, null);
+    new Transformation(null, null, null);
   }
 
   /**
@@ -50,28 +48,26 @@ public class TransformationTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testIdEquality() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
 
     List<GradoopId> expectedGraphHeadIds = Lists.newArrayList();
     List<GradoopId> expectedVertexIds = Lists.newArrayList();
     List<GradoopId> expectedEdgeIds = Lists.newArrayList();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> inputGraph =
-      loader.getLogicalGraphByVariable("g0");
+    LogicalGraph inputGraph = loader.getLogicalGraphByVariable("g0");
 
     inputGraph.getGraphHead().map(new Id<GraphHead>()).output(
       new LocalCollectionOutputFormat<>(expectedGraphHeadIds));
-    inputGraph.getVertices().map(new Id<VertexPojo>()).output(
+    inputGraph.getVertices().map(new Id<Vertex>()).output(
       new LocalCollectionOutputFormat<>(expectedVertexIds));
-    inputGraph.getEdges().map(new Id<EdgePojo>()).output(
+    inputGraph.getEdges().map(new Id<Edge>()).output(
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> result = inputGraph
+    LogicalGraph result = inputGraph
       .transform(
-        new GraphHeadModifier<GraphHead>(),
-        new VertexModifier<VertexPojo>(),
-        new EdgeModifier<EdgePojo>()
+        new GraphHeadModifier(),
+        new VertexModifier(),
+        new EdgeModifier()
       );
 
     List<GradoopId> resultGraphHeadIds = Lists.newArrayList();
@@ -82,10 +78,10 @@ public class TransformationTest extends GradoopFlinkTestBase {
       .map(new Id<GraphHead>())
       .output(new LocalCollectionOutputFormat<>(resultGraphHeadIds));
     result.getVertices()
-      .map(new Id<VertexPojo>())
+      .map(new Id<Vertex>())
       .output(new LocalCollectionOutputFormat<>(resultVertexIds));
     result.getEdges()
-      .map(new Id<EdgePojo>())
+      .map(new Id<Edge>())
       .output(new LocalCollectionOutputFormat<>(resultEdgeIds));
 
     getExecutionEnvironment().execute();
@@ -103,20 +99,17 @@ public class TransformationTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testDataEquality() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> original = loader
-      .getLogicalGraphByVariable("g0");
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
-      .getLogicalGraphByVariable("g01");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g01");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo>
+    LogicalGraph
       result = original.transform(
-      new GraphHeadModifier<GraphHead>(),
-      new VertexModifier<VertexPojo>(),
-      new EdgeModifier<EdgePojo>()
+      new GraphHeadModifier(),
+      new VertexModifier(),
+      new EdgeModifier()
     );
 
     collectAndAssertTrue(result.equalsByData(expected));
@@ -124,71 +117,57 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGraphHeadOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> original = loader
-      .getLogicalGraphByVariable("g0");
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
-      .getLogicalGraphByVariable("g02");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g02");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> result = original
-      .transformGraphHead(new GraphHeadModifier<GraphHead>());
+    LogicalGraph result = original.transformGraphHead(new GraphHeadModifier());
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
   @Test
   public void testVertexOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> original = loader
-      .getLogicalGraphByVariable("g0");
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
-      .getLogicalGraphByVariable("g03");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g03");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> result = original
-      .transformVertices(new VertexModifier<VertexPojo>());
+    LogicalGraph result = original.transformVertices(new VertexModifier());
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
   @Test
   public void testEdgeOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> original = loader
-      .getLogicalGraphByVariable("g0");
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> expected = loader
-      .getLogicalGraphByVariable("g04");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g04");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> result = original
-      .transformEdges(new EdgeModifier<EdgePojo>());
+    LogicalGraph result = original.transformEdges(new EdgeModifier());
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
-  public static class GraphHeadModifier<G extends org.gradoop.model.api.epgm.GraphHead>
-    implements TransformationFunction<G> {
+  public static class GraphHeadModifier implements TransformationFunction<GraphHead> {
 
     @Override
-    public G execute(G current, G transformed) {
+    public GraphHead execute(GraphHead current, GraphHead transformed) {
       transformed.setLabel(current.getLabel());
       transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
       return transformed;
     }
   }
 
-  public static class VertexModifier<V extends Vertex>
-    implements TransformationFunction<V> {
+  public static class VertexModifier implements TransformationFunction<Vertex> {
 
     @Override
-    public V execute(V current, V transformed) {
+    public Vertex execute(Vertex current, Vertex transformed) {
       transformed.setLabel(current.getLabel());
       if (current.getLabel().equals("A")) {
         transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
@@ -200,11 +179,10 @@ public class TransformationTest extends GradoopFlinkTestBase {
     }
   }
 
-  public static class EdgeModifier<E extends Edge>
-    implements TransformationFunction<E> {
+  public static class EdgeModifier implements TransformationFunction<Edge> {
 
     @Override
-    public E execute(E current, E transformed) {
+    public Edge execute(Edge current, Edge transformed) {
       return transformed;
     }
   }

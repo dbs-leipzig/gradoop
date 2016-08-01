@@ -32,7 +32,6 @@ import org.gradoop.model.impl.id.GradoopId;
 /**
  * Initializes an EPGM vertex from the given {@link ImportVertex}.
  *
- * @param <V> EPGM vertex type
  * @param <K> Import Edge/Vertex identifier type
  */
 @FunctionAnnotation.ForwardedFields(
@@ -40,20 +39,20 @@ import org.gradoop.model.impl.id.GradoopId;
   "f1->f2.label;" + // vertex label
   "f2->f2.properties" // vertex properties
 )
-public class InitEPGMVertex<V extends Vertex, K extends Comparable<K>>
-  extends InitEPGMElement<V, K>
-  implements MapFunction<ImportVertex<K>, Tuple3<K, GradoopId, V>>,
-  ResultTypeQueryable<Tuple3<K, GradoopId, V>> {
+public class InitEPGMVertex<K extends Comparable<K>>
+  extends InitEPGMElement<Vertex, K>
+  implements MapFunction<ImportVertex<K>, Tuple3<K, GradoopId, Vertex>>,
+  ResultTypeQueryable<Tuple3<K, GradoopId, Vertex>> {
 
   /**
    * Used to create new EPGM vertex.
    */
-  private final VertexFactory<V> vertexFactory;
+  private final VertexFactory vertexFactory;
 
   /**
    * Reduce object instantiation.
    */
-  private final Tuple3<K, GradoopId, V> reuseTuple;
+  private final Tuple3<K, GradoopId, Vertex> reuseTuple;
 
   /**
    * Creates a new map function
@@ -62,7 +61,7 @@ public class InitEPGMVertex<V extends Vertex, K extends Comparable<K>>
    *                            (can be {@code null})
    * @param keyTypeInfo         type info for the import vertex identifier
    */
-  public InitEPGMVertex(VertexFactory<V> vertexFactory,
+  public InitEPGMVertex(VertexFactory vertexFactory,
     String lineagePropertyKey, TypeInformation<K> keyTypeInfo) {
     super(lineagePropertyKey, keyTypeInfo);
     this.vertexFactory      = vertexFactory;
@@ -78,11 +77,11 @@ public class InitEPGMVertex<V extends Vertex, K extends Comparable<K>>
    * @throws Exception
    */
   @Override
-  public Tuple3<K, GradoopId, V> map(ImportVertex<K> importVertex) throws
+  public Tuple3<K, GradoopId, Vertex> map(ImportVertex<K> importVertex) throws
     Exception {
     reuseTuple.f0 = importVertex.getId();
 
-    V vertex = vertexFactory.createVertex(importVertex.getLabel(),
+    Vertex vertex = vertexFactory.createVertex(importVertex.getLabel(),
       importVertex.getProperties());
 
     reuseTuple.f1 = vertex.getId();
@@ -95,7 +94,7 @@ public class InitEPGMVertex<V extends Vertex, K extends Comparable<K>>
    * {@inheritDoc}
    */
   @Override
-  public TypeInformation<Tuple3<K, GradoopId, V>> getProducedType() {
+  public TypeInformation<Tuple3<K, GradoopId, Vertex>> getProducedType() {
     return new TupleTypeInfo<>(getKeyTypeInfo(),
       TypeExtractor.getForClass(GradoopId.class),
       TypeExtractor.createTypeInfo(vertexFactory.getType()));

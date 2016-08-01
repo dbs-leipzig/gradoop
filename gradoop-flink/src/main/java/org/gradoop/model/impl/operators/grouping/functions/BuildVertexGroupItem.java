@@ -36,9 +36,9 @@ import java.util.List;
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildVertexGroupItem
+public class BuildVertexGroupItem<V extends Vertex>
   extends BuildBase
-  implements MapFunction<Vertex, VertexGroupItem> {
+  implements MapFunction<V, VertexGroupItem> {
 
   /**
    * Reduce object instantiations.
@@ -69,7 +69,7 @@ public class BuildVertexGroupItem
    * {@inheritDoc}
    */
   @Override
-  public VertexGroupItem map(Vertex vertex) throws Exception {
+  public VertexGroupItem map(V vertex) throws Exception {
     reuseVertexGroupItem.setVertexId(vertex.getId());
     reuseVertexGroupItem.setGroupLabel(getLabel(vertex));
     reuseVertexGroupItem.setGroupingValues(getGroupProperties(vertex));

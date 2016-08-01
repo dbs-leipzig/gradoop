@@ -32,34 +32,32 @@ import org.gradoop.model.api.epgm.GraphHeadFactory;
  * *->f0: input graph element
  *
  * @param <GE> EPGM graph element type
- * @param <G> EPGM graph head type
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
-public class AddGraphElementToNewGraph
-  <GE extends GraphElement, G extends GraphHead>
-  implements MapFunction<GE, Tuple2<GE, G>> {
+public class AddGraphElementToNewGraph<GE extends GraphElement>
+  implements MapFunction<GE, Tuple2<GE, GraphHead>> {
   /**
    * EPGM graph head factory
    */
-  private final GraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
   /**
    * Reduce instantiations
    */
-  private final Tuple2<GE, G> reuseTuple;
+  private final Tuple2<GE, GraphHead> reuseTuple;
 
   /**
    * Constructor
    *
    * @param graphHeadFactory EPGM graph head factory
    */
-  public AddGraphElementToNewGraph(GraphHeadFactory<G> graphHeadFactory) {
+  public AddGraphElementToNewGraph(GraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
     reuseTuple = new Tuple2<>();
   }
 
   @Override
-  public Tuple2<GE, G> map(GE value) throws Exception {
-    G graphHead = graphHeadFactory.createGraphHead();
+  public Tuple2<GE, GraphHead> map(GE value) throws Exception {
+    GraphHead graphHead = graphHeadFactory.createGraphHead();
     value.addGraphId(graphHead.getId());
     reuseTuple.f0 = value;
     reuseTuple.f1 = graphHead;

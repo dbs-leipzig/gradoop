@@ -19,13 +19,8 @@ package org.gradoop.util;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.config.GradoopConfig;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.EdgePojoFactory;
-import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.model.impl.pojo.GraphHeadPojoFactory;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.pojo.VertexPojoFactory;
 import org.gradoop.storage.api.EdgeHandler;
 import org.gradoop.storage.api.GraphHeadHandler;
@@ -36,16 +31,8 @@ import org.gradoop.storage.impl.hbase.HBaseVertexHandler;
 
 /**
  * Configuration for Gradoop running on Flink.
- *
- * @param <G>  EPGM graph head type
- * @param <V>  EPGM vertex type
- * @param <E>  EPGM edge type
  */
-public class GradoopFlinkConfig<
-  G extends org.gradoop.model.api.epgm.GraphHead,
-  V extends Vertex,
-  E extends Edge>
-  extends GradoopConfig<G, V, E> {
+public class GradoopFlinkConfig extends GradoopConfig {
 
   /**
    * Flink execution environment.
@@ -60,9 +47,8 @@ public class GradoopFlinkConfig<
    * @param edgeHandler           edge handler
    * @param executionEnvironment  Flink execution environment
    */
-  private GradoopFlinkConfig(GraphHeadHandler<G> graphHeadHandler,
-    VertexHandler<V, E> vertexHandler,
-    EdgeHandler<V, E> edgeHandler,
+  private GradoopFlinkConfig(GraphHeadHandler graphHeadHandler,
+    VertexHandler vertexHandler, EdgeHandler edgeHandler,
     ExecutionEnvironment executionEnvironment) {
     super(graphHeadHandler, vertexHandler, edgeHandler);
     if (executionEnvironment == null) {
@@ -78,7 +64,7 @@ public class GradoopFlinkConfig<
    * @param gradoopConfig         Gradoop configuration
    * @param executionEnvironment  Flink execution environment
    */
-  private GradoopFlinkConfig(GradoopConfig<G, V, E> gradoopConfig,
+  private GradoopFlinkConfig(GradoopConfig gradoopConfig,
     ExecutionEnvironment executionEnvironment) {
     this(gradoopConfig.getGraphHeadHandler(),
       gradoopConfig.getVertexHandler(),
@@ -93,15 +79,14 @@ public class GradoopFlinkConfig<
    *
    * @return Gradoop Flink configuration
    */
-  public static GradoopFlinkConfig<GraphHead, VertexPojo, EdgePojo>
-  createDefaultConfig(ExecutionEnvironment env) {
-    HBaseVertexHandler<VertexPojo, EdgePojo> vertexHandler =
-      new HBaseVertexHandler<>(new VertexPojoFactory());
-    HBaseEdgeHandler<VertexPojo, EdgePojo> edgeHandler =
-      new HBaseEdgeHandler<>(new EdgePojoFactory());
-    HBaseGraphHeadHandler<GraphHead> graphHandler =
-      new HBaseGraphHeadHandler<>(new GraphHeadPojoFactory());
-    return new GradoopFlinkConfig<>(graphHandler, vertexHandler, edgeHandler,
+  public static GradoopFlinkConfig createDefaultConfig(ExecutionEnvironment env) {
+    HBaseVertexHandler vertexHandler = new HBaseVertexHandler(
+      new VertexPojoFactory());
+    HBaseEdgeHandler edgeHandler = new HBaseEdgeHandler(
+      new EdgePojoFactory());
+    HBaseGraphHeadHandler graphHandler = new HBaseGraphHeadHandler(
+      new GraphHeadPojoFactory());
+    return new GradoopFlinkConfig(graphHandler, vertexHandler, edgeHandler,
       env);
   }
 
@@ -110,18 +95,12 @@ public class GradoopFlinkConfig<
    *
    * @param config      Gradoop configuration
    * @param environment Flink execution environment
-   * @param <G>         EPGM graph head type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
    *
    * @return Gradoop Flink configuration
    */
-  public static <
-    G extends org.gradoop.model.api.epgm.GraphHead,
-    V extends Vertex,
-    E extends Edge> GradoopFlinkConfig<G, V, E> createConfig(
-    GradoopConfig<G, V, E> config, ExecutionEnvironment environment) {
-    return new GradoopFlinkConfig<>(config, environment);
+  public static GradoopFlinkConfig createConfig(
+    GradoopConfig config, ExecutionEnvironment environment) {
+    return new GradoopFlinkConfig(config, environment);
   }
 
   /**

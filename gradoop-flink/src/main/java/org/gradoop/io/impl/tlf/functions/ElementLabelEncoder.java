@@ -21,7 +21,6 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.io.impl.tlf.constants.BroadcastNames;
 import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
@@ -31,13 +30,9 @@ import java.util.Map;
 /**
  * Map function which sets the simple label from either the vertex labels or
  * the edge labels or both.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class ElementLabelEncoder<G extends GraphHead, V extends Vertex, E extends Edge> extends
-  RichMapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>> {
+public class ElementLabelEncoder
+  extends RichMapFunction<GraphTransaction, GraphTransaction> {
 
   /**
    * True if the vertices of the transaction as labels set by a dictionary.
@@ -99,15 +94,15 @@ public class ElementLabelEncoder<G extends GraphHead, V extends Vertex, E extend
    * @throws Exception
    */
   @Override
-  public GraphTransaction<G, V, E> map(
-    GraphTransaction<G, V, E> graphTransaction) throws Exception {
+  public GraphTransaction map(GraphTransaction graphTransaction)
+    throws Exception {
     if (vertexDictionary != null) {
-      for (V vertex : graphTransaction.getVertices()) {
+      for (Vertex vertex : graphTransaction.getVertices()) {
         vertex.setLabel(vertexDictionary.get(vertex.getLabel()).toString());
       }
     }
     if (edgeDictionary != null) {
-      for (E edge : graphTransaction.getEdges()) {
+      for (Edge edge : graphTransaction.getEdges()) {
         edge.setLabel(edgeDictionary.get(edge.getLabel()).toString());
       }
     }

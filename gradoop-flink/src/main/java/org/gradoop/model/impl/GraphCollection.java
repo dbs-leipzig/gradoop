@@ -505,18 +505,17 @@ public class GraphCollection extends GraphBase
       .getTransactions()
       .map(new GraphTransactionTriple());
 
-    DataSet<GraphHead> graphHeads =
-      triples.map(new TransactionGraphHead());
+    DataSet<GraphHead> graphHeads = triples.map(new TransactionGraphHead());
 
     DataSet<Vertex> vertices = triples
       .flatMap(new TransactionVertices())
-      .returns(config.getVertexFactory().getType())
+//      .returns(config.getVertexFactory().getType())
       .groupBy(new Id<Vertex>())
       .reduceGroup(vertexMergeReducer);
 
     DataSet<Edge> edges = triples
       .flatMap(new TransactionEdges())
-      .returns(config.getEdgeFactory().getType())
+//      .returns(config.getEdgeFactory().getType())
       .groupBy(new Id<Edge>())
       .reduceGroup(edgeMergeReducer);
 

@@ -34,45 +34,38 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Filter logical graphs from a graph collection based on their associated graph
  * head.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Selection
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements UnaryCollectionToCollectionOperator<G, V, E> {
+public class Selection implements UnaryCollectionToCollectionOperator {
 
   /**
    * User-defined predicate function
    */
-  private final FilterFunction<G> predicate;
+  private final FilterFunction<GraphHead> predicate;
 
   /**
    * Creates a new Selection operator.
    *
    * @param predicate user-defined predicate function
    */
-  public Selection(FilterFunction<G> predicate) {
+  public Selection(FilterFunction<GraphHead> predicate) {
     this.predicate = checkNotNull(predicate, "Predicate function was null");
   }
 
   @Override
-  public GraphCollection<G, V, E> execute(
-    GraphCollection<G, V, E> collection) {
+  public GraphCollection execute(GraphCollection collection) {
     // find graph heads matching the predicate
-    DataSet<G> graphHeads = collection.getGraphHeads().filter(predicate);
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads().filter(predicate);
 
     // get the identifiers of these logical graphs
-    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<G>());
+    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<GraphHead>());
 
     // use graph ids to filter vertices from the actual graph structure
-    DataSet<V> vertices = collection.getVertices()
-      .filter(new InAnyGraphBroadcast<V>())
+    DataSet<Vertex> vertices = collection.getVertices()
+      .filter(new InAnyGraphBroadcast<Vertex>())
       .withBroadcastSet(graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<E> edges = collection.getEdges()
-      .filter(new InAnyGraphBroadcast<E>())
+    DataSet<Edge> edges = collection.getEdges()
+      .filter(new InAnyGraphBroadcast<Edge>())
       .withBroadcastSet(graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return GraphCollection.fromDataSets(

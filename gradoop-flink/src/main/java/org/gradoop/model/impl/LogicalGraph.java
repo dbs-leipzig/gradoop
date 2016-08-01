@@ -81,9 +81,8 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * @param edges     edge data set
    * @param config    Gradoop Flink configuration
    */
-  private LogicalGraph(
-    DataSet<GraphHead> graphHead, DataSet<Vertex> vertices, DataSet<Edge> edges,
-    GradoopFlinkConfig config) {
+  private LogicalGraph(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
+    DataSet<Edge> edges, GradoopFlinkConfig config) {
     super(graphHead, vertices, edges, config);
   }
 
@@ -101,7 +100,6 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   public static LogicalGraph fromGellyGraph(
     Graph<GradoopId, Vertex, Edge> graph, GradoopFlinkConfig config) {
-
     return fromGellyGraph(graph, config.getGraphHeadFactory().createGraphHead(),
       config);
   }
@@ -330,7 +328,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
     TransformationFunction<GraphHead> graphHeadTransformationFunction,
     TransformationFunction<Vertex> vertexTransformationFunction,
     TransformationFunction<Edge> edgeTransformationFunction) {
-    return callForGraph(new Transformation<>(
+    return callForGraph(new Transformation(
       graphHeadTransformationFunction,
       vertexTransformationFunction,
       edgeTransformationFunction));
@@ -417,7 +415,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph groupBy(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys) {
-    GroupingBuilder builder = new GroupingBuilder<>();
+    GroupingBuilder builder = new GroupingBuilder();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -467,7 +465,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph groupByVertexLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    GroupingBuilder builder = new GroupingBuilder<>();
+    GroupingBuilder builder = new GroupingBuilder();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -516,7 +514,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph groupByVertexAndEdgeLabel(
     List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    GroupingBuilder builder = new GroupingBuilder<>();
+    GroupingBuilder builder = new GroupingBuilder();
 
     if (vertexGroupingKeys != null) {
       builder.addVertexGroupingKeys(vertexGroupingKeys);
@@ -566,10 +564,10 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
-    return new GraphEquality<>(
-      new GraphHeadToEmptyString<GraphHead>(),
-      new VertexToIdString<Vertex>(),
-      new EdgeToIdString<Edge>(), true).execute(this, other);
+    return new GraphEquality(
+      new GraphHeadToEmptyString<>(),
+      new VertexToIdString<>(),
+      new EdgeToIdString<>(), true).execute(this, other);
   }
 
   /**
@@ -577,10 +575,10 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
-    return new GraphEquality<>(
-      new GraphHeadToEmptyString<GraphHead>(),
-      new VertexToDataString<Vertex>(),
-      new EdgeToDataString<Edge>(), true).execute(this, other);
+    return new GraphEquality(
+      new GraphHeadToEmptyString<>(),
+      new VertexToDataString<>(),
+      new EdgeToDataString<>(), true).execute(this, other);
   }
 
   /**
@@ -588,10 +586,10 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public DataSet<Boolean> equalsByData(LogicalGraph other) {
-    return new GraphEquality<>(
-      new GraphHeadToDataString<GraphHead>(),
-      new VertexToDataString<Vertex>(),
-      new EdgeToDataString<Edge>(), true).execute(this, other);
+    return new GraphEquality(
+      new GraphHeadToDataString<>(),
+      new VertexToDataString<>(),
+      new EdgeToDataString<>(), true).execute(this, other);
   }
 
   //----------------------------------------------------------------------------

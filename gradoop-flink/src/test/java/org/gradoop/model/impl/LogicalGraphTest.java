@@ -21,15 +21,13 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.api.epgm.GraphElement;
+import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -53,41 +51,39 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFromGellyGraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-      loader = getLoaderFromString("()-->()<--()-->()");
+    FlinkAsciiGraphLoader loader = getLoaderFromString("()-->()<--()-->()");
 
     // transform EPGM vertices to Gelly vertices
-    DataSet<org.apache.flink.graph.Vertex> gellyVertices =
+    DataSet<org.apache.flink.graph.Vertex<GradoopId, Vertex>> gellyVertices =
       getExecutionEnvironment().fromCollection(loader.getVertices())
-        .map(new MapFunction<VertexPojo, org.apache.flink.graph.Vertex>() {
+        .map(new MapFunction<Vertex, org.apache.flink.graph.Vertex<GradoopId, Vertex>>() {
           @Override
-          public org.apache.flink.graph.Vertex map(VertexPojo vertexPojo) throws
+          public org.apache.flink.graph.Vertex<GradoopId, Vertex> map(Vertex v) 
+            throws
             Exception {
-            return new org.apache.flink.graph.Vertex(vertexPojo.getId(), vertexPojo);
+            return new org.apache.flink.graph.Vertex<>(v.getId(), v);
           }
         });
 
     // transform EPGM edges to Gelly edges
-    DataSet<Edge<GradoopId, EdgePojo>> gellyEdges =
+    DataSet<org.apache.flink.graph.Edge<GradoopId, Edge>> gellyEdges =
       getExecutionEnvironment().fromCollection(loader.getEdges())
-        .map(new MapFunction<EdgePojo, Edge<GradoopId, EdgePojo>>() {
+        .map(new MapFunction<Edge, org.apache.flink.graph.Edge<GradoopId, Edge>>() {
           @Override
-          public Edge<GradoopId, EdgePojo> map(EdgePojo edgePojo) throws
+          public org.apache.flink.graph.Edge<GradoopId, Edge> map(Edge e) throws
             Exception {
-            return new Edge<>(
-              edgePojo.getSourceId(), edgePojo.getTargetId(), edgePojo);
+            return new org.apache.flink.graph.Edge<>(e.getSourceId(), e.getTargetId(), e);
           }
         });
 
-    Graph<GradoopId, VertexPojo, EdgePojo> gellyGraph = Graph.fromDataSet(
+    Graph<GradoopId, Vertex, Edge> gellyGraph = Graph.fromDataSet(
       gellyVertices, gellyEdges, getExecutionEnvironment());
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> logicalGraph =
-      LogicalGraph.fromGellyGraph(gellyGraph, getConfig());
+    LogicalGraph logicalGraph = LogicalGraph.fromGellyGraph(gellyGraph, getConfig());
 
     Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
-    Collection<VertexPojo> loadedVertices   = Lists.newArrayList();
-    Collection<EdgePojo> loadedEdges      = Lists.newArrayList();
+    Collection<Vertex> loadedVertices   = Lists.newArrayList();
+    Collection<Edge> loadedEdges      = Lists.newArrayList();
 
     logicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(
       loadedGraphHead));
@@ -124,43 +120,42 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFromGellyGraphWithGraphHead() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader
       loader = getLoaderFromString("g[()-->()<--()-->()]");
 
     // transform EPGM vertices to Gelly vertices
-    DataSet<org.apache.flink.graph.Vertex> gellyVertices =
+    DataSet<org.apache.flink.graph.Vertex<GradoopId, Vertex>> gellyVertices =
       getExecutionEnvironment().fromCollection(loader.getVertices())
-        .map(new MapFunction<VertexPojo, org.apache.flink.graph.Vertex>() {
+        .map(new MapFunction<Vertex, org.apache.flink.graph.Vertex<GradoopId, Vertex>>() {
           @Override
-          public org.apache.flink.graph.Vertex map(VertexPojo vertexPojo) throws
+          public org.apache.flink.graph.Vertex<GradoopId, Vertex> map(Vertex v)
+            throws
             Exception {
-            return new org.apache.flink.graph.Vertex(vertexPojo.getId(), vertexPojo);
+            return new org.apache.flink.graph.Vertex<>(v.getId(), v);
           }
         });
 
     // transform EPGM edges to Gelly edges
-    DataSet<Edge<GradoopId, EdgePojo>> gellyEdges =
+    DataSet<org.apache.flink.graph.Edge<GradoopId, Edge>> gellyEdges =
       getExecutionEnvironment().fromCollection(loader.getEdges())
-        .map(new MapFunction<EdgePojo, Edge<GradoopId, EdgePojo>>() {
+        .map(new MapFunction<Edge, org.apache.flink.graph.Edge<GradoopId, Edge>>() {
           @Override
-          public Edge<GradoopId, EdgePojo> map(EdgePojo edgePojo) throws
+          public org.apache.flink.graph.Edge<GradoopId, Edge> map(Edge e) throws
             Exception {
-            return new Edge<>(
-              edgePojo.getSourceId(), edgePojo.getTargetId(), edgePojo);
+            return new org.apache.flink.graph.Edge<>(e.getSourceId(), e.getTargetId(), e);
           }
         });
 
-    Graph<GradoopId, VertexPojo, EdgePojo> gellyGraph = Graph.fromDataSet(
+    Graph<GradoopId, Vertex, Edge> gellyGraph = Graph.fromDataSet(
       gellyVertices, gellyEdges, getExecutionEnvironment());
 
     GraphHead graphHead = loader.getGraphHeadByVariable("g");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> logicalGraph =
-      LogicalGraph.fromGellyGraph(gellyGraph, graphHead, getConfig());
+    LogicalGraph logicalGraph = LogicalGraph.fromGellyGraph(gellyGraph, graphHead, getConfig());
 
     Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
-    Collection<VertexPojo> loadedVertices   = Lists.newArrayList();
-    Collection<EdgePojo> loadedEdges      = Lists.newArrayList();
+    Collection<Vertex> loadedVertices     = Lists.newArrayList();
+    Collection<Edge> loadedEdges          = Lists.newArrayList();
 
     logicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(
       loadedGraphHead));
@@ -185,26 +180,26 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFromDataSets() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader
       loader = getSocialNetworkLoader();
 
     GraphHead graphHead = loader.getGraphHeadByVariable("g0");
-    Collection<VertexPojo> vertices = loader.getVerticesByGraphVariables("g0");
-    Collection<EdgePojo> edges = loader.getEdgesByGraphVariables("g0");
+    Collection<Vertex> vertices = loader.getVerticesByGraphVariables("g0");
+    Collection<Edge> edges = loader.getEdgesByGraphVariables("g0");
 
     DataSet<GraphHead> graphHeadDataSet = getExecutionEnvironment()
       .fromElements(graphHead);
-    DataSet<VertexPojo> vertexDataSet = getExecutionEnvironment()
+    DataSet<Vertex> vertexDataSet = getExecutionEnvironment()
       .fromCollection(vertices);
-    DataSet<EdgePojo> edgeDataSet = getExecutionEnvironment()
+    DataSet<Edge> edgeDataSet = getExecutionEnvironment()
       .fromCollection(edges);
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graph =
+    LogicalGraph graph =
       LogicalGraph.fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet, getConfig());
 
     Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
-    Collection<VertexPojo> loadedVertices       = Lists.newArrayList();
-    Collection<EdgePojo> loadedEdges            = Lists.newArrayList();
+    Collection<Vertex> loadedVertices       = Lists.newArrayList();
+    Collection<Edge> loadedEdges            = Lists.newArrayList();
 
     graph.getGraphHead().output(new LocalCollectionOutputFormat<>(
       loadedGraphHeads));
@@ -224,20 +219,20 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testFromCollections() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader
       loader = getSocialNetworkLoader();
 
     GraphHead graphHead = loader.getGraphHeadByVariable("g0");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graph =
+    LogicalGraph graph =
       LogicalGraph.fromCollections(graphHead,
         loader.getVerticesByGraphVariables("g0"),
         loader.getEdgesByGraphVariables("g0"),
         getConfig());
 
     Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
-    Collection<VertexPojo> loadedVertices       = Lists.newArrayList();
-    Collection<EdgePojo> loadedEdges            = Lists.newArrayList();
+    Collection<Vertex> loadedVertices       = Lists.newArrayList();
+    Collection<Edge> loadedEdges            = Lists.newArrayList();
 
     graph.getGraphHead().output(new LocalCollectionOutputFormat<>(
       loadedGraphHeads));
@@ -267,18 +262,18 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testFromDataSetsWithoutGraphHead() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader
       loader = getLoaderFromString("()-->()<--()-->()");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> logicalGraph =
+    LogicalGraph logicalGraph =
       LogicalGraph.fromDataSets(
         getExecutionEnvironment().fromCollection(loader.getVertices()),
         getExecutionEnvironment().fromCollection(loader.getEdges()),
         getConfig());
 
     Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
-    Collection<VertexPojo> loadedVertices   = Lists.newArrayList();
-    Collection<EdgePojo> loadedEdges      = Lists.newArrayList();
+    Collection<Vertex> loadedVertices   = Lists.newArrayList();
+    Collection<Edge> loadedEdges      = Lists.newArrayList();
 
     logicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(
       loadedGraphHead));
@@ -308,7 +303,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetGraphHead() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader loader =
       getSocialNetworkLoader();
 
     GraphHead inputGraphHead = loader.getGraphHeadByVariable("g0");
@@ -321,12 +316,12 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetVertices() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader loader =
       getSocialNetworkLoader();
 
-    Collection<VertexPojo> inputVertices = loader.getVertices();
+    Collection<Vertex> inputVertices = loader.getVertices();
 
-    List<VertexPojo> outputVertices = loader
+    List<Vertex> outputVertices = loader
       .getDatabase()
       .getDatabaseGraph()
       .getVertices()
@@ -338,12 +333,12 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetEdges() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader loader =
       getSocialNetworkLoader();
 
-    Collection<EdgePojo> inputEdges = loader.getEdges();
+    Collection<Edge> inputEdges = loader.getEdges();
 
-    List<EdgePojo> outputEdges = loader
+    List<Edge> outputEdges = loader
       .getDatabase()
       .getDatabaseGraph()
       .getEdges()
@@ -378,22 +373,22 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
   private void testOutgoingAndIncomingEdges(String graphVariable,
     String vertexVariable, String[] edgeVariables, boolean testOutgoing)
     throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader
       loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> g0 =
+    LogicalGraph g0 =
       loader.getLogicalGraphByVariable(graphVariable);
 
     Vertex v = loader.getVertexByVariable(vertexVariable);
 
-    Collection<EdgePojo> inputE =
+    Collection<Edge> inputE =
       Lists.newArrayListWithCapacity(edgeVariables.length);
 
     for (String edgeVariable : edgeVariables) {
       inputE.add(loader.getEdgeByVariable(edgeVariable));
     }
 
-    List<EdgePojo> outputE = (testOutgoing)
+    List<Edge> outputE = (testOutgoing)
       ? g0.getOutgoingEdges(v.getId()).collect()
       : g0.getIncomingEdges(v.getId()).collect();
 

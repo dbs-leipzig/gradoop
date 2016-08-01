@@ -23,7 +23,6 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
 import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
@@ -56,14 +55,8 @@ import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * Vertex-centric Dual-Simulation.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class DualSimulation
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  extends PatternMatching<G, V, E> {
+public class DualSimulation extends PatternMatching {
 
   /**
    * Logger
@@ -89,8 +82,8 @@ public class DualSimulation
   }
 
   @Override
-  protected GraphCollection<G, V, E> executeForVertex(
-    LogicalGraph<G, V, E> graph)  {
+  protected GraphCollection executeForVertex(
+    LogicalGraph graph)  {
     DataSet<Tuple1<GradoopId>> matchingVertexIds = PreProcessor
       .filterVertices(graph, getQuery())
       .project(0);
@@ -99,14 +92,14 @@ public class DualSimulation
       return GraphCollection.fromGraph(
         LogicalGraph.fromDataSets(matchingVertexIds
             .join(graph.getVertices())
-            .where(0).equalTo(new Id<V>())
-            .with(new RightSide<Tuple1<GradoopId>, V>()),
+            .where(0).equalTo(new Id<Vertex>())
+            .with(new RightSide<Tuple1<GradoopId>, Vertex>()),
           graph.getConfig()
         ));
     } else {
       return GraphCollection.fromGraph(
         LogicalGraph.fromDataSets(matchingVertexIds
-            .map(new VertexFromId<>(graph.getConfig().getVertexFactory())),
+            .map(new VertexFromId(graph.getConfig().getVertexFactory())),
           graph.getConfig()
         ));
     }
@@ -118,8 +111,8 @@ public class DualSimulation
    * @param graph data graph
    * @return match graph
    */
-  protected GraphCollection<G, V, E> executeForPattern(
-    LogicalGraph<G, V, E> graph) {
+  protected GraphCollection executeForPattern(
+    LogicalGraph graph) {
     //--------------------------------------------------------------------------
     // Pre-processing (filter candidates + build initial working set)
     //--------------------------------------------------------------------------
@@ -155,7 +148,7 @@ public class DualSimulation
    * @param g input graph
    * @return triples that have a match in the query graph
    */
-  private DataSet<TripleWithCandidates> filterTriples(LogicalGraph<G, V, E> g) {
+  private DataSet<TripleWithCandidates> filterTriples(LogicalGraph g) {
     // filter vertex-edge-vertex triples by query predicates
     return PreProcessor.filterTriplets(g, getQuery());
   }
@@ -324,15 +317,15 @@ public class DualSimulation
    * @param vertices valid vertices after simulation
    * @return maximum match graph
    */
-  private GraphCollection<G, V, E> postProcess(LogicalGraph<G, V, E> graph,
+  private GraphCollection postProcess(LogicalGraph graph,
     DataSet<FatVertex> vertices) {
-    GradoopFlinkConfig<G, V, E> config = graph.getConfig();
+    GradoopFlinkConfig config = graph.getConfig();
 
-    DataSet<V> matchVertices = doAttachData() ?
+    DataSet<Vertex> matchVertices = doAttachData() ?
       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :
       PostProcessor.extractVertices(vertices, config.getVertexFactory());
 
-    DataSet<E> matchEdges = doAttachData() ?
+    DataSet<Edge> matchEdges = doAttachData() ?
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
       PostProcessor.extractEdges(vertices, config.getEdgeFactory());
 

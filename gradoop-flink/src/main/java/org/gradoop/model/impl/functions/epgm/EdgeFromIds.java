@@ -38,25 +38,23 @@ import org.gradoop.model.impl.id.GradoopId;
  * f0->id:        edge id
  * f1->sourceId:  source vertex id
  * f2->targetId:  target vertex id
- *
- * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("f0->id;f1->sourceId;f2->targetId")
-public class EdgeFromIds<E extends Edge>
-  implements MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, E>,
-  ResultTypeQueryable<E> {
+public class EdgeFromIds implements
+  MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, Edge>,
+  ResultTypeQueryable<Edge> {
 
   /**
    * EPGM edge factory
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * Constructor
    *
    * @param edgeFactory EPGM edge factory
    */
-  public EdgeFromIds(EdgeFactory<E> edgeFactory) {
+  public EdgeFromIds(EdgeFactory edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
@@ -70,13 +68,15 @@ public class EdgeFromIds<E extends Edge>
    * @throws Exception
    */
   @Override
-  public E map(Tuple3<GradoopId, GradoopId, GradoopId> idTriple) throws
+  public Edge map(Tuple3<GradoopId, GradoopId, GradoopId> idTriple) throws
     Exception {
     return edgeFactory.initEdge(idTriple.f0, idTriple.f1, idTriple.f2);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<E> getProducedType() {
-    return TypeExtractor.createTypeInfo(edgeFactory.getType());
+  public TypeInformation<Edge> getProducedType() {
+    return (TypeInformation<Edge>) TypeExtractor
+      .createTypeInfo(edgeFactory.getType());
   }
 }

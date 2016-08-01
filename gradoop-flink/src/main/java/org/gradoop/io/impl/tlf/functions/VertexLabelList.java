@@ -29,20 +29,15 @@ import java.util.List;
 
 /**
  * Creates a list containing all vertex labels.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
 public class VertexLabelList
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements FlatMapFunction<GraphTransaction<G, V, E>, List<String>> {
+  implements FlatMapFunction<GraphTransaction, List<String>> {
 
   @Override
-  public void flatMap(GraphTransaction<G, V, E> graphTransaction,
+  public void flatMap(GraphTransaction graphTransaction,
     Collector<List<String>> collector) throws Exception {
     List<String> list = Lists.newLinkedList();
-    for (V vertex : graphTransaction.getVertices()) {
+    for (Vertex vertex : graphTransaction.getVertices()) {
       list.add(vertex.getLabel());
     }
     collector.collect(list);

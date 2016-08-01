@@ -19,8 +19,6 @@ package org.gradoop.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 
@@ -32,14 +30,9 @@ import java.util.Map;
  * integer-like labels are replaced by those from the dictionary files
  * where the integer value from the old labels matches the corresponding
  * keys from the dictionary.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class VertexLabelDecoder<G extends GraphHead,
-  V extends Vertex, E extends Edge> extends
-  RichMapFunction<GraphTransaction<G, V, E>, GraphTransaction<G, V, E>> {
+public class VertexLabelDecoder extends
+  RichMapFunction<GraphTransaction, GraphTransaction> {
   /**
    * Constant for broadcast set containing the vertex dictionary.
    */
@@ -69,10 +62,10 @@ public class VertexLabelDecoder<G extends GraphHead,
    * {@inheritDoc}
    */
   @Override
-  public GraphTransaction<G, V, E> map(
-    GraphTransaction<G, V, E> graphTransaction) throws Exception {
+  public GraphTransaction map(GraphTransaction graphTransaction)
+    throws Exception {
     String label;
-    for (V vertex : graphTransaction.getVertices()) {
+    for (Vertex vertex : graphTransaction.getVertices()) {
       label = vertexDictionary.get(Integer.parseInt(vertex.getLabel()));
       if (label != null) {
         vertex.setLabel(label);

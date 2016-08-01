@@ -28,19 +28,13 @@ import org.gradoop.util.GConstants;
 
 /**
  * Reads edge data from HBase.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class EdgeTableInputFormat<
-  V extends Vertex,
-  E extends Edge>
-  extends TableInputFormat<Tuple1<E>> {
+public class EdgeTableInputFormat extends TableInputFormat<Tuple1<Edge>> {
 
   /**
    * Handles reading of persistent edge data.
    */
-  private final EdgeHandler<V, E> edgeHandler;
+  private final EdgeHandler edgeHandler;
 
   /**
    * Table to read from.
@@ -53,8 +47,7 @@ public class EdgeTableInputFormat<
    * @param edgeHandler   edge data handler
    * @param edgeTableName edge data table name
    */
-  public EdgeTableInputFormat(EdgeHandler<V, E> edgeHandler,
-    String edgeTableName) {
+  public EdgeTableInputFormat(EdgeHandler edgeHandler, String edgeTableName) {
     this.edgeHandler = edgeHandler;
     this.edgeTableName = edgeTableName;
   }
@@ -81,7 +74,7 @@ public class EdgeTableInputFormat<
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<E> mapResultToTuple(Result result) {
+  protected Tuple1<Edge> mapResultToTuple(Result result) {
     return new Tuple1<>(edgeHandler.readEdge(result));
   }
 }

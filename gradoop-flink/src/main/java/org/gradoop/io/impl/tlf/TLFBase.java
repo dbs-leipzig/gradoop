@@ -27,17 +27,12 @@ import java.util.Map;
 
 /**
  * Base class for TLF data source and sink.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-abstract class TLFBase
-  <G extends GraphHead, V extends Vertex, E extends Edge> {
+abstract class TLFBase {
   /**
    * Gradoop Flink configuration
    */
-  private final GradoopFlinkConfig<G, V, E> config;
+  private final GradoopFlinkConfig config;
   /**
    * File to read/write TLF content to
    */
@@ -69,7 +64,7 @@ abstract class TLFBase
    * @param config Gradoop Flink configuration
    */
   TLFBase(String tlfPath, String tlfVertexDictionaryPath, String
-    tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E> config) {
+    tlfEdgeDictionaryPath, GradoopFlinkConfig config) {
     if (config == null) {
       throw new IllegalArgumentException("config must not be null");
     }
@@ -84,7 +79,7 @@ abstract class TLFBase
 
   }
 
-  public GradoopFlinkConfig<G, V, E> getConfig() {
+  public GradoopFlinkConfig getConfig() {
     return config;
   }
 

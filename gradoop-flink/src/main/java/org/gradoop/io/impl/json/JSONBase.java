@@ -17,24 +17,16 @@
 
 package org.gradoop.io.impl.json;
 
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * Base class for file based I/O formats.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-abstract class JSONBase
-  <G extends GraphHead, V extends Vertex, E extends Edge> {
+abstract class JSONBase {
   /**
    * Gradoop Flink configuration
    */
-  private final GradoopFlinkConfig<G, V, E> config;
+  private final GradoopFlinkConfig config;
   /**
    * File to write graph heads to
    */
@@ -58,7 +50,7 @@ abstract class JSONBase
    * @param config        Gradoop Flink configuration
    */
   JSONBase(String graphHeadPath, String vertexPath,
-    String edgePath, GradoopFlinkConfig<G, V, E> config) {
+    String edgePath, GradoopFlinkConfig config) {
     if (config == null) {
       throw new IllegalArgumentException("config must not be null");
     }
@@ -74,7 +66,7 @@ abstract class JSONBase
     this.config = config;
   }
 
-  public GradoopFlinkConfig<G, V, E> getConfig() {
+  public GradoopFlinkConfig getConfig() {
     return config;
   }
 

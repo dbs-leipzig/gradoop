@@ -29,24 +29,23 @@ import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Initializes an {@link Vertex} from a given {@link GradoopId}.
- *
- * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("f0->id")
-public class VertexFromId<V extends Vertex>
-  implements MapFunction<Tuple1<GradoopId>, V>, ResultTypeQueryable<V> {
+public class VertexFromId implements
+  MapFunction<Tuple1<GradoopId>, Vertex>,
+  ResultTypeQueryable<Vertex> {
 
   /**
    * EPGM vertex factory
    */
-  private final VertexFactory<V> vertexFactory;
+  private final VertexFactory vertexFactory;
 
   /**
    * Create new function.
    *
    * @param vertexFactory EPGM vertex factory
    */
-  public VertexFromId(VertexFactory<V> vertexFactory) {
+  public VertexFromId(VertexFactory vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 
@@ -58,12 +57,14 @@ public class VertexFromId<V extends Vertex>
    * @throws Exception
    */
   @Override
-  public V map(Tuple1<GradoopId> gradoopId) throws Exception {
+  public Vertex map(Tuple1<GradoopId> gradoopId) throws Exception {
     return vertexFactory.initVertex(gradoopId.f0);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<V> getProducedType() {
-    return TypeExtractor.createTypeInfo(vertexFactory.getType());
+  public TypeInformation<Vertex> getProducedType() {
+    return (TypeInformation<Vertex>) TypeExtractor
+      .createTypeInfo(vertexFactory.getType());
   }
 }

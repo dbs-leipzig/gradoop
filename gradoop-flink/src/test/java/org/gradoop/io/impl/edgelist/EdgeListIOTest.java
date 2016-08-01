@@ -20,9 +20,6 @@ package org.gradoop.io.impl.edgelist;
 import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -30,27 +27,21 @@ public class EdgeListIOTest extends GradoopFlinkTestBase {
 
   @Test
   public void testEdgeListData() throws Exception {
-    String edgeListFile =
-            EdgeListIOTest.class.getResource("/data/edgelist/input")
-              .getFile();
+    String edgeListFile = EdgeListIOTest.class
+      .getResource("/data/edgelist/input").getFile();
 
-    String gdlFile =
-            EdgeListIOTest.class.getResource("/data/edgelist/expected.gdl")
-              .getFile();
+    String gdlFile = EdgeListIOTest.class
+      .getResource("/data/edgelist/expected.gdl").getFile();
 
     // load from tsv file
-    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
-            new EdgeListDataSource<>(edgeListFile, " ", "lan", config);
+    DataSource dataSource = new EdgeListDataSource(edgeListFile, " ", "lan", config);
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo>
-            tsvGraph = dataSource.getLogicalGraph();
+    LogicalGraph tsvGraph = dataSource.getLogicalGraph();
 
     // load from gdl
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-            getLoaderFromFile(gdlFile);
+    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> resultGraph =
-            loader.getLogicalGraphByVariable("result");
+    LogicalGraph resultGraph = loader.getLogicalGraphByVariable("result");
 
     // test element data
     collectAndAssertTrue(resultGraph.equalsByElementData(tsvGraph));

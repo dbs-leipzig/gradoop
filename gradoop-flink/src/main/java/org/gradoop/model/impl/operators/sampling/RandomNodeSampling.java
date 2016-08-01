@@ -19,7 +19,6 @@ package org.gradoop.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
@@ -33,16 +32,8 @@ import org.gradoop.model.impl.operators.sampling.functions.VertexRandomFilter;
  * Takes a logical graph and a user defined aggregate function as input. The
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class RandomNodeSampling<
-  G extends GraphHead,
-  V extends Vertex,
-  E extends Edge>
-  implements UnaryGraphToGraphOperator<G, V, E> {
+public class RandomNodeSampling implements UnaryGraphToGraphOperator {
   /**
    * relative amount of nodes in the result graph
    */
@@ -78,20 +69,20 @@ public class RandomNodeSampling<
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+  public LogicalGraph execute(LogicalGraph graph) {
 
-    DataSet<V> newVertices = graph.getVertices()
-      .filter(new VertexRandomFilter<V>(sampleSize, randomSeed));
+    DataSet<Vertex> newVertices = graph.getVertices()
+      .filter(new VertexRandomFilter<>(sampleSize, randomSeed));
 
-    DataSet<E> newEdges = graph.getEdges()
+    DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
-      .where(new SourceId<E>())
-      .equalTo(new Id<V>())
-      .with(new LeftSide<E, V>())
+      .where(new SourceId<>())
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
       .join(newVertices)
-      .where(new TargetId<E>())
-      .equalTo(new Id<V>())
-      .with(new LeftSide<E, V>());
+      .where(new TargetId<>())
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>());
 
     return LogicalGraph.fromDataSets(
       newVertices, newEdges, graph.getConfig());

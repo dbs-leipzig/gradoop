@@ -39,17 +39,8 @@ import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * Creates an EPGM instance from HBase.
- *
- * @param <G>  EPGM graph head type
- * @param <V>  EPGM vertex type
- * @param <E>  EPGM edge type
  */
-public class HBaseDataSource<
-  G extends GraphHead,
-  V extends Vertex,
-  E extends Edge>
-  extends HBaseBase<G, V, E>
-  implements DataSource<G, V, E> {
+public class HBaseDataSource extends HBaseBase implements DataSource {
 
   /**
    * Creates a new HBase data source.
@@ -57,63 +48,63 @@ public class HBaseDataSource<
    * @param epgmStore HBase store
    * @param config    Gradoop Flink configuration
    */
-  public HBaseDataSource(HBaseEPGMStore<G, V, E> epgmStore,
-    GradoopFlinkConfig<G, V, E> config) {
+  public HBaseDataSource(HBaseEPGMStore epgmStore,
+    GradoopFlinkConfig config) {
     super(epgmStore, config);
   }
 
   @Override
-  public LogicalGraph<G, V, E> getLogicalGraph() {
-    return getGraphCollection().reduce(new ReduceCombination<G, V, E>());
+  public LogicalGraph getLogicalGraph() {
+    return getGraphCollection().reduce(new ReduceCombination());
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public GraphCollection<G, V, E> getGraphCollection() {
-    GradoopFlinkConfig<G, V, E> config = getFlinkConfig();
-    HBaseEPGMStore<G, V, E> store = getStore();
+  public GraphCollection getGraphCollection() {
+    GradoopFlinkConfig config = getFlinkConfig();
+    HBaseEPGMStore store = getStore();
 
     // used for type hinting when loading graph data
-    TypeInformation<Tuple1<G>> graphTypeInfo = new TupleTypeInfo(
+    TypeInformation<Tuple1<GraphHead>> graphTypeInfo = new TupleTypeInfo(
       Tuple1.class,
       TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType()));
 
     // used for type hinting when loading vertex data
-    TypeInformation<Tuple1<V>> vertexTypeInfo = new TupleTypeInfo(
+    TypeInformation<Tuple1<Vertex>> vertexTypeInfo = new TupleTypeInfo(
       Tuple1.class,
       TypeExtractor.createTypeInfo(config.getVertexFactory().getType()));
 
     // used for type hinting when loading edge data
-    TypeInformation<Tuple1<E>> edgeTypeInfo = new TupleTypeInfo(
+    TypeInformation<Tuple1<Edge>> edgeTypeInfo = new TupleTypeInfo(
       Tuple1.class,
       TypeExtractor.createTypeInfo(config.getEdgeFactory().getType()));
 
 
-    DataSet<Tuple1<G>> graphHeads = config.getExecutionEnvironment()
+    DataSet<Tuple1<GraphHead>> graphHeads = config.getExecutionEnvironment()
       .createInput(
-        new GraphHeadTableInputFormat<>(
+        new GraphHeadTableInputFormat(
           config.getGraphHeadHandler(), store.getGraphHeadName()),
         graphTypeInfo);
 
-    DataSet<Tuple1<V>> vertices = config.getExecutionEnvironment()
-      .createInput(new VertexTableInputFormat<>(
+    DataSet<Tuple1<Vertex>> vertices = config.getExecutionEnvironment()
+      .createInput(new VertexTableInputFormat(
           config.getVertexHandler(), store.getVertexTableName()),
         vertexTypeInfo);
 
-    DataSet<Tuple1<E>> edges = config.getExecutionEnvironment().createInput(
-      new EdgeTableInputFormat<>(
+    DataSet<Tuple1<Edge>> edges = config.getExecutionEnvironment().createInput(
+      new EdgeTableInputFormat(
         config.getEdgeHandler(), store.getEdgeTableName()),
       edgeTypeInfo);
 
     return GraphCollection.fromDataSets(
-      graphHeads.map(new ValueOf1<G>()),
-      vertices.map(new ValueOf1<V>()),
-      edges.map(new ValueOf1<E>()),
+      graphHeads.map(new ValueOf1<GraphHead>()),
+      vertices.map(new ValueOf1<Vertex>()),
+      edges.map(new ValueOf1<Edge>()),
       config);
   }
 
   @Override
-  public GraphTransactions<G, V, E> getGraphTransactions() {
+  public GraphTransactions getGraphTransactions() {
     return getGraphCollection().toTransactions();
   }
 }

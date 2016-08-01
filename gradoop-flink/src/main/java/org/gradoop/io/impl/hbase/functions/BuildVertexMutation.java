@@ -22,8 +22,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.PersistentVertex;
 import org.gradoop.storage.api.VertexHandler;
@@ -31,14 +29,9 @@ import org.gradoop.storage.api.VertexHandler;
 /**
  * Creates HBase {@link Mutation} from persistent vertex data using vertex
  * data handler.
- *
- * @param <V>  EPGM vertex type
- * @param <E>  EPGM edge type
- * @param <PV> EPGM persistent vertex type
  */
-public class BuildVertexMutation
-  <V extends Vertex, E extends Edge, PV extends PersistentVertex<E>>
-  extends RichMapFunction<PV, Tuple2<GradoopId, Mutation>> {
+public class BuildVertexMutation extends RichMapFunction
+  <PersistentVertex, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -53,14 +46,14 @@ public class BuildVertexMutation
   /**
    * Vertex data handler to create Mutations.
    */
-  private final VertexHandler<V, E> vertexHandler;
+  private final VertexHandler vertexHandler;
 
   /**
    * Creates rich map function.
    *
    * @param vertexHandler vertex data handler
    */
-  public BuildVertexMutation(VertexHandler<V, E> vertexHandler) {
+  public BuildVertexMutation(VertexHandler vertexHandler) {
     this.vertexHandler = vertexHandler;
   }
 
@@ -77,8 +70,8 @@ public class BuildVertexMutation
    * {@inheritDoc}
    */
   @Override
-  public Tuple2<GradoopId, Mutation> map(PV persistentVertexData) throws
-    Exception {
+  public Tuple2<GradoopId, Mutation> map(PersistentVertex persistentVertexData)
+    throws Exception {
     GradoopId key = persistentVertexData.getId();
     Put put =
       new Put(vertexHandler.getRowKey(persistentVertexData.getId()));

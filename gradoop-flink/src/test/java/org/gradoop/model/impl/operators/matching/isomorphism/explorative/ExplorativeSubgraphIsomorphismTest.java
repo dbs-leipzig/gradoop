@@ -2,9 +2,6 @@ package org.gradoop.model.impl.operators.matching.isomorphism.explorative;
 
 import org.gradoop.model.impl.operators.matching.PatternMatching;
 import org.gradoop.model.impl.operators.matching.isomorphism.SubgraphIsomorphismTest;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 
 public class ExplorativeSubgraphIsomorphismTest extends SubgraphIsomorphismTest {
 
@@ -16,8 +13,8 @@ public class ExplorativeSubgraphIsomorphismTest extends SubgraphIsomorphismTest 
   }
 
   @Override
-  public PatternMatching<GraphHead, VertexPojo, EdgePojo> getImplementation(
-    String queryGraph, boolean attachData) {
-    return new ExplorativeSubgraphIsomorphism<>(queryGraph, attachData);
+  public PatternMatching getImplementation(String queryGraph,
+    boolean attachData) {
+    return new ExplorativeSubgraphIsomorphism(queryGraph, attachData);
   }
 }

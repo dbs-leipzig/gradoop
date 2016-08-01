@@ -6,9 +6,6 @@ import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
 import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -19,20 +16,18 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDirected() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader = new
-      FlinkAsciiGraphLoader<>(getConfig());
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
 
     loader.initDatabaseFromFile(CanonicalAdjacencyMatrixBuilderTest.class
         .getResource("/data/gdl/cam_test.gdl").getFile());
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> g = loader
-      .getDatabase().getCollection();
+    GraphCollection g = loader.getDatabase().getCollection();
 
-    CanonicalAdjacencyMatrixBuilder<GraphHead, VertexPojo, EdgePojo> cam =
-      new CanonicalAdjacencyMatrixBuilder<>(
-        new GraphHeadToDataString<GraphHead>(),
-        new VertexToDataString<VertexPojo>(),
-        new EdgeToDataString<EdgePojo>(), true);
+    CanonicalAdjacencyMatrixBuilder cam =
+      new CanonicalAdjacencyMatrixBuilder(
+        new GraphHeadToDataString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(), true);
 
     String result = cam.execute(g).collect().get(0);
 
@@ -45,20 +40,18 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
   @Test
   public void testUndirected() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader = new
-      FlinkAsciiGraphLoader<>(getConfig());
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
 
     loader.initDatabaseFromFile(CanonicalAdjacencyMatrixBuilderTest.class
       .getResource("/data/gdl/cam_test.gdl").getFile());
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> g = loader
-      .getDatabase().getCollection();
+    GraphCollection g = loader.getDatabase().getCollection();
 
-    CanonicalAdjacencyMatrixBuilder<GraphHead, VertexPojo, EdgePojo> cam =
-      new CanonicalAdjacencyMatrixBuilder<>(
-        new GraphHeadToDataString<GraphHead>(),
-        new VertexToDataString<VertexPojo>(),
-        new EdgeToDataString<EdgePojo>(), false);
+    CanonicalAdjacencyMatrixBuilder cam =
+      new CanonicalAdjacencyMatrixBuilder(
+        new GraphHeadToDataString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(), false);
 
     String result = cam.execute(g).collect().get(0);
 

@@ -45,15 +45,8 @@ import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Computes the overlap graph from two logical graphs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Overlap
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  extends OverlapBase<V, E>
-  implements BinaryGraphToGraphOperator<G, V, E> {
+public class Overlap extends OverlapBase implements BinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
@@ -65,12 +58,12 @@ public class Overlap
    * @return graph with overlapping elements from both input graphs
    */
   @Override
-  public LogicalGraph<G, V, E> execute(
-    LogicalGraph<G, V, E> firstGraph, LogicalGraph<G, V, E> secondGraph) {
+  public LogicalGraph execute(
+    LogicalGraph firstGraph, LogicalGraph secondGraph) {
 
     DataSet<GradoopId> graphIds = firstGraph.getGraphHead()
-      .map(new Id<G>())
-      .union(secondGraph.getGraphHead().map(new Id<G>()));
+      .map(new Id<GraphHead>())
+      .union(secondGraph.getGraphHead().map(new Id<GraphHead>()));
 
     return LogicalGraph.fromDataSets(
       getVertices(firstGraph.getVertices(), graphIds),

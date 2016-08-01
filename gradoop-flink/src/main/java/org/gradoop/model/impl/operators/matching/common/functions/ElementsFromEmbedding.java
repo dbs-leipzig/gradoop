@@ -38,14 +38,9 @@ import java.util.Map;
 
 /**
  * Extracts {@link Element} instances from an {@link Embedding}.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class ElementsFromEmbedding
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements FlatMapFunction<Tuple1<Embedding>, Element> {
+public class ElementsFromEmbedding implements 
+  FlatMapFunction<Tuple1<Embedding>, Element> {
 
   /**
    * Maps edge candidates to the step in which they are traversed
@@ -54,15 +49,15 @@ public class ElementsFromEmbedding
   /**
    * Constructs EPGM graph heads
    */
-  private final GraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
   /**
    * Constructs EPGM vertices
    */
-  private final VertexFactory<V> vertexFactory;
+  private final VertexFactory vertexFactory;
   /**
    * Constructs EPGM edges
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * Constructor
@@ -73,9 +68,9 @@ public class ElementsFromEmbedding
    * @param edgeFactory       EPGM edge factory
    */
   public ElementsFromEmbedding(TraversalCode traversalCode,
-    GraphHeadFactory<G> graphHeadFactory,
-    VertexFactory<V> vertexFactory,
-    EdgeFactory<E> edgeFactory) {
+    GraphHeadFactory graphHeadFactory,
+    VertexFactory vertexFactory,
+    EdgeFactory edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
@@ -94,12 +89,12 @@ public class ElementsFromEmbedding
     GradoopId[] edgeEmbeddings    = embedding.f0.getEdgeMappings();
 
     // create graph head
-    G graphHead = graphHeadFactory.createGraphHead();
+    GraphHead graphHead = graphHeadFactory.createGraphHead();
     out.collect(graphHead);
 
     // collect vertices (and assign to graph head)
     for (GradoopId vertexId : vertexEmbeddings) {
-      V v = vertexFactory.initVertex(vertexId);
+      Vertex v = vertexFactory.initVertex(vertexId);
       v.addGraphId(graphHead.getId());
       out.collect(v);
     }
@@ -112,7 +107,7 @@ public class ElementsFromEmbedding
         vertexEmbeddings[(int) s.getFrom()] : vertexEmbeddings[(int) s.getTo()];
       GradoopId targetId = s.isOutgoing() ?
         vertexEmbeddings[(int) s.getTo()] : vertexEmbeddings[(int) s.getFrom()];
-      E e = edgeFactory.initEdge(edgeEmbeddings[i], sourceId, targetId);
+      Edge e = edgeFactory.initEdge(edgeEmbeddings[i], sourceId, targetId);
       e.addGraphId(graphHead.getId());
       out.collect(e);
     }

@@ -27,17 +27,13 @@ import java.util.Set;
 
 /**
  * (graphHead, {vertex,..}, {edge,..}) => graphHead
- *
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class TransactionGraphHead
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements MapFunction<Tuple3<G, Set<V>, Set<E>>, G> {
+public class TransactionGraphHead implements
+  MapFunction<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>, GraphHead> {
 
   @Override
-  public G map(Tuple3<G, Set<V>, Set<E>> triple) throws Exception {
+  public GraphHead map(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> triple)
+    throws Exception {
     return triple.f0;
   }
 }

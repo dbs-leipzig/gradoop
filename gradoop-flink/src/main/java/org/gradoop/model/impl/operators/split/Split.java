@@ -52,26 +52,20 @@ import java.util.List;
  * values. The operator supports overlapping logical graphs, where a vertex
  * can be in more than one logical graph. Edges, where source and target vertex
  * have no graphs in common, are removed from the resulting collection.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Split
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements UnaryGraphToCollectionOperator<G, V, E>, Serializable {
+public class Split implements UnaryGraphToCollectionOperator, Serializable {
 
   /**
    * User-defined function for value extraction
    */
-  private final UnaryFunction<V, List<PropertyValue>> function;
+  private final UnaryFunction<Vertex, List<PropertyValue>> function;
 
   /**
    * Constructor
    *
    * @param function user-defined function
    */
-  public Split(UnaryFunction<V, List<PropertyValue>> function) {
+  public Split(UnaryFunction<Vertex, List<PropertyValue>> function) {
     this.function = function;
   }
 
@@ -79,7 +73,7 @@ public class Split
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection<G, V, E> execute(LogicalGraph<G, V, E> graph) {
+  public GraphCollection execute(LogicalGraph graph) {
 
     //--------------------------------------------------------------------------
     // compute vertices
@@ -111,10 +105,10 @@ public class Split
         .reduceGroup(new MultipleGraphIdsGroupReducer());
 
     // add new graph ids to the initial vertex set
-    DataSet<V> vertices = graph.getVertices()
+    DataSet<Vertex> vertices = graph.getVertices()
       .join(vertexIdWithGraphIds)
-      .where(new Id<V>()).equalTo(0)
-      .with(new AddNewGraphsToVertex<V>());
+      .where(new Id<Vertex>()).equalTo(0)
+      .with(new AddNewGraphsToVertex<>());
 
     //--------------------------------------------------------------------------
     // compute new graphs
@@ -125,28 +119,27 @@ public class Split
       .map(new Project2To1<PropertyValue, GradoopId>());
 
     // add new graph id's to the initial graph set
-    DataSet<G> newGraphs = newGraphIds
-      .map(new InitGraphHead<>(
-        graph.getConfig().getGraphHeadFactory()));
+    DataSet<GraphHead> newGraphs = newGraphIds
+      .map(new InitGraphHead(graph.getConfig().getGraphHeadFactory()));
 
     //--------------------------------------------------------------------------
     // compute edges
     //--------------------------------------------------------------------------
 
     // replace source and target id by the graph list the corresponding vertex
-    DataSet<Tuple3<E, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
+    DataSet<Tuple3<Edge, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
       graph.getEdges()
         .join(vertexIdWithGraphIds)
-        .where(new SourceId<E>()).equalTo(0)
-        .with(new JoinEdgeTupleWithSourceGraphs<E>())
+        .where(new SourceId<>()).equalTo(0)
+        .with(new JoinEdgeTupleWithSourceGraphs<>())
         .join(vertexIdWithGraphIds)
         .where("f0.targetId").equalTo(0)
-        .with(new JoinEdgeTupleWithTargetGraphs<E>());
+        .with(new JoinEdgeTupleWithTargetGraphs<>());
 
     // add new graph ids to the edges iff source and target are contained in the
     // same graph
-    DataSet<E> edges = edgeGraphIdsGraphIds
-      .flatMap(new AddNewGraphsToEdge<E>());
+    DataSet<Edge> edges = edgeGraphIdsGraphIds
+      .flatMap(new AddNewGraphsToEdge<>());
 
     //--------------------------------------------------------------------------
     // return new graph collection

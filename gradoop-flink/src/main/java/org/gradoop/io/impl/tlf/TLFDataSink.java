@@ -41,15 +41,8 @@ import java.util.Map;
 /**
  * Writes an EPGM representation into one TLF file. The format
  * is documented at {@link TLFFileFormat}.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class TLFDataSink
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  extends TLFBase<G, V, E>
-  implements DataSink<G, V, E> {
+public class TLFDataSink extends TLFBase implements DataSink {
 
   /**
    * Creates a new data sink. Paths can be local (file://) or HDFS (hdfs://).
@@ -57,7 +50,7 @@ public class TLFDataSink
    * @param tlfPath tlf data file
    * @param config Gradoop Flink configuration
    */
-  public TLFDataSink(String tlfPath, GradoopFlinkConfig<G, V, E> config) {
+  public TLFDataSink(String tlfPath, GradoopFlinkConfig config) {
     super(tlfPath, "", "", config);
   }
 
@@ -70,30 +63,30 @@ public class TLFDataSink
    * @param config Gradoop Flink configuration
    */
   public TLFDataSink(String tlfPath, String tlfVertexDictionaryPath,
-    String tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E> config) {
+    String tlfEdgeDictionaryPath, GradoopFlinkConfig config) {
     super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
   }
 
   @Override
-  public void write(LogicalGraph<G, V, E> logicalGraph) {
+  public void write(LogicalGraph logicalGraph) {
     write(GraphCollection.fromGraph(logicalGraph).toTransactions());
   }
 
   @Override
-  public void write(GraphCollection<G, V, E> graphCollection) {
+  public void write(GraphCollection graphCollection) {
     write(graphCollection.toTransactions());
   }
 
   @Override
-  public void write(GraphTransactions<G, V, E> graphTransactions) {
-    DataSet<GraphTransaction<G, V, E>> simpleLabelTransaction;
+  public void write(GraphTransactions graphTransactions) {
+    DataSet<GraphTransaction> simpleLabelTransaction;
     DataSet<Map<String, Integer>> vertexDictionary = null;
     DataSet<Map<String, Integer>> edgeDictionary = null;
     // if the graph transaction vertex labels are set by a dictionary
     if (hasVertexDictionary()) {
       vertexDictionary = graphTransactions.getTransactions()
         // get a vertex dictionary for each transaction
-        .flatMap(new VertexLabelList<G, V, E>())
+        .flatMap(new VertexLabelList())
         // reduce them to one dictionary without duplicates
         .reduceGroup(new TLFDictionaryMapGroupReducer());
       // write the vertex dictionary
@@ -105,7 +98,7 @@ public class TLFDataSink
     if (hasEdgeDictionary()) {
       edgeDictionary = graphTransactions.getTransactions()
         // get an edge dictionary for each transaction
-        .flatMap(new EdgeLabelList<G, V, E>())
+        .flatMap(new EdgeLabelList())
         // reduce them to one dictionary without duplicates
         .reduceGroup(new TLFDictionaryMapGroupReducer());
       // write the edge dictionary
@@ -119,7 +112,7 @@ public class TLFDataSink
       if (hasVertexDictionary() && hasEdgeDictionary()) {
         simpleLabelTransaction = graphTransactions.getTransactions()
           // map the simple integer-like labels
-          .map(new ElementLabelEncoder<G, V, E>(
+          .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
           .withBroadcastSet(vertexDictionary,
             BroadcastNames.VERTEX_DICTIONARY)
@@ -128,14 +121,14 @@ public class TLFDataSink
       } else if (hasVertexDictionary()) {
         simpleLabelTransaction = graphTransactions.getTransactions()
           // map the simple integer-like labels
-          .map(new ElementLabelEncoder<G, V, E>(
+          .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
           .withBroadcastSet(vertexDictionary,
             BroadcastNames.VERTEX_DICTIONARY);
       } else {
         simpleLabelTransaction = graphTransactions.getTransactions()
           // map the simple integer-like labels
-          .map(new ElementLabelEncoder<G, V, E>(
+          .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
           .withBroadcastSet(edgeDictionary,
             BroadcastNames.EDGE_DICTIONARY);
@@ -143,12 +136,12 @@ public class TLFDataSink
       // write the TLF format adjusted graphs to file
       simpleLabelTransaction
         .writeAsFormattedText(getTLFPath(),
-          new TLFFileFormat<G, V, E>());
+          new TLFFileFormat());
     // if there was no dictionary used the graphs can simply be written
     } else {
       graphTransactions.getTransactions()
         .writeAsFormattedText(getTLFPath(),
-          new TLFFileFormat<G, V, E>());
+          new TLFFileFormat());
     }
   }
 }

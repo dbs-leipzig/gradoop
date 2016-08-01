@@ -17,30 +17,22 @@
 
 package org.gradoop.io.impl.hbase;
 
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.storage.impl.hbase.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.util.GradoopFlinkConfig;
 
 /**
  * Base class for HBase data source and sink.
- *
- * @param <G>  EPGM graph head type
- * @param <V>  EPGM vertex type
- * @param <E>  EPGM edge type
  */
-abstract class HBaseBase
-  <G extends GraphHead, V extends Vertex, E extends Edge> {
+abstract class HBaseBase {
   /**
    * HBase Store implementation
    */
-  private final HBaseEPGMStore<G, V, E> epgmStore;
+  private final HBaseEPGMStore epgmStore;
   /**
    * Gradoop Flink configuration
    */
-  private final GradoopFlinkConfig<G, V, E> config;
+  private final GradoopFlinkConfig config;
 
   /**
    * Creates a new HBase data source/sink.
@@ -48,21 +40,21 @@ abstract class HBaseBase
    * @param epgmStore store implementation
    * @param config    Gradoop Flink configuration
    */
-  HBaseBase(HBaseEPGMStore<G, V, E> epgmStore,
-    GradoopFlinkConfig<G, V, E> config) {
+  HBaseBase(HBaseEPGMStore epgmStore,
+    GradoopFlinkConfig config) {
     this.epgmStore  = epgmStore;
     this.config     = config;
   }
 
-  HBaseEPGMStore<G, V, E> getStore() {
+  HBaseEPGMStore getStore() {
     return epgmStore;
   }
 
-  GradoopFlinkConfig<G, V, E> getFlinkConfig() {
+  GradoopFlinkConfig getFlinkConfig() {
     return config;
   }
 
-  GradoopHBaseConfig<G, V, E> getHBaseConfig() {
+  GradoopHBaseConfig getHBaseConfig() {
     return epgmStore.getConfig();
   }
 }

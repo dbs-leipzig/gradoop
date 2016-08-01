@@ -23,7 +23,7 @@ import org.gradoop.model.impl.properties.PropertyList;
 /**
  * Initializes {@link GraphHead} objects of a given type.
  */
-public interface GraphHeadFactory extends ElementFactory {
+public interface GraphHeadFactory {
 
   /**
    * Creates a new graph head based.
@@ -75,4 +75,11 @@ public interface GraphHeadFactory extends ElementFactory {
    * @return graph data
    */
   GraphHead initGraphHead(GradoopId id, String label, PropertyList properties);
+
+  /**
+   * Return the type of the objects created by that factory.
+   *
+   * @return object type
+   */
+  Class<? extends GraphHead> getType();
 }

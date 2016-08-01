@@ -27,27 +27,21 @@ import org.gradoop.storage.api.PersistentGraphHeadFactory;
 
 /**
  * Creates persistent graph data from graph data and vertex/edge identifiers.
- *
- * @param <G>   EPGM graph head type
- * @param <PG>  EPGM persistent graph head type
  */
-public class BuildPersistentGraphHead
-  <G extends GraphHead, PG extends PersistentGraphHead>
-  implements JoinFunction
-  <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, G, PersistentGraphHead> {
+public class BuildPersistentGraphHead implements JoinFunction
+  <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, GraphHead, PersistentGraphHead> {
 
   /**
    * Persistent graph data factory.
    */
-  private PersistentGraphHeadFactory<G, PG> graphHeadFactory;
+  private PersistentGraphHeadFactory graphHeadFactory;
 
   /**
    * Creates join function.
    *
    * @param graphHeadFactory persistent graph data factory
    */
-  public BuildPersistentGraphHead(
-    PersistentGraphHeadFactory<G, PG> graphHeadFactory) {
+  public BuildPersistentGraphHead(PersistentGraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -57,7 +51,7 @@ public class BuildPersistentGraphHead
   @Override
   public PersistentGraphHead join(
     Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> longSetSetTuple3,
-    G graphHead) throws Exception {
+    GraphHead graphHead) throws Exception {
     return graphHeadFactory.createGraphHead(graphHead, longSetSetTuple3.f1,
       longSetSetTuple3.f2);
   }

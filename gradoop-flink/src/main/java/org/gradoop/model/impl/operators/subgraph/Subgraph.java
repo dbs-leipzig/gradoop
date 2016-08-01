@@ -20,7 +20,6 @@ package org.gradoop.model.impl.operators.subgraph;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.model.impl.LogicalGraph;
@@ -39,24 +38,18 @@ import org.gradoop.model.impl.functions.utils.RightSide;
  * 3) extract subgraph based on vertex and edge filter function
  *
  * Note that option 3) does not verify the consistency of the resulting graph.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class Subgraph
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements UnaryGraphToGraphOperator<G, V, E> {
+public class Subgraph implements UnaryGraphToGraphOperator {
 
   /**
    * Used to filter vertices from the logical graph.
    */
-  private final FilterFunction<V> vertexFilterFunction;
+  private final FilterFunction<Vertex> vertexFilterFunction;
 
   /**
    * Used to filter edges from the logical graph.
    */
-  private final FilterFunction<E> edgeFilterFunction;
+  private final FilterFunction<Edge> edgeFilterFunction;
 
   /**
    * Creates a new sub graph operator instance.
@@ -73,8 +66,8 @@ public class Subgraph
    * @param vertexFilterFunction  vertex filter function
    * @param edgeFilterFunction    edge filter function
    */
-  public Subgraph(FilterFunction<V> vertexFilterFunction,
-    FilterFunction<E> edgeFilterFunction) {
+  public Subgraph(FilterFunction<Vertex> vertexFilterFunction,
+    FilterFunction<Edge> edgeFilterFunction) {
     if (vertexFilterFunction == null && edgeFilterFunction == null) {
       throw new IllegalArgumentException("No filter functions was given.");
     }
@@ -83,7 +76,7 @@ public class Subgraph
   }
 
   @Override
-  public LogicalGraph<G, V, E> execute(LogicalGraph<G, V, E> superGraph) {
+  public LogicalGraph execute(LogicalGraph superGraph) {
     return vertexFilterFunction != null && edgeFilterFunction != null ?
       subgraph(superGraph) : vertexFilterFunction != null ?
       vertexInducedSubgraph(superGraph) : edgeInducedSubgraph(superGraph);
@@ -96,18 +89,18 @@ public class Subgraph
    * @param superGraph supergraph
    * @return vertex-induced subgraph
    */
-  private LogicalGraph<G, V, E> vertexInducedSubgraph(
-    LogicalGraph<G, V, E> superGraph) {
-    DataSet<V> filteredVertices = superGraph.getVertices()
+  private LogicalGraph vertexInducedSubgraph(
+    LogicalGraph superGraph) {
+    DataSet<Vertex> filteredVertices = superGraph.getVertices()
       .filter(vertexFilterFunction);
 
-    DataSet<E> newEdges = superGraph.getEdges()
+    DataSet<Edge> newEdges = superGraph.getEdges()
       .join(filteredVertices)
-      .where(new SourceId<E>()).equalTo(new Id<V>())
-      .with(new LeftSide<E, V>())
+      .where(new SourceId<>()).equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
       .join(filteredVertices)
-      .where(new TargetId<E>()).equalTo(new Id<V>())
-      .with(new LeftSide<E, V>());
+      .where(new TargetId<>()).equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>());
 
     return LogicalGraph.fromDataSets(
       filteredVertices, newEdges, superGraph.getConfig());
@@ -120,20 +113,20 @@ public class Subgraph
    * @param superGraph supergraph
    * @return edge-induced subgraph
    */
-  private LogicalGraph<G, V, E> edgeInducedSubgraph(
-    LogicalGraph<G, V, E> superGraph) {
-    DataSet<E> filteredEdges = superGraph.getEdges()
+  private LogicalGraph edgeInducedSubgraph(
+    LogicalGraph superGraph) {
+    DataSet<Edge> filteredEdges = superGraph.getEdges()
       .filter(edgeFilterFunction);
 
-    DataSet<V> newVertices = filteredEdges
+    DataSet<Vertex> newVertices = filteredEdges
       .join(superGraph.getVertices())
-      .where(new SourceId<E>()).equalTo(new Id<V>())
-      .with(new RightSide<E, V>())
+      .where(new SourceId<>()).equalTo(new Id<Vertex>())
+      .with(new RightSide<Edge, Vertex>())
       .union(filteredEdges
         .join(superGraph.getVertices())
-          .where(new TargetId<E>()).equalTo(new Id<V>())
-          .with(new RightSide<E, V>()))
-      .distinct(new Id<V>());
+          .where(new TargetId<>()).equalTo(new Id<Vertex>())
+          .with(new RightSide<Edge, Vertex>()))
+      .distinct(new Id<Vertex>());
 
     return LogicalGraph.fromDataSets(
       newVertices, filteredEdges, superGraph.getConfig());
@@ -150,7 +143,7 @@ public class Subgraph
    * @param superGraph supergraph
    * @return subgraph
    */
-  private LogicalGraph<G, V, E> subgraph(LogicalGraph<G, V, E> superGraph) {
+  private LogicalGraph subgraph(LogicalGraph superGraph) {
     return LogicalGraph.fromDataSets(
       superGraph.getVertices().filter(vertexFilterFunction),
       superGraph.getEdges().filter(edgeFilterFunction),

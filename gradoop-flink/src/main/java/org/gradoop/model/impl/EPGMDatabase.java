@@ -37,31 +37,24 @@ import java.util.Collection;
  * Represents an EPGM database. Enables access to the database graph and to
  * all logical graphs contained in the database. The database also handles in-
  * and output from external sources / graphs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
 @Deprecated
-public class EPGMDatabase<
-  G extends GraphHead,
-  V extends Vertex,
-  E extends Edge> {
+public class EPGMDatabase {
 
   /**
    * Gradoop Flink configuration.
    */
-  private final GradoopFlinkConfig<G, V, E> config;
+  private final GradoopFlinkConfig config;
 
   /**
    * Database graph representing the vertex and edge space.
    */
-  private GraphCollection<G, V, E> database;
+  private GraphCollection database;
 
   /**
    * Graph head representing the database graph.
    */
-  private final DataSet<G> graphHead;
+  private final DataSet<GraphHead> graphHead;
 
   /**
    * Creates a new EPGM database from the given arguments.
@@ -71,10 +64,10 @@ public class EPGMDatabase<
    * @param graphHeads  graph data set
    * @param config      Gradoop Flink Configuration
    */
-  private EPGMDatabase(DataSet<G> graphHeads,
-    DataSet<V> vertices,
-    DataSet<E> edges,
-    GradoopFlinkConfig<G, V, E> config) {
+  private EPGMDatabase(DataSet<GraphHead> graphHeads,
+    DataSet<Vertex> vertices,
+    DataSet<Edge> edges,
+    GradoopFlinkConfig config) {
     this.config = config;
     this.database = GraphCollection.fromDataSets(graphHeads, vertices,
       edges, config);
@@ -93,27 +86,22 @@ public class EPGMDatabase<
    * @param vertexDataCollection  collection of vertices
    * @param edgeDataCollection    collection of edges
    * @param config                Gradoop Flink configuration
-   * @param <G>                   EPGM graph head type
-   * @param <V>                   EPGM vertex type
-   * @param <E>                   EPGM edge type
    * @return EPGM database
    */
   @SuppressWarnings("unchecked")
   @Deprecated
-  public static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  EPGMDatabase fromCollections(
-    Collection<G> graphDataCollection,
-    Collection<V> vertexDataCollection,
-    Collection<E> edgeDataCollection,
-    GradoopFlinkConfig<G, V, E> config) {
+  public static EPGMDatabase fromCollections(
+    Collection<GraphHead> graphDataCollection,
+    Collection<Vertex> vertexDataCollection,
+    Collection<Edge> edgeDataCollection,
+    GradoopFlinkConfig config) {
     if (config == null) {
       throw new IllegalArgumentException("Config must not be null");
     }
     ExecutionEnvironment env = config.getExecutionEnvironment();
-    DataSet<V> vertices = env.fromCollection(vertexDataCollection);
-    DataSet<E> edges = env.fromCollection(edgeDataCollection);
-    DataSet<G> graphHeads;
+    DataSet<Vertex> vertices = env.fromCollection(vertexDataCollection);
+    DataSet<Edge> edges = env.fromCollection(edgeDataCollection);
+    DataSet<GraphHead> graphHeads;
     if (graphDataCollection != null) {
       graphHeads = env.fromCollection(graphDataCollection);
     } else {
@@ -121,7 +109,7 @@ public class EPGMDatabase<
         config.getGraphHeadFactory().createGraphHead());
     }
 
-    return new EPGMDatabase<>(graphHeads, vertices, edges, config);
+    return new EPGMDatabase(graphHeads, vertices, edges, config);
   }
 
 
@@ -136,7 +124,7 @@ public class EPGMDatabase<
    * @return logical graph of vertex and edge space
    */
   @Deprecated
-  public LogicalGraph<G, V, E> getDatabaseGraph() {
+  public LogicalGraph getDatabaseGraph() {
     return getDatabaseGraph(false);
   }
 
@@ -151,13 +139,13 @@ public class EPGMDatabase<
    * @return logical graph of vertex and edge space
    */
   @Deprecated
-  public LogicalGraph<G, V, E> getDatabaseGraph(boolean withGraphContainment) {
+  public LogicalGraph getDatabaseGraph(boolean withGraphContainment) {
     if (withGraphContainment) {
-      DataSet<GradoopId> graphId = graphHead.map(new Id<G>());
+      DataSet<GradoopId> graphId = graphHead.map(new Id<GraphHead>());
       return LogicalGraph.fromDataSets(graphHead,
-        database.getVertices().map(new AddToGraphBroadcast<V>())
+        database.getVertices().map(new AddToGraphBroadcast<Vertex>())
           .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID),
-        database.getEdges().map(new AddToGraphBroadcast<E>())
+        database.getEdges().map(new AddToGraphBroadcast<Edge>())
           .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID),
         config);
     } else {
@@ -174,7 +162,7 @@ public class EPGMDatabase<
    * @return logical graph (possibly empty)
    */
   @Deprecated
-  public LogicalGraph<G, V, E> getGraph(GradoopId graphID) {
+  public LogicalGraph getGraph(GradoopId graphID) {
     return database.getGraph(graphID);
   }
 
@@ -184,19 +172,19 @@ public class EPGMDatabase<
    * @return collection of all logical graphs
    */
   @Deprecated
-  public GraphCollection<G, V, E> getCollection() {
-    DataSet<V> newVertices = database.getVertices()
-        .filter(new FilterFunction<V>() {
+  public GraphCollection getCollection() {
+    DataSet<Vertex> newVertices = database.getVertices()
+        .filter(new FilterFunction<Vertex>() {
           @Override
-          public boolean filter(V vertex) throws
+          public boolean filter(Vertex vertex) throws
             Exception {
             return vertex.getGraphCount() > 0;
           }
         });
-    DataSet<E> newEdges = database.getEdges()
-      .filter(new FilterFunction<E>() {
+    DataSet<Edge> newEdges = database.getEdges()
+      .filter(new FilterFunction<Edge>() {
         @Override
-        public boolean filter(E longEDEdge) throws Exception {
+        public boolean filter(Edge longEDEdge) throws Exception {
           return longEDEdge.getGraphCount() > 0;
         }
       });
@@ -211,7 +199,7 @@ public class EPGMDatabase<
    * @param dataSink data sink
    */
   @Deprecated
-  public void writeTo(DataSink<G, V, E> dataSink) throws IOException {
+  public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(database);
   }
 }

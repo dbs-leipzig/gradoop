@@ -2,11 +2,11 @@ package org.gradoop.io.impl.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.EPGMDatabase;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.storage.api.PersistentEdge;
 import org.gradoop.storage.api.PersistentGraphHead;
 import org.gradoop.storage.api.PersistentVertex;
@@ -28,12 +28,11 @@ public class HBaseIOTest extends FlinkHBaseTestBase {
 
   @Test
   public void readFromHBaseTest() throws Exception {
-    HBaseEPGMStore<GraphHead, VertexPojo, EdgePojo> epgmStore =
-      GradoopHBaseTestBase.createEmptyEPGMStore();
+    HBaseEPGMStore epgmStore = GradoopHBaseTestBase.createEmptyEPGMStore();
 
-    List<PersistentVertex<EdgePojo>> vertices =
+    List<PersistentVertex> vertices =
       Lists.newArrayList(getSocialPersistentVertices());
-    List<PersistentEdge<VertexPojo>> edges =
+    List<PersistentEdge> edges =
       Lists.newArrayList(getSocialPersistentEdges());
     List<PersistentGraphHead> graphHeads =
       Lists.newArrayList(getSocialPersistentGraphHeads());
@@ -42,22 +41,22 @@ public class HBaseIOTest extends FlinkHBaseTestBase {
     for (PersistentGraphHead g : graphHeads) {
       epgmStore.writeGraphHead(g);
     }
-    for (PersistentVertex<EdgePojo> v : vertices) {
+    for (PersistentVertex v : vertices) {
       epgmStore.writeVertex(v);
     }
-    for (PersistentEdge<VertexPojo> e : edges) {
+    for (PersistentEdge e : edges) {
       epgmStore.writeEdge(e);
     }
 
     epgmStore.flush();
 
     // read social graph from HBase via EPGMDatabase
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> collection =
-      new HBaseDataSource<>(epgmStore, getConfig()).getGraphCollection();
+    GraphCollection collection = new HBaseDataSource(epgmStore, 
+      getConfig()).getGraphCollection();
 
     Collection<GraphHead> loadedGraphHeads    = Lists.newArrayList();
-    Collection<VertexPojo>    loadedVertices      = Lists.newArrayList();
-    Collection<EdgePojo>      loadedEdges         = Lists.newArrayList();
+    Collection<Vertex>    loadedVertices      = Lists.newArrayList();
+    Collection<Edge>      loadedEdges         = Lists.newArrayList();
 
     collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
@@ -80,17 +79,14 @@ public class HBaseIOTest extends FlinkHBaseTestBase {
   @Test
   public void writeToHBaseTest() throws Exception {
     // create empty EPGM store
-    HBaseEPGMStore<GraphHead, VertexPojo, EdgePojo> epgmStore =
-      GradoopHBaseTestBase.createEmptyEPGMStore();
+    HBaseEPGMStore epgmStore = GradoopHBaseTestBase.createEmptyEPGMStore();
 
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-      loader = getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    EPGMDatabase<GraphHead, VertexPojo, EdgePojo> epgmDB =
-      loader.getDatabase();
+    EPGMDatabase epgmDB = loader.getDatabase();
 
     // write social graph to HBase via EPGM database
-    epgmDB.writeTo(new HBaseDataSink<>(epgmStore, getConfig()));
+    epgmDB.writeTo(new HBaseDataSink(epgmStore, getConfig()));
 
     getExecutionEnvironment().execute();
 

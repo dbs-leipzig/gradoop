@@ -27,16 +27,14 @@ import org.gradoop.util.GConstants;
 
 /**
  * Reads graph data from HBase.
- *
- * @param <G> EPGM graph head type
  */
-public class GraphHeadTableInputFormat<G extends GraphHead>
-  extends TableInputFormat<Tuple1<G>> {
+public class GraphHeadTableInputFormat
+  extends TableInputFormat<Tuple1<GraphHead>> {
 
   /**
    * Handles reading of persistent graph data.
    */
-  private final GraphHeadHandler<G> graphHeadHandler;
+  private final GraphHeadHandler graphHeadHandler;
 
   /**
    * Table to read from.
@@ -49,7 +47,7 @@ public class GraphHeadTableInputFormat<G extends GraphHead>
    * @param graphHeadHandler   graph data handler
    * @param graphHeadTableName graph data table name
    */
-  public GraphHeadTableInputFormat(GraphHeadHandler<G> graphHeadHandler,
+  public GraphHeadTableInputFormat(GraphHeadHandler graphHeadHandler,
     String graphHeadTableName) {
     this.graphHeadHandler = graphHeadHandler;
     this.graphHeadTableName = graphHeadTableName;
@@ -77,7 +75,7 @@ public class GraphHeadTableInputFormat<G extends GraphHead>
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<G> mapResultToTuple(Result result) {
+  protected Tuple1<GraphHead> mapResultToTuple(Result result) {
     return new Tuple1<>(graphHeadHandler.readGraphHead(result));
   }
 }

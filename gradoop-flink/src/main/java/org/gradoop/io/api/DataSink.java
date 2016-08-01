@@ -17,9 +17,6 @@
 
 package org.gradoop.io.api;
 
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -28,32 +25,27 @@ import java.io.IOException;
 
 /**
  * Data source in analytical programs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public interface DataSink
-  <G extends GraphHead, V extends Vertex, E extends Edge> {
+public interface DataSink {
 
   /**
    * Writes a logical graph to the data sink.
    *
    * @param logicalGraph logical graph
    */
-  void write(LogicalGraph<G, V, E> logicalGraph) throws IOException;
+  void write(LogicalGraph logicalGraph) throws IOException;
 
   /**
    * Writes a logical graph to the data sink.
    *
    * @param graphCollection graph collection
    */
-  void write(GraphCollection<G, V, E> graphCollection) throws IOException;
+  void write(GraphCollection graphCollection) throws IOException;
 
   /**
    * Writes a logical graph to the data sink.
    *
    * @param graphTransactions graph transactions
    */
-  void write(GraphTransactions<G, V, E> graphTransactions) throws IOException;
+  void write(GraphTransactions graphTransactions) throws IOException;
 }

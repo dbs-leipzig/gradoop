@@ -21,9 +21,6 @@ import org.gradoop.io.api.DataSink;
 import org.gradoop.io.impl.json.functions.EdgeToJSON;
 import org.gradoop.io.impl.json.functions.GraphHeadToJSON;
 import org.gradoop.io.impl.json.functions.VertexToJSON;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -33,15 +30,8 @@ import org.gradoop.util.GradoopFlinkConfig;
  * Write an EPGM representation into three separate JSON files. The format
  * is documented at {@link GraphHeadToJSON}, {@link VertexToJSON} and
  * {@link EdgeToJSON}.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class JSONDataSink
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  extends JSONBase<G, V, E>
-  implements DataSink<G, V, E> {
+public class JSONDataSink extends JSONBase implements DataSink {
 
   /**
    * Creates a new data sink. Paths can be local (file://) or HDFS (hdfs://).
@@ -52,27 +42,27 @@ public class JSONDataSink
    * @param config        Gradoop Flink configuration
    */
   public JSONDataSink(String graphHeadPath, String vertexPath, String edgePath,
-    GradoopFlinkConfig<G, V, E> config) {
+    GradoopFlinkConfig config) {
     super(graphHeadPath, vertexPath, edgePath, config);
   }
 
   @Override
-  public void write(LogicalGraph<G, V, E> logicalGraph) {
+  public void write(LogicalGraph logicalGraph) {
     write(GraphCollection.fromGraph(logicalGraph));
   }
 
   @Override
-  public void write(GraphCollection<G, V, E> graphCollection) {
-    graphCollection.getGraphHeads()
-      .writeAsFormattedText(getGraphHeadPath(), new GraphHeadToJSON<G>());
-    graphCollection.getVertices()
-      .writeAsFormattedText(getVertexPath(), new VertexToJSON<V>());
-    graphCollection.getEdges()
-      .writeAsFormattedText(getEdgePath(), new EdgeToJSON<E>());
+  public void write(GraphCollection graphCollection) {
+    graphCollection.getGraphHeads().writeAsFormattedText(getGraphHeadPath(),
+      new GraphHeadToJSON<>());
+    graphCollection.getVertices().writeAsFormattedText(getVertexPath(),
+      new VertexToJSON<>());
+    graphCollection.getEdges().writeAsFormattedText(getEdgePath(),
+      new EdgeToJSON<>());
   }
 
   @Override
-  public void write(GraphTransactions<G, V, E> graphTransactions) {
+  public void write(GraphTransactions graphTransactions) {
     write(GraphCollection.fromTransactions(graphTransactions));
   }
 }

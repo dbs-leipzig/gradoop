@@ -37,15 +37,8 @@ import org.gradoop.util.GradoopFlinkConfig;
 /**
  * Creates an EPGM instance from JSON files. The exact format is documented in
  * {@link JSONToGraphHead}, {@link JSONToVertex}, {@link JSONToEdge}.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class JSONDataSource
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  extends JSONBase<G, V, E>
-  implements DataSource<G, V, E> {
+public class JSONDataSource extends JSONBase implements DataSource {
 
   /**
    * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
@@ -56,40 +49,40 @@ public class JSONDataSource
    * @param config        Gradoop Flink configuration
    */
   public JSONDataSource(String graphHeadPath, String vertexPath,
-    String edgePath, GradoopFlinkConfig<G, V, E> config) {
+    String edgePath, GradoopFlinkConfig config) {
     super(graphHeadPath, vertexPath, edgePath, config);
   }
 
   @Override
-  public LogicalGraph<G, V, E> getLogicalGraph() {
-    return getGraphCollection().reduce(new ReduceCombination<G, V, E>());
+  public LogicalGraph getLogicalGraph() {
+    return getGraphCollection().reduce(new ReduceCombination());
   }
 
   @Override
-  public GraphCollection<G, V, E> getGraphCollection() {
+  public GraphCollection getGraphCollection() {
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     // used for type hinting when loading vertex data
-    TypeInformation<V> vertexTypeInfo = TypeExtractor
+    TypeInformation vertexTypeInfo = TypeExtractor
       .createTypeInfo(getConfig().getVertexFactory().getType());
     // used for type hinting when loading edge data
-    TypeInformation<E> edgeTypeInfo = TypeExtractor
+    TypeInformation edgeTypeInfo = TypeExtractor
       .createTypeInfo(getConfig().getEdgeFactory().getType());
     // used for type hinting when loading graph data
-    TypeInformation<G> graphTypeInfo = TypeExtractor
+    TypeInformation graphTypeInfo = TypeExtractor
       .createTypeInfo(getConfig().getGraphHeadFactory().getType());
 
     // read vertex, edge and graph data
-    DataSet<V> vertices = env.readTextFile(getVertexPath())
-      .map(new JSONToVertex<>(getConfig().getVertexFactory()))
+    DataSet<Vertex> vertices = env.readTextFile(getVertexPath())
+      .map(new JSONToVertex(getConfig().getVertexFactory()))
       .returns(vertexTypeInfo);
-    DataSet<E> edges = env.readTextFile(getEdgePath())
-      .map(new JSONToEdge<>(getConfig().getEdgeFactory()))
+    DataSet<Edge> edges = env.readTextFile(getEdgePath())
+      .map(new JSONToEdge(getConfig().getEdgeFactory()))
       .returns(edgeTypeInfo);
-    DataSet<G> graphHeads;
+    DataSet<GraphHead> graphHeads;
     if (getGraphHeadPath() != null) {
       graphHeads = env.readTextFile(getGraphHeadPath())
-        .map(new JSONToGraphHead<>(getConfig().getGraphHeadFactory()))
+        .map(new JSONToGraphHead(getConfig().getGraphHeadFactory()))
         .returns(graphTypeInfo);
     } else {
       graphHeads = env.fromElements(
@@ -101,7 +94,7 @@ public class JSONDataSource
   }
 
   @Override
-  public GraphTransactions<G, V, E> getGraphTransactions() {
+  public GraphTransactions getGraphTransactions() {
     return getGraphCollection().toTransactions();
   }
 }

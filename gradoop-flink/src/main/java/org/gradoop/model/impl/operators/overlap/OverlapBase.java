@@ -43,12 +43,10 @@ import org.gradoop.model.impl.id.GradoopId;
 /**
  * Base class for overlap operators that contains common logic.
  *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  * @see Overlap
  * @see ReduceOverlap
  */
-public abstract class OverlapBase<V extends Vertex, E extends Edge> {
+public abstract class OverlapBase {
 
   /**
    * Filters vertices based on the given graph identifiers.
@@ -57,10 +55,10 @@ public abstract class OverlapBase<V extends Vertex, E extends Edge> {
    * @param ids       graph identifiers
    * @return filtered vertices
    */
-  protected DataSet<V> getVertices(DataSet<V> vertices,
+  protected DataSet<Vertex> getVertices(DataSet<Vertex> vertices,
     DataSet<GradoopId> ids) {
     return vertices
-      .filter(new InAllGraphsBroadcast<V>())
+      .filter(new InAllGraphsBroadcast<Vertex>())
       .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
   }
 
@@ -71,9 +69,10 @@ public abstract class OverlapBase<V extends Vertex, E extends Edge> {
    * @param ids   graph identifiers
    * @return filtered edges
    */
-  protected DataSet<E> getEdges(DataSet<E> edges, DataSet<GradoopId> ids) {
+  protected DataSet<Edge> getEdges(DataSet<Edge> edges,
+    DataSet<GradoopId> ids) {
     return edges
-      .filter(new InAllGraphsBroadcast<E>())
+      .filter(new InAllGraphsBroadcast<Edge>())
       .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
   }
 }

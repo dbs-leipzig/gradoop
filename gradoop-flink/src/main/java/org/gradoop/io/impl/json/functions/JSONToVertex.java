@@ -40,24 +40,21 @@ import org.gradoop.model.impl.properties.PropertyList;
  * "meta":{"label":"Employee", "out-edges":[0,1,2,3], in-edges:[4,5,6,7],
  * "graphs":[0,1,2,3]}
  * }
- *
- * @param <V> EPGM vertex type class
  */
-public class JSONToVertex<V extends Vertex>
-  extends JSONToEntity
-  implements MapFunction<String, V> {
+public class JSONToVertex extends JSONToEntity
+  implements MapFunction<String, Vertex> {
 
   /**
    * Creates vertex data objects.
    */
-  private final VertexFactory<V> vertexFactory;
+  private final VertexFactory vertexFactory;
 
   /**
    * Creates map function
    *
    * @param vertexFactory vertex data factory
    */
-  public JSONToVertex(VertexFactory<V> vertexFactory) {
+  public JSONToVertex(VertexFactory vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 
@@ -69,7 +66,7 @@ public class JSONToVertex<V extends Vertex>
    * @throws Exception
    */
   @Override
-  public V map(String s) throws Exception {
+  public Vertex map(String s) throws Exception {
     JSONObject jsonVertex = new JSONObject(s);
     GradoopId vertexID = getID(jsonVertex);
     String label = getLabel(jsonVertex);

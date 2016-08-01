@@ -3,9 +3,6 @@ package org.gradoop.model.impl.operators.limit;
 import org.apache.flink.api.common.InvalidProgramException;
 import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.junit.Test;
@@ -16,15 +13,14 @@ public class LimitTest extends GradoopFlinkTestBase {
 
   @Test
   public void testInBound() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-      loader = getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     int limit = 2;
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> inputCollection =
-      loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+    GraphCollection inputCollection = loader
+      .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> outputCollection =
+    GraphCollection outputCollection =
       inputCollection.limit(limit);
 
     assertEquals(limit, outputCollection.getGraphHeads().count());
@@ -32,47 +28,43 @@ public class LimitTest extends GradoopFlinkTestBase {
 
   @Test
   public void testOutOfBound() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-      loader = getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> inputCollection =
-      loader.getGraphCollectionByVariables("g0", "g1");
+    GraphCollection inputCollection = loader
+      .getGraphCollectionByVariables("g0", "g1");
 
     int limit = 4;
     int expectedLimit = 2;
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo>
-      outputCollection = inputCollection.limit(limit);
+    GraphCollection outputCollection = inputCollection.limit(limit);
 
     assertEquals(expectedLimit, outputCollection.getGraphHeads().count());
   }
 
   @Test
   public void testEmpty() throws Exception {
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> inputCollection =
+    GraphCollection inputCollection =
       GraphCollection.createEmptyCollection(
         GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
 
     int limit = 4;
     int expectedCount = 0;
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo>
-      outputCollection = inputCollection.limit(limit);
+    GraphCollection outputCollection = inputCollection.limit(limit);
 
     assertEquals(expectedCount, outputCollection.getGraphHeads().count());
   }
 
   @Test(expected = InvalidProgramException.class)
   public void testNegativeLimit() throws Exception {
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> inputCollection =
+    GraphCollection inputCollection =
       GraphCollection.createEmptyCollection(
         GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
 
     int limit = -1;
     int expectedCount = 0;
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo>
-      outputCollection = inputCollection.limit(limit);
+    GraphCollection outputCollection = inputCollection.limit(limit);
 
     assertEquals(expectedCount, outputCollection.getGraphHeads().count());
   }

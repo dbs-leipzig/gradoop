@@ -20,11 +20,9 @@ package org.gradoop.io.impl.tlf;
 import org.gradoop.io.api.DataSink;
 import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -45,12 +43,10 @@ public class TLFIOTest extends GradoopFlinkTestBase {
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
       "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
 
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString(asciiGraphs);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo>
-      originalCollection =
-      loader.getGraphCollectionByVariables("g1", "g2");
+    GraphCollection originalCollection = loader
+      .getGraphCollectionByVariables("g1", "g2");
 
     String filePath =
       TLFIOTest.class.getResource("/data/tlf").getFile() + "/io_test_rw.tlf";
@@ -58,20 +54,17 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     new File(filePath).createNewFile();
 
     // create data sink
-    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
-      new TLFDataSink<>(filePath, config);
+    DataSink dataSink = new TLFDataSink(filePath, config);
 
     dataSink.write(originalCollection);
 
     getExecutionEnvironment().execute();
 
     // create data source
-    TLFDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(filePath, config);
+    TLFDataSource dataSource = new TLFDataSource(filePath, config);
 
     //get transactions
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions
-      = dataSource.getGraphTransactions();
+    GraphTransactions transactions = dataSource.getGraphTransactions();
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphData(
@@ -88,22 +81,19 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testRead() throws Exception {
-    String tlfFile =
-      TLFIOTest.class.getResource("/data/tlf/io_test_string.tlf").getFile();
+    String tlfFile = TLFIOTest.class
+      .getResource("/data/tlf/io_test_string.tlf").getFile();
 
     // create datasource
-    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFile, config);
+    DataSource dataSource = new TLFDataSource(tlfFile, config);
     //get transactions
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions =
-      dataSource.getGraphTransactions();
+    GraphTransactions transactions = dataSource.getGraphTransactions();
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
       "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
 
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString(asciiGraphs);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
       loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
@@ -120,33 +110,24 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadWithDictionary() throws Exception {
-    String tlfFile =
-      TLFIOTest.class
-        .getResource("/data/tlf/io_test.tlf")
-        .getFile();
-    String tlfVertexDictionaryFile =
-      TLFIOTest.class
-        .getResource("/data/tlf/io_test_vertex_dictionary.tlf")
-        .getFile();
-    String tlfEdgeDictionaryFile =
-      TLFIOTest.class
-        .getResource("/data/tlf/io_test_edge_dictionary.tlf")
-        .getFile();
+    String tlfFile = TLFIOTest.class
+      .getResource("/data/tlf/io_test.tlf").getFile();
+    String tlfVertexDictionaryFile = TLFIOTest.class
+      .getResource("/data/tlf/io_test_vertex_dictionary.tlf").getFile();
+    String tlfEdgeDictionaryFile = TLFIOTest.class
+      .getResource("/data/tlf/io_test_edge_dictionary.tlf").getFile();
 
     // create datasource
-    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFile, tlfVertexDictionaryFile,
+    DataSource dataSource = new TLFDataSource(tlfFile, tlfVertexDictionaryFile,
         tlfEdgeDictionaryFile, config);
     //get transactions
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions
-      = dataSource.getGraphTransactions();
+    GraphTransactions transactions = dataSource.getGraphTransactions();
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
       "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
 
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString(asciiGraphs);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
       loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
@@ -163,35 +144,29 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWriteAsTLF() throws Exception {
-    String tlfFileImport =
-      TLFIOTest.class.getResource
-        ("/data/tlf/io_test.tlf")
-        .getFile();
+    String tlfFileImport = TLFIOTest.class
+      .getResource("/data/tlf/io_test.tlf").getFile();
 
-    String tlfFileExport =
-      TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat("/io_test_output");
+    String tlfFileExport = TLFIOTest.class
+      .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
     File file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
 
     // read from inputfile
-    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFileImport, config);
+    DataSource dataSource = new TLFDataSource(tlfFileImport, config);
     // write to ouput path
-    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
-      new TLFDataSink<>(tlfFileExport,getConfig());
+    DataSink dataSink = new TLFDataSink(tlfFileExport,getConfig());
     dataSink.write(dataSource.getGraphTransactions());
     // read from output path
-    dataSource = new TLFDataSource<>(tlfFileExport, config);
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> graphTransactions
-      = dataSource.getGraphTransactions();
+    dataSource = new TLFDataSource(tlfFileExport, config);
+    GraphTransactions graphTransactions = dataSource.getGraphTransactions();
 
     getExecutionEnvironment().execute();
 
-    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
-      .count());
+    assertEquals("Wrong graph count", 2, 
+      graphTransactions.getTransactions().count());
   }
 
   /**
@@ -201,62 +176,55 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWriteAsTLFWithVertexDictionary() throws Exception {
-    String tlfFileImport =
-      TLFIOTest.class.getResource
-        ("/data/tlf/io_test.tlf")
-        .getFile();
-    String tlfVertexDictionaryFileImport =
-      TLFIOTest.class.getResource
-        ("/data/tlf/io_test_vertex_dictionary.tlf")
-        .getFile();
+    String tlfFileImport = TLFIOTest.class
+      .getResource("/data/tlf/io_test.tlf").getFile();
+    String tlfVertexDictionaryFileImport = TLFIOTest.class
+      .getResource("/data/tlf/io_test_vertex_dictionary.tlf").getFile();
 
-    String tlfFileExport =
-      TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat("/io_test_output");
+    String tlfFileExport = TLFIOTest.class
+      .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
     File file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
-    String tlfVertexDictionaryFileExport =
-      TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat("/dictionaries/io_test_output_vertex_dictionary");
+    String tlfVertexDictionaryFileExport = TLFIOTest.class
+      .getResource("/data/tlf").toURI().getPath()
+      .concat("/dictionaries/io_test_output_vertex_dictionary");
     file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
 
     // read from inputfile
-    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFileImport, tlfVertexDictionaryFileImport,
-        "", config);
+    DataSource dataSource = new TLFDataSource(tlfFileImport, 
+      tlfVertexDictionaryFileImport, "", config);
     // write to ouput path
-    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
-      new TLFDataSink<>(tlfFileExport, tlfVertexDictionaryFileExport,
-        "", getConfig());
+    DataSink dataSink = new TLFDataSink(tlfFileExport, 
+      tlfVertexDictionaryFileExport, "", getConfig());
     dataSink.write(dataSource.getGraphTransactions());
     // read from output path
-    dataSource = new TLFDataSource<>(tlfFileExport, config);
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> graphTransactions
-      = dataSource.getGraphTransactions();
+    dataSource = new TLFDataSource(tlfFileExport, config);
+    GraphTransactions graphTransactions = dataSource.getGraphTransactions();
 
     //get first transaction which contains one complete graph
-    GraphTransaction<GraphHead, VertexPojo, EdgePojo> graphTransaction =
-      graphTransactions.getTransactions().collect().get(0);
+    GraphTransaction graphTransaction = graphTransactions
+      .getTransactions()
+      .collect().get(0);
     //get vertices of the first transaction/graph
-    VertexPojo[] vertexArray = graphTransaction.getVertices()
-      .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
+    Vertex[] vertexArray = graphTransaction.getVertices().toArray(
+      new Vertex[graphTransaction.getVertices().size()]);
     //sort vertices by label(alphabetically)
-    Arrays.sort(vertexArray, new Comparator<VertexPojo>() {
+    Arrays.sort(vertexArray, new Comparator<Vertex>() {
       @Override
-      public int compare(VertexPojo vertex1, VertexPojo vertex2) {
+      public int compare(Vertex vertex1, Vertex vertex2) {
         return vertex1.getLabel().compareTo(vertex2.getLabel());
       }
     });
 
     assertEquals("Wrong vertex label", "0", vertexArray[0].getLabel());
     assertEquals("Wrong vertex label", "1", vertexArray[1].getLabel());
-    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
-      .count());
+    assertEquals("Wrong graph count", 2,
+      graphTransactions.getTransactions().count());
   }
 
   /**
@@ -266,65 +234,55 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWriteAsTLFWithDictionaries() throws Exception {
-    String tlfFileImport =
-      TLFIOTest.class.getResource
-        ("/data/tlf/io_test.tlf")
-        .getFile();
-    String tlfVertexDictionaryFileImport =
-      TLFIOTest.class.getResource
-        ("/data/tlf/io_test_vertex_dictionary.tlf")
-        .getFile();
-    String tlfEdgeDictionaryFileImport =
-      TLFIOTest.class.getResource
-        ("/data/tlf/io_test_edge_dictionary.tlf")
-        .getFile();
+    String tlfFileImport = TLFIOTest.class
+      .getResource("/data/tlf/io_test.tlf").getFile();
+    String tlfVertexDictionaryFileImport = TLFIOTest.class
+      .getResource("/data/tlf/io_test_vertex_dictionary.tlf").getFile();
+    String tlfEdgeDictionaryFileImport = TLFIOTest.class
+      .getResource("/data/tlf/io_test_edge_dictionary.tlf").getFile();
 
-    String tlfFileExport =
-      TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat("/io_test_output");
+    String tlfFileExport = TLFIOTest.class
+      .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
     File file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
-    String tlfVertexDictionaryFileExport =
-      TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat("/dictionaries/io_test_output_vertex_dictionary");
+    String tlfVertexDictionaryFileExport = TLFIOTest.class
+      .getResource("/data/tlf").toURI().getPath()
+      .concat("/dictionaries/io_test_output_vertex_dictionary");
     file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
-    String tlfEdgeDictionaryFileExport =
-      TLFIOTest.class.getResource("/data/tlf")
-        .toURI().getPath().concat("/dictionaries/io_test_output_edge_dictionary");
+    String tlfEdgeDictionaryFileExport = TLFIOTest.class
+      .getResource("/data/tlf").toURI().getPath()
+      .concat("/dictionaries/io_test_output_edge_dictionary");
     file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
 
     // read from inputfile
-    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
-      new TLFDataSource<>(tlfFileImport, tlfVertexDictionaryFileImport,
-        tlfEdgeDictionaryFileImport, config);
+    DataSource dataSource = new TLFDataSource(tlfFileImport,
+      tlfVertexDictionaryFileImport, tlfEdgeDictionaryFileImport, config);
     // write to ouput path
-    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
-      new TLFDataSink<>(tlfFileExport, tlfVertexDictionaryFileExport,
-        tlfEdgeDictionaryFileExport, getConfig());
+    DataSink dataSink = new TLFDataSink(tlfFileExport,
+      tlfVertexDictionaryFileExport, tlfEdgeDictionaryFileExport, getConfig());
     dataSink.write(dataSource.getGraphTransactions());
     // read from output path
-    dataSource = new TLFDataSource<>(tlfFileExport, config);
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> graphTransactions
-      = dataSource.getGraphTransactions();
+    dataSource = new TLFDataSource(tlfFileExport, config);
+    GraphTransactions graphTransactions = dataSource.getGraphTransactions();
 
     //get first transaction which contains one complete graph
-    GraphTransaction<GraphHead, VertexPojo, EdgePojo> graphTransaction =
-      graphTransactions.getTransactions().collect().get(0);
+    GraphTransaction graphTransaction = graphTransactions
+      .getTransactions().collect().get(0);
     //get vertices of the first transaction/graph
-    VertexPojo[] vertexArray = graphTransaction.getVertices()
-      .toArray(new VertexPojo[graphTransaction.getVertices().size()]);
+    Vertex[] vertexArray = graphTransaction.getVertices().toArray(
+      new Vertex[graphTransaction.getVertices().size()]);
     //sort vertices by label(alphabetically)
-    Arrays.sort(vertexArray, new Comparator<VertexPojo>() {
+    Arrays.sort(vertexArray, new Comparator<Vertex>() {
       @Override
-      public int compare(VertexPojo vertex1, VertexPojo vertex2) {
+      public int compare(Vertex vertex1, Vertex vertex2) {
         return vertex1.getLabel().compareTo(vertex2.getLabel());
       }
     });
@@ -334,7 +292,4 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
       .count());
   }
-
-
-
 }

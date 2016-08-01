@@ -27,27 +27,21 @@ import org.gradoop.storage.api.PersistentEdgeFactory;
 /**
  * Creates persistent edge data objects from edge data and source/target
  * vertex data
- *
- * @param <E>  EPGM edge type
- * @param <V>  EPGM vertex type
- * @param <PE> EPGM persistent edge type
  */
 public class BuildPersistentEdge
-  <V extends Vertex, E extends Edge, PE extends PersistentEdge<V>>
-  implements JoinFunction<Tuple2<V, E>, V, PersistentEdge<V>> {
+  implements JoinFunction<Tuple2<Vertex, Edge>, Vertex, PersistentEdge> {
 
   /**
    * Persistent edge data factory.
    */
-  private final PersistentEdgeFactory<V, E, PE> edgeFactory;
+  private final PersistentEdgeFactory edgeFactory;
 
   /**
    * Creates join function
    *
    * @param edgeFactory persistent edge data factory.
    */
-  public BuildPersistentEdge(
-    PersistentEdgeFactory<V, E, PE> edgeFactory) {
+  public BuildPersistentEdge(PersistentEdgeFactory edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
@@ -55,8 +49,9 @@ public class BuildPersistentEdge
    * {@inheritDoc}
    */
   @Override
-  public PersistentEdge<V> join(
-    Tuple2<V, E> sourceVertexAndEdge, V targetVertex) throws Exception {
+  public PersistentEdge join(
+    Tuple2<Vertex, Edge> sourceVertexAndEdge, Vertex targetVertex)
+    throws Exception {
     return edgeFactory.createEdge(sourceVertexAndEdge.f1,
       sourceVertexAndEdge.f0, targetVertex);
   }

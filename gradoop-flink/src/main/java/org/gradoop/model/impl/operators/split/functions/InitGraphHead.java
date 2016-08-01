@@ -28,22 +28,20 @@ import org.gradoop.model.impl.id.GradoopId;
 
 /**
  * Initializes a new graph head from a given GradoopId.
- *
- * @param <G> EPGM graph head type
  */
-public class InitGraphHead<G extends GraphHead>
-  implements MapFunction<Tuple1<GradoopId>, G>, ResultTypeQueryable<G> {
+public class InitGraphHead implements MapFunction<Tuple1<GradoopId>, GraphHead>,
+  ResultTypeQueryable<GraphHead> {
   /**
    * EPGMGraphHeadFactory
    */
-  private final GraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
 
   /**
    * Constructor
    *
    * @param graphHeadFactory graph head factory
    */
-  public InitGraphHead(GraphHeadFactory<G> graphHeadFactory) {
+  public InitGraphHead(GraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -51,7 +49,7 @@ public class InitGraphHead<G extends GraphHead>
    * {@inheritDoc}
    */
   @Override
-  public G map(Tuple1<GradoopId> idTuple) {
+  public GraphHead map(Tuple1<GradoopId> idTuple) {
     return graphHeadFactory.initGraphHead(idTuple.f0);
   }
 
@@ -60,8 +58,8 @@ public class InitGraphHead<G extends GraphHead>
    */
   @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<G> getProducedType() {
-    return (TypeInformation<G>) TypeExtractor
+  public TypeInformation<GraphHead> getProducedType() {
+    return (TypeInformation<GraphHead>) TypeExtractor
       .createTypeInfo(graphHeadFactory.getType());
   }
 }

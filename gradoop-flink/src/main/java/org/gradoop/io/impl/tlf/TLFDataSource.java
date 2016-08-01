@@ -32,9 +32,6 @@ import org.gradoop.io.impl.tlf.functions.TLFGraphFromText;
 import org.gradoop.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.io.impl.tlf.tuples.TLFGraph;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -48,15 +45,8 @@ import java.io.IOException;
  * Creates an EPGM instance from one TLF file. The exact format is
  * documented in
  * {@link TLFFileFormat}.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class TLFDataSource
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  extends TLFBase<G, V, E>
-  implements DataSource<G, V, E> {
+public class TLFDataSource extends TLFBase implements DataSource {
 
   /**
    * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
@@ -64,7 +54,7 @@ public class TLFDataSource
    * @param tlfPath tlf data file
    * @param config Gradoop Flink configuration
    */
-  public TLFDataSource(String tlfPath, GradoopFlinkConfig<G, V, E> config) {
+  public TLFDataSource(String tlfPath, GradoopFlinkConfig config) {
     super(tlfPath, "", "", config);
   }
 
@@ -77,7 +67,7 @@ public class TLFDataSource
    * @param config Gradoop Flink configuration
    */
   public TLFDataSource(String tlfPath, String tlfVertexDictionaryPath,
-    String tlfEdgeDictionaryPath, GradoopFlinkConfig<G, V, E> config) {
+    String tlfEdgeDictionaryPath, GradoopFlinkConfig config) {
     super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
     ExecutionEnvironment env = config.getExecutionEnvironment();
     if (hasVertexDictionary()) {
@@ -97,19 +87,19 @@ public class TLFDataSource
   }
 
   @Override
-  public LogicalGraph<G, V, E> getLogicalGraph() throws IOException {
-    return getGraphCollection().reduce(new ReduceCombination<G, V, E>());
+  public LogicalGraph getLogicalGraph() throws IOException {
+    return getGraphCollection().reduce(new ReduceCombination());
   }
 
   @Override
-  public GraphCollection<G, V, E> getGraphCollection() throws IOException {
+  public GraphCollection getGraphCollection() throws IOException {
     return GraphCollection.fromTransactions(getGraphTransactions());
   }
 
   @Override
-  public GraphTransactions<G, V, E> getGraphTransactions() throws IOException {
+  public GraphTransactions getGraphTransactions() throws IOException {
     DataSet<TLFGraph> graphs;
-    DataSet<GraphTransaction<G, V, E>> transactions;
+    DataSet<GraphTransaction> transactions;
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     // load tlf graphs from file
@@ -119,7 +109,7 @@ public class TLFDataSource
 
     // map the tlf graph to transactions
     transactions = graphs
-      .map(new GraphTransactionFromTLFGraph<>(
+      .map(new GraphTransactionFromTLFGraph(
         getConfig().getGraphHeadFactory(),
         getConfig().getVertexFactory(),
         getConfig().getEdgeFactory()))
@@ -128,17 +118,17 @@ public class TLFDataSource
     // map the integer valued labels to strings from dictionary
     if (hasVertexDictionary()) {
       transactions = transactions
-        .map(new VertexLabelDecoder<G, V, E>())
+        .map(new VertexLabelDecoder())
         .withBroadcastSet(
           getVertexDictionary(), VertexLabelDecoder.VERTEX_DICTIONARY);
     }
     if (hasEdgeDictionary()) {
       transactions = transactions
-        .map(new EdgeLabelDecoder<G, V, E>())
+        .map(new EdgeLabelDecoder())
         .withBroadcastSet(
           getEdgeDictionary(), EdgeLabelDecoder.EDGE_DICTIONARY);
     }
-    return new GraphTransactions<>(transactions, getConfig());
+    return new GraphTransactions(transactions, getConfig());
   }
 
   /**

@@ -25,7 +25,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
-import org.gradoop.model.api.epgm.Edge;
 import org.gradoop.model.api.epgm.Element;
 import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.api.epgm.GraphHeadFactory;
@@ -151,28 +150,28 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
   protected GraphCollection executeForVertex(
     LogicalGraph graph) {
     GradoopFlinkConfig config = graph.getConfig();
-    GraphHeadFactory<GraphHead> graphHeadFactory = config.getGraphHeadFactory();
-    VertexFactory<Vertex> vertexFactory = config.getVertexFactory();
+    GraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
+    VertexFactory vertexFactory = config.getVertexFactory();
 
-    DataSet<V> matchingVertices = graph.getVertices()
-      .filter(new MatchingVertices<V>(getQuery()));
+    DataSet<Vertex> matchingVertices = graph.getVertices()
+      .filter(new MatchingVertices<>(getQuery()));
 
     if (!doAttachData()) {
       matchingVertices = matchingVertices
-        .map(new Id<V>())
+        .map(new Id<Vertex>())
         .map(new ObjectTo1<GradoopId>())
-        .map(new VertexFromId<>(vertexFactory));
+        .map(new VertexFromId(vertexFactory));
     }
 
-    DataSet<Tuple2<V, G>> pairs = matchingVertices
-      .map(new AddGraphElementToNewGraph<V, G>(graphHeadFactory))
-      .returns(new TupleTypeInfo<Tuple2<V, G>>(
+    DataSet<Tuple2<Vertex, GraphHead>> pairs = matchingVertices
+      .map(new AddGraphElementToNewGraph<Vertex>(graphHeadFactory))
+      .returns(new TupleTypeInfo<Tuple2<Vertex, GraphHead>>(
         TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(graphHeadFactory.getType())));
 
     return GraphCollection.fromDataSets(
-      pairs.map(new Value1Of2<V, G>()),
-      pairs.map(new Value0Of2<V, G>()),
+      pairs.map(new Value1Of2<Vertex, GraphHead>()),
+      pairs.map(new Value0Of2<Vertex, GraphHead>()),
       config);
   }
 
@@ -216,7 +215,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
 
     DataSet<Element> epgmElements = result
       .<Tuple1<Embedding>>project(0)
-      .flatMap(new ElementsFromEmbedding<>(traversalCode,
+      .flatMap(new ElementsFromEmbedding(traversalCode,
         graph.getConfig().getGraphHeadFactory(),
         graph.getConfig().getVertexFactory(),
         graph.getConfig().getEdgeFactory()));

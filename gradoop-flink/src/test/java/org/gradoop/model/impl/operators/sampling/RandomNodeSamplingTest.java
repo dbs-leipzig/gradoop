@@ -19,11 +19,10 @@ package org.gradoop.model.impl.operators.sampling;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.LogicalGraph;
 import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -36,63 +35,54 @@ public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
 
   @Test
   public void randomNodeSamplingTest() throws Exception {
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> dbGraph =
-      getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph dbGraph = getSocialNetworkLoader()
+      .getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo>
-      newGraph = dbGraph.sampleRandomNodes(0.272f);
+    LogicalGraph newGraph = dbGraph.sampleRandomNodes(0.272f);
 
     validateResult(dbGraph, newGraph);
   }
 
   @Test
   public void randomNodeSamplingTestWithSeed() throws Exception {
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> dbGraph =
-      getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph dbGraph = getSocialNetworkLoader()
+      .getDatabase().getDatabaseGraph();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo>
-      newGraph = dbGraph.callForGraph(
-      new RandomNodeSampling<GraphHead, VertexPojo, EdgePojo>(
-        0.272f, -4181668494294894490L));
+    LogicalGraph newGraph = dbGraph.callForGraph(
+      new RandomNodeSampling(0.272f, -4181668494294894490L));
 
     validateResult(dbGraph, newGraph);
   }
 
-  private void validateResult(
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input,
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output)
+  private void validateResult(LogicalGraph input, LogicalGraph output)
     throws Exception {
-    List<VertexPojo> dbVertices = Lists.newArrayList();
-    List<EdgePojo> dbEdges = Lists.newArrayList();
-    List<VertexPojo> newVertices = Lists.newArrayList();
-    List<EdgePojo> newEdges = Lists.newArrayList();
+    List<Vertex> dbVertices = Lists.newArrayList();
+    List<Edge> dbEdges = Lists.newArrayList();
+    List<Vertex> newVertices = Lists.newArrayList();
+    List<Edge> newEdges = Lists.newArrayList();
 
-    input.getVertices()
-      .output(new LocalCollectionOutputFormat<>(dbVertices));
-    input.getEdges()
-      .output(new LocalCollectionOutputFormat<>(dbEdges));
+    input.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
+    input.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
 
-    output.getVertices()
-      .output(new LocalCollectionOutputFormat<>(newVertices));
-    output.getEdges()
-      .output(new LocalCollectionOutputFormat<>(newEdges));
+    output.getVertices().output(new LocalCollectionOutputFormat<>(newVertices));
+    output.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
 
     getExecutionEnvironment().execute();
 
     assertNotNull("graph was null", output);
 
     Set<GradoopId> newVertexIDs = new HashSet<>();
-    for (VertexPojo vertex : newVertices) {
+    for (Vertex vertex : newVertices) {
       assertTrue(dbVertices.contains(vertex));
       newVertexIDs.add(vertex.getId());
     }
-    for (EdgePojo edge : newEdges) {
+    for (Edge edge : newEdges) {
       assertTrue(dbEdges.contains(edge));
       assertTrue(newVertexIDs.contains(edge.getSourceId()));
       assertTrue(newVertexIDs.contains(edge.getTargetId()));
     }
     dbEdges.removeAll(newEdges);
-    for (EdgePojo edge : dbEdges) {
+    for (Edge edge : dbEdges) {
       assertFalse(
         newVertexIDs.contains(edge.getSourceId()) &&
         newVertexIDs.contains(edge.getTargetId()));

@@ -21,11 +21,11 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.io.api.DataSource;
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.GraphHead;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,13 +45,13 @@ public class JSONIOTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetDatabaseGraph() throws Exception {
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> dbGraph =
-      getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph dbGraph = getSocialNetworkLoader()
+      .getDatabase().getDatabaseGraph();
 
     assertNotNull("database graph was null", dbGraph);
 
-    Collection<VertexPojo> vertices = Lists.newArrayList();
-    Collection<EdgePojo> edges = Lists.newArrayList();
+    Collection<Vertex> vertices = Lists.newArrayList();
+    Collection<Edge> edges = Lists.newArrayList();
 
     dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
     dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
@@ -71,15 +71,15 @@ public class JSONIOTest extends GradoopFlinkTestBase {
     String graphFile =
       JSONIOTest.class.getResource("/data/json/sna/graphs.json").getFile();
 
-    DataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
-      new JSONDataSource<>(graphFile, vertexFile, edgeFile, config);
+    DataSource dataSource = new JSONDataSource(
+      graphFile, vertexFile, edgeFile, config);
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo>
+    GraphCollection
       collection = dataSource.getGraphCollection();
 
     Collection<GraphHead> graphHeads = Lists.newArrayList();
-    Collection<VertexPojo> vertices = Lists.newArrayList();
-    Collection<EdgePojo> edges = Lists.newArrayList();
+    Collection<Vertex> vertices = Lists.newArrayList();
+    Collection<Edge> edges = Lists.newArrayList();
 
     collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(graphHeads));
@@ -102,27 +102,26 @@ public class JSONIOTest extends GradoopFlinkTestBase {
     final String edgeFile   = tmpDir + "/edges.json";
     final String graphFile  = tmpDir + "/graphs.json";
 
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader loader =
       getSocialNetworkLoader();
 
     // write to JSON
-    loader.getDatabase()
-      .writeTo(new JSONDataSink<>(graphFile, vertexFile, edgeFile, getConfig()));
+    loader.getDatabase().writeTo(
+      new JSONDataSink(graphFile, vertexFile, edgeFile, getConfig()));
 
     getExecutionEnvironment().execute();
 
     // read from JSON
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> collection =
-      new JSONDataSource<>(graphFile, vertexFile, edgeFile, getConfig())
-        .getGraphCollection();
+    GraphCollection collection = new JSONDataSource(
+      graphFile, vertexFile, edgeFile, getConfig()).getGraphCollection();
 
     Collection<GraphHead> expectedGraphHeads  = loader.getGraphHeads();
-    Collection<VertexPojo>    expectedVertices    = loader.getVertices();
-    Collection<EdgePojo>      expectedEdges       = loader.getEdges();
+    Collection<Vertex>    expectedVertices    = loader.getVertices();
+    Collection<Edge>      expectedEdges       = loader.getEdges();
 
     Collection<GraphHead> loadedGraphHeads    = Lists.newArrayList();
-    Collection<VertexPojo>    loadedVertices      = Lists.newArrayList();
-    Collection<EdgePojo>      loadedEdges         = Lists.newArrayList();
+    Collection<Vertex>    loadedVertices      = Lists.newArrayList();
+    Collection<Edge>      loadedEdges         = Lists.newArrayList();
 
     collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));

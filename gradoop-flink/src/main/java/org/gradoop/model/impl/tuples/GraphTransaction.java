@@ -32,8 +32,8 @@ import java.util.Set;
 /**
  * An encapsulated representation of a logical graph with duplicated elements.
  */
-public class GraphTransaction 
-  extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>> {
+public class GraphTransaction extends
+  Tuple3<GraphHead, Set<Vertex>, Set<Edge>> {
 
   /**
    * default constructor
@@ -47,7 +47,7 @@ public class GraphTransaction
    * @param vertices set of vertices
    * @param edges set of edges
    */
-  public GraphTransaction(GraphHead graphHead, Set<Vertex> vertices, 
+  public GraphTransaction(GraphHead graphHead, Set<Vertex> vertices,
     Set<Edge> edges) {
     setGraphHead(graphHead);
     setVertices(vertices);

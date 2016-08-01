@@ -22,7 +22,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
-import org.gradoop.model.api.epgm.GraphHead;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.storage.api.GraphHeadHandler;
 import org.gradoop.storage.api.PersistentGraphHead;
@@ -30,13 +29,9 @@ import org.gradoop.storage.api.PersistentGraphHead;
 /**
  * Creates HBase {@link Mutation} from persistent graph data using graph
  * data handler.
- *
- * @param <G>  EPGM graph head type
- * @param <PG> EPGM persistent graph type
  */
-public class BuildGraphHeadMutation
-  <G extends GraphHead, PG extends PersistentGraphHead>
-  extends RichMapFunction<PG, Tuple2<GradoopId, Mutation>> {
+public class BuildGraphHeadMutation extends RichMapFunction
+  <PersistentGraphHead, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -51,14 +46,14 @@ public class BuildGraphHeadMutation
   /**
    * Graph data handler to create Mutations.
    */
-  private final GraphHeadHandler<G> graphHeadHandler;
+  private final GraphHeadHandler graphHeadHandler;
 
   /**
    * Creates rich map function.
    *
    * @param graphHeadHandler graph data handler
    */
-  public BuildGraphHeadMutation(GraphHeadHandler<G> graphHeadHandler) {
+  public BuildGraphHeadMutation(GraphHeadHandler graphHeadHandler) {
     this.graphHeadHandler = graphHeadHandler;
   }
 
@@ -75,11 +70,10 @@ public class BuildGraphHeadMutation
    * {@inheritDoc}
    */
   @Override
-  public Tuple2<GradoopId, Mutation> map(PG persistentGraphData) throws
-    Exception {
+  public Tuple2<GradoopId, Mutation> map(
+    PersistentGraphHead persistentGraphData) throws Exception {
     GradoopId key = persistentGraphData.getId();
-    Put put =
-      new Put(graphHeadHandler.getRowKey(persistentGraphData.getId()));
+    Put put = new Put(graphHeadHandler.getRowKey(persistentGraphData.getId()));
     put = graphHeadHandler.writeGraphHead(put, persistentGraphData);
 
     reuseTuple.f0 = key;

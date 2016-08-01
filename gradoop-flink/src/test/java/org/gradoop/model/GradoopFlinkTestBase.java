@@ -24,9 +24,6 @@ import org.apache.flink.test.util.ForkableFlinkMiniCluster;
 import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.GradoopTestUtils;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.gradoop.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
@@ -63,7 +60,7 @@ public abstract class GradoopFlinkTestBase {
   /**
    * Gradoop Flink configuration
    */
-  protected GradoopFlinkConfig<GraphHead, VertexPojo, EdgePojo> config;
+  protected GradoopFlinkConfig config;
 
   public GradoopFlinkTestBase() {
     TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM);
@@ -87,8 +84,7 @@ public abstract class GradoopFlinkTestBase {
    *
    * @return Gradoop Flink configuration
    */
-  protected GradoopFlinkConfig<GraphHead, VertexPojo, EdgePojo>
-  getConfig() {
+  protected GradoopFlinkConfig getConfig() {
     return config;
   }
 
@@ -140,29 +136,26 @@ public abstract class GradoopFlinkTestBase {
   // Data generation
   //----------------------------------------------------------------------------
 
-  protected FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-  getLoaderFromString(String asciiString) {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
+  protected FlinkAsciiGraphLoader getLoaderFromString(String asciiString) {
+    FlinkAsciiGraphLoader
       loader = getNewLoader();
     loader.initDatabaseFromString(asciiString);
     return loader;
   }
 
-  protected FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
+  protected FlinkAsciiGraphLoader
   getLoaderFromFile(
     String fileName) throws IOException {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
+    FlinkAsciiGraphLoader
       loader = getNewLoader();
 
     loader.initDatabaseFromFile(fileName);
     return loader;
   }
 
-  protected FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-  getLoaderFromStream(
-    InputStream inputStream) throws IOException {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-      loader = getNewLoader();
+  protected FlinkAsciiGraphLoader getLoaderFromStream(InputStream inputStream)
+    throws IOException {
+    FlinkAsciiGraphLoader loader = getNewLoader();
 
     loader.initDatabaseFromStream(inputStream);
     return loader;
@@ -176,9 +169,7 @@ public abstract class GradoopFlinkTestBase {
    *
    * @return graph store containing a simple social network for tests.
    */
-  protected FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-  getSocialNetworkLoader() throws
-    IOException {
+  protected FlinkAsciiGraphLoader getSocialNetworkLoader() throws IOException {
     InputStream inputStream = getClass()
       .getResourceAsStream(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
     return getLoaderFromStream(inputStream);
@@ -189,9 +180,8 @@ public abstract class GradoopFlinkTestBase {
    *
    * @return uninitialized Flink Ascii graph loader
    */
-  private FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-  getNewLoader() {
-    return new FlinkAsciiGraphLoader<>(config);
+  private FlinkAsciiGraphLoader getNewLoader() {
+    return new FlinkAsciiGraphLoader(config);
   }
 
   //----------------------------------------------------------------------------

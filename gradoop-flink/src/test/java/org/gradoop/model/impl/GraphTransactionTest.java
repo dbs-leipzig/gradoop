@@ -1,10 +1,9 @@
 package org.gradoop.model.impl;
 
 import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.functions.utils.First;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -12,19 +11,16 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
   @Test
   public void testTransformation() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-      loader = getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> originalCollection =
-      loader
-        .getDatabase()
-        .getCollection();
+    GraphCollection originalCollection = loader
+      .getDatabase()
+      .getCollection();
 
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo>
-      transactions = originalCollection.toTransactions();
+    GraphTransactions transactions = originalCollection.toTransactions();
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> restoredCollection =
-      GraphCollection.fromTransactions(transactions);
+    GraphCollection restoredCollection = GraphCollection
+      .fromTransactions(transactions);
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));
@@ -38,20 +34,16 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
   @Test
   public void testTransformationWithCustomReducer() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-      loader = getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> originalCollection =
-      loader
-        .getDatabase()
-        .getCollection();
+    GraphCollection originalCollection = loader
+      .getDatabase()
+      .getCollection();
 
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions =
-      originalCollection.toTransactions();
+    GraphTransactions transactions = originalCollection.toTransactions();
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> restoredCollection =
-      GraphCollection.fromTransactions(transactions,
-        new First<VertexPojo>(), new First<EdgePojo>());
+    GraphCollection restoredCollection = GraphCollection
+      .fromTransactions(transactions, new First<Vertex>(), new First<Edge>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));
@@ -75,20 +67,16 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithSubsetGraphContainment() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo>
-      loader = getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("g1[(eve)]");
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> originalCollection =
-      loader.getGraphCollectionByVariables("g1");
+    GraphCollection originalCollection = loader.getGraphCollectionByVariables("g1");
 
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions =
-      originalCollection.toTransactions();
+    GraphTransactions transactions = originalCollection.toTransactions();
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> restoredCollection =
-      GraphCollection.fromTransactions(transactions,
-        new First<VertexPojo>(), new First<EdgePojo>());
+    GraphCollection restoredCollection = GraphCollection
+      .fromTransactions(transactions, new First<Vertex>(), new First<Edge>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));

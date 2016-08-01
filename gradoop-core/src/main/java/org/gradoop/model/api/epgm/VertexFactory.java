@@ -24,7 +24,7 @@ import org.gradoop.model.impl.properties.PropertyList;
 /**
  * Initializes {@link Vertex} objects of a given type.
  */
-public interface VertexFactory extends ElementFactory {
+public interface VertexFactory {
   /**
    * Initializes a new vertex based on the given parameters.
    *
@@ -127,4 +127,11 @@ public interface VertexFactory extends ElementFactory {
     String label,
     PropertyList properties,
     GradoopIdSet graphIds);
+
+  /**
+   * Return the type of the objects created by that factory.
+   *
+   * @return object type
+   */
+  Class<? extends Vertex> getType();
 }

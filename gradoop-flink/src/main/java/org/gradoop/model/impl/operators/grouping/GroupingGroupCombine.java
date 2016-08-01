@@ -85,12 +85,11 @@ public class GroupingGroupCombine extends Grouping {
       edgeGroupingKeys, useEdgeLabels, edgeAggregators);
   }
 
-
   @Override
   protected LogicalGraph groupInternal(LogicalGraph graph) {
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      .map(new BuildVertexGroupItem<Vertex>(getVertexGroupingKeys(),
+      .map(new BuildVertexGroupItem<>(getVertexGroupingKeys(),
         useVertexLabels(), getVertexAggregators()));
 
     DataSet<VertexGroupItem> combinedVertexGroupItems =

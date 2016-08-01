@@ -25,9 +25,6 @@ import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggr
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.MinAggregator;
 import org.gradoop.model.impl.operators.grouping.functions.aggregation.SumAggregator;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
 import org.gradoop.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -40,11 +37,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexPropertySymmetricGraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("g2");
+    LogicalGraph input = loader.getLogicalGraphByVariable("g2");
 
     loader.appendToDatabaseFromString("expected[" +
       "(leipzig {city = \"Leipzig\", count = 2L});" +
@@ -55,8 +50,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(dresden)-[{count = 1L}]->(leipzig)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addVertexAggregator(new CountAggregator("count"))
         .addEdgeAggregator(new CountAggregator("count"))
@@ -70,10 +65,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleVertexProperty() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -89,8 +83,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(berlin)-[{count = 2L}]->(dresden)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addVertexAggregator(new CountAggregator("count"))
         .addEdgeAggregator(new CountAggregator("count"))
@@ -104,10 +98,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMultipleVertexProperties() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -129,8 +122,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(berlinM)-[{count = 1L}]->(dresdenM)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addVertexGroupingKey("gender")
         .addVertexAggregator(new CountAggregator("count"))
@@ -145,10 +138,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleVertexPropertyWithAbsentValue() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader.getLogicalGraphByVariable("g3");
+    LogicalGraph input = loader.getLogicalGraphByVariable("g3");
 
 
     loader.appendToDatabaseFromString("expected[" +
@@ -158,8 +150,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(dresden)-[{count = 1L}]->(dresden)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addVertexAggregator(new CountAggregator("count"))
         .addEdgeAggregator(new CountAggregator("count"))
@@ -173,10 +165,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMultipleVertexPropertiesWithAbsentValue() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader.getLogicalGraphByVariable("g3");
+    LogicalGraph input = loader.getLogicalGraphByVariable("g3");
 
     loader.appendToDatabaseFromString("expected[" +
       "(dresdenF {city = \"Dresden\", gender=\"f\", count = 1L});" +
@@ -187,8 +178,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(dresdenF)-[{count = 1L}]->(dresdenM)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addVertexGroupingKey("gender")
         .addVertexAggregator(new CountAggregator("count"))
@@ -203,10 +194,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleVertexAndSingleEdgeProperty() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -223,8 +213,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(berlin)-[{since = 2015, count = 2L}]->(dresden)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
         .addVertexAggregator(new CountAggregator("count"))
@@ -239,8 +229,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleVertexPropertyAndMultipleEdgeProperties() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("" +
         "input[" +
         "(v0 {a=0,b=0});" +
         "(v1 {a=0,b=1});" +
@@ -276,8 +265,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{a=1,b=3,count=1L}]->(v00);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("a")
         .addEdgeGroupingKey("a")
         .addEdgeGroupingKey("b")
@@ -293,8 +282,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMultipleVertexAndMultipleEdgeProperties() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("" +
         "input[" +
         "(v0 {a=0,b=0});" +
         "(v1 {a=0,b=1});" +
@@ -332,8 +320,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v11)-[{a=1,b=2,count=1L}]->(v01)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("a")
         .addVertexGroupingKey("b")
         .addEdgeGroupingKey("a")
@@ -349,12 +337,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testVertexAndEdgePropertyWithAbsentValues() throws
-    Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+  public void testVertexAndEdgePropertyWithAbsentValues() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g3");
 
     loader.appendToDatabaseFromString("expected[" +
@@ -365,8 +351,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(dresden)-[{since = 2014, count = 1L}]->(dresden)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
         .addVertexAggregator(new CountAggregator("count"))
@@ -381,11 +367,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexLabel() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count = 6L});" +
@@ -397,8 +381,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[{count =  4L}]->(t);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new CountAggregator("count"))
         .addEdgeAggregator(new CountAggregator("count"))
@@ -412,10 +396,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexLabelAndSingleVertexProperty() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -431,8 +414,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(b)-[{count = 2L}]->(d)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexGroupingKey("city")
         .addVertexAggregator(new CountAggregator("count"))
@@ -448,10 +431,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   @Test
   public void testVertexLabelAndSingleVertexPropertyWithAbsentValue()
     throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
@@ -473,8 +455,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[{count = 4L}]->(t);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexGroupingKey("city")
         .addVertexAggregator(new CountAggregator("count"))
@@ -489,10 +471,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexLabelAndSingleEdgeProperty() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -504,8 +485,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(p)-[{since = 2015, count = 3L}]->(p)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addEdgeGroupingKey("since")
         .addVertexAggregator(new CountAggregator("count"))
@@ -520,11 +501,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexLabelAndSingleEdgePropertyWithAbsentValue() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count = 6L});" +
@@ -539,8 +518,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[{since = " + NULL_STRING + ", count = 5L}]->(p);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addEdgeGroupingKey("since")
         .addVertexAggregator(new CountAggregator("count"))
@@ -555,10 +534,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexLabelAndSingleVertexAndSingleEdgeProperty() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -575,8 +553,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(b)-[{since = 2015, count = 2L}]->(d)" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
@@ -592,10 +570,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexAndEdgeLabel() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
@@ -609,8 +586,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(p)-[:knows        {count = 10L}]->(p);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .useEdgeLabel(true)
         .setStrategy(getStrategy())
@@ -624,12 +601,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testVertexAndEdgeLabelAndSingleVertexProperty() throws
-    Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+  public void testVertexAndEdgeLabelAndSingleVertexProperty() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -645,8 +620,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(b)-[:knows {count = 2L}]->(d);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .useVertexLabel(true)
         .useEdgeLabel(true)
@@ -662,11 +637,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexAndEdgeLabelAndSingleVertexPropertyWithAbsentValue() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city = \"Leipzig\", count = 2L});" +
@@ -689,8 +662,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[:hasTag {count = 4L}]->(t);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .useVertexLabel(true)
         .useEdgeLabel(true)
@@ -706,10 +679,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexAndEdgeLabelAndSingleEdgeProperty() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -721,8 +693,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(p)-[:knows {since = 2015, count = 3L}]->(p);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
         .useEdgeLabel(true)
@@ -738,10 +710,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexAndEdgeLabelAndSingleEdgePropertyWithAbsentValue() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
@@ -759,8 +730,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
         .useEdgeLabel(true)
@@ -776,10 +747,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexAndEdgeLabelAndVertexAndSingleEdgeProperty() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getLogicalGraphByVariable("g0")
       .combine(loader.getLogicalGraphByVariable("g1"))
       .combine(loader.getLogicalGraphByVariable("g2"));
@@ -796,8 +766,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(pB)-[:knows {since = 2015, count = 2L}]->(pD);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
@@ -815,10 +785,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   @Test
   public void testVertexAndEdgeLabelAndSingleVertexAndSingleEdgePropertyWithAbsentValue()
     throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
+    LogicalGraph input = loader
       .getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
@@ -843,8 +812,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[:hasTag {since = " + NULL_STRING + ", count = 4L}]->(t);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
@@ -865,8 +834,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testNoAggregate() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue {a=2});" +
         "(v2:Blue {a=4});" +
@@ -883,8 +851,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue);" +
@@ -894,8 +861,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .setStrategy(getStrategy())
         .build()
@@ -907,8 +874,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testCount() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue {a=2});" +
         "(v2:Blue {a=4});" +
@@ -925,8 +891,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {count=3L});" +
@@ -936,8 +901,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{count=3L}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new CountAggregator("count"))
         .addEdgeAggregator(new CountAggregator("count"))
@@ -951,8 +916,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSum() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue {a=2});" +
         "(v2:Blue {a=4});" +
@@ -969,8 +933,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {sumA= 9});" +
@@ -980,8 +943,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{sumB=5}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new SumAggregator("a", "sumA"))
         .addEdgeAggregator(new SumAggregator("b", "sumB"))
@@ -995,8 +958,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSumWithMissingValue() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue);" +
         "(v2:Blue {a=4});" +
@@ -1013,8 +975,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {sumA= 7});" +
@@ -1024,8 +985,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{sumB=5}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new SumAggregator("a", "sumA"))
         .addEdgeAggregator(new SumAggregator("b", "sumB"))
@@ -1039,8 +1000,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testSumWithMissingValues() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue);" +
         "(v1:Blue);" +
         "(v2:Blue);" +
@@ -1057,8 +1017,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {sumA= " + NULL_STRING + "});" +
@@ -1068,8 +1027,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{sumB=" + NULL_STRING + "}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new SumAggregator("a", "sumA"))
         .addEdgeAggregator(new SumAggregator("b", "sumB"))
@@ -1083,8 +1042,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMin() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue {a=2});" +
         "(v2:Blue {a=4});" +
@@ -1101,8 +1059,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {minA=2});" +
@@ -1112,8 +1069,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{minB=1}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new MinAggregator("a", "minA"))
         .addEdgeAggregator(new MinAggregator("b", "minB"))
@@ -1127,8 +1084,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMinWithMissingValue() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue);" +
         "(v2:Blue {a=4});" +
@@ -1145,8 +1101,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {minA=3});" +
@@ -1156,8 +1111,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{minB=1}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new MinAggregator("a", "minA"))
         .addEdgeAggregator(new MinAggregator("b", "minB"))
@@ -1171,8 +1126,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMinWithMissingValues() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue);" +
         "(v1:Blue);" +
         "(v2:Blue);" +
@@ -1189,8 +1143,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {minA= " + NULL_STRING + "});" +
@@ -1200,8 +1153,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{minB=" + NULL_STRING + "}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new MinAggregator("a", "minA"))
         .addEdgeAggregator(new MinAggregator("b", "minB"))
@@ -1215,8 +1168,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMax() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue {a=2});" +
         "(v2:Blue {a=4});" +
@@ -1233,8 +1185,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {maxA=4});" +
@@ -1244,8 +1195,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{maxB=3}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new MaxAggregator("a", "maxA"))
         .addEdgeAggregator(new MaxAggregator("b", "maxB"))
@@ -1259,8 +1210,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMaxWithMissingValue() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue {a=2});" +
         "(v2:Blue);" +
@@ -1277,8 +1227,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {maxA=3});" +
@@ -1288,8 +1237,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{maxB=1}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new MaxAggregator("a", "maxA"))
         .addEdgeAggregator(new MaxAggregator("b", "maxB"))
@@ -1303,8 +1252,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMaxWithMissingValues() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue);" +
         "(v1:Blue);" +
         "(v2:Blue);" +
@@ -1321,8 +1269,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {maxA= " + NULL_STRING + "});" +
@@ -1332,8 +1279,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{maxB=" + NULL_STRING + "}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new MaxAggregator("a", "maxA"))
         .addEdgeAggregator(new MaxAggregator("b", "maxB"))
@@ -1347,8 +1294,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   @Test
   public void testMultipleAggregators() throws Exception {
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
-      getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue {a=3});" +
         "(v1:Blue {a=2});" +
         "(v2:Blue {a=4});" +
@@ -1365,8 +1311,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         "(v5)-[{b=1}]->(v3);" +
         "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> input = loader
-      .getLogicalGraphByVariable("input");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Blue {minA=2,maxA=4,sumA=9,count=3L});" +
@@ -1376,8 +1321,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{minB=1,maxB=3,sumB=5,count=3L}]->(v01);" +
       "]");
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> output =
-      new GroupingBuilder<GraphHead, VertexPojo, EdgePojo>()
+    LogicalGraph output =
+      new GroupingBuilder()
         .useVertexLabel(true)
         .addVertexAggregator(new MinAggregator("a", "minA"))
         .addVertexAggregator(new MaxAggregator("a", "maxA"))

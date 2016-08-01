@@ -28,20 +28,15 @@ import java.util.Set;
 
 /**
  * (graphHead, {vertex,..}, {edge,..}) => vertex,..
- *
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class TransactionVertices
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements FlatMapFunction<Tuple3<G, Set<V>, Set<E>>, V> {
+public class TransactionVertices implements
+  FlatMapFunction<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>, Vertex> {
 
   @Override
-  public void flatMap(Tuple3<G, Set<V>, Set<E>> graphTriple,
-    Collector<V> collector) throws Exception {
+  public void flatMap(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> graphTriple,
+    Collector<Vertex> collector) throws Exception {
 
-    for (V vertex : graphTriple.f1) {
+    for (Vertex vertex : graphTriple.f1) {
       collector.collect(vertex);
     }
   }

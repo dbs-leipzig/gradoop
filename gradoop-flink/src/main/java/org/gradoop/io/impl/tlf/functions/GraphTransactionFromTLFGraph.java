@@ -40,34 +40,29 @@ import java.util.Set;
 
 /**
  * Reads a tlf graph. The result of the mapping is a GraphTransaction.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class GraphTransactionFromTLFGraph
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements MapFunction<TLFGraph, GraphTransaction<G, V, E>> {
+public class GraphTransactionFromTLFGraph implements
+  MapFunction<TLFGraph, GraphTransaction> {
 
   /**
    * Creates graph data objects
    */
-  private final GraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
 
   /**
    * Creates graph data objects
    */
-  private final VertexFactory<V> vertexFactory;
+  private final VertexFactory vertexFactory;
 
   /**
    * Creates graph data objects
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * Reduce object instantiation.
    */
-  private GraphTransaction<G, V, E> graphTransaction;
+  private GraphTransaction graphTransaction;
 
   /**
    * Creates a map function.
@@ -76,9 +71,8 @@ public class GraphTransactionFromTLFGraph
    * @param vertexFactory    vertex data factory
    * @param edgeFactory      edge data factory
    */
-  public GraphTransactionFromTLFGraph(
-    GraphHeadFactory<G> graphHeadFactory, VertexFactory<V>
-    vertexFactory, EdgeFactory<E> edgeFactory) {
+  public GraphTransactionFromTLFGraph(GraphHeadFactory graphHeadFactory,
+    VertexFactory vertexFactory, EdgeFactory edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
@@ -94,11 +88,11 @@ public class GraphTransactionFromTLFGraph
    * @throws Exception
    */
   @Override
-  public GraphTransaction<G, V, E> map(TLFGraph graph) throws Exception {
+  public GraphTransaction map(TLFGraph graph) throws Exception {
 
-    G graphHead = this.graphHeadFactory.createGraphHead();
-    Set<V> vertices = Sets.newHashSet();
-    Set<E> edges = Sets.newHashSet();
+    GraphHead graphHead = this.graphHeadFactory.createGraphHead();
+    Set<Vertex> vertices = Sets.newHashSet();
+    Set<Edge> edges = Sets.newHashSet();
 
     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
@@ -107,8 +101,7 @@ public class GraphTransactionFromTLFGraph
     vertexIdMap = Maps.newHashMap();
 
     for (TLFVertex tlfVertex : graph.getGraphVertices()) {
-
-      V vertex = vertexFactory.createVertex(
+      Vertex vertex = vertexFactory.createVertex(
         tlfVertex.getLabel(),
         graphIds
       );
@@ -129,16 +122,16 @@ public class GraphTransactionFromTLFGraph
       ));
     }
 
-    return new GraphTransaction<>(graphHead, vertices, edges);
+    return new GraphTransaction(graphHead, vertices, edges);
   }
 
   /**
-   * Returns the produced type information (GraphTransaction<G, V, E>) of the
+   * Returns the produced type information (GraphTransaction) of the
    * flatmap.
    *
-   * @return type information of GraphTransaction<G, V, E>
+   * @return type information of GraphTransaction
    */
-  public TypeInformation<GraphTransaction<G, V, E>> getProducedType() {
+  public TypeInformation<GraphTransaction> getProducedType() {
     return TypeExtractor.getForObject(this.graphTransaction);
   }
 
@@ -147,15 +140,15 @@ public class GraphTransactionFromTLFGraph
    * initiated.
    */
   private void prepareForProducedType() {
-    Set<V> vertices = Sets.newHashSetWithExpectedSize(2);
-    Set<E> edges = Sets.newHashSetWithExpectedSize(1);
-    V source = this.vertexFactory.createVertex();
-    V target = this.vertexFactory.createVertex();
+    Set<Vertex> vertices = Sets.newHashSetWithExpectedSize(2);
+    Set<Edge> edges = Sets.newHashSetWithExpectedSize(1);
+    Vertex source = this.vertexFactory.createVertex();
+    Vertex target = this.vertexFactory.createVertex();
     vertices.add(source);
     vertices.add(target);
     edges.add(this.edgeFactory.createEdge(source.getId(), target.getId()));
 
-    graphTransaction = new GraphTransaction<G, V, E>(this
-      .graphHeadFactory.initGraphHead(GradoopId.get()), vertices, edges);
+    graphTransaction = new GraphTransaction(this.graphHeadFactory
+      .initGraphHead(GradoopId.get()), vertices, edges);
   }
 }

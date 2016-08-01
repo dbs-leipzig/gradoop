@@ -27,16 +27,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transformation map function for vertices.
- *
- * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("id;graphIds")
-public class TransformVertex<V extends Vertex> extends TransformBase<V> {
+public class TransformVertex extends TransformBase<Vertex> {
 
   /**
    * Factory to init modified vertex.
    */
-  private final VertexFactory<V> vertexFactory;
+  private final VertexFactory vertexFactory;
 
   /**
    * Constructor
@@ -44,14 +42,14 @@ public class TransformVertex<V extends Vertex> extends TransformBase<V> {
    * @param transformationFunction  vertex modification function
    * @param vertexFactory         vertex factory
    */
-  public TransformVertex(TransformationFunction<V> transformationFunction,
-    VertexFactory<V> vertexFactory) {
+  public TransformVertex(TransformationFunction<Vertex> transformationFunction,
+    VertexFactory vertexFactory) {
     super(transformationFunction);
     this.vertexFactory = checkNotNull(vertexFactory);
   }
 
   @Override
-  protected V initFrom(V element) {
+  protected Vertex initFrom(Vertex element) {
     return vertexFactory.initVertex(
       element.getId(), GConstants.DEFAULT_VERTEX_LABEL, element.getGraphIds());
   }

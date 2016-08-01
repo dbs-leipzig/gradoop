@@ -27,16 +27,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transformation map function for edges.
- *
- * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;graphIds")
-public class TransformEdge<E extends Edge> extends TransformBase<E> {
+public class TransformEdge extends TransformBase<Edge> {
 
   /**
    * Factory to init modified edge.
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * Constructor
@@ -44,14 +42,14 @@ public class TransformEdge<E extends Edge> extends TransformBase<E> {
    * @param transformationFunction  edge modification function
    * @param edgeFactory           edge factory
    */
-  public TransformEdge(TransformationFunction<E> transformationFunction,
-    EdgeFactory<E> edgeFactory) {
+  public TransformEdge(TransformationFunction<Edge> transformationFunction,
+    EdgeFactory edgeFactory) {
     super(transformationFunction);
     this.edgeFactory = checkNotNull(edgeFactory);
   }
 
   @Override
-  protected E initFrom(E edge) {
+  protected Edge initFrom(Edge edge) {
     return edgeFactory.initEdge(edge.getId(),
       GConstants.DEFAULT_EDGE_LABEL,
       edge.getSourceId(),

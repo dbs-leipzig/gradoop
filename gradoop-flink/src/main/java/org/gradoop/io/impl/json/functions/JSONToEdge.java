@@ -42,23 +42,20 @@ import org.gradoop.model.impl.properties.PropertyList;
  * "data":{"since":2015},
  * "meta":{"label":"worksFor","graphs":[1,2,3,4]}
  * }
- *
- * @param <E> EPGM edge type
  */
-public class JSONToEdge<E extends Edge>
-  extends JSONToEntity
-  implements MapFunction<String, E> {
+public class JSONToEdge extends JSONToEntity
+  implements MapFunction<String, Edge> {
   /**
    * Edge data factory.
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * Creates map function.
    *
    * @param edgeFactory edge data factory
    */
-  public JSONToEdge(EdgeFactory<E> edgeFactory) {
+  public JSONToEdge(EdgeFactory edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
@@ -70,7 +67,7 @@ public class JSONToEdge<E extends Edge>
    * @throws Exception
    */
   @Override
-  public E map(String s) throws Exception {
+  public Edge map(String s) throws Exception {
     JSONObject jsonEdge = new JSONObject(s);
     GradoopId edgeID = getID(jsonEdge);
     String edgeLabel = getLabel(jsonEdge);
@@ -91,9 +88,7 @@ public class JSONToEdge<E extends Edge>
    * @return source vertex identifier
    * @throws JSONException
    */
-  private GradoopId getSourceId(JSONObject jsonEdge
-  ) throws JSONException {
-
+  private GradoopId getSourceId(JSONObject jsonEdge) throws JSONException {
     return GradoopId.fromString(jsonEdge.getString(JSONConstants.EDGE_SOURCE));
   }
 
@@ -104,9 +99,7 @@ public class JSONToEdge<E extends Edge>
    * @return target vertex identifier
    * @throws JSONException
    */
-  private GradoopId getTargetId(JSONObject jsonEdge
-  ) throws JSONException {
-
+  private GradoopId getTargetId(JSONObject jsonEdge) throws JSONException {
     return GradoopId.fromString(jsonEdge.getString(JSONConstants.EDGE_TARGET));
   }
 }

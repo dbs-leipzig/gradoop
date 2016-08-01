@@ -33,18 +33,16 @@ import java.util.List;
 /**
  * Creates a new super edge representing an edge group. The edge stores the
  * group label, the group property value and the aggregate values for its group.
- *
- * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId")
-public class ReduceEdgeGroupItems<E extends Edge>
-  extends BuildSuperEdge
-  implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
+public class ReduceEdgeGroupItems extends BuildSuperEdge
+  implements GroupReduceFunction<EdgeGroupItem, Edge>,
+  ResultTypeQueryable<Edge> {
 
   /**
    * Edge factory.
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * Creates group reducer
@@ -54,10 +52,8 @@ public class ReduceEdgeGroupItems<E extends Edge>
    * @param valueAggregators  aggregate functions for edge values
    * @param edgeFactory       edge factory
    */
-  public ReduceEdgeGroupItems(List<String> groupPropertyKeys,
-    boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators,
-    EdgeFactory<E> edgeFactory) {
+  public ReduceEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
+    List<PropertyValueAggregator> valueAggregators, EdgeFactory edgeFactory) {
     super(groupPropertyKeys, useLabel, valueAggregators);
     this.edgeFactory = edgeFactory;
   }
@@ -72,11 +68,11 @@ public class ReduceEdgeGroupItems<E extends Edge>
    */
   @Override
   public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-    Collector<E> collector) throws Exception {
+    Collector<Edge> collector) throws Exception {
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
 
-    E superEdge = edgeFactory.createEdge(
+    Edge superEdge = edgeFactory.createEdge(
       edgeGroupItem.getGroupLabel(),
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
@@ -91,8 +87,10 @@ public class ReduceEdgeGroupItems<E extends Edge>
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<E> getProducedType() {
-    return TypeExtractor.createTypeInfo(edgeFactory.getType());
+  public TypeInformation<Edge> getProducedType() {
+    return (TypeInformation<Edge>) TypeExtractor
+      .createTypeInfo(edgeFactory.getType());
   }
 }

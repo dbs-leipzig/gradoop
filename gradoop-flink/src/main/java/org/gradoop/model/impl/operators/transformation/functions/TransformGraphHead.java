@@ -27,17 +27,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transformation map function for graph heads.
- *
- * @param <G> EPGM graph head type
  */
 @FunctionAnnotation.ForwardedFields("id")
-public class TransformGraphHead<G extends GraphHead> extends
-  TransformBase<G> {
+public class TransformGraphHead extends TransformBase<GraphHead> {
 
   /**
    * Factory to init modified graph head.
    */
-  private final GraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
 
   /**
    * Constructor
@@ -45,14 +42,15 @@ public class TransformGraphHead<G extends GraphHead> extends
    * @param transformationFunction  graph head modification function
    * @param graphHeadFactory      graph head factory
    */
-  public TransformGraphHead(TransformationFunction<G> transformationFunction,
-    GraphHeadFactory<G> graphHeadFactory) {
+  public TransformGraphHead(
+    TransformationFunction<GraphHead> transformationFunction,
+    GraphHeadFactory graphHeadFactory) {
     super(transformationFunction);
     this.graphHeadFactory = checkNotNull(graphHeadFactory);
   }
 
   @Override
-  protected G initFrom(G graphHead) {
+  protected GraphHead initFrom(GraphHead graphHead) {
     return graphHeadFactory.initGraphHead(
       graphHead.getId(), GConstants.DEFAULT_GRAPH_LABEL);
   }

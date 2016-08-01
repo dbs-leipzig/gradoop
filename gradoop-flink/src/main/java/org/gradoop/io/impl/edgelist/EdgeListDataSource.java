@@ -28,9 +28,6 @@ import org.gradoop.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.io.impl.edgelist.functions.CreateImportVertex;
 import org.gradoop.io.impl.edgelist.functions.CreateImportEdge;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.LogicalGraph;
@@ -58,18 +55,12 @@ import java.io.IOException;
  * This DataSource will create EPGMEdges based on the given lines.
  * EPGMVertices will be created using the given id's + values will be
  * stored using a given property key.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class EdgeListDataSource
-  <G extends GraphHead, V extends Vertex, E extends Edge>
-  implements DataSource<G, V, E> {
+public class EdgeListDataSource implements DataSource {
   /**
    * Gradoop Flink configuration
    */
-  private GradoopFlinkConfig<G, V, E> config;
+  private GradoopFlinkConfig config;
 
   /**
    * Path to edge list file
@@ -96,7 +87,7 @@ public class EdgeListDataSource
    */
   public EdgeListDataSource(String edgeListPath, String tokenSeparator,
     String propertyKey,
-    GradoopFlinkConfig<G, V, E> config) {
+    GradoopFlinkConfig config) {
     this.config = config;
     this.edgeListPath = edgeListPath;
     this.tokenSeparator = tokenSeparator;
@@ -105,12 +96,12 @@ public class EdgeListDataSource
 
 
   @Override
-  public LogicalGraph<G, V, E> getLogicalGraph() throws IOException {
-    return getGraphCollection().reduce(new ReduceCombination<G, V, E>());
+  public LogicalGraph getLogicalGraph() throws IOException {
+    return getGraphCollection().reduce(new ReduceCombination());
   }
 
   @Override
-  public GraphCollection<G, V, E> getGraphCollection() throws IOException {
+  public GraphCollection getGraphCollection() throws IOException {
 
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
@@ -150,7 +141,7 @@ public class EdgeListDataSource
   }
 
   @Override
-  public GraphTransactions<G, V, E> getGraphTransactions() throws IOException {
+  public GraphTransactions getGraphTransactions() throws IOException {
     return getGraphCollection().toTransactions();
   }
 }

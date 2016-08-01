@@ -32,7 +32,6 @@ import org.gradoop.model.impl.id.GradoopId;
 /**
  * Initializes an EPGM edge from the given {@link ImportEdge}.
  *
- * @param <E> EPGM edge type
  * @param <K> Import Edge/Vertex identifier type
  */
 @FunctionAnnotation.ForwardedFieldsFirst(
@@ -42,20 +41,20 @@ import org.gradoop.model.impl.id.GradoopId;
 @FunctionAnnotation.ForwardedFieldsSecond(
   "f1->f1.sourceId"     // EPGM source vertex id
 )
-public class InitEPGMEdge<E extends Edge, K extends Comparable<K>>
-  extends InitEPGMElement<E, K>
-  implements JoinFunction<ImportEdge<K>, Tuple2<K, GradoopId>, Tuple2<K, E>>,
-  ResultTypeQueryable<Tuple2<K, E>> {
+public class InitEPGMEdge<K extends Comparable<K>>
+  extends InitEPGMElement<Edge, K>
+  implements JoinFunction<ImportEdge<K>, Tuple2<K, GradoopId>, Tuple2<K, Edge>>,
+  ResultTypeQueryable<Tuple2<K, Edge>> {
 
   /**
    * Used to create new EPGM edge.
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * Reduce object instantiation.
    */
-  private final Tuple2<K, E> reuseTuple;
+  private final Tuple2<K, Edge> reuseTuple;
 
   /**
    * Creates a new join function.
@@ -65,7 +64,7 @@ public class InitEPGMEdge<E extends Edge, K extends Comparable<K>>
    *                            (can be {@code null})
    * @param keyTypeInfo         type info for the import edge identifier
    */
-  public InitEPGMEdge(EdgeFactory<E> edgeFactory, String lineagePropertyKey,
+  public InitEPGMEdge(EdgeFactory edgeFactory, String lineagePropertyKey,
     TypeInformation<K> keyTypeInfo) {
     super(lineagePropertyKey, keyTypeInfo);
     this.edgeFactory        = edgeFactory;
@@ -82,11 +81,11 @@ public class InitEPGMEdge<E extends Edge, K extends Comparable<K>>
    * @throws Exception
    */
   @Override
-  public Tuple2<K, E> join(ImportEdge<K> importEdge,
+  public Tuple2<K, Edge> join(ImportEdge<K> importEdge,
     Tuple2<K, GradoopId> vertexIdPair) throws Exception {
     reuseTuple.f0 = importEdge.getTargetId();
 
-    E edge = edgeFactory.createEdge(importEdge.getLabel(),
+    Edge edge = edgeFactory.createEdge(importEdge.getLabel(),
       vertexIdPair.f1, GradoopId.get(), importEdge.getProperties());
 
     reuseTuple.f1 = updateLineage(edge, importEdge.getId());
@@ -98,7 +97,7 @@ public class InitEPGMEdge<E extends Edge, K extends Comparable<K>>
    * {@inheritDoc}
    */
   @Override
-  public TypeInformation<Tuple2<K, E>> getProducedType() {
+  public TypeInformation<Tuple2<K, Edge>> getProducedType() {
     return new TupleTypeInfo<>(getKeyTypeInfo(),
       TypeExtractor.createTypeInfo(edgeFactory.getType()));
   }

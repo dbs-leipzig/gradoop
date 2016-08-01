@@ -51,22 +51,16 @@ import org.gradoop.model.impl.operators.subgraph.functions.SourceTargetIdGraphsT
  * input. The aggregate function is applied on each logical graph contained in
  * the collection and the aggregate is stored as an additional property at the
  * graphs.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
-  extends Edge> implements
-  ApplicableUnaryGraphToGraphOperator<G, V, E> {
+public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
   /**
    * Used to filter vertices from the logical graph.
    */
-  private final FilterFunction<V> vertexFilterFunction;
+  private final FilterFunction<Vertex> vertexFilterFunction;
   /**
    * Used to filter edges from the logical graph.
    */
-  private final FilterFunction<E> edgeFilterFunction;
+  private final FilterFunction<Edge> edgeFilterFunction;
 
   /**
    * Creates a new sub graph operator instance.
@@ -83,8 +77,8 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
    */
-  public ApplySubgraph(FilterFunction<V> vertexFilterFunction,
-    FilterFunction<E> edgeFilterFunction) {
+  public ApplySubgraph(FilterFunction<Vertex> vertexFilterFunction,
+    FilterFunction<Edge> edgeFilterFunction) {
     if (vertexFilterFunction == null && edgeFilterFunction == null) {
       throw new IllegalArgumentException("No filter functions was given.");
     }
@@ -93,7 +87,7 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
   }
 
   @Override
-  public GraphCollection<G, V, E> execute(GraphCollection<G, V, E> superGraph) {
+  public GraphCollection execute(GraphCollection superGraph) {
     return vertexFilterFunction != null && edgeFilterFunction != null ?
       subgraph(superGraph) :
       vertexFilterFunction != null ? vertexInducedSubgraph(superGraph) :
@@ -108,27 +102,27 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
    * @param collection collection of supergraphs
    * @return collection of vertex-induced subgraphs
    */
-  private GraphCollection<G, V, E> vertexInducedSubgraph(
-    GraphCollection<G, V, E> collection) {
+  private GraphCollection vertexInducedSubgraph(
+    GraphCollection collection) {
     //--------------------------------------------------------------------------
     // compute a dictionary that maps the old graph ids to new ones
     //--------------------------------------------------------------------------
 
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdDictionary = collection
       .getGraphHeads()
-      .map(new Id<G>())
+      .map(new Id<GraphHead>())
       .map(new PairElementWithNewId<GradoopId>());
 
     //--------------------------------------------------------------------------
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory<G> graphFactory =
-      collection.getConfig().getGraphHeadFactory();
+    GraphHeadFactory graphFactory = collection.getConfig()
+      .getGraphHeadFactory();
 
-    DataSet<G> newGraphHeads = graphIdDictionary
+    DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<GradoopId, GradoopId>())
-      .map(new InitGraphHead<>(graphFactory));
+      .map(new InitGraphHead(graphFactory));
 
     //--------------------------------------------------------------------------
     // compute pairs of a vertex id and the set of new graphs this vertex is
@@ -139,7 +133,7 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
     DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdsWithNewGraphs =
       collection.getVertices()
         .filter(vertexFilterFunction)
-        .flatMap(new ElementIdGraphIdTuple<V>())
+        .flatMap(new ElementIdGraphIdTuple<Vertex>())
         .join(graphIdDictionary)
         .where(1)
         .equalTo(0)
@@ -151,11 +145,11 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
     // compute new vertices
     //--------------------------------------------------------------------------
 
-    DataSet<V> newVertices = vertexIdsWithNewGraphs
+    DataSet<Vertex> newVertices = vertexIdsWithNewGraphs
         .join(collection.getVertices())
         .where(0)
-        .equalTo(new Id<V>())
-        .with(new AddGraphsToElements<V>());
+        .equalTo(new Id<Vertex>())
+        .with(new AddGraphsToElements<Vertex>());
 
     //--------------------------------------------------------------------------
     // build tuples4 for each edge, containing
@@ -164,7 +158,7 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
 
     DataSet<Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdSet>> edgeTuple =
       collection.getEdges()
-        .flatMap(new IdSourceTargetGraphTuple<E>())
+        .flatMap(new IdSourceTargetGraphTuple<Edge>())
         .join(graphIdDictionary)
         .where(3).equalTo(0)
         .with(new EdgesWithNewGraphsTuple())
@@ -194,11 +188,11 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
     // compute the new edges
     //--------------------------------------------------------------------------
 
-    DataSet<E> newEdges = edgeIdsWithNewGraphs
+    DataSet<Edge> newEdges = edgeIdsWithNewGraphs
       .join(collection.getEdges())
       .where(0)
-      .equalTo(new Id<E>())
-      .with(new AddGraphsToElements<E>());
+      .equalTo(new Id<Edge>())
+      .with(new AddGraphsToElements<Edge>());
 
     return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
       collection.getConfig());
@@ -212,27 +206,27 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
    * @param collection collection of supergraphs
    * @return collection of edge-induced subgraphs
    */
-  private GraphCollection<G, V, E> edgeInducedSubgraph(
-    GraphCollection<G, V, E> collection) {
+  private GraphCollection edgeInducedSubgraph(
+    GraphCollection collection) {
     //--------------------------------------------------------------------------
     // compute a dictionary that maps the old graph ids to new ones
     //--------------------------------------------------------------------------
 
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdDictionary = collection
       .getGraphHeads()
-      .map(new Id<G>())
+      .map(new Id<GraphHead>())
       .map(new PairElementWithNewId<GradoopId>());
 
     //--------------------------------------------------------------------------
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory<G> graphFactory =
-      collection.getConfig().getGraphHeadFactory();
+    GraphHeadFactory graphFactory = collection.getConfig()
+      .getGraphHeadFactory();
 
-    DataSet<G> newGraphHeads = graphIdDictionary
+    DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<GradoopId, GradoopId>())
-      .map(new InitGraphHead<>(graphFactory));
+      .map(new InitGraphHead(graphFactory));
 
     //--------------------------------------------------------------------------
     // compute new edges by applying the filter function,
@@ -240,10 +234,10 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
     // contained in and finally adding the new graphs to the edges
     //--------------------------------------------------------------------------
 
-    DataSet<E> newEdges = collection
+    DataSet<Edge> newEdges = collection
       .getEdges()
       .filter(edgeFilterFunction)
-      .flatMap(new ElementIdGraphIdTuple<E>())
+      .flatMap(new ElementIdGraphIdTuple<Edge>())
       .join(graphIdDictionary)
       .where(1)
       .equalTo(0)
@@ -252,8 +246,8 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
       .reduceGroup(new MergeTupleGraphs())
       .join(collection.getEdges())
       .where(0)
-      .equalTo(new Id<E>())
-      .with(new AddGraphsToElements<E>());
+      .equalTo(new Id<Edge>())
+      .with(new AddGraphsToElements<Edge>());
 
     //--------------------------------------------------------------------------
     // compute the new vertices
@@ -263,13 +257,13 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
     // are added to the vertices
     //--------------------------------------------------------------------------
 
-    DataSet<V> newVertices = newEdges
-      .flatMap(new SourceTargetIdGraphsTuple<E>())
+    DataSet<Vertex> newVertices = newEdges
+      .flatMap(new SourceTargetIdGraphsTuple<Edge>())
       .distinct(0)
       .coGroup(collection.getVertices())
       .where(0)
-      .equalTo(new Id<V>())
-      .with(new AddGraphsToElementsCoGroup<V>());
+      .equalTo(new Id<Vertex>())
+      .with(new AddGraphsToElementsCoGroup<Vertex>());
 
     return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
       collection.getConfig());
@@ -286,8 +280,8 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
    * @param collection collection of supergraphs
    * @return collection of subgraphs
    */
-  private GraphCollection<G, V, E> subgraph(
-    GraphCollection<G, V, E> collection) {
+  private GraphCollection subgraph(
+    GraphCollection collection) {
 
     //--------------------------------------------------------------------------
     // compute a dictionary that maps the old graph ids to new ones
@@ -295,19 +289,19 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
 
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdDictionary = collection
       .getGraphHeads()
-      .map(new Id<G>())
+      .map(new Id<GraphHead>())
       .map(new PairElementWithNewId<GradoopId>());
 
     //--------------------------------------------------------------------------
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory<G> graphFactory =
-      collection.getConfig().getGraphHeadFactory();
+    GraphHeadFactory graphFactory = collection.getConfig()
+      .getGraphHeadFactory();
 
-    DataSet<G> newGraphHeads = graphIdDictionary
+    DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<GradoopId, GradoopId>())
-      .map(new InitGraphHead<>(graphFactory));
+      .map(new InitGraphHead(graphFactory));
 
     //--------------------------------------------------------------------------
     // compute pairs of a vertex and the set of new graphs this vertex is
@@ -315,10 +309,10 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
     // filter function is applied first to improve performance
     //--------------------------------------------------------------------------
 
-    DataSet<V> newVertices =
+    DataSet<Vertex> newVertices =
       collection.getVertices()
         .filter(vertexFilterFunction)
-        .flatMap(new ElementIdGraphIdTuple<V>())
+        .flatMap(new ElementIdGraphIdTuple<Vertex>())
         .join(graphIdDictionary)
         .where(1).equalTo(0)
         .with(new JoinTuplesWithNewGraphs())
@@ -326,8 +320,8 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
         .reduceGroup(new MergeTupleGraphs())
         .join(collection.getVertices())
         .where(0)
-        .equalTo(new Id<V>())
-        .with(new AddGraphsToElements<V>());
+        .equalTo(new Id<Vertex>())
+        .with(new AddGraphsToElements<Vertex>());
 
     //--------------------------------------------------------------------------
     // compute pairs of an edge and the set of new graphs this edge is
@@ -335,9 +329,9 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
     // filter function is applied first to improve performance
     //--------------------------------------------------------------------------
 
-    DataSet<E> newEdges = collection.getEdges()
+    DataSet<Edge> newEdges = collection.getEdges()
       .filter(edgeFilterFunction)
-      .flatMap(new ElementIdGraphIdTuple<E>())
+      .flatMap(new ElementIdGraphIdTuple<Edge>())
       .join(graphIdDictionary)
       .where(1)
       .equalTo(0)
@@ -346,8 +340,8 @@ public class ApplySubgraph<G extends GraphHead, V extends Vertex, E
       .reduceGroup(new MergeTupleGraphs())
       .join(collection.getEdges())
       .where(0)
-      .equalTo(new Id<E>())
-      .with(new AddGraphsToElements<E>());
+      .equalTo(new Id<Edge>())
+      .with(new AddGraphsToElements<Edge>());
 
     return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
       collection.getConfig());
