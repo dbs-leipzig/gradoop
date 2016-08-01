@@ -104,7 +104,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   @Override
   public void mapPartition(Iterable<Long> iterable,
     Collector<GraphTransaction<G, V, E>> collector) throws Exception {
-    GraphTransaction<G, V, E> grhTransaction = new GraphTransaction<>();
+    GraphTransaction<G, V, E> graphTransaction = new GraphTransaction<>();
 
     // SalesQuotation
     V salesQuotation;
