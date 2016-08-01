@@ -67,9 +67,9 @@ public class FoodBroker
   @Override
   public GraphCollection<G, V, E> execute() {
 
-//    // used for type hinting when loading graph head data
-//    TypeInformation<G> graphHeadTypeInfo = TypeExtractor
-//      .createTypeInfo(gradoopFlinkConfig.getGraphHeadFactory().getType());
+    // used for type hinting when loading graph head data
+    TypeInformation<G> graphHeadTypeInfo = TypeExtractor
+      .createTypeInfo(gradoopFlinkConfig.getGraphHeadFactory().getType());
     // used for type hinting when loading vertex data
     TypeInformation<V> vertexTypeInfo = TypeExtractor
       .createTypeInfo(gradoopFlinkConfig.getVertexFactory().getType());
@@ -118,7 +118,8 @@ public class FoodBroker
 
     DataSet<G> graphHeads = vertexEdgeTuple
       .map(new GraphHeadsFromFoodBrokerage<G, V, E>(
-        gradoopFlinkConfig.getGraphHeadFactory()));
+        gradoopFlinkConfig.getGraphHeadFactory()))
+      .returns(graphHeadTypeInfo);
 
     DataSet<V> vertices = transactionalVertices
       .union(customers)
