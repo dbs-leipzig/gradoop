@@ -16,6 +16,7 @@
  */
 package org.gradoop.model.impl.datagen.foodbroker;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -128,7 +129,18 @@ public class FoodBroker
       .union(employees
       .union(products));
 
-    
+    DataSet<V> salesOrderVertices = transactionalVertices
+      .filter(new FilterFunction<V>() {
+        @Override
+        public boolean filter(V value) throws Exception {
+          return "SalesOrder".equals(value.getLabel());
+        }
+      });
+    try {
+      salesOrderVertices.print();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     return GraphCollection.fromDataSets(graphHeads, vertices,
       transactionalEdges, gradoopFlinkConfig);

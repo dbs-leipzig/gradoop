@@ -44,6 +44,6 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> cases =
       foodBroker.execute();
 
-    GradoopFlinkTestUtils.printGraphCollection(cases);
+    // GradoopFlinkTestUtils.printGraphCollection(cases);
   }
 }
