@@ -144,11 +144,22 @@ public class FoodBroker
       .filter(new FilterFunction<V>() {
         @Override
         public boolean filter(V value) throws Exception {
+          value.getId();
           return "SalesOrder".equals(value.getLabel());
         }
       });
+
+    DataSet<V> deliveryNoteVertices = transactionalVertices
+      .filter(new FilterFunction<V>() {
+        @Override
+        public boolean filter(V value) throws Exception {
+          return "DeliveryNote".equals(value.getLabel());
+        }
+      });
+
     try {
       salesOrderVertices.print();
+      deliveryNoteVertices.print();
     } catch (Exception e) {
       e.printStackTrace();
     }
