@@ -193,7 +193,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     String label = "SalesQuotation";
     PropertyList properties = new PropertyList();
 
-    properties.set("date",startDate.toString());
+    properties.set("date",startDate);
     properties.set("kind","TransData");
 
     V salesQuotation = this.vertexFactory.createVertex(label, properties,
@@ -306,7 +306,8 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     V salesOrder = this.vertexFactory.createVertex(label, properties, this
       .graphIds);
 
-    newEdge("receivedFrom", salesOrder.getId(), getVertexEdgeTarget("sentTo", salesQuotation.getId()).getId());
+    newEdge("receivedFrom", salesOrder.getId(), getMasterDataEdgeTarget("sentTo", salesQuotation
+      .getId()).getId());
     newEdge("processedBy", salesOrder.getId(), rndEmployee.getId());
     newEdge("basedOn", salesOrder.getId(), salesQuotation.getId());
 
@@ -336,13 +337,15 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     properties.set("kind","TransData");
     properties.set("salesPrice", salesQuotationLine.getPropertyValue
-      ("salesPrice"));
-    properties.set("quantity", salesQuotationLine.getPropertyValue("quantity"));
+      ("salesPrice").getBigDecimal());
+    properties.set("quantity", salesQuotationLine.getPropertyValue
+      ("quantity").getInt());
 
     V salesOrderLine = this.vertexFactory.createVertex(label, properties, this.graphIds);
 
 
-    newEdge("contains", salesOrderLine.getId(), salesQuotationLine.getId());
+    newEdge("contains", salesOrderLine.getId(), getMasterDataEdgeTarget
+      ("contains", salesQuotationLine.getId()).getId());
     newEdge("partOf", salesOrderLine.getId(), salesOrder.getId());
 
     newVertex(salesOrderLine);
@@ -379,7 +382,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
         .getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
       (MasterDataTuple) getMasterDataEdgeTarget("processedBy", salesOrder.getId()),
-      "PurchOrder", "purchDelay");
+      "PurchOrder", "purchaseDelay");
 
     properties.set("date", date);
 
@@ -427,8 +430,9 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     PropertyList properties = new PropertyList();
 
     properties.set("kind","TransData");
-    properties.set("salesOrderLine", salesOrderLine.getId());
-    properties.set("quantity", salesOrderLine.getPropertyValue("quantity"));
+    properties.set("salesOrderLine", salesOrderLine.getId().toString());
+    properties.set("quantity", salesOrderLine.getPropertyValue("quantity")
+      .getInt());
 
     ProductTuple contains = (ProductTuple) getMasterDataEdgeTarget
       ("contains", salesOrderLine.getId());
@@ -449,7 +453,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     purchOrderLine = this.vertexFactory.createVertex(label, properties, this.graphIds);
 
-    salesOrderLine.setProperty("purchOrderLine", purchOrderLine.getId());
+    salesOrderLine.setProperty("purchOrderLine", purchOrderLine.getId().toString());
 
     newEdge("contains", purchOrderLine.getId(), contains.getId());
     newEdge("partOf", purchOrderLine.getId(), purchOrder.getId());
@@ -518,7 +522,8 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
       if (purchOrderTotals.containsKey(purchOrder)){
         total = purchOrderTotals.get(purchOrder);
       }
-      purchAmount = purchOrderLine.getPropertyValue("quantity").getBigDecimal();
+      purchAmount = BigDecimal.valueOf(purchOrderLine.getPropertyValue("quantity")
+        .getInt());
       purchAmount = purchAmount.multiply(purchOrderLine.getPropertyValue
         ("purchPrice").getBigDecimal());
       total = total.add(purchAmount);
@@ -553,7 +558,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     long date = config.delayDelayConfiguration(purchOrderDate,
       (MasterDataTuple)getMasterDataEdgeTarget("placedAt", purchOrder.getId()),
       "PurchOrder", "invoiceDelay");
-    properties.set("date",  new Date());
+    properties.set("date",  date);
 
     purchInvoice = this.vertexFactory.createVertex(label, properties, this.graphIds);
 
@@ -580,17 +585,21 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
         .getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
       (MasterDataTuple)getMasterDataEdgeTarget("processedBy", salesOrder.getId()),
-      "node", "key");
+      "SalesOrder", "invoiceDelay");
     properties.set("date",  date);
 
     salesInvoice = this.vertexFactory.createVertex(label, properties, this
       .graphIds);
 
     BigDecimal revenue;
+    BigDecimal salesAmount;
     for (V salesOrderLine : salesOrderLines){
+      salesAmount = BigDecimal.valueOf(salesOrderLine.getPropertyValue
+        ("quantity").getInt())
+        .multiply(salesOrderLine.getPropertyValue("salesPrice").getBigDecimal())
+        .setScale(2,BigDecimal.ROUND_HALF_UP);
       revenue = salesInvoice.getPropertyValue("revenue").getBigDecimal();
-      revenue = revenue.add(salesOrderLine.getPropertyValue("salesAmount")
-        .getBigDecimal());
+      revenue = revenue.add(salesAmount);
       salesInvoice.setProperty("revenue", revenue);
     }
 
