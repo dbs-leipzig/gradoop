@@ -17,19 +17,26 @@
 package org.gradoop.model.impl.datagen.foodbroker.config;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.hadoop.shaded.org.apache.http.impl.cookie
+  .DateParseException;
+import org.apache.flink.hadoop.shaded.org.apache.http.impl.cookie.DateUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.MDTuple;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class FoodBrokerConfig {
+public class FoodBrokerConfig implements Serializable {
   private final JSONObject root;
   private Integer scaleFactor = 0;
 
@@ -99,6 +106,32 @@ public class FoodBrokerConfig {
     return growth;
   }
 
+  public Float getProductMinPrice() {
+    Float minPrice = Float.MIN_VALUE;
+
+    try {
+      minPrice = (float) getMasterDataConfigNode("Product")
+        .getDouble("minPrice");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    return minPrice;
+  }
+
+  public Float getProductMaxPrice() {
+    Float maxPrice = Float.MIN_VALUE;
+
+    try {
+      maxPrice = (float) getMasterDataConfigNode("Product")
+        .getDouble("maxPrice");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    return maxPrice;
+  }
+
   public void setScaleFactor(Integer scaleFactor) {
     this.scaleFactor = scaleFactor;
   }
@@ -125,6 +158,21 @@ public class FoodBrokerConfig {
     }
 
     return caseCount;
+  }
+
+  public Date getStartDate() {
+    Date startDate = null;
+
+    try {
+      startDate = DateUtils.parseDate(root.getJSONObject("Process")
+        .getString("casesPerScaleFactor"));
+    } catch (DateParseException e) {
+      e.printStackTrace();
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    return startDate;
   }
 
   public Integer getMasterDataCount(String className) {
@@ -176,12 +224,21 @@ public class FoodBrokerConfig {
     return quality;
   }
 
+  private boolean getHigherIsBetter(String node, String key,
+    boolean defaultValue) throws JSONException {
+    Boolean value = getTransactionalNodes().getJSONObject(node)
+      .getBoolean(key + "HigherIsBetter");
+    return value == null ? defaultValue : value;
+  }
 
-  private Float getValue(List<MasterDataTuple> influencedMasterDataObjects,
+
+
+  private<T extends AbstractMasterDataTuple> Float getValue(List<T>
+    influencedMasterDataObjects,
     boolean higherIsBetter, Float influence, Float startValue) {
     Float value = startValue;
 
-    for (MasterDataTuple tuple : influencedMasterDataObjects) {
+    for (T tuple : influencedMasterDataObjects) {
       if (tuple.getQuality() == getQualityGood()){
         if(higherIsBetter){
           value += influence;
@@ -214,8 +271,7 @@ public class FoodBrokerConfig {
     try {
       min = getTransactionalNodes().getJSONObject(node).getInt(key + "Min");
       max = getTransactionalNodes().getJSONObject(node).getInt(key + "Max");
-      higherIsBetter = getTransactionalNodes().getJSONObject(node)
-        .getBoolean(key + "HigherIsBetter");;
+      higherIsBetter = getHigherIsBetter(node, key, true);
       influence = (float)getTransactionalNodes().getJSONObject(node)
         .getDouble(key
         + "Influence");
@@ -241,7 +297,8 @@ public class FoodBrokerConfig {
   }
 
   public BigDecimal getDecimalVariationConfigurationValue(
-    List<MasterDataTuple> influencedMasterDataObjects, String node, String key)
+    List<AbstractMasterDataTuple> influencedMasterDataObjects, String node,
+    String key)
     {
     Float baseValue = null;
     Boolean higherIsBetter = null;

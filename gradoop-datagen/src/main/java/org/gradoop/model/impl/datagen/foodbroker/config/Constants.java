@@ -20,10 +20,29 @@ package org.gradoop.model.impl.datagen.foodbroker.config;
  * Constants used for the FoodBroker data generator
  */
 public class Constants {
+
+  /**
+   * reserved property key referring to master or transactional data
+   */
+  public static final String SUPERTYPE_KEY = "superType";
+  /**
+   * reserved property value to mark master data
+   */
+  public static final String SUPERCLASS_VALUE_MASTER = "M";
+  /**
+   * reserved property key referring to the source identifier of vertices
+   */
+  public static final String SOURCEID_KEY = "sid";
+
   /**
    * property key for master data quality
    */
   public static final String QUALITY = "quality";
+
+  /**
+   * property key for product price
+   */
+  public static final String PRICE = "price";
 
   //TODO constants für alle configzugriffe
 }
