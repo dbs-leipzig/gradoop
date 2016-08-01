@@ -144,9 +144,10 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     long startDate = config.getStartDate();
 
     for (Long seed: iterable) {
-      this.graphHead = graphHeadFactory.createGraphHead();
-      this.graphIds = new GradoopIdSet();
-      graphIds.add(this.graphHead.getId());
+      vertices = Sets.newHashSet();
+      edges = Sets.newHashSet();
+      graphIds = new GradoopIdSet();
+      graphIds.add(graphHeadFactory.createGraphHead().getId());
 
       // SalesQuotation
       salesQuotation = this.newSalesQuotation(startDate);
