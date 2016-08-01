@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichMapPartitionFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.hadoop.shaded.org.apache.http.impl.cookie
   .DateParseException;
@@ -36,9 +37,9 @@ import org.gradoop.model.impl.datagen.foodbroker.masterdata.*;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
-import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -52,7 +53,8 @@ import java.util.Set;
 
 public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   extends EPGMEdge> extends RichMapPartitionFunction<Long,
-  GraphTransaction<G, V, E>> implements Serializable {
+  Tuple2<Set<V>, Set<E>>>
+  implements Serializable {
 
   private FoodBrokerConfig config;
 
@@ -71,9 +73,11 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   private EPGMEdgeFactory<E> edgeFactory;
 
   private Set<V> vertices;
-//  private Set<E> edges;
+  private Set<E> edges;
 
-  private Map<String,Map<V, Object>> edgeMap;
+  private Map<Tuple2<String, GradoopId>, GradoopId> edgeMap;
+  private Map<GradoopId, V> vertexMap;
+  private Map<GradoopId, AbstractMasterDataTuple> masterDataMap;
 
   public FoodBrokerage(G graphHead, EPGMVertexFactory<V> vertexFactory,
     EPGMEdgeFactory<E> edgeFactory, FoodBrokerConfig config) {
@@ -84,10 +88,12 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     this.edgeFactory = edgeFactory;
     this.config = config;
 
-    this.vertices = Sets.newHashSet();
-//    this.edges = Sets.newHashSet();
+    vertices = Sets.newHashSet();
+    edges = Sets.newHashSet();
 
-    initEdgeMap();
+    edgeMap = Maps.newHashMap();
+    vertexMap = Maps.newHashMap();
+    masterDataMap = Maps.newHashMap();
   }
 
   @Override
@@ -103,8 +109,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
   @Override
   public void mapPartition(Iterable<Long> iterable,
-    Collector<GraphTransaction<G, V, E>> collector) throws Exception {
-    GraphTransaction<G, V, E> graphTransaction = new GraphTransaction<>();
+    Collector<Tuple2<Set<V>, Set<E>>> collector) throws Exception {
 
     // SalesQuotation
     V salesQuotation;
@@ -132,64 +137,48 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     // SalesInvoices;
     V salesInvoice;
 
-    graphTransaction.setGraphHead(graphHead);
-
     Date startDate = config.getStartDate();
 
     for (Long seed: iterable) {
-      graphTransaction = new GraphTransaction<>();
-      this.vertices = Sets.newHashSet();
-//      this.edges = Sets.newHashSet();
-
       // SalesQuotation
       salesQuotation = this.newSalesQuotation(startDate);
-      vertices.add(salesQuotation);
 
       // SalesQuotationLines
 
       salesQuotationLines = this.newSalesQuotationLines(salesQuotation);
-      vertices.addAll(salesQuotationLines);
 
       if (this.confirmed(salesQuotation)) {
         // SalesOrder
         salesOrder = this.newSalesOrder(salesQuotation);
-        vertices.add(salesOrder);
 
         // SalesOrderLines
         salesOrderLines = this.newSalesOrderLines(salesOrder, salesQuotationLines);
-        vertices.addAll(salesOrderLines);
 
         // newPurchOrders
         purchOrders = this.newPurchOrders(salesOrder, salesOrderLines);
-        vertices.addAll(purchOrders);
 
         // PurchOrderLines
         purchOrderLines = this.newPurchOrderLines(purchOrders, salesOrderLines);
-        vertices.addAll(purchOrderLines);
 
         // DeliveryNotes
         deliveryNotes = this.newDeliveryNotes(purchOrders);
-        vertices.addAll(deliveryNotes);
 
         // PurchInvoices
         purchInvoices = newPurchInvoices(purchOrderLines);
-        vertices.addAll(purchInvoices);
 
         // SalesInvoices
         salesInvoice = newSalesInvoice(salesOrderLines);
-        vertices.add(salesInvoice);
       }
-      graphTransaction.getVertices().addAll(vertices);
-      graphTransaction.getEdges().addAll(edges);
-      collector.collect(graphTransaction);
+      collector.collect(new Tuple2<>(vertices, edges));
     }
   }
 
   private boolean confirmed(V salesQuotation) {
     List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentBy").get
-      (salesQuotation));
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentTo").get(salesQuotation));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("sentBy", salesQuotation.getId()));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("sentTo", salesQuotation.getId()));
 
     return config.happensTransitionConfiguration(influencingMasterData,
       "SalesQuotation", "confirmationProbability");
@@ -208,11 +197,11 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     MasterDataTuple rndEmployee = getRandomTuple(employees);
     MasterDataTuple rndCustomer = getRandomTuple(customers);
-    edgeMap.get("sentBy").put(salesQuotation, rndEmployee);
-    edgeMap.get("sentTo").put(salesQuotation, rndCustomer);
 
-    vertices.add(salesQuotation);
+    newEdge("sentBy", salesQuotation.getId(), rndEmployee.getId());
+    newEdge("sentTo", salesQuotation.getId(), rndCustomer.getId());
 
+    newVertex(salesQuotation);
     return salesQuotation;
   }
 
@@ -223,8 +212,10 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     ProductTuple product;
 
     List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentBy").get(salesQuotation));
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentTo").get(salesQuotation));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("sentBy", salesQuotation.getId()));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("sentTo", salesQuotation.getId()));
 
     int numberOfQuotationLines = config.getIntRangeConfigurationValue
       (influencingMasterData, "SalesQuotation", "lines");
@@ -235,7 +226,6 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
         product);
       salesQuotationLines.add(salesQuotationLine);
     }
-    vertices.addAll(salesQuotationLines);
     return salesQuotationLines;
   }
 
@@ -243,8 +233,11 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     String label = "SalesQuotationLine";
 
     List<AbstractMasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentBy").get(salesQuotation));
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentTo").get(salesQuotation));
+    influencingMasterData.add(getMasterDataEdgeTarget
+      ("sentBy", salesQuotation.getId()));
+    influencingMasterData.add(getMasterDataEdgeTarget
+      ("sentTo", salesQuotation.getId()));
+
     influencingMasterData.add(product);
 
     BigDecimal salesMargin = config.getDecimalVariationConfigurationValue
@@ -268,9 +261,10 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     V salesQuotationLine = this.vertexFactory.createVertex(label, properties, this.graphIds);
 
-    edgeMap.get("contains").put(salesQuotationLine, product);
-    edgeMap.get("partOf").put(salesQuotationLine, salesQuotation);
+    newEdge("contains", salesQuotationLine.getId(), product.getId());
+    newEdge("partOf", salesQuotationLine.getId(), salesQuotation.getId());
 
+    newVertex(salesQuotationLine);
     return salesQuotationLine;
   }
 
@@ -283,8 +277,10 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     properties.set("kind","TransData");
 
     List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentBy").get(salesQuotation));
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentTo").get(salesQuotation));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("sentBy", salesQuotation.getId()));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("sentTo", salesQuotation.getId()));
 
     Date salesQuotationDate = null;
     try {
@@ -301,7 +297,8 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     MasterDataTuple rndEmployee = getRandomTuple(employees);
     influencingMasterData.clear();
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("sentTo").get(salesQuotation));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("sentTo", salesQuotation.getId()));
     influencingMasterData.add(rndEmployee);
 
     properties.set("deliveryDate", config.delayDelayConfiguration(date,
@@ -310,13 +307,11 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     V salesOrder = this.vertexFactory.createVertex(label, properties, this
       .graphIds);
 
-    edgeMap.get("receivedFrom").put(salesOrder, edgeMap.get("sentTo")
-      .get(salesQuotation));
-    edgeMap.get("processedBy").put(salesOrder, rndEmployee);
-    edgeMap.get("basedOn").put(salesOrder, salesQuotation);
+    newEdge("receivedFrom", salesOrder.getId(), getVertexEdgeTarget("sentTo", salesQuotation.getId()).getId());
+    newEdge("processedBy", salesOrder.getId(), rndEmployee.getId());
+    newEdge("basedOn", salesOrder.getId(), salesQuotation.getId());
 
-    vertices.add(salesOrder);
-
+    newVertex(salesOrder);
     return salesOrder;
   }
 
@@ -331,7 +326,6 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
         singleSalesQuotationLine);
       salesOrderLines.add(salesOrderLine);
     }
-    vertices.addAll(salesOrderLines);
 
     return  salesOrderLines;
   }
@@ -348,9 +342,11 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     V salesOrderLine = this.vertexFactory.createVertex(label, properties, this.graphIds);
 
-    edgeMap.get("contains").put(salesOrderLine, salesQuotationLine);
-    edgeMap.get("partOf").put(salesOrderLine, salesOrder);
 
+    newEdge("contains", salesOrderLine.getId(), salesQuotationLine.getId());
+    newEdge("partOf", salesOrderLine.getId(), salesOrder.getId());
+
+    newVertex(salesOrderLine);
     return salesOrderLine;
   }
 
@@ -368,7 +364,6 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
       purchOrders.add(purchOrder);
     }
-    vertices.addAll(purchOrders);
 
     return purchOrders;
   }
@@ -388,19 +383,20 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     } catch (DateParseException e) {
       e.printStackTrace();
     }
-    Date date = config.delayDelayConfiguration(salesOrderDate, (MasterDataTuple) edgeMap.get
-      ("processedby").get(salesOrder), "PurchOrder", "purchDelay");
+    Date date = config.delayDelayConfiguration(salesOrderDate,
+      (MasterDataTuple) getMasterDataEdgeTarget("processedBy", salesOrder.getId()),
+      "PurchOrder", "purchDelay");
 
     properties.set("date", date);
 
     purchOrder = this.vertexFactory.createVertex(label, properties, this
       .graphIds);
 
+    newEdge("serves", purchOrder.getId(), salesOrder.getId());
+    newEdge("placedAt", purchOrder.getId(), getRandomTuple(vendors).getId());
+    newEdge("processedBy", purchOrder.getId(), processedBy.getId());
 
-    edgeMap.get("serves").put(purchOrder, salesOrder);
-    edgeMap.get("placedAt").put(purchOrder, getRandomTuple(vendors));
-    edgeMap.get("processedBy").put(purchOrder, processedBy);
-
+    newVertex(purchOrder);
     return purchOrder;
   }
 
@@ -426,7 +422,6 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
       purchOrderLines.add(purchOrderLine);
     }
-    vertices.addAll(purchOrderLines);
 
     return purchOrderLines;
   }
@@ -441,14 +436,14 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     properties.set("salesOrderLine", salesOrderLine.getId());
     properties.set("quantity", salesOrderLine.getPropertyValue("quantity"));
 
-    ProductTuple contains = (ProductTuple) edgeMap.get("contains").get
-      (salesOrderLine);
+    ProductTuple contains = (ProductTuple) getMasterDataEdgeTarget
+      ("contains", salesOrderLine.getId());
 
     List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("processedBy").get
-      (purchOrder));
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("placedAt").get
-      (purchOrder));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("processedBy", purchOrder.getId()));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("placedAt", purchOrder.getId()));
 
     BigDecimal purchPrice = contains.getPrice();
     purchPrice = BigDecimal.ONE
@@ -462,9 +457,10 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     salesOrderLine.setProperty("purchOrderLine", purchOrderLine.getId());
 
-    edgeMap.get("contains").put(purchOrderLine, contains);
-    edgeMap.get("partOf").put(purchOrderLine, purchOrder);
+    newEdge("contains", purchOrderLine.getId(), contains.getId());
+    newEdge("partOf", purchOrderLine.getId(), purchOrder.getId());
 
+    newVertex(purchOrderLine);
     return purchOrderLine;
   }
 
@@ -478,7 +474,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
       deliveryNotes.add(deliveryNote);
     }
-    vertices.addAll(deliveryNotes);
+
     return deliveryNotes;
   }
 
@@ -504,16 +500,17 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     MasterDataTuple operatedBy = getRandomTuple(logistics);
     List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
     influencingMasterData.add(operatedBy);
-    influencingMasterData.add((MasterDataTuple)edgeMap.get("placedAt").get
-      (purchOrder));
+    influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
+      ("placedAt", purchOrder.getId()));
 
     Date date = config.delayDelayConfiguration(purchOrderDate,
       influencingMasterData, "PurchOrder", "deliveryDelay");
-    deliveryNote.setProperty("date", new Date());
+    deliveryNote.setProperty("date", date);
 
-    edgeMap.get("contains").put(deliveryNote, purchOrder);
-    edgeMap.get("operatedBy").put(deliveryNote, operatedBy);
+    newEdge("contains", deliveryNote.getId(), purchOrder.getId());
+    newEdge("operatedBy", deliveryNote.getId(), operatedBy.getId());
 
+    newVertex(deliveryNote);
     return deliveryNote;
   }
 
@@ -525,7 +522,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     BigDecimal total;
     BigDecimal purchAmount;
     for(V purchOrderLine : purchOrderLines){
-      purchOrder = (V)edgeMap.get("partOf").get(purchOrderLine);
+      purchOrder = getVertexEdgeTarget("partOf", purchOrderLine.getId());
 
       total = BigDecimal.ZERO;
 
@@ -548,7 +545,6 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
       ));
     }
 
-    vertices.addAll(purchInvoices);
     return purchInvoices;
   }
 
@@ -571,20 +567,23 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
       e.printStackTrace();
     }
     Date date = config.delayDelayConfiguration(purchOrderDate,
-      (MasterDataTuple) edgeMap.get("placedAt").get(purchOrder), "PurchOrder", "invoiceDelay");
+      (MasterDataTuple)getMasterDataEdgeTarget("placedAt", purchOrder.getId()),
+      "PurchOrder", "invoiceDelay");
     properties.set("date",  new Date());
 
     purchInvoice = this.vertexFactory.createVertex(label, properties, this.graphIds);
 
-    edgeMap.get("createdFor").put(purchInvoice, purchOrder);
+    newEdge("createdFor", purchInvoice.getId(), purchOrder.getId());
 
+    newVertex(purchInvoice);
     return purchInvoice;
   }
 
   // SalesInvoices
   private V newSalesInvoice(List<V> salesOrderLines) {
     V salesInvoice;
-    V salesOrder = (V) edgeMap.get("partOf").get(salesOrderLines.get(0));
+    V salesOrder = getVertexEdgeTarget("partOf", salesOrderLines.get(0).getId
+      ());
 
     String label = "SalesInvoice";
 
@@ -601,9 +600,9 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
       e.printStackTrace();
     }
     Date date = config.delayDelayConfiguration(salesOrderDate,
-      (MasterDataTuple) edgeMap.get("processedBy").get(salesOrder), "node",
-      "key");
-    properties.set("date",  new Date());
+      (MasterDataTuple)getMasterDataEdgeTarget("processedBy", salesOrder.getId()),
+      "node", "key");
+    properties.set("date",  date);
 
     salesInvoice = this.vertexFactory.createVertex(label, properties, this
       .graphIds);
@@ -616,31 +615,38 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
       salesInvoice.setProperty("revenue", revenue);
     }
 
-    edgeMap.get("createdFor").put(salesInvoice, salesOrder);
+    newEdge("createdFor", salesInvoice.getId(), salesOrder.getId());
 
+    newVertex(salesInvoice);
     return salesInvoice;
   }
 
 
+  private void newEdge(String label, GradoopId source, GradoopId target) {
+    edges.add(edgeFactory.createEdge(label, source, target));
+    edgeMap.put(new Tuple2<String, GradoopId>(label, source), target);
+  }
+
+  private void newVertex(V vertex) {
+    vertices.add(vertex);
+    vertexMap.put(vertex.getId(), vertex);
+  }
+
+  private AbstractMasterDataTuple getMasterDataEdgeTarget(String edgeLabel,
+    GradoopId source) {
+    return masterDataMap.get(edgeMap.get(new Tuple2<String, GradoopId>
+      (edgeLabel, source)));
+  }
+
+  private V getVertexEdgeTarget(String edgeLabel,
+    GradoopId source) {
+    return vertexMap.get(edgeMap.get(new Tuple2<String, GradoopId>
+      (edgeLabel, source)));
+  }
 
   private<T extends AbstractMasterDataTuple> T getRandomTuple (List<T>
     list){
     //TODO rnd verbessern
     return list.get((int)Math.round(Math.random() * (list.size()-1)));
-  }
-
-  private void initEdgeMap() {
-    edgeMap = Maps.newHashMap();
-    edgeMap.put("sentTo", Maps.<V, Object>newHashMap());
-    edgeMap.put("sentBy", Maps.<V, Object>newHashMap());
-    edgeMap.put("contains", Maps.<V, Object>newHashMap());
-    edgeMap.put("partOf", Maps.<V, Object>newHashMap());
-    edgeMap.put("receivedFrom", Maps.<V, Object>newHashMap());
-    edgeMap.put("serves", Maps.<V, Object>newHashMap());
-    edgeMap.put("placedAt", Maps.<V, Object>newHashMap());
-    edgeMap.put("processedBy", Maps.<V, Object>newHashMap());
-    edgeMap.put("operatedBy", Maps.<V, Object>newHashMap());
-    edgeMap.put("createdFor", Maps.<V, Object>newHashMap());
-    edgeMap.put("basedOn", Maps.<V, Object>newHashMap());
   }
 }
