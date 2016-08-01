@@ -160,10 +160,10 @@ public class FoodBrokerConfig implements Serializable {
     return caseCount;
   }
 
-  public Date getStartDate() {
-    Date startDate = null;
+  public Long getStartDate() {
+    Date startDate = new Date();
 
-    try {
+    /*try {
       startDate = DateUtils.parseDate(root.getJSONObject("Process")
         .getString("startDate"));
     } catch (DateParseException e) {
@@ -171,8 +171,8 @@ public class FoodBrokerConfig implements Serializable {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
-    return startDate;
+*/
+    return startDate.getTime();
   }
 
   public Integer getMasterDataCount(String className) {
@@ -253,7 +253,7 @@ public class FoodBrokerConfig implements Serializable {
     Float value = startValue;
 
     for (T tuple : influencedMasterDataObjects) {
-      if (tuple.getQuality() == 0.66) {
+      if (Math.random() >= 0.66) {
         //getQualityGood()){
         if(higherIsBetter){
           value += influence;
@@ -262,7 +262,7 @@ public class FoodBrokerConfig implements Serializable {
           value -= influence;
         }
       }
-      else if (tuple.getQuality() == getQualityBad()){
+      else if (Math.random() <= getQualityBad()){
         if(higherIsBetter){
           value -= influence;
         }
@@ -357,19 +357,19 @@ public class FoodBrokerConfig implements Serializable {
   }
 
 
-  public Date delayDelayConfiguration (Date date, List<MasterDataTuple>
+  public long delayDelayConfiguration (long date, List<MasterDataTuple>
     influencingMasterDataObjects, String node, String key){
     int delay = getIntRangeConfigurationValue(influencingMasterDataObjects,
       node, key);
 
     Calendar calendar = Calendar.getInstance();
-    calendar.setTime(date);
+    calendar.setTimeInMillis(date);
     calendar.add(Calendar.DATE,delay);
 
-    return calendar.getTime();
+    return calendar.getTimeInMillis();
   }
 
-  public Date delayDelayConfiguration (Date date,
+  public long delayDelayConfiguration (long date,
     MasterDataTuple influencingMasterDataObject, String node, String key) {
     List <MasterDataTuple> influencingMasterDataObjects = new ArrayList<>();
     influencingMasterDataObjects.add(influencingMasterDataObject);

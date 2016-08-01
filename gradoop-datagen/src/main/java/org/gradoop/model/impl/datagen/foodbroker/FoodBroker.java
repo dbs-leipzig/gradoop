@@ -123,6 +123,8 @@ public class FoodBroker
       .union(employees
       .union(products));
 
+    
+
     return GraphCollection.fromDataSets(graphHeads, vertices,
       transactionalEdges, gradoopFlinkConfig);
     }
