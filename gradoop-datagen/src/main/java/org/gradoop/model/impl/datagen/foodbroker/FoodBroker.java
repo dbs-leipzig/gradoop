@@ -116,12 +116,15 @@ public class FoodBroker
 
     DataSet<G> graphHeads = env.fromElements(graphHead);
 
-    return GraphCollection.fromDataSets(graphHeads, transactionalVertices
+    DataSet<V> vertices = transactionalVertices
       .union(customers)
       .union(vendors)
       .union(logistics)
       .union(employees
-      .union(products)), transactionalEdges, gradoopFlinkConfig);
+      .union(products));
+
+    return GraphCollection.fromDataSets(graphHeads, vertices,
+      transactionalEdges, gradoopFlinkConfig);
     }
 
   @Override

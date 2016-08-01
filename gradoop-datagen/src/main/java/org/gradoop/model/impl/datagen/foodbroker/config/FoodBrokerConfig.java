@@ -165,7 +165,7 @@ public class FoodBrokerConfig implements Serializable {
 
     try {
       startDate = DateUtils.parseDate(root.getJSONObject("Process")
-        .getString("casesPerScaleFactor"));
+        .getString("startDate"));
     } catch (DateParseException e) {
       e.printStackTrace();
     } catch (JSONException e) {
