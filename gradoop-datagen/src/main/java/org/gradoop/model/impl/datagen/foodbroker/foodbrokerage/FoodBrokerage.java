@@ -137,7 +137,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     // SalesInvoices;
     V salesInvoice;
 
-    Date startDate = config.getStartDate();
+    long startDate = config.getStartDate();
 
     for (Long seed: iterable) {
       // SalesQuotation
@@ -185,7 +185,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   }
 
   // SalesQuotation
-  private V newSalesQuotation(Date startDate){
+  private V newSalesQuotation(long startDate){
     String label = "SalesQuotation";
     PropertyList properties = new PropertyList();
 
@@ -282,16 +282,11 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
       ("sentTo", salesQuotation.getId()));
 
-    Date salesQuotationDate = null;
-    try {
-      salesQuotationDate = DateUtils.parseDate(salesQuotation
+    Long salesQuotationDate = null;
+      salesQuotationDate = salesQuotation
         .getPropertyValue("date")
-        .getString());
-    } catch (DateParseException e) {
-      e.printStackTrace();
-      System.exit(0);
-    }
-    Date date = config.delayDelayConfiguration(salesQuotationDate,
+        .getLong();
+    long date = config.delayDelayConfiguration(salesQuotationDate,
       influencingMasterData, "SalesQuotation", "confirmationDelay");
     properties.set("date", date);
 
@@ -376,14 +371,9 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     properties.set("kind","TransData");
 
-    Date salesOrderDate = null;
-    try {
-      salesOrderDate = DateUtils.parseDate(salesOrder.getPropertyValue("date")
-        .toString());
-    } catch (DateParseException e) {
-      e.printStackTrace();
-    }
-    Date date = config.delayDelayConfiguration(salesOrderDate,
+    long salesOrderDate = salesOrder.getPropertyValue("date")
+        .getLong();
+    long date = config.delayDelayConfiguration(salesOrderDate,
       (MasterDataTuple) getMasterDataEdgeTarget("processedBy", salesOrder.getId()),
       "PurchOrder", "purchDelay");
 
@@ -490,20 +480,15 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
     deliveryNote = this.vertexFactory.createVertex(label, properties, this.graphIds);
 
-    Date purchOrderDate = null;
-    try {
-      purchOrderDate = DateUtils.parseDate(purchOrder.getPropertyValue("date")
-        .toString());
-    } catch (DateParseException e) {
-      e.printStackTrace();
-    }
+    long purchOrderDate = purchOrder.getPropertyValue("date")
+        .getLong();
     MasterDataTuple operatedBy = getRandomTuple(logistics);
     List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
     influencingMasterData.add(operatedBy);
     influencingMasterData.add((MasterDataTuple)getMasterDataEdgeTarget
       ("placedAt", purchOrder.getId()));
 
-    Date date = config.delayDelayConfiguration(purchOrderDate,
+    long date = config.delayDelayConfiguration(purchOrderDate,
       influencingMasterData, "PurchOrder", "deliveryDelay");
     deliveryNote.setProperty("date", date);
 
@@ -559,14 +544,9 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     properties.set("expense", total);
     properties.set("text", "*** TODO @ FoodBrokerage ***");
 
-    Date purchOrderDate = null;
-    try {
-      purchOrderDate = DateUtils.parseDate(purchOrder.getPropertyValue("date")
-        .toString());
-    } catch (DateParseException e) {
-      e.printStackTrace();
-    }
-    Date date = config.delayDelayConfiguration(purchOrderDate,
+    long purchOrderDate = purchOrder.getPropertyValue("date")
+        .getLong();
+    long date = config.delayDelayConfiguration(purchOrderDate,
       (MasterDataTuple)getMasterDataEdgeTarget("placedAt", purchOrder.getId()),
       "PurchOrder", "invoiceDelay");
     properties.set("date",  new Date());
@@ -592,14 +572,9 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     properties.set("revenue", BigDecimal.ZERO);
     properties.set("text", "*** TODO @ FoodBrokerage ***");
 
-    Date salesOrderDate = null;
-    try {
-      salesOrderDate = DateUtils.parseDate(salesOrder.getPropertyValue("date")
-        .toString());
-    } catch (DateParseException e) {
-      e.printStackTrace();
-    }
-    Date date = config.delayDelayConfiguration(salesOrderDate,
+    long salesOrderDate = salesOrder.getPropertyValue("date")
+        .getLong();
+    long date = config.delayDelayConfiguration(salesOrderDate,
       (MasterDataTuple)getMasterDataEdgeTarget("processedBy", salesOrder.getId()),
       "node", "key");
     properties.set("date",  date);
