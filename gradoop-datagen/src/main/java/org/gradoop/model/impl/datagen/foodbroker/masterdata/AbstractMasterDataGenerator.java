@@ -63,15 +63,15 @@ public abstract class AbstractMasterDataGenerator<V extends EPGMVertex>
 
     List<MasterDataSeed> seedList = new ArrayList<>();
 
-    Map<Integer, Integer> qualityCounts = new HashMap<>();
+    Map<Float, Integer> qualityCounts = new HashMap<>();
 
-    qualityCounts.put(AbstractMasterDataGenerator.GOOD_VALUE, goodCount);
-    qualityCounts.put(AbstractMasterDataGenerator.NORMAL_VALUE, normalCount);
-    qualityCounts.put(AbstractMasterDataGenerator.BAD_VALUE, badCount);
+    qualityCounts.put(foodBrokerConfig.getQualityGood(), goodCount);
+    qualityCounts.put(foodBrokerConfig.getQualityNormal(), normalCount);
+    qualityCounts.put(foodBrokerConfig.getQualityBad(), badCount);
 
-    for(Map.Entry<Integer, Integer> qualityCount : qualityCounts.entrySet()) {
+    for(Map.Entry<Float, Integer> qualityCount : qualityCounts.entrySet()) {
 
-      Integer quality = qualityCount.getKey();
+      Float quality = qualityCount.getKey();
 
       for(int i = 1; i <= qualityCount.getValue(); i++) {
         seedList.add(new MasterDataSeed(i , quality));

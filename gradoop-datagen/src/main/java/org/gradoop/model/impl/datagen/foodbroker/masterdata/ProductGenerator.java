@@ -56,7 +56,7 @@ public class ProductGenerator<V extends EPGMVertex>
     }
 
     return env.fromCollection(seeds)
-      .map(new Product<>(vertexFactory))
+      .map(new Product<>(vertexFactory, foodBrokerConfig))
       .withBroadcastSet(
         env.fromCollection(nameGroupPairs), Product.NAMES_GROUPS_BC)
       .withBroadcastSet(

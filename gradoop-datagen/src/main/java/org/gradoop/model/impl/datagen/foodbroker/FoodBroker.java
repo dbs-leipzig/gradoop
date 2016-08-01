@@ -23,7 +23,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.CollectionGenerator;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.datagen.foodbroker.complainthandling.*;
+import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Customer;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.CustomerGenerator;
@@ -34,14 +34,9 @@ import org.gradoop.model.impl.datagen.foodbroker.masterdata.Product;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.ProductGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Vendor;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.VendorGenerator;
-import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationConfirmation;
-
-
-
 import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage.*;
-
-import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationLineQuality;
-import org.gradoop.model.impl.datagen.foodbroker.functions.SalesQuotationWon;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
+import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
 
@@ -80,45 +75,25 @@ public class FoodBroker
     DataSet<V> products =
       new ProductGenerator<V>(gradoopFlinkConfig, foodBrokerConfig).generate();
 
-    DataSet<Long> caseSeeds = env
-      .generateSequence(1, foodBrokerConfig.getCaseCount());
+    DataSet<Long> caseSeeds = env.generateSequence(1, foodBrokerConfig.getCaseCount());
 
-    // TODO: process simulation
 
     G graphHead = gradoopFlinkConfig.getGraphHeadFactory().createGraphHead();
-    FoodBrokerage<G, V, E> foodBrokerage = new FoodBrokerage<G,V,E>(graphHead,
-      gradoopFlinkConfig.getVertexFactory(), gradoopFlinkConfig
-      .getEdgeFactory(), foodBrokerConfig);
+    FoodBrokerage<G, V, E> foodBrokerage = new FoodBrokerage<G, V, E>(graphHead,
+      gradoopFlinkConfig.getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
 
+    DataSet<GraphTransaction<G, V, E>> graphTransactions = caseSeeds.mapPartition(foodBrokerage)
+      .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()), Customer.CLASS_NAME)
+      .withBroadcastSet(vendors.map(new MasterDataTupleMapper<V>()), Vendor.CLASS_NAME)
+      .withBroadcastSet(logistics.map(new MasterDataTupleMapper<V>()),
+        LogisticsGenerator.CLASS_NAME)
+      .withBroadcastSet(employees.map(new MasterDataTupleMapper<V>()), Employee.CLASS_NAME)
+      .withBroadcastSet(products.map(new ProductTupleMapper<V>()), Product.CLASS_NAME)
+      .returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
 
-    caseSeeds
-      .mapPartition(foodBrokerage)
-      .withBroadcastSet(customers
-        .map(new MasterDataTupleMapper<V>()), Customer.CLASS_NAME)
-      .withBroadcastSet(vendors
-        .map(new MasterDataTupleMapper<V>()), Vendor.CLASS_NAME)
-      .withBroadcastSet(logistics
-        .map(new MasterDataTupleMapper<V>()), LogisticsGenerator.CLASS_NAME)
-      .withBroadcastSet(employees
-        .map(new MasterDataTupleMapper<V>()), Employee.CLASS_NAME)
-      .withBroadcastSet(products
-        .map(new MasterDataTupleMapper<V>()), Product.CLASS_NAME);
-
-
-    DataSet<V> masterData = customers
-      .union(vendors)
-      .union(logistics)
-      .union(employees)
-      .union(products);
-
-    try {
-      masterData
-        .print();
-    } catch (Exception e) {
-      System.out.println(e);
+    return GraphCollection.fromTransactions(
+      new GraphTransactions<G, V, E>(graphTransactions, gradoopFlinkConfig));
     }
-
-    return GraphCollection.createEmptyCollection(gradoopFlinkConfig);  }
 
   @Override
   public String getName() {

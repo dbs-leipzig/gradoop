@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 /**
  * (number, quality)
  */
-public class MasterDataSeed extends Tuple2<Integer, Integer> {
+public class MasterDataSeed extends Tuple2<Integer, Float> {
 
   /**
    * default constructor
@@ -34,7 +34,7 @@ public class MasterDataSeed extends Tuple2<Integer, Integer> {
    * @param number sequence number
    * @param quality master data quality
    */
-  public MasterDataSeed(Integer number, Integer quality) {
+  public MasterDataSeed(Integer number, Float quality) {
     super(number, quality);
   }
 
@@ -42,7 +42,7 @@ public class MasterDataSeed extends Tuple2<Integer, Integer> {
     return this.f0;
   }
 
-  public Integer getQuality() {
+  public Float getQuality() {
     return this.f1;
   }
 }

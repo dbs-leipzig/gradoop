@@ -1,6 +1,5 @@
 package org.gradoop.model.impl.datagen.foodbroker.masterdata;
 
-import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -26,9 +25,9 @@ public class MasterData {
 
     properties.set("num", bid);
     properties.set(Constants.QUALITY, seed.getQuality());
-    properties.set(BusinessTransactionGraphs.SUPERTYPE_KEY,
-      BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER);
-    properties.set(BusinessTransactionGraphs.SOURCEID_KEY, "ERP_" + bid);
+    properties.set(Constants.SUPERTYPE_KEY,
+      Constants.SUPERCLASS_VALUE_MASTER);
+    properties.set(Constants.SOURCEID_KEY, "ERP_" + bid);
 
     return properties;
   }

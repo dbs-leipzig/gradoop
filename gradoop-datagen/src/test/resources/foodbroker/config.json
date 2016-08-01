@@ -61,10 +61,6 @@
       "deliveryAgreementDelayMax" : 4,
       "deliveryAgreementDelayInfluence" : 1,
       "deliveryAgreementDelayHigherIsBetter" : true,
-      "purchaseDelayMin" : 0,
-      "purchaseDelayMax" : 2,
-      "purchaseDelayInfluence" : 2,
-      "purchaseDelayHigherIsBetter" : false,
       "invoiceDelayMin" : 0,
       "invoiceDelayMax" : 3,
       "invoiceDelayInfluence" : -2,
@@ -74,6 +70,10 @@
       "priceVariation" : 0.01,
       "priceVariationInfluence" : -0.02,
       "priceVariationHigherIsBetter" : false,
+      "purchaseDelayMin" : 0,
+      "purchaseDelayMax" : 2,
+      "purchaseDelayInfluence" : 2,
+      "purchaseDelayHigherIsBetter" : false,
       "deliveryDelayMin" : 0,
       "deliveryDelayMax" : 1,
       "deliveryDelayInfluence" : 1,
@@ -81,7 +81,9 @@
       "invoiceDelayMin" : 2,
       "invoiceDelayMax" : 5,
       "invoiceDelayInfluence" : 3,
-      "invoiceDelayHigherIsBetter" : true
+      "invoiceDelayHigherIsBetter" : true,
+      "numberOfVendorsMin" : 1,
+      "numberOfVendorsMax" : 3
     },
     "Ticket" : {
       "badQualityProbability" : 0.05,
@@ -99,13 +101,5 @@
     "good" : 0.66,
     "normal" : 0.33,
     "bad" : 0.01
-  },
-  //TODO check where needed
-  "Amounts" : {
-    "NumberOfVendors" : {
-      "min" : 1,
-      "max" : 3
-    }
   }
-
 }
