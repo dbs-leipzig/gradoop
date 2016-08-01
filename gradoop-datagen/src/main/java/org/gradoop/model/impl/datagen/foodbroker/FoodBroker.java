@@ -67,6 +67,9 @@ public class FoodBroker
   @Override
   public GraphCollection<G, V, E> execute() {
 
+//    // used for type hinting when loading graph head data
+//    TypeInformation<G> graphHeadTypeInfo = TypeExtractor
+//      .createTypeInfo(gradoopFlinkConfig.getGraphHeadFactory().getType());
     // used for type hinting when loading vertex data
     TypeInformation<V> vertexTypeInfo = TypeExtractor
       .createTypeInfo(gradoopFlinkConfig.getVertexFactory().getType());
@@ -91,9 +94,8 @@ public class FoodBroker
 
     DataSet<Long> caseSeeds = env.generateSequence(1, foodBrokerConfig.getCaseCount());
 
-
-    G graphHead = gradoopFlinkConfig.getGraphHeadFactory().createGraphHead();
-    FoodBrokerage<G, V, E> foodBrokerage = new FoodBrokerage<G, V, E>(graphHead,
+    FoodBrokerage<G, V, E> foodBrokerage = new FoodBrokerage<G, V, E>
+      (gradoopFlinkConfig.getGraphHeadFactory(),
       gradoopFlinkConfig.getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
 
     DataSet<Tuple2<Set<V>, Set<E>>> vertexEdgeTuple = caseSeeds.mapPartition
@@ -114,7 +116,9 @@ public class FoodBroker
       .flatMap(new EdgesFromFoodBrokerage<V, E>())
       .returns(edgeTypeInfo);
 
-    DataSet<G> graphHeads = env.fromElements(graphHead);
+    DataSet<G> graphHeads = vertexEdgeTuple
+      .map(new GraphHeadsFromFoodBrokerage<G, V, E>(
+        gradoopFlinkConfig.getGraphHeadFactory()));
 
     DataSet<V> vertices = transactionalVertices
       .union(customers)
