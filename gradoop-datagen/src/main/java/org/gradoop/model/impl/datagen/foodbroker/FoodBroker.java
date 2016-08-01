@@ -119,23 +119,11 @@ public class FoodBroker
         gradoopFlinkConfig.getGraphHeadFactory()))
       .returns(graphHeadTypeInfo);
 
-//    List<G> graphIds = null;
-//    try {
-//       graphIds = graphHeads.collect();
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
-//    GradoopIdSet set = new GradoopIdSet();
-//    for (G graphHead : graphIds) {
-//      System.out.println(graphHead.getId());
-//      set.add(graphHead.getId());
-//    }
-
     DataSet<V> vertices =customers
       .union(vendors)
       .union(logistics)
-      .union(employees
-      .union(products))
+      .union(employees)
+      .union(products)
       .map(new MasterDataGraphIdsFromEdges<G, V, E>())
       .withBroadcastSet(transactionalEdges, Constants.EDGES)
       .union(transactionalVertices);
