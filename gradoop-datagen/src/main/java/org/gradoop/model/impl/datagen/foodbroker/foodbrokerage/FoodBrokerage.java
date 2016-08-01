@@ -30,6 +30,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
@@ -79,9 +80,10 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   private Map<GradoopId, V> vertexMap;
   private Map<GradoopId, AbstractMasterDataTuple> masterDataMap;
 
-  public FoodBrokerage(G graphHead, EPGMVertexFactory<V> vertexFactory,
-    EPGMEdgeFactory<E> edgeFactory, FoodBrokerConfig config) {
-    this.graphHead = graphHead;
+  public FoodBrokerage(EPGMGraphHeadFactory<G> graphHeadFactory,
+    EPGMVertexFactory<V> vertexFactory, EPGMEdgeFactory<E> edgeFactory,
+    FoodBrokerConfig config) {
+    this.graphHead = graphHeadFactory.createGraphHead();
     this.graphIds = new GradoopIdSet();
     graphIds.add(this.graphHead.getId());
     this.vertexFactory = vertexFactory;
@@ -105,6 +107,8 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     logistics = getRuntimeContext().getBroadcastVariable(Logistics.CLASS_NAME);
     employees = getRuntimeContext().getBroadcastVariable(Employee.CLASS_NAME);
     products = getRuntimeContext().getBroadcastVariable(Product.CLASS_NAME);
+
+    initMasterDataMap();
   }
 
   @Override
@@ -189,7 +193,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     String label = "SalesQuotation";
     PropertyList properties = new PropertyList();
 
-    properties.set("date",startDate);
+    properties.set("date",startDate.toString());
     properties.set("kind","TransData");
 
     V salesQuotation = this.vertexFactory.createVertex(label, properties,
@@ -623,5 +627,23 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     list){
     //TODO rnd verbessern
     return list.get((int)Math.round(Math.random() * (list.size()-1)));
+  }
+
+  private void initMasterDataMap() {
+    for (MasterDataTuple customer : customers) {
+      masterDataMap.put(customer.getId(), customer);
+    }
+    for (MasterDataTuple vendor : vendors) {
+      masterDataMap.put(vendor.getId(), vendor);
+    }
+    for (MasterDataTuple logistic : logistics) {
+      masterDataMap.put(logistic.getId(), logistic);
+    }
+    for (MasterDataTuple employee : employees) {
+      masterDataMap.put(employee.getId(), employee);
+    }
+    for (ProductTuple product : products) {
+      masterDataMap.put(product.getId(), product);
+    }
   }
 }
