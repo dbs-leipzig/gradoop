@@ -16,8 +16,11 @@
  */
 package org.gradoop.model.impl.datagen.foodbroker;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -36,8 +39,12 @@ import org.gradoop.model.impl.datagen.foodbroker.masterdata.Vendor;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.VendorGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage.*;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
+
+import java.util.Map;
+import java.util.Set;
 
 
 public class FoodBroker
@@ -59,6 +66,13 @@ public class FoodBroker
 
   @Override
   public GraphCollection<G, V, E> execute() {
+
+    // used for type hinting when loading vertex data
+    TypeInformation<V> vertexTypeInfo = TypeExtractor
+      .createTypeInfo(gradoopFlinkConfig.getVertexFactory().getType());
+    // used for type hinting when loading edge data
+    TypeInformation<E> edgeTypeInfo = TypeExtractor
+      .createTypeInfo(gradoopFlinkConfig.getEdgeFactory().getType());
 
     DataSet<V> customers =
       new CustomerGenerator<V>(gradoopFlinkConfig, foodBrokerConfig).generate();
@@ -82,17 +96,32 @@ public class FoodBroker
     FoodBrokerage<G, V, E> foodBrokerage = new FoodBrokerage<G, V, E>(graphHead,
       gradoopFlinkConfig.getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
 
-    DataSet<GraphTransaction<G, V, E>> graphTransactions = caseSeeds.mapPartition(foodBrokerage)
+    DataSet<Tuple2<Set<V>, Set<E>>> vertexEdgeTuple = caseSeeds.mapPartition
+      (foodBrokerage)
       .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()), Customer.CLASS_NAME)
       .withBroadcastSet(vendors.map(new MasterDataTupleMapper<V>()), Vendor.CLASS_NAME)
       .withBroadcastSet(logistics.map(new MasterDataTupleMapper<V>()),
         LogisticsGenerator.CLASS_NAME)
       .withBroadcastSet(employees.map(new MasterDataTupleMapper<V>()), Employee.CLASS_NAME)
       .withBroadcastSet(products.map(new ProductTupleMapper<V>()), Product.CLASS_NAME)
-      .returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
+      ;//.returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
 
-    return GraphCollection.fromTransactions(
-      new GraphTransactions<G, V, E>(graphTransactions, gradoopFlinkConfig));
+    DataSet<V> transactionalVertices = vertexEdgeTuple
+      .flatMap(new VerticesFromFoodBrokerage<V, E>())
+      .returns(vertexTypeInfo);
+
+    DataSet<E> transactionalEdges = vertexEdgeTuple
+      .flatMap(new EdgesFromFoodBrokerage<V, E>())
+      .returns(edgeTypeInfo);
+
+    DataSet<G> graphHeads = env.fromElements(graphHead);
+
+    return GraphCollection.fromDataSets(graphHeads, transactionalVertices
+      .union(customers)
+      .union(vendors)
+      .union(logistics)
+      .union(employees
+      .union(products)), transactionalEdges, gradoopFlinkConfig);
     }
 
   @Override

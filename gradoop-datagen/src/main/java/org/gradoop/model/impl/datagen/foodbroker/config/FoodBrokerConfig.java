@@ -225,10 +225,24 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   private boolean getHigherIsBetter(String node, String key,
-    boolean defaultValue) throws JSONException {
-    Boolean value = getTransactionalNodes().getJSONObject(node)
-      .getBoolean(key + "HigherIsBetter");
-    return value == null ? defaultValue : value;
+    boolean defaultValue) {
+    Boolean value = defaultValue;
+    try {
+      value = getTransactionalNodes().getJSONObject(node)
+        .getBoolean(key + "HigherIsBetter");
+    } catch (JSONException e) {
+    }
+    return value;
+  }
+
+  private Float getInfluence(String node, String key, Float defaultValue) {
+    Float value = defaultValue;
+    try {
+      value = (float)getTransactionalNodes().getJSONObject(node)
+        .getDouble(key + "Influence");
+    } catch (JSONException e) {
+    }
+    return value;
   }
 
 
@@ -239,7 +253,8 @@ public class FoodBrokerConfig implements Serializable {
     Float value = startValue;
 
     for (T tuple : influencedMasterDataObjects) {
-      if (tuple.getQuality() == getQualityGood()){
+      if (tuple.getQuality() == 0.66) {
+        //getQualityGood()){
         if(higherIsBetter){
           value += influence;
         }
@@ -272,9 +287,7 @@ public class FoodBrokerConfig implements Serializable {
       min = getTransactionalNodes().getJSONObject(node).getInt(key + "Min");
       max = getTransactionalNodes().getJSONObject(node).getInt(key + "Max");
       higherIsBetter = getHigherIsBetter(node, key, true);
-      influence = (float)getTransactionalNodes().getJSONObject(node)
-        .getDouble(key
-        + "Influence");
+      influence = getInfluence(node, key, 0.0f);
 
     } catch (JSONException e) {
       e.printStackTrace();
