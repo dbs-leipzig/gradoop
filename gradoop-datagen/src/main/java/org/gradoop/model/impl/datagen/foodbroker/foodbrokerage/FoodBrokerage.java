@@ -70,6 +70,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
   private G graphHead;
   private GradoopIdSet graphIds;
+  private EPGMGraphHeadFactory<G> graphHeadFactory;
   private EPGMVertexFactory<V> vertexFactory;
   private EPGMEdgeFactory<E> edgeFactory;
 
@@ -83,9 +84,8 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
   public FoodBrokerage(EPGMGraphHeadFactory<G> graphHeadFactory,
     EPGMVertexFactory<V> vertexFactory, EPGMEdgeFactory<E> edgeFactory,
     FoodBrokerConfig config) {
-    this.graphHead = graphHeadFactory.createGraphHead();
-    this.graphIds = new GradoopIdSet();
-    graphIds.add(this.graphHead.getId());
+
+    this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
     this.config = config;
@@ -144,6 +144,10 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
     long startDate = config.getStartDate();
 
     for (Long seed: iterable) {
+      this.graphHead = graphHeadFactory.createGraphHead();
+      this.graphIds = new GradoopIdSet();
+      graphIds.add(this.graphHead.getId());
+
       // SalesQuotation
       salesQuotation = this.newSalesQuotation(startDate);
 
@@ -611,7 +615,7 @@ public class FoodBrokerage<G extends EPGMGraphHead,V extends EPGMVertex, E
 
 
   private void newEdge(String label, GradoopId source, GradoopId target) {
-    edges.add(edgeFactory.createEdge(label, source, target));
+    edges.add(edgeFactory.createEdge(label, source, target, graphIds));
     edgeMap.put(new Tuple2<String, GradoopId>(label, source), target);
   }
 

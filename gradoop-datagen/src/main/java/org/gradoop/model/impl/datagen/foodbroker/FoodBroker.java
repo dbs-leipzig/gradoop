@@ -27,7 +27,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.CollectionGenerator;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.GraphTransactions;
+import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Customer;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.CustomerGenerator;
@@ -39,12 +39,8 @@ import org.gradoop.model.impl.datagen.foodbroker.masterdata.ProductGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Vendor;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.VendorGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage.*;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
-import java.util.Map;
 import java.util.Set;
 
 
@@ -93,7 +89,8 @@ public class FoodBroker
     DataSet<V> products =
       new ProductGenerator<V>(gradoopFlinkConfig, foodBrokerConfig).generate();
 
-    DataSet<Long> caseSeeds = env.generateSequence(1, foodBrokerConfig.getCaseCount());
+    DataSet<Long> caseSeeds = env.generateSequence(1, foodBrokerConfig
+      .getCaseCount());
 
     FoodBrokerage<G, V, E> foodBrokerage = new FoodBrokerage<G, V, E>
       (gradoopFlinkConfig.getGraphHeadFactory(),
@@ -122,12 +119,26 @@ public class FoodBroker
         gradoopFlinkConfig.getGraphHeadFactory()))
       .returns(graphHeadTypeInfo);
 
-    DataSet<V> vertices = transactionalVertices
-      .union(customers)
+//    List<G> graphIds = null;
+//    try {
+//       graphIds = graphHeads.collect();
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+//    GradoopIdSet set = new GradoopIdSet();
+//    for (G graphHead : graphIds) {
+//      System.out.println(graphHead.getId());
+//      set.add(graphHead.getId());
+//    }
+
+    DataSet<V> vertices =customers
       .union(vendors)
       .union(logistics)
       .union(employees
-      .union(products));
+      .union(products))
+      .map(new MasterDataGraphIdsFromEdges<G, V, E>())
+      .withBroadcastSet(transactionalEdges, Constants.EDGES)
+      .union(transactionalVertices);
 
     DataSet<V> salesOrderVertices = transactionalVertices
       .filter(new FilterFunction<V>() {

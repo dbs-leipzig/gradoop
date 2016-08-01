@@ -44,5 +44,7 @@ public class Constants {
    */
   public static final String PRICE = "price";
 
+  public static final String EDGES = "edges";
+
   //TODO constants für alle configzugriffe
 }
