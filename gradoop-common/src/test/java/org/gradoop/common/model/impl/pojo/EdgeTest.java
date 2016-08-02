@@ -11,7 +11,7 @@ import org.junit.Test;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-public class EdgePojoTest {
+public class EdgeTest {
 
   @Test
   public void createWithIDTest() {
@@ -19,7 +19,7 @@ public class EdgePojoTest {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     EPGMEdge e =
-      new EdgePojoFactory().initEdge(edgeId, sourceId, targetId);
+      new EdgeFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getId(), is(edgeId));
     assertThat(e.getSourceId(), is(sourceId));
     assertThat(e.getTargetId(), is(targetId));
@@ -40,7 +40,7 @@ public class EdgePojoTest {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMEdge edge = new EdgePojoFactory()
+    EPGMEdge edge = new EdgeFactory()
       .initEdge(edgeId, label, sourceId, targetId, props, graphIds);
 
     assertThat(edge.getId(), is(edgeId));
@@ -63,7 +63,7 @@ public class EdgePojoTest {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     EPGMEdge e =
-      new EdgePojoFactory().initEdge(edgeId, sourceId, targetId);
+      new EdgeFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
   }
 
@@ -71,21 +71,21 @@ public class EdgePojoTest {
   public void createWithNullIDTest() {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    new EdgePojoFactory().initEdge(null, sourceId, targetId);
+    new EdgeFactory().initEdge(null, sourceId, targetId);
   }
 
   @Test(expected = NullPointerException.class)
   public void createWithNullSourceIdTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    new EdgePojoFactory().initEdge(edgeId, null, targetId);
+    new EdgeFactory().initEdge(edgeId, null, targetId);
   }
 
   @Test(expected = NullPointerException.class)
   public void createWithNullTargetIdTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
-    new EdgePojoFactory().initEdge(edgeId, sourceId, null);
+    new EdgeFactory().initEdge(edgeId, sourceId, null);
   }
 
   @Test(expected = NullPointerException.class)
@@ -93,6 +93,6 @@ public class EdgePojoTest {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    new EdgePojoFactory().initEdge(edgeId, null, sourceId, targetId);
+    new EdgeFactory().initEdge(edgeId, null, sourceId, targetId);
   }
 }

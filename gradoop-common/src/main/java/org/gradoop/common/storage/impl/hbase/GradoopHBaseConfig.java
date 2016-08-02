@@ -22,9 +22,9 @@ import org.gradoop.common.storage.api.GraphHeadHandler;
 import org.gradoop.common.util.GConstants;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.config.GradoopStoreConfig;
-import org.gradoop.common.model.impl.pojo.EdgePojoFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadPojoFactory;
-import org.gradoop.common.model.impl.pojo.VertexPojoFactory;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.storage.api.VertexHandler;
 
@@ -112,11 +112,11 @@ public class GradoopHBaseConfig extends GradoopStoreConfig {
    */
   public static GradoopHBaseConfig getDefaultConfig() {
     GraphHeadHandler graphHeadHandler =
-      new HBaseGraphHeadHandler(new GraphHeadPojoFactory());
+      new HBaseGraphHeadHandler(new GraphHeadFactory());
     VertexHandler vertexHandler =
-      new HBaseVertexHandler(new VertexPojoFactory());
+      new HBaseVertexHandler(new VertexFactory());
     EdgeHandler edgeHandler =
-      new HBaseEdgeHandler(new EdgePojoFactory());
+      new HBaseEdgeHandler(new EdgeFactory());
 
     return new GradoopHBaseConfig(
       graphHeadHandler,

@@ -25,7 +25,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.VertexPojoFactory;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.storage.api.PersistentEdge;
 import org.gradoop.common.storage.api.PersistentGraphHead;
@@ -177,7 +177,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       createEmptyEPGMStore();
 
     PersistentVertexFactory persistentVertexFactory = new HBaseVertexFactory();
-    EPGMVertexFactory vertexFactory = new VertexPojoFactory();
+    EPGMVertexFactory vertexFactory = new VertexFactory();
 
     // list is not supported by
     final List<String> value = Lists.newArrayList();
@@ -206,7 +206,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       createEmptyEPGMStore();
 
     PersistentVertexFactory persistentVertexFactory = new HBaseVertexFactory();
-    EPGMVertexFactory vertexFactory = new VertexPojoFactory();
+    EPGMVertexFactory vertexFactory = new VertexFactory();
 
     final GradoopId vertexID = GradoopId.get();
     final String label = "A";

@@ -19,9 +19,9 @@ package org.gradoop.flink.util;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.impl.pojo.EdgePojoFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadPojoFactory;
-import org.gradoop.common.model.impl.pojo.VertexPojoFactory;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.storage.api.GraphHeadHandler;
 import org.gradoop.common.storage.api.VertexHandler;
@@ -81,11 +81,11 @@ public class GradoopFlinkConfig extends GradoopConfig {
    */
   public static GradoopFlinkConfig createDefaultConfig(ExecutionEnvironment env) {
     HBaseVertexHandler vertexHandler = new HBaseVertexHandler(
-      new VertexPojoFactory());
+      new VertexFactory());
     HBaseEdgeHandler edgeHandler = new HBaseEdgeHandler(
-      new EdgePojoFactory());
+      new EdgeFactory());
     HBaseGraphHeadHandler graphHandler = new HBaseGraphHeadHandler(
-      new GraphHeadPojoFactory());
+      new GraphHeadFactory());
     return new GradoopFlinkConfig(graphHandler, vertexHandler, edgeHandler,
       env);
   }

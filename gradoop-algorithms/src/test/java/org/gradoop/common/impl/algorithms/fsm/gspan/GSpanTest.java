@@ -10,9 +10,9 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DirectedDFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.common.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -63,16 +63,16 @@ public class GSpanTest extends GradoopFlinkTestBase {
       "s6[             (v2:A)-[:a]->(v4:A);             (v3:A)-[:a]->(v4:A)]" +
       "s7[(v1:A)-[:a]->(v2:A)                                              ]";
 
-    FlinkAsciiGraphLoader<GraphHead, VertexPojo, EdgePojo> loader =
+    FlinkAsciiGraphLoader<GraphHead, Vertex, Edge> loader =
       getLoaderFromString(asciiGraphs);
 
-    GraphCollection<GraphHead, VertexPojo, EdgePojo> searchSpace =
+    GraphCollection<GraphHead, Vertex, Edge> searchSpace =
       loader.getGraphCollectionByVariables("g1");
 
     float threshold = 0.7f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    GSpanEncoder<GraphCollection<GraphHead, VertexPojo, EdgePojo>> encoder =
+    GSpanEncoder<GraphCollection<GraphHead, Vertex, Edge>> encoder =
       new GSpanGraphCollectionEncoder<>(fsmConfig);
 
     Collection<GSpanGraph> graphs = encoder

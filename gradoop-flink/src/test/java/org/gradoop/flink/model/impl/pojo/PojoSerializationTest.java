@@ -7,9 +7,9 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EdgePojoFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadPojoFactory;
-import org.gradoop.common.model.impl.pojo.VertexPojoFactory;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.junit.Assert;
@@ -22,7 +22,7 @@ public class PojoSerializationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexSerialization() throws Exception {
-    EPGMVertex vertexIn = new VertexPojoFactory().createVertex(
+    EPGMVertex vertexIn = new VertexFactory().createVertex(
       "Person",
       PropertyList.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES),
       GradoopIdSet.fromExisting(GradoopId.get()));
@@ -33,7 +33,7 @@ public class PojoSerializationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testEdgeSerialization() throws Exception {
-    EPGMEdge edgeIn = new EdgePojoFactory().createEdge(
+    EPGMEdge edgeIn = new EdgeFactory().createEdge(
       "knows",
       GradoopId.get(),
       GradoopId.get(),
@@ -46,7 +46,7 @@ public class PojoSerializationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGraphHeadSerialization() throws Exception {
-    EPGMGraphHead graphHeadIn = new GraphHeadPojoFactory().createGraphHead(
+    EPGMGraphHead graphHeadIn = new GraphHeadFactory().createGraphHead(
       "Community",
       PropertyList.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES)
     );

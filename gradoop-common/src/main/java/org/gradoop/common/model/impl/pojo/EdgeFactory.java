@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory for creating edge POJOs.
  */
-public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
+public class EdgeFactory implements EPGMEdgeFactory, Serializable {
 
   /**
    * serial version uid
@@ -42,7 +42,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(GradoopId sourceVertexId,
+  public Edge createEdge(GradoopId sourceVertexId,
     GradoopId targetVertexId) {
     return initEdge(GradoopId.get(), sourceVertexId, targetVertexId);
   }
@@ -51,7 +51,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo initEdge(final GradoopId id, final GradoopId sourceVertexId,
+  public Edge initEdge(final GradoopId id, final GradoopId sourceVertexId,
     final GradoopId targetVertexId) {
     return initEdge(id, GConstants.DEFAULT_EDGE_LABEL, sourceVertexId,
       targetVertexId);
@@ -61,7 +61,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(String label, GradoopId sourceVertexId,
+  public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId) {
     return initEdge(GradoopId.get(), label, sourceVertexId, targetVertexId);
   }
@@ -70,7 +70,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo initEdge(final GradoopId id, final String label,
+  public Edge initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId) {
     return initEdge(id, label, sourceVertexId, targetVertexId, null, null);
   }
@@ -79,7 +79,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(String label, GradoopId sourceVertexId,
+  public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, PropertyList properties) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, properties);
@@ -89,7 +89,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo initEdge(
+  public Edge initEdge(
     GradoopId id,
     String label,
     GradoopId sourceVertexId,
@@ -104,7 +104,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(String label, GradoopId sourceVertexId,
+  public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, GradoopIdSet graphIds) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, graphIds);
@@ -114,7 +114,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo initEdge(final GradoopId id, final String label,
+  public Edge initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
     GradoopIdSet graphs) {
     return initEdge(id, label, sourceVertexId, targetVertexId, null, graphs);
@@ -124,7 +124,7 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo createEdge(String label, GradoopId sourceVertexId,
+  public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, PropertyList properties,
     GradoopIdSet graphIds) {
     return initEdge(GradoopId.get(),
@@ -135,19 +135,19 @@ public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public EdgePojo initEdge(final GradoopId id, final String label,
+  public Edge initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
     final PropertyList properties, GradoopIdSet graphIds) {
     checkNotNull(id, "Identifier was null");
     checkNotNull(label, "Label was null");
     checkNotNull(sourceVertexId, "Source vertex id was null");
     checkNotNull(targetVertexId, "Target vertex id was null");
-    return new EdgePojo(id, label, sourceVertexId, targetVertexId,
+    return new Edge(id, label, sourceVertexId, targetVertexId,
       properties, graphIds);
   }
 
   @Override
   public Class<? extends EPGMEdge> getType() {
-    return EdgePojo.class;
+    return Edge.class;
   }
 }

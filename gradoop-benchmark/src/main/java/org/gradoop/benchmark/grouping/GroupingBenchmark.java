@@ -29,9 +29,9 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Cou
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MinAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-import org.gradoop.common.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.io.File;
 import java.io.IOException;
@@ -217,7 +217,7 @@ public class GroupingBenchmark
     readCMDArguments(cmd);
 
     // initialize EPGM database
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graphDatabase =
+    LogicalGraph<GraphHead, Vertex, Edge> graphDatabase =
       readLogicalGraph(INPUT_PATH, false);
 
     // initialize grouping keys

@@ -24,9 +24,9 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
-import org.gradoop.common.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * A dedicated program for parametrized graph grouping.
@@ -103,7 +103,7 @@ public class GroupingRunner
     boolean useEdgeLabels = cmd.hasOption(OPTION_USE_EDGE_LABELS);
 
     // initialize EPGM database
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> graphDatabase =
+    LogicalGraph<GraphHead, Vertex, Edge> graphDatabase =
       readLogicalGraph(inputPath, false);
 
     // initialize grouping method

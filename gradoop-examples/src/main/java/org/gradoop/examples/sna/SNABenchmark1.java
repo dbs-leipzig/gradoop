@@ -25,9 +25,9 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.common.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * The benchmark program executes the following workflow:
@@ -68,10 +68,10 @@ public class SNABenchmark1
     String inputDir  = args[0];
     String outputDir = args[1];
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> epgmDatabase =
+    LogicalGraph<GraphHead, Vertex, Edge> epgmDatabase =
       readLogicalGraph(inputDir);
 
-    LogicalGraph<GraphHead, VertexPojo, EdgePojo> result =
+    LogicalGraph<GraphHead, Vertex, Edge> result =
       execute(epgmDatabase);
 
     writeLogicalGraph(result, outputDir);
@@ -83,29 +83,29 @@ public class SNABenchmark1
    * @param socialNetwork social network graph
    * @return summarized, aggregated graph
    */
-  private static LogicalGraph<GraphHead, VertexPojo, EdgePojo>
-  execute(LogicalGraph<GraphHead, VertexPojo, EdgePojo> socialNetwork) {
+  private static LogicalGraph<GraphHead, Vertex, Edge>
+  execute(LogicalGraph<GraphHead, Vertex, Edge> socialNetwork) {
     return socialNetwork
       .subgraph(
-        new FilterFunction<VertexPojo>() {
+        new FilterFunction<Vertex>() {
           @Override
-          public boolean filter(VertexPojo vertex) throws Exception {
+          public boolean filter(Vertex vertex) throws Exception {
             return vertex.getLabel().equals("person");
           }
         },
-        new FilterFunction<EdgePojo>() {
+        new FilterFunction<Edge>() {
           @Override
-          public boolean filter(EdgePojo edge) throws Exception {
+          public boolean filter(Edge edge) throws Exception {
             return edge.getLabel().equals("knows");
           }
         })
       .groupBy(Lists.newArrayList("gender", "city"))
       .aggregate(
         "vertexCount",
-        new VertexCount<GraphHead, VertexPojo, EdgePojo>())
+        new VertexCount<GraphHead, Vertex, Edge>())
       .aggregate(
         "edgeCount",
-        new EdgeCount<GraphHead, VertexPojo, EdgePojo>());
+        new EdgeCount<GraphHead, Vertex, Edge>());
   }
 
   @Override

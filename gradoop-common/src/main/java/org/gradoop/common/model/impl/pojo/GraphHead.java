@@ -17,40 +17,37 @@
 
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
- * POJO Implementation of an EPGM vertex.
+ * POJO Implementation of an EPGM graph head.
  */
-public class VertexPojo extends GraphElementPojo implements EPGMVertex {
+public class GraphHead extends Element implements EPGMGraphHead {
 
   /**
    * Default constructor.
    */
-  public VertexPojo() {
+  public GraphHead() {
   }
 
   /**
-   * Creates a vertex based on the given parameters.
+   * Creates a graph head based on the given parameters.
    *
-   * @param id         vertex identifier
-   * @param label      vertex label
-   * @param properties vertex properties
-   * @param graphs     graphs that vertex is contained in
+   * @param id         graph identifier
+   * @param label      graph label
+   * @param properties graph properties
    */
-  VertexPojo(
+  GraphHead(
     final GradoopId id,
     final String label,
-    final PropertyList properties,
-    final GradoopIdSet graphs) {
-    super(id, label, properties, graphs);
+    final PropertyList properties) {
+    super(id, label, properties);
   }
 
   @Override
   public String toString() {
-    return String.format("(%s)", super.toString());
+    return super.toString() + "[]";
   }
 }

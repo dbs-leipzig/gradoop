@@ -18,9 +18,9 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBul
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.common.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void testPredictableBenchmark() throws Exception {
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions =
+    GraphTransactions<GraphHead, Vertex, Edge> transactions =
       new PredictableTransactionsGenerator<>(2, 1, true, getConfig())
         .execute();
 
@@ -43,14 +43,14 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     String tlfFile =  GSpanEncoderTest
       .class.getResource("/data/tlf").getFile() + "/benchmark.tlf";
 
-    DataSink<GraphHead, VertexPojo, EdgePojo> dataSink =
+    DataSink<GraphHead, Vertex, Edge> dataSink =
       new TLFDataSink<>(tlfFile, config);
 
     dataSink.write(transactions);
 
     getExecutionEnvironment().execute();
 
-    TLFDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHead, Vertex, Edge> dataSource =
       new TLFDataSource<>(tlfFile, config);
 
     DataSet<TLFGraph> graphs = dataSource.getTLFGraphs();
@@ -88,7 +88,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     FSMConfig fsmConfig = new FSMConfig(0.5f, false);
 
-    TLFDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHead, Vertex, Edge> dataSource =
       new TLFDataSource<>(tlfFile, config);
 
     GSpanEncoder tlfEncoder = new GSpanTLFGraphEncoder<>(fsmConfig);
@@ -115,16 +115,16 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void encode() throws Exception {
-    TLFDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHead, Vertex, Edge> dataSource =
       getDataSource();
 
     float threshold = 0.1f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    GSpanGraphTransactionsEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphTransactionsEncoder<GraphHead, Vertex, Edge>
       tEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
-    GSpanGraphCollectionEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphCollectionEncoder<GraphHead, Vertex, Edge>
       cEncoder = new GSpanGraphCollectionEncoder<>(fsmConfig);
 
     GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder(fsmConfig);
@@ -164,16 +164,16 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void getMinFrequency() throws Exception {
-    TLFDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHead, Vertex, Edge> dataSource =
       getDataSource();
 
     float threshold = 0.4f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    GSpanGraphTransactionsEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphTransactionsEncoder<GraphHead, Vertex, Edge>
       tEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
-    GSpanGraphCollectionEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphCollectionEncoder<GraphHead, Vertex, Edge>
       cEncoder = new GSpanGraphCollectionEncoder<>(fsmConfig);
 
     GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder(fsmConfig);
@@ -194,16 +194,16 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void getVertexLabelDictionary() throws Exception {
-    TLFDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHead, Vertex, Edge> dataSource =
       getDataSource();
 
     float threshold = 0.4f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    GSpanGraphTransactionsEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphTransactionsEncoder<GraphHead, Vertex, Edge>
       tEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
-    GSpanGraphCollectionEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphCollectionEncoder<GraphHead, Vertex, Edge>
       cEncoder = new GSpanGraphCollectionEncoder<>(fsmConfig);
 
     GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder(fsmConfig);
@@ -225,16 +225,16 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void getEdgeLabelDictionary() throws Exception {
-    TLFDataSource<GraphHead, VertexPojo, EdgePojo> dataSource =
+    TLFDataSource<GraphHead, Vertex, Edge> dataSource =
       getDataSource();
 
     float threshold = 0.4f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    GSpanGraphTransactionsEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphTransactionsEncoder<GraphHead, Vertex, Edge>
       tEncoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
-    GSpanGraphCollectionEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphCollectionEncoder<GraphHead, Vertex, Edge>
       cEncoder = new GSpanGraphCollectionEncoder<>(fsmConfig);
 
     GSpanTLFGraphEncoder tlfEncoder = new GSpanTLFGraphEncoder(fsmConfig);
@@ -268,7 +268,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     }
   }
 
-  private TLFDataSource<GraphHead, VertexPojo, EdgePojo> getDataSource() {
+  private TLFDataSource<GraphHead, Vertex, Edge> getDataSource() {
     String tlfFile =
       GSpanEncoderTest.class.getResource("/data/tlf/graphs.tlf").getFile();
 

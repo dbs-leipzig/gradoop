@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.properties.PropertyList;
 /**
  * Abstract base class for graphs, vertices and edges.
  */
-public abstract class ElementPojo implements EPGMElement {
+public abstract class Element implements EPGMElement {
   /**
    * Entity identifier.
    */
@@ -46,7 +46,7 @@ public abstract class ElementPojo implements EPGMElement {
   /**
    * Default constructor.
    */
-  protected ElementPojo() {
+  protected Element() {
   }
 
   /**
@@ -57,7 +57,7 @@ public abstract class ElementPojo implements EPGMElement {
    * @param label      entity label
    * @param properties key-value properties
    */
-  protected ElementPojo(
+  protected Element(
     GradoopId id, String label, PropertyList properties) {
     this.id = id;
     this.label = label;
@@ -181,7 +181,7 @@ public abstract class ElementPojo implements EPGMElement {
       return false;
     }
 
-    ElementPojo that = (ElementPojo) o;
+    Element that = (Element) o;
 
     return !(id != null ? !id.equals(that.id) : that.id != null);
   }

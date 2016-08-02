@@ -14,9 +14,9 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.flink.model.impl.operators.count.Count;
-import org.gradoop.common.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMinersSeparatelyDirected() throws Exception {
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions =
+    GraphTransactions<GraphHead, Vertex, Edge> transactions =
       new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
         .execute();
 
@@ -35,7 +35,7 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
 
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    GSpanGraphTransactionsEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphTransactionsEncoder<GraphHead, Vertex, Edge>
       encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     DataSet<GSpanGraph> edges = encoder.encode(transactions, fsmConfig);
@@ -55,7 +55,7 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMinersSeparatelyUndirected() throws Exception {
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions =
+    GraphTransactions<GraphHead, Vertex, Edge> transactions =
       new PredictableTransactionsGenerator<>(10, 1, true, getConfig())
         .execute();
 
@@ -63,7 +63,7 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
 
     FSMConfig fsmConfig = new FSMConfig(threshold, false);
 
-    GSpanGraphTransactionsEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphTransactionsEncoder<GraphHead, Vertex, Edge>
       encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     DataSet<GSpanGraph> edges = encoder.encode(transactions, fsmConfig);
@@ -91,14 +91,14 @@ public class GSpanMinerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMinersVersus() throws Exception {
-    GraphTransactions<GraphHead, VertexPojo, EdgePojo> transactions =
+    GraphTransactions<GraphHead, Vertex, Edge> transactions =
       new PredictableTransactionsGenerator<>(30, 1, true, getConfig())
         .execute();
 
     float threshold = 0.4f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    GSpanGraphTransactionsEncoder<GraphHead, VertexPojo, EdgePojo>
+    GSpanGraphTransactionsEncoder<GraphHead, Vertex, Edge>
       encoder = new GSpanGraphTransactionsEncoder<>(fsmConfig);
 
     DataSet<GSpanGraph> graphs = encoder.encode(transactions, fsmConfig);

@@ -26,8 +26,8 @@ import org.gradoop.common.model.impl.properties.PropertyList;
  * Abstract class representing an EPGM element that is contained in a logical
  * graph (i.e. vertices and edges).
  */
-public abstract class GraphElementPojo
-  extends ElementPojo
+public abstract class GraphElement
+  extends Element
   implements EPGMGraphElement {
 
   /**
@@ -38,7 +38,7 @@ public abstract class GraphElementPojo
   /**
    * Default constructor.
    */
-  protected GraphElementPojo() {
+  protected GraphElement() {
   }
 
   /**
@@ -48,7 +48,7 @@ public abstract class GraphElementPojo
    * @param properties element properties
    * @param graphIds     graphIds that element is contained in
    */
-  protected GraphElementPojo(GradoopId id, String label,
+  protected GraphElement(GradoopId id, String label,
     PropertyList properties, GradoopIdSet graphIds) {
     super(id, label, properties);
     this.graphIds = graphIds;

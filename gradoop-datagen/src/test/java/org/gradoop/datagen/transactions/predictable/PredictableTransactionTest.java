@@ -18,9 +18,9 @@
 package org.gradoop.datagen.transactions.predictable;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class PredictableTransactionTest extends GradoopFlinkTestBase {
   public void testMaxVertexLabel() throws Exception {
     for(long maxVertexLabel = 0; maxVertexLabel < 10; maxVertexLabel++) {
       // multigraph
-      GraphTransaction<GraphHead, VertexPojo, EdgePojo> graph =
+      GraphTransaction<GraphHead, Vertex, Edge> graph =
         new PredictableTransaction<>(1, true, getConfig()).map(maxVertexLabel);
 
       assertEquals(
@@ -54,10 +54,10 @@ public class PredictableTransactionTest extends GradoopFlinkTestBase {
   @Test
   public void testGraphSize() throws Exception {
     // multigraph
-    GraphTransaction<GraphHead, VertexPojo, EdgePojo> size1 =
+    GraphTransaction<GraphHead, Vertex, Edge> size1 =
       new PredictableTransaction<>(1, true, getConfig()).map(7L);
 
-    GraphTransaction<GraphHead, VertexPojo, EdgePojo> size2 =
+    GraphTransaction<GraphHead, Vertex, Edge> size2 =
       new PredictableTransaction<>(2, true, getConfig()).map(7L);
 
     assertEquals(

@@ -28,12 +28,12 @@ import org.junit.Test;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-public class VertexPojoTest {
+public class VertexTest {
 
   @Test
   public void createWithIDTest() {
     GradoopId vertexID = GradoopId.get();
-    EPGMVertex v = new VertexPojoFactory().initVertex(vertexID);
+    EPGMVertex v = new VertexFactory().initVertex(vertexID);
     assertThat(v.getId(), is(vertexID));
     assertThat(v.getPropertyCount(), is(0));
     assertThat(v.getGraphCount(), is(0));
@@ -54,7 +54,7 @@ public class VertexPojoTest {
     graphIds.add(graphId1);
     graphIds.add(graphId2);
 
-    EPGMVertex vertex = new VertexPojoFactory()
+    EPGMVertex vertex = new VertexFactory()
       .initVertex(vertexID, label, props, graphIds);
 
     assertThat(vertex.getId(), is(vertexID));
@@ -70,18 +70,18 @@ public class VertexPojoTest {
   @Test
   public void createWithMissingLabelTest() {
     GradoopId vertexID = GradoopId.get();
-    EPGMVertex v = new VertexPojoFactory().initVertex(vertexID);
+    EPGMVertex v = new VertexFactory().initVertex(vertexID);
     assertThat(v.getLabel(), is(GConstants.DEFAULT_VERTEX_LABEL));
   }
 
   @Test(expected = NullPointerException.class)
   public void createWithNullIDTest() {
-    new VertexPojoFactory().initVertex(null);
+    new VertexFactory().initVertex(null);
   }
 
   @Test(expected = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId vertexID = GradoopId.get();
-    new VertexPojoFactory().initVertex(vertexID, null);
+    new VertexFactory().initVertex(vertexID, null);
   }
 }

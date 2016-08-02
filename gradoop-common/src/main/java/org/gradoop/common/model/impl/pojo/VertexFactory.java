@@ -30,7 +30,7 @@ import java.io.Serializable;
 /**
  * Factory for creating vertex POJOs.
  */
-public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
+public class VertexFactory implements EPGMVertexFactory, Serializable {
 
   /**
    * serial version uid
@@ -41,7 +41,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex() {
+  public Vertex createVertex() {
     return initVertex(GradoopId.get());
   }
 
@@ -49,7 +49,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo initVertex(final GradoopId vertexID) {
+  public Vertex initVertex(final GradoopId vertexID) {
     return initVertex(vertexID, GConstants.DEFAULT_VERTEX_LABEL, null, null);
   }
 
@@ -57,7 +57,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(String label) {
+  public Vertex createVertex(String label) {
     return initVertex(GradoopId.get(), label);
   }
 
@@ -65,7 +65,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo initVertex(final GradoopId vertexID, final String label) {
+  public Vertex initVertex(final GradoopId vertexID, final String label) {
     return initVertex(vertexID, label, null, null);
   }
 
@@ -73,7 +73,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(String label, PropertyList properties) {
+  public Vertex createVertex(String label, PropertyList properties) {
     return initVertex(GradoopId.get(), label, properties);
   }
 
@@ -81,7 +81,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo initVertex(final GradoopId vertexID, final String label,
+  public Vertex initVertex(final GradoopId vertexID, final String label,
     PropertyList properties) {
     return initVertex(vertexID, label, properties, null);
   }
@@ -90,7 +90,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(String label, GradoopIdSet graphIds) {
+  public Vertex createVertex(String label, GradoopIdSet graphIds) {
     return initVertex(GradoopId.get(), label, graphIds);
   }
 
@@ -98,7 +98,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo initVertex(final GradoopId vertexID, final String label,
+  public Vertex initVertex(final GradoopId vertexID, final String label,
     final GradoopIdSet graphs) {
     return initVertex(vertexID, label, null, graphs);
   }
@@ -107,7 +107,7 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo createVertex(String label, PropertyList properties,
+  public Vertex createVertex(String label, PropertyList properties,
     GradoopIdSet graphIds) {
     return initVertex(GradoopId.get(), label, properties, graphIds);
   }
@@ -116,15 +116,15 @@ public class VertexPojoFactory implements EPGMVertexFactory, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public VertexPojo initVertex(final GradoopId id, final String label,
+  public Vertex initVertex(final GradoopId id, final String label,
     final PropertyList properties, final GradoopIdSet graphs) {
     Preconditions.checkNotNull(id, "Identifier was null");
     Preconditions.checkNotNull(label, "Label was null");
-    return new VertexPojo(id, label, properties, graphs);
+    return new Vertex(id, label, properties, graphs);
   }
 
   @Override
   public Class<? extends EPGMVertex> getType() {
-    return VertexPojo.class;
+    return Vertex.class;
   }
 }
