@@ -17,8 +17,8 @@
 
 package org.gradoop.common.storage.api;
 
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.io.Serializable;
 

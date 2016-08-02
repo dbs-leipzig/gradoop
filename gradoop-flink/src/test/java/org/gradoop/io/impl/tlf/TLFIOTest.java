@@ -22,7 +22,7 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.tlf.TLFDataSink;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.common.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;

@@ -28,9 +28,9 @@ import org.gradoop.flink.model.impl.operators.cloning.functions
 import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeTargetUpdateJoin;
 import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpdater;
 import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Clone;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;

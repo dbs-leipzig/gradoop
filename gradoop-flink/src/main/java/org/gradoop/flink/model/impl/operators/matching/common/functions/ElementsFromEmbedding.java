@@ -24,13 +24,13 @@ import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query
   .TraversalCode;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.EdgeFactory;
-import org.gradoop.common.model.api.epgm.Element;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.GraphHeadFactory;
-import org.gradoop.common.model.api.epgm.Vertex;
-import org.gradoop.common.model.api.epgm.VertexFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 

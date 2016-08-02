@@ -17,8 +17,8 @@
 
 package org.gradoop.common.storage.impl.hbase;
 
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;

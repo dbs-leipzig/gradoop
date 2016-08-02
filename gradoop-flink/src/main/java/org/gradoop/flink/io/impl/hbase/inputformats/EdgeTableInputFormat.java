@@ -21,8 +21,7 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.util.GConstants;
 

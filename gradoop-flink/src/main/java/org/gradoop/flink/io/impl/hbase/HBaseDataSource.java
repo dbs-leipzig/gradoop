@@ -31,9 +31,9 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.flink.io.impl.hbase.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.flink.io.impl.hbase.inputformats.VertexTableInputFormat;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 

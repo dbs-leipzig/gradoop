@@ -17,9 +17,9 @@
 
 package org.gradoop.common.config;
 
-import org.gradoop.common.model.api.epgm.EdgeFactory;
-import org.gradoop.common.model.api.epgm.GraphHeadFactory;
-import org.gradoop.common.model.api.epgm.VertexFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadPojoFactory;
 import org.gradoop.common.model.impl.pojo.VertexPojoFactory;

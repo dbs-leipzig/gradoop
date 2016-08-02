@@ -20,7 +20,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.types.NullValue;
-import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.entities.Edge;
 
 /**
  * Maps EPGM edge to a Gelly edge consisting of EPGM source and target

@@ -18,9 +18,9 @@
 package org.gradoop.common.storage.api;
 
 import org.gradoop.common.config.GradoopStoreConfig;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.IOException;

@@ -24,9 +24,9 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.functions.graphcontainment
   .AddToGraphBroadcast;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.util.GConstants;

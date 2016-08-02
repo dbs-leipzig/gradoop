@@ -1,7 +1,7 @@
 package org.gradoop.model.impl.operators.base;
 
 import org.gradoop.common.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.epgm.GraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 
 import java.util.Set;
 

@@ -25,8 +25,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions
   .GetPropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions
   .GraphIdsWithPropertyValue;
-import org.gradoop.common.model.api.epgm.Element;
-import org.gradoop.common.model.api.epgm.GraphElement;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 

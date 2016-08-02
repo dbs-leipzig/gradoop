@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.model.impl.operators.matching.common.matching
   .EntityMatcher;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Collection;
 

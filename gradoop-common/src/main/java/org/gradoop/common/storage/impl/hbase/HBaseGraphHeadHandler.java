@@ -28,8 +28,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.GraphHeadHandler;
 import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.util.GConstants;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 
 import java.io.IOException;
 import java.util.Set;

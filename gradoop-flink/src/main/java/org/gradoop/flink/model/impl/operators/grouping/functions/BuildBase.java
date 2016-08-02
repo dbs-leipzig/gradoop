@@ -20,8 +20,8 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import com.google.common.collect.Lists;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .CountAggregator;
-import org.gradoop.common.model.api.epgm.Attributed;
-import org.gradoop.common.model.api.epgm.Labeled;
+import org.gradoop.common.model.api.entities.Attributed;
+import org.gradoop.common.model.api.entities.Labeled;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;

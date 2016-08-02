@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.epgm.Vertex;
-import org.gradoop.common.model.api.epgm.VertexFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 

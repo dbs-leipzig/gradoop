@@ -19,9 +19,6 @@ package org.gradoop.flink.io.impl.tlf;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
 
 import java.util.Map;
 

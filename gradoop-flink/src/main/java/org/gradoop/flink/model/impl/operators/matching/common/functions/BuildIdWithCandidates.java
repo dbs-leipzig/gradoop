@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.matching
   .EntityMatcher;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples
   .IdWithCandidates;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Collection;
 

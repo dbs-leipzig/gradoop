@@ -18,7 +18,7 @@
 package org.gradoop.common.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
-import org.gradoop.common.model.api.epgm.Element;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;

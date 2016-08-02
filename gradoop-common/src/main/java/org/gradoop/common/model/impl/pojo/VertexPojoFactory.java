@@ -19,11 +19,11 @@ package org.gradoop.common.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
 import org.gradoop.common.util.GConstants;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.PropertyList;
-import org.gradoop.common.model.api.epgm.VertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 
 import java.io.Serializable;
 

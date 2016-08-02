@@ -19,7 +19,7 @@ package org.gradoop.flink.io.impl.hbase.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.storage.api.PersistentGraphHead;

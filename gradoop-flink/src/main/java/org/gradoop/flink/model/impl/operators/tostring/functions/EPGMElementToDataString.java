@@ -17,7 +17,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gradoop.common.model.api.epgm.Element;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyList;
 

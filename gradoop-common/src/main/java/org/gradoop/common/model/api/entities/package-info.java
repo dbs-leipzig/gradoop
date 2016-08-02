@@ -15,11 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.common.model.api.epgm;
-
 /**
- * Describes data specifically assigned to a logical graph in the EPGM.
+ * Contains all interfaces defining the Extended EPGMProperty Graph model.
  */
-public interface GraphHead extends Element {
-
-}
+package org.gradoop.common.model.api.entities;

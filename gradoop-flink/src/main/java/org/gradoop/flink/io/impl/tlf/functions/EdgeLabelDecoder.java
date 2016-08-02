@@ -20,7 +20,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
-import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.entities.Edge;
 
 import java.util.HashMap;
 import java.util.Map;

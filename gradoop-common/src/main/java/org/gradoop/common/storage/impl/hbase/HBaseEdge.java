@@ -19,8 +19,8 @@ package org.gradoop.common.storage.impl.hbase;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.PersistentEdge;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
  * Represents a persistent edge data object.

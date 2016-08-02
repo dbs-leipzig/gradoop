@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.common.model.api.epgm.Labeled;
+import org.gradoop.common.model.api.entities.Labeled;
 
 /**
  * concatenates the labels of labeled things

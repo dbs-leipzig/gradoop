@@ -17,7 +17,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.api;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**

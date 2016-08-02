@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.storage.api.ElementHandler;
 import org.gradoop.common.util.GConstants;
-import org.gradoop.common.model.api.epgm.Element;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
 import java.io.IOException;

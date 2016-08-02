@@ -24,8 +24,8 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 

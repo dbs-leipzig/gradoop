@@ -17,7 +17,7 @@
 
 package org.gradoop.common.storage.api;
 
-import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 import java.io.Serializable;

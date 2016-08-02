@@ -32,9 +32,9 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.TargetStringUpd
 import org.gradoop.flink.model.impl.operators.tostring.functions.UndirectedAdjacencyList;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.common.model.impl.id.GradoopId;

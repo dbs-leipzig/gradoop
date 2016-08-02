@@ -29,9 +29,9 @@ import org.gradoop.flink.model.impl.operators.split.functions.InitGraphHead;
 import org.gradoop.flink.model.impl.operators.split.functions
   .JoinVertexIdWithGraphIds;
 import org.gradoop.flink.model.impl.operators.split.functions.SplitValues;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.functions.UnaryFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;

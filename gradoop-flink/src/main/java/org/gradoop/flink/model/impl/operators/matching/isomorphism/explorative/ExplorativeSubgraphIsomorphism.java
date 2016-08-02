@@ -55,11 +55,11 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism
 import org.gradoop.flink.model.impl.operators.matching.isomorphism
   .explorative.tuples.VertexStep;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.api.epgm.Element;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.GraphHeadFactory;
-import org.gradoop.common.model.api.epgm.Vertex;
-import org.gradoop.common.model.api.epgm.VertexFactory;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;

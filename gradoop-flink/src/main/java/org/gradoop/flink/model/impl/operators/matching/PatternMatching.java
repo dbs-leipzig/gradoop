@@ -29,8 +29,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.debug
 import org.gradoop.flink.model.impl.operators.matching.common.debug
   .PrintTripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithPropertyValue;
 import org.gradoop.common.model.impl.id.GradoopId;

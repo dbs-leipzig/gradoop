@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.matching;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.api.epgm.Element;
+import org.gradoop.common.model.api.entities.Element;
 import org.s1ck.gdl.model.GraphElement;
 
 import java.util.Collection;

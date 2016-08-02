@@ -28,9 +28,7 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.ExpandGraphsToIds
 import org.gradoop.flink.model.impl.operators.aggregation.functions
   .GroupCountToPropertyValue;
 import org.gradoop.flink.model.impl.operators.count.Count;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 

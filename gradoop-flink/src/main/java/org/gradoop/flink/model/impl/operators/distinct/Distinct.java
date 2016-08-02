@@ -21,7 +21,7 @@ import org.gradoop.flink.model.api.operators
   .UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 
 /**
  * Returns a distinct collection of logical graphs. Graph heads are compared

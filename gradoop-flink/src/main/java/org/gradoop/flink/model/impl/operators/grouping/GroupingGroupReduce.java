@@ -30,8 +30,8 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVert
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;

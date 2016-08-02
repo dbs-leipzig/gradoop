@@ -15,17 +15,10 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.common.model.api.epgm;
-
-import java.io.Serializable;
+package org.gradoop.common.model.api.entities;
 
 /**
- * Base interface for all elements in the EPGM.
- *
- * @see GraphHead
- * @see Vertex
- * @see Edge
+ * Describes data assigned to a vertex in the EPGM.
  */
-public interface Element
-  extends Identifiable, Labeled, Attributed, Serializable {
+public interface Vertex extends GraphElement {
 }

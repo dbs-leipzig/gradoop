@@ -18,7 +18,7 @@
 package org.gradoop.flink.io.impl.graph.functions;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.gradoop.common.model.api.epgm.Element;
+import org.gradoop.common.model.api.entities.Element;
 
 import java.io.Serializable;
 

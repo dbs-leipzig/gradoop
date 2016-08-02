@@ -20,7 +20,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.List;

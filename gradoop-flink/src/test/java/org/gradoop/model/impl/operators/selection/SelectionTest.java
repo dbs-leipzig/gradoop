@@ -2,7 +2,7 @@ package org.gradoop.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;

@@ -57,10 +57,10 @@ import org.gradoop.flink.model.impl.operators.tostring.functions
 import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphElement;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
@@ -87,7 +87,7 @@ import static org.apache.flink.shaded.com.google.common.base.Preconditions
  * vertices and edges, the collections contains a single gelly graph
  * representing all subgraphs. Graph data is stored in an additional dataset.
  */
-public class GraphCollection extends GraphBase 
+public class GraphCollection extends GraphBase
   implements GraphCollectionOperators {
 
   /**
@@ -117,9 +117,9 @@ public class GraphCollection extends GraphBase
    */
   public static GraphCollection createEmptyCollection(
     GradoopFlinkConfig config) {
-    Collection<GraphHead> graphHeads = new ArrayList();
-    Collection<Vertex> vertices = new ArrayList();
-    Collection<Edge> edges = new ArrayList();
+    Collection<GraphHead> graphHeads = new ArrayList<>();
+    Collection<Vertex> vertices = new ArrayList<>();
+    Collection<Edge> edges = new ArrayList<>();
 
     return GraphCollection.fromCollections(graphHeads, vertices, edges, config);
   }
@@ -375,9 +375,9 @@ public class GraphCollection extends GraphBase
   public DataSet<Boolean> equalsByGraphElementIds(
     GraphCollection other) {
     return new CollectionEquality(
-      new GraphHeadToEmptyString<GraphHead>(),
-      new VertexToIdString<Vertex>(),
-      new EdgeToIdString<Edge>(), true).execute(this, other);
+      new GraphHeadToEmptyString<>(),
+      new VertexToIdString<>(),
+      new EdgeToIdString<>(), true).execute(this, other);
   }
 
   /**
@@ -387,9 +387,9 @@ public class GraphCollection extends GraphBase
   public DataSet<Boolean> equalsByGraphElementData(
     GraphCollection other) {
     return new CollectionEquality(
-      new GraphHeadToEmptyString<GraphHead>(),
-      new VertexToDataString<Vertex>(),
-      new EdgeToDataString<Edge>(), true).execute(this, other);
+      new GraphHeadToEmptyString<>(),
+      new VertexToDataString<>(),
+      new EdgeToDataString<>(), true).execute(this, other);
   }
 
   /**
@@ -398,9 +398,9 @@ public class GraphCollection extends GraphBase
   @Override
   public DataSet<Boolean> equalsByGraphData(GraphCollection other) {
     return new CollectionEquality(
-      new GraphHeadToDataString<GraphHead>(),
-      new VertexToDataString<Vertex>(),
-      new EdgeToDataString<Edge>(), true).execute(this, other);
+      new GraphHeadToDataString<>(),
+      new VertexToDataString<>(),
+      new EdgeToDataString<>(), true).execute(this, other);
   }
 
   //----------------------------------------------------------------------------

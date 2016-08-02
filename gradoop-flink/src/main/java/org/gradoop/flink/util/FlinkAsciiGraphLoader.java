@@ -18,9 +18,9 @@
 package org.gradoop.flink.util;
 
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.api.epgm.Edge;
-import org.gradoop.common.model.api.epgm.GraphHead;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.EPGMDatabase;
 import org.gradoop.flink.model.impl.GraphCollection;
 

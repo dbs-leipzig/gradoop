@@ -23,7 +23,7 @@ import org.apache.flink.core.memory.MemorySegment;
 import org.apache.flink.types.NormalizableKey;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
-import org.gradoop.common.model.api.epgm.Identifiable;
+import org.gradoop.common.model.api.entities.Identifiable;
 
 import java.io.DataInput;
 import java.io.DataOutput;

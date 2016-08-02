@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import com.google.common.collect.Lists;
 import org.gradoop.flink.model.api.functions.UnaryFunction;
-import org.gradoop.common.model.api.epgm.Element;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.List;

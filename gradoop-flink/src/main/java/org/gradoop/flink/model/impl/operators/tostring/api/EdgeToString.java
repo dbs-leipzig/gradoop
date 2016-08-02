@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.tostring.api;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
-import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.entities.Edge;
 
 /**
  * string representation of an edge

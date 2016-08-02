@@ -2,7 +2,7 @@ package org.gradoop.model.impl.operators.split;
 
 import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.common.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.functions.UnaryFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
