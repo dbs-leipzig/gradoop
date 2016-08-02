@@ -14,14 +14,9 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.model.impl.datagen.foodbroker.masterdata.Customer;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Employee;
-import org.gradoop.model.impl.datagen.foodbroker.masterdata.Logistics;
-import org.gradoop.model.impl.datagen.foodbroker.masterdata.Product;
-import org.gradoop.model.impl.datagen.foodbroker.masterdata.Vendor;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -51,11 +46,7 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
   private final EPGMEdgeFactory<E> edgeFactory;
   private final FoodBrokerConfig config;
 
-  private List<MasterDataTuple> customers;
-  private List<MasterDataTuple> vendors;
-  private List<MasterDataTuple> logistics;
   private List<MasterDataTuple> employees;
-  private List<ProductTuple> products;
 
   private List<V> purchOrderLines;
   private List<Tuple2<V, V>> purchesToLines;
@@ -97,11 +88,7 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
     super.open(parameters);
 
     // Get the master data
-    customers = getRuntimeContext().getBroadcastVariable(Customer.CLASS_NAME);
-    vendors = getRuntimeContext().getBroadcastVariable(Vendor.CLASS_NAME);
-    logistics = getRuntimeContext().getBroadcastVariable(Logistics.CLASS_NAME);
     employees = getRuntimeContext().getBroadcastVariable(Employee.CLASS_NAME);
-    products = getRuntimeContext().getBroadcastVariable(Product.CLASS_NAME);
 
     // Get the required transactional data
     purchOrderLines =
