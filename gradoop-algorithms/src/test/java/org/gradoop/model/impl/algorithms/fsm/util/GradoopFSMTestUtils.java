@@ -13,7 +13,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.comparators.DFSCodeComparator
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import java.util.Collections;
 import java.util.List;

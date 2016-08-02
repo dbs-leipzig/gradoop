@@ -1,6 +1,8 @@
 package org.gradoop.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
+import org.gradoop.flink.model.impl.operators.matching.common.query
+  .QueryHandler;
 import org.junit.Test;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.GDLHandler.Builder;

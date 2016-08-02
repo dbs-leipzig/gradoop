@@ -1,6 +1,6 @@
 package org.gradoop.model.impl.id;
 
-import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
 import static org.gradoop.model.impl.GradoopFlinkTestUtils.writeAndRead;

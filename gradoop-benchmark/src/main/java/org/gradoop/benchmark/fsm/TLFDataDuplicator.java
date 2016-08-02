@@ -20,17 +20,17 @@ package org.gradoop.benchmark.fsm;
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.io.api.DataSink;
-import org.gradoop.io.api.DataSource;
-import org.gradoop.io.impl.tlf.TLFDataSink;
-import org.gradoop.io.impl.tlf.TLFDataSource;
-import org.gradoop.model.impl.GraphTransactions;
-import org.gradoop.model.impl.functions.utils.Duplicate;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.tlf.TLFDataSink;
+import org.gradoop.flink.io.impl.tlf.TLFDataSource;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.functions.utils.Duplicate;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.tuples.GraphTransaction;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A program to duplicate TLF data sets.

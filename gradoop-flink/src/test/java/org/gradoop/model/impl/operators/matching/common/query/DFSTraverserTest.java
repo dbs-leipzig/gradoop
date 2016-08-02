@@ -2,6 +2,12 @@ package org.gradoop.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.gradoop.flink.model.impl.operators.matching.common.query
+  .DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
+import org.gradoop.flink.model.impl.operators.matching.common.query.RootedTraverser;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

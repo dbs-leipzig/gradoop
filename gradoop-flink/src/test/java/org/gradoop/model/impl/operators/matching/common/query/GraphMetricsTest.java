@@ -1,5 +1,7 @@
 package org.gradoop.model.impl.operators.matching.common.query;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query
+  .GraphMetrics;
 import org.junit.Test;
 
 import java.util.Map;

@@ -1,10 +1,12 @@
 package org.gradoop.model.impl;
 
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.functions.utils.First;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.functions.utils.First;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 public class GraphTransactionTest extends GradoopFlinkTestBase {

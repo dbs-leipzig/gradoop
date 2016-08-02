@@ -20,15 +20,15 @@ package org.gradoop.examples.io;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.io.impl.json.JSONDataSink;
-import org.gradoop.io.impl.json.JSONDataSource;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.combination.ReduceCombination;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.flink.io.impl.json.JSONDataSink;
+import org.gradoop.flink.io.impl.json.JSONDataSource;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Example program that reads a graph from an EPGM-specific JSON representation

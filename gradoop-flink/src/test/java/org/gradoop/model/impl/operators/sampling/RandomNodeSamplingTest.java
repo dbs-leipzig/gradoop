@@ -18,11 +18,12 @@ package org.gradoop.model.impl.operators.sampling;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.junit.Test;
 
 import java.util.HashSet;

@@ -18,11 +18,11 @@
 package org.gradoop.model.impl.algorithms.fsm;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.config.TransactionalFSMAlgorithm;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
@@ -33,7 +33,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBul
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * abstract superclass of different implementations of the gSpan frequent

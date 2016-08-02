@@ -2,6 +2,8 @@ package org.gradoop.model.impl.properties;
 
 import com.google.common.collect.Lists;
 import org.gradoop.GradoopTestUtils;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.function
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.tuples.RefinementMessage;
 
 /**

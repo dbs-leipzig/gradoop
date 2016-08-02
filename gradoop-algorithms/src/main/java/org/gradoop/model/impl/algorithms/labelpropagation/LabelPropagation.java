@@ -20,17 +20,17 @@ package org.gradoop.model.impl.algorithms.labelpropagation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.EdgeToGellyEdgeMapper;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPVertexJoin;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.VertexToGellyVertexMapper;
-import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

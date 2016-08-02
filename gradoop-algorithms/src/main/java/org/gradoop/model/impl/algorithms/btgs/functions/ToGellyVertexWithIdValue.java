@@ -18,8 +18,8 @@
 package org.gradoop.model.impl.algorithms.btgs.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * EPGM vertex to gelly vertex, where value is vertex id

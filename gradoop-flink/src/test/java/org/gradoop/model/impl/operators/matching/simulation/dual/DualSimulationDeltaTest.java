@@ -1,6 +1,8 @@
 package org.gradoop.model.impl.operators.matching.simulation.dual;
 
-import org.gradoop.model.impl.operators.matching.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.simulation.dual
+  .DualSimulation;
 
 /**
  * Creates an {@link DualSimulation} instance that used delta iteration.

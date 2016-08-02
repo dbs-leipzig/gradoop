@@ -20,10 +20,10 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.tuples.GraphTransaction;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.Set;
 

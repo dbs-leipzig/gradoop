@@ -1,11 +1,11 @@
 package org.gradoop.model.impl.algorithms.labelpropagation;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {

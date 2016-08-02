@@ -17,11 +17,12 @@
 
 package org.gradoop.model.impl.pojo;
 
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.properties.PropertyList;
-import org.gradoop.util.GConstants;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.VertexPojoFactory;
+import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.util.GConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 

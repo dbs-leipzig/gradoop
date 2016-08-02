@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.algorithms.fsm.api;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import java.util.List;
 

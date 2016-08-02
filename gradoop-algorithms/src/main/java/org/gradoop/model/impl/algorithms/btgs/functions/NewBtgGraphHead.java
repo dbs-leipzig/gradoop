@@ -21,10 +21,10 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.GraphHeadFactory;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.GraphHeadFactory;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Creates an EPGM graph head representing a business transaction graphs.

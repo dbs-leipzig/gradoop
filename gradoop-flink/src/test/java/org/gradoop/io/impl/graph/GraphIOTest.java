@@ -3,11 +3,12 @@ package org.gradoop.io.impl.graph;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.properties.PropertyList;
+import org.gradoop.flink.io.impl.graph.GraphDataSource;
+import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.common.model.impl.properties.PropertyList;
 import org.junit.Test;
 
 import java.util.Map;

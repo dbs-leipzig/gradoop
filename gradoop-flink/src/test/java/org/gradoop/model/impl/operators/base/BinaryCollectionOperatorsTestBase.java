@@ -1,7 +1,7 @@
 package org.gradoop.model.impl.operators.base;
 
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.GraphCollection;
 
 import static org.junit.Assert.assertTrue;
 

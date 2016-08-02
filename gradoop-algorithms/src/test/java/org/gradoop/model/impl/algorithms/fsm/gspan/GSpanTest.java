@@ -2,7 +2,7 @@ package org.gradoop.model.impl.algorithms.fsm.gspan;
 
 import com.google.common.collect.Lists;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GSpanGraphCollectionEncoder;
@@ -10,10 +10,10 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DirectedDFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.Collection;

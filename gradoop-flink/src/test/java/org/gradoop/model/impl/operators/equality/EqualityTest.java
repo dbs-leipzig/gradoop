@@ -1,15 +1,19 @@
 package org.gradoop.model.impl.operators.equality;
 
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
-import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.VertexToIdString;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.flink.model.impl.operators.equality
+  .CollectionEqualityByGraphIds;
+import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 public class EqualityTest extends GradoopFlinkTestBase {

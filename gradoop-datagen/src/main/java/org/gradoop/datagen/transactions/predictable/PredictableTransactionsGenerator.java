@@ -18,13 +18,13 @@
 package org.gradoop.datagen.transactions.predictable;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.api.operators.GraphTransactionsGenerator;
-import org.gradoop.model.impl.GraphTransactions;
-import org.gradoop.model.impl.tuples.GraphTransaction;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.api.operators.GraphTransactionsGenerator;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Data generator with predictable result for the evaluation of Frequent

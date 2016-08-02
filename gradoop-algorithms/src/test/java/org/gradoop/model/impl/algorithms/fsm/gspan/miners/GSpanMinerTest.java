@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.GSpanGraphTransactionsEncoder;
@@ -12,12 +12,12 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBul
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.functions.bool.Equals;
-import org.gradoop.model.impl.operators.count.Count;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.flink.model.impl.functions.bool.Equals;
+import org.gradoop.flink.model.impl.operators.count.Count;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.junit.Assert;
 import org.junit.Test;
 

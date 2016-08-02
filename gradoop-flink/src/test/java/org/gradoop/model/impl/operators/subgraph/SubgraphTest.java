@@ -1,13 +1,14 @@
 package org.gradoop.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.properties.PropertyValue;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -10,11 +10,11 @@
         <version>0.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>gradoop-core</artifactId>
+    <artifactId>gradoop-common</artifactId>
     <packaging>jar</packaging>
 
-    <name>Gradoop Core</name>
-    <description>Gradoop core classes</description>
+    <name>Gradoop Common</name>
+    <description>Implementations used by all Gradoop modules</description>
 
     <build>
         <plugins>

@@ -17,10 +17,11 @@
 
 package org.gradoop.io.impl.edgelist;
 
-import org.gradoop.io.api.DataSource;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.edgelist.EdgeListDataSource;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 public class EdgeListIOTest extends GradoopFlinkTestBase {

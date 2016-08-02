@@ -17,14 +17,16 @@
 
 package org.gradoop.io.impl.tlf;
 
-import org.gradoop.io.api.DataSink;
-import org.gradoop.io.api.DataSource;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.GraphTransactions;
-import org.gradoop.model.impl.tuples.GraphTransaction;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.tlf.TLFDataSink;
+import org.gradoop.flink.io.impl.tlf.TLFDataSource;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.io.File;

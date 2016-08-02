@@ -17,10 +17,11 @@
 
 package org.gradoop.model.impl.pojo;
 
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyList;
-import org.gradoop.util.GConstants;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHeadPojoFactory;
+import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.util.GConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ public class GraphHeadPojoTest {
   @Test
   public void createWithIDTest() {
     GradoopId graphID = GradoopId.get();
-    org.gradoop.model.api.epgm.GraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
+    GraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
     assertThat(g.getId(), is(graphID));
     assertThat(g.getPropertyCount(), is(0));
   }
@@ -44,7 +45,7 @@ public class GraphHeadPojoTest {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    org.gradoop.model.api.epgm.GraphHead graphHead =
+    GraphHead graphHead =
       new GraphHeadPojoFactory().initGraphHead(graphID, label, props);
 
     assertThat(graphHead.getId(), is(graphID));
@@ -57,7 +58,7 @@ public class GraphHeadPojoTest {
   @Test
   public void createWithMissingLabelTest() {
     GradoopId graphID = GradoopId.get();
-    org.gradoop.model.api.epgm.GraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
+    GraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
     assertThat(g.getLabel(), is(GConstants.DEFAULT_GRAPH_LABEL));
   }
 

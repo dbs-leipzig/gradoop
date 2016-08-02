@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.properties;
 
-import org.gradoop.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -8,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import static org.gradoop.GradoopTestUtils.*;
-import static org.gradoop.model.impl.properties.PropertyValue.create;
+import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.junit.Assert.*;
 
 public class PropertyValueTest {

@@ -17,7 +17,7 @@
 
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.comparators;
 
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import java.io.Serializable;
 import java.util.Comparator;

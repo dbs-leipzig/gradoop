@@ -22,15 +22,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.matching.PatternMatching;
-import org.gradoop.model.impl.operators.matching.common.query.DFSTraverser;
-import org.gradoop.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
-import org.gradoop.model.impl.operators.matching.simulation.dual.DualSimulation;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
+import org.gradoop.flink.model.impl.operators.matching.simulation.dual.DualSimulation;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
 
 import java.util.concurrent.TimeUnit;
 

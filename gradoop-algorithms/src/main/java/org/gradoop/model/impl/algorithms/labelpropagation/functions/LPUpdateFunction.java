@@ -21,8 +21,8 @@ import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.Collections;
 import java.util.List;

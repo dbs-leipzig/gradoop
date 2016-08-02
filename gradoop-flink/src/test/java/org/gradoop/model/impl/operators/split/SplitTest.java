@@ -1,12 +1,13 @@
 package org.gradoop.model.impl.operators.split;
 
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.api.functions.UnaryFunction;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.properties.PropertyValue;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.model.impl.operators.split.Split;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.api.functions.UnaryFunction;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.ArrayList;

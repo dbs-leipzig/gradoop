@@ -25,7 +25,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.pojos.IterationItem;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import java.util.Collection;
 import java.util.Iterator;

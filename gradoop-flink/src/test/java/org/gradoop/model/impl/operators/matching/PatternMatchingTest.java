@@ -1,8 +1,9 @@
 package org.gradoop.model.impl.operators.matching;
 
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

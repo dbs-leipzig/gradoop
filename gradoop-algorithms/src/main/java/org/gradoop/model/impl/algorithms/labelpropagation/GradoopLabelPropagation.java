@@ -20,13 +20,13 @@ package org.gradoop.model.impl.algorithms.labelpropagation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPMessageFunction;
 import org.gradoop.model.impl.algorithms.labelpropagation.functions.LPUpdateFunction;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Executes the label propagation integrated in Gradoop.

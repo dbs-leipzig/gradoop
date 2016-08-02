@@ -1,10 +1,12 @@
 package org.gradoop.util;
 
-import org.gradoop.config.GradoopConfig;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.id.GradoopIdSet;
+import org.gradoop.common.config.GradoopConfig;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.util.AsciiGraphLoader;
+import org.gradoop.common.util.GConstants;
 import org.junit.Test;
 
 import java.util.Collection;

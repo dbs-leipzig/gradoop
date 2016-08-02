@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.btgs.functions;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.MessagingFunction;
 import org.apache.flink.types.NullValue;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Update Function of vertex centric iteration.

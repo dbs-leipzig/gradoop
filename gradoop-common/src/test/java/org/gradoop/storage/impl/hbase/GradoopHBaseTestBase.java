@@ -20,6 +20,9 @@ package org.gradoop.storage.impl.hbase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
+import org.gradoop.common.storage.impl.hbase.GradoopHBaseConfig;
+import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.common.storage.impl.hbase.HBaseEPGMStoreFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 

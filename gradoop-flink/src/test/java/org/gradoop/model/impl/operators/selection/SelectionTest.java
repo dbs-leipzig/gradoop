@@ -1,10 +1,10 @@
 package org.gradoop.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 public class SelectionTest extends GradoopFlinkTestBase {

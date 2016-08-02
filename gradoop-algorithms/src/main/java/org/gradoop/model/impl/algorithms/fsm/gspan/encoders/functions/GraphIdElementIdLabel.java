@@ -20,8 +20,8 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.epgm.GraphElement;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.common.model.api.epgm.GraphElement;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * EPGMVertex => (graphId, vertexId, vertexLabel),..

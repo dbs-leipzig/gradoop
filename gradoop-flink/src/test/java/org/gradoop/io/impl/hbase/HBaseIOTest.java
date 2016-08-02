@@ -2,17 +2,19 @@ package org.gradoop.io.impl.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.EPGMDatabase;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.storage.api.PersistentEdge;
-import org.gradoop.storage.api.PersistentGraphHead;
-import org.gradoop.storage.api.PersistentVertex;
-import org.gradoop.storage.impl.hbase.GradoopHBaseTestBase;
-import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.io.impl.hbase.HBaseDataSink;
+import org.gradoop.flink.io.impl.hbase.HBaseDataSource;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.EPGMDatabase;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.common.storage.api.PersistentEdge;
+import org.gradoop.common.storage.api.PersistentGraphHead;
+import org.gradoop.common.storage.api.PersistentVertex;
+import org.gradoop.common.storage.impl.hbase.GradoopHBaseTestBase;
+import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -51,7 +53,7 @@ public class HBaseIOTest extends FlinkHBaseTestBase {
     epgmStore.flush();
 
     // read social graph from HBase via EPGMDatabase
-    GraphCollection collection = new HBaseDataSource(epgmStore, 
+    GraphCollection collection = new HBaseDataSource(epgmStore,
       getConfig()).getGraphCollection();
 
     Collection<GraphHead> loadedGraphHeads    = Lists.newArrayList();

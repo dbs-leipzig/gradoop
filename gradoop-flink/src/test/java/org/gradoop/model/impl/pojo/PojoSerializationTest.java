@@ -1,13 +1,13 @@
 package org.gradoop.model.impl.pojo;
 
-import org.gradoop.GradoopTestUtils;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.model.impl.properties.PropertyList;
+import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.properties.PropertyList;
 import org.junit.Test;
 
 import static org.gradoop.model.impl.GradoopFlinkTestUtils.writeAndRead;

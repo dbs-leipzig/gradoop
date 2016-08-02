@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.List;
 

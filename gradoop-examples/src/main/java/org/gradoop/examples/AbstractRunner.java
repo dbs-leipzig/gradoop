@@ -23,14 +23,14 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.io.impl.json.JSONDataSink;
-import org.gradoop.io.impl.json.JSONDataSource;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.flink.io.impl.json.JSONDataSink;
+import org.gradoop.flink.io.impl.json.JSONDataSource;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Base class for example runners.

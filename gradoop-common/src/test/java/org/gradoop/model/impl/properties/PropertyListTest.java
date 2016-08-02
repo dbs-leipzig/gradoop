@@ -1,6 +1,9 @@
 package org.gradoop.model.impl.properties;
 
 import com.google.common.collect.Lists;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.junit.Test;
 
 import java.util.List;

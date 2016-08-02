@@ -1,6 +1,7 @@
 package org.gradoop.model.impl.id;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;

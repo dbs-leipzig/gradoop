@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.epgm.Vertex;
 
 /**
  * Maps EPGM vertex to a Gelly vertex consisting of the EPGM identifier and the

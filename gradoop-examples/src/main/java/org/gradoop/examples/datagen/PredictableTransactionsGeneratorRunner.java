@@ -21,13 +21,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.io.api.DataSink;
-import org.gradoop.io.impl.tlf.TLFDataSink;
-import org.gradoop.model.impl.GraphTransactions;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.tlf.TLFDataSink;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Class to run the PredictableTransactionGenerator with console parameters

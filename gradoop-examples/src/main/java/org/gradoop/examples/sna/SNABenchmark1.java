@@ -22,12 +22,12 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.aggregation.functions.count.EdgeCount;
-import org.gradoop.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
 
 /**
  * The benchmark program executes the following workflow:

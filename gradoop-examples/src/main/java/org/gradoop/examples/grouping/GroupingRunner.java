@@ -20,13 +20,13 @@ package org.gradoop.examples.grouping;
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.grouping.Grouping;
-import org.gradoop.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggregator;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
 
 /**
  * A dedicated program for parametrized graph grouping.

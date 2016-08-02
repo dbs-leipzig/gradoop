@@ -21,12 +21,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.hadoop.io.Writable;
-import org.gradoop.model.api.epgm.Element;
-import org.gradoop.model.api.epgm.GraphElement;
-import org.gradoop.model.api.epgm.Identifiable;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.AsciiGraphLoader;
-import org.gradoop.config.GradoopConfig;
+import org.gradoop.common.model.api.epgm.Element;
+import org.gradoop.common.model.api.epgm.GraphElement;
+import org.gradoop.common.model.api.epgm.Identifiable;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.util.AsciiGraphLoader;
+import org.gradoop.common.config.GradoopConfig;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;

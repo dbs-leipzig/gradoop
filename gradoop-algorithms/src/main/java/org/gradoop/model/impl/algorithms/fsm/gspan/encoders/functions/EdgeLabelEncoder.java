@@ -20,10 +20,10 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.gradoop.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.Edge;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithoutVertexLabels;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Map;
 

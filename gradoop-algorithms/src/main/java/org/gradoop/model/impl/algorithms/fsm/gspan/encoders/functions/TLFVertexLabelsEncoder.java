@@ -21,9 +21,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.io.impl.tlf.tuples.TLFEdge;
-import org.gradoop.io.impl.tlf.tuples.TLFGraph;
-import org.gradoop.io.impl.tlf.tuples.TLFVertex;
+import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
+import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples
   .EdgeTripleWithStringEdgeLabel;

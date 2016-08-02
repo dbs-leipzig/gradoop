@@ -1,8 +1,8 @@
 package org.gradoop.model.impl.operators.distinct;
 
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 public class DistinctTest extends GradoopFlinkTestBase {

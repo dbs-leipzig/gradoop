@@ -25,13 +25,13 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.GraphHeadFactory;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.GraphHeadFactory;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.model.impl.tuples.WithCount;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.ArrayList;
 import java.util.HashMap;

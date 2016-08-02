@@ -18,10 +18,10 @@
 package org.gradoop.datagen.transactions.predictable;
 
 import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.tuples.GraphTransaction;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

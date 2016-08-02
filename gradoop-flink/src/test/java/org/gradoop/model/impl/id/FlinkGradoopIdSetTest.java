@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.operators.count.Count;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.operators.count.Count;
 import org.junit.Test;
 
 import java.util.Collections;

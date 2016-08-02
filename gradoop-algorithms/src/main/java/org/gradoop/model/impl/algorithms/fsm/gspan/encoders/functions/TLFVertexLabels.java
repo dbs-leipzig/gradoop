@@ -20,8 +20,8 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.io.impl.tlf.tuples.TLFGraph;
-import org.gradoop.io.impl.tlf.tuples.TLFVertex;
+import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
 
 import java.util.Set;
 

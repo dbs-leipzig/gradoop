@@ -17,7 +17,7 @@
 package org.gradoop.model.impl.algorithms.btgs.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.epgm.Vertex;
 import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
 
 /**

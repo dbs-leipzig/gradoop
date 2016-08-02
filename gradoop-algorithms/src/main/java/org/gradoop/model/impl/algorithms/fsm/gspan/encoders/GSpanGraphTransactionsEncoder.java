@@ -18,10 +18,10 @@
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.GraphTransactions;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
@@ -35,9 +35,9 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions.VertexLabe
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
 import org.gradoop.model.impl.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.functions.utils.AddCount;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.count.Count;
+import org.gradoop.flink.model.impl.functions.utils.AddCount;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.count.Count;
 
 import java.util.Collection;
 import java.util.List;

@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.comparators.LabelFrequencyComparator;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import java.util.Collections;
 import java.util.List;

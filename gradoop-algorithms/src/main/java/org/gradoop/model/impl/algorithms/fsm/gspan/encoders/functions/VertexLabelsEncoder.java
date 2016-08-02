@@ -21,13 +21,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.tuples.GraphTransaction;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.Collection;
 import java.util.Map;

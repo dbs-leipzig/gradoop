@@ -24,8 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.io.impl.tlf.TLFDataSource;
-import org.gradoop.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.flink.io.impl.tlf.TLFDataSource;
+import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.model.impl.algorithms.fsm.gspan.api.GSpanMiner;
@@ -34,11 +34,11 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.GSpanBul
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
+import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.tuples.WithCount;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.common.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
 import java.io.IOException;

@@ -22,13 +22,14 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.graph.Graph;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphElement;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphElement;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -79,7 +80,8 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     Graph<GradoopId, Vertex, Edge> gellyGraph = Graph.fromDataSet(
       gellyVertices, gellyEdges, getExecutionEnvironment());
 
-    LogicalGraph logicalGraph = LogicalGraph.fromGellyGraph(gellyGraph, getConfig());
+    LogicalGraph
+      logicalGraph = LogicalGraph.fromGellyGraph(gellyGraph, getConfig());
 
     Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
     Collection<Vertex> loadedVertices   = Lists.newArrayList();

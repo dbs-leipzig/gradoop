@@ -18,7 +18,7 @@
 package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * (graphId, sourceId, targetId, edgeLabel)

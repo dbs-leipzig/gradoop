@@ -2,14 +2,16 @@ package org.gradoop.model.impl.operators.transformation;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.GradoopTestUtils;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.functions.epgm.Id;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.flink.model.impl.operators.transformation
+  .ApplyTransformation;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.List;

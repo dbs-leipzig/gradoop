@@ -24,7 +24,7 @@ import org.gradoop.model.impl.algorithms.fsm.gspan.GSpan;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.SerializedDFSCode;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * G => compress(G) IF G is canonical

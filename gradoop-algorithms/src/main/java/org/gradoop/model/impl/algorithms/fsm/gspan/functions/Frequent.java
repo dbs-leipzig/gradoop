@@ -20,7 +20,7 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.functions;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * filters frequent (T, f), i.e., f > minFrequency

@@ -20,7 +20,7 @@ package org.gradoop.model.impl.algorithms.fsm.api;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.model.impl.algorithms.fsm.config.FSMConfig;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * Describes the core of a transactional FSM implementation.

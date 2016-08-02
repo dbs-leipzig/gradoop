@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.functio
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.model.impl.algorithms.fsm.gspan.miners.bulkiteration.pojos.IterationItem;
 
 import java.util.Collection;

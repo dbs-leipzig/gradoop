@@ -17,20 +17,21 @@
 
 package org.gradoop.model.impl.operators.aggregation;
 
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.aggregation.functions.count.EdgeCount;
-import org.gradoop.model.impl.operators.aggregation.functions.max.MaxEdgeProperty;
-import org.gradoop.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
-import org.gradoop.model.impl.operators.aggregation.functions.min.MinEdgeProperty;
-import org.gradoop.model.impl.operators.aggregation.functions.min.MinVertexProperty;
-import org.gradoop.model.impl.operators.aggregation.functions.sum.SumEdgeProperty;
-import org.gradoop.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
-import org.gradoop.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
+import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxEdgeProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinEdgeProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumEdgeProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Assert;
 import org.junit.Test;
 

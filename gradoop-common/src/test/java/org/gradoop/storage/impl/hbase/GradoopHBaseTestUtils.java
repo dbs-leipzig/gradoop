@@ -1,18 +1,21 @@
 package org.gradoop.storage.impl.hbase;
 
 import org.gradoop.GradoopTestUtils;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.id.GradoopIdSet;
-import org.gradoop.storage.api.PersistentEdge;
-import org.gradoop.storage.api.PersistentEdgeFactory;
-import org.gradoop.storage.api.PersistentGraphHead;
-import org.gradoop.storage.api.PersistentGraphHeadFactory;
-import org.gradoop.storage.api.PersistentVertex;
-import org.gradoop.storage.api.PersistentVertexFactory;
-import org.gradoop.util.AsciiGraphLoader;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.storage.api.PersistentEdge;
+import org.gradoop.common.storage.api.PersistentEdgeFactory;
+import org.gradoop.common.storage.api.PersistentGraphHead;
+import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
+import org.gradoop.common.storage.api.PersistentVertex;
+import org.gradoop.common.storage.api.PersistentVertexFactory;
+import org.gradoop.common.storage.impl.hbase.HBaseEdgeFactory;
+import org.gradoop.common.storage.impl.hbase.HBaseGraphHeadFactory;
+import org.gradoop.common.storage.impl.hbase.HBaseVertexFactory;
+import org.gradoop.common.util.AsciiGraphLoader;
 
 import java.io.IOException;
 import java.util.ArrayList;

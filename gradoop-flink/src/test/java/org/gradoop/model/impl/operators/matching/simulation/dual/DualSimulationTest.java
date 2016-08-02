@@ -1,6 +1,6 @@
 package org.gradoop.model.impl.operators.matching.simulation.dual;
 
-import org.gradoop.model.impl.operators.matching.PatternMatchingTest;
+import org.gradoop.common.model.impl.operators.matching.PatternMatchingTest;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;

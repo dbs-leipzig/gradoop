@@ -21,15 +21,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.epgm.Edge;
-import org.gradoop.model.api.epgm.GraphHead;
-import org.gradoop.model.api.epgm.Vertex;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
-import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.common.model.api.epgm.Edge;
+import org.gradoop.common.model.api.epgm.GraphHead;
+import org.gradoop.common.model.api.epgm.Vertex;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 
 import java.util.ArrayList;
 
