@@ -22,8 +22,8 @@ import org.gradoop.model.GradoopFlinkTestBase;
 import org.gradoop.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.model.impl.datagen.foodbroker.functions.LabledVerticesLineFromVertices;
-
+import org.gradoop.model.impl.datagen.foodbroker.functions
+  .LabledVerticesFromVertices;
 import org.gradoop.model.impl.datagen.foodbroker.functions
   .TransactionalVerticesFromVertices;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -50,9 +50,9 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   public void testSalesQuotationLineCount() throws IOException, JSONException {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> cases =
       generateCollection();
-    DataSet<VertexPojo> salesQuotationLine = cases.getVertices()
+    DataSet<VertexPojo> salesQuotationLines = cases.getVertices()
       .filter(
-        new LabledVerticesLineFromVertices<VertexPojo>("SalesQuotationLine"));
+        new LabledVerticesFromVertices<VertexPojo>("SalesQuotationLine"));
     int min = 1;
     int max = 20;
     int casesCount = 10;
@@ -61,7 +61,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     long expected = ((min + max) / 2) * casesCount;
 
     try {
-      count = salesQuotationLine.count();
+      count = salesQuotationLines.count();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -72,24 +72,24 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   public void testSalesOrderCount() throws IOException, JSONException {
     GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> cases =
       generateCollection();
-    DataSet<VertexPojo> salesQuotation = cases.getVertices()
+    DataSet<VertexPojo> salesQuotations = cases.getVertices()
       .filter(
-        new LabledVerticesLineFromVertices<VertexPojo>("SalesQuotation"));
-    DataSet<VertexPojo> salesOrder = cases.getVertices()
+        new LabledVerticesFromVertices<VertexPojo>("SalesQuotation"));
+    DataSet<VertexPojo> salesOrders = cases.getVertices()
       .filter(
-        new LabledVerticesLineFromVertices<VertexPojo>("SalesOrder"));
+        new LabledVerticesFromVertices<VertexPojo>("SalesOrder"));
 
     double actual = 0;
     double expected = 0;
     double confirmationProbability = 0.6;
     double epsilon = 0;
     try {
-      expected = salesQuotation.count() * confirmationProbability;
-      actual = salesOrder.count();
+      expected = salesQuotations.count() * confirmationProbability;
+      actual = salesOrders.count();
       //influence is +0.2 for each master data object -> 0.4
       //so epsilon is (quotation count * 0.6+0.4) minus
       //(quotation count * 0.6)
-      epsilon = salesQuotation.count() - expected;
+      epsilon = salesQuotations.count() - expected;
     } catch (Exception e) {
       e.printStackTrace();
     }
