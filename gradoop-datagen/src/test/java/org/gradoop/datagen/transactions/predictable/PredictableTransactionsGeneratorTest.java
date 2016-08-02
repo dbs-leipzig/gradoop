@@ -1,6 +1,6 @@
 package org.gradoop.datagen.transactions.predictable;
 
-import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

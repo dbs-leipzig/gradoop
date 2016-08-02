@@ -17,7 +17,7 @@
 
 package org.gradoop.datagen.transactions.predictable;
 
-import org.gradoop.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.impl.pojo.EdgePojo;
 import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.VertexPojo;
