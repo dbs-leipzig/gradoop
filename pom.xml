@@ -25,7 +25,7 @@
         <module>gradoop-examples</module>
         <module>gradoop-algorithms</module>
         <module>gradoop-flink</module>
-        <module>gradoop-core</module>
+        <module>gradoop-common</module>
         <module>gradoop-checkstyle</module>
         <module>gradoop-datagen</module>
         <module>gradoop-benchmark</module>
@@ -222,7 +222,7 @@
             <!-- Gradoop -->
             <dependency>
                 <groupId>org.gradoop</groupId>
-                <artifactId>gradoop-core</artifactId>
+                <artifactId>gradoop-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -309,7 +309,7 @@
             <!-- Gradoop -->
             <dependency>
                 <groupId>org.gradoop</groupId>
-                <artifactId>gradoop-core</artifactId>
+                <artifactId>gradoop-common</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
