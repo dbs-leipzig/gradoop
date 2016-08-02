@@ -103,6 +103,7 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
     FileSystem fs = file.getFileSystem(conf);
     fsin = fs.open(split.getPath());
     fsin.seek(start);
+    System.out.println("PATH: " + split.getPath());
   }
 
   /**

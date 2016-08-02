@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<MetaData>
+    <file>
+        <name>graph.csv</name>
+        <charset>utf8</charset>
+        <seperator>|</seperator>
+        <type>graph</type>
+        <label>Graph</label>
+        <containment>
+        </containment>
+        <key>
+            <id>
+                <field>0</field>
+            </id>
+            <sys>AllSystems</sys>
+        </key>
+        <columns>
+            <column name="id" typ="Long"/>
+            <column name="nodeCount" typ="Int"/>
+        </columns>
+    </file>
+    <file>
+        <name>book.csv</name>
+        <charset>utf8</charset>
+        <seperator>|</seperator>
+        <type>vertex</type>
+        <label>
+            <field>1</field>
+            <field>2</field>
+        </label>
+        <containment>
+            <graphid>1</graphid>
+        </containment>
+        <key>
+            <id>
+                <field>0</field>
+            </id>
+            <sys>MyBooks</sys>
+        </key>
+        <columns>
+            <column name="isbn" typ="String"/>
+            <column name="author" typ="String"/>
+            <column name="title" typ="String"/>
+        </columns>
+    </file>
+    <file>
+        <name>author.csv</name>
+        <charset>utf8</charset>
+        <seperator>|</seperator>
+        <type>vertex</type>
+        <label>
+            <field>0</field>
+        </label>
+        <containment>
+            <graphid>1</graphid>
+            <graphid>2</graphid>
+        </containment>
+        <key>
+            <id>
+                <field>0</field>
+                <field>3</field>
+            </id>
+            <sys>AllAuthors</sys>
+        </key>
+        <columns>
+            <column name="name" typ="String"/>
+            <column name="age" typ="String"/>
+            <column name="phone" typ="String"/>
+            <column name="zip" typ="String"/>
+        </columns>
+    </file>
+    <file>
+        <name>writes.csv</name>
+        <charset>utf8</charset>
+        <seperator>|</seperator>
+        <type>edge</type>
+        <label>writes
+            <field>3</field>
+        </label>
+        <containment graphid="1" />
+        <key>
+            <id>
+                <field>1</field>
+                <field>2</field>
+            </id>
+            <sys>AllAuthors</sys>
+        </key>
+        <columns>
+            <column name="date" typ="Date"/>
+            <column name="sourceId" typ="Long"/>
+            <column name="targetID" typ="Long"/>
+            <column name="teamWork" typ="Boolean"/>
+        </columns>
+    </file>
+</MetaData>
+

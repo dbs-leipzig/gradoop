@@ -50,12 +50,13 @@ public class CSVInputFormat extends FileInputFormat<LongWritable, String[]> {
   @Override
   public RecordReader<LongWritable, String[]> createRecordReader(InputSplit
     split, TaskAttemptContext context) {
-    try {
-      return new CSVRecordReader((FileSplit) split, context
-        .getConfiguration(), delimiter);
-    } catch (IOException ioe) {
-      System.err.println("Error while creating TLFRecordReader: " + ioe);
+//    try {
+//      return new CSVRecordReader((FileSplit) split, context
+//        .getConfiguration(), delimiter);
       return null;
-    }
+//    } catch (IOException ioe) {
+//      System.err.println("Error while creating TLFRecordReader: " + ioe);
+//      return null;
+//    }
   }
 }

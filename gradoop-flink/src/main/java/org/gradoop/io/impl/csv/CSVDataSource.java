@@ -17,7 +17,11 @@
 
 package org.gradoop.io.impl.csv;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.io.api.DataSource;
+import org.gradoop.io.impl.csv.functions.ImportVertexFromText;
+import org.gradoop.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
@@ -33,13 +37,31 @@ public class CSVDataSource
   extends CSVBase<G, V, E>
   implements DataSource<G, V, E> {
 
+  public static final String CACHED_FILE = "cachedfile";
 
-  public CSVDataSource(GradoopFlinkConfig<G, V, E> config, String csvPath) {
+  private String delimiter;
+
+
+  public CSVDataSource(GradoopFlinkConfig<G, V, E> config, String csvPath,
+    String delimiter) {
     super(config, csvPath);
+    this.delimiter = delimiter;
+
+
   }
 
   @Override
   public LogicalGraph<G, V, E> getLogicalGraph() throws IOException {
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+    env.registerCachedFile(getCSVPath(), CACHED_FILE);
+
+
+
+    DataSet<ImportVertex<String>> vertices = getConfig()
+      .getExecutionEnvironment()
+      .readTextFile("dfgfd")
+      .map(new ImportVertexFromText(delimiter));
+
     return null;
   }
 
