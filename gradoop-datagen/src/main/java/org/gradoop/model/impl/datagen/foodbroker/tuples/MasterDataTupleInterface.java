@@ -15,24 +15,26 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.datagen.foodbroker.complainthandling;
+package org.gradoop.model.impl.datagen.foodbroker.tuples;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.impl.id.GradoopId;
 
+/**
+ * Interface for master data tuples.
+ */
+public interface MasterDataTupleInterface {
 
-public class LateDeliveryPurchOrderLine<V extends EPGMVertex> implements
-  MapFunction<V, V>{
+  /**
+   * Returns the id of the master data tuple.
+   *
+   * @return GradoopId
+   */
+  GradoopId getId();
 
-  private final EPGMVertexFactory<V> vertexFactory;
-
-  public LateDeliveryPurchOrderLine(EPGMVertexFactory<V> vertexFactory) {
-    this.vertexFactory = vertexFactory;
-  }
-
-  @Override
-  public V map(V v) throws Exception {
-    return null;
-  }
+  /**
+   * Returns the quality of the master data tuple.
+   *
+   * @return float representation of the quality
+   */
+  Float getQuality();
 }

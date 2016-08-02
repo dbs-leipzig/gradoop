@@ -44,7 +44,10 @@ public class Constants {
    */
   public static final String PRICE = "price";
 
+  /**
+   * broadcast variable which is needed to find and set all graph ids for the
+   * masterdata
+   */
   public static final String EDGES = "edges";
 
-  //TODO constants für alle configzugriffe
 }

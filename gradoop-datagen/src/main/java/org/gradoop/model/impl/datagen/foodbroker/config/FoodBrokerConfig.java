@@ -387,25 +387,27 @@ public class FoodBrokerConfig implements Serializable {
    * Adds positiv or negative influence to the start value, depending on the
    * quality of the master data objects.
    *
-   * @param influencingMasterDataQuality list of influencing master data quality
+   * @param influencedMasterDataObjects list of influencing master data tuples
    * @param higherIsBetter true if positiv influence shall be added, negative
    *                       influence otherwise
    * @param influence influence value to be added to the start value
    * @param startValue the start value
+   * @param <T> subclass is either MasterDataTuple or ProductTuple
    * @return aggregated start value
    */
-  private Float getValue(List<Float> influencingMasterDataQuality,
+  private <T extends AbstractMasterDataTuple> Float getValue(List<T>
+    influencedMasterDataObjects,
     boolean higherIsBetter, Float influence, Float startValue) {
     Float value = startValue;
 
-    for (float quality : influencingMasterDataQuality) {
-      if (quality >= getQualityGood()) {
+    for (T tuple : influencedMasterDataObjects) {
+      if (tuple.getQuality() >= getQualityGood()) {
         if (higherIsBetter) {
           value += influence;
         } else {
           value -= influence;
         }
-      } else if (quality <= getQualityBad()) {
+      } else if (tuple.getQuality() <= getQualityBad()) {
         if (higherIsBetter) {
           value -= influence;
         } else {
@@ -419,13 +421,13 @@ public class FoodBrokerConfig implements Serializable {
   /**
    * Calculates and returns integer value of the loaded key.
    *
-   * @param influencingMasterDataQuality list of influencing master data quality
+   * @param influencedMasterDataObjects list of influencing master data tuples
    * @param node the transactional data node
    * @param key the key to load from
    * @return integer value
    */
-  public Integer getIntRangeConfigurationValue(
-    List<Float> influencingMasterDataQuality, String node, String key) {
+  public Integer getIntRangeConfigurationValue(List<MasterDataTuple>
+    influencedMasterDataObjects, String node, String key) {
     Integer min = 0;
     Integer max = 0;
     Boolean higherIsBetter = null;
@@ -443,7 +445,7 @@ public class FoodBrokerConfig implements Serializable {
 
     Integer startValue = 1 + (int) ((double) (max - min) * Math.random()) + min;
 
-    Integer value = getValue(influencingMasterDataQuality, higherIsBetter,
+    Integer value = getValue(influencedMasterDataObjects, higherIsBetter,
       influence, startValue.floatValue()).intValue();
 
     if (value < min) {
@@ -458,13 +460,14 @@ public class FoodBrokerConfig implements Serializable {
   /**
    * Calculates and returns BigDecimal value of the loaded key.
    *
-   * @param influencingMasterDataQuality list of influencing master data quality
+   * @param influencedMasterDataObjects list of influencing master data tuples
    * @param node the transactional data node
    * @param key the key to load from
    * @return BigDecimal value
    */
   public BigDecimal getDecimalVariationConfigurationValue(
-    List<Float> influencingMasterDataQuality, String node, String key) {
+    List<AbstractMasterDataTuple> influencedMasterDataObjects, String node,
+    String key) {
     Float baseValue = null;
     Boolean higherIsBetter = null;
     Float influence = null;
@@ -479,7 +482,7 @@ public class FoodBrokerConfig implements Serializable {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    Float value = getValue(influencingMasterDataQuality, higherIsBetter,
+    Float value = getValue(influencedMasterDataObjects, higherIsBetter,
       influence, baseValue);
 
     return BigDecimal.valueOf(value).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -489,21 +492,21 @@ public class FoodBrokerConfig implements Serializable {
    * Calculates wether a transition happens or not, based on the influencing
    * master data objects.
    *
-   * @param influencingMasterDataQuality list of influencing master data quality
+   * @param influencedMasterDataObjects list of influencing master data tuples
    * @param node the transactional data node
    * @param key the key to load from
    * @return true of transactions happens
    */
   public boolean happensTransitionConfiguration(
-    List<Float> influencingMasterDataQuality, String node, String key) {
-
+    List<MasterDataTuple> influencedMasterDataObjects, String node,
+    String key) {
     Float baseValue = null;
     Boolean higherIsBetter = null;
     Float influence = null;
 
     try {
-      baseValue =
-        (float) getTransactionalNodes().getJSONObject(node).getDouble(key);
+      baseValue = (float) getTransactionalNodes().getJSONObject(node)
+        .getDouble(key);
       higherIsBetter = getTransactionalNodes().getJSONObject(node)
         .getBoolean(key + "HigherIsBetter");
       influence = (float) getTransactionalNodes().getJSONObject(node)
@@ -511,9 +514,8 @@ public class FoodBrokerConfig implements Serializable {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    Float value =
-      getValue(influencingMasterDataQuality, higherIsBetter, influence,
-        baseValue);
+    Float value = getValue(influencedMasterDataObjects, higherIsBetter,
+      influence, baseValue);
 
     return (float) Math.random() <= value;
   }
@@ -523,14 +525,14 @@ public class FoodBrokerConfig implements Serializable {
    * influencing master data objects.
    *
    * @param date initial date
-   * @param influencingMasterDataQuality list of influencing master data quality
+   * @param influencingMasterDataObjects list of influencing master data tuples
    * @param node the transactional data node
    * @param key the key to load from
    * @return long representation of the new date
    */
-  public long delayDelayConfiguration(long date,
-    List<Float> influencingMasterDataQuality, String node, String key) {
-    int delay = getIntRangeConfigurationValue(influencingMasterDataQuality,
+  public long delayDelayConfiguration(long date, List<MasterDataTuple>
+    influencingMasterDataObjects, String node, String key) {
+    int delay = getIntRangeConfigurationValue(influencingMasterDataObjects,
       node, key);
 
     Calendar calendar = Calendar.getInstance();
@@ -545,16 +547,16 @@ public class FoodBrokerConfig implements Serializable {
    * influencing master data object.
    *
    * @param date initial date
-   * @param influencingMasterDataQuality influencing master data quality
+   * @param influencingMasterDataObject influencing master data tuple
    * @param node the transactional data node
    * @param key the key to load from
    * @return long representation of the new date
    */
   public long delayDelayConfiguration(long date,
-    Float influencingMasterDataQuality, String node, String key) {
-    List<Float> influencingMasterDataQualities = new ArrayList<>();
-    influencingMasterDataQualities.add(influencingMasterDataQuality);
+    MasterDataTuple influencingMasterDataObject, String node, String key) {
+    List<MasterDataTuple> influencingMasterDataObjects = new ArrayList<>();
+    influencingMasterDataObjects.add(influencingMasterDataObject);
     return delayDelayConfiguration(
-      date, influencingMasterDataQualities, node, key);
+      date, influencingMasterDataObjects, node, key);
   }
 }

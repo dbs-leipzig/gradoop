@@ -15,28 +15,25 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.model.impl.datagen.foodbroker.tuples;
+package org.gradoop.model.impl.datagen.foodbroker.functions;
 
-import org.gradoop.model.impl.id.GradoopId;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.model.api.EPGMVertex;
 
 /**
- * Class which represents all master data objects except the products.
+ * Filters all vertices by label.
  */
-public class MasterDataTuple extends AbstractMasterDataTuple {
+public class LabledVerticesFromVertices<V extends EPGMVertex>
+  implements FilterFunction<V> {
 
-  /**
-   * default constructor
-   */
-  public MasterDataTuple() {
+  private String label;
+
+  public LabledVerticesFromVertices(String label) {
+    this.label = label;
   }
 
-  /**
-   * Valued constructor.
-   *
-   * @param id id gradoop id
-   * @param quality master data quality
-   */
-  public MasterDataTuple(GradoopId id, Float quality) {
-    super(id, quality);
+  @Override
+  public boolean filter(V v) throws Exception {
+    return v.getLabel().equals(label);
   }
 }
