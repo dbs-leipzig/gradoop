@@ -21,14 +21,14 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.util.GConstants;
 
 /**
  * Reads edge data from HBase.
  */
-public class EdgeTableInputFormat extends TableInputFormat<Tuple1<Edge>> {
+public class EdgeTableInputFormat extends TableInputFormat<Tuple1<EPGMEdge>> {
 
   /**
    * Handles reading of persistent edge data.
@@ -73,7 +73,7 @@ public class EdgeTableInputFormat extends TableInputFormat<Tuple1<Edge>> {
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<Edge> mapResultToTuple(Result result) {
+  protected Tuple1<EPGMEdge> mapResultToTuple(Result result) {
     return new Tuple1<>(edgeHandler.readEdge(result));
   }
 }

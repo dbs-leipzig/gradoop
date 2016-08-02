@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -46,7 +46,7 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    *
    * @return graph heads
    */
-  DataSet<GraphHead> getGraphHeads();
+  DataSet<EPGMGraphHead> getGraphHeads();
 
   /**
    * Returns logical graph from collection using the given identifier. If the
@@ -82,7 +82,7 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @param predicateFunction predicate function for graph head
    * @return collection with logical graphs that fulfil the predicate
    */
-  GraphCollection select(FilterFunction<GraphHead> predicateFunction);
+  GraphCollection select(FilterFunction<EPGMGraphHead> predicateFunction);
 
   /**
    * Returns a distinct collection of logical graphs. Graph equality is based on

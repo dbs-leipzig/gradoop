@@ -17,9 +17,9 @@
 
 package org.gradoop.common.storage.impl.hbase;
 
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
@@ -28,8 +28,8 @@ import org.gradoop.common.model.impl.properties.PropertyList;
  *
  * @param <T> entity type
  */
-public abstract class HBaseElement<T extends Element>
-  implements Element {
+public abstract class HBaseElement<T extends EPGMElement>
+  implements EPGMElement {
 
   /**
    * Encapsulated EPGM element.

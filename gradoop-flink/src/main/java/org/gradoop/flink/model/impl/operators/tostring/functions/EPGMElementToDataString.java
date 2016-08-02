@@ -17,7 +17,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
@@ -30,7 +30,7 @@ import java.util.List;
  * such including label and properties
  * @param <EL> EPGM element type
  */
-public abstract class EPGMElementToDataString<EL extends Element> {
+public abstract class EPGMElementToDataString<EL extends EPGMElement> {
 
   /**
    * generalization of label and properties string concatenation

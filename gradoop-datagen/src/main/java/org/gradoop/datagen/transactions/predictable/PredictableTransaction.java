@@ -24,12 +24,12 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EdgeFactory;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
-import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
@@ -46,7 +46,7 @@ import java.util.Set;
  * @param <E> edge type
  */
 public class PredictableTransaction
-  <G extends GraphHead, V extends Vertex, E extends Edge>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements MapFunction<Long, GraphTransaction<G, V, E>>
   , ResultTypeQueryable<GraphTransaction<G, V, E>> {
 
@@ -67,15 +67,15 @@ public class PredictableTransaction
   /**
    * EPGM graph head factory
    */
-  private final GraphHeadFactory<G> graphHeadFactory;
+  private final EPGMGraphHeadFactory<G> graphHeadFactory;
   /**
    * EPGM vertex factory
    */
-  private final VertexFactory<V> vertexFactory;
+  private final EPGMVertexFactory<V> vertexFactory;
   /**
    * EPGM edge factory
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EPGMEdgeFactory<E> edgeFactory;
 
   /**
    * constructor

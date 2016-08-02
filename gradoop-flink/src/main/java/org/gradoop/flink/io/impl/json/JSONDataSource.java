@@ -21,6 +21,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.json.functions.JSONToEdge;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -30,9 +32,7 @@ import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.impl.json.functions.JSONToGraphHead;
 import org.gradoop.flink.io.impl.json.functions.JSONToVertex;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 
 /**
  * Creates an EPGM instance from JSON files. The exact format is documented in
@@ -73,13 +73,13 @@ public class JSONDataSource extends JSONBase implements DataSource {
       .createTypeInfo(getConfig().getGraphHeadFactory().getType());
 
     // read vertex, edge and graph data
-    DataSet<Vertex> vertices = env.readTextFile(getVertexPath())
+    DataSet<EPGMVertex> vertices = env.readTextFile(getVertexPath())
       .map(new JSONToVertex(getConfig().getVertexFactory()))
       .returns(vertexTypeInfo);
-    DataSet<Edge> edges = env.readTextFile(getEdgePath())
+    DataSet<EPGMEdge> edges = env.readTextFile(getEdgePath())
       .map(new JSONToEdge(getConfig().getEdgeFactory()))
       .returns(edgeTypeInfo);
-    DataSet<GraphHead> graphHeads;
+    DataSet<EPGMGraphHead> graphHeads;
     if (getGraphHeadPath() != null) {
       graphHeads = env.readTextFile(getGraphHeadPath())
         .map(new JSONToGraphHead(getConfig().getGraphHeadFactory()))

@@ -35,8 +35,8 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -50,7 +50,7 @@ public class ReduceOverlap extends OverlapBase
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge sets
-   * of the graphs contained in the given collection. Vertex and edge equality
+   * of the graphs contained in the given collection. EPGMVertex and edge equality
    * is based on their respective identifiers.
    *
    * @param collection input collection
@@ -58,9 +58,9 @@ public class ReduceOverlap extends OverlapBase
    */
   @Override
   public LogicalGraph execute(GraphCollection collection) {
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads();
+    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
 
-    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<GraphHead>());
+    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<EPGMGraphHead>());
 
     return LogicalGraph.fromDataSets(
       getVertices(collection.getVertices(), graphIDs),

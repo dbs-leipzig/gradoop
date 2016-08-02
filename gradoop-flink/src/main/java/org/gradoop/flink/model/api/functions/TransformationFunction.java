@@ -17,8 +17,8 @@
 
 package org.gradoop.flink.model.api.functions;
 
-import org.gradoop.common.model.api.entities.Attributed;
-import org.gradoop.common.model.api.entities.Labeled;
+import org.gradoop.common.model.api.entities.EPGMAttributed;
+import org.gradoop.common.model.api.entities.EPGMLabeled;
 
 /**
  * A transformation function is applied on an EPGM element (i.e. graph head,
@@ -26,7 +26,7 @@ import org.gradoop.common.model.api.entities.Labeled;
  *
  * @param <EL> EPGM attributed / labeled element
  */
-public interface TransformationFunction<EL extends Attributed & Labeled>
+public interface TransformationFunction<EL extends EPGMAttributed & EPGMLabeled>
   extends BinaryFunction<EL, EL, EL> {
 
   /**

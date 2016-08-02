@@ -19,9 +19,9 @@ package org.gradoop.flink.model.api.operators;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -42,7 +42,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *
    * @return 1-element dataset
    */
-  DataSet<GraphHead> getGraphHead();
+  DataSet<EPGMGraphHead> getGraphHead();
 
   //----------------------------------------------------------------------------
   // Unary Operators
@@ -91,9 +91,9 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return transformed logical graph
    */
   LogicalGraph transform(
-    TransformationFunction<GraphHead> graphHeadTransformationFunction,
-    TransformationFunction<Vertex> vertexTransformationFunction,
-    TransformationFunction<Edge> edgeTransformationFunction);
+    TransformationFunction<EPGMGraphHead> graphHeadTransformationFunction,
+    TransformationFunction<EPGMVertex> vertexTransformationFunction,
+    TransformationFunction<EPGMEdge> edgeTransformationFunction);
 
   /**
    * Transforms the graph head of the logical graph using the given
@@ -103,7 +103,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return transformed logical graph
    */
   LogicalGraph transformGraphHead(
-    TransformationFunction<GraphHead> graphHeadTransformationFunction);
+    TransformationFunction<EPGMGraphHead> graphHeadTransformationFunction);
 
   /**
    * Transforms the vertices of the logical graph using the given transformation
@@ -113,7 +113,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return transformed logical graph
    */
   LogicalGraph transformVertices(
-    TransformationFunction<Vertex> vertexTransformationFunction);
+    TransformationFunction<EPGMVertex> vertexTransformationFunction);
 
   /**
    * Transforms the edges of the logical graph using the given transformation
@@ -123,7 +123,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return transformed logical graph
    */
   LogicalGraph transformEdges(
-    TransformationFunction<Edge> edgeTransformationFunction);
+    TransformationFunction<EPGMEdge> edgeTransformationFunction);
 
   /**
    * Returns the subgraph that is induced by the vertices which fulfill the
@@ -133,7 +133,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return vertex-induced subgraph as a new logical graph
    */
   LogicalGraph vertexInducedSubgraph(
-    FilterFunction<Vertex> vertexFilterFunction);
+    FilterFunction<EPGMVertex> vertexFilterFunction);
 
   /**
    * Returns the subgraph that is induced by the edges which fulfill the given
@@ -143,7 +143,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return edge-induced subgraph as a new logical graph
    */
   LogicalGraph edgeInducedSubgraph(
-    FilterFunction<Edge> edgeFilterFunction);
+    FilterFunction<EPGMEdge> edgeFilterFunction);
 
   /**
    * Returns a subgraph of the logical graph which contains only those vertices
@@ -158,8 +158,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return  logical graph which fulfils the given predicates and is a subgraph
    *          of that graph
    */
-  LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction);
+  LogicalGraph subgraph(FilterFunction<EPGMVertex> vertexFilterFunction,
+    FilterFunction<EPGMEdge> edgeFilterFunction);
 
   /**
    * Applies the given aggregate function to the logical graph and stores the
@@ -360,7 +360,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
 
   /**
    * Creates a new logical graph by combining the vertex and edge sets of
-   * this graph and the given graph. Vertex and edge equality is based on their
+   * this graph and the given graph. EPGMVertex and edge equality is based on their
    * identifiers.
    *
    * @param otherGraph logical graph to combine this graph with
@@ -371,7 +371,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of this graph and the given graph. Vertex and edge equality is
+   * sets of this graph and the given graph. EPGMVertex and edge equality is
    * based on their identifiers.
    *
    * @param otherGraph logical graph to compute overlap with
@@ -382,7 +382,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
 
   /**
    * Creates a new logical graph containing only vertices and edges that
-   * exist in that graph but not in the other graph. Vertex and edge equality
+   * exist in that graph but not in the other graph. EPGMVertex and edge equality
    * is based on their identifiers.
    *
    * @param otherGraph logical graph to exclude from that graph

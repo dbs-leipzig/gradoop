@@ -19,6 +19,9 @@ package org.gradoop.flink.model.impl.operators.base;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -29,9 +32,6 @@ import org.gradoop.flink.model.impl.operators.base.functions.LeftJoin0OfTuple2;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.union.Union;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -54,18 +54,18 @@ public abstract class SetOperatorBase
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newGraphHeads) {
+  protected DataSet<EPGMVertex> computeNewVertices(DataSet<EPGMGraphHead> newGraphHeads) {
 
-    DataSet<Tuple2<Vertex, GradoopId>> verticesWithGraphs =
+    DataSet<Tuple2<EPGMVertex, GradoopId>> verticesWithGraphs =
       firstCollection.getVertices().flatMap(new PairVertexWithGraphs<>());
 
     return verticesWithGraphs
       .join(newGraphHeads)
       .where(1)
-      .equalTo(new Id<GraphHead>())
-      .with(new LeftJoin0OfTuple2<Vertex, GraphHead>())
+      .equalTo(new Id<EPGMGraphHead>())
+      .with(new LeftJoin0OfTuple2<EPGMVertex, EPGMGraphHead>())
       .withForwardedFieldsFirst("f0->*")
-      .distinct(new Id<Vertex>());
+      .distinct(new Id<EPGMVertex>());
   }
 
   /**
@@ -78,15 +78,15 @@ public abstract class SetOperatorBase
    * @see Intersection
    */
   @Override
-  protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
+  protected DataSet<EPGMEdge> computeNewEdges(DataSet<EPGMVertex> newVertices) {
     return firstCollection.getEdges().join(newVertices)
       .where(new SourceId<>())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>())
+      .equalTo(new Id<EPGMVertex>())
+      .with(new LeftSide<EPGMEdge, EPGMVertex>())
       .join(newVertices)
       .where(new TargetId<>())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>())
-      .distinct(new Id<Edge>());
+      .equalTo(new Id<EPGMVertex>())
+      .with(new LeftSide<EPGMEdge, EPGMVertex>())
+      .distinct(new Id<EPGMEdge>());
   }
 }

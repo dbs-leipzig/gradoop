@@ -19,10 +19,11 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.ExpandGraphsToIds;
-import org.gradoop.common.model.api.entities.Vertex;
+
 import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ToPropertyValue;
@@ -61,7 +62,7 @@ public class VertexCount implements AggregateFunction, ApplyAggregateFunction {
   public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
     GraphCollection collection) {
     return Count.groupBy(collection.getVertices()
-      .flatMap(new ExpandGraphsToIds<Vertex>())
+      .flatMap(new ExpandGraphsToIds<EPGMVertex>())
     ).map(new GroupCountToPropertyValue());
   }
 

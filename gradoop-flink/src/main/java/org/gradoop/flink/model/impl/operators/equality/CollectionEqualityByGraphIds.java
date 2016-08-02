@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.impl.functions.tuple.ValueInTuple1;
-import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.bool.Not;
@@ -40,13 +40,13 @@ public class CollectionEqualityByGraphIds
 
     DataSet<Tuple1<GradoopId>> distinctFirstGraphIds = firstCollection
       .getGraphHeads()
-      .map(new Id<GraphHead>())
+      .map(new Id<EPGMGraphHead>())
       .distinct()
       .map(new ValueInTuple1<GradoopId>());
 
     DataSet<Tuple1<GradoopId>> distinctSecondGraphIds = secondCollection
       .getGraphHeads()
-      .map(new Id<GraphHead>())
+      .map(new Id<EPGMGraphHead>())
       .distinct()
       .map(new ValueInTuple1<GradoopId>());
 

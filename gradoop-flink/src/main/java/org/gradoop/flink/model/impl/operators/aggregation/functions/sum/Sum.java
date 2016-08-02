@@ -20,9 +20,9 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
-import org.gradoop.common.model.api.entities.Element;
-import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.GetPropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.GraphIdsWithPropertyValue;
@@ -44,7 +44,7 @@ public class Sum {
    * @param <EL>     element type in input dataset
    * @return 1-element dataset with sum of input dataset
    */
-  public static <EL extends Element> DataSet<PropertyValue> sum(
+  public static <EL extends EPGMElement> DataSet<PropertyValue> sum(
     DataSet<EL> dataSet,
     String propertyKey,
     Number zero) {
@@ -67,7 +67,7 @@ public class Sum {
    * @param <EL>     element type in input dataset
    * @return {@code Tuple2} with group value and group sum
    */
-  public static <EL extends GraphElement>
+  public static <EL extends EPGMGraphElement>
   DataSet<Tuple2<GradoopId, PropertyValue>> groupBy(
     DataSet<EL> dataSet,
     String propertyKey,

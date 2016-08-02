@@ -19,8 +19,8 @@ package org.gradoop.common.storage.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 
 import java.io.IOException;
 import java.util.Set;
@@ -84,12 +84,12 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param res HBase row
    * @return graph entity
    */
-  GraphHead readGraphHead(final Result res);
+  EPGMGraphHead readGraphHead(final Result res);
 
   /**
    * Returns the graph data factory used by this handler.
    *
    * @return graph data factory
    */
-  GraphHeadFactory getGraphHeadFactory();
+  EPGMGraphHeadFactory getGraphHeadFactory();
 }

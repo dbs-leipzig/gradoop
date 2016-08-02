@@ -1,10 +1,9 @@
 package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -38,16 +37,16 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     LogicalGraph expected =
       loader.getLogicalGraphByVariable("expected");
 
-    FilterFunction<Vertex> vertexFilterFunction = new FilterFunction<Vertex>() {
+    FilterFunction<EPGMVertex> vertexFilterFunction = new FilterFunction<EPGMVertex>() {
       @Override
-      public boolean filter(Vertex vertexPojo) throws Exception {
+      public boolean filter(EPGMVertex vertexPojo) throws Exception {
         return vertexPojo.getLabel().equals("Person");
       }
     };
 
-    FilterFunction<Edge> edgeFilterFunction = new FilterFunction<Edge>() {
+    FilterFunction<EPGMEdge> edgeFilterFunction = new FilterFunction<EPGMEdge>() {
       @Override
-      public boolean filter(Edge edgePojo) throws Exception {
+      public boolean filter(EPGMEdge edgePojo) throws Exception {
         return edgePojo.getLabel().equals("knows");
       }
     };
@@ -73,16 +72,16 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    FilterFunction<Vertex> vertexFilterFunction = new FilterFunction<Vertex>() {
+    FilterFunction<EPGMVertex> vertexFilterFunction = new FilterFunction<EPGMVertex>() {
       @Override
-      public boolean filter(Vertex vertexPojo) throws Exception {
+      public boolean filter(EPGMVertex vertexPojo) throws Exception {
         return vertexPojo.getLabel().equals("Person");
       }
     };
 
-    FilterFunction<Edge> edgeFilterFunction = new FilterFunction<Edge>() {
+    FilterFunction<EPGMEdge> edgeFilterFunction = new FilterFunction<EPGMEdge>() {
       @Override
-      public boolean filter(Edge edgePojo) throws Exception {
+      public boolean filter(EPGMEdge edgePojo) throws Exception {
         return edgePojo.getLabel().equals("friendOf");
       }
     };
@@ -107,16 +106,16 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    FilterFunction<Vertex> vertexFilterFunction = new FilterFunction<Vertex>() {
+    FilterFunction<EPGMVertex> vertexFilterFunction = new FilterFunction<EPGMVertex>() {
       @Override
-      public boolean filter(Vertex vertexPojo) throws Exception {
+      public boolean filter(EPGMVertex vertexPojo) throws Exception {
         return vertexPojo.getLabel().equals("User");
       }
     };
 
-    FilterFunction<Edge> edgeFilterFunction = new FilterFunction<Edge>() {
+    FilterFunction<EPGMEdge> edgeFilterFunction = new FilterFunction<EPGMEdge>() {
       @Override
-      public boolean filter(Edge edgePojo) throws Exception {
+      public boolean filter(EPGMEdge edgePojo) throws Exception {
         return edgePojo.getLabel().equals("friendOf");
       }
     };
@@ -140,9 +139,9 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    FilterFunction<Vertex> vertexFilterFunction = new FilterFunction<Vertex>() {
+    FilterFunction<EPGMVertex> vertexFilterFunction = new FilterFunction<EPGMVertex>() {
       @Override
-      public boolean filter(Vertex vertexPojo) throws Exception {
+      public boolean filter(EPGMVertex vertexPojo) throws Exception {
         return vertexPojo.getLabel().equals("Forum")
           || vertexPojo.getLabel().equals("Tag") ;
       }
@@ -166,9 +165,9 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    FilterFunction<Edge> edgeFilterFunction = new FilterFunction<Edge>() {
+    FilterFunction<EPGMEdge> edgeFilterFunction = new FilterFunction<EPGMEdge>() {
       @Override
-      public boolean filter(Edge edgePojo) throws Exception {
+      public boolean filter(EPGMEdge edgePojo) throws Exception {
         return edgePojo.getLabel().equals("hasTag");
       }
     };
@@ -211,17 +210,17 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     GraphCollection input = loader.getGraphCollectionByVariables("g0","g1","g4");
 
 
-    FilterFunction<Vertex> vertexFilterFunction = new FilterFunction<Vertex>() {
+    FilterFunction<EPGMVertex> vertexFilterFunction = new FilterFunction<EPGMVertex>() {
       @Override
-      public boolean filter(Vertex vertexPojo) throws Exception {
+      public boolean filter(EPGMVertex vertexPojo) throws Exception {
         PropertyValue city = vertexPojo.getProperties().get("city");
         return city != null && city.toString().equals("Leipzig");
       }
     };
 
-    FilterFunction<Edge> edgeFilterFunction = new FilterFunction<Edge>() {
+    FilterFunction<EPGMEdge> edgeFilterFunction = new FilterFunction<EPGMEdge>() {
       @Override
-      public boolean filter(Edge edgePojo) throws Exception {
+      public boolean filter(EPGMEdge edgePojo) throws Exception {
         if(edgePojo.getLabel().equals("knows")){
           if(edgePojo.getPropertyValue("since").getInt() == 2016){
             return true;
@@ -274,9 +273,9 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     GraphCollection input = loader.getGraphCollectionByVariables("g0","g1","g4");
 
 
-    FilterFunction<Vertex> vertexFilterFunction = new FilterFunction<Vertex>() {
+    FilterFunction<EPGMVertex> vertexFilterFunction = new FilterFunction<EPGMVertex>() {
       @Override
-      public boolean filter(Vertex vertexPojo) throws Exception {
+      public boolean filter(EPGMVertex vertexPojo) throws Exception {
         PropertyValue city = vertexPojo.getProperties().get("city");
         return city != null && city.toString().equals("Leipzig");
       }
@@ -317,10 +316,10 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     GraphCollection input = loader.getGraphCollectionByVariables("g0","g1","g2");
 
 
-    FilterFunction<Edge> edgeFilterFunction = new FilterFunction<Edge>
+    FilterFunction<EPGMEdge> edgeFilterFunction = new FilterFunction<EPGMEdge>
       () {
       @Override
-      public boolean filter(Edge edgePojo) throws Exception {
+      public boolean filter(EPGMEdge edgePojo) throws Exception {
         return edgePojo.getPropertyValue("since").getInt() == 2015;
       }
     };

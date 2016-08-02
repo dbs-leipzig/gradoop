@@ -19,8 +19,8 @@ package org.gradoop.flink.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -45,14 +45,14 @@ public interface GraphBaseOperators {
    *
    * @return vertices
    */
-  DataSet<Vertex> getVertices();
+  DataSet<EPGMVertex> getVertices();
 
   /**
    * Returns all edge data associated with that logical graph.
    *
    * @return edges
    */
-  DataSet<Edge> getEdges();
+  DataSet<EPGMEdge> getEdges();
 
   /**
    * Returns the edge data associated with the outgoing edges of the given
@@ -62,7 +62,7 @@ public interface GraphBaseOperators {
    * @return outgoing edge data of given vertex
    */
   @Deprecated
-  DataSet<Edge> getOutgoingEdges(final GradoopId vertexID);
+  DataSet<EPGMEdge> getOutgoingEdges(final GradoopId vertexID);
 
   /**
    * Returns the edge data associated with the incoming edges of the given
@@ -72,14 +72,14 @@ public interface GraphBaseOperators {
    * @return incoming edge data of given vertex
    */
   @Deprecated
-  DataSet<Edge> getIncomingEdges(final GradoopId vertexID);
+  DataSet<EPGMEdge> getIncomingEdges(final GradoopId vertexID);
 
   /**
    * Transforms the EPGM graph to a Gelly Graph.
    *
    * @return Gelly Graph
    */
-  Graph<GradoopId, Vertex, Edge> toGellyGraph();
+  Graph<GradoopId, EPGMVertex, EPGMEdge> toGellyGraph();
 
   //----------------------------------------------------------------------------
   // Utility methods

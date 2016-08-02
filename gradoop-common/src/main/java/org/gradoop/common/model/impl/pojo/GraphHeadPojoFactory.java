@@ -18,10 +18,10 @@
 package org.gradoop.common.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.util.GConstants;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
 import java.io.Serializable;
@@ -29,7 +29,7 @@ import java.io.Serializable;
 /**
  * Factory for creating graph head POJOs.
  */
-public class GraphHeadPojoFactory implements GraphHeadFactory, Serializable {
+public class GraphHeadPojoFactory implements EPGMGraphHeadFactory, Serializable {
 
   /**
    * serial version uid
@@ -88,7 +88,7 @@ public class GraphHeadPojoFactory implements GraphHeadFactory, Serializable {
   }
 
   @Override
-  public Class<? extends GraphHead> getType() {
+  public Class<? extends EPGMGraphHead> getType() {
     return GraphHeadPojo.class;
   }
 }

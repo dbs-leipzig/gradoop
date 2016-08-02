@@ -17,14 +17,14 @@
 
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
  * POJO Implementation of an EPGM graph head.
  */
-public class GraphHeadPojo extends ElementPojo implements GraphHead {
+public class GraphHeadPojo extends ElementPojo implements EPGMGraphHead {
 
   /**
    * Default constructor.

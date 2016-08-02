@@ -25,8 +25,8 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.model.impl.algorithms.fsm.gspan.pojos.CompressedDFSCode;
@@ -38,10 +38,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Supportable<CompressedDfsCode> => (Graph, Vertex, Edge)
+ * Supportable<CompressedDfsCode> => (Graph, EPGMVertex, EPGMEdge)
  * @param <G> graph type
  */
-public class DFSDecoder<G extends GraphHead> implements
+public class DFSDecoder<G extends EPGMGraphHead> implements
   ResultTypeQueryable<Tuple3<G,
       ArrayList<Tuple2<GradoopId, Integer>>,
       ArrayList<Tuple3<GradoopId, GradoopId, Integer>>>>,
@@ -52,12 +52,12 @@ public class DFSDecoder<G extends GraphHead> implements
   /**
    * graph head factory
    */
-  private final GraphHeadFactory<G> graphHeadFactory;
+  private final EPGMGraphHeadFactory<G> graphHeadFactory;
   /**
    * constructor
    * @param graphHeadFactory graph head factory
    */
-  public DFSDecoder(GraphHeadFactory<G> graphHeadFactory) {
+  public DFSDecoder(EPGMGraphHeadFactory<G> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 

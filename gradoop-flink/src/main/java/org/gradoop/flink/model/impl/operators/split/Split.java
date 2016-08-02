@@ -21,6 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
@@ -29,9 +30,8 @@ import org.gradoop.flink.model.impl.operators.split.functions.InitGraphHead;
 import org.gradoop.flink.model.impl.operators.split.functions
   .JoinVertexIdWithGraphIds;
 import org.gradoop.flink.model.impl.operators.split.functions.SplitValues;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.api.functions.UnaryFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -60,14 +60,14 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
   /**
    * User-defined function for value extraction
    */
-  private final UnaryFunction<Vertex, List<PropertyValue>> function;
+  private final UnaryFunction<EPGMVertex, List<PropertyValue>> function;
 
   /**
    * Constructor
    *
    * @param function user-defined function
    */
-  public Split(UnaryFunction<Vertex, List<PropertyValue>> function) {
+  public Split(UnaryFunction<EPGMVertex, List<PropertyValue>> function) {
     this.function = function;
   }
 
@@ -107,9 +107,9 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
         .reduceGroup(new MultipleGraphIdsGroupReducer());
 
     // add new graph ids to the initial vertex set
-    DataSet<Vertex> vertices = graph.getVertices()
+    DataSet<EPGMVertex> vertices = graph.getVertices()
       .join(vertexIdWithGraphIds)
-      .where(new Id<Vertex>()).equalTo(0)
+      .where(new Id<EPGMVertex>()).equalTo(0)
       .with(new AddNewGraphsToVertex<>());
 
     //--------------------------------------------------------------------------
@@ -121,7 +121,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
       .map(new Project2To1<PropertyValue, GradoopId>());
 
     // add new graph id's to the initial graph set
-    DataSet<GraphHead> newGraphs = newGraphIds
+    DataSet<EPGMGraphHead> newGraphs = newGraphIds
       .map(new InitGraphHead(graph.getConfig().getGraphHeadFactory()));
 
     //--------------------------------------------------------------------------
@@ -129,7 +129,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     //--------------------------------------------------------------------------
 
     // replace source and target id by the graph list the corresponding vertex
-    DataSet<Tuple3<Edge, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
+    DataSet<Tuple3<EPGMEdge, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
       graph.getEdges()
         .join(vertexIdWithGraphIds)
         .where(new SourceId<>()).equalTo(0)
@@ -140,7 +140,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
 
     // add new graph ids to the edges iff source and target are contained in the
     // same graph
-    DataSet<Edge> edges = edgeGraphIdsGraphIds
+    DataSet<EPGMEdge> edges = edgeGraphIdsGraphIds
       .flatMap(new AddNewGraphsToEdge<>());
 
     //--------------------------------------------------------------------------

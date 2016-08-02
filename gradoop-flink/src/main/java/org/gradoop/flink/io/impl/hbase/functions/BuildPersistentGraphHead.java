@@ -19,7 +19,7 @@ package org.gradoop.flink.io.impl.hbase.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.storage.api.PersistentGraphHead;
@@ -29,7 +29,7 @@ import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
  * Creates persistent graph data from graph data and vertex/edge identifiers.
  */
 public class BuildPersistentGraphHead implements JoinFunction
-  <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, GraphHead, PersistentGraphHead> {
+  <Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>, EPGMGraphHead, PersistentGraphHead> {
 
   /**
    * Persistent graph data factory.
@@ -51,7 +51,7 @@ public class BuildPersistentGraphHead implements JoinFunction
   @Override
   public PersistentGraphHead join(
     Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> longSetSetTuple3,
-    GraphHead graphHead) throws Exception {
+    EPGMGraphHead graphHead) throws Exception {
     return graphHeadFactory.createGraphHead(graphHead, longSetSetTuple3.f1,
       longSetSetTuple3.f2);
   }

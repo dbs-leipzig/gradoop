@@ -20,11 +20,11 @@ package org.gradoop.flink.io.impl.json.functions;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.io.impl.json.JSONConstants;
-import org.gradoop.common.model.api.entities.Attributed;
-import org.gradoop.common.model.api.entities.GraphElement;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Labeled;
+import org.gradoop.common.model.api.entities.EPGMAttributed;
+import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
@@ -40,7 +40,7 @@ public class EntityToJSON {
    * @return json object containing the properties
    * @throws JSONException
    */
-  protected JSONObject writeProperties(Attributed entity) throws
+  protected JSONObject writeProperties(EPGMAttributed entity) throws
     JSONException {
     JSONObject data = new JSONObject();
     if (entity.getPropertyCount() > 0) {
@@ -61,7 +61,7 @@ public class EntityToJSON {
    * @return json object containing meta information
    * @throws JSONException
    */
-  protected <T extends Labeled & GraphElement> JSONObject
+  protected <T extends EPGMLabeled & EPGMGraphElement> JSONObject
   writeGraphElementMeta(
     T entity) throws JSONException {
     JSONObject meta = writeMeta(entity);
@@ -80,7 +80,7 @@ public class EntityToJSON {
    * @return json object with graph meta data
    * @throws JSONException
    */
-  protected <T extends GraphHead> JSONObject
+  protected <T extends EPGMGraphHead> JSONObject
   writeGraphMeta(T entity) throws JSONException {
     return writeMeta(entity);
   }
@@ -92,7 +92,7 @@ public class EntityToJSON {
    * @return json object with meta data containing the label
    * @throws JSONException
    */
-  private JSONObject writeMeta(Labeled entity) throws JSONException {
+  private JSONObject writeMeta(EPGMLabeled entity) throws JSONException {
     JSONObject meta = new JSONObject();
     meta.put(JSONConstants.LABEL, entity.getLabel());
     return meta;

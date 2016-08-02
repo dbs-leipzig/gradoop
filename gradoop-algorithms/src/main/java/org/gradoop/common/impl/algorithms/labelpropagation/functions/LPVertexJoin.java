@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 /**
  * Updates the vertex on the left side with the property value on the right side
@@ -28,7 +28,7 @@ import org.gradoop.common.model.api.entities.Vertex;
  */
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
 @FunctionAnnotation.ReadFieldsFirst("f1")
-public class LPVertexJoin<V extends Vertex>
+public class LPVertexJoin<V extends EPGMVertex>
   implements JoinFunction<org.apache.flink.graph.Vertex, V, V> {
 
   /**

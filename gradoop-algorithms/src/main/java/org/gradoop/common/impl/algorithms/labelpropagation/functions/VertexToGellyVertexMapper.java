@@ -19,7 +19,7 @@ package org.gradoop.model.impl.algorithms.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 /**
  * Maps EPGM vertex to a Gelly vertex consisting of the EPGM identifier and the
@@ -29,7 +29,7 @@ import org.gradoop.common.model.api.entities.Vertex;
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("properties")
-public class VertexToGellyVertexMapper<V extends Vertex>
+public class VertexToGellyVertexMapper<V extends EPGMVertex>
   implements MapFunction<V, org.apache.flink.graph.Vertex> {
   /**
    * Property key to access the label value which will be propagated

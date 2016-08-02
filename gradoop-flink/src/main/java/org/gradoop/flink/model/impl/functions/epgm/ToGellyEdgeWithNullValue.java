@@ -18,13 +18,13 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.types.NullValue;
-import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 
 /**
  * turns an EPGM edge into a Gelly edge without data.
  * @param <E>
  */
-public class ToGellyEdgeWithNullValue<E extends Edge>
+public class ToGellyEdgeWithNullValue<E extends EPGMEdge>
   implements MapFunction<E, org.apache.flink.graph.Edge> {
 
   @Override

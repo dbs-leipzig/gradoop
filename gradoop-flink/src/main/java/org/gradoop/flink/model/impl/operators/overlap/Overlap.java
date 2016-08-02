@@ -37,7 +37,7 @@ package org.gradoop.flink.model.impl.operators.overlap;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -48,7 +48,7 @@ public class Overlap extends OverlapBase implements BinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of two input graphs. Vertex and edge equality is based on their
+   * sets of two input graphs. EPGMVertex and edge equality is based on their
    * respective identifiers.
    *
    * @param firstGraph  first input graph
@@ -60,8 +60,8 @@ public class Overlap extends OverlapBase implements BinaryGraphToGraphOperator {
     LogicalGraph firstGraph, LogicalGraph secondGraph) {
 
     DataSet<GradoopId> graphIds = firstGraph.getGraphHead()
-      .map(new Id<GraphHead>())
-      .union(secondGraph.getGraphHead().map(new Id<GraphHead>()));
+      .map(new Id<EPGMGraphHead>())
+      .union(secondGraph.getGraphHead().map(new Id<EPGMGraphHead>()));
 
     return LogicalGraph.fromDataSets(
       getVertices(firstGraph.getVertices(), graphIds),

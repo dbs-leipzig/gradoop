@@ -2,11 +2,10 @@ package org.gradoop.flink.model.impl.operators.transformation;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.flink.model.impl.operators.transformation.Transformation;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -57,11 +56,11 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph inputGraph = loader.getLogicalGraphByVariable("g0");
 
-    inputGraph.getGraphHead().map(new Id<GraphHead>()).output(
+    inputGraph.getGraphHead().map(new Id<EPGMGraphHead>()).output(
       new LocalCollectionOutputFormat<>(expectedGraphHeadIds));
-    inputGraph.getVertices().map(new Id<Vertex>()).output(
+    inputGraph.getVertices().map(new Id<EPGMVertex>()).output(
       new LocalCollectionOutputFormat<>(expectedVertexIds));
-    inputGraph.getEdges().map(new Id<Edge>()).output(
+    inputGraph.getEdges().map(new Id<EPGMEdge>()).output(
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
     LogicalGraph result = inputGraph
@@ -76,13 +75,13 @@ public class TransformationTest extends GradoopFlinkTestBase {
     List<GradoopId> resultEdgeIds = Lists.newArrayList();
 
     result.getGraphHead()
-      .map(new Id<GraphHead>())
+      .map(new Id<EPGMGraphHead>())
       .output(new LocalCollectionOutputFormat<>(resultGraphHeadIds));
     result.getVertices()
-      .map(new Id<Vertex>())
+      .map(new Id<EPGMVertex>())
       .output(new LocalCollectionOutputFormat<>(resultVertexIds));
     result.getEdges()
-      .map(new Id<Edge>())
+      .map(new Id<EPGMEdge>())
       .output(new LocalCollectionOutputFormat<>(resultEdgeIds));
 
     getExecutionEnvironment().execute();
@@ -155,20 +154,20 @@ public class TransformationTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
-  public static class GraphHeadModifier implements TransformationFunction<GraphHead> {
+  public static class GraphHeadModifier implements TransformationFunction<EPGMGraphHead> {
 
     @Override
-    public GraphHead execute(GraphHead current, GraphHead transformed) {
+    public EPGMGraphHead execute(EPGMGraphHead current, EPGMGraphHead transformed) {
       transformed.setLabel(current.getLabel());
       transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
       return transformed;
     }
   }
 
-  public static class VertexModifier implements TransformationFunction<Vertex> {
+  public static class VertexModifier implements TransformationFunction<EPGMVertex> {
 
     @Override
-    public Vertex execute(Vertex current, Vertex transformed) {
+    public EPGMVertex execute(EPGMVertex current, EPGMVertex transformed) {
       transformed.setLabel(current.getLabel());
       if (current.getLabel().equals("A")) {
         transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
@@ -180,10 +179,10 @@ public class TransformationTest extends GradoopFlinkTestBase {
     }
   }
 
-  public static class EdgeModifier implements TransformationFunction<Edge> {
+  public static class EdgeModifier implements TransformationFunction<EPGMEdge> {
 
     @Override
-    public Edge execute(Edge current, Edge transformed) {
+    public EPGMEdge execute(EPGMEdge current, EPGMEdge transformed) {
       return transformed;
     }
   }

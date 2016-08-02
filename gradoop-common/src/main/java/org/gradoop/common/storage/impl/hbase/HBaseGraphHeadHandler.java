@@ -24,12 +24,12 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.GraphHeadHandler;
 import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.util.GConstants;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 
 import java.io.IOException;
 import java.util.Set;
@@ -70,14 +70,14 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler
   /**
    * Creates graph data objects from the rows.
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory graphHeadFactory;
 
   /**
    * Creates a graph handler.
    *
    * @param graphHeadFactory used to create runtime graph data objects
    */
-  public HBaseGraphHeadHandler(GraphHeadFactory graphHeadFactory) {
+  public HBaseGraphHeadHandler(EPGMGraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -153,8 +153,8 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler
    * {@inheritDoc}
    */
   @Override
-  public GraphHead readGraphHead(final Result res) {
-    GraphHead graphHead = null;
+  public EPGMGraphHead readGraphHead(final Result res) {
+    EPGMGraphHead graphHead = null;
     try {
       graphHead = graphHeadFactory
         .initGraphHead(readId(res), readLabel(res), readProperties(res));
@@ -168,7 +168,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler
    * {@inheritDoc}
    */
   @Override
-  public GraphHeadFactory getGraphHeadFactory() {
+  public EPGMGraphHeadFactory getGraphHeadFactory() {
     return graphHeadFactory;
   }
 }

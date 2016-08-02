@@ -18,11 +18,11 @@
 package org.gradoop.flink.model.impl.operators.base;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators
   .BinaryCollectionToCollectionOperator;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 
 /**
@@ -53,9 +53,9 @@ public abstract class BinaryCollectionToCollectionOperatorBase
     this.firstCollection = firstCollection;
     this.secondCollection = secondCollection;
 
-    final DataSet<GraphHead> newGraphHeads = computeNewGraphHeads();
-    final DataSet<Vertex> newVertices = computeNewVertices(newGraphHeads);
-    final DataSet<Edge> newEdges = computeNewEdges(newVertices);
+    final DataSet<EPGMGraphHead> newGraphHeads = computeNewGraphHeads();
+    final DataSet<EPGMVertex> newVertices = computeNewVertices(newGraphHeads);
+    final DataSet<EPGMEdge> newEdges = computeNewEdges(newVertices);
 
     return GraphCollection.fromDataSets(newGraphHeads, newVertices,
       newEdges, firstCollection.getConfig());
@@ -67,14 +67,14 @@ public abstract class BinaryCollectionToCollectionOperatorBase
    * @param newGraphHeads new graph heads
    * @return vertex set of the resulting graph collection
    */
-  protected abstract DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newGraphHeads);
+  protected abstract DataSet<EPGMVertex> computeNewVertices(DataSet<EPGMGraphHead> newGraphHeads);
 
   /**
    * Overridden by inheriting classes.
    *
    * @return subgraph dataset of the resulting collection
    */
-  protected abstract DataSet<GraphHead> computeNewGraphHeads();
+  protected abstract DataSet<EPGMGraphHead> computeNewGraphHeads();
 
   /**
    * Overridden by inheriting classes.
@@ -82,6 +82,6 @@ public abstract class BinaryCollectionToCollectionOperatorBase
    * @param newVertices vertex set of the resulting graph collection
    * @return edges set only connect vertices in {@code newVertices}
    */
-  protected abstract DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices);
+  protected abstract DataSet<EPGMEdge> computeNewEdges(DataSet<EPGMVertex> newVertices);
 
 }

@@ -17,21 +17,37 @@
 
 package org.gradoop.common.model.api.entities;
 
+import org.gradoop.common.model.impl.id.GradoopId;
+
 /**
- * Describes an entity that has a label.
+ * Describes data assigned to an edge in the EPGM.
  */
-public interface Labeled {
+public interface EPGMEdge extends EPGMGraphElement {
   /**
-   * Returns the label of that entity.
+   * Returns the source vertex identifier.
    *
-   * @return label
+   * @return source vertex id
    */
-  String getLabel();
+  GradoopId getSourceId();
 
   /**
-   * Sets the label of that entity.
+   * Sets the source vertex identifier.
    *
-   * @param label label to be set (must not be {@code null} or empty)
+   * @param sourceId source vertex id
    */
-  void setLabel(String label);
+  void setSourceId(GradoopId sourceId);
+
+  /**
+   * Returns the target vertex identifier.
+   *
+   * @return target vertex id
+   */
+  GradoopId getTargetId();
+
+  /**
+   * Sets the target vertex identifier.
+   *
+   * @param targetId target vertex id.
+   */
+  void setTargetId(GradoopId targetId);
 }

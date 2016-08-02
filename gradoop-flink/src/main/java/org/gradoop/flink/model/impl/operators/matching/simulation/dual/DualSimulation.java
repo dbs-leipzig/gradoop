@@ -22,12 +22,12 @@ import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
@@ -55,7 +55,7 @@ import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples.Me
 
 
 /**
- * Vertex-centric Dual-Simulation.
+ * EPGMVertex-centric Dual-Simulation.
  */
 public class DualSimulation extends PatternMatching {
 
@@ -93,8 +93,8 @@ public class DualSimulation extends PatternMatching {
       return GraphCollection.fromGraph(
         LogicalGraph.fromDataSets(matchingVertexIds
             .join(graph.getVertices())
-            .where(0).equalTo(new Id<Vertex>())
-            .with(new RightSide<Tuple1<GradoopId>, Vertex>()),
+            .where(0).equalTo(new Id<EPGMVertex>())
+            .with(new RightSide<Tuple1<GradoopId>, EPGMVertex>()),
           graph.getConfig()
         ));
     } else {
@@ -322,11 +322,11 @@ public class DualSimulation extends PatternMatching {
     DataSet<FatVertex> vertices) {
     GradoopFlinkConfig config = graph.getConfig();
 
-    DataSet<Vertex> matchVertices = doAttachData() ?
+    DataSet<EPGMVertex> matchVertices = doAttachData() ?
       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :
       PostProcessor.extractVertices(vertices, config.getVertexFactory());
 
-    DataSet<Edge> matchEdges = doAttachData() ?
+    DataSet<EPGMEdge> matchEdges = doAttachData() ?
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
       PostProcessor.extractEdges(vertices, config.getEdgeFactory());
 

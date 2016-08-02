@@ -52,11 +52,11 @@ public class QueryHandler {
    */
   private Integer radius;
   /**
-   * Cache: vId --> Vertex with Id == vId
+   * Cache: vId --> EPGMVertex with Id == vId
    */
   private Map<Long, Vertex> idToVertexCache;
   /**
-   * Cache: eId --> Edge with Id == eId
+   * Cache: eId --> EPGMEdge with Id == eId
    */
   private Map<Long, Edge> idToEdgeCache;
   /**

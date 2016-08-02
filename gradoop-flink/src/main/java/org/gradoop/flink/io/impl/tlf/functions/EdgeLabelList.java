@@ -20,7 +20,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class EdgeLabelList implements
     GraphTransaction graphTransaction, Collector<List<String>>
     collector) throws Exception {
     List<String> list = Lists.newLinkedList();
-    for (Edge edge : graphTransaction.getEdges()) {
+    for (EPGMEdge edge : graphTransaction.getEdges()) {
       list.add(edge.getLabel());
     }
     collector.collect(list);

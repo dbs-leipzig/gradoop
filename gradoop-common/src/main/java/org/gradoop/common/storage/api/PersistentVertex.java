@@ -17,8 +17,8 @@
 
 package org.gradoop.common.storage.api;
 
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 import java.util.Set;
 
@@ -26,34 +26,34 @@ import java.util.Set;
  * Representation of vertex data on the storage level. We additionally store
  * outgoing and incoming edges for faster access during e.g. traversal.
  */
-public interface PersistentVertex extends Vertex {
+public interface PersistentVertex extends EPGMVertex {
 
   /**
    * Returns outgoing edge data for the vertex.
    *
    * @return outgoing edge data
    */
-  Set<Edge> getOutgoingEdges();
+  Set<EPGMEdge> getOutgoingEdges();
 
   /**
    * Sets outgoing edge data.
    *
    * @param outgoingEdgeData outgoing edge data
    */
-  void setOutgoingEdges(Set<Edge> outgoingEdgeData);
+  void setOutgoingEdges(Set<EPGMEdge> outgoingEdgeData);
 
   /**
    * Returns incoming edge data for the vertex.
    *
    * @return incoming edge data
    */
-  Set<Edge> getIncomingEdges();
+  Set<EPGMEdge> getIncomingEdges();
 
   /**
    * Sets incoming edge data.
    *
    * @param incomingEdgeData incoming edge data
    */
-  void setIncomingEdges(Set<Edge> incomingEdgeData);
+  void setIncomingEdges(Set<EPGMEdge> incomingEdgeData);
 
 }

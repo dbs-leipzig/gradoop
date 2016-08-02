@@ -17,8 +17,8 @@
 
 package org.gradoop.common.storage.impl.hbase;
 
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.PersistentVertexFactory;
 
 import java.util.Set;
@@ -39,8 +39,8 @@ public class HBaseVertexFactory implements PersistentVertexFactory {
    * {@inheritDoc}
    */
   @Override
-  public HBaseVertex createVertex(Vertex inputVertex,
-    Set<Edge> outgoingEdges, Set<Edge> incomingEdges) {
+  public HBaseVertex createVertex(EPGMVertex inputVertex,
+    Set<EPGMEdge> outgoingEdges, Set<EPGMEdge> incomingEdges) {
     checkNotNull(inputVertex, "Input vertex was null");
     return new HBaseVertex(inputVertex, outgoingEdges, incomingEdges);
   }

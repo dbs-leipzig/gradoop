@@ -17,9 +17,8 @@
 
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHeadPojoFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.util.GConstants;
 import org.hamcrest.core.Is;
@@ -32,7 +31,7 @@ public class GraphHeadPojoTest {
   @Test
   public void createWithIDTest() {
     GradoopId graphID = GradoopId.get();
-    GraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
+    EPGMGraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
     assertThat(g.getId(), is(graphID));
     assertThat(g.getPropertyCount(), is(0));
   }
@@ -45,7 +44,7 @@ public class GraphHeadPojoTest {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    GraphHead graphHead =
+    EPGMGraphHead graphHead =
       new GraphHeadPojoFactory().initGraphHead(graphID, label, props);
 
     assertThat(graphHead.getId(), is(graphID));
@@ -58,7 +57,7 @@ public class GraphHeadPojoTest {
   @Test
   public void createWithMissingLabelTest() {
     GradoopId graphID = GradoopId.get();
-    GraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
+    EPGMGraphHead g = new GraphHeadPojoFactory().initGraphHead(graphID);
     assertThat(g.getLabel(), is(GConstants.DEFAULT_GRAPH_LABEL));
   }
 
@@ -78,9 +77,9 @@ public class GraphHeadPojoTest {
     GradoopId graphID1 = GradoopId.get();
     GradoopId graphID2 = GradoopId.get();
 
-    GraphHead graphHead1 = new GraphHeadPojoFactory().initGraphHead(graphID1);
-    GraphHead graphHead2 = new GraphHeadPojoFactory().initGraphHead(graphID1);
-    GraphHead graphHead3 = new GraphHeadPojoFactory().initGraphHead(graphID2);
+    EPGMGraphHead graphHead1 = new GraphHeadPojoFactory().initGraphHead(graphID1);
+    EPGMGraphHead graphHead2 = new GraphHeadPojoFactory().initGraphHead(graphID1);
+    EPGMGraphHead graphHead3 = new GraphHeadPojoFactory().initGraphHead(graphID2);
 
     assertEquals("Graph heads were not equal", graphHead1, graphHead1);
     assertEquals("Graph heads were not equal", graphHead1, graphHead2);
@@ -92,9 +91,9 @@ public class GraphHeadPojoTest {
     GradoopId graphID1 = GradoopId.get();
     GradoopId graphID2 = GradoopId.get();
 
-    GraphHead graphHead1 = new GraphHeadPojoFactory().initGraphHead(graphID1);
-    GraphHead graphHead2 = new GraphHeadPojoFactory().initGraphHead(graphID1);
-    GraphHead graphHead3 = new GraphHeadPojoFactory().initGraphHead(graphID2);
+    EPGMGraphHead graphHead1 = new GraphHeadPojoFactory().initGraphHead(graphID1);
+    EPGMGraphHead graphHead2 = new GraphHeadPojoFactory().initGraphHead(graphID1);
+    EPGMGraphHead graphHead3 = new GraphHeadPojoFactory().initGraphHead(graphID2);
 
     assertTrue("Graph heads have different hash",
       graphHead1.hashCode() == graphHead2.hashCode());

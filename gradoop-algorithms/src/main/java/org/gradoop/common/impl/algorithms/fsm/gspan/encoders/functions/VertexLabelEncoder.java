@@ -20,7 +20,7 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.encoders.functions;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.model.impl.algorithms.fsm.config.BroadcastNames;
 import org.gradoop.model.impl.algorithms.fsm.gspan.encoders.tuples.VertexIdLabel;
 
@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * @param <V> EPGM vertex type
  */
-public class VertexLabelEncoder<V extends Vertex>
+public class VertexLabelEncoder<V extends EPGMVertex>
   extends RichFlatMapFunction<V, VertexIdLabel> {
 
   /**

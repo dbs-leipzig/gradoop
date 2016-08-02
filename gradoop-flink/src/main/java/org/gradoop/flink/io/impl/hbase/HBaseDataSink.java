@@ -23,6 +23,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.hbase.functions.BuildEdgeMutation;
 import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentGraphHead;
@@ -40,9 +42,7 @@ import org.gradoop.flink.io.impl.hbase.functions.BuildGraphHeadMutation;
 import org.gradoop.flink.io.impl.hbase.functions.BuildGraphTransactions;
 import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentEdge;
 import org.gradoop.flink.io.impl.hbase.functions.BuildVertexMutation;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -109,11 +109,11 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
 
     // build (graph-id, vertex-id) tuples from vertices
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdToVertexId =
-      collection.getVertices().flatMap(new PairGraphIdWithElementId<Vertex>());
+      collection.getVertices().flatMap(new PairGraphIdWithElementId<EPGMVertex>());
 
     // build (graph-id, edge-id) tuples from vertices
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdToEdgeId =
-      collection.getEdges().flatMap(new PairGraphIdWithElementId<Edge>());
+      collection.getEdges().flatMap(new PairGraphIdWithElementId<EPGMEdge>());
 
     // co-group (graph-id, vertex-id) and (graph-id, edge-id) tuples to
     // (graph-id, {vertex-id}, {edge-id}) triples
@@ -129,7 +129,7 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     DataSet<PersistentGraphHead> persistentGraphDataSet =
       graphToVertexIdsAndEdgeIds
         .join(collection.getGraphHeads())
-        .where(0).equalTo(new Id<GraphHead>())
+        .where(0).equalTo(new Id<EPGMGraphHead>())
         .with(new BuildPersistentGraphHead(
           getHBaseConfig().getPersistentGraphHeadFactory()));
 
@@ -155,22 +155,22 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     IOException {
 
     // group edges by source vertex id (vertex-id, [out-edge])
-    DataSet<Tuple2<GradoopId, Set<Edge>>> vertexToOutgoingEdges =
+    DataSet<Tuple2<GradoopId, Set<EPGMEdge>>> vertexToOutgoingEdges =
       collection.getEdges()
         .groupBy(new SourceId<>())
         .reduceGroup(new EdgeSetBySourceId<>());
 
     // group edges by target vertex id (vertex-id, [in-edge])
-    DataSet<Tuple2<GradoopId, Set<Edge>>> vertexToIncomingEdges =
+    DataSet<Tuple2<GradoopId, Set<EPGMEdge>>> vertexToIncomingEdges =
       collection.getEdges()
         .groupBy(new TargetId<>())
         .reduceGroup(new EdgeSetByTargetId<>());
 
     // co-group (vertex-data) with (vertex-id, [out-edge])
-    DataSet<Tuple2<Vertex, Set<Edge>>> vertexDataWithOutgoingEdges = collection
+    DataSet<Tuple2<EPGMVertex, Set<EPGMEdge>>> vertexDataWithOutgoingEdges = collection
       .getVertices()
       .coGroup(vertexToOutgoingEdges)
-      .where(new Id<Vertex>()).equalTo(0)
+      .where(new Id<EPGMVertex>()).equalTo(0)
       .with(new BuildVertexDataWithEdges<>());
 
     // co-group
@@ -206,12 +206,12 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     DataSet<PersistentEdge> persistentEdgeDataSet = collection.getVertices()
       // join vertex with edges on edge source vertex id
       .join(collection.getEdges())
-      .where(new Id<Vertex>())
+      .where(new Id<EPGMVertex>())
       .equalTo(new SourceId<>())
       // join result with vertices on edge target vertex id
       .join(collection.getVertices())
       .where("f1.targetId")
-      .equalTo(new Id<Vertex>())
+      .equalTo(new Id<EPGMVertex>())
       // ((source-vertex-data, edge-data), target-vertex-data)
       .with(new BuildPersistentEdge(
         getHBaseConfig().getPersistentEdgeFactory()));

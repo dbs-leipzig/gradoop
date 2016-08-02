@@ -21,16 +21,16 @@ import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query
   .TraversalCode;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EdgeFactory;
-import org.gradoop.common.model.api.entities.Element;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
-import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 
@@ -38,10 +38,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Extracts {@link Element} instances from an {@link Embedding}.
+ * Extracts {@link EPGMElement} instances from an {@link Embedding}.
  */
 public class ElementsFromEmbedding implements 
-  FlatMapFunction<Tuple1<Embedding>, Element> {
+  FlatMapFunction<Tuple1<Embedding>, EPGMElement> {
 
   /**
    * Maps edge candidates to the step in which they are traversed
@@ -50,15 +50,15 @@ public class ElementsFromEmbedding implements
   /**
    * Constructs EPGM graph heads
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory graphHeadFactory;
   /**
    * Constructs EPGM vertices
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory vertexFactory;
   /**
    * Constructs EPGM edges
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory edgeFactory;
 
   /**
    * Constructor
@@ -69,9 +69,9 @@ public class ElementsFromEmbedding implements
    * @param edgeFactory       EPGM edge factory
    */
   public ElementsFromEmbedding(TraversalCode traversalCode,
-    GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory,
-    EdgeFactory edgeFactory) {
+    EPGMGraphHeadFactory graphHeadFactory,
+    EPGMVertexFactory vertexFactory,
+    EPGMEdgeFactory edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
@@ -84,18 +84,18 @@ public class ElementsFromEmbedding implements
   }
 
   @Override
-  public void flatMap(Tuple1<Embedding> embedding, Collector<Element> out)
+  public void flatMap(Tuple1<Embedding> embedding, Collector<EPGMElement> out)
       throws Exception {
     GradoopId[] vertexEmbeddings  = embedding.f0.getVertexMappings();
     GradoopId[] edgeEmbeddings    = embedding.f0.getEdgeMappings();
 
     // create graph head
-    GraphHead graphHead = graphHeadFactory.createGraphHead();
+    EPGMGraphHead graphHead = graphHeadFactory.createGraphHead();
     out.collect(graphHead);
 
     // collect vertices (and assign to graph head)
     for (GradoopId vertexId : vertexEmbeddings) {
-      Vertex v = vertexFactory.initVertex(vertexId);
+      EPGMVertex v = vertexFactory.initVertex(vertexId);
       v.addGraphId(graphHead.getId());
       out.collect(v);
     }
@@ -108,7 +108,7 @@ public class ElementsFromEmbedding implements
         vertexEmbeddings[(int) s.getFrom()] : vertexEmbeddings[(int) s.getTo()];
       GradoopId targetId = s.isOutgoing() ?
         vertexEmbeddings[(int) s.getTo()] : vertexEmbeddings[(int) s.getFrom()];
-      Edge e = edgeFactory.initEdge(edgeEmbeddings[i], sourceId, targetId);
+      EPGMEdge e = edgeFactory.initEdge(edgeEmbeddings[i], sourceId, targetId);
       e.addGraphId(graphHead.getId());
       out.collect(e);
     }

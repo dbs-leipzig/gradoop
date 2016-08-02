@@ -23,48 +23,48 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Initializes an {@link Vertex} from a given {@link GradoopId}.
+ * Initializes an {@link EPGMVertex} from a given {@link GradoopId}.
  */
 @FunctionAnnotation.ForwardedFields("f0->id")
 public class VertexFromId implements
-  MapFunction<Tuple1<GradoopId>, Vertex>,
-  ResultTypeQueryable<Vertex> {
+  MapFunction<Tuple1<GradoopId>, EPGMVertex>,
+  ResultTypeQueryable<EPGMVertex> {
 
   /**
    * EPGM vertex factory
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory vertexFactory;
 
   /**
    * Create new function.
    *
    * @param vertexFactory EPGM vertex factory
    */
-  public VertexFromId(VertexFactory vertexFactory) {
+  public VertexFromId(EPGMVertexFactory vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 
   /**
-   * Initializes an {@link Vertex} from a given {@link GradoopId}.
+   * Initializes an {@link EPGMVertex} from a given {@link GradoopId}.
    *
    * @param gradoopId Gradoop identifier
    * @return EPGM vertex
    * @throws Exception
    */
   @Override
-  public Vertex map(Tuple1<GradoopId> gradoopId) throws Exception {
+  public EPGMVertex map(Tuple1<GradoopId> gradoopId) throws Exception {
     return vertexFactory.initVertex(gradoopId.f0);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<Vertex> getProducedType() {
-    return (TypeInformation<Vertex>) TypeExtractor
+  public TypeInformation<EPGMVertex> getProducedType() {
+    return (TypeInformation<EPGMVertex>) TypeExtractor
       .createTypeInfo(vertexFactory.getType());
   }
 }

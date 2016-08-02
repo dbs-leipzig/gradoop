@@ -17,10 +17,10 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.operators.BinaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
@@ -50,8 +50,8 @@ public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public GraphEquality(GraphHeadToString<GraphHead> graphHeadToString,
-    VertexToString<Vertex> vertexToString, EdgeToString<Edge> edgeToString,
+  public GraphEquality(GraphHeadToString<EPGMGraphHead> graphHeadToString,
+    VertexToString<EPGMVertex> vertexToString, EdgeToString<EPGMEdge> edgeToString,
     boolean directed) {
     this.directed = directed;
 

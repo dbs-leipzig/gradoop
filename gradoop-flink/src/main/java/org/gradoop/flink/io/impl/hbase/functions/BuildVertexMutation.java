@@ -44,7 +44,7 @@ public class BuildVertexMutation extends RichMapFunction
   private transient Tuple2<GradoopId, Mutation> reuseTuple;
 
   /**
-   * Vertex data handler to create Mutations.
+   * EPGMVertex data handler to create Mutations.
    */
   private final VertexHandler vertexHandler;
 

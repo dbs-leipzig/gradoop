@@ -1,9 +1,9 @@
 package org.gradoop.common.storage.impl.hbase;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.storage.api.PersistentEdge;
@@ -78,18 +78,18 @@ public class GradoopHBaseTestUtils {
     PersistentGraphHeadFactory graphDataFactory = new HBaseGraphHeadFactory();
     List<PersistentGraphHead> persistentGraphData = new ArrayList<>();
 
-    for(GraphHead graphHead : loader.getGraphHeads()) {
+    for(EPGMGraphHead graphHead : loader.getGraphHeads()) {
 
       GradoopId graphId = graphHead.getId();
       GradoopIdSet vertexIds = new GradoopIdSet();
       GradoopIdSet edgeIds = new GradoopIdSet();
 
-      for (Vertex vertex : loader.getVertices()) {
+      for (EPGMVertex vertex : loader.getVertices()) {
         if (vertex.getGraphIds().contains(graphId)) {
           vertexIds.add(vertex.getId());
         }
       }
-      for (Edge edge : loader.getEdges()) {
+      for (EPGMEdge edge : loader.getEdges()) {
         if (edge.getGraphIds().contains(graphId)) {
           edgeIds.add(edge.getId());
         }
@@ -108,12 +108,12 @@ public class GradoopHBaseTestUtils {
     PersistentVertexFactory vertexDataFactory = new HBaseVertexFactory();
     List<PersistentVertex> persistentVertexData = new ArrayList<>();
 
-    for(Vertex vertex : loader.getVertices()) {
+    for(EPGMVertex vertex : loader.getVertices()) {
 
-      Set<Edge> outEdges = new HashSet<>();
-      Set<Edge> inEdges = new HashSet<>();
+      Set<EPGMEdge> outEdges = new HashSet<>();
+      Set<EPGMEdge> inEdges = new HashSet<>();
 
-      for(Edge edge : loader.getEdges()) {
+      for(EPGMEdge edge : loader.getEdges()) {
         if(edge.getSourceId().equals(vertex.getId())) {
           outEdges.add(edge);
         }
@@ -134,13 +134,13 @@ public class GradoopHBaseTestUtils {
     PersistentEdgeFactory edgeDataFactory = new HBaseEdgeFactory();
     List<PersistentEdge> persistentEdgeData = new ArrayList<>();
 
-    Map<GradoopId, Vertex> vertexById = new HashMap<>();
+    Map<GradoopId, EPGMVertex> vertexById = new HashMap<>();
 
-    for(Vertex vertex : loader.getVertices()) {
+    for(EPGMVertex vertex : loader.getVertices()) {
       vertexById.put(vertex.getId(), vertex);
     }
 
-    for(Edge edge : loader.getEdges()) {
+    for(EPGMEdge edge : loader.getEdges()) {
       persistentEdgeData.add(
         edgeDataFactory.createEdge(
           edge,

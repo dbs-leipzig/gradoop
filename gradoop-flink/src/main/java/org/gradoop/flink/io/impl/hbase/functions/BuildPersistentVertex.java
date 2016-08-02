@@ -20,8 +20,8 @@ package org.gradoop.flink.io.impl.hbase.functions;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.api.PersistentVertexFactory;
@@ -33,7 +33,7 @@ import java.util.Set;
  * outgoing/incoming edge data.
  */
 public class BuildPersistentVertex implements CoGroupFunction
-  <Tuple2<Vertex, Set<Edge>>, Tuple2<GradoopId, Set<Edge>>, PersistentVertex> {
+  <Tuple2<EPGMVertex, Set<EPGMEdge>>, Tuple2<GradoopId, Set<EPGMEdge>>, PersistentVertex> {
 
   /**
    * Persistent vertex data factory.
@@ -53,17 +53,17 @@ public class BuildPersistentVertex implements CoGroupFunction
    * {@inheritDoc}
    */
   @Override
-  public void coGroup(Iterable<Tuple2<Vertex, Set<Edge>>> iterable,
-    Iterable<Tuple2<GradoopId, Set<Edge>>> iterable1,
+  public void coGroup(Iterable<Tuple2<EPGMVertex, Set<EPGMEdge>>> iterable,
+    Iterable<Tuple2<GradoopId, Set<EPGMEdge>>> iterable1,
     Collector<PersistentVertex> collector) throws Exception {
-    Vertex vertex = null;
-    Set<Edge> outgoingEdgeData = null;
-    Set<Edge> incomingEdgeData = null;
-    for (Tuple2<Vertex, Set<Edge>> left : iterable) {
+    EPGMVertex vertex = null;
+    Set<EPGMEdge> outgoingEdgeData = null;
+    Set<EPGMEdge> incomingEdgeData = null;
+    for (Tuple2<EPGMVertex, Set<EPGMEdge>> left : iterable) {
       vertex = left.f0;
       outgoingEdgeData = left.f1;
     }
-    for (Tuple2<GradoopId, Set<Edge>> right : iterable1) {
+    for (Tuple2<GradoopId, Set<EPGMEdge>> right : iterable1) {
       incomingEdgeData = right.f1;
     }
     assert vertex != null;

@@ -1,10 +1,8 @@
 package org.gradoop.flink.model.impl;
 
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -45,7 +43,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = originalCollection.toTransactions();
 
     GraphCollection restoredCollection = GraphCollection
-      .fromTransactions(transactions, new First<Vertex>(), new First<Edge>());
+      .fromTransactions(transactions, new First<EPGMVertex>(), new First<EPGMEdge>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));
@@ -59,7 +57,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
   /**
    * There was a bug on converting a {@link GraphCollection} to
-   * {@link GraphTransactions} when there was a HeaderId in one of the Vertex
+   * {@link GraphTransactions} when there was a HeaderId in one of the EPGMVertex
    * headIds which is not present in the GraphHeads of the Collection.
    *
    * @see <a href="https://github.com/dbs-leipzig/gradoop/issues/273">
@@ -78,7 +76,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = originalCollection.toTransactions();
 
     GraphCollection restoredCollection = GraphCollection
-      .fromTransactions(transactions, new First<Vertex>(), new First<Edge>());
+      .fromTransactions(transactions, new First<EPGMVertex>(), new First<EPGMEdge>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));

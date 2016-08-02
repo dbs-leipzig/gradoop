@@ -1,9 +1,9 @@
 package org.gradoop.util;
 
 import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.common.util.GConstants;
@@ -44,7 +44,7 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 1, 1, 0);
     validateCaches(asciiGraphLoader, 0, 0, 0);
 
-    for (GraphHead graphHead : asciiGraphLoader.getGraphHeads()) {
+    for (EPGMGraphHead graphHead : asciiGraphLoader.getGraphHeads()) {
       assertEquals("Graph has wrong label",
         GConstants.DEFAULT_GRAPH_LABEL, graphHead.getLabel());
     }
@@ -58,8 +58,8 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 2, 2, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);
 
-    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
-    GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
+    EPGMGraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    EPGMGraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
     assertNotNull("graphHead was null", g);
     assertNotNull("graphHead was null", h);
     assertNotEquals("graphHeads were equal", g, h);
@@ -70,7 +70,7 @@ public class AsciiGraphLoaderTest {
     AsciiGraphLoader asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()];h[()]", config);
 
-    Collection<GraphHead> graphHeadPojos = asciiGraphLoader
+    Collection<EPGMGraphHead> graphHeadPojos = asciiGraphLoader
       .getGraphHeadsByVariables("g", "h");
 
     assertEquals("Wrong number of graphs", 2, graphHeadPojos.size());
@@ -84,8 +84,8 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 1, 1, 0);
     validateCaches(asciiGraphLoader, 0, 0, 0);
 
-    for (Vertex vertex : asciiGraphLoader.getVertices()) {
-      assertEquals("Vertex has wrong label",
+    for (EPGMVertex vertex : asciiGraphLoader.getVertices()) {
+      assertEquals("EPGMVertex has wrong label",
         GConstants.DEFAULT_VERTEX_LABEL, vertex.getLabel());
     }
   }
@@ -98,10 +98,10 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 0, 1, 0);
     validateCaches(asciiGraphLoader, 0, 1, 0);
 
-    Vertex v = asciiGraphLoader.getVertexByVariable("a");
-    assertEquals("Vertex has wrong label",
+    EPGMVertex v = asciiGraphLoader.getVertexByVariable("a");
+    assertEquals("EPGMVertex has wrong label",
       GConstants.DEFAULT_VERTEX_LABEL, v.getLabel());
-    assertNotNull("Vertex was null", v);
+    assertNotNull("EPGMVertex was null", v);
   }
 
   @Test
@@ -112,15 +112,15 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 1, 2, 0);
     validateCaches(asciiGraphLoader, 0, 2, 0);
 
-    Collection<Vertex> vertexs = asciiGraphLoader
+    Collection<EPGMVertex> vertexs = asciiGraphLoader
       .getVerticesByVariables("a", "b");
 
-    Vertex a = asciiGraphLoader.getVertexByVariable("a");
-    Vertex b = asciiGraphLoader.getVertexByVariable("b");
+    EPGMVertex a = asciiGraphLoader.getVertexByVariable("a");
+    EPGMVertex b = asciiGraphLoader.getVertexByVariable("b");
 
     assertEquals("Wrong number of vertices", 2, vertexs.size());
-    assertTrue("Vertex was not contained in result", vertexs.contains(a));
-    assertTrue("Vertex was not contained in result", vertexs.contains(b));
+    assertTrue("EPGMVertex was not contained in result", vertexs.contains(a));
+    assertTrue("EPGMVertex was not contained in result", vertexs.contains(b));
   }
 
   @Test
@@ -131,32 +131,32 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 2, 3, 0);
     validateCaches(asciiGraphLoader, 2, 3, 0);
 
-    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
-    GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
+    EPGMGraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    EPGMGraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
-    Collection<Vertex> vertexsG = asciiGraphLoader
+    Collection<EPGMVertex> vertexsG = asciiGraphLoader
       .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
-    Collection<Vertex> vertexsH = asciiGraphLoader
+    Collection<EPGMVertex> vertexsH = asciiGraphLoader
       .getVerticesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
-    Collection<Vertex> vertexsGH = asciiGraphLoader
+    Collection<EPGMVertex> vertexsGH = asciiGraphLoader
       .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
-    Vertex a = asciiGraphLoader.getVertexByVariable("a");
-    Vertex b = asciiGraphLoader.getVertexByVariable("b");
-    Vertex c = asciiGraphLoader.getVertexByVariable("c");
+    EPGMVertex a = asciiGraphLoader.getVertexByVariable("a");
+    EPGMVertex b = asciiGraphLoader.getVertexByVariable("b");
+    EPGMVertex c = asciiGraphLoader.getVertexByVariable("c");
 
     assertEquals("Wrong number of vertices", 2, vertexsG.size());
     assertEquals("Wrong number of vertices", 2, vertexsH.size());
     assertEquals("Wrong number of vertices", 3, vertexsGH.size());
-    assertTrue("Vertex was not contained in graph", vertexsG.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexsG.contains(b));
-    assertTrue("Vertex was not contained in graph", vertexsH.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexsH.contains(c));
-    assertTrue("Vertex was not contained in graph", vertexsGH.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexsGH.contains(b));
-    assertTrue("Vertex was not contained in graph", vertexsGH.contains(c));
+    assertTrue("EPGMVertex was not contained in graph", vertexsG.contains(a));
+    assertTrue("EPGMVertex was not contained in graph", vertexsG.contains(b));
+    assertTrue("EPGMVertex was not contained in graph", vertexsH.contains(a));
+    assertTrue("EPGMVertex was not contained in graph", vertexsH.contains(c));
+    assertTrue("EPGMVertex was not contained in graph", vertexsGH.contains(a));
+    assertTrue("EPGMVertex was not contained in graph", vertexsGH.contains(b));
+    assertTrue("EPGMVertex was not contained in graph", vertexsGH.contains(c));
   }
 
   @Test
@@ -167,29 +167,29 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 2, 3, 0);
     validateCaches(asciiGraphLoader, 2, 3, 0);
 
-    Collection<Vertex> vertexsG = asciiGraphLoader
+    Collection<EPGMVertex> vertexsG = asciiGraphLoader
       .getVerticesByGraphVariables("g");
 
-    Collection<Vertex> vertexsH = asciiGraphLoader
+    Collection<EPGMVertex> vertexsH = asciiGraphLoader
       .getVerticesByGraphVariables("h");
 
-    Collection<Vertex> vertexsGH = asciiGraphLoader
+    Collection<EPGMVertex> vertexsGH = asciiGraphLoader
       .getVerticesByGraphVariables("g", "h");
 
-    Vertex a = asciiGraphLoader.getVertexByVariable("a");
-    Vertex b = asciiGraphLoader.getVertexByVariable("b");
-    Vertex c = asciiGraphLoader.getVertexByVariable("c");
+    EPGMVertex a = asciiGraphLoader.getVertexByVariable("a");
+    EPGMVertex b = asciiGraphLoader.getVertexByVariable("b");
+    EPGMVertex c = asciiGraphLoader.getVertexByVariable("c");
 
     assertEquals("Wrong number of vertices", 2, vertexsG.size());
     assertEquals("Wrong number of vertices", 2, vertexsH.size());
     assertEquals("Wrong number of vertices", 3, vertexsGH.size());
-    assertTrue("Vertex was not contained in graph", vertexsG.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexsG.contains(b));
-    assertTrue("Vertex was not contained in graph", vertexsH.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexsH.contains(c));
-    assertTrue("Vertex was not contained in graph", vertexsGH.contains(a));
-    assertTrue("Vertex was not contained in graph", vertexsGH.contains(b));
-    assertTrue("Vertex was not contained in graph", vertexsGH.contains(c));
+    assertTrue("EPGMVertex was not contained in graph", vertexsG.contains(a));
+    assertTrue("EPGMVertex was not contained in graph", vertexsG.contains(b));
+    assertTrue("EPGMVertex was not contained in graph", vertexsH.contains(a));
+    assertTrue("EPGMVertex was not contained in graph", vertexsH.contains(c));
+    assertTrue("EPGMVertex was not contained in graph", vertexsGH.contains(a));
+    assertTrue("EPGMVertex was not contained in graph", vertexsGH.contains(b));
+    assertTrue("EPGMVertex was not contained in graph", vertexsGH.contains(c));
   }
 
   @Test
@@ -200,8 +200,8 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
 
-    for (Edge edge : asciiGraphLoader.getEdges()) {
-      assertEquals("Edge has wrong label",
+    for (EPGMEdge edge : asciiGraphLoader.getEdges()) {
+      assertEquals("EPGMEdge has wrong label",
         GConstants.DEFAULT_EDGE_LABEL, edge.getLabel());
     }
   }
@@ -214,15 +214,15 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 1, 3, 2);
     validateCaches(asciiGraphLoader, 0, 0, 2);
 
-    Collection<Edge> edges = asciiGraphLoader
+    Collection<EPGMEdge> edges = asciiGraphLoader
       .getEdgesByVariables("e", "f");
 
-    Edge e = asciiGraphLoader.getEdgeByVariable("e");
-    Edge f = asciiGraphLoader.getEdgeByVariable("f");
+    EPGMEdge e = asciiGraphLoader.getEdgeByVariable("e");
+    EPGMEdge f = asciiGraphLoader.getEdgeByVariable("f");
 
     assertEquals("Wrong number of edges", 2, edges.size());
-    assertTrue("Edge was not contained in result", edges.contains(e));
-    assertTrue("Edge was not contained in result", edges.contains(f));
+    assertTrue("EPGMEdge was not contained in result", edges.contains(e));
+    assertTrue("EPGMEdge was not contained in result", edges.contains(f));
   }
 
   @Test
@@ -234,34 +234,34 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 2, 6, 4);
     validateCaches(asciiGraphLoader, 2, 0, 4);
 
-    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
-    GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
+    EPGMGraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    EPGMGraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
-    Collection<Edge> edgesG = asciiGraphLoader
+    Collection<EPGMEdge> edgesG = asciiGraphLoader
       .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
-    Collection<Edge> edgesH = asciiGraphLoader
+    Collection<EPGMEdge> edgesH = asciiGraphLoader
       .getEdgesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
-    Collection<Edge> edgesGH = asciiGraphLoader
+    Collection<EPGMEdge> edgesGH = asciiGraphLoader
       .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
-    Edge a = asciiGraphLoader.getEdgeByVariable("a");
-    Edge b = asciiGraphLoader.getEdgeByVariable("b");
-    Edge c = asciiGraphLoader.getEdgeByVariable("c");
-    Edge d = asciiGraphLoader.getEdgeByVariable("d");
+    EPGMEdge a = asciiGraphLoader.getEdgeByVariable("a");
+    EPGMEdge b = asciiGraphLoader.getEdgeByVariable("b");
+    EPGMEdge c = asciiGraphLoader.getEdgeByVariable("c");
+    EPGMEdge d = asciiGraphLoader.getEdgeByVariable("d");
 
     assertEquals("Wrong number of edges", 2, edgesG.size());
     assertEquals("Wrong number of edges", 2, edgesH.size());
     assertEquals("Wrong number of edges", 4, edgesGH.size());
-    assertTrue("Edge was not contained in graph", edgesG.contains(a));
-    assertTrue("Edge was not contained in graph", edgesG.contains(b));
-    assertTrue("Edge was not contained in graph", edgesH.contains(c));
-    assertTrue("Edge was not contained in graph", edgesH.contains(d));
-    assertTrue("Edge was not contained in graph", edgesGH.contains(a));
-    assertTrue("Edge was not contained in graph", edgesGH.contains(b));
-    assertTrue("Edge was not contained in graph", edgesGH.contains(c));
-    assertTrue("Edge was not contained in graph", edgesGH.contains(d));
+    assertTrue("EPGMEdge was not contained in graph", edgesG.contains(a));
+    assertTrue("EPGMEdge was not contained in graph", edgesG.contains(b));
+    assertTrue("EPGMEdge was not contained in graph", edgesH.contains(c));
+    assertTrue("EPGMEdge was not contained in graph", edgesH.contains(d));
+    assertTrue("EPGMEdge was not contained in graph", edgesGH.contains(a));
+    assertTrue("EPGMEdge was not contained in graph", edgesGH.contains(b));
+    assertTrue("EPGMEdge was not contained in graph", edgesGH.contains(c));
+    assertTrue("EPGMEdge was not contained in graph", edgesGH.contains(d));
   }
 
   @Test
@@ -273,31 +273,31 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 2, 6, 4);
     validateCaches(asciiGraphLoader, 2, 0, 4);
 
-    Collection<Edge> edgesG = asciiGraphLoader
+    Collection<EPGMEdge> edgesG = asciiGraphLoader
       .getEdgesByGraphVariables("g");
 
-    Collection<Edge> edgesH = asciiGraphLoader
+    Collection<EPGMEdge> edgesH = asciiGraphLoader
       .getEdgesByGraphVariables("h");
 
-    Collection<Edge> edgesGH = asciiGraphLoader
+    Collection<EPGMEdge> edgesGH = asciiGraphLoader
       .getEdgesByGraphVariables("g", "h");
 
-    Edge a = asciiGraphLoader.getEdgeByVariable("a");
-    Edge b = asciiGraphLoader.getEdgeByVariable("b");
-    Edge c = asciiGraphLoader.getEdgeByVariable("c");
-    Edge d = asciiGraphLoader.getEdgeByVariable("d");
+    EPGMEdge a = asciiGraphLoader.getEdgeByVariable("a");
+    EPGMEdge b = asciiGraphLoader.getEdgeByVariable("b");
+    EPGMEdge c = asciiGraphLoader.getEdgeByVariable("c");
+    EPGMEdge d = asciiGraphLoader.getEdgeByVariable("d");
 
     assertEquals("Wrong number of edges", 2, edgesG.size());
     assertEquals("Wrong number of edges", 2, edgesH.size());
     assertEquals("Wrong number of edges", 4, edgesGH.size());
-    assertTrue("Edge was not contained in graph", edgesG.contains(a));
-    assertTrue("Edge was not contained in graph", edgesG.contains(b));
-    assertTrue("Edge was not contained in graph", edgesH.contains(c));
-    assertTrue("Edge was not contained in graph", edgesH.contains(d));
-    assertTrue("Edge was not contained in graph", edgesGH.contains(a));
-    assertTrue("Edge was not contained in graph", edgesGH.contains(b));
-    assertTrue("Edge was not contained in graph", edgesGH.contains(c));
-    assertTrue("Edge was not contained in graph", edgesGH.contains(d));
+    assertTrue("EPGMEdge was not contained in graph", edgesG.contains(a));
+    assertTrue("EPGMEdge was not contained in graph", edgesG.contains(b));
+    assertTrue("EPGMEdge was not contained in graph", edgesH.contains(c));
+    assertTrue("EPGMEdge was not contained in graph", edgesH.contains(d));
+    assertTrue("EPGMEdge was not contained in graph", edgesGH.contains(a));
+    assertTrue("EPGMEdge was not contained in graph", edgesGH.contains(b));
+    assertTrue("EPGMEdge was not contained in graph", edgesGH.contains(c));
+    assertTrue("EPGMEdge was not contained in graph", edgesGH.contains(d));
   }
 
   @Test
@@ -309,11 +309,11 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 3, 3, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);
 
-    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
-    GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
+    EPGMGraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    EPGMGraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
-    GraphHead gCache = asciiGraphLoader.getGraphHeadCache().get("g");
-    GraphHead hCache = asciiGraphLoader.getGraphHeadCache().get("h");
+    EPGMGraphHead gCache = asciiGraphLoader.getGraphHeadCache().get("g");
+    EPGMGraphHead hCache = asciiGraphLoader.getGraphHeadCache().get("h");
 
     assertEquals("Graphs were not equal", g, gCache);
     assertEquals("Graphs were not equal", h, hCache);
@@ -328,11 +328,11 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 0, 3, 0);
     validateCaches(asciiGraphLoader, 0, 2, 0);
 
-    Vertex a = asciiGraphLoader.getVertexByVariable("a");
-    Vertex b = asciiGraphLoader.getVertexByVariable("b");
+    EPGMVertex a = asciiGraphLoader.getVertexByVariable("a");
+    EPGMVertex b = asciiGraphLoader.getVertexByVariable("b");
 
-    Vertex aCache = asciiGraphLoader.getVertexCache().get("a");
-    Vertex bCache = asciiGraphLoader.getVertexCache().get("b");
+    EPGMVertex aCache = asciiGraphLoader.getVertexCache().get("a");
+    EPGMVertex bCache = asciiGraphLoader.getVertexCache().get("b");
 
     assertEquals("Vertices were not equal", a, aCache);
     assertEquals("Vertices were not equal", b, bCache);
@@ -347,11 +347,11 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 0, 4, 3);
     validateCaches(asciiGraphLoader, 0, 0, 2);
 
-    Edge e = asciiGraphLoader.getEdgeByVariable("e");
-    Edge f = asciiGraphLoader.getEdgeByVariable("f");
+    EPGMEdge e = asciiGraphLoader.getEdgeByVariable("e");
+    EPGMEdge f = asciiGraphLoader.getEdgeByVariable("f");
 
-    Edge eCache = asciiGraphLoader.getEdgeCache().get("e");
-    Edge fCache = asciiGraphLoader.getEdgeCache().get("f");
+    EPGMEdge eCache = asciiGraphLoader.getEdgeCache().get("e");
+    EPGMEdge fCache = asciiGraphLoader.getEdgeCache().get("f");
 
     assertEquals("Edges were not equal", e, eCache);
     assertEquals("Edges were not equal", f, fCache);
@@ -398,18 +398,18 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 2, 2, 1);
     validateCaches(asciiGraphLoader, 2, 2, 1);
 
-    GraphHead g1 = asciiGraphLoader.getGraphHeadByVariable("g0");
-    GraphHead g2 = asciiGraphLoader.getGraphHeadByVariable("g1");
-    Vertex a = asciiGraphLoader.getVertexByVariable("a");
-    Edge e = asciiGraphLoader.getEdgeByVariable("e");
+    EPGMGraphHead g1 = asciiGraphLoader.getGraphHeadByVariable("g0");
+    EPGMGraphHead g2 = asciiGraphLoader.getGraphHeadByVariable("g1");
+    EPGMVertex a = asciiGraphLoader.getVertexByVariable("a");
+    EPGMEdge e = asciiGraphLoader.getEdgeByVariable("e");
 
-    assertEquals("Vertex has wrong graph count", 2, a.getGraphCount());
-    assertTrue("Vertex was not in g1", a.getGraphIds().contains(g1.getId()));
-    assertTrue("Vertex was not in g2", a.getGraphIds().contains(g2.getId()));
+    assertEquals("EPGMVertex has wrong graph count", 2, a.getGraphCount());
+    assertTrue("EPGMVertex was not in g1", a.getGraphIds().contains(g1.getId()));
+    assertTrue("EPGMVertex was not in g2", a.getGraphIds().contains(g2.getId()));
 
-    assertEquals("Edge has wrong graph count", 2, e.getGraphCount());
-    assertTrue("Edge was not in g1", a.getGraphIds().contains(g1.getId()));
-    assertTrue("Edge was not in g2", a.getGraphIds().contains(g2.getId()));
+    assertEquals("EPGMEdge has wrong graph count", 2, e.getGraphCount());
+    assertTrue("EPGMEdge was not in g1", a.getGraphIds().contains(g1.getId()));
+    assertTrue("EPGMEdge was not in g2", a.getGraphIds().contains(g2.getId()));
   }
 
   @Test
@@ -425,12 +425,12 @@ public class AsciiGraphLoaderTest {
     validateCollections(asciiGraphLoader, 1, 3, 2);
     validateCaches(asciiGraphLoader, 1, 3, 2);
 
-    GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
-    Vertex c = asciiGraphLoader.getVertexByVariable("c");
-    Edge f = asciiGraphLoader.getEdgeByVariable("f");
+    EPGMGraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
+    EPGMVertex c = asciiGraphLoader.getVertexByVariable("c");
+    EPGMEdge f = asciiGraphLoader.getEdgeByVariable("f");
 
-    assertTrue("Vertex not in graph", c.getGraphIds().contains(g.getId()));
-    assertTrue("Edge not in graph", f.getGraphIds().contains(g.getId()));
+    assertTrue("EPGMVertex not in graph", c.getGraphIds().contains(g.getId()));
+    assertTrue("EPGMEdge not in graph", f.getGraphIds().contains(g.getId()));
   }
 
   private void validateCollections(

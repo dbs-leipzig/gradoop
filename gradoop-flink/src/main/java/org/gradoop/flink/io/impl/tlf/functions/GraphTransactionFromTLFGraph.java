@@ -22,15 +22,15 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EdgeFactory;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
-import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
@@ -47,17 +47,17 @@ public class GraphTransactionFromTLFGraph implements
   /**
    * Creates graph data objects
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory graphHeadFactory;
 
   /**
    * Creates graph data objects
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory vertexFactory;
 
   /**
    * Creates graph data objects
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory edgeFactory;
 
   /**
    * Reduce object instantiation.
@@ -71,8 +71,8 @@ public class GraphTransactionFromTLFGraph implements
    * @param vertexFactory    vertex data factory
    * @param edgeFactory      edge data factory
    */
-  public GraphTransactionFromTLFGraph(GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory, EdgeFactory edgeFactory) {
+  public GraphTransactionFromTLFGraph(EPGMGraphHeadFactory graphHeadFactory,
+    EPGMVertexFactory vertexFactory, EPGMEdgeFactory edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
@@ -90,9 +90,9 @@ public class GraphTransactionFromTLFGraph implements
   @Override
   public GraphTransaction map(TLFGraph graph) throws Exception {
 
-    GraphHead graphHead = this.graphHeadFactory.createGraphHead();
-    Set<Vertex> vertices = Sets.newHashSet();
-    Set<Edge> edges = Sets.newHashSet();
+    EPGMGraphHead graphHead = this.graphHeadFactory.createGraphHead();
+    Set<EPGMVertex> vertices = Sets.newHashSet();
+    Set<EPGMEdge> edges = Sets.newHashSet();
 
     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
@@ -101,7 +101,7 @@ public class GraphTransactionFromTLFGraph implements
     vertexIdMap = Maps.newHashMap();
 
     for (TLFVertex tlfVertex : graph.getGraphVertices()) {
-      Vertex vertex = vertexFactory.createVertex(
+      EPGMVertex vertex = vertexFactory.createVertex(
         tlfVertex.getLabel(),
         graphIds
       );
@@ -140,10 +140,10 @@ public class GraphTransactionFromTLFGraph implements
    * initiated.
    */
   private void prepareForProducedType() {
-    Set<Vertex> vertices = Sets.newHashSetWithExpectedSize(2);
-    Set<Edge> edges = Sets.newHashSetWithExpectedSize(1);
-    Vertex source = this.vertexFactory.createVertex();
-    Vertex target = this.vertexFactory.createVertex();
+    Set<EPGMVertex> vertices = Sets.newHashSetWithExpectedSize(2);
+    Set<EPGMEdge> edges = Sets.newHashSetWithExpectedSize(1);
+    EPGMVertex source = this.vertexFactory.createVertex();
+    EPGMVertex target = this.vertexFactory.createVertex();
     vertices.add(source);
     vertices.add(target);
     edges.add(this.edgeFactory.createEdge(source.getId(), target.getId()));

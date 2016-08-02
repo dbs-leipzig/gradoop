@@ -20,12 +20,12 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.GraphElement;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 
 /**
- * (GE) -> (GE (+ GraphHead), GraphHead)
+ * (GE) -> (GE (+ EPGMGraphHead), EPGMGraphHead)
  *
  * Forwarded fields:
  *
@@ -34,30 +34,30 @@ import org.gradoop.common.model.api.entities.GraphHeadFactory;
  * @param <GE> EPGM graph element type
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
-public class AddGraphElementToNewGraph<GE extends GraphElement>
-  implements MapFunction<GE, Tuple2<GE, GraphHead>> {
+public class AddGraphElementToNewGraph<GE extends EPGMGraphElement>
+  implements MapFunction<GE, Tuple2<GE, EPGMGraphHead>> {
   /**
    * EPGM graph head factory
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory graphHeadFactory;
   /**
    * Reduce instantiations
    */
-  private final Tuple2<GE, GraphHead> reuseTuple;
+  private final Tuple2<GE, EPGMGraphHead> reuseTuple;
 
   /**
    * Constructor
    *
    * @param graphHeadFactory EPGM graph head factory
    */
-  public AddGraphElementToNewGraph(GraphHeadFactory graphHeadFactory) {
+  public AddGraphElementToNewGraph(EPGMGraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
     reuseTuple = new Tuple2<>();
   }
 
   @Override
-  public Tuple2<GE, GraphHead> map(GE value) throws Exception {
-    GraphHead graphHead = graphHeadFactory.createGraphHead();
+  public Tuple2<GE, EPGMGraphHead> map(GE value) throws Exception {
+    EPGMGraphHead graphHead = graphHeadFactory.createGraphHead();
     value.addGraphId(graphHead.getId());
     reuseTuple.f0 = value;
     reuseTuple.f1 = graphHead;

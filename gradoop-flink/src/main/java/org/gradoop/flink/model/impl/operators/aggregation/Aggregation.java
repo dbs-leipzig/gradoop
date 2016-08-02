@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
@@ -69,8 +69,8 @@ public class Aggregation<N extends Number>
 
     DataSet<PropertyValue> aggregateValue = aggregationFunction.execute(graph);
 
-    DataSet<GraphHead> graphHead = graph.getGraphHead()
-      .map(new PropertySetterBroadcast<GraphHead>(aggregatePropertyKey))
+    DataSet<EPGMGraphHead> graphHead = graph.getGraphHead()
+      .map(new PropertySetterBroadcast<EPGMGraphHead>(aggregatePropertyKey))
       .withBroadcastSet(aggregateValue, PropertySetterBroadcast.VALUE);
 
     return LogicalGraph.fromDataSets(

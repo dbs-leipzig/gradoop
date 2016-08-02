@@ -17,26 +17,26 @@
 
 package org.gradoop.common.storage.impl.hbase;
 
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.PersistentEdge;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 /**
  * Represents a persistent edge data object.
  */
-public class HBaseEdge extends HBaseGraphElement<Edge> 
+public class HBaseEdge extends HBaseGraphElement<EPGMEdge>
   implements PersistentEdge {
 
   /**
    * Source vertex
    */
-  private Vertex source;
+  private EPGMVertex source;
 
   /**
    * Target vertex.
    */
-  private Vertex target;
+  private EPGMVertex target;
 
   /**
    * Creates persistent edge.
@@ -45,7 +45,7 @@ public class HBaseEdge extends HBaseGraphElement<Edge>
    * @param source  source vertex
    * @param target  target vertex
    */
-  HBaseEdge(Edge edge, Vertex source, Vertex target) {
+  HBaseEdge(EPGMEdge edge, EPGMVertex source, EPGMVertex target) {
     super(edge);
     this.source = source;
     this.target = target;
@@ -55,7 +55,7 @@ public class HBaseEdge extends HBaseGraphElement<Edge>
    * {@inheritDoc}
    */
   @Override
-  public Vertex getSource() {
+  public EPGMVertex getSource() {
     return source;
   }
 
@@ -63,7 +63,7 @@ public class HBaseEdge extends HBaseGraphElement<Edge>
    * {@inheritDoc}
    */
   @Override
-  public void setSource(Vertex sourceVertex) {
+  public void setSource(EPGMVertex sourceVertex) {
     this.source = sourceVertex;
   }
 
@@ -71,7 +71,7 @@ public class HBaseEdge extends HBaseGraphElement<Edge>
    * {@inheritDoc}
    */
   @Override
-  public Vertex getTarget() {
+  public EPGMVertex getTarget() {
     return target;
   }
 
@@ -79,7 +79,7 @@ public class HBaseEdge extends HBaseGraphElement<Edge>
    * {@inheritDoc}
    */
   @Override
-  public void setTarget(Vertex targetVertex) {
+  public void setTarget(EPGMVertex targetVertex) {
     this.target = targetVertex;
   }
 

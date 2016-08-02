@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions
@@ -32,7 +33,6 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 
@@ -274,7 +274,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    *                                  and super vertex id
    * @return super edges
    */
-  protected DataSet<Edge> buildSuperEdges(
+  protected DataSet<EPGMEdge> buildSuperEdges(
     LogicalGraph graph,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 

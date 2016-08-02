@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
@@ -29,12 +29,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Transformation map function for graph heads.
  */
 @FunctionAnnotation.ForwardedFields("id")
-public class TransformGraphHead extends TransformBase<GraphHead> {
+public class TransformGraphHead extends TransformBase<EPGMGraphHead> {
 
   /**
    * Factory to init modified graph head.
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory graphHeadFactory;
 
   /**
    * Constructor
@@ -43,14 +43,14 @@ public class TransformGraphHead extends TransformBase<GraphHead> {
    * @param graphHeadFactory      graph head factory
    */
   public TransformGraphHead(
-    TransformationFunction<GraphHead> transformationFunction,
-    GraphHeadFactory graphHeadFactory) {
+    TransformationFunction<EPGMGraphHead> transformationFunction,
+    EPGMGraphHeadFactory graphHeadFactory) {
     super(transformationFunction);
     this.graphHeadFactory = checkNotNull(graphHeadFactory);
   }
 
   @Override
-  protected GraphHead initFrom(GraphHead graphHead) {
+  protected EPGMGraphHead initFrom(EPGMGraphHead graphHead) {
     return graphHeadFactory.initGraphHead(
       graphHead.getId(), GConstants.DEFAULT_GRAPH_LABEL);
   }

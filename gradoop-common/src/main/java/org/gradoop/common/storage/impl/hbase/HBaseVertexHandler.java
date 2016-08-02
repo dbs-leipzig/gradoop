@@ -25,12 +25,12 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
-import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.api.VertexHandler;
 import org.gradoop.common.util.GConstants;
-import org.gradoop.common.model.api.entities.Edge;
 
 import java.io.IOException;
 import java.util.Set;
@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * Used to read/write EPGM vertex data from/to a HBase table.
  * <p>
- * Vertex data in HBase:
+ * EPGMVertex data in HBase:
  * <p>
  * |---------|--------------------|---------|-------------|-------------|
  * | row-key | meta               | data    | out-edges   | in-edges    |
@@ -70,14 +70,14 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
   /**
    * Creates vertex data objects from the rows.
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory vertexFactory;
 
   /**
    * Creates a vertex handler.
    *
    * @param vertexFactory used to create runtime vertex data objects
    */
-  public HBaseVertexHandler(VertexFactory vertexFactory) {
+  public HBaseVertexHandler(EPGMVertexFactory vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 
@@ -98,7 +98,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    * {@inheritDoc}
    */
   @Override
-  public Put writeOutgoingEdges(final Put put, final Set<Edge> outgoingEdgeData)
+  public Put writeOutgoingEdges(final Put put, final Set<EPGMEdge> outgoingEdgeData)
     throws IOException {
     return writeEdges(put, CF_OUT_EDGES_BYTES, outgoingEdgeData, true);
   }
@@ -107,7 +107,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    * {@inheritDoc}
    */
   @Override
-  public Put writeIncomingEdges(final Put put, final Set<Edge> incomingEdgeData)
+  public Put writeIncomingEdges(final Put put, final Set<EPGMEdge> incomingEdgeData)
     throws IOException {
     return writeEdges(put, CF_IN_EDGES_BYTES, incomingEdgeData, false);
   }
@@ -146,8 +146,8 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    * {@inheritDoc}
    */
   @Override
-  public Vertex readVertex(final Result res) {
-    Vertex vertex = null;
+  public EPGMVertex readVertex(final Result res) {
+    EPGMVertex vertex = null;
     try {
       vertex = vertexFactory.initVertex(
         readId(res), readLabel(res), readProperties(res), readGraphIds(res));
@@ -161,7 +161,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    * {@inheritDoc}
    */
   @Override
-  public VertexFactory getVertexFactory() {
+  public EPGMVertexFactory getVertexFactory() {
     return vertexFactory;
   }
 
@@ -178,9 +178,9 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    * @return the updated put
    */
   private Put writeEdges(Put put, final byte[] columnFamily,
-    final Set<Edge> edgeDataSet, boolean isOutgoing) throws IOException {
+    final Set<EPGMEdge> edgeDataSet, boolean isOutgoing) throws IOException {
     if (edgeDataSet != null) {
-      for (Edge edge : edgeDataSet) {
+      for (EPGMEdge edge : edgeDataSet) {
         put = writeEdge(put, columnFamily, edge, isOutgoing);
       }
     }
@@ -200,7 +200,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    * @return the updated put
    */
   private Put writeEdge(final Put put, final byte[] columnFamily,
-    final Edge edge, boolean isOutgoing) throws IOException {
+    final EPGMEdge edge, boolean isOutgoing) throws IOException {
     byte[] edgeKey = createEdgeIdentifier(edge, isOutgoing);
     put.add(columnFamily, edgeKey, null);
     return put;
@@ -216,7 +216,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    *                   incoming
    * @return byte representation of the edge identifier
    */
-  private byte[] createEdgeIdentifier(final Edge edge,
+  private byte[] createEdgeIdentifier(final EPGMEdge edge,
     boolean isOutgoing) throws IOException {
 
     // initially only GradoopId

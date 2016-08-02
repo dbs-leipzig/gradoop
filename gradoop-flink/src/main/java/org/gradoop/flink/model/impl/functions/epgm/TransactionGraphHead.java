@@ -19,9 +19,9 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 import java.util.Set;
 
@@ -29,10 +29,10 @@ import java.util.Set;
  * (graphHead, {vertex,..}, {edge,..}) => graphHead
  */
 public class TransactionGraphHead implements
-  MapFunction<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>, GraphHead> {
+  MapFunction<Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>>, EPGMGraphHead> {
 
   @Override
-  public GraphHead map(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> triple)
+  public EPGMGraphHead map(Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>> triple)
     throws Exception {
     return triple.f0;
   }

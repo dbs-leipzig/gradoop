@@ -18,14 +18,15 @@
 package org.gradoop.flink.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -62,17 +63,17 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(GraphCollection collection) {
     DataSet<GradoopId> excludedGraphIds = collection.getGraphHeads()
-      .filter(new ByDifferentId<GraphHead>(startId))
-      .map(new Id<GraphHead>());
+      .filter(new ByDifferentId<EPGMGraphHead>(startId))
+      .map(new Id<EPGMGraphHead>());
 
-    DataSet<Vertex> vertices = collection.getVertices()
-      .filter(new InGraph<Vertex>(startId))
-      .filter(new NotInGraphsBroadcast<Vertex>())
+    DataSet<EPGMVertex> vertices = collection.getVertices()
+      .filter(new InGraph<EPGMVertex>(startId))
+      .filter(new NotInGraphsBroadcast<EPGMVertex>())
       .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);
 
-    DataSet<Edge> edges = collection.getEdges()
-      .filter(new InGraph<Edge>(startId))
-      .filter(new NotInGraphsBroadcast<Edge>())
+    DataSet<EPGMEdge> edges = collection.getEdges()
+      .filter(new InGraph<EPGMEdge>(startId))
+      .filter(new NotInGraphsBroadcast<EPGMEdge>())
       .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);
 
     return LogicalGraph.fromDataSets(

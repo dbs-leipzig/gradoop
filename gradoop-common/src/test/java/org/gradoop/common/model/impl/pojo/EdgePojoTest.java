@@ -1,9 +1,8 @@
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.util.GConstants;
 import org.hamcrest.core.Is;
@@ -19,7 +18,7 @@ public class EdgePojoTest {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    Edge e =
+    EPGMEdge e =
       new EdgePojoFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getId(), is(edgeId));
     assertThat(e.getSourceId(), is(sourceId));
@@ -41,7 +40,7 @@ public class EdgePojoTest {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    Edge edge = new EdgePojoFactory()
+    EPGMEdge edge = new EdgePojoFactory()
       .initEdge(edgeId, label, sourceId, targetId, props, graphIds);
 
     assertThat(edge.getId(), is(edgeId));
@@ -63,7 +62,7 @@ public class EdgePojoTest {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    Edge e =
+    EPGMEdge e =
       new EdgePojoFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
   }

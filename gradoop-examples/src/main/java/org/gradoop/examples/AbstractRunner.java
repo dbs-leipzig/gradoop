@@ -23,11 +23,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -86,7 +86,7 @@ public abstract class AbstractRunner {
    */
   @SuppressWarnings("unchecked")
   protected static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   LogicalGraph<G, V, E> readLogicalGraph(String directory) {
     return readLogicalGraph(directory, true);
   }
@@ -103,7 +103,7 @@ public abstract class AbstractRunner {
    */
   @SuppressWarnings("unchecked")
   protected static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   LogicalGraph<G, V, E> readLogicalGraph(String directory,
     boolean readGraphHeads) {
     directory = appendSeparator(directory);
@@ -126,7 +126,7 @@ public abstract class AbstractRunner {
    * @throws Exception
    */
   protected static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   void writeLogicalGraph(LogicalGraph<G, V, E> graph, String directory) throws
     Exception {
     directory = appendSeparator(directory);
@@ -150,7 +150,7 @@ public abstract class AbstractRunner {
    * @throws Exception
    */
   protected static
-  <G extends GraphHead, V extends Vertex, E extends Edge>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   void writeGraphCollection(GraphCollection<G, V, E> collection,
     String directory) throws Exception {
     directory = appendSeparator(directory);

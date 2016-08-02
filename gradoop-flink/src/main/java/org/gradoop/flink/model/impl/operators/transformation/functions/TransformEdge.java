@@ -18,9 +18,9 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,12 +29,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Transformation map function for edges.
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;graphIds")
-public class TransformEdge extends TransformBase<Edge> {
+public class TransformEdge extends TransformBase<EPGMEdge> {
 
   /**
    * Factory to init modified edge.
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory edgeFactory;
 
   /**
    * Constructor
@@ -42,14 +42,14 @@ public class TransformEdge extends TransformBase<Edge> {
    * @param transformationFunction  edge modification function
    * @param edgeFactory           edge factory
    */
-  public TransformEdge(TransformationFunction<Edge> transformationFunction,
-    EdgeFactory edgeFactory) {
+  public TransformEdge(TransformationFunction<EPGMEdge> transformationFunction,
+    EPGMEdgeFactory edgeFactory) {
     super(transformationFunction);
     this.edgeFactory = checkNotNull(edgeFactory);
   }
 
   @Override
-  protected Edge initFrom(Edge edge) {
+  protected EPGMEdge initFrom(EPGMEdge edge) {
     return edgeFactory.initEdge(edge.getId(),
       GConstants.DEFAULT_EDGE_LABEL,
       edge.getSourceId(),

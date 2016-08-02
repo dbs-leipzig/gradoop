@@ -17,27 +17,27 @@
 
 package org.gradoop.common.storage.impl.hbase;
 
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.PersistentVertex;
-import org.gradoop.common.model.api.entities.Edge;
 
 import java.util.Set;
 
 /**
  * Represents a persistent vertex data object.
  */
-public class HBaseVertex extends HBaseGraphElement<Vertex> implements
+public class HBaseVertex extends HBaseGraphElement<EPGMVertex> implements
   PersistentVertex {
 
   /**
    * Outgoing edge set
    */
-  private Set<Edge> outgoingEdges;
+  private Set<EPGMEdge> outgoingEdges;
 
   /**
    * Incoming edge set
    */
-  private Set<Edge> incomingEdges;
+  private Set<EPGMEdge> incomingEdges;
 
   /**
    * Creates persistent vertex data.
@@ -46,7 +46,7 @@ public class HBaseVertex extends HBaseGraphElement<Vertex> implements
    * @param incomingEdges incoming edge
    * @param outgoingEdges outgoing edge
    */
-  HBaseVertex(Vertex vertex, Set<Edge> outgoingEdges, Set<Edge> incomingEdges) {
+  HBaseVertex(EPGMVertex vertex, Set<EPGMEdge> outgoingEdges, Set<EPGMEdge> incomingEdges) {
     super(vertex);
     this.outgoingEdges = outgoingEdges;
     this.incomingEdges = incomingEdges;
@@ -56,7 +56,7 @@ public class HBaseVertex extends HBaseGraphElement<Vertex> implements
    * {@inheritDoc}
    */
   @Override
-  public Set<Edge> getOutgoingEdges() {
+  public Set<EPGMEdge> getOutgoingEdges() {
     return outgoingEdges;
   }
 
@@ -64,7 +64,7 @@ public class HBaseVertex extends HBaseGraphElement<Vertex> implements
    * {@inheritDoc}
    */
   @Override
-  public void setOutgoingEdges(Set<Edge> outgoingEdgeIds) {
+  public void setOutgoingEdges(Set<EPGMEdge> outgoingEdgeIds) {
     this.outgoingEdges = outgoingEdgeIds;
   }
 
@@ -72,7 +72,7 @@ public class HBaseVertex extends HBaseGraphElement<Vertex> implements
    * {@inheritDoc}
    */
   @Override
-  public Set<Edge> getIncomingEdges() {
+  public Set<EPGMEdge> getIncomingEdges() {
     return incomingEdges;
   }
 
@@ -80,7 +80,7 @@ public class HBaseVertex extends HBaseGraphElement<Vertex> implements
    * {@inheritDoc}
    */
   @Override
-  public void setIncomingEdges(Set<Edge> incomingEdgeData) {
+  public void setIncomingEdges(Set<EPGMEdge> incomingEdgeData) {
     this.incomingEdges = incomingEdgeData;
   }
 

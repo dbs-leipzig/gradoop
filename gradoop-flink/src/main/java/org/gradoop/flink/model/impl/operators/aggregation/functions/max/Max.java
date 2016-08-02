@@ -19,9 +19,9 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
-import org.gradoop.common.model.api.entities.Element;
-import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.GetPropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.GraphIdsWithPropertyValue;
@@ -43,7 +43,7 @@ public class Max {
    * @param <EL>     element type in input dataset
    * @return 1-element dataset with maximum of input dataset
    */
-  public static <EL extends Element> DataSet<PropertyValue> max(
+  public static <EL extends EPGMElement> DataSet<PropertyValue> max(
     DataSet<EL> dataSet,
     String propertyKey,
     Number min) {
@@ -65,7 +65,7 @@ public class Max {
    * @param <EL>     element type in input dataset
    * @return {@code Tuple2} with group value and group maximum
    */
-  public static <EL extends GraphElement>
+  public static <EL extends EPGMGraphElement>
   DataSet<Tuple2<GradoopId, PropertyValue>> groupBy(
     DataSet<EL> dataSet,
     String propertyKey,

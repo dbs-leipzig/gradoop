@@ -20,9 +20,9 @@ package org.gradoop.flink.model.impl.operators.transformation;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -44,17 +44,17 @@ public class Transformation implements UnaryGraphToGraphOperator {
   /**
    * Modification function for graph heads
    */
-  private final TransformationFunction<GraphHead> graphHeadTransFunc;
+  private final TransformationFunction<EPGMGraphHead> graphHeadTransFunc;
 
   /**
    * Modification function for vertices
    */
-  private final TransformationFunction<Vertex> vertexTransFunc;
+  private final TransformationFunction<EPGMVertex> vertexTransFunc;
 
   /**
    * Modification function for edges
    */
-  private final TransformationFunction<Edge> edgeTransFunc;
+  private final TransformationFunction<EPGMEdge> edgeTransFunc;
 
   /**
    * Creates a new operator instance.
@@ -63,9 +63,9 @@ public class Transformation implements UnaryGraphToGraphOperator {
    * @param vertexTransFunc     vertex transformation function
    * @param edgeTransFunc       edge transformation function
    */
-  public Transformation(TransformationFunction<GraphHead> graphHeadTransFunc,
-    TransformationFunction<Vertex> vertexTransFunc,
-    TransformationFunction<Edge> edgeTransFunc) {
+  public Transformation(TransformationFunction<EPGMGraphHead> graphHeadTransFunc,
+    TransformationFunction<EPGMVertex> vertexTransFunc,
+    TransformationFunction<EPGMEdge> edgeTransFunc) {
 
     if (graphHeadTransFunc == null &&
       vertexTransFunc == null &&
@@ -97,27 +97,27 @@ public class Transformation implements UnaryGraphToGraphOperator {
    * @return transformed logical graph
    */
   @SuppressWarnings("unchecked")
-  protected LogicalGraph executeInternal(DataSet<GraphHead> graphHeads,
-    DataSet<Vertex> vertices, DataSet<Edge> edges, GradoopFlinkConfig config) {
+  protected LogicalGraph executeInternal(DataSet<EPGMGraphHead> graphHeads,
+    DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges, GradoopFlinkConfig config) {
 
-    DataSet<GraphHead> transformedGraphHeads = graphHeadTransFunc != null ?
+    DataSet<EPGMGraphHead> transformedGraphHeads = graphHeadTransFunc != null ?
       graphHeads.map(new TransformGraphHead(
         graphHeadTransFunc, config.getGraphHeadFactory()))
-      .returns((TypeInformation<GraphHead>) TypeExtractor
+      .returns((TypeInformation<EPGMGraphHead>) TypeExtractor
         .createTypeInfo(config.getGraphHeadFactory().getType())):
       graphHeads;
 
-    DataSet<Vertex> transformedVertices = vertexTransFunc != null ?
+    DataSet<EPGMVertex> transformedVertices = vertexTransFunc != null ?
       vertices.map(new TransformVertex(
         vertexTransFunc, config.getVertexFactory()))
-      .returns((TypeInformation<Vertex>) TypeExtractor
+      .returns((TypeInformation<EPGMVertex>) TypeExtractor
         .createTypeInfo(config.getVertexFactory().getType())):
       vertices;
 
-    DataSet<Edge> transformedEdges = edgeTransFunc != null ?
+    DataSet<EPGMEdge> transformedEdges = edgeTransFunc != null ?
       edges.map(new TransformEdge(
         edgeTransFunc, config.getEdgeFactory()))
-      .returns((TypeInformation<Edge>) TypeExtractor
+      .returns((TypeInformation<EPGMEdge>) TypeExtractor
         .createTypeInfo(config.getEdgeFactory().getType())):
       edges;
 

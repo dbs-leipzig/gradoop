@@ -18,9 +18,9 @@
 package org.gradoop.datagen.transactions.predictable;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.GraphTransactionsGenerator;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
@@ -32,11 +32,11 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  *
  *
  * @param <G> EPGM graph head type.
- * @param <V> EPGM Vertex type.
- * @param <E> EPGM Edge type.
+ * @param <V> EPGM EPGMVertex type.
+ * @param <E> EPGM EPGMEdge type.
  */
 public class PredictableTransactionsGenerator
-  <G extends GraphHead, V extends Vertex, E extends Edge>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements GraphTransactionsGenerator<G, V, E> {
 
 

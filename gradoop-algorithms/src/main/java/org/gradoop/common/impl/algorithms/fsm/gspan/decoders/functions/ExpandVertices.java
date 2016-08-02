@@ -21,16 +21,16 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.ArrayList;
 
 /**
- * (GraphHead, [vertex(),..], [edge(),..]) => (graphId, vertexId, vertexLabel)
+ * (EPGMGraphHead, [vertex(),..], [edge(),..]) => (graphId, vertexId, vertexLabel)
  * @param <G> graph type
  */
-public class ExpandVertices<G extends GraphHead>
+public class ExpandVertices<G extends EPGMGraphHead>
   implements FlatMapFunction<Tuple3<
     G,
     ArrayList<Tuple2<GradoopId, Integer>>,

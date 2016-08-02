@@ -18,12 +18,12 @@
 package org.gradoop.flink.model.impl.operators.intersection;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment
   .GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -36,13 +36,13 @@ import org.gradoop.common.model.impl.id.GradoopId;
 public class IntersectionBroadcast extends Intersection {
 
   @Override
-  protected DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newSubgraphs) {
+  protected DataSet<EPGMVertex> computeNewVertices(DataSet<EPGMGraphHead> newSubgraphs) {
 
     DataSet<GradoopId> ids = secondCollection.getGraphHeads()
-      .map(new Id<GraphHead>());
+      .map(new Id<EPGMGraphHead>());
 
     return firstCollection.getVertices()
-      .filter(new InAnyGraphBroadcast<Vertex>())
+      .filter(new InAnyGraphBroadcast<EPGMVertex>())
       .withBroadcastSet(ids, GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
 

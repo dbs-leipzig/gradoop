@@ -18,7 +18,7 @@
 package org.gradoop.common.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
-import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.properties.PropertyList;
 /**
  * Abstract base class for graphs, vertices and edges.
  */
-public abstract class ElementPojo implements Element {
+public abstract class ElementPojo implements EPGMElement {
   /**
    * Entity identifier.
    */

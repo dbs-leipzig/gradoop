@@ -1,8 +1,7 @@
 package org.gradoop.flink.model.impl.operators.split;
 
-import org.gradoop.flink.model.impl.operators.split.Split;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.functions.UnaryFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -150,9 +149,9 @@ public class SplitTest extends GradoopFlinkTestBase {
   }
 
   public static class SelectKeyValues
-    implements UnaryFunction<Vertex, List<PropertyValue>>{
+    implements UnaryFunction<EPGMVertex, List<PropertyValue>>{
     @Override
-    public List<PropertyValue> execute(Vertex entity) throws Exception {
+    public List<PropertyValue> execute(EPGMVertex entity) throws Exception {
       String key1 = "key1";
       String key2 = "key2";
       List<PropertyValue> valueList = new ArrayList<>();

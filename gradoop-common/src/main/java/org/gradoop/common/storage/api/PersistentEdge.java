@@ -17,41 +17,41 @@
 
 package org.gradoop.common.storage.api;
 
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 /**
  * Representation of an edge on the storage level. We additionally store
  * vertex label information which enables filter mechanisms during loading.
  */
-public interface PersistentEdge extends Edge {
+public interface PersistentEdge extends EPGMEdge {
 
   /**
    * Loads the vertex data associated with the source vertex.
    *
    * @return source vertex data
    */
-  Vertex getSource();
+  EPGMVertex getSource();
 
   /**
    * Sets the vertex data associated with the source vertex.
    *
    * @param vertex source vertex data
    */
-  void setSource(Vertex vertex);
+  void setSource(EPGMVertex vertex);
 
   /**
    * Loads the vertex data associated with the target vertex.
    *
    * @return target vertex data
    */
-  Vertex getTarget();
+  EPGMVertex getTarget();
 
   /**
    * Sets the vertex data associated with the target vertex.
    *
    * @param vertex target vertex data
    */
-  void setTarget(Vertex vertex);
+  void setTarget(EPGMVertex vertex);
 
 }

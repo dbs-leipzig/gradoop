@@ -19,8 +19,8 @@ package org.gradoop.model.impl.algorithms.fsm.gspan.decoders.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
@@ -29,20 +29,20 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  *
  * @param <E> edge type
  */
-public class FullEdge<E extends Edge> implements
+public class FullEdge<E extends EPGMEdge> implements
   MapFunction<Tuple4<GradoopId, GradoopId, GradoopId, String>, E> {
 
   /**
    * edge factory
    */
-  private final EdgeFactory<E> edgeFactory;
+  private final EPGMEdgeFactory<E> edgeFactory;
 
   /**
    * constructor
    *
    * @param edgeFactory edge factory
    */
-  public FullEdge(EdgeFactory<E> edgeFactory) {
+  public FullEdge(EPGMEdgeFactory<E> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 

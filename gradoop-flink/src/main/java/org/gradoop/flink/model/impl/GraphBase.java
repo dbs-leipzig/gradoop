@@ -22,9 +22,9 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.graph.Graph;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.operators.GraphBaseOperators;
 import org.gradoop.flink.model.impl.functions.bool.False;
@@ -43,7 +43,7 @@ public abstract class GraphBase implements GraphBaseOperators {
   /**
    * Graph data associated with the logical graphs in that collection.
    */
-  protected final DataSet<GraphHead> graphHeads;
+  protected final DataSet<EPGMGraphHead> graphHeads;
 
   /**
    * Gradoop Flink configuration.
@@ -53,11 +53,11 @@ public abstract class GraphBase implements GraphBaseOperators {
   /**
    * DataSet containing vertices associated with that graph.
    */
-  private final DataSet<Vertex> vertices;
+  private final DataSet<EPGMVertex> vertices;
   /**
    * DataSet containing edges associated with that graph.
    */
-  private final DataSet<Edge> edges;
+  private final DataSet<EPGMEdge> edges;
 
   /**
    * Creates a new graph instance.
@@ -67,8 +67,8 @@ public abstract class GraphBase implements GraphBaseOperators {
    * @param edges       edge data set
    * @param config      Gradoop Flink configuration
    */
-  protected GraphBase(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges, GradoopFlinkConfig config) {
+  protected GraphBase(DataSet<EPGMGraphHead> graphHeads, DataSet<EPGMVertex> vertices,
+    DataSet<EPGMEdge> edges, GradoopFlinkConfig config) {
     this.graphHeads = graphHeads;
     this.vertices = vertices;
     this.edges = edges;
@@ -83,16 +83,16 @@ public abstract class GraphBase implements GraphBaseOperators {
    * @param config      configuration
    * @return graph head dataset
    */
-  protected static DataSet<GraphHead> createGraphHeadDataSet(
-    Collection<GraphHead> graphHeads, GradoopFlinkConfig config) {
+  protected static DataSet<EPGMGraphHead> createGraphHeadDataSet(
+    Collection<EPGMGraphHead> graphHeads, GradoopFlinkConfig config) {
 
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
-    DataSet<GraphHead> graphHeadSet;
+    DataSet<EPGMGraphHead> graphHeadSet;
     if (graphHeads.isEmpty()) {
       graphHeadSet = config.getExecutionEnvironment()
         .fromElements(config.getGraphHeadFactory().createGraphHead())
-        .filter(new False<GraphHead>());
+        .filter(new False<EPGMGraphHead>());
     } else {
       graphHeadSet =  env.fromCollection(graphHeads);
     }
@@ -107,16 +107,16 @@ public abstract class GraphBase implements GraphBaseOperators {
    * @param config    configuration
    * @return vertex dataset
    */
-  protected static DataSet<Vertex> createVertexDataSet(
-    Collection<Vertex> vertices, GradoopFlinkConfig config) {
+  protected static DataSet<EPGMVertex> createVertexDataSet(
+    Collection<EPGMVertex> vertices, GradoopFlinkConfig config) {
 
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
-    DataSet<Vertex> vertexSet;
+    DataSet<EPGMVertex> vertexSet;
     if (vertices.isEmpty()) {
       vertexSet = config.getExecutionEnvironment()
         .fromElements(config.getVertexFactory().createVertex())
-        .filter(new False<Vertex>());
+        .filter(new False<EPGMVertex>());
     } else {
       vertexSet = env.fromCollection(vertices);
     }
@@ -131,15 +131,15 @@ public abstract class GraphBase implements GraphBaseOperators {
    * @param config configuration
    * @return edge dataset
    */
-  protected static DataSet<Edge> createEdgeDataSet(Collection<Edge> edges,
+  protected static DataSet<EPGMEdge> createEdgeDataSet(Collection<EPGMEdge> edges,
     GradoopFlinkConfig config) {
 
-    DataSet<Edge> edgeSet;
+    DataSet<EPGMEdge> edgeSet;
     if (edges.isEmpty()) {
       GradoopId dummyId = GradoopId.get();
       edgeSet = config.getExecutionEnvironment()
         .fromElements(config.getEdgeFactory().createEdge(dummyId, dummyId))
-        .filter(new False<Edge>());
+        .filter(new False<EPGMEdge>());
     } else {
       edgeSet = config.getExecutionEnvironment().fromCollection(edges);
     }
@@ -159,7 +159,7 @@ public abstract class GraphBase implements GraphBaseOperators {
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Vertex> getVertices() {
+  public DataSet<EPGMVertex> getVertices() {
     return vertices;
   }
 
@@ -167,7 +167,7 @@ public abstract class GraphBase implements GraphBaseOperators {
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Edge> getEdges() {
+  public DataSet<EPGMEdge> getEdges() {
     return edges;
   }
 
@@ -175,11 +175,11 @@ public abstract class GraphBase implements GraphBaseOperators {
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Edge> getOutgoingEdges(final GradoopId vertexID) {
+  public DataSet<EPGMEdge> getOutgoingEdges(final GradoopId vertexID) {
     return
-      this.edges.filter(new FilterFunction<Edge>() {
+      this.edges.filter(new FilterFunction<EPGMEdge>() {
         @Override
-        public boolean filter(Edge edge) throws Exception {
+        public boolean filter(EPGMEdge edge) throws Exception {
           return edge.getSourceId().equals(vertexID);
         }
       });
@@ -189,11 +189,11 @@ public abstract class GraphBase implements GraphBaseOperators {
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Edge> getIncomingEdges(final GradoopId vertexID) {
+  public DataSet<EPGMEdge> getIncomingEdges(final GradoopId vertexID) {
     return
-      this.edges.filter(new FilterFunction<Edge>() {
+      this.edges.filter(new FilterFunction<EPGMEdge>() {
         @Override
-        public boolean filter(Edge edge) throws Exception {
+        public boolean filter(EPGMEdge edge) throws Exception {
           return edge.getTargetId().equals(vertexID);
         }
       });
@@ -203,17 +203,17 @@ public abstract class GraphBase implements GraphBaseOperators {
    * {@inheritDoc}
    */
   @Override
-  public Graph<GradoopId, Vertex, Edge> toGellyGraph() {
+  public Graph<GradoopId, EPGMVertex, EPGMEdge> toGellyGraph() {
     return Graph.fromDataSet(getVertices().map(
-      new MapFunction<Vertex, org.apache.flink.graph.Vertex<GradoopId, Vertex>>() {
+      new MapFunction<EPGMVertex, org.apache.flink.graph.Vertex<GradoopId, EPGMVertex>>() {
         @Override
-        public org.apache.flink.graph.Vertex<GradoopId, Vertex> map(Vertex epgmVertex) throws Exception {
+        public org.apache.flink.graph.Vertex<GradoopId, EPGMVertex> map(EPGMVertex epgmVertex) throws Exception {
           return new org.apache.flink.graph.Vertex<>(epgmVertex.getId(), epgmVertex);
         }
       }).withForwardedFields("*->f1"),
-      getEdges().map(new MapFunction<Edge, org.apache.flink.graph.Edge<GradoopId, Edge>>() {
+      getEdges().map(new MapFunction<EPGMEdge, org.apache.flink.graph.Edge<GradoopId, EPGMEdge>>() {
         @Override
-        public org.apache.flink.graph.Edge<GradoopId, Edge> map(Edge epgmEdge) throws Exception {
+        public org.apache.flink.graph.Edge<GradoopId, EPGMEdge> map(EPGMEdge epgmEdge) throws Exception {
           return new org.apache.flink.graph.Edge<>(epgmEdge.getSourceId(),
             epgmEdge.getTargetId(),
             epgmEdge);

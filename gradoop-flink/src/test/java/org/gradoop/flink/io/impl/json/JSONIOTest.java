@@ -19,11 +19,11 @@ package org.gradoop.flink.io.impl.json;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -50,8 +50,8 @@ public class JSONIOTest extends GradoopFlinkTestBase {
 
     assertNotNull("database graph was null", dbGraph);
 
-    Collection<Vertex> vertices = Lists.newArrayList();
-    Collection<Edge> edges = Lists.newArrayList();
+    Collection<EPGMVertex> vertices = Lists.newArrayList();
+    Collection<EPGMEdge> edges = Lists.newArrayList();
 
     dbGraph.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
     dbGraph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
@@ -77,9 +77,9 @@ public class JSONIOTest extends GradoopFlinkTestBase {
     GraphCollection
       collection = dataSource.getGraphCollection();
 
-    Collection<GraphHead> graphHeads = Lists.newArrayList();
-    Collection<Vertex> vertices = Lists.newArrayList();
-    Collection<Edge> edges = Lists.newArrayList();
+    Collection<EPGMGraphHead> graphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> vertices = Lists.newArrayList();
+    Collection<EPGMEdge> edges = Lists.newArrayList();
 
     collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(graphHeads));
@@ -115,13 +115,13 @@ public class JSONIOTest extends GradoopFlinkTestBase {
     GraphCollection collection = new JSONDataSource(
       graphFile, vertexFile, edgeFile, getConfig()).getGraphCollection();
 
-    Collection<GraphHead> expectedGraphHeads  = loader.getGraphHeads();
-    Collection<Vertex>    expectedVertices    = loader.getVertices();
-    Collection<Edge>      expectedEdges       = loader.getEdges();
+    Collection<EPGMGraphHead> expectedGraphHeads  = loader.getGraphHeads();
+    Collection<EPGMVertex>    expectedVertices    = loader.getVertices();
+    Collection<EPGMEdge>      expectedEdges       = loader.getEdges();
 
-    Collection<GraphHead> loadedGraphHeads    = Lists.newArrayList();
-    Collection<Vertex>    loadedVertices      = Lists.newArrayList();
-    Collection<Edge>      loadedEdges         = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads    = Lists.newArrayList();
+    Collection<EPGMVertex>    loadedVertices      = Lists.newArrayList();
+    Collection<EPGMEdge>      loadedEdges         = Lists.newArrayList();
 
     collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));

@@ -22,15 +22,15 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
- * Initializes {@link Vertex} objects of a given type.
+ * Initializes {@link EPGMVertex} objects of a given type.
  */
-public interface VertexFactory {
+public interface EPGMVertexFactory {
   /**
    * Initializes a new vertex based on the given parameters.
    *
    * @return vertex data
    */
-  Vertex createVertex();
+  EPGMVertex createVertex();
 
   /**
    * Initializes a vertex based on the given parameters.
@@ -38,7 +38,7 @@ public interface VertexFactory {
    * @param id vertex identifier
    * @return vertex data
    */
-  Vertex initVertex(GradoopId id);
+  EPGMVertex initVertex(GradoopId id);
 
   /**
    * Creates a new vertex based on the given parameters.
@@ -46,7 +46,7 @@ public interface VertexFactory {
    * @param label vertex label
    * @return vertex data
    */
-  Vertex createVertex(String label);
+  EPGMVertex createVertex(String label);
 
   /**
    * Initializes a vertex based on the given parameters.
@@ -55,7 +55,7 @@ public interface VertexFactory {
    * @param label vertex label
    * @return vertex data
    */
-  Vertex initVertex(GradoopId id,
+  EPGMVertex initVertex(GradoopId id,
     String label);
 
   /**
@@ -65,7 +65,7 @@ public interface VertexFactory {
    * @param properties vertex properties
    * @return vertex data
    */
-  Vertex createVertex(String label,
+  EPGMVertex createVertex(String label,
     PropertyList properties);
 
   /**
@@ -76,7 +76,7 @@ public interface VertexFactory {
    * @param properties vertex properties
    * @return vertex data
    */
-  Vertex initVertex(GradoopId id,
+  EPGMVertex initVertex(GradoopId id,
     String label,
     PropertyList properties);
 
@@ -87,7 +87,7 @@ public interface VertexFactory {
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  Vertex createVertex(String label,
+  EPGMVertex createVertex(String label,
     GradoopIdSet graphIds);
 
   /**
@@ -98,7 +98,7 @@ public interface VertexFactory {
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  Vertex initVertex(GradoopId id,
+  EPGMVertex initVertex(GradoopId id,
     String label,
     GradoopIdSet graphIds);
 
@@ -110,7 +110,7 @@ public interface VertexFactory {
    * @param graphIds     graphIds, that contain the vertex
    * @return vertex data
    */
-  Vertex createVertex(String label,
+  EPGMVertex createVertex(String label,
     PropertyList properties,
     GradoopIdSet graphIds);
 
@@ -123,7 +123,7 @@ public interface VertexFactory {
    * @param graphIds     graphIds, that contain the vertex
    * @return vertex data
    */
-  Vertex initVertex(GradoopId id,
+  EPGMVertex initVertex(GradoopId id,
     String label,
     PropertyList properties,
     GradoopIdSet graphIds);
@@ -133,5 +133,5 @@ public interface VertexFactory {
    *
    * @return object type
    */
-  Class<? extends Vertex> getType();
+  Class<? extends EPGMVertex> getType();
 }

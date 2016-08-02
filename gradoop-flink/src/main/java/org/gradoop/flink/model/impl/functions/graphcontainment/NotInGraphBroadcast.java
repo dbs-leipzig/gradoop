@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
 
 /**
  * True, if an element is not contained in a given graph.
@@ -26,7 +26,7 @@ import org.gradoop.common.model.api.entities.GraphElement;
  * @param <GE> element type
  */
 @FunctionAnnotation.ReadFields("graphIds")
-public class NotInGraphBroadcast<GE extends GraphElement>
+public class NotInGraphBroadcast<GE extends EPGMGraphElement>
   extends GraphContainmentFilterBroadcast<GE> {
 
   @Override

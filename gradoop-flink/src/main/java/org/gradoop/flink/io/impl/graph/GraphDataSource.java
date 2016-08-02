@@ -22,6 +22,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.impl.graph.functions.UpdateEPGMEdge;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -32,8 +34,6 @@ import org.gradoop.flink.io.impl.graph.functions.InitEPGMVertex;
 import org.gradoop.flink.io.impl.graph.functions.InitEPGMEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -118,24 +118,24 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
     TypeInformation<K> externalIdType = ((TupleTypeInfo<?>) importVertices
       .getType()).getTypeAt(0);
 
-    DataSet<Tuple3<K, GradoopId, Vertex>> vertexTriples = importVertices
+    DataSet<Tuple3<K, GradoopId, EPGMVertex>> vertexTriples = importVertices
       .map(new InitEPGMVertex<>(
         config.getVertexFactory(), lineagePropertyKey, externalIdType));
 
-    DataSet<Vertex> epgmVertices = vertexTriples
-      .map(new Value2Of3<K, GradoopId, Vertex>());
+    DataSet<EPGMVertex> epgmVertices = vertexTriples
+      .map(new Value2Of3<K, GradoopId, EPGMVertex>());
 
     DataSet<Tuple2<K, GradoopId>> vertexIdPair = vertexTriples
-      .map(new Project3To0And1<K, GradoopId, Vertex>());
+      .map(new Project3To0And1<K, GradoopId, EPGMVertex>());
 
-    DataSet<Edge> epgmEdges = importEdges
+    DataSet<EPGMEdge> epgmEdges = importEdges
       .join(vertexIdPair)
       .where(1).equalTo(0)
       .with(new InitEPGMEdge<>(
         config.getEdgeFactory(), lineagePropertyKey, externalIdType))
       .join(vertexIdPair)
       .where(0).equalTo(0)
-      .with(new UpdateEPGMEdge<Edge, K>());
+      .with(new UpdateEPGMEdge<EPGMEdge, K>());
 
     return LogicalGraph.fromDataSets(epgmVertices, epgmEdges, config);
   }

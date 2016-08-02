@@ -19,10 +19,10 @@ package org.gradoop.common.storage.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EdgeFactory;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeSource(final Put put, final Vertex vertexData) throws IOException;
+  Put writeSource(final Put put, final EPGMVertex vertexData) throws IOException;
 
   /**
    * Reads the source vertex identifier from the given {@link Result}.
@@ -55,7 +55,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeTarget(final Put put, final Vertex vertexData) throws IOException;
+  Put writeTarget(final Put put, final EPGMVertex vertexData) throws IOException;
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -81,12 +81,12 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  Edge readEdge(final Result res);
+  EPGMEdge readEdge(final Result res);
 
   /**
    * Returns the edge data factory used by this handler.
    *
    * @return edge data factory
    */
-  EdgeFactory getEdgeFactory();
+  EPGMEdgeFactory getEdgeFactory();
 }

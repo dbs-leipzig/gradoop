@@ -19,8 +19,8 @@ package org.gradoop.flink.io.impl.hbase.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.PersistentEdge;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 
@@ -29,7 +29,7 @@ import org.gradoop.common.storage.api.PersistentEdgeFactory;
  * vertex data
  */
 public class BuildPersistentEdge
-  implements JoinFunction<Tuple2<Vertex, Edge>, Vertex, PersistentEdge> {
+  implements JoinFunction<Tuple2<EPGMVertex, EPGMEdge>, EPGMVertex, PersistentEdge> {
 
   /**
    * Persistent edge data factory.
@@ -50,7 +50,7 @@ public class BuildPersistentEdge
    */
   @Override
   public PersistentEdge join(
-    Tuple2<Vertex, Edge> sourceVertexAndEdge, Vertex targetVertex)
+    Tuple2<EPGMVertex, EPGMEdge> sourceVertexAndEdge, EPGMVertex targetVertex)
     throws Exception {
     return edgeFactory.createEdge(sourceVertexAndEdge.f1,
       sourceVertexAndEdge.f0, targetVertex);

@@ -19,12 +19,12 @@ package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
@@ -44,12 +44,12 @@ public class Subgraph implements UnaryGraphToGraphOperator {
   /**
    * Used to filter vertices from the logical graph.
    */
-  private final FilterFunction<Vertex> vertexFilterFunction;
+  private final FilterFunction<EPGMVertex> vertexFilterFunction;
 
   /**
    * Used to filter edges from the logical graph.
    */
-  private final FilterFunction<Edge> edgeFilterFunction;
+  private final FilterFunction<EPGMEdge> edgeFilterFunction;
 
   /**
    * Creates a new sub graph operator instance.
@@ -66,8 +66,8 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @param vertexFilterFunction  vertex filter function
    * @param edgeFilterFunction    edge filter function
    */
-  public Subgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction) {
+  public Subgraph(FilterFunction<EPGMVertex> vertexFilterFunction,
+    FilterFunction<EPGMEdge> edgeFilterFunction) {
     if (vertexFilterFunction == null && edgeFilterFunction == null) {
       throw new IllegalArgumentException("No filter functions was given.");
     }
@@ -91,16 +91,16 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    */
   private LogicalGraph vertexInducedSubgraph(
     LogicalGraph superGraph) {
-    DataSet<Vertex> filteredVertices = superGraph.getVertices()
+    DataSet<EPGMVertex> filteredVertices = superGraph.getVertices()
       .filter(vertexFilterFunction);
 
-    DataSet<Edge> newEdges = superGraph.getEdges()
+    DataSet<EPGMEdge> newEdges = superGraph.getEdges()
       .join(filteredVertices)
-      .where(new SourceId<>()).equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>())
+      .where(new SourceId<>()).equalTo(new Id<EPGMVertex>())
+      .with(new LeftSide<EPGMEdge, EPGMVertex>())
       .join(filteredVertices)
-      .where(new TargetId<>()).equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>());
+      .where(new TargetId<>()).equalTo(new Id<EPGMVertex>())
+      .with(new LeftSide<EPGMEdge, EPGMVertex>());
 
     return LogicalGraph.fromDataSets(
       filteredVertices, newEdges, superGraph.getConfig());
@@ -115,18 +115,18 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    */
   private LogicalGraph edgeInducedSubgraph(
     LogicalGraph superGraph) {
-    DataSet<Edge> filteredEdges = superGraph.getEdges()
+    DataSet<EPGMEdge> filteredEdges = superGraph.getEdges()
       .filter(edgeFilterFunction);
 
-    DataSet<Vertex> newVertices = filteredEdges
+    DataSet<EPGMVertex> newVertices = filteredEdges
       .join(superGraph.getVertices())
-      .where(new SourceId<>()).equalTo(new Id<Vertex>())
-      .with(new RightSide<Edge, Vertex>())
+      .where(new SourceId<>()).equalTo(new Id<EPGMVertex>())
+      .with(new RightSide<EPGMEdge, EPGMVertex>())
       .union(filteredEdges
         .join(superGraph.getVertices())
-          .where(new TargetId<>()).equalTo(new Id<Vertex>())
-          .with(new RightSide<Edge, Vertex>()))
-      .distinct(new Id<Vertex>());
+          .where(new TargetId<>()).equalTo(new Id<EPGMVertex>())
+          .with(new RightSide<EPGMEdge, EPGMVertex>()))
+      .distinct(new Id<EPGMVertex>());
 
     return LogicalGraph.fromDataSets(
       newVertices, filteredEdges, superGraph.getConfig());

@@ -20,9 +20,9 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 import java.util.Set;
 
@@ -30,13 +30,13 @@ import java.util.Set;
  * (graphHead, {vertex,..}, {edge,..}) => vertex,..
  */
 public class TransactionVertices implements
-  FlatMapFunction<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>, Vertex> {
+  FlatMapFunction<Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>>, EPGMVertex> {
 
   @Override
-  public void flatMap(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> graphTriple,
-    Collector<Vertex> collector) throws Exception {
+  public void flatMap(Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>> graphTriple,
+    Collector<EPGMVertex> collector) throws Exception {
 
-    for (Vertex vertex : graphTriple.f1) {
+    for (EPGMVertex vertex : graphTriple.f1) {
       collector.collect(vertex);
     }
   }

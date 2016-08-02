@@ -2,9 +2,9 @@ package org.gradoop.flink.io.impl.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.EPGMDatabase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.common.storage.api.PersistentEdge;
@@ -54,9 +54,9 @@ public class HBaseIOTest extends FlinkHBaseTestBase {
     GraphCollection collection = new HBaseDataSource(epgmStore,
       getConfig()).getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads    = Lists.newArrayList();
-    Collection<Vertex>    loadedVertices      = Lists.newArrayList();
-    Collection<Edge>      loadedEdges         = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads    = Lists.newArrayList();
+    Collection<EPGMVertex>    loadedVertices      = Lists.newArrayList();
+    Collection<EPGMEdge>      loadedEdges         = Lists.newArrayList();
 
     collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));

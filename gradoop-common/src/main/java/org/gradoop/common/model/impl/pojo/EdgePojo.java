@@ -17,7 +17,7 @@
 
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.PropertyList;
@@ -25,15 +25,15 @@ import org.gradoop.common.model.impl.properties.PropertyList;
 /**
  * POJO Implementation of an EPGM edge.
  */
-public class EdgePojo extends GraphElementPojo implements Edge {
+public class EdgePojo extends GraphElementPojo implements EPGMEdge {
 
   /**
-   * Vertex identifier of the source vertex.
+   * EPGMVertex identifier of the source vertex.
    */
   private GradoopId sourceId;
 
   /**
-   * Vertex identifier of the target vertex.
+   * EPGMVertex identifier of the target vertex.
    */
   private GradoopId targetId;
 

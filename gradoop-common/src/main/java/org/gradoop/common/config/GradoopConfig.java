@@ -17,9 +17,9 @@
 
 package org.gradoop.common.config;
 
-import org.gradoop.common.model.api.entities.EdgeFactory;
-import org.gradoop.common.model.api.entities.GraphHeadFactory;
-import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.EdgePojoFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadPojoFactory;
 import org.gradoop.common.model.impl.pojo.VertexPojoFactory;
@@ -42,11 +42,11 @@ public class GradoopConfig {
    */
   private final GraphHeadHandler graphHeadHandler;
   /**
-   * Vertex handler.
+   * EPGMVertex handler.
    */
   private final VertexHandler vertexHandler;
   /**
-   * Edge handler.
+   * EPGMEdge handler.
    */
   private final EdgeHandler edgeHandler;
 
@@ -112,15 +112,15 @@ public class GradoopConfig {
     return edgeHandler;
   }
 
-  public GraphHeadFactory getGraphHeadFactory() {
+  public EPGMGraphHeadFactory getGraphHeadFactory() {
     return graphHeadHandler.getGraphHeadFactory();
   }
 
-  public VertexFactory getVertexFactory() {
+  public EPGMVertexFactory getVertexFactory() {
     return vertexHandler.getVertexFactory();
   }
 
-  public EdgeFactory getEdgeFactory() {
+  public EPGMEdgeFactory getEdgeFactory() {
     return edgeHandler.getEdgeFactory();
   }
 }

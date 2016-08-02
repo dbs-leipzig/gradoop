@@ -17,7 +17,7 @@
 
 package org.gradoop.common.storage.impl.hbase;
 
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
 
@@ -37,11 +37,11 @@ public class HBaseGraphHeadFactory implements PersistentGraphHeadFactory {
    * {@inheritDoc}
    */
   @Override
-  public HBaseGraphHead createGraphHead(GraphHead inputGraphHead,
+  public HBaseGraphHead createGraphHead(EPGMGraphHead inputGraphHead,
     GradoopIdSet vertices, GradoopIdSet edges) {
-    checkNotNull(inputGraphHead, "GraphHead was null");
-    checkNotNull(vertices, "Vertex identifiers were null");
-    checkNotNull(edges, "Edge identifiers were null");
+    checkNotNull(inputGraphHead, "EPGMGraphHead was null");
+    checkNotNull(vertices, "EPGMVertex identifiers were null");
+    checkNotNull(edges, "EPGMEdge identifiers were null");
     return new HBaseGraphHead(inputGraphHead, vertices, edges);
   }
 }

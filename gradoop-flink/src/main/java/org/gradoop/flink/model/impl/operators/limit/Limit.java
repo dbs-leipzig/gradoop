@@ -18,6 +18,9 @@
 package org.gradoop.flink.model.impl.operators.limit;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators
   .UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -25,9 +28,8 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment
   .GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+
+
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -55,16 +57,16 @@ public class Limit implements UnaryCollectionToCollectionOperator {
   @Override
   public GraphCollection execute(GraphCollection collection) {
 
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads().first(limit);
+    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads().first(limit);
 
-    DataSet<GradoopId> firstIds = graphHeads.map(new Id<GraphHead>());
+    DataSet<GradoopId> firstIds = graphHeads.map(new Id<EPGMGraphHead>());
 
-    DataSet<Vertex> filteredVertices = collection.getVertices()
-      .filter(new InAllGraphsBroadcast<Vertex>())
+    DataSet<EPGMVertex> filteredVertices = collection.getVertices()
+      .filter(new InAllGraphsBroadcast<EPGMVertex>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<Edge> filteredEdges = collection.getEdges()
-      .filter(new InAllGraphsBroadcast<Edge>())
+    DataSet<EPGMEdge> filteredEdges = collection.getEdges()
+      .filter(new InAllGraphsBroadcast<EPGMEdge>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return GraphCollection.fromDataSets(graphHeads,

@@ -17,10 +17,10 @@
 
 package org.gradoop.common.model.impl.pojo;
 
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.util.GConstants;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory for creating edge POJOs.
  */
-public class EdgePojoFactory implements EdgeFactory, Serializable {
+public class EdgePojoFactory implements EPGMEdgeFactory, Serializable {
 
   /**
    * serial version uid
@@ -147,7 +147,7 @@ public class EdgePojoFactory implements EdgeFactory, Serializable {
   }
 
   @Override
-  public Class<? extends Edge> getType() {
+  public Class<? extends EPGMEdge> getType() {
     return EdgePojo.class;
   }
 }

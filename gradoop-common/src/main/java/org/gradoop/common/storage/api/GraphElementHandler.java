@@ -19,7 +19,7 @@ package org.gradoop.common.storage.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 import java.io.IOException;
@@ -36,7 +36,7 @@ public interface GraphElementHandler extends ElementHandler {
    * @param graphElement graph element
    * @return put with graph identifiers
    */
-  Put writeGraphIds(final Put put, final GraphElement graphElement) throws
+  Put writeGraphIds(final Put put, final EPGMGraphElement graphElement) throws
     IOException;
 
   /**

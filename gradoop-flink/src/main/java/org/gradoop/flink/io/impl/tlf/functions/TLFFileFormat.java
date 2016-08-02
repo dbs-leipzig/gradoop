@@ -21,11 +21,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.java.io.TextOutputFormat;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
@@ -71,14 +71,14 @@ public class TLFFileFormat implements
 
     // VERTICES
     int vertexId = 0;
-    for (Vertex vertex : graphTransaction.getVertices()) {
+    for (EPGMVertex vertex : graphTransaction.getVertices()) {
       vertexIdMap.put(vertex.getId(), vertexId);
       lines.add(TLFVertex.SYMBOL + " " + vertexId + " " + vertex.getLabel());
       vertexId++;
     }
 
     // EDGES
-    for (Edge edge : graphTransaction.getEdges()) {
+    for (EPGMEdge edge : graphTransaction.getEdges()) {
       Integer sourceId = vertexIdMap.get(edge.getSourceId());
       Integer targetId = vertexIdMap.get(edge.getTargetId());
 

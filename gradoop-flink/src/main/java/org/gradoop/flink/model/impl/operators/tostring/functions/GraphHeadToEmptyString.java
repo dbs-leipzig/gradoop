@@ -16,7 +16,7 @@
  */
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
-import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
  * represents a graph head by an empty string
  * @param <G> graph head type
  */
-public class GraphHeadToEmptyString<G extends GraphHead>
+public class GraphHeadToEmptyString<G extends EPGMGraphHead>
   implements GraphHeadToString<G> {
 
   @Override

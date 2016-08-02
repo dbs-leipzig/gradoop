@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
@@ -37,8 +38,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 
 import java.util.List;
 
@@ -112,7 +112,7 @@ public class GroupingGroupCombine extends Grouping {
           getVertexAggregators()));
 
     // build super vertices from super vertex tuples
-    DataSet<Vertex> superVertices = superVertexTuples
+    DataSet<EPGMVertex> superVertices = superVertexTuples
       .map(new Value0Of2<VertexGroupItem, IdWithIdSet>())
       .map(new BuildSuperVertex(getVertexGroupingKeys(), useVertexLabels(),
         getVertexAggregators(), config.getVertexFactory()));
@@ -130,7 +130,7 @@ public class GroupingGroupCombine extends Grouping {
         .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);
 
     // build super edges
-    DataSet<Edge> superEdges = buildSuperEdges(graph,
+    DataSet<EPGMEdge> superEdges = buildSuperEdges(graph,
       vertexToRepresentativeMap);
 
     return LogicalGraph.fromDataSets(

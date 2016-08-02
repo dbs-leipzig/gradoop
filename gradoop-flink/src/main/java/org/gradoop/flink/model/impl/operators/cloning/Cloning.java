@@ -19,6 +19,8 @@ package org.gradoop.flink.model.impl.operators.cloning;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ElementIdUpdater;
@@ -28,9 +30,7 @@ import org.gradoop.flink.model.impl.operators.cloning.functions
 import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeTargetUpdateJoin;
 import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpdater;
 import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.impl.functions.epgm.Clone;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
@@ -53,33 +53,33 @@ public class Cloning implements UnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    DataSet<GraphHead> graphHead = graph.getGraphHead()
-      .map(new Clone<GraphHead>());
+    DataSet<EPGMGraphHead> graphHead = graph.getGraphHead()
+      .map(new Clone<EPGMGraphHead>());
 
-    DataSet<GradoopId> graphId = graphHead.map(new Id<GraphHead>());
+    DataSet<GradoopId> graphId = graphHead.map(new Id<EPGMGraphHead>());
 
     //--------------------------------------------------------------------------
     // compute new vertices
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<Vertex, GradoopId>> vertexTuple = graph.getVertices()
-        .map(new PairElementWithNewId<Vertex>());
+    DataSet<Tuple2<EPGMVertex, GradoopId>> vertexTuple = graph.getVertices()
+        .map(new PairElementWithNewId<EPGMVertex>());
 
     DataSet<Tuple2<GradoopId, GradoopId>> vertexIdTuple = vertexTuple
-      .map(new Value0Of2ToId<Vertex, GradoopId>());
+      .map(new Value0Of2ToId<EPGMVertex, GradoopId>());
 
-    DataSet<Vertex> vertices = vertexTuple
+    DataSet<EPGMVertex> vertices = vertexTuple
       .map(new ElementIdUpdater<>())
       //update graph ids
-      .map(new ElementGraphUpdater<Vertex>())
+      .map(new ElementGraphUpdater<EPGMVertex>())
       .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);
 
     //--------------------------------------------------------------------------
     // compute new edges
     //--------------------------------------------------------------------------
 
-    DataSet<Edge> edges = graph.getEdges()
-      .map(new Clone<Edge>())
+    DataSet<EPGMEdge> edges = graph.getEdges()
+      .map(new Clone<EPGMEdge>())
       //update source vertex ids
       .join(vertexIdTuple)
       .where(new SourceId<>()).equalTo(0)
@@ -89,7 +89,7 @@ public class Cloning implements UnaryGraphToGraphOperator {
       .where(new TargetId<>()).equalTo(0)
       .with(new EdgeTargetUpdateJoin<>())
       //update graph ids
-      .map(new ElementGraphUpdater<Edge>())
+      .map(new ElementGraphUpdater<EPGMEdge>())
       .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);
 
     return LogicalGraph.fromDataSets(graphHead,

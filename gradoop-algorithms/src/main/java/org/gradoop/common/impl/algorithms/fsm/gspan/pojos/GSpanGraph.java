@@ -31,7 +31,7 @@ import java.util.Map;
 public class GSpanGraph implements Serializable {
 
   /**
-   * Vertex adjacency lists. Index is vertex identifier.
+   * EPGMVertex adjacency lists. Index is vertex identifier.
    */
   private List<AdjacencyList> adjacencyLists;
   /**

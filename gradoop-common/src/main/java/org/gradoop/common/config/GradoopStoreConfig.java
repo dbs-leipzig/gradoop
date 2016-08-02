@@ -36,7 +36,7 @@ public abstract class GradoopStoreConfig extends GradoopConfig {
    */
   private final PersistentGraphHeadFactory persistentGraphHeadFactory;
   /**
-   * Vertex handler.
+   * EPGMVertex handler.
    */
   private final PersistentVertexFactory persistentVertexFactory;
   /**

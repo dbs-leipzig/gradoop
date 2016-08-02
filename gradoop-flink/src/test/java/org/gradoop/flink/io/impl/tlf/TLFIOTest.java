@@ -17,10 +17,10 @@
 
 package org.gradoop.flink.io.impl.tlf;
 
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
@@ -211,12 +211,12 @@ public class TLFIOTest extends GradoopFlinkTestBase {
       .getTransactions()
       .collect().get(0);
     //get vertices of the first transaction/graph
-    Vertex[] vertexArray = graphTransaction.getVertices().toArray(
-      new Vertex[graphTransaction.getVertices().size()]);
+    EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(
+      new EPGMVertex[graphTransaction.getVertices().size()]);
     //sort vertices by label(alphabetically)
-    Arrays.sort(vertexArray, new Comparator<Vertex>() {
+    Arrays.sort(vertexArray, new Comparator<EPGMVertex>() {
       @Override
-      public int compare(Vertex vertex1, Vertex vertex2) {
+      public int compare(EPGMVertex vertex1, EPGMVertex vertex2) {
         return vertex1.getLabel().compareTo(vertex2.getLabel());
       }
     });
@@ -277,12 +277,12 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     GraphTransaction graphTransaction = graphTransactions
       .getTransactions().collect().get(0);
     //get vertices of the first transaction/graph
-    Vertex[] vertexArray = graphTransaction.getVertices().toArray(
-      new Vertex[graphTransaction.getVertices().size()]);
+    EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(
+      new EPGMVertex[graphTransaction.getVertices().size()]);
     //sort vertices by label(alphabetically)
-    Arrays.sort(vertexArray, new Comparator<Vertex>() {
+    Arrays.sort(vertexArray, new Comparator<EPGMVertex>() {
       @Override
-      public int compare(Vertex vertex1, Vertex vertex2) {
+      public int compare(EPGMVertex vertex1, EPGMVertex vertex2) {
         return vertex1.getLabel().compareTo(vertex2.getLabel());
       }
     });

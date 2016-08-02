@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.properties.PropertyList;
 /**
  * Used to describe entities that can have properties.
  */
-public interface Attributed {
+public interface EPGMAttributed {
 
   /**
    * Returns all properties of that entity.

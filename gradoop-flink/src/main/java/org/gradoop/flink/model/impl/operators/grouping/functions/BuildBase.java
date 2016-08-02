@@ -20,8 +20,8 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import com.google.common.collect.Lists;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .CountAggregator;
-import org.gradoop.common.model.api.entities.Attributed;
-import org.gradoop.common.model.api.entities.Labeled;
+import org.gradoop.common.model.api.entities.EPGMAttributed;
+import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -106,7 +106,7 @@ abstract class BuildBase implements Serializable {
    * @param labeled labeled element
    * @return label or {@code null}
    */
-  protected String getLabel(Labeled labeled) {
+  protected String getLabel(EPGMLabeled labeled) {
     return useLabel() ? labeled.getLabel() : null;
   }
 
@@ -116,7 +116,7 @@ abstract class BuildBase implements Serializable {
    * @param labeled labeled element
    * @param label   group label
    */
-  protected void setLabel(Labeled labeled, String label) {
+  protected void setLabel(EPGMLabeled labeled, String label) {
     if (useLabel()) {
       labeled.setLabel(label);
     }
@@ -134,7 +134,7 @@ abstract class BuildBase implements Serializable {
    * @param attributed EPGM attributed element
    * @return property value list
    */
-  protected PropertyValueList getGroupProperties(Attributed attributed)
+  protected PropertyValueList getGroupProperties(EPGMAttributed attributed)
       throws IOException {
     List<PropertyValue> values =
       Lists.newArrayListWithCapacity(attributed.getPropertyCount());
@@ -156,7 +156,7 @@ abstract class BuildBase implements Serializable {
    * @param attributed          attributed element
    * @param groupPropertyValues group property values
    */
-  protected void setGroupProperties(Attributed attributed,
+  protected void setGroupProperties(EPGMAttributed attributed,
     PropertyValueList groupPropertyValues) {
 
     Iterator<String> keyIterator = groupPropertyKeys.iterator();
@@ -188,7 +188,7 @@ abstract class BuildBase implements Serializable {
    * @param   attributed attributed EPGM element
    * @return  property values for aggregation
    */
-  protected PropertyValueList getAggregateValues(Attributed attributed)
+  protected PropertyValueList getAggregateValues(EPGMAttributed attributed)
       throws IOException {
     List<PropertyValue> propertyValues =
       Lists.newArrayListWithCapacity(valueAggregators.size());
@@ -249,7 +249,7 @@ abstract class BuildBase implements Serializable {
    *
    * @param element attributed element
    */
-  protected void setAggregateValues(Attributed element) {
+  protected void setAggregateValues(EPGMAttributed element) {
     if (doAggregate()) {
       for (PropertyValueAggregator valueAggregator : valueAggregators) {
         element.setProperty(
@@ -266,7 +266,7 @@ abstract class BuildBase implements Serializable {
    * @param values  aggregate values
    */
   protected void setAggregateValues(
-    Attributed element, PropertyValueList values) {
+    EPGMAttributed element, PropertyValueList values) {
     if (doAggregate()) {
       Iterator<PropertyValueAggregator> aggIt = valueAggregators.iterator();
       Iterator<PropertyValue> valueIt = values.iterator();

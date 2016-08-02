@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <EL> element type
  */
 @FunctionAnnotation.ReadFields("graphIds")
-public class InGraph<EL extends GraphElement>
+public class InGraph<EL extends EPGMGraphElement>
   implements FilterFunction<EL> {
 
   /**

@@ -65,7 +65,7 @@ public class GroupingBenchmark
    */
   private static final String OPTION_VERTEX_GROUPING_KEY = "vgk";
   /**
-   * Edge grouping key option
+   * EPGMEdge grouping key option
    */
   private static final String OPTION_EDGE_GROUPING_KEY = "egk";
   /**
@@ -93,7 +93,7 @@ public class GroupingBenchmark
    */
   private static final String OPTION_VERTEX_AGGREGATION_RESULT_KEYS = "vark";
   /**
-   * Used Edge aggregator functions (min, max, count, none)
+   * Used EPGMEdge aggregator functions (min, max, count, none)
    */
   private static final String OPTION_EDGE_AGGREGATION_FUNCS = "eagg";
   /**
@@ -284,7 +284,7 @@ public class GroupingBenchmark
         "(max, min, count, none (or list of these)");
     }
     if (!cmd.hasOption(OPTION_EDGE_AGGREGATION_FUNCS)) {
-      throw new IllegalArgumentException("Edge aggregator need to be set! " +
+      throw new IllegalArgumentException("EPGMEdge aggregator need to be set! " +
         "(max, min, count, none (or list of these)");
     }
 
@@ -459,7 +459,7 @@ public class GroupingBenchmark
     String head = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n",
       "Parallelism", "dataset", "vertexKeys", "edgeKeys", "USE_VERTEX_LABELS",
       "USE_EDGE_LABELS", "Vertex Aggregators", "Vertex-Aggregator-Keys",
-      "Edge-Aggregators", "Edge-Aggregator-Keys", "Runtime(s)");
+      "EPGMEdge-Aggregators", "EPGMEdge-Aggregator-Keys", "Runtime(s)");
 
     String tail = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n",
       getExecutionEnvironment().getParallelism(), INPUT_PATH,

@@ -19,7 +19,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.HashMap;
@@ -65,7 +65,7 @@ public class VertexLabelDecoder extends
   public GraphTransaction map(GraphTransaction graphTransaction)
     throws Exception {
     String label;
-    for (Vertex vertex : graphTransaction.getVertices()) {
+    for (EPGMVertex vertex : graphTransaction.getVertices()) {
       label = vertexDictionary.get(Integer.parseInt(vertex.getLabel()));
       if (label != null) {
         vertex.setLabel(label);

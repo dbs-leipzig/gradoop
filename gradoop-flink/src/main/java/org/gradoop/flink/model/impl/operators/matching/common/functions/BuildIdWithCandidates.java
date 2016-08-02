@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.matching
   .EntityMatcher;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples
   .IdWithCandidates;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 import java.util.Collection;
 
@@ -39,7 +39,7 @@ import java.util.Collection;
  * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
-public class BuildIdWithCandidates<V extends Vertex>
+public class BuildIdWithCandidates<V extends EPGMVertex>
   extends AbstractBuilder<V, IdWithCandidates> {
   /**
    * serial version uid

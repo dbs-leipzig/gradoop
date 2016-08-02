@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 
 /**
@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
  *
  * @param <EL>  EPGM element type
  */
-public abstract class AbstractFilter<EL extends Element>
+public abstract class AbstractFilter<EL extends EPGMElement>
   extends RichFilterFunction<EL> {
 
   /**

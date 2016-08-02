@@ -21,9 +21,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -50,14 +50,14 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Part of the BIIIG approach.
- * Vertex-centric implementation to isolate business transaction graphs.
+ * EPGMVertex-centric implementation to isolate business transaction graphs.
  *
  * @param <G> graph type
  * @param <V> vertex type
  * @param <E> edge type
  */
 public class BusinessTransactionGraphs
-  <G extends GraphHead, V extends Vertex, E extends Edge>
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements UnaryGraphToCollectionOperator<G, V, E> {
 
   /**

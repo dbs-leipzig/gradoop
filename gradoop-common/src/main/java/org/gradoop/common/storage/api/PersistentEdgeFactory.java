@@ -17,8 +17,8 @@
 
 package org.gradoop.common.storage.api;
 
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 import java.io.Serializable;
 
@@ -35,6 +35,6 @@ public interface PersistentEdgeFactory extends Serializable {
    * @param targetVertex target vertex
    * @return persistent edge
    */
-  PersistentEdge createEdge(Edge inputEdge, Vertex sourceVertex,
-    Vertex targetVertex);
+  PersistentEdge createEdge(EPGMEdge inputEdge, EPGMVertex sourceVertex,
+    EPGMVertex targetVertex);
 }

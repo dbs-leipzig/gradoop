@@ -158,6 +158,6 @@ public class EdgeListExample implements ProgramDescription {
 
   @Override
   public String getDescription() {
-    return "Edge List Reader";
+    return "EPGMEdge List Reader";
   }
 }

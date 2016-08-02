@@ -21,16 +21,16 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
- * Initializes {@link GraphHead} objects of a given type.
+ * Initializes {@link EPGMGraphHead} objects of a given type.
  */
-public interface GraphHeadFactory {
+public interface EPGMGraphHeadFactory {
 
   /**
    * Creates a new graph head based.
    *
    * @return graph data
    */
-  GraphHead createGraphHead();
+  EPGMGraphHead createGraphHead();
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -38,7 +38,7 @@ public interface GraphHeadFactory {
    * @param id graph identifier
    * @return graph data
    */
-  GraphHead initGraphHead(GradoopId id);
+  EPGMGraphHead initGraphHead(GradoopId id);
 
   /**
    * Creates a new graph head based on the given parameters.
@@ -46,7 +46,7 @@ public interface GraphHeadFactory {
    * @param label graph label
    * @return graph data
    */
-  GraphHead createGraphHead(String label);
+  EPGMGraphHead createGraphHead(String label);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -55,7 +55,7 @@ public interface GraphHeadFactory {
    * @param label graph label
    * @return graph data
    */
-  GraphHead initGraphHead(GradoopId id, String label);
+  EPGMGraphHead initGraphHead(GradoopId id, String label);
 
   /**
    * Creates a new graph head based on the given parameters.
@@ -64,7 +64,7 @@ public interface GraphHeadFactory {
    * @param properties graph attributes
    * @return graph data
    */
-  GraphHead createGraphHead(String label, PropertyList properties);
+  EPGMGraphHead createGraphHead(String label, PropertyList properties);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -74,12 +74,12 @@ public interface GraphHeadFactory {
    * @param properties graph attributes
    * @return graph data
    */
-  GraphHead initGraphHead(GradoopId id, String label, PropertyList properties);
+  EPGMGraphHead initGraphHead(GradoopId id, String label, PropertyList properties);
 
   /**
    * Return the type of the objects created by that factory.
    *
    * @return object type
    */
-  Class<? extends GraphHead> getType();
+  Class<? extends EPGMGraphHead> getType();
 }

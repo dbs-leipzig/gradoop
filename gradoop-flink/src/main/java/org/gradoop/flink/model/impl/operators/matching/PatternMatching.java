@@ -29,8 +29,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.debug
 import org.gradoop.flink.model.impl.operators.matching.common.debug
   .PrintTripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithPropertyValue;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -63,11 +63,11 @@ public abstract class PatternMatching implements
    */
   private final boolean attachData;
   /**
-   * Vertex mapping used for debug
+   * EPGMVertex mapping used for debug
    */
   private DataSet<Tuple2<GradoopId, PropertyValue>> vertexMapping;
   /**
-   * Edge mapping used for debug
+   * EPGMEdge mapping used for debug
    */
   private DataSet<Tuple2<GradoopId, PropertyValue>> edgeMapping;
 
@@ -201,8 +201,8 @@ public abstract class PatternMatching implements
    */
   private void initDebugMappings(LogicalGraph graph) {
     vertexMapping = graph.getVertices()
-      .map(new PairElementWithPropertyValue<Vertex>("id"));
+      .map(new PairElementWithPropertyValue<EPGMVertex>("id"));
     edgeMapping = graph.getEdges()
-      .map(new PairElementWithPropertyValue<Edge>("id"));
+      .map(new PairElementWithPropertyValue<EPGMEdge>("id"));
   }
 }

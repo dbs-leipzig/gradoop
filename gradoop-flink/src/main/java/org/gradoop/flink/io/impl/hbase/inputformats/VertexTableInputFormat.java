@@ -21,14 +21,14 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.VertexHandler;
 import org.gradoop.common.util.GConstants;
 
 /**
  * Reads vertex data from HBase.
  */
-public class VertexTableInputFormat extends TableInputFormat<Tuple1<Vertex>> {
+public class VertexTableInputFormat extends TableInputFormat<Tuple1<EPGMVertex>> {
 
   /**
    * Handles reading of persistent vertex data.
@@ -74,7 +74,7 @@ public class VertexTableInputFormat extends TableInputFormat<Tuple1<Vertex>> {
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<Vertex> mapResultToTuple(Result result) {
+  protected Tuple1<EPGMVertex> mapResultToTuple(Result result) {
     return new Tuple1<>(vertexHandler.readVertex(result));
   }
 }

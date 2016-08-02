@@ -18,14 +18,14 @@
 package org.gradoop.model.impl.algorithms.btgs.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * EPGM vertex to gelly vertex, where value is vertex id
  * @param <V> EPGM vertex type
  */
-public class ToGellyVertexWithIdValue<V extends Vertex>
+public class ToGellyVertexWithIdValue<V extends EPGMVertex>
   implements MapFunction<V, org.apache.flink.graph.Vertex> {
 
   @Override

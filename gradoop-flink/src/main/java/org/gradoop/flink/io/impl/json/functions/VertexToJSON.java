@@ -21,7 +21,7 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.flink.io.impl.json.JSONConstants;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 /**
  * Converts a vertex into the following format:
@@ -34,7 +34,7 @@ import org.gradoop.common.model.api.entities.Vertex;
  *
  * @param <V> EPGM vertex type
  */
-public class VertexToJSON<V extends Vertex>
+public class VertexToJSON<V extends EPGMVertex>
   extends EntityToJSON
   implements TextOutputFormat.TextFormatter<V> {
 

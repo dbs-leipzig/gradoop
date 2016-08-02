@@ -17,11 +17,11 @@
 
 package org.gradoop.flink.util;
 
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.EPGMDatabase;
 import org.gradoop.flink.model.impl.GraphCollection;
 
@@ -123,9 +123,9 @@ public class FlinkAsciiGraphLoader {
    * @return LogicalGraph
    */
   public LogicalGraph getLogicalGraphByVariable(String variable) {
-    GraphHead graphHead = loader.getGraphHeadByVariable(variable);
-    Collection<Vertex> vertices = loader.getVerticesByGraphVariables(variable);
-    Collection<Edge> edges = loader.getEdgesByGraphVariables(variable);
+    EPGMGraphHead graphHead = loader.getGraphHeadByVariable(variable);
+    Collection<EPGMVertex> vertices = loader.getVerticesByGraphVariables(variable);
+    Collection<EPGMEdge> edges = loader.getEdgesByGraphVariables(variable);
 
     return LogicalGraph.fromCollections(graphHead, vertices, edges, config);
   }
@@ -139,9 +139,9 @@ public class FlinkAsciiGraphLoader {
    */
   public GraphCollection getGraphCollectionByVariables(
     String... variables) {
-    Collection<GraphHead> graphHeads = loader.getGraphHeadsByVariables(variables);
-    Collection<Vertex> vertices = loader.getVerticesByGraphVariables(variables);
-    Collection<Edge> edges = loader.getEdgesByGraphVariables(variables);
+    Collection<EPGMGraphHead> graphHeads = loader.getGraphHeadsByVariables(variables);
+    Collection<EPGMVertex> vertices = loader.getVerticesByGraphVariables(variables);
+    Collection<EPGMEdge> edges = loader.getEdgesByGraphVariables(variables);
 
     return GraphCollection.fromCollections(graphHeads, vertices, edges, config);
   }
@@ -151,17 +151,17 @@ public class FlinkAsciiGraphLoader {
    *
    * @return graphHeads
    */
-  public Collection<GraphHead> getGraphHeads() {
+  public Collection<EPGMGraphHead> getGraphHeads() {
     return loader.getGraphHeads();
   }
 
   /**
-   * Returns GraphHead by given variable.
+   * Returns EPGMGraphHead by given variable.
    *
    * @param variable variable used in GDL script
    * @return graphHead or {@code null} if graph is not cached
    */
-  public GraphHead getGraphHeadByVariable(String variable) {
+  public EPGMGraphHead getGraphHeadByVariable(String variable) {
     return loader.getGraphHeadByVariable(variable);
   }
 
@@ -170,7 +170,7 @@ public class FlinkAsciiGraphLoader {
    *
    * @return vertices
    */
-  public Collection<Vertex> getVertices() {
+  public Collection<EPGMVertex> getVertices() {
     return loader.getVertices();
   }
 
@@ -180,7 +180,7 @@ public class FlinkAsciiGraphLoader {
    * @param variables graph variables used in the GDL script
    * @return vertices that are contained in the graphs
    */
-  public Collection<Vertex> getVerticesByGraphVariables(String... variables) {
+  public Collection<EPGMVertex> getVerticesByGraphVariables(String... variables) {
     return loader.getVerticesByGraphVariables(variables);
   }
 
@@ -191,7 +191,7 @@ public class FlinkAsciiGraphLoader {
    * @param variable vertex variable
    * @return vertex or {@code null} if variable is not used
    */
-  public Vertex getVertexByVariable(String variable) {
+  public EPGMVertex getVertexByVariable(String variable) {
     return loader.getVertexByVariable(variable);
   }
 
@@ -200,7 +200,7 @@ public class FlinkAsciiGraphLoader {
    *
    * @return edges
    */
-  public Collection<Edge> getEdges() {
+  public Collection<EPGMEdge> getEdges() {
     return loader.getEdges();
   }
 
@@ -210,7 +210,7 @@ public class FlinkAsciiGraphLoader {
    * @param variables graph variables used in the GDL script
    * @return edges
    */
-  public Collection<Edge> getEdgesByGraphVariables(String... variables) {
+  public Collection<EPGMEdge> getEdgesByGraphVariables(String... variables) {
     return loader.getEdgesByGraphVariables(variables);
   }
 
@@ -221,7 +221,7 @@ public class FlinkAsciiGraphLoader {
    * @param variable edge variable
    * @return edge or {@code null} if variable is not used
    */
-  public Edge getEdgeByVariable(String variable) {
+  public EPGMEdge getEdgeByVariable(String variable) {
     return loader.getEdgeByVariable(variable);
   }
 

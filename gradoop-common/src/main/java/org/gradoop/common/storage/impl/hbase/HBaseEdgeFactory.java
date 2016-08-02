@@ -17,8 +17,8 @@
 
 package org.gradoop.common.storage.impl.hbase;
 
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,9 +37,9 @@ public class HBaseEdgeFactory implements PersistentEdgeFactory {
    * {@inheritDoc}
    */
   @Override
-  public HBaseEdge createEdge(Edge inputEdge, Vertex sourceVertex,
-    Vertex targetVertex) {
-    checkNotNull(inputEdge, "Edge was null");
+  public HBaseEdge createEdge(EPGMEdge inputEdge, EPGMVertex sourceVertex,
+    EPGMVertex targetVertex) {
+    checkNotNull(inputEdge, "EPGMEdge was null");
     checkNotNull(sourceVertex, "Source vertex was null");
     checkNotNull(targetVertex, "Target vertex was null");
     return new HBaseEdge(inputEdge, sourceVertex, targetVertex);

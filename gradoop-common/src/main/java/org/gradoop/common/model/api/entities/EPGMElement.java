@@ -17,23 +17,15 @@
 
 package org.gradoop.common.model.api.entities;
 
-import org.gradoop.common.model.impl.id.GradoopId;
+import java.io.Serializable;
 
 /**
- * Describes an identifiable entity.
+ * Base interface for all elements in the EPGM.
+ *
+ * @see EPGMGraphHead
+ * @see EPGMVertex
+ * @see EPGMEdge
  */
-public interface Identifiable {
-  /**
-   * Returns the identifier of that entity.
-   *
-   * @return identifier
-   */
-  GradoopId getId();
-
-  /**
-   * Sets the identifier of that entity.
-   *
-   * @param id identifier
-   */
-  void setId(GradoopId id);
+public interface EPGMElement
+  extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed, Serializable {
 }
