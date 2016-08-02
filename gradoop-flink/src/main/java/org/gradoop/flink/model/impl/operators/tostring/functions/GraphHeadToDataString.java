@@ -22,13 +22,12 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
  * represents a graph head by a data string (label and properties)
- * @param <G> graph head type
  */
-public class GraphHeadToDataString<G extends GraphHead>
-  extends ElementToDataString<G> implements GraphHeadToString<G> {
+public class GraphHeadToDataString extends ElementToDataString<GraphHead>
+  implements GraphHeadToString<GraphHead> {
 
   @Override
-  public GraphHeadString map(G graph) throws Exception {
+  public GraphHeadString map(GraphHead graph) throws Exception {
     return new GraphHeadString(graph.getId(), "|" + label(graph) + "|");
   }
 }

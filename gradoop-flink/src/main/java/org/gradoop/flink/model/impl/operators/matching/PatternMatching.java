@@ -110,8 +110,7 @@ public abstract class PatternMatching implements
    * @param graph data graph
    * @return result collection
    */
-  protected abstract GraphCollection executeForVertex(
-    LogicalGraph graph);
+  protected abstract GraphCollection executeForVertex(LogicalGraph graph);
 
   /**
    * Computes the result for pattern query graph.
@@ -119,8 +118,7 @@ public abstract class PatternMatching implements
    * @param graph data graph
    * @return result collection
    */
-  protected abstract GraphCollection executeForPattern(
-    LogicalGraph graph);
+  protected abstract GraphCollection executeForPattern(LogicalGraph graph);
 
   /**
    * Returns the query handler used by the concrete implementation.

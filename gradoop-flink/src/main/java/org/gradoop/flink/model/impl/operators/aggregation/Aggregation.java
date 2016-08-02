@@ -31,11 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Takes a logical graph and a user defined aggregate function as input. The
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
- *
- * @param <N> output type of aggregate function
  */
-public class Aggregation<N extends Number>
-  implements UnaryGraphToGraphOperator {
+public class Aggregation implements UnaryGraphToGraphOperator {
 
   /**
    * Used to store aggregate result.

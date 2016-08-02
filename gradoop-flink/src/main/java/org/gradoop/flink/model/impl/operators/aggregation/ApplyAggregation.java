@@ -36,8 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * the collection and the aggregate is stored as an additional property at the
  * graphs.
  */
-public class ApplyAggregation
-  implements ApplicableUnaryGraphToGraphOperator {
+public class ApplyAggregation implements ApplicableUnaryGraphToGraphOperator {
 
   /**
    * Used to store aggregate result.

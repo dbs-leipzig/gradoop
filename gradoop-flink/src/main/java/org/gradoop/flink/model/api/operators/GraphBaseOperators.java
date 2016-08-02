@@ -18,10 +18,9 @@
 package org.gradoop.flink.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.graph.Graph;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -73,13 +72,6 @@ public interface GraphBaseOperators {
    */
   @Deprecated
   DataSet<Edge> getIncomingEdges(final GradoopId vertexID);
-
-  /**
-   * Transforms the EPGM graph to a Gelly Graph.
-   *
-   * @return Gelly Graph
-   */
-  Graph<GradoopId, Vertex, Edge> toGellyGraph();
 
   //----------------------------------------------------------------------------
   // Utility methods

@@ -102,9 +102,9 @@ public class GradoopFlinkTestUtils {
     GraphCollection collection) throws Exception {
 
     new CanonicalAdjacencyMatrixBuilder(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(), true).execute(collection).print();
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(collection).print();
   }
 
   public static void printUndirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
@@ -117,8 +117,8 @@ public class GradoopFlinkTestUtils {
     GraphCollection collection) throws Exception {
 
     new CanonicalAdjacencyMatrixBuilder(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(), false).execute(collection).print();
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), false).execute(collection).print();
   }
 }

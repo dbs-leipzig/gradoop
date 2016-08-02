@@ -24,14 +24,13 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 
 /**
  * represents a vertex by an id string
- * @param <V> vertex type
  */
-public class VertexToIdString<V extends Vertex>
-  extends ElementToDataString<V> implements VertexToString<V> {
+public class VertexToIdString extends ElementToDataString<Vertex>
+  implements VertexToString<Vertex> {
 
   @Override
-  public void flatMap(
-    V vertex, Collector<VertexString> collector) throws Exception {
+  public void flatMap(Vertex vertex, Collector<VertexString> collector)
+    throws Exception {
 
     GradoopId vertexId = vertex.getId();
     String vertexLabel = "(" + vertex.getId() + ")";

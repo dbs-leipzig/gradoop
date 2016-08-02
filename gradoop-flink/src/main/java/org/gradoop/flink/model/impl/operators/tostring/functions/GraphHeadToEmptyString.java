@@ -22,13 +22,11 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
  * represents a graph head by an empty string
- * @param <G> graph head type
  */
-public class GraphHeadToEmptyString<G extends GraphHead>
-  implements GraphHeadToString<G> {
+public class GraphHeadToEmptyString implements GraphHeadToString<GraphHead> {
 
   @Override
-  public GraphHeadString map(G graphHead) throws Exception {
+  public GraphHeadString map(GraphHead graphHead) throws Exception {
     return new GraphHeadString(graphHead.getId(), "");
   }
 }

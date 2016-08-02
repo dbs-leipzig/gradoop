@@ -69,7 +69,7 @@ public class Cloning implements UnaryGraphToGraphOperator {
       .map(new Value0Of2ToId<Vertex, GradoopId>());
 
     DataSet<Vertex> vertices = vertexTuple
-      .map(new ElementIdUpdater<>())
+      .map(new ElementIdUpdater<Vertex>())
       //update graph ids
       .map(new ElementGraphUpdater<Vertex>())
       .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);

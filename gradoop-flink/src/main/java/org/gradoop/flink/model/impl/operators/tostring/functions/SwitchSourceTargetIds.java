@@ -24,7 +24,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * switches source and target id of an edge string representation
  */
-public class SwitchSourceTargetIds implements MapFunction<EdgeString, EdgeString> {
+public class SwitchSourceTargetIds implements
+  MapFunction<EdgeString, EdgeString> {
 
   @Override
   public EdgeString map(EdgeString edgeString) throws Exception {

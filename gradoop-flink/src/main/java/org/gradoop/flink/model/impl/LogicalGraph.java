@@ -340,7 +340,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph aggregate(String propertyKey,
     AggregateFunction aggregateFunc) {
-    return callForGraph(new Aggregation<>(propertyKey, aggregateFunc));
+    return callForGraph(new Aggregation(propertyKey, aggregateFunc));
   }
 
   /**
@@ -515,9 +515,9 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
     return new GraphEquality(
-      new GraphHeadToEmptyString<>(),
-      new VertexToIdString<>(),
-      new EdgeToIdString<>(), true).execute(this, other);
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
+      new EdgeToIdString(), true).execute(this, other);
   }
 
   /**
@@ -526,9 +526,9 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
     return new GraphEquality(
-      new GraphHeadToEmptyString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(), true).execute(this, other);
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(this, other);
   }
 
   /**
@@ -537,9 +537,9 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public DataSet<Boolean> equalsByData(LogicalGraph other) {
     return new GraphEquality(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(), true).execute(this, other);
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(this, other);
   }
 
   //----------------------------------------------------------------------------

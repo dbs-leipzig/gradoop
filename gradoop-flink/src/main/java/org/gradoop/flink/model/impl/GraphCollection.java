@@ -371,9 +371,9 @@ public class GraphCollection extends GraphBase
   public DataSet<Boolean> equalsByGraphElementIds(
     GraphCollection other) {
     return new CollectionEquality(
-      new GraphHeadToEmptyString<>(),
-      new VertexToIdString<>(),
-      new EdgeToIdString<>(), true).execute(this, other);
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
+      new EdgeToIdString(), true).execute(this, other);
   }
 
   /**
@@ -383,9 +383,9 @@ public class GraphCollection extends GraphBase
   public DataSet<Boolean> equalsByGraphElementData(
     GraphCollection other) {
     return new CollectionEquality(
-      new GraphHeadToEmptyString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(), true).execute(this, other);
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(this, other);
   }
 
   /**
@@ -394,9 +394,9 @@ public class GraphCollection extends GraphBase
   @Override
   public DataSet<Boolean> equalsByGraphData(GraphCollection other) {
     return new CollectionEquality(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(), true).execute(this, other);
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(this, other);
   }
 
   //----------------------------------------------------------------------------

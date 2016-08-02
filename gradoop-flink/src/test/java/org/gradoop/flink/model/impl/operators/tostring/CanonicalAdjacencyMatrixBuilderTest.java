@@ -25,9 +25,9 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
     CanonicalAdjacencyMatrixBuilder cam =
       new CanonicalAdjacencyMatrixBuilder(
-        new GraphHeadToDataString<>(),
-        new VertexToDataString<>(),
-        new EdgeToDataString<>(), true);
+        new GraphHeadToDataString(),
+        new VertexToDataString(),
+        new EdgeToDataString(), true);
 
     String result = cam.execute(g).collect().get(0);
 
@@ -49,9 +49,9 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
     CanonicalAdjacencyMatrixBuilder cam =
       new CanonicalAdjacencyMatrixBuilder(
-        new GraphHeadToDataString<>(),
-        new VertexToDataString<>(),
-        new EdgeToDataString<>(), false);
+        new GraphHeadToDataString(),
+        new VertexToDataString(),
+        new EdgeToDataString(), false);
 
     String result = cam.execute(g).collect().get(0);
 

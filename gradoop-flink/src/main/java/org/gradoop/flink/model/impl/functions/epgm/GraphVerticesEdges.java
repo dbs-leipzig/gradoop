@@ -29,18 +29,16 @@ import java.util.Set;
 /**
  * (graphId, {vertex,..}) |><| (graphID, {edge,..})
  * => (graphId, {vertex,..}, {edge,..})
- *
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class GraphVerticesEdges<V extends Vertex, E extends Edge>
-  implements JoinFunction<Tuple2<GradoopId, Set<V>>, Tuple2<GradoopId, Set<E>>,
-  Tuple3<GradoopId, Set<V>, Set<E>>> {
+public class GraphVerticesEdges
+  implements JoinFunction<
+  Tuple2<GradoopId, Set<Vertex>>, Tuple2<GradoopId, Set<Edge>>,
+  Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> {
 
   @Override
-  public Tuple3<GradoopId, Set<V>, Set<E>> join(
-    Tuple2<GradoopId, Set<V>> vertices, Tuple2<GradoopId, Set<E>> edges) throws
-    Exception {
+  public Tuple3<GradoopId, Set<Vertex>, Set<Edge>> join(
+    Tuple2<GradoopId, Set<Vertex>> vertices, Tuple2<GradoopId, Set<Edge>> edges)
+    throws Exception {
     return new Tuple3<>(vertices.f0, vertices.f1, edges.f1);
   }
 }

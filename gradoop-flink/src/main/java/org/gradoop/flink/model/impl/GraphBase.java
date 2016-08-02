@@ -18,14 +18,12 @@
 package org.gradoop.flink.model.impl;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.graph.Graph;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.operators.GraphBaseOperators;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -39,17 +37,14 @@ import java.util.Collection;
  * @see GraphCollection
  */
 public abstract class GraphBase implements GraphBaseOperators {
-
-  /**
-   * Graph data associated with the logical graphs in that collection.
-   */
-  protected final DataSet<GraphHead> graphHeads;
-
   /**
    * Gradoop Flink configuration.
    */
   private final GradoopFlinkConfig config;
-
+  /**
+   * Graph data associated with the logical graphs in that collection.
+   */
+  protected final DataSet<GraphHead> graphHeads;
   /**
    * DataSet containing vertices associated with that graph.
    */
@@ -197,28 +192,5 @@ public abstract class GraphBase implements GraphBaseOperators {
           return edge.getTargetId().equals(vertexID);
         }
       });
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Graph<GradoopId, Vertex, Edge> toGellyGraph() {
-    return Graph.fromDataSet(getVertices().map(
-      new MapFunction<Vertex, org.apache.flink.graph.Vertex<GradoopId, Vertex>>() {
-        @Override
-        public org.apache.flink.graph.Vertex<GradoopId, Vertex> map(Vertex Vertex) throws Exception {
-          return new org.apache.flink.graph.Vertex<>(Vertex.getId(), Vertex);
-        }
-      }).withForwardedFields("*->f1"),
-      getEdges().map(new MapFunction<Edge, org.apache.flink.graph.Edge<GradoopId, Edge>>() {
-        @Override
-        public org.apache.flink.graph.Edge<GradoopId, Edge> map(Edge Edge) throws Exception {
-          return new org.apache.flink.graph.Edge<>(Edge.getSourceId(),
-            Edge.getTargetId(),
-            Edge);
-        }
-      }).withForwardedFields("*->f2"),
-      config.getExecutionEnvironment());
   }
 }

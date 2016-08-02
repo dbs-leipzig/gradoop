@@ -29,6 +29,7 @@ public class ToGellyEdgeWithNullValue<E extends Edge>
 
   @Override
   public org.apache.flink.graph.Edge map(E e) throws Exception {
-    return new org.apache.flink.graph.Edge(e.getSourceId(), e.getTargetId(), new NullValue());
+    return new org.apache.flink.graph.Edge<>(e.getSourceId(), e.getTargetId(),
+      new NullValue());
   }
 }

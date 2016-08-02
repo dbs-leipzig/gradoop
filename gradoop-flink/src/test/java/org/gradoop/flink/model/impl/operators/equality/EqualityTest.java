@@ -42,9 +42,9 @@ public class EqualityTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getTestGraphLoader();
     
     CollectionEquality equality = new CollectionEquality(
-      new GraphHeadToEmptyString<>(),
-      new VertexToIdString<>(),
-      new EdgeToIdString<>(),
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
+      new EdgeToIdString(),
       true
     );
 
@@ -77,9 +77,9 @@ public class EqualityTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getTestGraphLoader();
 
     CollectionEquality equality = new CollectionEquality(
-      new GraphHeadToEmptyString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
+      new EdgeToDataString(),
       true
     );
 
@@ -112,9 +112,9 @@ public class EqualityTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getTestGraphLoader();
 
     CollectionEquality equality = new CollectionEquality(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(),
       true
     );
 
@@ -151,9 +151,9 @@ public class EqualityTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getTestGraphLoader();
 
     CollectionEquality equality = new CollectionEquality(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(),
       false
     );
 
@@ -186,9 +186,9 @@ public class EqualityTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getTestGraphLoader();
 
     GraphEquality equality = new GraphEquality(
-      new GraphHeadToEmptyString<>(),
-      new VertexToIdString<>(),
-      new EdgeToIdString<>(),
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
+      new EdgeToIdString(),
       true
     );
 
@@ -213,9 +213,9 @@ public class EqualityTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getTestGraphLoader();
 
     GraphEquality equality = new GraphEquality(
-      new GraphHeadToEmptyString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
+      new EdgeToDataString(),
       true
     );
 
@@ -241,9 +241,9 @@ public class EqualityTest extends GradoopFlinkTestBase {
       getTestGraphLoader();
 
     GraphEquality equality = new GraphEquality(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(),
       true
     );
 
@@ -272,9 +272,9 @@ public class EqualityTest extends GradoopFlinkTestBase {
       getTestGraphLoader();
 
     GraphEquality equality = new GraphEquality(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(),
       false
     );
 
