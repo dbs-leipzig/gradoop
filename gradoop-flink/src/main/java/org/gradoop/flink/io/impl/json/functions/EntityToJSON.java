@@ -21,7 +21,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.io.impl.json.JSONConstants;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
@@ -80,7 +80,7 @@ public class EntityToJSON {
    * @return json object with graph meta data
    * @throws JSONException
    */
-  protected <T extends EPGMGraphHead> JSONObject
+  protected <T extends GraphHead> JSONObject
   writeGraphMeta(T entity) throws JSONException {
     return writeMeta(entity);
   }

@@ -124,7 +124,7 @@ public class TransactionalFSMBenchmark
 
     // create gradoop conf
     GradoopFlinkConfig gradoopConfig =
-      GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment());
+      GradoopFlinkConfig.createConfig(getExecutionEnvironment());
 
     // read tlf graph
     TLFDataSource<GraphHead, Vertex, Edge> tlfSource =

@@ -18,11 +18,11 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -71,18 +71,18 @@ public class RandomNodeSampling implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 
-    DataSet<EPGMVertex> newVertices = graph.getVertices()
+    DataSet<Vertex> newVertices = graph.getVertices()
       .filter(new VertexRandomFilter<>(sampleSize, randomSeed));
 
-    DataSet<EPGMEdge> newEdges = graph.getEdges()
+    DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
       .where(new SourceId<>())
-      .equalTo(new Id<EPGMVertex>())
-      .with(new LeftSide<EPGMEdge, EPGMVertex>())
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
       .join(newVertices)
       .where(new TargetId<>())
-      .equalTo(new Id<EPGMVertex>())
-      .with(new LeftSide<EPGMEdge, EPGMVertex>());
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>());
 
     return LogicalGraph.fromDataSets(
       newVertices, newEdges, graph.getConfig());

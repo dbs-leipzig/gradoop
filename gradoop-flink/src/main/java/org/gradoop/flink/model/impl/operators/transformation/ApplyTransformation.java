@@ -17,13 +17,13 @@
 
 package org.gradoop.flink.model.impl.operators.transformation;
 
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Applies the transformation operator on on all logical graphs in a graph
@@ -39,9 +39,9 @@ public class ApplyTransformation extends Transformation
    * @param vertexModFunc    vertex transformation function
    * @param edgeModFunc      edge transformation function
    */
-  public ApplyTransformation(TransformationFunction<EPGMGraphHead> graphHeadModFunc,
-    TransformationFunction<EPGMVertex> vertexModFunc,
-    TransformationFunction<EPGMEdge> edgeModFunc) {
+  public ApplyTransformation(TransformationFunction<GraphHead> graphHeadModFunc,
+    TransformationFunction<Vertex> vertexModFunc,
+    TransformationFunction<Edge> edgeModFunc) {
     super(graphHeadModFunc, vertexModFunc, edgeModFunc);
   }
 

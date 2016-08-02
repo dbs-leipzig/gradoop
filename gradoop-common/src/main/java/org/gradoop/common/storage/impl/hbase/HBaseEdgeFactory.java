@@ -26,7 +26,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Default factory for creating persistent edge representations.
  */
-public class HBaseEdgeFactory implements PersistentEdgeFactory {
+public class HBaseEdgeFactory<E extends EPGMEdge, V extends EPGMVertex>
+  implements PersistentEdgeFactory<E, V> {
 
   /**
    * serial version uid
@@ -37,11 +38,11 @@ public class HBaseEdgeFactory implements PersistentEdgeFactory {
    * {@inheritDoc}
    */
   @Override
-  public HBaseEdge createEdge(EPGMEdge inputEdge, EPGMVertex sourceVertex,
-    EPGMVertex targetVertex) {
+  public HBaseEdge<E, V> createEdge(E inputEdge, V sourceVertex, V
+    targetVertex) {
     checkNotNull(inputEdge, "EPGMEdge was null");
     checkNotNull(sourceVertex, "Source vertex was null");
     checkNotNull(targetVertex, "Target vertex was null");
-    return new HBaseEdge(inputEdge, sourceVertex, targetVertex);
+    return new HBaseEdge<>(inputEdge, sourceVertex, targetVertex);
   }
 }

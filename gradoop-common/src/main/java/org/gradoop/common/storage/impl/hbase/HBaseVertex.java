@@ -26,18 +26,18 @@ import java.util.Set;
 /**
  * Represents a persistent vertex data object.
  */
-public class HBaseVertex extends HBaseGraphElement<EPGMVertex> implements
-  PersistentVertex {
+public class HBaseVertex<V extends EPGMVertex, E extends EPGMEdge>
+  extends HBaseGraphElement<V> implements PersistentVertex<E> {
 
   /**
    * Outgoing edge set
    */
-  private Set<EPGMEdge> outgoingEdges;
+  private Set<E> outgoingEdges;
 
   /**
    * Incoming edge set
    */
-  private Set<EPGMEdge> incomingEdges;
+  private Set<E> incomingEdges;
 
   /**
    * Creates persistent vertex data.
@@ -46,7 +46,7 @@ public class HBaseVertex extends HBaseGraphElement<EPGMVertex> implements
    * @param incomingEdges incoming edge
    * @param outgoingEdges outgoing edge
    */
-  HBaseVertex(EPGMVertex vertex, Set<EPGMEdge> outgoingEdges, Set<EPGMEdge> incomingEdges) {
+  HBaseVertex(V vertex, Set<E> outgoingEdges, Set<E> incomingEdges) {
     super(vertex);
     this.outgoingEdges = outgoingEdges;
     this.incomingEdges = incomingEdges;
@@ -56,7 +56,7 @@ public class HBaseVertex extends HBaseGraphElement<EPGMVertex> implements
    * {@inheritDoc}
    */
   @Override
-  public Set<EPGMEdge> getOutgoingEdges() {
+  public Set<E> getOutgoingEdges() {
     return outgoingEdges;
   }
 
@@ -64,7 +64,7 @@ public class HBaseVertex extends HBaseGraphElement<EPGMVertex> implements
    * {@inheritDoc}
    */
   @Override
-  public void setOutgoingEdges(Set<EPGMEdge> outgoingEdgeIds) {
+  public void setOutgoingEdges(Set<E> outgoingEdgeIds) {
     this.outgoingEdges = outgoingEdgeIds;
   }
 
@@ -72,7 +72,7 @@ public class HBaseVertex extends HBaseGraphElement<EPGMVertex> implements
    * {@inheritDoc}
    */
   @Override
-  public Set<EPGMEdge> getIncomingEdges() {
+  public Set<E> getIncomingEdges() {
     return incomingEdges;
   }
 
@@ -80,7 +80,7 @@ public class HBaseVertex extends HBaseGraphElement<EPGMVertex> implements
    * {@inheritDoc}
    */
   @Override
-  public void setIncomingEdges(Set<EPGMEdge> incomingEdgeData) {
+  public void setIncomingEdges(Set<E> incomingEdgeData) {
     this.incomingEdges = incomingEdgeData;
   }
 

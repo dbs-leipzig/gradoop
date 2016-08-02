@@ -111,7 +111,7 @@ public abstract class AbstractRunner {
       readGraphHeads ? directory + GRAPHS_JSON : null,
       directory + VERTICES_JSON,
       directory + EDGES_JSON,
-      GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()))
+      GradoopFlinkConfig.createConfig(getExecutionEnvironment()))
       .getLogicalGraph();
   }
 

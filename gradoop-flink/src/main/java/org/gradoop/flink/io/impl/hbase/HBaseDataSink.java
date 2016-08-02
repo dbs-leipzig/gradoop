@@ -23,34 +23,25 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.hbase.functions.BuildEdgeMutation;
-import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentGraphHead;
-import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentVertex;
-import org.gradoop.flink.io.impl.hbase.functions.BuildVertexDataWithEdges;
-import org.gradoop.flink.io.impl.hbase.functions.EdgeSetBySourceId;
-import org.gradoop.flink.io.impl.hbase.functions.EdgeSetByTargetId;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.graphcontainment.PairGraphIdWithElementId;
-import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.flink.io.impl.hbase.functions.BuildGraphHeadMutation;
-import org.gradoop.flink.io.impl.hbase.functions.BuildGraphTransactions;
-import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentEdge;
-import org.gradoop.flink.io.impl.hbase.functions.BuildVertexMutation;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.api.PersistentEdge;
 import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.hbase.functions.*;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.graphcontainment.PairGraphIdWithElementId;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 import java.util.Set;
@@ -59,7 +50,8 @@ import java.util.Set;
  * Converts runtime representation of EPGM elements into persistent
  * representations and writes them to HBase.
  */
-public class HBaseDataSink extends HBaseBase implements DataSink {
+public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
+  implements DataSink {
 
   /**
    * Creates a new HBase data sink.
@@ -67,7 +59,7 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
    * @param epgmStore store implementation
    * @param config    Gradoop Flink configuration
    */
-  public HBaseDataSink(HBaseEPGMStore epgmStore,
+  public HBaseDataSink(HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore,
     GradoopFlinkConfig config) {
     super(epgmStore, config);
   }
@@ -109,11 +101,11 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
 
     // build (graph-id, vertex-id) tuples from vertices
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdToVertexId =
-      collection.getVertices().flatMap(new PairGraphIdWithElementId<EPGMVertex>());
+      collection.getVertices().flatMap(new PairGraphIdWithElementId<Vertex>());
 
     // build (graph-id, edge-id) tuples from vertices
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdToEdgeId =
-      collection.getEdges().flatMap(new PairGraphIdWithElementId<EPGMEdge>());
+      collection.getEdges().flatMap(new PairGraphIdWithElementId<Edge>());
 
     // co-group (graph-id, vertex-id) and (graph-id, edge-id) tuples to
     // (graph-id, {vertex-id}, {edge-id}) triples
@@ -129,8 +121,8 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     DataSet<PersistentGraphHead> persistentGraphDataSet =
       graphToVertexIdsAndEdgeIds
         .join(collection.getGraphHeads())
-        .where(0).equalTo(new Id<EPGMGraphHead>())
-        .with(new BuildPersistentGraphHead(
+        .where(0).equalTo(new Id<GraphHead>())
+        .with(new BuildPersistentGraphHead<>(
           getHBaseConfig().getPersistentGraphHeadFactory()));
 
     // write (persistent-graph-data) to HBase table
@@ -155,31 +147,31 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     IOException {
 
     // group edges by source vertex id (vertex-id, [out-edge])
-    DataSet<Tuple2<GradoopId, Set<EPGMEdge>>> vertexToOutgoingEdges =
+    DataSet<Tuple2<GradoopId, Set<Edge>>> vertexToOutgoingEdges =
       collection.getEdges()
         .groupBy(new SourceId<>())
         .reduceGroup(new EdgeSetBySourceId<>());
 
     // group edges by target vertex id (vertex-id, [in-edge])
-    DataSet<Tuple2<GradoopId, Set<EPGMEdge>>> vertexToIncomingEdges =
+    DataSet<Tuple2<GradoopId, Set<Edge>>> vertexToIncomingEdges =
       collection.getEdges()
         .groupBy(new TargetId<>())
         .reduceGroup(new EdgeSetByTargetId<>());
 
     // co-group (vertex-data) with (vertex-id, [out-edge])
-    DataSet<Tuple2<EPGMVertex, Set<EPGMEdge>>> vertexDataWithOutgoingEdges = collection
+    DataSet<Tuple2<Vertex, Set<Edge>>> vertexDataWithOutgoingEdges = collection
       .getVertices()
       .coGroup(vertexToOutgoingEdges)
-      .where(new Id<EPGMVertex>()).equalTo(0)
+      .where(new Id<Vertex>()).equalTo(0)
       .with(new BuildVertexDataWithEdges<>());
 
     // co-group
     // (vertex, (vertex-id, [out-edge])) with (vertex-id, [in-edge])
-    DataSet<PersistentVertex> persistentVertexDataSet =
+    DataSet<PersistentVertex<Edge>> persistentVertexDataSet =
       vertexDataWithOutgoingEdges
         .coGroup(vertexToIncomingEdges)
         .where("f0.id").equalTo(0)
-        .with(new BuildPersistentVertex(
+        .with(new BuildPersistentVertex<>(
           getHBaseConfig().getPersistentVertexFactory()));
 
     // write (persistent-vertex-data) to HBase table
@@ -188,7 +180,8 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
       TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getVertexTableName());
 
     persistentVertexDataSet
-      .map(new BuildVertexMutation(getFlinkConfig().getVertexHandler()))
+      .map(new BuildVertexMutation<Vertex, Edge>(
+        getFlinkConfig().getVertexHandler()))
       .output(
         new HadoopOutputFormat<>(new TableOutputFormat<GradoopId>(), job));
   }
@@ -203,17 +196,18 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
   private void writeEdges(final GraphCollection collection) throws
     IOException {
 
-    DataSet<PersistentEdge> persistentEdgeDataSet = collection.getVertices()
+    DataSet<PersistentEdge<Vertex>> persistentEdgeDataSet = collection
+      .getVertices()
       // join vertex with edges on edge source vertex id
       .join(collection.getEdges())
-      .where(new Id<EPGMVertex>())
+      .where(new Id<Vertex>())
       .equalTo(new SourceId<>())
       // join result with vertices on edge target vertex id
       .join(collection.getVertices())
       .where("f1.targetId")
-      .equalTo(new Id<EPGMVertex>())
+      .equalTo(new Id<Vertex>())
       // ((source-vertex-data, edge-data), target-vertex-data)
-      .with(new BuildPersistentEdge(
+      .with(new BuildPersistentEdge<>(
         getHBaseConfig().getPersistentEdgeFactory()));
 
     // write (persistent-edge-data) to HBase table
@@ -222,7 +216,8 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
       .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getEdgeTableName());
 
     persistentEdgeDataSet
-      .map(new BuildEdgeMutation(getFlinkConfig().getEdgeHandler()))
+      .map(new BuildEdgeMutation<Edge, Vertex>(
+        getFlinkConfig().getEdgeHandler()))
       .output(new HadoopOutputFormat<>(
         new TableOutputFormat<GradoopId>(), job));
   }

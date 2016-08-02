@@ -1,6 +1,7 @@
 package org.gradoop.flink.model.impl;
 
 import com.google.common.collect.Lists;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
@@ -20,7 +21,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
     String graphVariable = "g0";
 
-    EPGMGraphHead g = loader.getGraphHeadByVariable(graphVariable);
+    GraphHead g = loader.getGraphHeadByVariable(graphVariable);
     LogicalGraph graphFromLoader =
       loader.getLogicalGraphByVariable(graphVariable);
 
@@ -29,7 +30,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
     // head <> head
     collectAndAssertTrue(graphFromLoader.getGraphHead()
       .cross(graphFromDB.getGraphHead())
-      .with(new Equals<EPGMGraphHead>())
+      .with(new Equals<GraphHead>())
     );
 
     // elements <> elements

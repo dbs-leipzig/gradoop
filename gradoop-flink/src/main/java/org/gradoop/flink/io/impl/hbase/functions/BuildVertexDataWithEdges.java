@@ -24,6 +24,8 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.Set;
 
@@ -44,7 +46,7 @@ import java.util.Set;
  */
 @FunctionAnnotation.ForwardedFieldsFirst("*->f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f1")
-public class BuildVertexDataWithEdges<V extends EPGMVertex, E extends EPGMEdge>
+public class BuildVertexDataWithEdges<V extends Vertex, E extends Edge>
   implements CoGroupFunction<V, Tuple2<GradoopId, Set<E>>, Tuple2<V, Set<E>>> {
   /**
    * Reduce object instantiations

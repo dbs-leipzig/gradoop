@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.io.impl.hbase.functions;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Takes grouped edges as input and outputs a tuple containing target vertex id
@@ -27,8 +27,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
  *
  * @param <E> EPGM edge type
  */
-public class EdgeSetByTargetId<E extends EPGMEdge>
-  extends EdgeSet<E> {
+public class EdgeSetByTargetId<E extends Edge> extends EdgeSet<E> {
 
   /**
    * Constructor

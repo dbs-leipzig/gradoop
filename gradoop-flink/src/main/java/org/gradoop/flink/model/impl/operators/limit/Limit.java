@@ -18,9 +18,9 @@
 package org.gradoop.flink.model.impl.operators.limit;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators
   .UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -57,16 +57,16 @@ public class Limit implements UnaryCollectionToCollectionOperator {
   @Override
   public GraphCollection execute(GraphCollection collection) {
 
-    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads().first(limit);
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads().first(limit);
 
-    DataSet<GradoopId> firstIds = graphHeads.map(new Id<EPGMGraphHead>());
+    DataSet<GradoopId> firstIds = graphHeads.map(new Id<GraphHead>());
 
-    DataSet<EPGMVertex> filteredVertices = collection.getVertices()
-      .filter(new InAllGraphsBroadcast<EPGMVertex>())
+    DataSet<Vertex> filteredVertices = collection.getVertices()
+      .filter(new InAllGraphsBroadcast<Vertex>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<EPGMEdge> filteredEdges = collection.getEdges()
-      .filter(new InAllGraphsBroadcast<EPGMEdge>())
+    DataSet<Edge> filteredEdges = collection.getEdges()
+      .filter(new InAllGraphsBroadcast<Edge>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return GraphCollection.fromDataSets(graphHeads,

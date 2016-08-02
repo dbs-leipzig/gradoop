@@ -18,9 +18,9 @@
 package org.gradoop.flink.model.impl.operators.combination;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -104,12 +104,12 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
     LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
 
     // use collections as data sink
-    Collection<EPGMVertex> vertices0 = new HashSet<>();
-    Collection<EPGMEdge> edges0 = new HashSet<>();
-    Collection<EPGMVertex> vertices2 = new HashSet<>();
-    Collection<EPGMEdge> edges2 = new HashSet<>();
-    Collection<EPGMVertex> resVertices = new HashSet<>();
-    Collection<EPGMEdge> resEdges = new HashSet<>();
+    Collection<Vertex> vertices0 = new HashSet<>();
+    Collection<Edge> edges0 = new HashSet<>();
+    Collection<Vertex> vertices2 = new HashSet<>();
+    Collection<Edge> edges2 = new HashSet<>();
+    Collection<Vertex> resVertices = new HashSet<>();
+    Collection<Edge> resEdges = new HashSet<>();
 
     LogicalGraph expected = g0.combine(g2);
 
@@ -122,16 +122,16 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
 
     getExecutionEnvironment().execute();
 
-    Set<EPGMGraphElement> inVertices = new HashSet<>();
+    Set<GraphElement> inVertices = new HashSet<>();
     inVertices.addAll(vertices0);
     inVertices.addAll(vertices2);
-    Set<EPGMGraphElement> inEdges = new HashSet<>();
+    Set<GraphElement> inEdges = new HashSet<>();
     inEdges.addAll(edges0);
     inEdges.addAll(edges2);
 
-    Set<EPGMGraphElement> outVertices = new HashSet<>();
+    Set<GraphElement> outVertices = new HashSet<>();
     inVertices.addAll(outVertices);
-    Set<EPGMGraphElement> outEdges = new HashSet<>();
+    Set<GraphElement> outEdges = new HashSet<>();
     inEdges.addAll(resEdges);
 
     checkElementMatches(inVertices, outVertices);

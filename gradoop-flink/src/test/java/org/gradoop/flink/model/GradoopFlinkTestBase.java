@@ -67,7 +67,7 @@ public abstract class GradoopFlinkTestBase {
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
     testEnv.setAsContext();
     this.env = testEnv;
-    this.config = GradoopFlinkConfig.createDefaultConfig(env);
+    this.config = GradoopFlinkConfig.createConfig(env);
   }
 
   /**

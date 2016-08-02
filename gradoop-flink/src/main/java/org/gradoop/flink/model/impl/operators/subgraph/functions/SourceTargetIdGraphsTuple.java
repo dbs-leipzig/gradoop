@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
@@ -34,7 +34,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 @FunctionAnnotation.ReadFields("sourceId;targetId")
 @FunctionAnnotation.ForwardedFields("graphIds->f1")
-public class SourceTargetIdGraphsTuple<E extends EPGMEdge>
+public class SourceTargetIdGraphsTuple<E extends Edge>
   implements FlatMapFunction<E, Tuple2<GradoopId, GradoopIdSet>> {
 
   @Override

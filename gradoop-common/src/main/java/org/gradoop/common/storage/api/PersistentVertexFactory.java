@@ -27,7 +27,8 @@ import java.util.Set;
  * Base interface for creating persistent vertex data from transient vertex
  * data.
  */
-public interface PersistentVertexFactory extends Serializable {
+public interface PersistentVertexFactory
+  <V extends EPGMVertex, E extends EPGMEdge> extends Serializable {
 
   /**
    * Creates vertex data based on the given parameters.
@@ -37,6 +38,6 @@ public interface PersistentVertexFactory extends Serializable {
    * @param incomingEdges   incoming edge identifiers
    * @return persistent vertex data
    */
-  PersistentVertex createVertex(EPGMVertex inputVertexData, Set<EPGMEdge> outgoingEdges,
-    Set<EPGMEdge> incomingEdges);
+  PersistentVertex<E> createVertex(V inputVertexData, Set<E> outgoingEdges,
+    Set<E> incomingEdges);
 }

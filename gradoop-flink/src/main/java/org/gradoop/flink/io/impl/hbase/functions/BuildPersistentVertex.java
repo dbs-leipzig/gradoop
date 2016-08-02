@@ -32,20 +32,21 @@ import java.util.Set;
  * Used to create persistent vertex data from vertex data and
  * outgoing/incoming edge data.
  */
-public class BuildPersistentVertex implements CoGroupFunction
-  <Tuple2<EPGMVertex, Set<EPGMEdge>>, Tuple2<GradoopId, Set<EPGMEdge>>, PersistentVertex> {
+public class BuildPersistentVertex<V extends EPGMVertex, E extends EPGMEdge>
+  implements CoGroupFunction
+  <Tuple2<V, Set<E>>, Tuple2<GradoopId, Set<E>>, PersistentVertex<E>> {
 
   /**
    * Persistent vertex data factory.
    */
-  private final PersistentVertexFactory vertexFactory;
+  private final PersistentVertexFactory<V, E> vertexFactory;
 
   /**
    * Creates co group function.
    *
    * @param vertexFactory persistent vertex data factory
    */
-  public BuildPersistentVertex(PersistentVertexFactory vertexFactory) {
+  public BuildPersistentVertex(PersistentVertexFactory<V, E> vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 
@@ -53,17 +54,17 @@ public class BuildPersistentVertex implements CoGroupFunction
    * {@inheritDoc}
    */
   @Override
-  public void coGroup(Iterable<Tuple2<EPGMVertex, Set<EPGMEdge>>> iterable,
-    Iterable<Tuple2<GradoopId, Set<EPGMEdge>>> iterable1,
-    Collector<PersistentVertex> collector) throws Exception {
-    EPGMVertex vertex = null;
-    Set<EPGMEdge> outgoingEdgeData = null;
-    Set<EPGMEdge> incomingEdgeData = null;
-    for (Tuple2<EPGMVertex, Set<EPGMEdge>> left : iterable) {
+  public void coGroup(Iterable<Tuple2<V, Set<E>>> iterable,
+    Iterable<Tuple2<GradoopId, Set<E>>> iterable1,
+    Collector<PersistentVertex<E>> collector) throws Exception {
+    V vertex = null;
+    Set<E> outgoingEdgeData = null;
+    Set<E> incomingEdgeData = null;
+    for (Tuple2<V, Set<E>> left : iterable) {
       vertex = left.f0;
       outgoingEdgeData = left.f1;
     }
-    for (Tuple2<GradoopId, Set<EPGMEdge>> right : iterable1) {
+    for (Tuple2<GradoopId, Set<E>> right : iterable1) {
       incomingEdgeData = right.f1;
     }
     assert vertex != null;

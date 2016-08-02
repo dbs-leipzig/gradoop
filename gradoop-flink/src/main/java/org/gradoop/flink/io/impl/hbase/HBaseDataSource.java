@@ -22,8 +22,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
@@ -33,7 +33,7 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.flink.io.impl.hbase.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.flink.io.impl.hbase.inputformats.VertexTableInputFormat;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 
@@ -65,41 +65,41 @@ public class HBaseDataSource extends HBaseBase implements DataSource {
     HBaseEPGMStore store = getStore();
 
     // used for type hinting when loading graph data
-    TypeInformation<Tuple1<EPGMGraphHead>> graphTypeInfo = new TupleTypeInfo(
+    TypeInformation<Tuple1<GraphHead>> graphTypeInfo = new TupleTypeInfo(
       Tuple1.class,
       TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType()));
 
     // used for type hinting when loading vertex data
-    TypeInformation<Tuple1<EPGMVertex>> vertexTypeInfo = new TupleTypeInfo(
+    TypeInformation<Tuple1<Vertex>> vertexTypeInfo = new TupleTypeInfo(
       Tuple1.class,
       TypeExtractor.createTypeInfo(config.getVertexFactory().getType()));
 
     // used for type hinting when loading edge data
-    TypeInformation<Tuple1<EPGMEdge>> edgeTypeInfo = new TupleTypeInfo(
+    TypeInformation<Tuple1<Edge>> edgeTypeInfo = new TupleTypeInfo(
       Tuple1.class,
       TypeExtractor.createTypeInfo(config.getEdgeFactory().getType()));
 
 
-    DataSet<Tuple1<EPGMGraphHead>> graphHeads = config.getExecutionEnvironment()
+    DataSet<Tuple1<GraphHead>> graphHeads = config.getExecutionEnvironment()
       .createInput(
         new GraphHeadTableInputFormat(
           config.getGraphHeadHandler(), store.getGraphHeadName()),
         graphTypeInfo);
 
-    DataSet<Tuple1<EPGMVertex>> vertices = config.getExecutionEnvironment()
+    DataSet<Tuple1<Vertex>> vertices = config.getExecutionEnvironment()
       .createInput(new VertexTableInputFormat(
           config.getVertexHandler(), store.getVertexTableName()),
         vertexTypeInfo);
 
-    DataSet<Tuple1<EPGMEdge>> edges = config.getExecutionEnvironment().createInput(
+    DataSet<Tuple1<Edge>> edges = config.getExecutionEnvironment().createInput(
       new EdgeTableInputFormat(
         config.getEdgeHandler(), store.getEdgeTableName()),
       edgeTypeInfo);
 
     return GraphCollection.fromDataSets(
-      graphHeads.map(new ValueOf1<EPGMGraphHead>()),
-      vertices.map(new ValueOf1<EPGMVertex>()),
-      edges.map(new ValueOf1<EPGMEdge>()),
+      graphHeads.map(new ValueOf1<GraphHead>()),
+      vertices.map(new ValueOf1<Vertex>()),
+      edges.map(new ValueOf1<Edge>()),
       config);
   }
 

@@ -25,7 +25,8 @@ import java.io.Serializable;
 /**
  * Base interface for creating persistent graph data from transient graph data.
  */
-public interface PersistentGraphHeadFactory extends Serializable {
+public interface PersistentGraphHeadFactory<G extends EPGMGraphHead>
+  extends Serializable {
 
   /**
    * Creates graph data based on the given parameters.
@@ -35,6 +36,6 @@ public interface PersistentGraphHeadFactory extends Serializable {
    * @param edges          edges contained in that graph
    * @return graph data
    */
-  PersistentGraphHead createGraphHead(EPGMGraphHead inputGraphData,
+  PersistentGraphHead createGraphHead(G inputGraphData,
     GradoopIdSet vertices, GradoopIdSet edges);
 }

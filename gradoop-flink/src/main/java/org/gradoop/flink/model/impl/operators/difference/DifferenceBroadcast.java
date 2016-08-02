@@ -18,10 +18,10 @@
 package org.gradoop.flink.model.impl.operators.difference;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.functions.graphcontainment
   .GraphsContainmentFilterBroadcast;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -44,14 +44,14 @@ public class DifferenceBroadcast extends Difference {
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<EPGMVertex> computeNewVertices(
-    DataSet<EPGMGraphHead> newGraphHeads) {
+  protected DataSet<Vertex> computeNewVertices(
+    DataSet<GraphHead> newGraphHeads) {
 
     DataSet<GradoopId> identifiers = newGraphHeads
-      .map(new Id<EPGMGraphHead>());
+      .map(new Id<GraphHead>());
 
     return firstCollection.getVertices()
-      .filter(new InAnyGraphBroadcast<EPGMVertex>())
+      .filter(new InAnyGraphBroadcast<Vertex>())
       .withBroadcastSet(identifiers,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }

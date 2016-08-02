@@ -48,8 +48,9 @@ import java.io.IOException;
  * |         | "knows"  | <Person.0> | <Person.1> | [0,1]  | 2014  |
  * |---------|----------|------------|------------|--------|-------|
  */
-public class HBaseEdgeHandler extends HBaseGraphElementHandler
-  implements EdgeHandler {
+public class HBaseEdgeHandler<E extends EPGMEdge>
+  extends HBaseGraphElementHandler
+  implements EdgeHandler<E> {
 
   /**
    * serial version uid
@@ -70,14 +71,14 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler
   /**
    * Creates edge data objects from the rows.
    */
-  private final EPGMEdgeFactory edgeFactory;
+  private final EPGMEdgeFactory<E> edgeFactory;
 
   /**
    * Creates an edge data handler.
    *
    * @param edgeFactory edge data factory
    */
-  public HBaseEdgeHandler(EPGMEdgeFactory edgeFactory) {
+  public HBaseEdgeHandler(EPGMEdgeFactory<E> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
@@ -152,8 +153,8 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler
    * {@inheritDoc}
    */
   @Override
-  public EPGMEdge readEdge(Result res) {
-    EPGMEdge edge = null;
+  public E readEdge(Result res) {
+    E edge = null;
     try {
       edge = edgeFactory
         .initEdge(readId(res), readLabel(res), readSourceId(res),
@@ -169,7 +170,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler
    * {@inheritDoc}
    */
   @Override
-  public EPGMEdgeFactory getEdgeFactory() {
+  public EPGMEdgeFactory<E> getEdgeFactory() {
     return edgeFactory;
   }
 

@@ -29,7 +29,8 @@ import java.util.Set;
  * This class is responsible for reading and writing EPGM graph heads from
  * and to HBase.
  */
-public interface GraphHeadHandler extends ElementHandler {
+public interface GraphHeadHandler<G extends EPGMGraphHead>
+  extends ElementHandler {
   /**
    * Adds all vertex identifiers of the given graph to the given {@link Put}
    * and returns it.
@@ -84,12 +85,12 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param res HBase row
    * @return graph entity
    */
-  EPGMGraphHead readGraphHead(final Result res);
+  G readGraphHead(final Result res);
 
   /**
    * Returns the graph data factory used by this handler.
    *
    * @return graph data factory
    */
-  EPGMGraphHeadFactory getGraphHeadFactory();
+  EPGMGraphHeadFactory<G> getGraphHeadFactory();
 }

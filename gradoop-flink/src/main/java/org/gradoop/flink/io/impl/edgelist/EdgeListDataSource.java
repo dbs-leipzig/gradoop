@@ -52,7 +52,7 @@ import java.io.IOException;
  * source: with id = 2 and vertex value "DE" and
  * target: with id = 0 and vertex value "EN".
  *
- * This DataSource will create EPGMEdges based on the given lines.
+ * This DataSource will create Edges based on the given lines.
  * EPGMVertices will be created using the given id's + values will be
  * stored using a given property key.
  */

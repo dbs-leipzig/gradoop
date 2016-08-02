@@ -103,7 +103,7 @@ public class SNABenchmark2
       executeWithExternalData(args);
     } else {
       executeWithDemoData(GradoopFlinkConfig
-        .createDefaultConfig(ExecutionEnvironment.getExecutionEnvironment()));
+        .createConfig(ExecutionEnvironment.getExecutionEnvironment()));
     }
   }
 

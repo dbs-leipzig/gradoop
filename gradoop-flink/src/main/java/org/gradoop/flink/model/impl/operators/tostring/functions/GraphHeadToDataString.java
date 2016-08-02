@@ -18,14 +18,14 @@ package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
  * represents a graph head by a data string (label and properties)
  * @param <G> graph head type
  */
-public class GraphHeadToDataString<G extends EPGMGraphHead>
-  extends EPGMElementToDataString<G> implements GraphHeadToString<G> {
+public class GraphHeadToDataString<G extends GraphHead>
+  extends ElementToDataString<G> implements GraphHeadToString<G> {
 
   @Override
   public GraphHeadString map(G graph) throws Exception {

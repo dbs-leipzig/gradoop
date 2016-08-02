@@ -20,13 +20,13 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.flink.model.impl.operators.aggregation.functions
   .GetPropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions
   .GraphIdsWithPropertyValue;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -46,7 +46,7 @@ public class Min {
    * @param <EL>     element type in input dataset
    * @return 1-element dataset with minimum of input dataset
    */
-  public static <EL extends EPGMElement> DataSet<PropertyValue> min(
+  public static <EL extends Element> DataSet<PropertyValue> min(
     DataSet<EL> dataSet,
     String propertyKey,
     Number max) {
@@ -70,7 +70,7 @@ public class Min {
    * @param <EL>     element type in input dataset
    * @return {@code Tuple2} with group value and group minimum
    */
-  public static <EL extends EPGMGraphElement>
+  public static <EL extends GraphElement>
   DataSet<Tuple2<GradoopId, PropertyValue>> groupBy(
     DataSet<EL> dataSet,
     String propertyKey,

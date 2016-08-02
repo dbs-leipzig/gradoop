@@ -20,10 +20,10 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Set;
@@ -32,19 +32,19 @@ import java.util.Set;
  * graphTransaction <=> (graphHead, {vertex,..}, {edge, ..})
  */
 public class GraphTransactionTriple
-  implements MapFunction<GraphTransaction, Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>>>,
-  JoinFunction<Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>, EPGMGraphHead, GraphTransaction>
+  implements MapFunction<GraphTransaction, Tuple3<GraphHead, Set<Vertex>, Set<Edge>>>,
+  JoinFunction<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>, GraphHead, GraphTransaction>
 {
   @Override
-  public Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>> map(
+  public Tuple3<GraphHead, Set<Vertex>, Set<Edge>> map(
     GraphTransaction transaction) throws Exception {
 
     return new Tuple3<>(transaction.f0, transaction.f1, transaction.f2);
   }
 
   @Override
-  public GraphTransaction join(Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>> triple,
-    EPGMGraphHead graphHead) throws Exception {
+  public GraphTransaction join(Tuple3<GradoopId, Set<Vertex>, Set<Edge>> triple,
+    GraphHead graphHead) throws Exception {
 
     return new GraphTransaction(graphHead, triple.f1, triple.f2);
   }

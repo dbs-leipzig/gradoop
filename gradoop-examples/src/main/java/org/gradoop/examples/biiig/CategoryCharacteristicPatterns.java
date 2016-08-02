@@ -108,7 +108,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     GradoopFlinkConfig<GraphHead, Vertex, Edge> gradoopConf =
-      GradoopFlinkConfig.createDefaultConfig(env);
+      GradoopFlinkConfig.createConfig(env);
 
 
     FlinkAsciiGraphLoader<GraphHead, Vertex, Edge> loader = new

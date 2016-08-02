@@ -20,9 +20,11 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -56,10 +58,10 @@ public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
 
   private void validateResult(LogicalGraph input, LogicalGraph output)
     throws Exception {
-    List<EPGMVertex> dbVertices = Lists.newArrayList();
-    List<EPGMEdge> dbEdges = Lists.newArrayList();
-    List<EPGMVertex> newVertices = Lists.newArrayList();
-    List<EPGMEdge> newEdges = Lists.newArrayList();
+    List<Vertex> dbVertices = Lists.newArrayList();
+    List<Edge> dbEdges = Lists.newArrayList();
+    List<Vertex> newVertices = Lists.newArrayList();
+    List<Edge> newEdges = Lists.newArrayList();
 
     input.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
     input.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
@@ -72,17 +74,17 @@ public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
     assertNotNull("graph was null", output);
 
     Set<GradoopId> newVertexIDs = new HashSet<>();
-    for (EPGMVertex vertex : newVertices) {
+    for (Vertex vertex : newVertices) {
       assertTrue(dbVertices.contains(vertex));
       newVertexIDs.add(vertex.getId());
     }
-    for (EPGMEdge edge : newEdges) {
+    for (Edge edge : newEdges) {
       assertTrue(dbEdges.contains(edge));
       assertTrue(newVertexIDs.contains(edge.getSourceId()));
       assertTrue(newVertexIDs.contains(edge.getTargetId()));
     }
     dbEdges.removeAll(newEdges);
-    for (EPGMEdge edge : dbEdges) {
+    for (Edge edge : dbEdges) {
       assertFalse(
         newVertexIDs.contains(edge.getSourceId()) &&
         newVertexIDs.contains(edge.getTargetId()));

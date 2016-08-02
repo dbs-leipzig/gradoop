@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.tostring;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
@@ -34,7 +34,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.TargetStringUpd
 import org.gradoop.flink.model.impl.operators.tostring.functions.UndirectedAdjacencyList;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -54,15 +54,15 @@ public class CanonicalAdjacencyMatrixBuilder
   /**
    * function describing string representation of graph heads
    */
-  private final GraphHeadToString<EPGMGraphHead> graphHeadToString;
+  private final GraphHeadToString<GraphHead> graphHeadToString;
   /**
    * function describing string representation of vertices
    */
-  private final VertexToString<EPGMVertex> vertexToString;
+  private final VertexToString<Vertex> vertexToString;
   /**
    * function describing string representation of edges
    */
-  private final EdgeToString<EPGMEdge> egeLabelingFunction;
+  private final EdgeToString<Edge> egeLabelingFunction;
   /**
    * sets mode for either directed or undirected graph
    */
@@ -76,9 +76,9 @@ public class CanonicalAdjacencyMatrixBuilder
    * @param directed sets mode for either directed or undirected graph
    */
   public CanonicalAdjacencyMatrixBuilder(
-    GraphHeadToString<EPGMGraphHead> graphHeadToString,
-    VertexToString<EPGMVertex> vertexToString,
-    EdgeToString<EPGMEdge> edgeLabelingFunction,
+    GraphHeadToString<GraphHead> graphHeadToString,
+    VertexToString<Vertex> vertexToString,
+    EdgeToString<Edge> edgeLabelingFunction,
     boolean directed
   ) {
     this.graphHeadToString = graphHeadToString;

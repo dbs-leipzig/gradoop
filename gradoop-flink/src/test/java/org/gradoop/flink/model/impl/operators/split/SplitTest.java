@@ -1,11 +1,11 @@
 package org.gradoop.flink.model.impl.operators.split;
 
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.UnaryFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -149,9 +149,9 @@ public class SplitTest extends GradoopFlinkTestBase {
   }
 
   public static class SelectKeyValues
-    implements UnaryFunction<EPGMVertex, List<PropertyValue>>{
+    implements UnaryFunction<Vertex, List<PropertyValue>>{
     @Override
-    public List<PropertyValue> execute(EPGMVertex entity) throws Exception {
+    public List<PropertyValue> execute(Vertex entity) throws Exception {
       String key1 = "key1";
       String key2 = "key2";
       List<PropertyValue> valueList = new ArrayList<>();

@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 
@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <EL> EPGM element
  */
-public class GetPropertyValue<EL extends EPGMElement>
+public class GetPropertyValue<EL extends Element>
   implements MapFunction<EL, Tuple1<PropertyValue>> {
 
   /**

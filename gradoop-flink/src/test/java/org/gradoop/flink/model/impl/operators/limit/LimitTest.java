@@ -45,7 +45,7 @@ public class LimitTest extends GradoopFlinkTestBase {
   public void testEmpty() throws Exception {
     GraphCollection inputCollection =
       GraphCollection.createEmptyCollection(
-        GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
+        GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
 
     int limit = 4;
     int expectedCount = 0;
@@ -59,7 +59,7 @@ public class LimitTest extends GradoopFlinkTestBase {
   public void testNegativeLimit() throws Exception {
     GraphCollection inputCollection =
       GraphCollection.createEmptyCollection(
-        GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
+        GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
 
     int limit = -1;
     int expectedCount = 0;

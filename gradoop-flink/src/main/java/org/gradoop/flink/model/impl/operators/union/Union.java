@@ -18,9 +18,9 @@
 package org.gradoop.flink.model.impl.operators.union;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 
@@ -34,30 +34,30 @@ public class Union extends SetOperatorBase {
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<EPGMVertex> computeNewVertices(DataSet<EPGMGraphHead> newGraphHeads) {
+  protected DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newGraphHeads) {
     return firstCollection.getVertices()
       .union(secondCollection.getVertices())
-      .distinct(new Id<EPGMVertex>());
+      .distinct(new Id<Vertex>());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<EPGMGraphHead> computeNewGraphHeads() {
+  protected DataSet<GraphHead> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
       .union(secondCollection.getGraphHeads())
-      .distinct(new Id<EPGMGraphHead>());
+      .distinct(new Id<GraphHead>());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<EPGMEdge> computeNewEdges(DataSet<EPGMVertex> newVertices) {
+  protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
     return firstCollection.getEdges()
       .union(secondCollection.getEdges())
-      .distinct(new Id<EPGMEdge>());
+      .distinct(new Id<Edge>());
   }
 
   /**

@@ -47,8 +47,9 @@ import java.util.Set;
  * |         | "Community" | v1  | v2 |   |   |   |   |   |   |
  * |---------|-------------|----------|-----------|---|---|---|
  */
-public class HBaseGraphHeadHandler extends HBaseElementHandler
-  implements GraphHeadHandler {
+public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
+  extends HBaseElementHandler
+  implements GraphHeadHandler<G> {
 
   /**
    * serial version uid
@@ -70,14 +71,14 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler
   /**
    * Creates graph data objects from the rows.
    */
-  private final EPGMGraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Creates a graph handler.
    *
    * @param graphHeadFactory used to create runtime graph data objects
    */
-  public HBaseGraphHeadHandler(EPGMGraphHeadFactory graphHeadFactory) {
+  public HBaseGraphHeadHandler(EPGMGraphHeadFactory<G> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -153,8 +154,8 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler
    * {@inheritDoc}
    */
   @Override
-  public EPGMGraphHead readGraphHead(final Result res) {
-    EPGMGraphHead graphHead = null;
+  public G readGraphHead(final Result res) {
+    G graphHead = null;
     try {
       graphHead = graphHeadFactory
         .initGraphHead(readId(res), readLabel(res), readProperties(res));
@@ -168,7 +169,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler
    * {@inheritDoc}
    */
   @Override
-  public EPGMGraphHeadFactory getGraphHeadFactory() {
+  public EPGMGraphHeadFactory<G> getGraphHeadFactory() {
     return graphHeadFactory;
   }
 }

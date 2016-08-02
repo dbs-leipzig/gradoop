@@ -22,6 +22,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.storage.api.PersistentEdge;
@@ -30,8 +32,8 @@ import org.gradoop.common.storage.api.PersistentEdge;
  * Creates HBase {@link Mutation} from persistent edge data using edge
  * data handler.
  */
-public class BuildEdgeMutation extends RichMapFunction
-  <PersistentEdge, Tuple2<GradoopId, Mutation>> {
+public class BuildEdgeMutation<E extends EPGMEdge, V extends EPGMVertex>
+  extends RichMapFunction<PersistentEdge<V>, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -46,14 +48,14 @@ public class BuildEdgeMutation extends RichMapFunction
   /**
    * Edge data handler to create Mutations.
    */
-  private final EdgeHandler edgeHandler;
+  private final EdgeHandler<E> edgeHandler;
 
   /**
    * Creates rich map function.
    *
    * @param edgeHandler edge data handler
    */
-  public BuildEdgeMutation(EdgeHandler edgeHandler) {
+  public BuildEdgeMutation(EdgeHandler<E> edgeHandler) {
     this.edgeHandler = edgeHandler;
   }
 
@@ -61,7 +63,7 @@ public class BuildEdgeMutation extends RichMapFunction
    * {@inheritDoc}
    */
   @Override
-  public Tuple2<GradoopId, Mutation> map(PersistentEdge persistentEdgeData)
+  public Tuple2<GradoopId, Mutation> map(PersistentEdge<V> persistentEdgeData)
     throws Exception {
     GradoopId key = persistentEdgeData.getId();
     Put put = new Put(edgeHandler.getRowKey(persistentEdgeData.getId()));

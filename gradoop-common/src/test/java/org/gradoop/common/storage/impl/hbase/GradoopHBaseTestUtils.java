@@ -6,6 +6,9 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.api.PersistentEdge;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 import org.gradoop.common.storage.api.PersistentGraphHead;
@@ -51,7 +54,7 @@ public class GradoopHBaseTestUtils {
    * @return collection of persistent vertices
    * @throws IOException
    */
-  public static Collection<PersistentVertex> getSocialPersistentVertices()
+  public static Collection<PersistentVertex<Edge>> getSocialPersistentVertices()
     throws IOException {
     return getPersistentVertices(GradoopTestUtils.getSocialNetworkLoader());
   }
@@ -63,7 +66,7 @@ public class GradoopHBaseTestUtils {
    * @return collection of persistent edges
    * @throws IOException
    */
-  public static Collection<PersistentEdge> getSocialPersistentEdges()
+  public static Collection<PersistentEdge<Vertex>> getSocialPersistentEdges()
     throws IOException {
     return getPersistentEdges(GradoopTestUtils.getSocialNetworkLoader());
   }
@@ -72,13 +75,16 @@ public class GradoopHBaseTestUtils {
   // Helper methods
   //----------------------------------------------------------------------------
 
-  private static Collection<PersistentGraphHead> getPersistentGraphHeads(
-    AsciiGraphLoader loader) {
+  private static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  Collection<PersistentGraphHead> getPersistentGraphHeads(
+    AsciiGraphLoader<G, V, E> loader) {
 
-    PersistentGraphHeadFactory graphDataFactory = new HBaseGraphHeadFactory();
+    PersistentGraphHeadFactory<G> graphDataFactory = new
+      HBaseGraphHeadFactory<>();
     List<PersistentGraphHead> persistentGraphData = new ArrayList<>();
 
-    for(EPGMGraphHead graphHead : loader.getGraphHeads()) {
+    for(G graphHead : loader.getGraphHeads()) {
 
       GradoopId graphId = graphHead.getId();
       GradoopIdSet vertexIds = new GradoopIdSet();
@@ -102,18 +108,19 @@ public class GradoopHBaseTestUtils {
     return persistentGraphData;
   }
 
-  private static List<PersistentVertex> getPersistentVertices(
-    AsciiGraphLoader loader) {
+  private static List<PersistentVertex<Edge>> getPersistentVertices(
+    AsciiGraphLoader<GraphHead, Vertex, Edge> loader) {
 
-    PersistentVertexFactory vertexDataFactory = new HBaseVertexFactory();
-    List<PersistentVertex> persistentVertexData = new ArrayList<>();
+    PersistentVertexFactory<Vertex, Edge> vertexDataFactory =
+      new HBaseVertexFactory<>();
+    List<PersistentVertex<Edge>> persistentVertexData = new ArrayList<>();
 
-    for(EPGMVertex vertex : loader.getVertices()) {
+    for(Vertex vertex : loader.getVertices()) {
 
-      Set<EPGMEdge> outEdges = new HashSet<>();
-      Set<EPGMEdge> inEdges = new HashSet<>();
+      Set<Edge> outEdges = new HashSet<>();
+      Set<Edge> inEdges = new HashSet<>();
 
-      for(EPGMEdge edge : loader.getEdges()) {
+      for(Edge edge : loader.getEdges()) {
         if(edge.getSourceId().equals(vertex.getId())) {
           outEdges.add(edge);
         }
@@ -128,19 +135,20 @@ public class GradoopHBaseTestUtils {
     return persistentVertexData;
   }
 
-  private static List<PersistentEdge> getPersistentEdges(
-    AsciiGraphLoader loader) {
+  private static List<PersistentEdge<Vertex>> getPersistentEdges(
+    AsciiGraphLoader<GraphHead, Vertex, Edge> loader) {
 
-    PersistentEdgeFactory edgeDataFactory = new HBaseEdgeFactory();
-    List<PersistentEdge> persistentEdgeData = new ArrayList<>();
+    PersistentEdgeFactory<Edge, Vertex> edgeDataFactory =
+      new HBaseEdgeFactory<>();
+    List<PersistentEdge<Vertex>> persistentEdgeData = new ArrayList<>();
 
-    Map<GradoopId, EPGMVertex> vertexById = new HashMap<>();
+    Map<GradoopId, Vertex> vertexById = new HashMap<>();
 
-    for(EPGMVertex vertex : loader.getVertices()) {
+    for(Vertex vertex : loader.getVertices()) {
       vertexById.put(vertex.getId(), vertex);
     }
 
-    for(EPGMEdge edge : loader.getEdges()) {
+    for(Edge edge : loader.getEdges()) {
       persistentEdgeData.add(
         edgeDataFactory.createEdge(
           edge,

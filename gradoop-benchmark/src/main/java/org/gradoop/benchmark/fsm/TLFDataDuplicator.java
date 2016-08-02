@@ -69,7 +69,7 @@ public class TLFDataDuplicator
     performSanityCheck(cmd);
 
     GradoopFlinkConfig<GraphHead, Vertex, Edge> config =
-      GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment());
+      GradoopFlinkConfig.createConfig(getExecutionEnvironment());
 
     String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
     Integer multiplicand =

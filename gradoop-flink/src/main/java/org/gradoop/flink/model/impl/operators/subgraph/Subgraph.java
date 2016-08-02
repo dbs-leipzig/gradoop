@@ -19,8 +19,8 @@ package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -44,12 +44,12 @@ public class Subgraph implements UnaryGraphToGraphOperator {
   /**
    * Used to filter vertices from the logical graph.
    */
-  private final FilterFunction<EPGMVertex> vertexFilterFunction;
+  private final FilterFunction<Vertex> vertexFilterFunction;
 
   /**
    * Used to filter edges from the logical graph.
    */
-  private final FilterFunction<EPGMEdge> edgeFilterFunction;
+  private final FilterFunction<Edge> edgeFilterFunction;
 
   /**
    * Creates a new sub graph operator instance.
@@ -66,8 +66,8 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @param vertexFilterFunction  vertex filter function
    * @param edgeFilterFunction    edge filter function
    */
-  public Subgraph(FilterFunction<EPGMVertex> vertexFilterFunction,
-    FilterFunction<EPGMEdge> edgeFilterFunction) {
+  public Subgraph(FilterFunction<Vertex> vertexFilterFunction,
+    FilterFunction<Edge> edgeFilterFunction) {
     if (vertexFilterFunction == null && edgeFilterFunction == null) {
       throw new IllegalArgumentException("No filter functions was given.");
     }
@@ -91,16 +91,16 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    */
   private LogicalGraph vertexInducedSubgraph(
     LogicalGraph superGraph) {
-    DataSet<EPGMVertex> filteredVertices = superGraph.getVertices()
+    DataSet<Vertex> filteredVertices = superGraph.getVertices()
       .filter(vertexFilterFunction);
 
-    DataSet<EPGMEdge> newEdges = superGraph.getEdges()
+    DataSet<Edge> newEdges = superGraph.getEdges()
       .join(filteredVertices)
-      .where(new SourceId<>()).equalTo(new Id<EPGMVertex>())
-      .with(new LeftSide<EPGMEdge, EPGMVertex>())
+      .where(new SourceId<>()).equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
       .join(filteredVertices)
-      .where(new TargetId<>()).equalTo(new Id<EPGMVertex>())
-      .with(new LeftSide<EPGMEdge, EPGMVertex>());
+      .where(new TargetId<>()).equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>());
 
     return LogicalGraph.fromDataSets(
       filteredVertices, newEdges, superGraph.getConfig());
@@ -115,18 +115,18 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    */
   private LogicalGraph edgeInducedSubgraph(
     LogicalGraph superGraph) {
-    DataSet<EPGMEdge> filteredEdges = superGraph.getEdges()
+    DataSet<Edge> filteredEdges = superGraph.getEdges()
       .filter(edgeFilterFunction);
 
-    DataSet<EPGMVertex> newVertices = filteredEdges
+    DataSet<Vertex> newVertices = filteredEdges
       .join(superGraph.getVertices())
-      .where(new SourceId<>()).equalTo(new Id<EPGMVertex>())
-      .with(new RightSide<EPGMEdge, EPGMVertex>())
+      .where(new SourceId<>()).equalTo(new Id<Vertex>())
+      .with(new RightSide<Edge, Vertex>())
       .union(filteredEdges
         .join(superGraph.getVertices())
-          .where(new TargetId<>()).equalTo(new Id<EPGMVertex>())
-          .with(new RightSide<EPGMEdge, EPGMVertex>()))
-      .distinct(new Id<EPGMVertex>());
+          .where(new TargetId<>()).equalTo(new Id<Vertex>())
+          .with(new RightSide<Edge, Vertex>()))
+      .distinct(new Id<Vertex>());
 
     return LogicalGraph.fromDataSets(
       newVertices, filteredEdges, superGraph.getConfig());

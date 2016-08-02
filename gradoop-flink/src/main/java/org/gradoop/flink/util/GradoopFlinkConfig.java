@@ -19,8 +19,11 @@ package org.gradoop.flink.util;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.config.GradoopConfig;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.storage.api.GraphHeadHandler;
@@ -32,7 +35,7 @@ import org.gradoop.common.storage.impl.hbase.HBaseVertexHandler;
 /**
  * Configuration for Gradoop running on Flink.
  */
-public class GradoopFlinkConfig extends GradoopConfig {
+public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
 
   /**
    * Flink execution environment.
@@ -47,8 +50,8 @@ public class GradoopFlinkConfig extends GradoopConfig {
    * @param edgeHandler           edge handler
    * @param executionEnvironment  Flink execution environment
    */
-  private GradoopFlinkConfig(GraphHeadHandler graphHeadHandler,
-    VertexHandler vertexHandler, EdgeHandler edgeHandler,
+  private GradoopFlinkConfig(GraphHeadHandler<GraphHead> graphHeadHandler,
+    VertexHandler<Vertex> vertexHandler, EdgeHandler<Edge> edgeHandler,
     ExecutionEnvironment executionEnvironment) {
     super(graphHeadHandler, vertexHandler, edgeHandler);
     if (executionEnvironment == null) {
@@ -59,48 +62,21 @@ public class GradoopFlinkConfig extends GradoopConfig {
   }
 
   /**
-   * Creates a new Configuration.
-   *
-   * @param gradoopConfig         Gradoop configuration
-   * @param executionEnvironment  Flink execution environment
-   */
-  private GradoopFlinkConfig(GradoopConfig gradoopConfig,
-    ExecutionEnvironment executionEnvironment) {
-    this(gradoopConfig.getGraphHeadHandler(),
-      gradoopConfig.getVertexHandler(),
-      gradoopConfig.getEdgeHandler(),
-      executionEnvironment);
-  }
-
-  /**
    * Creates a default Gradoop Flink configuration using POJO handlers.
    *
    * @param env Flink execution environment.
    *
    * @return Gradoop Flink configuration
    */
-  public static GradoopFlinkConfig createDefaultConfig(ExecutionEnvironment env) {
-    HBaseVertexHandler vertexHandler = new HBaseVertexHandler(
+  public static GradoopFlinkConfig createConfig(ExecutionEnvironment env) {
+    HBaseVertexHandler<Vertex> vertexHandler = new HBaseVertexHandler<>(
       new VertexFactory());
-    HBaseEdgeHandler edgeHandler = new HBaseEdgeHandler(
+    HBaseEdgeHandler<Edge> edgeHandler = new HBaseEdgeHandler<>(
       new EdgeFactory());
-    HBaseGraphHeadHandler graphHandler = new HBaseGraphHeadHandler(
+    HBaseGraphHeadHandler<GraphHead> graphHandler = new HBaseGraphHeadHandler<>(
       new GraphHeadFactory());
     return new GradoopFlinkConfig(graphHandler, vertexHandler, edgeHandler,
       env);
-  }
-
-  /**
-   * Creates a Gradoop Flink configuration based on the given arguments.
-   *
-   * @param config      Gradoop configuration
-   * @param environment Flink execution environment
-   *
-   * @return Gradoop Flink configuration
-   */
-  public static GradoopFlinkConfig createConfig(
-    GradoopConfig config, ExecutionEnvironment environment) {
-    return new GradoopFlinkConfig(config, environment);
   }
 
   /**
@@ -110,5 +86,20 @@ public class GradoopFlinkConfig extends GradoopConfig {
    */
   public ExecutionEnvironment getExecutionEnvironment() {
     return executionEnvironment;
+  }
+
+  @Override
+  public GraphHeadFactory getGraphHeadFactory() {
+    return (GraphHeadFactory) super.getGraphHeadFactory();
+  }
+
+  @Override
+  public VertexFactory getVertexFactory() {
+    return (VertexFactory) super.getVertexFactory();
+  }
+
+  @Override
+  public EdgeFactory getEdgeFactory() {
+    return (EdgeFactory) super.getEdgeFactory();
   }
 }

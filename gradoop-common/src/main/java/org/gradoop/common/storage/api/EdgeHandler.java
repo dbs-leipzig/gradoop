@@ -29,7 +29,7 @@ import java.io.IOException;
 /**
  * Responsible for reading and writing edge data from and to HBase.
  */
-public interface EdgeHandler extends GraphElementHandler {
+public interface EdgeHandler<E extends EPGMEdge> extends GraphElementHandler {
 
   /**
    * Adds the source vertex data to the given {@link Put} and returns it.
@@ -55,7 +55,8 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeTarget(final Put put, final EPGMVertex vertexData) throws IOException;
+  Put writeTarget(final Put put, final EPGMVertex vertexData)
+    throws IOException;
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -81,12 +82,12 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  EPGMEdge readEdge(final Result res);
+  E readEdge(final Result res);
 
   /**
    * Returns the edge data factory used by this handler.
    *
    * @return edge data factory
    */
-  EPGMEdgeFactory getEdgeFactory();
+  EPGMEdgeFactory<E> getEdgeFactory();
 }

@@ -29,7 +29,8 @@ import java.util.Set;
 /**
  * Responsible for reading and writing vertex data from and to HBase.
  */
-public interface VertexHandler extends GraphElementHandler {
+public interface VertexHandler<V extends EPGMVertex>
+  extends GraphElementHandler {
 
   /**
    * Adds the given outgoing edge data to the given {@link Put} and
@@ -85,12 +86,12 @@ public interface VertexHandler extends GraphElementHandler {
    * @param res HBase row
    * @return vertex data contained in the given result.
    */
-  EPGMVertex readVertex(final Result res);
+  V readVertex(final Result res);
 
   /**
    * Returns the vertex data factory used by this handler.
    *
    * @return vertex data factory
    */
-  EPGMVertexFactory getVertexFactory();
+  EPGMVertexFactory<V> getVertexFactory();
 }

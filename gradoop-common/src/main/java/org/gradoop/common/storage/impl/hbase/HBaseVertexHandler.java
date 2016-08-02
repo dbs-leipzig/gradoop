@@ -48,8 +48,9 @@ import java.util.Set;
  * |         | "Person" |  [0,2]  | v1 | v2 |             |             |
  * |---------|----------|---------|----|----|-------------|-------------|
  */
-public class HBaseVertexHandler extends HBaseGraphElementHandler
-  implements VertexHandler {
+public class HBaseVertexHandler<V extends EPGMVertex>
+  extends HBaseGraphElementHandler
+  implements VertexHandler<V> {
 
   /**
    * serial version uid
@@ -70,14 +71,14 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
   /**
    * Creates vertex data objects from the rows.
    */
-  private final EPGMVertexFactory vertexFactory;
+  private final EPGMVertexFactory<V> vertexFactory;
 
   /**
    * Creates a vertex handler.
    *
    * @param vertexFactory used to create runtime vertex data objects
    */
-  public HBaseVertexHandler(EPGMVertexFactory vertexFactory) {
+  public HBaseVertexHandler(EPGMVertexFactory<V> vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 
@@ -146,8 +147,8 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    * {@inheritDoc}
    */
   @Override
-  public EPGMVertex readVertex(final Result res) {
-    EPGMVertex vertex = null;
+  public V readVertex(final Result res) {
+    V vertex = null;
     try {
       vertex = vertexFactory.initVertex(
         readId(res), readLabel(res), readProperties(res), readGraphIds(res));
@@ -161,7 +162,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler
    * {@inheritDoc}
    */
   @Override
-  public EPGMVertexFactory getVertexFactory() {
+  public EPGMVertexFactory<V> getVertexFactory() {
     return vertexFactory;
   }
 

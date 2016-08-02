@@ -20,22 +20,22 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Takes an object of type EPGMGraphElement, and creates a tuple2 for each
+ * Takes an object of type GraphElement, and creates a tuple2 for each
  *  gradoop id containing in the set of the object and the object.
  * element => (graphId, element)
  * @param <EL> graph element type
  */
-public class GraphElementExpander<EL extends EPGMGraphElement> implements
-  FlatMapFunction<EL, Tuple2<GradoopId, EPGMGraphElement>> {
+public class GraphElementExpander<EL extends GraphElement> implements
+  FlatMapFunction<EL, Tuple2<GradoopId, GraphElement>> {
 
   /**
    * reuse tuple
    */
-  private  Tuple2<GradoopId, EPGMGraphElement> reuse;
+  private  Tuple2<GradoopId, GraphElement> reuse;
 
   /**
    * constructor
@@ -46,7 +46,7 @@ public class GraphElementExpander<EL extends EPGMGraphElement> implements
 
   @Override
   public void flatMap(EL el, Collector
-    <Tuple2<GradoopId, EPGMGraphElement>> collector) throws Exception {
+    <Tuple2<GradoopId, GraphElement>> collector) throws Exception {
     for (GradoopId graphId : el.getGraphIds()) {
       reuse.f0 = graphId;
       reuse.f1 = el;

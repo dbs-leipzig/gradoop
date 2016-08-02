@@ -17,6 +17,9 @@
 
 package org.gradoop.common.config;
 
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.GraphHeadHandler;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 import org.gradoop.common.storage.api.EdgeHandler;
@@ -29,20 +32,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Basic configuration for Gradoop Stores
  */
-public abstract class GradoopStoreConfig extends GradoopConfig {
+public abstract class GradoopStoreConfig
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  extends GradoopConfig<G, V, E> {
 
   /**
    * Graph head handler.
    */
-  private final PersistentGraphHeadFactory persistentGraphHeadFactory;
+  private final PersistentGraphHeadFactory<G> persistentGraphHeadFactory;
   /**
    * EPGMVertex handler.
    */
-  private final PersistentVertexFactory persistentVertexFactory;
+  private final PersistentVertexFactory<V, E> persistentVertexFactory;
   /**
    * Edge handler.
    */
-  private final PersistentEdgeFactory persistentEdgeFactory;
+  private final PersistentEdgeFactory<E, V> persistentEdgeFactory;
 
   /**
    * Creates a new Configuration.
@@ -55,12 +60,12 @@ public abstract class GradoopStoreConfig extends GradoopConfig {
    * @param persistentEdgeFactory       persistent edge factory
    */
   protected GradoopStoreConfig(
-    GraphHeadHandler graphHeadHandler,
-    VertexHandler vertexHandler,
-    EdgeHandler edgeHandler,
-    PersistentGraphHeadFactory persistentGraphHeadFactory,
-    PersistentVertexFactory persistentVertexFactory,
-    PersistentEdgeFactory persistentEdgeFactory) {
+    GraphHeadHandler<G> graphHeadHandler,
+    VertexHandler<V> vertexHandler,
+    EdgeHandler<E> edgeHandler,
+    PersistentGraphHeadFactory<G> persistentGraphHeadFactory,
+    PersistentVertexFactory<V, E> persistentVertexFactory,
+    PersistentEdgeFactory<E, V> persistentEdgeFactory) {
     super(graphHeadHandler, vertexHandler, edgeHandler);
 
     this.persistentGraphHeadFactory =
@@ -74,15 +79,15 @@ public abstract class GradoopStoreConfig extends GradoopConfig {
         "PersistentEdgeFactory was null");
   }
 
-  public PersistentGraphHeadFactory getPersistentGraphHeadFactory() {
+  public PersistentGraphHeadFactory<G> getPersistentGraphHeadFactory() {
     return persistentGraphHeadFactory;
   }
 
-  public PersistentVertexFactory getPersistentVertexFactory() {
+  public PersistentVertexFactory<V, E> getPersistentVertexFactory() {
     return persistentVertexFactory;
   }
 
-  public PersistentEdgeFactory getPersistentEdgeFactory() {
+  public PersistentEdgeFactory<E, V> getPersistentEdgeFactory() {
     return persistentEdgeFactory;
   }
 }

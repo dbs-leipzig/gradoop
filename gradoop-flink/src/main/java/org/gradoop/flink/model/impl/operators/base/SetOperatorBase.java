@@ -19,9 +19,9 @@ package org.gradoop.flink.model.impl.operators.base;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -54,18 +54,18 @@ public abstract class SetOperatorBase
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<EPGMVertex> computeNewVertices(DataSet<EPGMGraphHead> newGraphHeads) {
+  protected DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newGraphHeads) {
 
-    DataSet<Tuple2<EPGMVertex, GradoopId>> verticesWithGraphs =
+    DataSet<Tuple2<Vertex, GradoopId>> verticesWithGraphs =
       firstCollection.getVertices().flatMap(new PairVertexWithGraphs<>());
 
     return verticesWithGraphs
       .join(newGraphHeads)
       .where(1)
-      .equalTo(new Id<EPGMGraphHead>())
-      .with(new LeftJoin0OfTuple2<EPGMVertex, EPGMGraphHead>())
+      .equalTo(new Id<GraphHead>())
+      .with(new LeftJoin0OfTuple2<Vertex, GraphHead>())
       .withForwardedFieldsFirst("f0->*")
-      .distinct(new Id<EPGMVertex>());
+      .distinct(new Id<Vertex>());
   }
 
   /**
@@ -78,15 +78,15 @@ public abstract class SetOperatorBase
    * @see Intersection
    */
   @Override
-  protected DataSet<EPGMEdge> computeNewEdges(DataSet<EPGMVertex> newVertices) {
+  protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
     return firstCollection.getEdges().join(newVertices)
       .where(new SourceId<>())
-      .equalTo(new Id<EPGMVertex>())
-      .with(new LeftSide<EPGMEdge, EPGMVertex>())
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
       .join(newVertices)
       .where(new TargetId<>())
-      .equalTo(new Id<EPGMVertex>())
-      .with(new LeftSide<EPGMEdge, EPGMVertex>())
-      .distinct(new Id<EPGMEdge>());
+      .equalTo(new Id<Vertex>())
+      .with(new LeftSide<Edge, Vertex>())
+      .distinct(new Id<Edge>());
   }
 }

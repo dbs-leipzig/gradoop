@@ -28,7 +28,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Default factory for creating persistent vertex data representation.
  */
-public class HBaseVertexFactory implements PersistentVertexFactory {
+public class HBaseVertexFactory<V extends EPGMVertex, E extends EPGMEdge>
+  implements PersistentVertexFactory<V, E> {
 
   /**
    * serial version uid
@@ -39,9 +40,9 @@ public class HBaseVertexFactory implements PersistentVertexFactory {
    * {@inheritDoc}
    */
   @Override
-  public HBaseVertex createVertex(EPGMVertex inputVertex,
-    Set<EPGMEdge> outgoingEdges, Set<EPGMEdge> incomingEdges) {
+  public HBaseVertex<V, E> createVertex(V inputVertex,
+    Set<E> outgoingEdges, Set<E> incomingEdges) {
     checkNotNull(inputVertex, "Input vertex was null");
-    return new HBaseVertex(inputVertex, outgoingEdges, incomingEdges);
+    return new HBaseVertex<>(inputVertex, outgoingEdges, incomingEdges);
   }
 }

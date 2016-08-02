@@ -19,8 +19,8 @@ package org.gradoop.flink.io.impl.json.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.PropertyList;
@@ -42,19 +42,19 @@ import org.gradoop.common.model.impl.properties.PropertyList;
  * }
  */
 public class JSONToVertex extends JSONToEntity
-  implements MapFunction<String, EPGMVertex> {
+  implements MapFunction<String, Vertex> {
 
   /**
    * Creates vertex data objects.
    */
-  private final EPGMVertexFactory vertexFactory;
+  private final VertexFactory vertexFactory;
 
   /**
    * Creates map function
    *
    * @param vertexFactory vertex data factory
    */
-  public JSONToVertex(EPGMVertexFactory vertexFactory) {
+  public JSONToVertex(VertexFactory vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 
@@ -66,7 +66,7 @@ public class JSONToVertex extends JSONToEntity
    * @throws Exception
    */
   @Override
-  public EPGMVertex map(String s) throws Exception {
+  public Vertex map(String s) throws Exception {
     JSONObject jsonVertex = new JSONObject(s);
     GradoopId vertexID = getID(jsonVertex);
     String label = getLabel(jsonVertex);

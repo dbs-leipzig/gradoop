@@ -23,8 +23,11 @@ import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
  * Initializes {@link EPGMEdge} objects of a given type.
+ *
+ * @param <E> EPGM edge type
  */
-public interface EPGMEdgeFactory {
+public interface EPGMEdgeFactory<E extends EPGMEdge>
+  extends EPGMElementFactory<E> {
 
   /**
    * Creates a new edge based on the given parameters.
@@ -33,8 +36,7 @@ public interface EPGMEdgeFactory {
    * @param targetVertexId target vertex id
    * @return edge data
    */
-  EPGMEdge createEdge(GradoopId sourceVertexId,
-    GradoopId targetVertexId);
+  E createEdge(GradoopId sourceVertexId, GradoopId targetVertexId);
 
   /**
    * Initializes an edge based on the given parameters.
@@ -44,9 +46,7 @@ public interface EPGMEdgeFactory {
    * @param targetVertexId target vertex id
    * @return edge data
    */
-  EPGMEdge initEdge(GradoopId id,
-    GradoopId sourceVertexId,
-    GradoopId targetVertexId);
+  E initEdge(GradoopId id, GradoopId sourceVertexId, GradoopId targetVertexId);
 
   /**
    * Creates a new edge based on the given parameters.
@@ -56,8 +56,7 @@ public interface EPGMEdgeFactory {
    * @param label          edge label
    * @return edge data
    */
-  EPGMEdge createEdge(String label,
-    GradoopId sourceVertexId,
+  E createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId);
 
   /**
@@ -69,9 +68,7 @@ public interface EPGMEdgeFactory {
    * @param label          edge label
    * @return edge data
    */
-  EPGMEdge initEdge(GradoopId id,
-    String label,
-    GradoopId sourceVertexId,
+  E initEdge(GradoopId id, String label, GradoopId sourceVertexId,
     GradoopId targetVertexId);
 
   /**
@@ -83,9 +80,7 @@ public interface EPGMEdgeFactory {
    * @param properties     edge properties
    * @return edge data
    */
-  EPGMEdge createEdge(String label,
-    GradoopId sourceVertexId,
-    GradoopId targetVertexId,
+  E createEdge(String label, GradoopId sourceVertexId, GradoopId targetVertexId,
     PropertyList properties);
 
   /**
@@ -98,11 +93,8 @@ public interface EPGMEdgeFactory {
    * @param properties     edge properties
    * @return edge data
    */
-  EPGMEdge initEdge(GradoopId id,
-    String label,
-    GradoopId sourceVertexId,
-    GradoopId targetVertexId,
-    PropertyList properties);
+  E initEdge(GradoopId id, String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, PropertyList properties);
 
   /**
    * Creates a new edge based on the given parameters.
@@ -113,9 +105,7 @@ public interface EPGMEdgeFactory {
    * @param graphIds        graphIds, that contain the edge
    * @return edge data
    */
-  EPGMEdge createEdge(String label,
-    GradoopId sourceVertexId,
-    GradoopId targetVertexId,
+  E createEdge(String label, GradoopId sourceVertexId, GradoopId targetVertexId,
     GradoopIdSet graphIds);
 
   /**
@@ -128,11 +118,8 @@ public interface EPGMEdgeFactory {
    * @param graphIds        graphIds, that contain the edge
    * @return edge data
    */
-  EPGMEdge initEdge(GradoopId id,
-    String label,
-    GradoopId sourceVertexId,
-    GradoopId targetVertexId,
-    GradoopIdSet graphIds);
+  E initEdge(GradoopId id, String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, GradoopIdSet graphIds);
 
   /**
    * Creates a new edge based on the given parameters.
@@ -144,11 +131,8 @@ public interface EPGMEdgeFactory {
    * @param graphIds        graphIds, that contain the edge
    * @return edge data
    */
-  EPGMEdge createEdge(String label,
-    GradoopId sourceVertexId,
-    GradoopId targetVertexId,
-    PropertyList properties,
-    GradoopIdSet graphIds);
+  E createEdge(String label, GradoopId sourceVertexId, GradoopId targetVertexId,
+    PropertyList properties, GradoopIdSet graphIds);
 
   /**
    * Initializes an edge based on the given parameters.
@@ -161,17 +145,6 @@ public interface EPGMEdgeFactory {
    * @param graphIds        graphIds, that contain the edge
    * @return edge data
    */
-  EPGMEdge initEdge(GradoopId id,
-    String label,
-    GradoopId sourceVertexId,
-    GradoopId targetVertexId,
-    PropertyList properties,
-    GradoopIdSet graphIds);
-
-  /**
-   * Return the type of the objects created by that factory.
-   *
-   * @return object type
-   */
-  Class<? extends EPGMEdge> getType();
+  E initEdge(GradoopId id, String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, PropertyList properties, GradoopIdSet graphIds);
 }

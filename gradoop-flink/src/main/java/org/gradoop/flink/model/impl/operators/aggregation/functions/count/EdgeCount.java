@@ -28,7 +28,7 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.ExpandGraphsToIds
 import org.gradoop.flink.model.impl.operators.aggregation.functions
   .GroupCountToPropertyValue;
 import org.gradoop.flink.model.impl.operators.count.Count;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -62,7 +62,7 @@ public class EdgeCount implements AggregateFunction, ApplyAggregateFunction {
     GraphCollection collection) {
     return Count.groupBy(
       collection.getEdges()
-        .flatMap(new ExpandGraphsToIds<EPGMEdge>())
+        .flatMap(new ExpandGraphsToIds<Edge>())
     ).map(new GroupCountToPropertyValue());
   }
 

@@ -19,9 +19,9 @@ package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators
   .UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -44,32 +44,32 @@ public class Selection implements UnaryCollectionToCollectionOperator {
   /**
    * User-defined predicate function
    */
-  private final FilterFunction<EPGMGraphHead> predicate;
+  private final FilterFunction<GraphHead> predicate;
 
   /**
    * Creates a new Selection operator.
    *
    * @param predicate user-defined predicate function
    */
-  public Selection(FilterFunction<EPGMGraphHead> predicate) {
+  public Selection(FilterFunction<GraphHead> predicate) {
     this.predicate = checkNotNull(predicate, "Predicate function was null");
   }
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
     // find graph heads matching the predicate
-    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads().filter(predicate);
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads().filter(predicate);
 
     // get the identifiers of these logical graphs
-    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<EPGMGraphHead>());
+    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<GraphHead>());
 
     // use graph ids to filter vertices from the actual graph structure
-    DataSet<EPGMVertex> vertices = collection.getVertices()
-      .filter(new InAnyGraphBroadcast<EPGMVertex>())
+    DataSet<Vertex> vertices = collection.getVertices()
+      .filter(new InAnyGraphBroadcast<Vertex>())
       .withBroadcastSet(graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<EPGMEdge> edges = collection.getEdges()
-      .filter(new InAnyGraphBroadcast<EPGMEdge>())
+    DataSet<Edge> edges = collection.getEdges()
+      .filter(new InAnyGraphBroadcast<Edge>())
       .withBroadcastSet(graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return GraphCollection.fromDataSets(

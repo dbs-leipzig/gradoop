@@ -23,9 +23,9 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 
@@ -37,13 +37,13 @@ import java.util.List;
  */
 @FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId")
 public class ReduceEdgeGroupItems extends BuildSuperEdge
-  implements GroupReduceFunction<EdgeGroupItem, EPGMEdge>,
-  ResultTypeQueryable<EPGMEdge> {
+  implements GroupReduceFunction<EdgeGroupItem, Edge>,
+  ResultTypeQueryable<Edge> {
 
   /**
-   * EPGMEdge factory.
+   * Edge factory.
    */
-  private final EPGMEdgeFactory edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * Creates group reducer
@@ -54,7 +54,7 @@ public class ReduceEdgeGroupItems extends BuildSuperEdge
    * @param edgeFactory       edge factory
    */
   public ReduceEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators, EPGMEdgeFactory edgeFactory) {
+    List<PropertyValueAggregator> valueAggregators, EdgeFactory edgeFactory) {
     super(groupPropertyKeys, useLabel, valueAggregators);
     this.edgeFactory = edgeFactory;
   }
@@ -69,11 +69,11 @@ public class ReduceEdgeGroupItems extends BuildSuperEdge
    */
   @Override
   public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-    Collector<EPGMEdge> collector) throws Exception {
+    Collector<Edge> collector) throws Exception {
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
 
-    EPGMEdge superEdge = edgeFactory.createEdge(
+    Edge superEdge = edgeFactory.createEdge(
       edgeGroupItem.getGroupLabel(),
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
@@ -90,8 +90,8 @@ public class ReduceEdgeGroupItems extends BuildSuperEdge
    */
   @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<EPGMEdge> getProducedType() {
-    return (TypeInformation<EPGMEdge>) TypeExtractor
+  public TypeInformation<Edge> getProducedType() {
+    return (TypeInformation<Edge>) TypeExtractor
       .createTypeInfo(edgeFactory.getType());
   }
 }

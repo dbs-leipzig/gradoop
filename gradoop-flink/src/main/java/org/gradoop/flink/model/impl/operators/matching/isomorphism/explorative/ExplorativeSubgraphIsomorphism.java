@@ -25,8 +25,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -57,9 +57,9 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism
 import org.gradoop.flink.model.impl.operators.matching.isomorphism
   .explorative.tuples.VertexStep;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
@@ -157,28 +157,28 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
   protected GraphCollection executeForVertex(
     LogicalGraph graph) {
     GradoopFlinkConfig config = graph.getConfig();
-    EPGMGraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
-    EPGMVertexFactory vertexFactory = config.getVertexFactory();
+    GraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
+    VertexFactory vertexFactory = config.getVertexFactory();
 
-    DataSet<EPGMVertex> matchingVertices = graph.getVertices()
+    DataSet<Vertex> matchingVertices = graph.getVertices()
       .filter(new MatchingVertices<>(getQuery()));
 
     if (!doAttachData()) {
       matchingVertices = matchingVertices
-        .map(new Id<EPGMVertex>())
+        .map(new Id<Vertex>())
         .map(new ObjectTo1<GradoopId>())
         .map(new VertexFromId(vertexFactory));
     }
 
-    DataSet<Tuple2<EPGMVertex, EPGMGraphHead>> pairs = matchingVertices
-      .map(new AddGraphElementToNewGraph<EPGMVertex>(graphHeadFactory))
-      .returns(new TupleTypeInfo<Tuple2<EPGMVertex, EPGMGraphHead>>(
+    DataSet<Tuple2<Vertex, GraphHead>> pairs = matchingVertices
+      .map(new AddGraphElementToNewGraph<Vertex>(graphHeadFactory))
+      .returns(new TupleTypeInfo<Tuple2<Vertex, GraphHead>>(
         TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(graphHeadFactory.getType())));
 
     return GraphCollection.fromDataSets(
-      pairs.map(new Value1Of2<EPGMVertex, EPGMGraphHead>()),
-      pairs.map(new Value0Of2<EPGMVertex, EPGMGraphHead>()),
+      pairs.map(new Value1Of2<Vertex, GraphHead>()),
+      pairs.map(new Value0Of2<Vertex, GraphHead>()),
       config);
   }
 
@@ -220,7 +220,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
     // Post-Processing (build Graph Collection from embeddings)
     //--------------------------------------------------------------------------
 
-    DataSet<EPGMElement> epgmElements = result
+    DataSet<Element> Elements = result
       .<Tuple1<Embedding>>project(0)
       .flatMap(new ElementsFromEmbedding(traversalCode,
         graph.getConfig().getGraphHeadFactory(),
@@ -228,8 +228,8 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
         graph.getConfig().getEdgeFactory()));
 
     return doAttachData() ?
-      PostProcessor.extractGraphCollectionWithData(epgmElements, graph, true) :
-      PostProcessor.extractGraphCollection(epgmElements, graph.getConfig(), true);
+      PostProcessor.extractGraphCollectionWithData(Elements, graph, true) :
+      PostProcessor.extractGraphCollection(Elements, graph.getConfig(), true);
   }
 
   /**

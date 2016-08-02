@@ -98,7 +98,7 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
 
     // create default Gradoop config
     GradoopFlinkConfig<GraphHead, Vertex, Edge> config =
-      GradoopFlinkConfig.createDefaultConfig(env);
+      GradoopFlinkConfig.createConfig(env);
 
     // create DataSource
     JSONDataSource<GraphHead, Vertex, Edge> dataSource =

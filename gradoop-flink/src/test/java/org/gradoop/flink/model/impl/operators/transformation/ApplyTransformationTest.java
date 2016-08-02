@@ -3,12 +3,12 @@ package org.gradoop.flink.model.impl.operators.transformation;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -32,11 +32,11 @@ public class ApplyTransformationTest extends TransformationTest {
     List<GradoopId> expectedVertexIds     = Lists.newArrayList();
     List<GradoopId> expectedEdgeIds       = Lists.newArrayList();
 
-    inputCollection.getGraphHeads().map(new Id<EPGMGraphHead>()).output(
+    inputCollection.getGraphHeads().map(new Id<GraphHead>()).output(
       new LocalCollectionOutputFormat<>(expectedGraphHeadIds));
-    inputCollection.getVertices().map(new Id<EPGMVertex>()).output(
+    inputCollection.getVertices().map(new Id<Vertex>()).output(
       new LocalCollectionOutputFormat<>(expectedVertexIds));
-    inputCollection.getEdges().map(new Id<EPGMEdge>()).output(
+    inputCollection.getEdges().map(new Id<Edge>()).output(
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
     GraphCollection outputCollection = inputCollection
@@ -49,11 +49,11 @@ public class ApplyTransformationTest extends TransformationTest {
     List<GradoopId> resultVertexIds    = Lists.newArrayList();
     List<GradoopId> resultEdgeIds      = Lists.newArrayList();
 
-    outputCollection.getGraphHeads().map(new Id<EPGMGraphHead>()).output(
+    outputCollection.getGraphHeads().map(new Id<GraphHead>()).output(
       new LocalCollectionOutputFormat<>(resultGraphHeadIds));
-    outputCollection.getVertices().map(new Id<EPGMVertex>()).output(
+    outputCollection.getVertices().map(new Id<Vertex>()).output(
       new LocalCollectionOutputFormat<>(resultVertexIds));
-    outputCollection.getEdges().map(new Id<EPGMEdge>()).output(
+    outputCollection.getEdges().map(new Id<Edge>()).output(
       new LocalCollectionOutputFormat<>(resultEdgeIds));
 
     getExecutionEnvironment().execute();

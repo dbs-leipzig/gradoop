@@ -1,8 +1,8 @@
 package org.gradoop.flink.model.impl;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = originalCollection.toTransactions();
 
     GraphCollection restoredCollection = GraphCollection
-      .fromTransactions(transactions, new First<EPGMVertex>(), new First<EPGMEdge>());
+      .fromTransactions(transactions, new First<Vertex>(), new First<Edge>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));
@@ -76,7 +76,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = originalCollection.toTransactions();
 
     GraphCollection restoredCollection = GraphCollection
-      .fromTransactions(transactions, new First<EPGMVertex>(), new First<EPGMEdge>());
+      .fromTransactions(transactions, new First<Vertex>(), new First<Edge>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));

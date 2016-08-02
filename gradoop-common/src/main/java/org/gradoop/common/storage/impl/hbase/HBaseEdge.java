@@ -25,18 +25,19 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 /**
  * Represents a persistent edge data object.
  */
-public class HBaseEdge extends HBaseGraphElement<EPGMEdge>
-  implements PersistentEdge {
+public class HBaseEdge<E extends EPGMEdge, V extends EPGMVertex>
+  extends HBaseGraphElement<E>
+  implements PersistentEdge<V> {
 
   /**
    * Source vertex
    */
-  private EPGMVertex source;
+  private V source;
 
   /**
    * Target vertex.
    */
-  private EPGMVertex target;
+  private V target;
 
   /**
    * Creates persistent edge.
@@ -45,7 +46,7 @@ public class HBaseEdge extends HBaseGraphElement<EPGMEdge>
    * @param source  source vertex
    * @param target  target vertex
    */
-  HBaseEdge(EPGMEdge edge, EPGMVertex source, EPGMVertex target) {
+  HBaseEdge(E edge, V source, V target) {
     super(edge);
     this.source = source;
     this.target = target;
@@ -55,7 +56,7 @@ public class HBaseEdge extends HBaseGraphElement<EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public EPGMVertex getSource() {
+  public V getSource() {
     return source;
   }
 
@@ -63,7 +64,7 @@ public class HBaseEdge extends HBaseGraphElement<EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public void setSource(EPGMVertex sourceVertex) {
+  public void setSource(V sourceVertex) {
     this.source = sourceVertex;
   }
 
@@ -71,7 +72,7 @@ public class HBaseEdge extends HBaseGraphElement<EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public EPGMVertex getTarget() {
+  public V getTarget() {
     return target;
   }
 
@@ -79,7 +80,7 @@ public class HBaseEdge extends HBaseGraphElement<EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public void setTarget(EPGMVertex targetVertex) {
+  public void setTarget(V targetVertex) {
     this.target = targetVertex;
   }
 

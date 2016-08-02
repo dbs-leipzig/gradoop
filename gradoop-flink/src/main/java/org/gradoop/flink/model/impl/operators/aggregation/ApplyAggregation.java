@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -66,10 +66,10 @@ public class ApplyAggregation
     DataSet<Tuple2<GradoopId, PropertyValue>> aggregateValues =
       aggregateFunction.execute(collection);
 
-    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads()
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
       .coGroup(aggregateValues)
-      .where(new Id<EPGMGraphHead>()).equalTo(0)
-      .with(new LeftOuterPropertySetter<EPGMGraphHead>(
+      .where(new Id<GraphHead>()).equalTo(0)
+      .with(new LeftOuterPropertySetter<GraphHead>(
         aggregatePropertyKey,
         PropertyValue.create(aggregateFunction.getDefaultValue())));
 

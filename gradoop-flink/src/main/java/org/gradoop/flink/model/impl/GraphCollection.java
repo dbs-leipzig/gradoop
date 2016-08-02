@@ -23,16 +23,22 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.GraphCollectionOperators;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
@@ -41,38 +47,28 @@ import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
+import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.flink.model.impl.operators.distinct.Distinct;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
+import org.gradoop.flink.model.impl.operators.limit.Limit;
 import org.gradoop.flink.model.impl.operators.selection.Selection;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .GraphHeadToEmptyString;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .VertexToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-
-import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.flink.model.impl.operators.distinct.Distinct;
-import org.gradoop.flink.model.impl.operators.limit.Limit;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.common.util.Order;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,9 +94,9 @@ public class GraphCollection extends GraphBase
    * @param edges       edges
    * @param config      Gradoop Flink configuration
    */
-  private GraphCollection(DataSet<EPGMGraphHead> graphHeads,
-    DataSet<EPGMVertex> vertices,
-    DataSet<EPGMEdge> edges,
+  private GraphCollection(DataSet<GraphHead> graphHeads,
+    DataSet<Vertex> vertices,
+    DataSet<Edge> edges,
     GradoopFlinkConfig config) {
     super(graphHeads, vertices, edges, config);
   }
@@ -117,9 +113,9 @@ public class GraphCollection extends GraphBase
    */
   public static GraphCollection createEmptyCollection(
     GradoopFlinkConfig config) {
-    Collection<EPGMGraphHead> graphHeads = new ArrayList<>();
-    Collection<EPGMVertex> vertices = new ArrayList<>();
-    Collection<EPGMEdge> edges = new ArrayList<>();
+    Collection<GraphHead> graphHeads = new ArrayList<>();
+    Collection<Vertex> vertices = new ArrayList<>();
+    Collection<Edge> edges = new ArrayList<>();
 
     return GraphCollection.fromCollections(graphHeads, vertices, edges, config);
   }
@@ -127,17 +123,17 @@ public class GraphCollection extends GraphBase
   /**
    * Creates a graph collection from the given arguments.
    *
-   * @param graphHeads  EPGMGraphHead DataSet
-   * @param vertices    EPGMVertex DataSet
+   * @param graphHeads  GraphHead DataSet
+   * @param vertices    Vertex DataSet
    * @param config      Gradoop Flink configuration
    * @return Graph collection
    */
-  public static GraphCollection fromDataSets(DataSet<EPGMGraphHead> graphHeads,
-    DataSet<EPGMVertex> vertices, GradoopFlinkConfig config) {
+  public static GraphCollection fromDataSets(DataSet<GraphHead> graphHeads,
+    DataSet<Vertex> vertices, GradoopFlinkConfig config) {
     return fromDataSets(
       graphHeads,
       vertices,
-      createEdgeDataSet(new ArrayList<EPGMEdge>(0), config),
+      createEdgeDataSet(new ArrayList<Edge>(0), config),
       config
     );
   }
@@ -145,18 +141,18 @@ public class GraphCollection extends GraphBase
   /**
    * Creates a graph collection from the given arguments.
    *
-   * @param graphHeads  EPGMGraphHead DataSet
-   * @param vertices    EPGMVertex DataSet
-   * @param edges       EPGMEdge DataSet
+   * @param graphHeads  GraphHead DataSet
+   * @param vertices    Vertex DataSet
+   * @param edges       Edge DataSet
    * @param config      Gradoop Flink configuration
    * @return Graph collection
    */
-  public static GraphCollection fromDataSets(DataSet<EPGMGraphHead> graphHeads,
-    DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges, GradoopFlinkConfig config) {
+  public static GraphCollection fromDataSets(DataSet<GraphHead> graphHeads,
+    DataSet<Vertex> vertices, DataSet<Edge> edges, GradoopFlinkConfig config) {
 
-    checkNotNull(graphHeads, "EPGMGraphHead DataSet was null");
-    checkNotNull(vertices, "EPGMVertex DataSet was null");
-    checkNotNull(edges, "EPGMEdge DataSet was null");
+    checkNotNull(graphHeads, "GraphHead DataSet was null");
+    checkNotNull(vertices, "Vertex DataSet was null");
+    checkNotNull(edges, "Edge DataSet was null");
     checkNotNull(config, "Config was null");
     return new GraphCollection(graphHeads, vertices, edges, config);
   }
@@ -165,20 +161,20 @@ public class GraphCollection extends GraphBase
    * Creates a new graph collection from the given collection.
    *
    * @param graphHeads  Graph Head collection
-   * @param vertices    EPGMVertex collection
-   * @param edges       EPGMEdge collection
+   * @param vertices    Vertex collection
+   * @param edges       Edge collection
    * @param config      Gradoop Flink configuration
    * @return Graph collection
    */
   public static GraphCollection fromCollections(
-    Collection<EPGMGraphHead> graphHeads,
-    Collection<EPGMVertex> vertices,
-    Collection<EPGMEdge> edges,
+    Collection<GraphHead> graphHeads,
+    Collection<Vertex> vertices,
+    Collection<Edge> edges,
     GradoopFlinkConfig config) {
 
-    checkNotNull(graphHeads, "EPGMGraphHead collection was null");
-    checkNotNull(vertices, "EPGMVertex collection was null");
-    checkNotNull(edges, "EPGMVertex collection was null");
+    checkNotNull(graphHeads, "GraphHead collection was null");
+    checkNotNull(vertices, "Vertex collection was null");
+    checkNotNull(edges, "Vertex collection was null");
     checkNotNull(config, "Config was null");
     return fromDataSets(
       createGraphHeadDataSet(graphHeads, config),
@@ -210,7 +206,7 @@ public class GraphCollection extends GraphBase
   /**
    * {@inheritDoc}
    */
-  public DataSet<EPGMGraphHead> getGraphHeads() {
+  public DataSet<GraphHead> getGraphHeads() {
     return this.graphHeads;
   }
 
@@ -220,13 +216,13 @@ public class GraphCollection extends GraphBase
   @Override
   public LogicalGraph getGraph(final GradoopId graphID) {
     // filter vertices and edges based on given graph id
-    DataSet<EPGMGraphHead> graphHead = getGraphHeads()
-      .filter(new BySameId<EPGMGraphHead>(graphID));
+    DataSet<GraphHead> graphHead = getGraphHeads()
+      .filter(new BySameId<GraphHead>(graphID));
 
-    DataSet<EPGMVertex> vertices = getVertices()
-      .filter(new InGraph<EPGMVertex>(graphID));
-    DataSet<EPGMEdge> edges = getEdges()
-      .filter(new InGraph<EPGMEdge>(graphID));
+    DataSet<Vertex> vertices = getVertices()
+      .filter(new InGraph<Vertex>(graphID));
+    DataSet<Edge> edges = getEdges()
+      .filter(new InGraph<Edge>(graphID));
 
     return LogicalGraph.fromDataSets(graphHead, vertices, edges, getConfig());
   }
@@ -252,23 +248,23 @@ public class GraphCollection extends GraphBase
   @Override
   public GraphCollection getGraphs(final GradoopIdSet identifiers) {
 
-    DataSet<EPGMGraphHead> newGraphHeads =
-      this.graphHeads.filter(new FilterFunction<EPGMGraphHead>() {
+    DataSet<GraphHead> newGraphHeads =
+      this.graphHeads.filter(new FilterFunction<GraphHead>() {
 
         @Override
-        public boolean filter(EPGMGraphHead graphHead) throws Exception {
+        public boolean filter(GraphHead graphHead) throws Exception {
           return identifiers.contains(graphHead.getId());
 
         }
       });
 
     // build new vertex set
-    DataSet<EPGMVertex> vertices = getVertices()
-      .filter(new InAnyGraph<EPGMVertex>(identifiers));
+    DataSet<Vertex> vertices = getVertices()
+      .filter(new InAnyGraph<Vertex>(identifiers));
 
     // build new edge set
-    DataSet<EPGMEdge> edges = getEdges()
-      .filter(new InAnyGraph<EPGMEdge>(identifiers));
+    DataSet<Edge> edges = getEdges()
+      .filter(new InAnyGraph<Edge>(identifiers));
 
     return new GraphCollection(newGraphHeads, vertices, edges, getConfig());
   }
@@ -281,7 +277,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection select(final FilterFunction<EPGMGraphHead> predicate) {
+  public GraphCollection select(final FilterFunction<GraphHead> predicate) {
     return callForCollection(new Selection(predicate));
   }
 
@@ -463,7 +459,7 @@ public class GraphCollection extends GraphBase
   @Override
   public DataSet<Boolean> isEmpty() {
     return getGraphHeads()
-      .map(new True<EPGMGraphHead>())
+      .map(new True<GraphHead>())
       .distinct()
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
@@ -480,8 +476,8 @@ public class GraphCollection extends GraphBase
   public static GraphCollection fromTransactions(
     GraphTransactions transactions) {
 
-    GroupReduceFunction<EPGMVertex, EPGMVertex> vertexReducer = new First<>();
-    GroupReduceFunction<EPGMEdge, EPGMEdge> edgeReducer = new First<>();
+    GroupReduceFunction<Vertex, Vertex> vertexReducer = new First<>();
+    GroupReduceFunction<Edge, Edge> edgeReducer = new First<>();
 
     return fromTransactions(transactions, vertexReducer, edgeReducer);
   }
@@ -498,27 +494,27 @@ public class GraphCollection extends GraphBase
   public static
   GraphCollection fromTransactions(
     GraphTransactions transactions,
-    GroupReduceFunction<EPGMVertex, EPGMVertex> vertexMergeReducer,
-    GroupReduceFunction<EPGMEdge, EPGMEdge> edgeMergeReducer) {
+    GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
+    GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
 
     GradoopFlinkConfig config = transactions.getConfig();
 
-    DataSet<Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>>> triples = transactions
+    DataSet<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> triples = transactions
       .getTransactions()
       .map(new GraphTransactionTriple());
 
-    DataSet<EPGMGraphHead> graphHeads = triples.map(new TransactionGraphHead());
+    DataSet<GraphHead> graphHeads = triples.map(new TransactionGraphHead());
 
-    DataSet<EPGMVertex> vertices = triples
+    DataSet<Vertex> vertices = triples
       .flatMap(new TransactionVertices())
 //      .returns(config.getVertexFactory().getType())
-      .groupBy(new Id<EPGMVertex>())
+      .groupBy(new Id<Vertex>())
       .reduceGroup(vertexMergeReducer);
 
-    DataSet<EPGMEdge> edges = triples
+    DataSet<Edge> edges = triples
       .flatMap(new TransactionEdges())
 //      .returns(config.getEdgeFactory().getType())
-      .groupBy(new Id<EPGMEdge>())
+      .groupBy(new Id<Edge>())
       .reduceGroup(edgeMergeReducer);
 
     return fromDataSets(graphHeads, vertices, edges, config);
@@ -529,18 +525,18 @@ public class GraphCollection extends GraphBase
    */
   @Override
   public GraphTransactions toTransactions() {
-    DataSet<Tuple2<GradoopId, EPGMGraphElement>> graphVertices = getVertices()
-      .flatMap(new GraphElementExpander<EPGMVertex>());
+    DataSet<Tuple2<GradoopId, GraphElement>> graphVertices = getVertices()
+      .flatMap(new GraphElementExpander<Vertex>());
 
-    DataSet<Tuple2<GradoopId, EPGMGraphElement>> graphEdges = getEdges()
-      .flatMap(new GraphElementExpander<EPGMEdge>());
+    DataSet<Tuple2<GradoopId, GraphElement>> graphEdges = getEdges()
+      .flatMap(new GraphElementExpander<Edge>());
 
-    DataSet<Tuple2<GradoopId, EPGMGraphElement>> verticesAndEdges =
+    DataSet<Tuple2<GradoopId, GraphElement>> verticesAndEdges =
       graphVertices.union(graphEdges);
 
     DataSet<GraphTransaction>  transactions = verticesAndEdges
       .coGroup(getGraphHeads())
-      .where(0).equalTo(new Id<EPGMGraphHead>())
+      .where(0).equalTo(new Id<GraphHead>())
       .with(new GraphElementsHeadsToTransaction());
 
     return new GraphTransactions(transactions, getConfig());

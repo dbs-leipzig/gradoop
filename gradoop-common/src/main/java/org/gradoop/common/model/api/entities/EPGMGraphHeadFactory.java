@@ -23,14 +23,15 @@ import org.gradoop.common.model.impl.properties.PropertyList;
 /**
  * Initializes {@link EPGMGraphHead} objects of a given type.
  */
-public interface EPGMGraphHeadFactory {
+public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
+  extends EPGMElementFactory<G> {
 
   /**
    * Creates a new graph head based.
    *
    * @return graph data
    */
-  EPGMGraphHead createGraphHead();
+  G createGraphHead();
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -38,7 +39,7 @@ public interface EPGMGraphHeadFactory {
    * @param id graph identifier
    * @return graph data
    */
-  EPGMGraphHead initGraphHead(GradoopId id);
+  G initGraphHead(GradoopId id);
 
   /**
    * Creates a new graph head based on the given parameters.
@@ -46,7 +47,7 @@ public interface EPGMGraphHeadFactory {
    * @param label graph label
    * @return graph data
    */
-  EPGMGraphHead createGraphHead(String label);
+  G createGraphHead(String label);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -55,7 +56,7 @@ public interface EPGMGraphHeadFactory {
    * @param label graph label
    * @return graph data
    */
-  EPGMGraphHead initGraphHead(GradoopId id, String label);
+  G initGraphHead(GradoopId id, String label);
 
   /**
    * Creates a new graph head based on the given parameters.
@@ -64,7 +65,7 @@ public interface EPGMGraphHeadFactory {
    * @param properties graph attributes
    * @return graph data
    */
-  EPGMGraphHead createGraphHead(String label, PropertyList properties);
+  G createGraphHead(String label, PropertyList properties);
 
   /**
    * Initializes a graph head based on the given parameters.
@@ -74,12 +75,5 @@ public interface EPGMGraphHeadFactory {
    * @param properties graph attributes
    * @return graph data
    */
-  EPGMGraphHead initGraphHead(GradoopId id, String label, PropertyList properties);
-
-  /**
-   * Return the type of the objects created by that factory.
-   *
-   * @return object type
-   */
-  Class<? extends EPGMGraphHead> getType();
+  G initGraphHead(GradoopId id, String label, PropertyList properties);
 }

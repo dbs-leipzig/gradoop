@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.model.impl.operators.matching.common.matching
   .EntityMatcher;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 
@@ -39,7 +39,7 @@ import java.util.Collection;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
-public class BuildTripleWithCandidates<E extends EPGMEdge>
+public class BuildTripleWithCandidates<E extends Edge>
   extends AbstractBuilder<E, TripleWithCandidates> {
   /**
    * serial version uid

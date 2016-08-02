@@ -87,7 +87,7 @@ public class PredictableTransactionsGeneratorRunner
     // initialize generator
     PredictableTransactionsGenerator dataGen = new
       PredictableTransactionsGenerator(graphCount, graphSize, multiGraph,
-      GradoopFlinkConfig.createDefaultConfig(getExecutionEnvironment()));
+      GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
 
     // execute generator
     GraphTransactions<GraphHead, Vertex, Edge> generatedGraph =
@@ -105,7 +105,7 @@ public class PredictableTransactionsGeneratorRunner
     // write output
     DataSink<GraphHead, Vertex, Edge> dataSink =
       new TLFDataSink<>(outputPath + fileName, GradoopFlinkConfig
-        .createDefaultConfig(getExecutionEnvironment()));
+        .createConfig(getExecutionEnvironment()));
 
     dataSink.write(generatedGraph);
 

@@ -19,7 +19,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.HashMap;
@@ -67,7 +67,7 @@ public class EdgeLabelDecoder
   public GraphTransaction map(GraphTransaction graphTransaction)
     throws Exception {
     String label;
-    for (EPGMEdge edge : graphTransaction.getEdges()) {
+    for (Edge edge : graphTransaction.getEdges()) {
       label = edgeDictionary.get(Integer.parseInt(edge.getLabel()));
       if (label != null) {
         edge.setLabel(label);

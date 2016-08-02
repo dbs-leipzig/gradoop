@@ -51,7 +51,7 @@ public class BuildEmbeddingWithTiePoint
    */
   private final int vertexCount;
   /**
-   * EPGMVertex candidate to start with
+   * Vertex candidate to start with
    */
   private final int candidate;
 

@@ -19,8 +19,8 @@ package org.gradoop.flink.io.impl.json.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
@@ -40,19 +40,19 @@ import org.gradoop.common.model.impl.properties.PropertyList;
  * }
  */
 public class JSONToGraphHead extends JSONToEntity
-  implements MapFunction<String, EPGMGraphHead> {
+  implements MapFunction<String, GraphHead> {
 
   /**
    * Creates graph data objects
    */
-  private final EPGMGraphHeadFactory graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
 
   /**
    * Creates map function
    *
    * @param graphHeadFactory graph data factory
    */
-  public JSONToGraphHead(EPGMGraphHeadFactory graphHeadFactory) {
+  public JSONToGraphHead(GraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -64,7 +64,7 @@ public class JSONToGraphHead extends JSONToEntity
    * @throws Exception
    */
   @Override
-  public EPGMGraphHead map(String s) throws Exception {
+  public GraphHead map(String s) throws Exception {
     JSONObject jsonGraph = new JSONObject(s);
     GradoopId graphID = getID(jsonGraph);
     String label = getLabel(jsonGraph);

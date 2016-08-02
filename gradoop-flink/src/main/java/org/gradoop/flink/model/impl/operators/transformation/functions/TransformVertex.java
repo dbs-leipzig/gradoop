@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
@@ -29,12 +29,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Transformation map function for vertices.
  */
 @FunctionAnnotation.ForwardedFields("id;graphIds")
-public class TransformVertex extends TransformBase<EPGMVertex> {
+public class TransformVertex extends TransformBase<Vertex> {
 
   /**
    * Factory to init modified vertex.
    */
-  private final EPGMVertexFactory vertexFactory;
+  private final VertexFactory vertexFactory;
 
   /**
    * Constructor
@@ -42,14 +42,14 @@ public class TransformVertex extends TransformBase<EPGMVertex> {
    * @param transformationFunction  vertex modification function
    * @param vertexFactory         vertex factory
    */
-  public TransformVertex(TransformationFunction<EPGMVertex> transformationFunction,
-    EPGMVertexFactory vertexFactory) {
+  public TransformVertex(TransformationFunction<Vertex> transformationFunction,
+    VertexFactory vertexFactory) {
     super(transformationFunction);
     this.vertexFactory = checkNotNull(vertexFactory);
   }
 
   @Override
-  protected EPGMVertex initFrom(EPGMVertex element) {
+  protected Vertex initFrom(Vertex element) {
     return vertexFactory.initVertex(
       element.getId(), GConstants.DEFAULT_VERTEX_LABEL, element.getGraphIds());
   }

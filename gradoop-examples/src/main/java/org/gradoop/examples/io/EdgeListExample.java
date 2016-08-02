@@ -138,7 +138,7 @@ public class EdgeListExample implements ProgramDescription {
 
     // create default Gradoop config
     GradoopFlinkConfig<GraphHead, Vertex, Edge> config =
-      GradoopFlinkConfig.createDefaultConfig(env);
+      GradoopFlinkConfig.createConfig(env);
 
     // create datasource
     DataSource<GraphHead, Vertex, Edge> dataSource =

@@ -109,7 +109,7 @@ public class PokecExample {
 
     // create default Gradoop config
     final GradoopFlinkConfig<GraphHead, Vertex, Edge> config =
-      GradoopFlinkConfig.createDefaultConfig(env);
+      GradoopFlinkConfig.createConfig(env);
 
     final String profiles = inputDir + PROFILES;
     final String relations = inputDir + RELATIONSHIPS;

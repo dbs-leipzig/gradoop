@@ -22,6 +22,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.api.VertexHandler;
@@ -30,8 +32,8 @@ import org.gradoop.common.storage.api.VertexHandler;
  * Creates HBase {@link Mutation} from persistent vertex data using vertex
  * data handler.
  */
-public class BuildVertexMutation extends RichMapFunction
-  <PersistentVertex, Tuple2<GradoopId, Mutation>> {
+public class BuildVertexMutation<V extends EPGMVertex, E extends EPGMEdge>
+  extends RichMapFunction<PersistentVertex<E>, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -44,16 +46,16 @@ public class BuildVertexMutation extends RichMapFunction
   private transient Tuple2<GradoopId, Mutation> reuseTuple;
 
   /**
-   * EPGMVertex data handler to create Mutations.
+   * Vertex data handler to create Mutations.
    */
-  private final VertexHandler vertexHandler;
+  private final VertexHandler<V> vertexHandler;
 
   /**
    * Creates rich map function.
    *
    * @param vertexHandler vertex data handler
    */
-  public BuildVertexMutation(VertexHandler vertexHandler) {
+  public BuildVertexMutation(VertexHandler<V> vertexHandler) {
     this.vertexHandler = vertexHandler;
   }
 
@@ -70,7 +72,8 @@ public class BuildVertexMutation extends RichMapFunction
    * {@inheritDoc}
    */
   @Override
-  public Tuple2<GradoopId, Mutation> map(PersistentVertex persistentVertexData)
+  public Tuple2<GradoopId, Mutation> map(
+    PersistentVertex<E> persistentVertexData)
     throws Exception {
     GradoopId key = persistentVertexData.getId();
     Put put =

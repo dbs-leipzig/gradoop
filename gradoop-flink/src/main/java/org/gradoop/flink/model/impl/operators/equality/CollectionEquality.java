@@ -17,12 +17,12 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
@@ -48,8 +48,8 @@ public class CollectionEquality
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public CollectionEquality(GraphHeadToString<EPGMGraphHead> graphHeadToString,
-    VertexToString<EPGMVertex> vertexToString, EdgeToString<EPGMEdge> edgeToString,
+  public CollectionEquality(GraphHeadToString<GraphHead> graphHeadToString,
+    VertexToString<Vertex> vertexToString, EdgeToString<Edge> edgeToString,
     boolean directed) {
     /*
     sets mode for directed or undirected graphs

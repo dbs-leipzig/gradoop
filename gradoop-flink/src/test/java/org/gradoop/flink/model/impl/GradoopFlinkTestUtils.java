@@ -7,6 +7,9 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -26,11 +29,11 @@ public class GradoopFlinkTestUtils {
     return dataSet.collect().get(0);
   }
 
-  public static void printLogicalGraph(LogicalGraph graph) throws
-    Exception {
-    Collection<EPGMGraphHead> graphHeadCollection = Lists.newArrayList();
-    Collection<EPGMVertex> vertexCollection = Lists.newArrayList();
-    Collection<EPGMEdge> edgeCollection = Lists.newArrayList();
+  public static void printLogicalGraph(LogicalGraph graph)
+    throws Exception {
+    Collection<GraphHead> graphHeadCollection = Lists.newArrayList();
+    Collection<Vertex> vertexCollection = Lists.newArrayList();
+    Collection<Edge> edgeCollection = Lists.newArrayList();
 
     graph.getGraphHead().output(
       new LocalCollectionOutputFormat<>(graphHeadCollection));
@@ -57,12 +60,12 @@ public class GradoopFlinkTestUtils {
     }
   }
 
-  public static void printGraphCollection(
-    GraphCollection collection) throws Exception {
+  public static void printGraphCollection(GraphCollection collection)
+    throws Exception {
 
-    Collection<EPGMGraphHead> graphHeadCollection = Lists.newArrayList();
-    Collection<EPGMVertex> vertexCollection = Lists.newArrayList();
-    Collection<EPGMEdge> edgeCollection = Lists.newArrayList();
+    Collection<GraphHead> graphHeadCollection = Lists.newArrayList();
+    Collection<Vertex> vertexCollection = Lists.newArrayList();
+    Collection<Edge> edgeCollection = Lists.newArrayList();
 
     collection.getGraphHeads().output(
       new LocalCollectionOutputFormat<>(graphHeadCollection));
@@ -89,8 +92,8 @@ public class GradoopFlinkTestUtils {
     }
   }
 
-  public static void printDirectedCanonicalAdjacencyMatrix(
-    LogicalGraph graph) throws Exception {
+  public static void printDirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
+    throws Exception {
 
     printDirectedCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
   }
@@ -104,8 +107,8 @@ public class GradoopFlinkTestUtils {
       new EdgeToDataString<>(), true).execute(collection).print();
   }
 
-  public static void printUndirectedCanonicalAdjacencyMatrix(
-    LogicalGraph graph) throws Exception {
+  public static void printUndirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
+    throws Exception {
 
     printUndirectedCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
   }

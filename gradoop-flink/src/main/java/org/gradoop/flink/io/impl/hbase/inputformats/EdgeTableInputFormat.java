@@ -22,18 +22,20 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.util.GConstants;
 
 /**
  * Reads edge data from HBase.
  */
-public class EdgeTableInputFormat extends TableInputFormat<Tuple1<EPGMEdge>> {
+public class EdgeTableInputFormat<E extends EPGMEdge>
+  extends TableInputFormat<Tuple1<E>> {
 
   /**
    * Handles reading of persistent edge data.
    */
-  private final EdgeHandler edgeHandler;
+  private final EdgeHandler<E> edgeHandler;
 
   /**
    * Table to read from.
@@ -46,7 +48,8 @@ public class EdgeTableInputFormat extends TableInputFormat<Tuple1<EPGMEdge>> {
    * @param edgeHandler   edge data handler
    * @param edgeTableName edge data table name
    */
-  public EdgeTableInputFormat(EdgeHandler edgeHandler, String edgeTableName) {
+  public EdgeTableInputFormat(EdgeHandler<E> edgeHandler,
+    String edgeTableName) {
     this.edgeHandler = edgeHandler;
     this.edgeTableName = edgeTableName;
   }
@@ -73,7 +76,7 @@ public class EdgeTableInputFormat extends TableInputFormat<Tuple1<EPGMEdge>> {
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<EPGMEdge> mapResultToTuple(Result result) {
+  protected Tuple1<E> mapResultToTuple(Result result) {
     return new Tuple1<>(edgeHandler.readEdge(result));
   }
 }

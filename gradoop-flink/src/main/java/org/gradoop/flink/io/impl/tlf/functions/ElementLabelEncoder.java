@@ -21,8 +21,8 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.io.impl.tlf.constants.BroadcastNames;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -97,12 +97,12 @@ public class ElementLabelEncoder
   public GraphTransaction map(GraphTransaction graphTransaction)
     throws Exception {
     if (vertexDictionary != null) {
-      for (EPGMVertex vertex : graphTransaction.getVertices()) {
+      for (Vertex vertex : graphTransaction.getVertices()) {
         vertex.setLabel(vertexDictionary.get(vertex.getLabel()).toString());
       }
     }
     if (edgeDictionary != null) {
-      for (EPGMEdge edge : graphTransaction.getEdges()) {
+      for (Edge edge : graphTransaction.getEdges()) {
         edge.setLabel(edgeDictionary.get(edge.getLabel()).toString());
       }
     }

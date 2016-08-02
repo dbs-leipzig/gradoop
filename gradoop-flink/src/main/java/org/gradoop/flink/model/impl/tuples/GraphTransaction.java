@@ -22,10 +22,11 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Set;
 
@@ -33,7 +34,7 @@ import java.util.Set;
  * An encapsulated representation of a logical graph with duplicated elements.
  */
 public class GraphTransaction extends
-  Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>> {
+  Tuple3<GraphHead, Set<Vertex>, Set<Edge>> {
 
   /**
    * default constructor
@@ -47,34 +48,34 @@ public class GraphTransaction extends
    * @param vertices set of vertices
    * @param edges set of edges
    */
-  public GraphTransaction(EPGMGraphHead graphHead, Set<EPGMVertex> vertices,
-    Set<EPGMEdge> edges) {
+  public GraphTransaction(GraphHead graphHead, Set<Vertex> vertices,
+    Set<Edge> edges) {
     setGraphHead(graphHead);
     setVertices(vertices);
     setEdges(edges);
   }
 
-  public EPGMGraphHead getGraphHead() {
+  public GraphHead getGraphHead() {
     return this.f0;
   }
 
-  public void setGraphHead(EPGMGraphHead graphHead) {
+  public void setGraphHead(GraphHead graphHead) {
     this.f0 = graphHead;
   }
 
-  public Set<EPGMVertex> getVertices() {
+  public Set<Vertex> getVertices() {
     return this.f1;
   }
 
-  public void setVertices(Set<EPGMVertex> vertices) {
+  public void setVertices(Set<Vertex> vertices) {
     this.f1 = vertices;
   }
 
-  public Set<EPGMEdge> getEdges() {
+  public Set<Edge> getEdges() {
     return this.f2;
   }
 
-  public void  setEdges(Set<EPGMEdge> edges) {
+  public void  setEdges(Set<Edge> edges) {
     this.f2 = edges;
   }
 
@@ -85,12 +86,12 @@ public class GraphTransaction extends
    * @return type information
    */
   public static TypeInformation<GraphTransaction> getTypeInformation(
-    GradoopConfig config) {
+    GradoopFlinkConfig config) {
 
-    Set<EPGMVertex> vertices = Sets.newHashSetWithExpectedSize(1);
+    Set<Vertex> vertices = Sets.newHashSetWithExpectedSize(1);
     vertices.add(config.getVertexFactory().createVertex());
 
-    Set<EPGMEdge> edges = Sets.newHashSetWithExpectedSize(1);
+    Set<Edge> edges = Sets.newHashSetWithExpectedSize(1);
     edges.add(config.getEdgeFactory()
       .createEdge(GradoopId.get(), GradoopId.get()));
 

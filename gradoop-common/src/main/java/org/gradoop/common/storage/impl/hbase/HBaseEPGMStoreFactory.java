@@ -22,6 +22,9 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.EPGMStore;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.storage.api.GraphHeadHandler;
@@ -75,9 +78,11 @@ public class HBaseEPGMStoreFactory {
    *
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static HBaseEPGMStore createOrOpenEPGMStore(
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig gradoopHBaseConfig,
+    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig,
     final String graphTableName,
     final String vertexTableName,
     final String edgeTableName) {
@@ -94,9 +99,11 @@ public class HBaseEPGMStoreFactory {
    * @param gradoopHBaseConfig  Gradoop HBase configuration
    * @return EPGM store instance or {@code null in the case of errors}
    */
-  public static HBaseEPGMStore createOrOpenEPGMStore(
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig gradoopHBaseConfig) {
+    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig) {
     try {
       createTablesIfNotExists(config, gradoopHBaseConfig.getVertexHandler(),
         gradoopHBaseConfig.getEdgeHandler(),
@@ -112,7 +119,7 @@ public class HBaseEPGMStoreFactory {
       HTable edgeDataTable = new HTable(config,
         gradoopHBaseConfig.getEdgeTableName());
 
-      return new HBaseEPGMStore(graphDataTable, vertexDataTable, edgeDataTable,
+      return new HBaseEPGMStore<>(graphDataTable, vertexDataTable, edgeDataTable,
         gradoopHBaseConfig);
     } catch (IOException e) {
       e.printStackTrace();

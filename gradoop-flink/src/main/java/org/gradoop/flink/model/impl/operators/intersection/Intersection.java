@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.intersection;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 import org.gradoop.flink.model.impl.operators.intersection.functions.GroupCountEquals;
@@ -39,11 +39,11 @@ public class Intersection extends SetOperatorBase {
    * @return subgraph dataset of the resulting collection
    */
   @Override
-  protected DataSet<EPGMGraphHead> computeNewGraphHeads() {
+  protected DataSet<GraphHead> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
       .union(secondCollection.getGraphHeads())
-      .groupBy(new Id<EPGMGraphHead>())
-      .reduceGroup(new GroupCountEquals<EPGMGraphHead>(2));
+      .groupBy(new Id<GraphHead>())
+      .reduceGroup(new GroupCountEquals<GraphHead>(2));
   }
 
   /**

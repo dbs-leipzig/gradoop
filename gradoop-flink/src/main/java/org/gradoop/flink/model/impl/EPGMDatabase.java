@@ -20,9 +20,9 @@ package org.gradoop.flink.model.impl;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.functions.graphcontainment
   .AddToGraphBroadcast;
@@ -55,7 +55,7 @@ public class EPGMDatabase {
   /**
    * Graph head representing the database graph.
    */
-  private final DataSet<EPGMGraphHead> graphHead;
+  private final DataSet<GraphHead> graphHead;
 
   /**
    * Creates a new EPGM database from the given arguments.
@@ -65,9 +65,9 @@ public class EPGMDatabase {
    * @param graphHeads  graph data set
    * @param config      Gradoop Flink Configuration
    */
-  private EPGMDatabase(DataSet<EPGMGraphHead> graphHeads,
-    DataSet<EPGMVertex> vertices,
-    DataSet<EPGMEdge> edges,
+  private EPGMDatabase(DataSet<GraphHead> graphHeads,
+    DataSet<Vertex> vertices,
+    DataSet<Edge> edges,
     GradoopFlinkConfig config) {
     this.config = config;
     this.database = GraphCollection.fromDataSets(graphHeads, vertices,
@@ -92,17 +92,17 @@ public class EPGMDatabase {
   @SuppressWarnings("unchecked")
   @Deprecated
   public static EPGMDatabase fromCollections(
-    Collection<EPGMGraphHead> graphDataCollection,
-    Collection<EPGMVertex> vertexDataCollection,
-    Collection<EPGMEdge> edgeDataCollection,
+    Collection<GraphHead> graphDataCollection,
+    Collection<Vertex> vertexDataCollection,
+    Collection<Edge> edgeDataCollection,
     GradoopFlinkConfig config) {
     if (config == null) {
       throw new IllegalArgumentException("Config must not be null");
     }
     ExecutionEnvironment env = config.getExecutionEnvironment();
-    DataSet<EPGMVertex> vertices = env.fromCollection(vertexDataCollection);
-    DataSet<EPGMEdge> edges = env.fromCollection(edgeDataCollection);
-    DataSet<EPGMGraphHead> graphHeads;
+    DataSet<Vertex> vertices = env.fromCollection(vertexDataCollection);
+    DataSet<Edge> edges = env.fromCollection(edgeDataCollection);
+    DataSet<GraphHead> graphHeads;
     if (graphDataCollection != null) {
       graphHeads = env.fromCollection(graphDataCollection);
     } else {
@@ -142,11 +142,11 @@ public class EPGMDatabase {
   @Deprecated
   public LogicalGraph getDatabaseGraph(boolean withGraphContainment) {
     if (withGraphContainment) {
-      DataSet<GradoopId> graphId = graphHead.map(new Id<EPGMGraphHead>());
+      DataSet<GradoopId> graphId = graphHead.map(new Id<GraphHead>());
       return LogicalGraph.fromDataSets(graphHead,
-        database.getVertices().map(new AddToGraphBroadcast<EPGMVertex>())
+        database.getVertices().map(new AddToGraphBroadcast<Vertex>())
           .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID),
-        database.getEdges().map(new AddToGraphBroadcast<EPGMEdge>())
+        database.getEdges().map(new AddToGraphBroadcast<Edge>())
           .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID),
         config);
     } else {
@@ -174,18 +174,18 @@ public class EPGMDatabase {
    */
   @Deprecated
   public GraphCollection getCollection() {
-    DataSet<EPGMVertex> newVertices = database.getVertices()
-        .filter(new FilterFunction<EPGMVertex>() {
+    DataSet<Vertex> newVertices = database.getVertices()
+        .filter(new FilterFunction<Vertex>() {
           @Override
-          public boolean filter(EPGMVertex vertex) throws
+          public boolean filter(Vertex vertex) throws
             Exception {
             return vertex.getGraphCount() > 0;
           }
         });
-    DataSet<EPGMEdge> newEdges = database.getEdges()
-      .filter(new FilterFunction<EPGMEdge>() {
+    DataSet<Edge> newEdges = database.getEdges()
+      .filter(new FilterFunction<Edge>() {
         @Override
-        public boolean filter(EPGMEdge longEDEdge) throws Exception {
+        public boolean filter(Edge longEDEdge) throws Exception {
           return longEDEdge.getGraphCount() > 0;
         }
       });

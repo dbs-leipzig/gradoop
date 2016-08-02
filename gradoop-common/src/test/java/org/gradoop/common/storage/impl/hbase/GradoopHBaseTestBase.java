@@ -20,6 +20,9 @@ package org.gradoop.common.storage.impl.hbase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.hbase.GradoopHBaseConfig;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStoreFactory;
@@ -74,7 +77,7 @@ public class GradoopHBaseTestBase {
    *
    * @return empty HBase graph store
    */
-  public static HBaseEPGMStore createEmptyEPGMStore() {
+  public static HBaseEPGMStore<GraphHead, Vertex, Edge> createEmptyEPGMStore() {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config);
@@ -88,7 +91,7 @@ public class GradoopHBaseTestBase {
    *
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore() {
+  public static HBaseEPGMStore<GraphHead, Vertex, Edge> openEPGMStore() {
     Configuration config = utility.getConfiguration();
 
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,
