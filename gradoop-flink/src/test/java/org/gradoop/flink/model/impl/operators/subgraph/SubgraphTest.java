@@ -2,7 +2,7 @@ package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
-import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;

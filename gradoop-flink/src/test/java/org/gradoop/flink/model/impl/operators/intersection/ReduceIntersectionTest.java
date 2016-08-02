@@ -1,7 +1,7 @@
 package org.gradoop.flink.model.impl.operators.intersection;
 
 import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.common.model.impl.operators.base.BinaryCollectionOperatorsTestBase;
+import org.gradoop.flink.model.impl.operators.base.BinaryCollectionOperatorsTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 

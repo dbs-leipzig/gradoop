@@ -1,6 +1,6 @@
 package org.gradoop.common.storage.impl.hbase;
 
-import org.gradoop.GradoopTestUtils;
+import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
@@ -12,9 +12,6 @@ import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.api.PersistentVertexFactory;
-import org.gradoop.common.storage.impl.hbase.HBaseEdgeFactory;
-import org.gradoop.common.storage.impl.hbase.HBaseGraphHeadFactory;
-import org.gradoop.common.storage.impl.hbase.HBaseVertexFactory;
 import org.gradoop.common.util.AsciiGraphLoader;
 
 import java.io.IOException;

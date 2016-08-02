@@ -1,7 +1,7 @@
 package org.gradoop.flink.model.impl.pojo;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;

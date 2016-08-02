@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import static org.gradoop.GradoopTestUtils.*;
+import static org.gradoop.common.GradoopTestUtils.*;
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.junit.Assert.*;
 

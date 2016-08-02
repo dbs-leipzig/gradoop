@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.util;
 
+import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;

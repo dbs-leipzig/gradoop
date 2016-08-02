@@ -18,8 +18,8 @@ import org.junit.Test;
 import java.util.Collection;
 import java.util.List;
 
-import static org.gradoop.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentEdges;
 import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentGraphHeads;
 import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentVertices;

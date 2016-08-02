@@ -18,12 +18,11 @@
 package org.gradoop.flink.model.impl.operators.combination;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
+import org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 

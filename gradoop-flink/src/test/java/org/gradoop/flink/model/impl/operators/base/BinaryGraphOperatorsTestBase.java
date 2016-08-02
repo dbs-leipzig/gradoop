@@ -1,11 +1,12 @@
 package org.gradoop.flink.model.impl.operators.base;
 
-import org.gradoop.common.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
 

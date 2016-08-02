@@ -1,7 +1,10 @@
 package org.gradoop.flink.model.impl.properties;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.junit.Test;
 

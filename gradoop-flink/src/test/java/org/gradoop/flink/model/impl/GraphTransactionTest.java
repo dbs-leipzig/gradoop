@@ -2,7 +2,7 @@ package org.gradoop.flink.model.impl;
 
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.functions.utils.First;

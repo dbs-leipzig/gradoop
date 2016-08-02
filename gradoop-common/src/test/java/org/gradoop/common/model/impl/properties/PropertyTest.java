@@ -1,10 +1,8 @@
 package org.gradoop.common.model.impl.properties;
 
-import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.junit.Test;
 
-import static org.gradoop.GradoopTestUtils.writeAndReadFields;
+import static org.gradoop.common.GradoopTestUtils.writeAndReadFields;
 import static org.junit.Assert.*;
 
 public class PropertyTest {

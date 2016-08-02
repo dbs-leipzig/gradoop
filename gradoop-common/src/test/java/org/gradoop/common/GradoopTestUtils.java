@@ -15,7 +15,7 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop;
+package org.gradoop.common;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

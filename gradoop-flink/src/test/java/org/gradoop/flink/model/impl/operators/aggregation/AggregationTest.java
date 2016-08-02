@@ -17,20 +17,19 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation;
 
-import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
-import org.gradoop.common.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxEdgeProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinEdgeProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumEdgeProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Assert;
 import org.junit.Test;
@@ -106,7 +105,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (org.gradoop.model.api.epgm.GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("edge minimum not set", graphHead.hasProperty(EDGE_MIN));
       assertTrue("vertex minimum not set", graphHead.hasProperty(VERTEX_MIN));
       if (graphHead.getId().equals(g0Id)) {
@@ -191,7 +190,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (org.gradoop.model.api.epgm.GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("edge maximum not set", graphHead.hasProperty(EDGE_MAX));
       assertTrue("vertex maximum not set", graphHead.hasProperty(VERTEX_MAX));
       if (graphHead.getId().equals(g0Id)) {
@@ -275,7 +274,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (org.gradoop.model.api.epgm.GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("edge sum not set", graphHead.hasProperty(EDGE_SUM));
       assertTrue("vertex sum not set", graphHead.hasProperty(VERTEX_SUM));
       if (graphHead.getId().equals(g0Id)) {
@@ -448,7 +447,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     assertTrue("wrong number of output graph heads", graphHeadCount == 4);
   }
 
-  private void assertCounts(org.gradoop.model.api.epgm.GraphHead graphHead,
+  private void assertCounts(GraphHead graphHead,
     long expectedVertexCount, long expectedEdgeCount) {
     assertEquals("wrong vertex count", expectedVertexCount,
       graphHead.getPropertyValue(VERTEX_COUNT).getLong());

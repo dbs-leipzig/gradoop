@@ -1,9 +1,11 @@
 package org.gradoop.flink.model.impl.operators.matching.simulation.dual;
 
-import org.gradoop.common.model.impl.operators.matching.PatternMatchingTest;
+import org.gradoop.flink.model.impl.operators.matching.PatternMatchingTest;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
+
+import static org.gradoop.flink.model.impl.operators.matching.TestData.*;
 
 public abstract class DualSimulationTest extends PatternMatchingTest {
 

@@ -20,7 +20,7 @@ package org.gradoop.flink.io.impl.json;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
@@ -33,8 +33,8 @@ import org.junit.rules.TemporaryFolder;
 
 import java.util.Collection;
 
-import static org.gradoop.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

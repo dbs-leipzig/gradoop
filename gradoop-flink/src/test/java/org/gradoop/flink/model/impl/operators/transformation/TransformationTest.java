@@ -3,7 +3,7 @@ package org.gradoop.flink.model.impl.operators.transformation;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
-import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.gradoop.GradoopTestUtils.validateIdEquality;
+import static org.gradoop.common.GradoopTestUtils.validateIdEquality;
 
 public class TransformationTest extends GradoopFlinkTestBase {
 

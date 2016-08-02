@@ -17,11 +17,9 @@
 
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
-
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MinAggregator;
@@ -29,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Sum
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import static org.gradoop.util.GConstants.NULL_STRING;
+import static org.gradoop.common.util.GConstants.NULL_STRING;
 
 @SuppressWarnings("Duplicates")
 public abstract class GroupingTestBase extends GradoopFlinkTestBase {

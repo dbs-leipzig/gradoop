@@ -3,7 +3,7 @@ package org.gradoop.flink.model.impl;
 import com.google.common.collect.Lists;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.common.model.impl.id.GradoopId;

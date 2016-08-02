@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import static org.gradoop.GradoopTestUtils.*;
+import static org.gradoop.common.GradoopTestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
