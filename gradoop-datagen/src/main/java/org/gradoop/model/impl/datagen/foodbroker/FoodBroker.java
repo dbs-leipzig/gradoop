@@ -140,7 +140,7 @@ public class FoodBroker
       gradoopFlinkConfig.getVertexFactory(),
       gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
 
-    DataSet<Map<GradoopId, AbstractMasterDataTuple>> masterDataMap= customers
+    DataSet<Map<GradoopId, AbstractMasterDataTuple>> masterDataMap = customers
       .union(vendors)
       .union(logistics)
       .union(employees)
