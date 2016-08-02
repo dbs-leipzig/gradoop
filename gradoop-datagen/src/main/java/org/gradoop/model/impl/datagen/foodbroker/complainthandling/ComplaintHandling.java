@@ -34,6 +34,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Map partition function to run on vertices with label "SalesOrder". I spreads
+ * the whole complaint handling process equally to each worker.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ */
 public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
   E extends EPGMEdge> extends
   RichMapPartitionFunction<V, Tuple2<Set<V>, Set<E>>> implements Serializable {
@@ -63,6 +71,13 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
   private Map<GradoopId, V> vertexMap;
   private Map<GradoopId, AbstractMasterDataTuple> masterDataMap;
 
+  /**
+   * Initializes a lot of stuff and sets the factories as well as the config.
+   *
+   * @param vertexFactory Vertex factory
+   * @param edgeFactory   Edge factory
+   * @param config        Configuration
+   */
   public ComplaintHandling(EPGMVertexFactory<V> vertexFactory,
     EPGMEdgeFactory<E> edgeFactory, FoodBrokerConfig config) {
     this.vertexFactory = vertexFactory;
@@ -77,9 +92,65 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
     masterDataMap = Maps.newHashMap();
   }
 
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+
+    // Get the master data
+    customers = getRuntimeContext().getBroadcastVariable(Customer.CLASS_NAME);
+    vendors = getRuntimeContext().getBroadcastVariable(Vendor.CLASS_NAME);
+    logistics = getRuntimeContext().getBroadcastVariable(Logistics.CLASS_NAME);
+    employees = getRuntimeContext().getBroadcastVariable(Employee.CLASS_NAME);
+    products = getRuntimeContext().getBroadcastVariable(Product.CLASS_NAME);
+
+    // Get the required transactional data
+    purchOrderLines =
+      getRuntimeContext().getBroadcastVariable("purchOrderLines");
+    purchesToLines = getRuntimeContext().getBroadcastVariable("purchesToLines");
+    salesOrderLines =
+      getRuntimeContext().getBroadcastVariable("salesOrderLines");
+    salesToLines = getRuntimeContext().getBroadcastVariable("salesToLines");
+    salesToDeliveries =
+      getRuntimeContext().getBroadcastVariable("salesToDeliveries");
+    transactionalEdges =
+      getRuntimeContext().getBroadcastVariable("transactionalEdges");
+
+    // Init the master data map
+    initMasterDataMap();
+  }
+
+  @Override
+  public void mapPartition(Iterable<V> values,
+    Collector<Tuple2<Set<V>, Set<E>>> out) throws Exception {
+
+    // Iterate over SalesOrder vertices
+    for (V sale : values) {
+      // Create for each SalesOrder new
+      vertices = Sets.newHashSet();
+      edges = Sets.newHashSet();
+      graphIds = sale.getGraphIds();
+
+      lateDelivery(sale);
+      badQuality(sale);
+
+      // Collect the created vertices and edges
+      out.collect(new Tuple2<>(vertices, edges));
+    }
+  }
+
+  /* ----- Main complaint handling methods ----- */
+
+  /**
+   * Late delivery complaint handling
+   *
+   * @param sale for a given SalesOrder vertex
+   */
   private void lateDelivery(V sale) {
     final List<V> deliveryNotes = getDeliveryNotesBySale(sale);
     final List<V> lateSalesOrderLines = new ArrayList<>();
+
+    // Iterate over all delivery notes and take the sales order lines of
+    // sales orders, which are late
     for (V deliveryNote : deliveryNotes) {
       if (deliveryNote.getPropertyValue("date").getLong() >
         sale.getPropertyValue("deliveryDate").getLong()) {
@@ -87,7 +158,9 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
       }
     }
 
+    // If we have late sales order lines
     if (!lateSalesOrderLines.isEmpty()) {
+      // Collect the respective late purch order lines
       List<V> latePurchOrderLines = new ArrayList<>();
       for (V salesOrderLine : lateSalesOrderLines) {
         latePurchOrderLines
@@ -98,15 +171,22 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
       calendar.add(Calendar.DATE, 1);
       long createdDate = calendar.getTimeInMillis();
 
+      // Create ticket and process refunds
       V ticket = newTicket(sale, "late delivery", createdDate);
       grantSalesRefund(sale, lateSalesOrderLines, ticket);
       claimPurchRefund(latePurchOrderLines, ticket);
     }
   }
 
+  /**
+   * Bad quality complaint handling.
+   *
+   * @param sale for a given SalesOrder vertex.
+   */
   private void badQuality(V sale) {
     final List<V> deliveryNotes = getDeliveryNotesBySale(sale);
 
+    // Iterate over delivery notes
     for (V deliveryNote : deliveryNotes) {
       List<AbstractMasterDataTuple> influencingMasterData =
         Lists.newArrayList();
@@ -129,6 +209,7 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
           .add(getMasterDataEdgeTarget("placedAt", purchOrder.getId()));
       }
 
+      // Decide whether we have a bad quality order or not
       if (config.happensTransitionConfiguration(influencingMasterData, "Ticket",
         "badQualityProbability")) {
         List<V> badSalesOrderLines = new ArrayList<>();
@@ -137,6 +218,7 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
             .add(getSalesOrderLineByPurchOrderLine(purchOrderLine));
         }
 
+        // If we have, create ticket and process refunds
         V ticket = newTicket(sale, "bad quality",
           deliveryNote.getPropertyValue("date").getLong());
         grantSalesRefund(sale, badSalesOrderLines, ticket);
@@ -145,122 +227,17 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
     }
   }
 
-  @Override
-  public void open(Configuration parameters) throws Exception {
-    super.open(parameters);
-
-    customers = getRuntimeContext().getBroadcastVariable(Customer.CLASS_NAME);
-    vendors = getRuntimeContext().getBroadcastVariable(Vendor.CLASS_NAME);
-    logistics = getRuntimeContext().getBroadcastVariable(Logistics.CLASS_NAME);
-    employees = getRuntimeContext().getBroadcastVariable(Employee.CLASS_NAME);
-    products = getRuntimeContext().getBroadcastVariable(Product.CLASS_NAME);
-
-    purchOrderLines =
-      getRuntimeContext().getBroadcastVariable("purchOrderLines");
-    purchesToLines = getRuntimeContext().getBroadcastVariable("purchesToLines");
-    salesOrderLines =
-      getRuntimeContext().getBroadcastVariable("salesOrderLines");
-    salesToLines = getRuntimeContext().getBroadcastVariable("salesToLines");
-    salesToDeliveries =
-      getRuntimeContext().getBroadcastVariable("salesToDeliveries");
-    transactionalEdges =
-      getRuntimeContext().getBroadcastVariable("transactionalEdges");
-
-    initMasterDataMap();
-  }
-
-  @Override
-  public void mapPartition(Iterable<V> values,
-    Collector<Tuple2<Set<V>, Set<E>>> out) throws Exception {
-    for (V sale : values) {
-      vertices = Sets.newHashSet();
-      edges = Sets.newHashSet();
-      graphIds = sale.getGraphIds();
-
-      lateDelivery(sale);
-      badQuality(sale);
-
-      out.collect(new Tuple2<>(vertices, edges));
-    }
-  }
-
-  /* ----- Association fetches ----- */
-
-  private V getPurchOrderLineBySalesOrderLine(V salesOrderLine) {
-    for (V purchOrderLine : purchOrderLines) {
-      if (purchOrderLine.getPropertyValue("salesOrderLine").getString()
-        .equals(salesOrderLine.getId().toString())) {
-        return purchOrderLine;
-      }
-    }
-    return null;
-  }
-
-  private List<V> getDeliveryNotesBySale(V sale) {
-    List<V> result = new ArrayList<>();
-    for (Tuple3<V, V, V> t : salesToDeliveries) {
-      if (t.f0.getId().equals(sale.getId())) {
-        result.add(t.f2);
-      }
-    }
-    return result;
-  }
-
-  private List<V> getSalesOrderLinesBySale(V saleVertex) {
-    List<V> lines = new ArrayList<>();
-    for (Tuple2<V, V> t : salesToLines) {
-      if (t.f0.getId().equals(saleVertex.getId())) {
-        lines.add(t.f1);
-      }
-    }
-    return lines;
-  }
-
-  private V getPurchOrderByDeliveryNote(V deliveryNote) {
-    for (Tuple3<V, V, V> t : salesToDeliveries) {
-      if (t.f2.getId().equals(deliveryNote.getId())) {
-        return t.f1;
-      }
-    }
-    return null;
-  }
-
-  private List<V> getPurchOrderLinesByPurchOrder(V purchOrder) {
-    List<V> lines = new ArrayList<>();
-    for (Tuple2<V, V> t : purchesToLines) {
-      if (t.f0.getId().equals(purchOrder.getId())) {
-        lines.add(t.f1);
-      }
-    }
-    return lines;
-  }
-
-  private V getSalesOrderLineByPurchOrderLine(V purchOrderLine) {
-    for (V salesOrderLine : salesOrderLines) {
-      if (salesOrderLine.getPropertyValue("purchOrderLine").getString()
-        .equals(purchOrderLine.getId().toString())) {
-        return salesOrderLine;
-      }
-    }
-    return null;
-  }
-
-  private V getPurchOrderByPurchOrderLine(V purchOrderLine) {
-    for (Tuple2<V, V> t : purchesToLines) {
-      if (t.f1.getId().equals(purchOrderLine.getId())) {
-        return t.f0;
-      }
-    }
-    return null;
-  }
-
-  private <T extends AbstractMasterDataTuple> T getRandomTuple(List<T> list) {
-    //TODO rnd verbessern
-    return list.get((int) Math.round(Math.random() * (list.size() - 1)));
-  }
-
   /* ----- Creation of new elements ----- */
 
+  /**
+   * Create a new complaint handling ticket by given SalesOrder vertex,
+   * type/problem and creation date.
+   *
+   * @param sale        SalesOrder vertex
+   * @param type        Complaint problem
+   * @param createdDate Creation date
+   * @return the created ticket
+   */
   private V newTicket(V sale, String type, long createdDate) {
     String label = "Ticket";
     PropertyList properties = new PropertyList();
@@ -288,6 +265,14 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
 
   /* ----- Refunds ----- */
 
+  /**
+   * Process sales refunds by given SalesOrder vertex, sales order lines and
+   * ticket.
+   *
+   * @param sale            SalesOrder vertex
+   * @param salesOrderLines sales order lines (list)
+   * @param ticket          the ticket
+   */
   private void grantSalesRefund(V sale, List<V> salesOrderLines, V ticket) {
     List<AbstractMasterDataTuple> influencingMasterData = new ArrayList<>();
     influencingMasterData
@@ -326,6 +311,12 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
     }
   }
 
+  /**
+   * Process purch refunds by given purch order lines and ticket.
+   *
+   * @param purchOrderLines purch order lines (list)
+   * @param ticket          the ticket
+   */
   private void claimPurchRefund(List<V> purchOrderLines, V ticket) {
     V purchOrder = getPurchOrderByPurchOrderLine(purchOrderLines.get(0));
 
@@ -368,18 +359,161 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
     }
   }
 
+  /* ----- Association fetches ----- */
+
+  /**
+   * Get the purch order line by a given sales order line
+   *
+   * @param salesOrderLine given
+   * @return purch order line
+   */
+  private V getPurchOrderLineBySalesOrderLine(V salesOrderLine) {
+    for (V purchOrderLine : purchOrderLines) {
+      if (purchOrderLine.getPropertyValue("salesOrderLine").getString()
+        .equals(salesOrderLine.getId().toString())) {
+        return purchOrderLine;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get the delivery notes by a given sales order
+   *
+   * @param sale given
+   * @return delivery notes
+   */
+  private List<V> getDeliveryNotesBySale(V sale) {
+    List<V> result = new ArrayList<>();
+    for (Tuple3<V, V, V> t : salesToDeliveries) {
+      if (t.f0.getId().equals(sale.getId())) {
+        result.add(t.f2);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Get the sales order lines by a given sales order
+   *
+   * @param saleVertex given
+   * @return sales order lines
+   */
+  private List<V> getSalesOrderLinesBySale(V saleVertex) {
+    List<V> lines = new ArrayList<>();
+    for (Tuple2<V, V> t : salesToLines) {
+      if (t.f0.getId().equals(saleVertex.getId())) {
+        lines.add(t.f1);
+      }
+    }
+    return lines;
+  }
+
+  /**
+   * Get the purch order by a given delivery note
+   *
+   * @param deliveryNote given
+   * @return purch order
+   */
+  private V getPurchOrderByDeliveryNote(V deliveryNote) {
+    for (Tuple3<V, V, V> t : salesToDeliveries) {
+      if (t.f2.getId().equals(deliveryNote.getId())) {
+        return t.f1;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get the purch order lines by a given purch order
+   *
+   * @param purchOrder given
+   * @return purch order lines
+   */
+  private List<V> getPurchOrderLinesByPurchOrder(V purchOrder) {
+    List<V> lines = new ArrayList<>();
+    for (Tuple2<V, V> t : purchesToLines) {
+      if (t.f0.getId().equals(purchOrder.getId())) {
+        lines.add(t.f1);
+      }
+    }
+    return lines;
+  }
+
+  /**
+   * Get the sales order line equivalent for a purch order line
+   *
+   * @param purchOrderLine given
+   * @return sales order line
+   */
+  private V getSalesOrderLineByPurchOrderLine(V purchOrderLine) {
+    for (V salesOrderLine : salesOrderLines) {
+      if (salesOrderLine.getPropertyValue("purchOrderLine").getString()
+        .equals(purchOrderLine.getId().toString())) {
+        return salesOrderLine;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get the purch order by a given purch order line
+   *
+   * @param purchOrderLine given
+   * @return purch order
+   */
+  private V getPurchOrderByPurchOrderLine(V purchOrderLine) {
+    for (Tuple2<V, V> t : purchesToLines) {
+      if (t.f1.getId().equals(purchOrderLine.getId())) {
+        return t.f0;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get a random master data tuple from the given list.
+   *
+   * @param list Given list
+   * @param <T>  Must be a "AbstractMasterDataTuple"
+   * @return random tuple
+   */
+  private <T extends AbstractMasterDataTuple> T getRandomTuple(List<T> list) {
+    //TODO rnd verbessern
+    return list.get((int) Math.round(Math.random() * (list.size() - 1)));
+  }
+
   /* ----- Creation of Edges and Vertices ----- */
 
+  /**
+   * Add newly created edges
+   *
+   * @param label  edge's label
+   * @param source edge's source id
+   * @param target edge's target id
+   */
   private void newEdge(String label, GradoopId source, GradoopId target) {
     edges.add(edgeFactory.createEdge(label, source, target, graphIds));
     edgeMap.put(new Tuple2<String, GradoopId>(label, source), target);
   }
 
+  /**
+   * Add newly created vertex
+   *
+   * @param vertex the vertex
+   */
   private void newVertex(V vertex) {
     vertices.add(vertex);
     vertexMap.put(vertex.getId(), vertex);
   }
 
+  /**
+   * Get the master data id by given edge label and source id
+   *
+   * @param edgeLabel the edge label
+   * @param source    the source id
+   * @return master data id
+   */
   private AbstractMasterDataTuple getMasterDataEdgeTarget(String edgeLabel,
     GradoopId source) {
     GradoopId id =
@@ -396,6 +530,9 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
     return masterDataMap.get(id);
   }
 
+  /**
+   * Init the master data map
+   */
   private void initMasterDataMap() {
     for (MasterDataTuple customer : customers) {
       masterDataMap.put(customer.getId(), customer);

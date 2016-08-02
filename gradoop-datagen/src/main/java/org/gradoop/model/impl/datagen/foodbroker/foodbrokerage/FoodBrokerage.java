@@ -30,6 +30,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
+import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Customer;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Employee;
@@ -151,7 +152,6 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     edgeMap = Maps.newHashMap();
     vertexMap = Maps.newHashMap();
-    masterDataMap = Maps.newHashMap();
   }
 
   @Override
@@ -164,7 +164,8 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     employees = getRuntimeContext().getBroadcastVariable(Employee.CLASS_NAME);
     products = getRuntimeContext().getBroadcastVariable(Product.CLASS_NAME);
 
-    initMasterDataMap();
+    masterDataMap = getRuntimeContext().<Map<GradoopId, AbstractMasterDataTuple>>
+      getBroadcastVariable(Constants.MASTERDATA_MAP).get(0);
   }
 
   @Override
@@ -825,24 +826,4 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     return list.get((int) Math.round(Math.random() * (list.size() - 1)));
   }
 
-  /**
-   * Initializes a map of all master data tupels and their gradoop ids.
-   */
-  private void initMasterDataMap() {
-    for (MasterDataTuple customer : customers) {
-      masterDataMap.put(customer.getId(), customer);
-    }
-    for (MasterDataTuple vendor : vendors) {
-      masterDataMap.put(vendor.getId(), vendor);
-    }
-    for (MasterDataTuple logistic : logistics) {
-      masterDataMap.put(logistic.getId(), logistic);
-    }
-    for (MasterDataTuple employee : employees) {
-      masterDataMap.put(employee.getId(), employee);
-    }
-    for (ProductTuple product : products) {
-      masterDataMap.put(product.getId(), product);
-    }
-  }
 }

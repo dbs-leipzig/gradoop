@@ -50,4 +50,9 @@ public class Constants {
    */
   public static final String EDGES = "edges";
 
+  /**
+   * broadcast variable which is needed spread the precalculated master data map
+   */
+  public static final String MASTERDATA_MAP = "masterDataMap";
+
 }

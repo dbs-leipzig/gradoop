@@ -41,6 +41,12 @@ import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage.MasterDataGraphId
 import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage.MasterDataTupleMapper;
 import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage.ProductTupleMapper;
 import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage.VerticesFromFoodBrokerage;
+import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage
+  .MasterDataTupleMapper;
+import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage
+  .ProductTupleMapper;
+import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage
+  .VerticesFromFoodBrokerage;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Customer;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.CustomerGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Employee;
@@ -50,26 +56,51 @@ import org.gradoop.model.impl.datagen.foodbroker.masterdata.Product;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.ProductGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Vendor;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.VendorGenerator;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
+import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.util.GradoopFlinkConfig;
 
+import java.util.Map;
 import java.util.Set;
 
-
+/**
+ * Generates a GraphCollection containing a foodbrokerage and a complaint
+ * handling process.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
+ */
 public class FoodBroker
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   implements CollectionGenerator<G, V, E> {
-
-  private final GradoopFlinkConfig<G, V, E> gradoopFlinkConfig;
-  private final FoodBrokerConfig foodBrokerConfig;
+  /**
+   * Execution environment
+   */
   protected final ExecutionEnvironment env;
+  /**
+   * Gradoop Flink configuration
+   */
+  private final GradoopFlinkConfig<G, V, E> gradoopFlinkConfig;
+  /**
+   * Foodbroker configuration
+   */
+  private final FoodBrokerConfig foodBrokerConfig;
 
+  /**
+   * Valued constructor.
+   *
+   * @param env execution environment
+   * @param gradoopFlinkConfig Gradoop Flink configuration
+   * @param foodBrokerConfig Foodbroker configuration
+   */
   public FoodBroker(ExecutionEnvironment env,
     GradoopFlinkConfig<G, V, E> gradoopFlinkConfig,
     FoodBrokerConfig foodBrokerConfig) {
 
+    this.env = env;
     this.gradoopFlinkConfig = gradoopFlinkConfig;
     this.foodBrokerConfig = foodBrokerConfig;
-    this.env = env;
   }
 
   @Override
@@ -92,7 +123,8 @@ public class FoodBroker
       new VendorGenerator<V>(gradoopFlinkConfig, foodBrokerConfig).generate();
 
     DataSet<V> logistics =
-      new LogisticsGenerator<V>(gradoopFlinkConfig, foodBrokerConfig).generate();
+      new LogisticsGenerator<V>(gradoopFlinkConfig, foodBrokerConfig)
+        .generate();
 
     DataSet<V> employees =
       new EmployeeGenerator<V>(gradoopFlinkConfig, foodBrokerConfig).generate();
@@ -103,19 +135,33 @@ public class FoodBroker
     DataSet<Long> caseSeeds = env.generateSequence(1, foodBrokerConfig
       .getCaseCount());
 
-    FoodBrokerage<G, V, E> foodBrokerage = new FoodBrokerage<G, V, E>
-      (gradoopFlinkConfig.getGraphHeadFactory(),
-      gradoopFlinkConfig.getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
+    FoodBrokerage<G, V, E> foodBrokerage = new FoodBrokerage<G, V, E>(
+      gradoopFlinkConfig.getGraphHeadFactory(),
+      gradoopFlinkConfig.getVertexFactory(),
+      gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
 
-    DataSet<Tuple2<Set<V>, Set<E>>> vertexEdgeTuple = caseSeeds.mapPartition
-      (foodBrokerage)
-      .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()), Customer.CLASS_NAME)
-      .withBroadcastSet(vendors.map(new MasterDataTupleMapper<V>()), Vendor.CLASS_NAME)
+    DataSet<Map<GradoopId, AbstractMasterDataTuple>> masterDataMap= customers
+      .union(vendors)
+      .union(logistics)
+      .union(employees)
+      .map(new MasterDataTupleMapper<V>())
+      .union(products
+        .map(new ProductTupleMapper<V>()))
+      .reduceGroup(new MasterDataMapFromMasterData());
+
+    DataSet<Tuple2<Set<V>, Set<E>>> vertexEdgeTuple = caseSeeds
+      .mapPartition(foodBrokerage)
+      .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()),
+        Customer.CLASS_NAME)
+      .withBroadcastSet(vendors.map(new MasterDataTupleMapper<V>()),
+        Vendor.CLASS_NAME)
       .withBroadcastSet(logistics.map(new MasterDataTupleMapper<V>()),
         LogisticsGenerator.CLASS_NAME)
-      .withBroadcastSet(employees.map(new MasterDataTupleMapper<V>()), Employee.CLASS_NAME)
-      .withBroadcastSet(products.map(new ProductTupleMapper<V>()), Product.CLASS_NAME)
-      ;//.returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
+      .withBroadcastSet(employees.map(new MasterDataTupleMapper<V>()),
+        Employee.CLASS_NAME)
+      .withBroadcastSet(products.map(new ProductTupleMapper<V>()),
+        Product.CLASS_NAME)
+      .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP);
 
     DataSet<V> transactionalVertices = vertexEdgeTuple
       .flatMap(new VerticesFromFoodBrokerage<V, E>())
@@ -130,7 +176,7 @@ public class FoodBroker
         gradoopFlinkConfig.getGraphHeadFactory()))
       .returns(graphHeadTypeInfo);
 
-    DataSet<V> vertices =customers
+    DataSet<V> vertices = customers
       .union(vendors)
       .union(logistics)
       .union(employees)
@@ -139,6 +185,7 @@ public class FoodBroker
       .withBroadcastSet(transactionalEdges, Constants.EDGES)
       .union(transactionalVertices);
 
+    // Filter vertices with label "SalesOrder"
     DataSet<V> salesOrderVertices =
       transactionalVertices.filter(new FilterFunction<V>() {
         @Override
@@ -147,6 +194,7 @@ public class FoodBroker
         }
       });
 
+    // Filter vertices with label "SalesOrderLine"
     DataSet<V> salesOrderLineVertices =
       transactionalVertices.filter(new FilterFunction<V>() {
         @Override
@@ -155,6 +203,7 @@ public class FoodBroker
         }
       });
 
+    // Filter vertices with label "PurchOrder"
     DataSet<V> purchOrderVertices =
       transactionalVertices.filter(new FilterFunction<V>() {
         @Override
@@ -163,6 +212,7 @@ public class FoodBroker
         }
       });
 
+    // Filter vertices with label "PurchOrderLine"
     DataSet<V> purchOrderLineVertices =
       transactionalVertices.filter(new FilterFunction<V>() {
         @Override
@@ -171,6 +221,7 @@ public class FoodBroker
         }
       });
 
+    // Filter vertices with label "DeliveryNote"
     DataSet<V> deliveryNoteVertices =
       transactionalVertices.filter(new FilterFunction<V>() {
         @Override
@@ -179,6 +230,8 @@ public class FoodBroker
         }
       });
 
+    // Create a data set of tuple-2s so that we have sales associated to their
+    // lines
     DataSet<Tuple2<V, V>> salesToLines =
       salesOrderVertices.join(transactionalEdges).where("id")
         .equalTo("targetId").join(salesOrderLineVertices).where("f1.sourceId")
@@ -190,6 +243,8 @@ public class FoodBroker
         }
       });
 
+    // Create a data set of tuple-2s so that we have purches associated with
+    // their lines
     DataSet<Tuple2<V, V>> purchesToLines =
       purchOrderVertices.join(transactionalEdges).where("id")
         .equalTo("targetId").join(purchOrderLineVertices).where("f1.sourceId")
@@ -201,6 +256,11 @@ public class FoodBroker
         }
       });
 
+    // Create a data set of tuple-3s with the following structure:
+    // (x, y, z) with
+    // - x is a SalesOrder vertex
+    // - y is a PurchOrder vertex
+    // - z is a DeliveryNote vertex
     DataSet<Tuple3<V, V, V>> salesToDeliveries =
       salesOrderVertices.join(transactionalEdges) // Tuple2<V, E>
         .where("id").equalTo("targetId")
@@ -225,9 +285,11 @@ public class FoodBroker
           }
         }); // Tuple3<V, V, V>*/
 
-    ComplaintHandling complaintHandling =
-      new ComplaintHandling(gradoopFlinkConfig.getVertexFactory(),
+    // Initialize the complaint handling map partition function with some data
+    ComplaintHandling<G, V, E> complaintHandling =
+      new ComplaintHandling<G, V, E>(gradoopFlinkConfig.getVertexFactory(),
         gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
+    // Run the map partition function with some data
     DataSet<Tuple2<Set<V>, Set<E>>> complaintTuple =
       salesOrderVertices.mapPartition(complaintHandling)
         .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()),
@@ -245,23 +307,27 @@ public class FoodBroker
         .withBroadcastSet(salesToDeliveries, "salesToDeliveries")
         .withBroadcastSet(salesToLines, "salesToLines")
         .withBroadcastSet(salesOrderLineVertices, "salesOrderLines")
-        .withBroadcastSet(purchesToLines, "purchesToLines");
+        .withBroadcastSet(purchesToLines, "purchesToLines")
+        .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP);
 
+
+    // Fetch the vertices from complaint handling
     DataSet<V> complaintVertices =
       complaintTuple.flatMap(new VerticesFromFoodBrokerage<V, E>())
         .returns(vertexTypeInfo);
 
+    // Fetch the edges from complaint handling
     DataSet<E> complaintEdges =
       complaintTuple.flatMap(new EdgesFromFoodBrokerage<V, E>())
         .returns(edgeTypeInfo);
 
+    // Add the vertices and edges from complaint handling
     vertices = vertices.union(complaintVertices);
-
     transactionalEdges = transactionalEdges.union(complaintEdges);
 
     return GraphCollection.fromDataSets(graphHeads, vertices,
       transactionalEdges, gradoopFlinkConfig);
-    }
+  }
 
   @Override
   public String getName() {
