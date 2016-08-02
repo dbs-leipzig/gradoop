@@ -20,6 +20,7 @@ package org.gradoop.model.impl.datagen.foodbroker.foodbrokerage;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
 
 import java.math.BigDecimal;
@@ -30,7 +31,7 @@ import java.math.BigDecimal;
  * @param <V> EPGM vertex type
  */
 public class ProductTupleMapper<V extends EPGMVertex> implements
-  MapFunction<V, ProductTuple> {
+  MapFunction<V, AbstractMasterDataTuple> {
 
   @Override
   public ProductTuple map(V v) throws Exception {

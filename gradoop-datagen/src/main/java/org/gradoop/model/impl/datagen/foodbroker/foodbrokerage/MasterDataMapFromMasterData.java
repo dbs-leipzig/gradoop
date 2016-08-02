@@ -17,24 +17,29 @@
 
 package org.gradoop.model.impl.datagen.foodbroker.foodbrokerage;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
+import com.google.common.collect.Maps;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
+import org.gradoop.model.impl.id.GradoopId;
+
+import java.util.Map;
 
 /**
- * Creates a master data tuple from the given vertex.
- *
- * @param <V> EPGM vertex type
+ * Returns a map from each gradoop id to the object.
  */
-public class MasterDataTupleMapper<V extends EPGMVertex>
-  implements MapFunction<V, AbstractMasterDataTuple> {
+public class MasterDataMapFromMasterData
+  implements GroupReduceFunction<AbstractMasterDataTuple,
+  Map<GradoopId, AbstractMasterDataTuple>> {
 
   @Override
-  public MasterDataTuple map(V v) throws Exception {
-    return new MasterDataTuple(v.getId(), v.getPropertyValue(
-      Constants.QUALITY).getFloat());
-
+  public void reduce(Iterable<AbstractMasterDataTuple> iterable,
+    Collector<Map<GradoopId, AbstractMasterDataTuple>> collector) throws
+    Exception {
+    Map<GradoopId, AbstractMasterDataTuple> map = Maps.newHashMap();
+    for(AbstractMasterDataTuple tuple : iterable) {
+      map.put(tuple.getId(), tuple);
+    }
+    collector.collect(map);
   }
 }
