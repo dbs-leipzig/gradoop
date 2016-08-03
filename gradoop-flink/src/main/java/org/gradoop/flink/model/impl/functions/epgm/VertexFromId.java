@@ -64,7 +64,6 @@ public class VertexFromId implements
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Vertex> getProducedType() {
-    return (TypeInformation<Vertex>) TypeExtractor
-      .createTypeInfo(vertexFactory.getType());
+    return TypeExtractor.createTypeInfo(vertexFactory.getType());
   }
 }

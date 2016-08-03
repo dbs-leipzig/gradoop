@@ -76,7 +76,6 @@ public class EdgeFromIds implements
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Edge> getProducedType() {
-    return (TypeInformation<Edge>) TypeExtractor
-      .createTypeInfo(edgeFactory.getType());
+    return TypeExtractor.createTypeInfo(edgeFactory.getType());
   }
 }
