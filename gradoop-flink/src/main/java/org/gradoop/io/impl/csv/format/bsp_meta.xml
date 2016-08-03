@@ -2,7 +2,8 @@
 
 <datasource>
 
-    <csvFile name="graph.csv" charset="utf8" seperator="|" type="graph">
+    <csvfile name="graph.csv" charset="utf8" seperator="|"
+             graphelementtype="graph">
         <label>
             <specified>Graph</specified>
         </label>
@@ -16,9 +17,10 @@
             <column name="id" type="Long"/>
             <column name="nodeCount" type="Integer"/>
         </columns>
-    </csvFile>
+    </csvfile>
 
-    <csvFile name="book.csv" charset="utf8" seperator="|" type="vertex">
+    <csvfile name="book.csv" charset="utf8" seperator="|"
+             graphelementtype="vertex">
         <label>
             <field>1</field>
             <field>2</field>
@@ -37,9 +39,10 @@
             <column name="author" type="String"/>
             <column name="title" type="String"/>
         </columns>
-    </csvFile>
+    </csvfile>
 
-    <csvFile name="author.csv" charset="utf8" seperator="|" type="vertex">
+    <csvfile name="author.csv" charset="utf8" seperator="|"
+             graphelementtype="vertex">
         <label>
             <field>0</field>
         </label>
@@ -60,9 +63,10 @@
             <column name="phone" type="String"/>
             <column name="zip" type="String"/>
         </columns>
-    </csvFile>
+    </csvfile>
 
-    <csvFile name="writes.csv" charset="utf8" seperator="|" type="edge">
+    <csvfile name="writes.csv" charset="utf8" seperator="|"
+             graphelementtype="edge">
         <label>
             <specified>writes</specified>
         </label>
@@ -83,7 +87,7 @@
             <column name="targetID" type="Long"/>
             <column name="teamWork" type="Boolean"/>
         </columns>
-    </csvFile>
+    </csvfile>
 
 </datasource>
 
