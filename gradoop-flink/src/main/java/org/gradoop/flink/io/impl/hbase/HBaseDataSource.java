@@ -40,7 +40,8 @@ import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 /**
  * Creates an EPGM instance from HBase.
  */
-public class HBaseDataSource extends HBaseBase implements DataSource {
+public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
+  implements DataSource {
 
   /**
    * Creates a new HBase data source.
@@ -58,43 +59,35 @@ public class HBaseDataSource extends HBaseBase implements DataSource {
     return getGraphCollection().reduce(new ReduceCombination());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public GraphCollection getGraphCollection() {
     GradoopFlinkConfig config = getFlinkConfig();
     HBaseEPGMStore store = getStore();
 
     // used for type hinting when loading graph data
-    TypeInformation<Tuple1<GraphHead>> graphTypeInfo = new TupleTypeInfo(
-      Tuple1.class,
+    TypeInformation<Tuple1<GraphHead>> graphTypeInfo = new TupleTypeInfo<>(
       TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType()));
 
     // used for type hinting when loading vertex data
-    TypeInformation<Tuple1<Vertex>> vertexTypeInfo = new TupleTypeInfo(
-      Tuple1.class,
+    TypeInformation<Tuple1<Vertex>> vertexTypeInfo = new TupleTypeInfo<>(
       TypeExtractor.createTypeInfo(config.getVertexFactory().getType()));
 
     // used for type hinting when loading edge data
-    TypeInformation<Tuple1<Edge>> edgeTypeInfo = new TupleTypeInfo(
-      Tuple1.class,
+    TypeInformation<Tuple1<Edge>> edgeTypeInfo = new TupleTypeInfo<>(
       TypeExtractor.createTypeInfo(config.getEdgeFactory().getType()));
 
 
     DataSet<Tuple1<GraphHead>> graphHeads = config.getExecutionEnvironment()
-      .createInput(
-        new GraphHeadTableInputFormat(
-          config.getGraphHeadHandler(), store.getGraphHeadName()),
-        graphTypeInfo);
+      .createInput(new GraphHeadTableInputFormat<>(config.getGraphHeadHandler(),
+        store.getGraphHeadName()), graphTypeInfo);
 
     DataSet<Tuple1<Vertex>> vertices = config.getExecutionEnvironment()
-      .createInput(new VertexTableInputFormat(
-          config.getVertexHandler(), store.getVertexTableName()),
-        vertexTypeInfo);
+      .createInput(new VertexTableInputFormat<>(config.getVertexHandler(),
+          store.getVertexTableName()), vertexTypeInfo);
 
     DataSet<Tuple1<Edge>> edges = config.getExecutionEnvironment().createInput(
-      new EdgeTableInputFormat(
-        config.getEdgeHandler(), store.getEdgeTableName()),
-      edgeTypeInfo);
+      new EdgeTableInputFormat<>(config.getEdgeHandler(),
+        store.getEdgeTableName()), edgeTypeInfo);
 
     return GraphCollection.fromDataSets(
       graphHeads.map(new ValueOf1<GraphHead>()),

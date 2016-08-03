@@ -79,8 +79,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
   }
 
   @Override
-  public void write(GraphCollection graphCollection) throws
-    IOException {
+  public void write(GraphCollection graphCollection) throws IOException {
 
     // transform graph data to persistent graph data and write it
     writeGraphHeads(graphCollection);
@@ -93,8 +92,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) throws
-    IOException {
+  public void write(GraphTransactions graphTransactions) throws IOException {
     write(GraphCollection.fromTransactions(graphTransactions));
   }
 
@@ -105,8 +103,8 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
    * @param collection Graph collection
    * @throws IOException
    */
-  private void writeGraphHeads(final GraphCollection collection) throws
-    IOException {
+  private void writeGraphHeads(final GraphCollection collection)
+      throws IOException {
 
     // build (graph-id, vertex-id) tuples from vertices
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdToVertexId =
@@ -152,8 +150,8 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
    * @param collection Graph collection
    * @throws IOException
    */
-  private void writeVertices(final GraphCollection collection) throws
-    IOException {
+  private void writeVertices(final GraphCollection collection)
+      throws IOException {
 
     // group edges by source vertex id (vertex-id, [out-edge])
     DataSet<Tuple2<GradoopId, Set<Edge>>> vertexToOutgoingEdges =
@@ -201,8 +199,8 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
    * @param collection Graph collection
    * @throws IOException
    */
-  private void writeEdges(final GraphCollection collection) throws
-    IOException {
+  private void writeEdges(final GraphCollection collection)
+      throws IOException {
 
     DataSet<PersistentEdge<Vertex>> persistentEdgeDataSet = collection
       .getVertices()
