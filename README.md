@@ -128,21 +128,18 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
     
 ## Gradoop modules
 
-### gradoop-core
+### gradoop-common
 
 The main contents of that module are the EPGM data model and a corresponding POJO 
 implementation which is used in Flink&trade;. The persistent representation of the EPGM
-is also contained in gradoop-core and together with its mapping to HBase&trade;.
+is also contained in gradoop-common and together with its mapping to HBase&trade;.
 
 ### gradoop-flink
 
 This module contains reference implementations of the EPGM operators. The 
 EPGM is mapped to Flink&trade; DataSets while the operators are implemented
-using DataSet transformations.
-
-### gradoop-algorithms
-
-Contains implementations of general graph algorithms (e.g. Label Propagation)
+using DataSet transformations. The module also contains implementations of 
+general graph algorithms (e.g. Label Propagation, Frequent Subgraph Mining)
 adapted to be used with the EPGM model.
 
 ### gradoop-examples
@@ -151,6 +148,8 @@ Contains example pipelines showing use cases for Gradoop.
 
 *   Graph grouping example (build structural aggregates of property graphs)
 *   Social network examples (composition of multiple operators to analyze social networks graphs)
+*   Input/Output examples (usage of DataSource and DataSink implementations)
+*   Benchmarks used for cluster evaluations
 
 ### gradoop-checkstyle
 

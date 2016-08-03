@@ -20,13 +20,10 @@ package org.gradoop.examples.grouping;
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.grouping.Grouping;
-import org.gradoop.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.model.impl.operators.grouping.functions.aggregation.CountAggregator;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 
 /**
  * A dedicated program for parametrized graph grouping.
@@ -103,8 +100,7 @@ public class GroupingRunner
     boolean useEdgeLabels = cmd.hasOption(OPTION_USE_EDGE_LABELS);
 
     // initialize EPGM database
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graphDatabase =
-      readLogicalGraph(inputPath, false);
+    LogicalGraph graphDatabase = readLogicalGraph(inputPath, false);
 
     // initialize grouping method
     Grouping grouping = getOperator(
@@ -130,7 +126,7 @@ public class GroupingRunner
    */
   private static Grouping getOperator(String vertexKey,
     String edgeKey, boolean useVertexLabels, boolean useEdgeLabels) {
-    return new Grouping.GroupingBuilder<>()
+    return new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
       .addVertexGroupingKey(vertexKey)
       .addEdgeGroupingKey(edgeKey)

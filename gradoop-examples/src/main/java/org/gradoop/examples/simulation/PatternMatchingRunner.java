@@ -22,15 +22,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.matching.PatternMatching;
-import org.gradoop.model.impl.operators.matching.common.query.DFSTraverser;
-import org.gradoop.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
-import org.gradoop.model.impl.operators.matching.simulation.dual.DualSimulation;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
+import org.gradoop.flink.model.impl.operators.matching.simulation.dual.DualSimulation;
 
 import java.util.concurrent.TimeUnit;
 
@@ -39,8 +36,8 @@ import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHi
 /**
  * Performs graph pattern matching on an arbitrary input graph.
  */
-public class PatternMatchingRunner extends AbstractRunner
-  implements ProgramDescription {
+public class PatternMatchingRunner extends AbstractRunner implements
+  ProgramDescription {
   /**
    * Refers to {@link DualSimulation} using bulk iteration
    */
@@ -122,11 +119,10 @@ public class PatternMatchingRunner extends AbstractRunner
     String algorithm    = cmd.getOptionValue(OPTION_ALGORITHM);
     boolean attachData  = cmd.hasOption(OPTION_ATTACH_DATA);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
-      readLogicalGraph(inputDir);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      execute(epgmDatabase, query, attachData, algorithm);
+    GraphCollection result = execute(
+      epgmDatabase, query, attachData, algorithm);
 
     writeGraphCollection(result, outputDir);
 
@@ -165,24 +161,24 @@ public class PatternMatchingRunner extends AbstractRunner
    * @param algorithm     algorithm to use for pattern matching
    * @return result match graph
    */
-  private static GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> execute(
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> databaseGraph,
+  private static GraphCollection execute(
+    LogicalGraph databaseGraph,
     String query, boolean attachData, String algorithm) {
 
-    PatternMatching<GraphHeadPojo, VertexPojo, EdgePojo> op;
+    PatternMatching op;
 
     switch (algorithm) {
     case ALGO_DUAL_BULK:
-      op = new DualSimulation<>(query, attachData, true);
+      op = new DualSimulation(query, attachData, true);
       break;
     case ALGO_DUAL_DELTA:
-      op = new DualSimulation<>(query, attachData, false);
+      op = new DualSimulation(query, attachData, false);
       break;
     case ALGO_ISO_EXP:
-      op = new ExplorativeSubgraphIsomorphism<>(query, attachData);
+      op = new ExplorativeSubgraphIsomorphism(query, attachData);
       break;
     case ALGO_ISO_EXP_BC_HASH_FIRST:
-      op = new ExplorativeSubgraphIsomorphism<>(query, attachData,
+      op = new ExplorativeSubgraphIsomorphism(query, attachData,
         new DFSTraverser(), BROADCAST_HASH_FIRST, BROADCAST_HASH_FIRST);
       break;
     default :

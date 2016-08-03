@@ -20,15 +20,12 @@ package org.gradoop.examples.io;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.io.impl.json.JSONDataSink;
-import org.gradoop.io.impl.json.JSONDataSource;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.combination.ReduceCombination;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.flink.io.impl.json.JSONDataSink;
+import org.gradoop.flink.io.impl.json.JSONDataSource;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Example program that reads a graph from an EPGM-specific JSON representation
@@ -66,7 +63,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  * }
  *
  * An example graph collection can be found under src/main/resources/data.json.
- * For further information, have a look at the {@link org.gradoop.io.impl.json}
+ * For further information, have a look at the {@link org.gradoop.flink.io.impl.json}
  * package.
  */
 public class JSONExample extends AbstractRunner implements ProgramDescription {
@@ -97,24 +94,22 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     // create default Gradoop config
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
-      GradoopFlinkConfig.createDefaultConfig(env);
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     // create DataSource
-    JSONDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new JSONDataSource<>(graphHeadFile, vertexFile, edgeFile, config);
+    JSONDataSource dataSource = new JSONDataSource(
+      graphHeadFile, vertexFile, edgeFile, config);
 
     // read graph collection from DataSource
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> graphCollection =
-      dataSource.getGraphCollection();
+    GraphCollection graphCollection = dataSource.getGraphCollection();
 
     // do some analytics
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> schema = graphCollection
-      .reduce(new ReduceCombination<GraphHeadPojo, VertexPojo, EdgePojo>())
+    LogicalGraph schema = graphCollection
+      .reduce(new ReduceCombination())
       .groupByVertexAndEdgeLabel();
 
     // write resulting graph to DataSink
-    schema.writeTo(new JSONDataSink<>(
+    schema.writeTo(new JSONDataSink(
       outputDir + "graphHeads.json",
       outputDir + "vertices.json",
       outputDir + "edges.json",

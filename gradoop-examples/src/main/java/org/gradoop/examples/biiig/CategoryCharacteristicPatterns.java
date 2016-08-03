@@ -26,21 +26,21 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.utils.ExampleOutput;
-import org.gradoop.model.api.functions.ApplyAggregateFunction;
-import org.gradoop.model.api.functions.TransformationFunction;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.operators.aggregation.ApplyAggregation;
-import org.gradoop.model.impl.operators.transformation.ApplyTransformation;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.properties.PropertyValue;
-import org.gradoop.util.FlinkAsciiGraphLoader;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
+import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
+import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
@@ -62,32 +62,27 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    */
   public static void main(String[] args) throws Exception {
 
-    ExampleOutput<GraphHeadPojo, VertexPojo, EdgePojo> out =
-      new ExampleOutput<>();
+    ExampleOutput out = new ExampleOutput();
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> iig =
-      getIntegratedInstanceGraph();
+    LogicalGraph iig = getIntegratedInstanceGraph();
 
     out.add("Integrated Instance Graph", iig);
 
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> btgs = iig
-      .callForCollection(
-        new BusinessTransactionGraphs<GraphHeadPojo, VertexPojo, EdgePojo>());
+    GraphCollection btgs = iig
+      .callForCollection(new BusinessTransactionGraphs());
 
-    btgs = btgs.apply(new ApplyAggregation<>(
-      "isClosed",
-      new IsClosedAggregateFunction
-      ()));
+    btgs = btgs
+      .apply(new ApplyAggregation("isClosed", new IsClosedAggregateFunction()));
 
     btgs = btgs.select(new IsClosedPredicateFunction());
 
-    btgs = btgs.apply(new ApplyAggregation<>(
-      "soCount",
-      new CountSalesOrdersAggregateFunction()));
+    btgs = btgs
+      .apply(new ApplyAggregation(
+        "soCount", new CountSalesOrdersAggregateFunction()));
 
     out.add("Business Transaction Graphs with Measures", btgs);
 
-    btgs = btgs.apply(new ApplyTransformation<>(
+    btgs = btgs.apply(new ApplyTransformation(
         new CategorizeGraphsTransformationFunction(),
         new RelabelVerticesTransformationFunction(),
         new EdgeLabelOnlyTransformationFunction())
@@ -102,21 +97,16 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * @return integrated instance graph
    * @throws IOException
    */
-  public static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-  getIntegratedInstanceGraph() throws IOException {
+  public static LogicalGraph getIntegratedInstanceGraph() throws IOException {
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> gradoopConf =
-      GradoopFlinkConfig.createDefaultConfig(env);
+    GradoopFlinkConfig gradoopConf = GradoopFlinkConfig.createConfig(env);
 
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(gradoopConf);
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader = new
-      FlinkAsciiGraphLoader<>(gradoopConf);
-
-    String gdl = IOUtils.toString(
-      CategoryCharacteristicPatterns.class
-        .getResourceAsStream("/data/gdl/itbda.gdl"));
+    String gdl = IOUtils.toString(CategoryCharacteristicPatterns.class
+      .getResourceAsStream("/data/gdl/itbda.gdl"));
 
     gdl = gdl
       .replaceAll("SOURCEID_KEY",
@@ -137,16 +127,16 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Aggregate function to determine "isClosed" measure
    */
   private static class IsClosedAggregateFunction
-    implements ApplyAggregateFunction<GraphHeadPojo, VertexPojo, EdgePojo> {
+    implements ApplyAggregateFunction {
 
     @Override
     public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collection) {
+      GraphCollection collection) {
 
       return collection.getVertices()
-        .flatMap(new FlatMapFunction<VertexPojo, Tuple2<GradoopId, Integer>>() {
+        .flatMap(new FlatMapFunction<Vertex, Tuple2<GradoopId, Integer>>() {
           @Override
-          public void flatMap(VertexPojo vertex,
+          public void flatMap(Vertex vertex,
             Collector<Tuple2<GradoopId, Integer>> collector) throws Exception {
 
             for (GradoopId graphId : vertex.getGraphIds()) {
@@ -189,10 +179,10 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Predicate function to filter graphs by "isClosed" == true
    */
   private static class IsClosedPredicateFunction
-    implements FilterFunction<GraphHeadPojo> {
+    implements FilterFunction<GraphHead> {
 
     @Override
-    public boolean filter(GraphHeadPojo graphHead) throws Exception {
+    public boolean filter(GraphHead graphHead) throws Exception {
       return graphHead.getPropertyValue("isClosed").getBoolean();
     }
   }
@@ -201,16 +191,16 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Aggregate function to count sales orders per graph.
    */
   private static class CountSalesOrdersAggregateFunction
-    implements ApplyAggregateFunction<GraphHeadPojo, VertexPojo, EdgePojo> {
+    implements ApplyAggregateFunction {
 
     @Override
     public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> collection) {
+      GraphCollection collection) {
 
       return collection.getVertices()
-        .flatMap(new FlatMapFunction<VertexPojo, Tuple2<GradoopId, Integer>>() {
+        .flatMap(new FlatMapFunction<Vertex, Tuple2<GradoopId, Integer>>() {
           @Override
-          public void flatMap(VertexPojo vertex,
+          public void flatMap(Vertex vertex,
             Collector<Tuple2<GradoopId, Integer>> collector) throws Exception {
 
             for (GradoopId graphId : vertex.getGraphIds()) {
@@ -250,10 +240,10 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Transformation function to categorize graphs.
    */
   private static class CategorizeGraphsTransformationFunction implements
-    TransformationFunction<GraphHeadPojo> {
+    TransformationFunction<GraphHead> {
     @Override
-    public GraphHeadPojo execute(GraphHeadPojo current,
-      GraphHeadPojo transformed) {
+    public GraphHead execute(GraphHead current,
+      GraphHead transformed) {
 
       String category =
         current.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
@@ -268,9 +258,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Transformation function to relabel vertices and to drop properties.
    */
   private static class RelabelVerticesTransformationFunction implements
-    TransformationFunction<VertexPojo> {
+    TransformationFunction<Vertex> {
     @Override
-    public VertexPojo execute(VertexPojo current, VertexPojo transformed) {
+    public Vertex execute(Vertex current, Vertex transformed) {
 
       transformed.setLabel(current.getPropertyValue(
         BusinessTransactionGraphs.SUPERTYPE_KEY).toString()
@@ -288,9 +278,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Transformation function to drop properties of edges.
    */
   private static class EdgeLabelOnlyTransformationFunction implements
-    TransformationFunction<EdgePojo> {
+    TransformationFunction<Edge> {
     @Override
-    public EdgePojo execute(EdgePojo current, EdgePojo transformed) {
+    public Edge execute(Edge current, Edge transformed) {
 
       transformed.setLabel(current.getLabel());
 
@@ -298,10 +288,8 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
   }
 
-
   @Override
   public String getDescription() {
     return  CategoryCharacteristicPatterns.class.getName();
   }
-
 }

@@ -22,12 +22,11 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.aggregation.functions.count.EdgeCount;
-import org.gradoop.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * The benchmark program executes the following workflow:
@@ -42,8 +41,8 @@ import org.gradoop.model.impl.pojo.VertexPojo;
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
  */
-public class SNABenchmark1
-  extends AbstractRunner implements ProgramDescription {
+public class SNABenchmark1 extends AbstractRunner implements
+  ProgramDescription {
 
   /**
    * Runs the example program.
@@ -68,11 +67,9 @@ public class SNABenchmark1
     String inputDir  = args[0];
     String outputDir = args[1];
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
-      readLogicalGraph(inputDir);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> result =
-      execute(epgmDatabase);
+    LogicalGraph result = execute(epgmDatabase);
 
     writeLogicalGraph(result, outputDir);
   }
@@ -83,29 +80,25 @@ public class SNABenchmark1
    * @param socialNetwork social network graph
    * @return summarized, aggregated graph
    */
-  private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-  execute(LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> socialNetwork) {
+  private static LogicalGraph
+  execute(LogicalGraph socialNetwork) {
     return socialNetwork
       .subgraph(
-        new FilterFunction<VertexPojo>() {
+        new FilterFunction<Vertex>() {
           @Override
-          public boolean filter(VertexPojo vertex) throws Exception {
+          public boolean filter(Vertex vertex) throws Exception {
             return vertex.getLabel().equals("person");
           }
         },
-        new FilterFunction<EdgePojo>() {
+        new FilterFunction<Edge>() {
           @Override
-          public boolean filter(EdgePojo edge) throws Exception {
+          public boolean filter(Edge edge) throws Exception {
             return edge.getLabel().equals("knows");
           }
         })
       .groupBy(Lists.newArrayList("gender", "city"))
-      .aggregate(
-        "vertexCount",
-        new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>())
-      .aggregate(
-        "edgeCount",
-        new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>());
+      .aggregate("vertexCount", new VertexCount())
+      .aggregate("edgeCount", new EdgeCount());
   }
 
   @Override

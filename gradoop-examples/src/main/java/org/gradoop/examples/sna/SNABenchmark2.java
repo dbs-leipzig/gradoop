@@ -23,20 +23,20 @@ import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.examples.utils.ExampleOutput;
-import org.gradoop.model.api.functions.TransformationFunction;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.algorithms.labelpropagation.GellyLabelPropagation;
-import org.gradoop.model.impl.operators.aggregation.ApplyAggregation;
-import org.gradoop.model.impl.operators.aggregation.functions.count.EdgeCount;
-import org.gradoop.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.model.impl.operators.combination.ReduceCombination;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.FlinkAsciiGraphLoader;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.algorithms.labelpropagation.GellyLabelPropagation;
+import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * The program executes the following workflow:
@@ -59,8 +59,8 @@ import org.gradoop.util.GradoopFlinkConfig;
  * The program can be either executed using external data (for benchmarking) or
  * demo data ({@link #main(String[])}).
  */
-public class SNABenchmark2
-  extends AbstractRunner implements ProgramDescription {
+public class SNABenchmark2 extends AbstractRunner implements
+  ProgramDescription {
 
   /**
    * Runs the benchmark program.
@@ -103,7 +103,7 @@ public class SNABenchmark2
       executeWithExternalData(args);
     } else {
       executeWithDemoData(GradoopFlinkConfig
-        .createDefaultConfig(ExecutionEnvironment.getExecutionEnvironment()));
+        .createConfig(ExecutionEnvironment.getExecutionEnvironment()));
     }
   }
 
@@ -121,8 +121,7 @@ public class SNABenchmark2
     String outputDir = args[1];
     int threshold    = Integer.parseInt(args[2]);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> epgmDatabase =
-      readLogicalGraph(inputDir);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
 
     writeLogicalGraph(execute(epgmDatabase, threshold), outputDir);
 
@@ -135,28 +134,22 @@ public class SNABenchmark2
    * @param gradoopConf gradoop config
    * @throws Exception
    */
-  private static void executeWithDemoData(
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> gradoopConf) throws
-    Exception {
-    ExampleOutput<GraphHeadPojo, VertexPojo, EdgePojo> out =
-      new ExampleOutput<>();
+  private static void executeWithDemoData(GradoopFlinkConfig gradoopConf)
+      throws Exception {
+    ExampleOutput out = new ExampleOutput();
 
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
-      new FlinkAsciiGraphLoader<>(gradoopConf);
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(gradoopConf);
 
-    String graphDefinition = IOUtils.toString(
-      SNABenchmark2.class
-        .getResourceAsStream("/data/gdl/sna.gdl"));
+    String graphDefinition = IOUtils.toString(SNABenchmark2.class
+      .getResourceAsStream("/data/gdl/sna.gdl"));
 
     loader.initDatabaseFromString(graphDefinition);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph =
-      loader.getLogicalGraphByVariable("db");
+    LogicalGraph inputGraph = loader.getLogicalGraphByVariable("db");
 
     out.add("Input Graph", inputGraph);
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> outputGraph =
-      execute(inputGraph, 2);
+    LogicalGraph outputGraph = execute(inputGraph, 2);
 
     out.add("Output Graph", outputGraph);
 
@@ -170,8 +163,8 @@ public class SNABenchmark2
    * @param threshold     used in community selection predicate
    * @return summarized, aggregated graph
    */
-  private static LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo>
-  execute(LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> socialNetwork,
+  private static LogicalGraph
+  execute(LogicalGraph socialNetwork,
     final int threshold) {
 
     final int maxIterations   = 4;
@@ -186,67 +179,61 @@ public class SNABenchmark2
 
     return socialNetwork
       // 1) extract subgraph
-      .subgraph(new FilterFunction<VertexPojo>() {
+      .subgraph(new FilterFunction<Vertex>() {
         @Override
-        public boolean filter(VertexPojo vertex) throws Exception {
+        public boolean filter(Vertex vertex) throws Exception {
           return vertex.getLabel().toLowerCase().equals(person);
         }
-      }, new FilterFunction<EdgePojo>() {
+      }, new FilterFunction<Edge>() {
         @Override
-        public boolean filter(EdgePojo edge) throws Exception {
+        public boolean filter(Edge edge) throws Exception {
           return edge.getLabel().toLowerCase().equals(knows);
         }
       })
       // project to necessary information
-      .transform(new TransformationFunction<GraphHeadPojo>() {
+      .transform(new TransformationFunction<GraphHead>() {
         @Override
-        public GraphHeadPojo execute(GraphHeadPojo current,
-          GraphHeadPojo transformed) {
+        public GraphHead execute(GraphHead current,
+          GraphHead transformed) {
           return current;
         }
-      }, new TransformationFunction<VertexPojo>() {
+      }, new TransformationFunction<Vertex>() {
         @Override
-        public VertexPojo execute(VertexPojo current, VertexPojo transformed) {
+        public Vertex execute(Vertex current, Vertex transformed) {
           transformed.setLabel(current.getLabel());
           transformed.setProperty(city, current.getPropertyValue(city));
           transformed.setProperty(gender, current.getPropertyValue(gender));
           transformed.setProperty(label, current.getPropertyValue(birthday));
           return transformed;
         }
-      }, new TransformationFunction<EdgePojo>() {
+      }, new TransformationFunction<Edge>() {
         @Override
-        public EdgePojo execute(EdgePojo current, EdgePojo transformed) {
+        public Edge execute(Edge current, Edge transformed) {
           transformed.setLabel(current.getLabel());
           return transformed;
         }
       })
       // 3a) compute communities
-      .callForGraph(
-        new GellyLabelPropagation<GraphHeadPojo, VertexPojo, EdgePojo>(
-          maxIterations, label))
+      .callForGraph(new GellyLabelPropagation(maxIterations, label))
       // 3b) separate communities
       .splitBy(label)
       // 4) compute vertex count per community
-      .apply(new ApplyAggregation<>(
-        vertexCount,
-        new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>()))
+      .apply(new ApplyAggregation(vertexCount, new VertexCount()))
       // 5) select graphs with more than minClusterSize vertices
-      .select(new FilterFunction<GraphHeadPojo>() {
+      .select(new FilterFunction<GraphHead>() {
         @Override
-        public boolean filter(GraphHeadPojo g) throws Exception {
+        public boolean filter(GraphHead g) throws Exception {
           return g.getPropertyValue(vertexCount).getLong() > threshold;
         }
       })
       // 6) reduce filtered graphs to a single graph using combination
-      .reduce(new ReduceCombination<GraphHeadPojo, VertexPojo, EdgePojo>())
+      .reduce(new ReduceCombination())
       // 7) group that graph by vertex properties
       .groupBy(Lists.newArrayList(city, gender))
       // 8a) count vertices of grouped graph
-      .aggregate(
-        vertexCount, new VertexCount<GraphHeadPojo, VertexPojo, EdgePojo>())
+      .aggregate(vertexCount, new VertexCount())
       // 8b) count edges of grouped graph
-      .aggregate(
-        edgeCount, new EdgeCount<GraphHeadPojo, VertexPojo, EdgePojo>());
+      .aggregate(edgeCount, new EdgeCount());
   }
 
   @Override

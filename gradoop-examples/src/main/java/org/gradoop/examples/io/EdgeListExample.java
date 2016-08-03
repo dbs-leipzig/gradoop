@@ -24,16 +24,13 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.DataSetUtils;
-import org.gradoop.io.api.DataSource;
-import org.gradoop.io.impl.graph.GraphDataSource;
-import org.gradoop.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.graph.GraphDataSource;
+import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Example program that reads a graph from an edge list file into Gradoop.
@@ -58,7 +55,7 @@ public class EdgeListExample implements ProgramDescription {
 
   /**
    * Reads the edge list from the given file and transforms it into an
-   * {@link org.gradoop.model.impl.LogicalGraph}.
+   * {@link LogicalGraph}.
    *
    * args[0]: path to ede list file (can be stored in local FS or HDFS)
    * args[1]: token separator (optional, default is single whitespace)
@@ -137,19 +134,17 @@ public class EdgeListExample implements ProgramDescription {
     //--------------------------------------------------------------------------
 
     // create default Gradoop config
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
-      GradoopFlinkConfig.createDefaultConfig(env);
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     // create datasource
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new GraphDataSource<>(importVertices, importEdges, config);
+    DataSource dataSource = new GraphDataSource<>(
+      importVertices, importEdges, config);
 
     // read logical graph
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> logicalGraph =
-      dataSource.getLogicalGraph();
+    LogicalGraph logicalGraph = dataSource.getLogicalGraph();
 
     // do some analytics (e.g. match two-node cycles)
-    GraphCollection<GraphHeadPojo, VertexPojo, EdgePojo> matches = logicalGraph
+    GraphCollection matches = logicalGraph
       .match("(a:Node)-[:link]->(b:Node)-[:link]->(a)");
 
     // print number of matching subgraphs
@@ -158,6 +153,6 @@ public class EdgeListExample implements ProgramDescription {
 
   @Override
   public String getDescription() {
-    return "Edge List Reader";
+    return "EPGMEdge List Reader";
   }
 }

@@ -55,7 +55,7 @@
         <!-- Gradoop -->
         <dependency>
             <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-core</artifactId>
+            <artifactId>gradoop-common</artifactId>
         </dependency>
 
         <!-- Flink -->
@@ -79,7 +79,7 @@
         <!-- Gradoop -->
         <dependency>
             <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-core</artifactId>
+            <artifactId>gradoop-common</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

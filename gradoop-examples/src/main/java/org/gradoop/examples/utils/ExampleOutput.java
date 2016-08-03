@@ -21,26 +21,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
-import org.gradoop.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 
 import java.util.ArrayList;
 
 /**
  * Allows to collect and print intermediate results of example programs.
- * @param <G> graph type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class ExampleOutput
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+public class ExampleOutput {
 
   /**
    * Flink dataset, collecting the output lines
@@ -52,7 +45,7 @@ public class ExampleOutput
    * @param caption output caption
    * @param graph graph
    */
-  public void add(String caption, LogicalGraph<G, V, E> graph) {
+  public void add(String caption, LogicalGraph graph) {
     add(caption, GraphCollection.fromGraph(graph));
   }
 
@@ -61,7 +54,7 @@ public class ExampleOutput
    * @param caption output caption
    * @param collection collection
    */
-  public void add(String caption, GraphCollection<G, V, E> collection) {
+  public void add(String caption, GraphCollection collection) {
 
     if (outSet == null) {
       outSet = collection
@@ -75,10 +68,10 @@ public class ExampleOutput
         .fromElements("\n*** " + caption + " ***\n");
 
     DataSet<String> graphStringSet =
-      new CanonicalAdjacencyMatrixBuilder<>(
-        new GraphHeadToDataString<G>(),
-        new VertexToDataString<V>(),
-        new EdgeToDataString<E>(), true).execute(collection);
+      new CanonicalAdjacencyMatrixBuilder(
+        new GraphHeadToDataString(),
+        new VertexToDataString(),
+        new EdgeToDataString(), true).execute(collection);
 
     outSet = outSet
       .cross(captionSet)
@@ -100,8 +93,8 @@ public class ExampleOutput
   /**
    * Flink function to append output data set.
    */
-  private class OutputAppender
-    implements CrossFunction<ArrayList<String>, String, ArrayList<String>> {
+  private static class OutputAppender implements
+    CrossFunction<ArrayList<String>, String, ArrayList<String>> {
 
     @Override
     public ArrayList<String> cross(ArrayList<String> out, String line) throws
@@ -114,9 +107,10 @@ public class ExampleOutput
   }
 
   /**
-   * Flink function to combine outpur lines.
+   * Flink function to combine output lines.
    */
-  private class LineCombiner implements MapFunction<ArrayList<String>, String> {
+  private static class LineCombiner implements
+    MapFunction<ArrayList<String>, String> {
 
     @Override
     public String map(ArrayList<String> lines) throws Exception {
