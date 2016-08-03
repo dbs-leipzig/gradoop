@@ -132,7 +132,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 The main contents of that module are the EPGM data model and a corresponding POJO 
 implementation which is used in Flink&trade;. The persistent representation of the EPGM
-is also contained in gradoop-core and together with its mapping to HBase&trade;.
+is also contained in gradoop-common and together with its mapping to HBase&trade;.
 
 ### gradoop-flink
 
