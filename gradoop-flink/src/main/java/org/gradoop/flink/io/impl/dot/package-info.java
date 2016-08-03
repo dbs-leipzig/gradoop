@@ -18,4 +18,4 @@
 /**
  * Contains all classes related to graph data sources and data sinks.
  */
-package org.gradoop.io.impl.dot.functions;
+package org.gradoop.flink.io.impl.dot;

@@ -20,7 +20,8 @@ package org.gradoop.examples.io;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.io.impl.dot.DotDataSink;
+import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
+import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.io.impl.json.JSONDataSource;
 import org.gradoop.model.impl.GraphCollection;
 import org.gradoop.model.impl.pojo.EdgePojo;
@@ -32,7 +33,7 @@ import org.gradoop.util.GradoopFlinkConfig;
  * Example program that reads a graph from an EPGM-specific JSON representation
  * into a {@link GraphCollection} and stores the resulting
  * {@link GraphCollection} as DOT. The resulting format is described in
- * {@link org.gradoop.io.impl.dot.functions.DotFileFormat}.
+ * {@link DOTFileFormat}.
  */
 public class DotExample extends AbstractRunner implements ProgramDescription {
 
@@ -73,8 +74,8 @@ public class DotExample extends AbstractRunner implements ProgramDescription {
       new JSONDataSource<>(graphHeadFile, vertexFile, edgeFile, config);
 
     // create DataSink
-    DotDataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
-      new DotDataSink<>(outputDir, Boolean.parseBoolean(graphHeadInformation));
+    DOTDataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
+      new DOTDataSink<>(outputDir, Boolean.parseBoolean(graphHeadInformation));
 
     // write dot format
     dataSink.write(dataSource.getGraphCollection());

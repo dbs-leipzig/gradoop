@@ -1,12 +1,9 @@
-package org.gradoop.io.impl.dot;
+package org.gradoop.flink.io.impl.dot;
 
-import org.gradoop.io.api.DataSink;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -15,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class DotIOTest extends GradoopFlinkTestBase {
+public class DOTIOTest extends GradoopFlinkTestBase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -24,15 +21,13 @@ public class DotIOTest extends GradoopFlinkTestBase {
   public void testLogicalGraphAsDot() throws Exception {
 
     String gdlFile =
-      DotIOTest.class.getResource("/data/dot/input.gdl").getFile();
+      DOTIOTest.class.getResource("/data/dot/input.gdl").getFile();
 
     // load from gdl
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo> loader =
-      getLoaderFromFile(gdlFile);
+    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
 
     // load input graph
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> inputGraph =
-      loader.getLogicalGraphByVariable("singleGraph");
+    LogicalGraph inputGraph = loader.getLogicalGraphByVariable("singleGraph");
 
     // create temp directory
     String tmpDir = temporaryFolder.getRoot().toString();
@@ -40,8 +35,7 @@ public class DotIOTest extends GradoopFlinkTestBase {
     final String dotFile = tmpDir + "/test.dot";
 
     // create datasink
-    DataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
-      new DotDataSink<>(dotFile, false);
+    DataSink dataSink = new DOTDataSink(dotFile, false);
 
     // write graph
     dataSink.write(inputGraph);

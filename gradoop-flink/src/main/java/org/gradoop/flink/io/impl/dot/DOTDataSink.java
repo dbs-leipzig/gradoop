@@ -15,30 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.dot;
+package org.gradoop.flink.io.impl.dot;
 
-import org.gradoop.io.api.DataSink;
-import org.gradoop.io.impl.dot.functions.DotFileFormat;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.GraphTransactions;
-import org.gradoop.model.impl.LogicalGraph;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.LogicalGraph;
 
 import java.io.IOException;
 
 /**
  * Writes an EPGM representation into one DOT file. The format
- * is documented at {@link DotFileFormat}.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * is documented at {@link DOTFileFormat}.
  */
-public class DotDataSink
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements DataSink<G, V, E> {
+public class DOTDataSink implements DataSink {
   /**
    * Destination path of the dot file
    */
@@ -54,27 +45,27 @@ public class DotDataSink
    * @param path              dot data file
    * @param graphInformation  flag to print graph head information
    */
-  public DotDataSink(String path, boolean graphInformation) {
+  public DOTDataSink(String path, boolean graphInformation) {
     this.path = path;
     this.graphInformation = graphInformation;
   }
 
 
   @Override
-  public void write(LogicalGraph<G, V, E> logicalGraph) throws IOException {
+  public void write(LogicalGraph logicalGraph) throws IOException {
     write(GraphCollection.fromGraph(logicalGraph).toTransactions());
   }
 
   @Override
-  public void write(GraphCollection<G, V, E> graphCollection) throws
+  public void write(GraphCollection graphCollection) throws
     IOException {
     write(graphCollection.toTransactions());
   }
 
   @Override
-  public void write(GraphTransactions<G, V, E> graphTransactions) throws
+  public void write(GraphTransactions graphTransactions) throws
     IOException {
     graphTransactions.getTransactions()
-      .writeAsFormattedText(path, new DotFileFormat<G, V, E>(graphInformation));
+      .writeAsFormattedText(path, new DOTFileFormat(graphInformation));
   }
 }

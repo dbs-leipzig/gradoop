@@ -16,16 +16,16 @@
  */
 
 
-package org.gradoop.io.impl.dot.functions;
+package org.gradoop.flink.io.impl.dot.functions;
 
 import org.apache.flink.api.java.io.TextOutputFormat;
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.properties.Property;
-import org.gradoop.model.impl.properties.PropertyList;
-import org.gradoop.model.impl.tuples.GraphTransaction;
-import org.gradoop.util.GConstants;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.util.GConstants;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 /**
  * Converts a GraphTransaction to the following .dot format:
@@ -41,14 +41,9 @@ import org.gradoop.util.GConstants;
  *   gradoopId3->gradoopId4;
  *   }
  * </p>
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class DotFileFormat
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements TextOutputFormat.TextFormatter<GraphTransaction<G, V, E>> {
+public class DOTFileFormat
+  implements TextOutputFormat.TextFormatter<GraphTransaction> {
   /**
    * Whitespace
    */
@@ -111,13 +106,12 @@ public class DotFileFormat
    *
    * @param graphInformation flag to print graph head information
    */
-  public DotFileFormat(Boolean graphInformation) {
+  public DOTFileFormat(Boolean graphInformation) {
     this.graphInformation = graphInformation;
   }
 
   @Override
-  public String format(GraphTransaction<G, V, E> transaction) {
-
+  public String format(GraphTransaction transaction) {
 
     StringBuilder builder = new StringBuilder();
 
@@ -144,7 +138,7 @@ public class DotFileFormat
     //--------------------------------------------------------------------------
 
     if (graphInformation) {
-      G graphHead = transaction.getGraphHead();
+      GraphHead graphHead = transaction.getGraphHead();
 
       // writes:
       // "graph"
@@ -170,7 +164,7 @@ public class DotFileFormat
     // vertexId [label="label", property1="value1", ...];
     //--------------------------------------------------------------------------
 
-    for (V vertex: transaction.getVertices()) {
+    for (Vertex vertex: transaction.getVertices()) {
 
       // remove "-" from GradoopId (reserved character in dot format)
       String vertexId = vertex.getId().toString().replace("-", "");
@@ -199,7 +193,7 @@ public class DotFileFormat
     // sourceId->targetId [label="label", property1="value1", ...];
     //--------------------------------------------------------------------------
 
-    for (E edge: transaction.getEdges()) {
+    for (Edge edge: transaction.getEdges()) {
 
       // remove "-" from GradoopId (reserved character in dot format)
       String sourceId = edge.getSourceId().toString().replace("-", "");
