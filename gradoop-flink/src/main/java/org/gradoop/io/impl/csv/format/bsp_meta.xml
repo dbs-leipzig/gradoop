@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<MetaData>
-    <csvFile>
-        <name>graph.csv</name>
-        <charset>utf8</charset>
-        <seperator>|</seperator>
-        <type>graph</type>
-        <label>Graph</label>
-        <containment>
-        </containment>
+<datasource>
+    <csvFile name="graph.csv" charset="utf8" seperator="|">
+        <graphelement type="graph">
+            <label>
+                <specified>Graph</specified>
+            </label>
+        </graphelement>
+
         <key>
             <id>
                 <field>0</field>
@@ -16,19 +15,19 @@
             <sys>AllSystems</sys>
         </key>
         <columns>
-            <column name="id" typ="Long"/>
-            <column name="nodeCount" typ="Int"/>
+            <column name="id" type="Long"/>
+            <column name="nodeCount" type="Int"/>
         </columns>
     </csvFile>
-    <csvFile>
-        <name>book.csv</name>
-        <charset>utf8</charset>
-        <seperator>|</seperator>
-        <type>vertex</type>
-        <label>
-            <field>1</field>
-            <field>2</field>
-        </label>
+    <csvFile name="book.csv" charset="utf8" seperator="|">
+
+        <graphelement type="vertex">
+            <label>
+                <field>1</field>
+                <field>2</field>
+            </label>
+        </graphelement>
+
         <containment>
             <graphid>1</graphid>
         </containment>
@@ -39,19 +38,19 @@
             <sys>MyBooks</sys>
         </key>
         <columns>
-            <column name="isbn" typ="String"/>
-            <column name="author" typ="String"/>
-            <column name="title" typ="String"/>
+            <column name="isbn" type="String"/>
+            <column name="author" type="String"/>
+            <column name="title" type="String"/>
         </columns>
     </csvFile>
-    <csvFile>
-        <name>author.csv</name>
-        <charset>utf8</charset>
-        <seperator>|</seperator>
-        <type>vertex</type>
-        <label>
-            <field>0</field>
-        </label>
+    <csvFile name="author.csv" charset="utf8" seperator="|">
+
+        <graphelement type="vertex">
+            <label>
+                <field>0</field>
+            </label>
+        </graphelement>
+
         <containment>
             <graphid>1</graphid>
             <graphid>2</graphid>
@@ -64,21 +63,23 @@
             <sys>AllAuthors</sys>
         </key>
         <columns>
-            <column name="name" typ="String"/>
-            <column name="age" typ="String"/>
-            <column name="phone" typ="String"/>
-            <column name="zip" typ="String"/>
+            <column name="name" type="String"/>
+            <column name="age" type="String"/>
+            <column name="phone" type="String"/>
+            <column name="zip" type="String"/>
         </columns>
     </csvFile>
-    <csvFile>
-        <name>writes.csv</name>
-        <charset>utf8</charset>
-        <seperator>|</seperator>
-        <type>edge</type>
-        <label>
-            <specified>writes</specified>
-        </label>
-        <containment graphid="1" />
+    <csvFile name="writes.csv" charset="utf8" seperator="|">
+        <graphelement type="edge">
+            <label>
+                <specified>writes</specified>
+            </label>
+            <edgeids sourceid="1" targetid="2"/>
+
+        </graphelement>
+        <containment>
+            <graphid>1</graphid>
+        </containment>
         <key>
             <id>
                 <field>1</field>
@@ -87,11 +88,11 @@
             <sys>AllAuthors</sys>
         </key>
         <columns>
-            <column name="date" typ="Date"/>
-            <column name="sourceId" typ="Long"/>
-            <column name="targetID" typ="Long"/>
-            <column name="teamWork" typ="Boolean"/>
+            <column name="date" type="Date"/>
+            <column name="sourceId" type="Long"/>
+            <column name="targetID" type="Long"/>
+            <column name="teamWork" type="Boolean"/>
         </columns>
     </csvFile>
-</MetaData>
+</datasource>
 
