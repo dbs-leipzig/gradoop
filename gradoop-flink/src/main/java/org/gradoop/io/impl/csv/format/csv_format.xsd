@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+    <!--  typse mit element umgeben und dann ref nutzen-->
+
+
     <xs:element name="datasource" type="datasourceType"/>
 
     <xs:complexType name="datasourceType">
@@ -12,27 +15,17 @@
 
     <xs:complexType name="csvFileType">
         <xs:sequence>
-            <xs:element name="graphelement" type="graphelementType"/>
-
+            <xs:element name="label" type="labelType"/>
             <xs:element name="containment" type="containmentType"
                         minOccurs="0" maxOccurs="1"/>
-
+            <xs:element name="edgeids" type="edgeidsType" minOccurs="0"
+                        maxOccurs="1"/>
             <xs:element name="key" type="keyType"/>
-
             <xs:element name="columns" type="columnsType"/>
-
         </xs:sequence>
         <xs:attribute name="name" type="xs:string"/>
         <xs:attribute name="charset" type="xs:string"/>
         <xs:attribute name="seperator" type="xs:string"/>
-    </xs:complexType>
-
-    <xs:complexType name="graphelementType">
-        <xs:sequence>
-            <xs:element name="label" type="labelType"/>
-            <xs:element name="edgeids" type="edgeidsType" minOccurs="0"
-                        maxOccurs="1"/>
-        </xs:sequence>
         <xs:attribute name="type" type="graphelementEnum"/>
     </xs:complexType>
 
@@ -90,8 +83,21 @@
     
     <xs:complexType name="columnType">
         <xs:attribute name="name" type="xs:string"/>
-        <xs:attribute name="type" type="xs:string"/>
+        <xs:attribute name="type" type="typesEnum"/>
     </xs:complexType>
 
+    <xs:simpleType name="typesEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Integer"/>
+            <xs:enumeration value="Long"/>
+            <xs:enumeration value="Float"/>
+            <xs:enumeration value="Double"/>
+            <xs:enumeration value="String"/>
+            <xs:enumeration value="Boolean"/>
+            <!-- Date as valid data type? Parsing may be complex due to
+            different formats.
+            <xs:enumeration value="Date"/> -->
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>
 

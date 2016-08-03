@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <datasource>
-    <csvFile name="graph.csv" charset="utf8" seperator="|">
-        <graphelement type="graph">
-            <label>
-                <specified>Graph</specified>
-            </label>
-        </graphelement>
 
+    <csvFile name="graph.csv" charset="utf8" seperator="|" type="graph">
+        <label>
+            <specified>Graph</specified>
+        </label>
         <key>
             <id>
                 <field>0</field>
@@ -16,18 +14,15 @@
         </key>
         <columns>
             <column name="id" type="Long"/>
-            <column name="nodeCount" type="Int"/>
+            <column name="nodeCount" type="Integer"/>
         </columns>
     </csvFile>
-    <csvFile name="book.csv" charset="utf8" seperator="|">
 
-        <graphelement type="vertex">
-            <label>
-                <field>1</field>
-                <field>2</field>
-            </label>
-        </graphelement>
-
+    <csvFile name="book.csv" charset="utf8" seperator="|" type="vertex">
+        <label>
+            <field>1</field>
+            <field>2</field>
+        </label>
         <containment>
             <graphid>1</graphid>
         </containment>
@@ -43,14 +38,11 @@
             <column name="title" type="String"/>
         </columns>
     </csvFile>
-    <csvFile name="author.csv" charset="utf8" seperator="|">
 
-        <graphelement type="vertex">
-            <label>
-                <field>0</field>
-            </label>
-        </graphelement>
-
+    <csvFile name="author.csv" charset="utf8" seperator="|" type="vertex">
+        <label>
+            <field>0</field>
+        </label>
         <containment>
             <graphid>1</graphid>
             <graphid>2</graphid>
@@ -69,17 +61,15 @@
             <column name="zip" type="String"/>
         </columns>
     </csvFile>
-    <csvFile name="writes.csv" charset="utf8" seperator="|">
-        <graphelement type="edge">
-            <label>
-                <specified>writes</specified>
-            </label>
-            <edgeids sourceid="1" targetid="2"/>
 
-        </graphelement>
+    <csvFile name="writes.csv" charset="utf8" seperator="|" type="edge">
+        <label>
+            <specified>writes</specified>
+        </label>
         <containment>
             <graphid>1</graphid>
         </containment>
+        <edgeids sourceid="1" targetid="2"/>
         <key>
             <id>
                 <field>1</field>
@@ -88,11 +78,12 @@
             <sys>AllAuthors</sys>
         </key>
         <columns>
-            <column name="date" type="Date"/>
+            <column name="date" type="String"/>
             <column name="sourceId" type="Long"/>
             <column name="targetID" type="Long"/>
             <column name="teamWork" type="Boolean"/>
         </columns>
     </csvFile>
+
 </datasource>
 
