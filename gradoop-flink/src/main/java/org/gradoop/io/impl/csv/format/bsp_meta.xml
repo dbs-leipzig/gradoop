@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<datasource>
+<datasource xmlns="http://www.gradoop.org/csvInput"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.gradoop.org/csvInput
+            csv_format.xsd">
 
     <csvfile name="graph.csv" charset="utf8" seperator="|"
              graphelementtype="graph">
