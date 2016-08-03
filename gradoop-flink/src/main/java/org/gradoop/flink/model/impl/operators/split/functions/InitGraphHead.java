@@ -59,7 +59,6 @@ public class InitGraphHead implements MapFunction<Tuple1<GradoopId>, GraphHead>,
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<GraphHead> getProducedType() {
-    return (TypeInformation<GraphHead>) TypeExtractor
-      .createTypeInfo(graphHeadFactory.getType());
+    return TypeExtractor.createTypeInfo(graphHeadFactory.getType());
   }
 }

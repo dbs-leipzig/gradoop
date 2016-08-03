@@ -86,7 +86,6 @@ public class BuildSuperVertex extends BuildBase implements
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Vertex> getProducedType() {
-    return (TypeInformation<Vertex>) TypeExtractor
-      .createTypeInfo(vertexFactory.getType());
+    return TypeExtractor.createTypeInfo(vertexFactory.getType());
   }
 }

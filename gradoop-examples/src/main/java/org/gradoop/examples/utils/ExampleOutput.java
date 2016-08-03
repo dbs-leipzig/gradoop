@@ -62,10 +62,9 @@ public class ExampleOutput {
         .fromElements(new ArrayList<String>());
     }
 
-    DataSet<String> captionSet =
-      collection
-        .getConfig().getExecutionEnvironment()
-        .fromElements("\n*** " + caption + " ***\n");
+    DataSet<String> captionSet = collection
+      .getConfig().getExecutionEnvironment()
+      .fromElements("\n*** " + caption + " ***\n");
 
     DataSet<String> graphStringSet =
       new CanonicalAdjacencyMatrixBuilder(
