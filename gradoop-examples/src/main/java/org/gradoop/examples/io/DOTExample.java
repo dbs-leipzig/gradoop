@@ -22,20 +22,16 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
-import org.gradoop.io.impl.json.JSONDataSource;
-import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.util.GradoopFlinkConfig;
+import org.gradoop.flink.io.impl.json.JSONDataSource;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Example program that reads a graph from an EPGM-specific JSON representation
- * into a {@link GraphCollection} and stores the resulting
- * {@link GraphCollection} as DOT. The resulting format is described in
- * {@link DOTFileFormat}.
+ * into a {@link org.gradoop.flink.model.impl.GraphCollection} and stores the
+ * resulting {@link org.gradoop.flink.model.impl.GraphCollection} as DOT.
+ * The resulting format is described in {@link DOTFileFormat}.
  */
-public class DotExample extends AbstractRunner implements ProgramDescription {
+public class DOTExample extends AbstractRunner implements ProgramDescription {
 
   /**
    * Reads an EPGM graph collection from a directory that contains the separate
@@ -66,16 +62,15 @@ public class DotExample extends AbstractRunner implements ProgramDescription {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     // create default Gradoop config
-    GradoopFlinkConfig<GraphHeadPojo, VertexPojo, EdgePojo> config =
-      GradoopFlinkConfig.createDefaultConfig(env);
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     // create DataSource
-    JSONDataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new JSONDataSource<>(graphHeadFile, vertexFile, edgeFile, config);
+    JSONDataSource dataSource =
+      new JSONDataSource(graphHeadFile, vertexFile, edgeFile, config);
 
     // create DataSink
-    DOTDataSink<GraphHeadPojo, VertexPojo, EdgePojo> dataSink =
-      new DOTDataSink<>(outputDir, Boolean.parseBoolean(graphHeadInformation));
+    DOTDataSink dataSink =
+      new DOTDataSink(outputDir, Boolean.parseBoolean(graphHeadInformation));
 
     // write dot format
     dataSink.write(dataSource.getGraphCollection());
@@ -86,6 +81,6 @@ public class DotExample extends AbstractRunner implements ProgramDescription {
 
   @Override
   public String getDescription() {
-    return DotExample.class.getName();
+    return DOTExample.class.getName();
   }
 }
