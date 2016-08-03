@@ -42,7 +42,7 @@ public class ToGellyEdgeWithNullValue implements
 
   @Override
   public org.apache.flink.graph.Edge<GradoopId, NullValue> map(Edge e)
-    throws Exception {
+      throws Exception {
     reuse.setSource(e.getSourceId());
     reuse.setTarget(e.getTargetId());
     return reuse;

@@ -137,11 +137,13 @@ public class FlinkAsciiGraphLoader {
    * @param variables graph variables used in GDL script
    * @return GraphCollection
    */
-  public GraphCollection getGraphCollectionByVariables(
-    String... variables) {
-    Collection<GraphHead> graphHeads = loader.getGraphHeadsByVariables(variables);
-    Collection<Vertex> vertices = loader.getVerticesByGraphVariables(variables);
-    Collection<Edge> edges = loader.getEdgesByGraphVariables(variables);
+  public GraphCollection getGraphCollectionByVariables(String... variables) {
+    Collection<GraphHead> graphHeads =
+      loader.getGraphHeadsByVariables(variables);
+    Collection<Vertex> vertices =
+      loader.getVerticesByGraphVariables(variables);
+    Collection<Edge> edges =
+      loader.getEdgesByGraphVariables(variables);
 
     return GraphCollection.fromCollections(graphHeads, vertices, edges, config);
   }

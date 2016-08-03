@@ -30,15 +30,14 @@ import java.util.Set;
  * (graphId, {vertex,..}) |><| (graphID, {edge,..})
  * => (graphId, {vertex,..}, {edge,..})
  */
-public class GraphVerticesEdges
-  implements JoinFunction<
+public class GraphVerticesEdges implements JoinFunction<
   Tuple2<GradoopId, Set<Vertex>>, Tuple2<GradoopId, Set<Edge>>,
   Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> {
 
   @Override
   public Tuple3<GradoopId, Set<Vertex>, Set<Edge>> join(
     Tuple2<GradoopId, Set<Vertex>> vertices, Tuple2<GradoopId, Set<Edge>> edges)
-    throws Exception {
+      throws Exception {
     return new Tuple3<>(vertices.f0, vertices.f1, edges.f1);
   }
 }

@@ -31,8 +31,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f4: vertex group aggregate values
  * f5: super vertex tuple true/false
  */
-public class VertexGroupItem
-  extends Tuple6<GradoopId, GradoopId, String,
+public class VertexGroupItem extends Tuple6<GradoopId, GradoopId, String,
   PropertyValueList, PropertyValueList, Boolean> {
 
   public GradoopId getVertexId() {

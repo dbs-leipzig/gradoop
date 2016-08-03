@@ -31,10 +31,11 @@ import java.util.Set;
 /**
  * graphTransaction <=> (graphHead, {vertex,..}, {edge, ..})
  */
-public class GraphTransactionTriple
-  implements MapFunction<GraphTransaction, Tuple3<GraphHead, Set<Vertex>, Set<Edge>>>,
-  JoinFunction<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>, GraphHead, GraphTransaction>
-{
+public class GraphTransactionTriple implements
+  MapFunction<GraphTransaction, Tuple3<GraphHead, Set<Vertex>, Set<Edge>>>,
+  JoinFunction
+    <Tuple3<GradoopId, Set<Vertex>, Set<Edge>>, GraphHead, GraphTransaction> {
+
   @Override
   public Tuple3<GraphHead, Set<Vertex>, Set<Edge>> map(
     GraphTransaction transaction) throws Exception {

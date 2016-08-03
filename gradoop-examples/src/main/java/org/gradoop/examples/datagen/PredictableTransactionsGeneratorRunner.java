@@ -29,8 +29,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 /**
  * Class to run the PredictableTransactionGenerator with console parameters
  */
-public class PredictableTransactionsGeneratorRunner
-  extends AbstractRunner
+public class PredictableTransactionsGeneratorRunner extends AbstractRunner
   implements ProgramDescription {
   /**
    * Option to declare path to output graph

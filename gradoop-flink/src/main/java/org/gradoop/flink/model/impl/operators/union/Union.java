@@ -34,7 +34,8 @@ public class Union extends SetOperatorBase {
    * {@inheritDoc}
    */
   @Override
-  protected DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newGraphHeads) {
+  protected DataSet<Vertex> computeNewVertices(
+    DataSet<GraphHead> newGraphHeads) {
     return firstCollection.getVertices()
       .union(secondCollection.getVertices())
       .distinct(new Id<Vertex>());

@@ -32,8 +32,8 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 /**
  * A program to duplicate TLF data sets.
  */
-public class TLFDataDuplicator extends AbstractRunner 
-  implements ProgramDescription {
+public class TLFDataDuplicator extends AbstractRunner implements
+  ProgramDescription {
 
   /**
    * Option to declare path to input graph
@@ -84,8 +84,7 @@ public class TLFDataDuplicator extends AbstractRunner
       .getTransactions()
       .flatMap(new Duplicate<GraphTransaction>(multiplicand))
       .returns(GraphTransaction.getTypeInformation(config)),
-      config
-      );
+      config);
 
     dataSink.write(output);
 

@@ -99,7 +99,7 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
    * @param config              gradoop config
    */
   public GraphDataSource(DataSet<ImportVertex<K>> importVertices,
-    DataSet<ImportEdge<K>> importEdges, String lineagePropertyKey, 
+    DataSet<ImportEdge<K>> importEdges, String lineagePropertyKey,
     GradoopFlinkConfig config) {
     this.importVertices     = checkNotNull(importVertices);
     this.importEdges        = checkNotNull(importEdges);
@@ -128,7 +128,7 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
     DataSet<Tuple2<K, GradoopId>> vertexIdPair = vertexTriples
       .map(new Project3To0And1<K, GradoopId, Vertex>());
 
-    DataSet<Edge> Edges = importEdges
+    DataSet<Edge> epgmEdges = importEdges
       .join(vertexIdPair)
       .where(1).equalTo(0)
       .with(new InitEdge<>(
@@ -137,7 +137,7 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
       .where(0).equalTo(0)
       .with(new UpdateEdge<Edge, K>());
 
-    return LogicalGraph.fromDataSets(epgmVertices, Edges, config);
+    return LogicalGraph.fromDataSets(epgmVertices, epgmEdges, config);
   }
 
   @Override

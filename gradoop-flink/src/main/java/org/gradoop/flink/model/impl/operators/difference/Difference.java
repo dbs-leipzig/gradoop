@@ -42,10 +42,12 @@ public class Difference extends SetOperatorBase {
   @Override
   protected DataSet<GraphHead> computeNewGraphHeads() {
     // assign 1L to each logical graph in the first collection
-    DataSet<Tuple2<GraphHead, Long>> thisGraphs = firstCollection.getGraphHeads()
+    DataSet<Tuple2<GraphHead, Long>> thisGraphs = firstCollection
+      .getGraphHeads()
       .map(new CreateTuple2WithLong<GraphHead>(1L));
     // assign 2L to each logical graph in the second collection
-    DataSet<Tuple2<GraphHead, Long>> otherGraphs = secondCollection.getGraphHeads()
+    DataSet<Tuple2<GraphHead, Long>> otherGraphs = secondCollection
+      .getGraphHeads()
       .map(new CreateTuple2WithLong<GraphHead>(2L));
 
     // union the logical graphs, group them by their identifier and check that

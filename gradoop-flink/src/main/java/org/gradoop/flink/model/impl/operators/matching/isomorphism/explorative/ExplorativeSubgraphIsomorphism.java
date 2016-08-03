@@ -25,68 +25,59 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
+import org.gradoop.flink.model.impl.functions.utils.Superstep;
 import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
-import org.gradoop.flink.model.impl.operators.matching.common.functions
-  .AddGraphElementToNewGraph;
+import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.AddGraphElementToNewGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementHasCandidate;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.debug.PrintEmbeddingWithWeldPoint;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.functions.BuildEdgeStep;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.BuildVertexStep;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.EdgeHasCandidate;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.functions.UpdateEdgeMappings;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.UpdateVertexMappings;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.VertexHasCandidate;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.tuples.EdgeStep;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.tuples.VertexStep;
-import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
-import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
-import org.gradoop.flink.model.impl.functions.utils.Superstep;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
-import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
-
-import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
-import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.debug.PrintEdgeStep;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.debug.PrintEmbeddingWithWeldPoint;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.debug.PrintVertexStep;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.BuildEdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.BuildEmbeddingWithTiePoint;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.BuildVertexStep;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.EdgeHasCandidate;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.UpdateEdgeMappings;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.UpdateVertexMappings;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.VertexHasCandidate;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
-
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
-import static org.gradoop.flink.model.impl.operators.matching.common.PostProcessor.extractGraphCollection;
 
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a
  * given traversal code which is derived from the query pattern.
  */
-public class ExplorativeSubgraphIsomorphism extends PatternMatching
-  implements UnaryGraphToCollectionOperator {
+public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
+  UnaryGraphToCollectionOperator {
   /**
    * Name for broadcast set which contains the superstep id.
    */
@@ -220,7 +211,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
     // Post-Processing (build Graph Collection from embeddings)
     //--------------------------------------------------------------------------
 
-    DataSet<Element> Elements = result
+    DataSet<Element> elements = result
       .<Tuple1<Embedding>>project(0)
       .flatMap(new ElementsFromEmbedding(traversalCode,
         graph.getConfig().getGraphHeadFactory(),
@@ -228,8 +219,8 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
         graph.getConfig().getEdgeFactory()));
 
     return doAttachData() ?
-      PostProcessor.extractGraphCollectionWithData(Elements, graph, true) :
-      PostProcessor.extractGraphCollection(Elements, graph.getConfig(), true);
+      PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
+      PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
   }
 
   /**

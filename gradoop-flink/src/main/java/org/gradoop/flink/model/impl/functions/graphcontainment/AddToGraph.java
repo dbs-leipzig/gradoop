@@ -25,10 +25,12 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Adds the given graph head identifier to the graph element.
+ *
+ * @param <GE> EPGM graph element
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class AddToGraph<GE extends GraphElement>
-  implements MapFunction<GE, GE> {
+public class AddToGraph<GE extends GraphElement> implements
+  MapFunction<GE, GE> {
 
   /**
    * Graph head identifier which gets added to the graph element.

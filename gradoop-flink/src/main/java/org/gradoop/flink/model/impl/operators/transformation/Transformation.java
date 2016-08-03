@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.transformation;
 
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -30,7 +29,6 @@ import org.gradoop.flink.model.impl.operators.transformation.functions.Transform
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphHead;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-
 
 /**
  * The modification operators is a unary graph operator that takes a logical
@@ -103,23 +101,20 @@ public class Transformation implements UnaryGraphToGraphOperator {
     DataSet<GraphHead> transformedGraphHeads = graphHeadTransFunc != null ?
       graphHeads.map(new TransformGraphHead(
         graphHeadTransFunc, config.getGraphHeadFactory()))
-      .returns((TypeInformation<GraphHead>) TypeExtractor
-        .createTypeInfo(config.getGraphHeadFactory().getType())):
-      graphHeads;
+        .returns(TypeExtractor.createTypeInfo(
+          config.getGraphHeadFactory().getType())) : graphHeads;
 
     DataSet<Vertex> transformedVertices = vertexTransFunc != null ?
       vertices.map(new TransformVertex(
         vertexTransFunc, config.getVertexFactory()))
-      .returns((TypeInformation<Vertex>) TypeExtractor
-        .createTypeInfo(config.getVertexFactory().getType())):
-      vertices;
+        .returns(TypeExtractor.createTypeInfo(
+          config.getVertexFactory().getType())) : vertices;
 
     DataSet<Edge> transformedEdges = edgeTransFunc != null ?
       edges.map(new TransformEdge(
         edgeTransFunc, config.getEdgeFactory()))
-      .returns((TypeInformation<Edge>) TypeExtractor
-        .createTypeInfo(config.getEdgeFactory().getType())):
-      edges;
+        .returns(TypeExtractor.createTypeInfo(
+          config.getEdgeFactory().getType())) : edges;
 
     return LogicalGraph.fromDataSets(
       transformedGraphHeads,

@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * Extracts {@link Element} instances from an {@link Embedding}.
  */
-public class ElementsFromEmbedding implements 
+public class ElementsFromEmbedding implements
   FlatMapFunction<Tuple1<Embedding>, Element> {
 
   /**

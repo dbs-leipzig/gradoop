@@ -25,12 +25,12 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 /**
  * represents a vertex by a data string (label and properties)
  */
-public class VertexToDataString extends ElementToDataString<Vertex>
-  implements VertexToString<Vertex> {
+public class VertexToDataString extends ElementToDataString<Vertex> implements
+  VertexToString<Vertex> {
 
   @Override
   public void flatMap(Vertex vertex, Collector<VertexString> collector)
-    throws Exception {
+      throws Exception {
 
     GradoopId vertexId = vertex.getId();
     String vertexLabel = "(" + label(vertex) + ")";

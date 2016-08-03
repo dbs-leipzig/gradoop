@@ -45,8 +45,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Computes the overlap graph from a collection of logical graphs.
  */
-public class ReduceOverlap extends OverlapBase 
-  implements ReducibleBinaryGraphToGraphOperator {
+public class ReduceOverlap extends OverlapBase implements
+  ReducibleBinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge sets

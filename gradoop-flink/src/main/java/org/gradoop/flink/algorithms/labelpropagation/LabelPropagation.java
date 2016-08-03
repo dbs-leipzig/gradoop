@@ -102,7 +102,7 @@ public abstract class LabelPropagation implements UnaryGraphToGraphOperator {
    * @param gellyGraph gelly graph with initialized vertices
    * @return updated vertex set
    */
-  protected abstract 
+  protected abstract
   DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>>
   executeInternal(Graph<GradoopId, PropertyValue, NullValue> gellyGraph);
 

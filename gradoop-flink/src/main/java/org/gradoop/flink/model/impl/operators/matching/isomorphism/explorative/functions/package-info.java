@@ -18,5 +18,4 @@
 /**
  * Contains Flink functions that are used by {@link org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism}.
  */
-package org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.functions;
+package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions;

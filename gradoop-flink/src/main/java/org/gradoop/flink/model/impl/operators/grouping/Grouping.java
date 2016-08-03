@@ -280,7 +280,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
     DataSet<EdgeGroupItem> edges = graph.getEdges()
       // build edge group items
-      .map(new BuildEdgeGroupItem<>(
+      .map(new BuildEdgeGroupItem(
         getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators()))
       // join edges with vertex-group-map on source-id == vertex-id
       .join(vertexToRepresentativeMap)

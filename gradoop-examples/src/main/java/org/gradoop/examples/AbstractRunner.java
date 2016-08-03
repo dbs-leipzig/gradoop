@@ -110,7 +110,7 @@ public abstract class AbstractRunner {
    * @throws Exception
    */
   protected static void writeLogicalGraph(LogicalGraph graph, String directory)
-    throws Exception {
+      throws Exception {
     directory = appendSeparator(directory);
     graph.writeTo(new JSONDataSink(
       directory + GRAPHS_JSON,

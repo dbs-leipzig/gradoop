@@ -58,7 +58,8 @@ public class Selection implements UnaryCollectionToCollectionOperator {
   @Override
   public GraphCollection execute(GraphCollection collection) {
     // find graph heads matching the predicate
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads().filter(predicate);
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
+      .filter(predicate);
 
     // get the identifiers of these logical graphs
     DataSet<GradoopId> graphIDs = graphHeads.map(new Id<GraphHead>());

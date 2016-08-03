@@ -20,15 +20,16 @@ package org.gradoop.flink.io.impl.hbase;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.common.storage.impl.hbase.GradoopHBaseConfig;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Base class for HBase data source and sink.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 abstract class HBaseBase
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {

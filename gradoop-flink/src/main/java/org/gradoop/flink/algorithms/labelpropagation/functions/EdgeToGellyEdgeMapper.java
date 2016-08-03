@@ -45,7 +45,7 @@ public class EdgeToGellyEdgeMapper implements
 
   @Override
   public org.apache.flink.graph.Edge<GradoopId, NullValue> map(Edge epgmEdge)
-    throws Exception {
+      throws Exception {
     reuseEdge.setSource(epgmEdge.getSourceId());
     reuseEdge.setTarget(epgmEdge.getTargetId());
     return reuseEdge;

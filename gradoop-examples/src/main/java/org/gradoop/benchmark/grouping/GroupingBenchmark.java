@@ -41,8 +41,8 @@ import java.util.regex.Pattern;
 /**
  * A dedicated program for parametrized graph grouping benchmark.
  */
-public class GroupingBenchmark extends AbstractRunner 
-  implements ProgramDescription {
+public class GroupingBenchmark extends AbstractRunner implements
+  ProgramDescription {
 
   /**
    * Option to declare path to input graph
@@ -278,7 +278,7 @@ public class GroupingBenchmark extends AbstractRunner
         "(max, min, count, none (or list of these)");
     }
     if (!cmd.hasOption(OPTION_EDGE_AGGREGATION_FUNCS)) {
-      throw new IllegalArgumentException("EPGMEdge aggregator need to be set! " +
+      throw new IllegalArgumentException("Edge aggregator need to be set! " +
         "(max, min, count, none (or list of these)");
     }
 

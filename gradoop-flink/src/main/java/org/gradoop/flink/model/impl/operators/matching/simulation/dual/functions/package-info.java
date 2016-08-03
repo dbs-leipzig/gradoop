@@ -18,5 +18,4 @@
 /**
  * Flink functions that are used during dual simulation.
  */
-package org.gradoop.flink.model.impl.operators.matching.simulation.dual
-  .functions;
+package org.gradoop.flink.model.impl.operators.matching.simulation.dual.functions;

@@ -21,14 +21,15 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.api.PersistentEdge;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 
 /**
  * Creates persistent edge data objects from edge data and source/target
- * vertex data
+ * vertex data.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class BuildPersistentEdge<V extends EPGMVertex, E extends EPGMEdge>
   implements JoinFunction<Tuple2<V, E>, V, PersistentEdge<V>> {
@@ -51,9 +52,8 @@ public class BuildPersistentEdge<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public PersistentEdge<V> join(
-    Tuple2<V, E> sourceVertexAndEdge, V targetVertex)
-    throws Exception {
+  public PersistentEdge<V> join(Tuple2<V, E> sourceVertexAndEdge,
+    V targetVertex) throws Exception {
     return edgeFactory.createEdge(sourceVertexAndEdge.f1,
       sourceVertexAndEdge.f0, targetVertex);
   }

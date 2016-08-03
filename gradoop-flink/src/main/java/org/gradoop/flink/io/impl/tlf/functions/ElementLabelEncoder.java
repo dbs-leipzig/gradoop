@@ -31,8 +31,8 @@ import java.util.Map;
  * Map function which sets the simple label from either the vertex labels or
  * the edge labels or both.
  */
-public class ElementLabelEncoder
-  extends RichMapFunction<GraphTransaction, GraphTransaction> {
+public class ElementLabelEncoder extends
+  RichMapFunction<GraphTransaction, GraphTransaction> {
 
   /**
    * True if the vertices of the transaction as labels set by a dictionary.
@@ -95,7 +95,7 @@ public class ElementLabelEncoder
    */
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction)
-    throws Exception {
+      throws Exception {
     if (vertexDictionary != null) {
       for (Vertex vertex : graphTransaction.getVertices()) {
         vertex.setLabel(vertexDictionary.get(vertex.getLabel()).toString());

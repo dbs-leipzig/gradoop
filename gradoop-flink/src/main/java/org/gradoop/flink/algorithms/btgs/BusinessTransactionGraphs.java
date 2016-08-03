@@ -52,8 +52,8 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  * Part of the BIIIG approach.
  * EPGMVertex-centric implementation to isolate business transaction graphs.
  */
-public class BusinessTransactionGraphs
-  implements UnaryGraphToCollectionOperator {
+public class BusinessTransactionGraphs implements
+  UnaryGraphToCollectionOperator {
 
   /**
    * reserved property key referring to master or transactional data

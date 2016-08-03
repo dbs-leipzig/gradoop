@@ -45,23 +45,22 @@ import java.util.List;
 /**
  * Turns the gSpan result into a EPGM graph collection
  */
-public class GSpanGraphCollectionDecoder implements 
+public class GSpanGraphCollectionDecoder implements
   GSpanDecoder<GraphCollection> {
 
   /**
    * Gradoop configuration
    */
-  private final GradoopFlinkConfig gradoopConfig;
+  private final GradoopFlinkConfig config;
 
   /**
    * Constructor.
    *
-   * @param gradoopFlinkConfig Gradoop configuration
+   * @param config Gradoop configuration
    */
-  public GSpanGraphCollectionDecoder(
-    GradoopFlinkConfig gradoopFlinkConfig) {
+  public GSpanGraphCollectionDecoder(GradoopFlinkConfig config) {
 
-    this.gradoopConfig = gradoopFlinkConfig;
+    this.config = config;
   }
 
   @Override
@@ -74,7 +73,7 @@ public class GSpanGraphCollectionDecoder implements
     DataSet<Tuple3<GraphHead, ArrayList<Tuple2<GradoopId, Integer>>,
       ArrayList<Tuple3<GradoopId, GradoopId, Integer>>>> graphTriples =
       frequentSubgraphs
-        .map(new DFSDecoder<>(gradoopConfig.getGraphHeadFactory()));
+        .map(new DFSDecoder<>(config.getGraphHeadFactory()));
 
     DataSet<GraphHead> graphHeads = graphTriples
       .map(new Value0Of3<GraphHead, ArrayList<Tuple2<GradoopId, Integer>>,
@@ -84,17 +83,17 @@ public class GSpanGraphCollectionDecoder implements
       .flatMap(new ExpandVertices<GraphHead>())
       .map(new VertexLabelDecoder())
       .withBroadcastSet(vertexLabelDictionary, BroadcastNames.VERTEX_DICTIONARY)
-      .map(new FullVertex<>(gradoopConfig.getVertexFactory()))
-      .returns(gradoopConfig.getVertexFactory().getType());
+      .map(new FullVertex<>(config.getVertexFactory()))
+      .returns(config.getVertexFactory().getType());
 
     DataSet<Edge> edges = graphTriples
       .flatMap(new ExpandEdges<GraphHead>())
       .map(new EdgeLabelDecoder())
       .withBroadcastSet(edgeLabelDictionary, BroadcastNames.EDGE_DICTIONARY)
-      .map(new FullEdge<>(gradoopConfig.getEdgeFactory()))
-      .returns(gradoopConfig.getEdgeFactory().getType());
+      .map(new FullEdge<>(config.getEdgeFactory()))
+      .returns(config.getEdgeFactory().getType());
 
     return GraphCollection
-      .fromDataSets(graphHeads, vertices, edges, gradoopConfig);
+      .fromDataSets(graphHeads, vertices, edges, config);
   }
 }

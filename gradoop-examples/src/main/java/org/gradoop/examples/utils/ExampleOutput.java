@@ -93,8 +93,8 @@ public class ExampleOutput {
   /**
    * Flink function to append output data set.
    */
-  private class OutputAppender
-    implements CrossFunction<ArrayList<String>, String, ArrayList<String>> {
+  private static class OutputAppender implements
+    CrossFunction<ArrayList<String>, String, ArrayList<String>> {
 
     @Override
     public ArrayList<String> cross(ArrayList<String> out, String line) throws
@@ -107,9 +107,10 @@ public class ExampleOutput {
   }
 
   /**
-   * Flink function to combine outpur lines.
+   * Flink function to combine output lines.
    */
-  private class LineCombiner implements MapFunction<ArrayList<String>, String> {
+  private static class LineCombiner implements
+    MapFunction<ArrayList<String>, String> {
 
     @Override
     public String map(ArrayList<String> lines) throws Exception {

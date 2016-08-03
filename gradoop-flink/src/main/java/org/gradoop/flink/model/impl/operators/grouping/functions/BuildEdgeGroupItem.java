@@ -20,10 +20,9 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
 import org.gradoop.common.model.impl.properties.PropertyValueList;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
 import java.util.List;
 
@@ -31,13 +30,11 @@ import java.util.List;
  * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which
  * contains only necessary information for further processing.
  *
- * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1;")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildEdgeGroupItem<E extends Edge>
-  extends BuildBase
-  implements MapFunction<E, EdgeGroupItem> {
+public class BuildEdgeGroupItem extends BuildBase implements
+  MapFunction<Edge, EdgeGroupItem> {
 
   /**
    * Avoid object initialization in each call.
@@ -65,7 +62,7 @@ public class BuildEdgeGroupItem<E extends Edge>
    * {@inheritDoc}
    */
   @Override
-  public EdgeGroupItem map(E edge) throws Exception {
+  public EdgeGroupItem map(Edge edge) throws Exception {
     reuseEdgeGroupItem.setSourceId(edge.getSourceId());
     reuseEdgeGroupItem.setTargetId(edge.getTargetId());
     reuseEdgeGroupItem.setGroupLabel(getLabel(edge));

@@ -161,7 +161,7 @@ public class HBaseEPGMStore
   @Override
   public void writeVertex(final PersistentVertex<E> vertexData) {
     try {
-      VertexHandler vertexHandler = config.getVertexHandler();
+      VertexHandler<V, E> vertexHandler = config.getVertexHandler();
       // vertex id
       Put put = new Put(vertexHandler.getRowKey(vertexData.getId()));
       // write vertex data to Put
@@ -180,7 +180,7 @@ public class HBaseEPGMStore
   public void writeEdge(final PersistentEdge<V> edgeData) {
     // write to table
     try {
-      EdgeHandler edgeHandler = config.getEdgeHandler();
+      EdgeHandler<E, V> edgeHandler = config.getEdgeHandler();
       // edge id
       Put put = new Put(edgeHandler.getRowKey(edgeData.getId()));
       // write edge data to Put

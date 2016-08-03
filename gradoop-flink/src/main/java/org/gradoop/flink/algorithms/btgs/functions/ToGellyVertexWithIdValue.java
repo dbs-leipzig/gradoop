@@ -29,12 +29,15 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 public class ToGellyVertexWithIdValue implements
   MapFunction<Vertex, org.apache.flink.graph.Vertex<GradoopId, GradoopId>> {
 
+  /**
+   * Reduce object instantiations
+   */
   private final org.apache.flink.graph.Vertex<GradoopId, GradoopId> reuse =
     new org.apache.flink.graph.Vertex<>();
 
   @Override
   public org.apache.flink.graph.Vertex<GradoopId, GradoopId> map(Vertex vertex)
-    throws Exception {
+      throws Exception {
     GradoopId id = vertex.getId();
     reuse.setId(id);
     reuse.setValue(id);

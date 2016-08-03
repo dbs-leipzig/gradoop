@@ -48,8 +48,8 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
  * Operator deriving a string representation from a graph collection.
  * The representation follows the concept of a canonical adjacency matrix.
  */
-public class CanonicalAdjacencyMatrixBuilder 
-  implements UnaryGraphCollectionToValueOperator<String> {
+public class CanonicalAdjacencyMatrixBuilder implements
+  UnaryGraphCollectionToValueOperator<String> {
 
   /**
    * function describing string representation of graph heads

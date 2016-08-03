@@ -63,7 +63,7 @@ public class VertexLabelDecoder extends
    */
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction)
-    throws Exception {
+      throws Exception {
     String label;
     for (Vertex vertex : graphTransaction.getVertices()) {
       label = vertexDictionary.get(Integer.parseInt(vertex.getLabel()));

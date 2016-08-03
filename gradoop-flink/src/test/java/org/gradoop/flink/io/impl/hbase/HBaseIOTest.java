@@ -45,10 +45,10 @@ public class HBaseIOTest extends FlinkHBaseTestBase {
     for (PersistentGraphHead g : graphHeads) {
       epgmStore.writeGraphHead(g);
     }
-    for (PersistentVertex v : vertices) {
+    for (PersistentVertex<Edge> v : vertices) {
       epgmStore.writeVertex(v);
     }
-    for (PersistentEdge e : edges) {
+    for (PersistentEdge<Vertex> e : edges) {
       epgmStore.writeEdge(e);
     }
 

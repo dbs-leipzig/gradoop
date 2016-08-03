@@ -27,14 +27,16 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import java.util.ArrayList;
 
 /**
- * (EPGMGraphHead, [vertex(),..], [edge(),..]) => (graphId, vertexId, vertexLabel)
+ * (graphHead, [vertex(),..], [edge(),..]) => (graphId, vertexId, vertexLabel)
+ *
  * @param <G> graph type
  */
-public class ExpandVertices<G extends EPGMGraphHead>
-  implements FlatMapFunction<Tuple3<
-    G,
-    ArrayList<Tuple2<GradoopId, Integer>>,
-    ArrayList<Tuple3<GradoopId, GradoopId, Integer>>
+public class ExpandVertices<G extends EPGMGraphHead> implements
+  FlatMapFunction<
+    Tuple3<
+      G,
+      ArrayList<Tuple2<GradoopId, Integer>>,
+      ArrayList<Tuple3<GradoopId, GradoopId, Integer>>
     >, Tuple3<GradoopId, GradoopId, Integer>> {
 
   @Override

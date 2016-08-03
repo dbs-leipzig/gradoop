@@ -33,7 +33,7 @@ public class TransactionGraphHead implements
 
   @Override
   public GraphHead map(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> triple)
-    throws Exception {
+      throws Exception {
     return triple.f0;
   }
 }

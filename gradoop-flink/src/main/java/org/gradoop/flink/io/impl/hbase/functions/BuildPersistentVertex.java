@@ -31,6 +31,9 @@ import java.util.Set;
 /**
  * Used to create persistent vertex data from vertex data and
  * outgoing/incoming edge data.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class BuildPersistentVertex<V extends EPGMVertex, E extends EPGMEdge>
   implements CoGroupFunction

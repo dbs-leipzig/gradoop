@@ -42,8 +42,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @see Intersection
  * @see Union
  */
-public abstract class SetOperatorBase 
-  extends BinaryCollectionToCollectionOperatorBase {
+public abstract class SetOperatorBase extends
+  BinaryCollectionToCollectionOperatorBase {
 
   /**
    * Computes new vertices based on the new subgraphs. For each vertex, each
@@ -54,7 +54,8 @@ public abstract class SetOperatorBase
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newGraphHeads) {
+  protected DataSet<Vertex> computeNewVertices(
+    DataSet<GraphHead> newGraphHeads) {
 
     DataSet<Tuple2<Vertex, GradoopId>> verticesWithGraphs =
       firstCollection.getVertices().flatMap(new PairVertexWithGraphs<>());

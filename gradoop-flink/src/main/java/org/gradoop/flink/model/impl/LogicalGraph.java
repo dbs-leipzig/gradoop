@@ -237,7 +237,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   public DataSet<GraphHead> getGraphHead() {
-    return this.graphHeads;
+    return super.getGraphHeads();
   }
 
   //----------------------------------------------------------------------------
@@ -413,8 +413,8 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph groupByVertexLabel(
-    List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
+  public LogicalGraph groupByVertexLabel(List<String> vertexGroupingKeys,
+    List<String> edgeGroupingKeys) {
     GroupingBuilder builder = new GroupingBuilder();
 
     if (vertexGroupingKeys != null) {
@@ -550,8 +550,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(
-    UnaryGraphToGraphOperator operator) {
+  public LogicalGraph callForGraph(UnaryGraphToGraphOperator operator) {
     return operator.execute(this);
   }
 
@@ -559,8 +558,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(
-    BinaryGraphToGraphOperator operator,
+  public LogicalGraph callForGraph(BinaryGraphToGraphOperator operator,
     LogicalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }

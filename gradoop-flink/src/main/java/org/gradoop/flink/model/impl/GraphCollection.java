@@ -83,8 +83,8 @@ import static org.apache.flink.shaded.com.google.common.base.Preconditions
  * vertices and edges, the collections contains a single gelly graph
  * representing all subgraphs. Graph data is stored in an additional dataset.
  */
-public class GraphCollection extends GraphBase
-  implements GraphCollectionOperators {
+public class GraphCollection extends GraphBase implements
+  GraphCollectionOperators {
 
   /**
    * Creates a graph collection from the given arguments.
@@ -207,7 +207,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   public DataSet<GraphHead> getGraphHeads() {
-    return this.graphHeads;
+    return super.getGraphHeads();
   }
 
   /**
@@ -248,13 +248,11 @@ public class GraphCollection extends GraphBase
   @Override
   public GraphCollection getGraphs(final GradoopIdSet identifiers) {
 
-    DataSet<GraphHead> newGraphHeads =
-      this.graphHeads.filter(new FilterFunction<GraphHead>() {
-
+    DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
+      .filter(new FilterFunction<GraphHead>() {
         @Override
         public boolean filter(GraphHead graphHead) throws Exception {
           return identifiers.contains(graphHead.getId());
-
         }
       });
 
@@ -313,8 +311,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection union(
-    GraphCollection otherCollection) {
+  public GraphCollection union(GraphCollection otherCollection) {
     return callForCollection(new Union(), otherCollection);
   }
 
@@ -322,8 +319,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection intersect(
-    GraphCollection otherCollection) {
+  public GraphCollection intersect(GraphCollection otherCollection) {
     return callForCollection(new Intersection(), otherCollection);
   }
 
@@ -341,8 +337,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection difference(
-    GraphCollection otherCollection) {
+  public GraphCollection difference(GraphCollection otherCollection) {
     return callForCollection(new Difference(), otherCollection);
   }
 
@@ -368,8 +363,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Boolean> equalsByGraphElementIds(
-    GraphCollection other) {
+  public DataSet<Boolean> equalsByGraphElementIds(GraphCollection other) {
     return new CollectionEquality(
       new GraphHeadToEmptyString(),
       new VertexToIdString(),
@@ -380,8 +374,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public DataSet<Boolean> equalsByGraphElementData(
-    GraphCollection other) {
+  public DataSet<Boolean> equalsByGraphElementData(GraphCollection other) {
     return new CollectionEquality(
       new GraphHeadToEmptyString(),
       new VertexToDataString(),
@@ -426,8 +419,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(
-    UnaryCollectionToGraphOperator op) {
+  public LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
     return op.execute(this);
   }
 
@@ -435,8 +427,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection apply(
-    ApplicableUnaryGraphToGraphOperator op) {
+  public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
     return callForCollection(op);
   }
 
@@ -444,8 +435,7 @@ public class GraphCollection extends GraphBase
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph reduce(
-    ReducibleBinaryGraphToGraphOperator op) {
+  public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
     return callForGraph(op);
   }
 
@@ -491,8 +481,7 @@ public class GraphCollection extends GraphBase
    * @param edgeMergeReducer    edge merge function
    * @return graph collection
    */
-  public static
-  GraphCollection fromTransactions(
+  public static GraphCollection fromTransactions(
     GraphTransactions transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {

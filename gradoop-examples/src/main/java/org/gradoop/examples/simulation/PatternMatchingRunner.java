@@ -36,8 +36,8 @@ import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHi
 /**
  * Performs graph pattern matching on an arbitrary input graph.
  */
-public class PatternMatchingRunner extends AbstractRunner
-  implements ProgramDescription {
+public class PatternMatchingRunner extends AbstractRunner implements
+  ProgramDescription {
   /**
    * Refers to {@link DualSimulation} using bulk iteration
    */

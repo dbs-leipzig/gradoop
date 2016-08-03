@@ -23,7 +23,6 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.util.GConstants;
 

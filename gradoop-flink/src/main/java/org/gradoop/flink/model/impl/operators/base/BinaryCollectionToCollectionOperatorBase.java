@@ -67,7 +67,8 @@ public abstract class BinaryCollectionToCollectionOperatorBase
    * @param newGraphHeads new graph heads
    * @return vertex set of the resulting graph collection
    */
-  protected abstract DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newGraphHeads);
+  protected abstract DataSet<Vertex> computeNewVertices(
+    DataSet<GraphHead> newGraphHeads);
 
   /**
    * Overridden by inheriting classes.

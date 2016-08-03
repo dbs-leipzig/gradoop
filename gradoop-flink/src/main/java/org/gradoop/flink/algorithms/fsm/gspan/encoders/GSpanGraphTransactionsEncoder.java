@@ -40,13 +40,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * Transactional FSM pre processing: Determine vertex and edge label
  * frequencies, create frequency based dictionaries and finally translate und
  * filter vertices and edges
  */
-public class GSpanGraphTransactionsEncoder implements 
+public class GSpanGraphTransactionsEncoder implements
   GSpanEncoder<GraphTransactions> {
 
   /**

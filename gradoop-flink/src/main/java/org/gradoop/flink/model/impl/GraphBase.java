@@ -44,7 +44,7 @@ public abstract class GraphBase implements GraphBaseOperators {
   /**
    * Graph data associated with the logical graphs in that collection.
    */
-  protected final DataSet<GraphHead> graphHeads;
+  private final DataSet<GraphHead> graphHeads;
   /**
    * DataSet containing vertices associated with that graph.
    */
@@ -192,5 +192,14 @@ public abstract class GraphBase implements GraphBaseOperators {
           return edge.getTargetId().equals(vertexID);
         }
       });
+  }
+
+  /**
+   * Returns the graphHeads associated with that graph / graph collection.
+   *
+   * @return graph heads
+   */
+  protected DataSet<GraphHead> getGraphHeads() {
+    return this.graphHeads;
   }
 }

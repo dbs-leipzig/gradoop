@@ -41,8 +41,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  *    - add the total vertex count as new graph property
  *    - add the total edge count as new graph property
  */
-public class SNABenchmark1
-  extends AbstractRunner implements ProgramDescription {
+public class SNABenchmark1 extends AbstractRunner implements
+  ProgramDescription {
 
   /**
    * Runs the example program.

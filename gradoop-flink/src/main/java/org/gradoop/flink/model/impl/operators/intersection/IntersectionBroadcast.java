@@ -36,7 +36,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 public class IntersectionBroadcast extends Intersection {
 
   @Override
-  protected DataSet<Vertex> computeNewVertices(DataSet<GraphHead> newSubgraphs) {
+  protected DataSet<Vertex> computeNewVertices(
+    DataSet<GraphHead> newSubgraphs) {
 
     DataSet<GradoopId> ids = secondCollection.getGraphHeads()
       .map(new Id<GraphHead>());

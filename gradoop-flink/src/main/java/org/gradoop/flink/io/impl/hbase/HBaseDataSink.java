@@ -33,7 +33,16 @@ import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.hbase.functions.*;
+import org.gradoop.flink.io.impl.hbase.functions.BuildEdgeMutation;
+import org.gradoop.flink.io.impl.hbase.functions.BuildGraphHeadMutation;
+import org.gradoop.flink.io.impl.hbase.functions.BuildGraphTransactions;
+import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentEdge;
+import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentGraphHead;
+import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentVertex;
+import org.gradoop.flink.io.impl.hbase.functions.BuildVertexDataWithEdges;
+import org.gradoop.flink.io.impl.hbase.functions.BuildVertexMutation;
+import org.gradoop.flink.io.impl.hbase.functions.EdgeSetBySourceId;
+import org.gradoop.flink.io.impl.hbase.functions.EdgeSetByTargetId;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -180,8 +189,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
       TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getVertexTableName());
 
     persistentVertexDataSet
-      .map(new BuildVertexMutation<Vertex, Edge>(
-        getFlinkConfig().getVertexHandler()))
+      .map(new BuildVertexMutation<>(getFlinkConfig().getVertexHandler()))
       .output(
         new HadoopOutputFormat<>(new TableOutputFormat<GradoopId>(), job));
   }
@@ -216,8 +224,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
       .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getEdgeTableName());
 
     persistentEdgeDataSet
-      .map(new BuildEdgeMutation<Edge, Vertex>(
-        getFlinkConfig().getEdgeHandler()))
+      .map(new BuildEdgeMutation<>(getFlinkConfig().getEdgeHandler()))
       .output(new HadoopOutputFormat<>(
         new TableOutputFormat<GradoopId>(), job));
   }

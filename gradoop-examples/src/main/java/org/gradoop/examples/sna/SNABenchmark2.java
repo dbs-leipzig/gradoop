@@ -59,8 +59,8 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * The program can be either executed using external data (for benchmarking) or
  * demo data ({@link #main(String[])}).
  */
-public class SNABenchmark2
-  extends AbstractRunner implements ProgramDescription {
+public class SNABenchmark2 extends AbstractRunner implements
+  ProgramDescription {
 
   /**
    * Runs the benchmark program.
@@ -135,7 +135,7 @@ public class SNABenchmark2
    * @throws Exception
    */
   private static void executeWithDemoData(GradoopFlinkConfig gradoopConf)
-    throws Exception {
+      throws Exception {
     ExampleOutput out = new ExampleOutput();
 
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(gradoopConf);

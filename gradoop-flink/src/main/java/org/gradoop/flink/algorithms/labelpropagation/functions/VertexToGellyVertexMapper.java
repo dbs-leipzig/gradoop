@@ -40,7 +40,7 @@ public class VertexToGellyVertexMapper implements
    * Reduce object instantiations
    */
   private final org.apache.flink.graph.Vertex<GradoopId, PropertyValue>
-    reuseVertex;
+  reuseVertex;
 
   /**
    * Constructor

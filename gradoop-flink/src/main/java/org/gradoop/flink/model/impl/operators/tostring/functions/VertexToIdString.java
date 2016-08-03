@@ -30,7 +30,7 @@ public class VertexToIdString extends ElementToDataString<Vertex>
 
   @Override
   public void flatMap(Vertex vertex, Collector<VertexString> collector)
-    throws Exception {
+      throws Exception {
 
     GradoopId vertexId = vertex.getId();
     String vertexLabel = "(" + vertex.getId() + ")";

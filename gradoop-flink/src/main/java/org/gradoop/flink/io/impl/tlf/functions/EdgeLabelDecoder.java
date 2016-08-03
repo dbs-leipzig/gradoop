@@ -32,9 +32,8 @@ import java.util.Map;
  * the dictionary.
  *
  */
-public class EdgeLabelDecoder 
-  extends RichMapFunction<GraphTransaction, GraphTransaction>
-{
+public class EdgeLabelDecoder extends
+  RichMapFunction<GraphTransaction, GraphTransaction> {
   /**
    * Constant for broadcast set containing the edge dictionary.
    */
@@ -65,7 +64,7 @@ public class EdgeLabelDecoder
    */
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction)
-    throws Exception {
+      throws Exception {
     String label;
     for (Edge edge : graphTransaction.getEdges()) {
       label = edgeDictionary.get(Integer.parseInt(edge.getLabel()));

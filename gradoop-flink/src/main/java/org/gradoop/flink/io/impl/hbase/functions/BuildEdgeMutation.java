@@ -31,6 +31,9 @@ import org.gradoop.common.storage.api.PersistentEdge;
 /**
  * Creates HBase {@link Mutation} from persistent edge data using edge
  * data handler.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class BuildEdgeMutation<E extends EPGMEdge, V extends EPGMVertex>
   extends RichMapFunction<PersistentEdge<V>, Tuple2<GradoopId, Mutation>> {
@@ -64,7 +67,7 @@ public class BuildEdgeMutation<E extends EPGMEdge, V extends EPGMVertex>
    */
   @Override
   public Tuple2<GradoopId, Mutation> map(PersistentEdge<V> persistentEdgeData)
-    throws Exception {
+      throws Exception {
     GradoopId key = persistentEdgeData.getId();
     Put put = new Put(edgeHandler.getRowKey(persistentEdgeData.getId()));
     put = edgeHandler.writeEdge(put, persistentEdgeData);
