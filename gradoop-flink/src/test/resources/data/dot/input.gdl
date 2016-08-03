@@ -1,0 +1,6 @@
+singleGraph:Network{from="2006"}[
+(a:Person{name="Anna",age="20"})-[:knows{since="2012"}]->(b:Person{name="Tom",age="25"})
+(b)-[:knows{since="2012"}]->(a)
+(c:Forum{topic="Apache Flink",lan="EN"})-[:hasModerator{since="2002"}]->(b)
+(c)-[:hasMember{since="2008"}]->(a)
+]

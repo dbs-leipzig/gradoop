@@ -1,0 +1,10 @@
+digraph a4cf30a607ad4c468d045735bbd365cb
+{
+1bfa02ebbabe4532a32d2152e99ecf7e [label="Person",age="20",name="Anna"];
+b4162238946b4fae8cd7b2d8d570c2bd [label="Person",age="25",name="Tom"];
+b8f3e245e9e6420f94c2abcb1d6db6bc [label="Forum",topic="Apache Flink",lan="EN"];
+b4162238946b4fae8cd7b2d8d570c2bd->1bfa02ebbabe4532a32d2152e99ecf7e [label="knows",since="2012"];
+b8f3e245e9e6420f94c2abcb1d6db6bc->1bfa02ebbabe4532a32d2152e99ecf7e [label="hasMember",since="2008"];
+1bfa02ebbabe4532a32d2152e99ecf7e->b4162238946b4fae8cd7b2d8d570c2bd [label="knows",since="2012"];
+b8f3e245e9e6420f94c2abcb1d6db6bc->b4162238946b4fae8cd7b2d8d570c2bd [label="hasModerator",since="2002"];
+}
