@@ -27,7 +27,7 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.model.impl.algorithms.labelpropagation.GellyLabelPropagation;
+import org.gradoop.algorithms.labelpropagation.GellyLabelPropagation;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
