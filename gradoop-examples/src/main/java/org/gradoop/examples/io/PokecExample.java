@@ -24,15 +24,12 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.DataSetUtils;
+import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.flink.io.impl.graph.GraphDataSource;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Calendar;
@@ -108,8 +105,7 @@ public class PokecExample {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     // create default Gradoop config
-    final GradoopFlinkConfig<GraphHead, Vertex, Edge> config =
-      GradoopFlinkConfig.createConfig(env);
+    final GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     final String profiles = inputDir + PROFILES;
     final String relations = inputDir + RELATIONSHIPS;
@@ -202,7 +198,7 @@ public class PokecExample {
       // group the graph by users region and the decade they were born in
       .groupBy(Lists.newArrayList(PROP_KEY_REGION, PROP_KEY_DECADE))
       // store the result into json files
-      .writeTo(new JSONDataSink<>(
+      .writeTo(new JSONDataSink(
         outputDir + "graphHeads.json",
         outputDir + "vertices.json",
         outputDir + "edges.json",

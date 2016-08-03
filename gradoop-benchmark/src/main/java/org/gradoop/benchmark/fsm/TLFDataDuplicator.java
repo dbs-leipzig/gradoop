@@ -26,17 +26,14 @@ import org.gradoop.flink.io.impl.tlf.TLFDataSink;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.Duplicate;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A program to duplicate TLF data sets.
  */
-public class TLFDataDuplicator
-  extends AbstractRunner implements ProgramDescription {
+public class TLFDataDuplicator extends AbstractRunner 
+  implements ProgramDescription {
 
   /**
    * Option to declare path to input graph
@@ -68,8 +65,8 @@ public class TLFDataDuplicator
     }
     performSanityCheck(cmd);
 
-    GradoopFlinkConfig<GraphHead, Vertex, Edge> config =
-      GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    GradoopFlinkConfig config = GradoopFlinkConfig
+      .createConfig(getExecutionEnvironment());
 
     String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
     Integer multiplicand =
@@ -77,24 +74,17 @@ public class TLFDataDuplicator
 
     String outputPath = inputPath.replace(".tlf", "_" + multiplicand + ".tlf");
 
-    DataSource<GraphHead, Vertex, Edge> dataSource =
-      new TLFDataSource<>(inputPath, config);
+    DataSource dataSource = new TLFDataSource(inputPath, config);
 
-    DataSink<GraphHead, Vertex, Edge> dataSink =
-      new TLFDataSink<>(outputPath, config);
+    DataSink dataSink = new TLFDataSink(outputPath, config);
 
-    GraphTransactions<GraphHead, Vertex, Edge> input =
-      dataSource.getGraphTransactions();
+    GraphTransactions input = dataSource.getGraphTransactions();
 
-    GraphTransactions<GraphHead, Vertex, Edge> output =
-      new GraphTransactions<>(
-        input
-          .getTransactions()
-          .flatMap(new Duplicate
-          <GraphTransaction<GraphHead, Vertex, Edge>>
-          (multiplicand))
-          .returns(GraphTransaction.getTypeInformation(config)),
-        config
+    GraphTransactions output = new GraphTransactions(input
+      .getTransactions()
+      .flatMap(new Duplicate<GraphTransaction>(multiplicand))
+      .returns(GraphTransaction.getTypeInformation(config)),
+      config
       );
 
     dataSink.write(output);

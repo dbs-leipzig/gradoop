@@ -25,9 +25,6 @@ import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -66,7 +63,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * }
  *
  * An example graph collection can be found under src/main/resources/data.json.
- * For further information, have a look at the {@link org.gradoop.io.impl.json}
+ * For further information, have a look at the {@link org.gradoop.flink.io.impl.json}
  * package.
  */
 public class JSONExample extends AbstractRunner implements ProgramDescription {
@@ -97,24 +94,22 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     // create default Gradoop config
-    GradoopFlinkConfig<GraphHead, Vertex, Edge> config =
-      GradoopFlinkConfig.createConfig(env);
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     // create DataSource
-    JSONDataSource<GraphHead, Vertex, Edge> dataSource =
-      new JSONDataSource<>(graphHeadFile, vertexFile, edgeFile, config);
+    JSONDataSource dataSource = new JSONDataSource(
+      graphHeadFile, vertexFile, edgeFile, config);
 
     // read graph collection from DataSource
-    GraphCollection<GraphHead, Vertex, Edge> graphCollection =
-      dataSource.getGraphCollection();
+    GraphCollection graphCollection = dataSource.getGraphCollection();
 
     // do some analytics
-    LogicalGraph<GraphHead, Vertex, Edge> schema = graphCollection
-      .reduce(new ReduceCombination<GraphHead, Vertex, Edge>())
+    LogicalGraph schema = graphCollection
+      .reduce(new ReduceCombination())
       .groupByVertexAndEdgeLabel();
 
     // write resulting graph to DataSink
-    schema.writeTo(new JSONDataSink<>(
+    schema.writeTo(new JSONDataSink(
       outputDir + "graphHeads.json",
       outputDir + "vertices.json",
       outputDir + "edges.json",

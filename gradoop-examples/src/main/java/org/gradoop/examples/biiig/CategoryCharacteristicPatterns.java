@@ -26,6 +26,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -36,7 +37,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -62,32 +62,27 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    */
   public static void main(String[] args) throws Exception {
 
-    ExampleOutput<GraphHead, Vertex, Edge> out =
-      new ExampleOutput<>();
+    ExampleOutput out = new ExampleOutput();
 
-    LogicalGraph<GraphHead, Vertex, Edge> iig =
-      getIntegratedInstanceGraph();
+    LogicalGraph iig = getIntegratedInstanceGraph();
 
     out.add("Integrated Instance Graph", iig);
 
-    GraphCollection<GraphHead, Vertex, Edge> btgs = iig
-      .callForCollection(
-        new BusinessTransactionGraphs<GraphHead, Vertex, Edge>());
+    GraphCollection btgs = iig
+      .callForCollection(new BusinessTransactionGraphs());
 
-    btgs = btgs.apply(new ApplyAggregation<>(
-      "isClosed",
-      new IsClosedAggregateFunction
-      ()));
+    btgs = btgs
+      .apply(new ApplyAggregation("isClosed", new IsClosedAggregateFunction()));
 
     btgs = btgs.select(new IsClosedPredicateFunction());
 
-    btgs = btgs.apply(new ApplyAggregation<>(
-      "soCount",
-      new CountSalesOrdersAggregateFunction()));
+    btgs = btgs
+      .apply(new ApplyAggregation(
+        "soCount", new CountSalesOrdersAggregateFunction()));
 
     out.add("Business Transaction Graphs with Measures", btgs);
 
-    btgs = btgs.apply(new ApplyTransformation<>(
+    btgs = btgs.apply(new ApplyTransformation(
         new CategorizeGraphsTransformationFunction(),
         new RelabelVerticesTransformationFunction(),
         new EdgeLabelOnlyTransformationFunction())
@@ -102,21 +97,16 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * @return integrated instance graph
    * @throws IOException
    */
-  public static LogicalGraph<GraphHead, Vertex, Edge>
-  getIntegratedInstanceGraph() throws IOException {
+  public static LogicalGraph getIntegratedInstanceGraph() throws IOException {
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-    GradoopFlinkConfig<GraphHead, Vertex, Edge> gradoopConf =
-      GradoopFlinkConfig.createConfig(env);
+    GradoopFlinkConfig gradoopConf = GradoopFlinkConfig.createConfig(env);
 
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(gradoopConf);
 
-    FlinkAsciiGraphLoader<GraphHead, Vertex, Edge> loader = new
-      FlinkAsciiGraphLoader<>(gradoopConf);
-
-    String gdl = IOUtils.toString(
-      CategoryCharacteristicPatterns.class
-        .getResourceAsStream("/data/gdl/itbda.gdl"));
+    String gdl = IOUtils.toString(CategoryCharacteristicPatterns.class
+      .getResourceAsStream("/data/gdl/itbda.gdl"));
 
     gdl = gdl
       .replaceAll("SOURCEID_KEY",
@@ -137,11 +127,11 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Aggregate function to determine "isClosed" measure
    */
   private static class IsClosedAggregateFunction
-    implements ApplyAggregateFunction<GraphHead, Vertex, Edge> {
+    implements ApplyAggregateFunction {
 
     @Override
     public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection<GraphHead, Vertex, Edge> collection) {
+      GraphCollection collection) {
 
       return collection.getVertices()
         .flatMap(new FlatMapFunction<Vertex, Tuple2<GradoopId, Integer>>() {
@@ -201,11 +191,11 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Aggregate function to count sales orders per graph.
    */
   private static class CountSalesOrdersAggregateFunction
-    implements ApplyAggregateFunction<GraphHead, Vertex, Edge> {
+    implements ApplyAggregateFunction {
 
     @Override
     public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection<GraphHead, Vertex, Edge> collection) {
+      GraphCollection collection) {
 
       return collection.getVertices()
         .flatMap(new FlatMapFunction<Vertex, Tuple2<GradoopId, Integer>>() {
@@ -298,10 +288,8 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
   }
 
-
   @Override
   public String getDescription() {
     return  CategoryCharacteristicPatterns.class.getName();
   }
-
 }

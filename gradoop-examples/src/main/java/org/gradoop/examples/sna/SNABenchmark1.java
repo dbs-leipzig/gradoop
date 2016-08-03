@@ -26,7 +26,6 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
@@ -68,11 +67,9 @@ public class SNABenchmark1
     String inputDir  = args[0];
     String outputDir = args[1];
 
-    LogicalGraph<GraphHead, Vertex, Edge> epgmDatabase =
-      readLogicalGraph(inputDir);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
 
-    LogicalGraph<GraphHead, Vertex, Edge> result =
-      execute(epgmDatabase);
+    LogicalGraph result = execute(epgmDatabase);
 
     writeLogicalGraph(result, outputDir);
   }
@@ -83,8 +80,8 @@ public class SNABenchmark1
    * @param socialNetwork social network graph
    * @return summarized, aggregated graph
    */
-  private static LogicalGraph<GraphHead, Vertex, Edge>
-  execute(LogicalGraph<GraphHead, Vertex, Edge> socialNetwork) {
+  private static LogicalGraph
+  execute(LogicalGraph socialNetwork) {
     return socialNetwork
       .subgraph(
         new FilterFunction<Vertex>() {
@@ -100,12 +97,8 @@ public class SNABenchmark1
           }
         })
       .groupBy(Lists.newArrayList("gender", "city"))
-      .aggregate(
-        "vertexCount",
-        new VertexCount<GraphHead, Vertex, Edge>())
-      .aggregate(
-        "edgeCount",
-        new EdgeCount<GraphHead, Vertex, Edge>());
+      .aggregate("vertexCount", new VertexCount())
+      .aggregate("edgeCount", new EdgeCount());
   }
 
   @Override

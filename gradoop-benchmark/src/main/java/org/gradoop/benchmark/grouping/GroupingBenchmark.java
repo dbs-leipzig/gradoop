@@ -29,9 +29,6 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Cou
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MinAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,8 +41,7 @@ import java.util.regex.Pattern;
 /**
  * A dedicated program for parametrized graph grouping benchmark.
  */
-public class GroupingBenchmark
-  extends AbstractRunner
+public class GroupingBenchmark extends AbstractRunner 
   implements ProgramDescription {
 
   /**
@@ -217,8 +213,7 @@ public class GroupingBenchmark
     readCMDArguments(cmd);
 
     // initialize EPGM database
-    LogicalGraph<GraphHead, Vertex, Edge> graphDatabase =
-      readLogicalGraph(INPUT_PATH, false);
+    LogicalGraph graphDatabase = readLogicalGraph(INPUT_PATH, false);
 
     // initialize grouping keys
     List<String> vertexKeys = Lists.newArrayList();
@@ -242,9 +237,8 @@ public class GroupingBenchmark
     }
 
     if (cmd.hasOption(OPTION_EDGE_AGGREGATION_KEYS)) {
-      eAggregators =
-        getAggregators(EDGE_AGGREGATORS, EDGE_AGGREGATOR_KEYS,
-          EDGE_AGGREGATOR_RESULT_KEYS);
+      eAggregators = getAggregators(EDGE_AGGREGATORS, EDGE_AGGREGATOR_KEYS,
+        EDGE_AGGREGATOR_RESULT_KEYS);
     }
     // build grouping operator
     Grouping grouping = getOperator(STRATEGY,

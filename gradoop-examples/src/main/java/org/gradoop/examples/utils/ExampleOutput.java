@@ -21,9 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
@@ -35,12 +32,8 @@ import java.util.ArrayList;
 
 /**
  * Allows to collect and print intermediate results of example programs.
- * @param <G> graph type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class ExampleOutput
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+public class ExampleOutput {
 
   /**
    * Flink dataset, collecting the output lines
@@ -52,7 +45,7 @@ public class ExampleOutput
    * @param caption output caption
    * @param graph graph
    */
-  public void add(String caption, LogicalGraph<G, V, E> graph) {
+  public void add(String caption, LogicalGraph graph) {
     add(caption, GraphCollection.fromGraph(graph));
   }
 
@@ -61,7 +54,7 @@ public class ExampleOutput
    * @param caption output caption
    * @param collection collection
    */
-  public void add(String caption, GraphCollection<G, V, E> collection) {
+  public void add(String caption, GraphCollection collection) {
 
     if (outSet == null) {
       outSet = collection
@@ -75,10 +68,10 @@ public class ExampleOutput
         .fromElements("\n*** " + caption + " ***\n");
 
     DataSet<String> graphStringSet =
-      new CanonicalAdjacencyMatrixBuilder<>(
-        new GraphHeadToDataString<G>(),
-        new VertexToDataString<V>(),
-        new EdgeToDataString<E>(), true).execute(collection);
+      new CanonicalAdjacencyMatrixBuilder(
+        new GraphHeadToDataString(),
+        new VertexToDataString(),
+        new EdgeToDataString(), true).execute(collection);
 
     outSet = outSet
       .cross(captionSet)

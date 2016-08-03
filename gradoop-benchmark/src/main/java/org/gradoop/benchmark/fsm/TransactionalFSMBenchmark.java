@@ -34,9 +34,6 @@ import org.gradoop.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
 import org.gradoop.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
 import org.gradoop.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -49,8 +46,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A dedicated program for parametrized transactional FSM benchmark.
  */
-public class TransactionalFSMBenchmark
-  extends AbstractRunner
+public class TransactionalFSMBenchmark extends AbstractRunner
   implements ProgramDescription {
 
   /**
@@ -123,12 +119,11 @@ public class TransactionalFSMBenchmark
     String implementation = cmd.getOptionValue(OPTION_IMPLEMENTATION);
 
     // create gradoop conf
-    GradoopFlinkConfig gradoopConfig =
-      GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    GradoopFlinkConfig gradoopConfig = GradoopFlinkConfig
+      .createConfig(getExecutionEnvironment());
 
     // read tlf graph
-    TLFDataSource<GraphHead, Vertex, Edge> tlfSource =
-      new TLFDataSource<>(inputPath, gradoopConfig);
+    TLFDataSource tlfSource = new TLFDataSource(inputPath, gradoopConfig);
 
     // create input dataset
     DataSet<TLFGraph> graphs = tlfSource.getTLFGraphs();
@@ -137,7 +132,7 @@ public class TransactionalFSMBenchmark
     FSMConfig fsmConfig = new FSMConfig(threshold, directed);
 
     // set encoder
-    GSpanEncoder encoder = new GSpanTLFGraphEncoder<>(fsmConfig);
+    GSpanEncoder encoder = new GSpanTLFGraphEncoder(fsmConfig);
 
     // set miner
     GSpanMiner miner;

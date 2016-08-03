@@ -28,9 +28,6 @@ import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.DualSimulation;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.concurrent.TimeUnit;
 
@@ -122,11 +119,10 @@ public class PatternMatchingRunner extends AbstractRunner
     String algorithm    = cmd.getOptionValue(OPTION_ALGORITHM);
     boolean attachData  = cmd.hasOption(OPTION_ATTACH_DATA);
 
-    LogicalGraph<GraphHead, Vertex, Edge> epgmDatabase =
-      readLogicalGraph(inputDir);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
 
-    GraphCollection<GraphHead, Vertex, Edge> result =
-      execute(epgmDatabase, query, attachData, algorithm);
+    GraphCollection result = execute(
+      epgmDatabase, query, attachData, algorithm);
 
     writeGraphCollection(result, outputDir);
 
@@ -165,24 +161,24 @@ public class PatternMatchingRunner extends AbstractRunner
    * @param algorithm     algorithm to use for pattern matching
    * @return result match graph
    */
-  private static GraphCollection<GraphHead, Vertex, Edge> execute(
-    LogicalGraph<GraphHead, Vertex, Edge> databaseGraph,
+  private static GraphCollection execute(
+    LogicalGraph databaseGraph,
     String query, boolean attachData, String algorithm) {
 
-    PatternMatching<GraphHead, Vertex, Edge> op;
+    PatternMatching op;
 
     switch (algorithm) {
     case ALGO_DUAL_BULK:
-      op = new DualSimulation<>(query, attachData, true);
+      op = new DualSimulation(query, attachData, true);
       break;
     case ALGO_DUAL_DELTA:
-      op = new DualSimulation<>(query, attachData, false);
+      op = new DualSimulation(query, attachData, false);
       break;
     case ALGO_ISO_EXP:
-      op = new ExplorativeSubgraphIsomorphism<>(query, attachData);
+      op = new ExplorativeSubgraphIsomorphism(query, attachData);
       break;
     case ALGO_ISO_EXP_BC_HASH_FIRST:
-      op = new ExplorativeSubgraphIsomorphism<>(query, attachData,
+      op = new ExplorativeSubgraphIsomorphism(query, attachData,
         new DFSTraverser(), BROADCAST_HASH_FIRST, BROADCAST_HASH_FIRST);
       break;
     default :

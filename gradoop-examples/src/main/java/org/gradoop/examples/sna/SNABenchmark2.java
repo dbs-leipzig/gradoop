@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -33,7 +34,6 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCo
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -121,8 +121,7 @@ public class SNABenchmark2
     String outputDir = args[1];
     int threshold    = Integer.parseInt(args[2]);
 
-    LogicalGraph<GraphHead, Vertex, Edge> epgmDatabase =
-      readLogicalGraph(inputDir);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
 
     writeLogicalGraph(execute(epgmDatabase, threshold), outputDir);
 
@@ -135,28 +134,22 @@ public class SNABenchmark2
    * @param gradoopConf gradoop config
    * @throws Exception
    */
-  private static void executeWithDemoData(
-    GradoopFlinkConfig<GraphHead, Vertex, Edge> gradoopConf) throws
-    Exception {
-    ExampleOutput<GraphHead, Vertex, Edge> out =
-      new ExampleOutput<>();
+  private static void executeWithDemoData(GradoopFlinkConfig gradoopConf)
+    throws Exception {
+    ExampleOutput out = new ExampleOutput();
 
-    FlinkAsciiGraphLoader<GraphHead, Vertex, Edge> loader =
-      new FlinkAsciiGraphLoader<>(gradoopConf);
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(gradoopConf);
 
-    String graphDefinition = IOUtils.toString(
-      SNABenchmark2.class
-        .getResourceAsStream("/data/gdl/sna.gdl"));
+    String graphDefinition = IOUtils.toString(SNABenchmark2.class
+      .getResourceAsStream("/data/gdl/sna.gdl"));
 
     loader.initDatabaseFromString(graphDefinition);
 
-    LogicalGraph<GraphHead, Vertex, Edge> inputGraph =
-      loader.getLogicalGraphByVariable("db");
+    LogicalGraph inputGraph = loader.getLogicalGraphByVariable("db");
 
     out.add("Input Graph", inputGraph);
 
-    LogicalGraph<GraphHead, Vertex, Edge> outputGraph =
-      execute(inputGraph, 2);
+    LogicalGraph outputGraph = execute(inputGraph, 2);
 
     out.add("Output Graph", outputGraph);
 
@@ -170,8 +163,8 @@ public class SNABenchmark2
    * @param threshold     used in community selection predicate
    * @return summarized, aggregated graph
    */
-  private static LogicalGraph<GraphHead, Vertex, Edge>
-  execute(LogicalGraph<GraphHead, Vertex, Edge> socialNetwork,
+  private static LogicalGraph
+  execute(LogicalGraph socialNetwork,
     final int threshold) {
 
     final int maxIterations   = 4;
@@ -221,15 +214,11 @@ public class SNABenchmark2
         }
       })
       // 3a) compute communities
-      .callForGraph(
-        new GellyLabelPropagation<GraphHead, Vertex, Edge>(
-          maxIterations, label))
+      .callForGraph(new GellyLabelPropagation(maxIterations, label))
       // 3b) separate communities
       .splitBy(label)
       // 4) compute vertex count per community
-      .apply(new ApplyAggregation<>(
-        vertexCount,
-        new VertexCount<GraphHead, Vertex, Edge>()))
+      .apply(new ApplyAggregation(vertexCount, new VertexCount()))
       // 5) select graphs with more than minClusterSize vertices
       .select(new FilterFunction<GraphHead>() {
         @Override
@@ -238,15 +227,13 @@ public class SNABenchmark2
         }
       })
       // 6) reduce filtered graphs to a single graph using combination
-      .reduce(new ReduceCombination<GraphHead, Vertex, Edge>())
+      .reduce(new ReduceCombination())
       // 7) group that graph by vertex properties
       .groupBy(Lists.newArrayList(city, gender))
       // 8a) count vertices of grouped graph
-      .aggregate(
-        vertexCount, new VertexCount<GraphHead, Vertex, Edge>())
+      .aggregate(vertexCount, new VertexCount())
       // 8b) count edges of grouped graph
-      .aggregate(
-        edgeCount, new EdgeCount<GraphHead, Vertex, Edge>());
+      .aggregate(edgeCount, new EdgeCount());
   }
 
   @Override

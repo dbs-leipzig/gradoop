@@ -110,8 +110,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void encode() throws Exception {
-    TLFDataSource dataSource =
-      getDataSource();
+    TLFDataSource dataSource = getDataSource();
 
     float threshold = 0.1f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
@@ -159,8 +158,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void getMinFrequency() throws Exception {
-    TLFDataSource dataSource =
-      getDataSource();
+    TLFDataSource dataSource = getDataSource();
 
     float threshold = 0.4f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
@@ -189,8 +187,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void getVertexLabelDictionary() throws Exception {
-    TLFDataSource dataSource =
-      getDataSource();
+    TLFDataSource dataSource = getDataSource();
 
     float threshold = 0.4f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
@@ -220,8 +217,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
   public void getEdgeLabelDictionary() throws Exception {
-    TLFDataSource dataSource =
-      getDataSource();
+    TLFDataSource dataSource = getDataSource();
 
     float threshold = 0.4f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);

@@ -23,9 +23,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -79,15 +76,10 @@ public abstract class AbstractRunner {
    * Reads an EPGM database from a given directory.
    *
    * @param directory path to EPGM database
-   * @param <G>       EPGM graph head type
-   * @param <V>       EPGM vertex type
-   * @param <E>       EPGM edge type
    * @return EPGM logical graph
    */
   @SuppressWarnings("unchecked")
-  protected static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  LogicalGraph<G, V, E> readLogicalGraph(String directory) {
+  protected static LogicalGraph readLogicalGraph(String directory) {
     return readLogicalGraph(directory, true);
   }
 
@@ -96,15 +88,10 @@ public abstract class AbstractRunner {
    *
    * @param directory       path to EPGM database
    * @param readGraphHeads  true, if graph heads are contained
-   * @param <G>             EPGM graph head type
-   * @param <V>             EPGM vertex type
-   * @param <E>             EPGM edge type
    * @return EPGM logical graph
    */
   @SuppressWarnings("unchecked")
-  protected static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  LogicalGraph<G, V, E> readLogicalGraph(String directory,
+  protected static LogicalGraph readLogicalGraph(String directory,
     boolean readGraphHeads) {
     directory = appendSeparator(directory);
     return new JSONDataSource(
@@ -120,17 +107,12 @@ public abstract class AbstractRunner {
    *
    * @param graph     logical graph
    * @param directory output path
-   * @param <G>       EPGM graph head type
-   * @param <V>       EPGM vertex type
-   * @param <E>       EPGM edge type
    * @throws Exception
    */
-  protected static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  void writeLogicalGraph(LogicalGraph<G, V, E> graph, String directory) throws
-    Exception {
+  protected static void writeLogicalGraph(LogicalGraph graph, String directory)
+    throws Exception {
     directory = appendSeparator(directory);
-    graph.writeTo(new JSONDataSink<>(
+    graph.writeTo(new JSONDataSink(
       directory + GRAPHS_JSON,
       directory + VERTICES_JSON,
       directory + EDGES_JSON,
@@ -144,17 +126,12 @@ public abstract class AbstractRunner {
    *
    * @param collection  graph collection
    * @param directory   output path
-   * @param <G>         EPGM graph head type
-   * @param <V>         EPGM vertex type
-   * @param <E>         EPGM edge type
    * @throws Exception
    */
-  protected static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  void writeGraphCollection(GraphCollection<G, V, E> collection,
+  protected static void writeGraphCollection(GraphCollection collection,
     String directory) throws Exception {
     directory = appendSeparator(directory);
-    collection.writeTo(new JSONDataSink<>(
+    collection.writeTo(new JSONDataSink(
       directory + GRAPHS_JSON,
       directory + VERTICES_JSON,
       directory + EDGES_JSON,
