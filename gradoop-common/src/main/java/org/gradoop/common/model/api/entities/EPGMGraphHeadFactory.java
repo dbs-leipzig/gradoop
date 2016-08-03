@@ -22,6 +22,8 @@ import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
  * Initializes {@link EPGMGraphHead} objects of a given type.
+ *
+ * @param <G> EPGM graph head type
  */
 public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
   extends EPGMElementFactory<G> {

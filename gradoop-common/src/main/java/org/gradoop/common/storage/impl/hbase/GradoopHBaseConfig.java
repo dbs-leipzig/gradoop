@@ -38,6 +38,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Configuration class for using HBase with Gradoop.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class GradoopHBaseConfig
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
@@ -69,17 +73,17 @@ public class GradoopHBaseConfig
    */
   private GradoopHBaseConfig(
     GraphHeadHandler<G> graphHeadHandler,
-    VertexHandler<V> vertexHandler,
-    EdgeHandler<E> edgeHandler,
+    VertexHandler<V, E> vertexHandler,
+    EdgeHandler<E, V> edgeHandler,
     String graphTableName,
     String vertexTableName,
     String edgeTableName) {
     super(graphHeadHandler,
       vertexHandler,
       edgeHandler,
-      new HBaseGraphHeadFactory(),
-      new HBaseVertexFactory(),
-      new HBaseEdgeFactory());
+      new HBaseGraphHeadFactory<G>(),
+      new HBaseVertexFactory<V, E>(),
+      new HBaseEdgeFactory<E, V>());
     checkArgument(!StringUtils.isEmpty(graphTableName),
       "Graph table name was null or empty");
     checkArgument(!StringUtils.isEmpty(vertexTableName),
@@ -121,9 +125,9 @@ public class GradoopHBaseConfig
   public static GradoopHBaseConfig<GraphHead, Vertex, Edge> getDefaultConfig() {
     GraphHeadHandler<GraphHead> graphHeadHandler =
       new HBaseGraphHeadHandler<>(new GraphHeadFactory());
-    VertexHandler<Vertex> vertexHandler =
+    VertexHandler<Vertex, Edge> vertexHandler =
       new HBaseVertexHandler<>(new VertexFactory());
-    EdgeHandler<Edge> edgeHandler =
+    EdgeHandler<Edge, Vertex> edgeHandler =
       new HBaseEdgeHandler<>(new EdgeFactory());
 
     return new GradoopHBaseConfig<>(
@@ -142,6 +146,9 @@ public class GradoopHBaseConfig
    * @param graphTableName  graph table name
    * @param vertexTableName vertex table name
    * @param edgeTableName   edge table name
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
    *
    * @return Gradoop HBase configuration
    */

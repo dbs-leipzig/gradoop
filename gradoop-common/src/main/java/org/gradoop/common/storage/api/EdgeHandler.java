@@ -28,8 +28,12 @@ import java.io.IOException;
 
 /**
  * Responsible for reading and writing edge data from and to HBase.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public interface EdgeHandler<E extends EPGMEdge> extends GraphElementHandler {
+public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
+  extends GraphElementHandler {
 
   /**
    * Adds the source vertex data to the given {@link Put} and returns it.
@@ -38,7 +42,7 @@ public interface EdgeHandler<E extends EPGMEdge> extends GraphElementHandler {
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeSource(final Put put, final EPGMVertex vertexData) throws IOException;
+  Put writeSource(final Put put, final V vertexData) throws IOException;
 
   /**
    * Reads the source vertex identifier from the given {@link Result}.
@@ -55,8 +59,7 @@ public interface EdgeHandler<E extends EPGMEdge> extends GraphElementHandler {
    * @param vertexData vertex data
    * @return put with vertex data
    */
-  Put writeTarget(final Put put, final EPGMVertex vertexData)
-    throws IOException;
+  Put writeTarget(final Put put, final V vertexData) throws IOException;
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -73,7 +76,7 @@ public interface EdgeHandler<E extends EPGMEdge> extends GraphElementHandler {
    * @param edgeData edge data to be written
    * @return put with edge data
    */
-  Put writeEdge(final Put put, final PersistentEdge edgeData) throws
+  Put writeEdge(final Put put, final PersistentEdge<V> edgeData) throws
     IOException;
 
   /**

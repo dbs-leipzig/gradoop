@@ -46,6 +46,8 @@ import java.util.Set;
  * |         |-------------|----------|-----------|---|---|---|
  * |         | "Community" | v1  | v2 |   |   |   |   |   |   |
  * |---------|-------------|----------|-----------|---|---|---|
+ *
+ * @param <G> EPGM graph head type
  */
 public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
   extends HBaseElementHandler

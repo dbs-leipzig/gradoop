@@ -24,9 +24,10 @@ import org.gradoop.common.storage.api.PersistentGraphHead;
 
 /**
  * Represents a persistent vertex data object.
+ *
+ * @param <G> EPGM graph head type
  */
-public class HBaseGraphHead<G extends EPGMGraphHead>
-  extends HBaseElement<G>
+public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
   implements PersistentGraphHead {
 
   /**

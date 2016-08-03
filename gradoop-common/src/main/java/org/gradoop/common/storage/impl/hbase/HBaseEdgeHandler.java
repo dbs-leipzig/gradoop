@@ -47,10 +47,13 @@ import java.io.IOException;
  * |         |----------|------------|------------|--------|-------|
  * |         | "knows"  | <Person.0> | <Person.1> | [0,1]  | 2014  |
  * |---------|----------|------------|------------|--------|-------|
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class HBaseEdgeHandler<E extends EPGMEdge>
+public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
   extends HBaseGraphElementHandler
-  implements EdgeHandler<E> {
+  implements EdgeHandler<E, V> {
 
   /**
    * serial version uid
@@ -97,7 +100,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeSource(Put put, EPGMVertex vertexData) throws IOException {
+  public Put writeSource(Put put, V vertexData) throws IOException {
     return put.add(CF_META_BYTES, COL_SOURCE_BYTES,
       createVertexIdentifier(vertexData));
   }
@@ -118,7 +121,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeTarget(Put put, EPGMVertex vertexData) throws IOException {
+  public Put writeTarget(Put put, V vertexData) throws IOException {
     return put.add(CF_META_BYTES, COL_TARGET_BYTES,
       createVertexIdentifier(vertexData));
   }
@@ -139,7 +142,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdge(Put put, PersistentEdge edgeData) throws
+  public Put writeEdge(Put put, PersistentEdge<V> edgeData) throws
     IOException {
     writeLabel(put, edgeData);
     writeSource(put, edgeData.getSource());
@@ -182,7 +185,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge>
    * @param vertex vertex
    * @return byte representation of the vertex identifier
    */
-  private byte[] createVertexIdentifier(final EPGMVertex vertex) throws
+  private byte[] createVertexIdentifier(final V vertex) throws
     IOException {
     byte[] vertexKeyBytes = Writables.getBytes(vertex.getId());
     byte[] labelBytes = Bytes.toBytes(vertex.getLabel());

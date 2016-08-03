@@ -31,6 +31,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Basic configuration for Gradoop Stores
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public abstract class GradoopStoreConfig
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
@@ -61,8 +65,8 @@ public abstract class GradoopStoreConfig
    */
   protected GradoopStoreConfig(
     GraphHeadHandler<G> graphHeadHandler,
-    VertexHandler<V> vertexHandler,
-    EdgeHandler<E> edgeHandler,
+    VertexHandler<V, E> vertexHandler,
+    EdgeHandler<E, V> edgeHandler,
     PersistentGraphHeadFactory<G> persistentGraphHeadFactory,
     PersistentVertexFactory<V, E> persistentVertexFactory,
     PersistentEdgeFactory<E, V> persistentEdgeFactory) {

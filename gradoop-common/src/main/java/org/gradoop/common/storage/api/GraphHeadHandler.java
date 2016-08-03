@@ -28,9 +28,12 @@ import java.util.Set;
 /**
  * This class is responsible for reading and writing EPGM graph heads from
  * and to HBase.
+ *
+ * @param <G> EPGM graph head type
  */
 public interface GraphHeadHandler<G extends EPGMGraphHead>
   extends ElementHandler {
+
   /**
    * Adds all vertex identifiers of the given graph to the given {@link Put}
    * and returns it.

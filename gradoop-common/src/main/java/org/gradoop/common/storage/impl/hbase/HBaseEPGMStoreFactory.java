@@ -53,11 +53,17 @@ public class HBaseEPGMStoreFactory {
    * @param gradoopHBaseConfig Gradoop configuration
    * @param prefix        prefix for HBase table name
    *
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
+   *
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static HBaseEPGMStore createOrOpenEPGMStore(
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig gradoopHBaseConfig,
+    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig,
     final String prefix) {
     return createOrOpenEPGMStore(config,
       GradoopHBaseConfig.createConfig(gradoopHBaseConfig,
@@ -75,6 +81,9 @@ public class HBaseEPGMStoreFactory {
    * @param graphTableName      graph table name
    * @param vertexTableName     vertex table name
    * @param edgeTableName       edge table name
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
    *
    * @return a graph store instance or {@code null in the case of errors}
    */
@@ -97,6 +106,10 @@ public class HBaseEPGMStoreFactory {
    *
    * @param config              Hadoop cluster configuration
    * @param gradoopHBaseConfig  Gradoop HBase configuration
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
+   *
    * @return EPGM store instance or {@code null in the case of errors}
    */
   public static
@@ -119,8 +132,8 @@ public class HBaseEPGMStoreFactory {
       HTable edgeDataTable = new HTable(config,
         gradoopHBaseConfig.getEdgeTableName());
 
-      return new HBaseEPGMStore<>(graphDataTable, vertexDataTable, edgeDataTable,
-        gradoopHBaseConfig);
+      return new HBaseEPGMStore<>(
+        graphDataTable, vertexDataTable, edgeDataTable, gradoopHBaseConfig);
     } catch (IOException e) {
       e.printStackTrace();
       return null;
@@ -166,14 +179,21 @@ public class HBaseEPGMStoreFactory {
    * @param vertexDataTableName vertex data table name
    * @param edgeTableName       edge data table name
    * @param graphDataTableName  graph data table name
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
+   *
    * @throws IOException
    */
-  private static void createTablesIfNotExists(final Configuration config,
-    final VertexHandler vertexHandler,
-    final EdgeHandler edgeHandler,
-    final GraphHeadHandler graphHeadHandler, final String vertexDataTableName,
-    final String edgeTableName, final String graphDataTableName) throws
-    IOException {
+  private static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  void createTablesIfNotExists(final Configuration config,
+    final VertexHandler<V, E> vertexHandler,
+    final EdgeHandler<E, V> edgeHandler,
+    final GraphHeadHandler<G> graphHeadHandler,
+    final String vertexDataTableName, final String edgeTableName,
+    final String graphDataTableName) throws IOException {
+
     HTableDescriptor vertexDataTableDescriptor =
       new HTableDescriptor(TableName.valueOf(vertexDataTableName));
     HTableDescriptor edgeDataTableDescriptor =
@@ -208,6 +228,7 @@ public class HBaseEPGMStoreFactory {
   private static void deleteTablesIfExists(final Configuration config,
     final String vertexDataTableName, final String edgeDataTableName,
     final String graphDataTableName) throws IOException {
+
     HTableDescriptor vertexDataTableDescriptor =
       new HTableDescriptor(TableName.valueOf(vertexDataTableName));
     HTableDescriptor edgeDataTableDescriptor =

@@ -25,6 +25,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default factory for creating persistent edge representations.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class HBaseEdgeFactory<E extends EPGMEdge, V extends EPGMVertex>
   implements PersistentEdgeFactory<E, V> {

@@ -25,6 +25,9 @@ import java.util.Set;
 
 /**
  * Represents a persistent vertex data object.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class HBaseVertex<V extends EPGMVertex, E extends EPGMEdge>
   extends HBaseGraphElement<V> implements PersistentVertex<E> {

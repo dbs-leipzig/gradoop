@@ -48,14 +48,14 @@ public class BuildEdgeMutation<E extends EPGMEdge, V extends EPGMVertex>
   /**
    * Edge data handler to create Mutations.
    */
-  private final EdgeHandler<E> edgeHandler;
+  private final EdgeHandler<E, V> edgeHandler;
 
   /**
    * Creates rich map function.
    *
    * @param edgeHandler edge data handler
    */
-  public BuildEdgeMutation(EdgeHandler<E> edgeHandler) {
+  public BuildEdgeMutation(EdgeHandler<E, V> edgeHandler) {
     this.edgeHandler = edgeHandler;
   }
 

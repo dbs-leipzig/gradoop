@@ -32,7 +32,7 @@ import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.algorithms.btgs.BusinessTransactionGraphs;
+import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;

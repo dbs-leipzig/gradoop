@@ -24,6 +24,9 @@ import java.io.Serializable;
 
 /**
  * Base interface for creating persistent edge data from transient edge data.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public interface PersistentEdgeFactory<E extends EPGMEdge, V extends EPGMVertex>
   extends Serializable {

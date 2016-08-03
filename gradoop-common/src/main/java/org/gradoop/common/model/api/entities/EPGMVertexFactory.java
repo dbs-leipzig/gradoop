@@ -23,6 +23,8 @@ import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
  * Initializes {@link EPGMVertex} objects of a given type.
+ *
+ * @param <V> EPGM vertex type
  */
 public interface EPGMVertexFactory<V extends EPGMVertex>
   extends EPGMElementFactory<V> {

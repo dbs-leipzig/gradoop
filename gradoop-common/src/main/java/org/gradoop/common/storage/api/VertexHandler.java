@@ -28,8 +28,11 @@ import java.util.Set;
 
 /**
  * Responsible for reading and writing vertex data from and to HBase.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public interface VertexHandler<V extends EPGMVertex>
+public interface VertexHandler<V extends EPGMVertex, E extends EPGMEdge>
   extends GraphElementHandler {
 
   /**
@@ -40,8 +43,7 @@ public interface VertexHandler<V extends EPGMVertex>
    * @param edges edges to add
    * @return put with edge identifiers
    */
-  Put writeOutgoingEdges(final Put put, final Set<EPGMEdge> edges)
-    throws IOException;
+  Put writeOutgoingEdges(final Put put, final Set<E> edges) throws IOException;
 
   /**
    * Adds the given incoming edge data to the given {@link Put} and
@@ -51,8 +53,7 @@ public interface VertexHandler<V extends EPGMVertex>
    * @param edges edge identifiers to add
    * @return put with edge identifiers
    */
-  Put writeIncomingEdges(final Put put, final Set<EPGMEdge> edges)
-    throws IOException;
+  Put writeIncomingEdges(final Put put, final Set<E> edges) throws IOException;
 
   /**
    * Reads the outgoing edge identifiers from the given {@link Result}.
@@ -77,7 +78,7 @@ public interface VertexHandler<V extends EPGMVertex>
    * @param vertexData vertex data to be written
    * @return put with vertex data
    */
-  Put writeVertex(final Put put, final PersistentVertex vertexData) throws
+  Put writeVertex(final Put put, final PersistentVertex<E> vertexData) throws
     IOException;
 
   /**

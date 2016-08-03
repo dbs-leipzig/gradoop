@@ -26,6 +26,9 @@ import java.util.Set;
 /**
  * Base interface for creating persistent vertex data from transient vertex
  * data.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public interface PersistentVertexFactory
   <V extends EPGMVertex, E extends EPGMEdge> extends Serializable {

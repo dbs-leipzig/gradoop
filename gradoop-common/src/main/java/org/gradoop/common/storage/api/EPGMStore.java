@@ -29,6 +29,10 @@ import java.util.Iterator;
 /**
  * The EPGM store is responsible for writing and reading graph heads, vertices
  * and edges.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public interface EPGMStore
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {

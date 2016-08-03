@@ -51,7 +51,8 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @param executionEnvironment  Flink execution environment
    */
   private GradoopFlinkConfig(GraphHeadHandler<GraphHead> graphHeadHandler,
-    VertexHandler<Vertex> vertexHandler, EdgeHandler<Edge> edgeHandler,
+    VertexHandler<Vertex, Edge> vertexHandler,
+    EdgeHandler<Edge, Vertex> edgeHandler,
     ExecutionEnvironment executionEnvironment) {
     super(graphHeadHandler, vertexHandler, edgeHandler);
     if (executionEnvironment == null) {
@@ -69,9 +70,9 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @return Gradoop Flink configuration
    */
   public static GradoopFlinkConfig createConfig(ExecutionEnvironment env) {
-    HBaseVertexHandler<Vertex> vertexHandler = new HBaseVertexHandler<>(
+    HBaseVertexHandler<Vertex, Edge> vertexHandler = new HBaseVertexHandler<>(
       new VertexFactory());
-    HBaseEdgeHandler<Edge> edgeHandler = new HBaseEdgeHandler<>(
+    HBaseEdgeHandler<Edge, Vertex> edgeHandler = new HBaseEdgeHandler<>(
       new EdgeFactory());
     HBaseGraphHeadHandler<GraphHead> graphHandler = new HBaseGraphHeadHandler<>(
       new GraphHeadFactory());

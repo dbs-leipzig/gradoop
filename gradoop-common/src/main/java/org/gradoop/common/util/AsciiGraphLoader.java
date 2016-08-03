@@ -43,6 +43,10 @@ import java.util.Map;
  * Creates collections of graphs, vertices and edges from a given GDL script.
  *
  * @see <a href="https://github.com/s1ck/gdl">GDL on GitHub</a>
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class AsciiGraphLoader
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
@@ -101,7 +105,7 @@ public class AsciiGraphLoader
    * @param gdlHandler GDL Handler
    * @param config Gradoop configuration
    */
-  private AsciiGraphLoader(GDLHandler gdlHandler, 
+  private AsciiGraphLoader(GDLHandler gdlHandler,
     GradoopConfig<G, V, E> config) {
     this.gdlHandler = gdlHandler;
     this.config = config;
@@ -126,12 +130,15 @@ public class AsciiGraphLoader
    *
    * @param asciiGraph  GDL string
    * @param config      Gradoop configuration
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
    *
    * @return AsciiGraphLoader
    */
-  public static 
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> 
-  AsciiGraphLoader<G, V, E> fromString(String asciiGraph, 
+  public static
+  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  AsciiGraphLoader<G, V, E> fromString(String asciiGraph,
     GradoopConfig<G, V, E> config) {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
@@ -146,13 +153,16 @@ public class AsciiGraphLoader
    *
    * @param fileName  File that contains a GDL script
    * @param config    Gradoop configuration
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
    *
    * @return AsciiGraphLoader
    * @throws IOException
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  AsciiGraphLoader<G, V, E> fromFile(String fileName, 
+  AsciiGraphLoader<G, V, E> fromFile(String fileName,
     GradoopConfig<G, V, E> config) throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
@@ -167,6 +177,9 @@ public class AsciiGraphLoader
    *
    * @param inputStream   File that contains a GDL script
    * @param config        Gradoop configuration
+   * @param <G> EPGM graph head type
+   * @param <V> EPGM vertex type
+   * @param <E> EPGM edge type
    *
    * @return AsciiGraphLoader
    * @throws IOException
@@ -318,7 +331,7 @@ public class AsciiGraphLoader
    * @return edges
    */
   public Collection<E> getEdges() {
-    return new ImmutableSet.Builder<E> ().addAll(edges.values()).build();
+    return new ImmutableSet.Builder<E>().addAll(edges.values()).build();
   }
 
   /**

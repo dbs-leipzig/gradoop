@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Base interface for creating persistent graph data from transient graph data.
+ *
+ * @param <G> EPGM graph head type
  */
 public interface PersistentGraphHeadFactory<G extends EPGMGraphHead>
   extends Serializable {

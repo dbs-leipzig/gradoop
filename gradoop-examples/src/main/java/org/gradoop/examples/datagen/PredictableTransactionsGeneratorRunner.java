@@ -19,7 +19,7 @@ package org.gradoop.examples.datagen;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
-import org.gradoop.datagen.transactions.predictable.PredictableTransactionsGenerator;
+import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.tlf.TLFDataSink;

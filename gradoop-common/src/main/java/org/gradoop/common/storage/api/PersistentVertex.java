@@ -25,9 +25,10 @@ import java.util.Set;
 /**
  * Representation of vertex data on the storage level. We additionally store
  * outgoing and incoming edges for faster access during e.g. traversal.
+ *
+ * @param <E> EPGM edge type
  */
-public interface PersistentVertex<E extends EPGMEdge>
-  extends EPGMVertex {
+public interface PersistentVertex<E extends EPGMEdge> extends EPGMVertex {
 
   /**
    * Returns outgoing edge data for the vertex.

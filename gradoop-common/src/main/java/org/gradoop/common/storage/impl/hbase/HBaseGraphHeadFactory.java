@@ -25,6 +25,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default factory for creating persistent graph data representation.
+ *
+ * @param <G> EPGM graph head type
  */
 public class HBaseGraphHeadFactory<G extends EPGMGraphHead>
   implements PersistentGraphHeadFactory<G> {
@@ -38,11 +40,11 @@ public class HBaseGraphHeadFactory<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public HBaseGraphHead createGraphHead(G inputGraphHead,
+  public HBaseGraphHead<G> createGraphHead(G inputGraphHead,
     GradoopIdSet vertices, GradoopIdSet edges) {
     checkNotNull(inputGraphHead, "EPGMGraphHead was null");
     checkNotNull(vertices, "EPGMVertex identifiers were null");
     checkNotNull(edges, "EPGMEdge identifiers were null");
-    return new HBaseGraphHead(inputGraphHead, vertices, edges);
+    return new HBaseGraphHead<>(inputGraphHead, vertices, edges);
   }
 }

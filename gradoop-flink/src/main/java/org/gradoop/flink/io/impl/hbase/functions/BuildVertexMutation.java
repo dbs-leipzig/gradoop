@@ -48,14 +48,14 @@ public class BuildVertexMutation<V extends EPGMVertex, E extends EPGMEdge>
   /**
    * Vertex data handler to create Mutations.
    */
-  private final VertexHandler<V> vertexHandler;
+  private final VertexHandler<V, E> vertexHandler;
 
   /**
    * Creates rich map function.
    *
    * @param vertexHandler vertex data handler
    */
-  public BuildVertexMutation(VertexHandler<V> vertexHandler) {
+  public BuildVertexMutation(VertexHandler<V, E> vertexHandler) {
     this.vertexHandler = vertexHandler;
   }
 

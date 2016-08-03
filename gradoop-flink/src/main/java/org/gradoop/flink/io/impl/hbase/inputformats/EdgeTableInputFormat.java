@@ -22,20 +22,24 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.storage.api.EdgeHandler;
 import org.gradoop.common.util.GConstants;
 
 /**
  * Reads edge data from HBase.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class EdgeTableInputFormat<E extends EPGMEdge>
+public class EdgeTableInputFormat<E extends EPGMEdge, V extends EPGMVertex>
   extends TableInputFormat<Tuple1<E>> {
 
   /**
    * Handles reading of persistent edge data.
    */
-  private final EdgeHandler<E> edgeHandler;
+  private final EdgeHandler<E, V> edgeHandler;
 
   /**
    * Table to read from.
@@ -48,7 +52,7 @@ public class EdgeTableInputFormat<E extends EPGMEdge>
    * @param edgeHandler   edge data handler
    * @param edgeTableName edge data table name
    */
-  public EdgeTableInputFormat(EdgeHandler<E> edgeHandler,
+  public EdgeTableInputFormat(EdgeHandler<E, V> edgeHandler,
     String edgeTableName) {
     this.edgeHandler = edgeHandler;
     this.edgeTableName = edgeTableName;

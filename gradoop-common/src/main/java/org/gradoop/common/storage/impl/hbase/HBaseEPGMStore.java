@@ -44,6 +44,10 @@ import java.util.Iterator;
 /**
  * Default HBase graph store that handles reading and writing vertices and
  * graphs from and to HBase.
+ *
+ * @param <G> EPGM graph head type
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class HBaseEPGMStore
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
@@ -212,7 +216,7 @@ public class HBaseEPGMStore
   public V readVertex(final GradoopId vertexId) {
     V vertexData = null;
     try {
-      VertexHandler<V> vertexHandler = config.getVertexHandler();
+      VertexHandler<V, E> vertexHandler = config.getVertexHandler();
       byte[] rowKey = vertexHandler.getRowKey(vertexId);
       Result res = vertexTable.get(new Get(rowKey));
       if (!res.isEmpty()) {
@@ -231,7 +235,7 @@ public class HBaseEPGMStore
   public E readEdge(final GradoopId edgeId) {
     E edgeData = null;
     try {
-      EdgeHandler<E> edgeHandler = config.getEdgeHandler();
+      EdgeHandler<E, V> edgeHandler = config.getEdgeHandler();
       byte[] rowKey = edgeHandler.getRowKey(edgeId);
       Result res = edgeTable.get(new Get(rowKey));
       if (!res.isEmpty()) {

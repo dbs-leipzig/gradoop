@@ -47,10 +47,12 @@ import java.util.Set;
  * |         |----------|---------|----|----|-------------|-------------|
  * |         | "Person" |  [0,2]  | v1 | v2 |             |             |
  * |---------|----------|---------|----|----|-------------|-------------|
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class HBaseVertexHandler<V extends EPGMVertex>
-  extends HBaseGraphElementHandler
-  implements VertexHandler<V> {
+public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
+  extends HBaseGraphElementHandler implements VertexHandler<V, E> {
 
   /**
    * serial version uid
@@ -99,8 +101,8 @@ public class HBaseVertexHandler<V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeOutgoingEdges(final Put put, final Set<EPGMEdge> outgoingEdgeData)
-    throws IOException {
+  public Put writeOutgoingEdges(final Put put, final Set<E> outgoingEdgeData)
+      throws IOException {
     return writeEdges(put, CF_OUT_EDGES_BYTES, outgoingEdgeData, true);
   }
 
@@ -108,8 +110,8 @@ public class HBaseVertexHandler<V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeIncomingEdges(final Put put, final Set<EPGMEdge> incomingEdgeData)
-    throws IOException {
+  public Put writeIncomingEdges(final Put put, final Set<E> incomingEdgeData)
+      throws IOException {
     return writeEdges(put, CF_IN_EDGES_BYTES, incomingEdgeData, false);
   }
 
@@ -118,7 +120,7 @@ public class HBaseVertexHandler<V extends EPGMVertex>
    */
   @Override
   public Put writeVertex(
-    final Put put, final PersistentVertex vertexData) throws IOException {
+    final Put put, final PersistentVertex<E> vertexData) throws IOException {
     writeLabel(put, vertexData);
     writeProperties(put, vertexData);
     writeOutgoingEdges(put, vertexData.getOutgoingEdges());
@@ -179,9 +181,9 @@ public class HBaseVertexHandler<V extends EPGMVertex>
    * @return the updated put
    */
   private Put writeEdges(Put put, final byte[] columnFamily,
-    final Set<EPGMEdge> edgeDataSet, boolean isOutgoing) throws IOException {
+    final Set<E> edgeDataSet, boolean isOutgoing) throws IOException {
     if (edgeDataSet != null) {
-      for (EPGMEdge edge : edgeDataSet) {
+      for (E edge : edgeDataSet) {
         put = writeEdge(put, columnFamily, edge, isOutgoing);
       }
     }
@@ -201,7 +203,7 @@ public class HBaseVertexHandler<V extends EPGMVertex>
    * @return the updated put
    */
   private Put writeEdge(final Put put, final byte[] columnFamily,
-    final EPGMEdge edge, boolean isOutgoing) throws IOException {
+    final E edge, boolean isOutgoing) throws IOException {
     byte[] edgeKey = createEdgeIdentifier(edge, isOutgoing);
     put.add(columnFamily, edgeKey, null);
     return put;
@@ -217,8 +219,8 @@ public class HBaseVertexHandler<V extends EPGMVertex>
    *                   incoming
    * @return byte representation of the edge identifier
    */
-  private byte[] createEdgeIdentifier(final EPGMEdge edge,
-    boolean isOutgoing) throws IOException {
+  private byte[] createEdgeIdentifier(final E edge, boolean isOutgoing)
+      throws IOException {
 
     // initially only GradoopId
     byte[] edgeIdentifier = Writables.getBytes(edge.getId());

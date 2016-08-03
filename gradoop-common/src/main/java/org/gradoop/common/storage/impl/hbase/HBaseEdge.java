@@ -24,10 +24,12 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 
 /**
  * Represents a persistent edge data object.
+ *
+ * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
 public class HBaseEdge<E extends EPGMEdge, V extends EPGMVertex>
-  extends HBaseGraphElement<E>
-  implements PersistentEdge<V> {
+  extends HBaseGraphElement<E> implements PersistentEdge<V> {
 
   /**
    * Source vertex
