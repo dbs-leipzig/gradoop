@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <MetaData>
-    <file>
+    <csvFile>
         <name>graph.csv</name>
         <charset>utf8</charset>
         <seperator>|</seperator>
@@ -19,8 +19,8 @@
             <column name="id" typ="Long"/>
             <column name="nodeCount" typ="Int"/>
         </columns>
-    </file>
-    <file>
+    </csvFile>
+    <csvFile>
         <name>book.csv</name>
         <charset>utf8</charset>
         <seperator>|</seperator>
@@ -43,8 +43,8 @@
             <column name="author" typ="String"/>
             <column name="title" typ="String"/>
         </columns>
-    </file>
-    <file>
+    </csvFile>
+    <csvFile>
         <name>author.csv</name>
         <charset>utf8</charset>
         <seperator>|</seperator>
@@ -69,14 +69,14 @@
             <column name="phone" typ="String"/>
             <column name="zip" typ="String"/>
         </columns>
-    </file>
-    <file>
+    </csvFile>
+    <csvFile>
         <name>writes.csv</name>
         <charset>utf8</charset>
         <seperator>|</seperator>
         <type>edge</type>
-        <label>writes
-            <field>3</field>
+        <label>
+            <specified>writes</specified>
         </label>
         <containment graphid="1" />
         <key>
@@ -92,6 +92,6 @@
             <column name="targetID" typ="Long"/>
             <column name="teamWork" typ="Boolean"/>
         </columns>
-    </file>
+    </csvFile>
 </MetaData>
 

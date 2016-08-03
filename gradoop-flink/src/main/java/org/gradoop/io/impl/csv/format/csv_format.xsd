@@ -1,129 +1,76 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xs:simpleType name="MetaData">
-        <xs:list itemType="csvFile"/>
-    </xs:simpleType>
+    <xs:complexType name="MetaData">
+        <xs:sequence>
+            <xs:element name="csvFile" type="csvFileType" minOccurs="1"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
-    <xs:simpleType name="csvFile">
-        <xs:string name="name"/>
-        <xs:string name="charset"/>
-        <xs:string name="seperator"/>
-        <xs:string name="type"/>
-        <xs:list itemType="label"/>
-        <!-- containment, frage wlecher DT für graph ids?-->
-        <xs:list itemType="xs:int"/>
-        <xs:list itemType="key"/>
-        <xs:list itemType="columns"/>
-    </xs:simpleType>
+    <xs:complexType name="csvFileType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="charset" type="xs:string"/>
+            <xs:element name="seperator" type="xs:string"/>
+            <xs:element name="type" type="xs:string"/>
 
-    <xs:simpleType name="label">
-        <xs:restriction base="xs:string"/>
-        <xs:list itemType="xs:int"/>
-    </xs:simpleType>
+            <xs:element name="label" type="labelType"/>
 
-    <xs:simpleType name="key">
+            <xs:element name="containment" type="containmentType"/>
 
-    </xs:simpleType>
+            <xs:element name="key" type="keyType"/>
 
-    <xs:simpleType name="columns">
-    </xs:simpleType>
+            <xs:element name="columns" type="columnsType"/>
 
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="labelType">
+        <xs:choice>
+            <xs:element name="specified" type="xs:string"/>
+            <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:element name="field" type="xs:int"/>
+            </xs:sequence>
+        </xs:choice>
+
+    </xs:complexType>
+    
+    <xs:complexType name="containmentType" mixed="true">
+        <xs:sequence>
+            <!-- containment, frage welcher DT für graph ids?-->
+            <xs:element name="graphid" type="xs:anyType" minOccurs="1"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="keyType">
+        <xs:sequence>
+            <xs:element name="id" type="idType"/>
+            <xs:element name="sys" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="idType">
+        <xs:sequence>
+            <xs:element name="field" type="xs:int" minOccurs="1"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="columnsType">
+        <xs:sequence>
+            <xs:element name="column" type="columnType" minOccurs="1"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="columnType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="typ" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>
-
-<MetaData>
-    <csvFile>
-        <name>graph.csv</name>
-        <charset>utf8</charset>
-        <seperator>|</seperator>
-        <type>graph</type>
-        <label>Graph</label>
-        <containment>
-        </containment>
-        <key>
-            <id>
-                <field>0</field>
-            </id>
-            <sys>AllSystems</sys>
-        </key>
-        <columns>
-            <column name="id" typ="Long"/>
-            <column name="nodeCount" typ="Int"/>
-        </columns>
-    </csvFile>
-    <csvFile>
-        <name>book.csv</name>
-        <charset>utf8</charset>
-        <seperator>|</seperator>
-        <type>vertex</type>
-        <label>
-            <field>1</field>
-            <field>2</field>
-        </label>
-        <containment>
-            <graphid>1</graphid>
-        </containment>
-        <key>
-            <id>
-                <field>0</field>
-            </id>
-            <sys>MyBooks</sys>
-        </key>
-        <columns>
-            <column name="isbn" typ="String"/>
-            <column name="author" typ="String"/>
-            <column name="title" typ="String"/>
-        </columns>
-    </csvFile>
-    <csvFile>
-        <name>author.csv</name>
-        <charset>utf8</charset>
-        <seperator>|</seperator>
-        <type>vertex</type>
-        <label>
-            <field>0</field>
-        </label>
-        <containment>
-            <graphid>1</graphid>
-            <graphid>2</graphid>
-        </containment>
-        <key>
-            <id>
-                <field>0</field>
-                <field>3</field>
-            </id>
-            <sys>AllAuthors</sys>
-        </key>
-        <columns>
-            <column name="name" typ="String"/>
-            <column name="age" typ="String"/>
-            <column name="phone" typ="String"/>
-            <column name="zip" typ="String"/>
-        </columns>
-    </csvFile>
-    <csvFile>
-        <name>writes.csv</name>
-        <charset>utf8</charset>
-        <seperator>|</seperator>
-        <type>edge</type>
-        <label>writes
-            <field>3</field>
-        </label>
-        <containment graphid="1" />
-        <key>
-            <id>
-                <field>1</field>
-                <field>2</field>
-            </id>
-            <sys>AllAuthors</sys>
-        </key>
-        <columns>
-            <column name="date" typ="Date"/>
-            <column name="sourceId" typ="Long"/>
-            <column name="targetID" typ="Long"/>
-            <column name="teamWork" typ="Boolean"/>
-        </columns>
-    </csvFile>
-</MetaData>
 
