@@ -18,9 +18,6 @@
 package org.gradoop.datagen.transactions.predictable;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.GraphTransactionsGenerator;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
@@ -29,15 +26,9 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 /**
  * Data generator with predictable result for the evaluation of Frequent
  * Subgraph Mining algorithms.
- *
- *
- * @param <G> EPGM graph head type.
- * @param <V> EPGM EPGMVertex type.
- * @param <E> EPGM EPGMEdge type.
  */
-public class PredictableTransactionsGenerator
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements GraphTransactionsGenerator<G, V, E> {
+public class PredictableTransactionsGenerator implements
+  GraphTransactionsGenerator {
 
 
   /**
@@ -55,7 +46,7 @@ public class PredictableTransactionsGenerator
   /**
    * Gradoop configuration
    */
-  private final GradoopFlinkConfig<G, V, E> config;
+  private final GradoopFlinkConfig config;
 
   /**
    * constructor
@@ -66,7 +57,7 @@ public class PredictableTransactionsGenerator
    * @param config Gradoop configuration
    */
   public PredictableTransactionsGenerator(long graphCount, int graphSize,
-    boolean multigraph, GradoopFlinkConfig<G, V, E> config) {
+    boolean multigraph, GradoopFlinkConfig config) {
 
     this.graphCount = graphCount;
     this.graphSize = graphSize;
@@ -75,17 +66,17 @@ public class PredictableTransactionsGenerator
   }
 
   @Override
-  public GraphTransactions<G, V, E> execute() {
+  public GraphTransactions execute() {
 
     DataSet<Long> graphNumbers = config
       .getExecutionEnvironment()
       .generateSequence(1, graphCount);
 
-    DataSet<GraphTransaction<G, V, E>> transactions = graphNumbers
-      .map(new PredictableTransaction<>(graphSize, multigraph, config))
+    DataSet<GraphTransaction> transactions = graphNumbers
+      .map(new PredictableTransaction(graphSize, multigraph, config))
       .returns(GraphTransaction.getTypeInformation(config));
 
-    return new GraphTransactions<>(transactions, config);
+    return new GraphTransactions(transactions, config);
   }
 
   @Override

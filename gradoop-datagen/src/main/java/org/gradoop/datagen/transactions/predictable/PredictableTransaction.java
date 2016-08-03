@@ -24,14 +24,14 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -40,15 +40,9 @@ import java.util.Set;
 
 /**
  * graphNumber => GraphTransaction
- *
- * @param <G> graph head type
- * @param <V> vertex type
- * @param <E> edge type
  */
-public class PredictableTransaction
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements MapFunction<Long, GraphTransaction<G, V, E>>
-  , ResultTypeQueryable<GraphTransaction<G, V, E>> {
+public class PredictableTransaction implements
+  MapFunction<Long, GraphTransaction>, ResultTypeQueryable<GraphTransaction> {
 
   /**
    * list of vertex labels
@@ -65,17 +59,17 @@ public class PredictableTransaction
   private final boolean multigraph;
 
   /**
-   * EPGM graph head factory
+   * graph head factory
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory graphHeadFactory;
   /**
-   * EPGM vertex factory
+   * vertex factory
    */
-  private final EPGMVertexFactory<V> vertexFactory;
+  private final VertexFactory vertexFactory;
   /**
-   * EPGM edge factory
+   * edge factory
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory edgeFactory;
 
   /**
    * constructor
@@ -85,7 +79,7 @@ public class PredictableTransaction
    * @param config Gradoop Flink configuration
    */
   PredictableTransaction(int graphSize, boolean multigraph,
-    GradoopFlinkConfig<G, V, E> config) {
+    GradoopFlinkConfig config) {
 
     this.multigraph = multigraph;
     this.graphSize = graphSize;
@@ -95,19 +89,19 @@ public class PredictableTransaction
   }
 
   @Override
-  public GraphTransaction<G, V, E> map(Long graphNumber) throws Exception {
+  public GraphTransaction map(Long graphNumber) throws Exception {
 
     Long maxVertexLabelIndex = graphNumber % 10;
 
-    G graphHead = graphHeadFactory
+    GraphHead graphHead = graphHeadFactory
       .createGraphHead(String.valueOf(maxVertexLabelIndex));
 
-    Set<V> vertices = Sets.newHashSet();
-    Set<E> edges = Sets.newHashSet();
+    Set<Vertex> vertices = Sets.newHashSet();
+    Set<Edge> edges = Sets.newHashSet();
 
     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
-    V centerVertex = vertexFactory.createVertex("S", graphIds);
+    Vertex centerVertex = vertexFactory.createVertex("S", graphIds);
     vertices.add(centerVertex);
 
     for (int vertexLabelIndex = 0; vertexLabelIndex <= maxVertexLabelIndex;
@@ -118,13 +112,13 @@ public class PredictableTransaction
         addPattern(graphNumber, vertexLabel, centerVertex, vertices, edges);
       }
     }
-    for (V vertex : vertices) {
+    for (Vertex vertex : vertices) {
       vertex.setGraphIds(graphIds);
     }
-    for (E edge : edges) {
+    for (Edge edge : edges) {
       edge.setGraphIds(graphIds);
     }
-    return new GraphTransaction<>(graphHead, vertices, edges);
+    return new GraphTransaction(graphHead, vertices, edges);
   }
 
   /**
@@ -138,8 +132,8 @@ public class PredictableTransaction
    * @param vertices stores created vertices
    * @param edges stores created edges
    */
-  private void addPattern(long graphNumber,
-    String vertexLabel, V centerVertex, Set<V> vertices, Set<E> edges) {
+  private void addPattern(long graphNumber, String vertexLabel,
+    Vertex centerVertex, Set<Vertex> vertices, Set<Edge> edges) {
 
     GradoopId multiBottomId = createVertex(vertexLabel, vertices);
     createEdge(
@@ -189,9 +183,9 @@ public class PredictableTransaction
    * @param vertices stores the vertex
    * @return id of the created vertex
    */
-  private GradoopId createVertex(String vertexLabel, Set<V> vertices) {
+  private GradoopId createVertex(String vertexLabel, Set<Vertex> vertices) {
 
-    V vertex = vertexFactory.createVertex(vertexLabel);
+    Vertex vertex = vertexFactory.createVertex(vertexLabel);
     vertices.add(vertex);
     return vertex.getId();
   }
@@ -205,13 +199,13 @@ public class PredictableTransaction
    * @param edges stores the edge
    */
   private void createEdge(
-    GradoopId sourceId, String label, GradoopId targetId, Set<E> edges) {
+    GradoopId sourceId, String label, GradoopId targetId, Set<Edge> edges) {
 
     edges.add(edgeFactory.createEdge(label, sourceId, targetId));
   }
 
   @Override
-  public TypeInformation<GraphTransaction<G, V, E>> getProducedType() {
+  public TypeInformation<GraphTransaction> getProducedType() {
     return new TupleTypeInfo<>(
       TypeExtractor.getForClass(graphHeadFactory.getType()),
       TypeExtractor.getForClass(Set.class),
