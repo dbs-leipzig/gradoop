@@ -28,6 +28,9 @@ import java.io.IOException;
 /**
  * Writes an EPGM representation into one DOT file. The format
  * is documented at {@link DOTFileFormat}.
+ *
+ * For more information see:
+ * https://en.wikipedia.org/wiki/DOT_(graph_description_language)
  */
 public class DOTDataSink implements DataSink {
   /**
