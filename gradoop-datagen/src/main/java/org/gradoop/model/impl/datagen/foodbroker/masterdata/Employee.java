@@ -94,6 +94,6 @@ public class Employee<V extends EPGMVertex>
     properties.set("name", name);
     properties.set("gender", gender);
 
-    return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
+    return vertexFactory.createVertex(Employee.CLASS_NAME, properties);
   }
 }
