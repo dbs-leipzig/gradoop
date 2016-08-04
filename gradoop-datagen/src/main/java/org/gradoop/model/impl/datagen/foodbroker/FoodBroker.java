@@ -16,12 +16,15 @@
  */
 package org.gradoop.model.impl.datagen.foodbroker;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.operators.CoGroupOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
@@ -60,12 +63,14 @@ import org.gradoop.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.TargetId;
 import org.gradoop.model.impl.functions.epgm.TransactionEdges;
+import org.gradoop.model.impl.functions.epgm.TransactionGraphHead;
 import org.gradoop.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Generates a GraphCollection containing a foodbrokerage and a complaint
@@ -309,6 +314,23 @@ public class FoodBroker
         .returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
 
 
+    transactionalEdges = transactionalEdges
+      .union(complaintTransactions
+        .map(new GraphTransactionTriple<G, V, E>())
+        .flatMap(new TransactionEdges<G, V, E>())
+        .returns(edgeTypeInfo));
+
+    transactionalVertices = transactionalVertices
+      .union(complaintTransactions
+        .map(new GraphTransactionTriple<G, V, E>())
+        .flatMap(new TransactionVertices<G, V, E>())
+        .returns(vertexTypeInfo));
+    DataSet<G> graphHeads = foodBrokerageTransactions
+      .union(complaintTransactions)
+      .map(new GraphTransactionTriple<G, V, E>())
+      .map(new TransactionGraphHead<G, V, E>())
+      .returns(graphHeadTypeInfo);
+
     DataSet<V> masterData = customers
       .union(vendors)
       .union(logistics)
@@ -316,30 +338,19 @@ public class FoodBroker
       .union(products)
       .join(transactionalEdges)
       .where(new Id<V>()).equalTo(new TargetId<E>())
-      .groupBy("f1.graphIds")
-      .reduceGroup(new GroupReduceFunction<Tuple2<V, E>, V>() {
+      .with(new JoinFunction<V, E, V>() {
         @Override
-        public void reduce(Iterable<Tuple2<V, E>> iterable,
-          Collector<V> collector) throws Exception {
-          for (Tuple2<V, E> tuple : iterable) {
-            V v = tuple.f0;
-            v.setGraphIds(tuple.f1.getGraphIds());
-            collector.collect(v);
-          }
+        public V join(V v, E e) throws Exception {
+          v.setGraphIds(e.getGraphIds());
+          return v;
         }
       });
 
-    DataSet<GraphTransaction<G, V, E>> masterDataTransaction = masterData
-      .groupBy("graphIds")
-      .reduceGroup(new MasterDataTransactions<G, V, E>(gradoopFlinkConfig));
+ DataSet<V> vertices = masterData
+   .union(transactionalVertices);
 
-    GraphTransactions<G, V, E> graphTransactions =
-      new GraphTransactions<G, V, E>(foodBrokerageTransactions
-        .union(complaintTransactions)
-        .union(masterDataTransaction),
-        gradoopFlinkConfig);
-
-    return GraphCollection.fromTransactions(graphTransactions);
+    return GraphCollection.fromDataSets(graphHeads, vertices,
+      transactionalEdges, gradoopFlinkConfig);
   }
 
   @Override
