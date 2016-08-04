@@ -31,6 +31,7 @@ import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.CollectionGenerator;
 import org.gradoop.model.impl.GraphCollection;
+import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.datagen.foodbroker.complainthandling.ComplaintHandling;
 import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
@@ -45,8 +46,6 @@ import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage
   .MasterDataTupleMapper;
 import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage
   .ProductTupleMapper;
-import org.gradoop.model.impl.datagen.foodbroker.foodbrokerage
-  .VerticesFromFoodBrokerage;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Customer;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.CustomerGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Employee;
@@ -57,11 +56,16 @@ import org.gradoop.model.impl.datagen.foodbroker.masterdata.ProductGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Vendor;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.VendorGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
+import org.gradoop.model.impl.functions.epgm.GraphTransactionTriple;
+import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.epgm.TargetId;
+import org.gradoop.model.impl.functions.epgm.TransactionEdges;
+import org.gradoop.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.model.impl.id.GradoopId;
+import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Generates a GraphCollection containing a foodbrokerage and a complaint
@@ -149,7 +153,7 @@ public class FoodBroker
         .map(new ProductTupleMapper<V>()))
       .reduceGroup(new MasterDataMapFromMasterData());
 
-    DataSet<Tuple2<Set<V>, Set<E>>> vertexEdgeTuple = caseSeeds
+    DataSet<GraphTransaction<G, V, E>> foodBrokerageTransactions = caseSeeds
       .mapPartition(foodBrokerage)
       .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()),
         Customer.CLASS_NAME)
@@ -161,29 +165,21 @@ public class FoodBroker
         Employee.CLASS_NAME)
       .withBroadcastSet(products.map(new ProductTupleMapper<V>()),
         Product.CLASS_NAME)
-      .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP);
+      .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP)
+      .returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
 
-    DataSet<V> transactionalVertices = vertexEdgeTuple
-      .flatMap(new VerticesFromFoodBrokerage<V, E>())
+
+
+    DataSet<V> transactionalVertices = foodBrokerageTransactions
+      .map(new GraphTransactionTriple<G, V, E>())
+      .flatMap(new TransactionVertices<G, V, E>())
       .returns(vertexTypeInfo);
 
-    DataSet<E> transactionalEdges = vertexEdgeTuple
-      .flatMap(new EdgesFromFoodBrokerage<V, E>())
+    DataSet<E> transactionalEdges = foodBrokerageTransactions
+      .map(new GraphTransactionTriple<G, V, E>())
+      .flatMap(new TransactionEdges<G, V, E>())
       .returns(edgeTypeInfo);
 
-    DataSet<G> graphHeads = vertexEdgeTuple
-      .map(new GraphHeadsFromFoodBrokerage<G, V, E>(
-        gradoopFlinkConfig.getGraphHeadFactory()))
-      .returns(graphHeadTypeInfo);
-
-    DataSet<V> vertices = customers
-      .union(vendors)
-      .union(logistics)
-      .union(employees)
-      .union(products)
-      .map(new MasterDataGraphIdsFromEdges<G, V, E>())
-      .withBroadcastSet(transactionalEdges, Constants.EDGES)
-      .union(transactionalVertices);
 
     // Filter vertices with label "SalesOrder"
     DataSet<V> salesOrderVertices =
@@ -287,10 +283,11 @@ public class FoodBroker
 
     // Initialize the complaint handling map partition function with some data
     ComplaintHandling<G, V, E> complaintHandling =
-      new ComplaintHandling<G, V, E>(gradoopFlinkConfig.getVertexFactory(),
+      new ComplaintHandling<G, V, E>(gradoopFlinkConfig.getGraphHeadFactory(),
+        gradoopFlinkConfig.getVertexFactory(),
         gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
     // Run the map partition function with some data
-    DataSet<Tuple2<Set<V>, Set<E>>> complaintTuple =
+    DataSet<GraphTransaction<G, V, E>> complaintTransactions =
       salesOrderVertices.mapPartition(complaintHandling)
         .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()),
           Customer.CLASS_NAME)
@@ -308,25 +305,41 @@ public class FoodBroker
         .withBroadcastSet(salesToLines, "salesToLines")
         .withBroadcastSet(salesOrderLineVertices, "salesOrderLines")
         .withBroadcastSet(purchesToLines, "purchesToLines")
-        .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP);
+        .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP)
+        .returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
 
 
-    // Fetch the vertices from complaint handling
-    DataSet<V> complaintVertices =
-      complaintTuple.flatMap(new VerticesFromFoodBrokerage<V, E>())
-        .returns(vertexTypeInfo);
+    DataSet<V> masterData = customers
+      .union(vendors)
+      .union(logistics)
+      .union(employees)
+      .union(products)
+      .join(transactionalEdges)
+      .where(new Id<V>()).equalTo(new TargetId<E>())
+      .groupBy("f1.graphIds")
+      .reduceGroup(new GroupReduceFunction<Tuple2<V, E>, V>() {
+        @Override
+        public void reduce(Iterable<Tuple2<V, E>> iterable,
+          Collector<V> collector) throws Exception {
+          for (Tuple2<V, E> tuple : iterable) {
+            V v = tuple.f0;
+            v.setGraphIds(tuple.f1.getGraphIds());
+            collector.collect(v);
+          }
+        }
+      });
 
-    // Fetch the edges from complaint handling
-    DataSet<E> complaintEdges =
-      complaintTuple.flatMap(new EdgesFromFoodBrokerage<V, E>())
-        .returns(edgeTypeInfo);
+    DataSet<GraphTransaction<G, V, E>> masterDataTransaction = masterData
+      .groupBy("graphIds")
+      .reduceGroup(new MasterDataTransactions<G, V, E>(gradoopFlinkConfig));
 
-    // Add the vertices and edges from complaint handling
-    vertices = vertices.union(complaintVertices);
-    transactionalEdges = transactionalEdges.union(complaintEdges);
+    GraphTransactions<G, V, E> graphTransactions =
+      new GraphTransactions<G, V, E>(foodBrokerageTransactions
+        .union(complaintTransactions)
+        .union(masterDataTransaction),
+        gradoopFlinkConfig);
 
-    return GraphCollection.fromDataSets(graphHeads, vertices,
-      transactionalEdges, gradoopFlinkConfig);
+    return GraphCollection.fromTransactions(graphTransactions);
   }
 
   @Override

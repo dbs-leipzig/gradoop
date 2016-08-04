@@ -43,6 +43,7 @@ import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
+import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -60,8 +61,9 @@ import java.util.Set;
  * @param <E> EPGM edge type
  */
 public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
-  extends EPGMEdge> extends RichMapPartitionFunction<Long,
-  Tuple2<Set<V>, Set<E>>> implements Serializable {
+  extends EPGMEdge>
+  extends RichMapPartitionFunction<Long, GraphTransaction<G, V, E>>
+  implements Serializable {
 
   /**
    * Foodbroker configuration
@@ -170,7 +172,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
   @Override
   public void mapPartition(Iterable<Long> iterable,
-    Collector<Tuple2<Set<V>, Set<E>>> collector) throws Exception {
+    Collector<GraphTransaction<G, V, E>> collector) throws Exception {
 
     // SalesQuotation
     V salesQuotation;
@@ -200,11 +202,16 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     long startDate = config.getStartDate();
 
+    G graphHead;
+    GraphTransaction<G, V, E> graphTransaction;
+
     for (Long seed: iterable) {
       vertices = Sets.newHashSet();
       edges = Sets.newHashSet();
+      graphHead = graphHeadFactory.createGraphHead();
       graphIds = new GradoopIdSet();
-      graphIds.add(graphHeadFactory.createGraphHead().getId());
+      graphIds.add(graphHead.getId());
+      graphTransaction = new GraphTransaction<>();
 
       // SalesQuotation
       salesQuotation = newSalesQuotation(startDate);
@@ -235,7 +242,10 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
         // SalesInvoices
         salesInvoice = newSalesInvoice(salesOrderLines);
       }
-      collector.collect(new Tuple2<>(vertices, edges));
+      graphTransaction.setGraphHead(graphHead);
+      graphTransaction.setVertices(vertices);
+      graphTransaction.setEdges(edges);
+      collector.collect(graphTransaction);
     }
   }
 
