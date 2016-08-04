@@ -83,7 +83,7 @@ public class Product<V extends EPGMVertex>
       " " + nameGroupPair.f0);
     this.setPrice(properties);
 
-    return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
+    return vertexFactory.createVertex(Product.CLASS_NAME, properties);
   }
 
   private void setPrice(PropertyList properties) {

@@ -72,6 +72,6 @@ public class Logistics<V extends EPGMVertex>
       adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nouns.get(random.nextInt(nounCount)));
 
-    return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
+    return vertexFactory.createVertex(Logistics.CLASS_NAME, properties);
   }
 }
