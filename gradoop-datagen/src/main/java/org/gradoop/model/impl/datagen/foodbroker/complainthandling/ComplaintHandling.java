@@ -11,6 +11,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMEdgeFactory;
 import org.gradoop.model.api.EPGMGraphHead;
+import org.gradoop.model.api.EPGMGraphHeadFactory;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
@@ -20,6 +21,7 @@ import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
+import org.gradoop.model.impl.tuples.GraphTransaction;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -39,9 +41,11 @@ import java.util.Set;
  */
 public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
   E extends EPGMEdge> extends
-  RichMapPartitionFunction<V, Tuple2<Set<V>, Set<E>>> implements Serializable {
+  RichMapPartitionFunction<V, GraphTransaction<G, V, E>> implements
+  Serializable {
 
   private GradoopIdSet graphIds;
+  private final EPGMGraphHeadFactory<G> graphHeadFactory;
   private final EPGMVertexFactory<V> vertexFactory;
   private final EPGMEdgeFactory<E> edgeFactory;
   private final FoodBrokerConfig config;
@@ -65,12 +69,15 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
   /**
    * Initializes a lot of stuff and sets the factories as well as the config.
    *
+   * @param graphHeadFactory
    * @param vertexFactory Vertex factory
    * @param edgeFactory   Edge factory
    * @param config        Configuration
    */
-  public ComplaintHandling(EPGMVertexFactory<V> vertexFactory,
-    EPGMEdgeFactory<E> edgeFactory, FoodBrokerConfig config) {
+  public ComplaintHandling(EPGMGraphHeadFactory<G> graphHeadFactory,
+    EPGMVertexFactory<V> vertexFactory, EPGMEdgeFactory<E> edgeFactory,
+    FoodBrokerConfig config) {
+    this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
     this.config = config;
@@ -108,20 +115,29 @@ public class ComplaintHandling<G extends EPGMGraphHead, V extends EPGMVertex,
 
   @Override
   public void mapPartition(Iterable<V> values,
-    Collector<Tuple2<Set<V>, Set<E>>> out) throws Exception {
+    Collector<GraphTransaction<G, V, E>> out) throws Exception {
+
+    G graphHead;
+    GraphTransaction<G, V, E> graphTransaction;
 
     // Iterate over SalesOrder vertices
     for (V sale : values) {
       // Create for each SalesOrder new
       vertices = Sets.newHashSet();
       edges = Sets.newHashSet();
+      graphHead = graphHeadFactory.createGraphHead();
       graphIds = sale.getGraphIds();
+      graphIds.add(graphHead.getId());
+      graphTransaction = new GraphTransaction<>();
 
       lateDelivery(sale);
       badQuality(sale);
 
       // Collect the created vertices and edges
-      out.collect(new Tuple2<>(vertices, edges));
+      graphTransaction.setGraphHead(graphHead);
+      graphTransaction.setVertices(vertices);
+      graphTransaction.setEdges(edges);
+      out.collect(graphTransaction);
     }
   }
 
