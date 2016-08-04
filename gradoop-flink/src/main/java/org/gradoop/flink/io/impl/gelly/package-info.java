@@ -19,4 +19,4 @@
  * Contains all classes related to gelly graph data sources and gelly graph
  * data sinks.
  */
-package org.gradoop.io.impl.gelly;
+package org.gradoop.flink.io.impl.gelly;

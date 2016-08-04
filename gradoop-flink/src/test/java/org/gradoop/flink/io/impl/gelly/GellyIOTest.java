@@ -1,33 +1,29 @@
-package org.gradoop.io.impl.gelly;
+package org.gradoop.flink.io.impl.gelly;
 
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
-import org.gradoop.io.api.DataSink;
-import org.gradoop.io.impl.gelly.functions.ToGellyEdge;
-import org.gradoop.io.impl.gelly.functions.ToGellyVertex;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.api.EPGMGraphElement;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.id.GradoopId;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.EdgePojoFactory;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
-import org.gradoop.model.impl.pojo.VertexPojoFactory;
-import org.gradoop.util.FlinkAsciiGraphLoader;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.gradoop.flink.io.impl.gelly.functions.ToGellyEdge;
+import org.gradoop.flink.io.impl.gelly.functions.ToGellyVertex;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import static org.gradoop.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils
+  .validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils
+  .validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -43,32 +39,30 @@ public class GellyIOTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFromGellyGraph() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
-      loader = getLoaderFromString("()-->()<--()-->()");
+    FlinkAsciiGraphLoader loader = getLoaderFromString("()-->()<--()-->()");
 
     // transform EPGM vertices to Gelly vertices
-    DataSet<Vertex<GradoopId, VertexPojo>> gellyVertices =
+    DataSet<org.apache.flink.graph.Vertex<GradoopId, Vertex>> gellyVertices =
       getExecutionEnvironment().fromCollection(loader.getVertices())
-        .map(new ToGellyVertex<VertexPojo>());
+        .map(new ToGellyVertex());
 
     // transform EPGM edges to Gelly edges
-    DataSet<Edge<GradoopId, EdgePojo>> gellyEdges =
+    DataSet<org.apache.flink.graph.Edge<GradoopId, Edge>> gellyEdges =
       getExecutionEnvironment().fromCollection(loader.getEdges())
-        .map(new ToGellyEdge<EdgePojo>());
+        .map(new ToGellyEdge());
 
-    Graph<GradoopId, VertexPojo, EdgePojo> gellyGraph = Graph.fromDataSet(
+    Graph<GradoopId, Vertex, Edge> gellyGraph = Graph.fromDataSet(
       gellyVertices, gellyEdges, getExecutionEnvironment());
 
     // create GellyDataSource
-    GellyGraphDataSource<GraphHeadPojo, VertexPojo, EdgePojo> source =
-      new GellyGraphDataSource<>(gellyGraph, getConfig());
+    GellyGraphDataSource source =
+      new GellyGraphDataSource(gellyGraph, getConfig());
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> logicalGraph =
-      source.getLogicalGraph();
+    LogicalGraph logicalGraph = source.getLogicalGraph();
 
-    Collection<GraphHeadPojo> loadedGraphHead = Lists.newArrayList();
-    Collection<VertexPojo> loadedVertices   = Lists.newArrayList();
-    Collection<EdgePojo> loadedEdges      = Lists.newArrayList();
+    Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
+    Collection<Vertex> loadedVertices   = Lists.newArrayList();
+    Collection<Edge> loadedEdges      = Lists.newArrayList();
 
     logicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(
       loadedGraphHead));
@@ -79,16 +73,16 @@ public class GellyIOTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    GraphHeadPojo newGraphHead = loadedGraphHead.iterator().next();
+    GraphHead newGraphHead = loadedGraphHead.iterator().next();
 
     validateEPGMElementCollections(loadedVertices, loader.getVertices());
     validateEPGMElementCollections(loadedEdges, loader.getEdges());
 
-    Collection<EPGMGraphElement> epgmElements = new ArrayList<>();
+    Collection<GraphElement> epgmElements = new ArrayList<>();
     epgmElements.addAll(loadedVertices);
     epgmElements.addAll(loadedEdges);
 
-    for (EPGMGraphElement loadedVertex : epgmElements) {
+    for (GraphElement loadedVertex : epgmElements) {
       assertEquals("graph element has wrong graph count",
         1, loadedVertex.getGraphCount());
       assertTrue("graph element was not in new graph",
@@ -105,34 +99,32 @@ public class GellyIOTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFromGellyGraphWithGraphHead() throws Exception {
-    FlinkAsciiGraphLoader<GraphHeadPojo, VertexPojo, EdgePojo>
-      loader = getLoaderFromString("g[()-->()<--()-->()]");
+    FlinkAsciiGraphLoader loader = getLoaderFromString("g[()-->()<--()-->()]");
 
     // transform EPGM vertices to Gelly vertices
-    DataSet<Vertex<GradoopId, VertexPojo>> gellyVertices =
+    DataSet<org.apache.flink.graph.Vertex<GradoopId, Vertex>> gellyVertices =
       getExecutionEnvironment().fromCollection(loader.getVertices())
-        .map(new ToGellyVertex<VertexPojo>());
+        .map(new ToGellyVertex());
 
     // transform EPGM edges to Gelly edges
-    DataSet<Edge<GradoopId, EdgePojo>> gellyEdges =
+    DataSet<org.apache.flink.graph.Edge<GradoopId, Edge>> gellyEdges =
       getExecutionEnvironment().fromCollection(loader.getEdges())
-        .map(new ToGellyEdge<EdgePojo>());
+        .map(new ToGellyEdge());
 
-    Graph<GradoopId, VertexPojo, EdgePojo> gellyGraph = Graph.fromDataSet(
+    Graph<GradoopId, Vertex, Edge> gellyGraph = Graph.fromDataSet(
       gellyVertices, gellyEdges, getExecutionEnvironment());
 
-    GraphHeadPojo graphHead = loader.getGraphHeadByVariable("g");
+    GraphHead graphHead = loader.getGraphHeadByVariable("g");
 
     // create GellyDataSource
-    GellyGraphDataSource<GraphHeadPojo, VertexPojo, EdgePojo> source =
-      new GellyGraphDataSource<>(gellyGraph, graphHead, getConfig());
+    GellyGraphDataSource source =
+      new GellyGraphDataSource(gellyGraph, graphHead, getConfig());
 
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> logicalGraph =
-      source.getLogicalGraph();
+    LogicalGraph logicalGraph = source.getLogicalGraph();
 
-    Collection<GraphHeadPojo> loadedGraphHead = Lists.newArrayList();
-    Collection<VertexPojo> loadedVertices   = Lists.newArrayList();
-    Collection<EdgePojo> loadedEdges      = Lists.newArrayList();
+    Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
+    Collection<Vertex> loadedVertices     = Lists.newArrayList();
+    Collection<Edge> loadedEdges          = Lists.newArrayList();
 
     logicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(
       loadedGraphHead));
