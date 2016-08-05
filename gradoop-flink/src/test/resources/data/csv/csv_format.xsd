@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.gradoop.org/csvInput"
+            targetNamespace="http://www.gradoop.org/csvInput"
+            elementFormDefault="qualified">
+
+    <!--csvFile attributes -->
+    <xsd:attributeGroup name="csvfileattributes">
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="charset" type="xsd:string"/>
+        <xsd:attribute name="seperator" type="xsd:string"/>
+        <xsd:attribute name="graphelementtype" type="graphelementEnum"/>
+    </xsd:attributeGroup>
+    <!--edgeids attributes -->
+    <xsd:attributeGroup name="edgeidsattributes">
+        <xsd:attribute name="sourceid" type="xsd:int"/>
+        <xsd:attribute name="targetid" type="xsd:int"/>
+    </xsd:attributeGroup>
+    <!--collumntype attributes -->
+    <xsd:attributeGroup name="collumnattributes">
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="type" type="typesEnum"/>
+    </xsd:attributeGroup>
+
+
+    <!-- Enums -->
+    <xsd:simpleType name="graphelementEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="graph"/>
+            <xsd:enumeration value="vertex"/>
+            <xsd:enumeration value="edge"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="typesEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Integer"/>
+            <xsd:enumeration value="Long"/>
+            <xsd:enumeration value="Float"/>
+            <xsd:enumeration value="Double"/>
+            <xsd:enumeration value="String"/>
+            <xsd:enumeration value="Boolean"/>
+            <!-- Date as valid data type? Parsing may be complex due to
+            different formats.
+            <xsd:enumeration value="Date"/> -->
+        </xsd:restriction>
+    </xsd:simpleType>
+
+
+    <!-- complex elements -->
+    <xsd:element name="column">
+        <xsd:complexType>
+            <xsd:attributeGroup ref="collumnattributes"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="columns">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="column" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <xsd:element name="id">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="field" type="xsd:int" minOccurs="1"
+                            maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="key">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="id"/>
+                <xsd:element name="sys" type="xsd:string"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="containment">
+        <xsd:complexType>
+            <xsd:sequence>
+                <!-- containment, frage welcher DT für graph ids?-->
+                <xsd:element name="graphid" type="xsd:anyType" minOccurs="0"
+                            maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="edgeids">
+        <xsd:complexType>
+            <xsd:attributeGroup ref="edgeidsattributes"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="label">
+        <xsd:complexType>
+            <xsd:choice>
+                <xsd:element name="specified" type="xsd:string"/>
+                <xsd:sequence >
+                    <xsd:element name="field" type="xsd:int" minOccurs="1"
+                                maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:choice>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="csvfile">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="label"/>
+                <xsd:element ref="containment" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="edgeids" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="key"/>
+                <xsd:element ref="columns"/>
+            </xsd:sequence>
+            <xsd:attributeGroup ref="csvfileattributes"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="datasource">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="csvfile" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>
+

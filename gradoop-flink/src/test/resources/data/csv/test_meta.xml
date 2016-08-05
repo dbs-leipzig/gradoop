@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<datasource xmlns="http://www.gradoop.org/csvInput"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.gradoop.org/csvInput
+            http://www.gradoop.org/csvInput/csv_format.xsd">
+
+    <csvfile name="test_graph.csv" charset="utf8" seperator="|"
+             graphelementtype="graph">
+        <label>
+            <specified>Graph</specified>
+        </label>
+        <key>
+            <id>
+                <field>0</field>
+            </id>
+            <sys>TestGraph</sys>
+        </key>
+        <columns>
+            <column name="id" type="Long"/>
+        </columns>
+    </csvfile>
+
+    <csvfile name="test_vertex.csv" charset="utf8" seperator="|"
+             graphelementtype="vertex">
+        <label>
+            <field>1</field>
+            <field>2</field>
+        </label>
+        <containment>
+            <graphid>0</graphid>
+        </containment>
+        <key>
+            <id>
+                <field>0</field>
+            </id>
+            <sys>TestVertex</sys>
+        </key>
+        <columns>
+            <column name="id" type="Integer"/>
+            <column name="attr1" type="String"/>
+            <column name="attr2" type="String"/>
+        </columns>
+    </csvfile>
+
+    <csvfile name="test_edge.csv" charset="utf8" seperator="|"
+             graphelementtype="edge">
+        <label>
+            <specified>edge</specified>
+        </label>
+        <containment>
+            <graphid>0</graphid>
+        </containment>
+        <edgeids sourceid="1" targetid="2"/>
+        <key>
+            <id>
+                <field>1</field>
+                <field>2</field>
+            </id>
+            <sys>TestEdge</sys>
+        </key>
+        <columns>
+            <column name="edgelabel" type="String"/>
+            <column name="sourceId" type="Long"/>
+            <column name="targetID" type="Long"/>
+        </columns>
+    </csvfile>
+
+</datasource>
+
