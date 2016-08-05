@@ -15,22 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.io.impl.gelly.functions;
-
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
-
 /**
- * MapFunction to convert a EPGVertex to a Gelly Vertex
+ * Contains all flink functions for to gelly graph data sources and sinks
  */
-public class ToGellyVertex
-  implements MapFunction<Vertex,
-  org.apache.flink.graph.Vertex<GradoopId, Vertex>> {
-
-  @Override
-  public org.apache.flink.graph.Vertex<GradoopId, Vertex> map(Vertex v)
-      throws Exception {
-    return new org.apache.flink.graph.Vertex<>(v.getId(), v);
-  }
-}
+package org.gradoop.flink.io.impl.gelly.functions;
