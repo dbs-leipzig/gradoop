@@ -46,7 +46,7 @@ public class CSVTest extends GradoopFlinkTestBase {
 //    System.out.println(XmlParser.validateXml(xmlFile, xsdFile));
 
 //    XmlParser.parseSAX(xsdFile);
-    XmlParser.parseDom2(xsdFile);
+    XmlParser.parseJAXB2(xsdFile, xmlFile);
 
 
     // create datasource

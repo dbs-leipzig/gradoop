@@ -2,7 +2,6 @@ package org.gradoop.io.impl.csv.parser;
 
 
 import com.sun.org.apache.xerces.internal.impl.xs.XSImplementationImpl;
-import com.sun.org.apache.xerces.internal.xs.XSConstants;
 import com.sun.org.apache.xerces.internal.xs.XSLoader;
 import com.sun.org.apache.xerces.internal.xs.XSModel;
 import org.w3c.dom.Document;
@@ -31,6 +30,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -44,18 +45,36 @@ public class XmlParser {
 //  XSModel model = schemaLoader.loadURI("src/test/resources/my.xsd");
 
 
-  public static void parseJAXB2(String xsdSchema ,String xmlDatei) throws
-    MalformedURLException, SAXException {
+  public static CSVFile parseJAXB2(String xsdSchema, String xmlDatei) throws
+    MalformedURLException, SAXException, JAXBException, FileNotFoundException {
     SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
     Schema  schema   = ( xsdSchema == null || xsdSchema.trim().length() == 0 )
       ? null : schemaFactory.newSchema( new File( xsdSchema ) );
-    JAXBContext jaxbContext   = JAXBContext.newInstance( Object.getPackage()
+    JAXBContext jaxbContext   = JAXBContext.newInstance( DataSource.class.getPackage()
       .getName() );
 
 
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     unmarshaller.setSchema( schema );
-    return clss.cast( unmarshaller.unmarshal( new File( xmlDatei ) ) );
+
+    DataSource source = (DataSource) unmarshaller.unmarshal(new
+      FileInputStream(xmlDatei));
+
+    System.out.println(source);
+
+//CSVFile csvFile = (CSVFile) unmarshaller.unmarshal(new FileInputStream
+//  (xmlDatei));
+
+//    System.out.println(csvFile.getName());
+
+    return null;
+//    CSVFile object = CSVFile.class.cast( unmarshaller.unmarshal( new File( xmlDatei
+//    ) ) );
+//
+//    System.out.println(object);
+//
+//
+//    return CSVFile.class.cast( unmarshaller.unmarshal( new File( xmlDatei ) ) );
   }
 
 
@@ -67,7 +86,7 @@ public class XmlParser {
     factory.setNamespaceAware(true);
 
     SAXParser parser = factory.newSAXParser();
-    parser.setProperty(,
+    parser.setProperty("",
        new File(xsdFile));
 
     XMLReader reader = parser.getXMLReader();
@@ -166,7 +185,7 @@ public class XmlParser {
     com.sun.org.apache.xerces.internal.impl.xs.XSImplementationImpl impl = (XSImplementationImpl) registry.getDOMImplementation("XS-Loader");
     XSLoader schemaLoader = impl.createXSLoader(null);
     XSModel model = schemaLoader.loadURI(xsdFile);
-    model.
+
 
 //    System.out.println(model.getComponents(XSConstants.ATTRIBUTE_GROUP));
   }
