@@ -399,9 +399,9 @@ public class PropertyValueTest {
       create(new BigDecimal(11)));
 
     validateEqualsAndHashCode(
-      create(GradoopId.fromString("9b7a3995-c3bd-4503-9286-fe45955599eb")),
-      create(GradoopId.fromString("9b7a3995-c3bd-4503-9286-fe45955599eb")),
-      create(GradoopId.fromString("42424242-4242-4242-4242-424242424242"))
+      create(GradoopId.fromString("362624141-4503123-32003-777216")),
+      create(GradoopId.fromString("362624141-4503123-32003-777216")),
+      create(GradoopId.fromString("2147483647-8388607-32767-8388607"))
     );
   }
 
@@ -447,9 +447,9 @@ public class PropertyValueTest {
       create(new BigDecimal(11)));
 
     validateCompareTo(
-      create(GradoopId.fromString("9b7a3995-c3bd-4503-9286-fe45955599eb")),
-      create(GradoopId.fromString("9b7a3995-c3bd-4503-9286-fe45955599eb")),
-      create(GradoopId.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
+      create(GradoopId.fromString("362624141-4503123-32003-777216")),
+      create(GradoopId.fromString("362624141-4503123-32003-777216")),
+      create(GradoopId.fromString("2147483647-8388607-32767-8388607"))
     );
   }
 
