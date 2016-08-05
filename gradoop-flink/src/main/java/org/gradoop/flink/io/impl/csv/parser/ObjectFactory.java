@@ -1,4 +1,7 @@
-package org.gradoop.io.impl.csv.parser;
+package org.gradoop.flink.io.impl.csv.parser;
+
+import org.gradoop.flink.io.impl.csv.pojo.CSVFile;
+import org.gradoop.flink.io.impl.csv.pojo.DataSource;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

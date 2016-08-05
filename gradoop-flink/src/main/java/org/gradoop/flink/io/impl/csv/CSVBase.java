@@ -15,48 +15,42 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.csv;
+package org.gradoop.flink.io.impl.csv;
 
-import org.gradoop.model.api.EPGMEdge;
-import org.gradoop.model.api.EPGMGraphHead;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.util.GradoopFlinkConfig;
+
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Base class for TLF data source and sink.
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-abstract class CSVBase
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+abstract class CSVBase {
   /**
    * Gradoop Flink configuration
    */
-  private final GradoopFlinkConfig<G, V, E> config;
+  private final GradoopFlinkConfig config;
   /**
    * File to read/write TLF content to
    */
-  private final String csvPath;
+  private final String metaXmlPath;
 
-  CSVBase(GradoopFlinkConfig<G, V, E> config, String csvPath) {
+  CSVBase(GradoopFlinkConfig config, String metaXmlPath) {
     if (config == null) {
       throw new IllegalArgumentException("config must not be null");
     }
-    if (csvPath == null) {
+    if (metaXmlPath == null) {
       throw new IllegalArgumentException("csv file must not be null");
     }
 
     this.config = config;
-    this.csvPath = csvPath;
+    this.metaXmlPath = metaXmlPath;
   }
 
-  public GradoopFlinkConfig<G, V, E> getConfig() {
+  public GradoopFlinkConfig getConfig() {
     return config;
   }
 
-  public String getCSVPath() {
-    return csvPath;
+  public String getMetaXmlPath() {
+    return metaXmlPath;
   }
 }

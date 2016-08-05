@@ -1,11 +1,10 @@
-package org.gradoop.io.impl.csv.parser;
+package org.gradoop.flink.io.impl.csv.pojo;
 
-import javax.xml.bind.JAXBElement;
+import org.gradoop.flink.io.impl.csv.parser.ObjectFactory;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(namespace = "http://www.gradoop.org/csvInput", name="datasource")
-@XmlType(factoryClass=org.gradoop.io.impl.csv.parser.ObjectFactory.class,
+@XmlType(factoryClass=ObjectFactory.class,
   factoryMethod="createDataSource")
 public class DataSource {
 

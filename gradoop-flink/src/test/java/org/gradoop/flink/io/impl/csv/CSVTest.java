@@ -15,15 +15,12 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.csv;
+package org.gradoop.flink.io.impl.csv;
 
-import org.gradoop.io.api.DataSource;
-import org.gradoop.io.impl.csv.parser.XmlParser;
-import org.gradoop.model.GradoopFlinkTestBase;
-import org.gradoop.model.impl.LogicalGraph;
-import org.gradoop.model.impl.pojo.EdgePojo;
-import org.gradoop.model.impl.pojo.GraphHeadPojo;
-import org.gradoop.model.impl.pojo.VertexPojo;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.parser.XmlParser;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.LogicalGraph;
 import org.junit.Test;
 
 
@@ -50,10 +47,10 @@ public class CSVTest extends GradoopFlinkTestBase {
 
 
     // create datasource
-    DataSource<GraphHeadPojo, VertexPojo, EdgePojo> dataSource =
-      new CSVDataSource<>(config, xmlFile, delimiter);
+    DataSource dataSource =
+      new CSVDataSource(config, xmlFile, delimiter);
     //get transactions
-    LogicalGraph<GraphHeadPojo, VertexPojo, EdgePojo> graph =
+    LogicalGraph graph =
       dataSource.getLogicalGraph();
 
 

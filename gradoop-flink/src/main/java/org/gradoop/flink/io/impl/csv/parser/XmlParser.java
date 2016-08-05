@@ -1,9 +1,11 @@
-package org.gradoop.io.impl.csv.parser;
+package org.gradoop.flink.io.impl.csv.parser;
 
 
 import com.sun.org.apache.xerces.internal.impl.xs.XSImplementationImpl;
 import com.sun.org.apache.xerces.internal.xs.XSLoader;
 import com.sun.org.apache.xerces.internal.xs.XSModel;
+import org.gradoop.flink.io.impl.csv.pojo.CSVFile;
+import org.gradoop.flink.io.impl.csv.pojo.DataSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -50,7 +52,7 @@ public class XmlParser {
     SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
     Schema  schema   = ( xsdSchema == null || xsdSchema.trim().length() == 0 )
       ? null : schemaFactory.newSchema( new File( xsdSchema ) );
-    JAXBContext jaxbContext   = JAXBContext.newInstance( DataSource.class.getPackage()
+    JAXBContext jaxbContext   = JAXBContext.newInstance( ObjectFactory.class.getPackage()
       .getName() );
 
 

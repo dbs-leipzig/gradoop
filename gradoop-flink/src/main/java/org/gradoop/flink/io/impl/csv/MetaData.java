@@ -1,4 +1,4 @@
-package org.gradoop.io.impl.csv;
+package org.gradoop.flink.io.impl.csv;
 
 
 import org.apache.flink.api.java.tuple.Tuple9;

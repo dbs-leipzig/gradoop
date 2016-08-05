@@ -1,4 +1,4 @@
-package org.gradoop.io.impl.csv;
+package org.gradoop.flink.io.impl.csv;
 
 /**
  * Created by stephan on 03.08.16.

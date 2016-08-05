@@ -15,19 +15,13 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.io.impl.csv.inputformats;
+package org.gradoop.flink.io.impl.csv.inputformats;
 
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.gradoop.io.impl.tlf.inputformats.TLFRecordReader;
-
-import java.io.IOException;
 
 /**
  * This input format is used to extract csv data from distributed hdfs files.
