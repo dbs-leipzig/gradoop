@@ -16,25 +16,19 @@
  */
 package org.gradoop.model.impl.datagen.foodbroker;
 
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.operators.CoGroupOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.util.Collector;
 import org.gradoop.model.api.EPGMEdge;
 import org.gradoop.model.api.EPGMGraphHead;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.operators.CollectionGenerator;
 import org.gradoop.model.impl.GraphCollection;
-import org.gradoop.model.impl.GraphTransactions;
 import org.gradoop.model.impl.datagen.foodbroker.complainthandling.ComplaintHandling;
 import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
@@ -59,6 +53,8 @@ import org.gradoop.model.impl.datagen.foodbroker.masterdata.ProductGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.Vendor;
 import org.gradoop.model.impl.datagen.foodbroker.masterdata.VendorGenerator;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
 import org.gradoop.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.model.impl.functions.epgm.Id;
 import org.gradoop.model.impl.functions.epgm.TargetId;
@@ -70,7 +66,6 @@ import org.gradoop.model.impl.tuples.GraphTransaction;
 import org.gradoop.util.GradoopFlinkConfig;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Generates a GraphCollection containing a foodbrokerage and a complaint
@@ -156,21 +151,35 @@ public class FoodBroker
       .map(new MasterDataTupleMapper<V>())
       .union(products
         .map(new ProductTupleMapper<V>()))
+      .reduceGroup(new MasterDataMapFromMasterDataOld());
+
+    DataSet<Map<GradoopId, MasterDataTuple>> customerDataMap = customers
+      .map(new MasterDataTupleMapper<V>())
       .reduceGroup(new MasterDataMapFromMasterData());
+    DataSet<Map<GradoopId, MasterDataTuple>> vendorDataMap = vendors
+      .map(new MasterDataTupleMapper<V>())
+      .reduceGroup(new MasterDataMapFromMasterData());
+    DataSet<Map<GradoopId, MasterDataTuple>> logisticDataMap = logistics
+      .map(new MasterDataTupleMapper<V>())
+      .reduceGroup(new MasterDataMapFromMasterData());
+    DataSet<Map<GradoopId, MasterDataTuple>> employeeDataMap = employees
+      .map(new MasterDataTupleMapper<V>())
+      .reduceGroup(new MasterDataMapFromMasterData());
+    DataSet<Map<GradoopId, ProductTuple>> productDataMap = products
+      .map(new ProductTupleMapper<V>())
+      .reduceGroup(new ProductDataMapFromMasterData());
+
+
+
 
     DataSet<GraphTransaction<G, V, E>> foodBrokerageTransactions = caseSeeds
       .mapPartition(foodBrokerage)
-      .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()),
-        Customer.CLASS_NAME)
-      .withBroadcastSet(vendors.map(new MasterDataTupleMapper<V>()),
-        Vendor.CLASS_NAME)
-      .withBroadcastSet(logistics.map(new MasterDataTupleMapper<V>()),
-        LogisticsGenerator.CLASS_NAME)
-      .withBroadcastSet(employees.map(new MasterDataTupleMapper<V>()),
-        Employee.CLASS_NAME)
-      .withBroadcastSet(products.map(new ProductTupleMapper<V>()),
-        Product.CLASS_NAME)
       .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP)
+      .withBroadcastSet(customerDataMap, Constants.CUSTOMERDATA_MAP)
+      .withBroadcastSet(vendorDataMap, Constants.VENDORDATA_MAP)
+      .withBroadcastSet(logisticDataMap, Constants.LOGISTICDATA_MAP)
+      .withBroadcastSet(employeeDataMap, Constants.EMPLOYEEDATA_MAP)
+      .withBroadcastSet(productDataMap, Constants.PRODUCTDATA_MAP)
       .returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
 
 
@@ -247,9 +256,14 @@ public class FoodBroker
     // Create a data set of tuple-2s so that we have purches associated with
     // their lines
     DataSet<Tuple2<V, V>> purchesToLines =
-      purchOrderVertices.join(transactionalEdges).where("id")
-        .equalTo("targetId").join(purchOrderLineVertices).where("f1.sourceId")
-        .equalTo("id").with(new JoinFunction<Tuple2<V, E>, V, Tuple2<V, V>>() {
+      purchOrderVertices
+        .join(transactionalEdges)
+        .where("id")
+        .equalTo("targetId")
+        .join(purchOrderLineVertices)
+        .where("f1.sourceId")
+        .equalTo("id")
+        .with(new JoinFunction<Tuple2<V, E>, V, Tuple2<V, V>>() {
         @Override
         public Tuple2<V, V> join(Tuple2<V, E> first, V second) throws
           Exception {

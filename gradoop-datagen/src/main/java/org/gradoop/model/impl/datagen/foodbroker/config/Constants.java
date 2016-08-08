@@ -55,4 +55,15 @@ public class Constants {
    */
   public static final String MASTERDATA_MAP = "masterDataMap";
 
+  public static final String CUSTOMERDATA_MAP = "customerDataMap";
+
+  public static final String VENDORDATA_MAP = "vendorDataMap";
+
+  public static final String LOGISTICDATA_MAP = "logisticDataMap";
+
+  public static final String EMPLOYEEDATA_MAP = "employeeDataMap";
+
+  public static final String PRODUCTDATA_MAP = "productDataMap";
+
+
 }
