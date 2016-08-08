@@ -68,23 +68,23 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
   // these tuples contains only the important data: id, quality
   /**
-   * list of all customers
+   * iterator over all customers
    */
   private Iterator<Map.Entry<GradoopId, MasterDataTuple>> customerIterator;
   /**
-   * list of all vendors
+   * iterator over all vendors
    */
   private Iterator<Map.Entry<GradoopId, MasterDataTuple>> vendorIterator;
   /**
-   * list of all logistics
+   * iterator over all logistics
    */
   private Iterator<Map.Entry<GradoopId, MasterDataTuple>> logisticIterator;
   /**
-   * list of all employees
+   * iterator over all employees
    */
   private Iterator<Map.Entry<GradoopId, MasterDataTuple>> employeeIterator;
   /**
-   * list of all products
+   * iterator over all products
    */
   private Iterator<Map.Entry<GradoopId, ProductTuple>> productIterator;
   //caseseeds als input
@@ -124,18 +124,24 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    */
   private Map<GradoopId, V> vertexMap;
   /**
-   * map to get the master date tuple of a given gradoop id
+   * map to get the customer data tuple of a given gradoop id
    */
-  private Map<GradoopId, AbstractMasterDataTuple> masterDataMap;
-
   private Map<GradoopId, MasterDataTuple> customerDataMap;
-
+  /**
+   * map to get the vendor data tuple of a given gradoop id
+   */
   private Map<GradoopId, MasterDataTuple> vendorDataMap;
-
+  /**
+   * map to get the logistic data tuple of a given gradoop id
+   */
   private Map<GradoopId, MasterDataTuple> logisticDataMap;
-
+  /**
+   * map to get the employee data tuple of a given gradoop id
+   */
   private Map<GradoopId, MasterDataTuple> emplyoeeDataMap;
-
+  /**
+   * map to get the prodouct data tuple of a given gradoop id
+   */
   private Map<GradoopId, ProductTuple> productDataMap;
 
   /**
@@ -165,9 +171,6 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-
-    masterDataMap = getRuntimeContext().<Map<GradoopId, AbstractMasterDataTuple>>
-      getBroadcastVariable(Constants.MASTERDATA_MAP).get(0);
 
     customerDataMap = getRuntimeContext().<Map<GradoopId, MasterDataTuple>>
       getBroadcastVariable(Constants.CUSTOMERDATA_MAP).get(0);
@@ -199,18 +202,18 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     V salesQuotation;
 
     // SalesQuotationLines
-    List<V> salesQuotationLines;
+    List<E> salesQuotationLines;
     // SalesOrder
     V salesOrder;
 
     // SalesOrderLines
-    List<V> salesOrderLines;
+    List<E> salesOrderLines;
 
     // PurchOrder
     List<V> purchOrders;
 
     // PurchOrderLine
-    List<V> purchOrderLines;
+    List<E> purchOrderLines;
 
     // DeliveryNotes
     List<V> deliveryNotes;
@@ -318,9 +321,9 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param salesQuotation quotation, corresponding to the lines
    * @return list of vertices which represent a sales quotation line
    */
-  private List<V> newSalesQuotationLines(V salesQuotation) {
-    List<V> salesQuotationLines = Lists.newArrayList();
-    V salesQuotationLine;
+  private List<E> newSalesQuotationLines(V salesQuotation) {
+    List<E> salesQuotationLines = Lists.newArrayList();
+    E salesQuotationLine;
     ProductTuple product;
 
     List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
@@ -348,7 +351,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param product product, corresponding to the line
    * @return vertex representation of a sales quotation line
    */
-  private V newSalesQuotationLine(V salesQuotation, ProductTuple product) {
+  private E newSalesQuotationLine(V salesQuotation, ProductTuple product) {
     String label = "SalesQuotationLine";
 
     List<AbstractMasterDataTuple> influencingMasterData = Lists.newArrayList();
@@ -378,13 +381,9 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     properties.set("quantity", quantity);
 
-    V salesQuotationLine = vertexFactory.createVertex(
-      label, properties, graphIds);
+    E salesQuotationLine = newEdge(label, salesQuotation.getId(),
+      product.getId(), properties);
 
-    newEdge("contains", salesQuotationLine.getId(), product.getId());
-    newEdge("partOf", salesQuotationLine.getId(), salesQuotation.getId());
-
-    newVertex(salesQuotationLine);
     return salesQuotationLine;
   }
 
@@ -442,12 +441,12 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param salesQuotationLines lines, corresponding to the quotation
    * @return list of vertices which represent a sales order line
    */
-  private List<V> newSalesOrderLines(V salesOrder,
-    List<V> salesQuotationLines) {
-    List<V> salesOrderLines = Lists.newArrayList();
-    V salesOrderLine;
+  private List<E> newSalesOrderLines(V salesOrder,
+    List<E> salesQuotationLines) {
+    List<E> salesOrderLines = Lists.newArrayList();
+    E salesOrderLine;
 
-    for (V singleSalesQuotationLine : salesQuotationLines) {
+    for (E singleSalesQuotationLine : salesQuotationLines) {
       salesOrderLine = newSalesOrderLine(salesOrder, singleSalesQuotationLine);
       salesOrderLines.add(salesOrderLine);
     }
@@ -462,7 +461,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param salesQuotationLine lines, corresponding to the quotation
    * @return vertex representation of a sales order line
    */
-  private V newSalesOrderLine(V salesOrder, V salesQuotationLine) {
+  private E newSalesOrderLine(V salesOrder, E salesQuotationLine) {
     String label = "SalesOrderLine";
     PropertyList properties = new PropertyList();
 
@@ -472,13 +471,8 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     properties.set("quantity", salesQuotationLine.getPropertyValue(
       "quantity").getInt());
 
-    V salesOrderLine = vertexFactory.createVertex(label, properties, graphIds);
-
-    newEdge("contains", salesOrderLine.getId(), getMasterDataEdgeTarget
-      ("contains", salesQuotationLine.getId(), Constants.PRODUCTDATA_MAP).getId());
-    newEdge("partOf", salesOrderLine.getId(), salesOrder.getId());
-
-    newVertex(salesOrderLine);
+    E salesOrderLine = newEdge(label, salesOrder.getId(),
+      salesQuotationLine.getTargetId(), properties);
     return salesOrderLine;
   }
 
@@ -490,7 +484,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param salesOrderLines lines, corresponding to the sales order
    * @return list of vertices which represent a purch order
    */
-  private List<V> newPurchOrders(V salesOrder, List<V> salesOrderLines) {
+  private List<V> newPurchOrders(V salesOrder, List<E> salesOrderLines) {
     List<V> purchOrders = Lists.newArrayList();
     V purchOrder;
 
@@ -547,15 +541,15 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param salesOrderLines sales order lines, corresponding to the sales order
    * @return list of vertices which represent a purch order line
    */
-  private List<V> newPurchOrderLines(List<V> purchOrders,
-    List<V> salesOrderLines) {
-    List<V> purchOrderLines = Lists.newArrayList();
-    V purchOrderLine;
+  private List<E> newPurchOrderLines(List<V> purchOrders,
+    List<E> salesOrderLines) {
+    List<E> purchOrderLines = Lists.newArrayList();
+    E purchOrderLine;
     V purchOrder;
 
     int linesPerPurchOrder = salesOrderLines.size() / purchOrders.size();
 
-    for (V singleSalesOrderLine : salesOrderLines) {
+    for (E singleSalesOrderLine : salesOrderLines) {
       int purchOrderIndex = salesOrderLines.indexOf(singleSalesOrderLine) /
         linesPerPurchOrder;
 
@@ -579,8 +573,8 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param salesOrderLine sales order line, corresponding to the sales order
    * @return vertex representation of a purch order line
    */
-  private V newPurchOrderLine(V purchOrder, V salesOrderLine) {
-    V purchOrderLine;
+  private E newPurchOrderLine(V purchOrder, E salesOrderLine) {
+    E purchOrderLine;
 
     String label = "PurchOrderLine";
     PropertyList properties = new PropertyList();
@@ -590,8 +584,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     properties.set("quantity", salesOrderLine.getPropertyValue("quantity")
       .getInt());
 
-    ProductTuple contains = (ProductTuple) getMasterDataEdgeTarget(
-      "contains", salesOrderLine.getId(), Constants.PRODUCTDATA_MAP);
+    ProductTuple contains = productDataMap.get(salesOrderLine.getTargetId());
 
     List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
     influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
@@ -607,15 +600,12 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     properties.set("purchPrice", purchPrice);
 
-    purchOrderLine = vertexFactory.createVertex(label, properties, graphIds);
+    purchOrderLine = newEdge(label, purchOrder.getId(), contains.getId(),
+      properties);
 
     salesOrderLine.setProperty(
       "purchOrderLine", purchOrderLine.getId().toString());
 
-    newEdge("contains", purchOrderLine.getId(), contains.getId());
-    newEdge("partOf", purchOrderLine.getId(), purchOrder.getId());
-
-    newVertex(purchOrderLine);
     return purchOrderLine;
   }
 
@@ -681,14 +671,14 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    *                        invoices
    * @return list of vertices which represent a purch invoice
    */
-  private List<V> newPurchInvoices(List<V> purchOrderLines) {
+  private List<V> newPurchInvoices(List<E> purchOrderLines) {
     V purchOrder;
     Map<V, BigDecimal> purchOrderTotals = Maps.newHashMap();
 
     BigDecimal total;
     BigDecimal purchAmount;
-    for (V purchOrderLine : purchOrderLines) {
-      purchOrder = getVertexEdgeTarget("partOf", purchOrderLine.getId());
+    for (E purchOrderLine : purchOrderLines) {
+      purchOrder = vertexMap.get(purchOrderLine.getSourceId());
 
       total = BigDecimal.ZERO;
 
@@ -756,10 +746,9 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param salesOrderLines sales order line, corresponding to the new invoice
    * @return vertex representation of a sales invoice
    */
-  private V newSalesInvoice(List<V> salesOrderLines) {
+  private V newSalesInvoice(List<E> salesOrderLines) {
     V salesInvoice;
-    V salesOrder = getVertexEdgeTarget("partOf", salesOrderLines.get(0).getId
-      ());
+    V salesOrder = vertexMap.get(salesOrderLines.get(0).getSourceId());
 
     String label = "SalesInvoice";
 
@@ -779,7 +768,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     BigDecimal revenue;
     BigDecimal salesAmount;
-    for (V salesOrderLine : salesOrderLines) {
+    for (E salesOrderLine : salesOrderLines) {
       salesAmount = BigDecimal.valueOf(salesOrderLine.getPropertyValue(
         "quantity").getInt())
         .multiply(salesOrderLine.getPropertyValue("salesPrice").getBigDecimal())
@@ -805,6 +794,23 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
   private void newEdge(String label, GradoopId source, GradoopId target) {
     edges.add(edgeFactory.createEdge(label, source, target, graphIds));
     edgeMap.put(new Tuple2<String, GradoopId>(label, source), target);
+  }
+
+  /**
+   * Creates a new edge from the given fields.
+   *
+   * @param label the edge label
+   * @param source the source id
+   * @param target the target id
+   * @param properties the edge properties
+   */
+  private E newEdge(String label, GradoopId source, GradoopId target,
+    PropertyList properties) {
+    E edge = edgeFactory.createEdge(label, source, target, properties,
+      graphIds);
+    edges.add(edge);
+    edgeMap.put(new Tuple2<String, GradoopId>(label, source), target);
+    return edge;
   }
 
   /**
@@ -844,20 +850,6 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
         return null;
     }
   }
-
-  /**
-   * Searches the vertex which is the edge target of the given edge parameter.
-   *
-   * @param edgeLabel label of the edge
-   * @param source source id
-   * @return target vertex
-   */
-  private V getVertexEdgeTarget(String edgeLabel,
-    GradoopId source) {
-    return vertexMap.get(edgeMap.get(new Tuple2<String, GradoopId>(
-      edgeLabel, source)));
-  }
-
 
   private MasterDataTuple getNextCustomer() {
     return customerIterator.next().getValue();
