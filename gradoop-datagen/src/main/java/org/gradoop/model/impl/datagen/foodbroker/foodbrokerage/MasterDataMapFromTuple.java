@@ -17,28 +17,31 @@
 
 package org.gradoop.model.impl.datagen.foodbroker.foodbrokerage;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.model.api.EPGMVertex;
-import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
+import com.google.common.collect.Maps;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
+import org.gradoop.model.impl.id.GradoopId;
 
-import java.math.BigDecimal;
+import java.util.Map;
 
 /**
- * Creates a product tuple from the given vertex.
- *
- * @param <V> EPGM vertex type
+ * Returns a map from each gradoop id to the object.
  */
-public class ProductTupleMapper<V extends EPGMVertex> implements
-  MapFunction<V, AbstractMasterDataTuple> {
+public class MasterDataMapFromTuple<T>
+  implements GroupReduceFunction<Tuple2<GradoopId, T>,
+  Map<GradoopId, T>> {
 
   @Override
-  public ProductTuple map(V v) throws Exception {
-    BigDecimal price = v.getPropertyValue(Constants.PRICE).getBigDecimal();
-    return new ProductTuple(v.getId(), v.getPropertyValue(
-      Constants.QUALITY).getFloat(), price);
-
-
+  public void reduce(Iterable<Tuple2<GradoopId, T>> iterable,
+    Collector<Map<GradoopId, T>> collector) throws
+    Exception {
+    Map<GradoopId, T> map = Maps.newHashMap();
+    for(Tuple2<GradoopId, T> tuple : iterable) {
+      map.put(tuple.f0, tuple.f1);
+    }
+    collector.collect(map);
   }
 }

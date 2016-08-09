@@ -51,19 +51,19 @@ public class Constants {
   public static final String EDGES = "edges";
 
   /**
-   * broadcast variable which is needed spread the precalculated master data map
+   * broadcast variable which is needed spread the precalculated customer map
    */
-  public static final String MASTERDATA_MAP = "masterDataMap";
+  public static final String CUSTOMER_MAP = "customerMap";
 
-  public static final String CUSTOMERDATA_MAP = "customerDataMap";
+  public static final String VENDOR_MAP = "vendorMap";
 
-  public static final String VENDORDATA_MAP = "vendorDataMap";
+  public static final String LOGISTIC_MAP = "logisticMap";
 
-  public static final String LOGISTICDATA_MAP = "logisticDataMap";
+  public static final String EMPLOYEE_MAP = "employeeMap";
 
-  public static final String EMPLOYEEDATA_MAP = "employeeDataMap";
+  public static final String PRODUCT_QUALITY_MAP = "productQualityMap";
 
-  public static final String PRODUCTDATA_MAP = "productDataMap";
+  public static final String PRODUCT_PRICE_MAP = "productPriceMap";
 
 
 }

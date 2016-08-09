@@ -18,23 +18,25 @@
 package org.gradoop.model.impl.datagen.foodbroker.foodbrokerage;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
+import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
+import org.gradoop.model.impl.id.GradoopId;
+
+import java.math.BigDecimal;
 
 /**
- * Creates a master data tuple from the given vertex.
+ * Creates a product price tuple from the given vertex.
  *
  * @param <V> EPGM vertex type
  */
-public class MasterDataTupleMapper<V extends EPGMVertex>
-  implements MapFunction<V, AbstractMasterDataTuple> {
+public class ProductPriceMapper<V extends EPGMVertex> implements
+  MapFunction<V, Tuple2<GradoopId, BigDecimal>> {
 
   @Override
-  public MasterDataTuple map(V v) throws Exception {
-    return new MasterDataTuple(v.getId(), v.getPropertyValue(
-      Constants.QUALITY).getFloat());
-
+  public Tuple2<GradoopId, BigDecimal> map(V v) throws Exception {
+    BigDecimal price = v.getPropertyValue(Constants.PRICE).getBigDecimal();
+    return new Tuple2<>(v.getId(), price);
   }
 }
