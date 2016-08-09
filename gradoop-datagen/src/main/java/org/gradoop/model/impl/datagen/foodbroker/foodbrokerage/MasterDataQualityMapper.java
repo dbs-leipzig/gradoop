@@ -17,30 +17,24 @@
 
 package org.gradoop.model.impl.datagen.foodbroker.foodbrokerage;
 
-import com.google.common.collect.Maps;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.util.Collector;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.model.api.EPGMVertex;
+import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
 import org.gradoop.model.impl.id.GradoopId;
 
-import java.util.Map;
-
 /**
- * Returns a map from each gradoop id to the object.
+ * Creates a master data tuple from the given vertex.
+ *
+ * @param <V> EPGM vertex type
  */
-public class MasterDataMapFromMasterData
-  implements GroupReduceFunction<AbstractMasterDataTuple,
-  Map<GradoopId, MasterDataTuple>> {
+public class MasterDataQualityMapper<V extends EPGMVertex>
+  implements MapFunction<V, Tuple2<GradoopId, Float>> {
 
   @Override
-  public void reduce(Iterable<AbstractMasterDataTuple> iterable,
-    Collector<Map<GradoopId, MasterDataTuple>> collector) throws
-    Exception {
-    Map<GradoopId, MasterDataTuple> map = Maps.newHashMap();
-    for(AbstractMasterDataTuple tuple : iterable) {
-      map.put(tuple.getId(), (MasterDataTuple) tuple);
-    }
-    collector.collect(map);
+  public Tuple2<GradoopId, Float> map(V v) throws Exception {
+    return new Tuple2<>(v.getId(), v.getPropertyValue(
+      Constants.QUALITY).getFloat());
   }
 }

@@ -32,9 +32,6 @@ import org.gradoop.model.api.EPGMVertex;
 import org.gradoop.model.api.EPGMVertexFactory;
 import org.gradoop.model.impl.datagen.foodbroker.config.Constants;
 import org.gradoop.model.impl.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.AbstractMasterDataTuple;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
-import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
 import org.gradoop.model.impl.id.GradoopId;
 import org.gradoop.model.impl.id.GradoopIdSet;
 import org.gradoop.model.impl.properties.PropertyList;
@@ -49,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Map partition function with spreads the whole foodbrokerage process
+ * Map partition function which spreads the whole foodbrokerage process
  * equally to each worker.
  *
  * @param <G> EPGM graph head type
@@ -70,24 +67,27 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
   /**
    * iterator over all customers
    */
-  private Iterator<Map.Entry<GradoopId, MasterDataTuple>> customerIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> customerIterator;
   /**
    * iterator over all vendors
    */
-  private Iterator<Map.Entry<GradoopId, MasterDataTuple>> vendorIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> vendorIterator;
   /**
    * iterator over all logistics
    */
-  private Iterator<Map.Entry<GradoopId, MasterDataTuple>> logisticIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> logisticIterator;
   /**
    * iterator over all employees
    */
-  private Iterator<Map.Entry<GradoopId, MasterDataTuple>> employeeIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> employeeIterator;
   /**
-   * iterator over all products
+   * iterator over all product prices
    */
-  private Iterator<Map.Entry<GradoopId, ProductTuple>> productIterator;
-  //caseseeds als input
+  private Iterator<Map.Entry<GradoopId, Float>> productQualityIterator;
+  /**
+   * iterator over all product
+   */
+  private Iterator<Map.Entry<GradoopId, BigDecimal>> productPriceIterator;
 
   /**
    * graph ids, one seperate id for each case
@@ -124,25 +124,29 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    */
   private Map<GradoopId, V> vertexMap;
   /**
-   * map to get the customer data tuple of a given gradoop id
+   * map to get the customer quality of a given gradoop id
    */
-  private Map<GradoopId, MasterDataTuple> customerDataMap;
+  private Map<GradoopId, Float> customerMap;
   /**
-   * map to get the vendor data tuple of a given gradoop id
+   * map to get the vendor quality of a given gradoop id
    */
-  private Map<GradoopId, MasterDataTuple> vendorDataMap;
+  private Map<GradoopId, Float> vendorMap;
   /**
-   * map to get the logistic data tuple of a given gradoop id
+   * map to get the logistic quality of a given gradoop id
    */
-  private Map<GradoopId, MasterDataTuple> logisticDataMap;
+  private Map<GradoopId, Float> logisticMap;
   /**
-   * map to get the employee data tuple of a given gradoop id
+   * map to get the employee quality of a given gradoop id
    */
-  private Map<GradoopId, MasterDataTuple> emplyoeeDataMap;
+  private Map<GradoopId, Float> emplyoeeMap;
   /**
-   * map to get the prodouct data tuple of a given gradoop id
+   * map to get the prodouct quality of a given gradoop id
    */
-  private Map<GradoopId, ProductTuple> productDataMap;
+  private Map<GradoopId, Float> productQualityMap;
+  /**
+   * map to get the prodouct price of a given gradoop id
+   */
+  private Map<GradoopId, BigDecimal> productPriceMap;
 
   /**
    * Valued consturctor
@@ -172,26 +176,30 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    customerDataMap = getRuntimeContext().<Map<GradoopId, MasterDataTuple>>
-      getBroadcastVariable(Constants.CUSTOMERDATA_MAP).get(0);
+    customerMap = getRuntimeContext().<Map<GradoopId, Float>>
+      getBroadcastVariable(Constants.CUSTOMER_MAP).get(0);
 
-    vendorDataMap = getRuntimeContext().<Map<GradoopId, MasterDataTuple>>
-      getBroadcastVariable(Constants.VENDORDATA_MAP).get(0);
+    vendorMap = getRuntimeContext().<Map<GradoopId, Float>>
+      getBroadcastVariable(Constants.VENDOR_MAP).get(0);
 
-    logisticDataMap = getRuntimeContext().<Map<GradoopId, MasterDataTuple>>
-      getBroadcastVariable(Constants.LOGISTICDATA_MAP).get(0);
+    logisticMap = getRuntimeContext().<Map<GradoopId, Float>>
+      getBroadcastVariable(Constants.LOGISTIC_MAP).get(0);
 
-    emplyoeeDataMap = getRuntimeContext().<Map<GradoopId, MasterDataTuple>>
-      getBroadcastVariable(Constants.EMPLOYEEDATA_MAP).get(0);
+    emplyoeeMap = getRuntimeContext().<Map<GradoopId, Float>>
+      getBroadcastVariable(Constants.EMPLOYEE_MAP).get(0);
 
-    productDataMap = getRuntimeContext().<Map<GradoopId, ProductTuple>>
-      getBroadcastVariable(Constants.PRODUCTDATA_MAP).get(0);
+    productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
+      getBroadcastVariable(Constants.PRODUCT_QUALITY_MAP).get(0);
 
-    customerIterator = customerDataMap.entrySet().iterator();
-    vendorIterator = vendorDataMap.entrySet().iterator();
-    logisticIterator = logisticDataMap.entrySet().iterator();
-    employeeIterator = emplyoeeDataMap.entrySet().iterator();
-    productIterator = productDataMap.entrySet().iterator();
+    productPriceMap = getRuntimeContext().<Map<GradoopId, BigDecimal>>
+      getBroadcastVariable(Constants.PRODUCT_PRICE_MAP).get(0);
+
+    customerIterator = customerMap.entrySet().iterator();
+    vendorIterator = vendorMap.entrySet().iterator();
+    logisticIterator = logisticMap.entrySet().iterator();
+    employeeIterator = emplyoeeMap.entrySet().iterator();
+    productQualityIterator = productQualityMap.entrySet().iterator();
+    productPriceIterator = productPriceMap.entrySet().iterator();
   }
 
   @Override
@@ -280,13 +288,13 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @return true, if quotation is confirmed
    */
   private boolean confirmed(V salesQuotation) {
-    List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "sentBy", salesQuotation.getId(), Constants.EMPLOYEEDATA_MAP));
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMERDATA_MAP));
+    List<Float> influencingMasterQuality = Lists.newArrayList();
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentBy", salesQuotation.getId(), Constants.EMPLOYEE_MAP));
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP));
 
-    return config.happensTransitionConfiguration(influencingMasterData,
+    return config.happensTransitionConfiguration(influencingMasterQuality,
       "SalesQuotation", "confirmationProbability");
   }
 
@@ -305,11 +313,11 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     V salesQuotation = vertexFactory.createVertex(label, properties, graphIds);
 
-    MasterDataTuple rndEmployee = getNextEmplyoee();
-    MasterDataTuple rndCustomer = getNextCustomer();
+    GradoopId rndEmployee = getNextEmplyoee();
+    GradoopId rndCustomer = getNextCustomer();
 
-    newEdge("sentBy", salesQuotation.getId(), rndEmployee.getId());
-    newEdge("sentTo", salesQuotation.getId(), rndCustomer.getId());
+    newEdge("sentBy", salesQuotation.getId(), rndEmployee);
+    newEdge("sentTo", salesQuotation.getId(), rndCustomer);
 
     newVertex(salesQuotation);
     return salesQuotation;
@@ -324,16 +332,16 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
   private List<E> newSalesQuotationLines(V salesQuotation) {
     List<E> salesQuotationLines = Lists.newArrayList();
     E salesQuotationLine;
-    ProductTuple product;
+    GradoopId product;
 
-    List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "sentBy", salesQuotation.getId(), Constants.EMPLOYEEDATA_MAP));
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMERDATA_MAP));
+    List<Float> influencingMasterQuality = Lists.newArrayList();
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentBy", salesQuotation.getId(), Constants.EMPLOYEE_MAP));
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP));
 
     int numberOfQuotationLines = config.getIntRangeConfigurationValue(
-      influencingMasterData, "SalesQuotation", "lines");
+      influencingMasterQuality, "SalesQuotation", "lines");
 
     for (int i = 0; i < numberOfQuotationLines; i++) {
       product = getNextProduct();
@@ -351,38 +359,38 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param product product, corresponding to the line
    * @return vertex representation of a sales quotation line
    */
-  private E newSalesQuotationLine(V salesQuotation, ProductTuple product) {
+  private E newSalesQuotationLine(V salesQuotation, GradoopId product) {
     String label = "SalesQuotationLine";
 
-    List<AbstractMasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add(getMasterDataEdgeTarget(
-      "sentBy", salesQuotation.getId(), Constants.EMPLOYEEDATA_MAP));
-    influencingMasterData.add(getMasterDataEdgeTarget(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMERDATA_MAP));
+    List<Float> influencingMasterQuality = Lists.newArrayList();
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentBy", salesQuotation.getId(), Constants.EMPLOYEE_MAP));
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP));
 
-    influencingMasterData.add(product);
+    influencingMasterQuality.add(productQualityMap.get(product));
 
     BigDecimal salesMargin = config.getDecimalVariationConfigurationValue(
-      influencingMasterData, "SalesQuotation", "salesMargin");
+      influencingMasterQuality, "SalesQuotation", "salesMargin");
 
     PropertyList properties = new PropertyList();
 
     properties.set("kind", "TransData");
-    properties.set("purchPrice", product.getPrice());
+    properties.set("purchPrice", productPriceMap.get(product));
     properties.set("salesPrice",
       salesMargin
         .add(BigDecimal.ONE)
-        .multiply(product.getPrice())
+        .multiply(productPriceMap.get(product))
         .setScale(2, BigDecimal.ROUND_HALF_UP)
     );
 
     int quantity = config.getIntRangeConfigurationValue(
-      new ArrayList<MasterDataTuple>(), "SalesQuotation", "lineQuantity");
+      new ArrayList<Float>(), "SalesQuotation", "lineQuantity");
 
     properties.set("quantity", quantity);
 
     E salesQuotationLine = newEdge(label, salesQuotation.getId(),
-      product.getId(), properties);
+      product, properties);
 
     return salesQuotationLine;
   }
@@ -399,34 +407,34 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     properties.set("kind", "TransData");
 
-    List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "sentBy", salesQuotation.getId(), Constants.EMPLOYEEDATA_MAP));
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMERDATA_MAP));
+    List<Float> influencingMasterQuality = Lists.newArrayList();
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentBy", salesQuotation.getId(), Constants.EMPLOYEE_MAP));
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP));
 
     Long salesQuotationDate = null;
     salesQuotationDate = salesQuotation
       .getPropertyValue("date")
       .getLong();
     long date = config.delayDelayConfiguration(salesQuotationDate,
-      influencingMasterData, "SalesQuotation", "confirmationDelay");
+      influencingMasterQuality, "SalesQuotation", "confirmationDelay");
     properties.set("date", date);
 
-    MasterDataTuple rndEmployee = getNextEmplyoee();
-    influencingMasterData.clear();
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget
-      ("sentTo", salesQuotation.getId(), Constants.CUSTOMERDATA_MAP));
-    influencingMasterData.add(rndEmployee);
+    GradoopId rndEmployee = getNextEmplyoee();
+    influencingMasterQuality.clear();
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP));
+    influencingMasterQuality.add(emplyoeeMap.get(rndEmployee));
 
     properties.set("deliveryDate", config.delayDelayConfiguration(date,
-      influencingMasterData, "SalesOrder", "deliveryAgreementDelay"));
+      influencingMasterQuality, "SalesOrder", "deliveryAgreementDelay"));
 
     V salesOrder = vertexFactory.createVertex(label, properties, graphIds);
 
-    newEdge("receivedFrom", salesOrder.getId(), getMasterDataEdgeTarget(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMERDATA_MAP).getId());
-    newEdge("processedBy", salesOrder.getId(), rndEmployee.getId());
+    newEdge("receivedFrom", salesOrder.getId(), getEdgeTargetId(
+      "sentTo", salesQuotation.getId()));
+    newEdge("processedBy", salesOrder.getId(), rndEmployee);
     newEdge("basedOn", salesOrder.getId(), salesQuotation.getId());
 
     newVertex(salesOrder);
@@ -489,7 +497,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     V purchOrder;
 
     int numberOfVendors = config.getIntRangeConfigurationValue(new ArrayList
-      <MasterDataTuple>(), "PurchOrder", "numberOfVendors");
+      <Float>(), "PurchOrder", "numberOfVendors");
     for (int i = 0; i < (numberOfVendors > salesOrderLines.size() ?
       salesOrderLines.size() : numberOfVendors); i++) {
       purchOrder = newPurchOrder(salesOrder, getNextEmplyoee());
@@ -507,7 +515,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param processedBy employee chosen for this job
    * @return vertex representation of a purch order
    */
-  private V newPurchOrder(V salesOrder, MasterDataTuple processedBy) {
+  private V newPurchOrder(V salesOrder, GradoopId processedBy) {
     V purchOrder;
 
     String label = "PurchOrder";
@@ -518,16 +526,16 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     long salesOrderDate = salesOrder.getPropertyValue("date")
         .getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
-      (MasterDataTuple) getMasterDataEdgeTarget("processedBy",
-        salesOrder.getId(), Constants.EMPLOYEEDATA_MAP), "PurchOrder", "purchaseDelay");
+      getEdgeTargetQuality("processedBy", salesOrder.getId(),
+        Constants.EMPLOYEE_MAP), "PurchOrder", "purchaseDelay");
 
     properties.set("date", date);
 
     purchOrder = vertexFactory.createVertex(label, properties, graphIds);
 
     newEdge("serves", purchOrder.getId(), salesOrder.getId());
-    newEdge("placedAt", purchOrder.getId(), getNextVendor().getId());
-    newEdge("processedBy", purchOrder.getId(), processedBy.getId());
+    newEdge("placedAt", purchOrder.getId(), getNextVendor());
+    newEdge("processedBy", purchOrder.getId(), processedBy);
 
     newVertex(purchOrder);
     return purchOrder;
@@ -584,15 +592,15 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     properties.set("quantity", salesOrderLine.getPropertyValue("quantity")
       .getInt());
 
-    ProductTuple contains = productDataMap.get(salesOrderLine.getTargetId());
+    BigDecimal price = productPriceMap.get(salesOrderLine.getTargetId());
 
-    List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "processedBy", purchOrder.getId(), Constants.EMPLOYEEDATA_MAP));
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "placedAt", purchOrder.getId(), Constants.VENDORDATA_MAP));
+    List<Float> influencingMasterQuality = Lists.newArrayList();
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "processedBy", purchOrder.getId(), Constants.EMPLOYEE_MAP));
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "placedAt", purchOrder.getId(), Constants.VENDOR_MAP));
 
-    BigDecimal purchPrice = contains.getPrice();
+    BigDecimal purchPrice = price;
     purchPrice = BigDecimal.ONE
       .add(BigDecimal.ONE)
       .multiply(purchPrice)
@@ -600,7 +608,7 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     properties.set("purchPrice", purchPrice);
 
-    purchOrderLine = newEdge(label, purchOrder.getId(), contains.getId(),
+    purchOrderLine = newEdge(label, purchOrder.getId(), salesOrderLine.getTargetId(),
       properties);
 
     salesOrderLine.setProperty(
@@ -647,18 +655,18 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
 
     long purchOrderDate = purchOrder.getPropertyValue("date")
         .getLong();
-    MasterDataTuple operatedBy = getNextLogistic();
-    List<MasterDataTuple> influencingMasterData = Lists.newArrayList();
-    influencingMasterData.add(operatedBy);
-    influencingMasterData.add((MasterDataTuple) getMasterDataEdgeTarget(
-      "placedAt", purchOrder.getId(), Constants.VENDORDATA_MAP));
+    GradoopId operatedBy = getNextLogistic();
+    List<Float> influencingMasterQuality = Lists.newArrayList();
+    influencingMasterQuality.add(logisticMap.get(operatedBy));
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      "placedAt", purchOrder.getId(), Constants.VENDOR_MAP));
 
     long date = config.delayDelayConfiguration(purchOrderDate,
-      influencingMasterData, "PurchOrder", "deliveryDelay");
+      influencingMasterQuality, "PurchOrder", "deliveryDelay");
     deliveryNote.setProperty("date", date);
 
     newEdge("contains", deliveryNote.getId(), purchOrder.getId());
-    newEdge("operatedBy", deliveryNote.getId(), operatedBy.getId());
+    newEdge("operatedBy", deliveryNote.getId(), operatedBy);
 
     newVertex(deliveryNote);
     return deliveryNote;
@@ -727,10 +735,9 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     long purchOrderDate = purchOrder.getPropertyValue("date")
         .getLong();
     long date = config.delayDelayConfiguration(purchOrderDate,
-      (MasterDataTuple) getMasterDataEdgeTarget("placedAt", purchOrder.getId(),
-        Constants.VENDORDATA_MAP),
-      "PurchOrder", "invoiceDelay");
-    properties.set("date",  date);
+      getEdgeTargetQuality("placedAt", purchOrder.getId(),
+        Constants.VENDOR_MAP), "PurchOrder", "invoiceDelay");
+    properties.set("date", date);
 
     purchInvoice = vertexFactory.createVertex(label, properties, graphIds);
 
@@ -760,8 +767,8 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
     long salesOrderDate = salesOrder.getPropertyValue("date")
         .getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
-      (MasterDataTuple) getMasterDataEdgeTarget(
-        "processedBy", salesOrder.getId(), Constants.EMPLOYEEDATA_MAP), "SalesOrder", "invoiceDelay");
+      getEdgeTargetQuality("processedBy", salesOrder.getId(),
+        Constants.EMPLOYEE_MAP), "SalesOrder", "invoiceDelay");
     properties.set("date", date);
 
     salesInvoice = vertexFactory.createVertex(label, properties, graphIds);
@@ -831,44 +838,68 @@ public class FoodBrokerage<G extends EPGMGraphHead, V extends EPGMVertex, E
    * @param source source id
    * @return target master data tupel
    */
-  private AbstractMasterDataTuple getMasterDataEdgeTarget(String edgeLabel,
-    GradoopId source, String masterDataMap) {
-    GradoopId target = edgeMap.get(
+  private GradoopId getEdgeTargetId(String edgeLabel,
+    GradoopId source) {
+    return edgeMap.get(
       new Tuple2<String, GradoopId>(edgeLabel, source));
+  }
+
+  private Float getEdgeTargetQuality(String edgeLabel,
+    GradoopId source, String masterDataMap) {
+    GradoopId target = getEdgeTargetId(edgeLabel, source);
+
     switch (masterDataMap) {
-      case Constants.CUSTOMERDATA_MAP :
-        return customerDataMap.get(target);
-      case Constants.VENDORDATA_MAP :
-        return vendorDataMap.get(target);
-      case Constants.LOGISTICDATA_MAP :
-        return logisticDataMap.get(target);
-      case Constants.EMPLOYEEDATA_MAP :
-        return emplyoeeDataMap.get(target);
-      case Constants.PRODUCTDATA_MAP :
-        return productDataMap.get(target);
-      default:
-        return null;
+    case Constants.CUSTOMER_MAP:
+      return customerMap.get(target);
+    case Constants.VENDOR_MAP:
+      return vendorMap.get(target);
+    case Constants.LOGISTIC_MAP:
+      return logisticMap.get(target);
+    case Constants.EMPLOYEE_MAP:
+      return emplyoeeMap.get(target);
+    case Constants.PRODUCT_QUALITY_MAP :
+      return productQualityMap.get(target);
+    default:
+      return null;
     }
   }
 
-  private MasterDataTuple getNextCustomer() {
-    return customerIterator.next().getValue();
+
+  private GradoopId getNextCustomer() {
+    if (!customerIterator.hasNext()) {
+      customerIterator = customerMap.entrySet().iterator();
+    }
+    return customerIterator.next().getKey();
   }
 
-  private MasterDataTuple getNextVendor() {
-    return vendorIterator.next().getValue();
+  private GradoopId getNextVendor() {
+    if (!vendorIterator.hasNext()) {
+      vendorIterator = vendorMap.entrySet().iterator();
+    }
+    return vendorIterator.next().getKey();
   }
 
-  private MasterDataTuple getNextLogistic() {
-    return logisticIterator.next().getValue();
+  private GradoopId getNextLogistic() {
+    if (!logisticIterator.hasNext()) {
+      logisticIterator = logisticMap.entrySet().iterator();
+    }
+    return logisticIterator.next().getKey();
   }
 
-  private MasterDataTuple getNextEmplyoee() {
-    return employeeIterator.next().getValue();
+  private GradoopId getNextEmplyoee() {
+    if (!employeeIterator.hasNext()) {
+      employeeIterator = emplyoeeMap.entrySet().iterator();
+    }
+    return employeeIterator.next().getKey();
   }
 
-  private ProductTuple getNextProduct() {
-    return productIterator.next().getValue();
+  private GradoopId getNextProduct() {
+    if (!productQualityIterator.hasNext()) {
+      productQualityIterator = productQualityMap.entrySet().iterator();
+      productPriceIterator = productPriceMap.entrySet().iterator();
+    }
+    productPriceIterator.next();
+    return productQualityIterator.next().getKey();
   }
 
 }
