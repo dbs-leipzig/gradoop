@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
@@ -57,6 +58,7 @@ import org.gradoop.model.impl.datagen.foodbroker.tuples.MasterDataTuple;
 import org.gradoop.model.impl.datagen.foodbroker.tuples.ProductTuple;
 import org.gradoop.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.model.impl.functions.epgm.Id;
+import org.gradoop.model.impl.functions.epgm.SourceId;
 import org.gradoop.model.impl.functions.epgm.TargetId;
 import org.gradoop.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.model.impl.functions.epgm.TransactionGraphHead;
@@ -144,15 +146,6 @@ public class FoodBroker
       gradoopFlinkConfig.getVertexFactory(),
       gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
 
-    DataSet<Map<GradoopId, AbstractMasterDataTuple>> masterDataMap = customers
-      .union(vendors)
-      .union(logistics)
-      .union(employees)
-      .map(new MasterDataTupleMapper<V>())
-      .union(products
-        .map(new ProductTupleMapper<V>()))
-      .reduceGroup(new MasterDataMapFromMasterDataOld());
-
     DataSet<Map<GradoopId, MasterDataTuple>> customerDataMap = customers
       .map(new MasterDataTupleMapper<V>())
       .reduceGroup(new MasterDataMapFromMasterData());
@@ -170,11 +163,8 @@ public class FoodBroker
       .reduceGroup(new ProductDataMapFromMasterData());
 
 
-
-
     DataSet<GraphTransaction<G, V, E>> foodBrokerageTransactions = caseSeeds
       .mapPartition(foodBrokerage)
-      .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP)
       .withBroadcastSet(customerDataMap, Constants.CUSTOMERDATA_MAP)
       .withBroadcastSet(vendorDataMap, Constants.VENDORDATA_MAP)
       .withBroadcastSet(logisticDataMap, Constants.LOGISTICDATA_MAP)
@@ -194,153 +184,7 @@ public class FoodBroker
       .flatMap(new TransactionEdges<G, V, E>())
       .returns(edgeTypeInfo);
 
-
-    // Filter vertices with label "SalesOrder"
-    DataSet<V> salesOrderVertices =
-      transactionalVertices.filter(new FilterFunction<V>() {
-        @Override
-        public boolean filter(V value) throws Exception {
-          return "SalesOrder".equals(value.getLabel());
-        }
-      });
-
-    // Filter vertices with label "SalesOrderLine"
-    DataSet<V> salesOrderLineVertices =
-      transactionalVertices.filter(new FilterFunction<V>() {
-        @Override
-        public boolean filter(V value) throws Exception {
-          return "SalesOrderLine".equals(value.getLabel());
-        }
-      });
-
-    // Filter vertices with label "PurchOrder"
-    DataSet<V> purchOrderVertices =
-      transactionalVertices.filter(new FilterFunction<V>() {
-        @Override
-        public boolean filter(V value) throws Exception {
-          return "PurchOrder".equals(value.getLabel());
-        }
-      });
-
-    // Filter vertices with label "PurchOrderLine"
-    DataSet<V> purchOrderLineVertices =
-      transactionalVertices.filter(new FilterFunction<V>() {
-        @Override
-        public boolean filter(V value) throws Exception {
-          return "PurchOrderLine".equals(value.getLabel());
-        }
-      });
-
-    // Filter vertices with label "DeliveryNote"
-    DataSet<V> deliveryNoteVertices =
-      transactionalVertices.filter(new FilterFunction<V>() {
-        @Override
-        public boolean filter(V value) throws Exception {
-          return "DeliveryNote".equals(value.getLabel());
-        }
-      });
-
-    // Create a data set of tuple-2s so that we have sales associated to their
-    // lines
-    DataSet<Tuple2<V, V>> salesToLines =
-      salesOrderVertices.join(transactionalEdges).where("id")
-        .equalTo("targetId").join(salesOrderLineVertices).where("f1.sourceId")
-        .equalTo("id").with(new JoinFunction<Tuple2<V, E>, V, Tuple2<V, V>>() {
-        @Override
-        public Tuple2<V, V> join(Tuple2<V, E> first, V second) throws
-          Exception {
-          return new Tuple2<>(first.f0, second);
-        }
-      });
-
-    // Create a data set of tuple-2s so that we have purches associated with
-    // their lines
-    DataSet<Tuple2<V, V>> purchesToLines =
-      purchOrderVertices
-        .join(transactionalEdges)
-        .where("id")
-        .equalTo("targetId")
-        .join(purchOrderLineVertices)
-        .where("f1.sourceId")
-        .equalTo("id")
-        .with(new JoinFunction<Tuple2<V, E>, V, Tuple2<V, V>>() {
-        @Override
-        public Tuple2<V, V> join(Tuple2<V, E> first, V second) throws
-          Exception {
-          return new Tuple2<>(first.f0, second);
-        }
-      });
-
-    // Create a data set of tuple-3s with the following structure:
-    // (x, y, z) with
-    // - x is a SalesOrder vertex
-    // - y is a PurchOrder vertex
-    // - z is a DeliveryNote vertex
-    DataSet<Tuple3<V, V, V>> salesToDeliveries =
-      salesOrderVertices.join(transactionalEdges) // Tuple2<V, E>
-        .where("id").equalTo("targetId")
-        .join(purchOrderVertices) // Tuple2<Tuple2<V, E>, V>
-        .where("f1.sourceId").equalTo("id")
-        .with(new JoinFunction<Tuple2<V, E>, V, Tuple2<V, V>>() {
-          @Override
-          public Tuple2<V, V> join(Tuple2<V, E> first, V second) throws
-            Exception {
-            return new Tuple2<>(first.f0, second);
-          }
-        }) // Tuple2<V, V>
-        .join(transactionalEdges) // Tuple2<Tuple2<V, V>, E>
-        .where("f1.id").equalTo("targetId")
-        .join(deliveryNoteVertices) // Tuple2<Tuple2<Tuple2<V, V>, E>, V>
-        .where("f1.sourceId").equalTo("id")
-        .with(new JoinFunction<Tuple2<Tuple2<V, V>, E>, V, Tuple3<V, V, V>>() {
-          @Override
-          public Tuple3<V, V, V> join(Tuple2<Tuple2<V, V>, E> first,
-            V second) throws Exception {
-            return new Tuple3<>(first.f0.f0, first.f0.f1, second);
-          }
-        }); // Tuple3<V, V, V>*/
-
-    // Initialize the complaint handling map partition function with some data
-    ComplaintHandling<G, V, E> complaintHandling =
-      new ComplaintHandling<G, V, E>(gradoopFlinkConfig.getGraphHeadFactory(),
-        gradoopFlinkConfig.getVertexFactory(),
-        gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig);
-    // Run the map partition function with some data
-    DataSet<GraphTransaction<G, V, E>> complaintTransactions =
-      salesOrderVertices.mapPartition(complaintHandling)
-        .withBroadcastSet(customers.map(new MasterDataTupleMapper<V>()),
-          Customer.CLASS_NAME)
-        .withBroadcastSet(vendors.map(new MasterDataTupleMapper<V>()),
-          Vendor.CLASS_NAME)
-        .withBroadcastSet(logistics.map(new MasterDataTupleMapper<V>()),
-          LogisticsGenerator.CLASS_NAME)
-        .withBroadcastSet(employees.map(new MasterDataTupleMapper<V>()),
-          Employee.CLASS_NAME)
-        .withBroadcastSet(products.map(new ProductTupleMapper<V>()),
-          Product.CLASS_NAME)
-        .withBroadcastSet(purchOrderLineVertices, "purchOrderLines")
-        .withBroadcastSet(transactionalEdges, "transactionalEdges")
-        .withBroadcastSet(salesToDeliveries, "salesToDeliveries")
-        .withBroadcastSet(salesToLines, "salesToLines")
-        .withBroadcastSet(salesOrderLineVertices, "salesOrderLines")
-        .withBroadcastSet(purchesToLines, "purchesToLines")
-        .withBroadcastSet(masterDataMap, Constants.MASTERDATA_MAP)
-        .returns(GraphTransaction.getTypeInformation(gradoopFlinkConfig));
-
-
-    transactionalEdges = transactionalEdges
-      .union(complaintTransactions
-        .map(new GraphTransactionTriple<G, V, E>())
-        .flatMap(new TransactionEdges<G, V, E>())
-        .returns(edgeTypeInfo));
-
-    transactionalVertices = transactionalVertices
-      .union(complaintTransactions
-        .map(new GraphTransactionTriple<G, V, E>())
-        .flatMap(new TransactionVertices<G, V, E>())
-        .returns(vertexTypeInfo));
     DataSet<G> graphHeads = foodBrokerageTransactions
-      .union(complaintTransactions)
       .map(new GraphTransactionTriple<G, V, E>())
       .map(new TransactionGraphHead<G, V, E>())
       .returns(graphHeadTypeInfo);
