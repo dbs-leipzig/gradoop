@@ -1,4 +1,4 @@
-package org.gradoop.common.cache;
+package org.gradoop.common.cache.api;
 
 import java.util.List;
 
