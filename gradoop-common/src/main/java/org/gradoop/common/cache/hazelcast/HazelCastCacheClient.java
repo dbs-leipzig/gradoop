@@ -1,9 +1,10 @@
-package org.gradoop.common.cache;
+package org.gradoop.common.cache.hazelcast;
 
 import com.google.common.collect.Lists;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
+import org.gradoop.common.cache.api.DistributedCacheClient;
 
 import java.util.Collection;
 import java.util.List;

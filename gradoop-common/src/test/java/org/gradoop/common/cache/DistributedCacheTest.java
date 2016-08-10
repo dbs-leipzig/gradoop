@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.Hazelcast;
 import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.cache.api.DistributedCacheClient;
+import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.junit.Test;
 
 import java.util.List;

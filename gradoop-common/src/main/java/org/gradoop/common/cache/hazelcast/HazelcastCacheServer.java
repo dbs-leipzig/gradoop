@@ -1,7 +1,8 @@
-package org.gradoop.common.cache;
+package org.gradoop.common.cache.hazelcast;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import org.gradoop.common.cache.api.DistributedCacheServer;
 
 import java.util.List;
 import java.util.Set;
