@@ -37,4 +37,9 @@ public class HazelCastCacheClient implements DistributedCacheClient {
   public <T> List<T> getList(String name) {
     return instance.getList(name);
   }
+
+  @Override
+  public long incrementAndGetCounter(String name) {
+    return instance.getAtomicLong(name).incrementAndGet();
+  }
 }

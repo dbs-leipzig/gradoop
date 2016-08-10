@@ -30,6 +30,11 @@ public class HazelcastCacheServer implements DistributedCacheServer {
   }
 
   @Override
+  public void addCounter(String name) {
+    instance.getAtomicLong(name).set(0L);
+  }
+
+  @Override
   public void shutdown() {
     instance.shutdown();
   }
