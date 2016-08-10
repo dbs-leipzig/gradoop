@@ -85,6 +85,7 @@
 
         <dep.flink.version>1.0.3</dep.flink.version>
         <dep.gdl.version>0.2-SNAPSHOT</dep.gdl.version>
+        <dep.hazelcast.version>3.6.4</dep.hazelcast.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
         <dep.junit.version>4.11</dep.junit.version>
         <dep.jettison.version>1.3.7</dep.jettison.version>
@@ -299,6 +300,18 @@
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.hazelcast</groupId>
+                <artifactId>hazelcast</artifactId>
+                <version>${dep.hazelcast.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.hazelcast</groupId>
+                <artifactId>hazelcast-client</artifactId>
+                <version>${dep.hazelcast.version}</version>
             </dependency>
 
             <!-- Test dependencies -->
