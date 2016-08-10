@@ -14,23 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.api.operators;
 
+package org.gradoop.flink.datagen.foodbroker.functions;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.flink.model.api.operators.Operator;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Generates a graph collection
+ * Filters all vertices by label.
  */
-public interface CollectionGenerator extends Operator {
+public class LabledVerticesFromVertices
+  implements FilterFunction<Vertex> {
 
-  /**
-   * executes the operator
-   * @return graph collection
-   */
-  GraphCollection execute();
+  private String label;
+
+  public LabledVerticesFromVertices(String label) {
+    this.label = label;
+  }
+
+  @Override
+  public boolean filter(Vertex v) throws Exception {
+    return v.getLabel().equals(label);
+  }
 }

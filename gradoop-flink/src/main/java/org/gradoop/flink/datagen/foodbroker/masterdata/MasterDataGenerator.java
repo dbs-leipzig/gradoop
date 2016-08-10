@@ -14,23 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.api.operators;
+package org.gradoop.flink.datagen.foodbroker.masterdata;
 
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.flink.model.api.operators.Operator;
-import org.gradoop.flink.model.impl.GraphCollection;
+public interface MasterDataGenerator {
 
-/**
- * Generates a graph collection
- */
-public interface CollectionGenerator extends Operator {
-
-  /**
-   * executes the operator
-   * @return graph collection
-   */
-  GraphCollection execute();
+  DataSet<Vertex> generate();
 }

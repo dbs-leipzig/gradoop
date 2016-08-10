@@ -14,23 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.api.operators;
+package org.gradoop.flink.datagen.foodbroker.tuples;
 
-
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.flink.model.api.operators.Operator;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * Generates a graph collection
+ * (number, quality)
  */
-public interface CollectionGenerator extends Operator {
+public class MasterDataSeed extends Tuple2<Integer, Float> {
 
   /**
-   * executes the operator
-   * @return graph collection
+   * default constructor
    */
-  GraphCollection execute();
+  public MasterDataSeed() {
+  }
+
+  /**
+   * valued constructor
+   * @param number sequence number
+   * @param quality master data quality
+   */
+  public MasterDataSeed(Integer number, Float quality) {
+    super(number, quality);
+  }
+
+  public Integer getNumber() {
+    return this.f0;
+  }
+
+  public Float getQuality() {
+    return this.f1;
+  }
 }

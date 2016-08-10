@@ -14,23 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.api.operators;
 
+package org.gradoop.flink.datagen.foodbroker.tuples;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.flink.model.api.operators.Operator;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Generates a graph collection
+ * Interface for master data tuples.
  */
-public interface CollectionGenerator extends Operator {
+public interface MasterDataTupleInterface {
 
   /**
-   * executes the operator
-   * @return graph collection
+   * Returns the id of the master data tuple.
+   *
+   * @return GradoopId
    */
-  GraphCollection execute();
+  GradoopId getId();
+
+  /**
+   * Returns the quality of the master data tuple.
+   *
+   * @return float representation of the quality
+   */
+  Float getQuality();
 }

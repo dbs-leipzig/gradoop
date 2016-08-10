@@ -14,23 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.model.api.operators;
 
+package org.gradoop.flink.datagen.foodbroker.foodbrokerage;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.flink.model.api.operators.Operator;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.datagen.foodbroker.config.Constants;
+
 
 /**
- * Generates a graph collection
+ * Creates a master data tuple from the given vertex.
  */
-public interface CollectionGenerator extends Operator {
+public class MasterDataQualityMapper
+  implements MapFunction<Vertex, Tuple2<GradoopId, Float>> {
 
-  /**
-   * executes the operator
-   * @return graph collection
-   */
-  GraphCollection execute();
+  @Override
+  public Tuple2<GradoopId, Float> map(Vertex v) throws Exception {
+    return new Tuple2<>(v.getId(), v.getPropertyValue(
+      Constants.QUALITY).getFloat());
+  }
 }
