@@ -23,6 +23,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
@@ -98,20 +99,20 @@ public class FoodBroker implements CollectionGenerator {
     TypeInformation edgeTypeInfo = TypeExtractor
       .createTypeInfo(gradoopFlinkConfig.getEdgeFactory().getType());
 
-    DataSet customers =
+    DataSet<Vertex> customers =
       new CustomerGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
 
-    DataSet vendors =
+    DataSet<Vertex> vendors =
       new VendorGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
 
-    DataSet logistics =
+    DataSet<Vertex> logistics =
       new LogisticsGenerator(gradoopFlinkConfig, foodBrokerConfig)
         .generate();
 
-    DataSet employees =
+    DataSet<Vertex> employees =
       new EmployeeGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
 
-    DataSet products =
+    DataSet<Vertex> products =
       new ProductGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
 
     DataSet<Long> caseSeeds = env.generateSequence(1, foodBrokerConfig
@@ -155,29 +156,28 @@ public class FoodBroker implements CollectionGenerator {
 
 
 
-    DataSet transactionalVertices = foodBrokerageTransactions
+    DataSet<Vertex> transactionalVertices = foodBrokerageTransactions
       .map(new GraphTransactionTriple())
       .flatMap(new TransactionVertices())
-      .returns(vertexTypeInfo);
+      .returns(TypeExtractor.getForClass(Vertex.class));
 
-    DataSet transactionalEdges = foodBrokerageTransactions
+    DataSet<Edge> transactionalEdges = foodBrokerageTransactions
       .map(new GraphTransactionTriple())
       .flatMap(new TransactionEdges())
-      .returns(edgeTypeInfo);
+      .returns(TypeExtractor.getForClass(Edge.class));
 
-    DataSet graphHeads = foodBrokerageTransactions
+    DataSet<GraphHead> graphHeads = foodBrokerageTransactions
       .map(new GraphTransactionTriple())
       .map(new TransactionGraphHead())
-      .returns(graphHeadTypeInfo);
+      .returns(TypeExtractor.getForClass(GraphHead.class));
 
-    DataSet masterData = customers
+    DataSet<Vertex> masterData = customers
       .union(vendors)
       .union(logistics)
       .union(employees)
       .union(products)
       .join(transactionalEdges)
-      .where(new Id()).equalTo(new TargetId())
-
+      .where(new Id<Vertex>()).equalTo(new TargetId<Edge>())
       .with(new JoinFunction<Vertex, Edge, Vertex>() {
         @Override
         public Vertex join(Vertex v, Edge e) throws Exception {
@@ -186,7 +186,7 @@ public class FoodBroker implements CollectionGenerator {
         }
       });
 
- DataSet vertices = masterData
+ DataSet<Vertex> vertices = masterData
    .union(transactionalVertices);
 
     return GraphCollection.fromDataSets(graphHeads, vertices,
