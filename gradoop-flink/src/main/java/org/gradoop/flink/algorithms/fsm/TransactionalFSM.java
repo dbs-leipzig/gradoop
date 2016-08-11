@@ -38,6 +38,7 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
  */
 public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 
+  public static final String SUPPORT_KEY = "support";
   /**
    * frequent subgraph mining configuration
    */
