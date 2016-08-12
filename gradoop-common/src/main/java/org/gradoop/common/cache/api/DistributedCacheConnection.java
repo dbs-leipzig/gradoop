@@ -18,4 +18,8 @@ public interface DistributedCacheConnection {
   <K, V> void setMap(String name, Map<K, V> map);
 
   void delete(String name);
+
+  long getCounter(String name);
+
+  void setCounter(String name, long count);
 }

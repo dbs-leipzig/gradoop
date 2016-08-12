@@ -70,4 +70,14 @@ public class HazelcastCacheServer implements DistributedCacheServer {
   public void delete(String name) {
     instance.removeDistributedObjectListener(name);
   }
+
+  @Override
+  public long getCounter(String name) {
+    return instance.getAtomicLong(name).get();
+  }
+
+  @Override
+  public void setCounter(String name, long count) {
+    instance.getAtomicLong(name).set(count);
+  }
 }

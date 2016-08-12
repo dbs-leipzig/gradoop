@@ -67,6 +67,16 @@ public class HazelCastCacheClient implements DistributedCacheClient {
   }
 
   @Override
+  public long getCounter(String name) {
+    return instance.getAtomicLong(name).get();
+  }
+
+  @Override
+  public void setCounter(String name, long count) {
+    instance.getAtomicLong(name).set(count);
+  }
+
+  @Override
   public long incrementAndGetCounter(String name) {
     return instance.getAtomicLong(name).incrementAndGet();
   }
@@ -96,5 +106,10 @@ public class HazelCastCacheClient implements DistributedCacheClient {
   @Override
   public void resetCounter(String name) {
     instance.getAtomicLong(name).set(0L);
+  }
+
+  @Override
+  public void addAndGetCounter(String counterName, long count) {
+    instance.getAtomicLong(counterName).addAndGet(count);
   }
 }
