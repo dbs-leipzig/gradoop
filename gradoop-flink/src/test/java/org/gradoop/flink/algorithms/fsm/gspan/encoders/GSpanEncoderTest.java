@@ -66,7 +66,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     System.out.println("local vertex label frequencies :");
     List<Map<String, Integer>> vertexLabelFrequencies =
-      cacheServer.getList(EncodeWithCache.VERTEX_LABEL_FREQUENCIES);
+      cacheServer.getList(EncodeWithCache.LABEL_FREQUENCIES);
 
     for(Map<String, Integer> map : vertexLabelFrequencies) {
       System.out.println(map);
@@ -74,9 +74,23 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     System.out.println("vertex label dictionary :");
     System.out.println(Maps.newHashMap(
-      cacheServer.getMap(EncodeWithCache.VERTEX_LABEL_DICTIONARY)));
+      cacheServer.getMap(
+        EncodeWithCache.VERTEX_PREFIX +
+          EncodeWithCache.LABEL_DICTIONARY)));
     System.out.println(Lists.newArrayList(
-      cacheServer.getList(EncodeWithCache.VERTEX_LABEL_DICTIONARY_INVERSE)));
+      cacheServer.getList(
+        EncodeWithCache.VERTEX_PREFIX +
+          EncodeWithCache.LABEL_DICTIONARY_INVERSE)));
+
+    System.out.println("edge label dictionary :");
+    System.out.println(Maps.newHashMap(
+      cacheServer.getMap(
+        EncodeWithCache.EDGE_PREFIX +
+          EncodeWithCache.LABEL_DICTIONARY)));
+    System.out.println(Lists.newArrayList(
+      cacheServer.getList(
+        EncodeWithCache.EDGE_PREFIX +
+          EncodeWithCache.LABEL_DICTIONARY_INVERSE)));
 
     cacheServer.shutdown();
   }
