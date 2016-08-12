@@ -11,4 +11,6 @@ public interface DistributedCacheClient extends DistributedCacheConnection {
   void triggerEvent(String eventName) throws InterruptedException;
 
   void resetCounter(String name);
+
+  void addAndGetCounter(String counterName, long graphCount);
 }

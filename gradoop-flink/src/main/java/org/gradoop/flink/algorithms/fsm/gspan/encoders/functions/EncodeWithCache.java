@@ -34,12 +34,16 @@ public class EncodeWithCache extends
   public static final String LABEL_DICTIONARY = "vld";
   public static final String LABEL_DICTIONARY_INVERSE = "vldi";
   public static final String LABEL_DICTIONARY_AVAILABLE = "vlda";
+  private static final String GRAPH_COUNT = "gc";
+  private static final String GRAPH_COUNT_REPORTS = "gcr";
+  private static final String MIN_FREQUENCY = "mf";
 
   private final FSMConfig fsmConfig;
   private Collection<TLFGraph> graphs;
   private int partitionCount;
   private int partition;
   private DistributedCacheClient cacheClient;
+  private long minGlobalFrequency;
 
   public EncodeWithCache(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
@@ -52,14 +56,43 @@ public class EncodeWithCache extends
     setLocalFields();
     long vertexLabelReporter = reportVertexLabelFrequency(values);
 
-    Map<String, Integer> vertexLabelDictionary =
-      vertexLabelReporter == 1 ?
-        createLabelDictionary(VERTEX_PREFIX) :
-        readLabelDictionary(VERTEX_PREFIX);
+    Map<String, Integer> vertexLabelDictionary;
+
+    if (vertexLabelReporter == 1) {
+      setGlobalMinFrequency();
+      vertexLabelDictionary = createLabelDictionary(VERTEX_PREFIX);
+    } else {
+      vertexLabelDictionary = readLabelDictionary(VERTEX_PREFIX);
+      readGlobalMinFrequency();
+    }
 
     Collection<Collection<EdgeTripleWithStringEdgeLabel<Integer>>>
       graphTriples =  Lists.newArrayList();
 
+    long reporter = reportEdgeLabels(vertexLabelDictionary);
+
+    Map<String, Integer> edgeLabelDictionary =
+      reporter == 1 ?
+        createLabelDictionary(EDGE_PREFIX) :
+        readLabelDictionary(EDGE_PREFIX);
+
+    System.out.println("HERE");
+  }
+
+  private void readGlobalMinFrequency() {
+    this.minGlobalFrequency = cacheClient.getCounter(MIN_FREQUENCY);
+  }
+
+  private void setGlobalMinFrequency() throws InterruptedException {
+    cacheClient.waitForCounterToReach(GRAPH_COUNT_REPORTS, partitionCount);
+
+    this.minGlobalFrequency = Math.round((float)
+    cacheClient.getCounter(GRAPH_COUNT) * fsmConfig.getMinSupport());
+
+    cacheClient.setCounter(MIN_FREQUENCY, minGlobalFrequency);
+  }
+
+  private long reportEdgeLabels(Map<String, Integer> vertexLabelDictionary) {
     Map<String, Integer> labelFrequencies = Maps.newHashMap();
 
     for (TLFGraph graph : graphs) {
@@ -98,15 +131,8 @@ public class EncodeWithCache extends
 
     cacheClient.getList(LABEL_FREQUENCIES).add(labelFrequencies);
 
-    long reporter = cacheClient
+    return cacheClient
       .incrementAndGetCounter(LABEL_FREQUENCY_REPORTS);
-
-    Map<String, Integer> edgeLabelDictionary =
-      reporter == 1 ?
-        createLabelDictionary(EDGE_PREFIX) :
-        readLabelDictionary(EDGE_PREFIX);
-
-    System.out.println("HERE");
   }
 
   private Map<String, Integer> readLabelDictionary(String prefix) throws
@@ -156,11 +182,14 @@ public class EncodeWithCache extends
     Integer translation = 0;
     for (Map.Entry<String, Integer> entry : labelsWithCount) {
       String label = entry.getKey();
+      Integer frequency = entry.getValue();
 
-      dictionary.put(label, translation);
-      inverseDictionary.add(label);
+      if (frequency >= minGlobalFrequency) {
+        dictionary.put(label, translation);
+        inverseDictionary.add(label);
 
-      translation++;
+        translation++;
+      }
     }
 
     cacheClient.setMap(prefix + LABEL_DICTIONARY, dictionary);
@@ -178,7 +207,10 @@ public class EncodeWithCache extends
     Set<String> vertexLabels = Sets.newHashSet();
     Map<String, Integer> vertexLabelFrequency = Maps.newHashMap();
 
+    long graphCount = 0;
+
     for (TLFGraph graph : values) {
+      graphCount++;
       graphs.add(graph);
       vertexLabels.clear();
 
@@ -189,6 +221,9 @@ public class EncodeWithCache extends
       addLabelFrequency(vertexLabelFrequency, vertexLabels);
 
     }
+    cacheClient.addAndGetCounter(GRAPH_COUNT, graphCount);
+    cacheClient.incrementAndGetCounter(GRAPH_COUNT_REPORTS);
+
     cacheClient
       .getList(LABEL_FREQUENCIES).add(vertexLabelFrequency);
 
