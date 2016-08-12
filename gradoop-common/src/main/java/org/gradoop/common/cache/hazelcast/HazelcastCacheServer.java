@@ -33,7 +33,7 @@ public class HazelcastCacheServer implements DistributedCacheServer {
   }
 
   @Override
-  public void addCounter(String name) {
+  public void resetCounter(String name) {
     instance.getAtomicLong(name).set(0L);
   }
 

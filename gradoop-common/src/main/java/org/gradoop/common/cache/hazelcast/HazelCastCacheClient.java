@@ -92,4 +92,9 @@ public class HazelCastCacheClient implements DistributedCacheClient {
   public void triggerEvent(String eventName) throws InterruptedException {
     incrementAndGetCounter(eventName);
   }
+
+  @Override
+  public void resetCounter(String name) {
+    instance.getAtomicLong(name).set(0L);
+  }
 }

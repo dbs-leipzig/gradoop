@@ -157,7 +157,7 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
   public void testPartitionIteration() throws Exception {
     DistributedCacheServer server = DistributedCache.getServer();
 
-    server.addCounter("finishedPartions");
+    server.resetCounter("finishedPartions");
 
     Collection<Long> res = getExecutionEnvironment()
       .generateSequence(1, 100)

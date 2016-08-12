@@ -9,4 +9,6 @@ public interface DistributedCacheClient extends DistributedCacheConnection {
   void waitForEvent(String eventName) throws InterruptedException;
 
   void triggerEvent(String eventName) throws InterruptedException;
+
+  void resetCounter(String name);
 }
