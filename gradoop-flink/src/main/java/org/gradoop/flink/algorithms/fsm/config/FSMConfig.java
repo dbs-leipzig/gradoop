@@ -50,7 +50,7 @@ public class FSMConfig implements Serializable {
    * Minimum subgraph size by edge count.
    */
   private int minEdgeCount;
-
+  private String cacheServerAddress;
 
 
   /**
@@ -95,5 +95,13 @@ public class FSMConfig implements Serializable {
 
   public void setLikelinessThreshold(float likelinessThreshold) {
     this.likelinessThreshold = likelinessThreshold;
+  }
+
+  public String getCacheServerAddress() {
+    return cacheServerAddress;
+  }
+
+  public void setCacheAddress(String cacheAddress) {
+    this.cacheServerAddress = cacheAddress;
   }
 }

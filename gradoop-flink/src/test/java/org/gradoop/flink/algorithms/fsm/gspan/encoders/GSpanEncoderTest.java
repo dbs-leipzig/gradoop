@@ -1,11 +1,17 @@
 package org.gradoop.flink.algorithms.fsm.gspan.encoders;
 
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.cache.DistributedCache;
+import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanMiner;
 import org.gradoop.flink.algorithms.fsm.gspan.comparators.DFSCodeComparator;
+import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions
+  .EncodeWithCache;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.MinDFSCode;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
@@ -24,10 +30,56 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
 public class GSpanEncoderTest extends GradoopFlinkTestBase {
+
+  @Test
+  public void testCacheEncoder() throws Exception {
+    DistributedCacheServer cacheServer = DistributedCache.getServer();
+
+    GraphTransactions transactions = new PredictableTransactionsGenerator(
+      100, 1, true, getConfig()).execute();
+
+    FSMConfig fsmConfig = new FSMConfig(1.0f, true);
+    fsmConfig.setCacheAddress(cacheServer.getAddress());
+
+    String tlfFile =  GSpanEncoderTest
+      .class.getResource("/data/tlf").getFile() + "/benchmark.tlf";
+
+    DataSink dataSink = new TLFDataSink(tlfFile, config);
+
+    dataSink.write(transactions);
+
+    getExecutionEnvironment().execute();
+
+    TLFDataSource dataSource = new TLFDataSource(tlfFile, config);
+
+    DataSet<TLFGraph> graphs = dataSource.getTLFGraphs();
+
+    GSpanEncoder<DataSet<TLFGraph>> encoder =
+      new GSpanTLFGraphCacheEncoder(fsmConfig);
+
+    encoder.encode(graphs,fsmConfig).print();
+
+    System.out.println("local vertex label frequencies :");
+    List<Map<String, Integer>> vertexLabelFrequencies =
+      cacheServer.getList(EncodeWithCache.VERTEX_LABEL_FREQUENCIES);
+
+    for(Map<String, Integer> map : vertexLabelFrequencies) {
+      System.out.println(map);
+    }
+
+    System.out.println("vertex label dictionary :");
+    System.out.println(Maps.newHashMap(
+      cacheServer.getMap(EncodeWithCache.VERTEX_LABEL_DICTIONARY)));
+    System.out.println(Lists.newArrayList(
+      cacheServer.getList(EncodeWithCache.VERTEX_LABEL_DICTIONARY_INVERSE)));
+
+    cacheServer.shutdown();
+  }
 
   @Test
   public void testPredictableBenchmark() throws Exception {
