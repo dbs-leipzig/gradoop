@@ -10,8 +10,8 @@ import org.gradoop.common.cache.api.DistributedCacheClient;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.comparators
   .LabelFrequencyEntryComparator;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples
-  .EdgeTripleWithStringEdgeLabel;
+import org.gradoop.flink.algorithms.fsm.gspan.pojos.AdjacencyList;
+import org.gradoop.flink.algorithms.fsm.gspan.pojos.AdjacencyListEntry;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
@@ -19,12 +19,13 @@ import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class EncodeWithCache extends
-  RichMapPartitionFunction<TLFGraph, GSpanGraph> {
+public class EncodeWithCache
+  extends RichMapPartitionFunction<TLFGraph, GSpanGraph> {
 
   public static final String VERTEX_PREFIX = "v";
   public static final String EDGE_PREFIX = "e";
@@ -41,24 +42,23 @@ public class EncodeWithCache extends
   private final FSMConfig fsmConfig;
   private Collection<TLFGraph> graphs;
   private int partitionCount;
-  private int partition;
   private DistributedCacheClient cacheClient;
   private long minGlobalFrequency;
+  private int partition;
 
   public EncodeWithCache(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }
 
   @Override
-  public void mapPartition(Iterable<TLFGraph> values,
-    Collector<GSpanGraph> out) throws Exception {
+  public void mapPartition(
+    Iterable<TLFGraph> values, Collector<GSpanGraph> out) throws Exception {
 
     setLocalFields();
-    long vertexLabelReporter = reportVertexLabelFrequency(values);
 
+    long reporter = reportVertexLabelFrequency(values);
     Map<String, Integer> vertexLabelDictionary;
-
-    if (vertexLabelReporter == 1) {
+    if (reporter == 1) {
       setGlobalMinFrequency();
       vertexLabelDictionary = createLabelDictionary(VERTEX_PREFIX);
     } else {
@@ -66,17 +66,63 @@ public class EncodeWithCache extends
       readGlobalMinFrequency();
     }
 
-    Collection<Collection<EdgeTripleWithStringEdgeLabel<Integer>>>
-      graphTriples =  Lists.newArrayList();
+    reporter = reportEdgeLabels(vertexLabelDictionary);
+    Map<String, Integer> edgeLabelDictionary;
+    if (reporter == 1) {
+      edgeLabelDictionary = createLabelDictionary(EDGE_PREFIX);
+    } else {
+      edgeLabelDictionary = readLabelDictionary(EDGE_PREFIX);
+    }
 
-    long reporter = reportEdgeLabels(vertexLabelDictionary);
+    for (TLFGraph graph : graphs) {
+      Map<Integer, AdjacencyList> adjacencyLists = Maps.newHashMap();
+      int edgeId = 0;
 
-    Map<String, Integer> edgeLabelDictionary =
-      reporter == 1 ?
-        createLabelDictionary(EDGE_PREFIX) :
-        readLabelDictionary(EDGE_PREFIX);
+      for (TLFEdge edge : graph.getEdges()) {
+        Integer edgeLabel = edgeLabelDictionary.get(edge.getLabel());
 
-    System.out.println("HERE");
+        if (edgeLabel != null) {
+          edgeId ++;
+
+          Integer sourceId = edge.getSourceId();
+          Integer sourceLabel;
+          Integer targetId = edge.getTargetId();
+          Integer targetLabel;
+
+          AdjacencyList sourceAdjacencyList = adjacencyLists.get(sourceId);
+          if (sourceAdjacencyList == null) {
+            sourceLabel = vertexLabelDictionary
+              .get(graph.getGraphVertices().get(sourceId).getLabel());
+
+            sourceAdjacencyList = new AdjacencyList(sourceLabel);
+            adjacencyLists.put(sourceId, sourceAdjacencyList);
+          } else {
+            sourceLabel = sourceAdjacencyList.getFromVertexLabel();
+          }
+
+          AdjacencyList targetAdjacencyList = adjacencyLists.get(targetId);
+          if (targetAdjacencyList == null) {
+            targetLabel = vertexLabelDictionary
+              .get(graph.getGraphVertices().get(targetId).getLabel());
+
+            targetAdjacencyList = new AdjacencyList(targetLabel);
+            adjacencyLists.put(sourceId, targetAdjacencyList);
+          } else {
+            targetLabel = targetAdjacencyList.getFromVertexLabel();
+          }
+
+          sourceAdjacencyList.getEntries().add(new AdjacencyListEntry(
+            true, edgeId, edgeLabel, targetId, targetLabel));
+
+          targetAdjacencyList.getEntries().add(new AdjacencyListEntry(
+            !fsmConfig.isDirected(), edgeId, edgeLabel, sourceId, sourceLabel));
+        }
+      }
+
+      if (! adjacencyLists.isEmpty()) {
+        out.collect(new GSpanGraph(adjacencyLists));
+      }
+    }
   }
 
   private void readGlobalMinFrequency() {
@@ -96,36 +142,30 @@ public class EncodeWithCache extends
     Map<String, Integer> labelFrequencies = Maps.newHashMap();
 
     for (TLFGraph graph : graphs) {
-      Collection<EdgeTripleWithStringEdgeLabel<Integer>> triples = Lists
-        .newArrayList();
-      Set<String> edgeLabels = Sets.newHashSet();
+      Collection<Integer> vertexIdsWithFrequentLabels = Sets.newHashSet();
+      Collection<String> edgeLabels = Sets.newHashSet();
 
-      Map<Integer, Integer> vertexLabels = Maps.newHashMapWithExpectedSize
-        (graph.getGraphVertices().size());
-
+      // drop vertices with infrequent labels
       for (TLFVertex vertex : graph.getGraphVertices()) {
-        Integer label = vertexLabelDictionary.get(vertex.getLabel());
-        if (label != null) {
-          vertexLabels.put(vertex.getId(), label);
+        if (vertexLabelDictionary.containsKey(vertex.getLabel())) {
+          vertexIdsWithFrequentLabels.add(vertex.getId());
         }
       }
 
-      for (TLFEdge edge : graph.getGraphEdges()) {
-        Integer sourceId = edge.getSourceId();
-        Integer sourceLabel = vertexLabels.get(sourceId);
+      // drop edges with dropped vertices and report edge labels
 
-        if (sourceLabel != null) {
-          Integer targetId = edge.getTargetId();
-          Integer targetLabel = vertexLabels.get(targetId);
+      Iterator<TLFEdge> edgeIterator = graph.getEdges().iterator();
 
-          if (targetLabel != null) {
-            String edgeLabel = edge.getLabel();
-            edgeLabels.add(edgeLabel);
-            triples.add(new EdgeTripleWithStringEdgeLabel<>(
-              sourceId, targetId, edgeLabel, sourceLabel, targetLabel));
-          }
+      while (edgeIterator.hasNext()) {
+        TLFEdge edge = edgeIterator.next();
+        if (vertexIdsWithFrequentLabels.contains(edge.getSourceId()) &&
+          vertexIdsWithFrequentLabels.contains(edge.getTargetId())) {
+          edgeLabels.add(edge.getLabel());
+        } else {
+          edgeIterator.remove();
         }
       }
+
       addLabelFrequency(labelFrequencies, edgeLabels);
     }
 

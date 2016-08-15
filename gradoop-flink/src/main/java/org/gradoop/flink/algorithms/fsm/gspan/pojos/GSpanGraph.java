@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.algorithms.fsm.gspan.pojos;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.io.Serializable;
@@ -33,7 +32,7 @@ public class GSpanGraph implements Serializable {
   /**
    * EPGMVertex adjacency lists. Index is vertex identifier.
    */
-  private List<AdjacencyList> adjacencyLists;
+  private Map<Integer, AdjacencyList> adjacencyLists;
   /**
    * Embeddings (value) of supported DFS codes (key)
    */
@@ -49,7 +48,15 @@ public class GSpanGraph implements Serializable {
     List<AdjacencyList> adjacencyLists,
     Map<DFSCode, Collection<DFSEmbedding>> subgraphEmbeddings) {
 
-    this.adjacencyLists = adjacencyLists;
+    this.adjacencyLists = Maps
+      .newHashMapWithExpectedSize(adjacencyLists.size());
+
+    Integer vertexId = 0;
+    for (AdjacencyList adjacencyList : adjacencyLists) {
+      this.adjacencyLists.put(vertexId, adjacencyList);
+      vertexId++;
+    }
+
     this.subgraphEmbeddings = subgraphEmbeddings;
   }
 
@@ -57,7 +64,12 @@ public class GSpanGraph implements Serializable {
    * default constructor
    */
   public GSpanGraph() {
-    this.adjacencyLists = Lists.newArrayListWithCapacity(0);
+    this.adjacencyLists = Maps.newHashMapWithExpectedSize(0);
+    this.subgraphEmbeddings = Maps.newHashMapWithExpectedSize(0);
+  }
+
+  public GSpanGraph(Map<Integer, AdjacencyList> adjacencyLists) {
+    this.adjacencyLists = adjacencyLists;
     this.subgraphEmbeddings = Maps.newHashMapWithExpectedSize(0);
   }
 
@@ -70,7 +82,7 @@ public class GSpanGraph implements Serializable {
     return this.subgraphEmbeddings != null;
   }
 
-  public List<AdjacencyList> getAdjacencyLists() {
+  public Map<Integer, AdjacencyList> getAdjacencyLists() {
     return adjacencyLists;
   }
 
@@ -87,14 +99,13 @@ public class GSpanGraph implements Serializable {
   public String toString() {
     StringBuilder builder = new StringBuilder();
 
-    int listId = 0;
+    for (Map.Entry<Integer, AdjacencyList> adjacencyList :
+      adjacencyLists.entrySet()) {
 
-    for (AdjacencyList adjacencyList : adjacencyLists) {
       builder
-        .append("(").append(listId).append(":")
-        .append(adjacencyList.getFromVertexLabel()).append(")")
-        .append(adjacencyList.getEntries()).append("\n");
-      listId++;
+        .append("(").append(adjacencyList.getKey()).append(":")
+        .append(adjacencyList.getValue().getFromVertexLabel()).append(")")
+        .append(adjacencyList.getValue().getEntries()).append("\n");
     }
 
     return builder.toString();

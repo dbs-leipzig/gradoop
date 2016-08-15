@@ -110,7 +110,7 @@ public class GraphTransactionFromTLFGraph implements
       vertexIdMap.put(tlfVertex.getId(), vertex.getId());
     }
 
-    for (TLFEdge tlfEdge :graph.getGraphEdges()) {
+    for (TLFEdge tlfEdge :graph.getEdges()) {
       GradoopId sourceId = vertexIdMap.get(tlfEdge.getSourceId());
       GradoopId targetId = vertexIdMap.get(tlfEdge.getTargetId());
 

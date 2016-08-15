@@ -645,7 +645,7 @@ public class GSpan {
 
     Collection<DFSEmbedding> parentEmbeddings = Lists.newArrayList();
     int fromVertexId = 0;
-    for (AdjacencyList adjacencyList : graph.getAdjacencyLists()) {
+    for (AdjacencyList adjacencyList : graph.getAdjacencyLists().values()) {
       if (step.getFromLabel().equals(adjacencyList.getFromVertexLabel())) {
         for (AdjacencyListEntry entry : adjacencyList.getEntries()) {
           if (step.isOutgoing() == entry.isOutgoing() &&
