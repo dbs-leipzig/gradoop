@@ -25,6 +25,9 @@ import org.gradoop.flink.datagen.foodbroker.functions
   .LabledVerticesFromVertices;
 import org.gradoop.flink.datagen.foodbroker.functions
   .TransactionalVerticesFromVertices;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.json.JSONDataSink;
+import org.gradoop.flink.io.impl.tlf.TLFIOTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -142,5 +145,27 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
       new FoodBroker(getExecutionEnvironment(), getConfig(), config);
 
     return foodBroker.execute();
+  }
+
+  @Test
+  public void toJson() throws Exception {
+
+    GraphCollection cases = generateCollection();
+
+    String graphsPath =
+      FoodBrokerTest.class.getResource("/foodbroker").getFile() +
+        "/graphs.json";
+    String nodesPath =
+      FoodBrokerTest.class.getResource("/foodbroker").getFile() + "/nodes.json";
+    String edgesPath =
+      FoodBrokerTest.class.getResource("/foodbroker").getFile() + "/edges.json";
+
+    DataSink dataSink = new JSONDataSink(graphsPath, nodesPath, edgesPath, getConfig());
+
+    dataSink.write(cases);
+
+    config.getExecutionEnvironment().execute();
+//    cases.writeTo(new JSONDataSink(graphsPath, nodesPath, edgesPath, getConfig()));
+
   }
 }
