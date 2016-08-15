@@ -70,7 +70,7 @@ public class TLFVertexLabelsEncoder
       }
     }
 
-    for (TLFEdge edge : tlfGraph.getGraphEdges()) {
+    for (TLFEdge edge : tlfGraph.getEdges()) {
       Integer sourceLabel = vertexLabels.get(edge.getSourceId());
       if (sourceLabel != null) {
         Integer targetLabel = vertexLabels.get(edge.getTargetId());
