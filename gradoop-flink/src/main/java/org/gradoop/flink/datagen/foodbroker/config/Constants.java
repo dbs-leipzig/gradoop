@@ -24,11 +24,11 @@ public class Constants {
   /**
    * reserved property key referring to master or transactional data
    */
-  public static final String SUPERTYPE_KEY = "superType";
+  public static final String SUPERTYPE_KEY = "kind";
   /**
    * reserved property value to mark master data
    */
-  public static final String SUPERCLASS_VALUE_MASTER = "M";
+  public static final String SUPERCLASS_VALUE_MASTER = "MasterData";
   /**
    * reserved property key referring to the source identifier of vertices
    */
@@ -65,5 +65,7 @@ public class Constants {
 
   public static final String PRODUCT_PRICE_MAP = "productPriceMap";
 
+  public static final String VERTEX_MAP = "vertexMap";
 
+  public static final String EDGE_MAP = "edgeMap";
 }

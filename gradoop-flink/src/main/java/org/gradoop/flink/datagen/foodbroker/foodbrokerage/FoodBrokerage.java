@@ -35,6 +35,7 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.foodbroker.tuples.FoodBrokerMaps;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.io.Serializable;
@@ -50,7 +51,7 @@ import java.util.Set;
  * equally to each worker.
  */
 public class FoodBrokerage
-  extends RichMapPartitionFunction<Long, GraphTransaction>
+  extends RichMapPartitionFunction<Long, Tuple2<GraphTransaction, FoodBrokerMaps>>
   implements Serializable {
 
   /**
@@ -101,10 +102,10 @@ public class FoodBrokerage
    */
   private EdgeFactory edgeFactory;
 
-  /**
-   * set containing all vertices which are created
-   */
-  private Set<Vertex> vertices;
+//  /**
+//   * set containing all vertices which are created
+//   */
+//  private Set<Vertex> vertices;
   /**
    * set which contains all edges which are created
    */
@@ -113,7 +114,7 @@ public class FoodBrokerage
   /**
    * map to quickly receive the target id of an edge
    */
-  private Map<Tuple2<String, GradoopId>, GradoopId> edgeMap;
+  private Map<Tuple2<String, GradoopId>, Set<GradoopId>> edgeMap;
   /**
    * map to get the vertex object of a given gradoop id
    */
@@ -160,7 +161,7 @@ public class FoodBrokerage
     this.edgeFactory = edgeFactory;
     this.config = config;
 
-    vertices = Sets.newHashSet();
+//    vertices = Sets.newHashSet();
     edges = Sets.newHashSet();
 
     edgeMap = Maps.newHashMap();
@@ -199,7 +200,8 @@ public class FoodBrokerage
 
   @Override
   public void mapPartition(Iterable<Long> iterable,
-    Collector<GraphTransaction> collector) throws Exception {
+    Collector<Tuple2<GraphTransaction, FoodBrokerMaps>> collector) throws
+    Exception {
 
     // SalesQuotation
     Vertex salesQuotation;
@@ -233,7 +235,9 @@ public class FoodBrokerage
     GraphTransaction graphTransaction;
 
     for (Long seed: iterable) {
-      vertices = Sets.newHashSet();
+      vertexMap = Maps.newHashMap();
+      edgeMap = Maps.newHashMap();
+//      vertices = Sets.newHashSet();
       edges = Sets.newHashSet();
       graphHead = graphHeadFactory.createGraphHead();
       graphIds = new GradoopIdSet();
@@ -270,9 +274,10 @@ public class FoodBrokerage
         salesInvoice = newSalesInvoice(salesOrderLines);
       }
       graphTransaction.setGraphHead(graphHead);
-      graphTransaction.setVertices(vertices);
+      graphTransaction.setVertices(getVertices());
       graphTransaction.setEdges(edges);
-      collector.collect(graphTransaction);
+      collector.collect(new Tuple2<>(graphTransaction,
+        new FoodBrokerMaps(vertexMap, edgeMap)));
     }
   }
 
@@ -794,7 +799,13 @@ public class FoodBrokerage
    */
   private void newEdge(String label, GradoopId source, GradoopId target) {
     edges.add(edgeFactory.createEdge(label, source, target, graphIds));
-    edgeMap.put(new Tuple2<>(label, source), target);
+    Tuple2<String, GradoopId> key = new Tuple2<>(label, source);
+    Set<GradoopId> targets = Sets.newHashSet();
+    if (edgeMap.containsKey(key)) {
+      targets = edgeMap.get(key);
+    }
+    targets.add(target);
+    edgeMap.put(key, targets);
   }
 
   /**
@@ -810,7 +821,13 @@ public class FoodBrokerage
     Edge edge = edgeFactory.createEdge(label, source, target, properties,
       graphIds);
     edges.add(edge);
-    edgeMap.put(new Tuple2<>(label, source), target);
+    Tuple2<String, GradoopId> key = new Tuple2<>(label, source);
+    Set<GradoopId> targets = Sets.newHashSet();
+    if (edgeMap.containsKey(key)) {
+      targets = edgeMap.get(key);
+    }
+    targets.add(target);
+    edgeMap.put(key, targets);
     return edge;
   }
 
@@ -820,7 +837,7 @@ public class FoodBrokerage
    * @param vertex the vertex to store
    */
   private void newVertex(Vertex vertex) {
-    vertices.add(vertex);
+//    vertices.add(vertex);
     vertexMap.put(vertex.getId(), vertex);
   }
 
@@ -834,8 +851,9 @@ public class FoodBrokerage
    */
   private GradoopId getEdgeTargetId(String edgeLabel,
     GradoopId source) {
+    //there is always only one master data in this kind of edges
     return edgeMap.get(
-      new Tuple2<>(edgeLabel, source));
+      new Tuple2<>(edgeLabel, source)).iterator().next();
   }
 
   private Float getEdgeTargetQuality(String edgeLabel,
@@ -851,8 +869,6 @@ public class FoodBrokerage
       return logisticMap.get(target);
     case Constants.EMPLOYEE_MAP:
       return emplyoeeMap.get(target);
-    case Constants.PRODUCT_QUALITY_MAP :
-      return productQualityMap.get(target);
     default:
       return null;
     }
@@ -896,4 +912,11 @@ public class FoodBrokerage
     return productQualityIterator.next().getKey();
   }
 
+  private Set<Vertex> getVertices() {
+    Set<Vertex> vertices = Sets.newHashSet();
+    for(Map.Entry<GradoopId, Vertex> entry : vertexMap.entrySet()) {
+      vertices.add(entry.getValue());
+    }
+    return vertices;
+  }
 }
