@@ -65,6 +65,8 @@ public class Constants {
 
   public static final String PRODUCT_PRICE_MAP = "productPriceMap";
 
+  public static final String USER_MAP = "userMap";
+
   public static final String VERTEX_MAP = "vertexMap";
 
   public static final String EDGE_MAP = "edgeMap";

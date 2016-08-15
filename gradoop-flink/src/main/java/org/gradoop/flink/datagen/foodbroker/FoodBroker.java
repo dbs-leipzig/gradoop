@@ -16,11 +16,13 @@
  */
 package org.gradoop.flink.datagen.foodbroker;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
@@ -50,11 +52,7 @@ import org.gradoop.flink.datagen.foodbroker.foodbrokerage
 import org.gradoop.flink.datagen.foodbroker.foodbrokerage
   .MasterDataQualityMapper;
 import org.gradoop.flink.datagen.foodbroker.foodbrokerage.ProductPriceMapper;
-import org.gradoop.flink.datagen.foodbroker.masterdata.CustomerGenerator;
-import org.gradoop.flink.datagen.foodbroker.masterdata.EmployeeGenerator;
-import org.gradoop.flink.datagen.foodbroker.masterdata.LogisticsGenerator;
-import org.gradoop.flink.datagen.foodbroker.masterdata.ProductGenerator;
-import org.gradoop.flink.datagen.foodbroker.masterdata.VendorGenerator;
+import org.gradoop.flink.datagen.foodbroker.masterdata.*;
 import org.gradoop.flink.datagen.foodbroker.tuples.FoodBrokerMaps;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
@@ -223,7 +221,8 @@ public class FoodBroker implements CollectionGenerator {
           });
 
 
-    DataSet<GraphTransaction> complaintHandling = deliveryNotes
+    DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple =
+      deliveryNotes
       .mapPartition(new NewComplaintHandling(
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
@@ -233,91 +232,38 @@ public class FoodBroker implements CollectionGenerator {
       .withBroadcastSet(vendorDataMap, Constants.VENDOR_MAP)
       .withBroadcastSet(logisticDataMap, Constants.LOGISTIC_MAP)
       .withBroadcastSet(employeeDataMap, Constants.EMPLOYEE_MAP)
-      .withBroadcastSet(productQualityDataMap, Constants.PRODUCT_QUALITY_MAP);
+      .withBroadcastSet(productQualityDataMap, Constants.PRODUCT_QUALITY_MAP)
+      .withBroadcastSet(employees, Employee.CLASS_NAME)
+      .withBroadcastSet(customers, Customer.CLASS_NAME);
 
-    DataSet<Vertex> user = complaintHandling
-      .map(new GraphTransactionTriple())
-      .map(new MapFunction<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>, Set<Edge>>() {
+    DataSet<GraphTransaction> complaintHandling = complaintHandlingTuple
+      .map(new MapFunction<Tuple2<GraphTransaction, Set<Vertex>>, GraphTransaction>() {
         @Override
-        public Set<Edge> map(
-          Tuple3<GraphHead, Set<Vertex>, Set<Edge>> tuple)
+        public GraphTransaction map(
+          Tuple2<GraphTransaction, Set<Vertex>> tuple)
           throws
           Exception {
-          return tuple.f2;
-        }
-      })
-      .flatMap(new User(gradoopFlinkConfig.getVertexFactory()))
-      .withBroadcastSet(employees, "empCust")
-      .groupBy(0)
-      .reduceGroup(new MergeGraphIds());
-
-
-    DataSet<Vertex> clients = complaintHandling
-      .map(new GraphTransactionTriple())
-      .map(new MapFunction<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>, Set<Edge>>() {
-        @Override
-        public Set<Edge> map(
-          Tuple3<GraphHead, Set<Vertex>, Set<Edge>> tuple)
-          throws
-          Exception {
-          return tuple.f2;
-        }
-      })
-      .flatMap(new Client(gradoopFlinkConfig.getVertexFactory()))
-      .withBroadcastSet(customers, "empCust")
-      .groupBy(0)
-      .reduceGroup(new MergeGraphIds());
-
-    DataSet<Tuple2<GradoopId, GradoopId>> edgeChange = user
-      .union(clients)
-      .map(new MapFunction<Vertex, Tuple2<GradoopId, GradoopId>>() {
-        @Override
-        public Tuple2<GradoopId, GradoopId> map(Vertex vertex) throws
-          Exception {
-          GradoopId old;
-          if (vertex.hasProperty("erpCustNum")) {
-            old = GradoopId
-              .fromString(vertex.getPropertyValue("erpCustNum").getString());
-          } else {
-            old = GradoopId
-              .fromString(vertex.getPropertyValue("erpEmplNum").getString());
-          }
-          return new Tuple2<GradoopId, GradoopId>(old, vertex.getId());
+          return tuple.f0;
         }
       });
 
-//    try {
-//      clients.print();
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
-//    System.exit(0);
+    DataSet<Vertex> userClients = complaintHandlingTuple
+      .flatMap(new FlatMapFunction<Tuple2<GraphTransaction, Set<Vertex>>, Vertex>() {
+        @Override
+        public void flatMap(
+          Tuple2<GraphTransaction, Set<Vertex>> tuple,
+          Collector<Vertex> collector) throws Exception {
+          for (Vertex vertex : tuple.f1) {
+            collector.collect(vertex);
+          }
+        }
+      });
 
     DataSet<Edge> transactionalEdges = foodBrokerageTransactions
+      .union(complaintHandling)
       .map(new GraphTransactionTriple())
       .flatMap(new TransactionEdges())
-      .returns(TypeExtractor.getForClass(Edge.class))
-      .union(complaintHandling
-        .map(new GraphTransactionTriple())
-        .flatMap(new TransactionEdges())
-        .map(new RichMapFunction<Edge, Edge>() {
-          private List<Tuple2<GradoopId, GradoopId>> edgeChange;
-
-          @Override
-          public void open(Configuration parameters) throws Exception {
-            super.open(parameters);
-            edgeChange = getRuntimeContext().
-              getBroadcastVariable("edgeChange");
-          }
-
-          @Override
-          public Edge map(Edge edge) throws Exception {
-            return null;
-          }
-        })
-        //TODO constants setzen
-        .withBroadcastSet(edgeChange, "edgeChange")
-        .returns(TypeExtractor.getForClass(Edge.class)));
+      .returns(TypeExtractor.getForClass(Edge.class));
 
     DataSet<GraphHead> graphHeads = foodBrokerageTransactions
       .union(complaintHandling)
@@ -325,27 +271,82 @@ public class FoodBroker implements CollectionGenerator {
       .map(new TransactionGraphHead())
       .returns(TypeExtractor.getForClass(GraphHead.class));
 
+
+    DataSet<Map<GradoopId, GradoopIdSet>> graphIds = transactionalEdges
+      .map(new MapFunction<Edge, Tuple2<GradoopId, GradoopIdSet>>() {
+        @Override
+        public Tuple2<GradoopId, GradoopIdSet> map(Edge edge) throws Exception {
+          return new Tuple2<GradoopId, GradoopIdSet>(edge.getTargetId(),
+            edge.getGraphIds());
+        }
+      })
+      .reduceGroup(
+        new GroupReduceFunction<Tuple2<GradoopId, GradoopIdSet>, Map<GradoopId, GradoopIdSet>>() {
+          @Override
+          public void reduce(Iterable<Tuple2<GradoopId, GradoopIdSet>> iterable,
+            Collector<Map<GradoopId, GradoopIdSet>> collector) throws
+            Exception {
+            Map<GradoopId, GradoopIdSet> map = Maps.newHashMap();
+            GradoopIdSet graphIds;
+            for (Tuple2<GradoopId, GradoopIdSet> tuple : iterable) {
+              if (map.containsKey(tuple.f0)) {
+                graphIds = map.get(tuple.f0);
+                graphIds.addAll(tuple.f1);
+              } else {
+                graphIds = tuple.f1;
+              }
+              map.put(tuple.f0, graphIds);
+            }
+            collector.collect(map);
+          }
+        });
+
     DataSet<Vertex> masterData = customers
       .union(vendors)
       .union(logistics)
       .union(employees)
       .union(products)
-      .join(transactionalEdges)
-      .where(new Id<Vertex>()).equalTo(new TargetId<Edge>())
-      .with(new JoinFunction<Vertex, Edge, Vertex>() {
-      @Override
-      public Vertex join(Vertex v, Edge e) throws Exception {
-        GradoopIdSet graphIds = new GradoopIdSet();
-        if (v.getGraphIds() != null) {
-          graphIds = v.getGraphIds();
+      .union(userClients)
+      .map(new RichMapFunction<Vertex, Vertex>() {
+        Map<GradoopId, GradoopIdSet> map;
+
+        @Override
+        public void open(Configuration parameters) throws Exception {
+          super.open(parameters);
+
+          map = getRuntimeContext().<Map<GradoopId, GradoopIdSet>>
+            getBroadcastVariable("graphIds").get(0);
         }
-        graphIds.addAll(e.getGraphIds());
-        v.setGraphIds(graphIds);
-        return v;
-      }
-    });
-//      .union(user)
-//      .union(clients);
+
+        @Override
+        public Vertex map(Vertex vertex) throws Exception {
+          vertex.setGraphIds(map.get(vertex.getId()));
+          return vertex;
+        }
+      })
+      .withBroadcastSet(graphIds, "graphIds");
+
+
+//      customers
+//      .union(vendors)
+//      .union(logistics)
+//      .union(employees)
+//      .union(products)
+//      .union(userClients)
+//      .join(transactionalEdges)
+//      .where(new Id<Vertex>()).equalTo(new TargetId<Edge>())
+//      .with(new JoinFunction<Vertex, Edge, Vertex>() {
+//      @Override
+//      public Vertex join(Vertex v, Edge e) throws Exception {
+//        GradoopIdSet graphIds = new GradoopIdSet();
+//        if (v.getGraphIds() != null) {
+//          graphIds = v.getGraphIds();
+//        }
+//        graphIds.addAll(e.getGraphIds());
+//        v.setGraphIds(graphIds);
+//        return v;
+//      }
+//    });
 
  DataSet<Vertex> vertices = masterData
    .union(transactionalVertices);
