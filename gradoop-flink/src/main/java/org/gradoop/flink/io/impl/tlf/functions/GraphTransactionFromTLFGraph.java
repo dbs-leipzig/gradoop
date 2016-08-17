@@ -100,7 +100,7 @@ public class GraphTransactionFromTLFGraph implements
 
     vertexIdMap = Maps.newHashMap();
 
-    for (TLFVertex tlfVertex : graph.getGraphVertices()) {
+    for (TLFVertex tlfVertex : graph.getVertices()) {
       Vertex vertex = vertexFactory.createVertex(
         tlfVertex.getLabel(),
         graphIds

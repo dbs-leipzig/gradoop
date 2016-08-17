@@ -14,6 +14,7 @@ import org.gradoop.flink.algorithms.fsm.gspan.comparators.DFSCodeComparator;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions
   .EncodeWithCache;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.MinDFSCode;
+import org.gradoop.flink.algorithms.fsm.gspan.miners.CacheBasedGSpan;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSCode;
@@ -41,7 +42,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     GraphTransactions transactions = new PredictableTransactionsGenerator(
-      100, 1, true, getConfig()).execute();
+      10, 1, true, getConfig()).execute();
 
     FSMConfig fsmConfig = new FSMConfig(1.0f, true);
     fsmConfig.setCacheAddress(cacheServer.getAddress());
@@ -65,6 +66,8 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     DataSet<GSpanGraph> encodedGraphs = encoder.encode(graphs, fsmConfig);
 
 
+    encodedGraphs.mapPartition(
+      new CacheBasedGSpan(fsmConfig)).print();
 
 
 

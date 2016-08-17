@@ -38,7 +38,7 @@ public class TLFVertexLabels implements FlatMapFunction<TLFGraph, String> {
 
     Set<String> labels = Sets.newHashSet();
 
-    for (TLFVertex vertex : tlfGraph.getGraphVertices()) {
+    for (TLFVertex vertex : tlfGraph.getVertices()) {
       labels.add(vertex.getLabel());
     }
 

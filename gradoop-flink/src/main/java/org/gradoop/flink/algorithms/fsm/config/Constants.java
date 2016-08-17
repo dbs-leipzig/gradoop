@@ -48,7 +48,7 @@ public class Constants {
   public static final String WORKER_GRAPHCOUNT = "workerIds";
   public static final String VERTEX_PREFIX = "v";
   public static final String EDGE_PREFIX = "e";
-  public static final String REPORTS = "vlfc";
+  public static final String TASK_FINISHED = "vlfc";
   public static final String LABEL_DICTIONARY = "vld";
   public static final String LABEL_DICTIONARY_INVERSE = "vldi";
   public static final String LABEL_DICTIONARY_AVAILABLE = "vlda";
