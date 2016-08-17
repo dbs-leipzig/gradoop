@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.config;
 /**
  * Collection of broadcast dataset names used for frequent subgraph mining.
  */
-public class BroadcastNames {
+public class Constants {
 
   /**
    * set of frequent subgraphs
@@ -46,4 +46,12 @@ public class BroadcastNames {
    * graph counts of all workers
    */
   public static final String WORKER_GRAPHCOUNT = "workerIds";
+  public static final String VERTEX_PREFIX = "v";
+  public static final String EDGE_PREFIX = "e";
+  public static final String REPORTS = "vlfc";
+  public static final String LABEL_DICTIONARY = "vld";
+  public static final String LABEL_DICTIONARY_INVERSE = "vldi";
+  public static final String LABEL_DICTIONARY_AVAILABLE = "vlda";
+  public static final String GRAPH_COUNT = "gc";
+  public static final String GRAPH_COUNT_REPORTS = "gcr";
 }

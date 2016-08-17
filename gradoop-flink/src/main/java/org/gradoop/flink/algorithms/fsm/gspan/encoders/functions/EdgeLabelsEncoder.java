@@ -24,7 +24,7 @@ import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.GSpan;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithoutGraphId;
 
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
 
@@ -66,7 +66,7 @@ public class EdgeLabelsEncoder<IDT> extends RichMapFunction
     super.open(parameters);
 
     this.dictionary = getRuntimeContext().<Map<String, Integer>>
-      getBroadcastVariable(BroadcastNames.EDGE_DICTIONARY).get(0);
+      getBroadcastVariable(Constants.EDGE_DICTIONARY).get(0);
   }
 
   @Override

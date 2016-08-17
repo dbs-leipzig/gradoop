@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.gspan.decoders;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanDecoder;
 import org.gradoop.flink.algorithms.fsm.gspan.decoders.functions.DFSDecoder;
 import org.gradoop.flink.algorithms.fsm.gspan.decoders.functions.EdgeLabelDecoder;
@@ -82,14 +82,14 @@ public class GSpanGraphCollectionDecoder implements
     DataSet<Vertex> vertices = graphTriples
       .flatMap(new ExpandVertices<GraphHead>())
       .map(new VertexLabelDecoder())
-      .withBroadcastSet(vertexLabelDictionary, BroadcastNames.VERTEX_DICTIONARY)
+      .withBroadcastSet(vertexLabelDictionary, Constants.VERTEX_DICTIONARY)
       .map(new FullVertex<>(config.getVertexFactory()))
       .returns(config.getVertexFactory().getType());
 
     DataSet<Edge> edges = graphTriples
       .flatMap(new ExpandEdges<GraphHead>())
       .map(new EdgeLabelDecoder())
-      .withBroadcastSet(edgeLabelDictionary, BroadcastNames.EDGE_DICTIONARY)
+      .withBroadcastSet(edgeLabelDictionary, Constants.EDGE_DICTIONARY)
       .map(new FullEdge<>(config.getEdgeFactory()))
       .returns(config.getEdgeFactory().getType());
 

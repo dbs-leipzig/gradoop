@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.gspan.decoders.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class VertexLabelDecoder
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     this.dictionary = getRuntimeContext()
-      .<List<String>>getBroadcastVariable(BroadcastNames.VERTEX_DICTIONARY)
+      .<List<String>>getBroadcastVariable(Constants.VERTEX_DICTIONARY)
       .get(0);
   }
 

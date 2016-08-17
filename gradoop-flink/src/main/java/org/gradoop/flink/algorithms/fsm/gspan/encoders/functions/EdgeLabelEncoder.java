@@ -22,7 +22,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithoutVertexLabels;
 import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Map;
@@ -47,7 +47,7 @@ public class EdgeLabelEncoder<E extends EPGMEdge>
     super.open(parameters);
 
     this.dictionary = getRuntimeContext().<Map<String, Integer>>
-      getBroadcastVariable(BroadcastNames.EDGE_DICTIONARY).get(0);
+      getBroadcastVariable(Constants.EDGE_DICTIONARY).get(0);
   }
 
   @Override

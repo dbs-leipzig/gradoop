@@ -28,7 +28,7 @@ import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.functions.Ite
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.pojos.IterationItem;
 
 import org.gradoop.flink.algorithms.fsm.gspan.miners.GSpanBase;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.functions.GrowFrequentSubgraphs;
 
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.functions.IsTransaction;
@@ -97,7 +97,7 @@ public class GSpanBulkIteration extends GSpanBase {
         .groupBy(0)
         .sum(1)
         .filter(new Frequent<CompressedDFSCode>())
-        .withBroadcastSet(minFrequency, BroadcastNames.MIN_FREQUENCY);
+        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
 
     // get all frequent subgraphs
     DataSet<Collection<WithCount<CompressedDFSCode>>> collector = workSet
@@ -113,7 +113,7 @@ public class GSpanBulkIteration extends GSpanBase {
     DataSet<IterationItem> nextWorkSet = transactions
       .map(new GrowFrequentSubgraphs(fsmConfig))
       .withBroadcastSet(
-        currentFrequentSubgraphs, BroadcastNames.FREQUENT_SUBGRAPHS)
+        currentFrequentSubgraphs, Constants.FREQUENT_SUBGRAPHS)
       .filter(new HasGrownSubgraphs())
       .union(
         collector

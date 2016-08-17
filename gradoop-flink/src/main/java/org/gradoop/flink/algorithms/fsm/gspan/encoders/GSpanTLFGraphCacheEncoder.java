@@ -18,7 +18,7 @@
 package org.gradoop.flink.algorithms.fsm.gspan.encoders;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions.Dictionary;
@@ -127,7 +127,7 @@ public class GSpanTLFGraphCacheEncoder implements GSpanEncoder<DataSet<TLFGraph>
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<String>())
-      .withBroadcastSet(minFrequency, BroadcastNames.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
       .reduceGroup(new Dictionary());
 
     DataSet<Map<String, Integer>> reverseDictionary = edgeLabelDictionary
@@ -135,7 +135,7 @@ public class GSpanTLFGraphCacheEncoder implements GSpanEncoder<DataSet<TLFGraph>
 
     return tripleCollections
       .map(new EdgeLabelsEncoderInteger(fsmConfig))
-      .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
+      .withBroadcastSet(reverseDictionary, Constants.EDGE_DICTIONARY);
   }
 
   /**
@@ -155,7 +155,7 @@ public class GSpanTLFGraphCacheEncoder implements GSpanEncoder<DataSet<TLFGraph>
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<String>())
-      .withBroadcastSet(minFrequency, BroadcastNames.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
       .reduceGroup(new Dictionary());
 
     DataSet<Map<String, Integer>> reverseDictionary = vertexLabelDictionary
@@ -163,7 +163,7 @@ public class GSpanTLFGraphCacheEncoder implements GSpanEncoder<DataSet<TLFGraph>
 
     return graphs
       .map(new TLFVertexLabelsEncoder())
-      .withBroadcastSet(reverseDictionary, BroadcastNames.VERTEX_DICTIONARY);
+      .withBroadcastSet(reverseDictionary, Constants.VERTEX_DICTIONARY);
   }
 
   public DataSet<Integer> getMinFrequency() {

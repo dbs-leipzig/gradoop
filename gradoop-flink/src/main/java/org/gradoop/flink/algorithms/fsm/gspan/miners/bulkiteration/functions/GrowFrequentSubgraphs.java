@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.functions;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.GSpan;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.pojos.IterationItem;
@@ -59,7 +59,7 @@ public class GrowFrequentSubgraphs
 
     Collection<WithCount<CompressedDFSCode>> frequentSubgraphsWithFrequency =
       getRuntimeContext()
-        .getBroadcastVariable(BroadcastNames.FREQUENT_SUBGRAPHS);
+        .getBroadcastVariable(Constants.FREQUENT_SUBGRAPHS);
 
     frequentSubgraphs = Lists.newArrayList();
 

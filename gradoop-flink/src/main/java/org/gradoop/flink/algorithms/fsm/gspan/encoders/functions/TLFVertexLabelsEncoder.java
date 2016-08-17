@@ -27,7 +27,7 @@ import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStri
 import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 
 import java.util.Collection;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class TLFVertexLabelsEncoder
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     this.dictionary = getRuntimeContext().<Map<String, Integer>>
-      getBroadcastVariable(BroadcastNames.VERTEX_DICTIONARY).get(0);
+      getBroadcastVariable(Constants.VERTEX_DICTIONARY).get(0);
   }
 
   @Override

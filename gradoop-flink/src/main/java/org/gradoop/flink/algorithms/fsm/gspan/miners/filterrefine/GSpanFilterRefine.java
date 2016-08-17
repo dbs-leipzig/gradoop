@@ -29,7 +29,7 @@ import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.filterrefine.functions
   .CompressedSubgraphWithCount;
 import org.gradoop.flink.model.impl.tuples.WithCount;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.GSpanBase;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
@@ -80,8 +80,8 @@ public class GSpanFilterRefine extends GSpanBase {
       .groupBy(0)
       // keep if sure or likely globally frequent; drop otherwise
       .reduceGroup(new FrequentOrRefinementCandidate(fsmConfig))
-      .withBroadcastSet(minFrequency, BroadcastNames.MIN_FREQUENCY)
-      .withBroadcastSet(workerIdsGraphCount, BroadcastNames.WORKER_GRAPHCOUNT);
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+      .withBroadcastSet(workerIdsGraphCount, Constants.WORKER_GRAPHCOUNT);
 
     // add globally frequent DFS codes to result
     DataSet<WithCount<CompressedDFSCode>> frequentDfsCodes = filterResult
@@ -110,7 +110,7 @@ public class GSpanFilterRefine extends GSpanBase {
         .groupBy(0)
         .sum(1)
         .filter(new Frequent<CompressedDFSCode>())
-        .withBroadcastSet(minFrequency, BroadcastNames.MIN_FREQUENCY)
+        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
     );
 
     return frequentDfsCodes;

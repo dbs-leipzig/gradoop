@@ -19,7 +19,7 @@ package org.gradoop.flink.algorithms.fsm.gspan.functions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
@@ -38,7 +38,7 @@ public class Frequent<T> extends RichFilterFunction<WithCount<T>> {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     this.minFrequency = getRuntimeContext()
-      .<Integer>getBroadcastVariable(BroadcastNames.MIN_FREQUENCY)
+      .<Integer>getBroadcastVariable(Constants.MIN_FREQUENCY)
       .get(0);
   }
 
