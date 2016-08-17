@@ -338,8 +338,7 @@ public class NewComplaintHandling
       String label = "SalesInvoice";
 
       PropertyList properties = new PropertyList();
-      properties.set(Constants.SUPERTYPE_KEY, "Constants.SUPERCLASS_VALUE_TRANSACTIONAL");
-      properties.set("revenue", BigDecimal.ZERO);
+      properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
       properties.set("text", "*** TODO @ ComplaintHandling ***");
       properties.set("date", ticket.getPropertyValue("createdAt").getLong());
       properties.set("revenue", refundAmount);
@@ -381,7 +380,7 @@ public class NewComplaintHandling
       String label = "PurchInvoice";
       PropertyList properties = new PropertyList();
 
-      properties.set(Constants.SUPERTYPE_KEY, "Constants.SUPERCLASS_VALUE_TRANSACTIONAL");
+      properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
 
       properties.set("expense", refundAmount);
       properties.set("text", "*** TODO @ ComplaintHandling ***");
