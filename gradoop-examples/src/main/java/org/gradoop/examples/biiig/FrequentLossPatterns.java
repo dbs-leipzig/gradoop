@@ -74,9 +74,14 @@ public class FrequentLossPatterns
     GradoopFlinkConfig config = GradoopFlinkConfig
       .createConfig(getExecutionEnvironment());
 
-    String graphHeadPath = "";
-    String vertexPath = "";
-    String edgePath = "";
+    String graphHeadPath = FrequentLossPatterns.class
+      .getResource("/data/json/foodbroker/graphs.json").getFile();
+
+    String vertexPath = FrequentLossPatterns.class.
+      getResource("/data/json/foodbroker/nodes.json").getFile();
+
+    String edgePath = FrequentLossPatterns.class
+      .getResource("/data/json/foodbroker/edges.json").getFile();
 
     JSONDataSource dataSource = new JSONDataSource(
       graphHeadPath, vertexPath, edgePath, config);
@@ -113,9 +118,12 @@ public class FrequentLossPatterns
 
     // DATA SINK
 
-    String outPath = "";
+    String outPath = FrequentLossPatterns.class.getResource("/data/dot/flp.dot")
+      .getFile();
+
     new DOTDataSink(outPath, true).write(frequentSubgraphs);
 
+    getExecutionEnvironment().execute();
   }
 
   private static class Result implements ApplyAggregateFunction {
