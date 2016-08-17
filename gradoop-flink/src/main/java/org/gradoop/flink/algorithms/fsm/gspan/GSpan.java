@@ -362,13 +362,13 @@ public class GSpan {
     if (fsmConfig.isDirected()) {
       if (edge.isLoop()) {
         step = new DirectedDFSStep(
-          0, sourceLabel, true, edgeLabel, 0, sourceLabel);
+          0, 0, sourceLabel, true, edgeLabel, sourceLabel);
       } else if (edge.sourceIsMinimumLabel()) {
         step = new DirectedDFSStep(
-          0, sourceLabel, true, edgeLabel, 1, targetLabel);
+          0, 1, sourceLabel, true, edgeLabel, targetLabel);
       } else {
         step = new DirectedDFSStep(
-          0, targetLabel, false, edgeLabel, 1, sourceLabel);
+          0, 1, targetLabel, false, edgeLabel, sourceLabel);
       }
     } else {
       if (edge.isLoop()) {
@@ -470,9 +470,8 @@ public class GSpan {
 
                     if (fsmConfig.isDirected()) {
                       dfsStep = new DirectedDFSStep(
-                        fromVertexTime, fromVertexLabel,
-                        entry.isOutgoing(), entry.getEdgeLabel(),
-                        toVertexTime, toVertexLabel);
+                        fromVertexTime, toVertexTime, fromVertexLabel,
+                        entry.isOutgoing(), entry.getEdgeLabel(), toVertexLabel);
                     } else {
                       dfsStep = new UndirectedDFSStep(
                         fromVertexTime, fromVertexLabel,

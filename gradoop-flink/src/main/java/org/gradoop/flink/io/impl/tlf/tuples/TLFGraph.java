@@ -59,7 +59,7 @@ public class TLFGraph
     this.f0 = graphHead;
   }
 
-  public List<TLFVertex> getGraphVertices() {
+  public List<TLFVertex> getVertices() {
     return this.f1;
   }
 

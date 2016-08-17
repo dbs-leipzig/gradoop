@@ -1,7 +1,6 @@
 package org.gradoop.flink.algorithms.fsm.gspan;
 
 import com.google.common.collect.Lists;
-import org.gradoop.flink.algorithms.fsm.gspan.GSpan;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
@@ -31,9 +30,9 @@ public class GSpanTest extends GradoopFlinkTestBase {
     //  (0:A)    (1:A)
     //       -a->
 
-    DFSStep firstStep = new DirectedDFSStep(0, 0, true, 0, 1, 0);
-    DFSStep backwardStep = new DirectedDFSStep(1, 0, false, 0, 0, 0);
-    DFSStep branchStep = new DirectedDFSStep(0, 0, true, 0, 1, 0);
+    DFSStep firstStep = new DirectedDFSStep(0, 1, 0, true, 0, 0);
+    DFSStep backwardStep = new DirectedDFSStep(1, 0, 0, false, 0, 0);
+    DFSStep branchStep = new DirectedDFSStep(0, 1, 0, true, 0, 0);
 
     DFSCode minCode = new DFSCode(Lists.newArrayList(firstStep, backwardStep));
     DFSCode wrongCode = new DFSCode(Lists.newArrayList(firstStep, branchStep));
@@ -91,7 +90,8 @@ public class GSpanTest extends GradoopFlinkTestBase {
     DFSCode singleEdgeCode =
       singleEdgeCodes.iterator().next();
 
-    assertEquals(singleEdgeCode, new DFSCode(new DirectedDFSStep(0, 0, true, 0, 1, 0)));
+    assertEquals(singleEdgeCode, new DFSCode(new DirectedDFSStep(0, 1, 0, true, 0,
+      0)));
 
     // N=2
     assertEquals(0, singleEdgeCode.getMinVertexLabel());

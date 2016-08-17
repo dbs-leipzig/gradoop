@@ -45,14 +45,14 @@ public abstract class DFSStepBase implements DFSStep {
   /**
    * Constructor
    *
+   * @param fromTime discovery time of traversal start vertex
+   * @param toTime discovery time of traversal end vertex
    * @param fromLabel label of traversal start vertex
    * @param edgeLabel label of the traversed edge
    * @param toLabel label of traversal end vertex
-   * @param toTime discovery time of traversal end vertex
-   * @param fromTime discovery time of traversal start vertex
    */
-  public DFSStepBase(Integer fromLabel, Integer edgeLabel, Integer toLabel,
-    int toTime, int fromTime) {
+  public DFSStepBase(int fromTime, int toTime, Integer fromLabel, Integer edgeLabel,
+    Integer toLabel) {
     this.fromLabel = fromLabel;
     this.edgeLabel = edgeLabel;
     this.toLabel = toLabel;

@@ -62,7 +62,7 @@ public class TLFVertexLabelsEncoder
     Collection<EdgeTripleWithStringEdgeLabel<Integer>> triples =
       Lists.newArrayList();
 
-    for (TLFVertex vertex : tlfGraph.getGraphVertices()) {
+    for (TLFVertex vertex : tlfGraph.getVertices()) {
       Integer label = dictionary.get(vertex.getLabel());
 
       if (label != null) {

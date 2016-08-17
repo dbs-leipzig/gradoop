@@ -30,10 +30,15 @@ public class EncodeWithCache
 
   private final FSMConfig fsmConfig;
   private Collection<TLFGraph> graphs;
+  private Collection<Map<Integer, AdjacencyList>> graphAdjacencyLists;
+
+  private int partition;
   private int partitionCount;
   private DistributedCacheClient cacheClient;
+
   private long minFrequency;
-  private int partition;
+  private Map<String, Integer> vertexLabelDictionary;
+  private Map<String, Integer> edgeLabelDictionary;
 
   public EncodeWithCache(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
@@ -43,10 +48,12 @@ public class EncodeWithCache
   public void mapPartition(
     Iterable<TLFGraph> values, Collector<GSpanGraph> out) throws Exception {
 
-    setLocalFields();
+    graphs = Lists.newArrayList();
+    partitionCount = getRuntimeContext().getNumberOfParallelSubtasks();
+    partition = getRuntimeContext().getIndexOfThisSubtask();
+    cacheClient = DistributedCache.getClient(fsmConfig.getCacheServerAddress());
 
     long reporter = reportVertexLabelFrequency(values);
-    Map<String, Integer> vertexLabelDictionary;
     if (reporter == 1) {
       setMinFrequency();
       vertexLabelDictionary = createLabelDictionary(Constants.VERTEX_PREFIX);
@@ -55,19 +62,17 @@ public class EncodeWithCache
       readMinFrequency();
     }
 
-    reporter = reportEdgeLabels(vertexLabelDictionary);
-    Map<String, Integer> edgeLabelDictionary;
+    reporter = reportEdgeLabels();
     if (reporter == 1) {
       edgeLabelDictionary = createLabelDictionary(Constants.EDGE_PREFIX);
     } else {
       edgeLabelDictionary = readLabelDictionary(Constants.EDGE_PREFIX);
     }
 
-    for (TLFGraph graph : graphs) {
-      Map<Integer, AdjacencyList> adjacencyLists =
-        encodeGraphs(graph, vertexLabelDictionary, edgeLabelDictionary);
+    encodeGraphs();
 
-      if (! adjacencyLists.isEmpty()) {
+    for (Map<Integer, AdjacencyList> adjacencyLists : graphAdjacencyLists) {
+      if (!adjacencyLists.isEmpty()) {
         out.collect(new GSpanGraph(adjacencyLists));
       }
     }
@@ -81,7 +86,8 @@ public class EncodeWithCache
    * @throws InterruptedException
    */
   private void setMinFrequency() throws InterruptedException {
-    cacheClient.waitForCounterToReach(Constants.GRAPH_COUNT_REPORTS, partitionCount);
+    cacheClient.waitForCounterToReach(
+      Constants.GRAPH_COUNT_REPORTS, partitionCount);
 
     this.minFrequency = Math.round((float)
       cacheClient.getCounter(Constants.GRAPH_COUNT) * fsmConfig.getMinSupport());
@@ -116,7 +122,7 @@ public class EncodeWithCache
 
       Set<String> vertexLabels = Sets.newHashSet();
 
-      for (TLFVertex vertex : graph.getGraphVertices()) {
+      for (TLFVertex vertex : graph.getVertices()) {
         vertexLabels.add(vertex.getLabel());
       }
 
@@ -129,20 +135,32 @@ public class EncodeWithCache
     cacheClient.setMap(String.valueOf(partition), labelFrequency);
 
     return cacheClient
-      .incrementAndGetCounter(Constants.REPORTS);
+      .incrementAndGetCounter(Constants.TASK_FINISHED);
   }
 
-  private long reportEdgeLabels(Map<String, Integer> vertexLabelDictionary) {
+  private long reportEdgeLabels() {
     Map<String, Integer> labelFrequency = Maps.newHashMap();
 
+    graphAdjacencyLists = Lists.newArrayListWithCapacity(graphs.size());
+
     for (TLFGraph graph : graphs) {
-      Collection<Integer> vertexIdsWithFrequentLabels = Sets.newHashSet();
+      Map<Integer, AdjacencyList> vertexAdjacencyLists = Maps.newHashMap();
+      graphAdjacencyLists.add(vertexAdjacencyLists);
       Collection<String> edgeLabels = Sets.newHashSet();
 
       // drop vertices with infrequent labels
-      for (TLFVertex vertex : graph.getGraphVertices()) {
-        if (vertexLabelDictionary.containsKey(vertex.getLabel())) {
-          vertexIdsWithFrequentLabels.add(vertex.getId());
+      Iterator<TLFVertex> vertexIterator = graph.getVertices().iterator();
+
+      while (vertexIterator.hasNext()) {
+        TLFVertex vertex = vertexIterator.next();
+
+        Integer vertexLabel = vertexLabelDictionary.get(vertex.getLabel());
+
+        if (vertexLabel != null) {
+          vertexAdjacencyLists.put(
+            vertex.getId(), new AdjacencyList(vertexLabel));
+        } else {
+          vertexIterator.remove();
         }
       }
 
@@ -152,8 +170,9 @@ public class EncodeWithCache
 
       while (edgeIterator.hasNext()) {
         TLFEdge edge = edgeIterator.next();
-        if (vertexIdsWithFrequentLabels.contains(edge.getSourceId()) &&
-          vertexIdsWithFrequentLabels.contains(edge.getTargetId())) {
+
+        if (vertexAdjacencyLists.containsKey(edge.getSourceId()) &&
+          vertexAdjacencyLists.containsKey(edge.getTargetId())) {
           edgeLabels.add(edge.getLabel());
         } else {
           edgeIterator.remove();
@@ -166,7 +185,7 @@ public class EncodeWithCache
     cacheClient.setMap(String.valueOf(partition), labelFrequency);
 
     return cacheClient
-      .incrementAndGetCounter(Constants.REPORTS);
+      .incrementAndGetCounter(Constants.TASK_FINISHED);
   }
 
   private void addLabelFrequency(
@@ -196,7 +215,7 @@ public class EncodeWithCache
    */
   private Map<String, Integer> createLabelDictionary(String prefix) throws
     InterruptedException {
-    cacheClient.waitForCounterToReach(Constants.REPORTS, partitionCount);
+    cacheClient.waitForCounterToReach(Constants.TASK_FINISHED, partitionCount);
 
     Map<String, Integer> labelFrequencies = Maps.newHashMap();
 
@@ -250,7 +269,7 @@ public class EncodeWithCache
     cacheClient.setList(
       prefix + Constants.LABEL_DICTIONARY_INVERSE, inverseDictionary);
 
-    cacheClient.resetCounter(Constants.REPORTS);
+    cacheClient.resetCounter(Constants.TASK_FINISHED);
 
     return dictionary;
   }
@@ -261,60 +280,50 @@ public class EncodeWithCache
     return cacheClient.getMap(prefix + Constants.LABEL_DICTIONARY);
   }
 
-  private Map<Integer, AdjacencyList> encodeGraphs(TLFGraph graph,
-    Map<String, Integer> vertexLabelDictionary,
-    Map<String, Integer> edgeLabelDictionary) {
-    Map<Integer, AdjacencyList> adjacencyLists = Maps.newHashMap();
-    int edgeId = 0;
+  private void encodeGraphs() {
 
-    for (TLFEdge edge : graph.getEdges()) {
-      Integer edgeLabel = edgeLabelDictionary.get(edge.getLabel());
+    Iterator<TLFGraph> graphIterator = graphs.iterator();
+    Iterator<Map<Integer, AdjacencyList>> adjacencyListsIterator =
+      graphAdjacencyLists.iterator();
 
-      if (edgeLabel != null) {
-        edgeId ++;
+    while (graphIterator.hasNext()) {
+      TLFGraph graph = graphIterator.next();
+      Map<Integer, AdjacencyList> adjacencyLists =
+        adjacencyListsIterator.next();
 
-        Integer sourceId = edge.getSourceId();
-        Integer sourceLabel;
-        Integer targetId = edge.getTargetId();
-        Integer targetLabel;
+      int edgeId = 0;
 
-        AdjacencyList sourceAdjacencyList = adjacencyLists.get(sourceId);
-        if (sourceAdjacencyList == null) {
-          sourceLabel = vertexLabelDictionary
-            .get(graph.getGraphVertices().get(sourceId).getLabel());
+      for (TLFEdge edge : graph.getEdges()) {
+        Integer edgeLabel = edgeLabelDictionary.get(edge.getLabel());
 
-          sourceAdjacencyList = new AdjacencyList(sourceLabel);
-          adjacencyLists.put(sourceId, sourceAdjacencyList);
-        } else {
-          sourceLabel = sourceAdjacencyList.getFromVertexLabel();
+        if (edgeLabel != null) {
+          Integer sourceId = edge.getSourceId();
+          AdjacencyList sourceAdjacencyList = adjacencyLists.get(sourceId);
+          Integer sourceLabel = sourceAdjacencyList.getFromVertexLabel();
+
+          Integer targetId = edge.getTargetId();
+          AdjacencyList targetAdjacencyList = adjacencyLists.get(targetId);
+          Integer targetLabel = targetAdjacencyList.getFromVertexLabel();
+
+          sourceAdjacencyList.getEntries().add(new AdjacencyListEntry(
+            true, edgeId, edgeLabel, targetId, targetLabel));
+
+          targetAdjacencyList.getEntries().add(new AdjacencyListEntry(
+            !fsmConfig.isDirected(), edgeId, edgeLabel, sourceId, sourceLabel));
+
+          edgeId ++;
         }
+      }
 
-        AdjacencyList targetAdjacencyList = adjacencyLists.get(targetId);
-        if (targetAdjacencyList == null) {
-          targetLabel = vertexLabelDictionary
-            .get(graph.getGraphVertices().get(targetId).getLabel());
+      Iterator<Map.Entry<Integer, AdjacencyList>> vertexAdjacencyListIterator
+        = adjacencyLists.entrySet().iterator();
 
-          targetAdjacencyList = new AdjacencyList(targetLabel);
-          adjacencyLists.put(sourceId, targetAdjacencyList);
-        } else {
-          targetLabel = targetAdjacencyList.getFromVertexLabel();
+      while (vertexAdjacencyListIterator.hasNext()) {
+        if (vertexAdjacencyListIterator.next().getValue()
+          .getEntries().isEmpty()) {
+          vertexAdjacencyListIterator.remove();
         }
-
-        sourceAdjacencyList.getEntries().add(new AdjacencyListEntry(
-          true, edgeId, edgeLabel, targetId, targetLabel));
-
-        targetAdjacencyList.getEntries().add(new AdjacencyListEntry(
-          !fsmConfig.isDirected(), edgeId, edgeLabel, sourceId, sourceLabel));
       }
     }
-    return adjacencyLists;
   }
-
-  private void setLocalFields() {
-    cacheClient = DistributedCache.getClient(fsmConfig.getCacheServerAddress());
-    graphs = Lists.newArrayList();
-    partitionCount = getRuntimeContext().getNumberOfParallelSubtasks();
-    partition = getRuntimeContext().getIndexOfThisSubtask();
-  }
-
 }

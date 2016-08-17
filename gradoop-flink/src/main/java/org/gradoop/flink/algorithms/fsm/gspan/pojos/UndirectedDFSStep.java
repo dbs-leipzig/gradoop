@@ -36,7 +36,7 @@ public class UndirectedDFSStep extends DFSStepBase {
    */
   public UndirectedDFSStep(int fromTime, Integer fromLabel,
     Integer edgeLabel, int toTime, Integer toLabel) {
-    super(fromLabel, edgeLabel, toLabel, toTime, fromTime);
+    super(fromTime, toTime, fromLabel, edgeLabel, toLabel);
   }
 
   @Override
