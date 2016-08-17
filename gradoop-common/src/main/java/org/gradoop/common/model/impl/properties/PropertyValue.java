@@ -280,7 +280,7 @@ public class PropertyValue
       decimal = new BigDecimal(
         Bytes.toString(rawBytes, OFFSET, rawBytes.length - OFFSET));
     } else {
-      throw new RuntimeException(
+      throw new ClassCastException(
         "Cannot covert " + this.getType().getSimpleName() +
           " to " + Double.class.getSimpleName());
     }
