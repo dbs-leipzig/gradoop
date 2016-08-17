@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.cache.DistributedCache;
 import org.gradoop.common.cache.api.DistributedCacheServer;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanMiner;
@@ -30,7 +31,6 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -62,35 +62,31 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     GSpanEncoder<DataSet<TLFGraph>> encoder =
       new GSpanTLFGraphCacheEncoder(fsmConfig);
 
-    encoder.encode(graphs,fsmConfig).print();
+    DataSet<GSpanGraph> encodedGraphs = encoder.encode(graphs, fsmConfig);
 
-    System.out.println("local vertex label frequencies :");
-    List<Map<String, Integer>> vertexLabelFrequencies =
-      cacheServer.getList(EncodeWithCache.LABEL_FREQUENCIES);
 
-    for(Map<String, Integer> map : vertexLabelFrequencies) {
-      System.out.println(map);
-    }
+
+
 
     System.out.println("vertex label dictionary :");
     System.out.println(Maps.newHashMap(
       cacheServer.getMap(
-        EncodeWithCache.VERTEX_PREFIX +
-          EncodeWithCache.LABEL_DICTIONARY)));
+        Constants.VERTEX_PREFIX +
+          Constants.LABEL_DICTIONARY)));
     System.out.println(Lists.newArrayList(
       cacheServer.getList(
-        EncodeWithCache.VERTEX_PREFIX +
-          EncodeWithCache.LABEL_DICTIONARY_INVERSE)));
+        Constants.VERTEX_PREFIX +
+          Constants.LABEL_DICTIONARY_INVERSE)));
 
     System.out.println("edge label dictionary :");
     System.out.println(Maps.newHashMap(
       cacheServer.getMap(
-        EncodeWithCache.EDGE_PREFIX +
-          EncodeWithCache.LABEL_DICTIONARY)));
+        Constants.EDGE_PREFIX +
+          Constants.LABEL_DICTIONARY)));
     System.out.println(Lists.newArrayList(
       cacheServer.getList(
-        EncodeWithCache.EDGE_PREFIX +
-          EncodeWithCache.LABEL_DICTIONARY_INVERSE)));
+        Constants.EDGE_PREFIX +
+          Constants.LABEL_DICTIONARY_INVERSE)));
 
     cacheServer.shutdown();
   }

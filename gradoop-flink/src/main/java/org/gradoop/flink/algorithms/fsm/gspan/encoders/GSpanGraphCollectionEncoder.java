@@ -36,7 +36,7 @@ import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.AddCount;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -137,7 +137,7 @@ public class GSpanGraphCollectionEncoder implements
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<String>())
-      .withBroadcastSet(minFrequency, BroadcastNames.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
       .reduceGroup(new Dictionary());
 
     DataSet<Map<String, Integer>> reverseDictionary = edgeLabelDictionary
@@ -145,7 +145,7 @@ public class GSpanGraphCollectionEncoder implements
 
     return edges
       .flatMap(new EdgeLabelEncoder<Edge>())
-      .withBroadcastSet(reverseDictionary, BroadcastNames.EDGE_DICTIONARY);
+      .withBroadcastSet(reverseDictionary, Constants.EDGE_DICTIONARY);
   }
 
   /**
@@ -166,7 +166,7 @@ public class GSpanGraphCollectionEncoder implements
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<String>())
-      .withBroadcastSet(minFrequency, BroadcastNames.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
       .reduceGroup(new Dictionary());
 
     DataSet<Map<String, Integer>> reverseDictionary = vertexLabelDictionary
@@ -174,7 +174,7 @@ public class GSpanGraphCollectionEncoder implements
 
     return vertices
       .flatMap(new VertexLabelEncoder<Vertex>())
-      .withBroadcastSet(reverseDictionary, BroadcastNames.VERTEX_DICTIONARY);
+      .withBroadcastSet(reverseDictionary, Constants.VERTEX_DICTIONARY);
   }
 
   /**

@@ -8,7 +8,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Either;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.gspan.comparators.DFSCodeComparator;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSCode;
@@ -42,9 +42,9 @@ public class GradoopFSMTestUtils {
       iResult
         .combineGroup(new SortAndTranslate())
         .withBroadcastSet(
-          vertexLabelDictionary, BroadcastNames.VERTEX_DICTIONARY)
+          vertexLabelDictionary, Constants.VERTEX_DICTIONARY)
         .withBroadcastSet(
-          edgeLabelDictionary, BroadcastNames.EDGE_DICTIONARY)
+          edgeLabelDictionary, Constants.EDGE_DICTIONARY)
         .collect()
         .get(0)
     );
@@ -62,10 +62,10 @@ public class GradoopFSMTestUtils {
     public void open(Configuration parameters) throws Exception {
       super.open(parameters);
       this.vertexDictionary = getRuntimeContext()
-        .<List<String>>getBroadcastVariable(BroadcastNames.VERTEX_DICTIONARY)
+        .<List<String>>getBroadcastVariable(Constants.VERTEX_DICTIONARY)
         .get(0);
       this.edgeDictionary = getRuntimeContext()
-        .<List<String>>getBroadcastVariable(BroadcastNames.EDGE_DICTIONARY)
+        .<List<String>>getBroadcastVariable(Constants.EDGE_DICTIONARY)
         .get(0);
     }
 

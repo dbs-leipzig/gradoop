@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -48,7 +48,7 @@ public class VertexLabelsEncoder extends RichMapFunction
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     this.dictionary = getRuntimeContext().<Map<String, Integer>>
-      getBroadcastVariable(BroadcastNames.VERTEX_DICTIONARY).get(0);
+      getBroadcastVariable(Constants.VERTEX_DICTIONARY).get(0);
   }
 
 

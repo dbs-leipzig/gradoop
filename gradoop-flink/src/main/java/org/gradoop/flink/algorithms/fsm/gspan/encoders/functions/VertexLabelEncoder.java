@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.VertexIdLabel;
 
 import java.util.Map;
@@ -44,7 +44,7 @@ public class VertexLabelEncoder<V extends EPGMVertex>
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     this.dictionary = getRuntimeContext().<Map<String, Integer>>
-      getBroadcastVariable(BroadcastNames.VERTEX_DICTIONARY).get(0);
+      getBroadcastVariable(Constants.VERTEX_DICTIONARY).get(0);
   }
 
   @Override

@@ -25,7 +25,7 @@ import org.apache.flink.api.common.functions.RichGroupReduceFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.config.BroadcastNames;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.filterrefine.tuples.FilterMessage;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.filterrefine.tuples.RefinementMessage;
@@ -67,11 +67,11 @@ public class FrequentOrRefinementCandidate
     super.open(parameters);
     this.minFrequency = getRuntimeContext()
       .<Integer>getBroadcastVariable(
-        BroadcastNames.MIN_FREQUENCY).get(0);
+        Constants.MIN_FREQUENCY).get(0);
 
     this.workerGraphCount = getRuntimeContext()
       .<Map<Integer, Integer>>getBroadcastVariable(
-        BroadcastNames.WORKER_GRAPHCOUNT).get(0);
+        Constants.WORKER_GRAPHCOUNT).get(0);
   }
 
   @Override
