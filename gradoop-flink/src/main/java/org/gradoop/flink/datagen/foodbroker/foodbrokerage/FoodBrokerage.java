@@ -309,7 +309,7 @@ public class FoodBrokerage
     PropertyList properties = new PropertyList();
 
     properties.set("date", startDate);
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
 
     Vertex salesQuotation = vertexFactory.createVertex(label, properties, 
       graphIds);
@@ -376,7 +376,7 @@ public class FoodBrokerage
 
     PropertyList properties = new PropertyList();
 
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("purchPrice", productPriceMap.get(product));
     properties.set("salesPrice",
       salesMargin
@@ -404,7 +404,7 @@ public class FoodBrokerage
     String label = "SalesOrder";
     PropertyList properties = new PropertyList();
 
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
@@ -472,7 +472,7 @@ public class FoodBrokerage
     String label = "SalesOrderLine";
     PropertyList properties = new PropertyList();
 
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("salesPrice", salesQuotationLine.getPropertyValue(
       "salesPrice").getBigDecimal());
     properties.set("quantity", salesQuotationLine.getPropertyValue(
@@ -519,7 +519,7 @@ public class FoodBrokerage
     String label = "PurchOrder";
     PropertyList properties = new PropertyList();
 
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
 
     long salesOrderDate = salesOrder.getPropertyValue("date")
         .getLong();
@@ -585,7 +585,7 @@ public class FoodBrokerage
     String label = "PurchOrderLine";
     PropertyList properties = new PropertyList();
 
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("salesOrderLine", salesOrderLine.getId().toString());
     properties.set("quantity", salesOrderLine.getPropertyValue("quantity")
       .getInt());
@@ -645,7 +645,7 @@ public class FoodBrokerage
     String label = "DeliveryNote";
     PropertyList properties = new PropertyList();
 
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
 
     properties.set("trackingCode", "***TODO***");
 
@@ -726,7 +726,7 @@ public class FoodBrokerage
     String label = "PurchInvoice";
     PropertyList properties = new PropertyList();
 
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
 
     properties.set("expense", total);
     properties.set("text", "*** TODO @ FoodBrokerage ***");
@@ -759,7 +759,7 @@ public class FoodBrokerage
     String label = "SalesInvoice";
 
     PropertyList properties = new PropertyList();
-    properties.set("kind",  "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("revenue", BigDecimal.ZERO);
     properties.set("text", "*** TODO @ FoodBrokerage ***");
 
