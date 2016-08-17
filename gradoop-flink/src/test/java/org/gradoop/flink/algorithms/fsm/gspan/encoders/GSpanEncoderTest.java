@@ -42,7 +42,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     GraphTransactions transactions = new PredictableTransactionsGenerator(
-      10, 1, true, getConfig()).execute();
+      1000, 1, true, getConfig()).execute();
 
     FSMConfig fsmConfig = new FSMConfig(1.0f, true);
     fsmConfig.setCacheAddress(cacheServer.getAddress());
