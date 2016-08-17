@@ -269,7 +269,7 @@ public class NewComplaintHandling
 
     properties.set("erpSoNum", salesOrder.getId().toString());
     properties.set("problem", problem);
-    properties.set("kind", "TransData");
+    properties.set(Constants.SUPERTYPE_KEY, "Constants.SUPERCLASS_VALUE_TRANSACTIONAL");
     properties.set("createdAt", createdAt);
 
     GradoopId employeeId = getNextEmployee();
@@ -338,7 +338,7 @@ public class NewComplaintHandling
       String label = "SalesInvoice";
 
       PropertyList properties = new PropertyList();
-      properties.set("kind", "TransData");
+      properties.set(Constants.SUPERTYPE_KEY, "Constants.SUPERCLASS_VALUE_TRANSACTIONAL");
       properties.set("revenue", BigDecimal.ZERO);
       properties.set("text", "*** TODO @ ComplaintHandling ***");
       properties.set("date", ticket.getPropertyValue("createdAt").getLong());
@@ -381,7 +381,7 @@ public class NewComplaintHandling
       String label = "PurchInvoice";
       PropertyList properties = new PropertyList();
 
-      properties.set("kind", "TransData");
+      properties.set(Constants.SUPERTYPE_KEY, "Constants.SUPERCLASS_VALUE_TRANSACTIONAL");
 
       properties.set("expense", refundAmount);
       properties.set("text", "*** TODO @ ComplaintHandling ***");

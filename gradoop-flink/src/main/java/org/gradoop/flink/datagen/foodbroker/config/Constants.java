@@ -24,11 +24,15 @@ public class Constants {
   /**
    * reserved property key referring to master or transactional data
    */
-  public static final String SUPERTYPE_KEY = "kind";
+  public static final String SUPERTYPE_KEY = "superType";
   /**
    * reserved property value to mark master data
    */
-  public static final String SUPERCLASS_VALUE_MASTER = "MasterData";
+  public static final String SUPERCLASS_VALUE_MASTER = "M";
+  /**
+   * reserved property value to mark transactional data
+   */
+  public static final String SUPERCLASS_VALUE_TRANSACTIONAL = "T";
   /**
    * reserved property key referring to the source identifier of vertices
    */
