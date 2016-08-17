@@ -297,9 +297,9 @@
 {"id":"8f3af544-513b-46b9-b1af-daca5123d1e1","data":{"superType":"T","trackingCode":"***TODO***","date":1389481200000},"meta":{"label":"DeliveryNote","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"2ad1e52a-5855-46e4-84a8-9cc8f46f9461","data":{"superType":"T","date":1389394800000},"meta":{"label":"PurchOrder","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"cdfc4355-75c6-4ca5-8cc7-4b685d1e388c","data":{"superType":"T","expense":4182.34,"text":"*** TODO @ FoodBrokerage ***","date":1389567600000},"meta":{"label":"PurchInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
-{"id":"a01f5d87-cbf7-4ede-855a-0ece030aa02f","data":{"superType":"T","revenue":6782.0,"text":"*** TODO @ FoodBrokerage ***","date":1389308400000},"meta":{"label":"SalesInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
+{"id":"a01f5d87-cbf7-4ede-855a-0ece030aa02f","data":{"superType":"T","revenue":6782,"text":"*** TODO @ FoodBrokerage ***","date":1389308400000},"meta":{"label":"SalesInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"0cb6d5a4-0c91-4df3-88c1-ac50ba9b6d1d","data":{"superType":"T","date":1389308400000},"meta":{"label":"PurchOrder","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
-{"id":"6ca6f061-2286-45fb-96b4-1b4ed2fda70a","data":{"superType":"T","expense":3318.0,"text":"*** TODO @ FoodBrokerage ***","date":1389481200000},"meta":{"label":"PurchInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
+{"id":"6ca6f061-2286-45fb-96b4-1b4ed2fda70a","data":{"superType":"T","expense":3318,"text":"*** TODO @ FoodBrokerage ***","date":1389481200000},"meta":{"label":"PurchInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"f1171407-560e-48b6-9043-32858447f3d5","data":{"superType":"T","trackingCode":"***TODO***","date":1389394800000},"meta":{"label":"DeliveryNote","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"15461a29-bd7b-4f27-8f9b-67e8c5353786","data":{"date":1388530800000,"superType":"T"},"meta":{"label":"SalesQuotation","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"7c140a47-c8fc-4fb9-84c9-d00f8edb0081","data":{"num":"CUS00023","quality":0.33,"superType":"M","sid":"ERP_CUS00023","city":"Glendale","name":"green supermarket"},"meta":{"label":"Customer"}}
@@ -586,7 +586,7 @@
 {"id":"f9b1548f-a06f-40bf-bc97-34d1a8e74d56","data":{"superType":"T","revenue":7398.5,"text":"*** TODO @ FoodBrokerage ***","date":1388703600000},"meta":{"label":"SalesInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"4f49277c-b214-4942-aece-82a4cca92543","data":{"date":1388530800000,"superType":"T"},"meta":{"label":"SalesQuotation","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"b0102607-f41b-42a9-81fa-ebeaed7f8392","data":{"superType":"T","trackingCode":"***TODO***","date":1388790000000},"meta":{"label":"DeliveryNote","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
-{"id":"e7d52b78-03dc-48b7-8ea4-b658a15ec945","data":{"superType":"T","expense":4237.0,"text":"*** TODO @ FoodBrokerage ***","date":1388962800000},"meta":{"label":"PurchInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
+{"id":"e7d52b78-03dc-48b7-8ea4-b658a15ec945","data":{"superType":"T","expense":4237,"text":"*** TODO @ FoodBrokerage ***","date":1388962800000},"meta":{"label":"PurchInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"ff16c401-89ef-480a-b62d-5d6a3d506947","data":{"superType":"T","date":1388617200000},"meta":{"label":"PurchOrder","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"ad35e9d4-77d8-409a-b575-07737f005871","data":{"superType":"T","expense":9564.84,"text":"*** TODO @ FoodBrokerage ***","date":1388790000000},"meta":{"label":"PurchInvoice","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}
 {"id":"4b00280a-a62d-415f-a91c-3b173b997e4e","data":{"superType":"T","trackingCode":"***TODO***","date":1388703600000},"meta":{"label":"DeliveryNote","graphs":["e2c80add-f53c-4be1-8c48-028b74f2534b"]}}

@@ -187,7 +187,7 @@ public class FrequentLossPatterns
 
     @Override
     public Number getDefaultValue() {
-      return null;
+      return 0;
     }
   }
 
