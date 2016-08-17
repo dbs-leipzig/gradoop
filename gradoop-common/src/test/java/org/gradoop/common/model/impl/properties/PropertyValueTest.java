@@ -55,7 +55,7 @@ public class PropertyValueTest {
 
   @Test
   public void testFailedBigDecimalConversion() {
-    exception.expect(RuntimeException.class);
+    exception.expect(ClassCastException.class);
     create(BOOL_VAL_1).getBigDecimal();
   }
 
