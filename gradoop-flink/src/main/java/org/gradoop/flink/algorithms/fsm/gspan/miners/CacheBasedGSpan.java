@@ -19,6 +19,7 @@ import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,15 +28,11 @@ public class CacheBasedGSpan
   extends RichMapPartitionFunction<GSpanGraph, Object> {
 
   private final FSMConfig fsmConfig;
-  private List<GSpanGraph> graphs = Lists.newArrayList();
-  private Map<DFSCode, Map<Integer, Collection<DFSEmbedding>>>
-    subgraphGraphEmbeddings = Maps.newHashMap();
+  private List<GSpanGraph> graphs = Lists.newLinkedList();
   private DistributedCacheClient cacheClient;
   private int partition;
   private int partitionCount;
   private long minFrequency;
-  private Collection<WithCount<CompressedDFSCode>> frequentSubgraphStore =
-    Lists.newArrayList();
 
   public CacheBasedGSpan(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
@@ -50,17 +47,62 @@ public class CacheBasedGSpan
       DistributedCache.getClient(fsmConfig.getCacheServerAddress());
     this.minFrequency = cacheClient.getCounter(Constants.MIN_FREQUENCY);
 
+    Collection<CompressedDFSCode> frequentSubgraphs;
+
+    // single edge subgraphs
+    int k = 1;
     createDirectedSingleEdgeSubgraphs(values);
+    reportSubgraphs(k);
+    countAndFilterSubgraphs(k, out);
+    frequentSubgraphs = cacheClient.getList(Constants.FREQUENT_SUBGRAPHS);
 
-    reportSubgraphs(1);
-    countAndFilterSubgraphs(1);
-
-    for (WithCount<CompressedDFSCode> frequentSubgraph : this.frequentSubgraphStore) {
-      out.collect(frequentSubgraph);
+    // k-edge subgraphs
+    while (! frequentSubgraphs.isEmpty()) {
+      k++;
+      growChildren(frequentSubgraphs);
+      reportSubgraphs(k);
+      countAndFilterSubgraphs(k, out);
+      frequentSubgraphs = cacheClient.getList(Constants.FREQUENT_SUBGRAPHS);
     }
   }
 
-  private void countAndFilterSubgraphs(int k) throws InterruptedException {
+  private void growChildren(Collection<CompressedDFSCode> compressedSubgraphs
+  ) throws InterruptedException {
+
+    // decompress frequent subgraphs
+    Collection<DFSCode> frequentSubgraphs = Lists
+      .newArrayListWithExpectedSize(compressedSubgraphs.size());
+
+    for (CompressedDFSCode compressedSubgraph : compressedSubgraphs) {
+      frequentSubgraphs.add(compressedSubgraph.getDfsCode());
+    }
+
+    // grow embeddings and drop graphs without successful growths
+
+    Iterator<GSpanGraph> graphIterator = graphs.iterator();
+
+    while (graphIterator.hasNext()) {
+      GSpanGraph graph = graphIterator.next();
+      GSpan.growEmbeddings(graph, frequentSubgraphs, fsmConfig);
+
+      if (! graph.hasGrownSubgraphs()) {
+        graphIterator.remove();
+      }
+    }
+  }
+
+  private void countAndFilterSubgraphs(
+    int k, Collector<Object> out) throws InterruptedException {
+
+    String eventName = "clear" + k;
+
+    if (partition == 0) {
+      cacheClient.getList(Constants.FREQUENT_SUBGRAPHS).clear();
+      cacheClient.triggerEvent(eventName);
+    } else {
+      cacheClient.waitForEvent(eventName);
+    }
+
     Map<CompressedDFSCode, Integer> subgraphGlobalFrequencies =
       Maps.newHashMap();
 
@@ -93,29 +135,51 @@ public class CacheBasedGSpan
 
       if (frequency >= minFrequency) {
         frequentSubgraphs.add(subgraph);
-        frequentSubgraphStore.add(new WithCount<>(subgraph, frequency));
+        out.collect(new WithCount<>(subgraph, frequency));
       }
     }
 
-    String counterName = "ak" + k;
+    String counterName = "count" + k;
+    cacheClient.getList(Constants.FREQUENT_SUBGRAPHS).addAll(frequentSubgraphs);
+    cacheClient.setList(String.valueOf(partition), Lists.newArrayList());
     cacheClient.incrementAndGetCounter(counterName);
     cacheClient.waitForCounterToReach(counterName, partitionCount);
   }
 
   private void reportSubgraphs(int k) throws InterruptedException {
+
+    // count local frequency
+
+    Map<DFSCode, Integer> subgraphLocalFrequencies = Maps.newHashMap();
+
+    for (GSpanGraph graph : graphs) {
+      for (DFSCode subgraph : graph.getSubgraphEmbeddings().keySet()) {
+        Integer localFrequency = subgraphLocalFrequencies.get(subgraph);
+
+        if (localFrequency == null) {
+          localFrequency = 1;
+        } else {
+          localFrequency += 1;
+        }
+
+        subgraphLocalFrequencies.put(subgraph, localFrequency);
+      }
+    }
+
+    // partition local frequencies and validate subgraphs
+
     Map<Integer, Collection<WithCount<CompressedDFSCode>>>
       partitionSubgraphFrequencies =
       Maps.newHashMapWithExpectedSize(partitionCount);
 
-    for (Map.Entry<DFSCode, Map<Integer, Collection<DFSEmbedding>>> entry :
-    subgraphGraphEmbeddings.entrySet()) {
+    for (Map.Entry<DFSCode, Integer> entry :
+      subgraphLocalFrequencies.entrySet()) {
 
       DFSCode subgraph = entry.getKey();
 
       if (GSpan.isMinimal(subgraph, fsmConfig)) {
         int aggPartition = subgraph.hashCode() % partitionCount;
-
-        int frequency = entry.getValue().size();
+        int frequency = entry.getValue();
 
         WithCount<CompressedDFSCode> subgraphFrequency =
           new WithCount<>(new CompressedDFSCode(subgraph), frequency);
@@ -141,18 +205,17 @@ public class CacheBasedGSpan
       cacheClient.getList(aggPartition).addAll(subgraphs);
     }
 
-    String counterName = "rk" + k;
+    String counterName = "report" + k;
     cacheClient.incrementAndGetCounter(counterName);
     cacheClient.waitForCounterToReach(counterName, partitionCount);
   }
 
   private void createDirectedSingleEdgeSubgraphs(Iterable<GSpanGraph> values) {
-    int graphId = 0;
     for (GSpanGraph graph : values) {
       graphs.add(graph);
 
       Map<DFSCode, Collection<DFSEmbedding>> subgraphEmbeddings =
-        Maps.newHashMap();
+        graph.getSubgraphEmbeddings();
 
       for (Map.Entry<Integer, AdjacencyList> vertexIdAdjacencyList :
         graph.getAdjacencyLists().entrySet()) {
@@ -195,25 +258,6 @@ public class CacheBasedGSpan
           }
         }
       }
-
-      for (Map.Entry<DFSCode, Collection<DFSEmbedding>> entry :
-        subgraphEmbeddings.entrySet()) {
-
-        DFSCode subgraph = entry.getKey();
-        Collection<DFSEmbedding> embeddings = entry.getValue();
-
-        Map<Integer, Collection<DFSEmbedding>> graphIdEmbeddings =
-          subgraphGraphEmbeddings.get(subgraph);
-
-        if (graphIdEmbeddings == null) {
-          graphIdEmbeddings = Maps.newHashMap();
-          subgraphGraphEmbeddings.put(subgraph, graphIdEmbeddings);
-        }
-
-        graphIdEmbeddings.put(graphId, embeddings);
-      }
-
-      graphId++;
     }
   }
 }

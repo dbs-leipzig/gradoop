@@ -716,5 +716,4 @@ public class GSpan {
 
     return !parentEmbeddings.isEmpty();
   }
-
 }
