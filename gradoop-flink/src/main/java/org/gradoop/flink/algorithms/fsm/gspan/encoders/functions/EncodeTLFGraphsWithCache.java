@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class EncodeWithCache
+public class EncodeTLFGraphsWithCache
   extends RichMapPartitionFunction<TLFGraph, GSpanGraph> {
 
   private final FSMConfig fsmConfig;
@@ -40,7 +40,7 @@ public class EncodeWithCache
   private Map<String, Integer> vertexLabelDictionary;
   private Map<String, Integer> edgeLabelDictionary;
 
-  public EncodeWithCache(FSMConfig fsmConfig) {
+  public EncodeTLFGraphsWithCache(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }
 

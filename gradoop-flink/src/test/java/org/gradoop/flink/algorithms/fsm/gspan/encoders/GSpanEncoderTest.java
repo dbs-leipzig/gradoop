@@ -11,8 +11,6 @@ import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanMiner;
 import org.gradoop.flink.algorithms.fsm.gspan.comparators.DFSCodeComparator;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions
-  .EncodeWithCache;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.MinDFSCode;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.CacheBasedGSpan;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
@@ -38,7 +36,47 @@ import static org.junit.Assert.assertEquals;
 public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testCacheEncoder() throws Exception {
+  public void testTransactionsCacheEncoder() throws Exception {
+    DistributedCacheServer cacheServer = DistributedCache.getServer();
+
+    GraphTransactions transactions = new PredictableTransactionsGenerator(
+      1000, 1, true, getConfig()).execute();
+
+    FSMConfig fsmConfig = new FSMConfig(1.0f, true);
+    fsmConfig.setCacheAddress(cacheServer.getAddress());
+
+    GSpanEncoder<GraphTransactions> encoder =
+      new GSpanGraphTransactionsCacheEncoder(fsmConfig);
+
+    DataSet<GSpanGraph> encodedGraphs = encoder.encode(transactions, fsmConfig);
+
+    encodedGraphs.mapPartition(new CacheBasedGSpan(fsmConfig)).print();
+
+    System.out.println("vertex label dictionary :");
+    System.out.println(Maps.newHashMap(
+      cacheServer.getMap(
+        Constants.VERTEX_PREFIX +
+          Constants.LABEL_DICTIONARY)));
+    System.out.println(Lists.newArrayList(
+      cacheServer.getList(
+        Constants.VERTEX_PREFIX +
+          Constants.LABEL_DICTIONARY_INVERSE)));
+
+    System.out.println("edge label dictionary :");
+    System.out.println(Maps.newHashMap(
+      cacheServer.getMap(
+        Constants.EDGE_PREFIX +
+          Constants.LABEL_DICTIONARY)));
+    System.out.println(Lists.newArrayList(
+      cacheServer.getList(
+        Constants.EDGE_PREFIX +
+          Constants.LABEL_DICTIONARY_INVERSE)));
+
+    cacheServer.shutdown();
+  }
+
+  @Test
+  public void testTLFCacheEncoder() throws Exception {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     GraphTransactions transactions = new PredictableTransactionsGenerator(
@@ -68,8 +106,6 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
 
     encodedGraphs.mapPartition(
       new CacheBasedGSpan(fsmConfig)).print();
-
-
 
     System.out.println("vertex label dictionary :");
     System.out.println(Maps.newHashMap(
@@ -134,9 +170,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
     DataSet<WithCount<CompressedDFSCode>> tnsFrequentSubgraphs =
       miner.mine(tnsSearchSpace, tlfEncoder.getMinFrequency(), fsmConfig);
 
-
     assertEquals(tlfFrequentSubgraphs.count(), tnsFrequentSubgraphs.count());
-
   }
 
   @Test

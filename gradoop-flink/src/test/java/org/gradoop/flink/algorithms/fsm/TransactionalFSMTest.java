@@ -186,11 +186,10 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(expectation.equalsByGraphElementData(result));
   }
 
-  private Collection<UnaryCollectionToCollectionOperator
-    > getDirectedMultigraphMiners() {
+  private Collection<UnaryCollectionToCollectionOperator>
+  getDirectedMultigraphMiners() {
 
-    Collection<UnaryCollectionToCollectionOperator
-      > miners = new ArrayList<>();
+    Collection<UnaryCollectionToCollectionOperator> miners = new ArrayList<>();
 
     float threshold = 0.7f;
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
@@ -200,6 +199,9 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
     miners.add(new TransactionalFSM(
       fsmConfig, TransactionalFSMAlgorithm.GSPAN_FILTERREFINE));
+
+    miners.add(new TransactionalFSM(
+      fsmConfig, TransactionalFSMAlgorithm.GSPAN_ITERATIVE));
 
     return miners;
   }
