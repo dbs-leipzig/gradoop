@@ -7,6 +7,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
 import org.gradoop.common.cache.api.DistributedCacheClient;
+import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,10 +17,13 @@ public class HazelCastCacheClient implements DistributedCacheClient {
 
   private final HazelcastInstance instance;
 
-  public HazelCastCacheClient(String serverAddress) {
+  public HazelCastCacheClient(
+    DistributedCacheClientConfiguration cacheClientConfiguration) {
+
     ClientConfig clientConfig = new ClientConfig();
     clientConfig.getNetworkConfig()
-      .setAddresses(Lists.newArrayList(serverAddress));
+      .setAddresses(
+        Lists.newArrayList(cacheClientConfiguration.getServerAddress()));
 
     Collection<HazelcastInstance> instances =
       HazelcastClient.getAllHazelcastClients();

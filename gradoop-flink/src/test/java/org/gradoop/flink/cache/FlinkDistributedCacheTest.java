@@ -9,6 +9,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.cache.DistributedCache;
 import org.gradoop.common.cache.api.DistributedCacheClient;
+import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
 import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
       .generateSequence(1, 4);
 
     DataSet<String> strings = numbers
-      .map(new TestMapRead(server.getAddress()));
+      .map(new TestMapRead(server.getCacheClientConfiguration()));
 
     Collection<String> res = strings.collect();
     Collection<String> exp = Lists.newArrayList("A", "A", "A", "A");
@@ -49,15 +50,15 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
   }
 
   private class TestMapRead implements MapFunction<Long, String> {
-    private final String serverAddress;
+    private final DistributedCacheClientConfiguration configuration;
 
-    public TestMapRead(String serverAddress) {
-      this.serverAddress = serverAddress;
+    public TestMapRead(DistributedCacheClientConfiguration configuration) {
+      this.configuration = configuration;
     }
 
     @Override
     public String map(Long value) throws Exception {
-      DistributedCacheClient client = DistributedCache.getClient(serverAddress);
+      DistributedCacheClient client = DistributedCache.getClient(configuration);
       List<String> strings = client.getList(NAME);
       String s = strings.get(0);
       client.shutdown();
@@ -78,7 +79,7 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment()
       .fromCollection(exp)
-      .map(new TestMapWrite(server.getAddress()))
+      .map(new TestMapWrite(server.getCacheClientConfiguration()))
       .count();
 
     Collection<String> res = server.getList(NAME);
@@ -90,15 +91,15 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
   }
 
   private class TestMapWrite implements MapFunction<String, String> {
-    private final String serverAddress;
+    private final DistributedCacheClientConfiguration configuration;
 
-    public TestMapWrite(String serverAddress) {
-      this.serverAddress = serverAddress;
+    public TestMapWrite(DistributedCacheClientConfiguration configuration) {
+      this.configuration = configuration;
     }
 
     @Override
     public String map(String value) throws Exception {
-      DistributedCacheClient client = DistributedCache.getClient(serverAddress);
+      DistributedCacheClient client = DistributedCache.getClient(configuration);
       client.getList(NAME).add(value);
       client.shutdown();
       return value;
@@ -119,7 +120,7 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment()
       .fromCollection(exp)
-      .map(new TestMapCloseWrite(server.getAddress()))
+      .map(new TestMapCloseWrite(server.getCacheClientConfiguration()))
       .count();
 
     Collection<String> res = server.getList(NAME);
@@ -131,11 +132,11 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
   }
 
   private class TestMapCloseWrite extends RichMapFunction<String, String> {
-    private final String serverAddress;
+    private final DistributedCacheClientConfiguration configuration;
     private Collection<String> values = Lists.newArrayList();
 
-    public TestMapCloseWrite(String serverAddress) {
-      this.serverAddress = serverAddress;
+    public TestMapCloseWrite(DistributedCacheClientConfiguration configuration) {
+      this.configuration = configuration;
     }
 
     @Override
@@ -146,7 +147,7 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 
     @Override
     public void close() throws Exception {
-      DistributedCacheClient client = DistributedCache.getClient(serverAddress);
+      DistributedCacheClient client = DistributedCache.getClient(configuration);
       client.getList(NAME).addAll(values);
       client.shutdown();
       super.close();
@@ -161,7 +162,7 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 
     Collection<Long> res = getExecutionEnvironment()
       .generateSequence(1, 100)
-      .mapPartition(new testPartitionIteration(server.getAddress()))
+      .mapPartition(new testPartitionIteration(server.getCacheClientConfiguration()))
       .collect();
 
     assertEquals(1, res.size());
@@ -173,16 +174,16 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
   private class testPartitionIteration
     extends RichMapPartitionFunction<Long, Long> {
 
-    private final String serverAddress;
+    private final DistributedCacheClientConfiguration configuration;
 
-    public testPartitionIteration(String serverAddress) {
-      this.serverAddress = serverAddress;
+    public testPartitionIteration(DistributedCacheClientConfiguration configuration) {
+      this.configuration = configuration;
     }
 
     @Override
     public void mapPartition(
       Iterable<Long> values, Collector<Long> out) throws Exception {
-      DistributedCacheClient client = DistributedCache.getClient(serverAddress);
+      DistributedCacheClient client = DistributedCache.getClient(configuration);
 
       Long localMaxValue = 0L;
       long partitions = getRuntimeContext().getNumberOfParallelSubtasks();
@@ -227,8 +228,8 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 //
 //    Collection<Long> res = getExecutionEnvironment()
 //      .generateSequence(1, 10)
-//      .flatMap(new TestChainedMapWrite(server.getAddress()))
-//      .flatMap(new TestChainedMapRead(server.getAddress()))
+//      .flatMap(new TestChainedMapWrite(server.getCacheClientConfiguration()))
+//      .flatMap(new TestChainedMapRead(server.getCacheClientConfiguration()))
 //      .collect();
 //
 //    assertEquals(10, res.size());
@@ -242,11 +243,11 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 //
 //  private class TestChainedMapWrite extends RichFlatMapFunction<Long, Long> {
 //
-//    private final String serverAddress;
+//    private final String configuration;
 //    private long maxValue = 0L;
 //
-//    public TestChainedMapWrite(String serverAddress) {
-//      this.serverAddress = serverAddress;
+//    public TestChainedMapWrite(String configuration) {
+//      this.configuration = configuration;
 //    }
 //
 //    @Override
@@ -263,7 +264,7 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 //
 //    @Override
 //    public void close() throws Exception {
-//      DistributedCacheClient client = DistributedCache.getClient(serverAddress);
+//      DistributedCacheClient client = DistributedCache.getClient(configuration);
 //      client.getList(NAME).add(maxValue);
 //      client.shutdown();
 //
@@ -276,16 +277,16 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 //
 //  private class TestChainedMapRead extends RichFlatMapFunction<Long, Long> {
 //
-//    private final String serverAddress;
+//    private final String configuration;
 //    private long maxValue = 0L;
 //
-//    public TestChainedMapRead(String serverAddress) {
-//      this.serverAddress = serverAddress;
+//    public TestChainedMapRead(String configuration) {
+//      this.configuration = configuration;
 //    }
 //
 //    @Override
 //    public void open(Configuration parameters) throws Exception {
-//      DistributedCacheClient client = DistributedCache.getClient(serverAddress);
+//      DistributedCacheClient client = DistributedCache.getClient(configuration);
 //      List<Long> maxValues = client.getList(NAME);
 //
 //      System.out.println("open 2");

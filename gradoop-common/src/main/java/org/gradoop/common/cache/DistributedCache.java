@@ -1,6 +1,9 @@
 package org.gradoop.common.cache;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import org.gradoop.common.cache.api.DistributedCacheClient;
+import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
 import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.common.cache.hazelcast.HazelCastCacheClient;
 import org.gradoop.common.cache.hazelcast.HazelcastCacheServer;
@@ -12,7 +15,8 @@ public class DistributedCache {
     return new HazelcastCacheServer(NetworkHelper.getLocalHost());
   }
 
-  public static DistributedCacheClient getClient(String serverAddress) {
-    return new HazelCastCacheClient(serverAddress);
+  public static DistributedCacheClient getClient(
+    DistributedCacheClientConfiguration cacheClientConfiguration) {
+    return new HazelCastCacheClient(cacheClientConfiguration);
   }
 }

@@ -111,7 +111,8 @@ public class FrequentLossPatterns
 
     // frequent subgraphs
     FSMConfig fsmConfig = new FSMConfig(0.4f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setVerbose(true);
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     GraphCollection frequentSubgraphs = btgs.callForCollection(
       new TransactionalFSM(fsmConfig,
@@ -123,8 +124,7 @@ public class FrequentLossPatterns
 
     // DATA SINK
 
-    String outPath = FrequentLossPatterns.class.getResource("/data/dot/flp.dot")
-      .getFile();
+    String outPath = System.getProperty("user.home");
 
     new DOTDataSink(outPath, true).write(frequentSubgraphs);
 

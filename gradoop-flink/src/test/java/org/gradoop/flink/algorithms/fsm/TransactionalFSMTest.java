@@ -18,7 +18,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[e1:a]->(v2:A)];" +
@@ -44,7 +44,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(:A)-[:a]->(v1:B)-[:b]->(:C);(v1)-[:c]->(:D)]" +
@@ -73,7 +73,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(:A)-[:a]->(v1:A)]" +
@@ -99,7 +99,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v1)-[:a]->(:A)]" +
@@ -127,7 +127,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
@@ -162,7 +162,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +

@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class DistributedCacheTest {
@@ -20,7 +21,7 @@ public class DistributedCacheTest {
     DistributedCacheServer server =
       DistributedCache.getServer();
     DistributedCacheClient client =
-      DistributedCache.getClient(server.getAddress());
+      DistributedCache.getClient(server.getCacheClientConfiguration());
 
     String key = "Hello";
     List<String> in = Lists.newArrayList("Distributed", "Cache");
@@ -39,7 +40,7 @@ public class DistributedCacheTest {
     DistributedCacheServer server =
       DistributedCache.getServer();
     DistributedCacheClient client =
-      DistributedCache.getClient(server.getAddress());
+      DistributedCache.getClient(server.getCacheClientConfiguration());
 
     String key = "Hello";
     List<String> in = Lists.newArrayList("Distributed", "Cache");
@@ -56,11 +57,17 @@ public class DistributedCacheTest {
   }
 
   @Test
-  public void testUniqueServer() {
+  public void testMultipleServers() {
     DistributedCacheServer server1 = DistributedCache.getServer();
     DistributedCacheServer server2 = DistributedCache.getServer();
 
-    assertEquals(1, Hazelcast.getAllHazelcastInstances().size());
+    assertNotNull(Hazelcast.getHazelcastInstanceByName(
+      server1.getCacheClientConfiguration().getCacheName()));
+
+    assertNotNull(Hazelcast.getHazelcastInstanceByName(
+      server2.getCacheClientConfiguration().getCacheName()));
+
+    assertEquals(2, Hazelcast.getAllHazelcastInstances().size());
 
     server1.shutdown();
     server2.shutdown();
@@ -68,12 +75,14 @@ public class DistributedCacheTest {
 
   @Test
   public void testUniqueClient() {
+    Hazelcast.shutdownAll();
+
     DistributedCacheServer server = DistributedCache.getServer();
 
     DistributedCacheClient client1 =
-      DistributedCache.getClient(server.getAddress());
+      DistributedCache.getClient(server.getCacheClientConfiguration());
     DistributedCacheClient client2 =
-      DistributedCache.getClient(server.getAddress());
+      DistributedCache.getClient(server.getCacheClientConfiguration());
 
     assertEquals(1, HazelcastClient.getAllHazelcastClients().size());
 

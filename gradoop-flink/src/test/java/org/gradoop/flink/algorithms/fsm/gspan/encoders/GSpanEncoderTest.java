@@ -43,7 +43,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
       1000, 1, true, getConfig()).execute();
 
     FSMConfig fsmConfig = new FSMConfig(1.0f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     GSpanEncoder<GraphTransactions> encoder =
       new GSpanGraphTransactionsCacheEncoder(fsmConfig);
@@ -83,7 +83,7 @@ public class GSpanEncoderTest extends GradoopFlinkTestBase {
       1000, 1, true, getConfig()).execute();
 
     FSMConfig fsmConfig = new FSMConfig(1.0f, true);
-    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
+    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     String tlfFile =  GSpanEncoderTest
       .class.getResource("/data/tlf").getFile() + "/benchmark.tlf";

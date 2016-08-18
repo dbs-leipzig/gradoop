@@ -256,7 +256,7 @@ public class DOTFileFormat
 
     // writes for each property:
     // ",propertyKey1=propertyValue1,propertyKey2=propertyValue2,..."
-    if (propertyList.size() > 0) {
+    if (propertyList != null && propertyList.size() > 0) {
       for (Property property : propertyList) {
         attributeBuilder.append(String.format("%s%s%s%s%s",
           DOT_ATTRIBUTE_SEPARATOR,

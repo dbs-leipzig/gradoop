@@ -49,7 +49,7 @@ public class DecodeDFSCode extends
     Collector<GraphTransaction> out) throws Exception {
 
     DistributedCacheClient cacheClient =
-      DistributedCache.getClient(fsmConfig.getCacheServerAddress());
+      DistributedCache.getClient(fsmConfig.getCacheClientConfiguration());
 
     List<String> vertexLabelDictionary = cacheClient.getList(
       Constants.VERTEX_PREFIX + Constants.LABEL_DICTIONARY_INVERSE);

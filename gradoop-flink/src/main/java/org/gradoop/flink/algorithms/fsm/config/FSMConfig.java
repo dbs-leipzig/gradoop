@@ -17,6 +17,8 @@
 
 package org.gradoop.flink.algorithms.fsm.config;
 
+import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
+
 import java.io.Serializable;
 
 /**
@@ -50,7 +52,7 @@ public class FSMConfig implements Serializable {
    * Minimum subgraph size by edge count.
    */
   private int minEdgeCount;
-  private String cacheServerAddress;
+  private DistributedCacheClientConfiguration cacheClientConfiguration;
   private boolean verbose = false;
 
 
@@ -98,15 +100,20 @@ public class FSMConfig implements Serializable {
     this.likelinessThreshold = likelinessThreshold;
   }
 
-  public String getCacheServerAddress() {
-    return cacheServerAddress;
+  public DistributedCacheClientConfiguration getCacheClientConfiguration() {
+    return cacheClientConfiguration;
   }
 
   public boolean isVerbose() {
     return verbose;
   }
 
-  public void setCacheServerAddress(String cacheAddress) {
-    this.cacheServerAddress = cacheAddress;
+  public void setCacheClientConfiguration(
+    DistributedCacheClientConfiguration cacheClientConfiguration) {
+    this.cacheClientConfiguration = cacheClientConfiguration;
+  }
+
+  public void setVerbose(boolean verbose) {
+    this.verbose = verbose;
   }
 }

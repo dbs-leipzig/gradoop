@@ -33,6 +33,8 @@ public class CacheBasedGSpan
   private int partition;
   private int partitionCount;
   private long minFrequency;
+  private Collection<WithCount<CompressedDFSCode>> frequentSubgraphs =
+    Lists.newArrayList();
 
   public CacheBasedGSpan(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
@@ -45,7 +47,7 @@ public class CacheBasedGSpan
     this.partition = getRuntimeContext().getIndexOfThisSubtask();
     this.partitionCount = getRuntimeContext().getNumberOfParallelSubtasks();
     this.cacheClient =
-      DistributedCache.getClient(fsmConfig.getCacheServerAddress());
+      DistributedCache.getClient(fsmConfig.getCacheClientConfiguration());
     this.minFrequency = cacheClient.getCounter(Constants.MIN_FREQUENCY);
 
     Collection<CompressedDFSCode> frequentSubgraphs;
@@ -64,6 +66,17 @@ public class CacheBasedGSpan
       reportSubgraphs(k);
       countAndFilterSubgraphs(k, out);
       frequentSubgraphs = cacheClient.getList(Constants.FREQUENT_SUBGRAPHS);
+    }
+
+    if (fsmConfig.isVerbose()) {
+      System.out.println(
+        "Partition " + partition + "/" + partitionCount + "finished");
+    }
+
+    for (WithCount<CompressedDFSCode> frequentSubgraph :
+      this.frequentSubgraphs) {
+
+      out.collect(frequentSubgraph);
     }
   }
 
@@ -136,7 +149,7 @@ public class CacheBasedGSpan
 
       if (frequency >= minFrequency) {
         frequentSubgraphs.add(subgraph);
-        out.collect(new WithCount<>(subgraph, frequency));
+        this.frequentSubgraphs.add(new WithCount<>(subgraph, frequency));
       }
     }
 

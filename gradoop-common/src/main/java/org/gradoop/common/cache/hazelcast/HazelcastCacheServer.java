@@ -4,19 +4,22 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
+import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
 import org.gradoop.common.cache.api.DistributedCacheServer;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class HazelcastCacheServer implements DistributedCacheServer {
 
-  private final String address;
+  private final DistributedCacheClientConfiguration cacheClientConfiguration;
   private final HazelcastInstance instance;
 
-  public HazelcastCacheServer(String address) {
-    this.address = address;
+  public HazelcastCacheServer(String serverAddress) {
+    this.cacheClientConfiguration = new HazelcastCacheClientConfiguration
+      (serverAddress, UUID.randomUUID().toString());
 
     Set<HazelcastInstance> instances = Hazelcast.getAllHazelcastInstances();
 
@@ -28,8 +31,8 @@ public class HazelcastCacheServer implements DistributedCacheServer {
   }
 
   @Override
-  public String getAddress() {
-    return address;
+  public DistributedCacheClientConfiguration getCacheClientConfiguration() {
+    return cacheClientConfiguration;
   }
 
   @Override
