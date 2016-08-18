@@ -22,9 +22,12 @@ import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.config.TransactionalFSMAlgorithm;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanMiner;
-import org.gradoop.flink.algorithms.fsm.gspan.decoders.GSpanGraphCollectionDecoder;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.GSpanGraphCollectionEncoder;
+import org.gradoop.flink.algorithms.fsm.gspan.decoders
+  .GSpanGraphCollectionCacheDecoder;
 
+
+import org.gradoop.flink.algorithms.fsm.gspan.encoders
+  .GSpanGraphTransactionsCacheEncoder;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.GSpanIterative;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
@@ -32,6 +35,7 @@ import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
@@ -47,7 +51,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
   /**
    * input encoder (pre processing)
    */
-  private final GSpanEncoder<GraphCollection> encoder;
+  private final GSpanEncoder<GraphTransactions> encoder;
   /**
    * FSM implementation (actual algorithm)
    */
@@ -61,8 +65,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
   public TransactionalFSM(FSMConfig fsmConfig, TransactionalFSMAlgorithm
     algorithm) {
     this.fsmConfig = fsmConfig;
-    this.encoder = new GSpanGraphCollectionEncoder(fsmConfig) {
-    };
+    this.encoder = new GSpanGraphTransactionsCacheEncoder(fsmConfig);
     setMiner(algorithm);
   }
 
@@ -73,19 +76,16 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
     miner.setExecutionEnvironment(
       collection.getConfig().getExecutionEnvironment());
 
-    GSpanGraphCollectionDecoder decoder = new GSpanGraphCollectionDecoder(
-      collection.getConfig());
+    GSpanGraphCollectionCacheDecoder decoder =
+      new GSpanGraphCollectionCacheDecoder(collection.getConfig(), fsmConfig);
 
-    DataSet<GSpanGraph> graphs = encoder.encode(collection, fsmConfig);
+    DataSet<GSpanGraph> graphs = encoder
+      .encode(collection.toTransactions(), fsmConfig);
 
     DataSet<WithCount<CompressedDFSCode>> frequentDfsCodes = miner
       .mine(graphs, encoder.getMinFrequency(), fsmConfig);
 
-    return decoder.decode(
-      frequentDfsCodes,
-      encoder.getVertexLabelDictionary(),
-      encoder.getEdgeLabelDictionary()
-    );
+    return decoder.decode(frequentDfsCodes);
   }
 
   /**
