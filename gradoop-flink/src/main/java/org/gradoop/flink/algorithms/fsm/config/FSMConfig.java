@@ -51,6 +51,7 @@ public class FSMConfig implements Serializable {
    */
   private int minEdgeCount;
   private String cacheServerAddress;
+  private boolean verbose = false;
 
 
   /**
@@ -103,5 +104,9 @@ public class FSMConfig implements Serializable {
 
   public void setCacheAddress(String cacheAddress) {
     this.cacheServerAddress = cacheAddress;
+  }
+
+  public boolean isVerbose() {
+    return verbose;
   }
 }

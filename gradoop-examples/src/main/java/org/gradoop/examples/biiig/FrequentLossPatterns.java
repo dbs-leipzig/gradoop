@@ -17,6 +17,7 @@
 
 package org.gradoop.examples.biiig;
 
+import com.google.common.collect.Maps;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -24,6 +25,8 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.cache.DistributedCache;
+import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -32,6 +35,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.config.TransactionalFSMAlgorithm;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
@@ -68,6 +72,7 @@ public class FrequentLossPatterns
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
+    DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     // DATA SOURCE
 
@@ -96,25 +101,28 @@ public class FrequentLossPatterns
     GraphCollection btgs = iig
       .callForCollection(new BusinessTransactionGraphs());
 
-    // aggregate result
-    btgs = btgs.apply(new ApplyAggregation(RESULT_KEY, new Result()));
-
-    // filter by loss
-    btgs = btgs.select(new Loss());
+//    // aggregate result
+//    btgs = btgs.apply(new ApplyAggregation(RESULT_KEY, new Result()));
+//
+//    // filter by loss
+//    btgs = btgs.select(new Loss());
 
     // transform for FSM
     btgs = btgs.apply(new ApplyTransformation(
-      new EmptyGraphHead(), new RelabelVertices(), new RemoveEdgeProperties()));
+      new KeepGraphHead(), new RelabelVertices(), new RemoveEdgeProperties()));
+
 
     // frequent subgraphs
+    FSMConfig fsmConfig = new FSMConfig(0.4f, true);
+    fsmConfig.setCacheAddress(cacheServer.getAddress());
+
     GraphCollection frequentSubgraphs = btgs.callForCollection(
-      new TransactionalFSM(new FSMConfig(0.5f, true),
-        TransactionalFSMAlgorithm.GSPAN_BULKITERATION)
+      new TransactionalFSM(fsmConfig,
+        TransactionalFSMAlgorithm.GSPAN_ITERATIVE)
     );
 
     // filter by maximum support
-    frequentSubgraphs.select(new MaximumSupport(0.8f));
-
+    frequentSubgraphs.select(new MaximumSupport(0.6f));
 
     // DATA SINK
 
@@ -124,6 +132,8 @@ public class FrequentLossPatterns
     new DOTDataSink(outPath, true).write(frequentSubgraphs);
 
     getExecutionEnvironment().execute();
+
+    cacheServer.shutdown();
   }
 
   private static class Result implements ApplyAggregateFunction {
@@ -201,12 +211,12 @@ public class FrequentLossPatterns
 
   }
 
-  private static class EmptyGraphHead
+  private static class KeepGraphHead
     implements TransformationFunction<GraphHead> {
 
     @Override
     public GraphHead execute(GraphHead current, GraphHead transformed) {
-      return new GraphHead();
+      return current;
     }
   }
 
