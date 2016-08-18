@@ -97,4 +97,16 @@ public class FSMConfig implements Serializable {
   public void setLikelinessThreshold(float likelinessThreshold) {
     this.likelinessThreshold = likelinessThreshold;
   }
+
+  public String getCacheServerAddress() {
+    return cacheServerAddress;
+  }
+
+  public boolean isVerbose() {
+    return verbose;
+  }
+
+  public void setCacheServerAddress(String cacheAddress) {
+    this.cacheServerAddress = cacheAddress;
+  }
 }

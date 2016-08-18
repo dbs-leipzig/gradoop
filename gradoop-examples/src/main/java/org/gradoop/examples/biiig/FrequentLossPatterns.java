@@ -17,7 +17,6 @@
 
 package org.gradoop.examples.biiig;
 
-import com.google.common.collect.Maps;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -35,7 +34,6 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
-import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.config.TransactionalFSMAlgorithm;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
@@ -44,7 +42,6 @@ import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.transformation
   .ApplyTransformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -114,7 +111,7 @@ public class FrequentLossPatterns
 
     // frequent subgraphs
     FSMConfig fsmConfig = new FSMConfig(0.4f, true);
-    fsmConfig.setCacheAddress(cacheServer.getAddress());
+    fsmConfig.setCacheServerAddress(cacheServer.getAddress());
 
     GraphCollection frequentSubgraphs = btgs.callForCollection(
       new TransactionalFSM(fsmConfig,

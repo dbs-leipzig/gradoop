@@ -67,10 +67,7 @@ public class DecodeDFSCode extends
       int frequency = subgraphFrequency.getCount();
       long graphCount = cacheClient.getCounter(Constants.GRAPH_COUNT);
       graphHead.setProperty("support", (float) frequency / graphCount);
-<<<<<<< HEAD
       graphHead.setProperty("dfsCode", subgraph.toString());
-=======
->>>>>>> origin/#292_distcache
 
       Set<Vertex> vertices = Sets.newHashSet();
       Map<Integer, GradoopId> vertexTimeIdMap = Maps.newHashMap();
