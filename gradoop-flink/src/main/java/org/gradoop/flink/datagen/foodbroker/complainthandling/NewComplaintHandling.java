@@ -325,10 +325,14 @@ public class NewComplaintHandling
       .getDecimalVariationConfigurationValue(influencingMasterQuality, "Ticket",
         "salesRefund");
     BigDecimal refundAmount = BigDecimal.ZERO;
+    BigDecimal salesAmount;
 
     for (Edge salesOrderLine : salesOrderLines) {
-      refundAmount = refundAmount
-        .add(salesOrderLine.getPropertyValue("salesPrice").getBigDecimal());
+      salesAmount = BigDecimal.valueOf(salesOrderLine.getPropertyValue(
+        "quantity").getInt())
+        .multiply(salesOrderLine.getPropertyValue("salesPrice").getBigDecimal())
+        .setScale(2, BigDecimal.ROUND_HALF_UP);
+      refundAmount = refundAmount.add(salesAmount);
     }
     refundAmount =
       refundAmount.multiply(BigDecimal.valueOf(-1)).multiply(refundHeight)
@@ -367,10 +371,14 @@ public class NewComplaintHandling
       .getDecimalVariationConfigurationValue(influencingMasterQuality, "Ticket",
         "purchRefund");
     BigDecimal refundAmount = BigDecimal.ZERO;
+    BigDecimal purchAmount;
 
     for (Edge purchOrderLine : purchOrderLines) {
-      refundAmount = refundAmount
-        .add(purchOrderLine.getPropertyValue("purchPrice").getBigDecimal());
+      purchAmount = BigDecimal.valueOf(purchOrderLine.getPropertyValue(
+        "quantity").getInt())
+        .multiply(purchOrderLine.getPropertyValue("purchPrice").getBigDecimal())
+        .setScale(2, BigDecimal.ROUND_HALF_UP);
+      refundAmount = refundAmount.add(purchAmount);
     }
     refundAmount =
       refundAmount.multiply(BigDecimal.valueOf(-1)).multiply(refundHeight)
