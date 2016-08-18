@@ -599,7 +599,8 @@ public class FoodBrokerage
       "placedAt", purchOrder.getId(), Constants.VENDOR_MAP));
 
     BigDecimal purchPrice = price;
-    purchPrice = BigDecimal.ONE
+    purchPrice = config.getDecimalVariationConfigurationValue(
+      influencingMasterQuality, "PurchOrder", "priceVariation")
       .add(BigDecimal.ONE)
       .multiply(purchPrice)
       .setScale(2, BigDecimal.ROUND_HALF_UP);
