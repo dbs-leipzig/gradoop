@@ -143,10 +143,13 @@ public class CacheBasedGSpan
     String counterName = "count" + k;
     cacheClient.getList(Constants.FREQUENT_SUBGRAPHS).addAll(frequentSubgraphs);
 
+<<<<<<< HEAD
     if (fsmConfig.isVerbose()) {
       System.out.println(partition + ":" + frequentSubgraphs);
     }
 
+=======
+>>>>>>> origin/#292_distcache
     cacheClient.setList(String.valueOf(partition), Lists.newArrayList());
     cacheClient.incrementAndGetCounter(counterName);
     cacheClient.waitForCounterToReach(counterName, partitionCount);
@@ -210,10 +213,13 @@ public class CacheBasedGSpan
       String aggPartition = String.valueOf(entry.getKey());
       Collection<WithCount<CompressedDFSCode>> subgraphs = entry.getValue();
 
+<<<<<<< HEAD
       if (fsmConfig.isVerbose()) {
         System.out.println(partition + "->" + aggPartition + ":" + subgraphs);
       }
 
+=======
+>>>>>>> origin/#292_distcache
       cacheClient.getList(aggPartition).addAll(subgraphs);
     }
 
