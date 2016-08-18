@@ -175,12 +175,6 @@ public class FoodBroker implements CollectionGenerator {
           }
         });
 
-
-    DataSet<Vertex> transactionalVertices = foodBrokerageTransactions
-      .map(new GraphTransactionTriple())
-      .flatMap(new TransactionVertices())
-      .returns(TypeExtractor.getForClass(Vertex.class));
-
     DataSet<Tuple4<Set<Vertex>, FoodBrokerMaps, Set<Edge>, Set<Edge>>>
       deliveryNotes =
       foodBrokerageTuple
@@ -248,6 +242,12 @@ public class FoodBroker implements CollectionGenerator {
           }
         }
       });
+
+    DataSet<Vertex> transactionalVertices = foodBrokerageTransactions
+      .union(complaintHandling)
+      .map(new GraphTransactionTriple())
+      .flatMap(new TransactionVertices())
+      .returns(TypeExtractor.getForClass(Vertex.class));
 
     DataSet<Edge> transactionalEdges = foodBrokerageTransactions
       .union(complaintHandling)
