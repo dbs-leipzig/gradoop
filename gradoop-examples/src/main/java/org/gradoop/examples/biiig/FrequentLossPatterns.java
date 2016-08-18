@@ -24,6 +24,7 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.apache.hadoop.util.Time;
 import org.gradoop.common.cache.DistributedCache;
 import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -42,6 +43,7 @@ import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.transformation
   .ApplyTransformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -69,6 +71,10 @@ public class FrequentLossPatterns
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
+
+    // avoids multiple output files
+    getExecutionEnvironment().setParallelism(1);
+    // required for parallel FSM
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     // DATA SOURCE
@@ -87,7 +93,6 @@ public class FrequentLossPatterns
 
     JSONDataSource dataSource = new JSONDataSource(
       graphHeadPath, vertexPath, edgePath, config);
-
 
     // ANALYTICAL PROGRAM
 
@@ -124,7 +129,8 @@ public class FrequentLossPatterns
 
     // DATA SINK
 
-    String outPath = System.getProperty("user.home");
+    String outPath = System.getProperty("user.home") + "/lossPatterns_"
+      + Time.now() + ".dot";
 
     new DOTDataSink(outPath, true).write(frequentSubgraphs);
 

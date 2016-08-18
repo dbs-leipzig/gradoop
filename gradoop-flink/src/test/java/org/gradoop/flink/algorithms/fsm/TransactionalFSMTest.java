@@ -13,10 +13,14 @@ import org.junit.Test;
 
 public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
+  private DistributedCacheServer cacheServer;
+
+  public TransactionalFSMTest() {
+    this.cacheServer = DistributedCache.getServer();
+  }
+
   @Test
   public void testSingleEdges() throws Exception {
-    DistributedCacheServer cacheServer = DistributedCache.getServer();
-
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
     fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
@@ -35,16 +39,13 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
-
-    cacheServer.shutdown();
   }
 
   @Test
   public void testSimpleGraphs() throws Exception {
-    DistributedCacheServer cacheServer = DistributedCache.getServer();
-
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
+    fsmConfig.setCacheClientConfiguration(
+      cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(:A)-[:a]->(v1:B)-[:b]->(:C);(v1)-[:c]->(:D)]" +
@@ -64,16 +65,13 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
-
-    cacheServer.shutdown();
   }
 
   @Test
   public void testParallelEdges() throws Exception {
-    DistributedCacheServer cacheServer = DistributedCache.getServer();
-
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
+    fsmConfig.setCacheClientConfiguration(
+      cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(:A)-[:a]->(v1:A)]" +
@@ -90,16 +88,13 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
-
-    cacheServer.shutdown();
   }
 
   @Test
   public void testLoop() throws Exception {
-    DistributedCacheServer cacheServer = DistributedCache.getServer();
-
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
+    fsmConfig.setCacheClientConfiguration(
+      cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v1)-[:a]->(:A)]" +
@@ -118,16 +113,13 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
-
-    cacheServer.shutdown();
   }
 
   @Test
   public void testDiamond() throws Exception {
-    DistributedCacheServer cacheServer = DistributedCache.getServer();
-
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
+    fsmConfig.setCacheClientConfiguration(
+      cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
@@ -153,16 +145,13 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
-
-    cacheServer.shutdown();
   }
 
   @Test
   public void testCircleWithBranch() throws Exception {
-    DistributedCacheServer cacheServer = DistributedCache.getServer();
-
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
-    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
+    fsmConfig.setCacheClientConfiguration(
+      cacheServer.getCacheClientConfiguration());
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
@@ -192,8 +181,6 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
-
-    cacheServer.shutdown();
   }
 
   private void compareExpectationAndResult(

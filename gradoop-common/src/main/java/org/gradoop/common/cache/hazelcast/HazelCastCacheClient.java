@@ -16,14 +16,17 @@ import java.util.Map;
 public class HazelCastCacheClient implements DistributedCacheClient {
 
   private final HazelcastInstance instance;
+  private final String prefix;
 
   public HazelCastCacheClient(
     DistributedCacheClientConfiguration cacheClientConfiguration) {
 
     ClientConfig clientConfig = new ClientConfig();
-    clientConfig.getNetworkConfig()
-      .setAddresses(
+    clientConfig.getNetworkConfig().setAddresses(
         Lists.newArrayList(cacheClientConfiguration.getServerAddress()));
+    clientConfig.setProperty("hazelcast.logging.type", "none");
+
+    this.prefix = cacheClientConfiguration.getCacheName();
 
     Collection<HazelcastInstance> instances =
       HazelcastClient.getAllHazelcastClients();
@@ -43,54 +46,55 @@ public class HazelCastCacheClient implements DistributedCacheClient {
 
   @Override
   public <T> List<T> getList(String name) {
-    return instance.getList(name);
+    return instance.getList(prefix+name);
   }
 
   @Override
   public <T> void setList(String name, List<T> list) {
-    IList<T> cacheList = instance.getList(name);
+    IList<T> cacheList = instance.getList(prefix+name);
     cacheList.clear();
     cacheList.addAll(list);
   }
 
   @Override
   public <K, V> Map<K, V> getMap(String name) {
-    return instance.getMap(name);
+
+    return instance.getMap(prefix+name);
   }
 
   @Override
   public <K, V> void setMap(String name, Map<K, V> map) {
-    IMap<K, V> cacheMap = instance.getMap(name);
+    IMap<K, V> cacheMap = instance.getMap(prefix+name);
     cacheMap.clear();
     cacheMap.putAll(map);
   }
 
   @Override
   public void delete(String name) {
-    instance.removeDistributedObjectListener(name);
+    instance.removeDistributedObjectListener(prefix+name);
   }
 
   @Override
   public long getCounter(String name) {
-    return instance.getAtomicLong(name).get();
+    return instance.getAtomicLong(prefix+name).get();
   }
 
   @Override
   public void setCounter(String name, long count) {
-    instance.getAtomicLong(name).set(count);
+    instance.getAtomicLong(prefix+name).set(count);
   }
 
   @Override
   public long incrementAndGetCounter(String name) {
-    return instance.getAtomicLong(name).incrementAndGet();
+    return instance.getAtomicLong(prefix+name).incrementAndGet();
   }
 
   @Override
-  public void waitForCounterToReach(String counterName, int count) throws
+  public void waitForCounterToReach(String name, int count) throws
     InterruptedException {
     boolean loop = true;
     while (loop) {
-      if (instance.getAtomicLong(counterName).get() == count) {
+      if (instance.getAtomicLong(prefix+name).get() == count) {
         loop = false;
       }
       Thread.sleep(100);
@@ -98,22 +102,22 @@ public class HazelCastCacheClient implements DistributedCacheClient {
   }
 
   @Override
-  public void waitForEvent(String eventName) throws InterruptedException {
-    waitForCounterToReach(eventName, 1);
+  public void waitForEvent(String name) throws InterruptedException {
+    waitForCounterToReach(prefix+name, 1);
   }
 
   @Override
-  public void triggerEvent(String eventName) throws InterruptedException {
-    incrementAndGetCounter(eventName);
+  public void triggerEvent(String name) throws InterruptedException {
+    incrementAndGetCounter(prefix+name);
   }
 
   @Override
   public void resetCounter(String name) {
-    instance.getAtomicLong(name).set(0L);
+    instance.getAtomicLong(prefix+name).set(0L);
   }
 
   @Override
-  public void addAndGetCounter(String counterName, long count) {
-    instance.getAtomicLong(counterName).addAndGet(count);
+  public void addAndGetCounter(String name, long count) {
+    instance.getAtomicLong(prefix+name).addAndGet(count);
   }
 }

@@ -18,6 +18,8 @@ public class DistributedCacheTest {
 
   @Test
   public void testRead() {
+    Hazelcast.shutdownAll();
+
     DistributedCacheServer server =
       DistributedCache.getServer();
     DistributedCacheClient client =
@@ -61,16 +63,9 @@ public class DistributedCacheTest {
     DistributedCacheServer server1 = DistributedCache.getServer();
     DistributedCacheServer server2 = DistributedCache.getServer();
 
-    assertNotNull(Hazelcast.getHazelcastInstanceByName(
-      server1.getCacheClientConfiguration().getCacheName()));
-
-    assertNotNull(Hazelcast.getHazelcastInstanceByName(
-      server2.getCacheClientConfiguration().getCacheName()));
-
-    assertEquals(2, Hazelcast.getAllHazelcastInstances().size());
+    assertEquals(1, Hazelcast.getAllHazelcastInstances().size());
 
     server1.shutdown();
-    server2.shutdown();
   }
 
   @Test
