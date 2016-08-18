@@ -110,56 +110,6 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
     }
   }
 
-  /**
-   * Write to distributed cache in a map close function
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testMapCloseWrite() throws Exception {
-    Collection<String> exp = Lists.newArrayList(
-      "A", "B", "C", "D", "E", "F", "G", "H");
-
-    DistributedCacheServer server = DistributedCache.getServer();
-    DistributedCacheClient client = DistributedCache.getClient(
-      server.getCacheClientConfiguration(), "");
-
-    getExecutionEnvironment()
-      .fromCollection(exp)
-      .map(new TestMapCloseWrite(server.getCacheClientConfiguration()))
-      .count();
-
-    Collection<String> res = client.getList(NAME);
-    res = Lists.newArrayList(res);
-
-    assertTrue(GradoopTestUtils.equalContent(exp, res));
-
-    server.shutdown();
-  }
-
-  private class TestMapCloseWrite extends RichMapFunction<String, String> {
-    private final DistributedCacheClientConfiguration configuration;
-    private Collection<String> values = Lists.newArrayList();
-
-    public TestMapCloseWrite(DistributedCacheClientConfiguration configuration) {
-      this.configuration = configuration;
-    }
-
-    @Override
-    public String map(String value) throws Exception {
-      values.add(value);
-      return value;
-    }
-
-    @Override
-    public void close() throws Exception {
-      DistributedCacheClient client =
-        DistributedCache.getClient(configuration, "");
-      client.getList(NAME).addAll(values);
-      super.close();
-    }
-  }
-
   @Test
   public void testPartitionIteration() throws Exception {
     DistributedCacheServer server = DistributedCache.getServer();
