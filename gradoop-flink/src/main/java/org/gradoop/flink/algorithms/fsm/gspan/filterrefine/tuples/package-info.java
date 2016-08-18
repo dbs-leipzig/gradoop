@@ -15,26 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.api;
-
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.tuples.WithCount;
-
-import java.util.List;
-
 /**
- * Describes transactional FSM post processing.
- *
- * @param <S> subgraph representation
- * @param <C> graph collection representation
+ * Flink tuples related to the filter and refine gSpan implementation.
  */
-public interface TransactionalFSMDecoder<S, C> {
-
-  /**
-   * Triggers the post processing.
-   *
-   * @param frequentSubgraphs frequent subgraphs
-   * @return desired output
-   */
-  C decode(DataSet<WithCount<S>> frequentSubgraphs);
-}
+package org.gradoop.flink.algorithms.fsm.gspan.filterrefine.tuples;

@@ -15,26 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.api;
+package org.gradoop.flink.algorithms.fsm.gspan.filterrefine.functions;
 
-import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.flink.algorithms.fsm.gspan.filterrefine.tuples.RefinementMessage;
+import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
-import java.util.List;
-
 /**
- * Describes transactional FSM post processing.
- *
- * @param <S> subgraph representation
- * @param <C> graph collection representation
+ * refinementMessage => (subgraph, frequency)
  */
-public interface TransactionalFSMDecoder<S, C> {
+public class CompressedSubgraphWithCount
+  implements MapFunction<RefinementMessage, WithCount<CompressedDFSCode>> {
 
-  /**
-   * Triggers the post processing.
-   *
-   * @param frequentSubgraphs frequent subgraphs
-   * @return desired output
-   */
-  C decode(DataSet<WithCount<S>> frequentSubgraphs);
+  @Override
+  public WithCount<CompressedDFSCode> map(
+    RefinementMessage message) throws Exception {
+
+    return new WithCount<>(message.getSubgraph(), message.getSupport());
+  }
 }

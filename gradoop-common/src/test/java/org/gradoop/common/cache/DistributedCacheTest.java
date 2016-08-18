@@ -23,17 +23,16 @@ public class DistributedCacheTest {
     DistributedCacheServer server =
       DistributedCache.getServer();
     DistributedCacheClient client =
-      DistributedCache.getClient(server.getCacheClientConfiguration());
+      DistributedCache.getClient(server.getCacheClientConfiguration(), "");
 
     String key = "Hello";
     List<String> in = Lists.newArrayList("Distributed", "Cache");
 
-    server.getList(key).addAll(in);
+    client.getList(key).addAll(in);
     List<String> out = client.getList(key);
 
     assertTrue(GradoopTestUtils.equalContent(in, out));
 
-    client.shutdown();
     server.shutdown();
   }
 
@@ -42,7 +41,7 @@ public class DistributedCacheTest {
     DistributedCacheServer server =
       DistributedCache.getServer();
     DistributedCacheClient client =
-      DistributedCache.getClient(server.getCacheClientConfiguration());
+      DistributedCache.getClient(server.getCacheClientConfiguration(), "");
 
     String key = "Hello";
     List<String> in = Lists.newArrayList("Distributed", "Cache");
@@ -50,11 +49,11 @@ public class DistributedCacheTest {
     for (String s : in) {
       client.getList(key).add(s);
     }
-    List<String> out = server.getList(key);
+
+    List<String> out = client.getList(key);
 
     assertTrue(GradoopTestUtils.equalContent(in, out));
 
-    client.shutdown();
     server.shutdown();
   }
 
@@ -70,19 +69,13 @@ public class DistributedCacheTest {
 
   @Test
   public void testUniqueClient() {
-    Hazelcast.shutdownAll();
-
     DistributedCacheServer server = DistributedCache.getServer();
 
-    DistributedCacheClient client1 =
-      DistributedCache.getClient(server.getCacheClientConfiguration());
-    DistributedCacheClient client2 =
-      DistributedCache.getClient(server.getCacheClientConfiguration());
+    DistributedCache.getClient(server.getCacheClientConfiguration(), "");
+    DistributedCache.getClient(server.getCacheClientConfiguration(), "");
 
     assertEquals(1, HazelcastClient.getAllHazelcastClients().size());
 
-    client1.shutdown();
-    client2.shutdown();
     server.shutdown();
   }
 }

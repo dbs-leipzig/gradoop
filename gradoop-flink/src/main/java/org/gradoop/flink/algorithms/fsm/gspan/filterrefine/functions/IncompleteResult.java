@@ -15,26 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.api;
+package org.gradoop.flink.algorithms.fsm.gspan.filterrefine.functions;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.tuples.WithCount;
-
-import java.util.List;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.flink.algorithms.fsm.gspan.filterrefine.tuples.RefinementMessage;
 
 /**
- * Describes transactional FSM post processing.
- *
- * @param <S> subgraph representation
- * @param <C> graph collection representation
+ * filters incomplete results from refinement messages.
  */
-public interface TransactionalFSMDecoder<S, C> {
+public class IncompleteResult implements FilterFunction<RefinementMessage> {
 
-  /**
-   * Triggers the post processing.
-   *
-   * @param frequentSubgraphs frequent subgraphs
-   * @return desired output
-   */
-  C decode(DataSet<WithCount<S>> frequentSubgraphs);
+  @Override
+  public boolean filter(RefinementMessage refinementMessage) throws Exception {
+    return
+      refinementMessage.getMessageType() == RefinementMessage.INCOMPLETE_RESULT;
+  }
 }

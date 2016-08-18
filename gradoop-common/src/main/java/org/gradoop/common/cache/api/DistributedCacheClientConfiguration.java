@@ -4,5 +4,4 @@ import java.io.Serializable;
 
 public interface DistributedCacheClientConfiguration extends Serializable {
   String getServerAddress();
-  String getCacheName();
 }

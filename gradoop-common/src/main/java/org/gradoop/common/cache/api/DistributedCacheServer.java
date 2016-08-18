@@ -1,7 +1,6 @@
 package org.gradoop.common.cache.api;
 
-public interface DistributedCacheServer extends DistributedCacheConnection {
+public interface DistributedCacheServer {
   DistributedCacheClientConfiguration getCacheClientConfiguration();
-
-  void resetCounter(String name);
+  void shutdown();
 }

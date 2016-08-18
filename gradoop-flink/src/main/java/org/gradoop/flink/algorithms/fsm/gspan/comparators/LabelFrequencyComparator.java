@@ -15,26 +15,33 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.api;
+package org.gradoop.flink.algorithms.fsm.gspan.comparators;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * Describes transactional FSM post processing.
- *
- * @param <S> subgraph representation
- * @param <C> graph collection representation
+ * Comparator for (label, frequency)
  */
-public interface TransactionalFSMDecoder<S, C> {
+public class LabelFrequencyComparator
+  implements Comparator<WithCount<String>>, Serializable {
 
-  /**
-   * Triggers the post processing.
-   *
-   * @param frequentSubgraphs frequent subgraphs
-   * @return desired output
-   */
-  C decode(DataSet<WithCount<S>> frequentSubgraphs);
+  @Override
+  public int compare(WithCount<String> label1, WithCount<String> label2) {
+
+    int comparison;
+
+    if (label1.getCount() > label2.getCount()) {
+      comparison = -1;
+    } else if (label1.getCount() < label2.getCount()) {
+      comparison = 1;
+    } else {
+      comparison = label1.getObject().compareTo(label2.getObject());
+    }
+
+    return comparison;
+  }
 }
+

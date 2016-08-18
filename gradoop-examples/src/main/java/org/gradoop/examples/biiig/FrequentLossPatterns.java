@@ -36,14 +36,12 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.config.TransactionalFSMAlgorithm;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.transformation
   .ApplyTransformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -115,13 +113,13 @@ public class FrequentLossPatterns
 
 
     // frequent subgraphs
-    FSMConfig fsmConfig = new FSMConfig(0.4f, true);
+    FSMConfig fsmConfig = new FSMConfig(0.4f, true,
+      cacheServer.getCacheClientConfiguration());
     fsmConfig.setVerbose(true);
     fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
 
     GraphCollection frequentSubgraphs = btgs.callForCollection(
-      new TransactionalFSM(fsmConfig,
-        TransactionalFSMAlgorithm.GSPAN_ITERATIVE)
+      new TransactionalFSM(fsmConfig)
     );
 
     // filter by maximum support

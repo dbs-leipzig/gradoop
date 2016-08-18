@@ -27,23 +27,22 @@ public class UndirectedDFSStep extends DFSStepBase {
 
   /**
    * Constructor
-   *
    * @param fromTime discovery time of traversal start vertex
+   * @param toTime discovery time of traversal end vertex
    * @param fromLabel label of traversal start vertex
    * @param edgeLabel label of the traversed edge
-   * @param toTime discovery time of traversal end vertex
    * @param toLabel label of traversal end vertex
    */
-  public UndirectedDFSStep(int fromTime, Integer fromLabel,
-    Integer edgeLabel, int toTime, Integer toLabel) {
+  public UndirectedDFSStep(int fromTime, int toTime,
+    Integer fromLabel, Integer edgeLabel, Integer toLabel) {
     super(fromTime, toTime, fromLabel, edgeLabel, toLabel);
   }
 
   @Override
   public String toString() {
-    return "(" + fromTime + ":" + fromLabel + ")" +
-      "-" + edgeLabel + "-" +
-      "(" + toTime + ":" + toLabel + ")";
+    return "(" + getToTime() + ":" + getFromLabel() + ")" +
+      "-" + getEdgeLabel() + "-" +
+      "(" + getToTime() + ":" + getToLabel() + ")";
   }
 
   @Override

@@ -27,11 +27,7 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
-import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanMiner;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.GSpanTLFGraphEncoder;
-import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
-import org.gradoop.flink.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
+
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -129,7 +125,8 @@ public class TransactionalFSMBenchmark extends AbstractRunner
     DataSet<TLFGraph> graphs = tlfSource.getTLFGraphs();
 
     // set config for synthetic or real world dataset
-    FSMConfig fsmConfig = new FSMConfig(threshold, directed);
+    FSMConfig fsmConfig = new FSMConfig(threshold, directed,
+      cacheServer.getCacheClientConfiguration());
 
     // set encoder
     GSpanEncoder encoder = new GSpanTLFGraphEncoder(fsmConfig);

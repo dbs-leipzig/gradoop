@@ -5,15 +5,13 @@ import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
 /**
  * Created by peet on 18.08.16.
  */
-public class HazelcastCacheClientConfiguration implements
-  DistributedCacheClientConfiguration {
-  private final String serverAddress;
-  private final String cacheName;
+public class HazelcastCacheClientConfiguration
+  implements DistributedCacheClientConfiguration {
 
-  public HazelcastCacheClientConfiguration(
-    String serverAddress, String cacheName) {
+  private final String serverAddress;
+
+  public HazelcastCacheClientConfiguration(String serverAddress) {
     this.serverAddress = serverAddress;
-    this.cacheName = cacheName;
   }
 
   @Override
@@ -21,13 +19,9 @@ public class HazelcastCacheClientConfiguration implements
     return serverAddress;
   }
 
-  @Override
-  public String getCacheName() {
-    return cacheName;
-  }
 
   @Override
   public String toString() {
-    return cacheName + "@" + serverAddress;
+    return "@" + serverAddress;
   }
 }

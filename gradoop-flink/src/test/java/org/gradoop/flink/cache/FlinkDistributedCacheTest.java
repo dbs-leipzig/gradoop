@@ -32,8 +32,10 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
   @Test
   public void testMapRead() throws Exception {
     DistributedCacheServer server = DistributedCache.getServer();
+    DistributedCacheClient client = DistributedCache.getClient(
+      server.getCacheClientConfiguration(), "");
 
-    server.getList(NAME).addAll(Lists.newArrayList("A"));
+    client.getList(NAME).addAll(Lists.newArrayList("A"));
 
     DataSet<Long> numbers = getExecutionEnvironment()
       .generateSequence(1, 4);
@@ -58,10 +60,10 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 
     @Override
     public String map(Long value) throws Exception {
-      DistributedCacheClient client = DistributedCache.getClient(configuration);
+      DistributedCacheClient client =
+        DistributedCache.getClient(configuration, "");
       List<String> strings = client.getList(NAME);
       String s = strings.get(0);
-      client.shutdown();
       return s;
     }
   }
@@ -76,13 +78,15 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
     Collection<String> exp = Lists.newArrayList("A", "B", "C", "D");
 
     DistributedCacheServer server = DistributedCache.getServer();
+    DistributedCacheClient client = DistributedCache.getClient(
+      server.getCacheClientConfiguration(), "");
 
     getExecutionEnvironment()
       .fromCollection(exp)
       .map(new TestMapWrite(server.getCacheClientConfiguration()))
       .count();
 
-    Collection<String> res = server.getList(NAME);
+    Collection<String> res = client.getList(NAME);
     res = Lists.newArrayList(res);
 
     assertTrue(GradoopTestUtils.equalContent(exp, res));
@@ -99,9 +103,9 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 
     @Override
     public String map(String value) throws Exception {
-      DistributedCacheClient client = DistributedCache.getClient(configuration);
+      DistributedCacheClient client = DistributedCache
+        .getClient(configuration, "");
       client.getList(NAME).add(value);
-      client.shutdown();
       return value;
     }
   }
@@ -117,13 +121,15 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
       "A", "B", "C", "D", "E", "F", "G", "H");
 
     DistributedCacheServer server = DistributedCache.getServer();
+    DistributedCacheClient client = DistributedCache.getClient(
+      server.getCacheClientConfiguration(), "");
 
     getExecutionEnvironment()
       .fromCollection(exp)
       .map(new TestMapCloseWrite(server.getCacheClientConfiguration()))
       .count();
 
-    Collection<String> res = server.getList(NAME);
+    Collection<String> res = client.getList(NAME);
     res = Lists.newArrayList(res);
 
     assertTrue(GradoopTestUtils.equalContent(exp, res));
@@ -147,9 +153,9 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 
     @Override
     public void close() throws Exception {
-      DistributedCacheClient client = DistributedCache.getClient(configuration);
+      DistributedCacheClient client =
+        DistributedCache.getClient(configuration, "");
       client.getList(NAME).addAll(values);
-      client.shutdown();
       super.close();
     }
   }
@@ -157,8 +163,6 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
   @Test
   public void testPartitionIteration() throws Exception {
     DistributedCacheServer server = DistributedCache.getServer();
-
-    server.resetCounter("finishedPartions");
 
     Collection<Long> res = getExecutionEnvironment()
       .generateSequence(1, 100)
@@ -183,7 +187,8 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
     @Override
     public void mapPartition(
       Iterable<Long> values, Collector<Long> out) throws Exception {
-      DistributedCacheClient client = DistributedCache.getClient(configuration);
+      DistributedCacheClient client =
+        DistributedCache.getClient(configuration, "");
 
       Long localMaxValue = 0L;
       long partitions = getRuntimeContext().getNumberOfParallelSubtasks();
@@ -209,8 +214,6 @@ public class FlinkDistributedCacheTest extends GradoopFlinkTestBase {
 
         out.collect(localMaxValue);
       }
-
-      client.shutdown();
     }
   }
 

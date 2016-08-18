@@ -20,6 +20,7 @@ package org.gradoop.flink.algorithms.fsm.config;
 import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * frequent subgraph mining configuration
@@ -52,20 +53,25 @@ public class FSMConfig implements Serializable {
    * Minimum subgraph size by edge count.
    */
   private int minEdgeCount;
-  private DistributedCacheClientConfiguration cacheClientConfiguration;
+  private final DistributedCacheClientConfiguration cacheClientConfiguration;
   private boolean verbose = false;
+  private final String session;
 
 
   /**
    * valued constructor
    * @param minSupport minimum relative support of a subgraph
    * @param directed direction mode
+   * @param cacheClientConfiguration
    */
-  public FSMConfig(float minSupport, boolean directed) {
+  public FSMConfig(float minSupport, boolean directed,
+    DistributedCacheClientConfiguration cacheClientConfiguration) {
     this.minSupport = minSupport;
     this.directed = directed;
     this.maxEdgeCount = 1000;
     this.minEdgeCount = 0;
+    this.cacheClientConfiguration = cacheClientConfiguration;
+    this.session = UUID.randomUUID().toString();
   }
 
   public float getMinSupport() {
@@ -108,12 +114,11 @@ public class FSMConfig implements Serializable {
     return verbose;
   }
 
-  public void setCacheClientConfiguration(
-    DistributedCacheClientConfiguration cacheClientConfiguration) {
-    this.cacheClientConfiguration = cacheClientConfiguration;
-  }
-
   public void setVerbose(boolean verbose) {
     this.verbose = verbose;
+  }
+
+  public String getSession() {
+    return session;
   }
 }

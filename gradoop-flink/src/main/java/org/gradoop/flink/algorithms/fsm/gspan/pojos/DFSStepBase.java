@@ -51,13 +51,13 @@ public abstract class DFSStepBase implements DFSStep {
    * @param edgeLabel label of the traversed edge
    * @param toLabel label of traversal end vertex
    */
-  public DFSStepBase(int fromTime, int toTime, Integer fromLabel, Integer edgeLabel,
-    Integer toLabel) {
+  public DFSStepBase(int fromTime, int toTime,
+    Integer fromLabel, Integer edgeLabel, Integer toLabel) {
+    this.fromTime = fromTime;
+    this.toTime = toTime;
     this.fromLabel = fromLabel;
     this.edgeLabel = edgeLabel;
     this.toLabel = toLabel;
-    this.toTime = toTime;
-    this.fromTime = fromTime;
   }
 
   @Override
