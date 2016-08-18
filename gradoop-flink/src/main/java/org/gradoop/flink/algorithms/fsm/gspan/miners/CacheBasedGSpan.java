@@ -25,7 +25,7 @@ import java.util.Map;
 
 
 public class CacheBasedGSpan
-  extends RichMapPartitionFunction<GSpanGraph, Object> {
+  extends RichMapPartitionFunction<GSpanGraph, WithCount<CompressedDFSCode>> {
 
   private final FSMConfig fsmConfig;
   private List<GSpanGraph> graphs = Lists.newLinkedList();
@@ -39,8 +39,9 @@ public class CacheBasedGSpan
   }
 
   @Override
-  public void mapPartition(
-    Iterable<GSpanGraph> values, Collector<Object> out) throws Exception {
+  public void mapPartition(Iterable<GSpanGraph> values,
+    Collector<WithCount<CompressedDFSCode>> out) throws Exception {
+
     this.partition = getRuntimeContext().getIndexOfThisSubtask();
     this.partitionCount = getRuntimeContext().getNumberOfParallelSubtasks();
     this.cacheClient =
@@ -91,8 +92,8 @@ public class CacheBasedGSpan
     }
   }
 
-  private void countAndFilterSubgraphs(
-    int k, Collector<Object> out) throws InterruptedException {
+  private void countAndFilterSubgraphs(int k,
+    Collector< WithCount<CompressedDFSCode>> out) throws InterruptedException {
 
     String eventName = "clear" + k;
 

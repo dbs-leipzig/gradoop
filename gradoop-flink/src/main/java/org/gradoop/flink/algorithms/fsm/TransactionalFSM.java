@@ -24,6 +24,8 @@ import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanMiner;
 import org.gradoop.flink.algorithms.fsm.gspan.decoders.GSpanGraphCollectionDecoder;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.GSpanGraphCollectionEncoder;
+
+import org.gradoop.flink.algorithms.fsm.gspan.miners.GSpanIterative;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
 import org.gradoop.flink.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
@@ -96,8 +98,11 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
     case GSPAN_FILTERREFINE:
       miner = new GSpanFilterRefine();
       break;
-    default:
+    case GSPAN_BULKITERATION:
       miner = new GSpanBulkIteration();
+      break;
+    default:
+      miner = new GSpanIterative();
       break;
     }
   }

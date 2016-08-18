@@ -23,17 +23,23 @@ import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions.Dictionary;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions.EdgeLabels;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions.EdgeLabelsEncoderInteger;
-
+import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions
+  .EdgeLabelsEncoderInteger;
+import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions
+  .EncodeGraphTransactionsWithCache;
 import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions.EncodeTLFGraphsWithCache;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions.InverseDictionary;
-
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions.TLFVertexLabels;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions.TLFVertexLabelsEncoder;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.EdgeTripleWithStringEdgeLabel;
+import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions
+  .InverseDictionary;
+import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions
+  .TLFVertexLabels;
+import org.gradoop.flink.algorithms.fsm.gspan.encoders.functions
+  .TLFVertexLabelsEncoder;
+import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples
+  .EdgeTripleWithStringEdgeLabel;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.AddCount;
 
 import java.util.Collection;
@@ -46,7 +52,8 @@ import java.util.Map;
  * frequencies, create frequency based dictionaries and finally translate und
  * filter vertices and edges.
  */
-public class GSpanTLFGraphCacheEncoder implements GSpanEncoder<DataSet<TLFGraph>> {
+public class GSpanGraphTransactionsCacheEncoder
+  implements GSpanEncoder<GraphTransactions> {
   /**
    * minimum support
    */
@@ -69,7 +76,7 @@ public class GSpanTLFGraphCacheEncoder implements GSpanEncoder<DataSet<TLFGraph>
    *
    * @param fsmConfig FSM configuration
    */
-  public GSpanTLFGraphCacheEncoder(FSMConfig fsmConfig) {
+  public GSpanGraphTransactionsCacheEncoder(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }
 
@@ -84,10 +91,11 @@ public class GSpanTLFGraphCacheEncoder implements GSpanEncoder<DataSet<TLFGraph>
    */
   @Override
   public DataSet<GSpanGraph> encode(
-    DataSet<TLFGraph> graphs, FSMConfig fsmConfig) {
+    GraphTransactions graphs, FSMConfig fsmConfig) {
 
     return graphs
-      .mapPartition(new EncodeTLFGraphsWithCache(fsmConfig));
+      .getTransactions()
+      .mapPartition(new EncodeGraphTransactionsWithCache(fsmConfig));
   }
 
   /**
