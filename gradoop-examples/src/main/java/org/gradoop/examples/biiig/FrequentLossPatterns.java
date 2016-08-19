@@ -66,6 +66,8 @@ public class FrequentLossPatterns
   extends AbstractRunner implements ProgramDescription {
 
   public static final String RESULT_KEY = "result";
+  public static final String SOURCEID_KEY = "num";
+
 
   /**
    * main method
@@ -109,7 +111,7 @@ public class FrequentLossPatterns
     btgs = btgs.apply(new ApplyAggregation(RESULT_KEY, new Result()));
 
     // (4) filter by loss (negative financialResult)
-//    btgs = btgs.select(new Loss());
+    btgs = btgs.select(new Loss());
 
     // (5) relabel vertices and remove vertex and edge properties
 
@@ -122,7 +124,7 @@ public class FrequentLossPatterns
     // (6) mine frequent subgraphs
 
     FSMConfig fsmConfig = new FSMConfig(
-      0.4f, true, cacheServer.getCacheClientConfiguration());
+      0.65f, true, cacheServer.getCacheClientConfiguration());
 
     GraphCollection frequentSubgraphs = btgs.callForCollection(
       new TransactionalFSM(fsmConfig)
@@ -249,7 +251,7 @@ public class FrequentLossPatterns
         .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL) ?
         current.getLabel() :
         current
-          .getPropertyValue(BusinessTransactionGraphs.SOURCEID_KEY).toString()
+          .getPropertyValue(SOURCEID_KEY).toString()
       );
 
       return transformed;
