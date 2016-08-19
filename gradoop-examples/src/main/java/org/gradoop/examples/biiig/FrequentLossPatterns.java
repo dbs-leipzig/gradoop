@@ -27,6 +27,8 @@ import org.apache.flink.util.Collector;
 import org.apache.hadoop.util.Time;
 import org.gradoop.common.cache.DistributedCache;
 import org.gradoop.common.cache.api.DistributedCacheServer;
+import org.gradoop.common.model.api.entities.EPGMAttributed;
+import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -36,12 +38,14 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.DecodeDFSCodes;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.transformation
   .ApplyTransformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -55,7 +59,7 @@ import java.util.Iterator;
  *
  * To execute the example:
  * 1. checkout Gradoop
- * 2. mvn clean install
+ * 2. mvn clean package
  * 3. run main method
  */
 public class FrequentLossPatterns
@@ -72,13 +76,15 @@ public class FrequentLossPatterns
 
     // avoids multiple output files
     getExecutionEnvironment().setParallelism(1);
-    // required for parallel FSM
+    // start cache server
     DistributedCacheServer cacheServer = DistributedCache.getServer();
-
-    // DATA SOURCE
-
+    // get Gradoop configuration
     GradoopFlinkConfig config = GradoopFlinkConfig
       .createConfig(getExecutionEnvironment());
+
+    // START DEMONSTRATION PROGRAM
+
+    // (1) read data from source
 
     String graphHeadPath = FrequentLossPatterns.class
       .getResource("/data/json/foodbroker/graphs.json").getFile();
@@ -92,48 +98,56 @@ public class FrequentLossPatterns
     JSONDataSource dataSource = new JSONDataSource(
       graphHeadPath, vertexPath, edgePath, config);
 
-    // ANALYTICAL PROGRAM
-
-    // read graph from source
     LogicalGraph iig = dataSource.getLogicalGraph();
 
-    // extract collection fo business transaction graphs
+    // (2) extract collection of business transaction graphs
+
     GraphCollection btgs = iig
       .callForCollection(new BusinessTransactionGraphs());
 
-//    // aggregate result
-//    btgs = btgs.apply(new ApplyAggregation(RESULT_KEY, new Result()));
-//
-//    // filter by loss
+    // (3) aggregate financial result
+    btgs = btgs.apply(new ApplyAggregation(RESULT_KEY, new Result()));
+
+    // (4) filter by loss (negative financialResult)
 //    btgs = btgs.select(new Loss());
 
-    // transform for FSM
+    // (5) relabel vertices and remove vertex and edge properties
+
     btgs = btgs.apply(new ApplyTransformation(
-      new KeepGraphHead(), new RelabelVertices(), new RemoveEdgeProperties()));
+      new Keep<GraphHead>(),
+      new RelabelVerticesAndRemoveProperties(),
+      new RemoveEdgeProperties()
+    ));
 
+    // (6) mine frequent subgraphs
 
-    // frequent subgraphs
-    FSMConfig fsmConfig = new FSMConfig(0.4f, true,
-      cacheServer.getCacheClientConfiguration());
-    fsmConfig.setVerbose(true);
-    fsmConfig.setCacheClientConfiguration(cacheServer.getCacheClientConfiguration());
+    FSMConfig fsmConfig = new FSMConfig(
+      0.4f, true, cacheServer.getCacheClientConfiguration());
 
     GraphCollection frequentSubgraphs = btgs.callForCollection(
       new TransactionalFSM(fsmConfig)
     );
 
-    // filter by maximum support
-    frequentSubgraphs.select(new MaximumSupport(0.6f));
+    // (7) relabel graph heads of frequent subgraphs
 
-    // DATA SINK
+    frequentSubgraphs = frequentSubgraphs.apply(new ApplyTransformation(
+      new AddSupportToGraphHead(),
+      new Keep<Vertex>(),
+      new Keep<Edge>()
+    ));
+
+    // (8) write data sink
 
     String outPath = System.getProperty("user.home") + "/lossPatterns_"
       + Time.now() + ".dot";
 
     new DOTDataSink(outPath, true).write(frequentSubgraphs);
 
-    getExecutionEnvironment().execute();
+    // END DEMONSTRATION PROGRAM
 
+    // trigger execution
+    getExecutionEnvironment().execute();
+    // shutdown cache
     cacheServer.shutdown();
   }
 
@@ -212,11 +226,11 @@ public class FrequentLossPatterns
 
   }
 
-  private static class KeepGraphHead
-    implements TransformationFunction<GraphHead> {
+  private static class Keep<EL extends EPGMAttributed & EPGMLabeled>
+    implements TransformationFunction<EL> {
 
     @Override
-    public GraphHead execute(GraphHead current, GraphHead transformed) {
+    public EL execute(EL current, EL transformed) {
       return current;
     }
   }
@@ -224,7 +238,7 @@ public class FrequentLossPatterns
   /**
    * Transformation function to relabel vertices and to drop properties.
    */
-  private static class RelabelVertices
+  private static class RelabelVerticesAndRemoveProperties
     implements TransformationFunction<Vertex> {
 
     @Override
@@ -256,18 +270,18 @@ public class FrequentLossPatterns
     }
   }
 
-
-  private static class MaximumSupport implements FilterFunction<GraphHead> {
-    private final float maxSupport;
-
-    public MaximumSupport(float maxSupport) {
-      this.maxSupport = maxSupport;
-    }
+  private static class AddSupportToGraphHead implements
+    TransformationFunction<GraphHead> {
 
     @Override
-    public boolean filter(GraphHead value) throws Exception {
-      return value.getPropertyValue(TransactionalFSM.SUPPORT_KEY)
-        .getFloat() <= maxSupport;
+    public GraphHead execute(GraphHead current, GraphHead transformed) {
+
+      String newLabel = current.getLabel() +
+        " (" + current.getPropertyValue(DecodeDFSCodes.SUPPORT_KEY) + ")";
+
+      transformed.setLabel(newLabel);
+
+      return transformed;
     }
   }
 
@@ -275,4 +289,5 @@ public class FrequentLossPatterns
   public String getDescription() {
     return  FrequentLossPatterns.class.getName();
   }
+
 }

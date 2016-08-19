@@ -29,6 +29,8 @@ import java.util.Set;
 public class DecodeDFSCodes extends
   RichMapPartitionFunction<WithCount<CompressedDFSCode>, GraphTransaction> {
 
+  public static final String SUPPORT_KEY = "support";
+  public static final String DFS_CODE_KEY = "dfsCode";
   private final FSMConfig fsmConfig;
   private final GraphHeadFactory graphHeadFactory;
   private final VertexFactory vertexFactory;
@@ -67,8 +69,8 @@ public class DecodeDFSCodes extends
 
       int frequency = subgraphFrequency.getCount();
       long graphCount = cacheClient.getCounter(Constants.GRAPH_COUNT);
-      graphHead.setProperty("support", (float) frequency / graphCount);
-      graphHead.setProperty("dfsCode", subgraph.toString());
+      graphHead.setProperty(SUPPORT_KEY, (float) frequency / graphCount);
+      graphHead.setProperty(DFS_CODE_KEY, subgraph.toString());
 
       Set<Vertex> vertices = Sets.newHashSet();
       Map<Integer, GradoopId> vertexTimeIdMap = Maps.newHashMap();
