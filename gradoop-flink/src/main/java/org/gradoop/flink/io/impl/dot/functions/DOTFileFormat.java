@@ -120,7 +120,7 @@ public class DOTFileFormat
     //--------------------------------------------------------------------------
 
     // remove "-" from GradoopId (reserved character in dot format)
-    String graphHeadId = transaction.getGraphHead()
+    String graphHeadId = "g" + transaction.getGraphHead()
       .getId().toString().replace("-", "");
 
     // writes for each graph:
@@ -167,7 +167,7 @@ public class DOTFileFormat
     for (Vertex vertex: transaction.getVertices()) {
 
       // remove "-" from GradoopId (reserved character in dot format)
-      String vertexId = vertex.getId().toString().replace("-", "");
+      String vertexId = "v" + vertex.getId().toString().replace("-", "");
 
       // writes for each vertex:
       // "vertexId",
@@ -196,8 +196,8 @@ public class DOTFileFormat
     for (Edge edge: transaction.getEdges()) {
 
       // remove "-" from GradoopId (reserved character in dot format)
-      String sourceId = edge.getSourceId().toString().replace("-", "");
-      String targetId = edge.getTargetId().toString().replace("-", "");
+      String sourceId = "v" + edge.getSourceId().toString().replace("-", "");
+      String targetId = "v" + edge.getTargetId().toString().replace("-", "");
 
       // writes for each edge:
       // "sourceId->targetId"
