@@ -276,8 +276,11 @@ public class FrequentLossPatterns
     @Override
     public GraphHead execute(GraphHead current, GraphHead transformed) {
 
-      String newLabel = current.getLabel() +
-        " (" + current.getPropertyValue(DecodeDFSCodes.SUPPORT_KEY) + ")";
+      BigDecimal support = current
+        .getPropertyValue(DecodeDFSCodes.SUPPORT_KEY)
+        .getBigDecimal().setScale(2, BigDecimal.ROUND_HALF_UP);
+
+      String newLabel = current.getLabel() + " (" + support + ")";
 
       transformed.setLabel(newLabel);
 
