@@ -1,28 +1,20 @@
-package org.gradoop.flink.datagen.foodbroker;
+package org.gradoop.flink.datagen.foodbroker.process;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.foodbroker.foodbrokerage.MasterDataMapFromTuple;
-import org.gradoop.flink.datagen.foodbroker.foodbrokerage.MasterDataQualityMapper;
-import org.gradoop.flink.datagen.foodbroker.foodbrokerage.ProductPriceMapper;
+import org.gradoop.flink.datagen.foodbroker.functions.MasterDataMapFromTuple;
+import org.gradoop.flink.datagen.foodbroker.functions.MasterDataQualityMapper;
+import org.gradoop.flink.datagen.foodbroker.functions.ProductPriceMapper;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-/**
- * Created by Stephan on 18.08.16.
- */
 public abstract class AbstractBusinessProcess implements BusinessProcess {
 
-  /**
-   * Execution environment
-   */
-  private ExecutionEnvironment env;
   /**
    * Gradoop Flink configuration
    */
@@ -57,13 +49,12 @@ public abstract class AbstractBusinessProcess implements BusinessProcess {
   }
 
   public AbstractBusinessProcess(FoodBrokerConfig foodBrokerConfig,
-    GradoopFlinkConfig gradoopFlinkConfig, ExecutionEnvironment env,
+    GradoopFlinkConfig gradoopFlinkConfig,
     DataSet<Vertex> customers, DataSet<Vertex> vendors,
     DataSet<Vertex> logistics, DataSet<Vertex> employees,
     DataSet<Vertex> products, DataSet<Long> caseSeeds) {
     this.foodBrokerConfig = foodBrokerConfig;
     this.gradoopFlinkConfig = gradoopFlinkConfig;
-    this.env = env;
     this.customers = customers;
     this.vendors = vendors;
     this.logistics = logistics;
