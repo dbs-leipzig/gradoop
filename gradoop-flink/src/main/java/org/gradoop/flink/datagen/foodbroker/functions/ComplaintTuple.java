@@ -1,4 +1,4 @@
-package org.gradoop.flink.datagen.foodbroker.complainthandling;
+package org.gradoop.flink.datagen.foodbroker.functions;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -31,10 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by Stephan on 12.08.16.
- */
-public class NewComplaintHandling
+public class ComplaintTuple
   extends RichMapPartitionFunction<Tuple4<Set<Vertex>, FoodBrokerMaps,
   Set<Edge>, Set<Edge>>, Tuple2<GraphTransaction, Set<Vertex>>> {
 
@@ -109,7 +106,7 @@ public class NewComplaintHandling
   private Vertex salesOrder;
 
 
-  public NewComplaintHandling(GraphHeadFactory graphHeadFactory,
+  public ComplaintTuple(GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory, EdgeFactory edgeFactory,
     FoodBrokerConfig config) {
     this.graphHeadFactory = graphHeadFactory;
