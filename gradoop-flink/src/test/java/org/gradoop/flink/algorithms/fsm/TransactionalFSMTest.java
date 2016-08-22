@@ -1,22 +1,13 @@
 package org.gradoop.flink.algorithms.fsm;
 
-import org.gradoop.common.cache.DistributedCache;
-import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.operators
-  .UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.cache.GradoopFlinkCacheEnabledTestBase;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class TransactionalFSMTest extends GradoopFlinkTestBase {
-
-  private DistributedCacheServer cacheServer;
-
-  public TransactionalFSMTest() {
-    this.cacheServer = DistributedCache.getServer();
-  }
+public class TransactionalFSMTest extends GradoopFlinkCacheEnabledTestBase {
 
   @Test
   public void testSingleEdges() throws Exception {

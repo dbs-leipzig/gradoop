@@ -15,7 +15,10 @@ public class DistributedCache {
 
   public static DistributedCacheClient getClient(
     DistributedCacheClientConfiguration cacheClientConfiguration,
-    String session) {
-    return new HazelCastCacheClient(cacheClientConfiguration, session);
+    String session) throws InterruptedException {
+    HazelCastCacheClient hazelCastCacheClient =
+      new HazelCastCacheClient(cacheClientConfiguration, session);
+
+    return hazelCastCacheClient;
   }
 }

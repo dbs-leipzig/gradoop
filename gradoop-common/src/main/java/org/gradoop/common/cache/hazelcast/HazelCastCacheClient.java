@@ -113,6 +113,6 @@ public class HazelCastCacheClient implements DistributedCacheClient {
 
   @Override
   public void addAndGetCounter(String name, long count) {
-    instance.getAtomicLong(session +name).addAndGet(count);
+    instance.getAtomicLong(session + name).addAndGet(count);
   }
 }

@@ -21,6 +21,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
@@ -65,9 +66,26 @@ import java.util.Iterator;
 public class FrequentLossPatterns
   extends AbstractRunner implements ProgramDescription {
 
-  public static final String RESULT_KEY = "result";
+  /**
+   * Property key storing the vertex source identifier.
+   */
   public static final String SOURCEID_KEY = "num";
-
+  /**
+   * Property key used to store the financial result.
+   */
+  public static final String RESULT_KEY = "financialResult";
+  /**
+   * Property key used to store the number of master data instances.
+   */
+  private static final String MASTERDATA_KEY = "masterDataCount";
+  /**
+   * Label prefix of master data
+   */
+  private static final String MASTER_PREFIX = "M#";
+  /**
+   * Label prefix of transactional data.
+   */
+  private static final String TRANSACTIONAL_PREFIX = "T#";
 
   /**
    * main method
@@ -118,7 +136,7 @@ public class FrequentLossPatterns
     btgs = btgs.apply(new ApplyTransformation(
       new Keep<GraphHead>(),
       new RelabelVerticesAndRemoveProperties(),
-      new RemoveEdgeProperties()
+      new DropEdgeProperties()
     ));
 
     // (6) mine frequent subgraphs
@@ -138,7 +156,16 @@ public class FrequentLossPatterns
       new Keep<Edge>()
     ));
 
-    // (8) write data sink
+    // (8) Check, if frequent subgraph contains master data
+
+    frequentSubgraphs = frequentSubgraphs
+      .apply(new ApplyAggregation(MASTERDATA_KEY, new CountMasterData()));
+
+    // (9) Select graphs containing master data
+
+    frequentSubgraphs = frequentSubgraphs.select(new ContainsMasterData());
+
+    // (10) write data sink
 
     String outPath = System.getProperty("user.home") + "/lossPatterns_"
       + Time.now() + ".dot";
@@ -153,6 +180,11 @@ public class FrequentLossPatterns
     cacheServer.shutdown();
   }
 
+  // AGGREGATE FUNCTIONS
+
+  /**
+   * Calculate the financial result of business transaction graphs.
+   */
   private static class Result implements ApplyAggregateFunction {
 
     private static final String REVENUE_KEY = "revenue";
@@ -214,10 +246,56 @@ public class FrequentLossPatterns
 
     @Override
     public Number getDefaultValue() {
+      return BigDecimal.valueOf(0);
+    }
+  }
+
+  private static class CountMasterData implements ApplyAggregateFunction {
+
+    @Override
+    public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
+      GraphCollection collection) {
+      return collection
+        .getVertices()
+        .map(new MapFunction<Vertex, Tuple2<GradoopId, Integer>>() {
+          @Override
+
+          public Tuple2<GradoopId, Integer> map(Vertex value) throws
+            Exception {
+
+            GradoopId graphId = value.getGraphIds().iterator().next();
+
+            return value.getLabel().startsWith(MASTER_PREFIX) ?
+              new Tuple2<>(graphId, 1) :
+              new Tuple2<>(graphId, 0);
+          }
+        })
+        .groupBy(0)
+        .sum(1)
+        .map(
+          new MapFunction<Tuple2<GradoopId, Integer>,
+            Tuple2<GradoopId, PropertyValue>>() {
+
+
+            @Override
+            public Tuple2<GradoopId, PropertyValue> map(
+              Tuple2<GradoopId, Integer> value) throws Exception {
+              return new Tuple2<>(value.f0, PropertyValue.create(value.f1));
+            }
+          });
+    }
+
+    @Override
+    public Number getDefaultValue() {
       return 0;
     }
   }
 
+  // SELECTION PREDICATES
+
+  /**
+   * Select business transaction graphs with negative financial result
+   * */
   private static class Loss implements FilterFunction<GraphHead> {
 
     @Override
@@ -225,9 +303,25 @@ public class FrequentLossPatterns
       return graph.getPropertyValue(RESULT_KEY)
         .getBigDecimal().compareTo(BigDecimal.ZERO) < 0;
     }
-
   }
 
+  /**
+   * Select frequent subgraphs that contain master data.
+   */
+  private static class ContainsMasterData implements FilterFunction<GraphHead> {
+
+    @Override
+    public boolean filter(GraphHead value) throws Exception {
+      return value.getPropertyValue(MASTERDATA_KEY).getInt() > 0;
+    }
+  }
+
+  // TRANSFORMATION FUNCTIONS
+
+  /**
+   * Do not change graph/vertex/edge in transformation.
+   * @param <EL> graph/vertex/edge type
+   */
   private static class Keep<EL extends EPGMAttributed & EPGMLabeled>
     implements TransformationFunction<EL> {
 
@@ -238,7 +332,7 @@ public class FrequentLossPatterns
   }
 
   /**
-   * Transformation function to relabel vertices and to drop properties.
+   * Relabel vertices and to drop properties.
    */
   private static class RelabelVerticesAndRemoveProperties
     implements TransformationFunction<Vertex> {
@@ -246,22 +340,30 @@ public class FrequentLossPatterns
     @Override
     public Vertex execute(Vertex current, Vertex transformed) {
 
-      transformed.setLabel(current.getPropertyValue(
-        BusinessTransactionGraphs.SUPERTYPE_KEY).toString()
-        .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL) ?
-        current.getLabel() :
-        current
-          .getPropertyValue(SOURCEID_KEY).toString()
-      );
+      String label;
+
+      if (current
+        .getPropertyValue(BusinessTransactionGraphs.SUPERTYPE_KEY).getString()
+        .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL)) {
+
+        label = TRANSACTIONAL_PREFIX +
+          current.getLabel();
+
+      } else {
+        label = MASTER_PREFIX +
+          current.getPropertyValue(SOURCEID_KEY).toString();
+      }
+
+      transformed.setLabel(label);
 
       return transformed;
     }
   }
 
   /**
-   * Transformation function to drop properties of edges.
+   * Drop edge properties.
    */
-  private static class RemoveEdgeProperties implements
+  private static class DropEdgeProperties implements
     TransformationFunction<Edge> {
     @Override
     public Edge execute(Edge current, Edge transformed) {
@@ -272,6 +374,9 @@ public class FrequentLossPatterns
     }
   }
 
+  /**
+   * Append graph label by FSM support.
+   */
   private static class AddSupportToGraphHead implements
     TransformationFunction<GraphHead> {
 
@@ -294,5 +399,4 @@ public class FrequentLossPatterns
   public String getDescription() {
     return  FrequentLossPatterns.class.getName();
   }
-
 }

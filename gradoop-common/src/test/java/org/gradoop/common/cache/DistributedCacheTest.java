@@ -11,19 +11,20 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class DistributedCacheTest {
 
-  @Test
-  public void testRead() {
-    Hazelcast.shutdownAll();
+  private final DistributedCacheServer server;
 
-    DistributedCacheServer server =
-      DistributedCache.getServer();
+  public DistributedCacheTest() {
+    server = DistributedCache.getServer();
+  }
+
+  @Test
+  public void testRead() throws InterruptedException {
     DistributedCacheClient client =
-      DistributedCache.getClient(server.getCacheClientConfiguration(), "");
+      DistributedCache.getClient(server.getCacheClientConfiguration(), "read");
 
     String key = "Hello";
     List<String> in = Lists.newArrayList("Distributed", "Cache");
@@ -32,18 +33,14 @@ public class DistributedCacheTest {
     List<String> out = client.getList(key);
 
     assertTrue(GradoopTestUtils.equalContent(in, out));
-
-    server.shutdown();
   }
 
   @Test
-  public void testWrite() {
-    DistributedCacheServer server =
-      DistributedCache.getServer();
+  public void testWrite() throws InterruptedException {
     DistributedCacheClient client =
-      DistributedCache.getClient(server.getCacheClientConfiguration(), "");
+      DistributedCache.getClient(server.getCacheClientConfiguration(), "write");
 
-    String key = "Hello";
+    String key = "World";
     List<String> in = Lists.newArrayList("Distributed", "Cache");
 
     for (String s : in) {
@@ -53,29 +50,19 @@ public class DistributedCacheTest {
     List<String> out = client.getList(key);
 
     assertTrue(GradoopTestUtils.equalContent(in, out));
-
-    server.shutdown();
   }
 
   @Test
   public void testMultipleServers() {
-    DistributedCacheServer server1 = DistributedCache.getServer();
-    DistributedCacheServer server2 = DistributedCache.getServer();
-
+    DistributedCache.getServer();
     assertEquals(1, Hazelcast.getAllHazelcastInstances().size());
-
-    server1.shutdown();
   }
 
   @Test
-  public void testUniqueClient() {
-    DistributedCacheServer server = DistributedCache.getServer();
-
+  public void testUniqueClient() throws InterruptedException {
     DistributedCache.getClient(server.getCacheClientConfiguration(), "");
     DistributedCache.getClient(server.getCacheClientConfiguration(), "");
 
     assertEquals(1, HazelcastClient.getAllHazelcastClients().size());
-
-    server.shutdown();
   }
 }

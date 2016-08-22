@@ -1,15 +1,13 @@
 package org.gradoop.flink.algorithms.fsm.gspan;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.cache.DistributedCache;
-import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.EncodeTransactions;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSCode;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.DirectedDFSStep;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.cache.GradoopFlinkCacheEnabledTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -19,13 +17,7 @@ import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
-public class PatternGrowthTest extends GradoopFlinkTestBase {
-
-  private final DistributedCacheServer cacheServer;
-
-  public PatternGrowthTest() {
-    this.cacheServer = DistributedCache.getServer();
-  }
+public class PatternGrowthTest extends GradoopFlinkCacheEnabledTestBase {
 
   @Test
   public void testMinDfsCodeCalculation() {
