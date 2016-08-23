@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.algorithms.fsm.gspan.functions;
 
 import com.google.common.collect.Lists;
@@ -19,19 +36,46 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Executed the gSpan algorithm for a partition of graphs.
+ */
 public class IterativeGSpan
   extends RichMapPartitionFunction<GSpanGraph, WithCount<CompressedDFSCode>> {
 
+  /**
+   * FSM configuration.
+   */
   private final FSMConfig fsmConfig;
-  private List<GSpanGraph> graphs = Lists.newLinkedList();
-  private DistributedCacheClient cacheClient;
+  /**
+   * Own partition identifier.
+   */
   private int partition;
+  /**
+   * Count of all partitions.
+   */
   private int partitionCount;
+  /**
+   * Gradoop distributed cache Client.
+   */
+  private DistributedCacheClient cacheClient;
+  /**
+   * Minimum frequency of a pattern to be considered to be frequent.
+   */
   private long minFrequency;
-  private Collection<WithCount<CompressedDFSCode>> frequentSubgraphs =
+  /**
+   * Partition of gSpan encoded graphs.
+   */
+  private List<GSpanGraph> graphs = Lists.newLinkedList();
+  /**
+   * List of frequent subgraph patterns.
+   */
+  private Collection<WithCount<CompressedDFSCode>> resultPartition =
     Lists.newArrayList();
 
+  /**
+   * Constructor.
+   * @param fsmConfig FSM configuration
+   */
   public IterativeGSpan(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }
@@ -52,7 +96,7 @@ public class IterativeGSpan
     int k = 1;
     discoverSingleEdgeSubgraphs(values);
     reportSubgraphs(k);
-    countAndFilterSubgraphs(k, out);
+    countAndFilterSubgraphs(k);
     frequentSubgraphs = cacheClient.getList(Constants.FREQUENT_SUBGRAPHS);
 
     // k-edge subgraphs
@@ -60,7 +104,7 @@ public class IterativeGSpan
       k++;
       growChildren(frequentSubgraphs);
       reportSubgraphs(k);
-      countAndFilterSubgraphs(k, out);
+      countAndFilterSubgraphs(k);
       frequentSubgraphs = cacheClient.getList(Constants.FREQUENT_SUBGRAPHS);
     }
 
@@ -70,12 +114,18 @@ public class IterativeGSpan
     }
 
     for (WithCount<CompressedDFSCode> frequentSubgraph :
-      this.frequentSubgraphs) {
+      this.resultPartition) {
 
       out.collect(frequentSubgraph);
     }
   }
 
+  /**
+   * Grow k+1-edge embeddings of frequent subgraphs.
+   *
+   * @param compressedSubgraphs compressed k-edge frequent subgraphs
+   * @throws InterruptedException
+   */
   private void growChildren(Collection<CompressedDFSCode> compressedSubgraphs
   ) throws InterruptedException {
 
@@ -101,8 +151,14 @@ public class IterativeGSpan
     }
   }
 
-  private void countAndFilterSubgraphs(int k,
-    Collector< WithCount<CompressedDFSCode>> out) throws InterruptedException {
+  /**
+   * Aggregate partition of k-edge pattern frequencies.
+   *
+   * @param k edge count
+   *
+   * @throws InterruptedException
+   */
+  private void countAndFilterSubgraphs(int k) throws InterruptedException {
 
     String eventName = "clear" + k;
 
@@ -145,7 +201,7 @@ public class IterativeGSpan
 
       if (frequency >= minFrequency) {
         frequentSubgraphs.add(subgraph);
-        this.frequentSubgraphs.add(new WithCount<>(subgraph, frequency));
+        this.resultPartition.add(new WithCount<>(subgraph, frequency));
       }
     }
 
@@ -161,6 +217,12 @@ public class IterativeGSpan
     cacheClient.waitForCounterToReach(counterName, partitionCount);
   }
 
+  /**
+   * Determine local frequency of k-edge patterns and write them to cache.
+   *
+   * @param k edge count
+   * @throws InterruptedException
+   */
   private void reportSubgraphs(int k) throws InterruptedException {
 
     // count local frequency
@@ -203,7 +265,7 @@ public class IterativeGSpan
 
         Collection<WithCount<CompressedDFSCode>> subgraphFrequencies =
           partitionSubgraphFrequencies.get(aggPartition);
-        
+
         if (subgraphFrequencies == null) {
           //noinspection unchecked
           subgraphFrequencies = Lists.newArrayList(subgraphFrequency);
@@ -213,7 +275,7 @@ public class IterativeGSpan
         }
       }
     }
-    
+
     for (Map.Entry<Integer, Collection<WithCount<CompressedDFSCode>>> entry :
       partitionSubgraphFrequencies.entrySet()) {
       String aggPartition = String.valueOf(entry.getKey());
@@ -231,6 +293,12 @@ public class IterativeGSpan
     cacheClient.waitForCounterToReach(counterName, partitionCount);
   }
 
+  /**
+   * Determine 1-edge DFS code and embedding for every edge.
+   * Store graph to local graph partition.
+   *
+   * @param values input graphs
+   */
   private void discoverSingleEdgeSubgraphs(Iterable<GSpanGraph> values) {
     for (GSpanGraph graph : values) {
       GSpan.createSingleEdgeDfsCodes(graph, fsmConfig);

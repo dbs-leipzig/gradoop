@@ -158,8 +158,8 @@ public class FrequentLossPatterns
 
     // (8) Check, if frequent subgraph contains master data
 
-    frequentSubgraphs = frequentSubgraphs
-      .apply(new ApplyAggregation(MASTERDATA_KEY, new CountMasterData()));
+    frequentSubgraphs = frequentSubgraphs.apply(
+      new ApplyAggregation(MASTERDATA_KEY, new DetermineMasterDataSurplus()));
 
     // (9) Select graphs containing master data
 
@@ -167,8 +167,8 @@ public class FrequentLossPatterns
 
     // (10) write data sink
 
-    String outPath = System.getProperty("user.home") + "/lossPatterns_"
-      + Time.now() + ".dot";
+    String outPath =
+      System.getProperty("user.home") + "/lossPatterns_" + Time.now() + ".dot";
 
     new DOTDataSink(outPath, true).write(frequentSubgraphs);
 
@@ -187,7 +187,13 @@ public class FrequentLossPatterns
    */
   private static class Result implements ApplyAggregateFunction {
 
+    /**
+     * Property key for revenue values.
+     */
     private static final String REVENUE_KEY = "revenue";
+    /**
+     * Property key for expense values.
+     */
     private static final String EXPENSE_KEY = "expense";
 
     @Override
@@ -250,7 +256,11 @@ public class FrequentLossPatterns
     }
   }
 
-  private static class CountMasterData implements ApplyAggregateFunction {
+  /**
+   * Counts master data vertices less than the number of transactional vertices.
+   */
+  private static class DetermineMasterDataSurplus
+    implements ApplyAggregateFunction {
 
     @Override
     public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
@@ -267,7 +277,7 @@ public class FrequentLossPatterns
 
             return value.getLabel().startsWith(MASTER_PREFIX) ?
               new Tuple2<>(graphId, 1) :
-              new Tuple2<>(graphId, 0);
+              new Tuple2<>(graphId, -1);
           }
         })
         .groupBy(0)

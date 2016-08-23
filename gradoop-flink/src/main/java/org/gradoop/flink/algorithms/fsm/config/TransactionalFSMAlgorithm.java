@@ -26,7 +26,11 @@ public enum TransactionalFSMAlgorithm {
    * gSpan algorithm implemented based on Flink bulk iteration
    */
   GSPAN_BULKITERATION,
-  GSPAN_ITERATIVE, /**
+  /**
+   * gSpan algorithm implemented based on distributed cache
+   */
+  GSPAN_ITERATIVE,
+  /**
    * gSpan algorithm
    * implemented based on the filter-refinement approach (ICDE 2014)
    */

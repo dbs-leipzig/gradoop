@@ -45,13 +45,46 @@ public class Constants {
   /**
    * graph counts of all workers
    */
-  public static final String WORKER_GRAPHCOUNT = "workerIds";
+  public static final String WORKER_GRAPH_COUNT = "workerIds";
+
+  /**
+   * Cache event name for finished tasks.
+   */
+  public static final String TASK_FINISHED = "tf";
+
+  /**
+   * Vertex prefix for cache objects.
+   */
   public static final String VERTEX_PREFIX = "v";
+
+  /**
+   * Edge prefix for cache objects.
+   */
   public static final String EDGE_PREFIX = "e";
-  public static final String TASK_FINISHED = "vlfc";
-  public static final String LABEL_DICTIONARY = "vld";
-  public static final String LABEL_DICTIONARY_INVERSE = "vldi";
-  public static final String LABEL_DICTIONARY_AVAILABLE = "vlda";
+
+  /**
+   * Cache map name for a label dictionary.
+   */
+  public static final String LABEL_DICTIONARY = "ld";
+
+  /**
+   * Cache list name for an inverse label dictionary.
+   */
+  public static final String LABEL_DICTIONARY_INVERSE = "ldi";
+
+  /**
+   * Cache event name for an available label dictionary.
+   */
+  public static final String LABEL_DICTIONARY_AVAILABLE = "lda";
+
+  /**
+   * Cache counter name for the total number of graphs.
+   */
   public static final String GRAPH_COUNT = "gc";
+
+  /**
+   * Cache counter name for the total number of partitions reported their
+   * graph count.
+   */
   public static final String GRAPH_COUNT_REPORTS = "gcr";
 }

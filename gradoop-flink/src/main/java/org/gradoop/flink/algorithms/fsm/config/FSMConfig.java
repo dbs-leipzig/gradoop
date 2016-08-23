@@ -53,16 +53,27 @@ public class FSMConfig implements Serializable {
    * Minimum subgraph size by edge count.
    */
   private int minEdgeCount;
+
+  /**
+   * Configurations required to connect to a Gradoop distributed cache server.
+   */
   private final DistributedCacheClientConfiguration cacheClientConfiguration;
-  private boolean verbose = false;
+
+  /**
+   * Cache session identifier.
+   */
   private final String session;
 
+  /**
+   * Verbose mode.
+   */
+  private boolean verbose = false;
 
   /**
    * valued constructor
    * @param minSupport minimum relative support of a subgraph
    * @param directed direction mode
-   * @param cacheClientConfiguration
+   * @param cacheClientConfiguration cache server configurations
    */
   public FSMConfig(float minSupport, boolean directed,
     DistributedCacheClientConfiguration cacheClientConfiguration) {

@@ -71,7 +71,7 @@ public class FrequentOrRefinementCandidate
 
     this.workerGraphCount = getRuntimeContext()
       .<Map<Integer, Integer>>getBroadcastVariable(
-        Constants.WORKER_GRAPHCOUNT).get(0);
+        Constants.WORKER_GRAPH_COUNT).get(0);
   }
 
   @Override

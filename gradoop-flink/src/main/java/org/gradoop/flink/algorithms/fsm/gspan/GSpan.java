@@ -192,6 +192,110 @@ public class GSpan {
   }
 
   /**
+   * Adds 1-edge DFS codes and embeddings to a graph.
+   *
+   * @param graph graph
+   * @param fsmConfig FSM configuration
+   */
+  public static void createSingleEdgeDfsCodes(
+    GSpanGraph graph, FSMConfig fsmConfig) {
+
+    Map<DFSCode, Collection<DFSEmbedding>> subgraphEmbeddings =
+      graph.getSubgraphEmbeddings();
+
+    for (Map.Entry<Integer, AdjacencyList> vertexIdAdjacencyList :
+      graph.getAdjacencyLists().entrySet()) {
+
+      AdjacencyList adjacencyList = vertexIdAdjacencyList.getValue();
+
+      int fromLabel = adjacencyList.getFromVertexLabel();
+      int fromId = vertexIdAdjacencyList.getKey();
+
+      if (fsmConfig.isDirected()) {
+        for (AdjacencyListEntry entry : adjacencyList.getEntries()) {
+          boolean outgoing = entry.isOutgoing();
+          int toLabel = entry.getToVertexLabel();
+
+          if (fromLabel < toLabel || fromLabel == toLabel && outgoing) {
+            int edgeLabel = entry.getEdgeLabel();
+            int toId = entry.getToVertexId();
+            boolean loop = fromId == toId;
+            int toTime = loop ? 0 : 1;
+            int edgeId = entry.getEdgeId();
+
+            DFSCode subgraph = new DFSCode(new DirectedDFSStep(
+              0, toTime, fromLabel, outgoing, edgeLabel, toLabel));
+
+            DFSEmbedding embedding = new DFSEmbedding(
+              loop ?
+                Lists.newArrayList(fromId) :
+                Lists.newArrayList(fromId, toId),
+              Lists.newArrayList(edgeId)
+            );
+
+            Collection<DFSEmbedding> embeddings =
+              subgraphEmbeddings.get(subgraph);
+
+            if (embeddings == null) {
+              subgraphEmbeddings.put(
+                subgraph, Lists.newArrayList(embedding));
+            } else {
+              embeddings.add(embedding);
+            }
+          }
+        }
+      } else {
+        Set<Integer> edgeIds = Sets.newHashSet();
+
+        for (AdjacencyListEntry entry : adjacencyList.getEntries()) {
+          int edgeId = entry.getEdgeId();
+
+          if (!edgeIds.contains(edgeId)) {
+            int edgeLabel = entry.getEdgeLabel();
+            int toId = entry.getToVertexId();
+            boolean loop = fromId == toId;
+            int toTime = loop ? 0 : 1;
+            int toLabel = entry.getToVertexLabel();
+
+            DFSCode subgraph;
+            DFSEmbedding embedding;
+
+            if (toLabel >= fromLabel) {
+              subgraph = new DFSCode(new UndirectedDFSStep(
+                0, toTime, fromLabel, edgeLabel, toLabel));
+
+              embedding = new DFSEmbedding(
+                loop ?
+                  Lists.newArrayList(fromId) :
+                  Lists.newArrayList(fromId, toId),
+                Lists.newArrayList(edgeId)
+              );
+            } else {
+              subgraph = new DFSCode(new UndirectedDFSStep(
+                0, toTime, toLabel, edgeLabel, fromLabel));
+
+              embedding = new DFSEmbedding(
+                Lists.newArrayList(toId, fromId),
+                Lists.newArrayList(edgeId)
+              );
+            }
+
+            Collection<DFSEmbedding> embeddings =
+              subgraphEmbeddings.get(subgraph);
+
+            if (embeddings == null) {
+              subgraphEmbeddings.put(
+                subgraph, Lists.newArrayList(embedding));
+            } else {
+              embeddings.add(embedding);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Creates adjacency lists and gSpan edges for a list of DFS steps.
    *  @param steps DFS steps
    * @param adjacencyLists adjacency lists
@@ -395,12 +499,21 @@ public class GSpan {
 
                     if (fsmConfig.isDirected()) {
                       dfsStep = new DirectedDFSStep(
-                        fromVertexTime, toVertexTime, fromVertexLabel,
-                        entry.isOutgoing(), entry.getEdgeLabel(), toVertexLabel);
+                        fromVertexTime,
+                        toVertexTime,
+                        fromVertexLabel,
+                        entry.isOutgoing(),
+                        entry.getEdgeLabel(),
+                        toVertexLabel
+                      );
                     } else {
-                      dfsStep = new UndirectedDFSStep(fromVertexTime,
-                        toVertexTime, fromVertexLabel,
-                        entry.getEdgeLabel(), toVertexLabel);
+                      dfsStep = new UndirectedDFSStep(
+                        fromVertexTime,
+                        toVertexTime,
+                        fromVertexLabel,
+                        entry.getEdgeLabel(),
+                        toVertexLabel
+                      );
                     }
 
                     childCode.getSteps().add(dfsStep);
@@ -643,103 +756,5 @@ public class GSpan {
     }
 
     return !parentEmbeddings.isEmpty();
-  }
-
-  public static void createSingleEdgeDfsCodes(
-    GSpanGraph graph, FSMConfig fsmConfig) {
-
-    Map<DFSCode, Collection<DFSEmbedding>> subgraphEmbeddings =
-      graph.getSubgraphEmbeddings();
-
-    for (Map.Entry<Integer, AdjacencyList> vertexIdAdjacencyList :
-      graph.getAdjacencyLists().entrySet()) {
-
-      AdjacencyList adjacencyList = vertexIdAdjacencyList.getValue();
-
-      int fromLabel = adjacencyList.getFromVertexLabel();
-      int fromId = vertexIdAdjacencyList.getKey();
-
-      if (fsmConfig.isDirected()) {
-        for (AdjacencyListEntry entry : adjacencyList.getEntries()) {
-          boolean outgoing = entry.isOutgoing();
-          int toLabel = entry.getToVertexLabel();
-
-          if (fromLabel < toLabel || fromLabel == toLabel && outgoing) {
-            int edgeLabel = entry.getEdgeLabel();
-            int toId = entry.getToVertexId();
-            boolean loop = fromId == toId;
-            int toTime = loop ? 0 : 1;
-            int edgeId = entry.getEdgeId();
-
-            DFSCode subgraph = new DFSCode(new DirectedDFSStep(
-              0, toTime, fromLabel, outgoing, edgeLabel, toLabel));
-
-            DFSEmbedding embedding = new DFSEmbedding(
-              loop ?
-                Lists.newArrayList(fromId) :
-                Lists.newArrayList(fromId, toId),
-              Lists.newArrayList(edgeId)
-            );
-
-            Collection<DFSEmbedding> embeddings =
-              subgraphEmbeddings.get(subgraph);
-
-            if (embeddings == null) {
-              subgraphEmbeddings.put(
-                subgraph, Lists.newArrayList(embedding));
-            } else {
-              embeddings.add(embedding);
-            }
-          }
-        }
-      } else {
-        Set<Integer> edgeIds = Sets.newHashSet();
-
-        for (AdjacencyListEntry entry : adjacencyList.getEntries()) {
-          int edgeId = entry.getEdgeId();
-
-          if (!edgeIds.contains(edgeId)) {
-            int edgeLabel = entry.getEdgeLabel();
-            int toId = entry.getToVertexId();
-            boolean loop = fromId == toId;
-            int toTime = loop ? 0 : 1;
-            int toLabel = entry.getToVertexLabel();
-
-            DFSCode subgraph;
-            DFSEmbedding embedding;
-
-            if (toLabel >= fromLabel) {
-              subgraph = new DFSCode(new UndirectedDFSStep(
-                0, toTime, fromLabel, edgeLabel, toLabel));
-
-              embedding = new DFSEmbedding(
-                loop ?
-                  Lists.newArrayList(fromId) :
-                  Lists.newArrayList(fromId, toId),
-                Lists.newArrayList(edgeId)
-              );
-            } else {
-              subgraph = new DFSCode(new UndirectedDFSStep(
-                0, toTime, toLabel, edgeLabel, fromLabel));
-
-              embedding = new DFSEmbedding(
-                Lists.newArrayList(toId, fromId),
-                Lists.newArrayList(edgeId)
-              );
-            }
-
-            Collection<DFSEmbedding> embeddings =
-              subgraphEmbeddings.get(subgraph);
-
-            if (embeddings == null) {
-              subgraphEmbeddings.put(
-                subgraph, Lists.newArrayList(embedding));
-            } else {
-              embeddings.add(embedding);
-            }
-          }
-        }
-      }
-    }
   }
 }

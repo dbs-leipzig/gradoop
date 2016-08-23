@@ -61,13 +61,17 @@ public class GSpanGraph implements Serializable {
   }
 
   /**
-   * default constructor
+   * Default constructor.
    */
   public GSpanGraph() {
     this.adjacencyLists = Maps.newHashMapWithExpectedSize(0);
     this.subgraphEmbeddings = Maps.newHashMapWithExpectedSize(0);
   }
 
+  /**
+   * Constructor from existing adjacency lists.
+   * @param adjacencyLists adjacency lists
+   */
   public GSpanGraph(Map<Integer, AdjacencyList> adjacencyLists) {
     this.adjacencyLists = adjacencyLists;
     this.subgraphEmbeddings = Maps.newHashMapWithExpectedSize(0);

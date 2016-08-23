@@ -37,7 +37,6 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  */
 public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 
-  public static final String SUPPORT_KEY = "support";
   /**
    * frequent subgraph mining configuration
    */

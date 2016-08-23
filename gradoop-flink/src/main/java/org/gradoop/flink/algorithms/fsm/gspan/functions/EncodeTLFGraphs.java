@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.algorithms.fsm.gspan.functions;
 
 import com.google.common.collect.Lists;
@@ -24,21 +41,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Turns a partition of TLF graphs into graphs encoded for thew gSpan algorithm.
+ */
 public class EncodeTLFGraphs
   extends RichMapPartitionFunction<TLFGraph, GSpanGraph> {
 
+  /**
+   * FSM configuration.
+   */
   private final FSMConfig fsmConfig;
+  /**
+   * Own partition identifier.
+   */
+  private int partition;
+  /**
+   * Count of all partitions.
+   */
+  private int partitionCount;
+  /**
+   * Gradoop distributed cache Client.
+   */
+  private DistributedCacheClient cacheClient;
+  /**
+   * Minimum frequency of a pattern to be considered to be frequent.
+   */
+  private long minFrequency;
+  /**
+   * Vertex label dictionary.
+   */
+  private Map<String, Integer> vertexLabelDictionary;
+  /**
+   * Edge label dictionary.
+   */
+  private Map<String, Integer> edgeLabelDictionary;
+  /**
+   * Partition of graph transactions.
+   */
   private Collection<TLFGraph> graphs;
+  /**
+   * Local cache for graph-local vertex adjacency lists.
+   */
   private Collection<Map<Integer, AdjacencyList>> graphAdjacencyLists;
 
-  private int partition;
-  private int partitionCount;
-  private DistributedCacheClient cacheClient;
-
-  private long minFrequency;
-  private Map<String, Integer> vertexLabelDictionary;
-  private Map<String, Integer> edgeLabelDictionary;
-
+  /**
+   * Constructor.
+   * @param fsmConfig FSM configuration
+   */
   public EncodeTLFGraphs(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }
@@ -89,8 +138,8 @@ public class EncodeTLFGraphs
     cacheClient.waitForCounterToReach(
       Constants.GRAPH_COUNT_REPORTS, partitionCount);
 
-    this.minFrequency = Math.round((float)
-      cacheClient.getCounter(Constants.GRAPH_COUNT) * fsmConfig.getMinSupport());
+    this.minFrequency = Math.round((float) cacheClient
+      .getCounter(Constants.GRAPH_COUNT) * fsmConfig.getMinSupport());
 
     cacheClient.setCounter(Constants.MIN_FREQUENCY, minFrequency);
   }
@@ -138,6 +187,12 @@ public class EncodeTLFGraphs
       .incrementAndGetCounter(Constants.TASK_FINISHED);
   }
 
+  /**
+   * Determine local frequency of edge labels and write result to
+   * distributed cache.
+   *
+   * @return number of report
+   */
   private long reportEdgeLabels() {
     Map<String, Integer> labelFrequency = Maps.newHashMap();
 
@@ -188,6 +243,12 @@ public class EncodeTLFGraphs
       .incrementAndGetCounter(Constants.TASK_FINISHED);
   }
 
+  /**
+   * Increase frequency fro a given set of labels in a label frequency map.
+   *
+   * @param labelFrequency label frequency map
+   * @param labels labels
+   */
   private void addLabelFrequency(
     Map<String, Integer> labelFrequency, Collection<String> labels) {
 
@@ -274,12 +335,24 @@ public class EncodeTLFGraphs
     return dictionary;
   }
 
+  /**
+   * Read a label dictionary from distributed cache.
+   *
+   * @param prefix vertex/edge
+   * @return label dictionary
+   *
+   * @throws InterruptedException
+   */
   private Map<String, Integer> readLabelDictionary(String prefix) throws
     InterruptedException {
     cacheClient.waitForEvent(prefix + Constants.LABEL_DICTIONARY_AVAILABLE);
     return cacheClient.getMap(prefix + Constants.LABEL_DICTIONARY);
   }
 
+  /**
+   * Use previously generated vertex Id mappings and encode labels to
+   * generate the gSpan graph representation.
+   */
   private void encodeGraphs() {
 
     Iterator<TLFGraph> graphIterator = graphs.iterator();
@@ -311,7 +384,7 @@ public class EncodeTLFGraphs
           targetAdjacencyList.getEntries().add(new AdjacencyListEntry(
             !fsmConfig.isDirected(), edgeId, edgeLabel, sourceId, sourceLabel));
 
-          edgeId ++;
+          edgeId++;
         }
       }
 
