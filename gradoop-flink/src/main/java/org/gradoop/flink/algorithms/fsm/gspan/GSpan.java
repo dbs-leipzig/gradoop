@@ -27,7 +27,6 @@ import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSStep;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.DirectedDFSStep;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanEdge;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.UndirectedDFSStep;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.tuples.EdgeTriple;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.AdjacencyList;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.AdjacencyListEntry;
 
@@ -50,27 +49,6 @@ import java.util.Set;
 public class GSpan {
 
   // GRAPH CONSTRUCTION
-
-  /**
-   * Creates the gSpan mining representation of a graph transaction from a
-   * given collection of Gradoop edge triples.
-   *
-   * @param <T> edge triple type
-   * @param <IDT> id type
-   * @param triples the graphs edges
-   * @param fsmConfig FSM configuration
-   * @return graph transaction
-   */
-  public static <T extends EdgeTriple<IDT>, IDT> GSpanGraph
-  createGSpanGraph(Iterable<T> triples, FSMConfig fsmConfig) {
-
-    // replace GradoopIds by Integer Ids
-    List<GSpanEdge> edges = Lists.newArrayList();
-    List<AdjacencyList> adjacencyLists = Lists.newArrayList();
-    createAdjacencyListsAndEdges(triples, adjacencyLists, edges);
-
-    return createGSpanGraph(adjacencyLists, edges, fsmConfig);
-  }
 
   /**
    * Creates the gSpan mining representation of a graph transaction from an
@@ -144,56 +122,6 @@ public class GSpan {
   }
 
   /**
-   * turns edge triples into gSpan edges,
-   * i.e., replaces GradoopIds by local integer ids
-   *
-   * @param iterable edge triples with GradoopIds
-   * @param adjacencyLists adjacency lists
-   * @param edges  @return gSpan edges
-   * @param <T> edge triple type
-   * @param <IDT> id type
-   */
-  private static <T extends EdgeTriple<IDT>, IDT> void
-  createAdjacencyListsAndEdges(final Iterable<T> iterable,
-    final List<AdjacencyList> adjacencyLists, final List<GSpanEdge> edges) {
-
-    Map<IDT, Integer> vertexIdMap = Maps.newHashMap();
-    int vertexId = 0;
-
-    int edgeId = 0;
-    for (EdgeTriple<IDT> triple : iterable) {
-
-      Integer edgeLabel = triple.getEdgeLabel();
-
-      IDT sourceGradoopId = triple.getSourceId();
-      Integer sourceId = vertexIdMap.get(sourceGradoopId);
-      Integer sourceLabel = triple.getSourceLabel();
-
-      if (sourceId == null) {
-        sourceId = vertexId;
-        vertexIdMap.put(sourceGradoopId, sourceId);
-        vertexId++;
-      }
-
-      IDT targetGradoopId = triple.getTargetId();
-      Integer targetId = vertexIdMap.get(targetGradoopId);
-      Integer targetLabel = triple.getTargetLabel();
-
-      if (targetId == null) {
-        targetId = vertexId;
-        vertexIdMap.put(targetGradoopId, targetId);
-
-        vertexId++;
-      }
-
-      addNewEdgeAndAdjacencyListEntries(edges, adjacencyLists,
-        sourceId, sourceLabel, edgeId, edgeLabel, targetId, targetLabel);
-
-      edgeId++;
-    }
-  }
-
-  /**
    * Creates a new gSpan edge and two adjacency list entries for given labels
    * and identifiers. Edge will be added to an edge lists and adjacency list
    * entries to an adjacency list.
@@ -261,6 +189,110 @@ public class GSpan {
 
     adjacencyList.getEntries().add(new AdjacencyListEntry(
       outgoing, edgeId, edgeLabel, toId, toLabel));
+  }
+
+  /**
+   * Adds 1-edge DFS codes and embeddings to a graph.
+   *
+   * @param graph graph
+   * @param fsmConfig FSM configuration
+   */
+  public static void createSingleEdgeDfsCodes(
+    GSpanGraph graph, FSMConfig fsmConfig) {
+
+    Map<DFSCode, Collection<DFSEmbedding>> subgraphEmbeddings =
+      graph.getSubgraphEmbeddings();
+
+    for (Map.Entry<Integer, AdjacencyList> vertexIdAdjacencyList :
+      graph.getAdjacencyLists().entrySet()) {
+
+      AdjacencyList adjacencyList = vertexIdAdjacencyList.getValue();
+
+      int fromLabel = adjacencyList.getFromVertexLabel();
+      int fromId = vertexIdAdjacencyList.getKey();
+
+      if (fsmConfig.isDirected()) {
+        for (AdjacencyListEntry entry : adjacencyList.getEntries()) {
+          boolean outgoing = entry.isOutgoing();
+          int toLabel = entry.getToVertexLabel();
+
+          if (fromLabel < toLabel || fromLabel == toLabel && outgoing) {
+            int edgeLabel = entry.getEdgeLabel();
+            int toId = entry.getToVertexId();
+            boolean loop = fromId == toId;
+            int toTime = loop ? 0 : 1;
+            int edgeId = entry.getEdgeId();
+
+            DFSCode subgraph = new DFSCode(new DirectedDFSStep(
+              0, toTime, fromLabel, outgoing, edgeLabel, toLabel));
+
+            DFSEmbedding embedding = new DFSEmbedding(
+              loop ?
+                Lists.newArrayList(fromId) :
+                Lists.newArrayList(fromId, toId),
+              Lists.newArrayList(edgeId)
+            );
+
+            Collection<DFSEmbedding> embeddings =
+              subgraphEmbeddings.get(subgraph);
+
+            if (embeddings == null) {
+              subgraphEmbeddings.put(
+                subgraph, Lists.newArrayList(embedding));
+            } else {
+              embeddings.add(embedding);
+            }
+          }
+        }
+      } else {
+        Set<Integer> edgeIds = Sets.newHashSet();
+
+        for (AdjacencyListEntry entry : adjacencyList.getEntries()) {
+          int edgeId = entry.getEdgeId();
+
+          if (!edgeIds.contains(edgeId)) {
+            int edgeLabel = entry.getEdgeLabel();
+            int toId = entry.getToVertexId();
+            boolean loop = fromId == toId;
+            int toTime = loop ? 0 : 1;
+            int toLabel = entry.getToVertexLabel();
+
+            DFSCode subgraph;
+            DFSEmbedding embedding;
+
+            if (toLabel >= fromLabel) {
+              subgraph = new DFSCode(new UndirectedDFSStep(
+                0, toTime, fromLabel, edgeLabel, toLabel));
+
+              embedding = new DFSEmbedding(
+                loop ?
+                  Lists.newArrayList(fromId) :
+                  Lists.newArrayList(fromId, toId),
+                Lists.newArrayList(edgeId)
+              );
+            } else {
+              subgraph = new DFSCode(new UndirectedDFSStep(
+                0, toTime, toLabel, edgeLabel, fromLabel));
+
+              embedding = new DFSEmbedding(
+                Lists.newArrayList(toId, fromId),
+                Lists.newArrayList(edgeId)
+              );
+            }
+
+            Collection<DFSEmbedding> embeddings =
+              subgraphEmbeddings.get(subgraph);
+
+            if (embeddings == null) {
+              subgraphEmbeddings.put(
+                subgraph, Lists.newArrayList(embedding));
+            } else {
+              embeddings.add(embedding);
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -362,24 +394,21 @@ public class GSpan {
     if (fsmConfig.isDirected()) {
       if (edge.isLoop()) {
         step = new DirectedDFSStep(
-          0, sourceLabel, true, edgeLabel, 0, sourceLabel);
+          0, 0, sourceLabel, true, edgeLabel, sourceLabel);
       } else if (edge.sourceIsMinimumLabel()) {
         step = new DirectedDFSStep(
-          0, sourceLabel, true, edgeLabel, 1, targetLabel);
+          0, 1, sourceLabel, true, edgeLabel, targetLabel);
       } else {
         step = new DirectedDFSStep(
-          0, targetLabel, false, edgeLabel, 1, sourceLabel);
+          0, 1, targetLabel, false, edgeLabel, sourceLabel);
       }
     } else {
       if (edge.isLoop()) {
-        step = new UndirectedDFSStep(
-          0, sourceLabel, edgeLabel, 0, sourceLabel);
+        step = new UndirectedDFSStep(0, 0, sourceLabel, edgeLabel, sourceLabel);
       } else if (edge.sourceIsMinimumLabel()) {
-        step = new UndirectedDFSStep(
-          0, sourceLabel, edgeLabel, 1, targetLabel);
+        step = new UndirectedDFSStep(0, 1, sourceLabel, edgeLabel, targetLabel);
       } else {
-        step = new UndirectedDFSStep(
-          0, targetLabel, edgeLabel, 1, sourceLabel);
+        step = new UndirectedDFSStep(0, 1, targetLabel, edgeLabel, sourceLabel);
       }
     }
 
@@ -470,14 +499,21 @@ public class GSpan {
 
                     if (fsmConfig.isDirected()) {
                       dfsStep = new DirectedDFSStep(
-                        fromVertexTime, fromVertexLabel,
-                        entry.isOutgoing(), entry.getEdgeLabel(),
-                        toVertexTime, toVertexLabel);
+                        fromVertexTime,
+                        toVertexTime,
+                        fromVertexLabel,
+                        entry.isOutgoing(),
+                        entry.getEdgeLabel(),
+                        toVertexLabel
+                      );
                     } else {
                       dfsStep = new UndirectedDFSStep(
-                        fromVertexTime, fromVertexLabel,
+                        fromVertexTime,
+                        toVertexTime,
+                        fromVertexLabel,
                         entry.getEdgeLabel(),
-                        toVertexTime, toVertexLabel);
+                        toVertexLabel
+                      );
                     }
 
                     childCode.getSteps().add(dfsStep);
@@ -589,6 +625,10 @@ public class GSpan {
   public static DFSCode calculateMinDFSCode(
     GSpanGraph graph, FSMConfig fsmConfig) {
 
+    if (graph.getSubgraphEmbeddings().size() == 0) {
+      createSingleEdgeDfsCodes(graph, fsmConfig);
+    }
+
     DFSCode minDfsCode = null;
 
     while (graph.hasGrownSubgraphs()) {
@@ -645,7 +685,7 @@ public class GSpan {
 
     Collection<DFSEmbedding> parentEmbeddings = Lists.newArrayList();
     int fromVertexId = 0;
-    for (AdjacencyList adjacencyList : graph.getAdjacencyLists()) {
+    for (AdjacencyList adjacencyList : graph.getAdjacencyLists().values()) {
       if (step.getFromLabel().equals(adjacencyList.getFromVertexLabel())) {
         for (AdjacencyListEntry entry : adjacencyList.getEntries()) {
           if (step.isOutgoing() == entry.isOutgoing() &&
@@ -717,5 +757,4 @@ public class GSpan {
 
     return !parentEmbeddings.isEmpty();
   }
-
 }

@@ -28,6 +28,7 @@ import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraphHead;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Reads graph imported from a TLF file. The result of the mapping is a
@@ -54,7 +55,7 @@ public class TLFGraphFromText
     char currChar;
 
     TLFGraphHead graphHead = null;
-    Collection<TLFVertex> vertices = Lists.newArrayList();
+    List<TLFVertex> vertices = Lists.newArrayList();
     Collection<TLFEdge> edges = Lists.newArrayList();
 
     do {

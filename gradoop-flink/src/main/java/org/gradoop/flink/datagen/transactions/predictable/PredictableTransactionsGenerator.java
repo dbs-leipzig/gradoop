@@ -105,6 +105,6 @@ public class PredictableTransactionsGenerator implements
    */
   public static long containedUndirectedFrequentSubgraphs(float threshold) {
 
-    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 230L;
+    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 238L;
   }
 }

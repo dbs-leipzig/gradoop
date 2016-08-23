@@ -20,12 +20,13 @@ package org.gradoop.flink.io.impl.tlf.tuples;
 import org.apache.flink.api.java.tuple.Tuple3;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  *  Represents a graph used in a graph generation from TLF-files.
  */
 public class TLFGraph
-  extends Tuple3<TLFGraphHead, Collection<TLFVertex>, Collection<TLFEdge>> {
+  extends Tuple3<TLFGraphHead, List<TLFVertex>, Collection<TLFEdge>> {
 
   /**
    * Symbol identifying a line to represent a graph start.
@@ -45,7 +46,7 @@ public class TLFGraph
    * @param vertices collection containing TLFVertex
    * @param edges collection containing TLFEdge
    */
-  public TLFGraph(TLFGraphHead graphHead, Collection<TLFVertex> vertices,
+  public TLFGraph(TLFGraphHead graphHead, List<TLFVertex> vertices,
     Collection<TLFEdge> edges) {
     super(graphHead, vertices, edges);
   }
@@ -58,15 +59,15 @@ public class TLFGraph
     this.f0 = graphHead;
   }
 
-  public Collection<TLFVertex> getGraphVertices() {
+  public List<TLFVertex> getVertices() {
     return this.f1;
   }
 
-  public void setGraphVertices(Collection<TLFVertex> graphVertices) {
+  public void setGraphVertices(List<TLFVertex> graphVertices) {
     this.f1 = graphVertices;
   }
 
-  public Collection<TLFEdge> getGraphEdges() {
+  public Collection<TLFEdge> getEdges() {
     return this.f2;
   }
 

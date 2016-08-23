@@ -264,7 +264,27 @@ public class PropertyValue
    * @see BigDecimal
    */
   public BigDecimal getBigDecimal() {
-    return Bytes.toBigDecimal(rawBytes, OFFSET, rawBytes.length - OFFSET);
+    BigDecimal decimal;
+
+    if (isBigDecimal()) {
+      decimal = Bytes.toBigDecimal(rawBytes, OFFSET, rawBytes.length - OFFSET);
+    } else if (isFloat()) {
+      decimal = BigDecimal.valueOf(Bytes.toFloat(rawBytes, OFFSET));
+    } else if (isDouble())  {
+      decimal = BigDecimal.valueOf(Bytes.toDouble(rawBytes, OFFSET));
+    } else if (isInt()) {
+      decimal = BigDecimal.valueOf(Bytes.toInt(rawBytes, OFFSET));
+    } else if (isLong()) {
+      decimal = BigDecimal.valueOf(Bytes.toLong(rawBytes, OFFSET));
+    } else if (isString()) {
+      decimal = new BigDecimal(
+        Bytes.toString(rawBytes, OFFSET, rawBytes.length - OFFSET));
+    } else {
+      throw new ClassCastException(
+        "Cannot covert " + this.getType().getSimpleName() +
+          " to " + Double.class.getSimpleName());
+    }
+    return decimal;
   }
 
   //----------------------------------------------------------------------------

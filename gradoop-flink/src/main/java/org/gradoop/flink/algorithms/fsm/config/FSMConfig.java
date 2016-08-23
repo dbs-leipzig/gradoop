@@ -17,7 +17,10 @@
 
 package org.gradoop.flink.algorithms.fsm.config;
 
+import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
+
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * frequent subgraph mining configuration
@@ -51,18 +54,35 @@ public class FSMConfig implements Serializable {
    */
   private int minEdgeCount;
 
+  /**
+   * Configurations required to connect to a Gradoop distributed cache server.
+   */
+  private final DistributedCacheClientConfiguration cacheClientConfiguration;
 
+  /**
+   * Cache session identifier.
+   */
+  private final String session;
+
+  /**
+   * Verbose mode.
+   */
+  private boolean verbose = false;
 
   /**
    * valued constructor
    * @param minSupport minimum relative support of a subgraph
    * @param directed direction mode
+   * @param cacheClientConfiguration cache server configurations
    */
-  public FSMConfig(float minSupport, boolean directed) {
+  public FSMConfig(float minSupport, boolean directed,
+    DistributedCacheClientConfiguration cacheClientConfiguration) {
     this.minSupport = minSupport;
     this.directed = directed;
     this.maxEdgeCount = 1000;
     this.minEdgeCount = 0;
+    this.cacheClientConfiguration = cacheClientConfiguration;
+    this.session = UUID.randomUUID().toString();
   }
 
   public float getMinSupport() {
@@ -95,5 +115,21 @@ public class FSMConfig implements Serializable {
 
   public void setLikelinessThreshold(float likelinessThreshold) {
     this.likelinessThreshold = likelinessThreshold;
+  }
+
+  public DistributedCacheClientConfiguration getCacheClientConfiguration() {
+    return cacheClientConfiguration;
+  }
+
+  public boolean isVerbose() {
+    return verbose;
+  }
+
+  public void setVerbose(boolean verbose) {
+    this.verbose = verbose;
+  }
+
+  public String getSession() {
+    return session;
   }
 }

@@ -303,4 +303,29 @@ public class GradoopTestUtils {
         return o1.getId().compareTo(o2.getId());
       }
     };
+
+  public static <T> boolean equalContent(
+    Collection<T> col1, Collection<T> col2) {
+
+    boolean equal = col1.size() == col2.size();
+
+    if (equal) {
+      for (T val : col1) {
+        equal = col2.contains(val);
+        if (!equal) {
+          break;
+        }
+      }
+      if (equal) {
+        for (T val : col2) {
+          equal = col1.contains(val);
+          if (!equal) {
+            break;
+          }
+        }
+      }
+    }
+
+    return equal;
+  }
 }

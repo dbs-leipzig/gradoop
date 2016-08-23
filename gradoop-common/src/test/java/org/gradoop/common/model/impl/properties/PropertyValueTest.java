@@ -1,8 +1,9 @@
 package org.gradoop.common.model.impl.properties;
 
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -13,6 +14,50 @@ import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.junit.Assert.*;
 
 public class PropertyValueTest {
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
+
+  @Test
+  public void testBigDecimalConversion() {
+    PropertyValue property;
+    BigDecimal decimalValue;
+
+    // INT
+    property = create(INT_VAL_2);
+    decimalValue = BigDecimal.valueOf(INT_VAL_2);
+    assertEquals(decimalValue, property.getBigDecimal());
+
+    // LONG
+    property = create(LONG_VAL_3);
+    decimalValue = BigDecimal.valueOf(LONG_VAL_3);
+    assertEquals(decimalValue, property.getBigDecimal());
+
+    // FLOAT
+    property = create(FLOAT_VAL_4);
+    decimalValue = BigDecimal.valueOf(FLOAT_VAL_4);
+    assertEquals(decimalValue, property.getBigDecimal());
+
+    // DOUBLE
+    property = create(DOUBLE_VAL_5);
+    decimalValue = BigDecimal.valueOf(DOUBLE_VAL_5);
+    assertEquals(decimalValue, property.getBigDecimal());
+
+    // STRING
+    property = create("-3.5");
+    decimalValue = new BigDecimal("-3.5");
+    assertEquals(decimalValue, property.getBigDecimal());
+
+    exception.expect(NumberFormatException.class);
+    property = create("No Number");
+    property.getBigDecimal();
+  }
+
+  @Test
+  public void testFailedBigDecimalConversion() {
+    exception.expect(ClassCastException.class);
+    create(BOOL_VAL_1).getBigDecimal();
+  }
 
   @Test
   public void testCreate() throws Exception {

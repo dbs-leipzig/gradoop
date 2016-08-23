@@ -23,17 +23,16 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.cache.DistributedCache;
+import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.EncodeTLFGraphs;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.IterativeGSpan;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
-import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanMiner;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.GSpanTLFGraphEncoder;
-import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
-import org.gradoop.flink.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
+
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -128,27 +127,16 @@ public class TransactionalFSMBenchmark extends AbstractRunner
     // create input dataset
     DataSet<TLFGraph> graphs = tlfSource.getTLFGraphs();
 
+    DistributedCacheServer cacheServer = DistributedCache.getServer();
+
     // set config for synthetic or real world dataset
-    FSMConfig fsmConfig = new FSMConfig(threshold, directed);
-
-    // set encoder
-    GSpanEncoder encoder = new GSpanTLFGraphEncoder(fsmConfig);
-
-    // set miner
-    GSpanMiner miner;
-
-    miner = implementation.equals("it") ?
-      new GSpanBulkIteration() :
-      new GSpanFilterRefine();
-
-    miner.setExecutionEnvironment(getExecutionEnvironment());
-
-    // encode
-    DataSet<GSpanGraph> gsGraph = encoder.encode(graphs, fsmConfig);
+    FSMConfig fsmConfig = new FSMConfig(threshold, directed,
+      cacheServer.getCacheClientConfiguration());
 
     // mine
-    DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs =
-      miner.mine(gsGraph, encoder.getMinFrequency(), fsmConfig);
+    DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs = graphs
+      .mapPartition(new EncodeTLFGraphs(fsmConfig))
+      .mapPartition(new IterativeGSpan(fsmConfig));
 
     // write statistics
     writeCSV(inputPath, directed, implementation , threshold, logPath,

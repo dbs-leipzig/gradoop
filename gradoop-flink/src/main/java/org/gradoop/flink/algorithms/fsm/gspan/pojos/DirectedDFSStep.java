@@ -31,17 +31,16 @@ public class DirectedDFSStep extends DFSStepBase {
 
   /**
    * Constructor
-   *
    * @param fromTime discovery time of traversal start vertex
+   * @param toTime discovery time of traversal end vertex
    * @param fromLabel label of traversal start vertex
    * @param outgoing true, if edge was traversed in direction
    * @param edgeLabel label of the traversed edge
-   * @param toTime discovery time of traversal end vertex
    * @param toLabel label of traversal end vertex
    */
-  public DirectedDFSStep(int fromTime, Integer fromLabel, Boolean outgoing,
-    Integer edgeLabel, int toTime, Integer toLabel) {
-    super(fromLabel, edgeLabel, toLabel, toTime, fromTime);
+  public DirectedDFSStep(int fromTime, int toTime, Integer fromLabel,
+    Boolean outgoing, Integer edgeLabel, Integer toLabel) {
+    super(fromTime, toTime, fromLabel, edgeLabel, toLabel);
     this.outgoing = outgoing;
   }
 

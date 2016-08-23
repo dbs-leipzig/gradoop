@@ -19,18 +19,17 @@ package org.gradoop.flink.algorithms.fsm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.config.TransactionalFSMAlgorithm;
-import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanEncoder;
-import org.gradoop.flink.algorithms.fsm.gspan.api.GSpanMiner;
-import org.gradoop.flink.algorithms.fsm.gspan.decoders.GSpanGraphCollectionDecoder;
-import org.gradoop.flink.algorithms.fsm.gspan.encoders.GSpanGraphCollectionEncoder;
-import org.gradoop.flink.algorithms.fsm.gspan.miners.bulkiteration.GSpanBulkIteration;
-import org.gradoop.flink.algorithms.fsm.gspan.miners.filterrefine.GSpanFilterRefine;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.DecodeDFSCodes;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.EncodeTransactions;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.IterativeGSpan;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * abstract superclass of different implementations of the gSpan frequent
@@ -42,64 +41,43 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
    * frequent subgraph mining configuration
    */
   protected final FSMConfig fsmConfig;
-  /**
-   * input encoder (pre processing)
-   */
-  private final GSpanEncoder<GraphCollection> encoder;
-  /**
-   * FSM implementation (actual algorithm)
-   */
-  private GSpanMiner miner;
 
   /**
    * constructor
    * @param fsmConfig frequent subgraph mining configuration
-   * @param algorithm FSM implementation
+   *
    */
-  public TransactionalFSM(FSMConfig fsmConfig, TransactionalFSMAlgorithm
-    algorithm) {
+  public TransactionalFSM(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
-    this.encoder = new GSpanGraphCollectionEncoder(fsmConfig) {
-    };
-    setMiner(algorithm);
   }
 
   @Override
-  public GraphCollection execute(
-    GraphCollection collection)  {
+  public GraphCollection execute(GraphCollection collection)  {
+    GradoopFlinkConfig gradoopFlinkConfig = collection.getConfig();
 
-    miner.setExecutionEnvironment(
-      collection.getConfig().getExecutionEnvironment());
+    // create transactions from graph collection
+    DataSet<GraphTransaction> transactions = collection
+      .toTransactions()
+      .getTransactions();
 
-    GSpanGraphCollectionDecoder decoder = new GSpanGraphCollectionDecoder(
-      collection.getConfig());
+    // dictionary encoding
+    DataSet<GSpanGraph> encodedTransactions = transactions
+      .mapPartition(new EncodeTransactions(fsmConfig));
 
-    DataSet<GSpanGraph> graphs = encoder.encode(collection, fsmConfig);
+    // find frequent subgraphs
+    DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs =
+      encodedTransactions.mapPartition(new IterativeGSpan(fsmConfig));
 
-    DataSet<WithCount<CompressedDFSCode>> frequentDfsCodes = miner
-      .mine(graphs, encoder.getMinFrequency(), fsmConfig);
-
-    return decoder.decode(
-      frequentDfsCodes,
-      encoder.getVertexLabelDictionary(),
-      encoder.getEdgeLabelDictionary()
+    // dictionary decoding
+    transactions = frequentSubgraphs.mapPartition(new DecodeDFSCodes(
+      fsmConfig,
+      gradoopFlinkConfig.getGraphHeadFactory(),
+      gradoopFlinkConfig.getVertexFactory(),
+      gradoopFlinkConfig.getEdgeFactory())
     );
-  }
 
-  /**
-   * sets FSM implementation by a given enum
-   * @param algorithm enum
-   */
-  private void setMiner(TransactionalFSMAlgorithm algorithm) {
-
-    switch (algorithm) {
-    case GSPAN_FILTERREFINE:
-      miner = new GSpanFilterRefine();
-      break;
-    default:
-      miner = new GSpanBulkIteration();
-      break;
-    }
+    return GraphCollection.fromTransactions(
+      new GraphTransactions(transactions, gradoopFlinkConfig));
   }
 
   @Override
