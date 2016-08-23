@@ -8,6 +8,6 @@ public class NetworkHelperTest {
   @Test
   public void getLocalHost() throws Exception {
     assertFalse(
-      NetworkHelper.getLocalHost().equals(NetworkHelper.BAD_LOCAL_HOST));
+      NetworkHelper.getLocalHost().equals(NetworkHelper.LOCAL_HOST));
   }
 }

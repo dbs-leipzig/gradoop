@@ -24,7 +24,8 @@ public class DistributedCacheTest {
   @Test
   public void testRead() throws InterruptedException {
     DistributedCacheClient client =
-      DistributedCache.getClient(server.getCacheClientConfiguration(), "read");
+      DistributedCache
+        .getClient(server.getCacheClientConfiguration(), "read");
 
     String key = "Hello";
     List<String> in = Lists.newArrayList("Distributed", "Cache");
@@ -38,7 +39,8 @@ public class DistributedCacheTest {
   @Test
   public void testWrite() throws InterruptedException {
     DistributedCacheClient client =
-      DistributedCache.getClient(server.getCacheClientConfiguration(), "write");
+      DistributedCache
+        .getClient(server.getCacheClientConfiguration(), "write");
 
     String key = "World";
     List<String> in = Lists.newArrayList("Distributed", "Cache");

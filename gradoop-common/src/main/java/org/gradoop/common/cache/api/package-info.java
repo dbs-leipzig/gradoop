@@ -15,19 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.common.cache.api;
-
-import java.io.Serializable;
-
 /**
- * Describes the configurations required to connect to a distributed cache
- * server.
+ * Contains interfaces related to the Gradoop distributed cache.
  */
-public interface DistributedCacheClientConfiguration extends Serializable {
-  /**
-   * Returns the cache server's IP address.
-   *
-   * @return IP address
-   */
-  String getServerAddress();
-}
+package org.gradoop.common.cache.api;
