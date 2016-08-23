@@ -142,28 +142,29 @@ public class FrequentLossPatterns
     // (6) mine frequent subgraphs
 
     FSMConfig fsmConfig = new FSMConfig(
-      0.65f, true, cacheServer.getCacheClientConfiguration());
+      0.6f, true, cacheServer.getCacheClientConfiguration());
 
     GraphCollection frequentSubgraphs = btgs.callForCollection(
       new TransactionalFSM(fsmConfig)
     );
 
-    // (7) relabel graph heads of frequent subgraphs
+    // (7) Check, if frequent subgraph contains master data
+
+    frequentSubgraphs = frequentSubgraphs.apply(
+      new ApplyAggregation(MASTERDATA_KEY, new DetermineMasterDataSurplus()));
+
+    // (8) Select graphs containing master data
+
+    frequentSubgraphs = frequentSubgraphs.select(new ContainsMasterData());
+
+
+    // (9) relabel graph heads of frequent subgraphs
 
     frequentSubgraphs = frequentSubgraphs.apply(new ApplyTransformation(
       new AddSupportToGraphHead(),
       new Keep<Vertex>(),
       new Keep<Edge>()
     ));
-
-    // (8) Check, if frequent subgraph contains master data
-
-    frequentSubgraphs = frequentSubgraphs.apply(
-      new ApplyAggregation(MASTERDATA_KEY, new DetermineMasterDataSurplus()));
-
-    // (9) Select graphs containing master data
-
-    frequentSubgraphs = frequentSubgraphs.select(new ContainsMasterData());
 
     // (10) write data sink
 
@@ -322,7 +323,7 @@ public class FrequentLossPatterns
 
     @Override
     public boolean filter(GraphHead value) throws Exception {
-      return value.getPropertyValue(MASTERDATA_KEY).getInt() > 0;
+      return value.getPropertyValue(MASTERDATA_KEY).getInt() >= 0;
     }
   }
 
@@ -400,6 +401,7 @@ public class FrequentLossPatterns
       String newLabel = current.getLabel() + " (" + support + ")";
 
       transformed.setLabel(newLabel);
+      transformed.setProperties(null);
 
       return transformed;
     }
