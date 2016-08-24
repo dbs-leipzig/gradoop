@@ -19,58 +19,103 @@ package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.functions.VertexAndEdgeAggregateFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateEdges;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateVertices;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionApplyAggregates;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.LeftOuterPropertySetter;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Takes a collection of logical graphs and a user defined aggregate function as
- * input. The aggregate function is applied on each logical graph contained in
- * the collection and the aggregate is stored as an additional property at the
+ * Takes a collection of logical graphs and a user defined getVertexIncrement function as
+ * input. The getVertexIncrement function is applied on each logical graph contained in
+ * the collection and the getVertexIncrement is stored as an additional property at the
  * graphs.
  */
-public class ApplyAggregation implements ApplicableUnaryGraphToGraphOperator {
+public class ApplyAggregation
+  implements ApplicableUnaryGraphToGraphOperator {
 
   /**
-   * Used to store aggregate result.
+   * User-defined getVertexIncrement function which is applied on a graph collection.
    */
-  private final String aggregatePropertyKey;
-
-  /**
-   * User-defined aggregate function which is applied on a graph collection.
-   */
-  private final ApplyAggregateFunction aggregateFunction;
+  private final AggregateFunction aggregateFunction;
 
   /**
    * Creates a new operator instance.
    *
-   * @param aggregatePropertyKey  property key to store aggregate value
-   * @param aggregateFunction     function to compute aggregate value
+   * @param aggregateFunction     function to compute getVertexIncrement value
    */
-  public ApplyAggregation(final String aggregatePropertyKey,
-    final ApplyAggregateFunction aggregateFunction) {
-    this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
+  public ApplyAggregation(final AggregateFunction aggregateFunction) {
     this.aggregateFunction = checkNotNull(aggregateFunction);
   }
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
-    DataSet<Tuple2<GradoopId, PropertyValue>> aggregateValues =
-      aggregateFunction.execute(collection);
+    DataSet<Vertex> vertices = collection.getVertices();
+    DataSet<Edge> edges = collection.getEdges();
+
+    DataSet<Tuple2<GradoopId, PropertyValue>> aggregateValues;
+
+    if (this.aggregateFunction instanceof VertexAggregateFunction &&
+      this.aggregateFunction instanceof EdgeAggregateFunction) {
+
+      VertexAndEdgeAggregateFunction aggregateFunction =
+        (VertexAndEdgeAggregateFunction) this.aggregateFunction;
+
+      DataSet<Tuple2<GradoopId, PropertyValue>> vertexAggregateValues = vertices
+        .flatMap(new GraphElementExpander<Vertex>())
+        .groupBy(0)
+        .combineGroup(new ApplyAggregateVertices(aggregateFunction));
+
+      DataSet<Tuple2<GradoopId, PropertyValue>> edgeAggregateValues = edges
+        .flatMap(new GraphElementExpander<Edge>())
+        .groupBy(0)
+        .combineGroup(new ApplyAggregateEdges(aggregateFunction));
+
+      aggregateValues = vertexAggregateValues
+        .union(edgeAggregateValues)
+        .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
+
+    } else if (this.aggregateFunction instanceof VertexAggregateFunction) {
+
+      VertexAggregateFunction aggregateFunction =
+        (VertexAggregateFunction) this.aggregateFunction;
+
+      aggregateValues = vertices
+        .flatMap(new GraphElementExpander<Vertex>())
+        .groupBy(0)
+        .combineGroup(new ApplyAggregateVertices(aggregateFunction))
+        .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
+
+    } else {
+      EdgeAggregateFunction aggregateFunction =
+        (EdgeAggregateFunction) this.aggregateFunction;
+
+      aggregateValues = edges
+        .flatMap(new GraphElementExpander<Edge>())
+        .groupBy(0)
+        .combineGroup(new ApplyAggregateEdges(aggregateFunction))
+        .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
+    }
 
     DataSet<GraphHead> graphHeads = collection.getGraphHeads()
       .coGroup(aggregateValues)
       .where(new Id<GraphHead>()).equalTo(0)
-      .with(new LeftOuterPropertySetter<GraphHead>(
-        aggregatePropertyKey,
-        PropertyValue.create(aggregateFunction.getDefaultValue())));
+      .with(new LeftOuterPropertySetter<GraphHead>
+        (aggregateFunction.getAggregatePropertyKey()));
 
     return GraphCollection.fromDataSets(graphHeads,
       collection.getVertices(),

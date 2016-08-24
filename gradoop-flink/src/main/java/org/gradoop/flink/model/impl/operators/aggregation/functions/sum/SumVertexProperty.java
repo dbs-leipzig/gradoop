@@ -17,65 +17,44 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateWithDefaultValueFunction;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValues;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
  * Aggregate function returning the sum of a specified property over all
  * vertices.
  */
-public class SumVertexProperty extends AggregateWithDefaultValueFunction {
+public class SumVertexProperty implements VertexAggregateFunction {
 
   /**
-   * Property key to retrieve property values
+   * Property key whose value should be aggregated.
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
-   * Constructor
-   * @param propertyKey Property key to retrieve property values
-   * @param zero user defined zero element, used as default property value
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
    */
-  public SumVertexProperty(
-    String propertyKey,
-    Number zero) {
-    super(zero);
+  public SumVertexProperty(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
-  /**
-   * Returns a 1-element dataset containing the sum of the given property
-   * over the given elements.
-   *
-   * @param graph input graph
-   * @return 1-element dataset with vertex count
-   */
   @Override
-  public DataSet<PropertyValue> execute(LogicalGraph graph) {
-    return Sum.sum(
-      graph.getVertices(),
-      propertyKey,
-      getDefaultValue());
+  public PropertyValue getVertexIncrement(Vertex vertex) {
+    return vertex.getPropertyValue(propertyKey);
   }
 
-  /**
-   * Returns a dataset containing graph identifiers and the corresponding edge
-   * sum.
-   *
-   * @param collection input graph collection
-   * @return dataset with graph + edge count tuples
-   */
   @Override
-  public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection collection) {
-    return Sum.groupBy(
-      collection.getVertices(),
-      propertyKey,
-      getDefaultValue());
+  public PropertyValue aggregate(
+    PropertyValue aggregate, PropertyValue increment) {
+    return PropertyValues.add(aggregate, increment);
+  }
+
+  @Override
+  public String getAggregatePropertyKey() {
+    return "SUM(" + propertyKey + ")";
   }
 }

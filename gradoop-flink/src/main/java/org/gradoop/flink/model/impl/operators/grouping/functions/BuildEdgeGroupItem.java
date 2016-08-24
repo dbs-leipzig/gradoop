@@ -46,7 +46,7 @@ public class BuildEdgeGroupItem extends BuildBase implements
    *
    * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be used
-   * @param edgeAggregators   aggregate functions for super edges
+   * @param edgeAggregators   getVertexIncrement functions for super edges
    */
   public BuildEdgeGroupItem(List<String> groupPropertyKeys,
     boolean useLabel, List<PropertyValueAggregator> edgeAggregators) {

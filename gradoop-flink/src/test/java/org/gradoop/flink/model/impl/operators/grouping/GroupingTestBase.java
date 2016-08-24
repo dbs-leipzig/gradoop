@@ -828,7 +828,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   }
 
   //----------------------------------------------------------------------------
-  // Tests for aggregate functions
+  // Tests for getVertexIncrement functions
   //----------------------------------------------------------------------------
 
   @Test

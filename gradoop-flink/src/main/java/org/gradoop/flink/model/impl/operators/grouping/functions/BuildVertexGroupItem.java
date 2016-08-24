@@ -31,7 +31,7 @@ import java.util.List;
  * Creates a minimal representation of vertex data to be used for grouping.
  *
  * The output of that mapper is {@link VertexGroupItem} that contains
- * the vertex id, vertex label, vertex group properties and vertex aggregate
+ * the vertex id, vertex label, vertex group properties and vertex getVertexIncrement
  * properties.
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
@@ -49,7 +49,7 @@ public class BuildVertexGroupItem extends BuildBase implements
    *
    * @param groupPropertyKeys vertex property keys
    * @param useLabel          true, if label shall be considered
-   * @param vertexAggregators aggregate functions for super vertices
+   * @param vertexAggregators getVertexIncrement functions for super vertices
    */
   public BuildVertexGroupItem(List<String> groupPropertyKeys,
     boolean useLabel, List<PropertyValueAggregator> vertexAggregators) {

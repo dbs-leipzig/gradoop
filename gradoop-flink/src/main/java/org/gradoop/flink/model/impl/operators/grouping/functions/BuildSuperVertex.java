@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
- * group label, the group property value and the aggregate values for its group.
+ * group label, the group property value and the getVertexIncrement values for its group.
  */
 @FunctionAnnotation.ForwardedFields("f1->id")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4")
@@ -49,7 +49,7 @@ public class BuildSuperVertex extends BuildBase implements
    *
    * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be considered
-   * @param valueAggregators  aggregate functions for vertex values
+   * @param valueAggregators  getVertexIncrement functions for vertex values
    * @param vertexFactory     vertex factory
    */
   public BuildSuperVertex(List<String> groupPropertyKeys,

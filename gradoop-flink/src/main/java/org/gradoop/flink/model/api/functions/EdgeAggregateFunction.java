@@ -15,31 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
+package org.gradoop.flink.model.api.functions;
 
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
 /**
- * Aggregate function returning the vertex count of a graph / graph collection.
+ * Describes an getVertexIncrement function as input for the
+ * {@link Aggregation} operator, where only edge values are aggregated.
  */
-public class EdgeCount implements EdgeAggregateFunction {
+public interface EdgeAggregateFunction extends AggregateFunction {
 
-  @Override
-  public PropertyValue getEdgeIncrement(Edge edge) {
-    return PropertyValue.create(1L);
-  }
+  PropertyValue getEdgeIncrement(Edge edge);
 
-  @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate,  PropertyValue increment) {
-    return PropertyValues.add(aggregate, increment);
-  }
-
-  @Override
-  public String getAggregatePropertyKey() {
-    return "edgeCount";
-  }
 }

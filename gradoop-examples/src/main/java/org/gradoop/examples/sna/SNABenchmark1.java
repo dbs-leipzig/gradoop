@@ -97,8 +97,8 @@ public class SNABenchmark1 extends AbstractRunner implements
           }
         })
       .groupBy(Lists.newArrayList("gender", "city"))
-      .aggregate("vertexCount", new VertexCount())
-      .aggregate("edgeCount", new EdgeCount());
+      .aggregate(new VertexCount())
+      .aggregate(new EdgeCount());
   }
 
   @Override

@@ -30,12 +30,12 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <EL> graph element type
  */
 public class GraphElementExpander<EL extends GraphElement> implements
-  FlatMapFunction<EL, Tuple2<GradoopId, GraphElement>> {
+  FlatMapFunction<EL, Tuple2<GradoopId, EL>> {
 
   /**
    * reuse tuple
    */
-  private  Tuple2<GradoopId, GraphElement> reuse;
+  private Tuple2<GradoopId, EL> reuse;
 
   /**
    * constructor
@@ -46,7 +46,7 @@ public class GraphElementExpander<EL extends GraphElement> implements
 
   @Override
   public void flatMap(EL el, Collector
-    <Tuple2<GradoopId, GraphElement>> collector) throws Exception {
+    <Tuple2<GradoopId, EL>> collector) throws Exception {
     for (GradoopId graphId : el.getGraphIds()) {
       reuse.f0 = graphId;
       reuse.f1 = el;

@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * Creates a new super edge representing an edge group. The edge stores the
- * group label, the group property value and the aggregate values for its group.
+ * group label, the group property value and the getVertexIncrement values for its group.
  */
 @FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId")
 public class ReduceEdgeGroupItems extends BuildSuperEdge
@@ -50,7 +50,7 @@ public class ReduceEdgeGroupItems extends BuildSuperEdge
    *
    * @param groupPropertyKeys edge property keys
    * @param useLabel          use edge label
-   * @param valueAggregators  aggregate functions for edge values
+   * @param valueAggregators  getVertexIncrement functions for edge values
    * @param edgeFactory       edge factory
    */
   public ReduceEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,

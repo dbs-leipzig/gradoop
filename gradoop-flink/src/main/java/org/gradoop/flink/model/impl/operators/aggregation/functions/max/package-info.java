@@ -16,6 +16,6 @@
  */
 
 /**
- * aggregate functions
+ * getIncrement functions
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;

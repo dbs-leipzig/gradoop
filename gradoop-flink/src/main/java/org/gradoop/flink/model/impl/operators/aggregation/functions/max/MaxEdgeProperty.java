@@ -17,63 +17,44 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateWithDefaultValueFunction;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValues;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
- * Aggregate function returning the maximum of a specified property over all
- * edges.
+ * Aggregate function returning the minimum of a specified property over all
+ * vertices.
  */
-public class MaxEdgeProperty extends AggregateWithDefaultValueFunction {
+public class MaxEdgeProperty implements EdgeAggregateFunction {
 
   /**
-   * Property key to retrieve property values
+   * Property key whose value should be aggregated.
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
-   * Constructor
-   * @param propertyKey Property key to retrieve property values
-   * @param min user defined minimum, used as default property value
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
    */
-  public MaxEdgeProperty(
-    String propertyKey,
-    Number min) {
-    super(min);
+  public MaxEdgeProperty(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
-  /**
-   * Returns a 1-element dataset containing the maximum of the given property
-   * over the given elements.
-   *
-   * @param graph input graph
-   * @return 1-element dataset with vertex count
-   */
   @Override
-  public DataSet<PropertyValue> execute(LogicalGraph graph) {
-    return Max.max(graph.getEdges(),
-      propertyKey,
-      getDefaultValue());
+  public PropertyValue getEdgeIncrement(Edge edge) {
+    return edge.getPropertyValue(propertyKey);
   }
 
-  /**
-   * Returns a dataset containing graph identifiers and the corresponding edge
-   * maximum.
-   *
-   * @param collection input graph collection
-   * @return dataset with graph + edge count tuples
-   */
   @Override
-  public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection collection) {
-    return Max.groupBy(collection.getEdges(),
-      propertyKey,
-      getDefaultValue());
+  public PropertyValue aggregate(
+    PropertyValue aggregate, PropertyValue increment) {
+    return PropertyValues.max(aggregate, increment);
+  }
+
+  @Override
+  public String getAggregatePropertyKey() {
+    return "MAX("+propertyKey+")";
   }
 }

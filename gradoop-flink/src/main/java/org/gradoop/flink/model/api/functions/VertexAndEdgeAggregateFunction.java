@@ -15,7 +15,14 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.api.functions;
+
+import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
+
 /**
- * getIncrement functions
+ * Describes an getVertexIncrement function as input for the
+ * {@link Aggregation} operator, where vertex and edge values are aggregated.
  */
-package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
+public interface VertexAndEdgeAggregateFunction
+  extends VertexAggregateFunction, EdgeAggregateFunction {
+}

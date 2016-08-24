@@ -38,7 +38,7 @@ abstract class BuildSuperEdge extends BuildBase {
    *
    * @param groupPropertyKeys edge property keys
    * @param useLabel          use edge label
-   * @param valueAggregators  aggregate functions for edge values
+   * @param valueAggregators  getVertexIncrement functions for edge values
    */
   public BuildSuperEdge(List<String> groupPropertyKeys,
     boolean useLabel,

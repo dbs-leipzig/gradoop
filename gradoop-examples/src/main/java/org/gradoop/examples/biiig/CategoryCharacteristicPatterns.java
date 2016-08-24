@@ -72,13 +72,12 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
       .callForCollection(new BusinessTransactionGraphs());
 
     btgs = btgs
-      .apply(new ApplyAggregation("isClosed", new IsClosedAggregateFunction()));
+      .apply(new ApplyAggregation(new IsClosedAggregateFunction()));
 
     btgs = btgs.select(new IsClosedPredicateFunction());
 
     btgs = btgs
-      .apply(new ApplyAggregation(
-        "soCount", new CountSalesOrdersAggregateFunction()));
+      .apply(new ApplyAggregation(new CountSalesOrdersAggregateFunction()));
 
     out.add("Business Transaction Graphs with Measures", btgs);
 

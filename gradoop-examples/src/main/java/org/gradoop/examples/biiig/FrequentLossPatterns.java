@@ -125,8 +125,8 @@ public class FrequentLossPatterns
     GraphCollection btgs = iig
       .callForCollection(new BusinessTransactionGraphs());
 
-    // (3) aggregate financial result
-    btgs = btgs.apply(new ApplyAggregation(RESULT_KEY, new Result()));
+    // (3) getVertexIncrement financial result
+    btgs = btgs.apply(new ApplyAggregation(new Result()));
 
     // (4) filter by loss (negative financialResult)
     btgs = btgs.select(new Loss());
@@ -151,7 +151,7 @@ public class FrequentLossPatterns
     // (7) Check, if frequent subgraph contains master data
 
     frequentSubgraphs = frequentSubgraphs.apply(
-      new ApplyAggregation(MASTERDATA_KEY, new DetermineMasterDataSurplus()));
+      new ApplyAggregation(new DetermineMasterDataSurplus()));
 
     // (8) Select graphs containing master data
 

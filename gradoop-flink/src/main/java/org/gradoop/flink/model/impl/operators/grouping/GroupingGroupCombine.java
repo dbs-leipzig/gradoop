@@ -65,7 +65,7 @@ import java.util.List;
  *    vertex id.
  * 7) Updated edges are grouped by source and target id and optionally by label
  *    and/or edge property.
- * 8) Group combine on the workers and compute aggregate.
+ * 8) Group combine on the workers and compute getVertexIncrement.
  * 9) Group reduce globally and create final super edges.
  */
 public class GroupingGroupCombine extends Grouping {
@@ -75,10 +75,10 @@ public class GroupingGroupCombine extends Grouping {
    *
    * @param vertexGroupingKeys property keys to group vertices
    * @param useVertexLabels    group on vertex label true/false
-   * @param vertexAggregators  aggregate functions for grouped vertices
+   * @param vertexAggregators  getVertexIncrement functions for grouped vertices
    * @param edgeGroupingKeys   property keys to group edges
    * @param useEdgeLabels      group on edge label true/false
-   * @param edgeAggregators    aggregate functions for grouped edges
+   * @param edgeAggregators    getVertexIncrement functions for grouped edges
    */
   GroupingGroupCombine(List<String> vertexGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> vertexAggregators,
@@ -98,7 +98,7 @@ public class GroupingGroupCombine extends Grouping {
     DataSet<VertexGroupItem> combinedVertexGroupItems =
       // group vertices by label / properties / both
       groupVertices(verticesForGrouping)
-        // apply aggregate function per combined partition
+        // apply getVertexIncrement function per combined partition
         .combineGroup(new CombineVertexGroupItems(
           useVertexLabels(), getVertexAggregators()));
 

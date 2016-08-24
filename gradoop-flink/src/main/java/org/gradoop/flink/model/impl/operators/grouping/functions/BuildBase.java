@@ -66,7 +66,7 @@ abstract class BuildBase implements Serializable {
    *
    * @param groupPropertyKeys property keys used for grouping
    * @param useLabel          true, if element label shall be used for grouping
-   * @param valueAggregators  aggregate functions for super elements
+   * @param valueAggregators  getVertexIncrement functions for super elements
    */
   protected BuildBase(List<String> groupPropertyKeys,
     boolean useLabel, List<PropertyValueAggregator> valueAggregators) {
@@ -207,7 +207,7 @@ abstract class BuildBase implements Serializable {
   }
 
   /**
-   * Add the given values to the corresponding aggregate.
+   * Add the given values to the corresponding getVertexIncrement.
    *
    * @param values property values
    */
@@ -224,9 +224,9 @@ abstract class BuildBase implements Serializable {
   }
 
   /**
-   * Returns the current aggregate values from the aggregators.
+   * Returns the current getVertexIncrement values from the aggregators.
    *
-   * @return aggregate values
+   * @return getVertexIncrement values
    */
   protected PropertyValueList getAggregateValues() throws IOException {
     PropertyValueList result;
@@ -244,7 +244,7 @@ abstract class BuildBase implements Serializable {
   }
 
   /**
-   * Sets the final aggregate value as a new property at the given element. The
+   * Sets the final getVertexIncrement value as a new property at the given element. The
    * values are fetched from the internal aggregators.
    *
    * @param element attributed element
@@ -263,7 +263,7 @@ abstract class BuildBase implements Serializable {
    * Sets the given property values as new properties at the given element.
    *
    * @param element attributed element
-   * @param values  aggregate values
+   * @param values  getVertexIncrement values
    */
   protected void setAggregateValues(
     EPGMAttributed element, PropertyValueList values) {

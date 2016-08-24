@@ -24,20 +24,20 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Describes an aggregate function that can be applied on a collection of graphs
- * and computes an aggregate value for each graph contained in the collection.
+ * Describes an getVertexIncrement function that can be applied on a collection of graphs
+ * and computes an getVertexIncrement value for each graph contained in the collection.
  *
  * @see ApplyAggregateFunction
  */
 public interface ApplyAggregateFunction {
 
   /**
-   * Defines the aggregate function. The input is a graph collection, the output
+   * Defines the getVertexIncrement function. The input is a graph collection, the output
    * contains a tuple for each graph contained in the collection. The tuple
-   * holds the graph identifier and the associated aggregate value (e.g. count).
+   * holds the graph identifier and the associated getVertexIncrement value (e.g. count).
    *
    * @param collection input graph collection
-   * @return data set containing graph id + aggregate tuples
+   * @return data set containing graph id + getVertexIncrement tuples
    */
   DataSet<Tuple2<GradoopId, PropertyValue>> execute(GraphCollection collection);
 

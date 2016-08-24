@@ -31,7 +31,7 @@ public abstract class PropertyValueAggregator
    * Creates a new aggregator
    *
    * @param propertyKey           used to fetch property value from elements
-   * @param aggregatePropertyKey  used to store the final aggregate value
+   * @param aggregatePropertyKey  used to store the final getVertexIncrement value
    */
   protected PropertyValueAggregator(String propertyKey,
     String aggregatePropertyKey) {

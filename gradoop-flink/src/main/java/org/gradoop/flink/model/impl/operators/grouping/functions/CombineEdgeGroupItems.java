@@ -36,7 +36,7 @@ public class CombineEdgeGroupItems
    *
    * @param groupPropertyKeys edge property keys
    * @param useLabel          use edge label
-   * @param valueAggregators  aggregate functions for edge values
+   * @param valueAggregators  getVertexIncrement functions for edge values
    */
   public CombineEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
     List<PropertyValueAggregator> valueAggregators) {

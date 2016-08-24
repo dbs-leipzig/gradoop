@@ -17,23 +17,16 @@
 
 package org.gradoop.flink.model.api.functions;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
+import java.io.Serializable;
+
 /**
- * Describes an aggregate function as input for the
+ * Marker interface for getVertexIncrement functions as input for the
  * {@link Aggregation} operator.
  */
-public interface AggregateFunction {
-
-  /**
-   * Defines the aggregate function.
-   *
-   * @param graph input graph
-   * @return aggregated value as 1-element dataset
-   */
-  DataSet<PropertyValue> execute(LogicalGraph graph);
-
+public interface AggregateFunction extends Serializable {
+  PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment);
+  String getAggregatePropertyKey();
 }

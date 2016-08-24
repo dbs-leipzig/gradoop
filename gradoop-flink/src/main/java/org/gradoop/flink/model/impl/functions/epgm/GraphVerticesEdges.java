@@ -17,9 +17,11 @@
 
 package org.gradoop.flink.model.impl.functions.epgm;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.hadoop.yarn.webapp.hamlet.HamletSpec;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -36,8 +38,27 @@ public class GraphVerticesEdges implements JoinFunction<
 
   @Override
   public Tuple3<GradoopId, Set<Vertex>, Set<Edge>> join(
-    Tuple2<GradoopId, Set<Vertex>> vertices, Tuple2<GradoopId, Set<Edge>> edges)
-      throws Exception {
-    return new Tuple3<>(vertices.f0, vertices.f1, edges.f1);
+    Tuple2<GradoopId, Set<Vertex>> vertexPair,
+    Tuple2<GradoopId, Set<Edge>> edgePair) throws Exception {
+
+    GradoopId graphId;
+    Set<Vertex> vertices;
+    Set<Edge> edges;
+
+    if (vertexPair.f0 == null) {
+      graphId = edgePair.f0;
+      vertices = Sets.newHashSetWithExpectedSize(0);
+      edges = getEmptyEdgeSet();
+    } else {
+      graphId = vertexPair.f0;
+      vertices = vertexPair.f1;
+      edges = edgePair.f0 == null ? getEmptyEdgeSet() : edgePair.f1;
+    }
+
+    return new Tuple3<>(graphId, vertices, edges);
+  }
+
+  private Set<Edge> getEmptyEdgeSet() {
+    return Sets.newHashSetWithExpectedSize(0);
   }
 }

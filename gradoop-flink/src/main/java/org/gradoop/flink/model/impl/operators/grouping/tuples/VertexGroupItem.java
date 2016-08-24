@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f1: super vertex id
  * f2: vertex group label
  * f3: vertex group properties
- * f4: vertex group aggregate values
+ * f4: vertex group getVertexIncrement values
  * f5: super vertex tuple true/false
  */
 public class VertexGroupItem extends Tuple6<GradoopId, GradoopId, String,

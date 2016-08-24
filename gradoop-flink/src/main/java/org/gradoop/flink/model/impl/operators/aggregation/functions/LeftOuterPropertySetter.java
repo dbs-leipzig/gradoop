@@ -40,21 +40,12 @@ public class LeftOuterPropertySetter<G extends Element> implements
   private final String propertyKey;
 
   /**
-   * User defined default value
-   */
-  private final PropertyValue defaultValue;
-
-  /**
    * Constructor
+   *  @param propertyKey property key to set value
    *
-   * @param propertyKey property key to set value
-   * @param defaultValue user defined default value for left groups without
-   *                     matching right group
    */
-  public LeftOuterPropertySetter(final String propertyKey,
-    PropertyValue defaultValue) {
+  public LeftOuterPropertySetter(final String propertyKey) {
     this.propertyKey = checkNotNull(propertyKey);
-    this.defaultValue = defaultValue;
   }
 
   @Override
@@ -69,7 +60,7 @@ public class LeftOuterPropertySetter<G extends Element> implements
         rightEmpty = false;
       }
       if (rightEmpty) {
-        leftElem.setProperty(propertyKey, defaultValue);
+        leftElem.setProperty(propertyKey, PropertyValue.NULL_VALUE);
         out.collect(leftElem);
       }
     }

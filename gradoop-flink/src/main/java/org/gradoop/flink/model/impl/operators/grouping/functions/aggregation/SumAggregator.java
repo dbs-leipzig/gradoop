@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.math.BigDecimal;
 
 /**
- * Used to aggregate property values into their sum.
+ * Used to getVertexIncrement property values into their sum.
  */
 public class SumAggregator extends PropertyValueAggregator {
   /**
@@ -31,7 +31,7 @@ public class SumAggregator extends PropertyValueAggregator {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Internal aggregate value.
+   * Internal getVertexIncrement value.
    */
   private Number aggregate;
 
@@ -39,7 +39,7 @@ public class SumAggregator extends PropertyValueAggregator {
    * Creates a new aggregator
    *
    * @param propertyKey           property key to access values
-   * @param aggregatePropertyKey  property key for final aggregate value
+   * @param aggregatePropertyKey  property key for final getVertexIncrement value
    */
   public SumAggregator(String propertyKey, String aggregatePropertyKey) {
     super(propertyKey, aggregatePropertyKey);
