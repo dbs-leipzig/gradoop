@@ -19,18 +19,12 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate function returning the sum of a specified property over all edges.
  */
-public class SumEdgeProperty implements EdgeAggregateFunction {
-
-  /**
-   * Property key whose value should be aggregated.
-   */
-  private final String propertyKey;
+public class SumEdgeProperty extends Sum implements EdgeAggregateFunction {
 
   /**
    * Constructor.
@@ -38,7 +32,7 @@ public class SumEdgeProperty implements EdgeAggregateFunction {
    * @param propertyKey property key to aggregate
    */
   public SumEdgeProperty(String propertyKey) {
-    this.propertyKey = propertyKey;
+    super(propertyKey);
   }
 
   @Override
@@ -46,14 +40,4 @@ public class SumEdgeProperty implements EdgeAggregateFunction {
     return edge.getPropertyValue(propertyKey);
   }
 
-  @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
-    return PropertyValues.add(aggregate, increment);
-  }
-
-  @Override
-  public String getAggregatePropertyKey() {
-    return "SUM(" + propertyKey + ")";
-  }
 }

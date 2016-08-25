@@ -26,12 +26,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
  * Aggregate function returning the minimum of a specified property over all
  * vertices.
  */
-public class MaxVertexProperty implements VertexAggregateFunction {
-
-  /**
-   * Property key whose value should be aggregated.
-   */
-  private final String propertyKey;
+public class MaxVertexProperty extends Max implements VertexAggregateFunction {
 
   /**
    * Constructor.
@@ -39,22 +34,11 @@ public class MaxVertexProperty implements VertexAggregateFunction {
    * @param propertyKey property key to aggregate
    */
   public MaxVertexProperty(String propertyKey) {
-    this.propertyKey = propertyKey;
+    super(propertyKey);
   }
 
   @Override
   public PropertyValue getVertexIncrement(Vertex vertex) {
     return vertex.getPropertyValue(propertyKey);
-  }
-
-  @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
-    return PropertyValues.max(aggregate, increment);
-  }
-
-  @Override
-  public String getAggregatePropertyKey() {
-    return "MAX(" + propertyKey + ")";
   }
 }

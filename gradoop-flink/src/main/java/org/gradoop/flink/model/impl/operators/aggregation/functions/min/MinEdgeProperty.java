@@ -26,12 +26,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  * Aggregate function returning the minimum of a specified property over all
  * vertices.
  */
-public class MinEdgeProperty implements EdgeAggregateFunction {
-
-  /**
-   * Property key whose value should be aggregated.
-   */
-  private final String propertyKey;
+public class MinEdgeProperty extends Min implements EdgeAggregateFunction {
 
   /**
    * Constructor.
@@ -39,21 +34,11 @@ public class MinEdgeProperty implements EdgeAggregateFunction {
    * @param propertyKey property key to aggregate
    */
   public MinEdgeProperty(String propertyKey) {
-    this.propertyKey = propertyKey;
+    super(propertyKey);
   }
 
   @Override
   public PropertyValue getEdgeIncrement(Edge edge) {
     return edge.getPropertyValue(propertyKey);
-  }
-  @Override
-  public PropertyValue aggregate(PropertyValue aggregate,
-    PropertyValue increment) {
-    return PropertyValues.min(aggregate, increment);
-  }
-
-  @Override
-  public String getAggregatePropertyKey() {
-    return "MIN(" + propertyKey + ")";
   }
 }

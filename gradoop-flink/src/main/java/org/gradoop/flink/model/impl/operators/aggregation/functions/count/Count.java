@@ -8,7 +8,7 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import java.io.Serializable;
 
 public abstract class Count
-  implements AggregateFunction, AggregateDefaultValue, Serializable {
+  implements AggregateFunction, AggregateDefaultValue {
 
   @Override
   public PropertyValue aggregate(
