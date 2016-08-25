@@ -17,9 +17,13 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.runtime.client.JobExecutionException;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -34,6 +38,9 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVerte
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -116,37 +123,23 @@ public class AggregationTest extends GradoopFlinkTestBase {
         (minEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex minimum not set", graphHead.hasProperty
         (minVertexProperty.getAggregatePropertyKey()));
+
+      PropertyValue edgeAggregate =
+        graphHead.getPropertyValue(minEdgeProperty.getAggregatePropertyKey());
+
+      PropertyValue vertexAggregate =
+        graphHead.getPropertyValue(minVertexProperty.getAggregatePropertyKey());
+
       if (graphHead.getId().equals(g0Id)) {
-        assertEquals(
-          2,
-          graphHead.getPropertyValue(
-            minEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          0.1f,
-          graphHead.getPropertyValue(
-            minVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(2, edgeAggregate.getLong());
+        assertEquals(0.1f, vertexAggregate.getFloat(), 0.00001);
       } else if (graphHead.getId().equals(g1Id)) {
-        assertEquals(
-          2,
-          graphHead.getPropertyValue(
-            minEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          0.3f,
-          graphHead.getPropertyValue(
-            minVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(2, edgeAggregate.getLong());
+        assertEquals(0.3f, vertexAggregate.getFloat(), 0.00001);
       } else if (graphHead.getId().equals(g2Id)) {
-        assertEquals(
-          Long.MAX_VALUE,
-          graphHead.getPropertyValue(
-            minEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          Float.MAX_VALUE,
-          graphHead.getPropertyValue(
-            minVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
-      }  else {
+        assertEquals(PropertyValue.NULL_VALUE, edgeAggregate);
+        assertEquals(PropertyValue.NULL_VALUE, vertexAggregate);
+      } else {
         Assert.fail("unexpected graph head: " + graphHead);
       }
     }
@@ -228,36 +221,24 @@ public class AggregationTest extends GradoopFlinkTestBase {
         graphHead.hasProperty(maxEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex maximum not set", 
         graphHead.hasProperty(maxVertexProperty.getAggregatePropertyKey()));
+
+
+      PropertyValue edgeAggregate =
+        graphHead.getPropertyValue(maxEdgeProperty.getAggregatePropertyKey());
+
+
+      PropertyValue vertexAggregate =
+        graphHead.getPropertyValue(maxVertexProperty.getAggregatePropertyKey());
+
       if (graphHead.getId().equals(g0Id)) {
-        assertEquals(
-          2L,
-          graphHead.getPropertyValue(
-            maxEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          0.5f,
-          graphHead.getPropertyValue(
-            maxVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(2L, edgeAggregate.getLong());
+        assertEquals(0.5f, vertexAggregate.getFloat(), 0.00001);
       } else if (graphHead.getId().equals(g1Id)) {
-        assertEquals(
-          2L,
-          graphHead.getPropertyValue(
-            maxEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          0.5f,
-          graphHead.getPropertyValue(
-            maxVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(2L, edgeAggregate.getLong());
+        assertEquals(0.5f, vertexAggregate.getFloat(), 0.00001);
       } else if (graphHead.getId().equals(g2Id)) {
-        assertEquals(
-          Long.MIN_VALUE,
-          graphHead.getPropertyValue(
-            maxEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          Float.MIN_VALUE,
-          graphHead.getPropertyValue(
-            maxVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(PropertyValue.NULL_VALUE, edgeAggregate);
+        assertEquals(PropertyValue.NULL_VALUE, vertexAggregate);
       }  else {
         Assert.fail("unexpected graph head: " + graphHead);
       }
@@ -333,40 +314,25 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
     for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
-      assertTrue("edge sum not set", graphHead.hasProperty(
-        sumEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex sum not set", graphHead.hasProperty(
         sumVertexProperty.getAggregatePropertyKey()));
+      assertTrue("edge sum not set", graphHead.hasProperty(
+        sumEdgeProperty.getAggregatePropertyKey()));
+
+      PropertyValue vertexAggregate =
+        graphHead.getPropertyValue(sumVertexProperty.getAggregatePropertyKey());
+      PropertyValue edgeAggregate =
+        graphHead.getPropertyValue(sumEdgeProperty.getAggregatePropertyKey());
+
       if (graphHead.getId().equals(g0Id)) {
-        assertEquals(
-          2,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          0.9f,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(2, edgeAggregate.getLong());
+        assertEquals(0.9f, vertexAggregate.getFloat(), 0.00001);
       } else if (graphHead.getId().equals(g1Id)) {
-        assertEquals(
-          2,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          0.8f,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(2, edgeAggregate.getLong());
+        assertEquals(0.8f, vertexAggregate.getFloat(), 0.00001);
       } else if (graphHead.getId().equals(g2Id)) {
-        assertEquals(
-          0,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()).getInt());
-        assertEquals(
-          0f,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(PropertyValue.NULL_VALUE, edgeAggregate);
+        assertEquals(PropertyValue.NULL_VALUE,vertexAggregate);
       }  else {
         Assert.fail("unexpected graph head: " + graphHead);
       }
@@ -404,119 +370,68 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    List<GraphHead> graphHeads = outputCollection.getGraphHeads().collect();
+
+    for (EPGMGraphHead graphHead : graphHeads) {
       assertTrue("edge sum not set", graphHead.hasProperty(
         sumEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex sum not set", graphHead.hasProperty(
         sumVertexProperty.getAggregatePropertyKey()));
+
+      PropertyValue vertexAggregate =
+        graphHead.getPropertyValue(sumVertexProperty.getAggregatePropertyKey());
+
+      PropertyValue edgeAggregate =
+        graphHead.getPropertyValue(sumEdgeProperty.getAggregatePropertyKey());
+
       if (graphHead.getId().equals(g0Id)) {
-
-        System.out.println(graphHead.getPropertyValue(
-          sumEdgeProperty.getAggregatePropertyKey()));
-
-        assertEquals(
-          4.0f,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
-        assertEquals(
-          0.6f,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
+        assertEquals(0.6f, vertexAggregate.getFloat(), 0.00001);
+        assertEquals(4.0f, edgeAggregate.getFloat(), 0.00001);
       } else if (graphHead.getId().equals(g1Id)) {
-        assertEquals(
-          PropertyValue.NULL_VALUE,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()));
-        assertEquals(
-          PropertyValue.NULL_VALUE,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()));
+        assertEquals(0.5f, vertexAggregate.getFloat(), 0.00001);
+        assertEquals(2L, edgeAggregate.getLong());
       } else if (graphHead.getId().equals(g2Id)) {
-        assertEquals(PropertyValue.NULL_VALUE,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()));
-        assertEquals(
-          PropertyValue.NULL_VALUE,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()));
-      }  else {
-        Assert.fail("unexpected graph head: " + graphHead);
+        assertEquals(PropertyValue.NULL_VALUE, vertexAggregate);
+        assertEquals(PropertyValue.NULL_VALUE, edgeAggregate);
       }
     }
   }
 
   @Test
-  public void testUnsupportedPropertyValueType() throws Exception{
+  public void testGraphUnsupportedPropertyValueType() throws Exception{
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-      "g0[" +
-        "(va {vp=0.5});" +
-        "(vb {vp=\"test\"});" +
-        "(vc {vp=0.1});" +
-        "(va)-[ea {ep=2L}]->(vb);" +
-        "(vb)-[eb {ep=2.0F}]->(vc)" +
-        "]" +
-        "g1[" +
-        "(va)-[ea]->(vb);" +
-        "]" +
-        "g2[]");
+      "g[({a=0})-[{b=0.0}]->({a=true})-[{b=\"\"}]->({})]");
 
-    GraphCollection inputCollection = loader
-      .getGraphCollectionByVariables("g0", "g1", "g2");
+    LogicalGraph graph = loader.getLogicalGraphByVariable("g");
 
-    SumVertexProperty sumVertexProperty =
-      new SumVertexProperty(VERTEX_PROPERTY);
+    try {
+      graph
+      .aggregate(new SumVertexProperty("a"))
+      .aggregate(new SumEdgeProperty("b"))
+      .getGraphHead().print();
+    } catch (Exception e) {
+      assertTrue(
+        e instanceof JobExecutionException &&
+          e.getCause() instanceof UnsupportedTypeException);
+    }
+  }
 
-    SumEdgeProperty sumEdgeProperty =
-      new SumEdgeProperty(EDGE_PROPERTY);
+  @Test
+  public void testCollectionUnsupportedPropertyValueType() {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(
+      "g[({a=0})-[{b=0.0}]->({a=true})-[{b=\"\"}]->({})]");
 
-    GraphCollection outputCollection = inputCollection
-      .apply(new ApplyAggregation(sumVertexProperty))
-      .apply(new ApplyAggregation(sumEdgeProperty));
+    GraphCollection collection = loader.getGraphCollectionByVariables("g");
 
-    GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();
-    GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
-    GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
-
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
-      assertTrue("edge sum not set", graphHead.hasProperty(
-        sumEdgeProperty.getAggregatePropertyKey()));
-      assertTrue("vertex sum not set", graphHead.hasProperty(
-        sumVertexProperty.getAggregatePropertyKey()));
-      if (graphHead.getId().equals(g0Id)) {
-        assertEquals(
-          2,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          0.6f,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
-      } else if (graphHead.getId().equals(g1Id)) {
-        assertEquals(
-          2,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()).getLong());
-        assertEquals(
-          0.5f,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
-      } else if (graphHead.getId().equals(g2Id)) {
-        assertEquals(
-          0,
-          graphHead.getPropertyValue(
-            sumEdgeProperty.getAggregatePropertyKey()).getInt());
-        assertEquals(
-          0f,
-          graphHead.getPropertyValue(
-            sumVertexProperty.getAggregatePropertyKey()).getFloat(),
-          0.00001);
-      }  else {
-        Assert.fail("unexpected graph head: " + graphHead);
-      }
+    try {
+      collection
+        .apply(new ApplyAggregation(new SumVertexProperty("a")))
+        .apply(new ApplyAggregation(new SumEdgeProperty("b")))
+        .getGraphHeads().print();
+    } catch (Exception e) {
+      assertTrue(
+        e instanceof JobExecutionException &&
+          e.getCause() instanceof UnsupportedTypeException);
     }
   }
 
@@ -543,14 +458,11 @@ public class AggregationTest extends GradoopFlinkTestBase {
       sumEdgeProperty.getAggregatePropertyKey()));
     assertTrue("vertex sum not set", graphHead.hasProperty(
       sumVertexProperty.getAggregatePropertyKey()));
-    assertEquals(
-      0,
-      graphHead.getPropertyValue(
-        sumEdgeProperty.getAggregatePropertyKey()).getInt());
-    assertEquals(
-      0,
-      graphHead.getPropertyValue(
-        sumVertexProperty.getAggregatePropertyKey()).getInt());
+
+    assertEquals(PropertyValue.NULL_VALUE, graphHead.getPropertyValue(
+        sumEdgeProperty.getAggregatePropertyKey()));
+    assertEquals(PropertyValue.NULL_VALUE, graphHead.getPropertyValue(
+        sumVertexProperty.getAggregatePropertyKey()));
   }
 
 
@@ -572,6 +484,8 @@ public class AggregationTest extends GradoopFlinkTestBase {
       graphHead.hasProperty(vertexCount.getAggregatePropertyKey()));
     assertTrue("edge count not set",
       graphHead.hasProperty(edgeCount.getAggregatePropertyKey()));
+
+    System.out.println(graphHead);
 
     assertCounts(graphHead, 3L, 2L);
   }
@@ -601,19 +515,34 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
     int graphHeadCount = 0;
 
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    List<GraphHead> graphHeads = outputCollection.getGraphHeads().collect();
+
+    System.out.println(StringUtils.join(graphHeads, "\n"));
+
+    for (EPGMGraphHead graphHead : graphHeads) {
       graphHeadCount++;
       assertTrue("vertex count not set", graphHead.hasProperty(
         vertexCount.getAggregatePropertyKey()));
       assertTrue("edge count not set", graphHead.hasProperty(
         edgeCount.getAggregatePropertyKey()));
+
+      PropertyValue vertexAggregate =
+        graphHead.getPropertyValue(vertexCount.getAggregatePropertyKey());
+
+      PropertyValue edgeAggregate =
+        graphHead.getPropertyValue(edgeCount.getAggregatePropertyKey());
+
       if (graphHead.getId().equals(g0Id)) {
-        assertCounts(graphHead, 3, 2);
+        assertEquals(3, vertexAggregate.getLong());
+        assertEquals(2, edgeAggregate.getLong());
       } else if (graphHead.getId().equals(g1Id)) {
-        assertCounts(graphHead, 4, 3);
+        assertEquals(4, vertexAggregate.getLong());
+        assertEquals(3, edgeAggregate.getLong());
       } else if (graphHead.getId().equals(g2Id)) {
-        assertCounts(graphHead, 2, 1);
-      } else if (graphHead.getId().equals(g3Id)) {
+        assertEquals(2, vertexAggregate.getLong());
+        assertEquals(1, edgeAggregate.getLong());
+      } else if (graphHead
+        .getId().equals(g3Id)) {
         assertCounts(graphHead, 0, 0);
       } else {
         Assert.fail("unexpected graph head: " + graphHead);
@@ -625,6 +554,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
   private void assertCounts(EPGMGraphHead graphHead,
     long expectedVertexCount, long expectedEdgeCount) {
+
     assertEquals("wrong vertex count", expectedVertexCount,
       graphHead.getPropertyValue(
         new VertexCount().getAggregatePropertyKey()).getLong());

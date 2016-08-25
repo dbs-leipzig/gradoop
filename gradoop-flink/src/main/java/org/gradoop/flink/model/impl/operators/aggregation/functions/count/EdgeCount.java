@@ -25,17 +25,11 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 /**
  * Aggregate function returning the vertex count of a graph / graph collection.
  */
-public class EdgeCount implements EdgeAggregateFunction {
+public class EdgeCount extends Count implements EdgeAggregateFunction {
 
   @Override
   public PropertyValue getEdgeIncrement(Edge edge) {
     return PropertyValue.create(1L);
-  }
-
-  @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate,  PropertyValue increment) {
-    return PropertyValues.add(aggregate, increment);
   }
 
   @Override

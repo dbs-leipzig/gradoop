@@ -15,12 +15,15 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.epgm;
+package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,26 +49,36 @@ public class PropertySetterBroadcast<EL extends Element>
   /**
    * property value
    */
-  private Object propertyValue;
+  private PropertyValue aggregateValue;
+
+  private final PropertyValue defaultValue;
+
 
   /**
    * Constructor
    *
-   * @param propertyKey property key
+   * @param aggregateFunction property key
    */
-  public PropertySetterBroadcast(String propertyKey) {
-    this.propertyKey = checkNotNull(propertyKey);
+  public PropertySetterBroadcast(AggregateFunction aggregateFunction) {
+    checkNotNull(aggregateFunction);
+
+    this.propertyKey = aggregateFunction.getAggregatePropertyKey();
+
+    this.defaultValue = aggregateFunction instanceof AggregateDefaultValue ?
+      ((AggregateDefaultValue) aggregateFunction).getDefaultValue() :
+      PropertyValue.NULL_VALUE;
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    this.propertyValue = getRuntimeContext().getBroadcastVariable(VALUE).get(0);
+    this.aggregateValue =
+      (PropertyValue) getRuntimeContext().getBroadcastVariable(VALUE).get(0);
   }
 
   @Override
   public EL map(EL element) throws Exception {
-    element.setProperty(propertyKey, propertyValue);
+    element.setProperty(propertyKey, aggregateValue);
     return element;
   }
 }

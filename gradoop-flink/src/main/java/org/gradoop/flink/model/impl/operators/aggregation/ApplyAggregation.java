@@ -98,6 +98,7 @@ public class ApplyAggregation
         .flatMap(new GraphElementExpander<Vertex>())
         .groupBy(0)
         .combineGroup(new ApplyAggregateVertices(aggregateFunction))
+        .groupBy(0)
         .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
 
     } else {
@@ -108,14 +109,14 @@ public class ApplyAggregation
         .flatMap(new GraphElementExpander<Edge>())
         .groupBy(0)
         .combineGroup(new ApplyAggregateEdges(aggregateFunction))
+        .groupBy(0)
         .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
     }
 
     DataSet<GraphHead> graphHeads = collection.getGraphHeads()
       .coGroup(aggregateValues)
       .where(new Id<GraphHead>()).equalTo(0)
-      .with(new LeftOuterPropertySetter<GraphHead>
-        (aggregateFunction.getAggregatePropertyKey()));
+      .with(new LeftOuterPropertySetter<GraphHead>(aggregateFunction));
 
     return GraphCollection.fromDataSets(graphHeads,
       collection.getVertices(),

@@ -28,7 +28,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAndEdgeAggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.PropertySetterBroadcast;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.PropertySetterBroadcast;
 import org.gradoop.flink.model.impl.operators.aggregation.functions
   .AggregateEdges;
 import org.gradoop.flink.model.impl.operators.aggregation.functions
@@ -111,8 +111,7 @@ public class Aggregation implements UnaryGraphToGraphOperator {
       .reduceGroup(new SetNullIfEmpty());
 
     DataSet<GraphHead> graphHead = graph.getGraphHead()
-      .map(new PropertySetterBroadcast<GraphHead>(
-        aggregateFunction.getAggregatePropertyKey()))
+      .map(new PropertySetterBroadcast<GraphHead>(aggregateFunction))
       .withBroadcastSet(aggregateValue, PropertySetterBroadcast.VALUE);
 
     return LogicalGraph

@@ -22,6 +22,8 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,14 +40,19 @@ public class LeftOuterPropertySetter<G extends Element> implements
    * Property key
    */
   private final String propertyKey;
+  private final PropertyValue defaultValue;
 
   /**
    * Constructor
-   *  @param propertyKey property key to set value
+   * @param aggregateFunction property key to set value
    *
    */
-  public LeftOuterPropertySetter(final String propertyKey) {
-    this.propertyKey = checkNotNull(propertyKey);
+  public LeftOuterPropertySetter(final AggregateFunction aggregateFunction) {
+    checkNotNull(aggregateFunction);
+    this.propertyKey = aggregateFunction.getAggregatePropertyKey();
+    this.defaultValue = aggregateFunction instanceof AggregateDefaultValue ?
+      ((AggregateDefaultValue) aggregateFunction).getDefaultValue() :
+      PropertyValue.NULL_VALUE;
   }
 
   @Override
@@ -60,7 +67,7 @@ public class LeftOuterPropertySetter<G extends Element> implements
         rightEmpty = false;
       }
       if (rightEmpty) {
-        leftElem.setProperty(propertyKey, PropertyValue.NULL_VALUE);
+        leftElem.setProperty(propertyKey, defaultValue);
         out.collect(leftElem);
       }
     }

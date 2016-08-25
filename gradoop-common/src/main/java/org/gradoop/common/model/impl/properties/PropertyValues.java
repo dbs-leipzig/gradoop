@@ -15,7 +15,6 @@ public class PropertyValues {
   private static final int BIG_DECIMAL = 5;
 
   public static PropertyValue add(PropertyValue aValue, PropertyValue bValue) {
-
     int aType = getType(aValue);
     int bType = getType(bValue);
 
