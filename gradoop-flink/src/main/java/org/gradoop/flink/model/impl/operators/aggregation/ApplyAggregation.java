@@ -40,23 +40,23 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregate
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Takes a collection of logical graphs and a user defined getVertexIncrement function as
- * input. The getVertexIncrement function is applied on each logical graph contained in
- * the collection and the getVertexIncrement is stored as an additional property at the
+ * Takes a collection of logical graphs and a user defined aggregate function as
+ * input. The aggregate function is applied on each logical graph contained in
+ * the collection and the aggregate is stored as an additional property at the
  * graphs.
  */
 public class ApplyAggregation
   implements ApplicableUnaryGraphToGraphOperator {
 
   /**
-   * User-defined getVertexIncrement function which is applied on a graph collection.
+   * User-defined aggregate function which is applied on a graph collection.
    */
   private final AggregateFunction aggregateFunction;
 
   /**
    * Creates a new operator instance.
    *
-   * @param aggregateFunction     function to compute getVertexIncrement value
+   * @param aggregateFunction     function to compute aggregate value
    */
   public ApplyAggregation(final AggregateFunction aggregateFunction) {
     this.aggregateFunction = checkNotNull(aggregateFunction);
@@ -86,8 +86,7 @@ public class ApplyAggregation
         .combineGroup(new ApplyAggregateEdges(aggregateFunction));
 
       aggregateValues = vertexAggregateValues
-        .union(edgeAggregateValues)
-        .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
+        .union(edgeAggregateValues);
 
     } else if (this.aggregateFunction instanceof VertexAggregateFunction) {
 
@@ -97,9 +96,7 @@ public class ApplyAggregation
       aggregateValues = vertices
         .flatMap(new GraphElementExpander<Vertex>())
         .groupBy(0)
-        .combineGroup(new ApplyAggregateVertices(aggregateFunction))
-        .groupBy(0)
-        .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
+        .combineGroup(new ApplyAggregateVertices(aggregateFunction));
 
     } else {
       EdgeAggregateFunction aggregateFunction =
@@ -108,15 +105,17 @@ public class ApplyAggregation
       aggregateValues = edges
         .flatMap(new GraphElementExpander<Edge>())
         .groupBy(0)
-        .combineGroup(new ApplyAggregateEdges(aggregateFunction))
-        .groupBy(0)
-        .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
+        .combineGroup(new ApplyAggregateEdges(aggregateFunction));
     }
 
+    aggregateValues = aggregateValues
+      .groupBy(0)
+      .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
+    
     DataSet<GraphHead> graphHeads = collection.getGraphHeads()
       .coGroup(aggregateValues)
       .where(new Id<GraphHead>()).equalTo(0)
-      .with(new SetAggregateProperties<GraphHead>(aggregateFunction));
+      .with(new SetAggregateProperties(aggregateFunction));
 
     return GraphCollection.fromDataSets(graphHeads,
       collection.getVertices(),

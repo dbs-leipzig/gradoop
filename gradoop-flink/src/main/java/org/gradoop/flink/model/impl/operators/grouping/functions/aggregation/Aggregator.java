@@ -23,8 +23,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.io.Serializable;
 
 /**
- * Defines an getVertexIncrement function that can be applied on vertex and edge groups
- * during {@link Grouping}.
+ * Defines an aggregate function that can be applied on vertex and edge
+ * groups during {@link Grouping}.
  *
  * @param <IN> input type for the specific aggregation function
  */
@@ -48,10 +48,10 @@ public interface Aggregator<IN> extends Serializable {
    */
   String getPropertyKey();
   /**
-   * Returns the property key, which is used to store the final getVertexIncrement value
+   * Returns the property key, which is used to store the final aggregate value
    * (e.g. COUNT, AVG(age), ...)
    *
-   * @return property key to store the resulting getVertexIncrement value
+   * @return property key to store the resulting aggregate value
    */
   String getAggregatePropertyKey();
   /**

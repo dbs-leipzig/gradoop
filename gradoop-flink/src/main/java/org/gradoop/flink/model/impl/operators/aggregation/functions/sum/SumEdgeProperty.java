@@ -24,7 +24,8 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 /**
  * Aggregate function returning the sum of a specified property over all edges.
  */
-public class SumEdgeProperty extends SumProperty implements EdgeAggregateFunction {
+public class SumEdgeProperty extends SumProperty
+  implements EdgeAggregateFunction {
 
   /**
    * Constructor.
@@ -39,5 +40,4 @@ public class SumEdgeProperty extends SumProperty implements EdgeAggregateFunctio
   public PropertyValue getEdgeIncrement(Edge edge) {
     return edge.getPropertyValue(propertyKey);
   }
-
 }

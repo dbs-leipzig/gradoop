@@ -114,10 +114,10 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    *
    * @param vertexGroupingKeys  property keys to group vertices
    * @param useVertexLabels     group on vertex label true/false
-   * @param vertexAggregators   getVertexIncrement functions for grouped vertices
+   * @param vertexAggregators   aggregate functions for grouped vertices
    * @param edgeGroupingKeys    property keys to group edges
    * @param useEdgeLabels       group on edge label true/false
-   * @param edgeAggregators     getVertexIncrement functions for grouped edges
+   * @param edgeAggregators     aggregate functions for grouped edges
    */
   Grouping(
     List<String> vertexGroupingKeys,
@@ -182,9 +182,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   }
 
   /**
-   * Returns the getVertexIncrement functions which are applied on super vertices.
+   * Returns the aggregate functions which are applied on super vertices.
    *
-   * @return vertex getVertexIncrement functions
+   * @return vertex aggregate functions
    */
   protected List<PropertyValueAggregator> getVertexAggregators() {
     return vertexAggregators;
@@ -218,9 +218,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   }
 
   /**
-   * Returns the getVertexIncrement functions which shall be applied on super edges.
+   * Returns the aggregate functions which shall be applied on super edges.
    *
-   * @return edge getVertexIncrement functions
+   * @return edge aggregate functions
    */
   protected List<PropertyValueAggregator> getEdgeAggregators() {
     return edgeAggregators;
@@ -456,7 +456,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Add an getVertexIncrement function which is applied on a group of vertices
+     * Add an aggregate function which is applied on a group of vertices
      * represented by a single super vertex.
      *
      * @param aggregator vertex aggregator
@@ -470,7 +470,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Add an getVertexIncrement function which is applied on a group of edges
+     * Add an aggregate function which is applied on a group of edges
      * represented by a single super edge.
      *
      * @param aggregator edge aggregator

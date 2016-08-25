@@ -19,11 +19,10 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
- * Aggregate function returning the vertex count of a graph / graph collection.
+ * Aggregate function returning the edge count of a graph / graph collection.
  */
 public class EdgeCount extends Count implements EdgeAggregateFunction {
 

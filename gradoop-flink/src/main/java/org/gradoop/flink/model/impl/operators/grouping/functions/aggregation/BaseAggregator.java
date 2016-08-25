@@ -47,7 +47,7 @@ public abstract class BaseAggregator<IN> implements Aggregator<IN> {
    * Creates new aggregator.
    *
    * @param propertyKey           used to fetch property value from elements
-   * @param aggregatePropertyKey  used to store the final getVertexIncrement value
+   * @param aggregatePropertyKey  used to store the final aggregate value
    */
   protected BaseAggregator(String propertyKey, String aggregatePropertyKey) {
     this.propertyKey          = checkNotNull(propertyKey);

@@ -48,7 +48,7 @@ import java.util.List;
  * 2) Group vertices on label and/or property.
  * 3) Create a super vertex id for each group and collect a non-candidate
  *    {@link VertexGroupItem} for each group element and one additional
- *    super vertex tuple that holds the group getVertexIncrement.
+ *    super vertex tuple that holds the group aggregate.
  * 4) Filter output of 3)
  *    a) non-candidate tuples are mapped to {@link VertexWithSuperVertex}
  *    b) super vertex tuples are used to build final super vertices
@@ -57,7 +57,7 @@ import java.util.List;
  *    vertex id.
  * 7) Updated edges are grouped by source and target id and optionally by label
  *    and/or edge property.
- * 8) Group combine on the workers and compute getVertexIncrement.
+ * 8) Group combine on the workers and compute aggregate.
  * 9) Group reduce globally and create final super edges.
  */
 public class GroupingGroupReduce extends Grouping {
@@ -66,10 +66,10 @@ public class GroupingGroupReduce extends Grouping {
    *
    * @param vertexGroupingKeys  property key to group vertices
    * @param useVertexLabels     group on vertex label true/false
-   * @param vertexAggregators   getVertexIncrement functions for grouped vertices
+   * @param vertexAggregators   aggregate functions for grouped vertices
    * @param edgeGroupingKeys    property key to group edges
    * @param useEdgeLabels       group on edge label true/false
-   * @param edgeAggregators     getVertexIncrement functions for grouped edges
+   * @param edgeAggregators     aggregate functions for grouped edges
    */
   GroupingGroupReduce(
     List<String> vertexGroupingKeys,
@@ -97,7 +97,7 @@ public class GroupingGroupReduce extends Grouping {
     DataSet<VertexGroupItem> vertexGroupItems =
       // group vertices by label / properties / both
       groupVertices(verticesForGrouping)
-        // apply getVertexIncrement function
+        // apply aggregate function
         .reduceGroup(new ReduceVertexGroupItems(
           useVertexLabels(), getVertexAggregators()));
 

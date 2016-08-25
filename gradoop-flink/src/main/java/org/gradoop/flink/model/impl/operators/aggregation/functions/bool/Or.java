@@ -15,28 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
+package org.gradoop.flink.model.impl.operators.aggregation.functions.bool;
+
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValues;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Superclass of aggregate functions that determine a minimal property value.
+ * Superclass of aggregate functions determining a predicate support.
+ * e.g., graph contains a vertex labelled by "User"
  */
-public abstract class MinProperty extends Min {
-  /**
-   * Property key whose value should be aggregated.
-   */
-  protected final String propertyKey;
-
-  /**
-   * Constructor.
-   *
-   * @param propertyKey property key to aggregate
-   */
-  public MinProperty(String propertyKey) {
-    this.propertyKey = propertyKey;
-  }
+public abstract class Or implements AggregateFunction {
 
   @Override
-  public String getAggregatePropertyKey() {
-    return "min(" + propertyKey + ")";
+  public PropertyValue aggregate(
+    PropertyValue aggregate, PropertyValue increment) {
+    return PropertyValues.Boolean.or(aggregate, increment);
   }
 }

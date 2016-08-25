@@ -28,6 +28,8 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAndEdgeAggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions
+  .CombinePartitionAggregates;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions
   .AggregateEdges;
@@ -37,14 +39,14 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Takes a logical graph and a user defined getVertexIncrement function as input. The
- * getVertexIncrement function is applied on the logical graph and the resulting
- * getVertexIncrement is stored as an additional property at the result graph.
+ * Takes a logical graph and a user defined aggregate function as input. The
+ * aggregate function is applied on the logical graph and the resulting
+ * aggregate is stored as an additional property at the result graph.
  */
 public class Aggregation implements UnaryGraphToGraphOperator {
 
   /**
-   * User-defined getVertexIncrement function which is applied on a single logical graph.
+   * User-defined aggregate function which is applied on a single logical graph.
    */
   private final AggregateFunction aggregateFunction;
 
@@ -107,11 +109,12 @@ public class Aggregation implements UnaryGraphToGraphOperator {
     }
 
     aggregateValue = aggregateValue
+      .reduceGroup(new CombinePartitionAggregates(aggregateFunction))
       .union(nullValue)
       .reduceGroup(new SetNullIfEmpty());
 
     DataSet<GraphHead> graphHead = graph.getGraphHead()
-      .map(new SetAggregateProperty<GraphHead>(aggregateFunction))
+      .map(new SetAggregateProperty(aggregateFunction))
       .withBroadcastSet(aggregateValue, SetAggregateProperty.VALUE);
 
     return LogicalGraph

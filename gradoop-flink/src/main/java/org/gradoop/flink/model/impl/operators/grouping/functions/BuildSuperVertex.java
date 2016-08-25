@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
- * group label, the group property value and the getVertexIncrement values for its group.
+ * group label, the group property value and the aggregate values for its group.
  */
 @FunctionAnnotation.ForwardedFields("f1->id")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4")

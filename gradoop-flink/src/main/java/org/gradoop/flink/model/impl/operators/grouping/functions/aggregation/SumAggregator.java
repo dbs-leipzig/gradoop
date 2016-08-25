@@ -39,7 +39,7 @@ public class SumAggregator extends PropertyValueAggregator {
    * Creates a new aggregator
    *
    * @param propertyKey           property key to access values
-   * @param aggregatePropertyKey  property key for final getVertexIncrement value
+   * @param aggregatePropertyKey  property key for final aggregate value
    */
   public SumAggregator(String propertyKey, String aggregatePropertyKey) {
     super(propertyKey, aggregatePropertyKey);

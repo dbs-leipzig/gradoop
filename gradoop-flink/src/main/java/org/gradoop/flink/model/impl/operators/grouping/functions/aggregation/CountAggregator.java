@@ -30,7 +30,7 @@ public class CountAggregator extends SumAggregator {
   public static final String DEFAULT_PROPERTY_KEY = "*";
 
   /**
-   * Default property key to store the result of the getVertexIncrement function.
+   * Default property key to store the result of the aggregate function.
    */
   public static final String DEFAULT_AGGREGATE_PROPERTY_KEY = "count";
 
@@ -49,7 +49,7 @@ public class CountAggregator extends SumAggregator {
   /**
    * Creates a new count aggregator
    *
-   * @param aggregatePropertyKey used to store the final getVertexIncrement value
+   * @param aggregatePropertyKey used to store the final aggregate value
    */
   public CountAggregator(String aggregatePropertyKey) {
     this(DEFAULT_PROPERTY_KEY, aggregatePropertyKey);
@@ -58,8 +58,8 @@ public class CountAggregator extends SumAggregator {
   /**
    * Creates a new count aggregator
    *
-   * @param propertyKey           used to define the property to getVertexIncrement
-   * @param aggregatePropertyKey  used to store the final getVertexIncrement value
+   * @param propertyKey           used to define the property to aggregate
+   * @param aggregatePropertyKey  used to store the final aggregate value
    */
   public CountAggregator(String propertyKey, String aggregatePropertyKey) {
     super(propertyKey, aggregatePropertyKey);
