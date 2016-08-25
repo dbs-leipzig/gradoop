@@ -485,8 +485,6 @@ public class AggregationTest extends GradoopFlinkTestBase {
     assertTrue("edge count not set",
       graphHead.hasProperty(edgeCount.getAggregatePropertyKey()));
 
-    System.out.println(graphHead);
-
     assertCounts(graphHead, 3L, 2L);
   }
 
@@ -516,8 +514,6 @@ public class AggregationTest extends GradoopFlinkTestBase {
     int graphHeadCount = 0;
 
     List<GraphHead> graphHeads = outputCollection.getGraphHeads().collect();
-
-    System.out.println(StringUtils.join(graphHeads, "\n"));
 
     for (EPGMGraphHead graphHead : graphHeads) {
       graphHeadCount++;

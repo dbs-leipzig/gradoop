@@ -45,14 +45,14 @@ public class GraphVerticesEdges implements JoinFunction<
     Set<Vertex> vertices;
     Set<Edge> edges;
 
-    if (vertexPair.f0 == null) {
+    if (vertexPair == null) {
       graphId = edgePair.f0;
       vertices = Sets.newHashSetWithExpectedSize(0);
-      edges = getEmptyEdgeSet();
+      edges = edgePair.f1;
     } else {
       graphId = vertexPair.f0;
       vertices = vertexPair.f1;
-      edges = edgePair.f0 == null ? getEmptyEdgeSet() : edgePair.f1;
+      edges = edgePair == null ? getEmptyEdgeSet() : edgePair.f1;
     }
 
     return new Tuple3<>(graphId, vertices, edges);

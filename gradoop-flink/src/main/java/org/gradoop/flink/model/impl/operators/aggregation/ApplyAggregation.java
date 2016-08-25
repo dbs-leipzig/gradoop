@@ -35,7 +35,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateEdges;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateVertices;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionApplyAggregates;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.LeftOuterPropertySetter;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -116,7 +116,7 @@ public class ApplyAggregation
     DataSet<GraphHead> graphHeads = collection.getGraphHeads()
       .coGroup(aggregateValues)
       .where(new Id<GraphHead>()).equalTo(0)
-      .with(new LeftOuterPropertySetter<GraphHead>(aggregateFunction));
+      .with(new SetAggregateProperties<GraphHead>(aggregateFunction));
 
     return GraphCollection.fromDataSets(graphHeads,
       collection.getVertices(),

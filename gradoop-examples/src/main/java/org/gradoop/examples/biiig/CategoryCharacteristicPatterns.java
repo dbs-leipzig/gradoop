@@ -20,21 +20,17 @@ package org.gradoop.examples.biiig;
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.utils.ExampleOutput;
-import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.or.Or;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -125,52 +121,22 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   /**
    * Aggregate function to determine "isClosed" measure
    */
-  private static class IsClosedAggregateFunction
-    implements ApplyAggregateFunction {
+  private static class IsClosedAggregateFunction extends Or
+    implements VertexAggregateFunction {
 
     @Override
-    public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection collection) {
-
-      return collection.getVertices()
-        .flatMap(new FlatMapFunction<Vertex, Tuple2<GradoopId, Integer>>() {
-          @Override
-          public void flatMap(Vertex vertex,
-            Collector<Tuple2<GradoopId, Integer>> collector) throws Exception {
-
-            for (GradoopId graphId : vertex.getGraphIds()) {
-              Integer openQuotation = vertex.getLabel().equals("Quotation") &&
-                vertex.getPropertyValue("status").toString().equals("open") ?
-                1 : 0;
-
-              collector.collect(new Tuple2<>(graphId, openQuotation));
-            }
-          }
-        })
-        .groupBy(0).sum(1)
-        .map(
-          new MapFunction<Tuple2<GradoopId, Integer>,
-            Tuple2<GradoopId, PropertyValue>>() {
-
-            @Override
-            public Tuple2<GradoopId, PropertyValue> map(
-              Tuple2<GradoopId, Integer> openQuotations) throws
-              Exception {
-
-              Boolean isClosed = openQuotations.f1.equals(0);
-
-              return new Tuple2<>(
-                openQuotations.f0, PropertyValue.create(isClosed));
-            }
-          });
+    public String getAggregatePropertyKey() {
+      return "isClosed";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Number getDefaultValue() {
-      return 0;
+    public PropertyValue getVertexIncrement(Vertex vertex) {
+
+      boolean isClosedQuotation =
+        vertex.getLabel().equals("SalesQuotation") &&
+          !vertex.getPropertyValue("status").toString().equals("open");
+
+      return PropertyValue.create(isClosedQuotation);
     }
   }
 
@@ -190,48 +156,17 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Aggregate function to count sales orders per graph.
    */
   private static class CountSalesOrdersAggregateFunction
-    implements ApplyAggregateFunction {
+    extends Count implements VertexAggregateFunction {
 
     @Override
-    public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection collection) {
-
-      return collection.getVertices()
-        .flatMap(new FlatMapFunction<Vertex, Tuple2<GradoopId, Integer>>() {
-          @Override
-          public void flatMap(Vertex vertex,
-            Collector<Tuple2<GradoopId, Integer>> collector) throws Exception {
-
-            for (GradoopId graphId : vertex.getGraphIds()) {
-              Integer foundSalesOrder =
-                vertex.getLabel().equals("SalesOrder") ? 1 : 0;
-
-              collector.collect(new Tuple2<>(graphId, foundSalesOrder));
-            }
-          }
-        })
-        .groupBy(0).sum(1)
-        .map(
-          new MapFunction<Tuple2<GradoopId, Integer>,
-            Tuple2<GradoopId, PropertyValue>>() {
-
-            @Override
-            public Tuple2<GradoopId, PropertyValue> map(
-              Tuple2<GradoopId, Integer> salesOrderCount) throws
-              Exception {
-
-              return new Tuple2<>(
-                salesOrderCount.f0, PropertyValue.create(salesOrderCount.f1));
-            }
-          });
+    public PropertyValue getVertexIncrement(Vertex vertex) {
+      return PropertyValue.create(
+        vertex.getLabel().equals("SalesOrder") ? 1 : 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Number getDefaultValue() {
-      return 0;
+    public String getAggregatePropertyKey() {
+      return "salesOrderCount";
     }
   }
 

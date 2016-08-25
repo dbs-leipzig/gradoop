@@ -19,14 +19,13 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
  * Aggregate function returning the minimum of a specified property over all
  * vertices.
  */
-public class MaxVertexProperty extends Max implements VertexAggregateFunction {
+public class MaxVertexProperty extends MaxProperty implements VertexAggregateFunction {
 
   /**
    * Constructor.
