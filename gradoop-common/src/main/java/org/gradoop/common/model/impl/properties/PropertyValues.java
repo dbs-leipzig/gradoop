@@ -68,21 +68,21 @@ public class PropertyValues {
   public static class Numeric {
 
     /**
-     * Integer type.
-     */
-    private static final int INT = 1;
-    /**
-     * Long type.
-     */
-    private static final int LONG = 2;
-    /**
      * Float type.
      */
-    private static final int FLOAT = 3;
+    private static final int FLOAT = 1;
+    /**
+     * Integer type.
+     */
+    private static final int INT = 2;
     /**
      * Double type.
      */
-    private static final int DOUBLE = 4;
+    private static final int DOUBLE = 3;
+    /**
+     * Long type.
+     */
+    private static final int LONG = 4;
     /**
      * Big decimal type.
      */
@@ -104,39 +104,98 @@ public class PropertyValues {
 
       boolean sameType = aType == bType;
 
-      int returnType = sameType ? aType : Math.max(aType, bType);
+      int returnType = sameType ? aType : maxType(aType, bType);
 
       if (returnType == INT)  {
         aValue.setInt(aValue.getInt() + bValue.getInt());
 
-      } else if (returnType == LONG)  {
-        long a = aType == LONG ? aValue.getLong() : aValue.getInt();
-        long b = bType == LONG ? bValue.getLong() : bValue.getInt();
-        aValue.setLong(a + b);
-
       } else if (returnType == FLOAT)  {
-        float a = aType == FLOAT ?
-          aValue.getFloat() : floatValue(aValue, aType);
-        float b = bType == FLOAT ?
-          bValue.getFloat() : floatValue(bValue, bType);
+
+        float a;
+        float b;
+
+        if (sameType) {
+          a = aValue.getFloat();
+          b = bValue.getFloat();
+        } else {
+          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
+          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
+        }
+
         aValue.setFloat(a + b);
 
+      } else if (returnType == LONG)  {
+
+        long a;
+        long b;
+
+        if (sameType) {
+          a = aValue.getLong();
+          b = bValue.getLong();
+        } else {
+          a = aType == LONG ? aValue.getLong() : aValue.getInt();
+          b = bType == LONG ? bValue.getLong() : bValue.getInt();
+        }
+
+        aValue.setLong(a + b);
+
       } else if (returnType == DOUBLE)  {
-        double a = aType == DOUBLE ?
-          aValue.getDouble() : doubleValue(aValue, aType);
-        double b = bType == DOUBLE ?
-          bValue.getDouble() : doubleValue(bValue, bType);
+
+        double a;
+        double b;
+
+        if (sameType) {
+          a = aValue.getDouble();
+          b = bValue.getDouble();
+        } else {
+          a = aType == DOUBLE ? aValue.getDouble() : doubleValue(aValue, aType);
+          b = bType == DOUBLE ? bValue.getDouble() : doubleValue(bValue, bType);
+        }
+
         aValue.setDouble(a + b);
 
       } else {
-        BigDecimal a = aType == BIG_DECIMAL ?
-          aValue.getBigDecimal() : bigDecimalValue(aValue, aType);
-        BigDecimal b = bType == BIG_DECIMAL ?
-          bValue.getBigDecimal() : bigDecimalValue(bValue, bType);
+
+        BigDecimal a;
+        BigDecimal b;
+
+        if (sameType) {
+          a = aValue.getBigDecimal();
+          b = bValue.getBigDecimal();
+        } else {
+          a = aType == BIG_DECIMAL ?
+            aValue.getBigDecimal() : bigDecimalValue(aValue, aType);
+          b = bType == BIG_DECIMAL ?
+            bValue.getBigDecimal() : bigDecimalValue(bValue, bType);
+        }
+
         aValue.setBigDecimal(a.add(b));
       }
 
       return aValue;
+    }
+
+    /**
+     * returns the maximum of two types
+     *
+     * @param aType first type
+     * @param bType second type
+     *
+     * @return larger compatible type
+     */
+    private static int maxType(int aType, int bType) {
+
+      int maxType = Math.max(aType, bType);
+
+      if (maxType != BIG_DECIMAL && // not big decimal
+        aType % 2 != aType % 2 && // different supertype
+        maxType % 2 != 0) { // high supertype is integer
+
+        // next decimal type
+        maxType++;
+      }
+
+      return maxType;
     }
 
     /**
@@ -155,35 +214,71 @@ public class PropertyValues {
 
       boolean sameType = aType == bType;
 
-      int returnType = sameType ? aType : Math.max(aType, bType);
+      int returnType = sameType ? aType : maxType(aType, bType);
 
       if (returnType == INT)  {
         aValue.setInt(aValue.getInt() * bValue.getInt());
 
-      } else if (returnType == LONG)  {
-        long a = aType == LONG ? aValue.getLong() : aValue.getInt();
-        long b = bType == LONG ? bValue.getLong() : bValue.getInt();
-        aValue.setLong(a * b);
-
       } else if (returnType == FLOAT)  {
-        float a = aType == FLOAT ?
-          aValue.getFloat() : floatValue(aValue, aType);
-        float b = bType == FLOAT ?
-          bValue.getFloat() : floatValue(bValue, bType);
+
+        float a;
+        float b;
+
+        if (sameType) {
+          a = aValue.getFloat();
+          b = bValue.getFloat();
+        } else {
+          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
+          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
+        }
+
         aValue.setFloat(a * b);
 
+      } else if (returnType == LONG)  {
+
+        long a;
+        long b;
+
+        if (sameType) {
+          a = aValue.getLong();
+          b = bValue.getLong();
+        } else {
+          a = aType == LONG ? aValue.getLong() : aValue.getInt();
+          b = bType == LONG ? bValue.getLong() : bValue.getInt();
+        }
+
+        aValue.setLong(a * b);
+
       } else if (returnType == DOUBLE)  {
-        double a = aType == DOUBLE ?
-          aValue.getDouble() : doubleValue(aValue, aType);
-        double b = bType == DOUBLE ?
-          bValue.getDouble() : doubleValue(bValue, bType);
+
+        double a;
+        double b;
+
+        if (sameType) {
+          a = aValue.getDouble();
+          b = bValue.getDouble();
+        } else {
+          a = aType == DOUBLE ? aValue.getDouble() : doubleValue(aValue, aType);
+          b = bType == DOUBLE ? bValue.getDouble() : doubleValue(bValue, bType);
+        }
+
         aValue.setDouble(a * b);
 
       } else {
-        BigDecimal a = aType == BIG_DECIMAL ?
-          aValue.getBigDecimal() : bigDecimalValue(aValue, aType);
-        BigDecimal b = bType == BIG_DECIMAL ?
-          bValue.getBigDecimal() : bigDecimalValue(bValue, bType);
+
+        BigDecimal a;
+        BigDecimal b;
+
+        if (sameType) {
+          a = aValue.getBigDecimal();
+          b = bValue.getBigDecimal();
+        } else {
+          a = aType == BIG_DECIMAL ?
+            aValue.getBigDecimal() : bigDecimalValue(aValue, aType);
+          b = bType == BIG_DECIMAL ?
+            bValue.getBigDecimal() : bigDecimalValue(bValue, bType);
+        }
+
         aValue.setBigDecimal(a.multiply(b));
       }
 
@@ -199,7 +294,7 @@ public class PropertyValues {
      * @return smaller value
      */
     public static PropertyValue min(PropertyValue a, PropertyValue b) {
-      return isLessThan(a, b) ? a : b;
+      return isLessOrEqualThan(a, b) ? a : b;
     }
 
     /**
@@ -211,75 +306,97 @@ public class PropertyValues {
      * @return bigger value
      */
     public static PropertyValue max(PropertyValue a, PropertyValue b) {
-      return isLessThan(a, b) ? b : a;
+      return isLessOrEqualThan(a, b) ? b : a;
     }
 
     /**
      * Compares two numerical property values and returns true,
      * if the first one is smaller.
      *
-     * @param a first value
-     * @param b second value
+     * @param aValue first value
+     * @param bValue second value
      *
      * @return a < b
      */
-    private static boolean isLessThan(PropertyValue a, PropertyValue b) {
-      boolean aIsSmaller;
-      int aType = checkNumericalAndGetType(a);
-      int bType = checkNumericalAndGetType(b);
+    private static boolean isLessOrEqualThan(
+      PropertyValue aValue, PropertyValue bValue) {
 
-      if (aType == bType) {
-        switch (aType) {
-        case BIG_DECIMAL:
-          aIsSmaller = a.getBigDecimal().compareTo(b.getBigDecimal()) <= 0;
-          break;
-        case DOUBLE:
-          aIsSmaller = a.getDouble() <= b.getDouble();
-          break;
-        case FLOAT:
-          aIsSmaller = a.getFloat() <= b.getFloat();
-          break;
-        case LONG:
-          aIsSmaller = a.getLong() <= b.getLong();
-          break;
-        default:
-          aIsSmaller = a.getInt() <= b.getInt();
-          break;
+      int aType = checkNumericalAndGetType(aValue);
+      int bType = checkNumericalAndGetType(bValue);
+
+      boolean sameType = aType == bType;
+
+      int returnType = sameType ? aType : maxType(aType, bType);
+
+      boolean aIsLessOrEqual;
+
+      if (returnType == INT) {
+        aIsLessOrEqual = aValue.getInt() <= bValue.getInt();
+
+      } else if (returnType == FLOAT) {
+
+        float a;
+        float b;
+
+        if (sameType) {
+          a = aValue.getFloat();
+          b = bValue.getFloat();
+        } else {
+          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
+          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
         }
-      } else if (aType > bType) {
-        switch (aType) {
-        case BIG_DECIMAL:
-          aIsSmaller =
-            a.getBigDecimal().compareTo(bigDecimalValue(b, bType)) <= 0;
-          break;
-        case DOUBLE:
-          aIsSmaller = a.getDouble() <= doubleValue(b, bType);
-          break;
-        case FLOAT:
-          aIsSmaller = a.getFloat() <= floatValue(b, bType);
-          break;
-        default:
-          aIsSmaller = a.getLong() <= b.getInt();
-          break;
+
+        aIsLessOrEqual = a <= b;
+
+      } else if (returnType == LONG) {
+
+        long a;
+        long b;
+
+        if (sameType) {
+          a = aValue.getLong();
+          b = bValue.getLong();
+        } else {
+          a = aType == LONG ? aValue.getLong() : aValue.getInt();
+          b = bType == LONG ? bValue.getLong() : bValue.getInt();
         }
+
+        aIsLessOrEqual = a <= b;
+
+      } else if (returnType == DOUBLE) {
+
+        double a;
+        double b;
+
+        if (sameType) {
+          a = aValue.getDouble();
+          b = bValue.getDouble();
+        } else {
+          a = aType == DOUBLE ? aValue.getDouble() : doubleValue(aValue, aType);
+          b = bType == DOUBLE ? bValue.getDouble() : doubleValue(bValue, bType);
+        }
+
+        aIsLessOrEqual = a <= b;
+
       } else {
-        switch (bType) {
-        case BIG_DECIMAL:
-          aIsSmaller =
-            b.getBigDecimal().compareTo(bigDecimalValue(a, aType)) <= 0;
-          break;
-        case DOUBLE:
-          aIsSmaller = b.getDouble() > doubleValue(a, aType);
-          break;
-        case FLOAT:
-          aIsSmaller = b.getFloat() > floatValue(a, aType);
-          break;
-        default:
-          aIsSmaller = b.getLong() > a.getInt();
-          break;
+
+        BigDecimal a;
+        BigDecimal b;
+
+        if (sameType) {
+          a = aValue.getBigDecimal();
+          b = bValue.getBigDecimal();
+        } else {
+          a = aType == BIG_DECIMAL ? aValue.getBigDecimal() :
+            bigDecimalValue(aValue, aType);
+          b = bType == BIG_DECIMAL ? bValue.getBigDecimal() :
+            bigDecimalValue(bValue, bType);
         }
+
+        aIsLessOrEqual = a.compareTo(b) <= 0;
       }
-      return aIsSmaller;
+
+      return aIsLessOrEqual;
     }
 
     /**
@@ -348,23 +465,6 @@ public class PropertyValues {
         return value.getLong();
       default:
         return value.getFloat();
-      }
-    }
-
-    /**
-     * Converts a value of a lower domain numerical type to Float.
-     *
-     * @param value value
-     * @param type type
-     *
-     * @return converted value
-     */
-    private static float floatValue(PropertyValue value, int type) {
-      switch (type) {
-      case INT:
-        return value.getInt();
-      default:
-        return value.getLong();
       }
     }
   }
