@@ -39,7 +39,7 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
    *
    * @param groupPropertyKeys property keys used for grouping
    * @param useLabel          true, if element label shall be used for grouping
-   * @param valueAggregators  getVertexIncrement functions for super elements
+   * @param valueAggregators  aggregate functions for super elements
    */
   protected ReduceVertexGroupItemBase(List<String> groupPropertyKeys,
     boolean useLabel, List<PropertyValueAggregator> valueAggregators) {

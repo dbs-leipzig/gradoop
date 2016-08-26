@@ -43,7 +43,7 @@ public class ReduceVertexGroupItems
    * Creates group reduce function.
    *
    * @param useLabel          true, iff labels are used for grouping
-   * @param vertexAggregators getVertexIncrement functions for super vertices
+   * @param vertexAggregators aggregate functions for super vertices
    */
   public ReduceVertexGroupItems(boolean useLabel,
     List<PropertyValueAggregator> vertexAggregators) {

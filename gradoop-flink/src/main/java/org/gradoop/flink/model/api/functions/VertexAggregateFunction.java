@@ -32,7 +32,7 @@ public interface VertexAggregateFunction extends AggregateFunction {
    *
    * @param vertex vertex
    *
-   * @return increment
+   * @return increment, may be NULL, which is handled in the operator
    */
   PropertyValue getVertexIncrement(Vertex vertex);
 }

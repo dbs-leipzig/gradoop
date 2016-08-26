@@ -30,15 +30,15 @@ import java.io.Serializable;
  */
 public interface Aggregator<IN> extends Serializable {
   /**
-   * Adds the given value to the getVertexIncrement.
+   * Adds the given value to the aggregate.
    *
-   * @param value value to getVertexIncrement
+   * @param value value to aggregate
    */
   void aggregate(IN value);
   /**
-   * Returns the final getVertexIncrement.
+   * Returns the final aggregate.
    *
-   * @return getVertexIncrement
+   * @return aggregate
    */
   PropertyValue getAggregate();
   /**
@@ -55,7 +55,7 @@ public interface Aggregator<IN> extends Serializable {
    */
   String getAggregatePropertyKey();
   /**
-   * Resets the internal getVertexIncrement value.
+   * Resets the internal aggregate value.
    */
   void resetAggregate();
 }

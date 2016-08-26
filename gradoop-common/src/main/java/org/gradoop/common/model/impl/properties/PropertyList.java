@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Represents a list of properties.
  *
- * PropertyValues inside property lists are ordered by their insertion order. A
+ * Properties inside property lists are ordered by their insertion order. A
  * property list cannot contain two properties with the same key.
  *
  * Two property lists are considered equal, if they contain the same

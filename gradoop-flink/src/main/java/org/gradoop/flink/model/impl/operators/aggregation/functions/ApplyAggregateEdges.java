@@ -59,13 +59,13 @@ public class ApplyAggregateEdges implements GroupCombineFunction
 
     Tuple2<GradoopId, Edge> graphIdEdge = iterator.next();
 
-    Edge vertex = graphIdEdge.f1;
+    Edge edge = graphIdEdge.f1;
 
-    PropertyValue aggregate = aggFunc.getEdgeIncrement(vertex);
+    PropertyValue aggregate = aggFunc.getEdgeIncrement(edge);
 
     while (iterator.hasNext()) {
-      vertex = iterator.next().f1;
-      PropertyValue increment = aggFunc.getEdgeIncrement(vertex);
+      edge = iterator.next().f1;
+      PropertyValue increment = aggFunc.getEdgeIncrement(edge);
 
       if (increment != null) {
         if (aggregate == null) {

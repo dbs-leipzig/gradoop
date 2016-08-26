@@ -49,7 +49,7 @@ public class BuildSuperVertex extends BuildBase implements
    *
    * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be considered
-   * @param valueAggregators  getVertexIncrement functions for vertex values
+   * @param valueAggregators  aggregate functions for vertex values
    * @param vertexFactory     vertex factory
    */
   public BuildSuperVertex(List<String> groupPropertyKeys,

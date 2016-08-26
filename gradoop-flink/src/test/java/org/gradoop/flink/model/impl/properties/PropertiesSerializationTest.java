@@ -16,14 +16,14 @@ public class PropertiesSerializationTest extends GradoopFlinkTestBase {
   @Test
   public void testPropertyValueSerialization() throws Exception {
     PropertyValue pIn = PropertyValue.create(10L);
-    assertEquals("Property Values were not equal", pIn,
+    assertEquals("Property values were not equal", pIn,
       GradoopFlinkTestUtils.writeAndRead(pIn, getExecutionEnvironment()));
   }
 
   @Test
   public void testPropertySerialization() throws Exception {
     Property pIn = Property.create("key1", 10L);
-    assertEquals("PropertyValues were not equal", pIn,
+    assertEquals("Properties were not equal", pIn,
       GradoopFlinkTestUtils.writeAndRead(pIn, getExecutionEnvironment()));
   }
 

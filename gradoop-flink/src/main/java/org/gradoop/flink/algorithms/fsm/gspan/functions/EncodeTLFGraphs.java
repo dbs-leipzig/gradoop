@@ -266,7 +266,7 @@ public class EncodeTLFGraphs
   }
 
   /**
-   * Read label frequencies of all partitions, getVertexIncrement their global
+   * Read label frequencies of all partitions, aggregate their global
    * frequency, filter frequent ones and create a label dictionary including
    * its inverse dictionary. Write both to cache.
    *

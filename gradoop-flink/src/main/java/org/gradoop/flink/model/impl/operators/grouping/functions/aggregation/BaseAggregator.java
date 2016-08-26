@@ -39,7 +39,7 @@ public abstract class BaseAggregator<IN> implements Aggregator<IN> {
   private final String propertyKey;
 
   /**
-   * Property key to use for storing the final getVertexIncrement.
+   * Property key to use for storing the final aggregate.
    */
   private final String aggregatePropertyKey;
 
@@ -71,30 +71,30 @@ public abstract class BaseAggregator<IN> implements Aggregator<IN> {
   }
 
   /**
-   * Checks if the internal getVertexIncrement has been initialized.
+   * Checks if the internal aggregate has been initialized.
    *
    * @return true, iff the internal value is initialized
    */
   protected abstract boolean isInitialized();
 
   /**
-   * Initializes the internal getVertexIncrement.
+   * Initializes the internal aggregate.
    *
    * @param value first property value.
    */
   protected abstract void initializeAggregate(IN value);
 
   /**
-   * Adds the given value to the internal getVertexIncrement.
+   * Adds the given value to the internal aggregate.
    *
    * @param value property value
    */
   protected abstract void aggregateInternal(IN value);
 
   /**
-   * Returns the getVertexIncrement.
+   * Returns the aggregate.
    *
-   * @return getVertexIncrement
+   * @return aggregate
    */
   protected abstract PropertyValue getAggregateInternal();
 }

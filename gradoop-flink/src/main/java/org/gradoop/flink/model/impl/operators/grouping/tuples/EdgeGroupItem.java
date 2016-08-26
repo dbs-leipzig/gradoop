@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f1: target vertex id
  * f2: edge group label
  * f3: edge group property values
- * f4: edge group getVertexIncrement values
+ * f4: edge group aggregate values
  */
 public class EdgeGroupItem
   extends

@@ -119,7 +119,7 @@ public class FrequentLossPatterns
     GraphCollection btgs = iig
       .callForCollection(new BusinessTransactionGraphs());
 
-    // (3) getVertexIncrement financial result
+    // (3) aggregate financial result
     btgs = btgs.apply(new ApplyAggregation(new Result()));
 
     // (4) filter by loss (negative financialResult)

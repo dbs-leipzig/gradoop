@@ -32,7 +32,7 @@ public interface EdgeAggregateFunction extends AggregateFunction {
    *
    * @param edge edge
    *
-   * @return increment
+   * @return increment, may be NULL, which is handled in the operator
    */
   PropertyValue getEdgeIncrement(Edge edge);
 }
