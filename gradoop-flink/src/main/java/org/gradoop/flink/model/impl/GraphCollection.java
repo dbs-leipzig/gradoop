@@ -42,8 +42,6 @@ import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
 import org.gradoop.flink.model.impl.functions.epgm.GraphElementSet;
-import org.gradoop.flink.model.impl.functions.epgm
-  .GraphElementsHeadsToTransaction;
 import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.GraphVerticesEdges;
 import org.gradoop.flink.model.impl.functions.epgm.Id;

@@ -20,8 +20,8 @@ package org.gradoop.flink.model.api.functions;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
 /**
- * Describes an getVertexIncrement function as input for the
- * {@link Aggregation} operator, where vertex and edge values are aggregated.
+ * Describes a vertex and edge aggregate function as input for the
+ * {@link Aggregation} operator.
  */
 public interface VertexAndEdgeAggregateFunction
   extends VertexAggregateFunction, EdgeAggregateFunction {

@@ -162,12 +162,12 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     FilterFunction<Edge> edgeFilterFunction);
 
   /**
-   * Applies the given getVertexIncrement function to the logical graph and stores the
+   * Applies the given aggregate function to the logical graph and stores the
    * result of that function at the resulting graph using the given property
    * key.
    *
-   * @param aggregateFunc computes an getVertexIncrement on the logical graph
-   * @return logical graph with additional property storing the getVertexIncrement
+   * @param aggregateFunc computes an aggregate on the logical graph
+   * @return logical graph with additional property storing the aggregate
    */
   LogicalGraph aggregate(AggregateFunction aggregateFunc);
 

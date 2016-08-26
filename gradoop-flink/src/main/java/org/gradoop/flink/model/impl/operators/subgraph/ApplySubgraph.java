@@ -51,9 +51,9 @@ import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeEdgeGraphs
 import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeTupleGraphs;
 
 /**
- * Takes a collection of logical graphs and a user defined getVertexIncrement function as
- * input. The getVertexIncrement function is applied on each logical graph contained in
- * the collection and the getVertexIncrement is stored as an additional property at the
+ * Takes a collection of logical graphs and a user defined aggregate function as
+ * input. The aggregate function is applied on each logical graph contained in
+ * the collection and the aggregate is stored as an additional property at the
  * graphs.
  */
 public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {

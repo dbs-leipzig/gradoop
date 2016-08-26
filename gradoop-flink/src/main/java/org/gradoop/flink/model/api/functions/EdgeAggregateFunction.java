@@ -22,11 +22,17 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
 /**
- * Describes an getVertexIncrement function as input for the
- * {@link Aggregation} operator, where only edge values are aggregated.
+ * Describes an edge aggregate function as input for the
+ * {@link Aggregation} operator.
  */
 public interface EdgeAggregateFunction extends AggregateFunction {
 
+  /**
+   * Describes the increment of an edge that should be added to the aggregate.
+   *
+   * @param edge edge
+   *
+   * @return increment
+   */
   PropertyValue getEdgeIncrement(Edge edge);
-
 }

@@ -67,53 +67,28 @@ public class ApplyAggregation
     DataSet<Vertex> vertices = collection.getVertices();
     DataSet<Edge> edges = collection.getEdges();
 
-    DataSet<Tuple2<GradoopId, PropertyValue>> aggregateValues;
+    DataSet<Tuple2<GradoopId, PropertyValue>> aggregate;
 
-    if (this.aggregateFunction instanceof VertexAggregateFunction &&
-      this.aggregateFunction instanceof EdgeAggregateFunction) {
+    if (this.aggregateFunction instanceof VertexAndEdgeAggregateFunction) {
+      DataSet<Tuple2<GradoopId, PropertyValue>> vertexAggregate =
+        aggregateVertices(vertices);
 
-      VertexAndEdgeAggregateFunction aggregateFunction =
-        (VertexAndEdgeAggregateFunction) this.aggregateFunction;
+      DataSet<Tuple2<GradoopId, PropertyValue>> edgeAggregate =
+        aggregateEdges(edges);
 
-      DataSet<Tuple2<GradoopId, PropertyValue>> vertexAggregateValues = vertices
-        .flatMap(new GraphElementExpander<Vertex>())
-        .groupBy(0)
-        .combineGroup(new ApplyAggregateVertices(aggregateFunction));
-
-      DataSet<Tuple2<GradoopId, PropertyValue>> edgeAggregateValues = edges
-        .flatMap(new GraphElementExpander<Edge>())
-        .groupBy(0)
-        .combineGroup(new ApplyAggregateEdges(aggregateFunction));
-
-      aggregateValues = vertexAggregateValues
-        .union(edgeAggregateValues);
+      aggregate = vertexAggregate.union(edgeAggregate);
 
     } else if (this.aggregateFunction instanceof VertexAggregateFunction) {
-
-      VertexAggregateFunction aggregateFunction =
-        (VertexAggregateFunction) this.aggregateFunction;
-
-      aggregateValues = vertices
-        .flatMap(new GraphElementExpander<Vertex>())
-        .groupBy(0)
-        .combineGroup(new ApplyAggregateVertices(aggregateFunction));
-
+      aggregate = aggregateVertices(vertices);
     } else {
-      EdgeAggregateFunction aggregateFunction =
-        (EdgeAggregateFunction) this.aggregateFunction;
-
-      aggregateValues = edges
-        .flatMap(new GraphElementExpander<Edge>())
-        .groupBy(0)
-        .combineGroup(new ApplyAggregateEdges(aggregateFunction));
+      aggregate = aggregateEdges(edges);
     }
 
-    aggregateValues = aggregateValues
+    aggregate = aggregate
       .groupBy(0)
       .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
-    
     DataSet<GraphHead> graphHeads = collection.getGraphHeads()
-      .coGroup(aggregateValues)
+      .coGroup(aggregate)
       .where(new Id<GraphHead>()).equalTo(0)
       .with(new SetAggregateProperties(aggregateFunction));
 
@@ -121,6 +96,36 @@ public class ApplyAggregation
       collection.getVertices(),
       collection.getEdges(),
       collection.getConfig());
+  }
+
+  /**
+   * Applies an aggregate function to the partitions of a vertex data set.
+   *
+   * @param vertices vertex data set
+   * @return partition aggregate value
+   */
+  private DataSet<Tuple2<GradoopId, PropertyValue>> aggregateVertices(
+    DataSet<Vertex> vertices) {
+    return vertices
+      .flatMap(new GraphElementExpander<Vertex>())
+      .groupBy(0)
+      .combineGroup(new ApplyAggregateVertices(
+        (VertexAggregateFunction) aggregateFunction));
+  }
+
+  /**
+   * Applies an aggregate function to the partitions of an edge data set.
+   *
+   * @param edges edge data set
+   * @return partition aggregate value
+   */
+  private DataSet<Tuple2<GradoopId, PropertyValue>> aggregateEdges(
+    DataSet<Edge> edges) {
+    return edges
+      .flatMap(new GraphElementExpander<Edge>())
+      .groupBy(0)
+      .combineGroup(new ApplyAggregateEdges(
+        (EdgeAggregateFunction) aggregateFunction));
   }
 
   @Override

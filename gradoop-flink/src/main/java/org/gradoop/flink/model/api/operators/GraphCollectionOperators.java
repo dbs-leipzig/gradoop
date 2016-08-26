@@ -248,7 +248,7 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
     UnaryCollectionToGraphOperator op);
 
   /**
-   * Applies a given unary graph to graph operator (e.g., getVertexIncrement) on each
+   * Applies a given unary graph to graph operator (e.g., aggregate) on each
    * logical graph in the graph collection.
    *
    * @param op applicable unary graph to graph operator
