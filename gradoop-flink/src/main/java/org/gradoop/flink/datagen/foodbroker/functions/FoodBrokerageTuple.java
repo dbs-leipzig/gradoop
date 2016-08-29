@@ -144,6 +144,7 @@ public class FoodBrokerageTuple
    */
   private Map<GradoopId, BigDecimal> productPriceMap;
 
+  private long currentId = 1;
   /**
    * Valued consturctor
    *
@@ -308,8 +309,11 @@ public class FoodBrokerageTuple
     String label = "SalesQuotation";
     PropertyList properties = new PropertyList();
 
-    properties.set("date", startDate);
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set("date", startDate);
+    String bid = createBusinessIdentifier(
+      currentId++, Constants.SALESQUOTATION_ACRONYM);
+    properties.set("num", bid);
 
     Vertex salesQuotation = vertexFactory.createVertex(label, properties, 
       graphIds);
@@ -419,6 +423,9 @@ public class FoodBrokerageTuple
     long date = config.delayDelayConfiguration(salesQuotationDate,
       influencingMasterQuality, "SalesQuotation", "confirmationDelay");
     properties.set("date", date);
+    String bid = createBusinessIdentifier(
+      currentId++, Constants.SALESORDER_ACRONYM);
+    properties.set("num", bid);
 
     GradoopId rndEmployee = getNextEmplyoee();
     influencingMasterQuality.clear();
@@ -528,6 +535,9 @@ public class FoodBrokerageTuple
         Constants.EMPLOYEE_MAP), "PurchOrder", "purchaseDelay");
 
     properties.set("date", date);
+    String bid = createBusinessIdentifier(
+      currentId++, Constants.PURCHORDER_ACRONYM);
+    properties.set("num", bid);
 
     purchOrder = vertexFactory.createVertex(label, properties, graphIds);
 
@@ -648,8 +658,6 @@ public class FoodBrokerageTuple
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
 
-    properties.set("trackingCode", "***TODO***");
-
     deliveryNote = vertexFactory.createVertex(label, properties, graphIds);
 
     long purchOrderDate = purchOrder.getPropertyValue("date")
@@ -663,6 +671,11 @@ public class FoodBrokerageTuple
     long date = config.delayDelayConfiguration(purchOrderDate,
       influencingMasterQuality, "PurchOrder", "deliveryDelay");
     deliveryNote.setProperty("date", date);
+    String bid = createBusinessIdentifier(
+      currentId++, Constants.DELIVERYNOTE_ACRONYM);
+    deliveryNote.setProperty("num", bid);
+
+    deliveryNote.setProperty("trackingCode", "***TODO***");
 
     newEdge("contains", deliveryNote.getId(), purchOrder.getId());
     newEdge("operatedBy", deliveryNote.getId(), operatedBy);
@@ -729,16 +742,18 @@ public class FoodBrokerageTuple
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
 
-    properties.set("expense", total);
-    properties.set("text", "*** TODO @ FoodBrokerageTuple ***");
-
     long purchOrderDate = purchOrder.getPropertyValue("date")
         .getLong();
     long date = config.delayDelayConfiguration(purchOrderDate,
       getEdgeTargetQuality("placedAt", purchOrder.getId(),
         Constants.VENDOR_MAP), "PurchOrder", "invoiceDelay");
     properties.set("date", date);
+    String bid = createBusinessIdentifier(
+      currentId++, Constants.PURCHINVOICE_ACRONYM);
+    properties.set("num", bid);
 
+    properties.set("expense", total);
+    properties.set("text", "*** TODO @ FoodBrokerageTuple ***");
     purchInvoice = vertexFactory.createVertex(label, properties, graphIds);
 
     newEdge("createdFor", purchInvoice.getId(), purchOrder.getId());
@@ -761,8 +776,6 @@ public class FoodBrokerageTuple
 
     PropertyList properties = new PropertyList();
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set("revenue", BigDecimal.ZERO);
-    properties.set("text", "*** TODO @ FoodBrokerageTuple ***");
 
     long salesOrderDate = salesOrder.getPropertyValue("date")
         .getLong();
@@ -770,7 +783,12 @@ public class FoodBrokerageTuple
       getEdgeTargetQuality("processedBy", salesOrder.getId(),
         Constants.EMPLOYEE_MAP), "SalesOrder", "invoiceDelay");
     properties.set("date", date);
+    String bid = createBusinessIdentifier(
+      currentId++, Constants.SALESINVOICE_ACRONYM);
+    properties.set("num", bid);
 
+    properties.set("revenue", BigDecimal.ZERO);
+    properties.set("text", "*** TODO @ FoodBrokerageTuple ***");
     salesInvoice = vertexFactory.createVertex(label, properties, graphIds);
 
     BigDecimal revenue;
@@ -789,6 +807,14 @@ public class FoodBrokerageTuple
 
     newVertex(salesInvoice);
     return salesInvoice;
+  }
+
+  private String createBusinessIdentifier(long seed, String acronym) {
+    String idString = String.valueOf(seed);
+    for(int i = 1; i <= (8 - idString.length()); i++) {
+      idString = "0" + idString;
+    }
+    return acronym + idString;
   }
 
   /**
