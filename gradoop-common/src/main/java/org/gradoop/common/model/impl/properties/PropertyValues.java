@@ -188,8 +188,8 @@ public class PropertyValues {
       int maxType = Math.max(aType, bType);
 
       if (maxType != BIG_DECIMAL && // not big decimal
-        aType % 2 != aType % 2 && // different supertype
-        maxType % 2 != 0) { // high supertype is integer
+        aType % 2 != bType % 2 && // different supertype
+        maxType % 2 == 0) { // high supertype is integer
 
         // next decimal type
         maxType++;
