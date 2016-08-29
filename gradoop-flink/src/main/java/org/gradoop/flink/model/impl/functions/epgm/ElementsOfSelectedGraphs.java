@@ -17,20 +17,35 @@
 
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+
+import java.util.Collection;
 
 /**
- * Takes an object of type GraphElement, and creates a tuple2 for each
- *  gradoop id containing in the set of the object and the object.
- * element => (graphId, element)
+ * graphIds (BC)
+ * element => (graphId, element),..
+ *
+ * \forall (graphId, element) : graphId \in graphIds
+ *
  * @param <EL> graph element type
  */
-public class GraphElementExpander<EL extends GraphElement> implements
-  FlatMapFunction<EL, Tuple2<GradoopId, EL>> {
+public class ElementsOfSelectedGraphs<EL extends GraphElement> extends
+  RichFlatMapFunction<EL, Tuple2<GradoopId, EL>> {
+
+  /**
+   * constant string for "graph ids"
+   */
+  public static final String GRAPH_IDS = "graphIds";
+
+  /**
+   * graph ids
+   */
+  protected Collection<GradoopId> graphIds;
 
   /**
    * reuse tuple
@@ -40,17 +55,26 @@ public class GraphElementExpander<EL extends GraphElement> implements
   /**
    * constructor
    */
-  public GraphElementExpander() {
+  public ElementsOfSelectedGraphs() {
     reuse = new Tuple2<>();
+  }
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+
+    graphIds = getRuntimeContext().getBroadcastVariable(GRAPH_IDS);
   }
 
   @Override
   public void flatMap(EL el, Collector
     <Tuple2<GradoopId, EL>> collector) throws Exception {
     for (GradoopId graphId : el.getGraphIds()) {
-      reuse.f0 = graphId;
-      reuse.f1 = el;
-      collector.collect(reuse);
+      if (graphIds.contains(graphId)) {
+        reuse.f0 = graphId;
+        reuse.f1 = el;
+        collector.collect(reuse);
+      }
     }
   }
 }

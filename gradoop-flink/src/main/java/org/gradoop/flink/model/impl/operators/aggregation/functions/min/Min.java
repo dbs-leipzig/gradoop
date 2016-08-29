@@ -17,67 +17,18 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
-import org.gradoop.flink.model.impl.operators.aggregation.functions
-  .GetPropertyValue;
-import org.gradoop.flink.model.impl.operators.aggregation.functions
-  .GraphIdsWithPropertyValue;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValues;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Utility method to compute the minimum of a property of elements in a dataset
- * without collecting it.
+ * Superclass of aggregate functions that determine a minimal value.
  */
-public class Min {
+public abstract class Min implements AggregateFunction {
 
-  /**
-   * Computes the minimum of the given property of elements in the given dataset
-   * and stores the result in a 1-element dataset.
-   *
-   * @param dataSet input dataset
-   * @param propertyKey key of property
-   * @param max maximum of the same type as the property value
-   * @param <EL>     element type in input dataset
-   * @return 1-element dataset with minimum of input dataset
-   */
-  public static <EL extends Element> DataSet<PropertyValue> min(
-    DataSet<EL> dataSet,
-    String propertyKey,
-    Number max) {
-    return dataSet
-      .map(new GetPropertyValue<EL>(propertyKey, max))
-      .union(dataSet.getExecutionEnvironment()
-        .fromElements(new Tuple1<>(PropertyValue.create(max))))
-      .reduce(new MinOfPropertyValues(max))
-      .map(new ValueOf1<PropertyValue>());
-  }
-
-  /**
-   * Groups the input dataset by the contained elements and computes the minimum
-   * of a property for each group.
-   * Returns a {@code Tuple2} containing the group element and the
-   * corresponding minimum value.
-   *
-   * @param dataSet input dataset
-   * @param propertyKey key of property
-   * @param max maximum, of the same type as the property value
-   * @param <EL>     element type in input dataset
-   * @return {@code Tuple2} with group value and group minimum
-   */
-  public static <EL extends GraphElement>
-  DataSet<Tuple2<GradoopId, PropertyValue>> groupBy(
-    DataSet<EL> dataSet,
-    String propertyKey,
-    Number max) {
-    return dataSet
-      .flatMap(new GraphIdsWithPropertyValue<EL>(propertyKey))
-      .groupBy(0)
-      .reduceGroup(new MinOfPropertyValuesGroups(max));
+  @Override
+  public PropertyValue aggregate(PropertyValue aggregate,
+    PropertyValue increment) {
+    return PropertyValues.Numeric.min(aggregate, increment);
   }
 }

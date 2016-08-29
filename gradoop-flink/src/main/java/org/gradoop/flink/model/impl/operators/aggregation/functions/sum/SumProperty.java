@@ -15,38 +15,32 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.aggregation.functions;
+package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 
 /**
- * Aggregation function for which a default value can be
- * specified in the constructor.
+ * Superclass if aggregate functions that sum property values of vertices OR
+ * edges.
  */
-public abstract class AggregateWithDefaultValueFunction
-  implements AggregateFunction,  ApplyAggregateFunction {
+public abstract class SumProperty extends Sum implements AggregateFunction {
 
   /**
-   * User defined default value.
+   * Property key whose value should be aggregated.
    */
-  protected Number defaultValue;
+  protected final String propertyKey;
 
   /**
-   * Constructor
-   * @param defaultValue user defined default value
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
    */
-  public AggregateWithDefaultValueFunction(Number defaultValue) {
-    this.defaultValue = defaultValue;
+  public SumProperty(String propertyKey) {
+    this.propertyKey = propertyKey;
   }
 
-  /**
-   * Return default property value.
-   * @return default property value of this aggregation function
-   */
   @Override
-  public Number getDefaultValue() {
-    return this.defaultValue;
+  public String getAggregatePropertyKey() {
+    return "sum(" + propertyKey + ")";
   }
-
 }

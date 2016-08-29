@@ -19,22 +19,16 @@ package org.gradoop.examples.biiig;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.apache.hadoop.util.Time;
 import org.gradoop.common.cache.DistributedCache;
 import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValues;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
@@ -42,17 +36,17 @@ import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.DecodeDFSCodes;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
-import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 import org.gradoop.flink.model.impl.operators.transformation
   .ApplyTransformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 /**
  * Example workflow of paper "Scalable Business Intelligence with Graph
@@ -126,7 +120,7 @@ public class FrequentLossPatterns
       .callForCollection(new BusinessTransactionGraphs());
 
     // (3) aggregate financial result
-    btgs = btgs.apply(new ApplyAggregation(RESULT_KEY, new Result()));
+    btgs = btgs.apply(new ApplyAggregation(new Result()));
 
     // (4) filter by loss (negative financialResult)
     btgs = btgs.select(new Loss());
@@ -151,7 +145,7 @@ public class FrequentLossPatterns
     // (7) Check, if frequent subgraph contains master data
 
     frequentSubgraphs = frequentSubgraphs.apply(
-      new ApplyAggregation(MASTERDATA_KEY, new DetermineMasterDataSurplus()));
+      new ApplyAggregation(new DetermineMasterDataSurplus()));
 
     // (8) Select graphs containing master data
 
@@ -186,7 +180,8 @@ public class FrequentLossPatterns
   /**
    * Calculate the financial result of business transaction graphs.
    */
-  private static class Result implements ApplyAggregateFunction {
+  private static class Result
+    extends Sum implements VertexAggregateFunction {
 
     /**
      * Property key for revenue values.
@@ -197,63 +192,29 @@ public class FrequentLossPatterns
      */
     private static final String EXPENSE_KEY = "expense";
 
+
     @Override
-    public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection collection) {
+    public PropertyValue getVertexIncrement(Vertex vertex) {
+      PropertyValue increment;
 
-      return collection.getVertices()
-        .flatMap(new FlatMapFunction<Vertex, Tuple2<GradoopId, BigDecimal>>() {
+      if (vertex.hasProperty(REVENUE_KEY)) {
+        increment = vertex.getPropertyValue(REVENUE_KEY);
 
-          @Override
-          public void flatMap(Vertex value,
-            Collector<Tuple2<GradoopId, BigDecimal>> out) throws Exception {
+      } else if (vertex.hasProperty(EXPENSE_KEY)) {
+        PropertyValue expense = vertex.getPropertyValue(EXPENSE_KEY);
+        increment = PropertyValues.Numeric
+          .multiply(expense, PropertyValue.create(-1));
 
-            if (value.hasProperty(REVENUE_KEY)) {
-              for (GradoopId graphId : value.getGraphIds()) {
-                out.collect(new Tuple2<>(
-                  graphId, value.getPropertyValue(REVENUE_KEY).getBigDecimal())
-                );
-              }
-            } else if (value.hasProperty(EXPENSE_KEY)) {
-              for (GradoopId graphId : value.getGraphIds()) {
-                out.collect(new Tuple2<>(
-                  graphId, value.getPropertyValue(EXPENSE_KEY).getBigDecimal()
-                  .multiply(BigDecimal.valueOf(-1)))
-                );
-              }
-            }
-          }
-        })
-        .groupBy(0)
-        .reduceGroup(
-          new GroupReduceFunction<Tuple2<GradoopId, BigDecimal>,
-            Tuple2<GradoopId, PropertyValue>>() {
+      } else {
+        increment = PropertyValue.create(0);
+      }
 
-            @Override
-            public void reduce(Iterable<Tuple2<GradoopId, BigDecimal>> values,
-              Collector<Tuple2<GradoopId, PropertyValue>> out) throws
-              Exception {
-
-              Iterator<Tuple2<GradoopId, BigDecimal>> iterator = values
-                .iterator();
-
-              Tuple2<GradoopId, BigDecimal> first = iterator.next();
-
-              GradoopId graphId = first.f0;
-              BigDecimal sum = first.f1;
-
-              while (iterator.hasNext()) {
-                sum = sum.add(iterator.next().f1);
-              }
-
-              out.collect(new Tuple2<>(graphId, PropertyValue.create(sum)));
-            }
-          });
+      return increment;
     }
 
     @Override
-    public Number getDefaultValue() {
-      return BigDecimal.valueOf(0);
+    public String getAggregatePropertyKey() {
+      return RESULT_KEY;
     }
   }
 
@@ -261,44 +222,17 @@ public class FrequentLossPatterns
    * Counts master data vertices less than the number of transactional vertices.
    */
   private static class DetermineMasterDataSurplus
-    implements ApplyAggregateFunction {
+    extends Sum implements VertexAggregateFunction {
 
     @Override
-    public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-      GraphCollection collection) {
-      return collection
-        .getVertices()
-        .map(new MapFunction<Vertex, Tuple2<GradoopId, Integer>>() {
-          @Override
-
-          public Tuple2<GradoopId, Integer> map(Vertex value) throws
-            Exception {
-
-            GradoopId graphId = value.getGraphIds().iterator().next();
-
-            return value.getLabel().startsWith(MASTER_PREFIX) ?
-              new Tuple2<>(graphId, 1) :
-              new Tuple2<>(graphId, -1);
-          }
-        })
-        .groupBy(0)
-        .sum(1)
-        .map(
-          new MapFunction<Tuple2<GradoopId, Integer>,
-            Tuple2<GradoopId, PropertyValue>>() {
-
-
-            @Override
-            public Tuple2<GradoopId, PropertyValue> map(
-              Tuple2<GradoopId, Integer> value) throws Exception {
-              return new Tuple2<>(value.f0, PropertyValue.create(value.f1));
-            }
-          });
+    public PropertyValue getVertexIncrement(Vertex vertex) {
+      return vertex.getLabel().startsWith(MASTER_PREFIX) ?
+        PropertyValue.create(1) : PropertyValue.create(-1);
     }
 
     @Override
-    public Number getDefaultValue() {
-      return 0;
+    public String getAggregatePropertyKey() {
+      return MASTERDATA_KEY;
     }
   }
 

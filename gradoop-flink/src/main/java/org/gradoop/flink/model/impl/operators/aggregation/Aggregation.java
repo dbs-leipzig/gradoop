@@ -18,12 +18,20 @@
 package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.functions.VertexAndEdgeAggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.PropertySetterBroadcast;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionAggregates;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateEdges;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateVertices;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,27 +43,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Aggregation implements UnaryGraphToGraphOperator {
 
   /**
-   * Used to store aggregate result.
-   */
-  private final String aggregatePropertyKey;
-
-  /**
    * User-defined aggregate function which is applied on a single logical graph.
    */
-  private final AggregateFunction aggregationFunction;
+  private final AggregateFunction aggregateFunction;
 
   /**
    * Creates new aggregation.
    *
-   * @param aggregatePropertyKey property key to store result of {@code
-   *                             aggregationFunction}
-   * @param aggregationFunction  user defined aggregation function which gets
+   * @param aggregateFunction  user defined aggregation function which gets
    *                             called on the input graph
    */
-  public Aggregation(final String aggregatePropertyKey,
-    final AggregateFunction aggregationFunction) {
-    this.aggregatePropertyKey = checkNotNull(aggregatePropertyKey);
-    this.aggregationFunction = checkNotNull(aggregationFunction);
+  public Aggregation(final AggregateFunction aggregateFunction) {
+    this.aggregateFunction = checkNotNull(aggregateFunction);
   }
 
   /**
@@ -64,17 +63,63 @@ public class Aggregation implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 
-    DataSet<PropertyValue> aggregateValue = aggregationFunction.execute(graph);
+    DataSet<Vertex> vertices = graph.getVertices();
+    DataSet<Edge> edges = graph.getEdges();
+
+    DataSet<PropertyValue> aggregate;
+
+    if (this.aggregateFunction instanceof VertexAndEdgeAggregateFunction) {
+      DataSet<PropertyValue> vertexAggregate = aggregateVertices(vertices);
+      DataSet<PropertyValue> edgeAggregate = aggregateEdges(edges);
+      aggregate = vertexAggregate.union(edgeAggregate);
+
+    } else if (this.aggregateFunction instanceof VertexAggregateFunction) {
+      aggregate = aggregateVertices(vertices);
+
+    } else {
+      aggregate = aggregateEdges(edges);
+    }
+
+    DataSet<PropertyValue> nullValue = graph
+      .getConfig()
+      .getExecutionEnvironment()
+      .fromElements(PropertyValue.NULL_VALUE);
+
+    aggregate = aggregate
+      .reduceGroup(new CombinePartitionAggregates(aggregateFunction))
+      .union(nullValue)
+      .reduceGroup(new SetNullIfEmpty());
 
     DataSet<GraphHead> graphHead = graph.getGraphHead()
-      .map(new PropertySetterBroadcast<GraphHead>(aggregatePropertyKey))
-      .withBroadcastSet(aggregateValue, PropertySetterBroadcast.VALUE);
+      .map(new SetAggregateProperty(aggregateFunction))
+      .withBroadcastSet(aggregate, SetAggregateProperty.VALUE);
 
-    return LogicalGraph.fromDataSets(
-        graphHead,
-        graph.getVertices(),
-        graph.getEdges(),
-        graph.getConfig());
+    return LogicalGraph
+      .fromDataSets(graphHead, vertices, edges, graph.getConfig());
+  }
+
+  /**
+   * Applies an aggregate function to the partitions of a vertex data set.
+   *
+   * @param vertices vertex data set
+   * @return partition aggregate value
+   */
+  private DataSet<PropertyValue> aggregateVertices(DataSet<Vertex> vertices) {
+    return vertices
+      .combineGroup(new AggregateVertices(
+        (VertexAggregateFunction) aggregateFunction));
+  }
+
+  /**
+   * Applies an aggregate function to the partitions of an edge data set.
+   *
+   * @param edges edge data set
+   * @return partition aggregate value
+   */
+  private DataSet<PropertyValue> aggregateEdges(DataSet<Edge> edges) {
+    return edges
+      .combineGroup(new AggregateEdges(
+        (EdgeAggregateFunction) aggregateFunction));
   }
 
   /**

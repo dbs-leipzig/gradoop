@@ -17,61 +17,22 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.graphcontainment.ExpandGraphsToIds;
-
-import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.ToPropertyValue;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.GroupCountToPropertyValue;
-import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
  * Aggregate function returning the vertex count of a graph / graph collection.
- *
  */
-public class VertexCount implements AggregateFunction, ApplyAggregateFunction {
+public class VertexCount extends Count implements VertexAggregateFunction {
 
-  /**
-   * Returns a 1-element dataset containing the vertex count of the given graph.
-   *
-   * @param graph input graph
-   * @return 1-element dataset with vertex count
-   */
   @Override
-  public DataSet<PropertyValue> execute(LogicalGraph graph) {
-    return Count
-      .count(graph.getVertices())
-      .map(new ToPropertyValue<Long>());
+  public PropertyValue getVertexIncrement(Vertex vertex) {
+    return PropertyValue.create(1L);
   }
 
-  /**
-   * Returns a dataset containing graph identifiers and the corresponding vertex
-   * count.
-   *
-   * @param collection input graph collection
-   * @return dataset with graph + vertex count tuples
-   */
   @Override
-  public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection collection) {
-    return Count.groupBy(collection.getVertices()
-      .flatMap(new ExpandGraphsToIds<Vertex>())
-    ).map(new GroupCountToPropertyValue());
-  }
-
-  /**
-   * Return default property value, in this case 0L.
-   * @return default property value of this aggregation function
-   */
-  @Override
-  public Number getDefaultValue() {
-    return 0L;
+  public String getAggregatePropertyKey() {
+    return "vertexCount";
   }
 }

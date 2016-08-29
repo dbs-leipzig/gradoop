@@ -17,63 +17,27 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateWithDefaultValueFunction;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate function returning the minimum of a specified property over all
- * edges.
+ * vertices.
  */
-public class MinEdgeProperty extends AggregateWithDefaultValueFunction {
+public class MinEdgeProperty extends MinProperty implements EdgeAggregateFunction {
 
   /**
-   * Property key to retrieve property values
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
    */
-  private String propertyKey;
-
-  /**
-   * Constructor
-   * @param propertyKey Property key to retrieve property values
-   * @param max user defined maximum, used as default property value
-   */
-  public MinEdgeProperty(
-    String propertyKey,
-    Number max) {
-    super(max);
-    this.propertyKey = propertyKey;
+  public MinEdgeProperty(String propertyKey) {
+    super(propertyKey);
   }
 
-  /**
-   * Returns a 1-element dataset containing the minimum of the given property
-   * over the given elements.
-   *
-   * @param graph input graph
-   * @return 1-element dataset with vertex count
-   */
   @Override
-  public DataSet<PropertyValue> execute(LogicalGraph graph) {
-    return Min.min(graph.getEdges(),
-      propertyKey,
-      getDefaultValue());
-  }
-
-  /**
-   * Returns a dataset containing graph identifiers and the corresponding edge
-   * minimum.
-   *
-   * @param collection input graph collection
-   * @return dataset with graph + edge count tuples
-   */
-  @Override
-  public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection collection) {
-    return Min.groupBy(collection.getEdges(),
-      propertyKey,
-      getDefaultValue());
+  public PropertyValue getEdgeIncrement(Edge edge) {
+    return edge.getPropertyValue(propertyKey);
   }
 }

@@ -15,21 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
+package org.gradoop.flink.model.impl.operators.aggregation.functions.bool;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValues;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Superclass of summing aggregate functions
+ * Superclass of aggregate functions determining a predicate support.
+ * e.g., graph contains a vertex labelled by "User"
  */
-public abstract class Sum implements AggregateFunction {
+public abstract class Or implements AggregateFunction {
 
   @Override
   public PropertyValue aggregate(
     PropertyValue aggregate, PropertyValue increment) {
-
-    return PropertyValues.Numeric.add(aggregate, increment);
+    return PropertyValues.Boolean.or(aggregate, increment);
   }
 }

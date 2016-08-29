@@ -338,9 +338,8 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph aggregate(String propertyKey,
-    AggregateFunction aggregateFunc) {
-    return callForGraph(new Aggregation(propertyKey, aggregateFunc));
+  public LogicalGraph aggregate(AggregateFunction aggregateFunc) {
+    return callForGraph(new Aggregation(aggregateFunc));
   }
 
   /**

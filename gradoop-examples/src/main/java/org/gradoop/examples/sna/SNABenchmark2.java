@@ -218,7 +218,7 @@ public class SNABenchmark2 extends AbstractRunner implements
       // 3b) separate communities
       .splitBy(label)
       // 4) compute vertex count per community
-      .apply(new ApplyAggregation(vertexCount, new VertexCount()))
+      .apply(new ApplyAggregation(new VertexCount()))
       // 5) select graphs with more than minClusterSize vertices
       .select(new FilterFunction<GraphHead>() {
         @Override
@@ -231,9 +231,9 @@ public class SNABenchmark2 extends AbstractRunner implements
       // 7) group that graph by vertex properties
       .groupBy(Lists.newArrayList(city, gender))
       // 8a) count vertices of grouped graph
-      .aggregate(vertexCount, new VertexCount())
+      .aggregate(new VertexCount())
       // 8b) count edges of grouped graph
-      .aggregate(edgeCount, new EdgeCount());
+      .aggregate(new EdgeCount());
   }
 
   @Override

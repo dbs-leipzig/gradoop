@@ -15,21 +15,34 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
+package org.gradoop.flink.model.impl.operators.aggregation;
 
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
-import org.gradoop.flink.model.api.functions.AggregateFunction;
+
+import java.util.Iterator;
 
 /**
- * Superclass of summing aggregate functions
+ * NULL, aggregateValue => aggregateValue
+ * OR
+ * NULL => NULL
  */
-public abstract class Sum implements AggregateFunction {
+public class SetNullIfEmpty
+  implements GroupReduceFunction<PropertyValue, PropertyValue> {
 
   @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
+  public void reduce(Iterable<PropertyValue> values,
+    Collector<PropertyValue> out) throws Exception {
 
-    return PropertyValues.Numeric.add(aggregate, increment);
+    Iterator<PropertyValue> iterator = values.iterator();
+
+    PropertyValue value = iterator.next();
+
+    if (iterator.hasNext() && value.equals(PropertyValue.NULL_VALUE)) {
+      value = iterator.next();
+    }
+
+    out.collect(value);
   }
 }

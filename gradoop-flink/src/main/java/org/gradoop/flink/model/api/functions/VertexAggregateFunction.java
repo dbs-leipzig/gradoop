@@ -15,21 +15,24 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
+package org.gradoop.flink.model.api.functions;
 
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
-import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
 /**
- * Superclass of summing aggregate functions
+ * Describes a vertex aggregate function as input for the
+ * {@link Aggregation} operator.
  */
-public abstract class Sum implements AggregateFunction {
+public interface VertexAggregateFunction extends AggregateFunction {
 
-  @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
-
-    return PropertyValues.Numeric.add(aggregate, increment);
-  }
+  /**
+   * Describes the increment of a vertex that should be added to the aggregate.
+   *
+   * @param vertex vertex
+   *
+   * @return increment, may be NULL, which is handled in the operator
+   */
+  PropertyValue getVertexIncrement(Vertex vertex);
 }

@@ -19,45 +19,37 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.Set;
 
 /**
- * (graphId, {vertex,..}) |><| (graphID, {edge,..})
- * => (graphId, {vertex,..}, {edge,..})
+ * (graphHead) |><| (graphId,{vertex,..},{edge,..})
+ *    => (graphHead,{vertex,..},{edge,..})
  */
-public class GraphVerticesEdges implements JoinFunction<
-  Tuple2<GradoopId, Set<Vertex>>, Tuple2<GradoopId, Set<Edge>>,
-  Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> {
+public class TransactionFromSets implements JoinFunction
+  <GraphHead, Tuple3<GradoopId, Set<Vertex>, Set<Edge>>, GraphTransaction> {
 
   @Override
-  public Tuple3<GradoopId, Set<Vertex>, Set<Edge>> join(
-    Tuple2<GradoopId, Set<Vertex>> vertexPair,
-    Tuple2<GradoopId, Set<Edge>> edgePair) throws Exception {
+  public GraphTransaction join(GraphHead graphHead,
+    Tuple3<GradoopId, Set<Vertex>, Set<Edge>> sets) throws Exception {
 
-    GradoopId graphId;
     Set<Vertex> vertices;
     Set<Edge> edges;
 
-    if (vertexPair == null) {
-      graphId = edgePair.f0;
+    if (sets.f0 == null) {
       vertices = Sets.newHashSetWithExpectedSize(0);
-      edges = edgePair.f1;
+      edges = Sets.newHashSetWithExpectedSize(0);
     } else {
-      graphId = vertexPair.f0;
-      vertices = vertexPair.f1;
-      edges = edgePair == null ? getEmptyEdgeSet() : edgePair.f1;
+      vertices = sets.f1;
+      edges = sets.f2;
     }
 
-    return new Tuple3<>(graphId, vertices, edges);
-  }
-
-  private Set<Edge> getEmptyEdgeSet() {
-    return Sets.newHashSetWithExpectedSize(0);
+    return new GraphTransaction(graphHead, vertices, edges);
   }
 }

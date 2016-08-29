@@ -17,64 +17,27 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateWithDefaultValueFunction;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
- * Aggregate function returning the maximum of a specified property over all
+ * Aggregate function returning the minimum of a specified property over all
  * vertices.
  */
-public class MaxVertexProperty extends AggregateWithDefaultValueFunction {
+public class MaxVertexProperty extends MaxProperty implements VertexAggregateFunction {
 
   /**
-   * Property key to retrieve property values
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
    */
-  private String propertyKey;
-
-  /**
-   * Constructor
-   * @param propertyKey Property key to retrieve property values
-   * @param min user defined minimum, used as default property value
-   */
-  public MaxVertexProperty(
-    String propertyKey,
-    Number min) {
-    super(min);
-    this.propertyKey = propertyKey;
+  public MaxVertexProperty(String propertyKey) {
+    super(propertyKey);
   }
 
-  /**
-   * Returns a 1-element dataset containing the maximum of the given property
-   * over the given elements.
-   *
-   * @param graph input graph
-   * @return 1-element dataset with vertex count
-   */
   @Override
-  public DataSet<PropertyValue> execute(LogicalGraph graph) {
-    return Max.max(
-      graph.getVertices(),
-      propertyKey,
-      getDefaultValue());
-  }
-
-  /**
-   * Returns a dataset containing graph identifiers and the corresponding edge
-   * maximum.
-   *
-   * @param collection input graph collection
-   * @return dataset with graph + edge count tuples
-   */
-  @Override
-  public DataSet<Tuple2<GradoopId, PropertyValue>> execute(
-    GraphCollection collection) {
-    return Max.groupBy(collection.getVertices(),
-      propertyKey,
-      getDefaultValue());
+  public PropertyValue getVertexIncrement(Vertex vertex) {
+    return vertex.getPropertyValue(propertyKey);
   }
 }

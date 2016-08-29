@@ -19,49 +19,48 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Performs a left outer join between an epgm element and a tuple of gradoop id
- * and property value. The property values are set as new properties on each
- * element with the specified property key.
- * @param <G> epgm element type
+ * Sets aggregate values of a graph heads.
  */
-public class LeftOuterPropertySetter<G extends Element> implements
-  CoGroupFunction<G, Tuple2<GradoopId, PropertyValue>, G> {
+public class SetAggregateProperties implements
+  CoGroupFunction<GraphHead, Tuple2<GradoopId, PropertyValue>, GraphHead> {
 
   /**
-   * Property key
+   * aggregate property key
    */
   private final String propertyKey;
-
   /**
-   * User defined default value
+   * default value used to replace aggregate value in case of NULL.
    */
   private final PropertyValue defaultValue;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param propertyKey property key to set value
-   * @param defaultValue user defined default value for left groups without
-   *                     matching right group
+   * @param aggregateFunction aggregate function
    */
-  public LeftOuterPropertySetter(final String propertyKey,
-    PropertyValue defaultValue) {
-    this.propertyKey = checkNotNull(propertyKey);
-    this.defaultValue = defaultValue;
+  public SetAggregateProperties(final AggregateFunction aggregateFunction) {
+    checkNotNull(aggregateFunction);
+    this.propertyKey = aggregateFunction.getAggregatePropertyKey();
+    this.defaultValue = aggregateFunction instanceof AggregateDefaultValue ?
+      ((AggregateDefaultValue) aggregateFunction).getDefaultValue() :
+      PropertyValue.NULL_VALUE;
   }
 
   @Override
-  public void coGroup(Iterable<G> left,
-    Iterable<Tuple2<GradoopId, PropertyValue>> right, Collector<G> out) throws
-    Exception {
-    for (G leftElem : left) {
+  public void coGroup(Iterable<GraphHead> left,
+    Iterable<Tuple2<GradoopId, PropertyValue>> right, Collector<GraphHead> out
+  ) throws Exception {
+
+    for (GraphHead leftElem : left) {
       boolean rightEmpty = true;
       for (Tuple2<GradoopId, PropertyValue> rightElem : right) {
         leftElem.setProperty(propertyKey, rightElem.f1);

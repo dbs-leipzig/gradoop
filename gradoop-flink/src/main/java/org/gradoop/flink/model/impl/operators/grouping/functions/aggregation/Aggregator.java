@@ -23,8 +23,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.io.Serializable;
 
 /**
- * Defines an aggregate function that can be applied on vertex and edge groups
- * during {@link Grouping}.
+ * Defines an aggregate function that can be applied on vertex and edge
+ * groups during {@link Grouping}.
  *
  * @param <IN> input type for the specific aggregation function
  */
