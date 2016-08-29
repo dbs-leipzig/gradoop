@@ -105,6 +105,8 @@ public class ComplaintTuple
   private Set<Edge> purchOrderLines;
   private Vertex salesOrder;
 
+  private long currentId = 1;
+
 
   public ComplaintTuple(GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory, EdgeFactory edgeFactory,
@@ -340,8 +342,11 @@ public class ComplaintTuple
 
       PropertyList properties = new PropertyList();
       properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-      properties.set("text", "*** TODO @ ComplaintHandling ***");
       properties.set("date", ticket.getPropertyValue("createdAt").getLong());
+      String bid = createBusinessIdentifier(
+        currentId++, Constants.SALESINVOICE_ACRONYM);
+      properties.set("num", bid);
+      properties.set("text", "*** TODO @ ComplaintHandling ***");
       properties.set("revenue", refundAmount);
 
       Vertex salesInvoice = vertexFactory.createVertex(label, properties,
@@ -386,10 +391,12 @@ public class ComplaintTuple
       PropertyList properties = new PropertyList();
 
       properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-
+      properties.set("date", ticket.getPropertyValue("createdAt").getLong());
+      String bid = createBusinessIdentifier(
+        currentId++, Constants.PURCHINVOICE_ACRONYM);
+      properties.set("num", bid);
       properties.set("expense", refundAmount);
       properties.set("text", "*** TODO @ ComplaintHandling ***");
-      properties.set("date", ticket.getPropertyValue("createdAt").getLong());
 
       Vertex purchInvoice =
         this.vertexFactory.createVertex(label, properties, graphIds); // TODO
@@ -440,6 +447,14 @@ public class ComplaintTuple
       }
     }
     return null;
+  }
+
+  private String createBusinessIdentifier(long seed, String acronym) {
+    String idString = String.valueOf(seed);
+    for(int i = 1; i <= (8 - idString.length()); i++) {
+      idString = "0" + idString;
+    }
+    return acronym + idString;
   }
 
   /**

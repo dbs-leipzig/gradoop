@@ -74,4 +74,11 @@ public class Constants {
   public static final String VERTEX_MAP = "vertexMap";
 
   public static final String EDGE_MAP = "edgeMap";
+
+  public static final String SALESQUOTATION_ACRONYM = "SQN";
+  public static final String SALESORDER_ACRONYM = "SOR";
+  public static final String PURCHORDER_ACRONYM = "POR";
+  public static final String DELIVERYNOTE_ACRONYM = "DLV";
+  public static final String PURCHINVOICE_ACRONYM = "PIN";
+  public static final String SALESINVOICE_ACRONYM = "PIN";
 }
