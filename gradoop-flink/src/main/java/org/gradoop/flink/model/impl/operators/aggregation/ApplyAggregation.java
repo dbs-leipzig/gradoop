@@ -30,7 +30,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAndEdgeAggregateFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
+import org.gradoop.flink.model.impl.functions.epgm.ElementsOfSelectedGraphs;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateEdges;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateVertices;
@@ -64,30 +64,36 @@ public class ApplyAggregation
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
+
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads();
     DataSet<Vertex> vertices = collection.getVertices();
     DataSet<Edge> edges = collection.getEdges();
 
     DataSet<Tuple2<GradoopId, PropertyValue>> aggregate;
 
+    DataSet<GradoopId> graphIds = graphHeads
+      .map(new Id<GraphHead>());
+
     if (this.aggregateFunction instanceof VertexAndEdgeAggregateFunction) {
       DataSet<Tuple2<GradoopId, PropertyValue>> vertexAggregate =
-        aggregateVertices(vertices);
+        aggregateVertices(vertices, graphIds);
 
       DataSet<Tuple2<GradoopId, PropertyValue>> edgeAggregate =
-        aggregateEdges(edges);
+        aggregateEdges(edges, graphIds);
 
       aggregate = vertexAggregate.union(edgeAggregate);
 
     } else if (this.aggregateFunction instanceof VertexAggregateFunction) {
-      aggregate = aggregateVertices(vertices);
+      aggregate = aggregateVertices(vertices, graphIds);
     } else {
-      aggregate = aggregateEdges(edges);
+      aggregate = aggregateEdges(edges, graphIds);
     }
 
     aggregate = aggregate
       .groupBy(0)
       .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
+
+    graphHeads = graphHeads
       .coGroup(aggregate)
       .where(new Id<GraphHead>()).equalTo(0)
       .with(new SetAggregateProperties(aggregateFunction));
@@ -102,12 +108,14 @@ public class ApplyAggregation
    * Applies an aggregate function to the partitions of a vertex data set.
    *
    * @param vertices vertex data set
+   * @param graphIds graph ids to aggregate
    * @return partition aggregate value
    */
   private DataSet<Tuple2<GradoopId, PropertyValue>> aggregateVertices(
-    DataSet<Vertex> vertices) {
+    DataSet<Vertex> vertices, DataSet<GradoopId> graphIds) {
     return vertices
-      .flatMap(new GraphElementExpander<Vertex>())
+      .flatMap(new ElementsOfSelectedGraphs<Vertex>())
+      .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
       .combineGroup(new ApplyAggregateVertices(
         (VertexAggregateFunction) aggregateFunction));
@@ -117,12 +125,14 @@ public class ApplyAggregation
    * Applies an aggregate function to the partitions of an edge data set.
    *
    * @param edges edge data set
+   * @param graphIds graph ids to aggregate
    * @return partition aggregate value
    */
   private DataSet<Tuple2<GradoopId, PropertyValue>> aggregateEdges(
-    DataSet<Edge> edges) {
+    DataSet<Edge> edges, DataSet<GradoopId> graphIds) {
     return edges
-      .flatMap(new GraphElementExpander<Edge>())
+      .flatMap(new ElementsOfSelectedGraphs<Edge>())
+      .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
       .combineGroup(new ApplyAggregateEdges(
         (EdgeAggregateFunction) aggregateFunction));

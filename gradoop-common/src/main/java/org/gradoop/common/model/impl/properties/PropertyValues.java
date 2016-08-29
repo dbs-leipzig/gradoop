@@ -441,7 +441,7 @@ public class PropertyValues {
       case INT:
         return BigDecimal.valueOf(value.getInt());
       case LONG:
-        return BigDecimal.valueOf(value.getDouble());
+        return BigDecimal.valueOf(value.getLong());
       case FLOAT:
         return BigDecimal.valueOf(value.getFloat());
       default:

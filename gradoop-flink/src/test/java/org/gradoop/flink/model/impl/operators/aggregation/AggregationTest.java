@@ -40,6 +40,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -344,7 +347,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
         "g0[" +
         "(va {vp=0.5});" +
-        "(vc {vp=0.1});" +
+        "(vc {vp=1});" +
         "(va)-[ea {ep=2L}]->(vb);" +
         "(vb)-[eb {ep=2.0F}]->(vc)" +
         "]" +
@@ -385,8 +388,11 @@ public class AggregationTest extends GradoopFlinkTestBase {
         graphHead.getPropertyValue(sumEdgeProperty.getAggregatePropertyKey());
 
       if (graphHead.getId().equals(g0Id)) {
-        assertEquals(0.6f, vertexAggregate.getFloat(), 0.00001);
-        assertEquals(4.0f, edgeAggregate.getFloat(), 0.00001);
+        assertEquals(1.5d, vertexAggregate.getDouble(), 0.00001);
+        assertEquals(
+          new BigDecimal("4.0"),
+          edgeAggregate.getBigDecimal()
+            .round(new MathContext(2, RoundingMode.HALF_UP)));
       } else if (graphHead.getId().equals(g1Id)) {
         assertEquals(0.5f, vertexAggregate.getFloat(), 0.00001);
         assertEquals(2L, edgeAggregate.getLong());
