@@ -110,10 +110,12 @@ public class FoodBroker implements CollectionGenerator {
 
     Brokerage brokerage = new Brokerage(foodBrokerConfig, gradoopFlinkConfig,
       customers, vendors, logistics, employees, products, caseSeeds);
+    brokerage.execute();
 
     ComplaintHandling complaintHandling = new ComplaintHandling(
       foodBrokerConfig, gradoopFlinkConfig, customers, vendors, logistics,
         employees, products, caseSeeds, brokerage.getTuple());
+    complaintHandling.execute();
 
     DataSet<Vertex> transactionalVertices = brokerage.getTransactions()
       .union(complaintHandling.getTransactions())
