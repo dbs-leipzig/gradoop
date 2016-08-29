@@ -50,6 +50,11 @@ public class TLFFileFormat implements
   private int graphId = 0;
 
   /**
+   * TLF graph number indicator
+   */
+  private static final String NEW_GRAPH_TAG = "#";
+
+  /**
    * Creates a TLF string representation of a given graph transaction.
    *
    * @param graphTransaction graph transaction
@@ -57,23 +62,26 @@ public class TLFFileFormat implements
    */
   @Override
   public String format(GraphTransaction graphTransaction) {
+    StringBuilder builder = new StringBuilder();
+
     Map<GradoopId, Integer> vertexIdMap = Maps
       .newHashMapWithExpectedSize(graphTransaction.getVertices().size());
 
-    Collection<String> lines = Lists.newArrayListWithExpectedSize(
-      graphTransaction.getVertices().size() +
-        graphTransaction.getEdges().size() + 1
-    );
-
     // GRAPH HEAD
-    lines.add(TLFGraph.SYMBOL + " # " + graphId);
+    builder.append(String.format("%s %s %s%n",
+      TLFGraph.SYMBOL,
+      NEW_GRAPH_TAG,
+      graphId));
     graphId++;
 
     // VERTICES
     int vertexId = 0;
     for (Vertex vertex : graphTransaction.getVertices()) {
       vertexIdMap.put(vertex.getId(), vertexId);
-      lines.add(TLFVertex.SYMBOL + " " + vertexId + " " + vertex.getLabel());
+      builder.append(String.format("%s %s %s%n",
+        TLFVertex.SYMBOL,
+        vertexId,
+        vertex.getLabel()));
       vertexId++;
     }
 
@@ -82,9 +90,12 @@ public class TLFFileFormat implements
       Integer sourceId = vertexIdMap.get(edge.getSourceId());
       Integer targetId = vertexIdMap.get(edge.getTargetId());
 
-      lines.add(TLFEdge.SYMBOL +
-        " " + sourceId + " " + targetId + "" +  " " + edge.getLabel());
+      builder.append(String.format("%s %s %s %s%n",
+        TLFEdge.SYMBOL,
+        sourceId,
+        targetId,
+        edge.getLabel()));
     }
-    return StringUtils.join(lines, "\n");
+    return builder.toString().trim();
   }
 }
