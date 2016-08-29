@@ -266,7 +266,7 @@ public class ComplaintTuple
 
     properties.set("erpSoNum", salesOrder.getId().toString());
     properties.set("problem", problem);
-    properties.set(Constants.SUPERTYPE_KEY, "Constants.SUPERCLASS_VALUE_TRANSACTIONAL");
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("createdAt", createdAt);
 
     GradoopId employeeId = getNextEmployee();
