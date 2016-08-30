@@ -68,13 +68,15 @@ public abstract class AbstractMasterDataGenerator
     qualityCounts.put(foodBrokerConfig.getQualityNormal(), normalCount);
     qualityCounts.put(foodBrokerConfig.getQualityBad(), badCount);
 
+    int j = 0;
     for(Map.Entry<Float, Integer> qualityCount : qualityCounts.entrySet()) {
 
       Float quality = qualityCount.getKey();
 
       for(int i = 1; i <= qualityCount.getValue(); i++) {
-        seedList.add(new MasterDataSeed(i , quality));
+        seedList.add(new MasterDataSeed(i + j , quality));
       }
+      j += qualityCount.getValue();
     }
 
     Collections.shuffle(seedList);
