@@ -6,11 +6,13 @@ import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 
 public class MasterData {
-  static String createBusinessIdentifier(MasterDataSeed seed, String acronym) {
+  private static String createBusinessIdentifier(MasterDataSeed seed, String
+    acronym) {
 
-    String idString = seed.getNumber().toString();
+    String idString = String.valueOf(seed.getNumber());
+    long count = 8 - idString.length();
 
-    for(int i = 1; i <= (8 - idString.length()); i++) {
+    for(int i = 1; i <= (count); i++) {
       idString = "0" + idString;
     }
 
