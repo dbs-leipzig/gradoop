@@ -24,10 +24,10 @@ public class MasterData {
 
     PropertyList properties = new PropertyList();
 
-    properties.set("num", bid);
-    properties.set(Constants.QUALITY, seed.getQuality());
     properties.set(Constants.SUPERTYPE_KEY,
       Constants.SUPERCLASS_VALUE_MASTER);
+    properties.set("num", bid);
+    properties.set(Constants.QUALITY, seed.getQuality());
     properties.set(Constants.SOURCEID_KEY, "ERP_" + bid);
 
     return properties;
