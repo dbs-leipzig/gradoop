@@ -266,10 +266,10 @@ public class ComplaintTuple
     String label = "Ticket";
     PropertyList properties = new PropertyList();
 
-    properties.set("erpSoNum", salesOrder.getId().toString());
-    properties.set("problem", problem);
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("createdAt", createdAt);
+    properties.set("problem", problem);
+    properties.set("erpSoNum", salesOrder.getId().toString());
 
     GradoopId employeeId = getNextEmployee();
     GradoopId customerId = getEdgeTargetId("receivedFrom", salesOrder.getId());
@@ -346,8 +346,8 @@ public class ComplaintTuple
       String bid = createBusinessIdentifier(
         currentId++, Constants.SALESINVOICE_ACRONYM);
       properties.set("num", bid);
-      properties.set("text", "*** TODO @ ComplaintHandling ***");
       properties.set("revenue", refundAmount);
+      properties.set("text", "*** TODO @ ComplaintHandling ***");
 
       Vertex salesInvoice = vertexFactory.createVertex(label, properties,
         graphIds);
