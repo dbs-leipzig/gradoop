@@ -50,12 +50,19 @@ public class ComplaintHandling extends AbstractBusinessProcess {
       deliveryNotes = foodBrokerageTuple
         .map(new ComplaintData());
 
+    long globalSeed = 0;
+    try {
+      globalSeed = caseSeeds.count() + 1;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
     DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple =
       deliveryNotes
         .mapPartition(new ComplaintTuple(
           gradoopFlinkConfig.getGraphHeadFactory(),
           gradoopFlinkConfig.getVertexFactory(),
-          gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
+          gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig, globalSeed))
         .withBroadcastSet(customerDataMap, Constants.CUSTOMER_MAP)
         .withBroadcastSet(vendorDataMap, Constants.VENDOR_MAP)
         .withBroadcastSet(logisticDataMap, Constants.LOGISTIC_MAP)

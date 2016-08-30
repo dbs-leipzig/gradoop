@@ -107,14 +107,17 @@ public class ComplaintTuple
 
   private long currentId = 1;
 
+  private long globalSeed;
+
 
   public ComplaintTuple(GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory, EdgeFactory edgeFactory,
-    FoodBrokerConfig config) {
+    FoodBrokerConfig config, long globalSeed) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
     this.config = config;
+    this.globalSeed = globalSeed;
 
   }
 
@@ -186,6 +189,7 @@ public class ComplaintTuple
         graphTransaction.setEdges(edges);
         collector.collect(new Tuple2<GraphTransaction, Set<Vertex>>
           (graphTransaction, masterData));
+        globalSeed++;
       }
     }
   }
@@ -449,12 +453,20 @@ public class ComplaintTuple
     return null;
   }
 
-  private String createBusinessIdentifier(long seed, String acronym) {
-    String idString = String.valueOf(seed);
-    for(int i = 1; i <= (8 - idString.length()); i++) {
+
+  private String createBusinessIdentifier(long seed,
+    String acronym) {
+    String seedString = String.valueOf(seed);
+    String idString = String.valueOf(globalSeed);
+    int count = 6 - idString.length();
+    for(int i = 1; i <= (count); i++) {
       idString = "0" + idString;
     }
-    return acronym + idString;
+    count = 6 - seedString.length();
+    for(int i = 1; i <= (count); i++) {
+      seedString = "0" + seedString;
+    }
+    return acronym + idString + "-" + seedString;
   }
 
   /**
