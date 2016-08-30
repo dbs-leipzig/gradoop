@@ -145,6 +145,8 @@ public class FoodBrokerageTuple
   private Map<GradoopId, BigDecimal> productPriceMap;
 
   private long currentId = 1;
+
+  private long globalSeed;
   /**
    * Valued consturctor
    *
@@ -236,6 +238,7 @@ public class FoodBrokerageTuple
     GraphTransaction graphTransaction;
 
     for (Long seed: iterable) {
+      globalSeed = seed;
       vertexMap = Maps.newHashMap();
       edgeMap = Maps.newHashMap();
 //      vertices = Sets.newHashSet();
@@ -809,12 +812,19 @@ public class FoodBrokerageTuple
     return salesInvoice;
   }
 
-  private String createBusinessIdentifier(long seed, String acronym) {
-    String idString = String.valueOf(seed);
-    for(int i = 1; i <= (8 - idString.length()); i++) {
+  private String createBusinessIdentifier(long seed,
+    String acronym) {
+    String seedString = String.valueOf(seed);
+    String idString = String.valueOf(globalSeed);
+    int count = 6 - idString.length();
+    for(int i = 1; i <= (count); i++) {
       idString = "0" + idString;
     }
-    return acronym + idString;
+    count = 6 - seedString.length();
+    for(int i = 1; i <= (count); i++) {
+      seedString = "0" + seedString;
+    }
+    return acronym + idString + "-" + seedString;
   }
 
   /**
