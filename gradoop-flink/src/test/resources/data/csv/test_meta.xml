@@ -5,66 +5,97 @@
             xsi:schemaLocation="http://www.gradoop.org/csvInput
             http://www.gradoop.org/csvInput/csv_format.xsd">
 
-    <csvfile name="test_graph.csv" charset="utf8" seperator="|"
-             graphelementtype="graph">
-        <label>
-            <specified>Graph</specified>
-        </label>
-        <key>
-            <id>
-                <field>0</field>
-            </id>
-            <sys>TestGraph</sys>
-        </key>
-        <columns>
-            <column name="id" type="Long"/>
-        </columns>
-    </csvfile>
+    <domain name="">
 
-    <csvfile name="test_vertex.csv" charset="utf8" seperator="|"
-             graphelementtype="vertex">
-        <label>
-            <field>1</field>
-            <field>2</field>
-        </label>
-        <containment>
-            <graphid>0</graphid>
-        </containment>
-        <key>
-            <id>
-                <field>0</field>
-            </id>
-            <sys>TestVertex</sys>
-        </key>
-        <columns>
-            <column name="id" type="Integer"/>
-            <column name="attr1" type="String"/>
-            <column name="attr2" type="String"/>
-        </columns>
-    </csvfile>
+        <csv name="test_graph.csv" charset="utf8" saperator="|">
+            <columns>
+                <column id="1" pos="1" type="Long"/>
+            </columns>
+            <graphhead>
+                <label separator="_">
+                    <static name="graph"/> <!-- static oder ref column-->
+                    <!-- <ref column_id="1"/>  <!- columnref -->
+                </label>
 
-    <csvfile name="test_edge.csv" charset="utf8" seperator="|"
-             graphelementtype="edge">
-        <label>
-            <specified>edge</specified>
-        </label>
-        <containment>
-            <graphid>0</graphid>
-        </containment>
-        <edgeids sourceid="1" targetid="2"/>
-        <key>
-            <id>
-                <field>1</field>
-                <field>2</field>
-            </id>
-            <sys>TestEdge</sys>
-        </key>
-        <columns>
-            <column name="edgelabel" type="String"/>
-            <column name="sourceId" type="Long"/>
-            <column name="targetID" type="Long"/>
-        </columns>
-    </csvfile>
+                <key domain_name=""> <!-- separator intern e.g. arrays -->
+                    <static name="graph"/> <!-- static oder ref column-->
+                    <!-- <ref column_id="1"/>  <!- columnref -->
+                </key>
+            </graphhead>
+        </csv>
+        <csv name="test_graph.csv" charset="utf8" saperator="|">
+            <columns>
+                <column id="1" type="Long"/>
+            </columns>
+            <vertex>
+                <properties>
+                    <property column_id="" name=""/>
+                </properties>
 
+                <label separator="_">
+                    <static name="graph"/> <!-- static oder ref column-->
+                    <!-- <ref column_id="1"/>  <!- columnref -->
+                </label>
+
+                <key domain_name="">
+                    <static name="graph"/> <!-- static oder ref column-->
+                    <!-- <ref column_id="1"/>  <!- columnref -->
+                </key>
+
+                <edges>
+                    <reference datasource_name="">
+                        <key domain_name="">
+                            <static name="graph"/> <!-- static oder ref column-->
+                            <!-- <ref column_id="1"/>  <!- columnref -->
+                        </key>
+                        <properties>
+                            <property column_id="" name=""/>
+                        </properties>
+                    </reference>
+                </edges>
+                <graphs>
+                    <reference datasource_name="">
+                        <key domain_name="">
+                            <static name="graph"/> <!-- static oder ref column-->
+                            <!-- <ref column_id="1"/>  <!- columnref -->
+                        </key>
+                    </reference>
+                </graphs>
+            </vertex>
+        </csv>
+        <csv name="test_graph.csv" charset="utf8" saperator="|">
+            <columns>
+                <column id="1" pos="1" type="Long"/>
+            </columns>
+            <edge>
+                <label separator="_">
+                    <static name="graph"/> <!-- static oder ref column-->
+                    <!-- <ref column_id="1"/>  <!- columnref -->
+                </label>
+                <key domain_name=""> <!-- optional-->
+                    <static name="graph"/> <!-- static oder ref column-->
+                    <!-- <ref column_id="1"/>  <!- columnref -->
+                </key>
+                <source>
+                    <static name="graph"/> <!-- static oder ref column-->
+                    <!-- <ref column_id="1"/>  <!- columnref -->
+                </source>
+                <target>
+                    <static name="graph"/> <!-- static oder ref column-->
+                    <!-- <ref column_id="1"/>  <!- columnref -->
+                </target>
+                <properties>
+                    <property column_id="" name=""/>
+                </properties>
+                <graphs>
+                    <reference datasource_name="">
+                        <key domain_name="">
+                            <static name="graph"/> <!-- static oder ref column-->
+                            <!-- <ref column_id="1"/>  <!- columnref -->
+                        </key>
+                    </reference>
+                </graphs>
+            </edge>
+        </csv>
+    </domain>
 </datasource>
-

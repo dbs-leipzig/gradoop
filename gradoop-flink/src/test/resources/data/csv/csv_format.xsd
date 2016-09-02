@@ -4,33 +4,33 @@
             targetNamespace="http://www.gradoop.org/csvInput"
             elementFormDefault="qualified">
 
-    <!--csvFile attributes -->
-    <xsd:attributeGroup name="csvfileattributes">
+    <!--csv attributes -->
+    <xsd:attributeGroup name="csvattributes">
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="charset" type="xsd:string"/>
-        <xsd:attribute name="seperator" type="xsd:string"/>
-        <xsd:attribute name="graphelementtype" type="graphelementEnum"/>
+        <xsd:attribute name="saperator" type="xsd:string"/>
     </xsd:attributeGroup>
     <!--edgeids attributes -->
-    <xsd:attributeGroup name="edgeidsattributes">
+    <!--<xsd:attributeGroup name="edgeidsattributes">
         <xsd:attribute name="sourceid" type="xsd:int"/>
         <xsd:attribute name="targetid" type="xsd:int"/>
-    </xsd:attributeGroup>
+    </xsd:attributeGroup> -->
     <!--collumntype attributes -->
     <xsd:attributeGroup name="collumnattributes">
-        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="id" type="xsd:long"/>
+        <xsd:attribute name="pos" type="xsd:long"/>
         <xsd:attribute name="type" type="typesEnum"/>
     </xsd:attributeGroup>
 
 
     <!-- Enums -->
-    <xsd:simpleType name="graphelementEnum">
+    <!--<xsd:simpleType name="graphelementEnum">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="graph"/>
             <xsd:enumeration value="vertex"/>
             <xsd:enumeration value="edge"/>
         </xsd:restriction>
-    </xsd:simpleType>
+    </xsd:simpleType>-->
 
     <xsd:simpleType name="typesEnum">
         <xsd:restriction base="xsd:string">
@@ -63,41 +63,169 @@
     </xsd:element>
 
 
-    <xsd:element name="id">
+    <!--<xsd:element name="id">
         <xsd:complexType>
             <xsd:sequence>
                 <xsd:element name="field" type="xsd:int" minOccurs="1"
                             maxOccurs="unbounded"/>
             </xsd:sequence>
         </xsd:complexType>
+    </xsd:element> -->
+
+    <xsd:element name="static">
+        <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string"/>
+        </xsd:complexType>
     </xsd:element>
+
+    <xsd:element name="ref">
+        <xsd:complexType>
+            <xsd:attribute name="column_id" type="xsd:long"/>
+        </xsd:complexType>
+    </xsd:element>
+
+        <xsd:complexType name="staticorref">
+            <xsd:choice>
+                <xsd:element ref="static"/>
+                <xsd:element ref="ref"/>
+            </xsd:choice>
+            <xsd:attribute name="domain_name" type="xsd:string"/>
+        </xsd:complexType>
 
     <xsd:element name="key">
         <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="id"/>
-                <xsd:element name="sys" type="xsd:string"/>
-            </xsd:sequence>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="containment">
-        <xsd:complexType>
-            <xsd:sequence>
-                <!-- containment, frage welcher DT für graph ids?-->
-                <xsd:element name="graphid" type="xsd:anyType" minOccurs="0"
-                            maxOccurs="unbounded"/>
-            </xsd:sequence>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="edgeids">
-        <xsd:complexType>
-            <xsd:attributeGroup ref="edgeidsattributes"/>
+            <xsd:complexContent>
+                <xsd:extension base="staticorref"/>
+            </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="label">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="staticorref">
+                    <xsd:attribute name="separator" type="xsd:string"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="source">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="staticorref"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="target">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="staticorref"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="graphhead">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="label"/>
+                <xsd:element ref="key"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="property">
+        <xsd:complexType>
+            <xsd:attribute name="column_id"/>
+            <xsd:attribute name="name"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="properties">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="property" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="reference">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="key"/>
+                <xsd:element ref="properties" minOccurs="0" maxOccurs="1"/>
+            </xsd:sequence>
+            <xsd:attribute name="datasource_name" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="objectreferences">
+        <xsd:sequence>
+            <xsd:element ref="reference" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="edges">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="objectreferences"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="graphs">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="objectreferences"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <xsd:element name="vertex">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="properties"/>
+                <xsd:element ref="label"/>
+                <xsd:element ref="key"/>
+                <xsd:element ref="edges"/>
+                <xsd:element ref="graphs"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="edge">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="label"/>
+                <xsd:element ref="key"/>
+                <xsd:element ref="source"/>
+                <xsd:element ref="target"/>
+                <xsd:element ref="properties"/>
+                <xsd:element ref="graphs"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <!--<xsd:element name="containment">
+        <xsd:complexType>
+            <xsd:sequence>
+                <- containment, frage welcher DT für graph ids?->
+                <xsd:element name="graphid" type="xsd:anyType" minOccurs="0"
+                            maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element> -->
+
+   <!-- <xsd:element name="edgeids">
+        <xsd:complexType>
+            <xsd:attributeGroup ref="edgeidsattributes"/>
+        </xsd:complexType>
+    </xsd:element> -->
+
+   <!-- <xsd:element name="label">
         <xsd:complexType>
             <xsd:choice>
                 <xsd:element name="specified" type="xsd:string"/>
@@ -107,25 +235,35 @@
                 </xsd:sequence>
             </xsd:choice>
         </xsd:complexType>
-    </xsd:element>
+    </xsd:element> -->
 
-    <xsd:element name="csvfile">
+    <xsd:element name="csv">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element ref="label"/>
-                <xsd:element ref="containment" minOccurs="0" maxOccurs="1"/>
-                <xsd:element ref="edgeids" minOccurs="0" maxOccurs="1"/>
-                <xsd:element ref="key"/>
                 <xsd:element ref="columns"/>
+                <xsd:choice>
+                    <xsd:element ref="graphhead"/>
+                    <xsd:element ref="vertex"/>
+                    <xsd:element ref="edge"/>
+                </xsd:choice>
             </xsd:sequence>
-            <xsd:attributeGroup ref="csvfileattributes"/>
+            <xsd:attributeGroup ref="csvattributes"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="domain">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="csv" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:attribute name="name" type="xsd:string"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="datasource">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element ref="csvfile" minOccurs="1" maxOccurs="unbounded"/>
+                <xsd:element ref="domain" minOccurs="1" maxOccurs="unbounded"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
