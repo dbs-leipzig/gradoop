@@ -27,7 +27,7 @@
     </xsd:attributeGroup>
     <!-- label attributes -->
     <xsd:attributeGroup name="labelattributes">
-        <xsd:attribute name="separator" type="xsd:string"/>
+        <xsd:attribute name="separator" type="xsd:string" use="optional"/>
     </xsd:attributeGroup>
     <!-- static attributes -->
     <xsd:attributeGroup name="staticattributes">
@@ -78,7 +78,9 @@
     <xsd:complexType name="staticorref">
         <xsd:choice>
             <xsd:element ref="static"/>
-            <xsd:element ref="ref"/>
+            <xsd:sequence>
+                <xsd:element ref="ref" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
         </xsd:choice>
     </xsd:complexType>
 
@@ -199,6 +201,7 @@
                 <xsd:element ref="key"/>
             </xsd:sequence>
         </xsd:complexType>
+
     </xsd:element>
 
     <xsd:element name="column">
@@ -227,6 +230,16 @@
             </xsd:sequence>
             <xsd:attributeGroup ref="csvattributes"/>
         </xsd:complexType>
+
+        <xsd:key name="columnkey">
+            <xsd:selector xpath="columns/column"/>
+            <xsd:field xpath="@type"/>
+        </xsd:key>
+
+        <xsd:keyref name="columnkeyref" refer="columnkey">
+            <xsd:selector xpath="graphhead/label/ref"/>
+            <xsd:field xpath="@column_id"/>
+        </xsd:keyref>
     </xsd:element>
 
     <xsd:element name="domain">
@@ -244,6 +257,8 @@
                 <xsd:element ref="domain" minOccurs="1" maxOccurs="unbounded"/>
             </xsd:sequence>
         </xsd:complexType>
+
+
     </xsd:element>
 
 </xsd:schema>

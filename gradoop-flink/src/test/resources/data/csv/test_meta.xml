@@ -9,12 +9,14 @@
 
         <csv name="test_graph.csv" charset="utf8" saperator="|">
             <columns>
+                <column id="0" pos="0" type="Long"/>
                 <column id="1" pos="1" type="Long"/>
             </columns>
             <graphhead>
                 <label separator="_">
-                    <static name="graph"/> <!-- static oder ref column-->
-                    <!-- <ref column_id="1"/>  <!- columnref -->
+                    <!-- <static name="graph"/> <!- static oder ref column-->
+                    <ref column_id="0"/>  <!-- columnref -->
+                    <ref column_id="1"/>
                 </label>
 
                 <key domain_name=""> <!-- separator intern e.g. arrays -->
@@ -28,10 +30,6 @@
                 <column id="1" type="Long"/>
             </columns>
             <vertex>
-                <properties>
-                    <property column_id="" name=""/>
-                </properties>
-
                 <label separator="_">
                     <static name="graph"/> <!-- static oder ref column-->
                     <!-- <ref column_id="1"/>  <!- columnref -->
@@ -49,7 +47,7 @@
                             <!-- <ref column_id="1"/>  <!- columnref -->
                         </key>
                         <properties>
-                            <property column_id="" name=""/>
+                            <property column_id="1" name="test"/>
                         </properties>
                     </reference>
                 </edges>
@@ -61,6 +59,10 @@
                         </key>
                     </reference>
                 </graphs>
+
+                <properties>
+                    <property column_id="1" name="test"/>
+                </properties>
             </vertex>
         </csv>
         <csv name="test_graph.csv" charset="utf8" saperator="|">
@@ -84,9 +86,6 @@
                     <static name="graph"/> <!-- static oder ref column-->
                     <!-- <ref column_id="1"/>  <!- columnref -->
                 </target>
-                <properties>
-                    <property column_id="" name=""/>
-                </properties>
                 <graphs>
                     <reference datasource_name="">
                         <key domain_name="">
@@ -95,6 +94,9 @@
                         </key>
                     </reference>
                 </graphs>
+                <properties>
+                    <property column_id="1" name="test"/>
+                </properties>
             </edge>
         </csv>
     </domain>
