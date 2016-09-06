@@ -1,12 +1,14 @@
 package org.gradoop.flink.datagen.foodbroker.process;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.foodbroker.functions.MasterDataMapFromTuple;
 import org.gradoop.flink.datagen.foodbroker.functions.MasterDataQualityMapper;
 import org.gradoop.flink.datagen.foodbroker.functions.ProductPriceMapper;
+import org.gradoop.flink.datagen.foodbroker.tuples.FoodBrokerMaps;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -44,6 +46,9 @@ public abstract class AbstractBusinessProcess implements BusinessProcess {
   protected DataSet<Map<GradoopId, Float>> employeeDataMap;
   protected DataSet<Map<GradoopId, Float>> productQualityDataMap;
   protected DataSet<Map<GradoopId, BigDecimal>> productPriceDataMap;
+
+
+  protected DataSet<Tuple2<GraphTransaction, FoodBrokerMaps>> foodBrokerageTuple;
 
   public AbstractBusinessProcess() {
   }
@@ -84,6 +89,10 @@ public abstract class AbstractBusinessProcess implements BusinessProcess {
     productPriceDataMap = products
       .map(new ProductPriceMapper())
       .reduceGroup(new MasterDataMapFromTuple<BigDecimal>());
+  }
+
+  public DataSet<Tuple2<GraphTransaction, FoodBrokerMaps>> getTuple() {
+    return foodBrokerageTuple;
   }
 
   @Override

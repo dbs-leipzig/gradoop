@@ -32,9 +32,6 @@ public class ComplaintHandling extends AbstractBusinessProcess {
 
   private DataSet<Vertex> userClients;
 
-  private DataSet<Tuple2<GraphTransaction, FoodBrokerMaps>> foodBrokerageTuple;
-
-
   public ComplaintHandling(FoodBrokerConfig foodBrokerConfig,
     GradoopFlinkConfig gradoopFlinkConfig,
     DataSet<Vertex> customers, DataSet<Vertex> vendors,
