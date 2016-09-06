@@ -70,7 +70,7 @@
 
     <xsd:element name="static">
         <xsd:complexType>
-            <xsd:attribute name="name" type="xsd:string"/>
+            <xsd:attributeGroup ref="staticattributes"/>
         </xsd:complexType>
     </xsd:element>
 
