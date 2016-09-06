@@ -13,8 +13,6 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 public class Brokerage extends AbstractBusinessProcess {
 
-  private DataSet<Tuple2<GraphTransaction, FoodBrokerMaps>> foodBrokerageTuple;
-
   public Brokerage(FoodBrokerConfig foodBrokerConfig,
     GradoopFlinkConfig gradoopFlinkConfig,
     DataSet<Vertex> customers, DataSet<Vertex> vendors,
@@ -22,10 +20,6 @@ public class Brokerage extends AbstractBusinessProcess {
     DataSet<Vertex> products, DataSet<Long> caseSeeds) {
     super(foodBrokerConfig, gradoopFlinkConfig, customers, vendors,
       logistics, employees, products, caseSeeds);
-  }
-
-  public DataSet<Tuple2<GraphTransaction, FoodBrokerMaps>> getTuple() {
-    return foodBrokerageTuple;
   }
 
   @Override
