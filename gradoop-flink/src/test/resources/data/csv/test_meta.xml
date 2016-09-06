@@ -3,99 +3,98 @@
 <datasource xmlns="http://www.gradoop.org/csvInput"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://www.gradoop.org/csvInput
-            http://www.gradoop.org/csvInput/csv_format.xsd">
+            http://www.gradoop.org/csvInput/csv_format.xsd"
+            name="testDatasource">
 
-    <domain name="">
+    <domain name="testDomain">
 
         <csv name="test_graph.csv" charset="utf8" saperator="|">
             <columns>
                 <column id="0" pos="0" type="Long"/>
-                <column id="1" pos="1" type="Long"/>
             </columns>
             <graphhead>
                 <label separator="_">
-                    <!-- <static name="graph"/> <!- static oder ref column-->
-                    <ref column_id="0"/>  <!-- columnref -->
-                    <ref column_id="1"/>
+                    <static name="graphNo"/>
+                    <ref column_id="0"/>
                 </label>
-
-                <key domain_name=""> <!-- separator intern e.g. arrays -->
-                    <static name="graph"/> <!-- static oder ref column-->
-                    <!-- <ref column_id="1"/>  <!- columnref -->
+                <key domain_name="testDomain">
+                    <ref column_id="0"/>
                 </key>
             </graphhead>
         </csv>
-        <csv name="test_graph.csv" charset="utf8" saperator="|">
+        <csv name="test_vertex.csv" charset="utf8" saperator="|">
             <columns>
-                <column id="1" type="Long"/>
+                <column id="0" type="Long"/>
+                <column id="1" type="String"/>
+                <column id="2" type="String"/>
+                <column id="3" type="Long"/>
+                <column id="4" type="String"/>
             </columns>
             <vertex>
                 <label separator="_">
-                    <static name="graph"/> <!-- static oder ref column-->
-                    <!-- <ref column_id="1"/>  <!- columnref -->
+                    <ref column_id="1"/>
+                    <ref column_id="2"/>
                 </label>
 
-                <key domain_name="">
-                    <static name="graph"/> <!-- static oder ref column-->
-                    <!-- <ref column_id="1"/>  <!- columnref -->
+                <key domain_name="testDomain">
+                    <ref column_id="0"/>
                 </key>
 
                 <edges>
-                    <reference datasource_name="">
-                        <key domain_name="">
-                            <static name="graph"/> <!-- static oder ref column-->
-                            <!-- <ref column_id="1"/>  <!- columnref -->
+                    <reference datasource_name="testDatasource">
+                        <key domain_name="testDomain">
+                            <ref column_id="3"/>
                         </key>
                         <properties>
-                            <property column_id="1" name="test"/>
+                            <property column_id="4" name="connectedSince"/>
                         </properties>
                     </reference>
                 </edges>
                 <graphs>
-                    <reference datasource_name="">
-                        <key domain_name="">
-                            <static name="graph"/> <!-- static oder ref column-->
-                            <!-- <ref column_id="1"/>  <!- columnref -->
+                    <reference datasource_name="testDatasource">
+                        <key domain_name="testDomain">
+                            <static name="1"/>
                         </key>
                     </reference>
                 </graphs>
-
                 <properties>
-                    <property column_id="1" name="test"/>
+                    <property column_id="0" name="originalID"/>
+                    <property column_id="1" name="label1"/>
+                    <property column_id="2" name="label2"/>
                 </properties>
             </vertex>
         </csv>
-        <csv name="test_graph.csv" charset="utf8" saperator="|">
+        <csv name="test_edge.csv" charset="utf8" saperator="|">
             <columns>
+                <column id="0" pos="0" type="String"/>
                 <column id="1" pos="1" type="Long"/>
+                <column id="2" pos="2" type="Long"/>
+                <column id="3" pos="1" type="Long"/>
             </columns>
             <edge>
-                <label separator="_">
-                    <static name="graph"/> <!-- static oder ref column-->
-                    <!-- <ref column_id="1"/>  <!- columnref -->
-                </label>
-                <key domain_name=""> <!-- optional-->
-                    <static name="graph"/> <!-- static oder ref column-->
-                    <!-- <ref column_id="1"/>  <!- columnref -->
+                <label>
+                    <ref column_id="0"/>
+                 </label>
+                <key domain_name="testDomain">
+                    <ref column_id="1"/>
+                    <ref column_id="2"/>
                 </key>
                 <source>
-                    <static name="graph"/> <!-- static oder ref column-->
-                    <!-- <ref column_id="1"/>  <!- columnref -->
+                    <ref column_id="1"/>
                 </source>
                 <target>
-                    <static name="graph"/> <!-- static oder ref column-->
-                    <!-- <ref column_id="1"/>  <!- columnref -->
+                    <ref column_id="2"/>
                 </target>
                 <graphs>
-                    <reference datasource_name="">
-                        <key domain_name="">
-                            <static name="graph"/> <!-- static oder ref column-->
-                            <!-- <ref column_id="1"/>  <!- columnref -->
+                    <reference datasource_name="testDatasource">
+                        <key domain_name="testDomain">
+                            <ref column_id="3"/>
                         </key>
                     </reference>
                 </graphs>
                 <properties>
-                    <property column_id="1" name="test"/>
+                    <property column_id="1" name="originialSourceID"/>
+                    <property column_id="1" name="originialTargetID"/>
                 </properties>
             </edge>
         </csv>

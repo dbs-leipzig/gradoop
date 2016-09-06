@@ -4,6 +4,10 @@
             targetNamespace="http://www.gradoop.org/csvInput"
             elementFormDefault="qualified">
 
+    <!-- datasource attributes -->
+    <xsd:attributeGroup name="datasourceattributes">
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:attributeGroup>
     <!-- domain attributes -->
     <xsd:attributeGroup name="domainattributes">
         <xsd:attribute name="name" type="xsd:string"/>
@@ -39,11 +43,11 @@
     </xsd:attributeGroup>
     <!-- key attributes -->
     <xsd:attributeGroup name="keyattributes">
-        <xsd:attribute name="domain_name" type="xsd:string"/>
+        <xsd:attribute name="domain_name" type="xsd:string" use="optional"/>
     </xsd:attributeGroup>
     <!-- reference attributes -->
     <xsd:attributeGroup name="referenceattributes">
-        <xsd:attribute name="datasource_name" type="xsd:string"/>
+        <xsd:attribute name="datasource_name" type="xsd:string" use="optional"/>
     </xsd:attributeGroup>
 
     <xsd:simpleType name="typesEnum">
@@ -76,12 +80,10 @@
     </xsd:element>
 
     <xsd:complexType name="staticorref">
-        <xsd:choice>
-            <xsd:element ref="static"/>
-            <xsd:sequence>
-                <xsd:element ref="ref" minOccurs="1" maxOccurs="unbounded"/>
-            </xsd:sequence>
-        </xsd:choice>
+        <xsd:sequence>
+            <xsd:element ref="static" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="ref" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:element name="reference">
@@ -256,8 +258,8 @@
             <xsd:sequence>
                 <xsd:element ref="domain" minOccurs="1" maxOccurs="unbounded"/>
             </xsd:sequence>
+            <xsd:attributeGroup ref="datasourceattributes"/>
         </xsd:complexType>
-
 
     </xsd:element>
 
