@@ -21,12 +21,18 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
+import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.xml.sax.SAXException;
 
+import javax.xml.bind.JAXBException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 public class CSVDataSource extends CSVBase implements DataSource {
 
@@ -40,7 +46,8 @@ public class CSVDataSource extends CSVBase implements DataSource {
     super(config, metaXmlPath);
     this.delimiter = delimiter;
 
-
+    ExecutionEnvironment env = config.getExecutionEnvironment();
+    env.registerCachedFile(metaXmlPath, CACHED_FILE);
   }
 
   @Override

@@ -18,7 +18,8 @@
 package org.gradoop.flink.io.impl.csv;
 
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.parser.XmlParser;
+import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
+import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.junit.Test;
@@ -34,24 +35,15 @@ public class CSVTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testRead() throws Exception {
+
     String xmlFile =
       CSVTest.class.getResource("/data/csv/test_meta.xml").getFile();
-    String xsdFile =
-      CSVTest.class.getResource("/data/csv/csv_format.xsd").getFile();
     String delimiter = "|";
 
-//    System.out.println(XmlParser.validateXml(xmlFile, xsdFile));
-
-//    XmlParser.parseSAX(xsdFile);
-    XmlParser.parseJAXB2(xsdFile, xmlFile);
-
-
     // create datasource
-    DataSource dataSource =
-      new CSVDataSource(config, xmlFile, delimiter);
+    DataSource dataSource = new CSVDataSource(config, xmlFile, delimiter);
     //get transactions
-    LogicalGraph graph =
-      dataSource.getLogicalGraph();
+    LogicalGraph graph = dataSource.getLogicalGraph();
 
 
   }

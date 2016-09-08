@@ -34,6 +34,9 @@ abstract class CSVBase {
    */
   private final String metaXmlPath;
 
+  private final String xsdPath =
+    CSVBase.class.getResource("/data/csv/csv_format.xsd").getFile();
+
   CSVBase(GradoopFlinkConfig config, String metaXmlPath) {
     if (config == null) {
       throw new IllegalArgumentException("config must not be null");
@@ -52,5 +55,9 @@ abstract class CSVBase {
 
   public String getMetaXmlPath() {
     return metaXmlPath;
+  }
+
+  public String getXsdPath() {
+    return xsdPath;
   }
 }
