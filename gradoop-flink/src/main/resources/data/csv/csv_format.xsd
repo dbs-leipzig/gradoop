@@ -108,6 +108,24 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:complexType name="element">
+        <xsd:sequence>
+            <xsd:element ref="label"/>
+            <xsd:element ref="key"/>
+            <xsd:element ref="properties" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="graphelement">
+        <xsd:complexContent>
+            <xsd:extension base="element">
+                <xsd:sequence>
+                    <xsd:element ref="graphs"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 
     <!-- complex elements -->
 
@@ -179,37 +197,35 @@
 
     <xsd:element name="edge">
         <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="label"/>
-                <xsd:element ref="key"/>
-                <xsd:element ref="source"/>
-                <xsd:element ref="target"/>
-                <xsd:element ref="graphs"/>
-                <xsd:element ref="properties"/>
-            </xsd:sequence>
+            <xsd:complexContent>
+                <xsd:extension base="graphelement">
+                    <xsd:sequence>
+                        <xsd:element ref="source"/>
+                        <xsd:element ref="target"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="vertex">
         <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="label"/>
-                <xsd:element ref="key"/>
-                <xsd:element ref="edges"/>
-                <xsd:element ref="graphs"/>
-                <xsd:element ref="properties"/>
-            </xsd:sequence>
+            <xsd:complexContent>
+                <xsd:extension base="graphelement">
+                    <xsd:sequence>
+                        <xsd:element ref="edges"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="graphhead">
         <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="label"/>
-                <xsd:element ref="key"/>
-            </xsd:sequence>
+            <xsd:complexContent>
+                <xsd:extension base="element"/>
+            </xsd:complexContent>
         </xsd:complexType>
-
     </xsd:element>
 
     <xsd:element name="column">
