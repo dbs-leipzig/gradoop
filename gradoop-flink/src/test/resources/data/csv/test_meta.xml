@@ -24,11 +24,11 @@
         </csv>
         <csv name="test_vertex.csv" charset="utf8" saperator="|">
             <columns>
-                <column id="0" type="Long"/>
-                <column id="1" type="String"/>
-                <column id="2" type="String"/>
-                <column id="3" type="Long"/>
-                <column id="4" type="String"/>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="String"/>
+                <column id="2" pos="2" type="String"/>
+                <column id="3" pos="3" type="Long"/>
+                <column id="4" pos="4" type="String"/>
             </columns>
             <vertex>
                 <label separator="_">
