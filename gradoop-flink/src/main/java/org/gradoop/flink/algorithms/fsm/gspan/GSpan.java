@@ -376,7 +376,7 @@ public class GSpan {
   }
 
   /**
-   * Create a single edge Subgraph for a given edge.
+   * Create a single edge SubgraphWithCount for a given edge.
    *
    * @param edge edge
    * @param fsmConfig FSM configuration

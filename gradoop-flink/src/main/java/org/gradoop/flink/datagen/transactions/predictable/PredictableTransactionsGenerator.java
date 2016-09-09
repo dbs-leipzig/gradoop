@@ -25,7 +25,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Data generator with predictable result for the evaluation of Frequent
- * Subgraph Mining algorithms.
+ * SubgraphWithCount Mining algorithms.
  */
 public class PredictableTransactionsGenerator implements
   GraphTransactionsGenerator {

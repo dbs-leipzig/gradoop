@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * RefinementMessage,.. => (workerId, {Subgraph,..})
+ * RefinementMessage,.. => (workerId, {SubgraphWithCount,..})
  */
 public class RefinementCalls implements GroupReduceFunction
   <RefinementMessage, Tuple2<Integer, Collection<CompressedDFSCode>>> {

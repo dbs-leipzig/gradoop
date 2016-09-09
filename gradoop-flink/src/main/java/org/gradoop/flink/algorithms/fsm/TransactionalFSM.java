@@ -18,15 +18,19 @@
 package org.gradoop.flink.algorithms.fsm;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.DecodeDFSCodes;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.EncodeTransactions;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.IterativeGSpan;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.Frequent;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.JoinEmbeddings;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.MinFrequency;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.SingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.SubgraphWithCount;
 import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.GSpanGraph;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.functions.utils.AddCount;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -41,6 +45,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
    * frequent subgraph mining configuration
    */
   protected final FSMConfig fsmConfig;
+  private DataSet<Long> minFrequency;
 
   /**
    * constructor
@@ -60,24 +65,65 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
       .toTransactions()
       .getTransactions();
 
-    // dictionary encoding
-    DataSet<GSpanGraph> encodedTransactions = transactions
-      .mapPartition(new EncodeTransactions(fsmConfig));
+    minFrequency = Count
+      .count(transactions)
+      .map(new MinFrequency(fsmConfig));
 
-    // find frequent subgraphs
+    DataSet<CodeEmbeddings>
+      embeddings = transactions
+      .flatMap(new SingleEdgeEmbeddings());
+
     DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs =
-      encodedTransactions.mapPartition(new IterativeGSpan(fsmConfig));
+      getFrequentSubgraphs(embeddings);
 
-    // dictionary decoding
-    transactions = frequentSubgraphs.mapPartition(new DecodeDFSCodes(
-      fsmConfig,
-      gradoopFlinkConfig.getGraphHeadFactory(),
-      gradoopFlinkConfig.getVertexFactory(),
-      gradoopFlinkConfig.getEdgeFactory())
-    );
+    DataSet<WithCount<CompressedDFSCode>> allFrequentSubgraphs =
+      frequentSubgraphs;
 
-    return GraphCollection.fromTransactions(
-      new GraphTransactions(transactions, gradoopFlinkConfig));
+    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
+
+    embeddings = embeddings
+      .groupBy(0)
+      .reduceGroup(new JoinEmbeddings(1, 1));
+
+    frequentSubgraphs = getFrequentSubgraphs(embeddings);
+    allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
+    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
+
+    embeddings = embeddings
+      .groupBy(0)
+      .reduceGroup(new JoinEmbeddings(2, 2));
+
+    try {
+      embeddings.print();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+
+    return null;
+  }
+
+  private DataSet<CodeEmbeddings> filterByFrequentSubgraphs(
+    DataSet<CodeEmbeddings>
+      embeddings,
+    DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs) {
+    embeddings = embeddings
+      .join(frequentSubgraphs)
+      .where(1).equalTo(0)
+      .with(new LeftSide<CodeEmbeddings,
+          WithCount<CompressedDFSCode>>());
+    return embeddings;
+  }
+
+  private DataSet<WithCount<CompressedDFSCode>> getFrequentSubgraphs(
+    DataSet<CodeEmbeddings>
+      embeddings) {
+    return embeddings
+        .map(new SubgraphWithCount())
+        .groupBy(0)
+        .sum(1)
+        .filter(new Frequent<CompressedDFSCode>())
+        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
   }
 
   @Override

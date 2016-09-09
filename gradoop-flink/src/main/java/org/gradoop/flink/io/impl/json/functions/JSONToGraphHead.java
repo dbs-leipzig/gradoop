@@ -60,7 +60,7 @@ public class JSONToGraphHead extends JSONToEntity
    * Creates graph data from JSON string representation.
    *
    * @param s json string representation
-   * @return Subgraph storing graph data
+   * @return SubgraphWithCount storing graph data
    * @throws Exception
    */
   @Override
