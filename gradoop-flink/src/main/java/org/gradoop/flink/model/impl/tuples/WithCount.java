@@ -55,7 +55,7 @@ public class WithCount<T> extends Tuple2<T, Integer> {
     return f0;
   }
 
-  public void setCount(T object) {
+  public void setObject(T object) {
     this.f0 = object;
   }
 

@@ -29,7 +29,7 @@ public class FSMConfig implements Serializable {
 
   /**
    * Relative support of a subgraph in a graph collection.
-   * Subgraph supported above the minSupport are considered to be frequent.
+   * SubgraphWithCount supported above the minSupport are considered to be frequent.
    */
   private final float minSupport;
 

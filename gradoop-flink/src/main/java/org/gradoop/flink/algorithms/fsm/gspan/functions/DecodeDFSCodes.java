@@ -111,7 +111,7 @@ public class DecodeDFSCodes extends
       DFSCode subgraph = subgraphFrequency.getObject().getDfsCode();
 
       GraphHead graphHead =
-        graphHeadFactory.createGraphHead("Frequent Subgraph");
+        graphHeadFactory.createGraphHead("Frequent SubgraphWithCount");
       GradoopIdSet graphId = GradoopIdSet.fromExisting(graphHead.getId());
 
       int frequency = subgraphFrequency.getCount();
