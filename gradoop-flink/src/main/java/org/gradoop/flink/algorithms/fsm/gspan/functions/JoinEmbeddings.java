@@ -4,12 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
+import org.gradoop.flink.algorithms.fsm.AdjacencyMatrix;
 import org.gradoop.flink.algorithms.fsm.CodeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.gspan.GSpan;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSCode;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSEmbedding;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSStep;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -57,17 +53,17 @@ public class JoinEmbeddings
 
   private void joinOnVertex(CodeEmbeddings left, CodeEmbeddings right) {
 
-    CompressedDFSCode leftSubgraph = left.getSubgraph();
-    CompressedDFSCode rightSubgraph = right.getSubgraph();
+    String leftSubgraph = left.getSubgraph();
+    String rightSubgraph = right.getSubgraph();
 
-    for (DFSEmbedding leftEmbedding : left.getEmbeddings()) {
-      for (DFSEmbedding rightEmbedding : right.getEmbeddings()) {
+    for (AdjacencyMatrix leftMatrix : left.getMatrices()) {
+      for (AdjacencyMatrix rightMatrix : right.getMatrices()) {
 
         Set<Integer> commonVertexIds =
-          Sets.newHashSet(leftEmbedding.getVertexTimes());
+          leftMatrix.getVertices().keySet();
 
         Set<Integer> rightVertexIds =
-          Sets.newHashSet(leftEmbedding.getVertexTimes());
+          Sets.newHashSet(leftMatrix.getVertices().keySet());
 
         Iterator<Integer> vertexIterator = commonVertexIds.iterator();
 
@@ -78,26 +74,12 @@ public class JoinEmbeddings
         }
 
         if (! commonVertexIds.isEmpty() && Collections.disjoint(
-          leftEmbedding.getEdgeTimes(), leftEmbedding.getEdgeTimes())) {
+          leftMatrix.getEdges().keySet(), rightMatrix.getEdges().keySet())) {
 
-          joinOn(leftSubgraph, rightSubgraph, leftEmbedding, rightEmbedding,
-            commonVertexIds);
+          leftMatrix.combine(rightMatrix);
         }
       }
     }
   }
 
-  private void joinOn(
-    CompressedDFSCode leftSubgraph, CompressedDFSCode rightSubgraph,
-    DFSEmbedding leftEmbedding, DFSEmbedding rightEmbedding,
-    Set<Integer> commonVertexIds) {
-
-    Iterator<DFSStep> leftIterator =
-      leftSubgraph.getDfsCode().getSteps().iterator();
-
-    Iterator<DFSStep> rightIterator =
-      rightSubgraph.getDfsCode().getSteps().iterator();
-
-
-  }
 }

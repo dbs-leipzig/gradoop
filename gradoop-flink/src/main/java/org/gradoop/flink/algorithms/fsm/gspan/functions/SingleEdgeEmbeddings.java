@@ -3,17 +3,13 @@ package org.gradoop.flink.algorithms.fsm.gspan.functions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.fsm.CodeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSCode;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSEmbedding;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSStep;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.DirectedDFSStep;
+import org.gradoop.flink.algorithms.fsm.AdjacencyMatrix;
+import org.gradoop.flink.algorithms.fsm.cam.EdgeEntry;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.Collection;
@@ -35,60 +31,72 @@ public class SingleEdgeEmbeddings
     Map<GradoopId, Integer> vertexIdMap =
       Maps.newHashMapWithExpectedSize(graph.getVertices().size());
 
-    Map<GradoopId, Integer> vertexLabelMap =
+    Map<Integer, String> vertexLabelMap =
       Maps.newHashMapWithExpectedSize(graph.getVertices().size());
 
-    Map<CompressedDFSCode, Collection<DFSEmbedding>> codeEmbeddings =
-      Maps.newHashMap();
+    Map<String, Collection<AdjacencyMatrix>> subgraphMatrices = Maps.newHashMap();
 
+    int vertexId = 0;
     for (Vertex vertex : graph.getVertices()) {
-
-      GradoopId vertexId = vertex.getId();
-
-      vertexIdMap.put(vertexId, vertex.getId().hashCode());
-      vertexLabelMap.put(vertexId, vertex.getLabel().hashCode());
+      vertexIdMap.put(vertex.getId(), vertexId);
+      vertexLabelMap.put(vertexId, vertex.getLabel());
+      vertexId++;
     }
 
     int edgeId = 0;
     for (Edge edge : graph.getEdges()) {
-      GradoopId source = edge.getSourceId();
-      int sourceId = vertexIdMap.get(source);
-      int sourceLabel = vertexLabelMap.get(source);
 
-      GradoopId target = edge.getSourceId();
-      int targetId = vertexIdMap.get(target);
-      int targetLabel = vertexLabelMap.get(target);
+      Map<Integer, String> vertices;
+      Map<Integer, String> edges = Maps.newHashMapWithExpectedSize(1);
+      Map<Integer, Map<Integer,List<EdgeEntry>>> entries;
 
-      boolean isLoop = sourceId == targetId;
-      boolean inDirection = sourceLabel <= targetLabel;
+      int sourceId = vertexIdMap.get(edge.getSourceId());
+      String sourceLabel = vertexLabelMap.get(sourceId);
 
-      int fromTime = 0;
-      int toTime = isLoop ? 0 : 1;
-      int fromLabel = inDirection ? sourceLabel : targetLabel;
-      int toLabel = inDirection ? targetLabel : sourceLabel;
-      int edgeLabel = edge.getLabel().hashCode();
+      int targetId = vertexIdMap.get(edge.getTargetId());
+      String targetLabel = vertexLabelMap.get(targetId);
 
-      DFSStep step = new DirectedDFSStep(
-        fromTime, toTime, fromLabel, inDirection, edgeLabel, toLabel);
+      edges.put(edgeId, edge.getLabel());
 
-      CompressedDFSCode code = new CompressedDFSCode(new DFSCode(step));
 
-      List<Integer> vertexTimes = isLoop ?
-        Lists.newArrayList(sourceId) :
-        inDirection ?
-          Lists.newArrayList(sourceId, targetId) :
-          Lists.newArrayList(targetId, sourceId);
-
-      List<Integer> edgeTimes = Lists.newArrayList(edgeId);
-
-      DFSEmbedding embedding = new DFSEmbedding(vertexTimes, edgeTimes);
-
-      Collection<DFSEmbedding> embeddings = codeEmbeddings.get(code);
-
-      if (embeddings == null) {
-        codeEmbeddings.put(code, Lists.newArrayList(embedding));
+      if (sourceId == targetId) {
+        vertices  = Maps.newHashMapWithExpectedSize(1);
+        vertices.put(sourceId, sourceLabel);
+        entries  = Maps.newHashMapWithExpectedSize(1);
       } else {
-        embeddings.add(embedding);
+        vertices  = Maps.newHashMapWithExpectedSize(2);
+        vertices.put(sourceId, sourceLabel);
+        vertices.put(targetId, targetLabel);
+        entries  = Maps.newHashMapWithExpectedSize(2);
+      }
+
+
+      Map<Integer, List<EdgeEntry>> sourceEntries =
+        Maps.newHashMapWithExpectedSize(1);
+
+      sourceEntries
+        .put(targetId, Lists.newArrayList(new EdgeEntry(edgeId, true)));
+
+      entries.put(sourceId, sourceEntries);
+
+      Map<Integer, List<EdgeEntry>> targetEntries =
+        Maps.newHashMapWithExpectedSize(1);
+
+      targetEntries
+        .put(sourceId, Lists.newArrayList(new EdgeEntry(edgeId, false)));
+
+      entries.put(targetId, targetEntries);
+
+      AdjacencyMatrix matrix = new AdjacencyMatrix(vertices, edges, entries);
+
+      String camLabel = matrix.toCanonicalString();
+
+      Collection<AdjacencyMatrix> matrices = subgraphMatrices.get(camLabel);
+
+      if (matrices == null) {
+        subgraphMatrices.put(camLabel, Lists.newArrayList(matrix));
+      } else {
+        matrices.add(matrix);
       }
 
       edgeId++;
@@ -96,8 +104,8 @@ public class SingleEdgeEmbeddings
 
     reuseTuple.f0 = graph.getGraphHead().getId();
 
-    for (Map.Entry<CompressedDFSCode, Collection<DFSEmbedding>> entry :
-      codeEmbeddings.entrySet()) {
+    for (Map.Entry<String, Collection<AdjacencyMatrix>> entry :
+      subgraphMatrices.entrySet()) {
 
       reuseTuple.f1 = entry.getKey();
       reuseTuple.f2 = entry.getValue();

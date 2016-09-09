@@ -2,8 +2,6 @@ package org.gradoop.flink.algorithms.fsm;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.DFSEmbedding;
 
 import java.util.Collection;
 
@@ -11,14 +9,14 @@ import java.util.Collection;
  * Created by peet on 09.09.16.
  */
 public class CodeEmbeddings 
-  extends Tuple3<GradoopId, CompressedDFSCode, Collection<DFSEmbedding>> {
+  extends Tuple3<GradoopId, String, Collection<AdjacencyMatrix>> {
   
   public CodeEmbeddings() {
     super();
   }
 
   public CodeEmbeddings(GradoopId graphId, 
-    CompressedDFSCode subgraph, Collection<DFSEmbedding> embeddings) {
+    String subgraph, Collection<AdjacencyMatrix> embeddings) {
     super(graphId, subgraph, embeddings);
   }
 
@@ -30,19 +28,19 @@ public class CodeEmbeddings
     f0 = graphId;
   }
 
-  public CompressedDFSCode getSubgraph() {
+  public String getSubgraph() {
     return f1;
   }
 
-  public void setSubgraph(CompressedDFSCode subgraph) {
+  public void setSubgraph(String subgraph) {
     f1 = subgraph;
   }
 
-  public Collection<DFSEmbedding> getEmbeddings() {
+  public Collection<AdjacencyMatrix> getMatrices() {
     return f2;
   }
 
-  public void setEmbeddings(Collection<DFSEmbedding> embeddings) {
+  public void setEmbeddings(Collection<AdjacencyMatrix> embeddings) {
     f2 = embeddings;
   }
 }
