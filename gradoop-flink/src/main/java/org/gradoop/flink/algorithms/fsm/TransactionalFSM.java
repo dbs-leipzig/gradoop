@@ -20,11 +20,17 @@ package org.gradoop.flink.algorithms.fsm;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.ByFrequency;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.JoinSingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.MinFrequency;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.SingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.CountableFrequentSubgraph;
+import org.gradoop.flink.algorithms.fsm.functions.ByFrequency;
+import org.gradoop.flink.algorithms.fsm.functions.JoinSingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.functions.MinFrequency;
+import org.gradoop.flink.algorithms.fsm.functions.SingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.functions.CountableFrequentSubgraph;
+
+
+import org.gradoop.flink.algorithms.fsm.functions.FrequentSubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.functions.JoinMultiEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.tuples.FrequentSubgraph;
+import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
@@ -63,6 +69,14 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
       .toTransactions()
       .getTransactions();
 
+    transactions = execute(transactions);
+
+    return GraphCollection.fromTransactions(
+      new GraphTransactions(transactions, gradoopFlinkConfig));
+  }
+
+  private DataSet<GraphTransaction> execute(
+    DataSet<GraphTransaction> transactions) {
     minFrequency = Count
       .count(transactions)
       .map(new MinFrequency(fsmConfig));
@@ -99,9 +113,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 
     transactions = allFrequentSubgraphs
       .map(new FrequentSubgraphDecoder());
-
-    return GraphCollection
-      .fromTransactions(new GraphTransactions(transactions, gradoopFlinkConfig));
+    return transactions;
   }
 
   private DataSet<SubgraphEmbeddings> filterByFrequentSubgraphs(

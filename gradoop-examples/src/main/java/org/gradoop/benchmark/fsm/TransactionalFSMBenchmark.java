@@ -26,13 +26,11 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.cache.DistributedCache;
 import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.EncodeTLFGraphs;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.IterativeGSpan;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
+import org.gradoop.flink.algorithms.fsm.canonicalization.gspan.pojos.CompressedDFSCode;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 

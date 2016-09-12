@@ -17,10 +17,7 @@
 
 package org.gradoop.flink.algorithms.fsm.config;
 
-import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
-
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * frequent subgraph mining configuration
@@ -32,12 +29,6 @@ public class FSMConfig implements Serializable {
    * SubgraphWithCount supported above the minSupport are considered to be frequent.
    */
   private final float minSupport;
-
-  /**
-   * Threshold for subgraphs to be considered to be likely frequent.
-   * Only for filter-refinement approach (ICDE 2014)
-   */
-  private float likelinessThreshold = 0.05f;
 
   /**
    * Direction mode, true for directed graphs and false for undirected.
@@ -55,11 +46,6 @@ public class FSMConfig implements Serializable {
   private int minEdgeCount;
 
   /**
-   * Cache session identifier.
-   */
-  private final String session;
-
-  /**
    * Verbose mode.
    */
   private boolean verbose = false;
@@ -74,7 +60,6 @@ public class FSMConfig implements Serializable {
     this.directed = directed;
     this.maxEdgeCount = 1000;
     this.minEdgeCount = 0;
-    this.session = UUID.randomUUID().toString();
   }
 
   public float getMinSupport() {
@@ -101,14 +86,6 @@ public class FSMConfig implements Serializable {
     this.minEdgeCount = minEdgeCount;
   }
 
-  public float getLikelinessThreshold() {
-    return likelinessThreshold;
-  }
-
-  public void setLikelinessThreshold(float likelinessThreshold) {
-    this.likelinessThreshold = likelinessThreshold;
-  }
-
   public boolean isVerbose() {
     return verbose;
   }
@@ -117,7 +94,4 @@ public class FSMConfig implements Serializable {
     this.verbose = verbose;
   }
 
-  public String getSession() {
-    return session;
-  }
 }
