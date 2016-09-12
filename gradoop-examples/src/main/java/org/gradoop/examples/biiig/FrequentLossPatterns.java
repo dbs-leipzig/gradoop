@@ -26,8 +26,6 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.apache.hadoop.util.Time;
-import org.gradoop.common.cache.DistributedCache;
-import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -37,9 +35,9 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
+import org.gradoop.flink.algorithms.fsm.functions.FrequentSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.DecodeDFSCodes;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.functions.ApplyAggregateFunction;
@@ -96,8 +94,6 @@ public class FrequentLossPatterns
 
     // avoids multiple output files
     getExecutionEnvironment().setParallelism(1);
-    // start cache server
-    DistributedCacheServer cacheServer = DistributedCache.getServer();
     // get Gradoop configuration
     GradoopFlinkConfig config = GradoopFlinkConfig
       .createConfig(getExecutionEnvironment());
@@ -177,8 +173,6 @@ public class FrequentLossPatterns
 
     // trigger execution
     getExecutionEnvironment().execute();
-    // shutdown cache
-    cacheServer.shutdown();
   }
 
   // AGGREGATE FUNCTIONS
@@ -395,7 +389,7 @@ public class FrequentLossPatterns
     public GraphHead execute(GraphHead current, GraphHead transformed) {
 
       BigDecimal support = current
-        .getPropertyValue(DecodeDFSCodes.SUPPORT_KEY)
+        .getPropertyValue(FrequentSubgraphDecoder.FREQUENCY_KEY)
         .getBigDecimal().setScale(2, BigDecimal.ROUND_HALF_UP);
 
       String newLabel = current.getLabel() + " (" + support + ")";
