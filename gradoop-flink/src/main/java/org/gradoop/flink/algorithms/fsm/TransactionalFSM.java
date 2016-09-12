@@ -18,21 +18,19 @@
 package org.gradoop.flink.algorithms.fsm;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.FilterOperator;
 import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.Frequent;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.JoinEmbeddings;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.ByFrequency;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.JoinSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.MinFrequency;
 import org.gradoop.flink.algorithms.fsm.gspan.functions.SingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.gspan.functions.SubgraphWithCount;
-import org.gradoop.flink.algorithms.fsm.gspan.pojos.CompressedDFSCode;
+import org.gradoop.flink.algorithms.fsm.gspan.functions.CountableFrequentSubgraph;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
-import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -69,57 +67,60 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
       .count(transactions)
       .map(new MinFrequency(fsmConfig));
 
-    DataSet<CodeEmbeddings>
+    DataSet<SubgraphEmbeddings>
       embeddings = transactions
       .flatMap(new SingleEdgeEmbeddings());
 
-    DataSet<WithCount<String>> frequentSubgraphs =
+    DataSet<FrequentSubgraph> frequentSubgraphs =
       getFrequentSubgraphs(embeddings);
 
-    DataSet<WithCount<String>> allFrequentSubgraphs =
+    DataSet<FrequentSubgraph> allFrequentSubgraphs =
       frequentSubgraphs;
 
     embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
 
     embeddings = embeddings
       .groupBy(0)
-      .reduceGroup(new JoinEmbeddings(1, 1));
-//
-//    frequentSubgraphs = getFrequentSubgraphs(embeddings);
-//    allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
-//    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-//
-//    embeddings = embeddings
-//      .groupBy(0)
-//      .reduceGroup(new JoinEmbeddings(2, 2));
+      .reduceGroup(new JoinSingleEdgeEmbeddings());
 
-    try {
-      embeddings.print();
-    } catch (Exception e) {
-      e.printStackTrace();
+    frequentSubgraphs = getFrequentSubgraphs(embeddings);
+    allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
+
+    for (int i = 0; i < 3; i++) {
+      embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
+
+      embeddings = embeddings
+        .groupBy(0)
+        .reduceGroup(new JoinMultiEdgeEmbeddings());
+
+      frequentSubgraphs = getFrequentSubgraphs(embeddings);
+      allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
     }
 
+    transactions = allFrequentSubgraphs
+      .map(new FrequentSubgraphDecoder());
 
-    return null;
+    return GraphCollection
+      .fromTransactions(new GraphTransactions(transactions, gradoopFlinkConfig));
   }
 
-  private DataSet<CodeEmbeddings> filterByFrequentSubgraphs(
-    DataSet<CodeEmbeddings> embeddings,
-    DataSet<WithCount<String>> frequentSubgraphs) {
+  private DataSet<SubgraphEmbeddings> filterByFrequentSubgraphs(
+    DataSet<SubgraphEmbeddings> embeddings,
+    DataSet<FrequentSubgraph> frequentSubgraphs) {
 
     return embeddings
       .join(frequentSubgraphs)
-      .where(1).equalTo(0)
-      .with(new LeftSide<CodeEmbeddings, WithCount<String>>());
+      .where(2).equalTo(0)
+      .with(new LeftSide<SubgraphEmbeddings, FrequentSubgraph>());
   }
 
-  private DataSet<WithCount<String>> getFrequentSubgraphs(
-    DataSet<CodeEmbeddings> embeddings) {
+  private DataSet<FrequentSubgraph> getFrequentSubgraphs(
+    DataSet<SubgraphEmbeddings> embeddings) {
     return embeddings
-        .map(new SubgraphWithCount())
+        .map(new CountableFrequentSubgraph())
         .groupBy(0)
         .sum(1)
-        .filter(new Frequent<String>())
+        .filter(new ByFrequency())
         .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
   }
 

@@ -25,7 +25,7 @@ public class MiningTest extends GradoopFlinkCacheEnabledTestBase {
     float threshold = 0.2f;
 
     FSMConfig fsmConfig = new FSMConfig(
-      threshold, true, cacheServer.getCacheClientConfiguration());
+      threshold, true);
 
     DistributedCache.getClient
       (cacheServer.getCacheClientConfiguration(), fsmConfig.getSession())
@@ -51,7 +51,7 @@ public class MiningTest extends GradoopFlinkCacheEnabledTestBase {
     float threshold = 0.2f;
 
     FSMConfig fsmConfig = new FSMConfig(
-      threshold, false, cacheServer.getCacheClientConfiguration());
+      threshold, false);
 
     DistributedCache.getClient
       (cacheServer.getCacheClientConfiguration(), fsmConfig.getSession())

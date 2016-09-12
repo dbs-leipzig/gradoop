@@ -1,18 +1,17 @@
 package org.gradoop.flink.algorithms.fsm;
 
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.cache.GradoopFlinkCacheEnabledTestBase;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class TransactionalFSMTest extends GradoopFlinkCacheEnabledTestBase {
+public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleEdges() throws Exception {
-    FSMConfig fsmConfig =
-      new FSMConfig(0.7f, true, cacheServer.getCacheClientConfiguration());
+    FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[e1:a]->(v2:A)];" +
@@ -33,8 +32,7 @@ public class TransactionalFSMTest extends GradoopFlinkCacheEnabledTestBase {
 
   @Test
   public void testSimpleGraphs() throws Exception {
-    FSMConfig fsmConfig =
-      new FSMConfig(0.7f, true, cacheServer.getCacheClientConfiguration());
+    FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
       "g1[(:A)-[:a]->(v1:B)-[:b]->(:C);(v1)-[:c]->(:D)]" +
@@ -49,8 +47,7 @@ public class TransactionalFSMTest extends GradoopFlinkCacheEnabledTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3"};
     String[] expectedResultVariables = {"s1", "s2", "s3", "s4", "s5"};
 
-    TransactionalFSM transactionalFSM = new TransactionalFSM(
-      fsmConfig);
+    TransactionalFSM transactionalFSM = new TransactionalFSM(fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
@@ -58,8 +55,7 @@ public class TransactionalFSMTest extends GradoopFlinkCacheEnabledTestBase {
 
   @Test
   public void testParallelEdges() throws Exception {
-    FSMConfig fsmConfig =
-      new FSMConfig(0.7f, true, cacheServer.getCacheClientConfiguration());
+    FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(:A)-[:a]->(v1:A)]" +
@@ -80,8 +76,7 @@ public class TransactionalFSMTest extends GradoopFlinkCacheEnabledTestBase {
 
   @Test
   public void testLoop() throws Exception {
-    FSMConfig fsmConfig = new FSMConfig(0.7f, true,
-      cacheServer.getCacheClientConfiguration());
+    FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v1)-[:a]->(:A)]" +
@@ -104,8 +99,7 @@ public class TransactionalFSMTest extends GradoopFlinkCacheEnabledTestBase {
 
   @Test
   public void testDiamond() throws Exception {
-    FSMConfig fsmConfig =
-      new FSMConfig(0.7f, true, cacheServer.getCacheClientConfiguration());
+    FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
@@ -135,8 +129,7 @@ public class TransactionalFSMTest extends GradoopFlinkCacheEnabledTestBase {
 
   @Test
   public void testCircleWithBranch() throws Exception {
-    FSMConfig fsmConfig =
-      new FSMConfig(0.7f, true, cacheServer.getCacheClientConfiguration());
+    FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
