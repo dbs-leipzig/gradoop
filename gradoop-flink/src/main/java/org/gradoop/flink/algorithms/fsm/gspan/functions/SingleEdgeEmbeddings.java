@@ -7,108 +7,84 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.fsm.CodeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.AdjacencyMatrix;
-import org.gradoop.flink.algorithms.fsm.cam.EdgeEntry;
+import org.gradoop.flink.algorithms.fsm.DirectedCAMLabeler;
+import org.gradoop.flink.algorithms.fsm.SubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.Embedding;
+import org.gradoop.flink.algorithms.fsm.cam.EdgeTriple;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-/**
- * Created by peet on 09.09.16.
- */
 public class SingleEdgeEmbeddings
-  implements FlatMapFunction<GraphTransaction, CodeEmbeddings> {
+  implements FlatMapFunction<GraphTransaction, SubgraphEmbeddings> {
 
-  private final CodeEmbeddings reuseTuple = new CodeEmbeddings();
+  private final SubgraphEmbeddings reuseTuple = new SubgraphEmbeddings();
+
+  private final DirectedCAMLabeler canonicalLabeler = new DirectedCAMLabeler();
 
   @Override
   public void flatMap(
-    GraphTransaction graph, Collector<CodeEmbeddings> out) throws Exception {
+    GraphTransaction graph, Collector<SubgraphEmbeddings> out) throws Exception {
 
     Map<GradoopId, Integer> vertexIdMap =
       Maps.newHashMapWithExpectedSize(graph.getVertices().size());
 
-    Map<Integer, String> vertexLabelMap =
+    Map<Integer, String> vertices =
       Maps.newHashMapWithExpectedSize(graph.getVertices().size());
 
-    Map<String, Collection<AdjacencyMatrix>> subgraphMatrices = Maps.newHashMap();
+    Map<String, Collection<Embedding>> subgraphEmbeddings =
+      Maps.newHashMap();
 
     int vertexId = 0;
     for (Vertex vertex : graph.getVertices()) {
       vertexIdMap.put(vertex.getId(), vertexId);
-      vertexLabelMap.put(vertexId, vertex.getLabel());
+      vertices.put(vertexId, vertex.getLabel());
       vertexId++;
     }
 
     int edgeId = 0;
     for (Edge edge : graph.getEdges()) {
 
-      Map<Integer, String> vertices;
-      Map<Integer, String> edges = Maps.newHashMapWithExpectedSize(1);
-      Map<Integer, Map<Integer,List<EdgeEntry>>> entries;
-
       int sourceId = vertexIdMap.get(edge.getSourceId());
-      String sourceLabel = vertexLabelMap.get(sourceId);
-
       int targetId = vertexIdMap.get(edge.getTargetId());
-      String targetLabel = vertexLabelMap.get(targetId);
 
-      edges.put(edgeId, edge.getLabel());
+      Map<Integer, String> incidentVertices =
+        Maps.newHashMapWithExpectedSize(2);
 
+      incidentVertices.put(sourceId, vertices.get(sourceId));
 
-      if (sourceId == targetId) {
-        vertices  = Maps.newHashMapWithExpectedSize(1);
-        vertices.put(sourceId, sourceLabel);
-        entries  = Maps.newHashMapWithExpectedSize(1);
-      } else {
-        vertices  = Maps.newHashMapWithExpectedSize(2);
-        vertices.put(sourceId, sourceLabel);
-        vertices.put(targetId, targetLabel);
-        entries  = Maps.newHashMapWithExpectedSize(2);
+      if (sourceId != targetId) {
+        incidentVertices.put(targetId, vertices.get(targetId));
       }
 
+      EdgeTriple triple = new EdgeTriple(sourceId, edge.getLabel(), targetId);
+      Map<Integer, EdgeTriple> triples = Maps.newHashMapWithExpectedSize(1);
+      triples.put(edgeId, triple);
 
-      Map<Integer, List<EdgeEntry>> sourceEntries =
-        Maps.newHashMapWithExpectedSize(1);
+      Embedding embedding = new Embedding(incidentVertices, triples);
 
-      sourceEntries
-        .put(targetId, Lists.newArrayList(new EdgeEntry(edgeId, true)));
+      String subgraph = canonicalLabeler.label(embedding);
 
-      entries.put(sourceId, sourceEntries);
+      Collection<Embedding> embeddings = subgraphEmbeddings.get(subgraph);
 
-      Map<Integer, List<EdgeEntry>> targetEntries =
-        Maps.newHashMapWithExpectedSize(1);
-
-      targetEntries
-        .put(sourceId, Lists.newArrayList(new EdgeEntry(edgeId, false)));
-
-      entries.put(targetId, targetEntries);
-
-      AdjacencyMatrix matrix = new AdjacencyMatrix(vertices, edges, entries);
-
-      String camLabel = matrix.toCanonicalString();
-
-      Collection<AdjacencyMatrix> matrices = subgraphMatrices.get(camLabel);
-
-      if (matrices == null) {
-        subgraphMatrices.put(camLabel, Lists.newArrayList(matrix));
+      if (embeddings == null) {
+        subgraphEmbeddings.put(subgraph, Lists.newArrayList(embedding));
       } else {
-        matrices.add(matrix);
+        embeddings.add(embedding);
       }
 
       edgeId++;
     }
 
-    reuseTuple.f0 = graph.getGraphHead().getId();
+    reuseTuple.setGraphId(graph.getGraphHead().getId());
+    reuseTuple.setSize(1);
 
-    for (Map.Entry<String, Collection<AdjacencyMatrix>> entry :
-      subgraphMatrices.entrySet()) {
+    for (Map.Entry<String, Collection<Embedding>> entry :
+      subgraphEmbeddings.entrySet()) {
 
-      reuseTuple.f1 = entry.getKey();
-      reuseTuple.f2 = entry.getValue();
+      reuseTuple.setSubgraph(entry.getKey());
+      reuseTuple.setEmbeddings(entry.getValue());
 
       out.collect(reuseTuple);
     }

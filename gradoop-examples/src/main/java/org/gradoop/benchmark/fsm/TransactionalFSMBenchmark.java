@@ -130,8 +130,7 @@ public class TransactionalFSMBenchmark extends AbstractRunner
     DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     // set config for synthetic or real world dataset
-    FSMConfig fsmConfig = new FSMConfig(threshold, directed,
-      cacheServer.getCacheClientConfiguration());
+    FSMConfig fsmConfig = new FSMConfig(threshold, directed);
 
     // mine
     DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs = graphs

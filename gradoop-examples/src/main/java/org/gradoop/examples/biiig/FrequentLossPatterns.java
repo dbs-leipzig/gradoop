@@ -136,7 +136,7 @@ public class FrequentLossPatterns
     // (6) mine frequent subgraphs
 
     FSMConfig fsmConfig = new FSMConfig(
-      0.6f, true, cacheServer.getCacheClientConfiguration());
+      0.6f, true);
 
     GraphCollection frequentSubgraphs = btgs.callForCollection(
       new TransactionalFSM(fsmConfig)

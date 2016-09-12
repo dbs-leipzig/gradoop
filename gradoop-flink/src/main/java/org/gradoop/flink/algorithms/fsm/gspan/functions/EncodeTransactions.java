@@ -106,8 +106,7 @@ public class EncodeTransactions
     partitionCount = getRuntimeContext().getNumberOfParallelSubtasks();
     partition = getRuntimeContext().getIndexOfThisSubtask();
 
-    cacheClient = DistributedCache.getClient(
-      fsmConfig.getCacheClientConfiguration(), fsmConfig.getSession());
+    cacheClient = null;
 
     long reporter = reportVertexLabelFrequency(values);
     if (reporter == 1) {

@@ -2,14 +2,14 @@ package org.gradoop.flink.algorithms.fsm.gspan.functions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.algorithms.fsm.FrequentSubgraph;
 import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * Created by peet on 09.09.16.
  */
-public class Frequent<T> extends
-  RichFilterFunction<WithCount<T>> {
+public class ByFrequency extends RichFilterFunction<FrequentSubgraph> {
 
 
   private long minFrequency;
@@ -23,7 +23,7 @@ public class Frequent<T> extends
   }
 
   @Override
-  public boolean filter(WithCount<T> value) throws Exception {
-    return value.getCount() >= minFrequency;
+  public boolean filter(FrequentSubgraph subgraph) throws Exception {
+    return subgraph.getFrequency() >= minFrequency;
   }
 }

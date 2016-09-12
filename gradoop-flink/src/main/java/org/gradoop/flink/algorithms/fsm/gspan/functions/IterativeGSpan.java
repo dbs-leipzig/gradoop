@@ -86,8 +86,7 @@ public class IterativeGSpan
 
     this.partition = getRuntimeContext().getIndexOfThisSubtask();
     this.partitionCount = getRuntimeContext().getNumberOfParallelSubtasks();
-    this.cacheClient = DistributedCache.getClient(
-      fsmConfig.getCacheClientConfiguration(), fsmConfig.getSession());
+    this.cacheClient = null;
     this.minFrequency = cacheClient.getCounter(Constants.MIN_FREQUENCY);
 
     Collection<CompressedDFSCode> frequentSubgraphs;

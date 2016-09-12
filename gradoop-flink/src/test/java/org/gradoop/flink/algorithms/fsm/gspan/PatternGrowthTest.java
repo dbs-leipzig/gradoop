@@ -24,7 +24,7 @@ public class PatternGrowthTest extends GradoopFlinkCacheEnabledTestBase {
 
     float threshold = 0.7f;
     FSMConfig fsmConfig = new FSMConfig(
-      threshold, true, cacheServer.getCacheClientConfiguration());
+      threshold, true);
 
     //       -a->
     //  (0:A)    (1:A)
@@ -66,7 +66,7 @@ public class PatternGrowthTest extends GradoopFlinkCacheEnabledTestBase {
 
     float threshold = 0.7f;
     FSMConfig fsmConfig = new FSMConfig(
-      threshold, true, cacheServer.getCacheClientConfiguration());
+      threshold, true);
 
     Collection<GSpanGraph> graphs = searchSpace
       .toTransactions()

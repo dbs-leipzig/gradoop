@@ -106,10 +106,10 @@ public class EncodingTest extends GradoopFlinkCacheEnabledTestBase {
     float threshold = 0.1f;
 
     FSMConfig tlfConfig = new FSMConfig(
-      threshold, false, cacheServer.getCacheClientConfiguration());
+      threshold, false);
 
     FSMConfig tnsConfig = new FSMConfig(
-      threshold, false, cacheServer.getCacheClientConfiguration());
+      threshold, false);
 
     DistributedCache.getClient
       (cacheServer.getCacheClientConfiguration(), tlfConfig.getSession())

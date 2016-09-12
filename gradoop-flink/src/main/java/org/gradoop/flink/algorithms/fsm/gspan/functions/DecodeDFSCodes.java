@@ -97,9 +97,7 @@ public class DecodeDFSCodes extends
     Iterable<WithCount<CompressedDFSCode>> frequentSubgraphs,
     Collector<GraphTransaction> out) throws Exception {
 
-    DistributedCacheClient cacheClient =
-      DistributedCache.getClient(fsmConfig.getCacheClientConfiguration(),
-        fsmConfig.getSession());
+    DistributedCacheClient cacheClient = null;
 
     List<String> vertexLabelDictionary = cacheClient.getList(
       Constants.VERTEX_PREFIX + Constants.LABEL_DICTIONARY_INVERSE);
