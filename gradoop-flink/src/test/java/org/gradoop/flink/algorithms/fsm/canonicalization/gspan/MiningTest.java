@@ -1,12 +1,13 @@
 package org.gradoop.flink.algorithms.fsm.canonicalization.gspan;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.canonicalization.gspan.pojos.CompressedDFSCode;
-import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
+import org.gradoop.flink.datagen.transactions.predictable
+  .PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,13 +16,15 @@ public class MiningTest extends GradoopFlinkTestBase {
   @Test
   public void testMinersSeparatelyDirected() throws Exception {
     GraphTransactions transactions = new PredictableTransactionsGenerator(
-      10, 1, true, getConfig()).execute();
+      1000, 1, true, getConfig()).execute();
 
-    float threshold = 0.2f;
+    float threshold = 1.0f;
 
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs = null;
+    DataSet<GraphTransaction> frequentSubgraphs =
+      new TransactionalFSM(fsmConfig)
+        .execute(transactions.getTransactions());
 
     Assert.assertEquals(
       PredictableTransactionsGenerator
@@ -33,15 +36,15 @@ public class MiningTest extends GradoopFlinkTestBase {
   @Test
   public void testMinersSeparatelyUndirected() throws Exception {
     GraphTransactions transactions = new PredictableTransactionsGenerator(
-      10, 1, true, getConfig()).execute();
+      1000, 1, true, getConfig()).execute();
 
-    float threshold = 0.2f;
+    float threshold = 1.0f;
 
-    FSMConfig fsmConfig = new FSMConfig(
-      threshold, false);
+    FSMConfig fsmConfig = new FSMConfig(threshold, false);
 
-
-    DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs = null;
+    DataSet<GraphTransaction> frequentSubgraphs =
+      new TransactionalFSM(fsmConfig)
+        .execute(transactions.getTransactions());
 
 
     Assert.assertEquals(

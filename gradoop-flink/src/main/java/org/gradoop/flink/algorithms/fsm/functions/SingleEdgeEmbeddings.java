@@ -7,7 +7,8 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.fsm.canonicalization.DirectedCAMLabeler;
+import org.gradoop.flink.algorithms.fsm.canonicalization.CAMLabeler;
+import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.pojos.EdgeTriple;
@@ -21,7 +22,11 @@ public class SingleEdgeEmbeddings
 
   private final SubgraphEmbeddings reuseTuple = new SubgraphEmbeddings();
 
-  private final DirectedCAMLabeler canonicalLabeler = new DirectedCAMLabeler();
+  private final CAMLabeler canonicalLabeler;
+
+  public SingleEdgeEmbeddings(FSMConfig fsmConfig) {
+    canonicalLabeler = new CAMLabeler(fsmConfig);
+  }
 
   @Override
   public void flatMap(

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
+import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.pojos.EdgeTriple;
 
@@ -14,14 +15,20 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class DirectedCAMLabeler implements Serializable {
+public class CAMLabeler implements Serializable {
 
   private static final char VERTEX_SEPARATOR = '|';
   private static final char LIST_START = ':';
   private static final char ENTRY_SEPARATOR = ';';
   private static final char OUTGOING_CHAR = '>';
   private static final char INCOMING_CHAR = '<';
-  private static final char EDGE_SEPARATOR = ',';
+  private static final char EDGE_CHAR = '-';
+
+  private final FSMConfig fsmConfig;
+
+  public CAMLabeler(FSMConfig fsmConfig) {
+    this.fsmConfig = fsmConfig;
+  }
 
   public String label(Embedding embedding) {
 
@@ -68,7 +75,7 @@ public class DirectedCAMLabeler implements Serializable {
           }
 
           Collections.sort(edgeStrings);
-          toString += StringUtils.join(edgeStrings, EDGE_SEPARATOR);
+          toString += StringUtils.join(edgeStrings,"");
         }
 
         toStrings.add(toString);
@@ -133,7 +140,11 @@ public class DirectedCAMLabeler implements Serializable {
   }
 
   private String format(EdgeTriple edge, int fromId) {
-    return (edge.getSource() == fromId ? OUTGOING_CHAR : INCOMING_CHAR) +
-      edge.getLabel();
+
+    char edgeChar = fsmConfig.isDirected() ?
+      (edge.getSource() == fromId ? OUTGOING_CHAR : INCOMING_CHAR) :
+      EDGE_CHAR;
+
+    return edgeChar + edge.getLabel();
   }
 }
