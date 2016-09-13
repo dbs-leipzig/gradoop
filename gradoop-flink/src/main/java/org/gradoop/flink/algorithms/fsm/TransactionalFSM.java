@@ -75,7 +75,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
       new GraphTransactions(transactions, gradoopFlinkConfig));
   }
 
-  private DataSet<GraphTransaction> execute(
+  public DataSet<GraphTransaction> execute(
     DataSet<GraphTransaction> transactions) {
     minFrequency = Count
       .count(transactions)
@@ -83,7 +83,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 
     DataSet<SubgraphEmbeddings>
       embeddings = transactions
-      .flatMap(new SingleEdgeEmbeddings());
+      .flatMap(new SingleEdgeEmbeddings(fsmConfig));
 
     DataSet<FrequentSubgraph> frequentSubgraphs =
       getFrequentSubgraphs(embeddings);
@@ -95,7 +95,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 
     embeddings = embeddings
       .groupBy(0)
-      .reduceGroup(new JoinSingleEdgeEmbeddings());
+      .reduceGroup(new JoinSingleEdgeEmbeddings(fsmConfig));
 
     frequentSubgraphs = getFrequentSubgraphs(embeddings);
     allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
@@ -104,8 +104,8 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
       embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
 
       embeddings = embeddings
-        .groupBy(0)
-        .reduceGroup(new JoinMultiEdgeEmbeddings());
+        .groupBy(0, 1)
+        .reduceGroup(new JoinMultiEdgeEmbeddings(fsmConfig));
 
       frequentSubgraphs = getFrequentSubgraphs(embeddings);
       allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);

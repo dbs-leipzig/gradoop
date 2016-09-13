@@ -42,6 +42,9 @@ public class FrequentSubgraphDecoder implements MapFunction<FrequentSubgraph,
     properties.set(FREQUENCY_KEY, value.getFrequency());
     properties.set(CANONICAL_LABEL_KEY, value.getSubgraph());
 
+    System.out.println(value.getEmbedding().getEdges().size() + "\t" + value
+      .getSubgraph());
+
     GraphHead epgmGraphHead = new GraphHead(
       GradoopId.get(), "FrequentSubgraph", properties
     );
