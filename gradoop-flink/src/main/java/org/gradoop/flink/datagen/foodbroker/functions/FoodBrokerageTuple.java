@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -63,6 +64,15 @@ public class FoodBrokerageTuple
   }
 
 
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+
+    productPriceMap = getRuntimeContext().<Map<GradoopId, BigDecimal>>
+      getBroadcastVariable(Constants.PRODUCT_PRICE_MAP).get(0);
+
+    productPriceIterator = productPriceMap.entrySet().iterator();
+  }
 
   @Override
   public void mapPartition(Iterable<Long> iterable,
