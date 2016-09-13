@@ -62,6 +62,7 @@ public class ComplaintTuple
     GraphHead graphHead;
     GraphTransaction graphTransaction;
     Set<Vertex> vertices;
+    Set<Edge> edges;
     Set<Vertex> deliveryNotes;
 
     for (Tuple4<Set<Vertex>, FoodBrokerMaps, Set<Edge>, Set<Edge>> tuple: iterable) {
@@ -72,7 +73,6 @@ public class ComplaintTuple
       purchOrderLines = tuple.f3;
       edgeMap = tuple.f1.getEdgeMap();
       salesOrder = getSalesOrder();
-      edges = Sets.newHashSet();
       masterDataMap = Maps.newHashMap();
       userMap = Maps.newHashMap();
       graphHead = graphHeadFactory.createGraphHead();
@@ -84,6 +84,7 @@ public class ComplaintTuple
       lateDelivery(deliveryNotes);
 
       vertices = getVertices();
+      edges = getEdges();
       if ((vertices.size() > 0) && (edges.size() > 0)) {
         graphTransaction.setGraphHead(graphHead);
         graphTransaction.setVertices(vertices);

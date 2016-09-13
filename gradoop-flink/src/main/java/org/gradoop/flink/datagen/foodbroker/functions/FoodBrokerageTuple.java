@@ -77,7 +77,6 @@ public class FoodBrokerageTuple
       globalSeed = seed;
       vertexMap = Maps.newHashMap();
       edgeMap = Maps.newHashMap();
-      edges = Sets.newHashSet();
       graphHead = graphHeadFactory.createGraphHead();
       graphIds = new GradoopIdSet();
       graphIds.add(graphHead.getId());
@@ -115,7 +114,7 @@ public class FoodBrokerageTuple
       }
       graphTransaction.setGraphHead(graphHead);
       graphTransaction.setVertices(getVertices());
-      graphTransaction.setEdges(edges);
+      graphTransaction.setEdges(getEdges());
       collector.collect(new Tuple2<>(graphTransaction,
         new FoodBrokerMaps(vertexMap, edgeMap)));
     }

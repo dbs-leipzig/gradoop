@@ -15,17 +15,13 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.foodbroker.tuples.FoodBrokerMaps;
-import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by Stephan on 13.09.16.
- */
+
 public abstract class ProcessTuple<S, T> extends
   RichMapPartitionFunction<S, T> {
   /**
@@ -35,27 +31,27 @@ public abstract class ProcessTuple<S, T> extends
   /**
    * iterator over all customers
    */
-  protected Iterator<Map.Entry<GradoopId, Float>> customerIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> customerIterator;
   /**
    * iterator over all vendors
    */
-  protected Iterator<Map.Entry<GradoopId, Float>> vendorIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> vendorIterator;
   /**
    * iterator over all logistics
    */
-  protected Iterator<Map.Entry<GradoopId, Float>> logisticIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> logisticIterator;
   /**
    * iterator over all employees
    */
-  protected Iterator<Map.Entry<GradoopId, Float>> employeeIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> employeeIterator;
   /**
    * iterator over all product prices
    */
-  protected Iterator<Map.Entry<GradoopId, Float>> productQualityIterator;
+  private Iterator<Map.Entry<GradoopId, Float>> productQualityIterator;
   /**
    * iterator over all product
    */
-  protected Iterator<Map.Entry<GradoopId, BigDecimal>> productPriceIterator;
+  private Iterator<Map.Entry<GradoopId, BigDecimal>> productPriceIterator;
   /**
    * graph ids, one seperate id for each case
    */
@@ -73,13 +69,9 @@ public abstract class ProcessTuple<S, T> extends
    */
   protected EdgeFactory edgeFactory;
   /**
-   * set which contains all edges which are created
-   */
-  protected Set<Edge> edges;
-  /**
    * map to quickly receive the target id of an edge
    */
-  protected Map<Tuple2<String, GradoopId>, Set<GradoopId>> edgeMap;
+  protected Map<Tuple2<String, GradoopId>, Set<Edge>> edgeMap;
   /**
    * map to get the vertex object of a given gradoop id
    */
@@ -87,29 +79,29 @@ public abstract class ProcessTuple<S, T> extends
   /**
    * map to get the customer quality of a given gradoop id
    */
-  protected Map<GradoopId, Float> customerMap;
+  private Map<GradoopId, Float> customerMap;
   /**
    * map to get the vendor quality of a given gradoop id
    */
-  protected Map<GradoopId, Float> vendorMap;
+  private Map<GradoopId, Float> vendorMap;
   /**
    * map to get the logistic quality of a given gradoop id
    */
-  protected Map<GradoopId, Float> logisticMap;
+  Map<GradoopId, Float> logisticMap;
   /**
    * map to get the employee quality of a given gradoop id
    */
-  protected Map<GradoopId, Float> emplyoeeMap;
+  Map<GradoopId, Float> emplyoeeMap;
   /**
    * map to get the prodouct quality of a given gradoop id
    */
-  protected Map<GradoopId, Float> productQualityMap;
+  Map<GradoopId, Float> productQualityMap;
   /**
    * map to get the prodouct price of a given gradoop id
    */
-  protected Map<GradoopId, BigDecimal> productPriceMap;
+  Map<GradoopId, BigDecimal> productPriceMap;
 
-  protected Map<GradoopId, Float> userMap;
+  Map<GradoopId, Float> userMap;
 
   protected long currentId = 1;
   protected long globalSeed;
@@ -118,7 +110,6 @@ public abstract class ProcessTuple<S, T> extends
     FoodBrokerConfig config, GraphHeadFactory graphHeadFactory) {
     this.edgeFactory = edgeFactory;
     vertexMap = Maps.newHashMap();
-    edges = Sets.newHashSet();
     this.vertexFactory = vertexFactory;
     edgeMap = Maps.newHashMap();
     this.config = config;
@@ -178,15 +169,8 @@ public abstract class ProcessTuple<S, T> extends
    * @param source the source id
    * @param target the target id
    */
-  protected void newEdge(String label, GradoopId source, GradoopId target) {
-    edges.add(edgeFactory.createEdge(label, source, target, graphIds));
-    Tuple2<String, GradoopId> key = new Tuple2<>(label, source);
-    Set<GradoopId> targets = Sets.newHashSet();
-    if (edgeMap.containsKey(key)) {
-      targets = edgeMap.get(key);
-    }
-    targets.add(target);
-    edgeMap.put(key, targets);
+  protected Edge newEdge(String label, GradoopId source, GradoopId target) {
+    return newEdge(label, source, target, null);
   }
 
   /**
@@ -199,15 +183,19 @@ public abstract class ProcessTuple<S, T> extends
    */
   protected Edge newEdge(String label, GradoopId source, GradoopId target,
     PropertyList properties) {
-    Edge edge = edgeFactory.createEdge(label, source, target, properties,
-      graphIds);
-    edges.add(edge);
+    Edge edge;
+    if (properties == null) {
+      edge = edgeFactory.createEdge(label, source, target, graphIds);
+    } else {
+      edge = edgeFactory.createEdge(label, source, target, properties,
+        graphIds);
+    }
     Tuple2<String, GradoopId> key = new Tuple2<>(label, source);
-    Set<GradoopId> targets = Sets.newHashSet();
+    Set<Edge> targets = Sets.newHashSet();
     if (edgeMap.containsKey(key)) {
       targets = edgeMap.get(key);
     }
-    targets.add(target);
+    targets.add(edge);
     edgeMap.put(key, targets);
     return edge;
   }
@@ -233,7 +221,7 @@ public abstract class ProcessTuple<S, T> extends
   protected GradoopId getEdgeTargetId(String edgeLabel, GradoopId source) {
     //there is always only one master data in this kind of edges
     return edgeMap.get(
-      new Tuple2<>(edgeLabel, source)).iterator().next();
+      new Tuple2<>(edgeLabel, source)).iterator().next().getTargetId();
   }
 
   protected Float getEdgeTargetQuality(String edgeLabel, GradoopId source,
@@ -299,5 +287,13 @@ public abstract class ProcessTuple<S, T> extends
       vertices.add(entry.getValue());
     }
     return vertices;
+  }
+  protected Set<Edge> getEdges() {
+    Set<Edge> edges = Sets.newHashSet();
+    for(Map.Entry<Tuple2<String, GradoopId>, Set<Edge>> entry :
+      edgeMap.entrySet()) {
+      edges.addAll(entry.getValue());
+    }
+    return edges;
   }
 }
