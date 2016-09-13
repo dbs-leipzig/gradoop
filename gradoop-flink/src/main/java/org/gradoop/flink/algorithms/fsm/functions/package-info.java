@@ -15,31 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.functions;
-
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-
 /**
- * Calculates the min frequency based on a configured min support.
+ * Flink functions related to frequent subgraph mining.
  */
-public class MinFrequency implements MapFunction<Long, Long> {
 
-  /**
-   * FSM configuration
-   */
-  private final FSMConfig fsmConfig;
-
-  /**
-   * Constructor.
-   * @param fsmConfig FSM configuration
-   */
-  public MinFrequency(FSMConfig fsmConfig) {
-    this.fsmConfig = fsmConfig;
-  }
-
-  @Override
-  public Long map(Long value) throws Exception {
-    return (long) Math.round((float) value * fsmConfig.getMinSupport());
-  }
-}
+package org.gradoop.flink.algorithms.fsm.functions;

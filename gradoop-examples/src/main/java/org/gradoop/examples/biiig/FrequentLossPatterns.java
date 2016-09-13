@@ -35,7 +35,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.flink.algorithms.fsm.functions.FrequentSubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.functions.SubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
@@ -389,7 +389,7 @@ public class FrequentLossPatterns
     public GraphHead execute(GraphHead current, GraphHead transformed) {
 
       BigDecimal support = current
-        .getPropertyValue(FrequentSubgraphDecoder.FREQUENCY_KEY)
+        .getPropertyValue(SubgraphDecoder.FREQUENCY_KEY)
         .getBigDecimal().setScale(2, BigDecimal.ROUND_HALF_UP);
 
       String newLabel = current.getLabel() + " (" + support + ")";

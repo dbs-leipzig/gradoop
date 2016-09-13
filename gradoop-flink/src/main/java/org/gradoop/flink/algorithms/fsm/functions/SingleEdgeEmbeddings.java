@@ -4,21 +4,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.fsm.canonicalization.CAMLabeler;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
-import org.gradoop.flink.algorithms.fsm.pojos.EdgeTriple;
-import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.algorithms.fsm.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.tuples.FSMGraph;
+import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 
 import java.util.Collection;
 import java.util.Map;
 
 public class SingleEdgeEmbeddings
-  implements FlatMapFunction<GraphTransaction, SubgraphEmbeddings> {
+  implements FlatMapFunction<FSMGraph, SubgraphEmbeddings> {
 
   private final SubgraphEmbeddings reuseTuple = new SubgraphEmbeddings();
 
@@ -30,29 +27,16 @@ public class SingleEdgeEmbeddings
 
   @Override
   public void flatMap(
-    GraphTransaction graph, Collector<SubgraphEmbeddings> out) throws Exception {
+    FSMGraph graph, Collector<SubgraphEmbeddings> out) throws Exception {
 
-    Map<GradoopId, Integer> vertexIdMap =
-      Maps.newHashMapWithExpectedSize(graph.getVertices().size());
+    Map<Integer, String> vertices = graph.getVertices();
+    Map<String, Collection<Embedding>> subgraphEmbeddings = Maps.newHashMap();
 
-    Map<Integer, String> vertices =
-      Maps.newHashMapWithExpectedSize(graph.getVertices().size());
+    for (Map.Entry<Integer, FSMEdge> entry : graph.getEdges().entrySet()) {
 
-    Map<String, Collection<Embedding>> subgraphEmbeddings =
-      Maps.newHashMap();
-
-    int vertexId = 0;
-    for (Vertex vertex : graph.getVertices()) {
-      vertexIdMap.put(vertex.getId(), vertexId);
-      vertices.put(vertexId, vertex.getLabel());
-      vertexId++;
-    }
-
-    int edgeId = 0;
-    for (Edge edge : graph.getEdges()) {
-
-      int sourceId = vertexIdMap.get(edge.getSourceId());
-      int targetId = vertexIdMap.get(edge.getTargetId());
+      FSMEdge edge = entry.getValue();
+      int sourceId = edge.getSourceId();
+      int targetId = edge.getTargetId();
 
       Map<Integer, String> incidentVertices =
         Maps.newHashMapWithExpectedSize(2);
@@ -63,11 +47,10 @@ public class SingleEdgeEmbeddings
         incidentVertices.put(targetId, vertices.get(targetId));
       }
 
-      EdgeTriple triple = new EdgeTriple(sourceId, edge.getLabel(), targetId);
-      Map<Integer, EdgeTriple> triples = Maps.newHashMapWithExpectedSize(1);
-      triples.put(edgeId, triple);
+      Map<Integer, FSMEdge> singleEdge = Maps.newHashMapWithExpectedSize(1);
+      singleEdge.put(entry.getKey(), edge);
 
-      Embedding embedding = new Embedding(incidentVertices, triples);
+      Embedding embedding = new Embedding(incidentVertices, singleEdge);
 
       String subgraph = canonicalLabeler.label(embedding);
 
@@ -78,11 +61,9 @@ public class SingleEdgeEmbeddings
       } else {
         embeddings.add(embedding);
       }
-
-      edgeId++;
     }
 
-    reuseTuple.setGraphId(graph.getGraphHead().getId());
+    reuseTuple.setGraphId(graph.getId());
     reuseTuple.setSize(1);
 
     for (Map.Entry<String, Collection<Embedding>> entry :

@@ -15,31 +15,34 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package org.gradoop.flink.algorithms.fsm.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
+import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
+import org.gradoop.flink.model.api.tuples.Countable;
 
 /**
- * Calculates the min frequency based on a configured min support.
+ * Filters something countable by minimum frequency.
  */
-public class MinFrequency implements MapFunction<Long, Long> {
+public class Frequent<T extends Countable> extends RichFilterFunction<T> {
 
   /**
-   * FSM configuration
+   * minimum frequency
    */
-  private final FSMConfig fsmConfig;
+  private long minFrequency;
 
-  /**
-   * Constructor.
-   * @param fsmConfig FSM configuration
-   */
-  public MinFrequency(FSMConfig fsmConfig) {
-    this.fsmConfig = fsmConfig;
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+
+    this.minFrequency = getRuntimeContext()
+      .<Long>getBroadcastVariable(Constants.MIN_FREQUENCY).get(0);
   }
 
   @Override
-  public Long map(Long value) throws Exception {
-    return (long) Math.round((float) value * fsmConfig.getMinSupport());
+  public boolean filter(T value) throws Exception {
+    return value.getCount() >= minFrequency;
   }
 }

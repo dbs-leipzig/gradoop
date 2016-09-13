@@ -42,9 +42,9 @@ public class GradoopFSMTestUtils {
       iResult
         .combineGroup(new SortAndTranslate())
         .withBroadcastSet(
-          vertexLabelDictionary, Constants.VERTEX_DICTIONARY)
+          vertexLabelDictionary, Constants.FREQUENT_VERTEX_LABELS)
         .withBroadcastSet(
-          edgeLabelDictionary, Constants.EDGE_DICTIONARY)
+          edgeLabelDictionary, Constants.FREQUENT_EDGE_LABELS)
         .collect()
         .get(0)
     );
@@ -62,10 +62,10 @@ public class GradoopFSMTestUtils {
     public void open(Configuration parameters) throws Exception {
       super.open(parameters);
       this.vertexDictionary = getRuntimeContext()
-        .<List<String>>getBroadcastVariable(Constants.VERTEX_DICTIONARY)
+        .<List<String>>getBroadcastVariable(Constants.FREQUENT_VERTEX_LABELS)
         .get(0);
       this.edgeDictionary = getRuntimeContext()
-        .<List<String>>getBroadcastVariable(Constants.EDGE_DICTIONARY)
+        .<List<String>>getBroadcastVariable(Constants.FREQUENT_EDGE_LABELS)
         .get(0);
     }
 

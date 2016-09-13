@@ -10,10 +10,10 @@ import static com.google.common.collect.Sets.intersection;
 public class Embedding {
 
   private final Map<Integer, String> vertices;
-  private final Map<Integer, EdgeTriple> edges;
+  private final Map<Integer, FSMEdge> edges;
 
   public Embedding(
-    Map<Integer, String> vertices, Map<Integer, EdgeTriple> edges) {
+    Map<Integer, String> vertices, Map<Integer, FSMEdge> edges) {
 
     this.vertices = vertices;
     this.edges = edges;
@@ -29,7 +29,7 @@ public class Embedding {
     return vertices.toString() + "|" + edges.toString();
   }
 
-  public Map<Integer, EdgeTriple> getEdges() {
+  public Map<Integer, FSMEdge> getEdges() {
     return edges;
   }
 
@@ -47,7 +47,7 @@ public class Embedding {
     Map<Integer, String> commonVertices = Maps.newHashMap(vertices);
     commonVertices.putAll(that.vertices);
 
-    Map<Integer, EdgeTriple> commonEdges =
+    Map<Integer, FSMEdge> commonEdges =
       Maps.newHashMapWithExpectedSize(this.edges.size() + that.edges.size());
 
     commonEdges.putAll(this.edges);

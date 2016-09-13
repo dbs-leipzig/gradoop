@@ -1,22 +1,22 @@
 package org.gradoop.flink.algorithms.fsm.pojos;
 
-public class EdgeTriple {
+public class FSMEdge {
 
   private final int source;
   private final String label;
   private final int target;
 
-  public EdgeTriple(int source, String label, int target) {
+  public FSMEdge(int source, String label, int target) {
     this.source = source;
     this.label = label;
     this.target = target;
   }
 
-  public int getSource() {
+  public int getSourceId() {
     return source;
   }
 
-  public int getTarget() {
+  public int getTargetId() {
     return target;
   }
 
@@ -33,7 +33,7 @@ public class EdgeTriple {
       return false;
     }
 
-    EdgeTriple that = (EdgeTriple) o;
+    FSMEdge that = (FSMEdge) o;
 
     if (source != that.source) {
       return false;
