@@ -6,7 +6,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
-import org.gradoop.flink.algorithms.fsm.pojos.EdgeTriple;
+import org.gradoop.flink.algorithms.fsm.pojos.FSMEdge;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class CAMLabeler implements Serializable {
   public String label(Embedding embedding) {
 
     Map<Integer, String> vertices = embedding.getVertices();
-    Map<Integer, EdgeTriple> edges = embedding.getEdges();
+    Map<Integer, FSMEdge> edges = embedding.getEdges();
 
     Map<Integer, Map<Integer, Set<Integer>>> edgeIndex = index(vertices, edges);
 
@@ -61,7 +61,7 @@ public class CAMLabeler implements Serializable {
         Set<Integer> edgeIds = toVertex.getValue();
 
         if (edgeIds.size() == 1) {
-          EdgeTriple edge = edges.get(edgeIds.iterator().next());
+          FSMEdge edge = edges.get(edgeIds.iterator().next());
 
           toString += format(edge, fromId);
 
@@ -91,18 +91,18 @@ public class CAMLabeler implements Serializable {
   }
 
   private Map<Integer, Map<Integer, Set<Integer>>> index(
-    Map<Integer, String> vertices, Map<Integer, EdgeTriple> edges) {
+    Map<Integer, String> vertices, Map<Integer, FSMEdge> edges) {
 
     Map<Integer, Map<Integer, Set<Integer>>> edgeIndex =
       Maps.newHashMapWithExpectedSize(vertices.size());
 
-    for (Map.Entry<Integer, EdgeTriple> edgeEntry : edges.entrySet()) {
+    for (Map.Entry<Integer, FSMEdge> edgeEntry : edges.entrySet()) {
 
       int edgeId = edgeEntry.getKey();
-      EdgeTriple edge = edgeEntry.getValue();
+      FSMEdge edge = edgeEntry.getValue();
 
-      int sourceId = edge.getSource();
-      int targetId = edge.getTarget();
+      int sourceId = edge.getSourceId();
+      int targetId = edge.getTargetId();
 
       addToIndex(edgeIndex, sourceId, edgeId, targetId);
 
@@ -139,10 +139,10 @@ public class CAMLabeler implements Serializable {
     }
   }
 
-  private String format(EdgeTriple edge, int fromId) {
+  private String format(FSMEdge edge, int fromId) {
 
     char edgeChar = fsmConfig.isDirected() ?
-      (edge.getSource() == fromId ? OUTGOING_CHAR : INCOMING_CHAR) :
+      (edge.getSourceId() == fromId ? OUTGOING_CHAR : INCOMING_CHAR) :
       EDGE_CHAR;
 
     return edgeChar + edge.getLabel();

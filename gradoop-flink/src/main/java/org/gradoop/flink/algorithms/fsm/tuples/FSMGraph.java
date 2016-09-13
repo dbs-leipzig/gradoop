@@ -15,31 +15,38 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.functions;
+package org.gradoop.flink.algorithms.fsm.tuples;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.algorithms.fsm.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
+
+import java.util.Map;
 
 /**
- * Calculates the min frequency based on a configured min support.
+ * Lightweight representation of a labeled graph transaction.
  */
-public class MinFrequency implements MapFunction<Long, Long> {
+public class FSMGraph extends Embedding {
 
   /**
-   * FSM configuration
+   * graph identifier
    */
-  private final FSMConfig fsmConfig;
+  private final GradoopId id;
 
   /**
    * Constructor.
-   * @param fsmConfig FSM configuration
+   *
+   * @param id graph identifier
+   * @param vertices id-vertex map
+   * @param edges id-edge map
    */
-  public MinFrequency(FSMConfig fsmConfig) {
-    this.fsmConfig = fsmConfig;
+  public FSMGraph(GradoopId id,
+    Map<Integer, String> vertices, Map<Integer, FSMEdge> edges) {
+    super(vertices, edges);
+    this.id = id;
   }
 
-  @Override
-  public Long map(Long value) throws Exception {
-    return (long) Math.round((float) value * fsmConfig.getMinSupport());
+  public GradoopId getId() {
+    return id;
   }
 }

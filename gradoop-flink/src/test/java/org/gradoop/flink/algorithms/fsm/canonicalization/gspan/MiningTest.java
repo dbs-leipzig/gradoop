@@ -24,7 +24,8 @@ public class MiningTest extends GradoopFlinkTestBase {
 
     DataSet<GraphTransaction> frequentSubgraphs =
       new TransactionalFSM(fsmConfig)
-        .execute(transactions.getTransactions());
+        .execute(transactions)
+        .getTransactions();
 
     Assert.assertEquals(
       PredictableTransactionsGenerator
@@ -44,8 +45,8 @@ public class MiningTest extends GradoopFlinkTestBase {
 
     DataSet<GraphTransaction> frequentSubgraphs =
       new TransactionalFSM(fsmConfig)
-        .execute(transactions.getTransactions());
-
+        .execute(transactions)
+        .getTransactions();
 
     Assert.assertEquals(
       PredictableTransactionsGenerator

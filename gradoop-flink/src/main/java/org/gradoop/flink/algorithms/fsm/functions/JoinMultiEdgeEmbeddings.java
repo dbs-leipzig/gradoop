@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.algorithms.fsm.functions;
 
 import com.google.common.collect.Lists;
@@ -15,8 +32,16 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Joins k-edge embeddings to 2k-edge and 2k-1-edge embeddings.
+ */
 public class JoinMultiEdgeEmbeddings extends JoinEmbeddings {
 
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration.
+   */
   public JoinMultiEdgeEmbeddings(FSMConfig fsmConfig) {
     super(fsmConfig);
   }
@@ -77,13 +102,23 @@ public class JoinMultiEdgeEmbeddings extends JoinEmbeddings {
     collect(out, evenSubgraphEmbeddings);
   }
 
+  /**
+   * Creates an embedding by joining two others and stores it for output, if
+   * not already discovered before.
+   *
+   * @param subgraphEmbeddings output storage
+   * @param left first embedding
+   * @param right second embedding
+   * @param coverages discovered embeddings' coverages
+   * @param coverage current embedding's coverage
+   */
   private void addEmbedding(
     Map<String, Collection<Embedding>> subgraphEmbeddings, Embedding left,
-    Embedding right, Set<Coverage> coverages, Coverage converage) {
+    Embedding right, Set<Coverage> coverages, Coverage coverage) {
 
-    if (!coverages.contains(converage)) {
+    if (!coverages.contains(coverage)) {
 
-      coverages.add(converage);
+      coverages.add(coverage);
       Embedding embedding = left.combine(right);
 
       String subgraph = canonicalLabeler.label(embedding);

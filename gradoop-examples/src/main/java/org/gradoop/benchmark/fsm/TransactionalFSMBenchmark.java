@@ -22,16 +22,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.cache.DistributedCache;
-import org.gradoop.common.cache.api.DistributedCacheServer;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.io.impl.tlf.TLFDataSource;
-import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-
-import org.gradoop.flink.algorithms.fsm.canonicalization.gspan.pojos.CompressedDFSCode;
-import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.flink.io.impl.tlf.TLFDataSource;
+import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -123,21 +118,19 @@ public class TransactionalFSMBenchmark extends AbstractRunner
     TLFDataSource tlfSource = new TLFDataSource(inputPath, gradoopConfig);
 
     // create input dataset
-    DataSet<TLFGraph> graphs = tlfSource.getTLFGraphs();
+    GraphTransactions graphs = tlfSource.getGraphTransactions();
 
-    DistributedCacheServer cacheServer = DistributedCache.getServer();
 
     // set config for synthetic or real world dataset
     FSMConfig fsmConfig = new FSMConfig(threshold, directed);
 
     // mine
-    DataSet<WithCount<CompressedDFSCode>> frequentSubgraphs = graphs
-      .mapPartition(new EncodeTLFGraphs(fsmConfig))
-      .mapPartition(new IterativeGSpan(fsmConfig));
+    GraphTransactions frequentSubgraphs = new
+      TransactionalFSM(fsmConfig).execute(graphs);
 
     // write statistics
     writeCSV(inputPath, directed, implementation , threshold, logPath,
-      frequentSubgraphs.count());
+      frequentSubgraphs.getTransactions().count());
   }
 
   /**

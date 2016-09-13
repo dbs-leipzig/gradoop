@@ -18,13 +18,14 @@
 package org.gradoop.flink.model.impl.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.model.api.tuples.Countable;
 
 /**
  * (t,count)
  *
  * @param <T> data type of t
  */
-public class WithCount<T> extends Tuple2<T, Integer> {
+public class WithCount<T> extends Tuple2<T, Long> implements Countable {
 
   /**
    * default constructor
@@ -38,7 +39,7 @@ public class WithCount<T> extends Tuple2<T, Integer> {
    * @param t countable object
    */
   public WithCount(T t) {
-    super(t, 1);
+    super(t, 1L);
   }
 
   /**
@@ -47,7 +48,7 @@ public class WithCount<T> extends Tuple2<T, Integer> {
    * @param t countable object
    * @param count initial count
    */
-  public WithCount(T t, int count) {
+  public WithCount(T t, long count) {
     super(t, count);
   }
 
@@ -59,11 +60,13 @@ public class WithCount<T> extends Tuple2<T, Integer> {
     this.f0 = object;
   }
 
-  public Integer getCount() {
+  @Override
+  public long getCount() {
     return f1;
   }
 
-  public void setCount(int count) {
+  @Override
+  public void setCount(long count) {
     this.f1 = count;
   }
 }
