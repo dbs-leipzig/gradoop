@@ -3,7 +3,6 @@ package org.gradoop.flink.datagen.foodbroker.functions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.flink.api.common.functions.RichMapPartitionFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.configuration.Configuration;
@@ -26,142 +25,44 @@ import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class ComplaintTuple
-  extends RichMapPartitionFunction<Tuple4<Set<Vertex>, FoodBrokerMaps,
+  extends ProcessTuple<Tuple4<Set<Vertex>, FoodBrokerMaps,
   Set<Edge>, Set<Edge>>, Tuple2<GraphTransaction, Set<Vertex>>> {
-
-  /**
-   * Foodbroker configuration
-   */
-  private FoodBrokerConfig config;
-  /**
-   * graph ids, one seperate id for each case
-   */
-  private GradoopIdSet graphIds;
-  /**
-   * EPGM graph head factory
-   */
-  private GraphHeadFactory graphHeadFactory;
-  /**
-   * EPGM vertex factory
-   */
-  private VertexFactory vertexFactory;
-  /**
-   * EPGM edge factory
-   */
-  private EdgeFactory edgeFactory;
-  /**
-   * map to quickly receive the target id of an edge
-   */
-  private Map<Tuple2<String, GradoopId>, Set<GradoopId>> edgeMap;
-  /**
-   * map to get the vertex object of a given gradoop id
-   */
-  private Map<GradoopId, Vertex> vertexMap;
-
-  private Set<Vertex> vertices;
-
-  private Set<Edge> edges;
-
-  /**
-   * map to get the customer quality of a given gradoop id
-   */
-  private Map<GradoopId, Float> customerMap;
-  /**
-   * map to get the vendor quality of a given gradoop id
-   */
-  private Map<GradoopId, Float> vendorMap;
-  /**
-   * map to get the logistic quality of a given gradoop id
-   */
-  private Map<GradoopId, Float> logisticMap;
-  /**
-   * map to get the employee quality of a given gradoop id
-   */
-  private Map<GradoopId, Float> employeeMap;
-  /**
-   * map to get the prodouct quality of a given gradoop id
-   */
-  private Map<GradoopId, Float> productQualityMap;
-
-  private Map<GradoopId, Float> userMap;
-  /**
-   * iterator over all employees
-   */
-  private Iterator<Map.Entry<GradoopId, Float>> employeeIterator;
 
   private List<Vertex> employees;
   private List<Vertex> customers;
 
-  private Set<Vertex> masterData;
+  private Map<GradoopId, Vertex> masterDataMap;
 
-  private Set<Vertex> deliveryNotes;
   private Set<Edge> salesOrderLines;
   private Set<Edge> purchOrderLines;
   private Vertex salesOrder;
 
-  private long currentId = 1;
-
-  private long globalSeed;
-
-
   public ComplaintTuple(GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory, EdgeFactory edgeFactory,
     FoodBrokerConfig config, long globalSeed) {
-    this.graphHeadFactory = graphHeadFactory;
-    this.vertexFactory = vertexFactory;
-    this.edgeFactory = edgeFactory;
-    this.config = config;
+    super(edgeFactory, vertexFactory, config, graphHeadFactory);
     this.globalSeed = globalSeed;
-
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-
-//    vertexMap = getRuntimeContext().<Map<GradoopId, Vertex>>
-//      getBroadcastVariable(Constants.VERTEX_MAP).get(0);
-
-//    edgeMap = getRuntimeContext()
-//      .<Map<Tuple2<String, GradoopId>,Set<GradoopId>>>getBroadcastVariable(
-//        Constants.EDGE_MAP).get(0);
-
-    customerMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.CUSTOMER_MAP).get(0);
-
-    vendorMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.VENDOR_MAP).get(0);
-
-    logisticMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.LOGISTIC_MAP).get(0);
-
-    employeeMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.EMPLOYEE_MAP).get(0);
-
-    productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.PRODUCT_QUALITY_MAP).get(0);
-
-    employeeIterator = employeeMap.entrySet().iterator();
-
     employees = getRuntimeContext().getBroadcastVariable(Employee.CLASS_NAME);
-
     customers = getRuntimeContext().getBroadcastVariable(Customer.CLASS_NAME);
   }
 
   @Override
   public void mapPartition(Iterable<Tuple4<Set<Vertex>, FoodBrokerMaps, Set<Edge>, Set<Edge>>> iterable,
     Collector<Tuple2<GraphTransaction, Set<Vertex>>> collector) throws Exception {
-
     GraphHead graphHead;
     GraphTransaction graphTransaction;
-
-
+    Set<Vertex> vertices;
+    Set<Vertex> deliveryNotes;
 
     for (Tuple4<Set<Vertex>, FoodBrokerMaps, Set<Edge>, Set<Edge>> tuple: iterable) {
       deliveryNotes = tuple.f0;
@@ -171,9 +72,8 @@ public class ComplaintTuple
       purchOrderLines = tuple.f3;
       edgeMap = tuple.f1.getEdgeMap();
       salesOrder = getSalesOrder();
-      vertices = Sets.newHashSet();
       edges = Sets.newHashSet();
-      masterData = Sets.newHashSet();
+      masterDataMap = Maps.newHashMap();
       userMap = Maps.newHashMap();
       graphHead = graphHeadFactory.createGraphHead();
       graphIds = new GradoopIdSet();
@@ -183,12 +83,12 @@ public class ComplaintTuple
       badQuality(deliveryNotes);
       lateDelivery(deliveryNotes);
 
+      vertices = getVertices();
       if ((vertices.size() > 0) && (edges.size() > 0)) {
         graphTransaction.setGraphHead(graphHead);
         graphTransaction.setVertices(vertices);
         graphTransaction.setEdges(edges);
-        collector.collect(new Tuple2<GraphTransaction, Set<Vertex>>
-          (graphTransaction, masterData));
+        collector.collect(new Tuple2<>(graphTransaction, getMasterData()));
         globalSeed++;
       }
     }
@@ -278,43 +178,25 @@ public class ComplaintTuple
     GradoopId employeeId = getNextEmployee();
     GradoopId customerId = getEdgeTargetId("receivedFrom", salesOrder.getId());
 
-    Vertex ticket = vertexFactory.createVertex(label, properties, graphIds);
-    vertices.add(ticket);
+    Vertex ticket = newVertex(label, properties);
 
+    newEdge("concerns", ticket.getId(), salesOrder.getId());
 
     Vertex user = getUserFromEmployeeId(employeeId);
-    masterData.add(user);
-    userMap.put(user.getId(),
-      user.getPropertyValue(Constants.QUALITY).getFloat());
 
-
-    edges.add(edgeFactory.createEdge("createdBy", ticket.getId(), user.getId(),
-      graphIds));
-    edgeMap.put(new Tuple2<String, GradoopId>("createdBy", ticket.getId()),
-      Sets.<GradoopId>newHashSet(user.getId()));
+    newEdge("createdBy", ticket.getId(), user.getId());
 
     employeeId = getNextEmployee();
     user = getUserFromEmployeeId(employeeId);
-    masterData.add(user);
-    userMap.put(user.getId(),
-      user.getPropertyValue(Constants.QUALITY).getFloat());
 
-    edges.add(edgeFactory.createEdge("allocatedTo", ticket.getId(), user.getId(),
-      graphIds));
-    edgeMap.put(new Tuple2<String, GradoopId>("allocatedTo", ticket.getId()),
-      Sets.<GradoopId>newHashSet(user.getId()));
+    newEdge("allocatedTo", ticket.getId(), user.getId());
 
     Vertex client = getClientFromCustomerId(customerId);
-    masterData.add(client);
 
-    edges.add(edgeFactory.createEdge("openedBy", ticket.getId(), client.getId(),
-      graphIds));
-    edgeMap.put(new Tuple2<String, GradoopId>("openedBy", ticket.getId()),
-      Sets.<GradoopId>newHashSet(client.getId()));
+    newEdge("openedBy", ticket.getId(), client.getId());
 
     return ticket;
   }
-
 
 
   private void grantSalesRefund(Set<Edge> salesOrderLines, Vertex ticket) {
@@ -353,14 +235,9 @@ public class ComplaintTuple
       properties.set("revenue", refundAmount);
       properties.set("text", "*** TODO @ ComplaintHandling ***");
 
-      Vertex salesInvoice = vertexFactory.createVertex(label, properties,
-        graphIds);
-      vertices.add(salesInvoice);
+      Vertex salesInvoice = newVertex(label, properties);
 
-      edges.add(edgeFactory
-        .createEdge("createdFor", salesInvoice.getId(), salesOrder.getId(), graphIds));
-      edgeMap.put(new Tuple2<String, GradoopId>("createdFor", salesInvoice.getId()),
-        Sets.<GradoopId>newHashSet(salesOrder.getId()));
+      newEdge("createdFor", salesInvoice.getId(), salesOrder.getId());
     }
   }
 
@@ -402,14 +279,9 @@ public class ComplaintTuple
       properties.set("expense", refundAmount);
       properties.set("text", "*** TODO @ ComplaintHandling ***");
 
-      Vertex purchInvoice =
-        this.vertexFactory.createVertex(label, properties, graphIds); // TODO
-      vertices.add(purchInvoice);
+      Vertex purchInvoice = newVertex(label, properties);
 
-      edges.add(edgeFactory
-        .createEdge("createdFor", purchInvoice.getId(), purchOrderId, graphIds));
-      edgeMap.put(new Tuple2<String, GradoopId>("createdFor", purchInvoice.getId()),
-        Sets.<GradoopId>newHashSet(purchOrderId));
+      newEdge("createdFor", purchInvoice.getId(), purchOrderId);
     }
   }
 
@@ -453,70 +325,6 @@ public class ComplaintTuple
     return null;
   }
 
-
-  private String createBusinessIdentifier(long seed,
-    String acronym) {
-    String seedString = String.valueOf(seed);
-    String idString = String.valueOf(globalSeed);
-    int count = 6 - idString.length();
-    for(int i = 1; i <= (count); i++) {
-      idString = "0" + idString;
-    }
-    count = 6 - seedString.length();
-    for(int i = 1; i <= (count); i++) {
-      seedString = "0" + seedString;
-    }
-    return acronym + idString + "-" + seedString;
-  }
-
-  /**
-   * Searches the master data tupel which is the edge target of the given
-   * edge parameter.
-   *
-   * @param edgeLabel label of the edge
-   * @param source source id
-   * @return target master data tupel
-   */
-  private GradoopId getEdgeTargetId(String edgeLabel,
-    GradoopId source) {
-    //there is always only one master data in this kind of edges
-    return getEdgeTargetIdSet(edgeLabel, source).iterator().next();
-  }
-
-  private Set<GradoopId> getEdgeTargetIdSet(String edgeLabel,
-    GradoopId source) {
-    //there is always only one master data in this kind of edges
-    return edgeMap.get(
-      new Tuple2<>(edgeLabel, source));
-  }
-
-  private Float getEdgeTargetQuality(String edgeLabel,
-    GradoopId source, String masterDataMap) {
-    GradoopId target = getEdgeTargetId(edgeLabel, source);
-
-    switch (masterDataMap) {
-    case Constants.CUSTOMER_MAP:
-      return customerMap.get(target);
-    case Constants.VENDOR_MAP:
-      return vendorMap.get(target);
-    case Constants.LOGISTIC_MAP:
-      return logisticMap.get(target);
-    case Constants.EMPLOYEE_MAP:
-      return employeeMap.get(target);
-    case Constants.USER_MAP:
-      return userMap.get(target);
-    default:
-      return null;
-    }
-  }
-
-  private GradoopId getNextEmployee() {
-    if (!employeeIterator.hasNext()) {
-      employeeIterator = employeeMap.entrySet().iterator();
-    }
-    return employeeIterator.next().getKey();
-  }
-
   private Vertex getCustomerById(GradoopId id) {
     for (Vertex vertex : customers) {
       if (vertex.getId().equals(id)) {
@@ -536,29 +344,53 @@ public class ComplaintTuple
   }
 
   private Vertex getUserFromEmployeeId(GradoopId employeeId) {
-    PropertyList properties = new PropertyList();
-    Vertex employee = getEmployeeById(employeeId);
-    properties = employee.getProperties();
-    properties.set("erpEmplNum", employee.getId().toString());
-    String email = properties.get("name").getString();
-    email = email.replace(" ",".").toLowerCase();
-    email += "@biiig.org";
-    properties.set("email", email);
-    properties.remove("num");
-    properties.remove("sid");
-    return vertexFactory.createVertex("User", properties, graphIds);
+    if (masterDataMap.containsKey(employeeId)) {
+      return masterDataMap.get(employeeId);
+    } else {
+      PropertyList properties;
+      Vertex employee = getEmployeeById(employeeId);
+      properties = employee.getProperties();
+      properties.set("erpEmplNum", employee.getId().toString());
+      String email = properties.get("name").getString();
+      email = email.replace(" ", ".").toLowerCase();
+      email += "@biiig.org";
+      properties.set("email", email);
+      properties.remove("num");
+      properties.remove("sid");
+      Vertex user = vertexFactory.createVertex("User", properties, graphIds);
+
+      masterDataMap.put(employeeId, user);
+      userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY).getFloat());
+
+      newEdge("sameAs", user.getId(), employeeId);
+      return user;
+    }
   }
 
   private Vertex getClientFromCustomerId(GradoopId customerId) {
-    PropertyList properties = new PropertyList();
-    Vertex customer = getCustomerById(customerId);
-    properties = customer.getProperties();
-    properties.set("erpCustNum", customer.getId().toString());
-    properties.set("contactPhone", "0123456789");
-    properties.set("account","CL" + customer.getId().toString());
-    properties.remove("num");
-    properties.remove("sid");
-    return vertexFactory.createVertex("Client", properties, graphIds);
+    if (masterDataMap.containsKey(customerId)) {
+      return masterDataMap.get(customerId);
+    } else {
+      PropertyList properties;
+      Vertex customer = getCustomerById(customerId);
+      properties = customer.getProperties();
+      properties.set("erpCustNum", customer.getId().toString());
+      properties.set("contactPhone", "0123456789");
+      properties.set("account", "CL" + customer.getId().toString());
+      properties.remove("num");
+      properties.remove("sid");
+      Vertex client = vertexFactory.createVertex("Client", properties, graphIds);
+
+      masterDataMap.put(customerId, client);
+
+      newEdge("sameAs", client.getId(), customerId);
+      return client;
+    }
+  }
+
+
+  private Set<Vertex> getMasterData() {
+    return (Set<Vertex>) masterDataMap.values();
   }
 
 }
