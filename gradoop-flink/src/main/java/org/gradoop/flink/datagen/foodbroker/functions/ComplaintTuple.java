@@ -391,7 +391,7 @@ public class ComplaintTuple
 
 
   private Set<Vertex> getMasterData() {
-    return (Set<Vertex>) masterDataMap.values();
+    return Sets.newHashSet(masterDataMap.values());
   }
 
 }

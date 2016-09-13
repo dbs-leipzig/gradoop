@@ -136,15 +136,11 @@ public abstract class ProcessTuple<S, T> extends
     productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
       getBroadcastVariable(Constants.PRODUCT_QUALITY_MAP).get(0);
 
-    productPriceMap = getRuntimeContext().<Map<GradoopId, BigDecimal>>
-      getBroadcastVariable(Constants.PRODUCT_PRICE_MAP).get(0);
-
     customerIterator = customerMap.entrySet().iterator();
     vendorIterator = vendorMap.entrySet().iterator();
     logisticIterator = logisticMap.entrySet().iterator();
     employeeIterator = emplyoeeMap.entrySet().iterator();
     productQualityIterator = productQualityMap.entrySet().iterator();
-    productPriceIterator = productPriceMap.entrySet().iterator();
   }
 
 
