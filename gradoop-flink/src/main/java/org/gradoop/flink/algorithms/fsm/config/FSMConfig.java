@@ -49,6 +49,7 @@ public class FSMConfig implements Serializable {
    * Verbose mode.
    */
   private boolean verbose = false;
+  private boolean preprocessing = true;
 
   /**
    * valued constructor
@@ -94,4 +95,7 @@ public class FSMConfig implements Serializable {
     this.verbose = verbose;
   }
 
+  public boolean usePreprocessing() {
+    return preprocessing;
+  }
 }

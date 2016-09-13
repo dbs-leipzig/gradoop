@@ -21,19 +21,23 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.functions.ByFrequency;
-import org.gradoop.flink.algorithms.fsm.functions.JoinSingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.functions.MinFrequency;
-import org.gradoop.flink.algorithms.fsm.functions.SingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.functions.CountableFrequentSubgraph;
-
-
+import org.gradoop.flink.algorithms.fsm.functions.DropEdgesWithInfrequentLabels;
+import org.gradoop.flink.algorithms.fsm.functions.DropVerticesWithInfrequentLabels;
+import org.gradoop.flink.algorithms.fsm.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm.functions.FrequentSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.functions.JoinMultiEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.functions.JoinSingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.functions.MinCount;
+import org.gradoop.flink.algorithms.fsm.functions.MinFrequency;
+import org.gradoop.flink.algorithms.fsm.functions.SingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.functions.VertexLabels;
 import org.gradoop.flink.algorithms.fsm.tuples.FrequentSubgraph;
 import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
@@ -77,9 +81,36 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 
   public DataSet<GraphTransaction> execute(
     DataSet<GraphTransaction> transactions) {
+
     minFrequency = Count
       .count(transactions)
       .map(new MinFrequency(fsmConfig));
+
+    if (fsmConfig.usePreprocessing()) {
+      DataSet<String> frequentVertexLabels = transactions
+        .flatMap(new VertexLabels())
+        .groupBy(0)
+        .sum(1)
+        .filter(new MinCount<String>())
+        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+        .map(new ValueOfWithCount<String>());
+
+      transactions = transactions
+        .map(new DropVerticesWithInfrequentLabels())
+        .withBroadcastSet(frequentVertexLabels, Constants.VERTEX_DICTIONARY);
+
+      DataSet<String> frequentEdgeLabels = transactions
+        .flatMap(new EdgeLabels())
+        .groupBy(0)
+        .sum(1)
+        .filter(new MinCount<String>())
+        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+        .map(new ValueOfWithCount<String>());
+
+      transactions = transactions
+        .map(new DropEdgesWithInfrequentLabels())
+        .withBroadcastSet(frequentEdgeLabels, Constants.EDGE_DICTIONARY);
+    }
 
     DataSet<SubgraphEmbeddings>
       embeddings = transactions
