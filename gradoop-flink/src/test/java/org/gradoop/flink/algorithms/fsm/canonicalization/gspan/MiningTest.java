@@ -18,7 +18,7 @@ public class MiningTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = new PredictableTransactionsGenerator(
       1000, 1, true, getConfig()).execute();
 
-    float threshold = 1.0f;
+    float threshold = 0.8f;
 
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
@@ -38,7 +38,7 @@ public class MiningTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = new PredictableTransactionsGenerator(
       1000, 1, true, getConfig()).execute();
 
-    float threshold = 1.0f;
+    float threshold = 0.8f;
 
     FSMConfig fsmConfig = new FSMConfig(threshold, false);
 

@@ -27,11 +27,11 @@ public class JoinMultiEdgeEmbeddings extends JoinEmbeddings {
 
     Collection<Embedding> cachedEmbeddings = Lists.newArrayList();
 
-    Set<Integer> oddCoverages = Sets.newHashSet();
+    Set<Coverage> oddCoverages = Sets.newHashSet();
     Map<String, Collection<Embedding>> oddSubgraphEmbeddings =
       Maps.newHashMap();
 
-    Set<Integer> evenCoverages = Sets.newHashSet();
+    Set<Coverage> evenCoverages = Sets.newHashSet();
     Map<String, Collection<Embedding>> evenSubgraphEmbeddings =
       Maps.newHashMap();
 
@@ -79,13 +79,11 @@ public class JoinMultiEdgeEmbeddings extends JoinEmbeddings {
 
   private void addEmbedding(
     Map<String, Collection<Embedding>> subgraphEmbeddings, Embedding left,
-    Embedding right, Set<Integer> converages, Coverage converage) {
+    Embedding right, Set<Coverage> coverages, Coverage converage) {
 
-    int edgeHashCode = converage.hashCode();
+    if (!coverages.contains(converage)) {
 
-    if (!converages.contains(edgeHashCode)) {
-
-      converages.add(edgeHashCode);
+      coverages.add(converage);
       Embedding embedding = left.combine(right);
 
       String subgraph = canonicalLabeler.label(embedding);

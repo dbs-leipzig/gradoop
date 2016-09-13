@@ -1,23 +1,18 @@
 package org.gradoop.flink.algorithms.fsm.pojos;
 
 import com.google.common.collect.Sets;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class Coverage {
 
 
-  private final String ids;
-  private final int size;
+  private final TreeSet<Integer> ids;
 
   public Coverage(Set<Integer> leftEdgeIds, Set<Integer> rightEdgeIds) {
-    Collection<Integer> idSet = Sets.newTreeSet(leftEdgeIds);
-    idSet.addAll(rightEdgeIds);
-
-    size = idSet.size();
-    ids = StringUtils.join(idSet, ",");
+    this.ids = Sets.newTreeSet(leftEdgeIds);
+    this.ids.addAll(rightEdgeIds);
   }
 
   @Override
@@ -32,7 +27,6 @@ public class Coverage {
     Coverage coverage = (Coverage) o;
 
     return ids != null ? ids.equals(coverage.ids) : coverage.ids == null;
-
   }
 
   @Override
@@ -41,6 +35,11 @@ public class Coverage {
   }
 
   public int size() {
-    return size;
+    return ids.size();
+  }
+
+  @Override
+  public String toString() {
+    return ids.toString();
   }
 }
