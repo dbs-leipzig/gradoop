@@ -1,6 +1,8 @@
 package org.gradoop.flink.datagen.foodbroker.process;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.MapPartitionFunction;
 import org.apache.flink.api.java.DataSet;
@@ -62,21 +64,21 @@ public class ComplaintHandling extends AbstractBusinessProcess {
             return tuple.f1;
           }
         })
-      .map(new MapFunction<FoodBrokerMaps, FoodBrokerMaps>() {
+      .flatMap(new FlatMapFunction<FoodBrokerMaps, FoodBrokerMaps>() {
+
         @Override
-        public FoodBrokerMaps map(
-          FoodBrokerMaps foodBrokerMaps) throws Exception {
-          Map<GradoopId, Vertex> verices = foodBrokerMaps.getVertexMap();
-          Map<Tuple2<String, GradoopId>, Set<Edge>> edges =
-            foodBrokerMaps.getEdgeMap();
-          for (Map.Entry<GradoopId, Vertex> entry : verices.entrySet()) {
-            if (!(entry.getValue().getLabel().equals("SalesOrder") ||
-                  entry.getValue().getLabel().equals("DeliveryNote") )) {
-              verices.remove(entry.getKey());
+        public void flatMap(FoodBrokerMaps foodBrokerMaps,
+          Collector<FoodBrokerMaps> collector) throws Exception {
+          Map<GradoopId, Vertex> vertices = Maps.newHashMap();
+          Map<Tuple2<String, GradoopId>, Set<Edge>> edges = Maps.newHashMap();
+          for (Map.Entry<GradoopId, Vertex> entry : foodBrokerMaps.getVertexMap().entrySet()) {
+            if (entry.getValue().getLabel().equals("SalesOrder") ||
+                  entry.getValue().getLabel().equals("DeliveryNote") ) {
+              vertices.put(entry.getKey(), entry.getValue());
             }
           }
           for (Map.Entry<Tuple2<String, GradoopId>, Set<Edge>> entry :
-            edges.entrySet()) {
+            foodBrokerMaps.getEdgeMap().entrySet()) {
             switch (entry.getKey().f0) {
               case "contains" :
               case "receives" :
@@ -85,13 +87,15 @@ public class ComplaintHandling extends AbstractBusinessProcess {
               case "receivedFrom" :
               case "SalesOrderLine" :
               case "PurchOrderLine" :
+                edges.put(entry.getKey(), entry.getValue());
                 break;
               default:
-                edges.remove(entry.getKey());
                 break;
             }
           }
-          return new FoodBrokerMaps(verices, edges);
+          if (!vertices.isEmpty() && !edges.isEmpty()) {
+            collector.collect(new FoodBrokerMaps(vertices, edges));
+          }
         }
       });
 
