@@ -5,9 +5,9 @@
 ######################################################
 
 #Flink root directory
-FLINK="/usr/local/flink-1.0.0"
+FLINK="/usr/local/flink-1.0.3"
 #Used jar
-JAR="gradoop-benchmark-0.2-SNAPSHOT.jar"
+JAR="gradoop-examples-0.2-SNAPSHOT.jar"
 #Used generator running class
 CLASS="org.gradoop.benchmark.fsm.TLFDataDuplicator"
 
