@@ -23,12 +23,16 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.flink.algorithms.fsm.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.tuples.Subgraph;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
 import java.util.Map;
@@ -52,6 +56,29 @@ public class SubgraphDecoder
    * Label of frequent subgraphs.
    */
   private static final String SUBGRAPH_LABEL = "FrequentSubgraph";
+  /**
+   * graph Head Factory
+   */
+  private final GraphHeadFactory graphHeadFactory;
+  /**
+   * vertex Factory
+   */
+  private final VertexFactory vertexFactory;
+  /**
+   * edge Factory
+   */
+  private final EdgeFactory edgeFactory;
+
+  /**
+   * Constructor.
+   *
+   * @param config Gradoop Flink configuration
+   */
+  public SubgraphDecoder(GradoopFlinkConfig config) {
+    graphHeadFactory = config.getGraphHeadFactory();
+    vertexFactory = config.getVertexFactory();
+    edgeFactory = config.getEdgeFactory();
+  }
 
   @Override
   public GraphTransaction map(Subgraph value) throws Exception {
@@ -63,8 +90,8 @@ public class SubgraphDecoder
     properties.set(FREQUENCY_KEY, value.getCount());
     properties.set(CANONICAL_LABEL_KEY, value.getSubgraph());
 
-    GraphHead epgmGraphHead =
-      new GraphHead(GradoopId.get(), SUBGRAPH_LABEL, properties);
+    GraphHead epgmGraphHead = graphHeadFactory
+      .createGraphHead(SUBGRAPH_LABEL, properties);
 
     GradoopIdSet graphIds = GradoopIdSet.fromExisting(epgmGraphHead.getId());
 
@@ -76,8 +103,8 @@ public class SubgraphDecoder
       Maps.newHashMapWithExpectedSize(vertices.size());
 
     for (Map.Entry<Integer, String> vertex : vertices.entrySet()) {
-      Vertex epgmVertex =
-        new Vertex(GradoopId.get(), vertex.getValue(), null, graphIds);
+      Vertex epgmVertex = vertexFactory
+        .createVertex(vertex.getValue(), graphIds);
 
       vertexIdMap.put(vertex.getKey(), epgmVertex.getId());
       epgmVertices.add(epgmVertex);
@@ -90,12 +117,10 @@ public class SubgraphDecoder
     Set<Edge> epgmEdges = Sets.newHashSetWithExpectedSize(edges.size());
 
     for (FSMEdge edge : edges) {
-      epgmEdges.add(new Edge(
-        GradoopId.get(),
+      epgmEdges.add(edgeFactory.createEdge(
         edge.getLabel(),
         vertexIdMap.get(edge.getSourceId()),
         vertexIdMap.get(edge.getTargetId()),
-        null,
         graphIds
       ));
     }

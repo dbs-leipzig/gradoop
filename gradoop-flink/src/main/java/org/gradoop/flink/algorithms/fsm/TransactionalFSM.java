@@ -39,8 +39,7 @@ import org.gradoop.flink.algorithms.fsm.functions.WithoutInfrequentVertexLabels;
 import org.gradoop.flink.algorithms.fsm.tuples.FSMGraph;
 import org.gradoop.flink.algorithms.fsm.tuples.Subgraph;
 import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
-import org.gradoop.flink.model.api.operators
-  .UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
@@ -103,19 +102,23 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
       .map(new ToFSMGraph())
       .returns(TypeExtractor.getForClass(FSMGraph.class));
 
-    DataSet<GraphTransaction> dataSet = execute(fsmGraphs);
+    GradoopFlinkConfig gradoopConfig = transactions.getConfig();
 
-    return new GraphTransactions(dataSet, transactions.getConfig());
+    DataSet<GraphTransaction> dataSet = execute(fsmGraphs, gradoopConfig);
+
+    return new GraphTransactions(dataSet, gradoopConfig);
   }
 
   /**
    * Core mining method.
    *
    * @param fsmGraphs search space
+   * @param gradoopConfig Gradoop Flink configuration
    *
    * @return frequent subgraphs
    */
-  public DataSet<GraphTransaction> execute(DataSet<FSMGraph> fsmGraphs) {
+  public DataSet<GraphTransaction> execute(
+    DataSet<FSMGraph> fsmGraphs, GradoopFlinkConfig gradoopConfig) {
 
     minFrequency = Count
       .count(fsmGraphs)
@@ -179,7 +182,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
     }
 
     return allFrequentSubgraphs
-      .map(new SubgraphDecoder());
+      .map(new SubgraphDecoder(gradoopConfig));
   }
 
   /**
