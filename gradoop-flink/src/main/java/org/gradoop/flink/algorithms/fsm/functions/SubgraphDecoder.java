@@ -89,12 +89,12 @@ public class SubgraphDecoder
     Collection<FSMEdge> edges = value.getEmbedding().getEdges().values();
     Set<Edge> epgmEdges = Sets.newHashSetWithExpectedSize(edges.size());
 
-    for (FSMEdge FSMEdge : edges) {
+    for (FSMEdge edge : edges) {
       epgmEdges.add(new Edge(
         GradoopId.get(),
-        FSMEdge.getLabel(),
-        vertexIdMap.get(FSMEdge.getSourceId()),
-        vertexIdMap.get(FSMEdge.getTargetId()),
+        edge.getLabel(),
+        vertexIdMap.get(edge.getSourceId()),
+        vertexIdMap.get(edge.getTargetId()),
         null,
         graphIds
       ));

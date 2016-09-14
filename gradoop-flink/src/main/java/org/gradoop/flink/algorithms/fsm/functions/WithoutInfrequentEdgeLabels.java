@@ -36,6 +36,9 @@ import java.util.Set;
 public class WithoutInfrequentEdgeLabels
   extends RichMapFunction<FSMGraph, FSMGraph> {
 
+  /**
+   * frequent edge labels submitted via broadcast
+   */
   private Collection<String> frequentEdgeLabels;
 
   @Override

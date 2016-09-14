@@ -19,28 +19,14 @@ package org.gradoop.flink.algorithms.fsm.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.algorithms.fsm.tuples.Subgraph;
-import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 
 /**
- * (graphId, size, canonicalLabel, embeddings)
- *   => (canonicalLabel, frequency=1, sample embedding)
+ * (canonicalLabel, frequency, sample embedding) => canonicalLabel
  */
-public class SubgraphOnly implements MapFunction<SubgraphEmbeddings, Subgraph> {
-
-  /**
-   * reuse tuple to avoid instantiations
-   */
-  private final Subgraph reuseTuple = new Subgraph(null, 1L, null);
+public class CanonicalLabel implements MapFunction<Subgraph, String> {
 
   @Override
-  public Subgraph map(SubgraphEmbeddings subgraphEmbeddings) throws Exception {
-
-    reuseTuple
-      .setSubgraph(subgraphEmbeddings.getSubgraph());
-
-    reuseTuple
-      .setEmbedding(subgraphEmbeddings.getEmbeddings().iterator().next());
-
-    return reuseTuple;
+  public String map(Subgraph value) throws Exception {
+    return value.getSubgraph();
   }
 }

@@ -21,26 +21,28 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.functions.SubgraphOnly;
-import org.gradoop.flink.algorithms.fsm.functions.WithoutInfrequentEdgeLabels;
-import org.gradoop.flink.algorithms.fsm.functions.WithoutInfrequentVertexLabels;
+import org.gradoop.flink.algorithms.fsm.functions.CanonicalLabel;
 import org.gradoop.flink.algorithms.fsm.functions.EdgeLabels;
-import org.gradoop.flink.algorithms.fsm.functions.SubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.functions.JoinMultiEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.functions.JoinSingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.functions.MinFrequency;
 import org.gradoop.flink.algorithms.fsm.functions.SingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.functions.SubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.functions.SubgraphIsFrequent;
+import org.gradoop.flink.algorithms.fsm.functions.SubgraphOnly;
 import org.gradoop.flink.algorithms.fsm.functions.ToFSMGraph;
 import org.gradoop.flink.algorithms.fsm.functions.VertexLabels;
+import org.gradoop.flink.algorithms.fsm.functions.WithoutInfrequentEdgeLabels;
+import org.gradoop.flink.algorithms.fsm.functions.WithoutInfrequentVertexLabels;
 import org.gradoop.flink.algorithms.fsm.tuples.FSMGraph;
 import org.gradoop.flink.algorithms.fsm.tuples.Subgraph;
 import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators
+  .UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -56,6 +58,10 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
    * frequent subgraph mining configuration
    */
   protected final FSMConfig fsmConfig;
+
+  /**
+   * minimum frequency for subgraphs to be considered to be frequent
+   */
   private DataSet<Long> minFrequency;
 
   /**
@@ -78,9 +84,17 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
     transactions = execute(transactions);
 
     return GraphCollection.fromTransactions(
-      new GraphTransactions(transactions.getTransactions(), gradoopFlinkConfig));
+      new GraphTransactions(
+        transactions.getTransactions(), gradoopFlinkConfig));
   }
 
+  /**
+   * Encodes the search space before executing FSM.
+   *
+   * @param transactions search space as Gradoop graph transactions
+   *
+   * @return frequent subgraphs as Gradoop graph transactions
+   */
   public GraphTransactions execute(GraphTransactions transactions) {
     DataSet<FSMGraph> fsmGraphs = transactions
       .getTransactions()
@@ -92,15 +106,21 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
     return new GraphTransactions(dataSet, transactions.getConfig());
   }
 
-  public DataSet<GraphTransaction> execute(
-    DataSet<FSMGraph> transactions) {
+  /**
+   * Core mining method.
+   *
+   * @param fsmGraphs search space
+   *
+   * @return frequent subgraphs
+   */
+  public DataSet<GraphTransaction> execute(DataSet<FSMGraph> fsmGraphs) {
 
     minFrequency = Count
-      .count(transactions)
+      .count(fsmGraphs)
       .map(new MinFrequency(fsmConfig));
 
     if (fsmConfig.usePreprocessing()) {
-      DataSet<String> frequentVertexLabels = transactions
+      DataSet<String> frequentVertexLabels = fsmGraphs
         .flatMap(new VertexLabels())
         .groupBy(0)
         .sum(1)
@@ -108,11 +128,12 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
         .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
         .map(new ValueOfWithCount<String>());
 
-      transactions = transactions
+      fsmGraphs = fsmGraphs
         .map(new WithoutInfrequentVertexLabels())
-        .withBroadcastSet(frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
+        .withBroadcastSet(
+          frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
 
-      DataSet<String> frequentEdgeLabels = transactions
+      DataSet<String> frequentEdgeLabels = fsmGraphs
         .flatMap(new EdgeLabels())
         .groupBy(0)
         .sum(1)
@@ -120,13 +141,13 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
         .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
         .map(new ValueOfWithCount<String>());
 
-      transactions = transactions
+      fsmGraphs = fsmGraphs
         .map(new WithoutInfrequentEdgeLabels())
         .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
     }
 
     DataSet<SubgraphEmbeddings>
-      embeddings = transactions
+      embeddings = fsmGraphs
       .flatMap(new SingleEdgeEmbeddings(fsmConfig));
 
     DataSet<Subgraph> frequentSubgraphs =
@@ -159,16 +180,12 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
       .map(new SubgraphDecoder());
   }
 
-  private DataSet<SubgraphEmbeddings> filterByFrequentSubgraphs(
-    DataSet<SubgraphEmbeddings> embeddings,
-    DataSet<Subgraph> frequentSubgraphs) {
-
-    return embeddings
-      .join(frequentSubgraphs)
-      .where(2).equalTo(0)
-      .with(new LeftSide<SubgraphEmbeddings, Subgraph>());
-  }
-
+  /**
+   * Determines frequent subgraphs in a set of embeddings.
+   *
+   * @param embeddings set of embeddings
+   * @return frequent subgraphs
+   */
   private DataSet<Subgraph> getFrequentSubgraphs(
     DataSet<SubgraphEmbeddings> embeddings) {
     return embeddings
@@ -177,6 +194,27 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
         .sum(1)
         .filter(new Frequent<Subgraph>())
         .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
+  }
+
+  /**
+   * Filter a set of embeddings to such representing a frequent subgraph.
+   *
+   * @param embeddings set of embeddings
+   * @param frequentSubgraphs frequent subgraphs
+   *
+   * @return embeddings representing frequent subgraphs
+   */
+  private DataSet<SubgraphEmbeddings> filterByFrequentSubgraphs(
+    DataSet<SubgraphEmbeddings> embeddings,
+    DataSet<Subgraph> frequentSubgraphs) {
+
+    return embeddings
+      .filter(new SubgraphIsFrequent())
+      .withBroadcastSet(
+        frequentSubgraphs
+          .map(new CanonicalLabel()),
+        Constants.FREQUENT_SUBGRAPHS
+      );
   }
 
   @Override

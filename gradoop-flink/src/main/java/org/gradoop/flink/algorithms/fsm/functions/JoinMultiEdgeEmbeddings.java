@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.pojos.Coverage;
+import org.gradoop.flink.algorithms.fsm.coverage.Coverage;
 import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 
 

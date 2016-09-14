@@ -17,33 +17,35 @@
 
 package org.gradoop.flink.algorithms.fsm.functions;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.algorithms.fsm.config.Constants;
-import org.gradoop.flink.model.api.tuples.Countable;
+import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
+
+import java.util.Collection;
 
 /**
- * Filters something countable by minimum frequency.
- *
- * @param <T> type of something
+ * Evaluates to true if the subgraph of an embeddings list is frequent.
  */
-public class Frequent<T extends Countable> extends RichFilterFunction<T> {
+public class SubgraphIsFrequent extends RichFilterFunction<SubgraphEmbeddings> {
 
   /**
-   * minimum frequency
+   * frequent subgraphs received via broadcast
    */
-  private long minFrequency;
+  private Collection<String> frequentSubgraphs;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    this.minFrequency = getRuntimeContext()
-      .<Long>getBroadcastVariable(Constants.MIN_FREQUENCY).get(0);
-  }
+    this.frequentSubgraphs = getRuntimeContext()
+      .getBroadcastVariable(Constants.FREQUENT_SUBGRAPHS);
 
+    this.frequentSubgraphs = Sets.newHashSet(frequentSubgraphs);
+  }
   @Override
-  public boolean filter(T value) throws Exception {
-    return value.getCount() >= minFrequency;
+  public boolean filter(SubgraphEmbeddings value) throws Exception {
+    return frequentSubgraphs.contains(value.getSubgraph());
   }
 }

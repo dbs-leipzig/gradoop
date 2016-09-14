@@ -17,16 +17,18 @@
 
 package org.gradoop.flink.algorithms.fsm.config;
 
+import org.gradoop.flink.algorithms.fsm.canonicalization.CAMLabeler;
+import org.gradoop.flink.algorithms.fsm.canonicalization.CanonicalLabeler;
+
 import java.io.Serializable;
 
 /**
- * frequent subgraph mining configuration
+ * Frequent subgraph mining configuration.
  */
 public class FSMConfig implements Serializable {
 
   /**
-   * Relative support of a subgraph in a graph collection.
-   * SubgraphWithCount supported above the minSupport are considered to be frequent.
+   * support threshold for subgraphs to be considered to be frequenct
    */
   private final float minSupport;
 
@@ -46,10 +48,14 @@ public class FSMConfig implements Serializable {
   private int minEdgeCount;
 
   /**
-   * Verbose mode.
+   * flag to enable preprocessing (true=enabled)
    */
-  private boolean verbose = false;
-  private boolean preprocessing = true;
+  private final boolean preprocessing;
+
+  /**
+   * labeler used to generate canonical labels
+   */
+  private final CanonicalLabeler canonicalLabeler;
 
   /**
    * valued constructor
@@ -61,6 +67,8 @@ public class FSMConfig implements Serializable {
     this.directed = directed;
     this.maxEdgeCount = 1000;
     this.minEdgeCount = 0;
+    this.canonicalLabeler =  new CAMLabeler(directed);
+    this.preprocessing = true;
   }
 
   public float getMinSupport() {
@@ -87,15 +95,16 @@ public class FSMConfig implements Serializable {
     this.minEdgeCount = minEdgeCount;
   }
 
-  public boolean isVerbose() {
-    return verbose;
-  }
-
-  public void setVerbose(boolean verbose) {
-    this.verbose = verbose;
-  }
-
+  /**
+   * Getter for preprocessing flag.
+   *
+   * @return true, if preprocessing is enabled
+   */
   public boolean usePreprocessing() {
     return preprocessing;
+  }
+
+  public CanonicalLabeler getCanonicalLabeler() {
+    return canonicalLabeler;
   }
 }

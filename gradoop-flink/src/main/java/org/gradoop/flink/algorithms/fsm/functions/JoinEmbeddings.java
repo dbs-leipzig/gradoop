@@ -19,7 +19,7 @@ package org.gradoop.flink.algorithms.fsm.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.algorithms.fsm.canonicalization.CAMLabeler;
+import org.gradoop.flink.algorithms.fsm.canonicalization.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
@@ -41,7 +41,7 @@ abstract class JoinEmbeddings
   /**
    * Labeler used to generate canonical labels.
    */
-  final CAMLabeler canonicalLabeler;
+  protected final CanonicalLabeler canonicalLabeler;
 
   /**
    * Constructor.
@@ -49,7 +49,7 @@ abstract class JoinEmbeddings
    * @param fsmConfig FSM configuration.
    */
   JoinEmbeddings(FSMConfig fsmConfig) {
-    canonicalLabeler = new CAMLabeler(fsmConfig);
+    canonicalLabeler = fsmConfig.getCanonicalLabeler();
   }
 
   /**
