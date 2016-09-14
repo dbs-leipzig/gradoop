@@ -17,7 +17,7 @@ PARA=$5
 CLASS="org.gradoop.examples.datagen.PredictableTransactionsGeneratorRunner"
 
 # create graph count data sets
-for SIZE in 1000 10000
+for SIZE in 1000 3000 10000
 do
   ${FLINK}/bin/flink run -p ${PARA} -c ${CLASS} ${JAR} -o hdfs://${HDFS}/ -mg -gc ${SIZE} -gs 1
 done
