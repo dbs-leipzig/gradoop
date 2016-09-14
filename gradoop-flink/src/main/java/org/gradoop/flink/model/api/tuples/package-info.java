@@ -15,19 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.tuple;
-
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.model.impl.tuples.WithCount;
-
 /**
- * (object, count) => object
- * @param <T>
+ * Contains interfaces for tuple-type classes used by Gradoop.
  */
-public class ValueOfWithCount<T> implements MapFunction<WithCount<T>, T> {
-
-  @Override
-  public T map(WithCount<T> value) throws Exception {
-    return value.getObject();
-  }
-}
+package org.gradoop.flink.model.api.tuples;

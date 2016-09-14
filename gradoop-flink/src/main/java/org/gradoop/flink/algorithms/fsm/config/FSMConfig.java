@@ -58,6 +58,11 @@ public class FSMConfig implements Serializable {
   private final CanonicalLabeler canonicalLabeler;
 
   /**
+   * Strategy used to filter embeddings by frequent subgraphs
+   */
+  private final FilterStrategy filterStrategy;
+
+  /**
    * valued constructor
    * @param minSupport minimum relative support of a subgraph
    * @param directed direction mode
@@ -69,6 +74,7 @@ public class FSMConfig implements Serializable {
     this.minEdgeCount = 0;
     this.canonicalLabeler =  new CAMLabeler(directed);
     this.preprocessing = true;
+    this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
   }
 
   public float getMinSupport() {
@@ -106,5 +112,9 @@ public class FSMConfig implements Serializable {
 
   public CanonicalLabeler getCanonicalLabeler() {
     return canonicalLabeler;
+  }
+
+  public FilterStrategy getFilterStrategy() {
+    return filterStrategy;
   }
 }
