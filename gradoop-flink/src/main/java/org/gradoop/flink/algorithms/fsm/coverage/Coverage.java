@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.pojos;
+package org.gradoop.flink.algorithms.fsm.coverage;
 
 import com.google.common.collect.Sets;
 

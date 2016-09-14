@@ -36,6 +36,9 @@ import java.util.Set;
 public class WithoutInfrequentVertexLabels
   extends RichMapFunction<FSMGraph, FSMGraph> {
 
+  /**
+   * frequent vertex labels submitted via broadcast
+   */
   private Collection<String> frequentVertexLabels;
 
   @Override
