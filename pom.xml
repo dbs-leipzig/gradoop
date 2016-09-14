@@ -199,11 +199,6 @@
                     <configuration>
                         <excludes>
                             <exclude>**/*TestBase*.class</exclude>
-                            <exclude>**/*Cache*.class</exclude>
-                            <exclude>**/EncodingTest.class</exclude>
-                            <exclude>**/MiningTest.class</exclude>
-                            <exclude>**/PatternGrowthTest.class</exclude>
-                            <exclude>**/TransactionalFSMTest.class</exclude>
                         </excludes>
                         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
                     </configuration>
