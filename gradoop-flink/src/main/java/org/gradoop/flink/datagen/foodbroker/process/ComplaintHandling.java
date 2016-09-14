@@ -1,8 +1,13 @@
 package org.gradoop.flink.datagen.foodbroker.process;
 
+import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.MapPartitionFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.functions.TransactionFromTuple;
@@ -17,6 +22,7 @@ import org.gradoop.flink.datagen.foodbroker.tuples.FoodBrokerMaps;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -50,6 +56,49 @@ public class ComplaintHandling extends AbstractBusinessProcess {
       deliveryNotes = foodBrokerageTuple
         .map(new ComplaintData());
 
+    DataSet<FoodBrokerMaps> relevant = foodBrokerageTuple
+      .map(
+        new MapFunction<Tuple2<GraphTransaction, FoodBrokerMaps>, FoodBrokerMaps>() {
+          @Override
+          public FoodBrokerMaps map(
+            Tuple2<GraphTransaction, FoodBrokerMaps> tuple) throws Exception {
+            return tuple.f1;
+          }
+        })
+      .map(new MapFunction<FoodBrokerMaps, FoodBrokerMaps>() {
+        @Override
+        public FoodBrokerMaps map(
+          FoodBrokerMaps foodBrokerMaps) throws Exception {
+          Map<GradoopId, Vertex> verices = foodBrokerMaps.getVertexMap();
+          Map<Tuple2<String, GradoopId>, Set<Edge>> edges =
+            foodBrokerMaps.getEdgeMap();
+          for (Map.Entry<GradoopId, Vertex> entry : verices.entrySet()) {
+            if (!(entry.getValue().getLabel().equals("SalesOrder") ||
+                  entry.getValue().getLabel().equals("DeliveryNote") )) {
+              verices.remove(entry.getKey());
+            }
+          }
+          for (Map.Entry<Tuple2<String, GradoopId>, Set<Edge>> entry :
+            edges.entrySet()) {
+            switch (entry.getKey().f0) {
+              case "contains" :
+              case "receives" :
+              case "operatedBy" :
+              case "placedAt" :
+              case "receivedFrom" :
+              case "SalesOrderLine" :
+              case "PurchOrderLine" :
+                break;
+              default:
+                edges.remove(entry.getKey());
+                break;
+            }
+          }
+          return new FoodBrokerMaps(verices, edges);
+        }
+      });
+
+
     long globalSeed = 0;
     try {
       globalSeed = caseSeeds.count() + 1;
@@ -58,7 +107,8 @@ public class ComplaintHandling extends AbstractBusinessProcess {
     }
 
     DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple =
-      deliveryNotes
+//      deliveryNotes
+    relevant
         .mapPartition(new ComplaintTuple(
           gradoopFlinkConfig.getGraphHeadFactory(),
           gradoopFlinkConfig.getVertexFactory(),

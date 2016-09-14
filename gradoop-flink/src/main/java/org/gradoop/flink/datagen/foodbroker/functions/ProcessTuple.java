@@ -51,7 +51,7 @@ public abstract class ProcessTuple<S, T> extends
   /**
    * iterator over all product
    */
-  private Iterator<Map.Entry<GradoopId, BigDecimal>> productPriceIterator;
+  protected Iterator<Map.Entry<GradoopId, BigDecimal>> productPriceIterator;
   /**
    * graph ids, one seperate id for each case
    */
