@@ -51,11 +51,8 @@ public class ComplaintHandling extends AbstractBusinessProcess {
 
   @Override
   public void execute() {
-    DataSet<Tuple4<Set<Vertex>, FoodBrokerMaps, Set<Edge>, Set<Edge>>>
-      deliveryNotes = foodBrokerageTuple
-        .map(new ComplaintData());
 
-    DataSet<FoodBrokerMaps> relevant = foodBrokerageTuple
+    DataSet<FoodBrokerMaps> maps = foodBrokerageTuple
       .map(
         new MapFunction<Tuple2<GraphTransaction, FoodBrokerMaps>, FoodBrokerMaps>() {
           @Override
@@ -65,7 +62,6 @@ public class ComplaintHandling extends AbstractBusinessProcess {
           }
         })
       .flatMap(new FlatMapFunction<FoodBrokerMaps, FoodBrokerMaps>() {
-
         @Override
         public void flatMap(FoodBrokerMaps foodBrokerMaps,
           Collector<FoodBrokerMaps> collector) throws Exception {
@@ -99,7 +95,6 @@ public class ComplaintHandling extends AbstractBusinessProcess {
         }
       });
 
-
     long globalSeed = 0;
     try {
       globalSeed = caseSeeds.count() + 1;
@@ -108,8 +103,7 @@ public class ComplaintHandling extends AbstractBusinessProcess {
     }
 
     DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple =
-//      deliveryNotes
-    relevant
+      maps
         .mapPartition(new ComplaintTuple(
           gradoopFlinkConfig.getGraphHeadFactory(),
           gradoopFlinkConfig.getVertexFactory(),
