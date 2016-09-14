@@ -21,6 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.config.FilterStrategy;
 import org.gradoop.flink.algorithms.fsm.functions.CanonicalLabel;
 import org.gradoop.flink.algorithms.fsm.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm.functions.Frequent;
@@ -43,6 +44,7 @@ import org.gradoop.flink.model.api.operators
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -208,13 +210,25 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
     DataSet<SubgraphEmbeddings> embeddings,
     DataSet<Subgraph> frequentSubgraphs) {
 
-    return embeddings
-      .filter(new SubgraphIsFrequent())
-      .withBroadcastSet(
-        frequentSubgraphs
-          .map(new CanonicalLabel()),
-        Constants.FREQUENT_SUBGRAPHS
-      );
+    if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_FILTER) {
+      return embeddings
+        .filter(new SubgraphIsFrequent())
+        .withBroadcastSet(
+          frequentSubgraphs
+            .map(new CanonicalLabel()),
+          Constants.FREQUENT_SUBGRAPHS
+        );
+    } else if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_JOIN) {
+      return embeddings
+        .joinWithTiny(frequentSubgraphs)
+        .where(2).equalTo(0) // on canonical label
+        .with(new LeftSide<SubgraphEmbeddings, Subgraph>());
+    } else {
+      return embeddings
+        .join(frequentSubgraphs)
+        .where(2).equalTo(0) // on canonical label
+        .with(new LeftSide<SubgraphEmbeddings, Subgraph>());
+    }
   }
 
   @Override

@@ -19,7 +19,6 @@ package org.gradoop.flink.model.impl.functions.bool;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Logical "TRUE" as Flink function.
@@ -34,7 +33,7 @@ public class True<T> implements MapFunction<T, Boolean>, FilterFunction<T> {
   }
 
   @Override
-  public boolean filter(T value) throws Exception {
+  public boolean filter(T t) throws Exception {
     return true;
   }
 }

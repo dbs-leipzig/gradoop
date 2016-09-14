@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.coverage.Coverage;
+import org.gradoop.flink.algorithms.fsm.pojos.Intersection;
 import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 
 
@@ -52,11 +52,11 @@ public class JoinMultiEdgeEmbeddings extends JoinEmbeddings {
 
     Collection<Embedding> cachedEmbeddings = Lists.newArrayList();
 
-    Set<Coverage> oddCoverages = Sets.newHashSet();
+    Set<Intersection> oddIntersections = Sets.newHashSet();
     Map<String, Collection<Embedding>> oddSubgraphEmbeddings =
       Maps.newHashMap();
 
-    Set<Coverage> evenCoverages = Sets.newHashSet();
+    Set<Intersection> evenIntersections = Sets.newHashSet();
     Map<String, Collection<Embedding>> evenSubgraphEmbeddings =
       Maps.newHashMap();
 
@@ -76,18 +76,21 @@ public class JoinMultiEdgeEmbeddings extends JoinEmbeddings {
 
             Set<Integer> leftEdgeIds = left.getEdgeIds();
             Set<Integer> rightEdgeIds = right.getEdgeIds();
-            Coverage coverage = new Coverage(leftEdgeIds, rightEdgeIds);
+            Intersection
+              intersection = new Intersection(leftEdgeIds, rightEdgeIds);
 
             int overlappingEdgeCount =
-              leftEdgeIds.size() + rightEdgeIds.size() - coverage.size();
+              leftEdgeIds.size() + rightEdgeIds.size() - intersection.size();
 
             if (overlappingEdgeCount == 0) {
               addEmbedding(
-                evenSubgraphEmbeddings, left, right, evenCoverages, coverage);
+                evenSubgraphEmbeddings, left, right, evenIntersections,
+                intersection);
 
             } else if (overlappingEdgeCount == 1) {
               addEmbedding(
-                oddSubgraphEmbeddings, left, right, oddCoverages, coverage);
+                oddSubgraphEmbeddings, left, right, oddIntersections,
+                intersection);
             }
           }
         }
@@ -109,16 +112,17 @@ public class JoinMultiEdgeEmbeddings extends JoinEmbeddings {
    * @param subgraphEmbeddings output storage
    * @param left first embedding
    * @param right second embedding
-   * @param coverages discovered embeddings' coverages
-   * @param coverage current embedding's coverage
+   * @param intersections discovered embeddings' intersections
+   * @param intersection current embedding's intersection
    */
   private void addEmbedding(
-    Map<String, Collection<Embedding>> subgraphEmbeddings, Embedding left,
-    Embedding right, Set<Coverage> coverages, Coverage coverage) {
+    Map<String, Collection<Embedding>> subgraphEmbeddings,
+    Embedding left, Embedding right,
+    Set<Intersection> intersections, Intersection intersection) {
 
-    if (!coverages.contains(coverage)) {
+    if (!intersections.contains(intersection)) {
 
-      coverages.add(coverage);
+      intersections.add(intersection);
       Embedding embedding = left.combine(right);
 
       String subgraph = canonicalLabeler.label(embedding);

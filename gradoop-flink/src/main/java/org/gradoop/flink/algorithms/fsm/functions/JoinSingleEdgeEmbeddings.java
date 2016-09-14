@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.coverage.Coverage;
+import org.gradoop.flink.algorithms.fsm.pojos.Intersection;
 import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 
@@ -49,7 +49,7 @@ public class JoinSingleEdgeEmbeddings extends JoinEmbeddings {
     Collector<SubgraphEmbeddings> out) throws Exception {
 
     Collection<Embedding> cachedEmbeddings = Lists.newArrayList();
-    Set<Coverage> coverages = Sets.newHashSet();
+    Set<Intersection> intersections = Sets.newHashSet();
 
     Map<String, Collection<Embedding>> subgraphEmbeddings = Maps.newHashMap();
 
@@ -69,12 +69,13 @@ public class JoinSingleEdgeEmbeddings extends JoinEmbeddings {
 
             Set<Integer> leftEdgeIds = left.getEdgeIds();
             Set<Integer> rightEdgeIds = right.getEdgeIds();
-            Coverage coverage = new Coverage(leftEdgeIds, rightEdgeIds);
+            Intersection
+              intersection = new Intersection(leftEdgeIds, rightEdgeIds);
 
-            if (coverage.size() == 2) {
+            if (intersection.size() == 2) {
 
-              if (! coverages.contains(coverage)) {
-                coverages.add(coverage);
+              if (! intersections.contains(intersection)) {
+                intersections.add(intersection);
                 Embedding embedding = left.combine(right);
 
                 String subgraph = canonicalLabeler.label(embedding);

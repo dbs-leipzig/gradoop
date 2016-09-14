@@ -22,7 +22,16 @@ import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
 
 import java.io.Serializable;
 
+/**
+ * Represents object that can derive a canonical label from an embedding.
+ */
 public interface CanonicalLabeler extends Serializable {
 
+  /**
+   * Labelling method.
+   *
+   * @param embedding input embedding
+   * @return canonical label
+   */
   String label(Embedding embedding);
 }

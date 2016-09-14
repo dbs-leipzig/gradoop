@@ -123,7 +123,7 @@ public class CAMLabeler implements CanonicalLabeler {
           }
 
           Collections.sort(incidentEdges);
-          entryLabel += StringUtils.join(incidentEdges,"");
+          entryLabel += StringUtils.join(incidentEdges, "");
         }
 
         entryLabels.add(entryLabel);
@@ -202,10 +202,20 @@ public class CAMLabeler implements CanonicalLabeler {
     }
   }
 
-  private String format(FSMEdge edge, int fromId) {
+  /**
+   * Formats an edge in an adjacency list entry.
+   *
+   * @param edge edge
+   * @param adjacencyListVertexId vertex id of the related adjacency list
+   *
+   * @return string representation
+   */
+  private String format(FSMEdge edge, int adjacencyListVertexId) {
 
     char edgeChar = directed ?
-      (edge.getSourceId() == fromId ? OUTGOING_EDGE : INCOMING_EDGE) :
+      (edge.getSourceId() == adjacencyListVertexId ?
+        OUTGOING_EDGE : INCOMING_EDGE
+      ) :
       UNDIRECTED_EDGE;
 
     return edgeChar + edge.getLabel();

@@ -15,19 +15,22 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.tuple;
-
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.model.impl.tuples.WithCount;
+package org.gradoop.flink.algorithms.fsm.config;
 
 /**
- * (object, count) => object
- * @param <T>
+ * Different strategies to filter embeddings by frequent subgraphs.
  */
-public class ValueOfWithCount<T> implements MapFunction<WithCount<T>, T> {
-
-  @Override
-  public T map(WithCount<T> value) throws Exception {
-    return value.getObject();
-  }
+public enum FilterStrategy {
+  /**
+   * embeddings.join(frequentSubgraphs)
+   */
+  DEFAULT_JOIN,
+  /**
+   * embeddings.joinWithTiny(frequentSubgraphs)
+   */
+  BROADCAST_JOIN,
+  /**
+   * embeddings.filter(..).withBroadcastSet(frequentSubgraphs,..)
+   */
+  BROADCAST_FILTER
 }
