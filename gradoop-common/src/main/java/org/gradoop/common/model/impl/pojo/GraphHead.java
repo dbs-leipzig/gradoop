@@ -39,7 +39,7 @@ public class GraphHead extends Element implements EPGMGraphHead {
    * @param label      graph label
    * @param properties graph properties
    */
-  GraphHead(final GradoopId id, final String label,
+  public GraphHead(final GradoopId id, final String label,
     final PropertyList properties) {
     super(id, label, properties);
   }
