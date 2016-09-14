@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -30,8 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ComplaintTuple
-  extends ProcessTuple<Tuple4<Set<Vertex>, FoodBrokerMaps,
-  Set<Edge>, Set<Edge>>, Tuple2<GraphTransaction, Set<Vertex>>> {
+  extends ProcessTuple<FoodBrokerMaps, Tuple2<GraphTransaction, Set<Vertex>>> {
 
   private List<Vertex> employees;
   private List<Vertex> customers;
@@ -57,7 +55,7 @@ public class ComplaintTuple
   }
 
   @Override
-  public void mapPartition(Iterable<Tuple4<Set<Vertex>, FoodBrokerMaps, Set<Edge>, Set<Edge>>> iterable,
+  public void mapPartition(Iterable<FoodBrokerMaps> iterable,
     Collector<Tuple2<GraphTransaction, Set<Vertex>>> collector) throws Exception {
     GraphHead graphHead;
     GraphTransaction graphTransaction;
@@ -65,14 +63,15 @@ public class ComplaintTuple
     Set<Edge> edges;
     Set<Vertex> deliveryNotes;
 
-    for (Tuple4<Set<Vertex>, FoodBrokerMaps, Set<Edge>, Set<Edge>> tuple: iterable) {
-      deliveryNotes = tuple.f0;
+    for (FoodBrokerMaps maps: iterable) {
+      vertexMap = maps.getVertexMap();
+      edgeMap = maps.getEdgeMap();
 
-      vertexMap = tuple.f1.getVertexMap();
-      salesOrderLines = tuple.f2;
-      purchOrderLines = tuple.f3;
-      edgeMap = tuple.f1.getEdgeMap();
-      salesOrder = getSalesOrder();
+      deliveryNotes = getVertexByLabel("DeliveryNote");
+      salesOrderLines = getEdgesByLabel("SalesOrderLine");
+      purchOrderLines = getEdgesByLabel("PurchOrderLine");
+
+      salesOrder = getVertexByLabel("SalesOrder").iterator().next();
       masterDataMap = Maps.newHashMap();
       userMap = Maps.newHashMap();
       graphHead = graphHeadFactory.createGraphHead();
@@ -103,7 +102,7 @@ public class ComplaintTuple
 
     for (Vertex deliveryNote : deliveryNotes) {
       purchOrderId = getEdgeTargetId("contains", deliveryNote.getId());
-      purchOrderLines = this.getPurchOrderLines(purchOrderId);
+      purchOrderLines = this.getPurchOrderLinesByPurchOrder(purchOrderId);
       influencingMasterQuality = Lists.newArrayList();
       badSalesOrderLines = Sets.newHashSet();
 
@@ -287,16 +286,28 @@ public class ComplaintTuple
   }
 
 
-  private Vertex getSalesOrder() {
+  private Set<Vertex> getVertexByLabel(String label) {
+    Set<Vertex> vertices = Sets.newHashSet();
     for (Map.Entry<GradoopId, Vertex> entry : vertexMap.entrySet()) {
-      if (entry.getValue().getLabel().equals("SalesOrder")) {
-        return entry.getValue();
+      if (entry.getValue().getLabel().equals(label)) {
+        vertices.add(entry.getValue());
       }
     }
-    return null;
+    return vertices;
   }
 
-  private Set<Edge> getPurchOrderLines(GradoopId purchOrderId) {
+  private Set<Edge> getEdgesByLabel(String label) {
+    Set<Edge> edges = Sets.newHashSet();
+    for (Map.Entry<Tuple2<String, GradoopId>, Set<Edge>> entry :
+      edgeMap.entrySet()) {
+      if (entry.getKey().f0.equals(label)) {
+        edges.addAll(entry.getValue());
+      }
+    }
+    return edges;
+  }
+
+  private Set<Edge> getPurchOrderLinesByPurchOrder(GradoopId purchOrderId) {
     Set<Edge> purchOrderLines = Sets.newHashSet();
     for (Edge purchOrderLine : this.purchOrderLines) {
       if (purchOrderId.equals(purchOrderLine.getSourceId())) {
