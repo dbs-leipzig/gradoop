@@ -80,13 +80,13 @@ public class FoodBroker implements CollectionGenerator {
   public GraphCollection execute() {
 
     // used for type hinting when loading graph head data
-    TypeInformation graphHeadTypeInfo = TypeExtractor
+    TypeInformation<GraphHead> graphHeadTypeInfo = TypeExtractor
       .createTypeInfo(gradoopFlinkConfig.getGraphHeadFactory().getType());
     // used for type hinting when loading vertex data
-    TypeInformation vertexTypeInfo = TypeExtractor
+    TypeInformation<Vertex> vertexTypeInfo = TypeExtractor
       .createTypeInfo(gradoopFlinkConfig.getVertexFactory().getType());
     // used for type hinting when loading edge data
-    TypeInformation edgeTypeInfo = TypeExtractor
+    TypeInformation<Edge> edgeTypeInfo = TypeExtractor
       .createTypeInfo(gradoopFlinkConfig.getEdgeFactory().getType());
 
     DataSet<Vertex> customers =
@@ -121,19 +121,19 @@ public class FoodBroker implements CollectionGenerator {
       .union(complaintHandling.getTransactions())
       .map(new GraphTransactionTriple())
       .flatMap(new TransactionVertices())
-      .returns(TypeExtractor.getForClass(Vertex.class));
+      .returns(vertexTypeInfo);
 
     DataSet<Edge> transactionalEdges = brokerage.getTransactions()
       .union(complaintHandling.getTransactions())
       .map(new GraphTransactionTriple())
       .flatMap(new TransactionEdges())
-      .returns(TypeExtractor.getForClass(Edge.class));
+      .returns(edgeTypeInfo);
 
     DataSet<GraphHead> graphHeads = brokerage.getTransactions()
       .union(complaintHandling.getTransactions())
       .map(new GraphTransactionTriple())
       .map(new TransactionGraphHead())
-      .returns(TypeExtractor.getForClass(GraphHead.class));
+      .returns(graphHeadTypeInfo);
 
     DataSet<Map<GradoopId, GradoopIdSet>> graphIds = transactionalEdges
       .map(new GraphIdsTupleFromEdge())
