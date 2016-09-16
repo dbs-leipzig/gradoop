@@ -10,7 +10,7 @@ package org.gradoop.flink.io.impl.csv.pojos;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -23,8 +23,10 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
- *     &lt;extension base="{http://www.gradoop.org/flink/io/impl/csv/pojo}staticorref"&gt;
- *       &lt;attGroup ref="{http://www.gradoop.org/flink/io/impl/csv/pojo}keyattributes"/&gt;
+ *     &lt;extension base="{http://www.gradoop.org/flink/io/impl/csv/pojo}graphelement"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojo}target"/&gt;
+ *       &lt;/sequence&gt;
  *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -33,37 +35,39 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
-@XmlRootElement(name = "key")
-public class Key
-    extends Staticorref
+@XmlType(name = "", propOrder = {
+    "target"
+})
+@XmlRootElement(name = "vertexedge")
+public class Vertexedge
+    extends Graphelement
 {
 
-    @XmlAttribute(name = "class", required = true)
-    protected String clazz;
+    @XmlElement(required = true)
+    protected Target target;
 
     /**
-     * Gets the value of the clazz property.
+     * Gets the value of the target property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link Target }
      *     
      */
-    public String getClazz() {
-        return clazz;
+    public Target getTarget() {
+        return target;
     }
 
     /**
-     * Sets the value of the clazz property.
+     * Sets the value of the target property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link Target }
      *     
      */
-    public void setClazz(String value) {
-        this.clazz = value;
+    public void setTarget(Target value) {
+        this.target = value;
     }
 
 }
