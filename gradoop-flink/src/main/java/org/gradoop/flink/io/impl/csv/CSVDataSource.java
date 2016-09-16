@@ -19,9 +19,19 @@ package org.gradoop.flink.io.impl.csv;
 
 
 
+import org.apache.hadoop.io.Text;
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
+import org.gradoop.flink.io.impl.csv.functions.CSVToVertex;
+import org.gradoop.flink.io.impl.csv.functions.CsvTypeFilter;
+import org.gradoop.flink.io.impl.csv.functions.XmlToGraphhead;
+import org.gradoop.flink.io.impl.csv.parser.ObjectFactory;
+import org.gradoop.flink.io.impl.csv.pojos.Csv;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
@@ -29,31 +39,79 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.io.FileNotFoundException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 public class CSVDataSource extends CSVBase implements DataSource {
 
   public static final String CACHED_FILE = "cachedfile";
 
-  private String delimiter;
+  private ExecutionEnvironment env;
+
+  private String hdfsPrefix;
 
 
   public CSVDataSource(GradoopFlinkConfig config, String metaXmlPath,
-    String delimiter) {
+    String hdfsPrefix) {
     super(config, metaXmlPath);
-    this.delimiter = delimiter;
+    this.hdfsPrefix = hdfsPrefix;
 
-    ExecutionEnvironment env = config.getExecutionEnvironment();
-    env.registerCachedFile(metaXmlPath, CACHED_FILE);
+    env = getConfig().getExecutionEnvironment();
+    env.registerCachedFile(getMetaXmlPath(), CACHED_FILE);
   }
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    env.registerCachedFile(getMetaXmlPath(), CACHED_FILE);
+
+    Datasource source = null;
+
+    SchemaFactory schemaFactory =
+      SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+    Schema schema = null;
+    try {
+      schema = schemaFactory.newSchema( new File( getXsdPath() ) );
+      JAXBContext jaxbContext =
+        JAXBContext.newInstance(ObjectFactory.class.getPackage().getName() );
+      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+      unmarshaller.setSchema( schema );
+      source = (Datasource) unmarshaller.unmarshal(new FileInputStream(getMetaXmlPath()));
+
+    } catch (SAXException e) {
+      e.printStackTrace();
+    } catch (JAXBException e) {
+      e.printStackTrace();
+    }
+
+    DataSet<Datasource> datasource = env.fromElements(source);
+
+
+    DataSet<Csv> csvGraphHead = datasource
+      .filter(new CsvTypeFilter())
+      .map(); //csv graphheads etc
+
+    DataSet<GraphHead> graphHead = csvGraphHead
+      .map(new XmlToGraphhead(env)); //import graphheads
+
+
+
+
+
+
+
+
+
+    DataSet<Vertex> vertices =  getConfig().getExecutionEnvironment()
+      .readHadoopFile(new TextInputFormat(),
+      LongWritable.class, Text.class, getMetaXmlPath())
+      .map(new CSVToVertex(getConfig().getVertexFactory()));
+
 
     return null;
   }

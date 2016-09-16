@@ -18,8 +18,6 @@
 package org.gradoop.flink.io.impl.csv;
 
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
-import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.junit.Test;
@@ -38,10 +36,9 @@ public class CSVTest extends GradoopFlinkTestBase {
 
     String xmlFile =
       CSVTest.class.getResource("/data/csv/test_meta.xml").getFile();
-    String delimiter = "|";
 
     // create datasource
-    DataSource dataSource = new CSVDataSource(config, xmlFile, delimiter);
+    DataSource dataSource = new CSVDataSource(config, xmlFile, "hdfsPrefix");
     //get transactions
     LogicalGraph graph = dataSource.getLogicalGraph();
 

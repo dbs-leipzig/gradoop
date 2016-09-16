@@ -23,6 +23,8 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 
+import java.io.IOException;
+
 /**
  * This input format is used to extract csv data from distributed hdfs files.
  */
@@ -44,13 +46,13 @@ public class CSVInputFormat extends FileInputFormat<LongWritable, String[]> {
   @Override
   public RecordReader<LongWritable, String[]> createRecordReader(InputSplit
     split, TaskAttemptContext context) {
-//    try {
-//      return new CSVRecordReader((FileSplit) split, context
-//        .getConfiguration(), delimiter);
+    try {
+      CSVRecordReader reader = new CSVRecordReader(delimiter);
+      reader.initialize( split, context);
+      return reader;
+    } catch (IOException | InterruptedException e) {
+      System.err.println("Error while creating TLFRecordReader: " + e);
       return null;
-//    } catch (IOException ioe) {
-//      System.err.println("Error while creating TLFRecordReader: " + ioe);
-//      return null;
-//    }
+    }
   }
 }
