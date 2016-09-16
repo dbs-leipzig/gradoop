@@ -18,15 +18,15 @@
 package org.gradoop.flink.algorithms.btgs.functions;
 
 import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.spargel.GatherFunction;
 import org.apache.flink.graph.spargel.MessageIterator;
-import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Update Function of vertex centric iteration.
  */
 public class BtgUpdater
-  extends VertexUpdateFunction<GradoopId, GradoopId, GradoopId> {
+  extends GatherFunction<GradoopId, GradoopId, GradoopId> {
 
   @Override
   public void updateVertex(Vertex<GradoopId, GradoopId> vertex,

@@ -18,8 +18,8 @@
 package org.gradoop.flink.algorithms.labelpropagation.functions;
 
 import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.spargel.GatherFunction;
 import org.apache.flink.graph.spargel.MessageIterator;
-import org.apache.flink.graph.spargel.VertexUpdateFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -32,7 +32,7 @@ import java.util.List;
  * all incoming values.
  */
 public class LPUpdateFunction
-  extends VertexUpdateFunction<GradoopId, PropertyValue, PropertyValue> {
+  extends GatherFunction<GradoopId, PropertyValue, PropertyValue> {
   /**
    * Updates the vertex value if it has changed.
    *

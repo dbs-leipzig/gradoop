@@ -17,7 +17,7 @@
 package org.gradoop.flink.algorithms.btgs.functions;
 
 import org.apache.flink.graph.Vertex;
-import org.apache.flink.graph.spargel.MessagingFunction;
+import org.apache.flink.graph.spargel.ScatterFunction;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Update Function of vertex centric iteration.
  */
 public class BtgMessenger
-  extends MessagingFunction<GradoopId, GradoopId, GradoopId, NullValue> {
+  extends ScatterFunction<GradoopId, GradoopId, GradoopId, NullValue> {
 
   @Override
   public void sendMessages(
