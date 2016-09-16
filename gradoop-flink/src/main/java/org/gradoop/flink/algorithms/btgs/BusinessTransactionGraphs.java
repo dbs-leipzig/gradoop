@@ -99,7 +99,7 @@ public class BusinessTransactionGraphs implements
 
     gellyTransGraph = gellyTransGraph
       .getUndirected()
-      .runScatterGatherIteration(new BtgUpdater(), new BtgMessenger(), 100);
+      .runScatterGatherIteration(new BtgMessenger(), new BtgUpdater() , 100);
 
 
     DataSet<Tuple2<GradoopId, GradoopIdSet>> btgVerticesMap = gellyTransGraph

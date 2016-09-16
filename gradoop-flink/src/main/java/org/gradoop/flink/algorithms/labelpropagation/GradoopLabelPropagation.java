@@ -44,7 +44,7 @@ public class GradoopLabelPropagation extends LabelPropagation {
   protected DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>>
   executeInternal(Graph<GradoopId, PropertyValue, NullValue> gellyGraph) {
     return gellyGraph.runScatterGatherIteration(
-      new LPUpdateFunction(), new LPMessageFunction(), getMaxIterations())
+      new LPMessageFunction(), new LPUpdateFunction(), getMaxIterations())
       .getVertices();
   }
 }
