@@ -29,10 +29,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.functions.CSVToVertex;
 import org.gradoop.flink.io.impl.csv.functions.CsvTypeFilter;
+import org.gradoop.flink.io.impl.csv.functions.DatasourceToCsv;
 import org.gradoop.flink.io.impl.csv.functions.XmlToGraphhead;
 import org.gradoop.flink.io.impl.csv.parser.ObjectFactory;
 import org.gradoop.flink.io.impl.csv.pojos.Csv;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
+import org.gradoop.flink.io.impl.csv.pojos.Graphhead;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -76,16 +78,15 @@ public class CSVDataSource extends CSVBase implements DataSource {
       SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
     Schema schema = null;
     try {
-      schema = schemaFactory.newSchema( new File( getXsdPath() ) );
+      schema = schemaFactory.newSchema(new File(getXsdPath()));
       JAXBContext jaxbContext =
-        JAXBContext.newInstance(ObjectFactory.class.getPackage().getName() );
+        JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
       unmarshaller.setSchema( schema );
-      source = (Datasource) unmarshaller.unmarshal(new FileInputStream(getMetaXmlPath()));
+      source = (Datasource) unmarshaller
+        .unmarshal(new FileInputStream(getMetaXmlPath()));
 
-    } catch (SAXException e) {
-      e.printStackTrace();
-    } catch (JAXBException e) {
+    } catch (SAXException|JAXBException e) {
       e.printStackTrace();
     }
 
@@ -93,24 +94,14 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
 
     DataSet<Csv> csvGraphHead = datasource
-      .filter(new CsvTypeFilter())
-      .map(); //csv graphheads etc
+      .flatMap(new DatasourceToCsv()) //csv graphheads etc
+      .filter(new CsvTypeFilter(Graphhead.class));
 
     DataSet<GraphHead> graphHead = csvGraphHead
       .map(new XmlToGraphhead(env)); //import graphheads
 
 
 
-
-
-
-
-
-
-    DataSet<Vertex> vertices =  getConfig().getExecutionEnvironment()
-      .readHadoopFile(new TextInputFormat(),
-      LongWritable.class, Text.class, getMetaXmlPath())
-      .map(new CSVToVertex(getConfig().getVertexFactory()));
 
 
     return null;

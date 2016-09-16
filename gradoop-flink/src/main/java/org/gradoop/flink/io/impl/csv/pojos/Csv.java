@@ -63,6 +63,9 @@ public class Csv {
     @XmlAttribute(name = "separator")
     protected String separator;
 
+    private String datasourceName;
+
+    private String domainName;
     /**
      * Gets the value of the columns property.
      * 
@@ -231,4 +234,19 @@ public class Csv {
         this.separator = value;
     }
 
+    public String getDatasourceName() {
+        return datasourceName;
+    }
+
+    public void setDatasourceName(String datasourceName) {
+        this.datasourceName = datasourceName;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
 }

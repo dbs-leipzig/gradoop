@@ -2,12 +2,24 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.flink.io.impl.csv.pojos.Csv;
-import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 
 
-public class CsvTypeFilter implements FilterFunction<Datasource> {
+public class CsvTypeFilter implements FilterFunction<Csv> {
+  private Class type;
+
+  public CsvTypeFilter(Class type) {
+    this.type = type;
+  }
+
   @Override
-  public boolean filter(Datasource csv) throws Exception {
+  public boolean filter(Csv csv) throws Exception {
+    if (csv.getGraphhead() != null && type.isInstance(csv.getGraphhead())) {
+      return true;
+    } else if (csv.getVertex() != null && type.isInstance(csv.getVertex())) {
+      return true;
+    } else if (csv.getEdge() != null && type.isInstance(csv.getEdge())) {
+      return true;
+    }
     return false;
   }
 }
