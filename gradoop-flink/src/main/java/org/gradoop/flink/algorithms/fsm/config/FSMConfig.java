@@ -17,27 +17,20 @@
 
 package org.gradoop.flink.algorithms.fsm.config;
 
-import org.gradoop.common.cache.api.DistributedCacheClientConfiguration;
+import org.gradoop.flink.algorithms.fsm.canonicalization.CAMLabeler;
+import org.gradoop.flink.algorithms.fsm.canonicalization.CanonicalLabeler;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
- * frequent subgraph mining configuration
+ * Frequent subgraph mining configuration.
  */
 public class FSMConfig implements Serializable {
 
   /**
-   * Relative support of a subgraph in a graph collection.
-   * Subgraph supported above the minSupport are considered to be frequent.
+   * support threshold for subgraphs to be considered to be frequenct
    */
   private final float minSupport;
-
-  /**
-   * Threshold for subgraphs to be considered to be likely frequent.
-   * Only for filter-refinement approach (ICDE 2014)
-   */
-  private float likelinessThreshold = 0.05f;
 
   /**
    * Direction mode, true for directed graphs and false for undirected.
@@ -55,34 +48,33 @@ public class FSMConfig implements Serializable {
   private int minEdgeCount;
 
   /**
-   * Configurations required to connect to a Gradoop distributed cache server.
+   * flag to enable preprocessing (true=enabled)
    */
-  private final DistributedCacheClientConfiguration cacheClientConfiguration;
+  private final boolean preprocessing;
 
   /**
-   * Cache session identifier.
+   * labeler used to generate canonical labels
    */
-  private final String session;
+  private final CanonicalLabeler canonicalLabeler;
 
   /**
-   * Verbose mode.
+   * Strategy used to filter embeddings by frequent subgraphs
    */
-  private boolean verbose = false;
+  private final FilterStrategy filterStrategy;
 
   /**
    * valued constructor
    * @param minSupport minimum relative support of a subgraph
    * @param directed direction mode
-   * @param cacheClientConfiguration cache server configurations
    */
-  public FSMConfig(float minSupport, boolean directed,
-    DistributedCacheClientConfiguration cacheClientConfiguration) {
+  public FSMConfig(float minSupport, boolean directed) {
     this.minSupport = minSupport;
     this.directed = directed;
     this.maxEdgeCount = 1000;
     this.minEdgeCount = 0;
-    this.cacheClientConfiguration = cacheClientConfiguration;
-    this.session = UUID.randomUUID().toString();
+    this.canonicalLabeler =  new CAMLabeler(directed);
+    this.preprocessing = true;
+    this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
   }
 
   public float getMinSupport() {
@@ -109,27 +101,20 @@ public class FSMConfig implements Serializable {
     this.minEdgeCount = minEdgeCount;
   }
 
-  public float getLikelinessThreshold() {
-    return likelinessThreshold;
+  /**
+   * Getter for preprocessing flag.
+   *
+   * @return true, if preprocessing is enabled
+   */
+  public boolean usePreprocessing() {
+    return preprocessing;
   }
 
-  public void setLikelinessThreshold(float likelinessThreshold) {
-    this.likelinessThreshold = likelinessThreshold;
+  public CanonicalLabeler getCanonicalLabeler() {
+    return canonicalLabeler;
   }
 
-  public DistributedCacheClientConfiguration getCacheClientConfiguration() {
-    return cacheClientConfiguration;
-  }
-
-  public boolean isVerbose() {
-    return verbose;
-  }
-
-  public void setVerbose(boolean verbose) {
-    this.verbose = verbose;
-  }
-
-  public String getSession() {
-    return session;
+  public FilterStrategy getFilterStrategy() {
+    return filterStrategy;
   }
 }

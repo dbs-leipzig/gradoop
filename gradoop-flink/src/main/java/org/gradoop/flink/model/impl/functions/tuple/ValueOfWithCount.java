@@ -15,25 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.bool;
+package org.gradoop.flink.model.impl.functions.tuple;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Logical "TRUE" as Flink function.
- *
- * @param <T> input element type
+ * (object, count) => object
+ * @param <T>
  */
-public class True<T> implements MapFunction<T, Boolean>, FilterFunction<T> {
+public class ValueOfWithCount<T> implements MapFunction<WithCount<T>, T> {
 
   @Override
-  public Boolean map(T t) throws Exception {
-    return true;
-  }
-
-  @Override
-  public boolean filter(T t) throws Exception {
-    return true;
+  public T map(WithCount<T> value) throws Exception {
+    return value.getObject();
   }
 }

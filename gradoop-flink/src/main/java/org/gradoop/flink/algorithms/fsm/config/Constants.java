@@ -35,12 +35,12 @@ public class Constants {
   /**
    * vertex label dictionary
    */
-  public static final String VERTEX_DICTIONARY = "vertexLabelDictionary";
+  public static final String FREQUENT_VERTEX_LABELS = "vertexLabelDictionary";
 
   /**
    * vertex label dictionary
    */
-  public static final String EDGE_DICTIONARY = "edgeLabelDictionary";
+  public static final String FREQUENT_EDGE_LABELS = "edgeLabelDictionary";
 
   /**
    * graph counts of all workers

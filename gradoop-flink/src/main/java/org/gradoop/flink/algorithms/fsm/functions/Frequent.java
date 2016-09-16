@@ -15,58 +15,35 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.tuples;
+package org.gradoop.flink.algorithms.fsm.functions;
 
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.algorithms.fsm.config.Constants;
 import org.gradoop.flink.model.api.tuples.Countable;
 
 /**
- * (t,count)
+ * Filters something countable by minimum frequency.
  *
- * @param <T> data type of t
+ * @param <T> type of something
  */
-public class WithCount<T> extends Tuple2<T, Long> implements Countable {
+public class Frequent<T extends Countable> extends RichFilterFunction<T> {
 
   /**
-   * default constructor
+   * minimum frequency
    */
-  public WithCount() {
-  }
+  private long minFrequency;
 
-  /**
-   * valued constructor
-   *
-   * @param t countable object
-   */
-  public WithCount(T t) {
-    super(t, 1L);
-  }
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
 
-  /**
-   * valued constructor
-   *
-   * @param t countable object
-   * @param count initial count
-   */
-  public WithCount(T t, long count) {
-    super(t, count);
-  }
-
-  public T getObject() {
-    return f0;
-  }
-
-  public void setObject(T object) {
-    this.f0 = object;
+    this.minFrequency = getRuntimeContext()
+      .<Long>getBroadcastVariable(Constants.MIN_FREQUENCY).get(0);
   }
 
   @Override
-  public long getCount() {
-    return f1;
-  }
-
-  @Override
-  public void setCount(long count) {
-    this.f1 = count;
+  public boolean filter(T value) throws Exception {
+    return value.getCount() >= minFrequency;
   }
 }

@@ -25,7 +25,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Data generator with predictable result for the evaluation of Frequent
- * Subgraph Mining algorithms.
+ * SubgraphWithCount Mining algorithms.
  */
 public class PredictableTransactionsGenerator implements
   GraphTransactionsGenerator {
@@ -93,7 +93,7 @@ public class PredictableTransactionsGenerator implements
    */
   public static long containedDirectedFrequentSubgraphs(float threshold) {
 
-    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 702L;
+    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 682L;
   }
 
   /**
@@ -105,6 +105,6 @@ public class PredictableTransactionsGenerator implements
    */
   public static long containedUndirectedFrequentSubgraphs(float threshold) {
 
-    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 238L;
+    return ((Math.round((1.0 - threshold) / 0.1)) + 1) * 329L;
   }
 }

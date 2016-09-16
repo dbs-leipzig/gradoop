@@ -15,25 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.bool;
+package org.gradoop.flink.algorithms.fsm.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.flink.algorithms.fsm.tuples.Subgraph;
 
 /**
- * Logical "TRUE" as Flink function.
- *
- * @param <T> input element type
+ * (canonicalLabel, frequency, sample embedding) => canonicalLabel
  */
-public class True<T> implements MapFunction<T, Boolean>, FilterFunction<T> {
+public class CanonicalLabel implements MapFunction<Subgraph, String> {
 
   @Override
-  public Boolean map(T t) throws Exception {
-    return true;
-  }
-
-  @Override
-  public boolean filter(T t) throws Exception {
-    return true;
+  public String map(Subgraph value) throws Exception {
+    return value.getSubgraph();
   }
 }

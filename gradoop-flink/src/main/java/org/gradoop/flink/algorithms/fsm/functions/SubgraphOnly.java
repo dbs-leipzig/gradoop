@@ -15,25 +15,32 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.bool;
+package org.gradoop.flink.algorithms.fsm.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.flink.algorithms.fsm.tuples.Subgraph;
+import org.gradoop.flink.algorithms.fsm.tuples.SubgraphEmbeddings;
 
 /**
- * Logical "TRUE" as Flink function.
- *
- * @param <T> input element type
+ * (graphId, size, canonicalLabel, embeddings)
+ *   => (canonicalLabel, frequency=1, sample embedding)
  */
-public class True<T> implements MapFunction<T, Boolean>, FilterFunction<T> {
+public class SubgraphOnly implements MapFunction<SubgraphEmbeddings, Subgraph> {
+
+  /**
+   * reuse tuple to avoid instantiations
+   */
+  private final Subgraph reuseTuple = new Subgraph(null, 1L, null);
 
   @Override
-  public Boolean map(T t) throws Exception {
-    return true;
-  }
+  public Subgraph map(SubgraphEmbeddings subgraphEmbeddings) throws Exception {
 
-  @Override
-  public boolean filter(T t) throws Exception {
-    return true;
+    reuseTuple
+      .setSubgraph(subgraphEmbeddings.getSubgraph());
+
+    reuseTuple
+      .setEmbedding(subgraphEmbeddings.getEmbeddings().iterator().next());
+
+    return reuseTuple;
   }
 }

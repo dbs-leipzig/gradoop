@@ -15,37 +15,38 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.common.model.impl.pojo;
+package org.gradoop.flink.algorithms.fsm.tuples;
 
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.flink.algorithms.fsm.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
+
+import java.util.Map;
 
 /**
- * POJO Implementation of an EPGM graph head.
+ * Lightweight representation of a labeled graph transaction.
  */
-public class GraphHead extends Element implements EPGMGraphHead {
+public class FSMGraph extends Embedding {
 
   /**
-   * Default constructor.
+   * graph identifier
    */
-  public GraphHead() {
-  }
+  private final GradoopId id;
 
   /**
-   * Creates a graph head based on the given parameters.
+   * Constructor.
    *
-   * @param id         graph identifier
-   * @param label      graph label
-   * @param properties graph properties
+   * @param id graph identifier
+   * @param vertices id-vertex map
+   * @param edges id-edge map
    */
-  public GraphHead(final GradoopId id, final String label,
-    final PropertyList properties) {
-    super(id, label, properties);
+  public FSMGraph(GradoopId id,
+    Map<Integer, String> vertices, Map<Integer, FSMEdge> edges) {
+    super(vertices, edges);
+    this.id = id;
   }
 
-  @Override
-  public String toString() {
-    return super.toString() + "[]";
+  public GradoopId getId() {
+    return id;
   }
 }

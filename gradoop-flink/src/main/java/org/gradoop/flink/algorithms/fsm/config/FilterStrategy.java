@@ -15,25 +15,22 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.bool;
-
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.MapFunction;
+package org.gradoop.flink.algorithms.fsm.config;
 
 /**
- * Logical "TRUE" as Flink function.
- *
- * @param <T> input element type
+ * Different strategies to filter embeddings by frequent subgraphs.
  */
-public class True<T> implements MapFunction<T, Boolean>, FilterFunction<T> {
-
-  @Override
-  public Boolean map(T t) throws Exception {
-    return true;
-  }
-
-  @Override
-  public boolean filter(T t) throws Exception {
-    return true;
-  }
+public enum FilterStrategy {
+  /**
+   * embeddings.join(frequentSubgraphs)
+   */
+  DEFAULT_JOIN,
+  /**
+   * embeddings.joinWithTiny(frequentSubgraphs)
+   */
+  BROADCAST_JOIN,
+  /**
+   * embeddings.filter(..).withBroadcastSet(frequentSubgraphs,..)
+   */
+  BROADCAST_FILTER
 }

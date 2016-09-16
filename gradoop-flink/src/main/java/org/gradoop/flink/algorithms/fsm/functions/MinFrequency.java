@@ -15,25 +15,31 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.bool;
+package org.gradoop.flink.algorithms.fsm.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
 
 /**
- * Logical "TRUE" as Flink function.
- *
- * @param <T> input element type
+ * Calculates the min frequency based on a configured min support.
  */
-public class True<T> implements MapFunction<T, Boolean>, FilterFunction<T> {
+public class MinFrequency implements MapFunction<Long, Long> {
 
-  @Override
-  public Boolean map(T t) throws Exception {
-    return true;
+  /**
+   * FSM configuration
+   */
+  private final FSMConfig fsmConfig;
+
+  /**
+   * Constructor.
+   * @param fsmConfig FSM configuration
+   */
+  public MinFrequency(FSMConfig fsmConfig) {
+    this.fsmConfig = fsmConfig;
   }
 
   @Override
-  public boolean filter(T t) throws Exception {
-    return true;
+  public Long map(Long value) throws Exception {
+    return (long) Math.round((float) value * fsmConfig.getMinSupport());
   }
 }

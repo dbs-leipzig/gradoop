@@ -15,25 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.bool;
 
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.MapFunction;
+package org.gradoop.flink.algorithms.fsm.canonicalization;
+
+import org.gradoop.flink.algorithms.fsm.pojos.Embedding;
+
+import java.io.Serializable;
 
 /**
- * Logical "TRUE" as Flink function.
- *
- * @param <T> input element type
+ * Represents object that can derive a canonical label from an embedding.
  */
-public class True<T> implements MapFunction<T, Boolean>, FilterFunction<T> {
+public interface CanonicalLabeler extends Serializable {
 
-  @Override
-  public Boolean map(T t) throws Exception {
-    return true;
-  }
-
-  @Override
-  public boolean filter(T t) throws Exception {
-    return true;
-  }
+  /**
+   * Labelling method.
+   *
+   * @param embedding input embedding
+   * @return canonical label
+   */
+  String label(Embedding embedding);
 }
