@@ -13,7 +13,7 @@
                 <column id="0" pos="0" type="Long"/>
             </columns>
             <graphhead>
-                <key scope="testGraph">
+                <key class="testGraph">
                     <ref column_id="0"/>
                 </key>
                 <label separator="_">
@@ -31,7 +31,7 @@
                 <column id="4" pos="4" type="String"/>
             </columns>
             <vertex>
-                <key scope="testVertex">
+                <key class="testVertex">
                     <ref column_id="0"/>
                 </key>
                 <label separator="_">
@@ -48,7 +48,7 @@
                 </graphs>
                 <edges>
                     <vertexedge>
-                        <key scope="testVertexEdge">
+                        <key class="testVertexEdge">
                             <ref column_id="0"/>
                             <ref column_id="3"/>
                         </key>
@@ -73,7 +73,7 @@
                 <column id="3" pos="3" type="Long"/>
             </columns>
             <edge>
-                <key scope="testEdge">
+                <key class="testEdge">
                     <ref column_id="1"/>
                     <ref column_id="2"/>
                 </key>
@@ -107,7 +107,7 @@
                 <column id="2" pos="2" type="Long"/>
             </columns>
             <graphhead>
-                <key scope="secondGraph">
+                <key class="secondGraph">
                     <ref column_id="0"/>
                 </key>
                 <label separator=":">
@@ -125,7 +125,7 @@
                 <column id="0" pos="0" type="Long"/>
             </columns>
             <vertex>
-                <key scope="secondVertex">
+                <key class="secondVertex">
                     <ref column_id="0"/>
                 </key>
                 <graphs>
@@ -141,7 +141,7 @@
                 <column id="2" pos="2" type="Long"/>
             </columns>
             <vertex>
-                <key scope="thirdVertex">
+                <key class="thirdVertex">
                     <ref column_id="0"/>
                 </key>
                 <label>
@@ -149,14 +149,14 @@
                 </label>
                 <graphs>
                     <reference domain_name="testDomain">
-                        <key scope="">
+                        <key class="">
                             <ref column_id="2"/>
                         </key>
                     </reference>
                 </graphs>
                 <edges>
                     <vertexedge>
-                        <key scope="thirdVertexEdge">
+                        <key class="thirdVertexEdge">
                             <ref column_id="0"/>
                             <ref column_id="2"/>
                         </key>
@@ -165,14 +165,14 @@
                         </label>
                         <graphs>
                             <reference domain_name="testDomain">
-                                <key scope="testGraph">
+                                <key class="testGraph">
                                     <static name="1"/>
                                 </key>
                             </reference>
                         </graphs>
                         <target>
                             <reference domain_name="testDomain">
-                                <key scope="testVertex">
+                                <key class="testVertex">
                                     <ref column_id="2"/>
                                 </key>
                             </reference>
@@ -189,7 +189,7 @@
                 <column id="3" pos="1" type="Long"/>
             </columns>
             <edge>
-                <key scope="secondEdge">
+                <key class="secondEdge">
                     <ref column_id="1"/>
                     <ref column_id="2"/>
                 </key>
@@ -202,7 +202,7 @@
                 </properties>
                 <graphs>
                     <reference datasource_name="Another Datasource">
-                        <key scope="AnotherSource">
+                        <key class="AnotherSource">
                             <ref column_id="3"/>
                         </key>
                     </reference>

@@ -44,7 +44,7 @@
     </xsd:attributeGroup>
     <!-- key attributes -->
     <xsd:attributeGroup name="keyattributes">
-        <xsd:attribute name="scope" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
     </xsd:attributeGroup>
     <!-- reference attributes -->
     <xsd:attributeGroup name="referenceattributes">
