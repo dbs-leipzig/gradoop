@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<datasource xmlns="http://www.gradoop.org/csvInput"
+<datasource xmlns="http://www.gradoop.org/flink/io/impl/csv/pojo"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://www.gradoop.org/csvInput
-            http://www.gradoop.org/csvInput/csv_format.xsd"
+            xsi:schemaLocation="http://www.gradoop.org/flink/io/impl/csv/pojo
+            http://www.gradoop.org/flink/io/impl/csv/pojo"
             name="testDatasource">
 
     <domain name="testDomain">
