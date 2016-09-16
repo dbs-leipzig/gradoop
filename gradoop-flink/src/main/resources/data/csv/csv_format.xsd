@@ -118,8 +118,6 @@
             <!--<xsd:attributeGroup ref="referenceattributes"/>-->
             <xsd:attribute name="domain_name"/>
             <xsd:attribute name="datasource_name"/>
-            <xsd:assert
-                    test="(@datasource_name and @domain_name) or (not(@datasource_name) and @domain_name)"/>
         </xsd:complexType>
     </xsd:element>
 
