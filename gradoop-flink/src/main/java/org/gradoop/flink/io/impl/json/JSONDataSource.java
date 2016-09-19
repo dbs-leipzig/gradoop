@@ -63,13 +63,13 @@ public class JSONDataSource extends JSONBase implements DataSource {
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     // used for type hinting when loading vertex data
-    TypeInformation vertexTypeInfo = TypeExtractor
+    TypeInformation<Vertex> vertexTypeInfo = TypeExtractor
       .createTypeInfo(getConfig().getVertexFactory().getType());
     // used for type hinting when loading edge data
-    TypeInformation edgeTypeInfo = TypeExtractor
+    TypeInformation<Edge> edgeTypeInfo = TypeExtractor
       .createTypeInfo(getConfig().getEdgeFactory().getType());
     // used for type hinting when loading graph data
-    TypeInformation graphTypeInfo = TypeExtractor
+    TypeInformation<GraphHead> graphTypeInfo = TypeExtractor
       .createTypeInfo(getConfig().getGraphHeadFactory().getType());
 
     // read vertex, edge and graph data
