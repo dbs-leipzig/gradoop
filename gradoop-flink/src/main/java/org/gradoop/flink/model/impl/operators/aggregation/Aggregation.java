@@ -25,7 +25,6 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.flink.model.api.functions.VertexAndEdgeAggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionAggregates;
@@ -68,12 +67,7 @@ public class Aggregation implements UnaryGraphToGraphOperator {
 
     DataSet<PropertyValue> aggregate;
 
-    if (this.aggregateFunction instanceof VertexAndEdgeAggregateFunction) {
-      DataSet<PropertyValue> vertexAggregate = aggregateVertices(vertices);
-      DataSet<PropertyValue> edgeAggregate = aggregateEdges(edges);
-      aggregate = vertexAggregate.union(edgeAggregate);
-
-    } else if (this.aggregateFunction instanceof VertexAggregateFunction) {
+    if (this.aggregateFunction instanceof VertexAggregateFunction) {
       aggregate = aggregateVertices(vertices);
 
     } else {
