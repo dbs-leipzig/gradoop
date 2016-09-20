@@ -23,8 +23,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
-import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.tfsm.TransactionalFSM;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -125,8 +125,8 @@ public class TransactionalFSMBenchmark extends AbstractRunner
     FSMConfig fsmConfig = new FSMConfig(threshold, directed);
 
     // mine
-    GraphTransactions frequentSubgraphs = new
-      TransactionalFSM(fsmConfig).execute(graphs);
+    GraphTransactions frequentSubgraphs =
+      new TransactionalFSM(fsmConfig).execute(graphs);
 
     // write statistics
     writeCSV(inputPath, directed, implementation , threshold, logPath,
