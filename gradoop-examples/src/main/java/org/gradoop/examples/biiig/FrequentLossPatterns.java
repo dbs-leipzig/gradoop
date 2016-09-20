@@ -20,8 +20,6 @@ package org.gradoop.examples.biiig;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.hadoop.util.Time;
-import org.gradoop.common.model.api.entities.EPGMAttributed;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -29,9 +27,9 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValues;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.flink.algorithms.fsm.functions.SubgraphDecoder;
-import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
-import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.tfsm.TransactionalFSM;
+import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -42,6 +40,7 @@ import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 import org.gradoop.flink.model.impl.operators.transformation
   .ApplyTransformation;
+import org.gradoop.flink.model.impl.operators.transformation.functions.Keep;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.math.BigDecimal;
@@ -256,19 +255,6 @@ public class FrequentLossPatterns
   }
 
   // TRANSFORMATION FUNCTIONS
-
-  /**
-   * Do not change graph/vertex/edge in transformation.
-   * @param <EL> graph/vertex/edge type
-   */
-  private static class Keep<EL extends EPGMAttributed & EPGMLabeled>
-    implements TransformationFunction<EL> {
-
-    @Override
-    public EL execute(EL current, EL transformed) {
-      return current;
-    }
-  }
 
   /**
    * Relabel vertices and to drop properties.

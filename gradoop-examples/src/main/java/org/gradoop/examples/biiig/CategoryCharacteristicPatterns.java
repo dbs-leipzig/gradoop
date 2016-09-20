@@ -23,6 +23,8 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.utils.ExampleOutput;
+import org.gradoop.flink.algorithms.fsm.ccs.CategoryCharacteristicSubgraphs;
+import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -78,12 +80,21 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     out.add("Business Transaction Graphs with Measures", btgs);
 
     btgs = btgs.apply(new ApplyTransformation(
-        new CategorizeGraphsTransformationFunction(),
-        new RelabelVerticesTransformationFunction(),
-        new EdgeLabelOnlyTransformationFunction())
+      new CategorizeGraphsTransformationFunction(),
+      new RelabelVerticesTransformationFunction(),
+      new EdgeLabelOnlyTransformationFunction())
     );
 
     out.add("Business Transaction Graphs after Transformation", btgs);
+
+    FSMConfig fsmConfig = new FSMConfig(0.8f, true);
+    fsmConfig.setMaxEdgeCount(3);
+
+    GraphCollection patterns = btgs
+      .callForCollection(new CategoryCharacteristicSubgraphs(fsmConfig, 2.0f));
+
+    out.add("Category characteristic graph patters", patterns);
+
     out.print();
   }
 
@@ -133,7 +144,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     public PropertyValue getVertexIncrement(Vertex vertex) {
 
       boolean isClosedQuotation =
-        vertex.getLabel().equals("SalesQuotation") &&
+        vertex.getLabel().equals("Quotation") &&
           !vertex.getPropertyValue("status").toString().equals("open");
 
       return PropertyValue.create(isClosedQuotation);
@@ -166,7 +177,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     @Override
     public String getAggregatePropertyKey() {
-      return "salesOrderCount";
+      return "soCount";
     }
   }
 
@@ -182,7 +193,10 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
       String category =
         current.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
 
-      transformed.setProperty("category", PropertyValue.create(category));
+      transformed.setProperty(
+        CategoryCharacteristicSubgraphs.CATEGORY_KEY,
+        PropertyValue.create(category)
+      );
 
       return transformed;
     }

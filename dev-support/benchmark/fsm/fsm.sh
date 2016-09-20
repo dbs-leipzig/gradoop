@@ -17,9 +17,9 @@ JAR_FILE=""
 #Class name of benchmark class
 CLASS=""
 #FLINK root directory
-FLINK="$FLINK_PREFIX/bin/flink"
+FLINK=""
 #HDFS root directory
-HDFS="$HADOOP_PREFIX/bin/hadoop"
+HDFS=""
 
 while read LINE
 do 
@@ -29,6 +29,8 @@ IFS=':' read -ra LINE <<< "$LINE"
 KEY=${LINE[0]}
 
 case ${KEY} in
+    flink_root)	    FLINK="${LINE[1]}";;
+    hdfs_root)      HDFS="${LINE[1]}";;
     jar)            JAR_FILE="${LINE[1]}";;
     class)          CLASS="${LINE[1]}";;
     parallelism)    PARALLELISMS="${LINE[1]}";;

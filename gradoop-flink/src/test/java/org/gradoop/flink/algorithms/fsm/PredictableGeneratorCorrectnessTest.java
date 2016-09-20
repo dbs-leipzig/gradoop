@@ -1,7 +1,8 @@
 package org.gradoop.flink.algorithms.fsm;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.algorithms.fsm.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.tfsm.TransactionalFSM;
 import org.gradoop.flink.datagen.transactions.predictable
   .PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
