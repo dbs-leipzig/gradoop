@@ -27,7 +27,6 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.flink.model.api.functions.VertexAndEdgeAggregateFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ElementsOfSelectedGraphs;
@@ -74,16 +73,7 @@ public class ApplyAggregation
     DataSet<GradoopId> graphIds = graphHeads
       .map(new Id<GraphHead>());
 
-    if (this.aggregateFunction instanceof VertexAndEdgeAggregateFunction) {
-      DataSet<Tuple2<GradoopId, PropertyValue>> vertexAggregate =
-        aggregateVertices(vertices, graphIds);
-
-      DataSet<Tuple2<GradoopId, PropertyValue>> edgeAggregate =
-        aggregateEdges(edges, graphIds);
-
-      aggregate = vertexAggregate.union(edgeAggregate);
-
-    } else if (this.aggregateFunction instanceof VertexAggregateFunction) {
+    if (this.aggregateFunction instanceof VertexAggregateFunction) {
       aggregate = aggregateVertices(vertices, graphIds);
     } else {
       aggregate = aggregateEdges(edges, graphIds);
