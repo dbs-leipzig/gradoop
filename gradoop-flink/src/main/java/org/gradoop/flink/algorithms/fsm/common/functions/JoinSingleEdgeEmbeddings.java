@@ -20,10 +20,11 @@ package org.gradoop.flink.algorithms.fsm.common.functions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
-import org.gradoop.flink.algorithms.fsm.common.pojos.Intersection;
+import org.gradoop.flink.algorithms.fsm.common.pojos.Union;
 import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
 
 import java.util.Collection;
@@ -36,7 +37,7 @@ import java.util.Set;
  * @param <SE> subgraph type
  */
 public class JoinSingleEdgeEmbeddings<SE extends SubgraphEmbeddings>
-  extends JoinEmbeddings<SE> {
+  extends JoinEmbeddings<SE> implements GroupReduceFunction<SE, SE> {
 
   /**
    * Constructor.
@@ -51,7 +52,7 @@ public class JoinSingleEdgeEmbeddings<SE extends SubgraphEmbeddings>
   public void reduce(Iterable<SE> values, Collector<SE> out) throws Exception {
 
     Collection<Embedding> cachedEmbeddings = Lists.newArrayList();
-    Set<Intersection> intersections = Sets.newHashSet();
+    Set<Union> unions = Sets.newHashSet();
 
     Map<String, Collection<Embedding>> subgraphEmbeddings = Maps.newHashMap();
 
@@ -69,13 +70,12 @@ public class JoinSingleEdgeEmbeddings<SE extends SubgraphEmbeddings>
 
             Set<Integer> leftEdgeIds = left.getEdgeIds();
             Set<Integer> rightEdgeIds = right.getEdgeIds();
-            Intersection
-              intersection = new Intersection(leftEdgeIds, rightEdgeIds);
+            Union union = new Union(leftEdgeIds, rightEdgeIds);
 
-            if (intersection.size() == 2) {
+            if (union.size() == 2) {
 
-              if (! intersections.contains(intersection)) {
-                intersections.add(intersection);
+              if (! unions.contains(union)) {
+                unions.add(union);
                 Embedding embedding = left.combine(right);
 
                 String subgraph = canonicalLabeler.label(embedding);

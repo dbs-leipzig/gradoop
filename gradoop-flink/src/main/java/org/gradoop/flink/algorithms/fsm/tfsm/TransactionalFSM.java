@@ -23,6 +23,7 @@ import org.gradoop.flink.algorithms.fsm.common.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.config.FilterStrategy;
+import org.gradoop.flink.algorithms.fsm.common.config.TFSMImplementation;
 import org.gradoop.flink.algorithms.fsm.common.functions.CanonicalLabelOnly;
 import org.gradoop.flink.algorithms.fsm.common.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions.Frequent;
@@ -38,6 +39,8 @@ import org.gradoop.flink.algorithms.fsm.common.functions
   .WithoutInfrequentEdgeLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions
   .WithoutInfrequentVertexLabels;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.MergeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.PatternGrowth;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSubgraphOnly;
@@ -120,39 +123,59 @@ public class TransactionalFSM extends TransactionalFSMBase {
   public DataSet<GraphTransaction> execute(
     DataSet<TFSMGraph> fsmGraphs, GradoopFlinkConfig gradoopConfig) {
 
-    minFrequency = Count
-      .count(fsmGraphs)
-      .map(new MinFrequency(fsmConfig));
+    setMinFrequency(fsmGraphs);
 
     if (fsmConfig.usePreprocessing()) {
-      DataSet<String> frequentVertexLabels = fsmGraphs
-        .flatMap(new VertexLabels<TFSMGraph>())
-        .groupBy(0)
-        .sum(1)
-        .filter(new Frequent<WithCount<String>>())
-        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
-        .map(new ValueOfWithCount<String>());
-
-      fsmGraphs = fsmGraphs
-        .map(new WithoutInfrequentVertexLabels<TFSMGraph>())
-        .withBroadcastSet(
-          frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
-
-      DataSet<String> frequentEdgeLabels = fsmGraphs
-        .flatMap(new EdgeLabels<TFSMGraph>())
-        .groupBy(0)
-        .sum(1)
-        .filter(new Frequent<WithCount<String>>())
-        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
-        .map(new ValueOfWithCount<String>());
-
-      fsmGraphs = fsmGraphs
-        .map(new WithoutInfrequentEdgeLabels<TFSMGraph>())
-        .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
+      fsmGraphs = preProcess(fsmGraphs);
     }
+
+    DataSet<TFSMSubgraph> allFrequentSubgraphs;
 
     DataSet<TFSMSubgraphEmbeddings> embeddings = fsmGraphs
       .flatMap(new TFSMSingleEdgeEmbeddings(fsmConfig));
+
+    if (fsmConfig.getImplementation() ==
+      TFSMImplementation.QUADRATIC_UNROLLING) {
+      allFrequentSubgraphs = executeLoopUnrolling(fsmGraphs, embeddings);
+    } else {
+      allFrequentSubgraphs = executeQuadraticLoopUnrolling(embeddings);
+    }
+
+    return allFrequentSubgraphs
+      .map(new TFSMSubgraphDecoder(gradoopConfig));
+  }
+
+  private DataSet<TFSMSubgraph> executeLoopUnrolling(
+    DataSet<TFSMGraph> fsmGraphs, DataSet<TFSMSubgraphEmbeddings> embeddings) {
+
+    DataSet<TFSMSubgraph> frequentSubgraphs = getFrequentSubgraphs(embeddings);
+    DataSet<TFSMSubgraph> allFrequentSubgraphs = frequentSubgraphs;
+
+    if (fsmConfig.getMaxEdgeCount() > 1) {
+      for (int k=fsmConfig.getMinEdgeCount();
+           k<fsmConfig.getMaxEdgeCount(); k++) {
+
+        embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
+
+        embeddings = embeddings
+          .groupBy(0)
+          .reduceGroup(new MergeEmbeddings());
+
+        embeddings = embeddings
+          .join(fsmGraphs)
+          .where(0).equalTo(0)
+          .with(new PatternGrowth(fsmConfig));
+
+        frequentSubgraphs = getFrequentSubgraphs(embeddings);
+        allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
+      }
+    }
+
+    return allFrequentSubgraphs;
+  }
+
+  private DataSet<TFSMSubgraph> executeQuadraticLoopUnrolling(
+    DataSet<TFSMSubgraphEmbeddings> embeddings) {
 
     DataSet<TFSMSubgraph> frequentSubgraphs =
       getFrequentSubgraphs(embeddings);
@@ -189,9 +212,41 @@ public class TransactionalFSM extends TransactionalFSMBase {
       allFrequentSubgraphs = allFrequentSubgraphs
         .filter(new MinEdgeCount<TFSMSubgraph>(fsmConfig));
     }
+    return allFrequentSubgraphs;
+  }
 
-    return allFrequentSubgraphs
-      .map(new TFSMSubgraphDecoder(gradoopConfig));
+  private void setMinFrequency(DataSet<TFSMGraph> fsmGraphs) {
+    minFrequency = Count
+      .count(fsmGraphs)
+      .map(new MinFrequency(fsmConfig));
+  }
+
+  private DataSet<TFSMGraph> preProcess(DataSet<TFSMGraph> fsmGraphs) {
+    DataSet<String> frequentVertexLabels = fsmGraphs
+      .flatMap(new VertexLabels<TFSMGraph>())
+      .groupBy(0)
+      .sum(1)
+      .filter(new Frequent<WithCount<String>>())
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+      .map(new ValueOfWithCount<String>());
+
+    fsmGraphs = fsmGraphs
+      .map(new WithoutInfrequentVertexLabels<TFSMGraph>())
+      .withBroadcastSet(
+        frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
+
+    DataSet<String> frequentEdgeLabels = fsmGraphs
+      .flatMap(new EdgeLabels<TFSMGraph>())
+      .groupBy(0)
+      .sum(1)
+      .filter(new Frequent<WithCount<String>>())
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+      .map(new ValueOfWithCount<String>());
+
+    fsmGraphs = fsmGraphs
+      .map(new WithoutInfrequentEdgeLabels<TFSMGraph>())
+      .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
+    return fsmGraphs;
   }
 
   /**

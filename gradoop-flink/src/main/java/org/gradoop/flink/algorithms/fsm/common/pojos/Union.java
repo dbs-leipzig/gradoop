@@ -25,7 +25,7 @@ import java.util.TreeSet;
 /**
  * Represents the intersection of two integer sets.
  */
-public class Intersection {
+public class Union {
 
   /**
    * Edge ids
@@ -38,9 +38,14 @@ public class Intersection {
    * @param first first integer set
    * @param second first integer set
    */
-  public Intersection(Set<Integer> first, Set<Integer> second) {
+  public Union(Set<Integer> first, Set<Integer> second) {
     this.ids = Sets.newTreeSet(first);
     this.ids.addAll(second);
+  }
+
+  public Union(Set<Integer> ids, int id) {
+    this.ids = Sets.newTreeSet(ids);
+    this.ids.add(id);
   }
 
 
@@ -62,7 +67,7 @@ public class Intersection {
       return false;
     }
 
-    Intersection that = (Intersection) o;
+    Union that = (Union) o;
 
     return ids != null ? ids.equals(that.ids) : that.ids == null;
   }

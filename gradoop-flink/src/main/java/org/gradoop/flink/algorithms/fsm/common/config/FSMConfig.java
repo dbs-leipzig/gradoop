@@ -61,6 +61,7 @@ public class FSMConfig implements Serializable {
    * Strategy used to filter embeddings by frequent subgraphs
    */
   private final FilterStrategy filterStrategy;
+  private TFSMImplementation implementation;
 
   /**
    * valued constructor
@@ -116,5 +117,9 @@ public class FSMConfig implements Serializable {
 
   public FilterStrategy getFilterStrategy() {
     return filterStrategy;
+  }
+
+  public TFSMImplementation getImplementation() {
+    return implementation;
   }
 }

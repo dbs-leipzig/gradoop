@@ -102,4 +102,8 @@ public class Embedding {
   public Set<Integer> getEdgeIds() {
     return edges.keySet();
   }
+
+  public Embedding deepCopy() {
+    return new Embedding(Maps.newHashMap(vertices), Maps.newHashMap(edges));
+  }
 }

@@ -20,10 +20,11 @@ package org.gradoop.flink.algorithms.fsm.common.functions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
-import org.gradoop.flink.algorithms.fsm.common.pojos.Intersection;
+import org.gradoop.flink.algorithms.fsm.common.pojos.Union;
 import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
 
 import java.util.Collection;
@@ -36,7 +37,7 @@ import java.util.Set;
  * @param <SE> subgraph embeddings type
  */
 public class JoinMultiEdgeEmbeddings<SE extends SubgraphEmbeddings>
-  extends JoinEmbeddings<SE> {
+  extends JoinEmbeddings<SE> implements GroupReduceFunction<SE, SE> {
 
   /**
    * Constructor.
@@ -52,13 +53,11 @@ public class JoinMultiEdgeEmbeddings<SE extends SubgraphEmbeddings>
 
     Collection<Embedding> cachedEmbeddings = Lists.newArrayList();
 
-    Set<Intersection> oddIntersections = Sets.newHashSet();
-    Map<String, Collection<Embedding>> oddSE =
-      Maps.newHashMap();
+    Set<Union> oddUnions = Sets.newHashSet();
+    Map<String, Collection<Embedding>> oddEmbeddings = Maps.newHashMap();
 
-    Set<Intersection> evenIntersections = Sets.newHashSet();
-    Map<String, Collection<Embedding>> evenSE =
-      Maps.newHashMap();
+    Set<Union> evenUnions = Sets.newHashSet();
+    Map<String, Collection<Embedding>> evenEmbeddings = Maps.newHashMap();
 
     SE reuseTuple = null;
     boolean skipEvenEmbeddings = false;
@@ -86,19 +85,18 @@ public class JoinMultiEdgeEmbeddings<SE extends SubgraphEmbeddings>
 
             Set<Integer> leftEdgeIds = left.getEdgeIds();
             Set<Integer> rightEdgeIds = right.getEdgeIds();
-            Intersection intersection =
-              new Intersection(leftEdgeIds, rightEdgeIds);
+            Union union = new Union(leftEdgeIds, rightEdgeIds);
 
             int overlappingEdgeCount =
-              leftEdgeIds.size() + rightEdgeIds.size() - intersection.size();
+              leftEdgeIds.size() + rightEdgeIds.size() - union.size();
 
             if (overlappingEdgeCount == 0 && !skipEvenEmbeddings) {
               addEmbedding(
-                evenSE, left, right, evenIntersections, intersection);
+                evenEmbeddings, left, right, evenUnions, union);
 
             } else if (overlappingEdgeCount == 1) {
               addEmbedding(
-                oddSE, left, right, oddIntersections, intersection);
+                oddEmbeddings, left, right, oddUnions, union);
             }
           }
         }
@@ -106,11 +104,11 @@ public class JoinMultiEdgeEmbeddings<SE extends SubgraphEmbeddings>
       }
     }
 
-    collect(reuseTuple, out, oddSE);
+    collect(reuseTuple, out, oddEmbeddings);
 
     reuseTuple.setSize(reuseTuple.getSize() + 1);
 
-    collect(reuseTuple, out, evenSE);
+    collect(reuseTuple, out, evenEmbeddings);
   }
 
   /**
@@ -120,17 +118,17 @@ public class JoinMultiEdgeEmbeddings<SE extends SubgraphEmbeddings>
    * @param subgraphEmbeddings output storage
    * @param left first embedding
    * @param right second embedding
-   * @param intersections discovered embeddings' intersections
-   * @param intersection current embedding's intersection
+   * @param unions discovered embeddings' intersections
+   * @param union current embedding's intersection
    */
   private void addEmbedding(
     Map<String, Collection<Embedding>> subgraphEmbeddings,
     Embedding left, Embedding right,
-    Set<Intersection> intersections, Intersection intersection) {
+    Set<Union> unions, Union union) {
 
-    if (!intersections.contains(intersection)) {
+    if (!unions.contains(union)) {
 
-      intersections.add(intersection);
+      unions.add(union);
       Embedding embedding = left.combine(right);
 
       String subgraph = canonicalLabeler.label(embedding);

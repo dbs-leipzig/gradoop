@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.algorithms.fsm.common.functions;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.common.canonicalization.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
@@ -32,8 +31,7 @@ import java.util.Map;
  *
  * @param <SE> subgraph type
  */
-abstract class JoinEmbeddings<SE extends SubgraphEmbeddings>
-  implements GroupReduceFunction<SE, SE> {
+public abstract class JoinEmbeddings<SE extends SubgraphEmbeddings> {
 
   /**
    * Labeler used to generate canonical labels.
@@ -50,7 +48,7 @@ abstract class JoinEmbeddings<SE extends SubgraphEmbeddings>
    *
    * @param fsmConfig FSM configuration.
    */
-  JoinEmbeddings(FSMConfig fsmConfig) {
+  protected JoinEmbeddings(FSMConfig fsmConfig) {
     this.canonicalLabeler = fsmConfig.getCanonicalLabeler();
     this.fsmConfig = fsmConfig;
   }
