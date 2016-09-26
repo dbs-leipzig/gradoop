@@ -23,6 +23,7 @@ import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -31,7 +32,8 @@ import java.util.Map;
  *
  * @param <SE> subgraph type
  */
-public abstract class JoinEmbeddings<SE extends SubgraphEmbeddings> {
+public abstract class JoinEmbeddings<SE extends SubgraphEmbeddings>
+  implements Serializable {
 
   /**
    * Labeler used to generate canonical labels.
