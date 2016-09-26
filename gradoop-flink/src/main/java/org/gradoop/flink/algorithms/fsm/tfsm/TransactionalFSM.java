@@ -39,6 +39,7 @@ import org.gradoop.flink.algorithms.fsm.common.functions
   .WithoutInfrequentEdgeLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions
   .WithoutInfrequentVertexLabels;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.GraphId;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.MergeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.PatternGrowth;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSingleEdgeEmbeddings;
@@ -134,8 +135,7 @@ public class TransactionalFSM extends TransactionalFSMBase {
     DataSet<TFSMSubgraphEmbeddings> embeddings = fsmGraphs
       .flatMap(new TFSMSingleEdgeEmbeddings(fsmConfig));
 
-    if (fsmConfig.getImplementation() ==
-      TFSMImplementation.QUADRATIC_UNROLLING) {
+    if (fsmConfig.getImplementation() == TFSMImplementation.LOOP_UNROLLING) {
       allFrequentSubgraphs = executeLoopUnrolling(fsmGraphs, embeddings);
     } else {
       allFrequentSubgraphs = executeQuadraticLoopUnrolling(embeddings);
@@ -163,7 +163,7 @@ public class TransactionalFSM extends TransactionalFSMBase {
 
         embeddings = embeddings
           .join(fsmGraphs)
-          .where(0).equalTo(0)
+          .where(0).equalTo(new GraphId())
           .with(new PatternGrowth(fsmConfig));
 
         frequentSubgraphs = getFrequentSubgraphs(embeddings);

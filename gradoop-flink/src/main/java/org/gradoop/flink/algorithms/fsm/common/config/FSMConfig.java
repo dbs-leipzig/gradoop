@@ -76,6 +76,7 @@ public class FSMConfig implements Serializable {
     this.canonicalLabeler =  new CAMLabeler(directed);
     this.preprocessing = true;
     this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
+    this.implementation = TFSMImplementation.LOOP_UNROLLING;
   }
 
   public float getMinSupport() {
