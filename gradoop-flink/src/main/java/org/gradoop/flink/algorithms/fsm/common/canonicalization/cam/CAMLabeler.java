@@ -16,12 +16,13 @@
  */
 
 
-package org.gradoop.flink.algorithms.fsm.common.canonicalization;
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.cam;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
 

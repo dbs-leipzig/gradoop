@@ -1,28 +1,26 @@
-package org.gradoop.flink.algorithms.fsm.common.canonicalization.pojos;
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.VertexRole;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class DFSEmbedding {
+public class Mapping {
   private final Map<Integer, Integer> vertexTimes;
   private final List<Integer> rightmostPath;
   private final Collection<Integer> edgeCoverage;
 
-  public DFSEmbedding(Integer startVertex) {
+  public Mapping(Integer startVertex) {
     this.vertexTimes = Maps.newHashMap();
     this.vertexTimes.put(startVertex, 0);
     this.rightmostPath = Lists.newArrayList(startVertex);
     this.edgeCoverage = Sets.newHashSet();
   }
 
-  private DFSEmbedding(Map<Integer, Integer> vertexTimes,
+  private Mapping(Map<Integer, Integer> vertexTimes,
     List<Integer> rightmostPath, Collection<Integer> edgeCoverage) {
 
     this.vertexTimes = vertexTimes;
@@ -45,16 +43,12 @@ public class DFSEmbedding {
   public int getRole(int vertexId) {
     int role;
 
-    if (vertexTimes.containsKey(vertexId)) {
+    if (vertexId == getRightmostVertexId()) {
+      role = VertexRole.IS_RIGHTMOST;
+    } else if (rightmostPath.contains(vertexId)) {
+      role = VertexRole.ON_RIGHTMOST_PATH;
+    } else if (vertexTimes.containsKey(vertexId)) {
       role = VertexRole.CONTAINED;
-
-      if (rightmostPath.contains(vertexId)) {
-        role = VertexRole.ON_RIGHTMOST_PATH;
-
-        if (vertexId == getRightmostVertexId()) {
-          role = VertexRole.IS_RIGHTMOST;
-        }
-      }
     } else {
       role = VertexRole.NOT_CONTAINED;
     }
@@ -66,47 +60,53 @@ public class DFSEmbedding {
     return vertexTimes;
   }
 
-  public DFSEmbedding growBackwards(int toTime, Integer edgeId) {
+  public Mapping growBackwards(Integer edgeId, int toId) {
+    // keep vertex mapping
     Map<Integer, Integer> childVertexTimes = Maps.newHashMap(vertexTimes);
 
+    // keep rightmost path until backtrace vertex and add rightmost
     List<Integer> childRightmostPath = Lists.newArrayList();
-
-    int time = 0;
-    Iterator<Integer> timeIterator = childRightmostPath.iterator();
-
-    while (time <= toTime) {
-      childRightmostPath.add(timeIterator.next());
-      time++;
+    for (int vertexId : rightmostPath) {
+      childRightmostPath.add(vertexId);
+      if (vertexId == toId) {
+        break;
+      }
     }
-
     childRightmostPath.add(getRightmostVertexId());
 
+    // add new edge to coverage
     Collection<Integer> childEdgeCoverage = Sets.newHashSet(edgeCoverage);
     childEdgeCoverage.add(edgeId);
 
-    return new DFSEmbedding(
+    return new Mapping(
       childVertexTimes, childRightmostPath, childEdgeCoverage);
   }
 
-  public DFSEmbedding growForwards(int fromTime, int edgeId, int toId) {
+  public Mapping growForwards(int fromId, int edgeId, int toId) {
+    // add new vertex to vertex mapping
     Map<Integer, Integer> childVertexTimes = Maps.newHashMap(vertexTimes);
     childVertexTimes.put(toId, vertexTimes.size());
 
+    // keep rightmost path until start vertex and add new vertex
     List<Integer> childRightmostPath = Lists.newArrayList();
-
-    int time = 0;
-    Iterator<Integer> timeIterator = childRightmostPath.iterator();
-
-    while (time <= fromTime) {
-      childRightmostPath.add(timeIterator.next());
-      time++;
+    for (int vertexId : rightmostPath) {
+      childRightmostPath.add(vertexId);
+      if (vertexId == fromId) {
+        break;
+      }
     }
-
     childRightmostPath.add(toId);
 
+    // add new edge to coverage
     Collection<Integer> childEdgeCoverage = Sets.newHashSet(edgeCoverage);
     childEdgeCoverage.add(edgeId);
 
-    return new DFSEmbedding(
-      childVertexTimes, childRightmostPath, childEdgeCoverage);  }
+    return new Mapping(
+      childVertexTimes, childRightmostPath, childEdgeCoverage);
+  }
+
+  @Override
+  public String toString() {
+    return vertexTimes + "\n" + rightmostPath + "\n" + edgeCoverage + "\n";
+  }
 }

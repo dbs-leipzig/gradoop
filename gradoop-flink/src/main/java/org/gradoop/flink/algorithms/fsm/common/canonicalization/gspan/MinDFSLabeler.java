@@ -1,23 +1,32 @@
-package org.gradoop.flink.algorithms.fsm.common.canonicalization;
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.pojos.DFSEmbedding;
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.pojos.DFSExtension;
+import org.apache.commons.lang.StringUtils;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
+
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class MinDFSLabeler implements CanonicalLabeler {
+
+  private static final char STEP_SEPARATOR = ',';
+  private final boolean directed;
+
+  public MinDFSLabeler(boolean directed) {
+    this.directed = directed;
+  }
 
   @Override
   public String label(Embedding graph) {
 
     String minVertexLabel = null;
 
-    Collection<DFSEmbedding> parents = Lists.newArrayListWithCapacity(0);
+    Collection<Mapping> parents = Lists.newArrayListWithCapacity(0);
 
     for (Map.Entry<Integer, String> vertexEntry :
       graph.getVertices().entrySet()) {
@@ -28,19 +37,22 @@ public class MinDFSLabeler implements CanonicalLabeler {
 
       if (minLabelComparison < 0) {
         minVertexLabel = vertexLabel;
-        parents = Sets.newHashSet(new DFSEmbedding(vertexEntry.getKey()));
+        parents = Sets.newHashSet(new Mapping(vertexEntry.getKey()));
       } else if (minLabelComparison == 0) {
-        parents.add(new DFSEmbedding(vertexEntry.getKey()));
+        parents.add(new Mapping(vertexEntry.getKey()));
       }
     }
 
-    StringBuilder stringBuilder = new StringBuilder();
-    DFSExtension minExtension = null;
+    List<String> stepStrings =
+      Lists.newArrayListWithCapacity(graph.getEdges().size());
+
 
     for (int k = 1; k <= graph.getEdges().size(); k++) {
-      Collection<DFSEmbedding> children = Lists.newArrayList();
+      Collection<Mapping> children = Lists.newArrayList();
 
-      for (DFSEmbedding parent : parents) {
+      Extension minExtension = null;
+
+      for (Mapping parent : parents) {
         for (Map.Entry<Integer, FSMEdge> edgeEntry :
           graph.getEdges().entrySet()) {
 
@@ -59,14 +71,14 @@ public class MinDFSLabeler implements CanonicalLabeler {
                 int fromTime = parent.getVertexTimes().get(sourceId);
                 String fromLabel = graph.getVertices().get(sourceId);
 
-                DFSExtension extension = new DFSExtension(
-                  fromTime, fromLabel, true, edgeLabel, fromTime, fromLabel);
+                Extension extension = new Extension(fromTime, fromLabel,
+                  true, edgeLabel, fromTime, fromLabel, directed);
 
                 int minComparison = minExtension == null ? -1 :
                   extension.compareTo(minExtension);
 
                 if (minComparison <= 0) {
-                  DFSEmbedding child = parent.growBackwards(fromTime, edgeId);
+                  Mapping child = parent.growBackwards(edgeId, sourceId);
 
                   if (minComparison < 0) {
                     minExtension = extension;
@@ -85,21 +97,21 @@ public class MinDFSLabeler implements CanonicalLabeler {
 
                 // backward from source
                 if (sourceRole == VertexRole.IS_RIGHTMOST &&
-                  targetRole == VertexRole.CONTAINED) {
+                  targetRole >= VertexRole.CONTAINED) {
 
                   int fromTime = parent.getVertexTimes().get(sourceId);
                   String fromLabel = graph.getVertices().get(sourceId);
                   int toTime = parent.getVertexTimes().get(targetId);
                   String toLabel = graph.getVertices().get(targetId);
 
-                  DFSExtension extension = new DFSExtension(
-                    fromTime, fromLabel, true, edgeLabel, toTime, toLabel);
+                  Extension extension = new Extension(fromTime, fromLabel,
+                    true, edgeLabel, toTime, toLabel, directed);
 
                   int minComparison = minExtension == null ? -1 :
                     extension.compareTo(minExtension);
 
                   if (minComparison <= 0) {
-                    DFSEmbedding child = parent.growBackwards(toTime, edgeId);
+                    Mapping child = parent.growBackwards(edgeId, targetId);
 
                     if (minComparison < 0) {
                       minExtension = extension;
@@ -113,20 +125,20 @@ public class MinDFSLabeler implements CanonicalLabeler {
                 } else if (targetRole == VertexRole.NOT_CONTAINED) {
 
                   int fromTime = parent.getVertexTimes().get(sourceId);
-                  int toTime = parent.getVertexTimes().size() + 1;
+                  int toTime = parent.getVertexTimes().size();
 
                   String fromLabel = graph.getVertices().get(sourceId);
                   String toLabel = graph.getVertices().get(targetId);
 
-                  DFSExtension extension = new DFSExtension(
-                    fromTime, fromLabel, true, edgeLabel, toTime, toLabel);
+                  Extension extension = new Extension(fromTime, fromLabel,
+                    true, edgeLabel, toTime, toLabel, directed);
 
                   int minComparison = minExtension == null ? -1 :
                     extension.compareTo(minExtension);
 
                   if (minComparison <= 0) {
-                    DFSEmbedding child =
-                      parent.growForwards(fromTime, edgeId, targetId);
+                    Mapping child =
+                      parent.growForwards(sourceId, edgeId, targetId);
 
                     if (minComparison < 0) {
                       minExtension = extension;
@@ -142,22 +154,23 @@ public class MinDFSLabeler implements CanonicalLabeler {
 
                 // backward from target
                 if (targetRole == VertexRole.IS_RIGHTMOST &&
-                  sourceRole == VertexRole.CONTAINED) {
+                  sourceRole >= VertexRole.CONTAINED) {
 
                   int fromTime = parent.getVertexTimes().get(targetId);
                   int toTime = parent.getVertexTimes().get(sourceId);
 
+
                   String fromLabel = graph.getVertices().get(targetId);
                   String toLabel = graph.getVertices().get(sourceId);
 
-                  DFSExtension extension = new DFSExtension(
-                    fromTime, fromLabel, false, edgeLabel, toTime, toLabel);
+                  Extension extension = new Extension(fromTime, fromLabel,
+                    false, edgeLabel, toTime, toLabel, directed);
 
                   int minComparison = minExtension == null ? -1 :
                     extension.compareTo(minExtension);
 
                   if (minComparison <= 0) {
-                    DFSEmbedding child = parent.growBackwards(toTime, edgeId);
+                    Mapping child = parent.growBackwards(edgeId, sourceId);
 
                     if (minComparison < 0) {
                       minExtension = extension;
@@ -171,20 +184,20 @@ public class MinDFSLabeler implements CanonicalLabeler {
                 } else if (sourceRole == VertexRole.NOT_CONTAINED) {
 
                   int fromTime = parent.getVertexTimes().get(targetId);
-                  int toTime = parent.getVertexTimes().size() + 1;
+                  int toTime = parent.getVertexTimes().size();
 
                   String fromLabel = graph.getVertices().get(targetId);
                   String toLabel = graph.getVertices().get(sourceId);
 
-                  DFSExtension extension = new DFSExtension(
-                    fromTime, fromLabel, false, edgeLabel, toTime, toLabel);
+                  Extension extension = new Extension(fromTime, fromLabel,
+                    false, edgeLabel, toTime, toLabel, directed);
 
                   int minComparison = minExtension == null ? -1 :
                     extension.compareTo(minExtension);
 
                   if (minComparison <= 0) {
-                    DFSEmbedding child =
-                      parent.growForwards(fromTime, edgeId, targetId);
+                    Mapping child =
+                      parent.growForwards(targetId, edgeId, sourceId);
 
                     if (minComparison < 0) {
                       minExtension = extension;
@@ -199,10 +212,11 @@ public class MinDFSLabeler implements CanonicalLabeler {
           }
         }
       }
-      stringBuilder.append(minExtension.toString());
+      stepStrings.add(minExtension.toString());
+      parents = children;
     }
 
-    return stringBuilder.toString();
+    return StringUtils.join(stepStrings, STEP_SEPARATOR);
   }
 
 }

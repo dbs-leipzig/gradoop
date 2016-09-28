@@ -19,7 +19,7 @@ package org.gradoop.flink.algorithms.fsm.common.functions;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.CanonicalLabeler;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;

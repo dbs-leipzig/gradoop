@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.common.canonicalization;
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan;
 
 public class VertexRole  {
   public static final int NOT_CONTAINED = 0;

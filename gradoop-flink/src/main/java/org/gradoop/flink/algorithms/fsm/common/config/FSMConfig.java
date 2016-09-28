@@ -17,8 +17,10 @@
 
 package org.gradoop.flink.algorithms.fsm.common.config;
 
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.CAMLabeler;
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.CanonicalLabeler;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
+
+
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan.MinDFSLabeler;
 
 import java.io.Serializable;
 
@@ -73,10 +75,10 @@ public class FSMConfig implements Serializable {
     this.directed = directed;
     this.maxEdgeCount = 16;
     this.minEdgeCount = 1;
-    this.canonicalLabeler =  new CAMLabeler(directed);
+    this.canonicalLabeler =  new MinDFSLabeler(directed);
     this.preprocessing = true;
     this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
-    this.implementation = TFSMImplementation.LOOP_UNROLLING;
+    this.implementation = TFSMImplementation.QUADRATIC_UNROLLING;
   }
 
   public float getMinSupport() {

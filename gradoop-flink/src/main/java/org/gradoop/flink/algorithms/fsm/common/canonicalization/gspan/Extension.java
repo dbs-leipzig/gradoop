@@ -1,13 +1,11 @@
-package org.gradoop.flink.algorithms.fsm.common.canonicalization.pojos;
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
+public class Extension implements Comparable<Extension> {
 
-public class DFSExtension implements Comparable<DFSExtension> {
-
-  private static final char VERTEX_LABEL_SEPARATOR = ',';
+  private static final char VERTEX_LABEL_SEPARATOR = ':';
   private static final char OUTGOING_CHAR = '>';
   private static final char INCOMING_CHAR = '<';
-  private static final char EDGE_END_CHAR = '-';
+  private static final char EDGE_CHAR = '-';
 
   private final int fromTime;
   private final String fromLabel;
@@ -15,19 +13,21 @@ public class DFSExtension implements Comparable<DFSExtension> {
   private final String edgeLabel;
   private final int toTime;
   private final String toLabel;
+  private final boolean directed;
 
-  public DFSExtension(int fromTime, String fromLabel, boolean outgoing,
-    String edgeLabel, int toTime, String toLabel) {
+  public Extension(int fromTime, String fromLabel, boolean outgoing,
+    String edgeLabel, int toTime, String toLabel, boolean directed) {
     this.fromTime = fromTime;
     this.fromLabel = fromLabel;
     this.outgoing = outgoing;
     this.edgeLabel = edgeLabel;
     this.toTime = toTime;
     this.toLabel = toLabel;
+    this.directed = directed;
   }
 
   @Override
-  public int compareTo(DFSExtension that) {
+  public int compareTo(Extension that) {
 
     int comparison;
 
@@ -70,17 +70,25 @@ public class DFSExtension implements Comparable<DFSExtension> {
     return comparison;
   }
 
-  private int compareEdgeDirectionAndLabel(DFSExtension that) {
+  private int compareEdgeDirectionAndLabel(Extension that) {
     int comparison;
 
-    if (this.outgoing && ! that.outgoing) {
-      comparison = -1;
-    } else if (! this.outgoing && that.outgoing) {
-      comparison = 1;
-    } else {
+    if (!directed || this.outgoing == that.outgoing) {
       comparison = this.edgeLabel.compareTo(that.edgeLabel);
+    } else if (this.outgoing) {
+      comparison = -1;
+    } else {
+      comparison = 1;
     }
 
     return comparison;
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(fromTime) + VERTEX_LABEL_SEPARATOR + fromLabel +
+      (directed ? (outgoing ? OUTGOING_CHAR : INCOMING_CHAR) : EDGE_CHAR) +
+      edgeLabel + EDGE_CHAR +
+      toTime + VERTEX_LABEL_SEPARATOR + toLabel;
   }
 }

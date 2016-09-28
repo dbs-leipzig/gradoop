@@ -16,7 +16,7 @@
  */
 
 
-package org.gradoop.flink.algorithms.fsm.common.canonicalization;
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.api;
 
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 

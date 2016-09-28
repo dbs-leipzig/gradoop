@@ -18,7 +18,7 @@
 package org.gradoop.flink.algorithms.fsm.common.functions;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.CanonicalLabeler;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
