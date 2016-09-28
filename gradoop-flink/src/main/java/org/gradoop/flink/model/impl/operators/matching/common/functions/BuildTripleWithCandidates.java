@@ -19,13 +19,13 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.model.impl.operators.matching.common.matching
-  .EntityMatcher;
+import org.gradoop.flink.model.impl.operators.matching.common.matching.EntityMatcher;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
-
 import java.util.Collection;
+
+import static org.gradoop.common.util.GConstants.DEFAULT_EDGE_LABEL;
 
 /**
  * Converts an EPGM edge to a {@link TripleWithCandidates} tuple.
@@ -80,7 +80,8 @@ public class BuildTripleWithCandidates<E extends Edge>
     reuseTuple.setSourceId(e.getSourceId());
     reuseTuple.setTargetId(e.getTargetId());
     reuseTuple.setCandidates(
-      getCandidates(edgeCount, EntityMatcher.getMatches(e, queryEdges)));
+      getCandidates(edgeCount,
+        EntityMatcher.getMatches(e, queryEdges, DEFAULT_EDGE_LABEL)));
     return reuseTuple;
   }
 }

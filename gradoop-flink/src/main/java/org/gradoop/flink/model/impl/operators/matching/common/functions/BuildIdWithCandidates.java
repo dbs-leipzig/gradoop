@@ -19,13 +19,13 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.model.impl.operators.matching.common.matching
-  .EntityMatcher;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples
-  .IdWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.matching.EntityMatcher;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.Collection;
+
+import static org.gradoop.common.util.GConstants.DEFAULT_VERTEX_LABEL;
 
 /**
  * Converts an EPGM vertex to a {@link IdWithCandidates} tuple.
@@ -79,7 +79,7 @@ public class BuildIdWithCandidates<V extends Vertex>
   public IdWithCandidates map(V v) throws Exception {
     reuseTuple.setId(v.getId());
     reuseTuple.setCandidates(getCandidates(vertexCount,
-      EntityMatcher.getMatches(v, queryVertices)));
+      EntityMatcher.getMatches(v, queryVertices, DEFAULT_VERTEX_LABEL)));
     return reuseTuple;
   }
 }

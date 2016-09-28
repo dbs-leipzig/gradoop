@@ -24,6 +24,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.matching.EntityMat
 
 import java.util.Collection;
 
+import static org.gradoop.common.util.GConstants.DEFAULT_EDGE_LABEL;
+
 /**
  * Filter edges based on their occurrence in the given GDL pattern.
  *
@@ -59,6 +61,6 @@ public class MatchingEdges<E extends Edge> extends AbstractFilter<E> {
 
   @Override
   public boolean filter(E e) throws Exception {
-    return EntityMatcher.matchAll(e, queryEdges);
+    return EntityMatcher.matchAll(e, queryEdges, DEFAULT_EDGE_LABEL);
   }
 }

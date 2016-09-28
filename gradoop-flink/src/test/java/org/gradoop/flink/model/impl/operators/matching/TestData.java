@@ -43,6 +43,18 @@ public class TestData {
   public static final String TREE_PATTERN_0 =
     "(:B)-[:b]->(:C)<-[:a]-(:A)";
 
+  public static final String UNLABELED_PATTERN_0 =
+    "()";
+
+  public static final String UNLABELED_PATTERN_1 =
+    "()-->()";
+
+  public static final String UNLABELED_PATTERN_2 =
+    "()-[:b]->()";
+
+  public static final String UNLABELED_PATTERN_3 =
+    "(:A)-->(:B)";
+
   public static final String GRAPH_1 = DATA_GRAPH_VARIABLE +
     "[" +
     "(v0:B {id=0})" +

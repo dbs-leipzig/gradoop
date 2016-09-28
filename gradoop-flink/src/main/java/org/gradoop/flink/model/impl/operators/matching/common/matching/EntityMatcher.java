@@ -34,19 +34,21 @@ public class EntityMatcher {
   /**
    * Matches the given data graph element against all given query elements.
    *
-   * @param dbElement     data graph element (vertex/edge)
-   * @param queryElements query graph elements (vertices/edges)
    * @param <EL1>         EPGM element type
    * @param <EL2>         GDL element type
+   * @param dbElement     data graph element (vertex/edge)
+   * @param queryElements query graph elements (vertices/edges)
+   * @param defaultLabel  default element label
    * @return true, iff the data graph element matches at least one query element
    */
   public static <EL1 extends Element, EL2 extends GraphElement>
-  boolean matchAll(EL1 dbElement, Collection<EL2> queryElements) {
+  boolean matchAll(EL1 dbElement, Collection<EL2> queryElements,
+    String defaultLabel) {
 
     boolean match = false;
 
     for (GraphElement queryElement : queryElements) {
-      match = match(dbElement, queryElement);
+      match = match(dbElement, queryElement, defaultLabel);
       // no need to verify remaining elements
       if (match) {
         break;
@@ -62,14 +64,16 @@ public class EntityMatcher {
    * @param queryElements query graph elements (vertices/edges)
    * @param <EL1>         EPGM element type
    * @param <EL2>         GDL element type
+   * @param defaultLabel  default element label
    * @return all candidate ids for {@code dbElement}
    */
   public static <EL1 extends Element, EL2 extends GraphElement>
-  List<Long> getMatches(EL1 dbElement, Collection<EL2> queryElements) {
+  List<Long> getMatches(EL1 dbElement, Collection<EL2> queryElements,
+    String defaultLabel) {
     List<Long> matches = Lists.newArrayListWithCapacity(queryElements.size());
 
     for (GraphElement queryElement : queryElements) {
-      if (match(dbElement, queryElement)) {
+      if (match(dbElement, queryElement, defaultLabel)) {
         matches.add(queryElement.getId());
       }
     }
@@ -80,18 +84,20 @@ public class EntityMatcher {
   /**
    * Matches the given data graph element against the given query element.
    *
-   * @param dbElement     data graph element (vertex/edge)
-   * @param queryElement  query graph element (vertex/edge)
    * @param <EL1>         EPGM element type
    * @param <EL2>         GDL element type
+   * @param dbElement     data graph element (vertex/edge)
+   * @param queryElement  query graph element (vertex/edge)
+   * @param defaultLabel  default element label
    * @return true, iff the data graph element matches the query graph element
    */
   public static <EL1 extends Element, EL2 extends GraphElement>
-  boolean match(EL1 dbElement, EL2 queryElement) {
+  boolean match(EL1 dbElement, EL2 queryElement, String defaultLabel) {
 
     boolean match  = false;
     // verify label
-    if (queryElement.getLabel().equals(dbElement.getLabel())) {
+    if (queryElement.getLabel().equals(dbElement.getLabel()) ||
+      queryElement.getLabel().equals(defaultLabel)) {
       match = true;
     }
     // verify properties
